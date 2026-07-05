@@ -1,0 +1,39 @@
+import { createClient } from "@/lib/supabase/server";
+import { NextResponse } from "next/server";
+
+export async function requireUser() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  if (error || !user) {
+    return { supabase, user: null, response: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
+  }
+
+  return { supabase, user, response: null };
+}
+
+export async function parseJsonBody<T>(request: Request): Promise<T | NextResponse> {
+  try {
+    return (await request.json()) as T;
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+}
+
+export function safeRedirectPath(path: string | null | undefined, fallback = "/dashboard"): string {
+  if (!path || !path.startsWith("/") || path.startsWith("//")) {
+    return fallback;
+  }
+  return path;
+}
+
+export function paginationParams(searchParams: URLSearchParams) {
+  const page = Math.max(1, Number(searchParams.get("page") ?? 1) || 1);
+  const limit = Math.min(50, Math.max(1, Number(searchParams.get("limit") ?? 10) || 10));
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+  return { page, limit, from, to };
+}

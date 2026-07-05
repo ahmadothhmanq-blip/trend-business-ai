@@ -1,36 +1,99 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Trend Business AI
+
+A modern SaaS platform for AI-powered business intelligence — generate startup ideas, analyze markets, and create strategic reports.
+
+## Tech Stack
+
+- **Next.js 16** — App Router, Server Components, Server Actions
+- **TypeScript** — Full type safety
+- **Tailwind CSS 4** — Utility-first styling with dark mode
+- **Supabase** — Authentication and database
+- **shadcn/ui** — Accessible UI components
+
+## Features
+
+- Modern landing page with features and pricing
+- Supabase authentication (sign up, sign in, sign out)
+- Protected dashboard with sidebar navigation
+- Business ideas generator (AI-powered)
+- Market analysis tool
+- AI reports generator with download
+- User profile management
+- Responsive design
+- Dark / light mode toggle
 
 ## Getting Started
 
-First, run the development server:
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Configure Supabase
+
+Create a project at [supabase.com](https://supabase.com), then copy your credentials:
+
+```bash
+cp .env.example .env.local
+```
+
+Update `.env.local`:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
+
+Run the SQL schema in the Supabase SQL Editor (optional, for profile storage):
+
+```
+supabase/schema.sql
+```
+
+### 3. Run the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+app/
+├── (auth)/           # Login & signup pages
+├── (dashboard)/      # Protected dashboard routes
+├── api/              # API routes for AI features
+├── auth/callback/    # Supabase OAuth callback
+components/
+├── auth/             # Auth forms
+├── dashboard/        # Dashboard UI components
+├── hero/             # Landing page hero
+├── landing/          # Features & pricing sections
+├── theme/            # Dark mode provider
+└── ui/               # shadcn UI primitives
+lib/
+├── actions/          # Server actions
+├── ai/               # AI generation logic
+├── constants/        # Navigation & config
+└── supabase/         # Supabase clients
+```
 
-## Learn More
+## Routes
 
-To learn more about Next.js, take a look at the following resources:
+| Route | Description |
+|-------|-------------|
+| `/` | Landing page |
+| `/login` | Sign in |
+| `/signup` | Create account |
+| `/dashboard` | Overview |
+| `/dashboard/ideas` | Business ideas generator |
+| `/dashboard/market-analysis` | Market analysis |
+| `/dashboard/reports` | AI reports |
+| `/dashboard/profile` | User profile |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
