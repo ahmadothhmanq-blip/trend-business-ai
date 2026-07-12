@@ -9,6 +9,7 @@ export const metadata: Metadata = createPageMetadata({
   description:
     "Create your Trend Business AI account and start building with AI-powered business tools.",
   path: "/signup",
+  noIndex: true,
 });
 
 export default function SignUpPage() {

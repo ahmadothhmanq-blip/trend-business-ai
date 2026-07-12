@@ -12,6 +12,7 @@ import {
   LineChart,
   Loader2,
   Search,
+  Sparkles,
   Trash2,
   type LucideIcon,
 } from "lucide-react";
@@ -35,6 +36,7 @@ import {
   dashboardInputClass,
 } from "@/components/dashboard/ui/dashboard-styles";
 import type { HistoryItem, HistoryItemType } from "@/types/database";
+import { getHistoryItemEndpoint } from "@/lib/workspace/history";
 import { cn } from "@/lib/utils";
 
 type HistoryListProps = {
@@ -67,6 +69,11 @@ const TYPE_META: Record<
     label: "Website Blueprint",
     icon: Globe,
     endpoint: "/api/website-builder",
+  },
+  workspace: {
+    label: "AI Workspace",
+    icon: Sparkles,
+    endpoint: "/api/workspaces/brand",
   },
 };
 
@@ -114,7 +121,7 @@ export function HistoryList({ initialItems }: HistoryListProps) {
         acc[item.type] += 1;
         return acc;
       },
-      { all: 0, idea: 0, analysis: 0, report: 0, website: 0 },
+      { all: 0, idea: 0, analysis: 0, report: 0, website: 0, workspace: 0 },
     );
   }, [items]);
 
@@ -123,12 +130,13 @@ export function HistoryList({ initialItems }: HistoryListProps) {
   async function confirmDelete() {
     if (!deleteTarget) return;
 
-    const meta = TYPE_META[deleteTarget.type];
     setDeletingId(deleteTarget.id);
     setDeleteError(null);
 
+    const endpoint = getHistoryItemEndpoint(deleteTarget);
+
     try {
-      const res = await fetch(`${meta.endpoint}/${deleteTarget.id}`, {
+      const res = await fetch(`${endpoint}/${deleteTarget.id}`, {
         method: "DELETE",
       });
       const data = await res.json();
@@ -181,7 +189,7 @@ export function HistoryList({ initialItems }: HistoryListProps) {
               </p>
             </div>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:min-w-[420px]">
-              {(["idea", "analysis", "report", "website"] as const).map((type) => {
+              {(["idea", "analysis", "report", "website", "workspace"] as const).map((type) => {
                 const meta = TYPE_META[type];
                 return (
                   <div

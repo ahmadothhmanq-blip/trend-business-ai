@@ -2,7 +2,12 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { NextResponse } from "next/server";
 
-export type AiRateLimitResource = "ideas" | "market-analysis" | "reports" | "website-builder";
+export type AiRateLimitResource =
+  | "ideas"
+  | "market-analysis"
+  | "reports"
+  | "website-builder"
+  | "workspace";
 
 const AI_RATE_LIMITS: Record<
   AiRateLimitResource,
@@ -12,6 +17,7 @@ const AI_RATE_LIMITS: Record<
   "market-analysis": { requests: 10, window: "1 m" },
   reports: { requests: 10, window: "1 m" },
   "website-builder": { requests: 10, window: "1 m" },
+  workspace: { requests: 10, window: "1 m" },
 };
 
 function isUpstashConfigured(): boolean {

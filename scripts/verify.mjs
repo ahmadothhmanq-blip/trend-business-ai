@@ -31,6 +31,7 @@ const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 const openAiKey = process.env.OPENAI_API_KEY;
+const deepseekKey = process.env.DEEPSEEK_API_KEY;
 const upstashUrl = process.env.UPSTASH_REDIS_REST_URL;
 const upstashToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
@@ -42,6 +43,7 @@ const TABLES = [
   "favorites",
   "user_preferences",
   "website_generations",
+  "workspace_generations",
 ];
 
 const EXPECTED_RLS_POLICIES = {
@@ -52,6 +54,7 @@ const EXPECTED_RLS_POLICIES = {
   favorites: ["select", "insert", "delete"],
   user_preferences: ["select", "insert", "update"],
   website_generations: ["select", "insert", "update", "delete"],
+  workspace_generations: ["select", "insert", "update", "delete"],
 };
 
 const API_ROUTES = [
@@ -61,20 +64,53 @@ const API_ROUTES = [
   { path: "/api/profile", methods: ["GET", "POST"] },
   { path: "/api/preferences", methods: ["GET", "PUT"] },
   { path: "/api/website-builder", methods: ["GET", "POST"] },
+  { path: "/api/workspaces/[type]", methods: ["GET", "POST"] },
 ];
 
 const DASHBOARD_PAGES = [
   "/dashboard",
+  "/dashboard/projects",
   "/dashboard/ideas",
   "/dashboard/market-analysis",
   "/dashboard/reports",
   "/dashboard/profile",
   "/dashboard/website-builder",
+  "/dashboard/website-builder/settings",
   "/dashboard/history",
   "/dashboard/favorites",
+  "/dashboard/admin",
+  "/dashboard/analytics",
+  "/dashboard/api-keys",
+  "/dashboard/billing",
+  "/dashboard/brand-designer",
+  "/dashboard/business-audit",
+  "/dashboard/business-intelligence",
+  "/dashboard/business-manager",
+  "/dashboard/content-studio",
+  "/dashboard/creative-studio",
+  "/dashboard/marketing",
+  "/dashboard/notifications",
+  "/dashboard/search",
+  "/dashboard/settings",
+  "/dashboard/social-media",
+  "/dashboard/subscription",
+  "/dashboard/team",
+  "/dashboard/usage",
 ];
 
 const AUTH_PAGES = ["/login", "/signup", "/forgot-password", "/reset-password"];
+const PUBLIC_PAGES = [
+  "/",
+  "/features",
+  "/pricing",
+  "/docs",
+  "/contact",
+  "/faq",
+  "/changelog",
+  "/blog",
+  "/privacy",
+  "/terms",
+];
 
 const results = [];
 let failed = false;
@@ -87,7 +123,7 @@ function pass(label, detail) {
 function fail(label, detail) {
   failed = true;
   results.push({ ok: false, label, detail });
-  console.error(`  ✗ ${label}${detail ? `: ${detail}` : ""}`);
+  console.log(`  ✗ ${label}${detail ? `: ${detail}` : ""}`);
 }
 
 async function verifySupabase() {
@@ -103,7 +139,10 @@ async function verifySupabase() {
   }
   pass("NEXT_PUBLIC_SUPABASE_ANON_KEY", "set");
   if (!siteUrl) {
-    fail("NEXT_PUBLIC_SITE_URL", "missing");
+    const fallback = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL.replace(/\/+$/, "")}`
+      : "http://localhost:3000";
+    pass("NEXT_PUBLIC_SITE_URL", `missing — using fallback ${fallback}`);
   } else if (!/^https?:\/\/[^/]+/.test(siteUrl)) {
     fail("NEXT_PUBLIC_SITE_URL", "must be an absolute URL");
   } else {
@@ -113,6 +152,11 @@ async function verifySupabase() {
     fail("OPENAI_API_KEY", "missing — live AI generation disabled");
   } else {
     pass("OPENAI_API_KEY", "set");
+  }
+  if (!deepseekKey) {
+    fail("DEEPSEEK_API_KEY", "missing — Website/App Builder generation disabled");
+  } else {
+    pass("DEEPSEEK_API_KEY", "set");
   }
   if (!upstashUrl || !upstashToken) {
     pass(
@@ -221,6 +265,7 @@ function verifyMigrationFiles() {
     "007_storage_avatars.sql",
     "008_website_generations.sql",
     "009_website_favorites.sql",
+    "010_workspace_generations.sql",
   ];
   migrations.forEach((file, i) => {
     const path = join(root, "supabase", "migrations", file);
@@ -250,6 +295,11 @@ function verifyRouteFiles() {
     "app/api/preferences/route.ts",
     "app/api/website-builder/route.ts",
     "app/api/website-builder/[id]/route.ts",
+    "app/api/website-builder/preview/route.ts",
+    "app/api/website-builder/preview/[id]/route.ts",
+    "app/api/website-builder/preview/[id]/asset/[...path]/route.ts",
+    "app/api/workspaces/[type]/route.ts",
+    "app/api/workspaces/[type]/[id]/route.ts",
     "app/auth/callback/route.ts",
   ];
   for (const file of apiFiles) {
@@ -262,18 +312,9 @@ function verifyRouteFiles() {
 
   console.log("\n[10] Dashboard & auth pages");
   const pages = [
-    "app/(dashboard)/dashboard/page.tsx",
-    "app/(dashboard)/dashboard/ideas/page.tsx",
-    "app/(dashboard)/dashboard/market-analysis/page.tsx",
-    "app/(dashboard)/dashboard/reports/page.tsx",
-    "app/(dashboard)/dashboard/profile/page.tsx",
-    "app/(dashboard)/dashboard/website-builder/page.tsx",
-    "app/(dashboard)/dashboard/history/page.tsx",
-    "app/(dashboard)/dashboard/favorites/page.tsx",
-    "app/(auth)/login/page.tsx",
-    "app/(auth)/signup/page.tsx",
-    "app/(auth)/forgot-password/page.tsx",
-    "app/(auth)/reset-password/page.tsx",
+    ...PUBLIC_PAGES.map((path) => `app${path === "/" ? "" : path}/page.tsx`),
+    ...DASHBOARD_PAGES.map((path) => `app/(dashboard)${path}/page.tsx`),
+    ...AUTH_PAGES.map((path) => `app/(auth)${path}/page.tsx`),
   ];
   for (const file of pages) {
     if (existsSync(join(root, file))) {
@@ -319,7 +360,7 @@ async function verifyLiveServer(baseUrl) {
   }
 
   console.log("\n[12] Live pages (expect 200 or redirect to login)");
-  const publicPages = ["/", ...AUTH_PAGES];
+  const publicPages = [...PUBLIC_PAGES, ...AUTH_PAGES];
   for (const path of publicPages) {
     try {
       const res = await fetchOnce(baseUrl, path);

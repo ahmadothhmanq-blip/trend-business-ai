@@ -21,9 +21,13 @@ export const DEFAULT_KEYWORDS = [
 /** Public routes included in the sitemap. */
 export const PUBLIC_ROUTES = [
   { path: "/", changeFrequency: "weekly" as const, priority: 1 },
-  { path: "/signup", changeFrequency: "monthly" as const, priority: 0.8 },
-  { path: "/login", changeFrequency: "monthly" as const, priority: 0.6 },
-  { path: "/forgot-password", changeFrequency: "yearly" as const, priority: 0.3 },
+  { path: "/features", changeFrequency: "weekly" as const, priority: 0.9 },
+  { path: "/pricing", changeFrequency: "weekly" as const, priority: 0.9 },
+  { path: "/docs", changeFrequency: "weekly" as const, priority: 0.8 },
+  { path: "/contact", changeFrequency: "monthly" as const, priority: 0.7 },
+  { path: "/faq", changeFrequency: "monthly" as const, priority: 0.7 },
+  { path: "/changelog", changeFrequency: "weekly" as const, priority: 0.6 },
+  { path: "/blog", changeFrequency: "weekly" as const, priority: 0.5 },
   { path: "/privacy", changeFrequency: "yearly" as const, priority: 0.2 },
   { path: "/terms", changeFrequency: "yearly" as const, priority: 0.2 },
 ] as const;

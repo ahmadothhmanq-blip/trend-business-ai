@@ -38,12 +38,12 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <a
-            href="#hero"
+            href="#main-content"
             className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-premium-gold focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-luxury-black"
           >
             Skip to content
           </a>
-          {children}
+          <div id="main-content">{children}</div>
           <AppToaster />
         </ThemeProvider>
       </body>

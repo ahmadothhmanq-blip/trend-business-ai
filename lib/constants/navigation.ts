@@ -1,9 +1,9 @@
 export const NAV_LINKS = [
-  { label: "Services", href: "#services" },
-  { label: "How It Works", href: "#workflow" },
-  { label: "Pricing", href: "#pricing" },
-  { label: "Trust", href: "#trust" },
-  { label: "Contact", href: "#contact" },
+  { label: "Features", href: "/features" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "Docs", href: "/docs" },
+  { label: "FAQ", href: "/faq" },
+  { label: "Contact", href: "/contact" },
 ] as const;
 
 export const TRUST_BADGES = [

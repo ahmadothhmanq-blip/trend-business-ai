@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { databaseErrorResponse } from "@/lib/api/errors";
 import { preferencesSchema } from "@/lib/validations/auth";
 import { NextResponse } from "next/server";
 
@@ -13,7 +14,7 @@ export async function GET() {
     .single();
 
   if (error && error.code !== "PGRST116") {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return databaseErrorResponse("preferences.get", error);
   }
 
   return NextResponse.json({
@@ -45,7 +46,7 @@ export async function PUT(request: Request) {
   });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return databaseErrorResponse("preferences.update", error);
   }
 
   return NextResponse.json({ message: "Preferences saved." });

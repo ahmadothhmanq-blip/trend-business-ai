@@ -1,4 +1,8 @@
 import { createOpenAIClient, withOpenAIRetry } from "@/lib/ai/openai-client";
+import {
+  marketAnalysisSystemPrompt,
+  marketAnalysisUserPrompt,
+} from "@/lib/ai/prompts/legacy-services";
 
 export type MarketAnalysisInput = {
   industry: string;
@@ -62,15 +66,11 @@ async function generateWithOpenAI(
     messages: [
       {
         role: "system",
-        content: `You are a market research analyst. Return JSON with this exact shape:
-{"industry":"string","region":"string","market_size":"string","growth_rate":"string","competitors":["string"],"opportunities":["string"],"risks":["string"],"summary":"string"}
-Provide 4 items each for competitors, opportunities, and risks. Summary should be 3-4 sentences.`,
+        content: marketAnalysisSystemPrompt,
       },
       {
         role: "user",
-        content: `Industry: ${input.industry}
-Region: ${input.region}
-Target audience: ${input.targetAudience}`,
+        content: marketAnalysisUserPrompt(input),
       },
     ],
       temperature: 0.7,

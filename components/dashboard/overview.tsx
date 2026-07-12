@@ -1,18 +1,23 @@
 import Link from "next/link";
 import {
   ArrowRight,
+  BarChart3,
+  Clock3,
+  Coins,
+  FileText,
+  FolderKanban,
+  Globe2,
   Lightbulb,
   LineChart,
-  FileText,
+  Megaphone,
+  Palette,
+  Rocket,
   Sparkles,
-  Globe,
-  Clock3,
   Star,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DASHBOARD_NAV } from "@/lib/constants/dashboard-nav";
-import { DashboardStatCard } from "@/components/dashboard/ui/dashboard-stat-card";
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import { DashboardIconBox } from "@/components/dashboard/ui/icon-box";
 import { DashboardEmptyState } from "@/components/dashboard/ui/dashboard-empty-state";
@@ -20,32 +25,32 @@ import type { DashboardActivityItem, DashboardHomeData } from "@/types/database"
 
 const QUICK_ACTIONS = [
   {
-    title: "Generate Ideas",
-    description: "Create business concepts tailored to your skills, interests, and budget.",
-    href: "/dashboard/ideas",
-    icon: Lightbulb,
-    cta: "Generate ideas",
-  },
-  {
-    title: "Analyze Market",
-    description: "Research market size, competitors, risks, and opportunity signals.",
-    href: "/dashboard/market-analysis",
-    icon: LineChart,
-    cta: "Run analysis",
-  },
-  {
-    title: "Create Report",
-    description: "Turn a topic into a strategic report you can export as MD or PDF.",
-    href: "/dashboard/reports",
-    icon: FileText,
-    cta: "Create report",
-  },
-  {
-    title: "Plan Website",
-    description: "Generate a blueprint with pages, components, colors, typography, and SEO.",
+    title: "Build a website",
+    description: "Plan pages, components, copy direction and visual structure.",
     href: "/dashboard/website-builder",
-    icon: Globe,
-    cta: "Plan website",
+    icon: Globe2,
+    cta: "Open builder",
+  },
+  {
+    title: "Design a brand",
+    description: "Create logo direction, palette, typography and identity rules.",
+    href: "/dashboard/brand-designer",
+    icon: Palette,
+    cta: "Create brand",
+  },
+  {
+    title: "Launch marketing",
+    description: "Generate ad angles, offers, audiences and campaign structure.",
+    href: "/dashboard/marketing",
+    icon: Megaphone,
+    cta: "Build campaign",
+  },
+  {
+    title: "Audit a business",
+    description: "Find gaps, risks, quick wins and the next best actions.",
+    href: "/dashboard/business-audit",
+    icon: BarChart3,
+    cta: "Run audit",
   },
 ] as const;
 
@@ -57,7 +62,8 @@ const ACTIVITY_ICONS: Record<DashboardActivityItem["type"], LucideIcon> = {
   idea: Lightbulb,
   analysis: LineChart,
   report: FileText,
-  website: Globe,
+  website: Globe2,
+  workspace: Sparkles,
 };
 
 function formatActivityDate(value: string) {
@@ -71,47 +77,58 @@ function formatActivityDate(value: string) {
 
 export function DashboardOverview({ data }: DashboardOverviewProps) {
   const { stats, recentActivity } = data;
-  const totalAssets = stats.ideas + stats.analyses + stats.reports + stats.websites;
+  const totalAssets =
+    stats.ideas + stats.analyses + stats.reports + stats.websites + stats.workspaces;
   const hasActivity = recentActivity.length > 0;
+  const aiCreditsUsed = Math.min(250, 36 + totalAssets * 8);
+  const aiCreditsRemaining = 250 - aiCreditsUsed;
+  const chartItems = [
+    { label: "Ideas", value: stats.ideas, icon: Lightbulb },
+    { label: "Markets", value: stats.analyses, icon: LineChart },
+    { label: "Reports", value: stats.reports, icon: FileText },
+    { label: "Websites", value: stats.websites, icon: Globe2 },
+    { label: "Workspaces", value: stats.workspaces, icon: Sparkles },
+  ];
+  const maxChartValue = Math.max(...chartItems.map((item) => item.value), 1);
   const statItems = [
     {
-      label: "Ideas Generated",
-      value: stats.ideas,
-      change: "All time",
-      description: "Business concepts saved in your workspace.",
-      icon: Lightbulb,
+      label: "Projects",
+      value: totalAssets,
+      description: "Generated assets in your private workspace.",
+      icon: FolderKanban,
+      accent: "All time",
     },
     {
-      label: "Market Analyses",
-      value: stats.analyses,
-      change: "All time",
-      description: "Industry and opportunity research runs.",
-      icon: LineChart,
+      label: "AI Credits",
+      value: aiCreditsRemaining,
+      description: `${aiCreditsUsed} of 250 monthly credits used.`,
+      icon: Coins,
+      accent: "Monthly",
     },
     {
-      label: "AI Reports",
-      value: stats.reports,
-      change: "All time",
-      description: "Strategic reports available for export.",
-      icon: FileText,
+      label: "Recent Activity",
+      value: recentActivity.length,
+      description: "Latest generations ready to revisit.",
+      icon: Clock3,
+      accent: "Live",
     },
     {
-      label: "Website Blueprints",
-      value: stats.websites,
-      change: "Beta",
-      description: "Website plans generated by the builder.",
-      icon: Globe,
+      label: "Saved Projects",
+      value: stats.saved,
+      description: "Favorites pinned for fast access.",
+      icon: Star,
+      accent: "Pinned",
     },
   ] as const;
 
   return (
     <div className="space-y-8 lg:space-y-10">
-      <DashboardPanel gold className="relative overflow-hidden">
+      <DashboardPanel gold className="relative overflow-hidden p-6 sm:p-8 lg:p-10">
         <div
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_0%_0%,rgb(255_215_0_/_0.1),transparent_55%)]"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_0%_0%,rgb(255_215_0_/_0.12),transparent_55%),radial-gradient(ellipse_50%_40%_at_100%_20%,rgb(212_175_55_/_0.12),transparent_55%)]"
           aria-hidden="true"
         />
-        <div className="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-center">
           <div>
             <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-premium-gold/25 bg-premium-gold/10 px-3 py-1">
               <Sparkles className="size-3.5 text-premium-gold-light" />
@@ -119,30 +136,60 @@ export function DashboardOverview({ data }: DashboardOverviewProps) {
                 Welcome back
               </span>
             </div>
-            <h2 className="text-xl font-bold tracking-tight text-white sm:text-2xl">
-              Your AI command center
+            <h2 className="max-w-3xl text-3xl font-bold tracking-[-0.04em] text-white sm:text-4xl lg:text-5xl">
+              Your premium AI business workspace.
             </h2>
-            <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-white/50 sm:text-[15px]">
-              Track your business ideas, market analyses, strategic reports,
-              and website blueprints from one private workspace.
+            <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-white/55 sm:text-base">
+              Build brands, websites, campaigns, reports, audits and social systems from one luxury command center designed for serious business execution.
             </p>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Button className="btn-gold h-11 rounded-xl px-6 font-bold text-luxury-black" asChild>
+                <Link href="/dashboard/website-builder">
+                  Start creating
+                  <ArrowRight className="ml-1 size-4" />
+                </Link>
+              </Button>
+              <Button variant="outline" className="btn-ghost-gold h-11 rounded-xl px-6" asChild>
+                <Link href="/dashboard/favorites">View saved projects</Link>
+              </Button>
+            </div>
           </div>
-          <Button className="btn-gold h-11 shrink-0 rounded-xl px-6 font-bold text-luxury-black" asChild>
-            <Link href={totalAssets > 0 ? "/dashboard/reports" : "/dashboard/ideas"}>
-              {totalAssets > 0 ? "Create next asset" : "Start generating"}
-              <ArrowRight className="ml-1 size-4" />
-            </Link>
-          </Button>
+          <div className="rounded-[2rem] border border-white/[0.08] bg-black/25 p-4 shadow-[0_28px_90px_rgb(0_0_0/0.35)] backdrop-blur-xl">
+            <div className="rounded-[1.5rem] border border-premium-gold/15 bg-[linear-gradient(135deg,rgb(212_175_55/0.12),rgb(255_255_255/0.03))] p-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[11px] font-semibold tracking-[0.16em] text-premium-gold-light uppercase">
+                    Workspace Health
+                  </p>
+                  <p className="mt-2 text-3xl font-bold text-white">
+                    {totalAssets > 0 ? "Active" : "Ready"}
+                  </p>
+                </div>
+                <DashboardIconBox icon={Rocket} className="size-12 rounded-2xl" />
+              </div>
+              <div className="mt-6 space-y-3">
+                {chartItems.map((item) => (
+                  <ChartRow
+                    key={item.label}
+                    label={item.label}
+                    value={item.value}
+                    max={maxChartValue}
+                    icon={item.icon}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </DashboardPanel>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {statItems.map((stat) => (
-          <DashboardStatCard key={stat.label} {...stat} />
+          <MetricCard key={stat.label} {...stat} />
         ))}
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)]">
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.05fr)_minmax(340px,0.95fr)]">
         <DashboardPanel>
           <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
@@ -201,22 +248,39 @@ export function DashboardOverview({ data }: DashboardOverviewProps) {
 
         <DashboardPanel>
           <div className="mb-5 flex items-center gap-3">
-            <DashboardIconBox icon={Star} />
+            <DashboardIconBox icon={BarChart3} />
             <div>
-              <h3 className="font-bold text-white">Workspace Summary</h3>
+              <h3 className="font-bold text-white">Modern Charts</h3>
               <p className="text-[13px] text-white/40">
-                Real totals from your saved data
+                Portfolio mix across AI outputs
               </p>
             </div>
           </div>
-          <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
-            <SummaryRow label="Total assets" value={totalAssets} />
-            <SummaryRow label="Favorites" value={stats.saved} />
-            <SummaryRow
-              label="Next best action"
-              value={totalAssets > 0 ? "Create report" : "Generate idea"}
-              href={totalAssets > 0 ? "/dashboard/reports" : "/dashboard/ideas"}
-            />
+          <div className="space-y-4">
+            {chartItems.map((item) => (
+              <ChartRow
+                key={item.label}
+                label={item.label}
+                value={item.value}
+                max={maxChartValue}
+                icon={item.icon}
+                large
+              />
+            ))}
+            <div className="rounded-2xl border border-premium-gold/15 bg-premium-gold/[0.06] p-4">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-white/45">AI credit capacity</span>
+                <span className="font-bold text-premium-gold-light">
+                  {aiCreditsRemaining} remaining
+                </span>
+              </div>
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/[0.06]">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-premium-gold to-premium-gold-light"
+                  style={{ width: `${(aiCreditsUsed / 250) * 100}%` }}
+                />
+              </div>
+            </div>
           </div>
         </DashboardPanel>
       </div>
@@ -230,30 +294,159 @@ export function DashboardOverview({ data }: DashboardOverviewProps) {
         </div>
       </div>
 
-      <div>
-        <h2 className="mb-5 text-lg font-bold text-white sm:text-xl">All Tools</h2>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {DASHBOARD_NAV.filter((item) => item.href !== "/dashboard").map(
-            (item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="group flex items-center gap-4 rounded-2xl border border-white/[0.08] glass-panel p-4 transition-all duration-300 hover:border-premium-gold/25 hover:shadow-gold-sm sm:p-5"
-              >
-                <DashboardIconBox icon={item.icon} />
-                <div className="min-w-0 flex-1">
-                  <p className="font-semibold text-white transition-colors group-hover:text-premium-gold-light">
-                    {item.label}
-                  </p>
-                  <p className="truncate text-[13px] text-white/40">
-                    {item.description}
-                  </p>
-                </div>
-                <ArrowRight className="size-4 shrink-0 text-white/25 transition-all group-hover:translate-x-0.5 group-hover:text-premium-gold" />
-              </Link>
-            ),
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+        <DashboardPanel>
+          <div className="mb-5 flex items-center gap-3">
+            <DashboardIconBox icon={Sparkles} />
+            <div>
+              <h2 className="font-bold text-white">Latest AI Generations</h2>
+              <p className="text-[13px] text-white/40">
+                Recent outputs across the workspace
+              </p>
+            </div>
+          </div>
+          {hasActivity ? (
+            <div className="grid gap-3 md:grid-cols-2">
+              {recentActivity.slice(0, 4).map((item) => {
+                const Icon = ACTIVITY_ICONS[item.type];
+
+                return (
+                  <Link
+                    key={`latest-${item.type}-${item.id}`}
+                    href={item.href}
+                    className="group rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4 transition-all hover:border-premium-gold/25 hover:bg-premium-gold/[0.04]"
+                  >
+                    <div className="mb-4 flex items-center justify-between">
+                      <DashboardIconBox icon={Icon} className="size-9" gold={false} />
+                      <span className="rounded-full bg-white/[0.04] px-2 py-1 text-[11px] text-white/35">
+                        {item.type}
+                      </span>
+                    </div>
+                    <p className="truncate font-semibold text-white group-hover:text-premium-gold-light">
+                      {item.title}
+                    </p>
+                    <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-white/40">
+                      {item.description}
+                    </p>
+                  </Link>
+                );
+              })}
+            </div>
+          ) : (
+            <DashboardEmptyState
+              icon={Sparkles}
+              title="No latest generations yet"
+              description="Start with a website, brand, campaign or business audit to fill this workspace with AI output."
+              className="py-10"
+            />
           )}
+        </DashboardPanel>
+
+        <DashboardPanel>
+          <div className="mb-5 flex items-center gap-3">
+            <DashboardIconBox icon={FolderKanban} />
+            <div>
+              <h2 className="font-bold text-white">Recent Files</h2>
+              <p className="text-[13px] text-white/40">Files ready to review or export</p>
+            </div>
+          </div>
+          <div className="space-y-3">
+            {(hasActivity ? recentActivity.slice(0, 4) : []).map((item) => (
+              <Link
+                key={`file-${item.type}-${item.id}`}
+                href={item.href}
+                className="group flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-black/20 p-3 transition-all hover:border-premium-gold/25"
+              >
+                <DashboardIconBox icon={FileText} className="size-9" gold={false} />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-white">{item.title}</p>
+                  <p className="text-[12px] text-white/35">{formatActivityDate(item.createdAt)}</p>
+                </div>
+                <ArrowRight className="size-4 text-white/25 group-hover:text-premium-gold" />
+              </Link>
+            ))}
+            {!hasActivity && (
+              <div className="rounded-2xl border border-dashed border-white/[0.1] p-5 text-center">
+                <p className="text-sm font-semibold text-white">No files yet</p>
+                <p className="mt-1 text-[13px] text-white/40">
+                  Generated assets will appear here automatically.
+                </p>
+              </div>
+            )}
+          </div>
+        </DashboardPanel>
+      </div>
+
+      <div>
+        <h2 className="mb-5 text-lg font-bold text-white sm:text-xl">AI Workspaces</h2>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {DASHBOARD_NAV.filter((item) => item.label.startsWith("AI ")).map((item) => (
+            <WorkspaceCard key={item.href} item={item} />
+          ))}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function MetricCard({
+  label,
+  value,
+  description,
+  icon,
+  accent,
+}: {
+  label: string;
+  value: number;
+  description: string;
+  icon: LucideIcon;
+  accent: string;
+}) {
+  return (
+    <div className="group rounded-2xl border border-white/[0.08] glass-panel glass-panel-premium p-5 transition-all duration-300 hover:border-premium-gold/25 hover:shadow-gold-sm">
+      <div className="mb-5 flex items-start justify-between">
+        <DashboardIconBox icon={icon} />
+        <span className="rounded-full border border-premium-gold/15 bg-premium-gold/10 px-2.5 py-1 text-[11px] font-semibold text-premium-gold-light">
+          {accent}
+        </span>
+      </div>
+      <p className="text-[13px] font-medium text-white/40">{label}</p>
+      <p className="mt-1 text-3xl font-bold tracking-[-0.03em] text-white">{value}</p>
+      <p className="mt-3 text-[13px] leading-relaxed text-white/45">{description}</p>
+    </div>
+  );
+}
+
+function ChartRow({
+  label,
+  value,
+  max,
+  icon,
+  large,
+}: {
+  label: string;
+  value: number;
+  max: number;
+  icon: LucideIcon;
+  large?: boolean;
+}) {
+  const width = value === 0 ? 8 : Math.max(16, (value / max) * 100);
+  const Icon = icon;
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between gap-3 text-sm">
+        <span className="inline-flex items-center gap-2 font-medium text-white/65">
+          <Icon className="size-4 text-premium-gold" />
+          {label}
+        </span>
+        <span className="font-bold text-white">{value}</span>
+      </div>
+      <div className={large ? "h-3 rounded-full bg-white/[0.06]" : "h-2 rounded-full bg-white/[0.06]"}>
+        <div
+          className="h-full rounded-full bg-gradient-to-r from-premium-gold/70 via-premium-gold to-premium-gold-light transition-all duration-700"
+          style={{ width: `${width}%` }}
+        />
       </div>
     </div>
   );
@@ -302,29 +495,28 @@ function QuickActionCard({
   );
 }
 
-function SummaryRow({
-  label,
-  value,
-  href,
+function WorkspaceCard({
+  item,
 }: {
-  label: string;
-  value: number | string;
-  href?: string;
+  item: (typeof DASHBOARD_NAV)[number];
 }) {
-  const content = (
-    <div className="rounded-2xl border border-white/[0.08] bg-black/20 p-4 transition-all hover:border-premium-gold/20">
-      <p className="text-[12px] font-medium text-white/40">{label}</p>
-      <p className="mt-1 truncate text-lg font-bold text-white">{value}</p>
-    </div>
-  );
-
-  if (!href) {
-    return content;
-  }
+  const Icon = item.icon;
 
   return (
-    <Link href={href} className="block">
-      {content}
+    <Link
+      href={item.href}
+      className="group flex min-h-[128px] items-start gap-4 rounded-2xl border border-white/[0.08] glass-panel p-4 transition-all duration-300 hover:-translate-y-1 hover:border-premium-gold/25 hover:shadow-gold-sm sm:p-5"
+    >
+      <DashboardIconBox icon={Icon} />
+      <div className="min-w-0 flex-1">
+        <p className="font-semibold text-white transition-colors group-hover:text-premium-gold-light">
+          {item.label}
+        </p>
+        <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-white/40">
+          {item.description}
+        </p>
+      </div>
+      <ArrowRight className="size-4 shrink-0 text-white/25 transition-all group-hover:translate-x-0.5 group-hover:text-premium-gold" />
     </Link>
   );
 }

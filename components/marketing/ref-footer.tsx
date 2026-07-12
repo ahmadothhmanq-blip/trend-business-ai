@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { BrandLogoLarge, BrandLogoWatermark } from "@/components/ui/brand-logo";
+import { BrandLogoWatermark } from "@/components/ui/brand-logo";
+import { OfficialLogo } from "@/components/marketing/official-logo";
 import {
   REF_FOOTER_COMPANY,
   REF_FOOTER_RESOURCES,
@@ -19,7 +20,7 @@ export function RefFooter() {
       <div className="landing-container relative py-14 md:py-16">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.35fr_1fr_1fr_1fr_1.25fr] lg:gap-8">
           <div className="sm:col-span-2 lg:col-span-1">
-            <BrandLogoLarge />
+            <OfficialLogo />
             <p className="mt-5 max-w-[280px] text-[13px] leading-[1.65] text-[#B5B5B5]">
               {REF_FOOTER_TAGLINE}
             </p>

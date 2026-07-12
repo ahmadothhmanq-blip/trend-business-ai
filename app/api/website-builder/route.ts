@@ -1,10 +1,73 @@
-import { generateWebsiteBlueprint } from "@/lib/ai/website-builder";
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
+import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
 import { enforceAiRateLimit } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
-import { websiteBuilderInputSchema } from "@/lib/validations/website-builder";
-import type { WebsiteGeneration } from "@/types/database";
+import { generateWebsiteWithDeepSeek } from "@/lib/deepseek";
+import type { WebsiteBlueprint, WebsiteGeneration } from "@/types/database";
 import { NextResponse } from "next/server";
+import { z } from "zod";
+
+const websiteRequestSchema = z.object({
+  prompt: z.string().trim().min(10, "Describe your project in at least 10 characters."),
+  projectType: z.string().trim().min(1, "Select a project type."),
+  language: z.string().trim().min(1, "Select a language."),
+  theme: z.string().trim().min(1, "Select a theme."),
+  features: z.array(z.string().trim()).default([]),
+});
+
+function detectProjectKind(input: z.infer<typeof websiteRequestSchema>) {
+  const signal = [
+    input.prompt,
+    input.projectType,
+    ...input.features,
+  ]
+    .join(" ")
+    .toLowerCase();
+  const appSignals = [
+    "app",
+    "application",
+    "dashboard",
+    "admin",
+    "crm",
+    "erp",
+    "saas",
+    "authentication",
+    "auth",
+    "login",
+    "sign in",
+    "signup",
+    "register",
+    "portal",
+    "platform",
+    "payments",
+    "payment",
+    "analytics",
+    "database",
+    "workflow",
+    "kanban",
+    "management",
+    "booking system",
+    "user roles",
+    "api",
+    "api route",
+    "crud",
+    "mobile app",
+    "web app",
+  ];
+
+  return appSignals.some((keyword) => signal.includes(keyword))
+    ? "web_application"
+    : "website";
+}
+
+function logWebsiteBuilderError(stage: string, error: unknown) {
+  const stack =
+    error instanceof Error
+      ? (error.stack ?? error.message)
+      : JSON.stringify(error, null, 2);
+
+  console.error(`[website-builder:${stage}]`, stack);
+}
 
 export async function GET(request: Request) {
   const auth = await requireUser();
@@ -35,7 +98,7 @@ export async function GET(request: Request) {
   const { data, error, count } = await query.range(from, to);
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return databaseErrorResponse("website-builder.list", error);
   }
 
   const total = count ?? 0;
@@ -59,7 +122,7 @@ export async function POST(request: Request) {
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
 
-  const parsed = websiteBuilderInputSchema.safeParse(body);
+  const parsed = websiteRequestSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
       { error: parsed.error.issues[0]?.message ?? "Invalid input" },
@@ -68,37 +131,69 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data;
+  const projectKind = detectProjectKind(input);
 
-  const { blueprint, source } = await generateWebsiteBlueprint(input);
+  let stage = "generateWebsiteWithDeepSeek";
 
-  const { data, error } = await auth.supabase
-    .from("website_generations")
-    .insert({
-      user_id: auth.user!.id,
-      project_name: input.projectName,
-      website_type: input.websiteType,
-      business_description: input.businessDescription,
-      target_audience: input.targetAudience,
-      language: input.language,
-      color_style: input.colorStyle,
-      design_style: input.designStyle,
-      page_count: input.pageCount,
-      features: input.features,
-      blueprint,
-      is_favorite: false,
-    })
-    .select("*")
-    .single();
+  try {
+    const project = await generateWebsiteWithDeepSeek({
+      ...input,
+      projectKind,
+    });
+    const savedProjectKind = project.projectKind ?? projectKind;
+    const savedProject = {
+      ...project,
+      projectKind: savedProjectKind,
+      prompt: input.prompt,
+      generatedAt: new Date().toISOString(),
+      settings: {
+        framework: "Next.js App Router",
+        styling: "Tailwind CSS",
+        packageManager: "npm",
+        deploymentTarget: "Vercel or Node hosting",
+        ...project.settings,
+      },
+      progressEvents: [
+        ...(project.progressEvents ?? []),
+        "Saving project..." as const,
+        "Done." as const,
+      ],
+    };
+    stage = "supabase.insert.website_generations";
+    const { data, error } = await auth.supabase
+      .from("website_generations")
+      .insert({
+        user_id: auth.user!.id,
+        project_name: savedProject.title,
+        website_type: savedProjectKind === "web_application" ? "Web Application" : "Website",
+        business_description: savedProject.description,
+        target_audience: "Auto-detected from project prompt",
+        language: input.language,
+        color_style: input.theme,
+        design_style: input.theme,
+        page_count: String(savedProject.pages.length || 1),
+        features: input.features,
+        blueprint: savedProject as unknown as WebsiteBlueprint,
+      })
+      .select("*")
+      .single();
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) {
+      logWebsiteBuilderError(stage, error);
+      return databaseErrorResponse("website-builder.insert", error);
+    }
+
+    return NextResponse.json({
+      project: savedProject,
+      generation: data as WebsiteGeneration,
+      message: "Generated project saved.",
+    });
+  } catch (error) {
+    logWebsiteBuilderError(stage, error);
+    return serverErrorResponse(
+      stage,
+      error,
+      "Unable to generate website application.",
+    );
   }
-
-  return NextResponse.json({
-    generation: data as WebsiteGeneration,
-    message:
-      source === "openai"
-        ? "Website blueprint generated and saved with AI."
-        : "Website blueprint generated and saved.",
-  });
 }

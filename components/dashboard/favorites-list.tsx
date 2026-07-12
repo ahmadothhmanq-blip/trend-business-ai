@@ -10,6 +10,7 @@ import {
   LineChart,
   Loader2,
   Search,
+  Sparkles,
   Star,
   type LucideIcon,
 } from "lucide-react";
@@ -25,6 +26,7 @@ import {
   dashboardInputClass,
 } from "@/components/dashboard/ui/dashboard-styles";
 import type { HistoryItem, HistoryItemType } from "@/types/database";
+import { getHistoryItemEndpoint } from "@/lib/workspace/history";
 import { cn } from "@/lib/utils";
 
 type FavoritesListProps = {
@@ -57,6 +59,11 @@ const TYPE_META: Record<
     label: "Website Blueprint",
     icon: Globe,
     endpoint: "/api/website-builder",
+  },
+  workspace: {
+    label: "AI Workspace",
+    icon: Sparkles,
+    endpoint: "/api/workspaces/brand",
   },
 };
 
@@ -102,18 +109,17 @@ export function FavoritesList({ initialItems }: FavoritesListProps) {
         acc[item.type] += 1;
         return acc;
       },
-      { all: 0, idea: 0, analysis: 0, report: 0, website: 0 },
+      { all: 0, idea: 0, analysis: 0, report: 0, website: 0, workspace: 0 },
     );
   }, [items]);
 
   const isFiltering = search.trim() || typeFilter !== "all";
 
   async function removeFavorite(item: HistoryItem) {
-    const meta = TYPE_META[item.type];
     setRemovingId(item.id);
 
     try {
-      const res = await fetch(`${meta.endpoint}/${item.id}`, {
+      const res = await fetch(`${getHistoryItemEndpoint(item)}/${item.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ is_favorite: false }),
@@ -165,7 +171,7 @@ export function FavoritesList({ initialItems }: FavoritesListProps) {
             </p>
           </div>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:min-w-[420px]">
-            {(["idea", "analysis", "report", "website"] as const).map((type) => {
+            {(["idea", "analysis", "report", "website", "workspace"] as const).map((type) => {
               const meta = TYPE_META[type];
               return (
                 <div

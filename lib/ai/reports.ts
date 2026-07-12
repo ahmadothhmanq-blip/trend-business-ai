@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { reportInputSchema } from "@/lib/validations/reports";
 import { createOpenAIClient, parseOpenAIJson, withOpenAIRetry } from "@/lib/ai/openai-client";
+import {
+  reportsSystemPrompt,
+  reportsUserPrompt,
+} from "@/lib/ai/prompts/legacy-services";
 
 export type ReportInput = z.infer<typeof reportInputSchema>;
 
@@ -39,13 +43,11 @@ async function generateWithOpenAI(input: ReportInput): Promise<GeneratedReport> 
       messages: [
         {
           role: "system",
-          content: `You are a senior business analyst. Return JSON:
-{"title":"string","report_type":"string","content":"string (markdown)","insights":["string"]}
-Provide 5 insights. Content must include Executive Summary, Key Findings, Recommendations, Conclusion.`,
+          content: reportsSystemPrompt,
         },
         {
           role: "user",
-          content: `Report type: ${input.reportType}\nTopic: ${input.topic}\nTimeframe: ${input.timeframe}`,
+          content: reportsUserPrompt(input),
         },
       ],
       temperature: 0.7,

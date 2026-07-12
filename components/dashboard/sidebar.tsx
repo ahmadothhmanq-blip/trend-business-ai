@@ -17,7 +17,7 @@ export function DashboardSidebar() {
     <>
       <Link
         href="/"
-        className="mb-8 flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 transition-colors hover:border-premium-gold/20"
+        className="mb-5 flex items-center gap-3 rounded-2xl border border-premium-gold/15 bg-[linear-gradient(135deg,rgb(255_255_255/0.06),rgb(212_175_55/0.05))] p-3.5 shadow-[0_18px_60px_rgb(0_0_0/0.22)] transition-colors hover:border-premium-gold/30"
         onClick={() => setMobileOpen(false)}
       >
         <BrandLogo size="sm" />
@@ -28,12 +28,26 @@ export function DashboardSidebar() {
           </span>
           <span className="flex items-center gap-1 text-[10px] text-white/35">
             <Sparkles className="size-2.5 text-premium-gold/70" />
-            Intelligence Hub
+            AI Workspace
           </span>
         </div>
       </Link>
 
-      <nav className="flex flex-1 flex-col gap-1.5" aria-label="Dashboard">
+      <div className="mb-3 rounded-2xl border border-white/[0.06] bg-white/[0.025] p-3">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-semibold tracking-[0.18em] text-white/35 uppercase">
+            Workspace
+          </span>
+          <span className="rounded-full border border-premium-gold/20 bg-premium-gold/10 px-2 py-0.5 text-[10px] font-bold text-premium-gold-light">
+            Pro
+          </span>
+        </div>
+        <p className="mt-2 text-[12px] leading-relaxed text-white/45">
+          Generate, organize, export and refine every AI business asset from one place.
+        </p>
+      </div>
+
+      <nav className="flex flex-1 flex-col gap-1.5 overflow-y-auto pr-1" aria-label="Dashboard">
         {DASHBOARD_NAV.map((item) => {
           const isActive =
             item.href === "/dashboard"
@@ -47,15 +61,15 @@ export function DashboardSidebar() {
               href={item.href}
               onClick={() => setMobileOpen(false)}
               className={cn(
-                "group flex items-center gap-3 rounded-xl px-3.5 py-3 text-[14px] font-medium transition-all duration-200",
+                "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200",
                 isActive
-                  ? "border border-premium-gold/25 bg-premium-gold/12 text-premium-gold-light shadow-gold-sm"
+                  ? "border border-premium-gold/30 bg-premium-gold/12 text-premium-gold-light shadow-gold-sm"
                   : "border border-transparent text-white/45 hover:border-white/[0.06] hover:bg-white/[0.04] hover:text-white/80",
               )}
             >
               <span
                 className={cn(
-                  "flex size-8 items-center justify-center rounded-lg ring-1 transition-all duration-200",
+                  "flex size-8 shrink-0 items-center justify-center rounded-lg ring-1 transition-all duration-200",
                   isActive
                     ? "bg-premium-gold/20 ring-premium-gold/30"
                     : "bg-white/[0.03] ring-white/[0.06] group-hover:ring-premium-gold/15",
@@ -63,18 +77,25 @@ export function DashboardSidebar() {
               >
                 <Icon className="size-4 shrink-0" aria-hidden="true" />
               </span>
-              <span className="truncate">{item.label}</span>
+              <span className="min-w-0">
+                <span className="block truncate">{item.label}</span>
+                {item.description && (
+                  <span className="block truncate text-[11px] font-normal text-white/30 group-hover:text-white/40">
+                    {item.description}
+                  </span>
+                )}
+              </span>
             </Link>
           );
         })}
       </nav>
 
-      <div className="mt-auto rounded-xl border border-premium-gold/15 bg-premium-gold/[0.06] p-4">
+      <div className="mt-4 rounded-2xl border border-premium-gold/15 bg-premium-gold/[0.06] p-4 shadow-[0_18px_60px_rgb(212_175_55/0.06)]">
         <p className="text-[11px] font-semibold tracking-wide text-premium-gold-light uppercase">
           Pro tip
         </p>
         <p className="mt-1.5 text-[12px] leading-relaxed text-white/45">
-          Favorite your best ideas and reports for quick access from the dashboard.
+          Save your best generations, revisit history and export assets when they are ready to ship.
         </p>
       </div>
     </>
@@ -102,7 +123,7 @@ export function DashboardSidebar() {
 
       <aside
         className={cn(
-          "dashboard-sidebar fixed inset-y-0 left-0 z-50 flex w-[280px] flex-col border-r border-white/[0.08] p-5 transition-transform sm:p-6 lg:static lg:translate-x-0",
+          "dashboard-sidebar fixed inset-y-0 left-0 z-50 flex w-[306px] flex-col border-r border-white/[0.08] p-5 transition-transform sm:p-6 lg:static lg:translate-x-0",
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         )}
       >

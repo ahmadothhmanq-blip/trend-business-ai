@@ -4,13 +4,20 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { safeRedirectPath } from "@/lib/api/helpers";
-import { getRequiredSiteUrl } from "@/lib/env";
+import { getOptionalSiteUrl } from "@/lib/env";
 import {
   emailSchema,
   passwordSchema,
   preferencesSchema,
   profileSchema,
 } from "@/lib/validations/auth";
+
+const AVATAR_TYPES = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+} as const;
+const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
 
 export async function signUp(formData: FormData) {
   const supabase = await createClient();
@@ -28,7 +35,7 @@ export async function signUp(formData: FormData) {
     password: password.data,
     options: {
       data: { full_name: fullName },
-      emailRedirectTo: `${getRequiredSiteUrl()}/auth/callback`,
+      emailRedirectTo: `${getOptionalSiteUrl()}/auth/callback`,
     },
   });
 
@@ -84,7 +91,7 @@ export async function requestPasswordReset(formData: FormData) {
     return { error: "Please enter a valid email address." };
   }
 
-  const siteUrl = getRequiredSiteUrl();
+  const siteUrl = getOptionalSiteUrl();
   const { error } = await supabase.auth.resetPasswordForEmail(email.data, {
     redirectTo: `${siteUrl}/auth/callback?next=/reset-password`,
   });
@@ -155,7 +162,7 @@ export async function updateProfile(formData: FormData) {
   });
 
   if (profileError) {
-    console.warn("Profile upsert:", profileError.message);
+    return { error: profileError.message };
   }
 
   revalidatePath("/dashboard/profile");
@@ -211,15 +218,15 @@ export async function uploadAvatar(formData: FormData) {
     return { error: "No file selected" };
   }
 
-  if (!file.type.startsWith("image/")) {
-    return { error: "File must be an image" };
+  const ext = AVATAR_TYPES[file.type as keyof typeof AVATAR_TYPES];
+  if (!ext) {
+    return { error: "File must be a JPG, PNG or WebP image" };
   }
 
-  if (file.size > 2 * 1024 * 1024) {
+  if (file.size > MAX_AVATAR_BYTES) {
     return { error: "Image must be under 2MB" };
   }
 
-  const ext = file.name.split(".").pop() ?? "jpg";
   const path = `${user.id}/avatar.${ext}`;
 
   const { error: uploadError } = await supabase.storage
@@ -236,11 +243,15 @@ export async function uploadAvatar(formData: FormData) {
 
   const avatarUrl = `${publicUrl}?t=${Date.now()}`;
 
-  await supabase.from("profiles").upsert({
+  const { error } = await supabase.from("profiles").upsert({
     id: user.id,
     avatar_url: avatarUrl,
     updated_at: new Date().toISOString(),
   });
+
+  if (error) {
+    return { error: error.message };
+  }
 
   revalidatePath("/dashboard/profile");
   return { success: true, avatarUrl, message: "Avatar updated." };

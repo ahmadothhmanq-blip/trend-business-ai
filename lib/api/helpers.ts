@@ -1,5 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { z } from "zod";
+
+const uuidSchema = z.string().uuid();
 
 export async function requireUser() {
   const supabase = await createClient();
@@ -28,6 +31,17 @@ export function safeRedirectPath(path: string | null | undefined, fallback = "/d
     return fallback;
   }
   return path;
+}
+
+export function parseUuidParam(
+  id: string,
+  label = "id",
+): { id: string } | NextResponse {
+  const parsed = uuidSchema.safeParse(id);
+  if (!parsed.success) {
+    return NextResponse.json({ error: `Invalid ${label}.` }, { status: 400 });
+  }
+  return { id: parsed.data };
 }
 
 export function paginationParams(searchParams: URLSearchParams) {

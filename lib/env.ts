@@ -29,5 +29,13 @@ export function getRequiredSiteUrl() {
 }
 
 export function getOptionalSiteUrl(fallback = "http://localhost:3000") {
-  return trimEnv(process.env.NEXT_PUBLIC_SITE_URL) || fallback;
+  const configuredUrl = trimEnv(process.env.NEXT_PUBLIC_SITE_URL);
+  if (configuredUrl) return configuredUrl;
+
+  const vercelUrl = trimEnv(process.env.VERCEL_URL);
+  if (vercelUrl) {
+    return vercelUrl.startsWith("http") ? vercelUrl : `https://${vercelUrl}`;
+  }
+
+  return fallback;
 }

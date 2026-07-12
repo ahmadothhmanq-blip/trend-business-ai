@@ -1,5 +1,6 @@
 import { syncFavorite } from "@/lib/db/favorites";
-import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { requireUser, parseJsonBody, parseUuidParam } from "@/lib/api/helpers";
+import { databaseErrorResponse } from "@/lib/api/errors";
 import { favoriteSchema } from "@/lib/validations/common";
 import { ideaUpdateSchema } from "@/lib/validations/ideas";
 import type { BusinessIdea } from "@/types/database";
@@ -8,7 +9,11 @@ import { NextResponse } from "next/server";
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function PUT(request: Request, context: RouteContext) {
-  const { id } = await context.params;
+  const { id: rawId } = await context.params;
+  const idParsed = parseUuidParam(rawId);
+  if (idParsed instanceof NextResponse) return idParsed;
+  const { id } = idParsed;
+
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
@@ -32,7 +37,7 @@ export async function PUT(request: Request, context: RouteContext) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return databaseErrorResponse("ideas.update", error);
   }
 
   if (!data) {
@@ -46,7 +51,11 @@ export async function PUT(request: Request, context: RouteContext) {
 }
 
 export async function PATCH(request: Request, context: RouteContext) {
-  const { id } = await context.params;
+  const { id: rawId } = await context.params;
+  const idParsed = parseUuidParam(rawId);
+  if (idParsed instanceof NextResponse) return idParsed;
+  const { id } = idParsed;
+
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
@@ -69,20 +78,23 @@ export async function PATCH(request: Request, context: RouteContext) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return databaseErrorResponse("ideas.favorite", error);
   }
 
   if (!data) {
     return NextResponse.json({ error: "Idea not found" }, { status: 404 });
   }
 
-  await syncFavorite(
+  const favoriteSync = await syncFavorite(
     auth.supabase,
     auth.user!.id,
     "business_idea",
     id,
     is_favorite,
   );
+  if (favoriteSync.error) {
+    return databaseErrorResponse("ideas.syncFavorite", favoriteSync.error);
+  }
 
   return NextResponse.json({
     idea: data as BusinessIdea,
@@ -91,20 +103,29 @@ export async function PATCH(request: Request, context: RouteContext) {
 }
 
 export async function DELETE(_request: Request, context: RouteContext) {
-  const { id } = await context.params;
+  const { id: rawId } = await context.params;
+  const idParsed = parseUuidParam(rawId);
+  if (idParsed instanceof NextResponse) return idParsed;
+  const { id } = idParsed;
+
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  await syncFavorite(auth.supabase, auth.user!.id, "business_idea", id, false);
-
-  const { error } = await auth.supabase
+  const { data, error } = await auth.supabase
     .from("business_ideas")
     .delete()
     .eq("id", id)
-    .eq("user_id", auth.user!.id);
+    .eq("user_id", auth.user!.id)
+    .select("id")
+    .single();
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error || !data) {
+    return NextResponse.json({ error: "Idea not found" }, { status: 404 });
+  }
+
+  const favoriteSync = await syncFavorite(auth.supabase, auth.user!.id, "business_idea", id, false);
+  if (favoriteSync.error) {
+    return databaseErrorResponse("ideas.syncFavorite", favoriteSync.error);
   }
 
   return NextResponse.json({ message: "Idea deleted successfully." });

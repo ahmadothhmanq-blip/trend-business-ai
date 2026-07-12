@@ -1,5 +1,6 @@
 import { generateMarketAnalysis } from "@/lib/ai/market-analysis";
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
+import { databaseErrorResponse } from "@/lib/api/errors";
 import { enforceAiRateLimit } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter, ilikeContainsPattern } from "@/lib/api/search-filters";
 import { marketInputSchema } from "@/lib/validations/market-analysis";
@@ -39,7 +40,7 @@ export async function GET(request: Request) {
   const { data, error, count } = await query.range(from, to);
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return databaseErrorResponse("market-analysis.list", error);
   }
 
   const total = count ?? 0;
@@ -92,7 +93,7 @@ export async function POST(request: Request) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return databaseErrorResponse("market-analysis.insert", error);
   }
 
   return NextResponse.json({

@@ -13,7 +13,14 @@ Run these files in order against your Supabase project (SQL Editor or CLI).
 | 7 | `007_storage_avatars.sql` | `avatars` storage bucket + RLS |
 | 8 | `008_website_generations.sql` | `website_generations` table + RLS |
 | 9 | `009_website_favorites.sql` | Website favorite column, index, update RLS, and favorite type constraint |
+| 10 | `010_workspace_generations.sql` | `workspace_generations` table + RLS, extends favorites item types |
 
 Alternatively, run the consolidated `supabase/schema.sql` once on a fresh project.
+
+Apply pending migrations via Supabase SQL Editor or CLI:
+
+```bash
+npx supabase db push
+```
 
 Verify with: `npm run verify`

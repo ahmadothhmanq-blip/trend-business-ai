@@ -2,13 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ChevronDown, Menu, X, ArrowRight } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { NAV_LINKS } from "@/lib/constants/navigation";
-import { BrandLogo } from "@/components/ui/brand-logo";
+import { OfficialLogo } from "@/components/marketing/official-logo";
 import { RefButton } from "@/components/marketing/ui/ref-button";
-
-const CHEVRON = new Set(["Services", "How It Works"]);
 
 export function RefHeader() {
   const [open, setOpen] = useState(false);
@@ -17,7 +15,7 @@ export function RefHeader() {
     <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6">
       <div className="mx-auto grid h-14 max-w-[1200px] grid-cols-2 items-center border-b border-[rgb(212_175_55/0.12)] bg-[rgb(5_5_5/0.92)] px-5 backdrop-blur-[20px] lg:h-[68px] lg:grid-cols-[1fr_auto_1fr] lg:rounded-full lg:border lg:border-[rgb(212_175_55/0.22)] lg:px-6 lg:shadow-[0_8px_32px_rgb(0_0_0/0.4)]">
         <Link href="/" className="justify-self-start" aria-label="Trend Business AI home">
-          <BrandLogo size="sm" variant="nav" />
+          <OfficialLogo />
         </Link>
 
         <nav aria-label="Main" className="hidden justify-self-center lg:block">
@@ -29,9 +27,6 @@ export function RefHeader() {
                   className="inline-flex items-center gap-1 text-[13px] font-medium text-[#B5B5B5] transition-colors hover:text-white"
                 >
                   {l.label}
-                  {CHEVRON.has(l.label) && (
-                    <ChevronDown className="size-3 text-[#D4AF37]/70" aria-hidden="true" />
-                  )}
                 </Link>
               </li>
             ))}

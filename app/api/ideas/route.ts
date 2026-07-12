@@ -1,5 +1,6 @@
 import { generateBusinessIdeas } from "@/lib/ai/business-ideas";
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
+import { databaseErrorResponse } from "@/lib/api/errors";
 import { enforceAiRateLimit } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import {
@@ -37,7 +38,7 @@ export async function GET(request: Request) {
   const { data, error, count } = await query.range(from, to);
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return databaseErrorResponse("ideas.list", error);
   }
 
   const total = count ?? 0;
@@ -87,7 +88,7 @@ export async function POST(request: Request) {
     .select("*");
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return databaseErrorResponse("ideas.insert", error);
   }
 
   return NextResponse.json({

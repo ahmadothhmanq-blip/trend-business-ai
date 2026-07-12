@@ -6,6 +6,7 @@ export const metadata: Metadata = createPageMetadata({
   description:
     "Request a password reset link for your Trend Business AI account.",
   path: "/forgot-password",
+  noIndex: true,
 });
 
 export default function ForgotPasswordLayout({

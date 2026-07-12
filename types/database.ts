@@ -104,7 +104,53 @@ export type WebsiteGeneration = {
   updated_at: string;
 };
 
-export type FavoriteItemType = "business_idea" | "market_analysis" | "report" | "website_generation";
+export type FavoriteItemType =
+  | "business_idea"
+  | "market_analysis"
+  | "report"
+  | "website_generation"
+  | "workspace_generation";
+
+export type WorkspaceType =
+  | "brand"
+  | "creative"
+  | "content"
+  | "business"
+  | "manager"
+  | "marketing"
+  | "social"
+  | "audit";
+
+export type WorkspaceSection = {
+  heading: string;
+  content: string;
+};
+
+export type WorkspaceOutput = {
+  title: string;
+  summary: string;
+  sections: WorkspaceSection[];
+  deliverables: string[];
+  progressEvents?: string[];
+  generatedAt?: string;
+  source?: "openai" | "anthropic" | "deepseek" | "structured";
+};
+
+export type WorkspaceGeneration = {
+  id: string;
+  user_id: string;
+  workspace_type: WorkspaceType;
+  title: string;
+  brief: string;
+  template: string | null;
+  language: string;
+  theme: string;
+  features: string[];
+  output: WorkspaceOutput;
+  is_favorite: boolean;
+  created_at: string;
+  updated_at: string;
+};
 
 export type Favorite = {
   id: string;
@@ -127,12 +173,13 @@ export type DashboardStats = {
   analyses: number;
   reports: number;
   websites: number;
+  workspaces: number;
   saved: number;
 };
 
 export type DashboardActivityItem = {
   id: string;
-  type: "idea" | "analysis" | "report" | "website";
+  type: "idea" | "analysis" | "report" | "website" | "workspace";
   title: string;
   description: string;
   href: string;
@@ -144,7 +191,12 @@ export type DashboardHomeData = {
   recentActivity: DashboardActivityItem[];
 };
 
-export type HistoryItemType = "idea" | "analysis" | "report" | "website";
+export type HistoryItemType =
+  | "idea"
+  | "analysis"
+  | "report"
+  | "website"
+  | "workspace";
 
 export type HistoryItem = {
   id: string;
@@ -154,6 +206,7 @@ export type HistoryItem = {
   detail: string;
   href: string;
   createdAt: string;
+  workspaceType?: WorkspaceType;
 };
 
 export type PaginatedResponse<T> = {

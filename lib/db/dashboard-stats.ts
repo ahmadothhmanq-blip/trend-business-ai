@@ -1,11 +1,13 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { DashboardActivityItem, DashboardHomeData, DashboardStats } from "@/types/database";
+import { getWorkspaceDefinition } from "@/lib/workspace/registry";
+import type { WorkspaceType } from "@/lib/workspace/types";
 
 export async function getDashboardStats(
   supabase: SupabaseClient,
   userId: string,
 ): Promise<DashboardStats> {
-  const [ideas, analyses, reports, websites, favorites] = await Promise.all([
+  const [ideas, analyses, reports, websites, workspaces, favorites] = await Promise.all([
     supabase
       .from("business_ideas")
       .select("id", { count: "exact", head: true })
@@ -23,6 +25,10 @@ export async function getDashboardStats(
       .select("id", { count: "exact", head: true })
       .eq("user_id", userId),
     supabase
+      .from("workspace_generations")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId),
+    supabase
       .from("favorites")
       .select("id", { count: "exact", head: true })
       .eq("user_id", userId),
@@ -33,6 +39,7 @@ export async function getDashboardStats(
     analyses: analyses.count ?? 0,
     reports: reports.count ?? 0,
     websites: websites.count ?? 0,
+    workspaces: workspaces.count ?? 0,
     saved: favorites.count ?? 0,
   };
 }
@@ -65,6 +72,14 @@ type WebsiteActivityRow = {
   created_at: string;
 };
 
+type WorkspaceActivityRow = {
+  id: string;
+  workspace_type: WorkspaceType;
+  title: string;
+  output: { summary?: string };
+  created_at: string;
+};
+
 function sortRecentActivity(items: DashboardActivityItem[]) {
   return items
     .sort(
@@ -78,7 +93,7 @@ export async function getDashboardHomeData(
   supabase: SupabaseClient,
   userId: string,
 ): Promise<DashboardHomeData> {
-  const [stats, ideas, analyses, reports, websites] = await Promise.all([
+  const [stats, ideas, analyses, reports, websites, workspaceRows] = await Promise.all([
     getDashboardStats(supabase, userId),
     supabase
       .from("business_ideas")
@@ -101,6 +116,12 @@ export async function getDashboardHomeData(
     supabase
       .from("website_generations")
       .select("id,project_name,website_type,created_at")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(3),
+    supabase
+      .from("workspace_generations")
+      .select("id,workspace_type,title,output,created_at")
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(3),
@@ -138,6 +159,16 @@ export async function getDashboardHomeData(
       description: `Website blueprint · ${website.website_type}`,
       href: "/dashboard/website-builder",
       createdAt: website.created_at,
+    })),
+    ...((workspaceRows.data ?? []) as WorkspaceActivityRow[]).map((workspace) => ({
+      id: workspace.id,
+      type: "workspace" as const,
+      title: workspace.title,
+      description:
+        workspace.output?.summary ??
+        `${getWorkspaceDefinition(workspace.workspace_type).metadata.label} project`,
+      href: getWorkspaceDefinition(workspace.workspace_type).metadata.dashboardHref,
+      createdAt: workspace.created_at,
     })),
   ];
 

@@ -1,4 +1,8 @@
 import { createOpenAIClient, withOpenAIRetry } from "@/lib/ai/openai-client";
+import {
+  businessIdeasSystemPrompt,
+  businessIdeasUserPrompt,
+} from "@/lib/ai/prompts/legacy-services";
 
 export type IdeaInput = {
   interests: string;
@@ -88,16 +92,11 @@ async function generateWithOpenAI(input: IdeaInput): Promise<GeneratedIdea[]> {
     messages: [
       {
         role: "system",
-        content: `You are a business strategist. Generate exactly 3 unique, actionable business ideas as JSON with this shape:
-{"ideas":[{"title":"string","description":"string","industry":"string","target_market":"string","revenue_model":"string"}]}
-Each idea must be specific to the user's profile. Descriptions should be 2-3 sentences.`,
+        content: businessIdeasSystemPrompt,
       },
       {
         role: "user",
-        content: `Interests: ${input.interests}
-Skills: ${input.skills}
-Budget: ${input.budget}
-Preferred industry: ${input.industry || "any"}`,
+        content: businessIdeasUserPrompt(input),
       },
     ],
       temperature: 0.8,
