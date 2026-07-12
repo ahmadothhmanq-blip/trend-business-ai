@@ -1,4 +1,11 @@
 import { aiGenerationEngine } from "@/lib/ai/engine";
+import {
+  isProviderConfigured,
+  listConfiguredProviders,
+  resolveAvailableProvider,
+} from "@/lib/ai/adapters";
+import { emptyTokenUsage } from "@/lib/ai/usage";
+import type { AIProviderName, TokenUsage } from "@/lib/ai/types";
 import { getWorkspaceDefinition } from "@/lib/workspace/registry";
 import { generateStructuredWorkspaceOutput } from "@/lib/workspace/structured-output";
 import type {
@@ -8,19 +15,68 @@ import type {
 } from "@/lib/workspace/types";
 import type { PluginBriefInput, TextPluginOutput } from "@/plugins/types";
 
-function isProviderConfigured(provider: string) {
-  if (provider === "openai") return Boolean(process.env.OPENAI_API_KEY?.trim());
-  if (provider === "anthropic") return Boolean(process.env.ANTHROPIC_API_KEY?.trim());
-  if (provider === "deepseek") return Boolean(process.env.DEEPSEEK_API_KEY?.trim());
-  return false;
-}
+const DEPTH_HINTS: Record<string, string> = {
+  focused: "Keep the output focused, concise, and execution-ready.",
+  standard: "Balance depth and clarity for production-ready deliverables.",
+  deep: "Provide board-ready depth, evidence, and detailed recommendations.",
+};
 
 function toPluginInput(input: WorkspaceGenerationInput): PluginBriefInput {
+  const features = [
+    ...(input.features ?? []),
+    ...(input.productId ? [`product:${input.productId}`] : []),
+    ...(input.depth ? [`depth:${input.depth}`] : []),
+  ];
+
+  const attachmentNotes =
+    input.attachments && input.attachments.length > 0
+      ? `\n\nAttached references:\n${input.attachments
+          .map(
+            (file) =>
+              `- [${file.fileType}] ${file.fileName}${file.mimeType ? ` (${file.mimeType})` : ""}`,
+          )
+          .join("\n")}`
+      : "";
+
+  const depthHint = input.depth ? `\n\nDepth guidance: ${DEPTH_HINTS[input.depth]}` : "";
+
+  let prompt = `${input.prompt}${depthHint}${attachmentNotes}`;
+
+  if (
+    (input.mode === "continue" || input.continueInstruction) &&
+    input.previousOutput
+  ) {
+    const prior = [
+      `Title: ${input.previousOutput.title}`,
+      `Summary: ${input.previousOutput.summary}`,
+      ...input.previousOutput.sections.map(
+        (section) => `${section.heading}:\n${section.content}`,
+      ),
+    ].join("\n\n");
+
+    prompt = [
+      "Continue and expand the previous generation.",
+      input.continueInstruction
+        ? `Continue instruction: ${input.continueInstruction}`
+        : "Extend with additional depth, missing sections, and actionable next steps.",
+      "",
+      "Previous output:",
+      prior,
+      "",
+      "Original brief:",
+      input.prompt,
+    ].join("\n");
+  }
+
+  if (input.mode === "regenerate" || input.mode === "retry") {
+    prompt = `${prompt}\n\nRegenerate with a fresh approach while preserving the brief intent.`;
+  }
+
   return {
-    prompt: input.prompt,
+    prompt,
     language: input.language,
     theme: input.theme,
-    features: input.features,
+    features,
   };
 }
 
@@ -28,6 +84,14 @@ function toWorkspaceOutput(
   result: TextPluginOutput,
   progressEvents: string[],
   source: WorkspaceOutput["source"],
+  meta?: {
+    productId?: string;
+    depth?: WorkspaceGenerationInput["depth"];
+    tokenUsage?: TokenUsage;
+    generationTimeMs?: number;
+    mode?: WorkspaceGenerationInput["mode"];
+    continuedFrom?: string;
+  },
 ): WorkspaceOutput {
   return {
     title: result.title,
@@ -37,37 +101,97 @@ function toWorkspaceOutput(
     progressEvents,
     generatedAt: new Date().toISOString(),
     source,
+    productId: meta?.productId,
+    depth: meta?.depth,
+    tokenUsage: meta?.tokenUsage,
+    generationTimeMs: meta?.generationTimeMs,
+    mode: meta?.mode,
+    continuedFrom: meta?.continuedFrom,
   };
 }
+
+export type WorkspaceGenerationResult = {
+  output: WorkspaceOutput;
+  source: WorkspaceOutput["source"];
+  provider: string | null;
+  usage: TokenUsage;
+  generationTimeMs: number;
+};
 
 export async function generateWorkspaceProject(
   workspaceType: WorkspaceType,
   input: WorkspaceGenerationInput,
-): Promise<{ output: WorkspaceOutput; source: WorkspaceOutput["source"] }> {
+  options?: { onProgress?: (event: string) => void },
+): Promise<WorkspaceGenerationResult> {
   const definition = getWorkspaceDefinition(workspaceType);
   const plugin = definition.plugin;
+  const preferred =
+    (input.provider as AIProviderName | undefined) ?? plugin.preferredProvider;
+  const primary = resolveAvailableProvider(preferred);
+  const startedAt = Date.now();
 
-  if (isProviderConfigured(plugin.preferredProvider)) {
+  const providers = primary
+    ? [primary, ...listConfiguredProviders().filter((name) => name !== primary)]
+    : [];
+
+  let lastError: unknown = null;
+
+  for (const providerName of providers) {
+    if (!isProviderConfigured(providerName)) continue;
     try {
-      const result = await aiGenerationEngine.run(
-        plugin,
-        toPluginInput(input),
-        { provider: plugin.preferredProvider },
-      );
+      options?.onProgress?.(`Connecting to ${providerName}...`);
+      const result = await aiGenerationEngine.run(plugin, toPluginInput(input), {
+        provider: providerName,
+        onProgress: options?.onProgress,
+      });
 
       return {
-        output: toWorkspaceOutput(
-          result.output,
-          result.progressEvents,
-          plugin.preferredProvider,
-        ),
-        source: plugin.preferredProvider,
+        output: toWorkspaceOutput(result.output, result.progressEvents, providerName, {
+          productId: input.productId,
+          depth: input.depth,
+          tokenUsage: result.usage,
+          generationTimeMs: result.generationTimeMs,
+          mode: input.mode ?? "generate",
+          continuedFrom: input.parentGenerationId,
+        }),
+        source: providerName,
+        provider: providerName,
+        usage: result.usage,
+        generationTimeMs: result.generationTimeMs,
       };
     } catch (error) {
-      console.error(`[workspace:${workspaceType}] engine generation failed:`, error);
+      lastError = error;
+      console.error(`[workspace:${workspaceType}] provider ${providerName} failed:`, error);
+      options?.onProgress?.(
+        error instanceof Error
+          ? `${providerName} failed: ${error.message}. Trying next provider...`
+          : `${providerName} failed. Trying next provider...`,
+      );
     }
   }
 
+  if (providers.length > 0 && lastError) {
+    throw lastError instanceof Error
+      ? lastError
+      : new Error("All configured AI providers failed.");
+  }
+
+  options?.onProgress?.("No AI provider configured — using structured fallback.");
   const output = generateStructuredWorkspaceOutput(workspaceType, input);
-  return { output, source: "structured" };
+  const generationTimeMs = Date.now() - startedAt;
+  return {
+    output: {
+      ...output,
+      productId: input.productId,
+      depth: input.depth,
+      tokenUsage: emptyTokenUsage(),
+      generationTimeMs,
+      mode: input.mode ?? "generate",
+      continuedFrom: input.parentGenerationId,
+    },
+    source: "structured",
+    provider: null,
+    usage: emptyTokenUsage(),
+    generationTimeMs,
+  };
 }

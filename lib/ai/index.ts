@@ -1,6 +1,7 @@
 export * from "@/lib/ai/types";
 export * from "@/lib/ai/retry";
 export * from "@/lib/ai/progress";
+export * from "@/lib/ai/usage";
 export * from "@/lib/ai/adapters";
 export * from "@/lib/ai/prompts";
 export * from "@/lib/ai/planner";

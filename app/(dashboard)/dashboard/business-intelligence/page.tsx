@@ -1,5 +1,5 @@
-import { WorkspaceDashboardPage } from "@/components/dashboard/workspace-dashboard-page";
+import { ProductEnginePage } from "@/components/dashboard/product-engine/product-engine-page";
 
 export default function BusinessIntelligencePage() {
-  return <WorkspaceDashboardPage workspaceType="business" />;
+  return <ProductEnginePage productId="business-intelligence" />;
 }

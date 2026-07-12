@@ -1,68 +1,25 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  BarChart3,
   Clock3,
   Coins,
-  FileText,
   FolderKanban,
-  Globe2,
-  Lightbulb,
-  LineChart,
-  Megaphone,
-  Palette,
-  Rocket,
   Sparkles,
   Star,
   type LucideIcon,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { DASHBOARD_NAV } from "@/lib/constants/dashboard-nav";
+import { DASHBOARD_QUICK_ACTIONS } from "@/lib/constants/dashboard-nav";
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import { DashboardIconBox } from "@/components/dashboard/ui/icon-box";
 import { DashboardEmptyState } from "@/components/dashboard/ui/dashboard-empty-state";
+import { Button } from "@/components/ui/button";
 import type { DashboardActivityItem, DashboardHomeData } from "@/types/database";
 
-const QUICK_ACTIONS = [
-  {
-    title: "Build a website",
-    description: "Plan pages, components, copy direction and visual structure.",
-    href: "/dashboard/website-builder",
-    icon: Globe2,
-    cta: "Open builder",
-  },
-  {
-    title: "Design a brand",
-    description: "Create logo direction, palette, typography and identity rules.",
-    href: "/dashboard/brand-designer",
-    icon: Palette,
-    cta: "Create brand",
-  },
-  {
-    title: "Launch marketing",
-    description: "Generate ad angles, offers, audiences and campaign structure.",
-    href: "/dashboard/marketing",
-    icon: Megaphone,
-    cta: "Build campaign",
-  },
-  {
-    title: "Audit a business",
-    description: "Find gaps, risks, quick wins and the next best actions.",
-    href: "/dashboard/business-audit",
-    icon: BarChart3,
-    cta: "Run audit",
-  },
-] as const;
-
-type DashboardOverviewProps = {
-  data: DashboardHomeData;
-};
-
 const ACTIVITY_ICONS: Record<DashboardActivityItem["type"], LucideIcon> = {
-  idea: Lightbulb,
-  analysis: LineChart,
-  report: FileText,
-  website: Globe2,
+  idea: Sparkles,
+  analysis: Sparkles,
+  report: Sparkles,
+  website: FolderKanban,
   workspace: Sparkles,
 };
 
@@ -75,448 +32,292 @@ function formatActivityDate(value: string) {
   }).format(new Date(value));
 }
 
-export function DashboardOverview({ data }: DashboardOverviewProps) {
+type DashboardOverviewProps = {
+  data: DashboardHomeData;
+  userName?: string;
+};
+
+function QuickActionsGrid() {
+  return (
+    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-7">
+      {DASHBOARD_QUICK_ACTIONS.map((action) => {
+        const Icon = action.icon;
+        return (
+          <Link
+            key={action.title}
+            href={action.href}
+            className="group rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4 transition-all hover:border-premium-gold/30 hover:bg-premium-gold/[0.06]"
+          >
+            <DashboardIconBox icon={Icon} />
+            <p className="mt-3 text-[13px] font-semibold text-white group-hover:text-premium-gold-light">
+              {action.title}
+            </p>
+            <p className="mt-1 text-[11px] leading-relaxed text-white/40">
+              {action.description}
+            </p>
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
+export function DashboardOverview({ data, userName }: DashboardOverviewProps) {
   const { stats, recentActivity } = data;
-  const totalAssets =
+  const totalProjects =
     stats.ideas + stats.analyses + stats.reports + stats.websites + stats.workspaces;
-  const hasActivity = recentActivity.length > 0;
-  const aiCreditsUsed = Math.min(250, 36 + totalAssets * 8);
-  const aiCreditsRemaining = 250 - aiCreditsUsed;
-  const chartItems = [
-    { label: "Ideas", value: stats.ideas, icon: Lightbulb },
-    { label: "Markets", value: stats.analyses, icon: LineChart },
-    { label: "Reports", value: stats.reports, icon: FileText },
-    { label: "Websites", value: stats.websites, icon: Globe2 },
-    { label: "Workspaces", value: stats.workspaces, icon: Sparkles },
-  ];
-  const maxChartValue = Math.max(...chartItems.map((item) => item.value), 1);
-  const statItems = [
-    {
-      label: "Projects",
-      value: totalAssets,
-      description: "Generated assets in your private workspace.",
-      icon: FolderKanban,
-      accent: "All time",
-    },
-    {
-      label: "AI Credits",
-      value: aiCreditsRemaining,
-      description: `${aiCreditsUsed} of 250 monthly credits used.`,
-      icon: Coins,
-      accent: "Monthly",
-    },
-    {
-      label: "Recent Activity",
-      value: recentActivity.length,
-      description: "Latest generations ready to revisit.",
-      icon: Clock3,
-      accent: "Live",
-    },
-    {
-      label: "Saved Projects",
-      value: stats.saved,
-      description: "Favorites pinned for fast access.",
-      icon: Star,
-      accent: "Pinned",
-    },
-  ] as const;
+  const aiCreditsUsed = Math.min(250, 36 + totalProjects * 8);
+  const aiCreditsRemaining = Math.max(0, 250 - aiCreditsUsed);
+  const usagePct = Math.round((aiCreditsUsed / 250) * 100);
+  const recentProjects = recentActivity.filter(
+    (item) => item.type === "website" || item.type === "workspace",
+  );
+  const latestGenerations = recentActivity.slice(0, 5);
+  const firstName = userName?.split(" ")[0] || "there";
 
   return (
-    <div className="space-y-8 lg:space-y-10">
-      <DashboardPanel gold className="relative overflow-hidden p-6 sm:p-8 lg:p-10">
-        <div
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_0%_0%,rgb(255_215_0_/_0.12),transparent_55%),radial-gradient(ellipse_50%_40%_at_100%_20%,rgb(212_175_55_/_0.12),transparent_55%)]"
-          aria-hidden="true"
-        />
-        <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-center">
-          <div>
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-premium-gold/25 bg-premium-gold/10 px-3 py-1">
-              <Sparkles className="size-3.5 text-premium-gold-light" />
-              <span className="text-[11px] font-semibold tracking-wide text-premium-gold-light uppercase">
-                Welcome back
-              </span>
-            </div>
-            <h2 className="max-w-3xl text-3xl font-bold tracking-[-0.04em] text-white sm:text-4xl lg:text-5xl">
-              Your premium AI business workspace.
-            </h2>
-            <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-white/55 sm:text-base">
-              Build brands, websites, campaigns, reports, audits and social systems from one luxury command center designed for serious business execution.
+    <div className="space-y-6 lg:space-y-8">
+      {/* Welcome */}
+      <DashboardPanel className="relative overflow-hidden p-6 sm:p-8">
+        <div className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.18),transparent_70%)]" />
+        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-2xl">
+            <p className="text-[11px] font-semibold tracking-[0.18em] text-premium-gold uppercase">
+              Welcome back
             </p>
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <Button className="btn-gold h-11 rounded-xl px-6 font-bold text-luxury-black" asChild>
-                <Link href="/dashboard/website-builder">
-                  Start creating
-                  <ArrowRight className="ml-1 size-4" />
-                </Link>
-              </Button>
-              <Button variant="outline" className="btn-ghost-gold h-11 rounded-xl px-6" asChild>
-                <Link href="/dashboard/favorites">View saved projects</Link>
-              </Button>
-            </div>
+            <h2 className="mt-2 text-[clamp(1.6rem,3vw,2.25rem)] font-bold tracking-[-0.03em] text-white">
+              Good to see you, {firstName}.
+            </h2>
+            <p className="mt-3 text-[15px] leading-relaxed text-white/50">
+              Your private AI workspace for websites, brands, content, marketing and
+              business intelligence — ready when you are.
+            </p>
           </div>
-          <div className="rounded-[2rem] border border-white/[0.08] bg-black/25 p-4 shadow-[0_28px_90px_rgb(0_0_0/0.35)] backdrop-blur-xl">
-            <div className="rounded-[1.5rem] border border-premium-gold/15 bg-[linear-gradient(135deg,rgb(212_175_55/0.12),rgb(255_255_255/0.03))] p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[11px] font-semibold tracking-[0.16em] text-premium-gold-light uppercase">
-                    Workspace Health
-                  </p>
-                  <p className="mt-2 text-3xl font-bold text-white">
-                    {totalAssets > 0 ? "Active" : "Ready"}
-                  </p>
-                </div>
-                <DashboardIconBox icon={Rocket} className="size-12 rounded-2xl" />
-              </div>
-              <div className="mt-6 space-y-3">
-                {chartItems.map((item) => (
-                  <ChartRow
-                    key={item.label}
-                    label={item.label}
-                    value={item.value}
-                    max={maxChartValue}
-                    icon={item.icon}
-                  />
-                ))}
-              </div>
-            </div>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Button asChild className="rounded-xl bg-[linear-gradient(180deg,#FFD700,#D4AF37)] text-[#111] hover:brightness-110">
+              <Link href="/dashboard/website-builder">
+                New Project <ArrowRight className="size-4" />
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              className="rounded-xl border-white/15 bg-transparent text-white hover:border-premium-gold/40 hover:bg-premium-gold/10"
+            >
+              <Link href="/dashboard/projects">View projects</Link>
+            </Button>
           </div>
         </div>
       </DashboardPanel>
 
+      {/* Stats row */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {statItems.map((stat) => (
-          <MetricCard key={stat.label} {...stat} />
+        {[
+          {
+            label: "Projects",
+            value: totalProjects,
+            hint: "All generated assets",
+            icon: FolderKanban,
+          },
+          {
+            label: "AI Credits",
+            value: aiCreditsRemaining,
+            hint: `${aiCreditsUsed} used this month`,
+            icon: Coins,
+          },
+          {
+            label: "Activity",
+            value: recentActivity.length,
+            hint: "Recent generations",
+            icon: Clock3,
+          },
+          {
+            label: "Saved",
+            value: stats.saved,
+            hint: "Pinned favorites",
+            icon: Star,
+          },
+        ].map((item) => (
+          <DashboardPanel key={item.label} className="p-5">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-[12px] font-medium text-white/40">{item.label}</p>
+                <p className="mt-2 text-3xl font-bold tracking-tight text-white">
+                  {item.value}
+                </p>
+                <p className="mt-1 text-[12px] text-white/35">{item.hint}</p>
+              </div>
+              <DashboardIconBox icon={item.icon} />
+            </div>
+          </DashboardPanel>
         ))}
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.05fr)_minmax(340px,0.95fr)]">
-        <DashboardPanel>
-          <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3">
-              <DashboardIconBox icon={Clock3} />
-              <div>
-                <h3 className="font-bold text-white">Recent Activity</h3>
-                <p className="text-[13px] text-white/40">
-                  Latest assets saved in your dashboard
-                </p>
-              </div>
-            </div>
-            {hasActivity && (
-              <span className="rounded-full bg-premium-gold/10 px-2.5 py-1 text-[11px] font-semibold text-premium-gold-light ring-1 ring-premium-gold/20">
-                {recentActivity.length} recent
-              </span>
-            )}
+      {/* Quick Actions */}
+      <section>
+        <div className="mb-4 flex items-end justify-between gap-4">
+          <div>
+            <h3 className="text-lg font-bold text-white">Quick Actions</h3>
+            <p className="mt-1 text-[13px] text-white/40">
+              Jump into the most-used AI products.
+            </p>
           </div>
+        </div>
+        <QuickActionsGrid />
+      </section>
 
-          {hasActivity ? (
-            <div className="space-y-2.5">
-              {recentActivity.map((item) => {
-                const Icon = ACTIVITY_ICONS[item.type];
-
-                return (
+      <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+        {/* Recent Projects */}
+        <DashboardPanel className="p-5 sm:p-6">
+          <div className="mb-5 flex items-center justify-between gap-3">
+            <div>
+              <h3 className="text-lg font-bold text-white">Recent Projects</h3>
+              <p className="mt-1 text-[13px] text-white/40">
+                Latest website and workspace generations.
+              </p>
+            </div>
+            <Link
+              href="/dashboard/projects"
+              className="text-[13px] font-semibold text-premium-gold hover:text-premium-gold-light"
+            >
+              View all
+            </Link>
+          </div>
+          {recentProjects.length === 0 ? (
+            <DashboardEmptyState
+              icon={FolderKanban}
+              title="No projects yet"
+              description="Create your first website, brand or campaign project to see it here."
+              action={{ label: "Create project", href: "/dashboard/website-builder" }}
+            />
+          ) : (
+            <ul className="space-y-3">
+              {recentProjects.map((item) => (
+                <li key={`${item.type}-${item.id}`}>
                   <Link
-                    key={`${item.type}-${item.id}`}
                     href={item.href}
-                    className="group flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.025] p-3 transition-all hover:border-premium-gold/25 hover:bg-premium-gold/[0.04]"
+                    className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 transition-colors hover:border-premium-gold/25 hover:bg-premium-gold/[0.05]"
                   >
-                    <DashboardIconBox icon={Icon} className="size-9" gold={false} />
+                    <DashboardIconBox icon={ACTIVITY_ICONS[item.type]} size="sm" />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-white transition-colors group-hover:text-premium-gold-light">
+                      <p className="truncate text-[14px] font-semibold text-white">
                         {item.title}
                       </p>
                       <p className="truncate text-[12px] text-white/40">
                         {item.description}
                       </p>
                     </div>
-                    <span className="hidden shrink-0 text-[11px] text-white/30 sm:inline">
+                    <span className="shrink-0 text-[11px] text-white/30">
                       {formatActivityDate(item.createdAt)}
                     </span>
-                    <ArrowRight className="size-4 shrink-0 text-white/20 transition-all group-hover:translate-x-0.5 group-hover:text-premium-gold" />
                   </Link>
-                );
-              })}
-            </div>
-          ) : (
-            <DashboardEmptyState
-              icon={Sparkles}
-              title="No activity yet"
-              description="Generate your first idea, market analysis, report, or website blueprint to start building your workspace history."
-              className="py-12 sm:py-14"
-            />
+                </li>
+              ))}
+            </ul>
           )}
         </DashboardPanel>
 
-        <DashboardPanel>
-          <div className="mb-5 flex items-center gap-3">
-            <DashboardIconBox icon={BarChart3} />
-            <div>
-              <h3 className="font-bold text-white">Modern Charts</h3>
-              <p className="text-[13px] text-white/40">
-                Portfolio mix across AI outputs
-              </p>
+        {/* Credits / Plan */}
+        <DashboardPanel className="p-5 sm:p-6">
+          <h3 className="text-lg font-bold text-white">Credits / Plan</h3>
+          <p className="mt-1 text-[13px] text-white/40">Free Beta · monthly allowance</p>
+          <div className="mt-6">
+            <div className="flex items-end justify-between">
+              <p className="text-3xl font-bold text-premium-gold">{aiCreditsRemaining}</p>
+              <p className="text-[13px] text-white/40">of 250 left</p>
             </div>
-          </div>
-          <div className="space-y-4">
-            {chartItems.map((item) => (
-              <ChartRow
-                key={item.label}
-                label={item.label}
-                value={item.value}
-                max={maxChartValue}
-                icon={item.icon}
-                large
+            <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/[0.08]">
+              <div
+                className="h-full rounded-full bg-[linear-gradient(90deg,#D4AF37,#FFD700)]"
+                style={{ width: `${usagePct}%` }}
               />
-            ))}
-            <div className="rounded-2xl border border-premium-gold/15 bg-premium-gold/[0.06] p-4">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-white/45">AI credit capacity</span>
-                <span className="font-bold text-premium-gold-light">
-                  {aiCreditsRemaining} remaining
-                </span>
-              </div>
-              <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/[0.06]">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-premium-gold to-premium-gold-light"
-                  style={{ width: `${(aiCreditsUsed / 250) * 100}%` }}
-                />
-              </div>
             </div>
+            <p className="mt-3 text-[12px] text-white/35">{usagePct}% of monthly credits used</p>
           </div>
+          <Button
+            asChild
+            variant="outline"
+            className="mt-6 w-full rounded-xl border-premium-gold/25 bg-premium-gold/10 text-premium-gold-light hover:bg-premium-gold/15"
+          >
+            <Link href="/dashboard/billing">Manage billing</Link>
+          </Button>
         </DashboardPanel>
       </div>
 
-      <div>
-        <h2 className="mb-5 text-lg font-bold text-white sm:text-xl">Quick Actions</h2>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {QUICK_ACTIONS.map((action) => (
-            <QuickActionCard key={action.href} {...action} />
-          ))}
-        </div>
-      </div>
-
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
-        <DashboardPanel>
-          <div className="mb-5 flex items-center gap-3">
-            <DashboardIconBox icon={Sparkles} />
-            <div>
-              <h2 className="font-bold text-white">Latest AI Generations</h2>
-              <p className="text-[13px] text-white/40">
-                Recent outputs across the workspace
-              </p>
-            </div>
-          </div>
-          {hasActivity ? (
-            <div className="grid gap-3 md:grid-cols-2">
-              {recentActivity.slice(0, 4).map((item) => {
-                const Icon = ACTIVITY_ICONS[item.type];
-
-                return (
-                  <Link
-                    key={`latest-${item.type}-${item.id}`}
-                    href={item.href}
-                    className="group rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4 transition-all hover:border-premium-gold/25 hover:bg-premium-gold/[0.04]"
-                  >
-                    <div className="mb-4 flex items-center justify-between">
-                      <DashboardIconBox icon={Icon} className="size-9" gold={false} />
-                      <span className="rounded-full bg-white/[0.04] px-2 py-1 text-[11px] text-white/35">
-                        {item.type}
-                      </span>
-                    </div>
-                    <p className="truncate font-semibold text-white group-hover:text-premium-gold-light">
-                      {item.title}
-                    </p>
-                    <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-white/40">
-                      {item.description}
+      <div className="grid gap-6 xl:grid-cols-2">
+        {/* Activity timeline */}
+        <DashboardPanel className="p-5 sm:p-6">
+          <h3 className="text-lg font-bold text-white">Activity timeline</h3>
+          <p className="mt-1 text-[13px] text-white/40">Recent workspace events</p>
+          {recentActivity.length === 0 ? (
+            <DashboardEmptyState
+              icon={Clock3}
+              className="mt-6 py-12"
+              description="Your generations and project updates will appear here."
+            />
+          ) : (
+            <ol className="relative mt-6 space-y-4 border-l border-white/[0.08] pl-5">
+              {recentActivity.map((item) => (
+                <li key={`timeline-${item.type}-${item.id}`} className="relative">
+                  <span className="absolute -left-[1.4rem] top-1.5 size-2.5 rounded-full bg-premium-gold shadow-[0_0_10px_rgba(212,175,55,0.8)]" />
+                  <Link href={item.href} className="block hover:opacity-90">
+                    <p className="text-[14px] font-semibold text-white">{item.title}</p>
+                    <p className="text-[12px] text-white/40">{item.description}</p>
+                    <p className="mt-1 text-[11px] text-white/30">
+                      {formatActivityDate(item.createdAt)}
                     </p>
                   </Link>
-                );
-              })}
-            </div>
-          ) : (
-            <DashboardEmptyState
-              icon={Sparkles}
-              title="No latest generations yet"
-              description="Start with a website, brand, campaign or business audit to fill this workspace with AI output."
-              className="py-10"
-            />
+                </li>
+              ))}
+            </ol>
           )}
         </DashboardPanel>
 
-        <DashboardPanel>
-          <div className="mb-5 flex items-center gap-3">
-            <DashboardIconBox icon={FolderKanban} />
+        {/* Latest AI generations */}
+        <DashboardPanel className="p-5 sm:p-6">
+          <div className="mb-5 flex items-center justify-between">
             <div>
-              <h2 className="font-bold text-white">Recent Files</h2>
-              <p className="text-[13px] text-white/40">Files ready to review or export</p>
+              <h3 className="text-lg font-bold text-white">Latest AI generations</h3>
+              <p className="mt-1 text-[13px] text-white/40">Fresh outputs across products</p>
             </div>
+            <Link
+              href="/dashboard/history"
+              className="text-[13px] font-semibold text-premium-gold hover:text-premium-gold-light"
+            >
+              History
+            </Link>
           </div>
-          <div className="space-y-3">
-            {(hasActivity ? recentActivity.slice(0, 4) : []).map((item) => (
-              <Link
-                key={`file-${item.type}-${item.id}`}
-                href={item.href}
-                className="group flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-black/20 p-3 transition-all hover:border-premium-gold/25"
-              >
-                <DashboardIconBox icon={FileText} className="size-9" gold={false} />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-white">{item.title}</p>
-                  <p className="text-[12px] text-white/35">{formatActivityDate(item.createdAt)}</p>
-                </div>
-                <ArrowRight className="size-4 text-white/25 group-hover:text-premium-gold" />
-              </Link>
-            ))}
-            {!hasActivity && (
-              <div className="rounded-2xl border border-dashed border-white/[0.1] p-5 text-center">
-                <p className="text-sm font-semibold text-white">No files yet</p>
-                <p className="mt-1 text-[13px] text-white/40">
-                  Generated assets will appear here automatically.
-                </p>
-              </div>
-            )}
-          </div>
+          {latestGenerations.length === 0 ? (
+            <DashboardEmptyState
+              icon={Sparkles}
+              className="py-12"
+              description="Generate a website, logo, campaign or report to populate this feed."
+              action={{ label: "Start generating", href: "/dashboard/website-builder" }}
+            />
+          ) : (
+            <ul className="space-y-3">
+              {latestGenerations.map((item) => (
+                <li key={`gen-${item.type}-${item.id}`}>
+                  <Link
+                    href={item.href}
+                    className="flex items-center justify-between gap-3 rounded-xl border border-white/[0.06] px-4 py-3 hover:border-premium-gold/25"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-[14px] font-medium text-white">
+                        {item.title}
+                      </p>
+                      <p className="truncate text-[12px] text-white/40">
+                        {item.description}
+                      </p>
+                    </div>
+                    <ArrowRight className="size-4 shrink-0 text-premium-gold/70" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
         </DashboardPanel>
       </div>
-
-      <div>
-        <h2 className="mb-5 text-lg font-bold text-white sm:text-xl">AI Workspaces</h2>
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {DASHBOARD_NAV.filter((item) => item.label.startsWith("AI ")).map((item) => (
-            <WorkspaceCard key={item.href} item={item} />
-          ))}
-        </div>
-      </div>
     </div>
-  );
-}
-
-function MetricCard({
-  label,
-  value,
-  description,
-  icon,
-  accent,
-}: {
-  label: string;
-  value: number;
-  description: string;
-  icon: LucideIcon;
-  accent: string;
-}) {
-  return (
-    <div className="group rounded-2xl border border-white/[0.08] glass-panel glass-panel-premium p-5 transition-all duration-300 hover:border-premium-gold/25 hover:shadow-gold-sm">
-      <div className="mb-5 flex items-start justify-between">
-        <DashboardIconBox icon={icon} />
-        <span className="rounded-full border border-premium-gold/15 bg-premium-gold/10 px-2.5 py-1 text-[11px] font-semibold text-premium-gold-light">
-          {accent}
-        </span>
-      </div>
-      <p className="text-[13px] font-medium text-white/40">{label}</p>
-      <p className="mt-1 text-3xl font-bold tracking-[-0.03em] text-white">{value}</p>
-      <p className="mt-3 text-[13px] leading-relaxed text-white/45">{description}</p>
-    </div>
-  );
-}
-
-function ChartRow({
-  label,
-  value,
-  max,
-  icon,
-  large,
-}: {
-  label: string;
-  value: number;
-  max: number;
-  icon: LucideIcon;
-  large?: boolean;
-}) {
-  const width = value === 0 ? 8 : Math.max(16, (value / max) * 100);
-  const Icon = icon;
-
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between gap-3 text-sm">
-        <span className="inline-flex items-center gap-2 font-medium text-white/65">
-          <Icon className="size-4 text-premium-gold" />
-          {label}
-        </span>
-        <span className="font-bold text-white">{value}</span>
-      </div>
-      <div className={large ? "h-3 rounded-full bg-white/[0.06]" : "h-2 rounded-full bg-white/[0.06]"}>
-        <div
-          className="h-full rounded-full bg-gradient-to-r from-premium-gold/70 via-premium-gold to-premium-gold-light transition-all duration-700"
-          style={{ width: `${width}%` }}
-        />
-      </div>
-    </div>
-  );
-}
-
-function QuickActionCard({
-  title,
-  description,
-  href,
-  icon,
-  cta,
-}: {
-  title: string;
-  description: string;
-  href: string;
-  icon: LucideIcon;
-  cta: string;
-}) {
-  return (
-    <div className="group flex h-full flex-col rounded-2xl border border-white/[0.08] glass-panel glass-panel-premium p-5 transition-all duration-300 hover:border-premium-gold/25 hover:shadow-gold-sm sm:p-6">
-      <div className="mb-4 flex items-start justify-between">
-        <DashboardIconBox icon={icon} />
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          className="text-white/40 hover:text-premium-gold-light"
-          asChild
-        >
-          <Link href={href} aria-label={title}>
-            <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-          </Link>
-        </Button>
-      </div>
-      <h3 className="font-bold text-white">{title}</h3>
-      <p className="mt-2 flex-1 text-[14px] leading-relaxed text-white/45">
-        {description}
-      </p>
-      <Button
-        variant="outline"
-        className="btn-ghost-gold mt-5 w-full rounded-xl"
-        asChild
-      >
-        <Link href={href}>{cta}</Link>
-      </Button>
-    </div>
-  );
-}
-
-function WorkspaceCard({
-  item,
-}: {
-  item: (typeof DASHBOARD_NAV)[number];
-}) {
-  const Icon = item.icon;
-
-  return (
-    <Link
-      href={item.href}
-      className="group flex min-h-[128px] items-start gap-4 rounded-2xl border border-white/[0.08] glass-panel p-4 transition-all duration-300 hover:-translate-y-1 hover:border-premium-gold/25 hover:shadow-gold-sm sm:p-5"
-    >
-      <DashboardIconBox icon={Icon} />
-      <div className="min-w-0 flex-1">
-        <p className="font-semibold text-white transition-colors group-hover:text-premium-gold-light">
-          {item.label}
-        </p>
-        <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-white/40">
-          {item.description}
-        </p>
-      </div>
-      <ArrowRight className="size-4 shrink-0 text-white/25 transition-all group-hover:translate-x-0.5 group-hover:text-premium-gold" />
-    </Link>
   );
 }

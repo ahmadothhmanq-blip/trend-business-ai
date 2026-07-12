@@ -84,6 +84,30 @@ export async function PATCH(request: Request, context: RouteContext) {
     }
   }
 
+  if (parsed.data.draft_prompt !== undefined) {
+    updates.draft_prompt = parsed.data.draft_prompt;
+  }
+
+  if (parsed.data.brief !== undefined) {
+    updates.brief = parsed.data.brief;
+  }
+
+  if (parsed.data.output !== undefined) {
+    updates.output = parsed.data.output;
+  }
+
+  if (parsed.data.prompt_versions !== undefined) {
+    updates.prompt_versions = parsed.data.prompt_versions;
+  }
+
+  if (parsed.data.attachments !== undefined) {
+    updates.attachments = parsed.data.attachments;
+  }
+
+  if (parsed.data.status !== undefined) {
+    updates.status = parsed.data.status;
+  }
+
   const { data, error } = await auth.supabase
     .from("workspace_generations")
     .update(updates)
@@ -143,6 +167,20 @@ export async function POST(_request: Request, context: RouteContext) {
       features: row.features,
       output: row.output,
       is_favorite: false,
+      project_id: row.project_id ?? null,
+      product_id: row.product_id ?? null,
+      status: "completed",
+      mode: "generate",
+      parent_generation_id: row.id,
+      provider: row.provider ?? null,
+      token_usage: row.token_usage ?? {
+        promptTokens: 0,
+        completionTokens: 0,
+        totalTokens: 0,
+      },
+      generation_time_ms: row.generation_time_ms ?? null,
+      prompt_versions: row.prompt_versions ?? [],
+      attachments: row.attachments ?? [],
     })
     .select("*")
     .single();

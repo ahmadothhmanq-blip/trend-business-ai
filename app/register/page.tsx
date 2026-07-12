@@ -1,1 +1,5 @@
-export { default } from "@/lib/routes/scaffold-page";
+import { redirect } from "next/navigation";
+
+export default function RegisterPage() {
+  redirect("/signup");
+}

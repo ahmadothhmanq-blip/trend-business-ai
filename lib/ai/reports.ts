@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { reportInputSchema } from "@/lib/validations/reports";
-import { createOpenAIClient, parseOpenAIJson, withOpenAIRetry } from "@/lib/ai/openai-client";
 import {
   reportsSystemPrompt,
   reportsUserPrompt,
@@ -33,53 +32,48 @@ function generateFallbackReport(input: ReportInput): GeneratedReport {
   };
 }
 
-async function generateWithOpenAI(input: ReportInput): Promise<GeneratedReport> {
-  const openai = await createOpenAIClient();
-
-  const response = await withOpenAIRetry(() =>
-    openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      response_format: { type: "json_object" },
-      messages: [
-        {
-          role: "system",
-          content: reportsSystemPrompt,
-        },
-        {
-          role: "user",
-          content: reportsUserPrompt(input),
-        },
-      ],
-      temperature: 0.7,
-    }),
-  );
-
-  const content = response.choices[0]?.message?.content;
-  if (!content) throw new Error("Empty response from OpenAI");
-
-  const parsed = parseOpenAIJson<GeneratedReport>(content);
-
-  return {
-    title: parsed.title?.trim() || `${input.reportType}: ${input.topic}`,
-    report_type: parsed.report_type?.trim() || input.reportType,
-    content: parsed.content?.trim() || "",
-    insights: Array.isArray(parsed.insights)
-      ? parsed.insights.map(String).slice(0, 8)
-      : [],
-  };
-}
-
 export async function generateReport(
   input: ReportInput,
-): Promise<{ report: GeneratedReport; source: "openai" | "fallback" }> {
-  if (process.env.OPENAI_API_KEY) {
+): Promise<{
+  report: GeneratedReport;
+  source: "openai" | "deepseek" | "anthropic" | "fallback";
+  usage?: { promptTokens: number; completionTokens: number; totalTokens: number };
+  generationTimeMs?: number;
+}> {
+  const startedAt = Date.now();
+  const { getAIProvider, resolveAvailableProvider } = await import("@/lib/ai/adapters");
+  const providerName = resolveAvailableProvider("openai");
+
+  if (providerName) {
     try {
-      const report = await generateWithOpenAI(input);
-      return { report, source: "openai" };
+      const provider = getAIProvider(providerName);
+      const parsed = await provider.generateJson<GeneratedReport>({
+        system: reportsSystemPrompt,
+        prompt: reportsUserPrompt(input),
+        temperature: 0.7,
+      });
+
+      return {
+        report: {
+          title: parsed.title?.trim() || `${input.reportType}: ${input.topic}`,
+          report_type: parsed.report_type?.trim() || input.reportType,
+          content: parsed.content?.trim() || "",
+          insights: Array.isArray(parsed.insights)
+            ? parsed.insights.map(String).slice(0, 8)
+            : [],
+        },
+        source: providerName as "openai" | "deepseek" | "anthropic",
+        usage: provider.getLastUsage?.() ?? undefined,
+        generationTimeMs: Date.now() - startedAt,
+      };
     } catch (error) {
-      console.error("OpenAI report generation failed, using fallback:", error);
+      console.error("AI report generation failed, using fallback:", error);
     }
   }
 
-  return { report: generateFallbackReport(input), source: "fallback" };
+  return {
+    report: generateFallbackReport(input),
+    source: "fallback",
+    generationTimeMs: Date.now() - startedAt,
+  };
 }

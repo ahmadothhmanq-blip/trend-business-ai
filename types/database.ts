@@ -86,6 +86,43 @@ export type WebsiteBlueprint = {
   };
 };
 
+export type TokenUsage = {
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+};
+
+export type GenerationStatus = "pending" | "running" | "completed" | "failed";
+export type GenerationMode = "generate" | "regenerate" | "continue" | "retry";
+
+export type PromptVersion = {
+  id: string;
+  prompt: string;
+  createdAt: string;
+  mode?: GenerationMode;
+};
+
+export type GenerationAttachmentMeta = {
+  id: string;
+  fileName: string;
+  fileType: "file" | "image";
+  mimeType?: string;
+  sizeBytes?: number;
+  storagePath: string;
+  publicUrl?: string | null;
+};
+
+export type Project = {
+  id: string;
+  user_id: string;
+  name: string;
+  product_id: string | null;
+  workspace_type: string | null;
+  description: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export type WebsiteGeneration = {
   id: string;
   user_id: string;
@@ -102,6 +139,17 @@ export type WebsiteGeneration = {
   is_favorite: boolean;
   created_at: string;
   updated_at: string;
+  project_id?: string | null;
+  product_id?: string | null;
+  status?: GenerationStatus;
+  mode?: GenerationMode;
+  parent_generation_id?: string | null;
+  provider?: string | null;
+  token_usage?: TokenUsage;
+  generation_time_ms?: number | null;
+  error_message?: string | null;
+  prompt_versions?: PromptVersion[];
+  attachments?: GenerationAttachmentMeta[];
 };
 
 export type FavoriteItemType =
@@ -133,7 +181,13 @@ export type WorkspaceOutput = {
   deliverables: string[];
   progressEvents?: string[];
   generatedAt?: string;
-  source?: "openai" | "anthropic" | "deepseek" | "structured";
+  source?: "openai" | "anthropic" | "deepseek" | "structured" | string;
+  productId?: string;
+  depth?: "focused" | "standard" | "deep";
+  tokenUsage?: TokenUsage;
+  generationTimeMs?: number;
+  mode?: GenerationMode;
+  continuedFrom?: string;
 };
 
 export type WorkspaceGeneration = {
@@ -150,6 +204,18 @@ export type WorkspaceGeneration = {
   is_favorite: boolean;
   created_at: string;
   updated_at: string;
+  project_id?: string | null;
+  product_id?: string | null;
+  status?: GenerationStatus;
+  mode?: GenerationMode;
+  parent_generation_id?: string | null;
+  provider?: string | null;
+  token_usage?: TokenUsage;
+  generation_time_ms?: number | null;
+  error_message?: string | null;
+  prompt_versions?: PromptVersion[];
+  attachments?: GenerationAttachmentMeta[];
+  draft_prompt?: string | null;
 };
 
 export type Favorite = {

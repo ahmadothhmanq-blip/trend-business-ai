@@ -1,9 +1,11 @@
 import { getAIProvider } from "@/lib/ai/adapters";
 import { createProgressTracker } from "@/lib/ai/progress";
+import { createUsageTracker } from "@/lib/ai/usage";
 import type {
   AIProviderName,
   ExportResult,
   GenerationContext,
+  TokenUsage,
   ValidationResult,
 } from "@/lib/ai/types";
 
@@ -30,7 +32,12 @@ export type AIPlugin<TInput, TAnalysis, TPlan, TOutput> = {
 export type EngineRunOptions = {
   provider?: AIProviderName;
   progressEvents?: string[];
+  onProgress?: (event: string) => void;
 };
+
+function trackProviderUsage(ctx: GenerationContext) {
+  ctx.usage.add(ctx.provider.getLastUsage?.() ?? null);
+}
 
 export class AIGenerationEngine {
   async run<TInput, TAnalysis, TPlan, TOutput>(
@@ -41,14 +48,30 @@ export class AIGenerationEngine {
     output: TOutput;
     progressEvents: string[];
     exportResult: ExportResult;
+    usage: TokenUsage;
+    generationTimeMs: number;
+    provider: AIProviderName;
   }> {
+    const startedAt = Date.now();
     const progress = createProgressTracker(options.progressEvents);
-    const provider = getAIProvider(options.provider ?? plugin.preferredProvider);
-    const ctx: GenerationContext = { provider, progress };
+    const usage = createUsageTracker();
+    const providerName = options.provider ?? plugin.preferredProvider;
+    const provider = getAIProvider(providerName);
+
+    const originalEmit = progress.emit;
+    progress.emit = (event) => {
+      originalEmit(event);
+      options.onProgress?.(event);
+    };
+
+    const ctx: GenerationContext = { provider, progress, usage };
 
     const analysis = await plugin.analyze(input, ctx);
+    trackProviderUsage(ctx);
     const plan = await plugin.plan(input, analysis, ctx);
+    trackProviderUsage(ctx);
     const output = await plugin.generate(input, analysis, plan, ctx);
+    trackProviderUsage(ctx);
     const validation = await plugin.validate(output, ctx);
     if (!validation.valid) {
       throw new Error(
@@ -64,6 +87,9 @@ export class AIGenerationEngine {
       output,
       progressEvents: progress.getEvents(),
       exportResult,
+      usage: usage.get(),
+      generationTimeMs: Date.now() - startedAt,
+      provider: providerName,
     };
   }
 }

@@ -1,4 +1,3 @@
-import { createOpenAIClient, withOpenAIRetry } from "@/lib/ai/openai-client";
 import {
   marketAnalysisSystemPrompt,
   marketAnalysisUserPrompt,
@@ -54,65 +53,56 @@ function generateFallbackAnalysis(
   };
 }
 
-async function generateWithOpenAI(
-  input: MarketAnalysisInput,
-): Promise<GeneratedMarketAnalysis> {
-  const openai = await createOpenAIClient();
-
-  const response = await withOpenAIRetry(() =>
-    openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    response_format: { type: "json_object" },
-    messages: [
-      {
-        role: "system",
-        content: marketAnalysisSystemPrompt,
-      },
-      {
-        role: "user",
-        content: marketAnalysisUserPrompt(input),
-      },
-    ],
-      temperature: 0.7,
-    }),
-  );
-
-  const content = response.choices[0]?.message?.content;
-  if (!content) {
-    throw new Error("Empty response from OpenAI");
-  }
-
-  const parsed = JSON.parse(content) as GeneratedMarketAnalysis;
-
-  return {
-    industry: parsed.industry?.trim() || input.industry,
-    region: parsed.region?.trim() || input.region,
-    market_size: parsed.market_size?.trim() || "Not available",
-    growth_rate: parsed.growth_rate?.trim() || "Not available",
-    competitors: Array.isArray(parsed.competitors)
-      ? parsed.competitors.map(String).slice(0, 6)
-      : [],
-    opportunities: Array.isArray(parsed.opportunities)
-      ? parsed.opportunities.map(String).slice(0, 6)
-      : [],
-    risks: Array.isArray(parsed.risks)
-      ? parsed.risks.map(String).slice(0, 6)
-      : [],
-    summary: parsed.summary?.trim() || "",
-  };
-}
-
 export async function generateMarketAnalysis(
   input: MarketAnalysisInput,
-): Promise<{ analysis: GeneratedMarketAnalysis; source: "openai" | "fallback" }> {
-  if (process.env.OPENAI_API_KEY) {
+): Promise<{
+  analysis: GeneratedMarketAnalysis;
+  source: "openai" | "deepseek" | "anthropic" | "fallback";
+  usage?: { promptTokens: number; completionTokens: number; totalTokens: number };
+  generationTimeMs?: number;
+}> {
+  const startedAt = Date.now();
+  const { getAIProvider, resolveAvailableProvider } = await import("@/lib/ai/adapters");
+  const providerName = resolveAvailableProvider("openai");
+
+  if (providerName) {
     try {
-      const analysis = await generateWithOpenAI(input);
-      return { analysis, source: "openai" };
+      const provider = getAIProvider(providerName);
+      const parsed = await provider.generateJson<GeneratedMarketAnalysis>({
+        system: marketAnalysisSystemPrompt,
+        prompt: marketAnalysisUserPrompt(input),
+        temperature: 0.7,
+      });
+
+      return {
+        analysis: {
+          industry: parsed.industry?.trim() || input.industry,
+          region: parsed.region?.trim() || input.region,
+          market_size: parsed.market_size?.trim() || "Not available",
+          growth_rate: parsed.growth_rate?.trim() || "Not available",
+          competitors: Array.isArray(parsed.competitors)
+            ? parsed.competitors.map(String).slice(0, 6)
+            : [],
+          opportunities: Array.isArray(parsed.opportunities)
+            ? parsed.opportunities.map(String).slice(0, 6)
+            : [],
+          risks: Array.isArray(parsed.risks)
+            ? parsed.risks.map(String).slice(0, 6)
+            : [],
+          summary: parsed.summary?.trim() || "",
+        },
+        source: providerName as "openai" | "deepseek" | "anthropic",
+        usage: provider.getLastUsage?.() ?? undefined,
+        generationTimeMs: Date.now() - startedAt,
+      };
     } catch (error) {
-      console.error("OpenAI market analysis failed, using fallback:", error);
+      console.error("AI market analysis failed, using fallback:", error);
     }
   }
 
-  return { analysis: generateFallbackAnalysis(input), source: "fallback" };
+  return {
+    analysis: generateFallbackAnalysis(input),
+    source: "fallback",
+    generationTimeMs: Date.now() - startedAt,
+  };
 }

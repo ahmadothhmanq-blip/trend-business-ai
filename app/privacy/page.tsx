@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { BrandLogo } from "@/components/ui/brand-logo";
+import { MarketingLegalPage } from "@/components/marketing/marketing-legal-page";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = createPageMetadata({
@@ -38,39 +37,11 @@ const sections = [
 
 export default function PrivacyPage() {
   return (
-    <main className="min-h-screen bg-[#050505] text-white">
-      <div className="landing-container py-8 sm:py-10">
-        <header className="flex items-center justify-between gap-4">
-          <Link href="/" aria-label="Trend Business AI home">
-            <BrandLogo size="sm" variant="nav" />
-          </Link>
-          <Link href="/" className="text-sm font-medium text-[#B5B5B5] hover:text-white">
-            Back to home
-          </Link>
-        </header>
-
-        <article className="mx-auto mt-14 max-w-3xl rounded-[24px] border border-[rgb(212_175_55/0.18)] bg-[#111111]/80 p-6 shadow-[0_24px_80px_rgb(0_0_0/0.28)] sm:p-8 lg:p-10">
-          <p className="text-[11px] font-semibold tracking-[0.18em] text-[#D4AF37] uppercase">
-            Legal
-          </p>
-          <h1 className="mt-3 text-[clamp(2rem,5vw,3.5rem)] font-bold tracking-[-0.04em]">
-            Privacy Policy
-          </h1>
-          <p className="mt-4 text-sm leading-7 text-[#B5B5B5]">
-            Last updated: July 5, 2026. This MVP policy explains the current
-            data handling model for Trend Business AI.
-          </p>
-
-          <div className="mt-9 space-y-7">
-            {sections.map((section) => (
-              <section key={section.title}>
-                <h2 className="text-lg font-bold text-white">{section.title}</h2>
-                <p className="mt-2 text-sm leading-7 text-[#B5B5B5]">{section.body}</p>
-              </section>
-            ))}
-          </div>
-        </article>
-      </div>
-    </main>
+    <MarketingLegalPage
+      eyebrow="Legal"
+      title="Privacy Policy"
+      intro="Last updated: July 5, 2026. This MVP policy explains the current data handling model for Trend Business AI."
+      sections={sections}
+    />
   );
 }

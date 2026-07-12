@@ -13,6 +13,10 @@ const websiteRequestSchema = z.object({
   language: z.string().trim().min(1, "Select a language."),
   theme: z.string().trim().min(1, "Select a theme."),
   features: z.array(z.string().trim()).default([]),
+  productId: z.string().trim().optional(),
+  mode: z.enum(["generate", "regenerate", "continue", "retry"]).optional(),
+  parentGenerationId: z.string().uuid().optional(),
+  projectId: z.string().uuid().optional(),
 });
 
 function detectProjectKind(input: z.infer<typeof websiteRequestSchema>) {
@@ -172,8 +176,28 @@ export async function POST(request: Request) {
         color_style: input.theme,
         design_style: input.theme,
         page_count: String(savedProject.pages.length || 1),
-        features: input.features,
+        features: [
+          ...input.features,
+          ...(input.productId ? [`product:${input.productId}`] : []),
+        ],
         blueprint: savedProject as unknown as WebsiteBlueprint,
+        product_id: input.productId ?? null,
+        project_id: input.projectId ?? null,
+        status: "completed",
+        mode: input.mode ?? "generate",
+        parent_generation_id: input.parentGenerationId ?? null,
+        provider: project.provider ?? "deepseek",
+        token_usage: project.usage,
+        generation_time_ms: project.generationTimeMs,
+        prompt_versions: [
+          {
+            id: crypto.randomUUID(),
+            prompt: input.prompt,
+            createdAt: new Date().toISOString(),
+            mode: input.mode ?? "generate",
+          },
+        ],
+        attachments: [],
       })
       .select("*")
       .single();

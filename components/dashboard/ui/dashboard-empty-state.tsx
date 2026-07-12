@@ -1,11 +1,14 @@
 import { type LucideIcon } from "lucide-react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 type DashboardEmptyStateProps = {
   icon: LucideIcon;
   title?: string;
   description: string;
   className?: string;
+  action?: { label: string; href: string };
 };
 
 export function DashboardEmptyState({
@@ -13,6 +16,7 @@ export function DashboardEmptyState({
   title,
   description,
   className,
+  action,
 }: DashboardEmptyStateProps) {
   return (
     <div
@@ -30,6 +34,14 @@ export function DashboardEmptyState({
       <p className="max-w-md text-[14px] leading-relaxed text-white/45 sm:text-[15px]">
         {description}
       </p>
+      {action && (
+        <Button
+          asChild
+          className="mt-6 rounded-xl bg-[linear-gradient(180deg,#FFD700,#D4AF37)] text-[#111] hover:brightness-110"
+        >
+          <Link href={action.href}>{action.label}</Link>
+        </Button>
+      )}
     </div>
   );
 }

@@ -7,3 +7,5 @@ export * from "@/lib/workspace/export";
 export * from "@/lib/workspace/project";
 export * from "@/lib/workspace/history";
 export * from "@/lib/workspace/structured-output";
+export * from "@/lib/workspace/projects";
+export * from "@/lib/workspace/persist";

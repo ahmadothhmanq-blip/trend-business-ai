@@ -11,6 +11,18 @@ export default async function DashboardPage() {
   } = await supabase.auth.getUser();
 
   const metadata = user?.user_metadata ?? {};
+  const userName = (metadata.full_name as string | undefined) ?? undefined;
+
+  let avatarUrl: string | null = null;
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("avatar_url, full_name")
+      .eq("id", user.id)
+      .maybeSingle();
+    avatarUrl = profile?.avatar_url ?? null;
+  }
+
   const homeData: DashboardHomeData = user
     ? await getDashboardHomeData(supabase, user.id)
     : {
@@ -29,12 +41,13 @@ export default async function DashboardPage() {
     <>
       <DashboardHeader
         title="Dashboard"
-        description="Your business intelligence overview"
+        description="Your AI business workspace overview"
         userEmail={user?.email}
-        userName={metadata.full_name as string | undefined}
+        userName={userName}
+        avatarUrl={avatarUrl}
       />
       <main className="flex-1 p-4 sm:p-6 lg:p-8 xl:p-10">
-        <DashboardOverview data={homeData} />
+        <DashboardOverview data={homeData} userName={userName} />
       </main>
     </>
   );

@@ -1,4 +1,11 @@
-import type { AIProvider, JsonGenerationRequest, TextGenerationRequest } from "@/lib/ai/types";
+import type {
+  AIProvider,
+  JsonGenerationRequest,
+  StreamTextRequest,
+  TextGenerationRequest,
+  TokenUsage,
+} from "@/lib/ai/types";
+import { normalizeOpenAIUsage } from "@/lib/ai/usage";
 import { parseJsonResponse, withRetry } from "@/lib/ai/retry";
 
 const DEFAULT_MODEL = "gpt-4o-mini";
@@ -16,8 +23,26 @@ async function createClient() {
 
 export class OpenAIAdapter implements AIProvider {
   readonly name = "openai" as const;
+  private lastUsage: TokenUsage | null = null;
 
   constructor(private readonly model = DEFAULT_MODEL) {}
+
+  getLastUsage() {
+    return this.lastUsage;
+  }
+
+  private recordUsage(
+    usage:
+      | {
+          prompt_tokens?: number;
+          completion_tokens?: number;
+          total_tokens?: number;
+        }
+      | null
+      | undefined,
+  ) {
+    this.lastUsage = normalizeOpenAIUsage(usage);
+  }
 
   async generateJson<T>(request: JsonGenerationRequest): Promise<T> {
     const client = await createClient();
@@ -30,12 +55,15 @@ export class OpenAIAdapter implements AIProvider {
         messages: [
           {
             role: "system",
-            content: "Return only valid JSON matching the requested structure.",
+            content:
+              request.system ??
+              "Return only valid JSON matching the requested structure.",
           },
           { role: "user", content: request.prompt },
         ],
       });
 
+      this.recordUsage(response.usage);
       const content = response.choices[0]?.message?.content;
       if (!content) {
         throw new Error("OpenAI returned an empty response.");
@@ -52,9 +80,15 @@ export class OpenAIAdapter implements AIProvider {
       const response = await client.chat.completions.create({
         model: this.model,
         temperature: request.temperature ?? 0.7,
-        messages: [{ role: "user", content: request.prompt }],
+        messages: [
+          ...(request.system
+            ? [{ role: "system" as const, content: request.system }]
+            : []),
+          { role: "user", content: request.prompt },
+        ],
       });
 
+      this.recordUsage(response.usage);
       const content = response.choices[0]?.message?.content;
       if (!content) {
         throw new Error("OpenAI returned an empty response.");
@@ -62,6 +96,40 @@ export class OpenAIAdapter implements AIProvider {
 
       return content;
     });
+  }
+
+  async streamText(request: StreamTextRequest): Promise<string> {
+    const client = await createClient();
+    const stream = await client.chat.completions.create({
+      model: this.model,
+      temperature: request.temperature ?? 0.7,
+      stream: true,
+      stream_options: { include_usage: true },
+      messages: [
+        ...(request.system
+          ? [{ role: "system" as const, content: request.system }]
+          : []),
+        { role: "user", content: request.prompt },
+      ],
+    });
+
+    let text = "";
+    for await (const chunk of stream) {
+      if (chunk.usage) {
+        this.recordUsage(chunk.usage);
+      }
+      const delta = chunk.choices[0]?.delta?.content ?? "";
+      if (delta) {
+        text += delta;
+        request.onChunk?.(delta);
+      }
+    }
+
+    if (!text) {
+      throw new Error("OpenAI returned an empty streamed response.");
+    }
+
+    return text;
   }
 }
 

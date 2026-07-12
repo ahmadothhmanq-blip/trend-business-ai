@@ -15,7 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { BrandLogo } from "@/components/ui/brand-logo";
+import { OfficialLogo } from "@/components/marketing/official-logo";
 
 type LoginFormProps = {
   redirect?: string;
@@ -30,13 +30,13 @@ export function LoginForm({ redirect }: LoginFormProps) {
   );
 
   return (
-    <Card className="w-full max-w-md border-border/60 bg-card/80 backdrop-blur-xl">
+    <Card className="w-full max-w-md border-[rgb(212_175_55/0.2)] bg-[#111111] text-white shadow-[0_24px_80px_rgb(0_0_0/0.45)] backdrop-blur-xl">
       <CardHeader className="text-center">
         <div className="mx-auto mb-2 flex justify-center">
-          <BrandLogo size="md" />
+          <OfficialLogo size="md" />
         </div>
-        <CardTitle className="text-xl">Welcome back</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-xl text-white">Welcome back</CardTitle>
+        <CardDescription className="text-[#B5B5B5]">
           Sign in to your Trend Business AI account
         </CardDescription>
       </CardHeader>

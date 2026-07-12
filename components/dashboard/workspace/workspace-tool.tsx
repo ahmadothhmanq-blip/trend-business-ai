@@ -15,22 +15,26 @@ import { WorkspaceHero } from "@/components/dashboard/workspace/workspace-hero";
 import { WorkspaceOutputPreview } from "@/components/dashboard/workspace/workspace-output-preview";
 import { WorkspaceProjectsList } from "@/components/dashboard/workspace/workspace-projects-list";
 import { useWorkspaceTool } from "@/lib/hooks/use-workspace-tool";
+import type { ProductDefinition } from "@/lib/products/types";
 import type { WorkspaceDefinition } from "@/lib/workspace/definition";
 import type { WorkspaceGeneration } from "@/types/database";
 
 type WorkspaceToolProps = {
   definition: WorkspaceDefinition;
+  product?: ProductDefinition;
   initialGenerations?: WorkspaceGeneration[];
   initialTotal?: number;
 };
 
 export function WorkspaceTool({
   definition,
+  product,
   initialGenerations = [],
   initialTotal = 0,
 }: WorkspaceToolProps) {
   const tool = useWorkspaceTool({
     definition,
+    product,
     initialGenerations,
     initialTotal,
   });
@@ -50,18 +54,43 @@ export function WorkspaceTool({
           onLanguageChange={tool.setLanguage}
           theme={tool.theme}
           onThemeChange={tool.setTheme}
+          depth={tool.depth}
+          onDepthChange={tool.setDepth}
+          selectedOutputs={tool.selectedOutputs}
+          onToggleOutput={tool.toggleOutputFeature}
+          advancedOpen={tool.advancedOpen}
+          onAdvancedOpenChange={tool.setAdvancedOpen}
           isGenerating={tool.isGenerating}
+          isStreaming={tool.isStreaming}
+          streamStatus={tool.streamStatus}
           progress={tool.progress}
           apiError={tool.apiError}
           onGenerate={tool.generate}
+          onRetry={tool.retryFailed}
+          attachments={tool.attachments}
+          uploading={tool.uploading}
+          onUploadFiles={tool.uploadFiles}
+          onRemoveAttachment={tool.removeAttachment}
+          promptVersions={tool.activeProject?.promptVersions ?? []}
+          onRestorePromptVersion={tool.restorePromptVersion}
+          autosaveState={tool.autosaveState}
         />
 
         <WorkspaceOutputPreview
           project={tool.activeProject}
+          isStreaming={tool.isStreaming}
+          streamStatus={tool.streamStatus}
+          actionLoading={tool.actionLoading}
           onCopy={tool.copyProject}
           onExportMarkdown={(project) => tool.exportProject(project, "markdown")}
           onExportJson={(project) => tool.exportProject(project, "json")}
+          onExportPdf={(project) => tool.exportProject(project, "pdf")}
+          onExportDocx={(project) => tool.exportProject(project, "docx")}
           onRename={tool.openRename}
+          onRegenerate={tool.regenerate}
+          onContinue={() => tool.continueGeneration()}
+          onRetry={tool.retryFailed}
+          onToggleFavorite={tool.toggleFavorite}
         />
       </div>
 
@@ -88,9 +117,9 @@ export function WorkspaceTool({
       <Dialog open={tool.renameOpen} onOpenChange={tool.setRenameOpen}>
         <DialogContent className="border-white/10 bg-luxury-black text-white">
           <DialogHeader>
-            <DialogTitle>Rename project</DialogTitle>
+            <DialogTitle>Save project</DialogTitle>
             <DialogDescription className="text-white/45">
-              Update the saved project title.
+              Rename and keep this generation in your workspace project history.
             </DialogDescription>
           </DialogHeader>
           <Input
@@ -103,7 +132,7 @@ export function WorkspaceTool({
               Cancel
             </Button>
             <Button type="button" className="btn-gold text-luxury-black" onClick={tool.saveRename}>
-              Save
+              Save project
             </Button>
           </DialogFooter>
         </DialogContent>

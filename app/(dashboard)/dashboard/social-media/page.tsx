@@ -1,5 +1,5 @@
-import { WorkspaceDashboardPage } from "@/components/dashboard/workspace-dashboard-page";
+import { ProductEnginePage } from "@/components/dashboard/product-engine/product-engine-page";
 
 export default function SocialMediaPage() {
-  return <WorkspaceDashboardPage workspaceType="social" />;
+  return <ProductEnginePage productId="social-media-manager" />;
 }

@@ -43,57 +43,97 @@ export function createSocialImageResponse() {
         />
         <div
           style={{
-            position: "absolute",
-            inset: 0,
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
-            backgroundSize: "64px 64px",
-            opacity: 0.35,
-            display: "flex",
-          }}
-        />
-        <div
-          style={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             textAlign: "center",
             position: "relative",
-            gap: "24px",
+            gap: "20px",
           }}
         >
           <div
             style={{
               display: "flex",
-              flexDirection: "row",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: 72,
-              fontWeight: 800,
-              letterSpacing: "-0.03em",
-              lineHeight: 1.05,
-              color: "#ffffff",
+              width: 88,
+              height: 98,
             }}
           >
-            <span>Trend Business </span>
-            <span
-              style={{
-                background: "linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8941F 100%)",
-                backgroundClip: "text",
-                color: "transparent",
-              }}
+            <svg
+              width="88"
+              height="98"
+              viewBox="0 0 64 72"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
             >
-              AI
-            </span>
+              <path
+                d="M32 16.5 48 23.5V38c0 9.5-6.8 16.8-16 20-9.2-3.2-16-10.5-16-20V23.5L32 16.5Z"
+                fill="#111111"
+                stroke="#D4AF37"
+                strokeWidth="2"
+              />
+              <rect x="22" y="40" width="4.2" height="9" rx="1" fill="#D4AF37" opacity="0.75" />
+              <rect x="28.2" y="35.5" width="4.2" height="13.5" rx="1" fill="#D4AF37" opacity="0.88" />
+              <rect x="34.4" y="31.5" width="4.2" height="17.5" rx="1" fill="#D4AF37" />
+              <rect x="40.6" y="26.5" width="4.2" height="22.5" rx="1" fill="#FFD700" />
+              <path d="M42.7 24.2 45.5 27.2H44v4.2h-2.6v-4.2h-1.5l2.8-3Z" fill="#FFD700" />
+              <path
+                d="M24 14.5 27.5 9l4.5 5 4.5-5 3.5 5.5"
+                stroke="#D4AF37"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <circle cx="27.5" cy="8.2" r="1.5" fill="#FFD700" />
+              <circle cx="32" cy="7.2" r="1.7" fill="#FFD700" />
+              <circle cx="36.5" cy="8.2" r="1.5" fill="#FFD700" />
+            </svg>
           </div>
+
           <div
             style={{
               display: "flex",
-              fontSize: 32,
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 10,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                fontSize: 64,
+                fontWeight: 800,
+                letterSpacing: "-0.03em",
+                lineHeight: 1.05,
+                color: "#ffffff",
+              }}
+            >
+              Trend Business AI
+            </div>
+            <div
+              style={{
+                display: "flex",
+                fontSize: 22,
+                fontWeight: 600,
+                letterSpacing: "0.22em",
+                textTransform: "uppercase",
+                color: "#D4AF37",
+              }}
+            >
+              Premium AI Company
+            </div>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              fontSize: 28,
               fontWeight: 500,
               lineHeight: 1.35,
               color: "rgba(255, 255, 255, 0.78)",
               maxWidth: "880px",
+              marginTop: 8,
             }}
           >
             AI Business Planning Workspace
@@ -101,8 +141,7 @@ export function createSocialImageResponse() {
           <div
             style={{
               display: "flex",
-              marginTop: "8px",
-              fontSize: 22,
+              fontSize: 20,
               lineHeight: 1.5,
               color: "rgba(255, 255, 255, 0.52)",
               maxWidth: "820px",

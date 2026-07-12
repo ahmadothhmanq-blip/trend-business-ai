@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import { PublicSaasPage } from "@/components/marketing/public-saas-page";
-import { PUBLIC_SAAS_PAGES } from "@/lib/constants/saas-pages";
+import { MarketingPricingPage } from "@/components/marketing/marketing-pricing-page";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = createPageMetadata({
   title: "Pricing",
-  description: PUBLIC_SAAS_PAGES.pricing.description,
+  description:
+    "Simple pricing for Trend Business AI. Start free during beta and scale into higher limits when you are ready.",
   path: "/pricing",
 });
 
 export default function PricingPage() {
-  return <PublicSaasPage page={PUBLIC_SAAS_PAGES.pricing} />;
+  return <MarketingPricingPage />;
 }

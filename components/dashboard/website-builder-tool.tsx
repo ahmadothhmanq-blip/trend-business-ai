@@ -42,10 +42,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { GeneratedProjectFile, GeneratedWebsiteProject } from "@/lib/deepseek";
+import type { ProductDefinition } from "@/lib/products/types";
 import type { WebsiteGeneration } from "@/types/database";
 import { cn } from "@/lib/utils";
 
 type WebsiteBuilderToolProps = {
+  product?: ProductDefinition;
   initialGenerations?: WebsiteGeneration[];
 };
 
@@ -175,18 +177,36 @@ function toProject(generation: WebsiteGeneration): WorkspaceProject {
   };
 }
 
+function resolveInitialProjectType(
+  product?: ProductDefinition,
+): (typeof PROJECT_TYPES)[number] {
+  const candidate = product?.defaultProjectType;
+  if (candidate && (PROJECT_TYPES as readonly string[]).includes(candidate)) {
+    return candidate as (typeof PROJECT_TYPES)[number];
+  }
+  return "Web Application";
+}
+
 export function WebsiteBuilderTool({
+  product,
   initialGenerations = [],
 }: WebsiteBuilderToolProps) {
+  const productTemplates = product?.templates?.length
+    ? product.templates
+    : [...TEMPLATES];
   const [projectBrief, setProjectBrief] = useState("");
-  const [projectType, setProjectType] = useState<(typeof PROJECT_TYPES)[number]>("Web Application");
+  const [projectType, setProjectType] = useState<(typeof PROJECT_TYPES)[number]>(
+    () => resolveInitialProjectType(product),
+  );
   const [designStyle, setDesignStyle] = useState<(typeof DESIGN_STYLES)[number]>("Luxury");
   const [colorTheme, setColorTheme] = useState<(typeof COLOR_THEMES)[number]>("Gold");
   const [language, setLanguage] = useState<(typeof LANGUAGES)[number]>("English");
   const [features, setFeatures] = useState<string[]>(["Dashboard", "Booking", "Admin Panel"]);
+  const [advancedOpen, setAdvancedOpen] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [progress, setProgress] = useState(34);
+  const [streamStatus, setStreamStatus] = useState<string | null>(null);
   const [selectedFilePath, setSelectedFilePath] = useState<string>("");
   const [outputTab, setOutputTab] = useState<"preview" | "code">("preview");
   const [fileSearch, setFileSearch] = useState("");
@@ -290,14 +310,35 @@ export function WebsiteBuilderTool({
     setSelectedFilePath((path) => path || nextProject.generatedProject?.files[0]?.path || "");
   }
 
-  async function createInterfaceProject() {
+  async function createInterfaceProject(options?: { regenerate?: boolean }) {
     const brief =
       projectBrief.trim() ||
+      (options?.regenerate ? activeProject?.description.trim() : "") ||
+      productTemplates[0] ||
       "I need a luxury real estate web application with booking system, authentication and admin dashboard.";
+
+    if (options?.regenerate && !projectBrief.trim() && activeProject?.description) {
+      setProjectBrief(activeProject.description);
+    }
 
     setIsGenerating(true);
     setApiError(null);
-    setProgress(68);
+    setProgress(28);
+    setStreamStatus("Connecting to AI website engine...");
+
+    const stages = [
+      "Analyzing product brief...",
+      "Planning pages and architecture...",
+      "Generating file blueprint...",
+      "Saving project to workspace...",
+    ];
+
+    let stageIndex = 0;
+    const stageTimer = window.setInterval(() => {
+      stageIndex = Math.min(stageIndex + 1, stages.length - 1);
+      setStreamStatus(stages[stageIndex] ?? null);
+      setProgress((value) => Math.min(92, value + 14));
+    }, 900);
 
     try {
       const response = await fetch("/api/website-builder", {
@@ -308,7 +349,13 @@ export function WebsiteBuilderTool({
           projectType,
           language,
           theme: `${colorTheme} ${designStyle}`,
-          features,
+          features: [
+            ...features,
+            ...(product?.id ? [`product:${product.id}`] : []),
+          ],
+          productId: product?.id,
+          mode: options?.regenerate ? "regenerate" : "generate",
+          parentGenerationId: options?.regenerate ? activeProject?.id : undefined,
         }),
       });
       const data = (await response.json()) as GenerateProjectResponse;
@@ -338,11 +385,14 @@ export function WebsiteBuilderTool({
         build: { status: "idle" },
       };
 
+      setStreamStatus("Streaming blueprint into workspace...");
       setActiveProject(nextProject);
       setSelectedFilePath(generatedProject.files[0]?.path ?? "");
       setOutputTab("code");
       setProjects((items) => [nextProject, ...items].slice(0, 8));
       setProgress(100);
+      setStreamStatus("Project saved.");
+      toast.success("Project generated and saved to your workspace.");
     } catch (error) {
       setApiError(
         error instanceof Error
@@ -350,8 +400,11 @@ export function WebsiteBuilderTool({
           : "Unable to generate website application.",
       );
       setProgress(34);
+      setStreamStatus(null);
     } finally {
+      window.clearInterval(stageTimer);
       setIsGenerating(false);
+      window.setTimeout(() => setStreamStatus(null), 1200);
     }
   }
 
@@ -537,13 +590,14 @@ export function WebsiteBuilderTool({
           <div>
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-premium-gold/25 bg-premium-gold/10 px-3 py-1 text-[11px] font-semibold tracking-[0.16em] text-premium-gold-light uppercase">
               <Sparkles className="size-3.5" />
-              Website and app generation workspace
+              {product?.eyebrow ?? "Website and app generation workspace"}
             </div>
             <h2 className="text-3xl font-bold tracking-[-0.04em] text-white sm:text-4xl lg:text-5xl">
-              AI Website & App Builder
+              {product?.title ?? "AI Website & App Builder"}
             </h2>
             <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-white/55 sm:text-base">
-              Generate complete production-ready websites and web applications with AI.
+              {product?.description ??
+                "Generate complete production-ready websites and web applications with AI."}
             </p>
           </div>
           <div className="rounded-[2rem] border border-white/[0.08] bg-black/25 p-4 shadow-[0_24px_90px_rgb(0_0_0/0.35)] backdrop-blur-xl">
@@ -584,9 +638,34 @@ export function WebsiteBuilderTool({
             <Textarea
               value={projectBrief}
               onChange={(event) => setProjectBrief(event.target.value)}
-              placeholder='Describe your project...&#10;&#10;Example: "I need a luxury real estate web application with booking system, authentication and admin dashboard."'
+              placeholder={
+                product?.promptPlaceholder ??
+                'Describe your project...\n\nExample: "I need a luxury real estate web application with booking system, authentication and admin dashboard."'
+              }
               className="mt-5 min-h-[190px] rounded-3xl border-white/[0.08] bg-black/25 p-5 text-[15px] leading-relaxed text-white placeholder:text-white/30 focus-visible:border-premium-gold/35 focus-visible:ring-premium-gold/15"
             />
+            <div className="mt-5">
+              <p className="mb-2 text-[12px] font-semibold tracking-wide text-white/45 uppercase">
+                Templates
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {productTemplates.map((template) => (
+                  <button
+                    key={template}
+                    type="button"
+                    onClick={() => setProjectBrief(template)}
+                    className={cn(
+                      "rounded-full border px-3 py-1.5 text-[12px] transition-all",
+                      projectBrief === template
+                        ? "border-premium-gold/35 bg-premium-gold/12 text-premium-gold-light"
+                        : "border-white/[0.08] bg-white/[0.03] text-white/45 hover:border-premium-gold/25 hover:text-white/75",
+                    )}
+                  >
+                    {template}
+                  </button>
+                ))}
+              </div>
+            </div>
             {apiError && (
               <p
                 role="alert"
@@ -605,6 +684,18 @@ export function WebsiteBuilderTool({
             )}
           </DashboardPanel>
 
+          <Button
+            type="button"
+            onClick={() => setAdvancedOpen((open) => !open)}
+            variant="outline"
+            className="btn-ghost-gold h-12 w-full rounded-2xl"
+          >
+            <Settings className="size-4" />
+            {advancedOpen ? "Hide advanced settings" : "Show advanced settings"}
+          </Button>
+
+          {advancedOpen ? (
+            <>
           <DashboardPanel>
             <SectionHeader
               icon={Globe2}
@@ -698,25 +789,59 @@ export function WebsiteBuilderTool({
               </div>
             </DashboardPanel>
           </div>
+            </>
+          ) : null}
 
+          {(isGenerating || streamStatus) && (
+            <div className="rounded-2xl border border-premium-gold/20 bg-premium-gold/5 p-4">
+              <div className="mb-2 flex items-center justify-between text-[12px] text-premium-gold-light">
+                <span>{streamStatus ?? "Generation in progress"}</span>
+                <span>{progress}%</span>
+              </div>
+              <div className="h-2 overflow-hidden rounded-full bg-black/30">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-premium-gold to-premium-gold-light transition-all"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="grid gap-3 sm:grid-cols-2">
           <Button
             type="button"
-            onClick={createInterfaceProject}
+            onClick={() => void createInterfaceProject()}
             disabled={isGenerating}
             className="btn-gold h-14 w-full rounded-2xl text-base font-bold text-luxury-black shadow-[0_18px_60px_rgb(212_175_55/0.18)]"
           >
             {isGenerating ? (
               <>
                 <Loader2 className="size-5 animate-spin" />
-                Preparing interface...
+                Generating...
               </>
             ) : (
               <>
                 <Sparkles className="size-5" />
-                Generate Website
+                {product?.generateLabel ?? "Generate Website"}
               </>
             )}
           </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              if (activeProject?.description && !projectBrief.trim()) {
+                setProjectBrief(activeProject.description);
+              }
+              void createInterfaceProject({ regenerate: true });
+            }}
+            disabled={isGenerating}
+            className="btn-ghost-gold h-14 w-full rounded-2xl text-base font-semibold"
+          >
+            <RefreshCw className="size-5" />
+            Regenerate
+          </Button>
+          </div>
         </div>
 
         {LIVE_PREVIEW_ENABLED ? (
@@ -801,7 +926,7 @@ export function WebsiteBuilderTool({
 
       <BottomWorkspace
         projects={projects}
-        templates={TEMPLATES}
+        templates={productTemplates}
         activeProject={activeProject}
         onSelect={selectProject}
         onFavorite={toggleFavorite}

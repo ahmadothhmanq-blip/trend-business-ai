@@ -1,12 +1,11 @@
-export type WorkspaceType =
-  | "brand"
-  | "creative"
-  | "content"
-  | "business"
-  | "manager"
-  | "marketing"
-  | "social"
-  | "audit";
+import type {
+  GenerationAttachmentMeta,
+  GenerationMode,
+  TokenUsage,
+  WorkspaceType as DbWorkspaceType,
+} from "@/types/database";
+
+export type WorkspaceType = DbWorkspaceType;
 
 export type WorkspaceSection = {
   heading: string;
@@ -20,7 +19,14 @@ export type WorkspaceOutput = {
   deliverables: string[];
   progressEvents?: string[];
   generatedAt?: string;
-  source?: "openai" | "anthropic" | "deepseek" | "structured";
+  source?: "openai" | "anthropic" | "deepseek" | "structured" | string;
+  /** Product Engine product id (user → workspace → project lineage). */
+  productId?: string;
+  depth?: "focused" | "standard" | "deep";
+  tokenUsage?: TokenUsage;
+  generationTimeMs?: number;
+  mode?: GenerationMode;
+  continuedFrom?: string;
 };
 
 export type WorkspaceGenerationInput = {
@@ -29,6 +35,15 @@ export type WorkspaceGenerationInput = {
   language?: string;
   theme?: string;
   features?: string[];
+  productId?: string;
+  depth?: "focused" | "standard" | "deep";
+  mode?: GenerationMode;
+  parentGenerationId?: string;
+  projectId?: string;
+  continueInstruction?: string;
+  previousOutput?: WorkspaceOutput;
+  attachments?: GenerationAttachmentMeta[];
+  provider?: string;
 };
 
 export const WORKSPACE_TYPES: WorkspaceType[] = [

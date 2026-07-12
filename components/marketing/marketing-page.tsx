@@ -1,32 +1,35 @@
 "use client";
 
-import { MouseProvider } from "@/components/marketing/motion/mouse-provider";
-import { RefBackground } from "@/components/marketing/ref-background";
-import { RefHeader } from "@/components/marketing/ref-header";
-import { RefHero } from "@/components/marketing/ref-hero";
-import { RefStatsRow } from "@/components/marketing/ref-stats-row";
-import { RefServices } from "@/components/marketing/ref-services";
-import { RefWorkflow } from "@/components/marketing/ref-workflow";
-import { RefPricing } from "@/components/marketing/ref-pricing";
-import { RefTrust } from "@/components/marketing/ref-trust";
-import { RefFooter } from "@/components/marketing/ref-footer";
+import { SiteShell } from "@/components/marketing/site/shell";
+import { SiteHero } from "@/components/marketing/site/hero";
+import { SiteSolutions } from "@/components/marketing/site/solutions";
+import { SiteFeaturedProducts } from "@/components/marketing/site/featured-products";
+import { SiteWorkflow } from "@/components/marketing/site/workflow";
+import { SiteWhy } from "@/components/marketing/site/why";
+import { SiteTemplates } from "@/components/marketing/site/templates";
+import { SitePricing } from "@/components/marketing/site/pricing";
+import { SiteTestimonials } from "@/components/marketing/site/testimonials";
+import { SiteFaq } from "@/components/marketing/site/faq";
+import { SiteCtaBand } from "@/components/marketing/site/ui";
 
 export function MarketingPage() {
   return (
-    <MouseProvider>
-      <div className="relative min-h-screen overflow-x-clip bg-[#050505] text-white">
-        <RefBackground />
-        <RefHeader />
-        <main>
-          <RefHero />
-          <RefStatsRow />
-          <RefServices />
-          <RefWorkflow />
-          <RefPricing />
-          <RefTrust />
-        </main>
-        <RefFooter />
-      </div>
-    </MouseProvider>
+    <SiteShell>
+      <SiteHero />
+      <SiteSolutions />
+      <SiteFeaturedProducts />
+      <SiteWorkflow />
+      <SiteWhy />
+      <SiteTemplates />
+      <SitePricing />
+      <SiteTestimonials />
+      <SiteFaq />
+      <SiteCtaBand
+        title="Ready to build with Trend Business AI?"
+        description="Create your free account and explore Create, Design, Content, and Business products from one premium AI workspace."
+        secondaryHref="/#solutions"
+        secondaryLabel="Browse AI Solutions"
+      />
+    </SiteShell>
   );
 }

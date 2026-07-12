@@ -1,4 +1,3 @@
-import { createOpenAIClient, withOpenAIRetry } from "@/lib/ai/openai-client";
 import {
   businessIdeasSystemPrompt,
   businessIdeasUserPrompt,
@@ -82,57 +81,46 @@ function generateFallbackIdeas(input: IdeaInput): GeneratedIdea[] {
   ];
 }
 
-async function generateWithOpenAI(input: IdeaInput): Promise<GeneratedIdea[]> {
-  const openai = await createOpenAIClient();
-
-  const response = await withOpenAIRetry(() =>
-    openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    response_format: { type: "json_object" },
-    messages: [
-      {
-        role: "system",
-        content: businessIdeasSystemPrompt,
-      },
-      {
-        role: "user",
-        content: businessIdeasUserPrompt(input),
-      },
-    ],
-      temperature: 0.8,
-    }),
-  );
-
-  const content = response.choices[0]?.message?.content;
-  if (!content) {
-    throw new Error("Empty response from OpenAI");
-  }
-
-  const parsed = JSON.parse(content) as { ideas?: GeneratedIdea[] };
-  if (!parsed.ideas?.length) {
-    throw new Error("Invalid OpenAI response format");
-  }
-
-  return parsed.ideas.slice(0, 3).map((idea) => ({
-    title: idea.title?.trim() || "Untitled Idea",
-    description: idea.description?.trim() || "",
-    industry: idea.industry?.trim() || "General",
-    target_market: idea.target_market?.trim() || "General market",
-    revenue_model: idea.revenue_model?.trim() || "Subscription",
-  }));
-}
-
 export async function generateBusinessIdeas(
   input: IdeaInput,
-): Promise<{ ideas: GeneratedIdea[]; source: "openai" | "fallback" }> {
-  if (process.env.OPENAI_API_KEY) {
+): Promise<{ ideas: GeneratedIdea[]; source: "openai" | "deepseek" | "fallback"; usage?: { promptTokens: number; completionTokens: number; totalTokens: number }; generationTimeMs?: number }> {
+  const startedAt = Date.now();
+  const { getAIProvider, resolveAvailableProvider } = await import("@/lib/ai/adapters");
+  const providerName = resolveAvailableProvider("openai");
+
+  if (providerName) {
     try {
-      const ideas = await generateWithOpenAI(input);
-      return { ideas, source: "openai" };
+      const provider = getAIProvider(providerName);
+      const ideas = await provider.generateJson<{ ideas?: GeneratedIdea[] }>({
+        system: businessIdeasSystemPrompt,
+        prompt: businessIdeasUserPrompt(input),
+        temperature: 0.8,
+      });
+
+      if (!ideas.ideas?.length) {
+        throw new Error("Invalid AI response format");
+      }
+
+      return {
+        ideas: ideas.ideas.slice(0, 3).map((idea) => ({
+          title: idea.title?.trim() || "Untitled Idea",
+          description: idea.description?.trim() || "",
+          industry: idea.industry?.trim() || "General",
+          target_market: idea.target_market?.trim() || "General market",
+          revenue_model: idea.revenue_model?.trim() || "Subscription",
+        })),
+        source: providerName === "deepseek" ? "deepseek" : "openai",
+        usage: provider.getLastUsage?.() ?? undefined,
+        generationTimeMs: Date.now() - startedAt,
+      };
     } catch (error) {
-      console.error("OpenAI generation failed, using fallback:", error);
+      console.error("AI generation failed, using fallback:", error);
     }
   }
 
-  return { ideas: generateFallbackIdeas(input), source: "fallback" };
+  return {
+    ideas: generateFallbackIdeas(input),
+    source: "fallback",
+    generationTimeMs: Date.now() - startedAt,
+  };
 }

@@ -361,3 +361,6 @@ alter table public.favorites add constraint favorites_item_type_check
       'workspace_generation'
     )
   );
+
+-- Migration 011: AI Engine Phase 5 metadata (see supabase/migrations/011_ai_engine_phase5.sql)
+-- Apply that migration for projects, attachments, token usage, and generation status columns.
