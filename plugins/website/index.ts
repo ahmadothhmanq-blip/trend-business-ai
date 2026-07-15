@@ -1,4 +1,5 @@
 import type { AIPlugin } from "@/lib/ai/engine";
+import { getActiveProvider } from "@/lib/ai/provider-config";
 import { analyzeWebsite } from "@/plugins/website/analyze";
 import { exportWebsite } from "@/plugins/website/export";
 import { generateWebsite } from "@/plugins/website/generate";
@@ -19,7 +20,7 @@ export const websitePlugin: AIPlugin<
 > = {
   id: "website",
   name: "Website Builder",
-  preferredProvider: "deepseek",
+  preferredProvider: getActiveProvider(),
   analyze: analyzeWebsite,
   plan: planWebsite,
   generate: generateWebsite,

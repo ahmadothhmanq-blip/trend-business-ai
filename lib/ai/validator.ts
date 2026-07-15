@@ -659,7 +659,9 @@ function validateImportsForFile(
     if (importPath.startsWith("./") || importPath.startsWith("../")) {
       const resolved = resolveRelativeImport(file.path, importPath);
       const candidates = candidatePathsForImport(resolved);
-      const exists = candidates.some((candidate) => projectPaths.has(candidate));
+      const exists =
+        candidates.some((candidate) => projectPaths.has(candidate)) ||
+        projectPaths.has(resolved);
       if (!exists) {
         issues.push(
           `${file.path}: missing relative import "${importPath}" (resolved to ${resolved}).`,

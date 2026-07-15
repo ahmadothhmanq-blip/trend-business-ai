@@ -1,9 +1,16 @@
 import type { Metadata } from "next";
-import { PlatformDashboardPage } from "@/components/dashboard/platform-dashboard-page";
-import { DASHBOARD_PLATFORM_PAGES } from "@/lib/constants/dashboard-platform-pages";
+import { DashboardHeader } from "@/components/dashboard/header";
+import { UsagePanel } from "@/components/dashboard/platform/usage-panel";
+import { ActivityPanel } from "@/components/dashboard/platform/activity-panel";
 
 export const metadata: Metadata = { title: "Analytics" };
 
 export default function AnalyticsPage() {
-  return <PlatformDashboardPage config={DASHBOARD_PLATFORM_PAGES.analytics} />;
+  return (
+    <div className="space-y-6">
+      <DashboardHeader title="Analytics" description="View your AI usage analytics and activity history" />
+      <UsagePanel />
+      <ActivityPanel />
+    </div>
+  );
 }

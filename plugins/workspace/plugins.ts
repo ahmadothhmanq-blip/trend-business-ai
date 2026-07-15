@@ -45,7 +45,6 @@ export const creativePlugin = createTextPlugin({
 export const marketingPlugin = createTextPlugin({
   id: "marketing",
   name: "Marketing",
-  preferredProvider: "openai",
   analyzePrompt: (input) => marketingAnalyzePrompt(input.prompt),
   planPrompt: (input, analysis) =>
     servicePlanPrompt("marketing campaign", input.prompt, analysis),

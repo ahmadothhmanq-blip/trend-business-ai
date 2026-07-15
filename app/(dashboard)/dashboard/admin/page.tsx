@@ -1,24 +1,23 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { PlatformDashboardPage } from "@/components/dashboard/platform-dashboard-page";
-import { DASHBOARD_PLATFORM_PAGES } from "@/lib/constants/dashboard-platform-pages";
+import { DashboardHeader } from "@/components/dashboard/header";
+import { AdminPanel } from "@/components/dashboard/platform/admin-panel";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Admin Dashboard" };
 
 export default async function AdminPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   const appMetadata = user?.app_metadata ?? {};
-  const isAdmin =
-    appMetadata.role === "admin" ||
-    appMetadata.is_admin === true;
+  const isAdmin = appMetadata.role === "admin" || appMetadata.is_admin === true;
 
-  if (!isAdmin) {
-    redirect("/dashboard");
-  }
+  if (!isAdmin) redirect("/dashboard");
 
-  return <PlatformDashboardPage config={DASHBOARD_PLATFORM_PAGES.admin} />;
+  return (
+    <div className="space-y-6">
+      <DashboardHeader title="Admin Dashboard" description="System overview, feature flags, and monitoring" />
+      <AdminPanel />
+    </div>
+  );
 }

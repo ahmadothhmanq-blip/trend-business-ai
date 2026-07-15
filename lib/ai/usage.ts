@@ -9,10 +9,12 @@ export function mergeTokenUsage(
   b: TokenUsage | null | undefined,
 ): TokenUsage {
   if (!b) return a;
+  const promptTokens = a.promptTokens + (b.promptTokens || 0);
+  const completionTokens = a.completionTokens + (b.completionTokens || 0);
   return {
-    promptTokens: a.promptTokens + (b.promptTokens || 0),
-    completionTokens: a.completionTokens + (b.completionTokens || 0),
-    totalTokens: a.totalTokens + (b.totalTokens || 0),
+    promptTokens,
+    completionTokens,
+    totalTokens: promptTokens + completionTokens,
   };
 }
 

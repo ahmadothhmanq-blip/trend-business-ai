@@ -1,4 +1,11 @@
-export type AIProviderName = "deepseek" | "openai" | "anthropic" | (string & {});
+export type AIProviderName =
+  | "deepseek"
+  | "openai"
+  | "gemini"
+  | "claude"
+  | "grok"
+  | "llama"
+  | (string & {});
 
 export type GenerationProgressEvent = string;
 

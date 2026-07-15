@@ -36,18 +36,17 @@ export async function generateReport(
   input: ReportInput,
 ): Promise<{
   report: GeneratedReport;
-  source: "openai" | "deepseek" | "anthropic" | "fallback";
+  source: string;
   usage?: { promptTokens: number; completionTokens: number; totalTokens: number };
   generationTimeMs?: number;
 }> {
   const startedAt = Date.now();
-  const { getAIProvider, resolveAvailableProvider } = await import("@/lib/ai/adapters");
-  const providerName = resolveAvailableProvider("openai");
+  const { providerManager } = await import("@/lib/ai/provider-manager");
+  const providerName = providerManager.resolve();
 
   if (providerName) {
     try {
-      const provider = getAIProvider(providerName);
-      const parsed = await provider.generateJson<GeneratedReport>({
+      const parsed = await providerManager.generateJson<GeneratedReport>({
         system: reportsSystemPrompt,
         prompt: reportsUserPrompt(input),
         temperature: 0.7,
@@ -62,8 +61,8 @@ export async function generateReport(
             ? parsed.insights.map(String).slice(0, 8)
             : [],
         },
-        source: providerName as "openai" | "deepseek" | "anthropic",
-        usage: provider.getLastUsage?.() ?? undefined,
+        source: providerName,
+        usage: providerManager.getLastUsage() ?? undefined,
         generationTimeMs: Date.now() - startedAt,
       };
     } catch (error) {

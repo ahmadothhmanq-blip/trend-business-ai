@@ -83,15 +83,14 @@ function generateFallbackIdeas(input: IdeaInput): GeneratedIdea[] {
 
 export async function generateBusinessIdeas(
   input: IdeaInput,
-): Promise<{ ideas: GeneratedIdea[]; source: "openai" | "deepseek" | "fallback"; usage?: { promptTokens: number; completionTokens: number; totalTokens: number }; generationTimeMs?: number }> {
+): Promise<{ ideas: GeneratedIdea[]; source: string; usage?: { promptTokens: number; completionTokens: number; totalTokens: number }; generationTimeMs?: number }> {
   const startedAt = Date.now();
-  const { getAIProvider, resolveAvailableProvider } = await import("@/lib/ai/adapters");
-  const providerName = resolveAvailableProvider("openai");
+  const { providerManager } = await import("@/lib/ai/provider-manager");
+  const providerName = providerManager.resolve();
 
   if (providerName) {
     try {
-      const provider = getAIProvider(providerName);
-      const ideas = await provider.generateJson<{ ideas?: GeneratedIdea[] }>({
+      const ideas = await providerManager.generateJson<{ ideas?: GeneratedIdea[] }>({
         system: businessIdeasSystemPrompt,
         prompt: businessIdeasUserPrompt(input),
         temperature: 0.8,
@@ -109,8 +108,8 @@ export async function generateBusinessIdeas(
           target_market: idea.target_market?.trim() || "General market",
           revenue_model: idea.revenue_model?.trim() || "Subscription",
         })),
-        source: providerName === "deepseek" ? "deepseek" : "openai",
-        usage: provider.getLastUsage?.() ?? undefined,
+        source: providerName,
+        usage: providerManager.getLastUsage() ?? undefined,
         generationTimeMs: Date.now() - startedAt,
       };
     } catch (error) {

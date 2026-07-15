@@ -1,4 +1,5 @@
 import type { AIPlugin } from "@/lib/ai/engine";
+import { getActiveProvider } from "@/lib/ai/provider-config";
 import type {
   AIProviderName,
   ExportResult,
@@ -33,7 +34,7 @@ export function createTextPlugin(config: {
     plan: Record<string, unknown>,
   ) => string;
 }): AIPlugin<PluginBriefInput, Record<string, unknown>, Record<string, unknown>, TextPluginOutput> {
-  const preferredProvider = config.preferredProvider ?? "openai";
+  const preferredProvider = config.preferredProvider ?? getActiveProvider();
 
   return {
     id: config.id,

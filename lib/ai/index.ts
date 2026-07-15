@@ -10,3 +10,5 @@ export * from "@/lib/ai/validator";
 export * from "@/lib/ai/zipper";
 export * from "@/lib/ai/exporter";
 export * from "@/lib/ai/engine";
+export * from "@/lib/ai/provider-config";
+export { providerManager } from "@/lib/ai/provider-manager";

@@ -1,0 +1,125 @@
+import type {
+  AIProvider,
+  AIProviderName,
+  JsonGenerationRequest,
+  StreamTextRequest,
+  TextGenerationRequest,
+  TokenUsage,
+} from "@/lib/ai/types";
+import {
+  getAIProvider,
+  isProviderConfigured,
+  listConfiguredProviders,
+  resolveAvailableProvider,
+} from "@/lib/ai/adapters";
+import { aiGenerationEngine, type AIPlugin, type EngineRunOptions } from "@/lib/ai/engine";
+import {
+  getActiveProvider,
+  setActiveProvider,
+  PROVIDER_REGISTRY,
+  getProviderLabel,
+} from "@/lib/ai/provider-config";
+import type { AIProviderSettings } from "@/types/ai-settings";
+
+class ProviderManager {
+  private _userSettings: AIProviderSettings | null = null;
+
+  getActiveProviderName(): AIProviderName {
+    return getActiveProvider();
+  }
+
+  getActiveProviderLabel(): string {
+    return getProviderLabel(getActiveProvider());
+  }
+
+  getProvider(name?: AIProviderName): AIProvider {
+    return getAIProvider(name ?? getActiveProvider());
+  }
+
+  resolve(preferred?: AIProviderName): AIProviderName | null {
+    return resolveAvailableProvider(preferred);
+  }
+
+  isConfigured(name?: AIProviderName): boolean {
+    return isProviderConfigured(name ?? getActiveProvider());
+  }
+
+  listConfigured(): AIProviderName[] {
+    return listConfiguredProviders();
+  }
+
+  listAll() {
+    return PROVIDER_REGISTRY.map((reg) => ({
+      ...reg,
+      configured: isProviderConfigured(reg.name),
+    }));
+  }
+
+  getUserSettings(): AIProviderSettings | null {
+    return this._userSettings;
+  }
+
+  /** Load user settings from Supabase and set the active provider dynamically. */
+  async loadUserSettings(supabase: { from: (table: string) => { select: (columns: string) => { eq: (col: string, val: string) => { single: () => Promise<{ data: AIProviderSettings | null; error: unknown }> } } } }, userId: string): Promise<AIProviderSettings | null> {
+    try {
+      const { data } = await supabase
+        .from("ai_provider_settings")
+        .select("*")
+        .eq("user_id", userId)
+        .single();
+
+      if (data) {
+        this._userSettings = data as AIProviderSettings;
+        setActiveProvider(this._userSettings.default_provider as AIProviderName);
+        return this._userSettings;
+      }
+    } catch {
+      // Table may not exist yet — fall through to defaults
+    }
+    return null;
+  }
+
+  /** Apply settings without a database call (e.g. from cached API response). */
+  applySettings(settings: AIProviderSettings) {
+    this._userSettings = settings;
+    setActiveProvider(settings.default_provider as AIProviderName);
+  }
+
+  async generateJson<T>(request: JsonGenerationRequest, providerName?: AIProviderName): Promise<T> {
+    const provider = this.getProvider(providerName);
+    return provider.generateJson<T>(request);
+  }
+
+  async generateText(request: TextGenerationRequest, providerName?: AIProviderName): Promise<string> {
+    const provider = this.getProvider(providerName);
+    if (!provider.generateText) {
+      throw new Error(`Provider "${provider.name}" does not support generateText.`);
+    }
+    return provider.generateText(request);
+  }
+
+  async streamText(request: StreamTextRequest, providerName?: AIProviderName): Promise<string> {
+    const provider = this.getProvider(providerName);
+    if (!provider.streamText) {
+      throw new Error(`Provider "${provider.name}" does not support streamText.`);
+    }
+    return provider.streamText(request);
+  }
+
+  async runPlugin<TInput, TAnalysis, TPlan, TOutput>(
+    plugin: AIPlugin<TInput, TAnalysis, TPlan, TOutput>,
+    input: TInput,
+    options: EngineRunOptions = {},
+  ) {
+    const provider = options.provider ?? getActiveProvider();
+    return aiGenerationEngine.run(plugin, input, { ...options, provider });
+  }
+
+  getLastUsage(providerName?: AIProviderName): TokenUsage | null {
+    const provider = this.getProvider(providerName);
+    return provider.getLastUsage?.() ?? null;
+  }
+}
+
+export const providerManager = new ProviderManager();
+export type { ProviderManager };

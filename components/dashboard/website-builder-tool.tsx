@@ -41,7 +41,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import type { GeneratedProjectFile, GeneratedWebsiteProject } from "@/lib/deepseek";
+import type { GeneratedProjectFile, GeneratedWebsiteProject } from "@/lib/website-generator";
 import type { ProductDefinition } from "@/lib/products/types";
 import type { WebsiteGeneration } from "@/types/database";
 import { cn } from "@/lib/utils";
@@ -365,7 +365,7 @@ export function WebsiteBuilderTool({
       }
 
       if (!("project" in data)) {
-        throw new Error("Gemini did not return a generated project.");
+        throw new Error("AI engine did not return a generated project.");
       }
 
       const generatedProject = data.project;
@@ -620,7 +620,7 @@ export function WebsiteBuilderTool({
                 />
               </div>
               <p className="mt-3 text-[12px] text-white/40">
-                Connected to Gemini 2.5 Flash for generated React and Next.js applications.
+                Connected to DeepSeek AI for generated React and Next.js applications.
               </p>
             </div>
           </div>
@@ -700,7 +700,7 @@ export function WebsiteBuilderTool({
             <SectionHeader
               icon={Globe2}
               title="Project Type"
-              description="Choose a website or application architecture. Gemini will also auto-detect from your prompt."
+              description="Choose a website or application architecture. DeepSeek will also auto-detect from your prompt."
             />
             <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {PROJECT_TYPES.map((type) => (
@@ -1232,7 +1232,7 @@ function RightPreview({
           <SectionHeader
             icon={Sparkles}
             title="Generated Result"
-            description="Gemini output for this project."
+            description="DeepSeek output for this project."
           />
           <div className="mt-5 space-y-4">
             <ResultList title="Sections" items={generatedProject.sections} />

@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
-import { PlatformDashboardPage } from "@/components/dashboard/platform-dashboard-page";
-import { DASHBOARD_PLATFORM_PAGES } from "@/lib/constants/dashboard-platform-pages";
+import { DashboardHeader } from "@/components/dashboard/header";
+import { SettingsPanel } from "@/components/dashboard/platform/settings-panel";
 
 export const metadata: Metadata = { title: "Settings" };
 
 export default function SettingsPage() {
-  return <PlatformDashboardPage config={DASHBOARD_PLATFORM_PAGES.settings} />;
+  return (
+    <div className="space-y-6">
+      <DashboardHeader title="Settings" description="Manage your account, team, API keys, and integrations" />
+      <SettingsPanel />
+    </div>
+  );
 }

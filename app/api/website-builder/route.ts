@@ -2,7 +2,8 @@ import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers"
 import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
 import { enforceAiRateLimit } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
-import { generateWebsiteWithDeepSeek } from "@/lib/deepseek";
+import { generateWebsite } from "@/lib/website-generator";
+import { getActiveProvider } from "@/lib/ai/provider-config";
 import type { WebsiteBlueprint, WebsiteGeneration } from "@/types/database";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -137,10 +138,10 @@ export async function POST(request: Request) {
   const input = parsed.data;
   const projectKind = detectProjectKind(input);
 
-  let stage = "generateWebsiteWithDeepSeek";
+  let stage = "generateWebsite";
 
   try {
-    const project = await generateWebsiteWithDeepSeek({
+    const project = await generateWebsite({
       ...input,
       projectKind,
     });
@@ -164,43 +165,69 @@ export async function POST(request: Request) {
       ],
     };
     stage = "supabase.insert.website_generations";
-    const { data, error } = await auth.supabase
+
+    const coreRow = {
+      user_id: auth.user!.id,
+      project_name: savedProject.title,
+      website_type: savedProjectKind === "web_application" ? "Web Application" : "Website",
+      business_description: savedProject.description,
+      target_audience: "Auto-detected from project prompt",
+      language: input.language,
+      color_style: input.theme,
+      design_style: input.theme,
+      page_count: String(savedProject.pages.length || 1),
+      features: [
+        ...input.features,
+        ...(input.productId ? [`product:${input.productId}`] : []),
+      ],
+      blueprint: savedProject as unknown as WebsiteBlueprint,
+    };
+
+    const phase5Row = {
+      ...coreRow,
+      product_id: input.productId ?? null,
+      project_id: input.projectId ?? null,
+      status: "completed",
+      mode: input.mode ?? "generate",
+      parent_generation_id: input.parentGenerationId ?? null,
+      provider: project.provider ?? getActiveProvider(),
+      token_usage: project.usage,
+      generation_time_ms: project.generationTimeMs,
+      prompt_versions: [
+        {
+          id: crypto.randomUUID(),
+          prompt: input.prompt,
+          createdAt: new Date().toISOString(),
+          mode: input.mode ?? "generate",
+        },
+      ],
+      attachments: [],
+    };
+
+    let result = await auth.supabase
       .from("website_generations")
-      .insert({
-        user_id: auth.user!.id,
-        project_name: savedProject.title,
-        website_type: savedProjectKind === "web_application" ? "Web Application" : "Website",
-        business_description: savedProject.description,
-        target_audience: "Auto-detected from project prompt",
-        language: input.language,
-        color_style: input.theme,
-        design_style: input.theme,
-        page_count: String(savedProject.pages.length || 1),
-        features: [
-          ...input.features,
-          ...(input.productId ? [`product:${input.productId}`] : []),
-        ],
-        blueprint: savedProject as unknown as WebsiteBlueprint,
-        product_id: input.productId ?? null,
-        project_id: input.projectId ?? null,
-        status: "completed",
-        mode: input.mode ?? "generate",
-        parent_generation_id: input.parentGenerationId ?? null,
-        provider: project.provider ?? "deepseek",
-        token_usage: project.usage,
-        generation_time_ms: project.generationTimeMs,
-        prompt_versions: [
-          {
-            id: crypto.randomUUID(),
-            prompt: input.prompt,
-            createdAt: new Date().toISOString(),
-            mode: input.mode ?? "generate",
-          },
-        ],
-        attachments: [],
-      })
+      .insert(phase5Row)
       .select("*")
       .single();
+
+    if (result.error) {
+      const msg = result.error.message?.toLowerCase() ?? "";
+      const missingCol =
+        msg.includes("column") ||
+        msg.includes("does not exist") ||
+        msg.includes("schema cache");
+
+      if (missingCol) {
+        console.warn("[website-builder] Phase 5 columns missing — falling back to core insert");
+        result = await auth.supabase
+          .from("website_generations")
+          .insert(coreRow)
+          .select("*")
+          .single();
+      }
+    }
+
+    const { data, error } = result;
 
     if (error) {
       logWebsiteBuilderError(stage, error);

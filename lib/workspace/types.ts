@@ -19,7 +19,7 @@ export type WorkspaceOutput = {
   deliverables: string[];
   progressEvents?: string[];
   generatedAt?: string;
-  source?: "openai" | "anthropic" | "deepseek" | "structured" | string;
+  source?: "deepseek" | "openai" | "claude" | "gemini" | "grok" | "llama" | "structured" | string;
   /** Product Engine product id (user → workspace → project lineage). */
   productId?: string;
   depth?: "focused" | "standard" | "deep";

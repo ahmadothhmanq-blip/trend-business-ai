@@ -1,9 +1,4 @@
-import { aiGenerationEngine } from "@/lib/ai/engine";
-import {
-  isProviderConfigured,
-  listConfiguredProviders,
-  resolveAvailableProvider,
-} from "@/lib/ai/adapters";
+import { providerManager } from "@/lib/ai/provider-manager";
 import { emptyTokenUsage } from "@/lib/ai/usage";
 import type { AIProviderName, TokenUsage } from "@/lib/ai/types";
 import { getWorkspaceDefinition } from "@/lib/workspace/registry";
@@ -126,21 +121,21 @@ export async function generateWorkspaceProject(
   const definition = getWorkspaceDefinition(workspaceType);
   const plugin = definition.plugin;
   const preferred =
-    (input.provider as AIProviderName | undefined) ?? plugin.preferredProvider;
-  const primary = resolveAvailableProvider(preferred);
+    (input.provider as AIProviderName | undefined) ?? undefined;
+  const primary = providerManager.resolve(preferred);
   const startedAt = Date.now();
 
   const providers = primary
-    ? [primary, ...listConfiguredProviders().filter((name) => name !== primary)]
+    ? [primary, ...providerManager.listConfigured().filter((name) => name !== primary)]
     : [];
 
   let lastError: unknown = null;
 
   for (const providerName of providers) {
-    if (!isProviderConfigured(providerName)) continue;
+    if (!providerManager.isConfigured(providerName)) continue;
     try {
       options?.onProgress?.(`Connecting to ${providerName}...`);
-      const result = await aiGenerationEngine.run(plugin, toPluginInput(input), {
+      const result = await providerManager.runPlugin(plugin, toPluginInput(input), {
         provider: providerName,
         onProgress: options?.onProgress,
       });

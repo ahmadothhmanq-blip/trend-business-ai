@@ -1,67 +1,84 @@
 import type { AIProvider, AIProviderName } from "@/lib/ai/types";
+import {
+  getActiveProvider,
+  PROVIDER_REGISTRY,
+  getProviderEnvKey,
+  getAllProviderNames,
+} from "@/lib/ai/provider-config";
 import { AnthropicAdapter } from "@/lib/ai/adapters/anthropic-adapter";
 import { DeepSeekAdapter } from "@/lib/ai/adapters/deepseek-adapter";
+import { GeminiAdapter } from "@/lib/ai/adapters/gemini-adapter";
+import { GrokAdapter } from "@/lib/ai/adapters/grok-adapter";
+import { LlamaAdapter } from "@/lib/ai/adapters/llama-adapter";
 import { OpenAIAdapter } from "@/lib/ai/adapters/openai-adapter";
 
 export { AnthropicAdapter, createAnthropicAdapter } from "@/lib/ai/adapters/anthropic-adapter";
 export { DeepSeekAdapter, createDeepSeekAdapter } from "@/lib/ai/adapters/deepseek-adapter";
+export { GeminiAdapter, createGeminiAdapter } from "@/lib/ai/adapters/gemini-adapter";
+export { GrokAdapter, createGrokAdapter } from "@/lib/ai/adapters/grok-adapter";
+export { LlamaAdapter, createLlamaAdapter } from "@/lib/ai/adapters/llama-adapter";
 export { OpenAIAdapter, createOpenAIAdapter } from "@/lib/ai/adapters/openai-adapter";
 
 const providerCache = new Map<string, AIProvider>();
 const customFactories = new Map<string, () => AIProvider>();
 
-const BUILTIN_PROVIDERS: AIProviderName[] = ["deepseek", "openai", "anthropic"];
-
 function createBuiltinProvider(name: AIProviderName): AIProvider {
-  if (name === "openai") return new OpenAIAdapter();
-  if (name === "anthropic") return new AnthropicAdapter();
-  return new DeepSeekAdapter();
+  switch (name) {
+    case "openai": return new OpenAIAdapter();
+    case "claude": return new AnthropicAdapter();
+    case "gemini": return new GeminiAdapter();
+    case "grok": return new GrokAdapter();
+    case "llama": return new LlamaAdapter();
+    default: return new DeepSeekAdapter();
+  }
 }
 
-/** Register a future provider without changing call sites. */
 export function registerAIProvider(name: string, factory: () => AIProvider) {
   customFactories.set(name, factory);
   providerCache.delete(name);
 }
 
-export function isProviderConfigured(name: string) {
-  if (name === "openai") return Boolean(process.env.OPENAI_API_KEY?.trim());
-  if (name === "anthropic") return Boolean(process.env.ANTHROPIC_API_KEY?.trim());
-  if (name === "deepseek") return Boolean(process.env.DEEPSEEK_API_KEY?.trim());
+export function isProviderConfigured(name: string): boolean {
+  const envKey = getProviderEnvKey(name as AIProviderName);
+  if (envKey) return Boolean(process.env[envKey]?.trim());
   return customFactories.has(name);
 }
 
 export function listConfiguredProviders(): AIProviderName[] {
-  const names = [
-    ...BUILTIN_PROVIDERS,
-    ...Array.from(customFactories.keys()),
-  ] as AIProviderName[];
-  return names.filter((name) => isProviderConfigured(name));
+  const names: AIProviderName[] = [
+    ...getAllProviderNames(),
+    ...(Array.from(customFactories.keys()) as AIProviderName[]),
+  ];
+  return [...new Set(names)].filter((n) => isProviderConfigured(n));
 }
 
-/** Prefer requested provider, then DeepSeek → OpenAI → Anthropic → custom. */
 export function resolveAvailableProvider(
-  preferred: AIProviderName = "deepseek",
+  preferred?: AIProviderName,
 ): AIProviderName | null {
-  if (isProviderConfigured(preferred)) return preferred;
-  const fallbackOrder: AIProviderName[] = [
-    "deepseek",
-    "openai",
-    "anthropic",
-    ...Array.from(customFactories.keys()),
-  ];
-  for (const name of fallbackOrder) {
-    if (name !== preferred && isProviderConfigured(name)) return name;
+  const active = getActiveProvider();
+  const target = preferred ?? active;
+  if (isProviderConfigured(target)) return target;
+
+  if (target !== active && isProviderConfigured(active)) {
+    return active;
+  }
+
+  for (const reg of PROVIDER_REGISTRY) {
+    if (reg.name !== target && isProviderConfigured(reg.name)) return reg.name;
+  }
+  for (const name of customFactories.keys()) {
+    if (isProviderConfigured(name)) return name as AIProviderName;
   }
   return null;
 }
 
-export function getAIProvider(name: AIProviderName = "deepseek"): AIProvider {
-  const cached = providerCache.get(name);
+export function getAIProvider(name?: AIProviderName): AIProvider {
+  const providerName = name ?? getActiveProvider();
+  const cached = providerCache.get(providerName);
   if (cached) return cached;
 
-  const custom = customFactories.get(name);
-  const provider = custom ? custom() : createBuiltinProvider(name);
-  providerCache.set(name, provider);
+  const custom = customFactories.get(providerName);
+  const provider = custom ? custom() : createBuiltinProvider(providerName);
+  providerCache.set(providerName, provider);
   return provider;
 }

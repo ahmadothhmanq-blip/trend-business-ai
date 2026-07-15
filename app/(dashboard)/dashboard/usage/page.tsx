@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
-import { PlatformDashboardPage } from "@/components/dashboard/platform-dashboard-page";
-import { DASHBOARD_PLATFORM_PAGES } from "@/lib/constants/dashboard-platform-pages";
+import { DashboardHeader } from "@/components/dashboard/header";
+import { UsagePanel } from "@/components/dashboard/platform/usage-panel";
 
-export const metadata: Metadata = { title: "Usage" };
+export const metadata: Metadata = { title: "Usage & Monitoring" };
 
 export default function UsagePage() {
-  return <PlatformDashboardPage config={DASHBOARD_PLATFORM_PAGES.usage} />;
+  return (
+    <div className="space-y-6">
+      <DashboardHeader title="Usage & Monitoring" description="Track your AI generation usage and resource consumption" />
+      <UsagePanel />
+    </div>
+  );
 }

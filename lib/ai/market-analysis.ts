@@ -57,18 +57,17 @@ export async function generateMarketAnalysis(
   input: MarketAnalysisInput,
 ): Promise<{
   analysis: GeneratedMarketAnalysis;
-  source: "openai" | "deepseek" | "anthropic" | "fallback";
+  source: string;
   usage?: { promptTokens: number; completionTokens: number; totalTokens: number };
   generationTimeMs?: number;
 }> {
   const startedAt = Date.now();
-  const { getAIProvider, resolveAvailableProvider } = await import("@/lib/ai/adapters");
-  const providerName = resolveAvailableProvider("openai");
+  const { providerManager } = await import("@/lib/ai/provider-manager");
+  const providerName = providerManager.resolve();
 
   if (providerName) {
     try {
-      const provider = getAIProvider(providerName);
-      const parsed = await provider.generateJson<GeneratedMarketAnalysis>({
+      const parsed = await providerManager.generateJson<GeneratedMarketAnalysis>({
         system: marketAnalysisSystemPrompt,
         prompt: marketAnalysisUserPrompt(input),
         temperature: 0.7,
@@ -91,8 +90,8 @@ export async function generateMarketAnalysis(
             : [],
           summary: parsed.summary?.trim() || "",
         },
-        source: providerName as "openai" | "deepseek" | "anthropic",
-        usage: provider.getLastUsage?.() ?? undefined,
+        source: providerName,
+        usage: providerManager.getLastUsage() ?? undefined,
         generationTimeMs: Date.now() - startedAt,
       };
     } catch (error) {

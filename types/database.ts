@@ -157,6 +157,15 @@ export type FavoriteItemType =
   | "market_analysis"
   | "report"
   | "website_generation"
+  | "webapp_generation"
+  | "landing_page_generation"
+  | "logo_generation"
+  | "brand_identity_generation"
+  | "image_generation"
+  | "video_generation"
+  | "content_generation"
+  | "business_generation"
+  | "agent_execution"
   | "workspace_generation";
 
 export type WorkspaceType =
@@ -181,7 +190,7 @@ export type WorkspaceOutput = {
   deliverables: string[];
   progressEvents?: string[];
   generatedAt?: string;
-  source?: "openai" | "anthropic" | "deepseek" | "structured" | string;
+  source?: "deepseek" | "openai" | "claude" | "gemini" | "grok" | "llama" | "structured" | string;
   productId?: string;
   depth?: "focused" | "standard" | "deep";
   tokenUsage?: TokenUsage;

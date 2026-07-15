@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
-import { PlatformDashboardPage } from "@/components/dashboard/platform-dashboard-page";
-import { DASHBOARD_PLATFORM_PAGES } from "@/lib/constants/dashboard-platform-pages";
+import { DashboardHeader } from "@/components/dashboard/header";
+import { BillingPanel } from "@/components/dashboard/platform/billing-panel";
 
-export const metadata: Metadata = { title: "Billing" };
+export const metadata: Metadata = { title: "Billing & Plans" };
 
 export default function BillingPage() {
-  return <PlatformDashboardPage config={DASHBOARD_PLATFORM_PAGES.billing} />;
+  return (
+    <div className="space-y-6">
+      <DashboardHeader title="Billing & Plans" description="Manage your subscription and billing preferences" />
+      <BillingPanel />
+    </div>
+  );
 }

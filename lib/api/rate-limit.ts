@@ -7,6 +7,15 @@ export type AiRateLimitResource =
   | "market-analysis"
   | "reports"
   | "website-builder"
+  | "webapp-builder"
+  | "landing-page-builder"
+  | "logo-designer"
+  | "brand-identity"
+  | "image-generator"
+  | "video-studio"
+  | "content-studio"
+  | "business-suite"
+  | "ai-agents"
   | "workspace";
 
 const AI_RATE_LIMITS: Record<
@@ -17,6 +26,15 @@ const AI_RATE_LIMITS: Record<
   "market-analysis": { requests: 10, window: "1 m" },
   reports: { requests: 10, window: "1 m" },
   "website-builder": { requests: 10, window: "1 m" },
+  "webapp-builder": { requests: 5, window: "1 m" },
+  "landing-page-builder": { requests: 10, window: "1 m" },
+  "logo-designer": { requests: 10, window: "1 m" },
+  "brand-identity": { requests: 10, window: "1 m" },
+  "image-generator": { requests: 10, window: "1 m" },
+  "video-studio": { requests: 5, window: "1 m" },
+  "content-studio": { requests: 15, window: "1 m" },
+  "business-suite": { requests: 10, window: "1 m" },
+  "ai-agents": { requests: 10, window: "1 m" },
   workspace: { requests: 10, window: "1 m" },
 };
 
@@ -131,5 +149,32 @@ export async function enforceAiRateLimit(
     );
   }
 
+  return null;
+}
+
+const MUTATION_RATE = { requests: 30, window: "1 m" as const };
+const mutationMemoryStore = new Map<string, number[]>();
+
+/**
+ * Lightweight rate limiter for non-AI mutation endpoints.
+ * 30 requests per minute per user — uses in-memory store (no Upstash needed).
+ */
+export function enforceMutationRateLimit(userId: string): NextResponse | null {
+  const now = Date.now();
+  const duration = windowMs(MUTATION_RATE.window);
+  const recent = (mutationMemoryStore.get(userId) ?? []).filter(
+    (ts) => now - ts < duration,
+  );
+
+  if (recent.length >= MUTATION_RATE.requests) {
+    const reset = recent[0] + duration;
+    return NextResponse.json(
+      { error: "Too many requests. Please slow down.", retryAfter: Math.max(1, Math.ceil((reset - now) / 1000)) },
+      { status: 429, headers: rateLimitHeaders(MUTATION_RATE.requests, 0, reset) },
+    );
+  }
+
+  recent.push(now);
+  mutationMemoryStore.set(userId, recent);
   return null;
 }

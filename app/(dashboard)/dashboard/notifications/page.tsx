@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
-import { PlatformDashboardPage } from "@/components/dashboard/platform-dashboard-page";
-import { DASHBOARD_PLATFORM_PAGES } from "@/lib/constants/dashboard-platform-pages";
+import { DashboardHeader } from "@/components/dashboard/header";
+import { NotificationsPanel } from "@/components/dashboard/platform/notifications-panel";
 
 export const metadata: Metadata = { title: "Notifications" };
 
 export default function NotificationsPage() {
-  return <PlatformDashboardPage config={DASHBOARD_PLATFORM_PAGES.notifications} />;
+  return (
+    <div className="space-y-6">
+      <DashboardHeader title="Notifications" description="View and manage your notifications" />
+      <NotificationsPanel />
+    </div>
+  );
 }

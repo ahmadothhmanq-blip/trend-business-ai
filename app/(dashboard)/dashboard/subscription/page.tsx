@@ -1,9 +1,5 @@
-import type { Metadata } from "next";
-import { PlatformDashboardPage } from "@/components/dashboard/platform-dashboard-page";
-import { DASHBOARD_PLATFORM_PAGES } from "@/lib/constants/dashboard-platform-pages";
-
-export const metadata: Metadata = { title: "Subscription" };
+import { redirect } from "next/navigation";
 
 export default function SubscriptionPage() {
-  return <PlatformDashboardPage config={DASHBOARD_PLATFORM_PAGES.subscription} />;
+  redirect("/dashboard/billing");
 }

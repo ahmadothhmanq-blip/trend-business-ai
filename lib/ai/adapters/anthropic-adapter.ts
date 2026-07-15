@@ -54,7 +54,7 @@ function extractText(response: AnthropicResponse) {
 }
 
 export class AnthropicAdapter implements AIProvider {
-  readonly name = "anthropic" as const;
+  readonly name = "claude" as const;
   private lastUsage: TokenUsage | null = null;
 
   constructor(private readonly model = DEFAULT_MODEL) {}

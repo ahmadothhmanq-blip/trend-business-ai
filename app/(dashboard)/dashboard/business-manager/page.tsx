@@ -1,5 +1,5 @@
-import { WorkspaceDashboardPage } from "@/components/dashboard/workspace-dashboard-page";
+import { redirect } from "next/navigation";
 
 export default function BusinessManagerPage() {
-  return <WorkspaceDashboardPage workspaceType="manager" />;
+  redirect("/dashboard/business-intelligence");
 }

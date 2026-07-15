@@ -3,6 +3,7 @@ import {
   FILE_GENERATION_RULES,
   PRODUCTION_ARCHITECTURE_GUIDE,
 } from "@/lib/ai/prompts/shared";
+import { sanitizePromptInput } from "@/lib/ai/sanitize";
 
 type WebsiteAnalyzeInput = {
   prompt: string;

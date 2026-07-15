@@ -1,5 +1,5 @@
-import { ProductEnginePage } from "@/components/dashboard/product-engine/product-engine-page";
+import { redirect } from "next/navigation";
 
 export default function BusinessAuditPage() {
-  return <ProductEnginePage productId="feasibility-study" />;
+  redirect("/dashboard/business-intelligence");
 }
