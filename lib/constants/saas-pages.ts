@@ -171,7 +171,7 @@ export const PUBLIC_SAAS_PAGES = {
       },
       {
         title: "Website & App Builder",
-        description: "Upgraded Gemini generation from blueprints to full projects.",
+        description: "Upgraded AI generation from blueprints to full projects.",
         items: ["Next.js App Router file generation", "README and package.json output", "Supabase project persistence"],
       },
       {
