@@ -89,7 +89,7 @@ export type BillingCheckoutSession = {
   user_id: string;
   purpose: CheckoutPurpose;
   provider: BillingProviderId;
-  status: "pending" | "completed" | "expired" | "canceled";
+  status: "pending" | "processing" | "completed" | "expired" | "canceled";
   plan_id: string | null;
   billing_interval: BillingInterval | null;
   credit_pack_id: string | null;

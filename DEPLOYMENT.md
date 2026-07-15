@@ -59,6 +59,14 @@ npm run db:apply -- --only 027
 
 Or paste `supabase/APPLY_PHASE19.sql` into the SQL Editor. Adds composite indexes for list/filter hot paths and billing webhook lookups. See `PERFORMANCE_REPORT_PHASE19.md`.
 
+### Phase 20 — Production QA fixes (028)
+
+```bash
+npm run db:apply -- --only 028
+```
+
+Or paste `supabase/APPLY_PHASE20.sql` into the SQL Editor. Fixes org RLS recursion, checkout `processing` status, and hardened `consume_credits`. See `QA_REPORT_PHASE20.md`.
+
 ### 2. Auth settings (Supabase Dashboard → Authentication)
 
 - **Site URL**: `https://your-domain.vercel.app`

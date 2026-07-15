@@ -51,6 +51,9 @@ export async function ensureCreditBalance(
 
   const writer = writeClient(supabase);
   if (!writer) {
+    if (!billingOptional()) {
+      throw new Error("Billing write client unavailable. Set SUPABASE_SERVICE_ROLE_KEY.");
+    }
     return {
       user_id: userId,
       balance: 0,
@@ -185,7 +188,8 @@ export async function consumeCreditsForUsage(
   amount = 1,
 ): Promise<ConsumeCreditsResult> {
   try {
-    const { data, error } = await supabase.rpc("consume_credits", {
+    const rpcClient = writeClient(supabase) ?? supabase;
+    const { data, error } = await rpcClient.rpc("consume_credits", {
       p_user_id: userId,
       p_amount: amount,
       p_resource: resource,

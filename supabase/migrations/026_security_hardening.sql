@@ -62,13 +62,13 @@ drop policy if exists "Users insert own usage" on public.usage_records;
 create policy "Users insert own usage" on public.usage_records
   for insert with check (auth.uid() = user_id);
 
--- Org members: non-owners cannot escalate to owner
-drop policy if exists "Admins can update members" on public.organization_members;
-create policy "Admins can update members" on public.organization_members
+-- Org members: non-owners cannot escalate to owner (fixed table name: org_members)
+drop policy if exists "Admins can update members" on public.org_members;
+create policy "Admins can update members" on public.org_members
   for update using (
     exists (
-      select 1 from public.organization_members m
-      where m.organization_id = organization_members.organization_id
+      select 1 from public.org_members m
+      where m.organization_id = org_members.organization_id
         and m.user_id = auth.uid()
         and m.role in ('owner', 'admin')
     )
@@ -77,15 +77,15 @@ create policy "Admins can update members" on public.organization_members
     (
       role <> 'owner'
       and exists (
-        select 1 from public.organization_members m
-        where m.organization_id = organization_members.organization_id
+        select 1 from public.org_members m
+        where m.organization_id = org_members.organization_id
           and m.user_id = auth.uid()
           and m.role in ('owner', 'admin')
       )
     )
     or exists (
-      select 1 from public.organization_members m
-      where m.organization_id = organization_members.organization_id
+      select 1 from public.org_members m
+      where m.organization_id = org_members.organization_id
         and m.user_id = auth.uid()
         and m.role = 'owner'
     )
@@ -108,6 +108,10 @@ declare
   next_balance integer;
   used integer;
 begin
+  if auth.uid() is not null and auth.uid() is distinct from p_user_id then
+    raise exception 'forbidden';
+  end if;
+
   if p_amount is null or p_amount <= 0 then
     raise exception 'amount must be positive';
   end if;

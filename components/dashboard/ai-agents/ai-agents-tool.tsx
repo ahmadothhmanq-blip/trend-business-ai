@@ -561,11 +561,27 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
                       onFavorite={() => {}}
                       onDelete={() => {}}
                       onRegenerate={() => {}}
-                      onView={() => {
+                      onView={async () => {
                         const exec = executions.find((e) => e.id === item.id);
-                        if (exec) {
-                          setResult({ output: exec.output as unknown as AgentOutput, execution: exec });
+                        if (!exec) return;
+                        try {
+                          const res = await fetch(`/api/ai-agents/executions/${exec.id}`);
+                          const data = await res.json();
+                          if (!res.ok || !data.execution) {
+                            throw new Error(data.error || "Unable to load execution.");
+                          }
+                          const full = data.execution as AgentExecution;
+                          setResult({
+                            output: (full.output ?? {}) as unknown as AgentOutput,
+                            execution: full,
+                          });
                           setTab("result");
+                        } catch (error) {
+                          toast.error(
+                            error instanceof Error
+                              ? error.message
+                              : "Unable to load execution.",
+                          );
                         }
                       }}
                     />

@@ -3,6 +3,7 @@ import { DashboardHeader } from "@/components/dashboard/header";
 import { WebsiteBuilderToolLazy } from "@/components/dashboard/product-engine/website-builder-tool-lazy";
 import { getProductDefinition } from "@/lib/products/registry";
 import { WEBSITE_LIST_COLUMNS } from "@/lib/api/list-selects";
+import { logger } from "@/lib/logger";
 import type { ProductId } from "@/lib/products/types";
 import type { WebsiteGeneration } from "@/types/database";
 
@@ -21,29 +22,40 @@ export async function WebsiteProductPage({ productId }: { productId: ProductId }
   let initialGenerations: WebsiteGeneration[] = [];
 
   if (user) {
-    const { data: rows } = await supabase
+    const { data: rows, error: listError } = await supabase
       .from("website_generations")
       .select(WEBSITE_LIST_COLUMNS)
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .range(0, 19);
 
-    const list = (rows ?? []) as Omit<WebsiteGeneration, "blueprint">[];
-    const firstId = list[0]?.id;
-
-    if (firstId) {
-      const { data: firstFull } = await supabase
+    if (listError) {
+      logger.error("Website list load failed", "website-product-page", {}, listError);
+      const { data: fallback } = await supabase
         .from("website_generations")
         .select("*")
-        .eq("id", firstId)
         .eq("user_id", user.id)
-        .maybeSingle();
+        .order("created_at", { ascending: false })
+        .range(0, 19);
+      initialGenerations = (fallback ?? []) as WebsiteGeneration[];
+    } else {
+      const list = (rows ?? []) as Omit<WebsiteGeneration, "blueprint">[];
+      const firstId = list[0]?.id;
 
-      initialGenerations = list.map((row) =>
-        row.id === firstId && firstFull
-          ? (firstFull as WebsiteGeneration)
-          : ({ ...row, blueprint: { files: [] } } as unknown as WebsiteGeneration),
-      );
+      if (firstId) {
+        const { data: firstFull } = await supabase
+          .from("website_generations")
+          .select("*")
+          .eq("id", firstId)
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        initialGenerations = list.map((row) =>
+          row.id === firstId && firstFull
+            ? (firstFull as WebsiteGeneration)
+            : ({ ...row, blueprint: { files: [] } } as unknown as WebsiteGeneration),
+        );
+      }
     }
   }
 

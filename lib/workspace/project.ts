@@ -40,7 +40,26 @@ export function formatWorkspaceDate(value: string) {
   }).format(new Date(value));
 }
 
+function normalizeWorkspaceOutput(
+  generation: WorkspaceGeneration,
+): WorkspaceOutput {
+  const raw = (generation.output ?? {}) as Partial<WorkspaceOutput>;
+  return {
+    ...raw,
+    title: raw.title || generation.title,
+    summary: raw.summary || generation.brief || "",
+    sections: Array.isArray(raw.sections) ? raw.sections : [],
+    deliverables: Array.isArray(raw.deliverables) ? raw.deliverables : [],
+    tokenUsage: raw.tokenUsage ?? generation.token_usage,
+    generationTimeMs:
+      raw.generationTimeMs ?? generation.generation_time_ms ?? undefined,
+    productId: raw.productId ?? generation.product_id ?? undefined,
+    mode: raw.mode ?? generation.mode,
+  };
+}
+
 export function toWorkspaceProject(generation: WorkspaceGeneration): WorkspaceProject {
+  const output = normalizeWorkspaceOutput(generation);
   return {
     id: generation.id,
     title: generation.title,
@@ -48,24 +67,17 @@ export function toWorkspaceProject(generation: WorkspaceGeneration): WorkspacePr
     template: generation.template ?? "",
     language: generation.language,
     theme: generation.theme,
-    features: generation.features,
+    features: generation.features ?? [],
     createdAt: formatWorkspaceDate(generation.created_at),
     favorite: Boolean(generation.is_favorite),
-    output: {
-      ...generation.output,
-      tokenUsage: generation.output.tokenUsage ?? generation.token_usage,
-      generationTimeMs:
-        generation.output.generationTimeMs ?? generation.generation_time_ms ?? undefined,
-      productId: generation.output.productId ?? generation.product_id ?? undefined,
-      mode: generation.output.mode ?? generation.mode,
-    },
+    output,
     projectId: generation.project_id,
     productId: generation.product_id,
     status: generation.status,
     mode: generation.mode,
     parentGenerationId: generation.parent_generation_id,
     provider: generation.provider,
-    tokenUsage: generation.token_usage ?? generation.output.tokenUsage,
+    tokenUsage: generation.token_usage ?? output.tokenUsage,
     generationTimeMs: generation.generation_time_ms,
     errorMessage: generation.error_message,
     promptVersions: generation.prompt_versions ?? [],

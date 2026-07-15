@@ -181,21 +181,13 @@ export function useWorkspaceTool({
     dataKey: "generations",
     initialData: seedGenerations,
     initialTotal: productId ? seedGenerations.length : initialTotal,
+    queryParams: productId ? { productId } : undefined,
   });
 
-  const projects = useMemo(() => {
-    const mapped = pagination.items.map(toWorkspaceProject);
-    if (!productId) return mapped;
-    return mapped.filter((project) => {
-      if (project.productId === productId) return true;
-      if (project.output.productId === productId) return true;
-      const productTags = project.features.filter((feature) =>
-        feature.startsWith("product:"),
-      );
-      if (productTags.length === 0) return true;
-      return productTags.includes(`product:${productId}`);
-    });
-  }, [pagination.items, productId]);
+  const projects = useMemo(
+    () => pagination.items.map(toWorkspaceProject),
+    [pagination.items],
+  );
 
   const [prompt, setPrompt] = useState("");
   const [selectedTemplate, setSelectedTemplate] = useState(metadata.templates[0] ?? "");
@@ -594,8 +586,24 @@ export function useWorkspaceTool({
     toast.success("Copied to clipboard.");
   }
 
-  function exportProject(project: WorkspaceProject, format: WorkspaceExportFormat) {
-    downloadWorkspaceProject(project, format);
+  async function exportProject(project: WorkspaceProject, format: WorkspaceExportFormat) {
+    let target = project;
+    const needsHydration =
+      !project.output?.sections?.length && !project.output?.deliverables?.length;
+    if (needsHydration) {
+      try {
+        const res = await fetch(`${endpoint}/${project.id}`);
+        if (res.ok) {
+          const data = (await res.json()) as { generation?: WorkspaceGeneration };
+          if (data.generation) {
+            target = toWorkspaceProject(data.generation);
+          }
+        }
+      } catch {
+        // Fall through with list payload
+      }
+    }
+    downloadWorkspaceProject(target, format);
     toast.success(`Exported ${format.toUpperCase()} file.`);
   }
 

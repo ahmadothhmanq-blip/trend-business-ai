@@ -201,6 +201,10 @@ export class BillingManager {
       return { alreadyCompleted: true as const, session: typed };
     }
 
+    if (typed.status !== "pending" && typed.status !== "processing") {
+      throw new Error(`Checkout session is ${typed.status}.`);
+    }
+
     if (!typed.provider_order_id) throw new Error("Checkout session has no provider order.");
 
     const adapter = getBillingAdapter(typed.provider);
@@ -229,33 +233,64 @@ export class BillingManager {
 
     const typed = session as BillingCheckoutSession;
     if (typed.status === "completed") return typed;
+    // Allow retry when a previous fulfill crashed after claiming processing.
+    if (typed.status !== "pending" && typed.status !== "processing") return typed;
     await this.fulfillSession(typed, providerPaymentId ?? providerOrderId);
     return typed;
   }
 
   private async fulfillSession(session: BillingCheckoutSession, providerPaymentId: string) {
     // Atomic claim — prevents double-fulfill from webhook + return URL races.
+    // Claim as processing first; only mark completed after entitlements succeed.
     const { data: claimed, error: claimError } = await this.supabase
       .from("billing_checkout_sessions")
       .update({
-        status: "completed",
-        completed_at: new Date().toISOString(),
+        status: "processing",
       })
       .eq("id", session.id)
-      .eq("status", "pending")
+      .in("status", ["pending", "processing"])
       .select("*")
       .maybeSingle();
 
     if (claimError) throw claimError;
     if (!claimed) {
-      logger.info("Checkout already fulfilled", "billing.manager", { sessionId: session.id });
-      return;
+      const { data: current } = await this.supabase
+        .from("billing_checkout_sessions")
+        .select("status")
+        .eq("id", session.id)
+        .maybeSingle();
+      if (current?.status === "completed") {
+        logger.info("Checkout already fulfilled", "billing.manager", { sessionId: session.id });
+        return;
+      }
+      throw new Error("Unable to claim checkout session for fulfillment.");
     }
 
-    if (session.purpose === "subscription") {
-      await this.activateSubscription(session, providerPaymentId);
-    } else {
-      await this.deliverCredits(session, providerPaymentId);
+    try {
+      if (session.purpose === "subscription") {
+        await this.activateSubscription(session, providerPaymentId);
+      } else {
+        await this.deliverCredits(session, providerPaymentId);
+      }
+
+      const { error: completeError } = await this.supabase
+        .from("billing_checkout_sessions")
+        .update({
+          status: "completed",
+          completed_at: new Date().toISOString(),
+        })
+        .eq("id", session.id);
+
+      if (completeError) throw completeError;
+    } catch (error) {
+      await this.supabase
+        .from("billing_checkout_sessions")
+        .update({
+          status: "pending",
+        })
+        .eq("id", session.id)
+        .eq("status", "processing");
+      throw error;
     }
   }
 

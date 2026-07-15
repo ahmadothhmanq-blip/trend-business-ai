@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
 import {
@@ -219,6 +219,33 @@ export function WebsiteBuilderTool({
     initialGenerations[0] ? toProject(initialGenerations[0]) : null,
   );
 
+  useEffect(() => {
+    const active = activeProject;
+    if (!active?.id || active.generatedProject?.files?.length) return;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const response = await fetch(`/api/website-builder/${active.id}`);
+        if (!response.ok || cancelled) return;
+        const data = (await response.json()) as { generation?: WebsiteGeneration };
+        if (!data.generation || cancelled) return;
+        const hydrated = toProject(data.generation);
+        setProjects((items) =>
+          items.map((item) => (item.id === hydrated.id ? hydrated : item)),
+        );
+        setActiveProject(hydrated);
+        setSelectedFilePath(hydrated.generatedProject?.files[0]?.path ?? "");
+      } catch {
+        // Keep stub until user selects again
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // Only hydrate once on mount when SSR stub is empty.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const currentPages = useMemo(() => {
     const featurePages = features.includes("Blog") ? ["Blog"] : [];
     const appPages = features.includes("Payments") ? ["Checkout"] : [];
@@ -384,8 +411,8 @@ export function WebsiteBuilderTool({
         throw new Error("error" in data ? data.error : "Unable to generate website.");
       }
 
-      if (!("project" in data)) {
-        throw new Error("AI engine did not return a generated project.");
+      if (!("project" in data) || !data.project || !data.generation?.id) {
+        throw new Error("AI engine did not return a saved generation.");
       }
 
       const generatedProject = data.project;

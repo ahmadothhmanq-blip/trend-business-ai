@@ -89,37 +89,35 @@ async function generateImage(
   const concepts: ImageVariation[] = [];
   const conceptPlans = plan.concepts.slice(0, Math.min(input.batchCount, 4));
 
-  ctx.progress.emit(`Creating ${conceptPlans.length} concepts in parallel...`);
-  const results = await Promise.all(
-    conceptPlans.map(async (concept) => {
-      try {
-        const result = await ctx.provider.generateJson<ImageVariation>({
-          prompt: imageConceptPrompt(input, analysis, concept),
-          schema: imageConceptSchema,
-        });
-        return {
-          name: result.name || concept.name,
-          description: result.description || concept.description,
-          prompt: result.prompt || "",
-          negativePrompt: result.negativePrompt || input.negativePrompt || "",
-          aspectRatio: result.aspectRatio || input.aspectRatio,
-          style: result.style || analysis.style,
-          svgConcept: sanitizeSvg(result.svgConcept),
-        } satisfies ImageVariation;
-      } catch {
-        return {
-          name: concept.name,
-          description: concept.description,
-          prompt: "",
-          negativePrompt: "",
-          aspectRatio: input.aspectRatio,
-          style: analysis.style,
-          svgConcept: "",
-        } satisfies ImageVariation;
-      }
-    }),
-  );
-  concepts.push(...results);
+  // Sequential generation avoids provider usage races and blank parallel failures.
+  for (const concept of conceptPlans) {
+    ctx.progress.emit(`Creating "${concept.name}"...`);
+    try {
+      const result = await ctx.provider.generateJson<ImageVariation>({
+        prompt: imageConceptPrompt(input, analysis, concept),
+        schema: imageConceptSchema,
+      });
+      concepts.push({
+        name: result.name || concept.name,
+        description: result.description || concept.description,
+        prompt: result.prompt || "",
+        negativePrompt: result.negativePrompt || input.negativePrompt || "",
+        aspectRatio: result.aspectRatio || input.aspectRatio,
+        style: result.style || analysis.style,
+        svgConcept: sanitizeSvg(result.svgConcept),
+      });
+    } catch {
+      concepts.push({
+        name: concept.name,
+        description: concept.description,
+        prompt: "",
+        negativePrompt: "",
+        aspectRatio: input.aspectRatio,
+        style: analysis.style,
+        svgConcept: "",
+      });
+    }
+  }
 
   ctx.progress.emit("Building prompt library...");
   let promptLibrary: { name: string; prompt: string; negativePrompt: string; style: string }[] = [];
@@ -187,6 +185,9 @@ async function validateImage(output: ImageOutput, ctx: GenerationContext): Promi
 
   if (!output.title) issues.push("Missing title");
   if (!output.concepts.length) issues.push("No concepts generated");
+  if (!output.concepts.some((c) => Boolean(c.svgConcept?.trim()))) {
+    issues.push("No valid SVG concepts generated");
+  }
 
   return { valid: issues.length === 0, issues, reason: issues.length > 0 ? issues.join("; ") : undefined };
 }

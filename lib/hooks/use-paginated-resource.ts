@@ -17,6 +17,8 @@ type UsePaginatedResourceOptions = {
   initialData?: unknown[];
   initialTotal?: number;
   limit?: number;
+  /** Extra query params always appended (e.g. productId). */
+  queryParams?: Record<string, string>;
 };
 
 export function usePaginatedResource<T>({
@@ -25,6 +27,7 @@ export function usePaginatedResource<T>({
   initialData = [],
   initialTotal = 0,
   limit = 10,
+  queryParams,
 }: UsePaginatedResourceOptions) {
   const [items, setItems] = useState<T[]>(initialData as T[]);
   const [page, setPage] = useState(1);
@@ -50,6 +53,11 @@ export function usePaginatedResource<T>({
           if (endpoint.includes("market-analysis")) params.set("industry", nextExtra);
           if (endpoint.includes("reports")) params.set("reportType", nextExtra);
         }
+        if (queryParams) {
+          for (const [key, value] of Object.entries(queryParams)) {
+            if (value) params.set(key, value);
+          }
+        }
 
         const res = await fetch(`${endpoint}?${params.toString()}`);
         const json = await res.json();
@@ -69,7 +77,7 @@ export function usePaginatedResource<T>({
         setLoading(false);
       }
     },
-    [endpoint, dataKey, page, search, favoriteFilter, extraFilter, limit],
+    [endpoint, dataKey, page, search, favoriteFilter, extraFilter, limit, queryParams],
   );
 
   const refresh = useCallback(() => {
