@@ -1,6 +1,6 @@
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
 import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
-import { enforceAiRateLimit } from "@/lib/api/rate-limit";
+import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import { generateWebApp } from "@/lib/webapp-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
@@ -88,7 +88,7 @@ export async function POST(request: Request) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  const rateLimited = await enforceAiRateLimit(auth.user!.id, "webapp-builder");
+  const rateLimited = await enforceAiUsage(auth.supabase, auth.user!.id, "webapp-builder");
   if (rateLimited) return rateLimited;
 
   const body = await parseJsonBody<unknown>(request);

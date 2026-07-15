@@ -1,6 +1,6 @@
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
 import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
-import { enforceAiRateLimit } from "@/lib/api/rate-limit";
+import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { runAgent } from "@/lib/agent-runner";
 import type { Agent, AgentExecution } from "@/types/agents";
 import { NextResponse } from "next/server";
@@ -93,7 +93,7 @@ export async function POST(request: Request) {
   const parsed = runAgentSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0]?.message }, { status: 400 });
 
-  const rateLimited = await enforceAiRateLimit(auth.user!.id, "ai-agents");
+  const rateLimited = await enforceAiUsage(auth.supabase, auth.user!.id, "ai-agents");
   if (rateLimited) return rateLimited;
 
   let agent: Agent | null = null;

@@ -1,7 +1,7 @@
 import { generateMarketAnalysis } from "@/lib/ai/market-analysis";
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
 import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
-import { enforceAiRateLimit } from "@/lib/api/rate-limit";
+import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter, ilikeContainsPattern } from "@/lib/api/search-filters";
 import { marketInputSchema } from "@/lib/validations/market-analysis";
 import type { MarketAnalysis } from "@/types/database";
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  const rateLimited = await enforceAiRateLimit(auth.user!.id, "market-analysis");
+  const rateLimited = await enforceAiUsage(auth.supabase, auth.user!.id, "market-analysis");
   if (rateLimited) return rateLimited;
 
   const body = await parseJsonBody<unknown>(request);

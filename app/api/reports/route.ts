@@ -1,7 +1,7 @@
 import { generateReport } from "@/lib/ai/reports";
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
 import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
-import { enforceAiRateLimit } from "@/lib/api/rate-limit";
+import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import { reportInputSchema } from "@/lib/validations/reports";
 import type { AIReport } from "@/types/database";
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  const rateLimited = await enforceAiRateLimit(auth.user!.id, "reports");
+  const rateLimited = await enforceAiUsage(auth.supabase, auth.user!.id, "reports");
   if (rateLimited) return rateLimited;
 
   const body = await parseJsonBody<unknown>(request);

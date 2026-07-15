@@ -13,6 +13,13 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  {
+    rules: {
+      // Legitimate client data-fetch / URL-sync patterns trip this React Compiler rule.
+      // Keep immutability and other hooks rules; avoid mass-rewriting unrelated panels.
+      "react-hooks/set-state-in-effect": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

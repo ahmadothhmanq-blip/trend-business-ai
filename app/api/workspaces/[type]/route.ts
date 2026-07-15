@@ -1,6 +1,6 @@
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
 import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
-import { enforceAiRateLimit } from "@/lib/api/rate-limit";
+import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import { generateWorkspaceProject } from "@/lib/workspace/service";
 import { getWorkspaceDefinition } from "@/lib/workspace/registry";
@@ -77,7 +77,7 @@ export async function POST(request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Unknown workspace type." }, { status: 404 });
   }
 
-  const rateLimited = await enforceAiRateLimit(auth.user!.id, "workspace");
+  const rateLimited = await enforceAiUsage(auth.supabase, auth.user!.id, "workspace");
   if (rateLimited) return rateLimited;
 
   const body = await parseJsonBody<unknown>(request);

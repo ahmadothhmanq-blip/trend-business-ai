@@ -1,5 +1,7 @@
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { consumeCreditsForUsage } from "@/lib/billing/credits";
 import { NextResponse } from "next/server";
 
 export type AiRateLimitResource =
@@ -146,6 +148,32 @@ export async function enforceAiRateLimit(
         status: 429,
         headers: rateLimitHeaders(limit, remaining, reset),
       },
+    );
+  }
+
+  return null;
+}
+
+/**
+ * Rate limit + usage-based credit deduction for AI generation routes.
+ */
+export async function enforceAiUsage(
+  supabase: SupabaseClient,
+  userId: string,
+  resource: AiRateLimitResource,
+): Promise<NextResponse | null> {
+  const rateLimited = await enforceAiRateLimit(userId, resource);
+  if (rateLimited) return rateLimited;
+
+  const credits = await consumeCreditsForUsage(supabase, userId, resource, 1);
+  if (!credits.ok && credits.code === "INSUFFICIENT_CREDITS") {
+    return NextResponse.json(
+      {
+        error: credits.error,
+        code: credits.code,
+        balance: credits.balance.balance,
+      },
+      { status: 402 },
     );
   }
 
