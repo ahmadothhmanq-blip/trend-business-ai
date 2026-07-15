@@ -1,6 +1,6 @@
 # Phase 20 — Final Production QA Report
 
-**Commit:** _(filled after commit)_  
+**Commit:** `76961ac`  
 **Date:** 2026-07-16  
 **Scope:** End-to-end production QA; bug fixes only (no new features)
 
