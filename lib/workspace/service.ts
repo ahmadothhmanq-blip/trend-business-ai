@@ -1,8 +1,6 @@
 import { providerManager } from "@/lib/ai/provider-manager";
-import { emptyTokenUsage } from "@/lib/ai/usage";
 import type { AIProviderName, TokenUsage } from "@/lib/ai/types";
 import { getWorkspaceDefinition } from "@/lib/workspace/registry";
-import { generateStructuredWorkspaceOutput } from "@/lib/workspace/structured-output";
 import type {
   WorkspaceGenerationInput,
   WorkspaceOutput,
@@ -123,7 +121,6 @@ export async function generateWorkspaceProject(
   const preferred =
     (input.provider as AIProviderName | undefined) ?? undefined;
   const primary = providerManager.resolve(preferred);
-  const startedAt = Date.now();
 
   const providers = primary
     ? [primary, ...providerManager.listConfigured().filter((name) => name !== primary)]
@@ -171,22 +168,7 @@ export async function generateWorkspaceProject(
       : new Error("All configured AI providers failed.");
   }
 
-  options?.onProgress?.("No AI provider configured — using structured fallback.");
-  const output = generateStructuredWorkspaceOutput(workspaceType, input);
-  const generationTimeMs = Date.now() - startedAt;
-  return {
-    output: {
-      ...output,
-      productId: input.productId,
-      depth: input.depth,
-      tokenUsage: emptyTokenUsage(),
-      generationTimeMs,
-      mode: input.mode ?? "generate",
-      continuedFrom: input.parentGenerationId,
-    },
-    source: "structured",
-    provider: null,
-    usage: emptyTokenUsage(),
-    generationTimeMs,
-  };
+  throw new Error(
+    "No AI provider configured. Set DEEPSEEK_API_KEY to enable workspace generation.",
+  );
 }

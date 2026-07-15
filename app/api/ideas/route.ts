@@ -1,6 +1,6 @@
 import { generateBusinessIdeas } from "@/lib/ai/business-ideas";
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
-import { databaseErrorResponse } from "@/lib/api/errors";
+import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
 import { enforceAiRateLimit } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import {
@@ -70,7 +70,19 @@ export async function POST(request: Request) {
     );
   }
 
-  const { ideas: generated, source } = await generateBusinessIdeas(parsed.data);
+  let generated;
+  let source: string;
+  try {
+    const result = await generateBusinessIdeas(parsed.data);
+    generated = result.ideas;
+    source = result.source;
+  } catch (error) {
+    return serverErrorResponse(
+      "ideas.generate",
+      error,
+      error instanceof Error ? error.message : "AI idea generation failed.",
+    );
+  }
 
   const rows = generated.map((idea) => ({
     user_id: auth.user!.id,
@@ -94,7 +106,7 @@ export async function POST(request: Request) {
   return NextResponse.json({
     ideas: data as BusinessIdea[],
     message:
-      source === "openai"
+      source === "deepseek" || source === "openai" || source === "claude"
         ? "3 new ideas generated and saved with AI."
         : "3 new ideas generated and saved.",
   });

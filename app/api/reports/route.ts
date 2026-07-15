@@ -1,6 +1,6 @@
 import { generateReport } from "@/lib/ai/reports";
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
-import { databaseErrorResponse } from "@/lib/api/errors";
+import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
 import { enforceAiRateLimit } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import { reportInputSchema } from "@/lib/validations/reports";
@@ -70,7 +70,19 @@ export async function POST(request: Request) {
     );
   }
 
-  const { report, source } = await generateReport(parsed.data);
+  let report;
+  let source: string;
+  try {
+    const result = await generateReport(parsed.data);
+    report = result.report;
+    source = result.source;
+  } catch (error) {
+    return serverErrorResponse(
+      "reports.generate",
+      error,
+      error instanceof Error ? error.message : "AI report generation failed.",
+    );
+  }
 
   const { data, error } = await auth.supabase
     .from("reports")
@@ -94,7 +106,7 @@ export async function POST(request: Request) {
   return NextResponse.json({
     report: data as AIReport,
     message:
-      source === "openai"
+      source === "deepseek" || source === "openai" || source === "claude"
         ? "Report generated and saved with AI."
         : "Report generated and saved.",
   });

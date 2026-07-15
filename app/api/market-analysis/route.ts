@@ -1,6 +1,6 @@
 import { generateMarketAnalysis } from "@/lib/ai/market-analysis";
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
-import { databaseErrorResponse } from "@/lib/api/errors";
+import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
 import { enforceAiRateLimit } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter, ilikeContainsPattern } from "@/lib/api/search-filters";
 import { marketInputSchema } from "@/lib/validations/market-analysis";
@@ -72,7 +72,19 @@ export async function POST(request: Request) {
     );
   }
 
-  const { analysis, source } = await generateMarketAnalysis(parsed.data);
+  let analysis;
+  let source: string;
+  try {
+    const result = await generateMarketAnalysis(parsed.data);
+    analysis = result.analysis;
+    source = result.source;
+  } catch (error) {
+    return serverErrorResponse(
+      "market-analysis.generate",
+      error,
+      error instanceof Error ? error.message : "AI market analysis failed.",
+    );
+  }
 
   const { data, error } = await auth.supabase
     .from("market_analyses")
@@ -99,7 +111,7 @@ export async function POST(request: Request) {
   return NextResponse.json({
     analysis: data as MarketAnalysis,
     message:
-      source === "openai"
+      source === "deepseek" || source === "openai" || source === "claude"
         ? "Market analysis generated and saved with AI."
         : "Market analysis generated and saved.",
   });

@@ -44,12 +44,21 @@ export function isProviderConfigured(name: string): boolean {
   return customFactories.has(name);
 }
 
+/** True when the adapter is a real implementation (not a stub). */
+export function isProviderImplemented(name: string): boolean {
+  const reg = PROVIDER_REGISTRY.find((r) => r.name === name);
+  if (reg) return reg.status === "active";
+  return customFactories.has(name);
+}
+
 export function listConfiguredProviders(): AIProviderName[] {
   const names: AIProviderName[] = [
     ...getAllProviderNames(),
     ...(Array.from(customFactories.keys()) as AIProviderName[]),
   ];
-  return [...new Set(names)].filter((n) => isProviderConfigured(n));
+  return [...new Set(names)].filter(
+    (n) => isProviderConfigured(n) && isProviderImplemented(n),
+  );
 }
 
 export function resolveAvailableProvider(
@@ -57,14 +66,27 @@ export function resolveAvailableProvider(
 ): AIProviderName | null {
   const active = getActiveProvider();
   const target = preferred ?? active;
-  if (isProviderConfigured(target)) return target;
 
-  if (target !== active && isProviderConfigured(active)) {
+  if (isProviderConfigured(target) && isProviderImplemented(target)) {
+    return target;
+  }
+
+  if (
+    target !== active &&
+    isProviderConfigured(active) &&
+    isProviderImplemented(active)
+  ) {
     return active;
   }
 
   for (const reg of PROVIDER_REGISTRY) {
-    if (reg.name !== target && isProviderConfigured(reg.name)) return reg.name;
+    if (
+      reg.name !== target &&
+      reg.status === "active" &&
+      isProviderConfigured(reg.name)
+    ) {
+      return reg.name;
+    }
   }
   for (const name of customFactories.keys()) {
     if (isProviderConfigured(name)) return name as AIProviderName;

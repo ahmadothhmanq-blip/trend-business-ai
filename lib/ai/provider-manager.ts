@@ -86,12 +86,24 @@ class ProviderManager {
   }
 
   async generateJson<T>(request: JsonGenerationRequest, providerName?: AIProviderName): Promise<T> {
-    const provider = this.getProvider(providerName);
+    const resolved = this.resolve(providerName);
+    if (!resolved) {
+      throw new Error(
+        "No AI provider configured. Set DEEPSEEK_API_KEY to enable generation.",
+      );
+    }
+    const provider = this.getProvider(resolved);
     return provider.generateJson<T>(request);
   }
 
   async generateText(request: TextGenerationRequest, providerName?: AIProviderName): Promise<string> {
-    const provider = this.getProvider(providerName);
+    const resolved = this.resolve(providerName);
+    if (!resolved) {
+      throw new Error(
+        "No AI provider configured. Set DEEPSEEK_API_KEY to enable generation.",
+      );
+    }
+    const provider = this.getProvider(resolved);
     if (!provider.generateText) {
       throw new Error(`Provider "${provider.name}" does not support generateText.`);
     }
@@ -99,7 +111,13 @@ class ProviderManager {
   }
 
   async streamText(request: StreamTextRequest, providerName?: AIProviderName): Promise<string> {
-    const provider = this.getProvider(providerName);
+    const resolved = this.resolve(providerName);
+    if (!resolved) {
+      throw new Error(
+        "No AI provider configured. Set DEEPSEEK_API_KEY to enable generation.",
+      );
+    }
+    const provider = this.getProvider(resolved);
     if (!provider.streamText) {
       throw new Error(`Provider "${provider.name}" does not support streamText.`);
     }
@@ -111,8 +129,13 @@ class ProviderManager {
     input: TInput,
     options: EngineRunOptions = {},
   ) {
-    const provider = options.provider ?? getActiveProvider();
-    return aiGenerationEngine.run(plugin, input, { ...options, provider });
+    const resolved = this.resolve(options.provider);
+    if (!resolved) {
+      throw new Error(
+        "No AI provider configured. Set DEEPSEEK_API_KEY to enable generation.",
+      );
+    }
+    return aiGenerationEngine.run(plugin, input, { ...options, provider: resolved });
   }
 
   getLastUsage(providerName?: AIProviderName): TokenUsage | null {

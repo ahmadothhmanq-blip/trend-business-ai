@@ -33,9 +33,9 @@ export const ACTIVE_PROVIDER: AIProviderName = DEFAULT_PROVIDER;
 
 export const PROVIDER_REGISTRY: ProviderRegistration[] = [
   { name: "deepseek", label: "DeepSeek", envKey: "DEEPSEEK_API_KEY", status: "active" },
-  { name: "openai", label: "OpenAI", envKey: "OPENAI_API_KEY", status: "placeholder" },
+  { name: "openai", label: "OpenAI", envKey: "OPENAI_API_KEY", status: "active" },
+  { name: "claude", label: "Anthropic Claude", envKey: "ANTHROPIC_API_KEY", status: "active" },
   { name: "gemini", label: "Google Gemini", envKey: "GEMINI_API_KEY", status: "placeholder" },
-  { name: "claude", label: "Anthropic Claude", envKey: "ANTHROPIC_API_KEY", status: "placeholder" },
   { name: "grok", label: "xAI Grok", envKey: "GROK_API_KEY", status: "placeholder" },
   { name: "llama", label: "Meta Llama", envKey: "LLAMA_API_KEY", status: "placeholder" },
 ];
