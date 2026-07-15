@@ -1,3 +1,5 @@
+import { sanitizePromptInput } from "@/lib/ai/sanitize";
+
 export const businessIdeasSystemPrompt = `You are a business strategist. Generate exactly 3 unique, actionable business ideas as JSON with this shape:
 {"ideas":[{"title":"string","description":"string","industry":"string","target_market":"string","revenue_model":"string"}]}
 Each idea must be specific to the user's profile. Descriptions should be 2-3 sentences.`;
@@ -8,10 +10,14 @@ export function businessIdeasUserPrompt(input: {
   budget: string;
   industry?: string;
 }) {
-  return `Interests: ${input.interests}
-Skills: ${input.skills}
-Budget: ${input.budget}
-Preferred industry: ${input.industry || "any"}`;
+  const interests = sanitizePromptInput(input.interests);
+  const skills = sanitizePromptInput(input.skills);
+  const budget = sanitizePromptInput(input.budget);
+  const industry = sanitizePromptInput(input.industry || "any");
+  return `Interests: ${interests}
+Skills: ${skills}
+Budget: ${budget}
+Preferred industry: ${industry}`;
 }
 
 export const reportsSystemPrompt = `You are a senior business analyst. Return JSON:
@@ -23,7 +29,9 @@ export function reportsUserPrompt(input: {
   topic: string;
   timeframe: string;
 }) {
-  return `Report type: ${input.reportType}\nTopic: ${input.topic}\nTimeframe: ${input.timeframe}`;
+  return `Report type: ${sanitizePromptInput(input.reportType)}
+Topic: ${sanitizePromptInput(input.topic)}
+Timeframe: ${sanitizePromptInput(input.timeframe)}`;
 }
 
 export const marketAnalysisSystemPrompt = `You are a market research analyst. Return JSON with this exact shape:
@@ -35,7 +43,7 @@ export function marketAnalysisUserPrompt(input: {
   region: string;
   targetAudience: string;
 }) {
-  return `Industry: ${input.industry}
-Region: ${input.region}
-Target audience: ${input.targetAudience}`;
+  return `Industry: ${sanitizePromptInput(input.industry)}
+Region: ${sanitizePromptInput(input.region)}
+Target audience: ${sanitizePromptInput(input.targetAudience)}`;
 }

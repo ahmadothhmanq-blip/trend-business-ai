@@ -15,8 +15,26 @@ const MIN_LEVEL: LogLevel =
   (process.env.LOG_LEVEL as LogLevel) ??
   (process.env.NODE_ENV === "production" ? "info" : "debug");
 
+const SENSITIVE_KEY =
+  /(token|secret|password|authorization|cookie|api[_-]?key|private[_-]?key|access[_-]?token|refresh[_-]?token|credit.?card|ssn|email)/i;
+
 function shouldLog(level: LogLevel): boolean {
   return LOG_LEVELS[level] >= LOG_LEVELS[MIN_LEVEL];
+}
+
+function redactValue(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(redactValue);
+  if (value && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [key, nested] of Object.entries(value as Record<string, unknown>)) {
+      out[key] = SENSITIVE_KEY.test(key) ? "[REDACTED]" : redactValue(nested);
+    }
+    return out;
+  }
+  if (typeof value === "string" && value.length > 500) {
+    return `${value.slice(0, 120)}…[truncated ${value.length} chars]`;
+  }
+  return value;
 }
 
 function formatEntry(entry: LogEntry): string {
@@ -37,11 +55,14 @@ function log(level: LogLevel, message: string, context?: string, data?: Record<s
     message,
     timestamp: new Date().toISOString(),
     ...(context && { context }),
-    ...(data && { data }),
+    ...(data && { data: redactValue(data) as Record<string, unknown> }),
   };
 
   if (err instanceof Error) {
-    entry.error = { message: err.message, stack: err.stack };
+    entry.error = {
+      message: err.message,
+      ...(process.env.NODE_ENV !== "production" ? { stack: err.stack } : {}),
+    };
   }
 
   const formatted = formatEntry(entry);

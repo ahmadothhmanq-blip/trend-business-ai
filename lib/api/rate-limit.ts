@@ -166,14 +166,15 @@ export async function enforceAiUsage(
   if (rateLimited) return rateLimited;
 
   const credits = await consumeCreditsForUsage(supabase, userId, resource, 1);
-  if (!credits.ok && credits.code === "INSUFFICIENT_CREDITS") {
+  if (!credits.ok) {
+    const status = credits.code === "INSUFFICIENT_CREDITS" ? 402 : 503;
     return NextResponse.json(
       {
         error: credits.error,
         code: credits.code,
         balance: credits.balance.balance,
       },
-      { status: 402 },
+      { status },
     );
   }
 
@@ -182,27 +183,70 @@ export async function enforceAiUsage(
 
 const MUTATION_RATE = { requests: 30, window: "1 m" as const };
 const mutationMemoryStore = new Map<string, number[]>();
+const authMemoryStore = new Map<string, number[]>();
+const AUTH_RATE = { requests: 10, window: "1 m" as const };
+const WEBHOOK_RATE = { requests: 120, window: "1 m" as const };
+const webhookMemoryStore = new Map<string, number[]>();
+
+function enforceKeyedMemoryLimit(
+  store: Map<string, number[]>,
+  key: string,
+  limit: number,
+  window: "1 m" | "1 h",
+  errorMessage: string,
+): NextResponse | null {
+  const now = Date.now();
+  const duration = windowMs(window);
+  const recent = (store.get(key) ?? []).filter((ts) => now - ts < duration);
+
+  if (recent.length >= limit) {
+    const reset = recent[0] + duration;
+    return NextResponse.json(
+      {
+        error: errorMessage,
+        retryAfter: Math.max(1, Math.ceil((reset - now) / 1000)),
+      },
+      { status: 429, headers: rateLimitHeaders(limit, 0, reset) },
+    );
+  }
+
+  recent.push(now);
+  store.set(key, recent);
+  return null;
+}
 
 /**
  * Lightweight rate limiter for non-AI mutation endpoints.
  * 30 requests per minute per user — uses in-memory store (no Upstash needed).
  */
 export function enforceMutationRateLimit(userId: string): NextResponse | null {
-  const now = Date.now();
-  const duration = windowMs(MUTATION_RATE.window);
-  const recent = (mutationMemoryStore.get(userId) ?? []).filter(
-    (ts) => now - ts < duration,
+  return enforceKeyedMemoryLimit(
+    mutationMemoryStore,
+    userId,
+    MUTATION_RATE.requests,
+    MUTATION_RATE.window,
+    "Too many requests. Please slow down.",
   );
+}
 
-  if (recent.length >= MUTATION_RATE.requests) {
-    const reset = recent[0] + duration;
-    return NextResponse.json(
-      { error: "Too many requests. Please slow down.", retryAfter: Math.max(1, Math.ceil((reset - now) / 1000)) },
-      { status: 429, headers: rateLimitHeaders(MUTATION_RATE.requests, 0, reset) },
-    );
-  }
+/** Auth endpoints: 10 attempts per minute per email (or IP key). */
+export function enforceAuthRateLimit(key: string): NextResponse | null {
+  return enforceKeyedMemoryLimit(
+    authMemoryStore,
+    `auth:${key.toLowerCase()}`,
+    AUTH_RATE.requests,
+    AUTH_RATE.window,
+    "Too many authentication attempts. Please try again later.",
+  );
+}
 
-  recent.push(now);
-  mutationMemoryStore.set(userId, recent);
-  return null;
+/** Billing webhook ingress: 120 requests per minute per provider. */
+export function enforceWebhookRateLimit(provider: string): NextResponse | null {
+  return enforceKeyedMemoryLimit(
+    webhookMemoryStore,
+    `webhook:${provider}`,
+    WEBHOOK_RATE.requests,
+    WEBHOOK_RATE.window,
+    "Too many webhook requests.",
+  );
 }

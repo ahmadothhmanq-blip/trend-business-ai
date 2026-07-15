@@ -33,6 +33,24 @@ npm run db:verify
 
 Or paste `supabase/APPLY_PHASE14.sql` into the Supabase SQL Editor once.
 
+### Phase 16 — Billing (025)
+
+```bash
+npm run db:apply -- --only 025
+```
+
+Or paste `supabase/APPLY_PHASE16.sql` into the SQL Editor.
+
+### Phase 18 — Security hardening (026) — required for production
+
+```bash
+npm run db:apply -- --only 026
+```
+
+Or paste `supabase/APPLY_PHASE18.sql` into the SQL Editor once.
+
+This locks billing writes to the service role, hardens agent/prompt template policies, and blocks org owner escalation. See `SECURITY_AUDIT_PHASE18.md`.
+
 ### 2. Auth settings (Supabase Dashboard → Authentication)
 
 - **Site URL**: `https://your-domain.vercel.app`

@@ -1,6 +1,7 @@
 import { parseJsonBody, requireUser } from "@/lib/api/helpers";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { createBillingManager, isBillingConfigured } from "@/lib/billing";
+import { requireBillingWriteClient } from "@/lib/billing/write-client";
 import { enforceMutationRateLimit } from "@/lib/api/rate-limit";
 import type { BillingInterval, BillingProviderId } from "@/types/billing";
 import { NextResponse } from "next/server";
@@ -29,6 +30,9 @@ export async function POST(request: Request) {
     );
   }
 
+  const writer = requireBillingWriteClient();
+  if (writer.response) return writer.response;
+
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
 
@@ -38,7 +42,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const manager = createBillingManager(auth.supabase);
+    const manager = createBillingManager(writer.client!);
     const session = await manager.createSubscriptionCheckout({
       userId: auth.user!.id,
       planId: parsed.data.planId,

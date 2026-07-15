@@ -47,12 +47,29 @@ export async function GET() {
     return NextResponse.json({ settings: getDefaultSettings() });
   }
 
+  const providers = Array.isArray(data.providers)
+    ? data.providers.map((p: { apiKey?: string; [key: string]: unknown }) => ({
+        ...p,
+        apiKey: maskApiKey(typeof p.apiKey === "string" ? p.apiKey : ""),
+      }))
+    : [];
+
   const settings: AIProviderSettings = {
     ...data,
-    providers: Array.isArray(data.providers) ? data.providers : [],
+    providers,
   };
 
   return NextResponse.json({ settings });
+}
+
+function maskApiKey(key: string): string {
+  if (!key) return "";
+  if (key.length <= 8) return "••••••••";
+  return `${key.slice(0, 4)}••••${key.slice(-4)}`;
+}
+
+function isMaskedApiKey(key: string): boolean {
+  return !key || key.includes("••••");
 }
 
 export async function PUT(request: Request) {
@@ -70,6 +87,29 @@ export async function PUT(request: Request) {
     );
   }
 
+  // Preserve stored API keys when the client sends a masked placeholder.
+  const { data: existing } = await auth.supabase
+    .from("ai_provider_settings")
+    .select("providers")
+    .eq("user_id", auth.user!.id)
+    .maybeSingle();
+
+  const existingByName = new Map<string, string>();
+  if (Array.isArray(existing?.providers)) {
+    for (const p of existing.providers as Array<{ name?: string; apiKey?: string }>) {
+      if (p?.name && typeof p.apiKey === "string" && p.apiKey && !isMaskedApiKey(p.apiKey)) {
+        existingByName.set(p.name, p.apiKey);
+      }
+    }
+  }
+
+  const providers = parsed.data.providers.map((p) => ({
+    ...p,
+    apiKey: isMaskedApiKey(p.apiKey)
+      ? (existingByName.get(p.name) ?? "")
+      : p.apiKey,
+  }));
+
   const row = {
     user_id: auth.user!.id,
     default_provider: parsed.data.default_provider,
@@ -78,7 +118,7 @@ export async function PUT(request: Request) {
     temperature: parsed.data.temperature,
     max_tokens: parsed.data.max_tokens,
     timeout_seconds: parsed.data.timeout_seconds,
-    providers: parsed.data.providers,
+    providers,
     updated_at: new Date().toISOString(),
   };
 

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { safeRedirectPath } from "@/lib/api/helpers";
+import { enforceAuthRateLimit } from "@/lib/api/rate-limit";
 import { getOptionalSiteUrl } from "@/lib/env";
 import {
   emailSchema,
@@ -30,6 +31,11 @@ export async function signUp(formData: FormData) {
     return { error: "Please provide a valid name, email, and password." };
   }
 
+  const limited = enforceAuthRateLimit(email.data);
+  if (limited) {
+    return { error: "Too many authentication attempts. Please try again later." };
+  }
+
   const { data, error } = await supabase.auth.signUp({
     email: email.data,
     password: password.data,
@@ -40,7 +46,10 @@ export async function signUp(formData: FormData) {
   });
 
   if (error) {
-    return { error: error.message };
+    return {
+      error:
+        "Unable to create account. Try a different email or try again later.",
+    };
   }
 
   if (data.user && !data.session) {
@@ -60,13 +69,18 @@ export async function signIn(formData: FormData) {
     return { error: "Invalid email or password." };
   }
 
+  const limited = enforceAuthRateLimit(email.data);
+  if (limited) {
+    return { error: "Too many authentication attempts. Please try again later." };
+  }
+
   const { error } = await supabase.auth.signInWithPassword({
     email: email.data,
     password: password.data,
   });
 
   if (error) {
-    return { error: error.message };
+    return { error: "Invalid email or password." };
   }
 
   const redirectTo = safeRedirectPath(
@@ -91,16 +105,26 @@ export async function requestPasswordReset(formData: FormData) {
     return { error: "Please enter a valid email address." };
   }
 
+  const limited = enforceAuthRateLimit(`reset:${email.data}`);
+  if (limited) {
+    return {
+      success: true,
+      message: "If that email exists, a password reset link has been sent.",
+    };
+  }
+
   const siteUrl = getOptionalSiteUrl();
   const { error } = await supabase.auth.resetPasswordForEmail(email.data, {
     redirectTo: `${siteUrl}/auth/callback?next=/reset-password`,
   });
 
-  if (error) {
-    return { error: error.message };
-  }
+  // Always return success to avoid email enumeration.
+  void error;
 
-  return { success: true, message: "Password reset link sent. Check your email." };
+  return {
+    success: true,
+    message: "If that email exists, a password reset link has been sent.",
+  };
 }
 
 export async function updatePassword(formData: FormData) {
@@ -108,7 +132,7 @@ export async function updatePassword(formData: FormData) {
   const password = passwordSchema.safeParse(formData.get("password"));
 
   if (!password.success) {
-    return { error: "Password must be at least 6 characters." };
+    return { error: "Password must be at least 8 characters." };
   }
 
   const { error } = await supabase.auth.updateUser({
@@ -116,7 +140,7 @@ export async function updatePassword(formData: FormData) {
   });
 
   if (error) {
-    return { error: error.message };
+    return { error: "Unable to update password. Please try again." };
   }
 
   revalidatePath("/dashboard/profile");

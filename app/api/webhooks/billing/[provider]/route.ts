@@ -1,4 +1,5 @@
 import { handleBillingWebhook } from "@/lib/billing";
+import { enforceWebhookRateLimit } from "@/lib/api/rate-limit";
 import { NextResponse } from "next/server";
 
 type RouteContext = { params: Promise<{ provider: string }> };
@@ -8,6 +9,9 @@ export async function POST(request: Request, context: RouteContext) {
   if (raw !== "paypal" && raw !== "card") {
     return NextResponse.json({ error: "Unsupported billing provider." }, { status: 404 });
   }
+
+  const limited = enforceWebhookRateLimit(raw);
+  if (limited) return limited;
 
   const rawBody = await request.text();
   const result = await handleBillingWebhook({

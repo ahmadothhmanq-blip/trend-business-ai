@@ -14,7 +14,7 @@ export async function recordWebhookEvent(params: {
   const client = admin;
   if (!client) {
     logger.warn("Service role missing — webhook event not persisted", "billing.webhook");
-    return { duplicate: false, client: null };
+    return { duplicate: false, alreadyProcessed: false, client: null };
   }
 
   const { error } = await client.from("billing_webhook_events").insert({
@@ -27,12 +27,22 @@ export async function recordWebhookEvent(params: {
 
   if (error) {
     if (error.code === "23505") {
-      return { duplicate: true, client };
+      const { data: existing } = await client
+        .from("billing_webhook_events")
+        .select("processed")
+        .eq("provider", params.provider)
+        .eq("event_id", params.eventId)
+        .maybeSingle();
+      return {
+        duplicate: true,
+        alreadyProcessed: Boolean(existing?.processed),
+        client,
+      };
     }
     logger.error("Failed to store webhook event", "billing.webhook", undefined, error);
   }
 
-  return { duplicate: false, client };
+  return { duplicate: false, alreadyProcessed: false, client };
 }
 
 export async function markWebhookProcessed(
@@ -74,14 +84,14 @@ export async function handleBillingWebhook(params: {
     return { ok: true as const, status: 200, ignored: true };
   }
 
-  const { duplicate, client } = await recordWebhookEvent({
+  const { duplicate, alreadyProcessed, client } = await recordWebhookEvent({
     provider: params.provider,
     eventId: event.eventId,
     eventType: event.eventType,
     payload,
   });
 
-  if (duplicate) {
+  if (duplicate && alreadyProcessed) {
     return { ok: true as const, status: 200, duplicate: true };
   }
 
@@ -96,19 +106,15 @@ export async function handleBillingWebhook(params: {
 
   try {
     const manager = createBillingManager(admin);
-    const actionable =
-      event.eventType === "PAYMENT.CAPTURE.COMPLETED" ||
-      event.eventType === "CHECKOUT.ORDER.APPROVED" ||
+    // Prefer capture-completed only to avoid double-fulfill from APPROVED + COMPLETED.
+    const actionable = event.eventType === "PAYMENT.CAPTURE.COMPLETED" ||
       event.eventType === "CHECKOUT.ORDER.COMPLETED";
 
     if (actionable) {
-      const orderId = event.providerSessionId ?? event.customId;
       if (event.providerSessionId) {
         await manager.fulfillByProviderOrder(event.providerSessionId, event.providerPaymentId);
       } else if (event.customId) {
         await manager.completeCheckoutSession(event.customId);
-      } else if (orderId) {
-        await manager.fulfillByProviderOrder(orderId, event.providerPaymentId);
       }
     }
 
@@ -118,6 +124,6 @@ export async function handleBillingWebhook(params: {
     const message = error instanceof Error ? error.message : "Webhook processing failed.";
     await markWebhookProcessed(admin, params.provider, event.eventId, message);
     logger.error("Webhook processing failed", "billing.webhook", { eventType: event.eventType }, error);
-    return { ok: false as const, status: 500, error: message };
+    return { ok: false as const, status: 500, error: "Webhook processing failed." };
   }
 }

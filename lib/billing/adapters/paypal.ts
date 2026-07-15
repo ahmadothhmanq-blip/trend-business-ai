@@ -33,8 +33,7 @@ async function getAccessToken(): Promise<string> {
   });
 
   if (!res.ok) {
-    const text = await res.text();
-    logger.error("PayPal OAuth failed", "billing.paypal", { status: res.status, text });
+    logger.error("PayPal OAuth failed", "billing.paypal", { status: res.status });
     throw new Error("Failed to authenticate with PayPal.");
   }
 
@@ -61,7 +60,7 @@ async function paypalFetch<T>(path: string, init?: RequestInit): Promise<T> {
 
   if (!res.ok) {
     const text = await res.text();
-    logger.error("PayPal API error", "billing.paypal", { path, status: res.status, text });
+    logger.error("PayPal API error", "billing.paypal", { path, status: res.status, bodyLength: text.length });
     throw new Error(`PayPal request failed (${res.status}).`);
   }
 
@@ -186,8 +185,9 @@ export class PayPalAdapter implements BillingProviderAdapter {
   async verifyWebhook(headers: Headers, rawBody: string): Promise<boolean> {
     const config = getPayPalConfig();
     if (!config.webhookId) {
-      logger.warn("PAYPAL_WEBHOOK_ID unset — skipping signature verification", "billing.paypal");
-      return process.env.NODE_ENV !== "production";
+      logger.warn("PAYPAL_WEBHOOK_ID unset — rejecting webhook", "billing.paypal");
+      // Never accept unverified webhooks when billing credentials exist.
+      return process.env.ALLOW_INSECURE_PAYPAL_WEBHOOKS === "true" && process.env.NODE_ENV !== "production";
     }
 
     const transmissionId = headers.get("paypal-transmission-id");
@@ -201,6 +201,12 @@ export class PayPalAdapter implements BillingProviderAdapter {
     }
 
     try {
+      const certHost = new URL(certUrl).hostname.toLowerCase();
+      if (!certHost.endsWith(".paypal.com") && !certHost.endsWith(".paypalobjects.com")) {
+        logger.warn("Rejected PayPal cert_url host", "billing.paypal", { certHost });
+        return false;
+      }
+
       const result = await paypalFetch<{ verification_status: string }>("/v1/notifications/verify-webhook-signature", {
         method: "POST",
         body: JSON.stringify({

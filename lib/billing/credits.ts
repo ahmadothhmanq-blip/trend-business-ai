@@ -1,11 +1,21 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { CreditBalance, CreditLedgerReason } from "@/types/billing";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { logger } from "@/lib/logger";
+import { isProductionRuntime } from "@/lib/seo/site";
 
 const DEFAULT_FREE_CREDITS = 50;
 
-function isMissingTable(error: { code?: string } | null) {
-  return error?.code === "42P01";
+function isMissingTable(error: { code?: string; message?: string } | null) {
+  return error?.code === "42P01" || error?.code === "PGRST205";
+}
+
+function billingOptional() {
+  return process.env.BILLING_OPTIONAL === "true" || !isProductionRuntime();
+}
+
+function writeClient(preferred?: SupabaseClient) {
+  return createAdminClient() ?? preferred ?? null;
 }
 
 export async function ensureCreditBalance(
@@ -25,6 +35,9 @@ export async function ensureCreditBalance(
   }
 
   if (isMissingTable(error)) {
+    if (!billingOptional()) {
+      throw Object.assign(new Error("Billing tables missing."), { code: "42P01" });
+    }
     return {
       user_id: userId,
       balance: initialBalance,
@@ -36,7 +49,18 @@ export async function ensureCreditBalance(
 
   if (data) return data as CreditBalance;
 
-  const { data: created, error: insertError } = await supabase
+  const writer = writeClient(supabase);
+  if (!writer) {
+    return {
+      user_id: userId,
+      balance: 0,
+      lifetime_purchased: 0,
+      lifetime_used: 0,
+      updated_at: new Date().toISOString(),
+    };
+  }
+
+  const { data: created, error: insertError } = await writer
     .from("credit_balances")
     .insert({
       user_id: userId,
@@ -49,6 +73,7 @@ export async function ensureCreditBalance(
 
   if (insertError) {
     if (isMissingTable(insertError)) {
+      if (!billingOptional()) throw insertError;
       return {
         user_id: userId,
         balance: initialBalance,
@@ -57,7 +82,6 @@ export async function ensureCreditBalance(
         updated_at: new Date().toISOString(),
       };
     }
-    // Race: another request created the row
     const { data: again } = await supabase
       .from("credit_balances")
       .select("*")
@@ -68,7 +92,7 @@ export async function ensureCreditBalance(
   }
 
   if (initialBalance > 0) {
-    await supabase.from("credit_ledger").insert({
+    await writer.from("credit_ledger").insert({
       user_id: userId,
       delta: initialBalance,
       balance_after: initialBalance,
@@ -93,6 +117,11 @@ export async function applyCreditDelta(
     metadata?: Record<string, unknown>;
   },
 ): Promise<CreditBalance> {
+  const writer = writeClient(supabase);
+  if (!writer) {
+    throw new Error("Billing write client unavailable. Set SUPABASE_SERVICE_ROLE_KEY.");
+  }
+
   const current = await ensureCreditBalance(supabase, params.userId);
   const nextBalance = Math.max(0, current.balance + params.delta);
 
@@ -105,7 +134,7 @@ export async function applyCreditDelta(
       ? current.lifetime_used + Math.abs(params.delta)
       : current.lifetime_used;
 
-  const { data, error } = await supabase
+  const { data, error } = await writer
     .from("credit_balances")
     .upsert(
       {
@@ -121,13 +150,13 @@ export async function applyCreditDelta(
     .single();
 
   if (error) {
-    if (isMissingTable(error)) {
+    if (isMissingTable(error) && billingOptional()) {
       return { ...current, balance: nextBalance, lifetime_purchased, lifetime_used };
     }
     throw error;
   }
 
-  await supabase.from("credit_ledger").insert({
+  await writer.from("credit_ledger").insert({
     user_id: params.userId,
     delta: params.delta,
     balance_after: nextBalance,
@@ -146,8 +175,8 @@ export type ConsumeCreditsResult =
   | { ok: false; balance: CreditBalance; error: string; code: "INSUFFICIENT_CREDITS" | "UNAVAILABLE" };
 
 /**
- * Usage-based credit update. Deducts 1 credit per generation by default.
- * Soft-fails open when billing tables are not migrated yet.
+ * Usage-based credit update via SECURITY DEFINER RPC when available.
+ * Fails closed in production when billing is misconfigured.
  */
 export async function consumeCreditsForUsage(
   supabase: SupabaseClient,
@@ -156,8 +185,36 @@ export async function consumeCreditsForUsage(
   amount = 1,
 ): Promise<ConsumeCreditsResult> {
   try {
-    const balance = await ensureCreditBalance(supabase, userId);
-    if (balance.balance < amount) {
+    const { data, error } = await supabase.rpc("consume_credits", {
+      p_user_id: userId,
+      p_amount: amount,
+      p_resource: resource,
+      p_reference_id: null,
+    });
+
+    if (!error && data) {
+      const row = Array.isArray(data) ? data[0] : data;
+      return {
+        ok: true,
+        balance: {
+          user_id: userId,
+          balance: Number(row?.balance ?? 0),
+          lifetime_purchased: 0,
+          lifetime_used: Number(row?.lifetime_used ?? 0),
+          updated_at: new Date().toISOString(),
+        },
+      };
+    }
+
+    const message = String(error?.message ?? "");
+    if (message.includes("INSUFFICIENT_CREDITS")) {
+      const balance = await ensureCreditBalance(supabase, userId).catch(() => ({
+        user_id: userId,
+        balance: 0,
+        lifetime_purchased: 0,
+        lifetime_used: 0,
+        updated_at: new Date().toISOString(),
+      }));
       return {
         ok: false,
         balance,
@@ -166,18 +223,46 @@ export async function consumeCreditsForUsage(
       };
     }
 
-    const next = await applyCreditDelta(supabase, {
-      userId,
-      delta: -amount,
-      reason: "usage",
-      resource,
-      metadata: { amount },
-    });
+    // RPC missing — fall back carefully
+    if (error && (isMissingTable(error) || error.code === "PGRST202" || message.includes("consume_credits"))) {
+      if (!billingOptional()) {
+        return {
+          ok: false,
+          balance: {
+            user_id: userId,
+            balance: 0,
+            lifetime_purchased: 0,
+            lifetime_used: 0,
+            updated_at: new Date().toISOString(),
+          },
+          error: "Credits unavailable.",
+          code: "UNAVAILABLE",
+        };
+      }
 
-    return { ok: true, balance: next };
+      const balance = await ensureCreditBalance(supabase, userId);
+      if (balance.balance < amount) {
+        return {
+          ok: false,
+          balance,
+          error: "Insufficient credits. Purchase credits or upgrade your plan.",
+          code: "INSUFFICIENT_CREDITS",
+        };
+      }
+      const next = await applyCreditDelta(supabase, {
+        userId,
+        delta: -amount,
+        reason: "usage",
+        resource,
+        metadata: { amount },
+      });
+      return { ok: true, balance: next, skipped: true };
+    }
+
+    throw error;
   } catch (error) {
     const code = (error as { code?: string })?.code;
-    if (code === "42P01") {
+    if (code === "42P01" && billingOptional()) {
       return {
         ok: true,
         skipped: true,

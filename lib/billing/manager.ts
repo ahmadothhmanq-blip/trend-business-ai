@@ -235,19 +235,29 @@ export class BillingManager {
   }
 
   private async fulfillSession(session: BillingCheckoutSession, providerPaymentId: string) {
-    if (session.purpose === "subscription") {
-      await this.activateSubscription(session, providerPaymentId);
-    } else {
-      await this.deliverCredits(session, providerPaymentId);
-    }
-
-    await this.supabase
+    // Atomic claim — prevents double-fulfill from webhook + return URL races.
+    const { data: claimed, error: claimError } = await this.supabase
       .from("billing_checkout_sessions")
       .update({
         status: "completed",
         completed_at: new Date().toISOString(),
       })
-      .eq("id", session.id);
+      .eq("id", session.id)
+      .eq("status", "pending")
+      .select("*")
+      .maybeSingle();
+
+    if (claimError) throw claimError;
+    if (!claimed) {
+      logger.info("Checkout already fulfilled", "billing.manager", { sessionId: session.id });
+      return;
+    }
+
+    if (session.purpose === "subscription") {
+      await this.activateSubscription(session, providerPaymentId);
+    } else {
+      await this.deliverCredits(session, providerPaymentId);
+    }
   }
 
   private async activateSubscription(session: BillingCheckoutSession, providerPaymentId: string) {

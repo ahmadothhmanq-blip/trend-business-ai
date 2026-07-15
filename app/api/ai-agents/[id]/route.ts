@@ -17,6 +17,7 @@ export async function GET(_request: Request, context: RouteContext) {
     .from("agents")
     .select("*")
     .eq("id", idParsed.id)
+    .or(`user_id.eq.${auth.user!.id},is_template.eq.true`)
     .single();
 
   if (error) {
