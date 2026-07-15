@@ -24,7 +24,13 @@ function resolveHref(label?: string) {
   return "/signup";
 }
 
-export function PublicSaasPage({ page }: { page: PublicSaasPageConfig }) {
+export function PublicSaasPage({
+  page,
+  children,
+}: {
+  page: PublicSaasPageConfig;
+  children?: React.ReactNode;
+}) {
   return (
     <SiteShell>
       <SitePageHero
@@ -65,6 +71,7 @@ export function PublicSaasPage({ page }: { page: PublicSaasPageConfig }) {
           </div>
         </div>
       </section>
+      {children}
       <SiteCtaBand
         title="Ready to build with Trend Business AI?"
         description="Create your free account and explore Create, Design, Content, and Business from one premium AI workspace."

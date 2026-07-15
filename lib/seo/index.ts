@@ -1,4 +1,12 @@
 export { createPageMetadata, rootMetadata } from "@/lib/seo/metadata";
+export type { PageMetadataOptions, PageSeoType } from "@/lib/seo/metadata";
+export { SeoService } from "@/lib/seo/engine";
+export {
+  generateSeoMetadata,
+  generateProductSeoMetadata,
+  generateBlogPostSeoMetadata,
+  generateProgrammaticSeoMetadata,
+} from "@/lib/seo/generate-metadata";
 export {
   SITE_NAME,
   DEFAULT_TITLE,

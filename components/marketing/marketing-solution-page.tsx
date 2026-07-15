@@ -20,6 +20,14 @@ import {
   AI_PRODUCT_CATEGORIES,
   type AiProductCategoryId,
 } from "@/lib/constants/marketing-content";
+import { SeoBreadcrumbs } from "@/components/seo/breadcrumbs";
+import { RelatedLinksGroups } from "@/components/seo/related-links";
+import {
+  getRelatedBlogArticles,
+  getRelatedBusinessResources,
+  getRelatedServices,
+  getRelatedTemplates,
+} from "@/lib/seo/internal-links";
 
 /** Category page — products for this suite only, each card links to its landing. */
 export function MarketingSolutionPage({ id }: { id: AiProductCategoryId }) {
@@ -30,6 +38,13 @@ export function MarketingSolutionPage({ id }: { id: AiProductCategoryId }) {
   return (
     <SiteShell>
       <section className="landing-container pt-[108px] pb-14 lg:pb-16 lg:pt-[124px]">
+        <SeoBreadcrumbs
+          items={[
+            { name: "Home", href: "/" },
+            { name: "Products", href: "/features" },
+            { name: category.title },
+          ]}
+        />
         <div className="grid items-center gap-10 lg:grid-cols-[1fr_1.05fr] lg:gap-14">
           <div>
             <div className="flex flex-wrap items-center gap-3">
@@ -143,6 +158,19 @@ export function MarketingSolutionPage({ id }: { id: AiProductCategoryId }) {
               </Link>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="border-t border-[rgba(212,175,55,0.12)]">
+        <div className="landing-container py-16 lg:py-20">
+          <RelatedLinksGroups
+            groups={[
+              { title: "Related services", links: getRelatedServices(id) },
+              { title: "Related templates", links: getRelatedTemplates() },
+              { title: "Related articles", links: getRelatedBlogArticles() },
+              { title: "Business resources", links: getRelatedBusinessResources() },
+            ]}
+          />
         </div>
       </section>
 
