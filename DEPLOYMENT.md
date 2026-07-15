@@ -23,6 +23,16 @@ MVP runtime, `006_user_preferences.sql`, `007_storage_avatars.sql`, and
 `009_website_favorites.sql` are required for Profile, avatar upload, Website
 Builder favorites, and the Favorites dashboard page.
 
+### Phase 14 — Organizations / Team (021–024)
+
+```bash
+# Add SUPABASE_DB_URL to .env.local (Database → Connection string URI, port 5432)
+npm run db:apply -- --only 021,022,023,024
+npm run db:verify
+```
+
+Or paste `supabase/APPLY_PHASE14.sql` into the Supabase SQL Editor once.
+
 ### 2. Auth settings (Supabase Dashboard → Authentication)
 
 - **Site URL**: `https://your-domain.vercel.app`
