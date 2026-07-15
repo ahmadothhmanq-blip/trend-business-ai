@@ -31,7 +31,7 @@ const TEMPLATES: TemplateMeta[] = [
     description: "Logo, palette and identity direction patterns for new brands.",
     path: "/templates",
     category: "brand",
-    image: "/images/ai/brand-studio.png",
+    image: "/images/ai/template-brand.png",
     relatedProductSlugs: ["brand-studio", "logo-maker"],
     status: "published",
   },

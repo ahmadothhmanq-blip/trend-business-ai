@@ -76,8 +76,15 @@ Expect all tables, RLS checks, and `avatars` bucket to pass.
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Anon / publishable key |
 | `NEXT_PUBLIC_SITE_URL` | Yes | Production URL, e.g. `https://your-app.vercel.app` |
 | `OPENAI_API_KEY` | Yes | Required for production live AI generation |
+| `DEEPSEEK_API_KEY` | Recommended | Default AI provider for live generation |
 | `UPSTASH_REDIS_REST_URL` | Recommended | Global per-user AI rate limiting |
 | `UPSTASH_REDIS_REST_TOKEN` | Recommended | Global per-user AI rate limiting |
+| `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | Optional | Google Search Console HTML tag verification |
+| `NEXT_PUBLIC_BING_SITE_VERIFICATION` | Optional | Bing Webmaster Tools `msvalidate.01` |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Optional | GA4 measurement ID (`G-XXXXXXXX`) |
+| `NEXT_PUBLIC_GTM_ID` | Optional | Google Tag Manager container (`GTM-XXXX`) |
+| `PAYPAL_CLIENT_ID` / `PAYPAL_CLIENT_SECRET` | Optional | Billing checkout (Phase 16) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Optional | Billing webhook fulfillment |
 
 If Upstash is not configured, production API routes use a per-instance in-memory
 fallback limit. Configure Upstash before public launch if the deployment uses
@@ -101,6 +108,8 @@ multiple serverless instances or expected traffic is not tightly controlled.
 - [ ] Profile update and avatar upload
 - [ ] Password reset flow
 - [ ] Unauthenticated `/dashboard/*` redirects to `/login`
+- [ ] `/sitemap.xml` and `/robots.txt` resolve
+- [ ] Specialized sitemaps under `/sitemaps/*.xml` resolve
 
 ### 4. Local pre-deploy
 
@@ -112,8 +121,45 @@ npm run verify
 
 ---
 
+## SEO & organic growth (Phase 17)
+
+### Public discovery endpoints
+
+| URL | Purpose |
+|-----|---------|
+| `/sitemap.xml` | Combined XML sitemap |
+| `/sitemaps/pages.xml` | Core + legal pages |
+| `/sitemaps/tools.xml` | Product / tool landings |
+| `/sitemaps/images.xml` | Image-enriched product URLs |
+| `/sitemaps/blog.xml` | Blog hub + published posts |
+| `/sitemaps/templates.xml` | Templates hub |
+| `/sitemaps/knowledge.xml` | Learn / docs / resources |
+| `/robots.txt` | Production allows indexing; preview/dev disallows all |
+| `/manifest.webmanifest` | PWA / brand manifest |
+
+### Search Console & analytics
+
+1. Set `NEXT_PUBLIC_SITE_URL` to the canonical production origin.
+2. Add Google / Bing verification env vars, redeploy, then verify the property.
+3. Submit `https://your-domain/sitemap.xml` in Google Search Console and Bing Webmaster Tools.
+4. Optionally set `NEXT_PUBLIC_GA_MEASUREMENT_ID` and/or `NEXT_PUBLIC_GTM_ID` (CSP already allows Google Tag domains).
+
+### URL rules
+
+- Canonical product URLs live under `/products/*`.
+- Legacy `/solutions/:slug` permanently redirects to `/products/:slug`.
+- Dashboard, API, and auth routes are `noindex` / robots-disallowed.
+
+### Content publishing rules
+
+- Blog posts, knowledge entries, and programmatic landings only enter sitemaps when `status: "published"`.
+- Use `SeoService` (`lib/seo/engine.ts`) and `generate*SeoMetadata` helpers for new public pages — do not invent thin duplicate URLs.
+
+---
+
 ## Architecture notes
 
 - Session refresh and route protection: `proxy.ts` → `lib/supabase/proxy.ts`
 - API routes enforce auth via `requireUser()` in `lib/api/helpers.ts`
 - Do not rely on proxy alone for API security — each route validates the session
+- Central SEO: `lib/seo/*` + `components/seo/*`

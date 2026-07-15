@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { MarketingPricingPage } from "@/components/marketing/marketing-pricing-page";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
+import { RelatedLinksSection } from "@/components/seo/related-links";
 import { SeoService } from "@/lib/seo/engine";
 import { softwareApplicationJsonLd, webPageJsonLd } from "@/lib/seo/json-ld";
 
@@ -30,7 +31,17 @@ export default function PricingPage() {
           }),
         ]}
       />
-      <MarketingPricingPage />
+      <MarketingPricingPage>
+        <div className="landing-container border-t border-[rgba(212,175,55,0.12)] py-16">
+          <RelatedLinksSection
+            title="Before you upgrade"
+            links={[
+              ...SeoService.links.tools("website-builder", 2),
+              ...SeoService.links.resources(2),
+            ]}
+          />
+        </div>
+      </MarketingPricingPage>
     </>
   );
 }

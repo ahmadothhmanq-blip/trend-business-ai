@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { MarketingLegalPage } from "@/components/marketing/marketing-legal-page";
-import { createPageMetadata } from "@/lib/seo/metadata";
+import { JsonLdScript } from "@/components/seo/json-ld-script";
+import { RelatedLinksSection } from "@/components/seo/related-links";
+import { SeoService } from "@/lib/seo/engine";
+import { webPageJsonLd } from "@/lib/seo/json-ld";
 
-export const metadata: Metadata = createPageMetadata({
+export const metadata: Metadata = SeoService.createMetadata({
   title: "Terms of Service",
   description: "Terms for using the Trend Business AI MVP beta.",
   path: "/terms",
@@ -37,11 +40,36 @@ const sections = [
 
 export default function TermsPage() {
   return (
-    <MarketingLegalPage
-      eyebrow="Legal"
-      title="Terms of Service"
-      intro="Last updated: July 5, 2026. These terms describe the current MVP beta usage expectations for Trend Business AI."
-      sections={sections}
-    />
+    <>
+      <JsonLdScript
+        id="terms-jsonld"
+        data={webPageJsonLd({
+          name: "Terms of Service",
+          description: "Terms for using the Trend Business AI MVP beta.",
+          path: "/terms",
+        })}
+      />
+      <MarketingLegalPage
+        eyebrow="Legal"
+        title="Terms of Service"
+        intro="Last updated: July 5, 2026. These terms describe the current MVP beta usage expectations for Trend Business AI."
+        sections={sections}
+      >
+        <div className="landing-container border-t border-[rgba(212,175,55,0.12)] pb-16">
+          <RelatedLinksSection
+            title="Related"
+            links={[
+              {
+                title: "Privacy Policy",
+                description: "How we handle account and generated data.",
+                href: "/privacy",
+                kind: "resource",
+              },
+              ...SeoService.links.resources(2),
+            ]}
+          />
+        </div>
+      </MarketingLegalPage>
+    </>
   );
 }

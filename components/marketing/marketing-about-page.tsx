@@ -30,7 +30,7 @@ const PILLARS = [
   },
 ] as const;
 
-export function MarketingAboutPage() {
+export function MarketingAboutPage({ children }: { children?: React.ReactNode }) {
   return (
     <SiteShell>
       <SitePageHero
@@ -79,6 +79,7 @@ export function MarketingAboutPage() {
         </div>
       </section>
       <SiteTrust />
+      {children}
       <SiteCtaBand
         title="Build with Trend Business AI"
         description="Start free and explore the full Create, Design, Content and Business product suites."

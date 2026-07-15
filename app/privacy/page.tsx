@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { MarketingLegalPage } from "@/components/marketing/marketing-legal-page";
-import { createPageMetadata } from "@/lib/seo/metadata";
+import { JsonLdScript } from "@/components/seo/json-ld-script";
+import { RelatedLinksSection } from "@/components/seo/related-links";
+import { SeoService } from "@/lib/seo/engine";
+import { webPageJsonLd } from "@/lib/seo/json-ld";
 
-export const metadata: Metadata = createPageMetadata({
+export const metadata: Metadata = SeoService.createMetadata({
   title: "Privacy Policy",
   description: "How Trend Business AI handles account, profile, and generated business planning data.",
   path: "/privacy",
@@ -37,11 +40,37 @@ const sections = [
 
 export default function PrivacyPage() {
   return (
-    <MarketingLegalPage
-      eyebrow="Legal"
-      title="Privacy Policy"
-      intro="Last updated: July 5, 2026. This MVP policy explains the current data handling model for Trend Business AI."
-      sections={sections}
-    />
+    <>
+      <JsonLdScript
+        id="privacy-jsonld"
+        data={webPageJsonLd({
+          name: "Privacy Policy",
+          description:
+            "How Trend Business AI handles account, profile, and generated business planning data.",
+          path: "/privacy",
+        })}
+      />
+      <MarketingLegalPage
+        eyebrow="Legal"
+        title="Privacy Policy"
+        intro="Last updated: July 5, 2026. This MVP policy explains the current data handling model for Trend Business AI."
+        sections={sections}
+      >
+        <div className="landing-container border-t border-[rgba(212,175,55,0.12)] pb-16">
+          <RelatedLinksSection
+            title="Related"
+            links={[
+              {
+                title: "Terms of Service",
+                description: "MVP beta usage expectations.",
+                href: "/terms",
+                kind: "resource",
+              },
+              ...SeoService.links.resources(2),
+            ]}
+          />
+        </div>
+      </MarketingLegalPage>
+    </>
   );
 }

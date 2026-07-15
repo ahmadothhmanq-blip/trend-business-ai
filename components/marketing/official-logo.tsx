@@ -36,7 +36,6 @@ export function OfficialLogo({
           sizes="44px"
           className="object-contain"
           priority
-          unoptimized
         />
       </span>
     );
@@ -51,7 +50,6 @@ export function OfficialLogo({
         height={259}
         className={cn("object-contain", s.full)}
         priority
-        unoptimized
       />
     </span>
   );

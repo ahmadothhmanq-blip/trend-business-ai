@@ -6,7 +6,7 @@ import { SitePricing } from "@/components/marketing/site/pricing";
 import { SiteTrust } from "@/components/marketing/site/trust";
 import { SiteCtaBand, SitePageHero } from "@/components/marketing/site/ui";
 
-export function MarketingPricingPage() {
+export function MarketingPricingPage({ children }: { children?: React.ReactNode }) {
   return (
     <SiteShell>
       <SitePageHero
@@ -19,6 +19,7 @@ export function MarketingPricingPage() {
       <SiteStats />
       <SitePricing standalone />
       <SiteTrust />
+      {children}
       <SiteCtaBand
         title="Start building today"
         description="Create your free account and open every AI product category from one private dashboard."

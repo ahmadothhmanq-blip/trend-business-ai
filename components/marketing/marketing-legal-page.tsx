@@ -12,11 +12,13 @@ export function MarketingLegalPage({
   title,
   intro,
   sections,
+  children,
 }: {
   eyebrow: string;
   title: string;
   intro: string;
   sections: readonly { title: string; body: string }[];
+  children?: React.ReactNode;
 }) {
   return (
     <SiteShell>
@@ -35,6 +37,7 @@ export function MarketingLegalPage({
           </div>
         </article>
       </section>
+      {children}
     </SiteShell>
   );
 }

@@ -75,7 +75,6 @@ export function SiteFooter() {
           alt=""
           fill
           className="object-contain object-bottom"
-          unoptimized
         />
       </div>
 

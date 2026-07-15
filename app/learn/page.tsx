@@ -77,11 +77,18 @@ export default function LearnPage() {
             name: "Knowledge Center",
             description: "Learning hubs across Trend Business AI.",
             path: "/learn",
-            items: SECTIONS.map((section) => ({
-              name: section.title,
-              path: "/learn",
-              description: section.description,
-            })),
+            items: [
+              ...hubs.map((hub) => ({
+                name: hub.title,
+                path: hub.path,
+                description: hub.description,
+              })),
+              ...published.documentation.map((entry) => ({
+                name: entry.title,
+                path: entry.path,
+                description: entry.description,
+              })),
+            ],
           }),
         ]}
       />

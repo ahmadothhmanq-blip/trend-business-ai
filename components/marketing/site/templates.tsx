@@ -44,7 +44,6 @@ export function SiteTemplates() {
                     fill
                     sizes="(min-width: 640px) 50vw, 100vw"
                     className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-                    unoptimized
                   />
                 </div>
               </div>
