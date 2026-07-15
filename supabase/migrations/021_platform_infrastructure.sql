@@ -18,6 +18,10 @@ create table if not exists public.organizations (
 );
 
 alter table public.organizations enable row level security;
+drop policy if exists "Org members can view their org" on public.organizations;
+drop policy if exists "Org members and owners can view" on public.organizations;
+drop policy if exists "Users can create organizations" on public.organizations;
+drop policy if exists "Org owners can update" on public.organizations;
 create policy "Org members can view their org" on public.organizations
   for select using (id in (select organization_id from public.org_members where user_id = auth.uid()));
 create policy "Org owners can update" on public.organizations
@@ -35,6 +39,12 @@ create table if not exists public.org_members (
 );
 
 alter table public.org_members enable row level security;
+drop policy if exists "Members can view org members" on public.org_members;
+drop policy if exists "Admins can manage members" on public.org_members;
+drop policy if exists "Admins can update members" on public.org_members;
+drop policy if exists "Admins can delete members" on public.org_members;
+drop policy if exists "Admins can insert members" on public.org_members;
+drop policy if exists "Owners can join as first member" on public.org_members;
 create policy "Members can view org members" on public.org_members
   for select using (organization_id in (select organization_id from public.org_members om where om.user_id = auth.uid()));
 create policy "Admins can manage members" on public.org_members
@@ -57,6 +67,7 @@ create table if not exists public.team_invitations (
 );
 
 alter table public.team_invitations enable row level security;
+drop policy if exists "Org admins can manage invitations" on public.team_invitations;
 create policy "Org admins can manage invitations" on public.team_invitations
   for all using (organization_id in (select organization_id from public.org_members where user_id = auth.uid() and role in ('owner','admin')));
 
@@ -74,6 +85,10 @@ create table if not exists public.notifications (
 );
 
 alter table public.notifications enable row level security;
+drop policy if exists "Users see own notifications" on public.notifications;
+drop policy if exists "Users update own notifications" on public.notifications;
+drop policy if exists "System can insert notifications" on public.notifications;
+drop policy if exists "Service role inserts notifications" on public.notifications;
 create policy "Users see own notifications" on public.notifications
   for select using (auth.uid() = user_id);
 create policy "Users update own notifications" on public.notifications
@@ -100,6 +115,7 @@ create table if not exists public.activity_log (
 );
 
 alter table public.activity_log enable row level security;
+drop policy if exists "Users see own activity" on public.activity_log;
 create policy "Users see own activity" on public.activity_log
   for select using (auth.uid() = user_id or organization_id in (select organization_id from public.org_members where user_id = auth.uid() and role in ('owner','admin')));
 
@@ -123,6 +139,7 @@ create table if not exists public.api_keys (
 );
 
 alter table public.api_keys enable row level security;
+drop policy if exists "Users manage own keys" on public.api_keys;
 create policy "Users manage own keys" on public.api_keys
   for all using (auth.uid() = user_id);
 
@@ -145,6 +162,7 @@ create table if not exists public.webhooks (
 );
 
 alter table public.webhooks enable row level security;
+drop policy if exists "Users manage own webhooks" on public.webhooks;
 create policy "Users manage own webhooks" on public.webhooks
   for all using (auth.uid() = user_id);
 
@@ -163,6 +181,8 @@ create table if not exists public.usage_records (
 );
 
 alter table public.usage_records enable row level security;
+drop policy if exists "Users see own usage" on public.usage_records;
+drop policy if exists "System inserts usage" on public.usage_records;
 create policy "Users see own usage" on public.usage_records
   for select using (auth.uid() = user_id);
 create policy "System inserts usage" on public.usage_records
@@ -186,6 +206,7 @@ create table if not exists public.feature_flags (
 );
 
 alter table public.feature_flags enable row level security;
+drop policy if exists "Anyone can read flags" on public.feature_flags;
 create policy "Anyone can read flags" on public.feature_flags
   for select using (true);
 
@@ -204,6 +225,7 @@ create table if not exists public.subscription_plans (
 );
 
 alter table public.subscription_plans enable row level security;
+drop policy if exists "Anyone can read plans" on public.subscription_plans;
 create policy "Anyone can read plans" on public.subscription_plans
   for select using (true);
 

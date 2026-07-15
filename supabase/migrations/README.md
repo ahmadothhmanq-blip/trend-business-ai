@@ -4,23 +4,30 @@ Run these files in order against your Supabase project (SQL Editor or CLI).
 
 | Order | File | Creates |
 | ----- | ---- | ------- |
-| 1 | `001_profiles.sql` | `profiles` table, RLS, `handle_new_user` trigger |
-| 2 | `002_business_ideas.sql` | `business_ideas` table + RLS |
-| 3 | `003_market_analyses.sql` | `market_analyses` table + RLS |
-| 4 | `004_reports.sql` | `reports` table + RLS |
-| 5 | `005_favorites.sql` | `favorites` table + RLS |
-| 6 | `006_user_preferences.sql` | `user_preferences` table + RLS, extends `handle_new_user` |
-| 7 | `007_storage_avatars.sql` | `avatars` storage bucket + RLS |
-| 8 | `008_website_generations.sql` | `website_generations` table + RLS |
-| 9 | `009_website_favorites.sql` | Website favorite column, index, update RLS, and favorite type constraint |
-| 10 | `010_workspace_generations.sql` | `workspace_generations` table + RLS, extends favorites item types |
+| 1–9 | `001` … `009` | Core MVP tables |
+| 10 | `010_workspace_generations.sql` | Workspace generations |
+| 11 | `011_ai_engine_phase5.sql` | AI engine extensions |
+| 12 | `012_ai_provider_settings.sql` | Provider settings |
+| 13–20 | `013` … `020` | Create / Design / Video / Content / Business tables |
+| 21 | `021_platform_infrastructure.sql` | Organizations, teams, API keys, webhooks, usage |
+| 22 | `022_ai_agents_platform.sql` | Agents, workflows, executions |
+| 23 | `023_security_hardening.sql` | RLS fixes, indexes, `updated_at` triggers |
+| 24 | `024_organization_bootstrap.sql` | Org create + owner bootstrap policies |
 
-Alternatively, run the consolidated `supabase/schema.sql` once on a fresh project.
+## Phase 14 — Organizations / Team (021–024)
 
-Apply pending migrations via Supabase SQL Editor or CLI:
+**Option A — CLI (preferred):**
+
+1. Add `SUPABASE_DB_URL` (or `DATABASE_URL`) to `.env.local` from Supabase → Settings → Database → Connection string (URI, port 5432).
+2. Run:
 
 ```bash
-npx supabase db push
+npm run db:apply -- --only 021,022,023,024
+npm run db:verify
 ```
 
-Verify with: `npm run verify`
+**Option B — SQL Editor:**
+
+Paste and run `supabase/APPLY_PHASE14.sql` once in the Supabase SQL Editor.
+
+Verify with: `npm run db:verify`

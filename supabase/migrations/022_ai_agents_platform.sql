@@ -35,6 +35,7 @@ create table if not exists public.agents (
 );
 
 alter table public.agents enable row level security;
+drop policy if exists "Users manage own agents" on public.agents;
 create policy "Users manage own agents" on public.agents
   for all using (auth.uid() = user_id or is_template = true);
 
@@ -60,6 +61,7 @@ create table if not exists public.agent_workflows (
 );
 
 alter table public.agent_workflows enable row level security;
+drop policy if exists "Users manage own workflows" on public.agent_workflows;
 create policy "Users manage own workflows" on public.agent_workflows
   for all using (auth.uid() = user_id);
 
@@ -88,6 +90,7 @@ create table if not exists public.agent_executions (
 );
 
 alter table public.agent_executions enable row level security;
+drop policy if exists "Users see own executions" on public.agent_executions;
 create policy "Users see own executions" on public.agent_executions
   for all using (auth.uid() = user_id);
 
@@ -112,6 +115,7 @@ create table if not exists public.agent_memory (
 );
 
 alter table public.agent_memory enable row level security;
+drop policy if exists "Users manage own memory" on public.agent_memory;
 create policy "Users manage own memory" on public.agent_memory
   for all using (auth.uid() = user_id);
 
@@ -134,6 +138,7 @@ create table if not exists public.prompt_library (
 );
 
 alter table public.prompt_library enable row level security;
+drop policy if exists "Users manage own prompts" on public.prompt_library;
 create policy "Users manage own prompts" on public.prompt_library
   for all using (auth.uid() = user_id or is_public = true);
 
@@ -157,6 +162,7 @@ create table if not exists public.scheduled_jobs (
 );
 
 alter table public.scheduled_jobs enable row level security;
+drop policy if exists "Users manage own jobs" on public.scheduled_jobs;
 create policy "Users manage own jobs" on public.scheduled_jobs
   for all using (auth.uid() = user_id);
 
