@@ -1,5 +1,6 @@
 import { requireUser, paginationParams } from "@/lib/api/helpers";
 import { databaseErrorResponse } from "@/lib/api/errors";
+import { AGENT_EXECUTION_LIST_COLUMNS } from "@/lib/api/list-selects";
 import type { AgentExecution } from "@/types/agents";
 import { NextResponse } from "next/server";
 
@@ -14,7 +15,7 @@ export async function GET(request: Request) {
 
   let query = auth.supabase
     .from("agent_executions")
-    .select("*", { count: "exact" })
+    .select(AGENT_EXECUTION_LIST_COLUMNS, { count: "exact" })
     .eq("user_id", auth.user!.id)
     .order("created_at", { ascending: false });
 
@@ -23,10 +24,29 @@ export async function GET(request: Request) {
 
   const { data, error, count } = await query.range(from, to);
   if (error) {
-    if (error.code === "42P01") return NextResponse.json({ executions: [], total: 0, page, limit, totalPages: 1 });
+    if (error.code === "42P01") {
+      return NextResponse.json({
+        executions: [],
+        total: 0,
+        page,
+        limit,
+        totalPages: 1,
+      });
+    }
     return databaseErrorResponse("executions.list", error);
   }
 
   const total = count ?? 0;
-  return NextResponse.json({ executions: data as AgentExecution[], total, page, limit, totalPages: Math.ceil(total / limit) || 1 });
+  return NextResponse.json({
+    executions: (data ?? []).map((row) => ({
+      ...row,
+      input: {},
+      output: {},
+      steps_log: [],
+    })) as AgentExecution[],
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit) || 1,
+  });
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import JSZip from "jszip";
 import { toast } from "sonner";
 import {
   ArrowLeft,
@@ -94,7 +93,7 @@ function ImagePreview({ gen, onBack }: { gen: ImageGeneration; onBack: () => voi
         <div className="ml-auto">
           <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:border-premium-gold/25 hover:text-premium-gold-light"
             onClick={async () => {
-              const zip = new JSZip();
+              const JSZip = (await import("jszip")).default; const zip = new JSZip();
               for (const f of bp.files) zip.file(f.path, f.content);
               const blob = await zip.generateAsync({ type: "blob" });
               const url = URL.createObjectURL(blob);

@@ -67,7 +67,7 @@ export function SiteHeader() {
           aria-label="Trend Business AI home"
           onClick={() => setOpen(false)}
         >
-          <OfficialLogo compact size="sm" className="!size-7 sm:!size-[30px]" />
+          <OfficialLogo compact size="sm" priority className="!size-7 sm:!size-[30px]" />
           <span className="hidden text-[13px] font-semibold tracking-[-0.02em] sm:inline xl:text-[14px]">
             <span className="text-white">Trend Business </span>
             <span className="text-[#D4AF37]">AI</span>

@@ -196,14 +196,4 @@ export async function copyWorkspaceSummary(project: WorkspaceProject) {
   await navigator.clipboard.writeText(text);
 }
 
-export function formatGenerationMeta(output: WorkspaceOutput) {
-  const parts: string[] = [];
-  if (output.source) parts.push(String(output.source));
-  if (output.tokenUsage?.totalTokens) {
-    parts.push(`${output.tokenUsage.totalTokens} tokens`);
-  }
-  if (output.generationTimeMs) {
-    parts.push(`${(output.generationTimeMs / 1000).toFixed(1)}s`);
-  }
-  return parts.join(" · ");
-}
+export { formatGenerationMeta } from "@/lib/workspace/export-meta";

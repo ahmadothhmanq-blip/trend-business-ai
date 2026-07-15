@@ -61,34 +61,33 @@ export async function GET(request: Request) {
 
   const { organizationId } = resolved;
 
-  const { data: members, error } = await auth.supabase
-    .from("org_members")
-    .select("*")
-    .eq("organization_id", organizationId);
+  const [membersResult, invitationsResult, organizationResult] = await Promise.all([
+    auth.supabase.from("org_members").select("*").eq("organization_id", organizationId),
+    auth.supabase
+      .from("team_invitations")
+      .select("*")
+      .eq("organization_id", organizationId)
+      .eq("status", "pending")
+      .order("created_at", { ascending: false }),
+    auth.supabase
+      .from("organizations")
+      .select("id, name, slug, plan")
+      .eq("id", organizationId)
+      .maybeSingle(),
+  ]);
 
-  if (error) {
-    if (error.code === "42P01") return NextResponse.json({ members: [], invitations: [], organizationId });
-    return databaseErrorResponse("team.list", error);
+  if (membersResult.error) {
+    if (membersResult.error.code === "42P01") {
+      return NextResponse.json({ members: [], invitations: [], organizationId });
+    }
+    return databaseErrorResponse("team.list", membersResult.error);
   }
-
-  const { data: invitations } = await auth.supabase
-    .from("team_invitations")
-    .select("*")
-    .eq("organization_id", organizationId)
-    .eq("status", "pending")
-    .order("created_at", { ascending: false });
-
-  const { data: organization } = await auth.supabase
-    .from("organizations")
-    .select("id, name, slug, plan")
-    .eq("id", organizationId)
-    .maybeSingle();
 
   return NextResponse.json({
     organizationId,
-    organization,
-    members: (members ?? []) as OrgMember[],
-    invitations: (invitations ?? []) as TeamInvitation[],
+    organization: organizationResult.data,
+    members: (membersResult.data ?? []) as OrgMember[],
+    invitations: (invitationsResult.data ?? []) as TeamInvitation[],
   });
 }
 

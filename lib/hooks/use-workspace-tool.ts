@@ -599,7 +599,34 @@ export function useWorkspaceTool({
     toast.success(`Exported ${format.toUpperCase()} file.`);
   }
 
-  function loadProjectIntoEditor(project: WorkspaceProject) {
+  async function loadProjectIntoEditor(project: WorkspaceProject) {
+    const needsHydration =
+      !project.output?.sections?.length &&
+      !project.output?.deliverables?.length;
+
+    if (needsHydration) {
+      try {
+        const res = await fetch(`${endpoint}/${project.id}`);
+        if (res.ok) {
+          const data = (await res.json()) as { generation?: WorkspaceGeneration };
+          if (data.generation) {
+            const hydrated = toWorkspaceProject(data.generation);
+            setActiveProject(hydrated);
+            setStreamedOutput(hydrated.output);
+            setPrompt(hydrated.draftPrompt || hydrated.brief);
+            lastBriefRef.current = hydrated.brief;
+            if (hydrated.template) setSelectedTemplate(hydrated.template);
+            setLanguage((hydrated.language as WorkspaceLanguage) || "English");
+            setTheme((hydrated.theme as WorkspaceTheme) || "Gold");
+            setAttachments(hydrated.attachments ?? []);
+            return;
+          }
+        }
+      } catch {
+        // Fall through to list payload
+      }
+    }
+
     setActiveProject(project);
     setStreamedOutput(project.output);
     setPrompt(project.draftPrompt || project.brief);

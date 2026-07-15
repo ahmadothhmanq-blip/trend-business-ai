@@ -1,7 +1,7 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { useMouse } from "@/components/marketing/site/mouse";
 
 const PARTICLES = [
   { t: "8%", l: "12%", s: 2, o: 0.55 },
@@ -18,10 +18,43 @@ const PARTICLES = [
   { t: "32%", l: "70%", s: 2, o: 0.3 },
 ] as const;
 
-/** Ambient black + gold aura matching the reference board. */
+/**
+ * Ambient background with local mouse parallax.
+ * Mouse state stays here (rAF-throttled) so marketing chrome does not re-render.
+ */
 export function SiteBackground() {
-  const mouse = useMouse();
   const reduce = useReducedMotion();
+  const [mouse, setMouse] = useState({ nx: 0, ny: 0 });
+  const pending = useRef<{ nx: number; ny: number } | null>(null);
+  const raf = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (reduce) return;
+
+    const flush = () => {
+      raf.current = null;
+      if (pending.current) {
+        setMouse(pending.current);
+        pending.current = null;
+      }
+    };
+
+    const onMove = (e: MouseEvent) => {
+      pending.current = {
+        nx: (e.clientX / window.innerWidth) * 2 - 1,
+        ny: (e.clientY / window.innerHeight) * 2 - 1,
+      };
+      if (raf.current == null) {
+        raf.current = window.requestAnimationFrame(flush);
+      }
+    };
+
+    window.addEventListener("mousemove", onMove, { passive: true });
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      if (raf.current != null) window.cancelAnimationFrame(raf.current);
+    };
+  }, [reduce]);
 
   return (
     <div className="pointer-events-none fixed inset-0 z-0 bg-[#050505]" aria-hidden="true">
@@ -59,8 +92,24 @@ export function SiteBackground() {
             opacity: p.o,
             boxShadow: `0 0 ${p.s * 4}px rgba(255,215,0,0.8)`,
           }}
-          animate={reduce ? undefined : { opacity: [p.o * 0.4, p.o, p.o * 0.4], y: [0, -8, 0] }}
-          transition={{ duration: 4 + (i % 4), repeat: Infinity, ease: "easeInOut", delay: i * 0.2 }}
+          animate={
+            reduce
+              ? undefined
+              : {
+                  y: [0, -6 - (i % 3) * 2, 0],
+                  opacity: [p.o * 0.6, p.o, p.o * 0.6],
+                }
+          }
+          transition={
+            reduce
+              ? undefined
+              : {
+                  duration: 4 + (i % 4),
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: i * 0.2,
+                }
+          }
         />
       ))}
     </div>

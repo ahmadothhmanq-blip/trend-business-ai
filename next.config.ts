@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  compress: true,
+  poweredByHeader: false,
   async redirects() {
     return [
       // Consolidate legacy /solutions/* into canonical /products/* URLs
@@ -29,6 +31,15 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        source: "/images/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
     ];
   },
   images: {
@@ -41,8 +52,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  serverExternalPackages: ["openai", "jspdf", "jszip"],
   experimental: {
-    optimizePackageImports: ["lucide-react", "framer-motion"],
+    optimizePackageImports: ["lucide-react", "framer-motion", "radix-ui"],
   },
 };
 

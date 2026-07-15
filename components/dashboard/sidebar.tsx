@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronDown, ChevronsLeft, ChevronsRight, Menu, Sparkles, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import {
   DASHBOARD_AI_PRODUCTS_NAV,
   DASHBOARD_PRIMARY_NAV,
@@ -15,16 +15,17 @@ import { BrandLogo } from "@/components/ui/brand-logo";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-function NavLink({
+const NavLink = memo(function NavLink({
   item,
   collapsed,
+  pathname,
   onNavigate,
 }: {
   item: DashboardNavItem;
   collapsed: boolean;
+  pathname: string;
   onNavigate?: () => void;
 }) {
-  const pathname = usePathname();
   const isActive =
     item.href === "/dashboard"
       ? pathname === "/dashboard"
@@ -57,7 +58,7 @@ function NavLink({
       {!collapsed && <span className="truncate">{item.label}</span>}
     </Link>
   );
-}
+});
 
 export function DashboardSidebar() {
   const pathname = usePathname();
@@ -117,6 +118,7 @@ export function DashboardSidebar() {
               key={item.href}
               item={item}
               collapsed={collapsed}
+              pathname={pathname}
               onNavigate={closeMobile}
             />
           ))}
@@ -149,6 +151,7 @@ export function DashboardSidebar() {
                   key={item.href}
                   item={item}
                   collapsed={collapsed}
+                  pathname={pathname}
                   onNavigate={closeMobile}
                 />
               ))}
@@ -167,6 +170,7 @@ export function DashboardSidebar() {
               key={item.href}
               item={item}
               collapsed={collapsed}
+              pathname={pathname}
               onNavigate={closeMobile}
             />
           ))}

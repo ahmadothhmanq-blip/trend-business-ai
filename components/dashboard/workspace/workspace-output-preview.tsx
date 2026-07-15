@@ -16,7 +16,7 @@ import { DashboardEmptyState } from "@/components/dashboard/ui/dashboard-empty-s
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import { DashboardIconBox } from "@/components/dashboard/ui/icon-box";
 import type { WorkspaceProject } from "@/lib/workspace/project";
-import { formatGenerationMeta } from "@/lib/workspace/export";
+import { formatGenerationMeta } from "@/lib/workspace/export-meta";
 import { cn } from "@/lib/utils";
 
 type WorkspaceOutputPreviewProps = {

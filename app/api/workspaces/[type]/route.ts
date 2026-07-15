@@ -1,6 +1,7 @@
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
 import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
 import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { WORKSPACE_LIST_COLUMNS } from "@/lib/api/list-selects";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import { generateWorkspaceProject } from "@/lib/workspace/service";
 import { getWorkspaceDefinition } from "@/lib/workspace/registry";
@@ -11,6 +12,7 @@ import {
   buildCompletedGenerationRow,
 } from "@/lib/workspace/persist";
 import { insertWorkspaceGeneration } from "@/lib/workspace/insert";
+import { startTimer } from "@/lib/perf/timing";
 import type { WorkspaceGeneration } from "@/types/database";
 import { NextResponse } from "next/server";
 
@@ -36,7 +38,7 @@ export async function GET(request: Request, context: RouteContext) {
 
   let query = auth.supabase
     .from("workspace_generations")
-    .select("*", { count: "exact" })
+    .select(WORKSPACE_LIST_COLUMNS, { count: "exact" })
     .eq("user_id", auth.user!.id)
     .eq("workspace_type", type)
     .order("created_at", { ascending: false });
@@ -51,21 +53,38 @@ export async function GET(request: Request, context: RouteContext) {
   if (productId) query = query.eq("product_id", productId);
   if (projectId) query = query.eq("project_id", projectId);
 
+  const timer = startTimer();
   const { data, error, count } = await query.range(from, to);
+  const listMs = timer.ms();
 
   if (error) {
     return databaseErrorResponse("workspace.list", error);
   }
 
   const total = count ?? 0;
-
-  return NextResponse.json({
-    generations: data as WorkspaceGeneration[],
-    page,
-    limit,
-    total,
-    totalPages: Math.ceil(total / limit) || 1,
-  });
+  return NextResponse.json(
+    {
+      generations: ((data ?? []) as Omit<WorkspaceGeneration, "output">[]).map((row) => ({
+        ...row,
+        output: {
+          title: row.title,
+          summary: row.brief,
+          sections: [],
+          deliverables: [],
+        },
+      })) as WorkspaceGeneration[],
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit) || 1,
+    },
+    {
+      headers: {
+        "Server-Timing": `db;dur=${listMs}`,
+        "Cache-Control": "private, no-store",
+      },
+    },
+  );
 }
 
 export async function POST(request: Request, context: RouteContext) {

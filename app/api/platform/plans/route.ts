@@ -25,5 +25,12 @@ export async function GET() {
     return databaseErrorResponse("plans.list", error);
   }
 
-  return NextResponse.json({ plans: data as SubscriptionPlan[] });
+  return NextResponse.json(
+    { plans: data as SubscriptionPlan[] },
+    {
+      headers: {
+        "Cache-Control": "private, max-age=60, stale-while-revalidate=300",
+      },
+    },
+  );
 }

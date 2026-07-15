@@ -2,6 +2,7 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { consumeCreditsForUsage } from "@/lib/billing/credits";
+import { withTiming } from "@/lib/perf/timing";
 import { NextResponse } from "next/server";
 
 export type AiRateLimitResource =
@@ -162,23 +163,25 @@ export async function enforceAiUsage(
   userId: string,
   resource: AiRateLimitResource,
 ): Promise<NextResponse | null> {
-  const rateLimited = await enforceAiRateLimit(userId, resource);
-  if (rateLimited) return rateLimited;
+  return withTiming(`ai.usage.${resource}`, async () => {
+    const rateLimited = await enforceAiRateLimit(userId, resource);
+    if (rateLimited) return rateLimited;
 
-  const credits = await consumeCreditsForUsage(supabase, userId, resource, 1);
-  if (!credits.ok) {
-    const status = credits.code === "INSUFFICIENT_CREDITS" ? 402 : 503;
-    return NextResponse.json(
-      {
-        error: credits.error,
-        code: credits.code,
-        balance: credits.balance.balance,
-      },
-      { status },
-    );
-  }
+    const credits = await consumeCreditsForUsage(supabase, userId, resource, 1);
+    if (!credits.ok) {
+      const status = credits.code === "INSUFFICIENT_CREDITS" ? 402 : 503;
+      return NextResponse.json(
+        {
+          error: credits.error,
+          code: credits.code,
+          balance: credits.balance.balance,
+        },
+        { status },
+      );
+    }
 
-  return null;
+    return null;
+  });
 }
 
 const MUTATION_RATE = { requests: 30, window: "1 m" as const };
@@ -212,6 +215,18 @@ function enforceKeyedMemoryLimit(
 
   recent.push(now);
   store.set(key, recent);
+
+  if (store.size > 5000) {
+    for (const [storeKey, timestamps] of store) {
+      const active = timestamps.filter((timestamp) => now - timestamp < duration);
+      if (active.length) {
+        store.set(storeKey, active);
+      } else {
+        store.delete(storeKey);
+      }
+    }
+  }
+
   return null;
 }
 

@@ -51,6 +51,14 @@ Or paste `supabase/APPLY_PHASE18.sql` into the SQL Editor once.
 
 This locks billing writes to the service role, hardens agent/prompt template policies, and blocks org owner escalation. See `SECURITY_AUDIT_PHASE18.md`.
 
+### Phase 19 — Performance indexes (027)
+
+```bash
+npm run db:apply -- --only 027
+```
+
+Or paste `supabase/APPLY_PHASE19.sql` into the SQL Editor. Adds composite indexes for list/filter hot paths and billing webhook lookups. See `PERFORMANCE_REPORT_PHASE19.md`.
+
 ### 2. Auth settings (Supabase Dashboard → Authentication)
 
 - **Site URL**: `https://your-domain.vercel.app`

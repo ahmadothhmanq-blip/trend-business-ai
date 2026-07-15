@@ -1,9 +1,11 @@
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
 import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
 import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { WEBSITE_LIST_COLUMNS } from "@/lib/api/list-selects";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import { generateWebsite } from "@/lib/website-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
+import { startTimer } from "@/lib/perf/timing";
 import type { WebsiteBlueprint, WebsiteGeneration } from "@/types/database";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -85,7 +87,7 @@ export async function GET(request: Request) {
 
   let query = auth.supabase
     .from("website_generations")
-    .select("*", { count: "exact" })
+    .select(WEBSITE_LIST_COLUMNS, { count: "exact" })
     .eq("user_id", auth.user!.id)
     .order("created_at", { ascending: false });
 
@@ -100,21 +102,33 @@ export async function GET(request: Request) {
   if (favorite === "true") query = query.eq("is_favorite", true);
   if (favorite === "false") query = query.eq("is_favorite", false);
 
+  const timer = startTimer();
   const { data, error, count } = await query.range(from, to);
+  const listMs = timer.ms();
 
   if (error) {
     return databaseErrorResponse("website-builder.list", error);
   }
 
   const total = count ?? 0;
-
-  return NextResponse.json({
-    generations: data as WebsiteGeneration[],
-    page,
-    limit,
-    total,
-    totalPages: Math.ceil(total / limit) || 1,
-  });
+  return NextResponse.json(
+    {
+      generations: ((data ?? []) as Omit<WebsiteGeneration, "blueprint">[]).map((row) => ({
+        ...row,
+        blueprint: { files: [] },
+      })) as unknown as WebsiteGeneration[],
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit) || 1,
+    },
+    {
+      headers: {
+        "Server-Timing": `db;dur=${listMs}`,
+        "Cache-Control": "private, no-store",
+      },
+    },
+  );
 }
 
 export async function POST(request: Request) {

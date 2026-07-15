@@ -8,15 +8,16 @@ export async function GET(request: Request) {
   if (auth.response) return auth.response;
 
   const { searchParams } = new URL(request.url);
-  const days = parseInt(searchParams.get("days") ?? "30") || 30;
+  const days = Math.min(90, Math.max(1, parseInt(searchParams.get("days") ?? "30") || 30));
   const since = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
 
   const { data, error } = await auth.supabase
     .from("usage_records")
-    .select("*")
+    .select("id,user_id,resource,tokens_used,generations_count,period_start,created_at")
     .eq("user_id", auth.user!.id)
     .gte("period_start", since)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(2000);
 
   if (error) {
     if (error.code === "42P01") return NextResponse.json({ records: [], summary: { totalTokens: 0, totalGenerations: 0, byResource: {} } });

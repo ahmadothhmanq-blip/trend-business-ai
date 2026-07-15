@@ -1,5 +1,4 @@
 import { requireUser } from "@/lib/api/helpers";
-import { databaseErrorResponse } from "@/lib/api/errors";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -9,23 +8,41 @@ export async function GET() {
   const isAdmin = auth.user!.app_metadata?.role === "admin";
   if (!isAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
 
-  const stats: Record<string, number> = {};
-  const tables = ["profiles", "business_ideas", "content_generations", "business_generations", "website_generations", "logo_generations", "video_generations"];
+  const tables = [
+    "profiles",
+    "business_ideas",
+    "content_generations",
+    "business_generations",
+    "website_generations",
+    "logo_generations",
+    "video_generations",
+  ] as const;
 
-  for (const table of tables) {
-    try {
-      const { count } = await auth.supabase.from(table).select("*", { count: "exact", head: true });
-      stats[table] = count ?? 0;
-    } catch {
-      stats[table] = 0;
-    }
-  }
+  const countResults = await Promise.all(
+    tables.map(async (table) => {
+      try {
+        const { count } = await auth.supabase
+          .from(table)
+          .select("*", { count: "exact", head: true });
+        return [table, count ?? 0] as const;
+      } catch {
+        return [table, 0] as const;
+      }
+    }),
+  );
+
+  const stats: Record<string, number> = Object.fromEntries(countResults);
 
   let featureFlags: unknown[] = [];
   try {
-    const { data } = await auth.supabase.from("feature_flags").select("*").order("created_at", { ascending: false });
+    const { data } = await auth.supabase
+      .from("feature_flags")
+      .select("*")
+      .order("created_at", { ascending: false });
     featureFlags = data ?? [];
-  } catch { /* table may not exist */ }
+  } catch {
+    /* table may not exist */
+  }
 
   return NextResponse.json({ stats, featureFlags, isAdmin: true });
 }

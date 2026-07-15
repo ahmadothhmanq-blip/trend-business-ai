@@ -26,6 +26,8 @@ function getApiKey() {
   return apiKey;
 }
 
+const DEFAULT_TIMEOUT_MS = 120_000;
+
 async function callAnthropic(body: Record<string, unknown>) {
   const response = await fetch(ANTHROPIC_API_URL, {
     method: "POST",
@@ -35,6 +37,7 @@ async function callAnthropic(body: Record<string, unknown>) {
       "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify(body),
+    signal: AbortSignal.timeout(DEFAULT_TIMEOUT_MS),
   });
 
   if (!response.ok) {

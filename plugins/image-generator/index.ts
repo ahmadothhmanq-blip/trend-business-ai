@@ -87,35 +87,39 @@ async function generateImage(
   ctx.progress.emit("Generating image concepts...");
 
   const concepts: ImageVariation[] = [];
+  const conceptPlans = plan.concepts.slice(0, Math.min(input.batchCount, 4));
 
-  for (const concept of plan.concepts.slice(0, Math.min(input.batchCount, 4))) {
-    ctx.progress.emit(`Creating "${concept.name}"...`);
-    try {
-      const result = await ctx.provider.generateJson<ImageVariation>({
-        prompt: imageConceptPrompt(input, analysis, concept),
-        schema: imageConceptSchema,
-      });
-      concepts.push({
-        name: result.name || concept.name,
-        description: result.description || concept.description,
-        prompt: result.prompt || "",
-        negativePrompt: result.negativePrompt || input.negativePrompt || "",
-        aspectRatio: result.aspectRatio || input.aspectRatio,
-        style: result.style || analysis.style,
-        svgConcept: sanitizeSvg(result.svgConcept),
-      });
-    } catch {
-      concepts.push({
-        name: concept.name,
-        description: concept.description,
-        prompt: "",
-        negativePrompt: "",
-        aspectRatio: input.aspectRatio,
-        style: analysis.style,
-        svgConcept: "",
-      });
-    }
-  }
+  ctx.progress.emit(`Creating ${conceptPlans.length} concepts in parallel...`);
+  const results = await Promise.all(
+    conceptPlans.map(async (concept) => {
+      try {
+        const result = await ctx.provider.generateJson<ImageVariation>({
+          prompt: imageConceptPrompt(input, analysis, concept),
+          schema: imageConceptSchema,
+        });
+        return {
+          name: result.name || concept.name,
+          description: result.description || concept.description,
+          prompt: result.prompt || "",
+          negativePrompt: result.negativePrompt || input.negativePrompt || "",
+          aspectRatio: result.aspectRatio || input.aspectRatio,
+          style: result.style || analysis.style,
+          svgConcept: sanitizeSvg(result.svgConcept),
+        } satisfies ImageVariation;
+      } catch {
+        return {
+          name: concept.name,
+          description: concept.description,
+          prompt: "",
+          negativePrompt: "",
+          aspectRatio: input.aspectRatio,
+          style: analysis.style,
+          svgConcept: "",
+        } satisfies ImageVariation;
+      }
+    }),
+  );
+  concepts.push(...results);
 
   ctx.progress.emit("Building prompt library...");
   let promptLibrary: { name: string; prompt: string; negativePrompt: string; style: string }[] = [];

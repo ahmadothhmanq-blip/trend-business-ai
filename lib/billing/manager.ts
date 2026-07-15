@@ -39,44 +39,43 @@ export class BillingManager {
     const providersConfigured = getConfiguredBillingProviders();
     const credits = await ensureCreditBalance(this.supabase, userId);
 
-    const { data: subscription, error: subError } = await this.supabase
-      .from("billing_subscriptions")
-      .select("*")
-      .eq("user_id", userId)
-      .in("status", ["active", "trialing", "past_due"])
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+    const [subResult, invResult, packsResult] = await Promise.all([
+      this.supabase
+        .from("billing_subscriptions")
+        .select("*")
+        .eq("user_id", userId)
+        .in("status", ["active", "trialing", "past_due"])
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      this.supabase
+        .from("billing_invoices")
+        .select("*")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(25),
+      this.supabase
+        .from("credit_packs")
+        .select("*")
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true }),
+    ]);
 
-    if (subError && !isMissingTable(subError)) {
-      logger.error("Failed to load subscription", "billing.manager", { userId }, subError);
+    if (subResult.error && !isMissingTable(subResult.error)) {
+      logger.error("Failed to load subscription", "billing.manager", { userId }, subResult.error);
+    }
+    if (invResult.error && !isMissingTable(invResult.error)) {
+      logger.error("Failed to load invoices", "billing.manager", { userId }, invResult.error);
     }
 
-    const { data: invoices, error: invError } = await this.supabase
-      .from("billing_invoices")
-      .select("*")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false })
-      .limit(25);
-
-    if (invError && !isMissingTable(invError)) {
-      logger.error("Failed to load invoices", "billing.manager", { userId }, invError);
-    }
-
-    const { data: packs } = await this.supabase
-      .from("credit_packs")
-      .select("*")
-      .eq("is_active", true)
-      .order("sort_order", { ascending: true });
-
-    const activeSub = (subscription as BillingSubscription | null) ?? null;
+    const activeSub = (subResult.data as BillingSubscription | null) ?? null;
 
     return {
       currentPlanId: activeSub?.plan_id ?? "free",
       subscription: activeSub,
       credits,
-      invoices: (invoices as BillingInvoice[] | null) ?? [],
-      creditPacks: (packs as CreditPack[] | null) ?? defaultCreditPacks(),
+      invoices: (invResult.data as BillingInvoice[] | null) ?? [],
+      creditPacks: (packsResult.data as CreditPack[] | null) ?? defaultCreditPacks(),
       providersConfigured,
       billingConfigured: isBillingConfigured(),
     };

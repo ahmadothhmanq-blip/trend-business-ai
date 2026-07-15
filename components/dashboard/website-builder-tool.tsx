@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import JSZip from "jszip";
 import { toast } from "sonner";
 import {
   AlertTriangle,
@@ -229,7 +228,28 @@ export function WebsiteBuilderTool({
   const activeFile =
     activeFiles.find((file) => file.path === selectedFilePath) ?? activeFiles[0] ?? null;
 
-  function selectProject(project: WorkspaceProject) {
+  async function selectProject(project: WorkspaceProject) {
+    const needsHydration = !project.generatedProject?.files?.length;
+    if (needsHydration) {
+      try {
+        const response = await fetch(`/api/website-builder/${project.id}`);
+        if (response.ok) {
+          const data = (await response.json()) as { generation?: WebsiteGeneration };
+          if (data.generation) {
+            const hydrated = toProject(data.generation);
+            setProjects((items) =>
+              items.map((item) => (item.id === hydrated.id ? hydrated : item)),
+            );
+            setActiveProject(hydrated);
+            setSelectedFilePath(hydrated.generatedProject?.files[0]?.path ?? "");
+            setFileSearch("");
+            return;
+          }
+        }
+      } catch {
+        // Fall through
+      }
+    }
     setActiveProject(project);
     setSelectedFilePath(project.generatedProject?.files[0]?.path ?? "");
     setFileSearch("");
@@ -520,7 +540,7 @@ export function WebsiteBuilderTool({
   async function downloadProject(project = activeProject) {
     if (!project) return;
 
-    const zip = new JSZip();
+    const JSZip = (await import("jszip")).default; const zip = new JSZip();
     const files =
       project.generatedProject?.files.length
         ? project.generatedProject.files

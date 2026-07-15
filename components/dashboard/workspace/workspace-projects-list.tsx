@@ -1,3 +1,4 @@
+import { memo } from "react";
 import {
   ArrowDownToLine,
   Clock3,
@@ -36,7 +37,7 @@ type WorkspaceProjectsListProps = {
   onExportJson: (project: WorkspaceProject) => void;
 };
 
-export function WorkspaceProjectsList({
+export const WorkspaceProjectsList = memo(function WorkspaceProjectsList({
   projects,
   activeProjectId,
   loading,
@@ -177,4 +178,4 @@ export function WorkspaceProjectsList({
       )}
     </DashboardPanel>
   );
-}
+});

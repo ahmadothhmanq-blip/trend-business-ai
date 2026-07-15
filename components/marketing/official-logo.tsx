@@ -11,6 +11,8 @@ type OfficialLogoProps = {
   /** Shield/icon only (no wordmark). */
   compact?: boolean;
   size?: "sm" | "md" | "lg";
+  /** Only set for above-the-fold brand marks. */
+  priority?: boolean;
 };
 
 const SIZE = {
@@ -23,6 +25,7 @@ export function OfficialLogo({
   className,
   compact = false,
   size = "md",
+  priority = false,
 }: OfficialLogoProps) {
   const s = SIZE[size];
 
@@ -35,7 +38,7 @@ export function OfficialLogo({
           fill
           sizes="44px"
           className="object-contain"
-          priority
+          priority={priority}
         />
       </span>
     );
@@ -49,7 +52,7 @@ export function OfficialLogo({
         width={244}
         height={259}
         className={cn("object-contain", s.full)}
-        priority
+        priority={priority}
       />
     </span>
   );

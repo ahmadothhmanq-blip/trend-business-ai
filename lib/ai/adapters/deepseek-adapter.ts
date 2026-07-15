@@ -7,12 +7,16 @@ import type {
 } from "@/lib/ai/types";
 import { normalizeOpenAIUsage } from "@/lib/ai/usage";
 import { parseJsonResponse, withRetry } from "@/lib/ai/retry";
+import { withTiming } from "@/lib/perf/timing";
 
 const DEEPSEEK_RETRY_DELAYS_MS = [2000, 4000, 8000] as const;
 const DEFAULT_MODEL = "deepseek-chat";
 const DEEPSEEK_BASE_URL = "https://api.deepseek.com";
+const DEFAULT_TIMEOUT_MS = 120_000;
 
-async function createClient() {
+type OpenAIClient = Awaited<ReturnType<typeof createDeepSeekSdk>>;
+
+async function createDeepSeekSdk() {
   const { default: OpenAI } = await import("openai");
   const apiKey = process.env.DEEPSEEK_API_KEY?.trim();
 
@@ -23,17 +27,27 @@ async function createClient() {
   return new OpenAI({
     apiKey,
     baseURL: DEEPSEEK_BASE_URL,
+    timeout: DEFAULT_TIMEOUT_MS,
+    maxRetries: 0,
   });
 }
 
 export class DeepSeekAdapter implements AIProvider {
   readonly name = "deepseek" as const;
   private lastUsage: TokenUsage | null = null;
+  private clientPromise: Promise<OpenAIClient> | null = null;
 
   constructor(private readonly model = DEFAULT_MODEL) {}
 
   getLastUsage() {
     return this.lastUsage;
+  }
+
+  private getClient() {
+    if (!this.clientPromise) {
+      this.clientPromise = createDeepSeekSdk();
+    }
+    return this.clientPromise;
   }
 
   private recordUsage(
@@ -50,98 +64,104 @@ export class DeepSeekAdapter implements AIProvider {
   }
 
   async generateJson<T>(request: JsonGenerationRequest): Promise<T> {
-    const client = await createClient();
+    const client = await this.getClient();
 
-    return withRetry(
-      async () => {
-        const schemaHint = request.schema
-          ? `\n\nRespond with JSON matching this schema:\n${JSON.stringify(request.schema, null, 2)}`
-          : "";
+    return withTiming("deepseek.generateJson", () =>
+      withRetry(
+        async () => {
+          const schemaHint = request.schema
+            ? `\n\nRespond with JSON matching this schema:\n${JSON.stringify(request.schema, null, 2)}`
+            : "";
 
-        const response = await client.chat.completions.create({
-          model: this.model,
-          temperature: request.temperature ?? 0.7,
-          response_format: { type: "json_object" },
-          messages: [
-            {
-              role: "system",
-              content: `${request.system ?? "Return only valid JSON matching the requested structure."}${schemaHint}`,
-            },
-            { role: "user", content: request.prompt },
-          ],
-        });
+          const response = await client.chat.completions.create({
+            model: this.model,
+            temperature: request.temperature ?? 0.7,
+            response_format: { type: "json_object" },
+            messages: [
+              {
+                role: "system",
+                content: `${request.system ?? "Return only valid JSON matching the requested structure."}${schemaHint}`,
+              },
+              { role: "user", content: request.prompt },
+            ],
+          });
 
-        this.recordUsage(response.usage);
-        const content = response.choices[0]?.message?.content;
-        if (!content) {
-          throw new Error("DeepSeek returned an empty response.");
-        }
+          this.recordUsage(response.usage);
+          const content = response.choices[0]?.message?.content;
+          if (!content) {
+            throw new Error("DeepSeek returned an empty response.");
+          }
 
-        return parseJsonResponse<T>(content);
-      },
-      { delaysMs: DEEPSEEK_RETRY_DELAYS_MS },
+          return parseJsonResponse<T>(content);
+        },
+        { delaysMs: DEEPSEEK_RETRY_DELAYS_MS },
+      ),
     );
   }
 
   async generateText(request: TextGenerationRequest): Promise<string> {
-    const client = await createClient();
+    const client = await this.getClient();
 
-    return withRetry(
-      async () => {
-        const response = await client.chat.completions.create({
-          model: this.model,
-          temperature: request.temperature ?? 0.7,
-          messages: [
-            ...(request.system
-              ? [{ role: "system" as const, content: request.system }]
-              : []),
-            { role: "user", content: request.prompt },
-          ],
-        });
+    return withTiming("deepseek.generateText", () =>
+      withRetry(
+        async () => {
+          const response = await client.chat.completions.create({
+            model: this.model,
+            temperature: request.temperature ?? 0.7,
+            messages: [
+              ...(request.system
+                ? [{ role: "system" as const, content: request.system }]
+                : []),
+              { role: "user", content: request.prompt },
+            ],
+          });
 
-        this.recordUsage(response.usage);
-        const content = response.choices[0]?.message?.content;
-        if (!content) {
-          throw new Error("DeepSeek returned an empty response.");
-        }
+          this.recordUsage(response.usage);
+          const content = response.choices[0]?.message?.content;
+          if (!content) {
+            throw new Error("DeepSeek returned an empty response.");
+          }
 
-        return content;
-      },
-      { delaysMs: DEEPSEEK_RETRY_DELAYS_MS },
+          return content;
+        },
+        { delaysMs: DEEPSEEK_RETRY_DELAYS_MS },
+      ),
     );
   }
 
   async streamText(request: StreamTextRequest): Promise<string> {
-    const client = await createClient();
-    const stream = await client.chat.completions.create({
-      model: this.model,
-      temperature: request.temperature ?? 0.7,
-      stream: true,
-      messages: [
-        ...(request.system
-          ? [{ role: "system" as const, content: request.system }]
-          : []),
-        { role: "user", content: request.prompt },
-      ],
+    const client = await this.getClient();
+    return withTiming("deepseek.streamText", async () => {
+      const stream = await client.chat.completions.create({
+        model: this.model,
+        temperature: request.temperature ?? 0.7,
+        stream: true,
+        messages: [
+          ...(request.system
+            ? [{ role: "system" as const, content: request.system }]
+            : []),
+          { role: "user", content: request.prompt },
+        ],
+      });
+
+      let text = "";
+      for await (const chunk of stream) {
+        if (chunk.usage) {
+          this.recordUsage(chunk.usage);
+        }
+        const delta = chunk.choices[0]?.delta?.content ?? "";
+        if (delta) {
+          text += delta;
+          request.onChunk?.(delta);
+        }
+      }
+
+      if (!text) {
+        throw new Error("DeepSeek returned an empty streamed response.");
+      }
+
+      return text;
     });
-
-    let text = "";
-    for await (const chunk of stream) {
-      if (chunk.usage) {
-        this.recordUsage(chunk.usage);
-      }
-      const delta = chunk.choices[0]?.delta?.content ?? "";
-      if (delta) {
-        text += delta;
-        request.onChunk?.(delta);
-      }
-    }
-
-    if (!text) {
-      throw new Error("DeepSeek returned an empty streamed response.");
-    }
-
-    return text;
   }
 }
 

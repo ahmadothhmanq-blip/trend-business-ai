@@ -6,7 +6,7 @@ import { promisify } from "node:util";
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
 import { logApiError } from "@/lib/api/errors";
 import { writePreviewOwner } from "@/lib/api/preview-ownership";
-import { sanitizeProjectPath } from "@/lib/ai/zipper";
+import { sanitizeProjectPath } from "@/lib/ai/sanitize-path";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
