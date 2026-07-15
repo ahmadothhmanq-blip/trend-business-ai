@@ -71,9 +71,10 @@ export const REF_FOOTER_COMPANY = [
 
 export const REF_FOOTER_RESOURCES = [
   { label: "Documentation", href: "/docs" },
+  { label: "Knowledge Center", href: "/learn" },
   { label: "Help Center", href: "/faq" },
-  { label: "API", href: "/docs" },
-  { label: "Community", href: "/contact" },
+  { label: "Templates", href: "/templates" },
+  { label: "Resources", href: "/resources" },
 ] as const;
 
 export type AiProductCategoryId = "create" | "design" | "content" | "business";

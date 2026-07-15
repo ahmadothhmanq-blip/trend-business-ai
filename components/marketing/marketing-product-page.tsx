@@ -21,6 +21,9 @@ import {
   getMarketingProduct,
   type MarketingProductSlug,
 } from "@/lib/constants/marketing-content";
+import { SeoBreadcrumbs } from "@/components/seo/breadcrumbs";
+import { RelatedLinksGroups } from "@/components/seo/related-links";
+import { getProductInternalLinks } from "@/lib/seo/internal-links";
 
 /** Individual product landing — dedicated page per product slug. */
 export function MarketingProductPage({ slug }: { slug: MarketingProductSlug }) {
@@ -28,18 +31,18 @@ export function MarketingProductPage({ slug }: { slug: MarketingProductSlug }) {
   const product = getMarketingProduct(slug)!;
   const category = AI_PRODUCT_CATEGORIES.find((c) => c.id === product.categoryId)!;
   const siblings = category.products.filter((p) => p.href !== `/products/${slug}`);
+  const related = getProductInternalLinks(slug);
 
   return (
     <SiteShell>
       <section className="landing-container pt-[108px] pb-14 lg:pb-16 lg:pt-[124px]">
-        <div className="mb-6">
-          <Link
-            href={category.href}
-            className="text-[13px] font-medium text-[#8A8A8A] transition-colors hover:text-[#D4AF37]"
-          >
-            ← {category.title} products
-          </Link>
-        </div>
+        <SeoBreadcrumbs
+          items={[
+            { name: "Home", href: "/" },
+            { name: category.title, href: category.href },
+            { name: product.title },
+          ]}
+        />
         <div className="grid items-center gap-10 lg:grid-cols-[1fr_1.05fr] lg:gap-14">
           <div>
             <SiteEyebrow>{product.eyebrow}</SiteEyebrow>
@@ -203,6 +206,20 @@ export function MarketingProductPage({ slug }: { slug: MarketingProductSlug }) {
               </span>
             </Link>
           </div>
+        </div>
+      </section>
+
+      <section className="border-t border-[rgba(212,175,55,0.12)]">
+        <div className="landing-container py-16 lg:py-20">
+          <RelatedLinksGroups
+            groups={[
+              { title: "Related tools", links: related.tools },
+              { title: "Related services", links: related.services },
+              { title: "Related templates", links: related.templates },
+              { title: "Related articles", links: related.articles },
+              { title: "Business resources", links: related.resources },
+            ]}
+          />
         </div>
       </section>
 

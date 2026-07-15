@@ -1,6 +1,16 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      // Consolidate legacy /solutions/* into canonical /products/* URLs
+      {
+        source: "/solutions/:slug",
+        destination: "/products/:slug",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {
@@ -18,6 +28,7 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
+    formats: ["image/avif", "image/webp"],
     remotePatterns: [
       {
         protocol: "https",
@@ -25,6 +36,9 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
     ],
+  },
+  experimental: {
+    optimizePackageImports: ["lucide-react", "framer-motion"],
   },
 };
 

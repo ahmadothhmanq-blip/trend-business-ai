@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
+import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { MarketingSolutionPage } from "@/components/marketing/marketing-solution-page";
 import {
   AI_PRODUCT_CATEGORIES,
   type AiProductCategoryId,
 } from "@/lib/constants/marketing-content";
 import { createPageMetadata } from "@/lib/seo/metadata";
+import {
+  breadcrumbJsonLd,
+  collectionPageJsonLd,
+} from "@/lib/seo/json-ld";
 
 const META: Record<
   AiProductCategoryId,
@@ -34,10 +39,14 @@ const META: Record<
 
 export function categoryMetadata(id: AiProductCategoryId): Metadata {
   const meta = META[id];
+  const category = AI_PRODUCT_CATEGORIES.find((item) => item.id === id);
   return createPageMetadata({
     title: meta.title,
     description: meta.description,
     path: `/products/${id}`,
+    type: "collection",
+    image: category?.image,
+    imageAlt: category?.imageAlt,
   });
 }
 
@@ -46,5 +55,30 @@ export function CategoryRoutePage({ id }: { id: AiProductCategoryId }) {
   if (!category) {
     throw new Error(`Unknown product category: ${id}`);
   }
-  return <MarketingSolutionPage id={id} />;
+
+  return (
+    <>
+      <JsonLdScript
+        id={`category-jsonld-${id}`}
+        data={[
+          breadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "Products", path: "/features" },
+            { name: category.title, path: category.href },
+          ]),
+          collectionPageJsonLd({
+            name: category.title,
+            description: category.description,
+            path: category.href,
+            items: category.products.map((product) => ({
+              name: product.title,
+              path: product.href,
+              description: product.description,
+            })),
+          }),
+        ]}
+      />
+      <MarketingSolutionPage id={id} />
+    </>
+  );
 }
