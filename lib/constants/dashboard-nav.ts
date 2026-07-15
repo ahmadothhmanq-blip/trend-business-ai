@@ -296,5 +296,5 @@ export const DASHBOARD_STATS = [
 
 export const DASHBOARD_WORKSPACES = [
   { id: "personal", name: "Personal", plan: "Free Beta" },
-  { id: "team", name: "Team Workspace", plan: "Coming Soon" },
+  { id: "team", name: "Team Workspace", plan: "Free Beta" },
 ] as const;
