@@ -9,15 +9,24 @@ import {
 } from "@/lib/seo/site";
 import { buildHreflangAlternates, localizePath } from "@/lib/seo/i18n";
 import { getAnalyticsConfig, isAnalyticsConfigured } from "@/lib/seo/analytics";
-import { buildFullSitemap, SPECIALIZED_SITEMAPS } from "@/lib/seo/sitemap-registry";
+import {
+  buildFullSitemap,
+  buildSitemapIndexEntries,
+  SPECIALIZED_SITEMAPS,
+} from "@/lib/seo/sitemap-registry";
 import {
   getProductInternalLinks,
   getRelatedBlogArticles,
   getRelatedBusinessResources,
+  getRelatedProgrammaticLinks,
   getRelatedServices,
   getRelatedTemplates,
   getRelatedTools,
 } from "@/lib/seo/internal-links";
+import { DynamicSeoEngine } from "@/lib/seo/dynamic-engine";
+import { BreadcrumbEngine } from "@/lib/seo/breadcrumbs";
+import { analyzeSeo, enrichSeoAnalysisWithAi } from "@/lib/seo/analyzer";
+import { buildSeoHealthReport } from "@/lib/seo/health";
 import * as jsonLd from "@/lib/seo/json-ld";
 
 /**
@@ -39,9 +48,17 @@ export const SeoService = {
 
   rootMetadata,
 
+  dynamic: DynamicSeoEngine,
+  breadcrumbs: BreadcrumbEngine,
+
+  analyze: analyzeSeo,
+  enrichAnalysis: enrichSeoAnalysisWithAi,
+  health: buildSeoHealthReport,
+
   publicRoutes: PUBLIC_ROUTES,
   specializedSitemaps: SPECIALIZED_SITEMAPS,
   buildSitemap: buildFullSitemap,
+  buildSitemapIndex: buildSitemapIndexEntries,
 
   analytics: {
     getConfig: getAnalyticsConfig,
@@ -57,6 +74,7 @@ export const SeoService = {
     templates: getRelatedTemplates,
     articles: getRelatedBlogArticles,
     resources: getRelatedBusinessResources,
+    programmatic: getRelatedProgrammaticLinks,
   },
 } as const;
 

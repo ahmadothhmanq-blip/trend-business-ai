@@ -35,38 +35,6 @@ const deepseekKey = process.env.DEEPSEEK_API_KEY;
 const upstashUrl = process.env.UPSTASH_REDIS_REST_URL;
 const upstashToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
-const TABLES = [
-  "profiles",
-  "business_ideas",
-  "market_analyses",
-  "reports",
-  "favorites",
-  "user_preferences",
-  "website_generations",
-  "workspace_generations",
-];
-
-const EXPECTED_RLS_POLICIES = {
-  profiles: ["select", "insert", "update"],
-  business_ideas: ["select", "insert", "update", "delete"],
-  market_analyses: ["select", "insert", "update", "delete"],
-  reports: ["select", "insert", "update", "delete"],
-  favorites: ["select", "insert", "delete"],
-  user_preferences: ["select", "insert", "update"],
-  website_generations: ["select", "insert", "update", "delete"],
-  workspace_generations: ["select", "insert", "update", "delete"],
-};
-
-const API_ROUTES = [
-  { path: "/api/ideas", methods: ["GET", "POST"] },
-  { path: "/api/market-analysis", methods: ["GET", "POST"] },
-  { path: "/api/reports", methods: ["GET", "POST"] },
-  { path: "/api/profile", methods: ["GET", "POST"] },
-  { path: "/api/preferences", methods: ["GET", "PUT"] },
-  { path: "/api/website-builder", methods: ["GET", "POST"] },
-  { path: "/api/workspaces/[type]", methods: ["GET", "POST"] },
-];
-
 const DASHBOARD_PAGES = [
   "/dashboard",
   "/dashboard/projects",
@@ -82,20 +50,27 @@ const DASHBOARD_PAGES = [
   "/dashboard/analytics",
   "/dashboard/api-keys",
   "/dashboard/billing",
-  "/dashboard/brand-designer",
-  "/dashboard/business-audit",
+  "/dashboard/ai-agents",
+  "/dashboard/ai-providers",
+  "/dashboard/app-builder",
+  "/dashboard/brand-studio",
   "/dashboard/business-intelligence",
-  "/dashboard/business-manager",
   "/dashboard/content-studio",
-  "/dashboard/creative-studio",
+  "/dashboard/feasibility-study",
+  "/dashboard/files",
+  "/dashboard/growth",
+  "/dashboard/image-generator",
+  "/dashboard/landing-page-builder",
+  "/dashboard/logo-maker",
   "/dashboard/marketing",
   "/dashboard/notifications",
-  "/dashboard/search",
+  "/dashboard/seo",
   "/dashboard/settings",
   "/dashboard/social-media",
-  "/dashboard/subscription",
   "/dashboard/team",
+  "/dashboard/templates",
   "/dashboard/usage",
+  "/dashboard/video-studio",
 ];
 
 const AUTH_PAGES = ["/login", "/signup", "/forgot-password", "/reset-password"];
@@ -110,6 +85,52 @@ const PUBLIC_PAGES = [
   "/blog",
   "/privacy",
   "/terms",
+  "/templates",
+  "/learn",
+  "/resources",
+];
+
+const TABLES = [
+  "profiles",
+  "business_ideas",
+  "market_analyses",
+  "reports",
+  "favorites",
+  "user_preferences",
+  "website_generations",
+  "workspace_generations",
+  "organizations",
+  "org_members",
+  "billing_checkout_sessions",
+  "growth_leads",
+  "growth_affiliates",
+  "growth_events",
+];
+
+const EXPECTED_RLS_POLICIES = {
+  profiles: ["select", "insert", "update"],
+  business_ideas: ["select", "insert", "update", "delete"],
+  market_analyses: ["select", "insert", "update", "delete"],
+  reports: ["select", "insert", "update", "delete"],
+  favorites: ["select", "insert", "delete"],
+  user_preferences: ["select", "insert", "update"],
+  website_generations: ["select", "insert", "update", "delete"],
+  workspace_generations: ["select", "insert", "update", "delete"],
+  growth_leads: ["select", "insert", "update"],
+  growth_affiliates: ["select", "insert", "update"],
+};
+
+const API_ROUTES = [
+  { path: "/api/ideas", methods: ["GET", "POST"] },
+  { path: "/api/market-analysis", methods: ["GET", "POST"] },
+  { path: "/api/reports", methods: ["GET", "POST"] },
+  { path: "/api/profile", methods: ["GET", "POST"] },
+  { path: "/api/preferences", methods: ["GET", "PUT"] },
+  { path: "/api/website-builder", methods: ["GET", "POST"] },
+  { path: "/api/workspaces/[type]", methods: ["GET", "POST"] },
+  { path: "/api/growth/dashboard", methods: ["GET"] },
+  { path: "/api/growth/leads", methods: ["POST"] },
+  { path: "/api/seo/health", methods: ["GET"] },
 ];
 
 const results = [];
@@ -139,10 +160,11 @@ async function verifySupabase() {
   }
   pass("NEXT_PUBLIC_SUPABASE_ANON_KEY", "set");
   if (!siteUrl) {
-    const fallback = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL.replace(/\/+$/, "")}`
-      : "http://localhost:3000";
-    pass("NEXT_PUBLIC_SITE_URL", `missing — using fallback ${fallback}`);
+    if (process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production") {
+      fail("NEXT_PUBLIC_SITE_URL", "required in production for canonicals/sitemaps/auth redirects");
+    } else {
+      pass("NEXT_PUBLIC_SITE_URL", "missing — using localhost fallback (set before production launch)");
+    }
   } else if (!/^https?:\/\/[^/]+/.test(siteUrl)) {
     fail("NEXT_PUBLIC_SITE_URL", "must be an absolute URL");
   } else {
@@ -266,6 +288,12 @@ function verifyMigrationFiles() {
     "008_website_generations.sql",
     "009_website_favorites.sql",
     "010_workspace_generations.sql",
+    "021_platform_infrastructure.sql",
+    "025_billing_system.sql",
+    "026_security_hardening.sql",
+    "028_production_qa_fixes.sql",
+    "029_growth_engine.sql",
+    "030_growth_security_hardening.sql",
   ];
   migrations.forEach((file, i) => {
     const path = join(root, "supabase", "migrations", file);

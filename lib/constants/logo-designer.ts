@@ -1,7 +1,6 @@
 import {
   Crown,
   Diamond,
-  Flame,
   Gem,
   Hash,
   Hexagon,

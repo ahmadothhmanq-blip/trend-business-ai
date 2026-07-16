@@ -78,8 +78,13 @@ drop policy if exists "Admins can update members" on public.org_members;
 drop policy if exists "Admins can delete members" on public.org_members;
 drop policy if exists "Admins can insert members" on public.org_members;
 
--- Drop mistaken Phase 18 policy name if it somehow applied
-drop policy if exists "Admins can update members" on public.organization_members;
+-- Guarded: mistaken Phase 18 name used organization_members (never created)
+do $$
+begin
+  if to_regclass('public.organization_members') is not null then
+    execute 'drop policy if exists "Admins can update members" on public.organization_members';
+  end if;
+end $$;
 
 create policy "Admins can update members" on public.org_members
   for update using (public.is_org_admin(organization_id))

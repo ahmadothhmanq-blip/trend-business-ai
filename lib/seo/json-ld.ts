@@ -254,7 +254,8 @@ export function graphJsonLd(...nodes: JsonLd[]): JsonLd {
   return {
     "@context": "https://schema.org",
     "@graph": nodes.map((node) => {
-      const { ["@context"]: _ctx, ...rest } = node;
+      const rest = { ...node };
+      delete rest["@context"];
       return rest;
     }),
   };

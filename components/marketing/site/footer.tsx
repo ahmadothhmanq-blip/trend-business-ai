@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+import { useState } from "react";
+import { ArrowRight, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { OfficialLogo } from "@/components/marketing/official-logo";
 import {
   REF_FOOTER_COMPANY,
@@ -36,6 +38,72 @@ function Col({
         ))}
       </ul>
     </div>
+  );
+}
+
+function NewsletterForm() {
+  const [email, setEmail] = useState("");
+  const [honeypot, setHoneypot] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await fetch("/api/growth/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, source: "newsletter", honeypot }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Subscribe failed");
+      toast.success("You are subscribed.");
+      setEmail("");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Subscribe failed");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <form
+      className="mt-4 flex items-center overflow-hidden rounded-full border border-[rgba(212,175,55,0.2)] bg-[#111111] sm:mt-5"
+      onSubmit={onSubmit}
+    >
+      <input
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden
+        className="hidden"
+        value={honeypot}
+        onChange={(e) => setHoneypot(e.target.value)}
+      />
+      <label htmlFor="site-newsletter" className="sr-only">
+        Email address
+      </label>
+      <input
+        id="site-newsletter"
+        type="email"
+        required
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Your email address"
+        className="min-w-0 flex-1 bg-transparent px-4 py-2.5 text-[13px] text-white outline-none placeholder:text-[#5A5A5A] sm:py-3"
+      />
+      <button
+        type="submit"
+        disabled={loading}
+        aria-label="Subscribe"
+        className="m-1 inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(180deg,#FFD700,#D4AF37)] text-[#111111] hover:brightness-110 disabled:opacity-60 sm:m-1.5 sm:size-9"
+      >
+        {loading ? (
+          <Loader2 className="size-3.5 animate-spin" />
+        ) : (
+          <ArrowRight className="size-3.5 sm:size-4" />
+        )}
+      </button>
+    </form>
   );
 }
 
@@ -124,27 +192,7 @@ export function SiteFooter() {
             <p className="mt-4 text-[13px] leading-[1.7] text-[#7A7A7A] sm:mt-5 sm:text-[14px]">
               {REF_FOOTER_NEWSLETTER}
             </p>
-            <form
-              className="mt-4 flex items-center overflow-hidden rounded-full border border-[rgba(212,175,55,0.2)] bg-[#111111] sm:mt-5"
-              onSubmit={(e) => e.preventDefault()}
-            >
-              <label htmlFor="site-newsletter" className="sr-only">
-                Email address
-              </label>
-              <input
-                id="site-newsletter"
-                type="email"
-                placeholder="Your email address"
-                className="min-w-0 flex-1 bg-transparent px-4 py-2.5 text-[13px] text-white outline-none placeholder:text-[#5A5A5A] sm:py-3"
-              />
-              <button
-                type="submit"
-                aria-label="Subscribe"
-                className="m-1 inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(180deg,#FFD700,#D4AF37)] text-[#111111] hover:brightness-110 sm:m-1.5 sm:size-9"
-              >
-                <ArrowRight className="size-3.5 sm:size-4" />
-              </button>
-            </form>
+            <NewsletterForm />
           </div>
         </div>
 

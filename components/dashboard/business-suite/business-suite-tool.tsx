@@ -8,15 +8,12 @@ import {
   ArrowRight,
   BarChart3,
   Check,
-  ChevronDown,
-  ChevronUp,
   ClipboardCopy,
   Copy,
   Download,
   FileText,
   Lightbulb,
   Search,
-  Shield,
   Sparkles,
   Target,
   TrendingUp,
@@ -55,7 +52,7 @@ import {
   getBusinessToolLabel,
   getBusinessTypeLabel,
 } from "@/lib/constants/business-suite";
-import type { BusinessGeneration, BusinessBlueprint, BusinessScorecard } from "@/types/business";
+import type { BusinessGeneration, BusinessScorecard } from "@/types/business";
 
 type Props = { initialGenerations?: BusinessGeneration[] };
 

@@ -6,7 +6,8 @@ export function JsonLdScript({ data, id }: { data: JsonLd | JsonLd[]; id?: strin
     ? {
         "@context": "https://schema.org",
         "@graph": data.map((node) => {
-          const { ["@context"]: _ctx, ...rest } = node;
+          const rest = { ...node };
+          delete rest["@context"];
           return rest;
         }),
       }

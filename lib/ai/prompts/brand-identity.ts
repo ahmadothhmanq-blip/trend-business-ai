@@ -1,5 +1,4 @@
 import type { BrandIdentityPluginInput, BrandAnalysis, BrandPlanResult } from "@/plugins/brand-identity/types";
-import { sanitizePromptInput } from "@/lib/ai/sanitize";
 
 function getBrandTypeContext(type: string): string {
   const ctx: Record<string, string> = {

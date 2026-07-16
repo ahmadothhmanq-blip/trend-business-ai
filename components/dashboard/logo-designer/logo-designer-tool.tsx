@@ -1,14 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
   ArrowLeft,
   ArrowRight,
-  Check,
   Copy,
   Download,
-  Palette,
   Search,
   Sparkles,
   Type,
@@ -46,7 +44,7 @@ import {
   LOGO_OPTION_LIST,
   getLogoStyle,
 } from "@/lib/constants/logo-designer";
-import type { LogoGeneration, LogoBlueprint } from "@/types/logo";
+import type { LogoGeneration } from "@/types/logo";
 
 type Props = { initialGenerations?: LogoGeneration[] };
 

@@ -185,13 +185,13 @@ export const PUBLIC_SAAS_PAGES = {
     eyebrow: "Blog",
     title: "Insights on AI business building, launches and growth.",
     description:
-      "Editorial content is coming soon. The blog is prepared for product education, founder guides and AI workflow playbooks.",
+      "Product education, founder guides and AI workflow playbooks from the Trend Business AI team.",
     primaryCta: "Join Beta",
     secondaryCta: "Read Help Center",
     sections: [
       {
-        title: "Coming soon",
-        description: "Founder-focused guides for using AI to move from idea to launch.",
+        title: "Latest articles",
+        description: "Browse published posts for launch playbooks, AI workflows and product updates.",
         items: ["AI website launch checklists", "Market research workflows", "Brand and campaign planning guides"],
       },
       {

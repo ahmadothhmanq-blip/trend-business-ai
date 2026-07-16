@@ -37,5 +37,18 @@ export function getOptionalSiteUrl(fallback = "http://localhost:3000") {
     return vercelUrl.startsWith("http") ? vercelUrl : `https://${vercelUrl}`;
   }
 
+  // Fail closed on Vercel production — localhost fallback would poison SEO/canonicals.
+  if (process.env.VERCEL_ENV === "production") {
+    throw new Error("Missing required environment variable: NEXT_PUBLIC_SITE_URL");
+  }
+
   return fallback;
+}
+
+/** True when distributed rate limiting (Upstash) is configured. */
+export function isDistributedRateLimitConfigured() {
+  return Boolean(
+    process.env.UPSTASH_REDIS_REST_URL?.trim() &&
+      process.env.UPSTASH_REDIS_REST_TOKEN?.trim(),
+  );
 }

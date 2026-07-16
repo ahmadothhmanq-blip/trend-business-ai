@@ -2,12 +2,12 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { BookOpen, Copy, Plus, Tag, Trash2 } from "lucide-react";
+import { BookOpen, Copy, Plus, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   DashboardCard, DashboardCardContent, DashboardCardHeader,
-  DashboardCardTitle, DashboardCardDescription, DashboardPanel,
+  DashboardCardTitle, DashboardPanel,
 } from "@/components/dashboard/ui/dashboard-card";
 import { dashboardInputClass, dashboardSelectClass } from "@/components/dashboard/ui/dashboard-styles";
 import { cn } from "@/lib/utils";

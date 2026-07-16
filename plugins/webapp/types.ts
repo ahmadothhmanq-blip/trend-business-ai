@@ -1,4 +1,4 @@
-import type { ProjectCapabilityFlags, PlannedFileLike } from "@/lib/ai/validator";
+import type { ProjectCapabilityFlags } from "@/lib/ai/validator";
 import type { GeneratedProjectFile, GenerationProgressEvent } from "@/lib/ai/types";
 import type { PlannedFile } from "@/lib/ai/planner";
 

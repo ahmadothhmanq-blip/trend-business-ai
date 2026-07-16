@@ -19,7 +19,8 @@ export type AiRateLimitResource =
   | "content-studio"
   | "business-suite"
   | "ai-agents"
-  | "workspace";
+  | "workspace"
+  | "seo-analyzer";
 
 const AI_RATE_LIMITS: Record<
   AiRateLimitResource,
@@ -39,6 +40,7 @@ const AI_RATE_LIMITS: Record<
   "business-suite": { requests: 10, window: "1 m" },
   "ai-agents": { requests: 10, window: "1 m" },
   workspace: { requests: 10, window: "1 m" },
+  "seo-analyzer": { requests: 20, window: "1 m" },
 };
 
 function isUpstashConfigured(): boolean {
@@ -232,9 +234,24 @@ function enforceKeyedMemoryLimit(
 
 /**
  * Lightweight rate limiter for non-AI mutation endpoints.
- * 30 requests per minute per user — uses in-memory store (no Upstash needed).
+ * Uses Upstash when configured; otherwise in-memory (dev / single-instance).
+ * Public growth keys fail closed in Vercel production without Upstash.
  */
 export function enforceMutationRateLimit(userId: string): NextResponse | null {
+  if (
+    process.env.VERCEL_ENV === "production" &&
+    !isUpstashConfigured() &&
+    userId.startsWith("growth-")
+  ) {
+    return NextResponse.json(
+      {
+        error: "Service temporarily unavailable. Rate limiting is not configured.",
+        code: "RATE_LIMIT_UNAVAILABLE",
+      },
+      { status: 503 },
+    );
+  }
+
   return enforceKeyedMemoryLimit(
     mutationMemoryStore,
     userId,
@@ -242,6 +259,39 @@ export function enforceMutationRateLimit(userId: string): NextResponse | null {
     MUTATION_RATE.window,
     "Too many requests. Please slow down.",
   );
+}
+
+const mutationUpstashCache = new Map<string, Ratelimit>();
+
+/** Async mutation limiter — prefers Upstash when available. */
+export async function enforceMutationRateLimitAsync(
+  userId: string,
+): Promise<NextResponse | null> {
+  if (isUpstashConfigured()) {
+    let limiter = mutationUpstashCache.get("mutation");
+    if (!limiter) {
+      limiter = new Ratelimit({
+        redis: Redis.fromEnv(),
+        limiter: Ratelimit.slidingWindow(MUTATION_RATE.requests, MUTATION_RATE.window),
+        prefix: "ratelimit:mutation",
+        analytics: true,
+      });
+      mutationUpstashCache.set("mutation", limiter);
+    }
+    const { success, limit, remaining, reset } = await limiter.limit(userId);
+    if (!success) {
+      return NextResponse.json(
+        {
+          error: "Too many requests. Please slow down.",
+          retryAfter: Math.max(1, Math.ceil((reset - Date.now()) / 1000)),
+        },
+        { status: 429, headers: rateLimitHeaders(limit, remaining, reset) },
+      );
+    }
+    return null;
+  }
+
+  return enforceMutationRateLimit(userId);
 }
 
 /** Auth endpoints: 10 attempts per minute per email (or IP key). */

@@ -9,7 +9,6 @@ import {
   Palette,
   Rocket,
   ShieldCheck,
-  Sparkles,
   Store,
   Users,
   Wand2,

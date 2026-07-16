@@ -4,7 +4,6 @@ import {
   PRODUCTION_ARCHITECTURE_GUIDE,
 } from "@/lib/ai/prompts/shared";
 import { WEBAPP_TYPES } from "@/lib/constants/webapp-builder";
-import { sanitizePromptInput } from "@/lib/ai/sanitize";
 
 type WebAppPromptInput = {
   prompt: string;

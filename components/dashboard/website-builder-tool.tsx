@@ -1208,7 +1208,7 @@ function RightPreview({
                 title={`${activeProject?.title ?? "Generated project"} live preview`}
                 src={previewUrl}
                 className="h-[520px] w-full rounded-2xl border border-premium-gold/15 bg-white"
-                sandbox="allow-scripts allow-forms allow-popups allow-same-origin"
+                sandbox="allow-scripts allow-forms allow-popups"
               />
             ) : isBuilding ? (
               <div className="flex h-[420px] flex-col items-center justify-center rounded-2xl border border-premium-gold/15 bg-black/30 text-center">

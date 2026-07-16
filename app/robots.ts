@@ -50,6 +50,7 @@ export default function robots(): MetadataRoute.Robots {
       })),
     ],
     sitemap: [
+      absoluteUrl("/sitemaps/index.xml"),
       absoluteUrl("/sitemap.xml"),
       ...SPECIALIZED_SITEMAPS.map((item) => absoluteUrl(item.path)),
     ],

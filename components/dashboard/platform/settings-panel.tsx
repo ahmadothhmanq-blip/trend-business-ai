@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, Globe, Key, Monitor, Palette, Settings2, Shield, User, Webhook } from "lucide-react";
+import { Bell, Key, Monitor, Shield, User, Webhook } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { TeamPanel } from "./team-panel";
 import { NotificationsPanel } from "./notifications-panel";

@@ -4,7 +4,7 @@ import {
   MARKETING_PRODUCTS,
 } from "@/lib/constants/marketing-content";
 import { getKnowledgeEntries } from "@/lib/seo/knowledge";
-import { getProgrammaticPageDefs } from "@/lib/seo/programmatic";
+import { getPublishedProgrammaticPages } from "@/lib/seo/programmatic";
 import {
   PUBLIC_ROUTES,
   absoluteUrl,
@@ -12,6 +12,9 @@ import {
 } from "@/lib/seo/site";
 import { getPublishedBlogPosts } from "@/lib/seo/content/blog";
 import { getTemplateCatalog } from "@/lib/seo/content/templates";
+import { getPublishedIndustries, industryPath } from "@/lib/seo/industries";
+import { getPublishedCountries, countryPath } from "@/lib/seo/countries";
+import type { SitemapIndexEntry } from "@/lib/seo/sitemap-xml";
 
 function toSitemapEntry(
   route: PublicRouteEntry,
@@ -55,6 +58,26 @@ export function buildCoreSitemap(): MetadataRoute.Sitemap {
 export function buildToolsSitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
   return enrichToolRoutes().map((route) => toSitemapEntry(route, lastModified));
+}
+
+/** Service / category + published service cluster programmatic pages. */
+export function buildServiceSitemap(): MetadataRoute.Sitemap {
+  const lastModified = new Date();
+  const categories = AI_PRODUCT_CATEGORIES.map((category) => ({
+    url: absoluteUrl(category.href),
+    lastModified,
+    changeFrequency: "weekly" as const,
+    priority: 0.85,
+  }));
+
+  const services = getPublishedProgrammaticPages("services").map((page) => ({
+    url: absoluteUrl(page.path),
+    lastModified,
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
+
+  return [...categories, ...services];
 }
 
 export function buildBlogSitemap(): MetadataRoute.Sitemap {
@@ -105,6 +128,26 @@ export function buildImagesSitemap(): MetadataRoute.Sitemap {
   );
 }
 
+export function buildIndustrySitemap(): MetadataRoute.Sitemap {
+  const lastModified = new Date();
+  return getPublishedIndustries().map((industry) => ({
+    url: absoluteUrl(industryPath(industry.slug)),
+    lastModified,
+    changeFrequency: "monthly" as const,
+    priority: 0.65,
+  }));
+}
+
+export function buildCountrySitemap(): MetadataRoute.Sitemap {
+  const lastModified = new Date();
+  return getPublishedCountries().map((country) => ({
+    url: absoluteUrl(countryPath(country.slug)),
+    lastModified,
+    changeFrequency: "monthly" as const,
+    priority: 0.6,
+  }));
+}
+
 export function buildKnowledgeSitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
   const hubs = PUBLIC_ROUTES.filter((route) => route.group === "knowledge").map((route) =>
@@ -120,19 +163,19 @@ export function buildKnowledgeSitemap(): MetadataRoute.Sitemap {
       priority: 0.65,
     }));
 
-  const programmatic = getProgrammaticPageDefs()
-    .filter((page) => page.status === "published")
+  const programmatic = getPublishedProgrammaticPages()
+    .filter((page) => page.cluster === "use-cases" || page.cluster === "comparisons")
     .map((page) => ({
       url: absoluteUrl(page.path),
       lastModified,
       changeFrequency: "monthly" as const,
-      priority: 0.5,
+      priority: 0.55,
     }));
 
   return [...hubs, ...entries, ...programmatic];
 }
 
-/** Full combined sitemap used by /sitemap.xml */
+/** Full combined sitemap used by /sitemap.xml fallback / health checks */
 export function buildFullSitemap(): MetadataRoute.Sitemap {
   const seen = new Set<string>();
   const merged: MetadataRoute.Sitemap = [];
@@ -140,9 +183,12 @@ export function buildFullSitemap(): MetadataRoute.Sitemap {
   for (const entry of [
     ...buildCoreSitemap(),
     ...buildToolsSitemap(),
+    ...buildServiceSitemap(),
     ...buildBlogSitemap(),
     ...buildTemplatesSitemap(),
     ...buildKnowledgeSitemap(),
+    ...buildIndustrySitemap(),
+    ...buildCountrySitemap(),
   ]) {
     if (seen.has(entry.url)) continue;
     seen.add(entry.url);
@@ -153,10 +199,20 @@ export function buildFullSitemap(): MetadataRoute.Sitemap {
 }
 
 export const SPECIALIZED_SITEMAPS = [
-  { id: "pages", path: "/sitemaps/pages.xml" },
-  { id: "tools", path: "/sitemaps/tools.xml" },
-  { id: "images", path: "/sitemaps/images.xml" },
-  { id: "blog", path: "/sitemaps/blog.xml" },
-  { id: "templates", path: "/sitemaps/templates.xml" },
-  { id: "knowledge", path: "/sitemaps/knowledge.xml" },
+  { id: "pages", path: "/sitemaps/pages.xml", builder: "core" },
+  { id: "tools", path: "/sitemaps/tools.xml", builder: "tools" },
+  { id: "services", path: "/sitemaps/services.xml", builder: "services" },
+  { id: "images", path: "/sitemaps/images.xml", builder: "images" },
+  { id: "blog", path: "/sitemaps/blog.xml", builder: "blog" },
+  { id: "templates", path: "/sitemaps/templates.xml", builder: "templates" },
+  { id: "knowledge", path: "/sitemaps/knowledge.xml", builder: "knowledge" },
+  { id: "industries", path: "/sitemaps/industries.xml", builder: "industries" },
+  { id: "countries", path: "/sitemaps/countries.xml", builder: "countries" },
 ] as const;
+
+export function buildSitemapIndexEntries(lastModified = new Date()): SitemapIndexEntry[] {
+  return SPECIALIZED_SITEMAPS.map((item) => ({
+    loc: absoluteUrl(item.path),
+    lastModified,
+  }));
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock3, Code2, RefreshCw, Sparkles, Star, Trash2, type LucideIcon } from "lucide-react";
+import { Clock3, Code2, RefreshCw, Star, Trash2, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import { cn } from "@/lib/utils";

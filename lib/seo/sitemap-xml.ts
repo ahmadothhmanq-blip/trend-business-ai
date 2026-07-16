@@ -53,3 +53,40 @@ export function xmlSitemapResponse(entries: MetadataRoute.Sitemap) {
     },
   });
 }
+
+export type SitemapIndexEntry = {
+  loc: string;
+  lastModified?: Date | string;
+};
+
+/** Sitemap index XML (lists child sitemaps). */
+export function sitemapIndexToXml(entries: SitemapIndexEntry[]): string {
+  const body = entries
+    .map((entry) => {
+      return [
+        "  <sitemap>",
+        `    <loc>${escapeXml(entry.loc)}</loc>`,
+        entry.lastModified
+          ? `    <lastmod>${new Date(entry.lastModified).toISOString()}</lastmod>`
+          : null,
+        "  </sitemap>",
+      ]
+        .filter(Boolean)
+        .join("\n");
+    })
+    .join("\n");
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${body}
+</sitemapindex>`;
+}
+
+export function xmlSitemapIndexResponse(entries: SitemapIndexEntry[]) {
+  return new Response(sitemapIndexToXml(entries), {
+    headers: {
+      "Content-Type": "application/xml; charset=utf-8",
+      "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+    },
+  });
+}

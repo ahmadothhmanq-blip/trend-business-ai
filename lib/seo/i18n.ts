@@ -37,6 +37,7 @@ export function buildHreflangAlternates(path: string): Record<string, string> {
 }
 
 export function localeAwareTitle(title: string, _locale: SupportedLocaleCode = DEFAULT_LOCALE) {
+  void _locale;
   // Placeholder for future translation catalogs — keep English identity today.
   return title;
 }
@@ -45,5 +46,6 @@ export function localeAwareDescription(
   description: string,
   _locale: SupportedLocaleCode = DEFAULT_LOCALE,
 ) {
+  void _locale;
   return description;
 }

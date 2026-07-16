@@ -3,22 +3,21 @@
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
-  ChevronLeft, GitBranch, Plus, Play, Settings2, Trash2, Workflow,
+  ChevronLeft, GitBranch, Plus, Trash2, Workflow,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   DashboardCard, DashboardCardContent, DashboardCardHeader,
-  DashboardCardTitle, DashboardCardDescription, DashboardPanel,
+  DashboardCardTitle, DashboardPanel,
 } from "@/components/dashboard/ui/dashboard-card";
 import { dashboardInputClass, dashboardSelectClass } from "@/components/dashboard/ui/dashboard-styles";
 import { cn } from "@/lib/utils";
-import { WORKFLOW_TRIGGERS, WORKFLOW_STEP_TYPES, AGENT_TOOLS, getToolLabel } from "@/lib/constants/ai-agents";
+import { WORKFLOW_TRIGGERS, WORKFLOW_STEP_TYPES, AGENT_TOOLS } from "@/lib/constants/ai-agents";
 import type { AgentWorkflow, WorkflowStep } from "@/types/agents";
 
 export function WorkflowBuilder() {
   const [workflows, setWorkflows] = useState<AgentWorkflow[]>([]);
-  const [editing, setEditing] = useState<AgentWorkflow | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");

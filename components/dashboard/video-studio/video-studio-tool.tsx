@@ -49,7 +49,7 @@ import {
   VIDEO_OPTION_LIST,
   getVideoType,
 } from "@/lib/constants/video-studio";
-import type { VideoGeneration, VideoBlueprint } from "@/types/video";
+import type { VideoGeneration } from "@/types/video";
 
 type Props = { initialGenerations?: VideoGeneration[] };
 

@@ -27,10 +27,35 @@ export async function parseJsonBody<T>(request: Request): Promise<T | NextRespon
 }
 
 export function safeRedirectPath(path: string | null | undefined, fallback = "/dashboard"): string {
-  if (!path || !path.startsWith("/") || path.startsWith("//")) {
+  if (!path) return fallback;
+
+  // Decode once to catch encoded bypasses, then reject absolute/protocol-relative URLs.
+  let decoded = path;
+  try {
+    decoded = decodeURIComponent(path);
+  } catch {
     return fallback;
   }
-  return path;
+
+  if (
+    !decoded.startsWith("/") ||
+    decoded.startsWith("//") ||
+    decoded.includes("\\") ||
+    decoded.includes("@") ||
+    decoded.includes("\0") ||
+    decoded.includes("\r") ||
+    decoded.includes("\n") ||
+    /^\/[a-z][a-z0-9+.-]*:/i.test(decoded)
+  ) {
+    return fallback;
+  }
+
+  // Allow only relative app paths with safe characters.
+  if (!/^\/[A-Za-z0-9._~/?#&=+\-[\]%]*$/.test(decoded)) {
+    return fallback;
+  }
+
+  return decoded;
 }
 
 export function parseUuidParam(

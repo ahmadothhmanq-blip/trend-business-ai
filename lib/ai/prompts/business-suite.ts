@@ -1,5 +1,4 @@
 import type { BusinessPluginInput } from "@/plugins/business-suite/types";
-import { sanitizePromptInput } from "@/lib/ai/sanitize";
 
 function getToolContext(tool: string): string {
   const ctx: Record<string, string> = {

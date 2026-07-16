@@ -3,7 +3,6 @@ import {
   PRODUCTION_ARCHITECTURE_GUIDE,
 } from "@/lib/ai/prompts/shared";
 import { LANDING_PAGE_TYPES } from "@/lib/constants/landing-page-builder";
-import { sanitizePromptInput } from "@/lib/ai/sanitize";
 
 type LPPromptInput = {
   prompt: string;

@@ -1,5 +1,4 @@
 import type { ContentPluginInput } from "@/plugins/content-studio/types";
-import { sanitizePromptInput } from "@/lib/ai/sanitize";
 
 function getContentTypeContext(type: string): string {
   const ctx: Record<string, string> = {

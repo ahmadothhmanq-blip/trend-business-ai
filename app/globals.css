@@ -321,3 +321,13 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Enterprise a11y: visible keyboard focus without mouse focus rings */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-premium-gold, #d4af37);
+  outline-offset: 2px;
+}

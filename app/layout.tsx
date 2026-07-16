@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { AppToaster } from "@/components/providers/app-toaster";
 import { AnalyticsNoscript, AnalyticsScripts } from "@/components/seo/analytics-scripts";
+import { CoreWebVitalsHints } from "@/components/seo/core-web-vitals-hints";
 import { rootMetadata } from "@/lib/seo/metadata";
 import { DEFAULT_LOCALE } from "@/lib/seo/site";
 import "./globals.css";
@@ -36,6 +37,9 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
+      <head>
+        <CoreWebVitalsHints />
+      </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <AnalyticsNoscript />
         <ThemeProvider

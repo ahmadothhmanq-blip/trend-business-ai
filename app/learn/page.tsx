@@ -4,7 +4,6 @@ import { SiteShell } from "@/components/marketing/site/shell";
 import {
   SiteBody,
   SiteEyebrow,
-  SiteH1,
   SiteH2,
   SitePageHero,
 } from "@/components/marketing/site/ui";

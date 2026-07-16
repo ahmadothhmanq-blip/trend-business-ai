@@ -242,20 +242,23 @@ export async function uploadAvatar(formData: FormData) {
     return { error: "No file selected" };
   }
 
-  const ext = AVATAR_TYPES[file.type as keyof typeof AVATAR_TYPES];
-  if (!ext) {
-    return { error: "File must be a JPG, PNG or WebP image" };
-  }
-
   if (file.size > MAX_AVATAR_BYTES) {
     return { error: "Image must be under 2MB" };
   }
 
+  const buffer = Buffer.from(await file.arrayBuffer());
+  const magicMime = detectAvatarMime(buffer);
+  const claimed = file.type as keyof typeof AVATAR_TYPES;
+  if (!magicMime || !AVATAR_TYPES[claimed] || magicMime !== claimed) {
+    return { error: "File must be a valid JPG, PNG or WebP image" };
+  }
+
+  const ext = AVATAR_TYPES[claimed];
   const path = `${user.id}/avatar.${ext}`;
 
   const { error: uploadError } = await supabase.storage
     .from("avatars")
-    .upload(path, file, { upsert: true, contentType: file.type });
+    .upload(path, buffer, { upsert: true, contentType: magicMime });
 
   if (uploadError) {
     return { error: uploadError.message };
@@ -280,3 +283,21 @@ export async function uploadAvatar(formData: FormData) {
   revalidatePath("/dashboard/profile");
   return { success: true, avatarUrl, message: "Avatar updated." };
 }
+
+function detectAvatarMime(buffer: Buffer): keyof typeof AVATAR_TYPES | null {
+  if (buffer.length < 12) return null;
+  if (buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4e && buffer[3] === 0x47) {
+    return "image/png";
+  }
+  if (buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) {
+    return "image/jpeg";
+  }
+  if (
+    buffer.toString("ascii", 0, 4) === "RIFF" &&
+    buffer.toString("ascii", 8, 12) === "WEBP"
+  ) {
+    return "image/webp";
+  }
+  return null;
+}
+

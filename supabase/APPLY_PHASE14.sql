@@ -12,6 +12,9 @@
 -- Activity Log, Usage Tracking, Webhooks, Feature Flags
 -- ============================================================
 
+-- Required for gen_random_bytes() defaults (team_invitations, webhooks)
+create extension if not exists pgcrypto with schema extensions;
+
 -- Organizations
 create table if not exists public.organizations (
   id uuid primary key default gen_random_uuid(),
@@ -30,8 +33,7 @@ drop policy if exists "Org members can view their org" on public.organizations;
 drop policy if exists "Org members and owners can view" on public.organizations;
 drop policy if exists "Users can create organizations" on public.organizations;
 drop policy if exists "Org owners can update" on public.organizations;
-create policy "Org members can view their org" on public.organizations
-  for select using (id in (select organization_id from public.org_members where user_id = auth.uid()));
+-- Owner update policy only (no org_members reference yet — that table is created next)
 create policy "Org owners can update" on public.organizations
   for update using (owner_id = auth.uid());
 
@@ -60,6 +62,10 @@ create policy "Admins can manage members" on public.org_members
 
 create index if not exists idx_org_members_user on public.org_members(user_id);
 create index if not exists idx_org_members_org on public.org_members(organization_id);
+
+-- Organizations SELECT policy requires org_members (created above)
+create policy "Org members can view their org" on public.organizations
+  for select using (id in (select organization_id from public.org_members where user_id = auth.uid()));
 
 -- Team invitations
 create table if not exists public.team_invitations (

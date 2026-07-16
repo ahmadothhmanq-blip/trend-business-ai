@@ -1,4 +1,3 @@
-import type { ProjectCapabilityFlags } from "@/lib/ai/validator";
 import { lpAnalyzePrompt } from "@/lib/ai/prompts/landing-page";
 import { lpAnalysisSchema } from "@/plugins/landing-page/schemas";
 import type { LandingPagePluginInput, LPAnalysis } from "@/plugins/landing-page/types";

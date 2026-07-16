@@ -1,6 +1,6 @@
 import type { TypeDefinition } from "@/components/dashboard/builder-shared";
 import {
-  BarChart3, Bot, Globe2, Megaphone, Palette, PenLine, Rocket,
+  BarChart3, Globe2, Megaphone, Palette, PenLine, Rocket,
   Search, Smartphone, Video, Microscope, Settings2,
 } from "lucide-react";
 

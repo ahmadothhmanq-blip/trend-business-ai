@@ -1,5 +1,4 @@
 import type { LogoPluginInput, LogoAnalysis, LogoConcept } from "@/plugins/logo-designer/types";
-import { sanitizePromptInput } from "@/lib/ai/sanitize";
 
 function getStyleGuidance(style: string): string {
   const guides: Record<string, string> = {

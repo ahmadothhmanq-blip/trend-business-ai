@@ -1,5 +1,4 @@
 import type { ImagePluginInput, ImageAnalysis, ImageConcept } from "@/plugins/image-generator/types";
-import { sanitizePromptInput } from "@/lib/ai/sanitize";
 
 function getImageTypeContext(type: string): string {
   const ctx: Record<string, string> = {

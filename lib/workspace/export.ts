@@ -1,4 +1,3 @@
-import type { WorkspaceOutput } from "@/lib/workspace/types";
 import type { WorkspaceProject } from "@/lib/workspace/project";
 import type { WorkspaceType } from "@/lib/workspace/types";
 import { workspaceOutputToMarkdown } from "@/lib/workspace/markdown";

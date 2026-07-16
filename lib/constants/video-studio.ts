@@ -8,7 +8,6 @@ import {
   Palette,
   PlayCircle,
   Presentation,
-  Sparkles,
   Video,
   Wand2,
   type LucideIcon,

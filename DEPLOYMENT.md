@@ -157,37 +157,84 @@ npm run verify
 
 ## SEO & organic growth (Phase 17)
 
+> Note: Billing is Phase 16. SEO / organic growth is Phase 17. The enterprise SEO Engine upgrade lives in `lib/seo/*`, `components/seo/*`, and `/dashboard/seo`.
+
 ### Public discovery endpoints
 
 | URL | Purpose |
 |-----|---------|
-| `/sitemap.xml` | Combined XML sitemap |
+| `/sitemaps/index.xml` | **Sitemap index** (preferred Search Console entry) |
+| `/sitemap.xml` | Combined XML sitemap (all published URLs) |
 | `/sitemaps/pages.xml` | Core + legal pages |
 | `/sitemaps/tools.xml` | Product / tool landings |
+| `/sitemaps/services.xml` | Category + service landings |
 | `/sitemaps/images.xml` | Image-enriched product URLs |
 | `/sitemaps/blog.xml` | Blog hub + published posts |
 | `/sitemaps/templates.xml` | Templates hub |
-| `/sitemaps/knowledge.xml` | Learn / docs / resources |
+| `/sitemaps/knowledge.xml` | Learn / docs / resources + use-cases |
+| `/sitemaps/industries.xml` | Industry programmatic pages |
+| `/sitemaps/countries.xml` | Country / market pages |
 | `/robots.txt` | Production allows indexing; preview/dev disallows all |
 | `/manifest.webmanifest` | PWA / brand manifest |
+
+### SEO Engine surfaces
+
+| Surface | Path |
+|---------|------|
+| SEO Health Dashboard + Analyzer | `/dashboard/seo` |
+| Analyze API | `POST /api/seo/analyze` |
+| Health API | `GET /api/seo/health` |
+| Dynamic metadata / robots / social | `lib/seo/dynamic-engine.ts` |
+| Breadcrumb engine | `lib/seo/breadcrumbs.ts` |
+| JSON-LD builders | `lib/seo/json-ld.ts` |
+| Internal linking | `lib/seo/internal-links.ts` |
+| Programmatic / industry / country | `lib/seo/programmatic.ts`, `industries.ts`, `countries.ts` |
 
 ### Search Console & analytics
 
 1. Set `NEXT_PUBLIC_SITE_URL` to the canonical production origin.
 2. Add Google / Bing verification env vars, redeploy, then verify the property.
-3. Submit `https://your-domain/sitemap.xml` in Google Search Console and Bing Webmaster Tools.
+3. Submit `https://your-domain/sitemaps/index.xml` (or `/sitemap.xml`) in Google Search Console and Bing Webmaster Tools.
 4. Optionally set `NEXT_PUBLIC_GA_MEASUREMENT_ID` and/or `NEXT_PUBLIC_GTM_ID` (CSP already allows Google Tag domains).
 
 ### URL rules
 
 - Canonical product URLs live under `/products/*`.
+- Programmatic clusters: `/use-cases/*`, `/compare/*`, `/services/*`, `/industries/*`, `/countries/*`.
 - Legacy `/solutions/:slug` permanently redirects to `/products/:slug`.
 - Dashboard, API, and auth routes are `noindex` / robots-disallowed.
 
 ### Content publishing rules
 
-- Blog posts, knowledge entries, and programmatic landings only enter sitemaps when `status: "published"`.
+- Blog posts, knowledge entries, industries, countries, and programmatic landings only enter sitemaps when `status: "published"`.
 - Use `SeoService` (`lib/seo/engine.ts`) and `generate*SeoMetadata` helpers for new public pages — do not invent thin duplicate URLs.
+- Quality gate: `assertProgrammaticQuality()` before flipping draft → published.
+
+---
+
+## Growth Engine (Phase 21)
+
+> Phase 17 is SEO. This Growth / marketing engine is **Phase 21**.
+
+### Surfaces
+
+| Surface | Path |
+|---------|------|
+| Growth dashboard | `/dashboard/growth` |
+| Dashboard API | `GET /api/growth/dashboard` |
+| Lead capture | `POST /api/growth/leads` |
+| Newsletter | `POST /api/growth/newsletter` |
+| Event tracking | `POST /api/growth/events` |
+| Referrals | `POST /api/growth/referrals` |
+| CRM | `POST/PATCH /api/growth/crm` |
+| Campaigns / A/B / automations | `POST /api/growth/actions` |
+
+### Migration
+
+```bash
+npm run db:apply -- --only 029
+# or run supabase/APPLY_PHASE21.sql in the SQL editor
+```
 
 ---
 

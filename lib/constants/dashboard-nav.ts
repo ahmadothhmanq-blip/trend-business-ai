@@ -19,7 +19,6 @@ import {
   PenLine,
   SearchCheck,
   Settings,
-  ShieldCheck,
   Sparkles,
   Smartphone,
   Users,
@@ -155,6 +154,18 @@ export const DASHBOARD_SECONDARY_NAV: DashboardNavItem[] = [
     href: "/dashboard/analytics",
     icon: BarChart3,
     description: "Usage and insights",
+  },
+  {
+    label: "SEO Engine",
+    href: "/dashboard/seo",
+    icon: SearchCheck,
+    description: "SEO health and analyzer",
+  },
+  {
+    label: "Growth Engine",
+    href: "/dashboard/growth",
+    icon: Megaphone,
+    description: "Affiliates, CRM and campaigns",
   },
   {
     label: "Billing",

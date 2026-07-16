@@ -5,15 +5,12 @@ import { toast } from "sonner";
 import {
   ArrowLeft,
   ArrowRight,
-  BarChart3,
-  BookOpen,
   Check,
   ChevronDown,
   ChevronUp,
   ClipboardCopy,
   Copy,
   Download,
-  Eye,
   FileText,
   Lightbulb,
   Search,
@@ -55,7 +52,7 @@ import {
   getContentTypesForTool,
   getContentTypeLabel,
 } from "@/lib/constants/content-studio";
-import type { ContentGeneration, ContentBlueprint } from "@/types/content";
+import type { ContentGeneration } from "@/types/content";
 
 type Props = { initialGenerations?: ContentGeneration[] };
 
@@ -299,7 +296,6 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
 /* ------------------------------------------------------------------ */
 
 function toHistoryItem(gen: ContentGeneration): ProjectHistoryItem {
-  const tool = getContentTool(gen.content_tool);
   return {
     id: gen.id,
     name: gen.title,

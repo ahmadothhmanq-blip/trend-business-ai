@@ -1,5 +1,4 @@
 import { requireUser, parseJsonBody, parseUuidParam } from "@/lib/api/helpers";
-import { databaseErrorResponse } from "@/lib/api/errors";
 import type { CalendarEntry } from "@/types/content";
 import { NextResponse } from "next/server";
 import { z } from "zod";

@@ -9,8 +9,9 @@
  * Use the "Session" or "Direct" connection (port 5432), not the Transaction pooler for DDL.
  *
  * Usage:
- *   node scripts/apply-migrations.mjs
- *   node scripts/apply-migrations.mjs --only 021,022,023,024
+ *   npm run db:apply                         # apply all pending 001–030
+ *   npm run db:apply -- --only 021,022,023,024
+ *   npm run db:apply -- --only 001-030       # range (same as all)
  */
 import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
@@ -41,21 +42,56 @@ loadEnv();
 const dbUrl = process.env.SUPABASE_DB_URL || process.env.DATABASE_URL;
 const migrationsDir = join(root, "supabase", "migrations");
 
-const DEFAULT_PHASE14 = ["021", "022", "023", "024"];
+function migrationNumericId(filename) {
+  const base = filename.replace(/\.sql$/, "");
+  const prefix = base.split("_")[0] ?? "";
+  return prefix;
+}
+
+function normalizePrefix(p) {
+  const trimmed = String(p).trim();
+  if (!trimmed) return "";
+  if (/^\d+$/.test(trimmed)) return trimmed.padStart(3, "0");
+  return trimmed;
+}
+
+function expandOnlyArg(raw) {
+  const parts = raw.split(",").map((s) => s.trim()).filter(Boolean);
+  const out = [];
+  for (const part of parts) {
+    const range = part.match(/^(\d+)\s*-\s*(\d+)$/);
+    if (range) {
+      const start = Number(range[1]);
+      const end = Number(range[2]);
+      const lo = Math.min(start, end);
+      const hi = Math.max(start, end);
+      for (let n = lo; n <= hi; n++) out.push(String(n).padStart(3, "0"));
+      continue;
+    }
+    out.push(normalizePrefix(part));
+  }
+  return [...new Set(out)];
+}
 
 function parseOnlyArg() {
   const idx = process.argv.indexOf("--only");
-  if (idx === -1) return DEFAULT_PHASE14;
+  if (idx === -1) return null; // all migrations
   const raw = process.argv[idx + 1];
-  if (!raw) return DEFAULT_PHASE14;
-  return raw.split(",").map((s) => s.trim()).filter(Boolean);
+  if (!raw) return null;
+  return expandOnlyArg(raw);
+}
+
+function listAllMigrationFiles() {
+  return readdirSync(migrationsDir)
+    .filter((f) => f.endsWith(".sql"))
+    .sort((a, b) => migrationNumericId(a).localeCompare(migrationNumericId(b)));
 }
 
 function listMigrationFiles(prefixes) {
-  const all = readdirSync(migrationsDir)
-    .filter((f) => f.endsWith(".sql"))
-    .sort();
-  return all.filter((f) => prefixes.some((p) => f.startsWith(p + "_") || f.startsWith(p)));
+  const all = listAllMigrationFiles();
+  if (!prefixes) return all;
+  const wanted = new Set(prefixes.map(normalizePrefix));
+  return all.filter((f) => wanted.has(migrationNumericId(f)));
 }
 
 async function ensureTracking(client) {
@@ -91,9 +127,7 @@ Add one of these to .env.local:
   SUPABASE_DB_URL=postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres
   DATABASE_URL=postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
 
-Then re-run: node scripts/apply-migrations.mjs --only 021,022,023,024
-
-Or paste supabase/APPLY_PHASE14.sql into the Supabase SQL Editor.
+Then re-run: npm run db:apply
 `);
     process.exit(2);
   }
@@ -101,7 +135,7 @@ Or paste supabase/APPLY_PHASE14.sql into the Supabase SQL Editor.
   const prefixes = parseOnlyArg();
   const files = listMigrationFiles(prefixes);
   if (!files.length) {
-    console.error("No migration files matched:", prefixes.join(", "));
+    console.error("No migration files matched:", prefixes?.join(", ") ?? "(all)");
     process.exit(1);
   }
 
@@ -114,11 +148,25 @@ Or paste supabase/APPLY_PHASE14.sql into the Supabase SQL Editor.
   await client.connect();
   await ensureTracking(client);
 
+  // Ensure pgcrypto for gen_random_bytes used by later migrations
+  try {
+    await client.query(`create extension if not exists pgcrypto with schema extensions`);
+  } catch {
+    try {
+      await client.query(`create extension if not exists pgcrypto`);
+    } catch {
+      // Supabase usually has this already
+    }
+  }
+
   console.log(`Applying ${files.length} migration(s):\n`);
+  let applied = 0;
+  let skipped = 0;
   for (const file of files) {
     const id = file.replace(/\.sql$/, "");
     if (await isApplied(client, id)) {
       console.log(`  skip  ${file} (already applied)`);
+      skipped++;
       continue;
     }
     const sql = readFileSync(join(migrationsDir, file), "utf8");
@@ -129,6 +177,7 @@ Or paste supabase/APPLY_PHASE14.sql into the Supabase SQL Editor.
       await markApplied(client, id);
       await client.query("commit");
       console.log("OK");
+      applied++;
     } catch (err) {
       await client.query("rollback");
       console.log("FAILED");
@@ -139,7 +188,7 @@ Or paste supabase/APPLY_PHASE14.sql into the Supabase SQL Editor.
   }
 
   await client.end();
-  console.log("\nDone.");
+  console.log(`\nDone. applied=${applied} skipped=${skipped}`);
 }
 
 main().catch((err) => {

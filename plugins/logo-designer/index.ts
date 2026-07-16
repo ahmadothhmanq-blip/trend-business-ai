@@ -169,7 +169,7 @@ async function generateLogo(
 
   const files: { path: string; content: string; language: string }[] = [];
 
-  concepts.forEach((c, i) => {
+  concepts.forEach((c) => {
     if (c.svgCode) {
       files.push({
         path: `logos/${c.name.toLowerCase().replace(/\s+/g, "-")}.svg`,

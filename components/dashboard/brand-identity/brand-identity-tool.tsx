@@ -9,9 +9,7 @@ import {
   Copy,
   Download,
   Eye,
-  FileText,
   Megaphone,
-  Palette,
   Search,
   Sparkles,
   Type,
@@ -46,7 +44,7 @@ import {
   BRAND_DELIVERABLE_OPTIONS,
   getBrandType,
 } from "@/lib/constants/brand-identity-builder";
-import type { BrandIdentityGeneration, BrandIdentityBlueprint } from "@/types/brand-identity";
+import type { BrandIdentityGeneration } from "@/types/brand-identity";
 
 type Props = { initialGenerations?: BrandIdentityGeneration[] };
 

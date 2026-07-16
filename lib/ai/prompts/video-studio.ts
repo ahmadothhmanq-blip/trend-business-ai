@@ -1,5 +1,4 @@
 import type { VideoPluginInput, VideoAnalysis, VideoScenePlan } from "@/plugins/video-studio/types";
-import { sanitizePromptInput } from "@/lib/ai/sanitize";
 
 function getVideoTypeContext(type: string): string {
   const ctx: Record<string, string> = {

@@ -45,7 +45,7 @@ import {
   IMAGE_OPTION_LIST,
   getImageType,
 } from "@/lib/constants/image-generator";
-import type { ImageGeneration, ImageBlueprint } from "@/types/image-generation";
+import type { ImageGeneration } from "@/types/image-generation";
 
 type Props = { initialGenerations?: ImageGeneration[] };
 

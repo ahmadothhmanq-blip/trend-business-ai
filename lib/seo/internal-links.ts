@@ -5,7 +5,9 @@ import {
 } from "@/lib/constants/marketing-content";
 import { getPublishedBlogPosts } from "@/lib/seo/content/blog";
 import { getTemplateHubItems } from "@/lib/seo/content/templates";
+import { getPublishedIndustries, industryPath } from "@/lib/seo/industries";
 import { KNOWLEDGE_HUBS } from "@/lib/seo/knowledge";
+import { getPublishedProgrammaticPages } from "@/lib/seo/programmatic";
 
 export type RelatedLink = {
   title: string;
@@ -111,6 +113,26 @@ export function getRelatedBusinessResources(limit = 4): RelatedLink[] {
   ].slice(0, limit);
 }
 
+/** Cross-link industry and market programmatic pages for topical clusters. */
+export function getRelatedProgrammaticLinks(limit = 4): RelatedLink[] {
+  const pages = [
+    ...getPublishedProgrammaticPages().map((page) => ({
+      title: page.title,
+      description: page.description,
+      href: page.path,
+      kind: "resource" as const,
+    })),
+    ...getPublishedIndustries().map((industry) => ({
+      title: industry.title,
+      description: industry.description,
+      href: industryPath(industry.slug),
+      kind: "resource" as const,
+    })),
+  ];
+
+  return pages.slice(0, limit);
+}
+
 /** Full internal linking pack for a product landing page. */
 export function getProductInternalLinks(slug: MarketingProductSlug) {
   const product = MARKETING_PRODUCTS.find((item) => item.slug === slug);
@@ -120,5 +142,6 @@ export function getProductInternalLinks(slug: MarketingProductSlug) {
     templates: getRelatedTemplates(slug),
     articles: getRelatedBlogArticles(),
     resources: getRelatedBusinessResources(),
+    programmatic: getRelatedProgrammaticLinks(),
   };
 }

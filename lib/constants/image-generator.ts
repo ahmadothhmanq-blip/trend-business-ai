@@ -4,7 +4,6 @@ import {
   Eye,
   Flame,
   Frame,
-  Image,
   Layers,
   Monitor,
   Mountain,

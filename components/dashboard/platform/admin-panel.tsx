@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { BarChart3, Database, Gauge, ShieldCheck, ToggleLeft } from "lucide-react";
+import { Database, Gauge, ShieldCheck, ToggleLeft } from "lucide-react";
 import { DashboardCard, DashboardCardContent, DashboardCardHeader, DashboardCardTitle, DashboardCardDescription, DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import type { FeatureFlag } from "@/types/platform";
 

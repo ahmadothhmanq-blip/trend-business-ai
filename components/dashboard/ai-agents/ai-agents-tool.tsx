@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
   Bot, ChevronLeft, Clock, Copy, Download, FileText, History,
-  Pencil, Play, Plus, RotateCcw, Settings2, Sparkles, Trash2, Zap,
+  Play, Plus, RotateCcw, Settings2, Sparkles, Trash2, Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,7 +15,7 @@ import {
 import { dashboardInputClass, dashboardSelectClass } from "@/components/dashboard/ui/dashboard-styles";
 import { safeMarkdownToHtml } from "@/lib/ai/sanitize";
 import {
-  TypeSelectorCard, CheckboxToggle, GenerationProgress,
+  CheckboxToggle, GenerationProgress,
   ProjectHistoryCard, EmptyHistory, HistoryPagination,
   type ProjectHistoryItem,
 } from "@/components/dashboard/builder-shared";
@@ -56,7 +56,6 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
   // History
   const [historyPage, setHistoryPage] = useState(1);
   const [historyTotal, setHistoryTotal] = useState(0);
-  const [historyTotalPages, setHistoryTotalPages] = useState(1);
 
   const fetchAgents = useCallback(async () => {
     try {
@@ -74,7 +73,6 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
       const d = await res.json();
       setExecutions(d.executions ?? []);
       setHistoryTotal(d.total ?? 0);
-      setHistoryTotalPages(d.totalPages ?? 1);
     } catch { /* ignore */ }
   }, [historyPage]);
 
