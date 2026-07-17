@@ -3,7 +3,7 @@
 **Living work queue.** Priorities from `PROJECT_AUDIT.md`.  
 **Statuses:** `Completed` | `In Progress` | `Pending` | `Future`  
 **Rule:** Do not start Pending/Future implementation without approval.  
-**Last updated:** 2026-07-17  
+**Last updated:** 2026-07-17 (H03 SSR slim-list reconciled locally)  
 
 ---
 
@@ -19,9 +19,9 @@
 
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
-| H01 | Confirm Supabase migrations `001`–`030` applied on each environment | Pending | Ops |
-| H02 | Confirm required env (`SUPABASE_*`, `DEEPSEEK_API_KEY`, `NEXT_PUBLIC_SITE_URL`, service role, Upstash for prod) | Pending | Ops |
-| H03 | Commit/reconcile Website Builder SSR slim-list fix (no full blueprint on list) | Pending | Working tree; needs approval to land on `main` |
+| H01 | Confirm Supabase migrations `001`–`030` applied on each environment | Completed (configured env) | Local `.env.local` Supabase: `public.schema_migrations` has all **30** IDs; table probes OK; `npm run db:verify` PASS. Separate staging/prod not configured locally — re-verify when those URLs are available. |
+| H02 | Confirm required env (`SUPABASE_*`, `DEEPSEEK_API_KEY`, `NEXT_PUBLIC_SITE_URL`, service role, Upstash for prod) | Completed (local audit) | See H02 notes below. Local gaps: `NEXT_PUBLIC_SITE_URL`. Prod blockers if launching from this file: service role + Upstash + SITE_URL. Anon key length WARN. |
+| H03 | Commit/reconcile Website Builder SSR slim-list fix (no full blueprint on list) | Completed (local WT) | `website-product-page.tsx`: no SSR `select("*")` / no first-row full blueprint; slim columns + stub; client hydrate via GET `[id]`. Not on remote until committed. |
 | H04 | Commit/reconcile React 19–safe theme migration (no client script crash) | Pending | Working tree |
 | H05 | Commit/reconcile generation file-cap + soft-pass (prevent runaway loops) | Pending | Working tree |
 | H06 | Authenticated smoke: `/dashboard/website-builder` loads + generate → save → download | Pending | After H03–H05 |
@@ -73,6 +73,9 @@
 | C08 | Security baseline (RLS, rate limits, headers) | Completed | Ongoing vigilance |
 | C09 | Profile API content-type / PUT fixes | Completed | See FIX_REPORT (historical) |
 | C10 | Generation runaway file-tree mitigation (WT) | Completed (local only) | **Not done on remote until H05 lands** — do not treat as shipped |
+| C11 | H01 migrations `001`–`030` on configured env | Completed | Staging/prod separate URLs not verified |
+| C12 | H02 env configuration audit (local `.env.local`) | Completed | Prod gaps documented; staging/prod hosting env not separately audited |
+| C13 | H03 Website Builder SSR slim-list (no full blueprint on list) | Completed (local WT) | Still needs git commit/push to land on remote `main` |
 
 ---
 
@@ -81,7 +84,7 @@
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
 | I01 | Docs as single source of truth | In Progress | This folder |
-| I02 | Production ops readiness | In Progress | Env/migrations/E2E open |
+| I02 | Production ops readiness | In Progress | H01+H02 local audits done; fill SITE_URL/service role/Upstash before prod; E2E open |
 
 ---
 
@@ -103,8 +106,8 @@
 
 ## Execution order (recommended after approval)
 
-1. H01–H02 (ops)  
-2. H03–H05 (land critical WT fixes)  
+1. ~~H01~~ / ~~H02~~ (ops audits done for local) → ~~H03~~ (SSR local) → next: **H04–H05**  
+2. H04–H05 (land remaining critical WT fixes)  
 3. H06 (smoke)  
 4. H07–H08 (preview honesty/policy)  
 5. M01–M03 (clarity)  
@@ -113,3 +116,49 @@
 ---
 
 **Wait for approval before implementing any Pending/Future application tasks.**
+
+### H01 verification notes (2026-07-17)
+
+| Check | Result |
+|-------|--------|
+| Environment | `.env.local` → `SUPABASE_DB_URL` (Supabase pooler `aws-1-us-east-1`) |
+| Repo files | 30 SQL migrations `001`…`030` |
+| `public.schema_migrations` | **30/30** applied; none missing; no extras |
+| Table probes (core + billing + growth) | All expected tables **present** |
+| `npm run db:verify` (021–024 platform) | **PASS** |
+| Official `supabase_migrations.schema_migrations` | Only 001–008 rows (CLI history incomplete; project uses `public.schema_migrations` via `db:apply`) |
+| Staging / separate production | **Not verified** — no additional env files/URLs available locally |
+| App code changes | **None** |
+
+### H02 verification notes (2026-07-17)
+
+**Scope:** Local `.env.local` only (no `.env.production` / `.env.staging` on disk). Values never logged; status only.
+
+| Variable | Local status | Severity |
+|----------|--------------|----------|
+| `NEXT_PUBLIC_SUPABASE_URL` | **SET** (valid `*.supabase.co` HTTPS URL) | OK |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | **SET** but **len=46** (classic Supabase anon JWTs are usually 100+ chars) | **WARN** — confirm full anon key in Supabase Dashboard → Settings → API |
+| `DEEPSEEK_API_KEY` | **SET** | OK for default AI |
+| `SUPABASE_DB_URL` | **SET** (used by H01 / `db:apply`) | OK for ops |
+| `NEXT_PUBLIC_SITE_URL` | **MISSING** | **Gap** — local falls back to `http://localhost:3000` via `getOptionalSiteUrl`; **required for Vercel production** (`lib/env.ts`) |
+| `SUPABASE_SERVICE_ROLE_KEY` | **MISSING** | **Prod / billing gap** — needed for admin client + PayPal webhook fulfillment |
+| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | **MISSING** | **Prod recommended** — without them, production rate limits are per-instance memory only |
+| `WEBSITE_PREVIEW_BUILDER_ENABLED` | unset | OK / H08-aligned (treated as off) |
+| PayPal (`PAYPAL_*`) | all **MISSING** | Expected until billing go-live |
+| Optional AI (`OPENAI_*`, `ANTHROPIC_*`, stubs) | **MISSING** | OK — DeepSeek is default; placeholders stay disabled |
+
+**Keys present in `.env.local` (4):** `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `DEEPSEEK_API_KEY`, `SUPABASE_DB_URL`.
+
+**Production readiness from this file alone:** **Not launch-ready** until SITE_URL + service role (+ Upstash recommended) are set in the real hosting env. Re-run H02 against staging/prod dashboards when those targets exist.
+
+### H03 verification notes (2026-07-17)
+
+| Check | Result |
+|-------|--------|
+| HEAD bug | Fallback `select("*")` + first-row full `blueprint` on SSR |
+| Fix file | `components/dashboard/product-engine/website-product-page.tsx` only |
+| List path | `WEBSITE_LIST_COLUMNS` (no blueprint) |
+| Fallback | `WEBSITE_LIST_COLUMNS_CORE` (no blueprint) — never `select("*")` |
+| Detail | Client `GET /api/website-builder/[id]` (unchanged) |
+| Out of scope | Reverted unrelated lazy `productId` prop experiment |
+| Git | Local WT reconciled; **not committed** unless approved |

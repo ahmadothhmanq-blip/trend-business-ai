@@ -7,6 +7,20 @@ import { logger } from "@/lib/logger";
 import type { ProductId } from "@/lib/products/types";
 import type { WebsiteGeneration } from "@/types/database";
 
+/** Core columns without blueprint — used if Phase 5 list columns fail. */
+const WEBSITE_LIST_COLUMNS_CORE =
+  "id,user_id,project_name,website_type,business_description,target_audience,language,color_style,design_style,page_count,features,is_favorite,created_at,updated_at";
+
+function toListStub(
+  row: Omit<WebsiteGeneration, "blueprint"> | Record<string, unknown>,
+): WebsiteGeneration {
+  return { ...row, blueprint: { files: [] } } as unknown as WebsiteGeneration;
+}
+
+/**
+ * SSR loads a slim project list only — never blueprint JSONB.
+ * Full blueprints hydrate on the client via GET /api/website-builder/[id].
+ */
 export async function WebsiteProductPage({ productId }: { productId: ProductId }) {
   const product = getProductDefinition(productId);
   if (product.kind !== "website") {
@@ -31,31 +45,27 @@ export async function WebsiteProductPage({ productId }: { productId: ProductId }
 
     if (listError) {
       logger.error("Website list load failed", "website-product-page", {}, listError);
-      const { data: fallback } = await supabase
+      const { data: fallback, error: fallbackError } = await supabase
         .from("website_generations")
-        .select("*")
+        .select(WEBSITE_LIST_COLUMNS_CORE)
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .range(0, 19);
-      initialGenerations = (fallback ?? []) as WebsiteGeneration[];
-    } else {
-      const list = (rows ?? []) as Omit<WebsiteGeneration, "blueprint">[];
-      const firstId = list[0]?.id;
 
-      if (firstId) {
-        const { data: firstFull } = await supabase
-          .from("website_generations")
-          .select("*")
-          .eq("id", firstId)
-          .eq("user_id", user.id)
-          .maybeSingle();
-
-        initialGenerations = list.map((row) =>
-          row.id === firstId && firstFull
-            ? (firstFull as WebsiteGeneration)
-            : ({ ...row, blueprint: { files: [] } } as unknown as WebsiteGeneration),
+      if (fallbackError) {
+        logger.error(
+          "Website list core fallback failed",
+          "website-product-page",
+          {},
+          fallbackError,
         );
       }
+
+      initialGenerations = (fallback ?? []).map((row) => toListStub(row));
+    } else {
+      initialGenerations = (rows ?? []).map((row) =>
+        toListStub(row as Omit<WebsiteGeneration, "blueprint">),
+      );
     }
   }
 

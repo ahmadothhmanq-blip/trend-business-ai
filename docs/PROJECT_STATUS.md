@@ -3,7 +3,7 @@
 **Living status board** (update when work lands).  
 **Based on:** `PROJECT_AUDIT.md` + docs review (2026-07-17)  
 **Git HEAD (remote tip at audit):** `fa44510`  
-**Branch:** `main`  
+**Branch:** `cursor/docs-ssot-audit-plan` (docs) / local WT may differ from remote `main`  
 **Baseline rule:** Status reflects **local working tree** unless marked “HEAD only” (see D-011).  
 
 ---
@@ -19,9 +19,10 @@
 | Default AI | DeepSeek (real) |
 | Dashboard routes | 40 dirs / 42 pages |
 | API routes | 73 |
-| Migrations | 30 |
-| Docs on remote | **May be untracked** until L08 |
-| Blocking for honest launch messaging | Preview honesty + ops env + commit critical WT fixes (H03–H05) |
+| Migrations | **30/30 applied** on configured `.env.local` DB (H01) |
+| Local env (H02) | Core AI/Supabase **partial** — SITE_URL / service role / Upstash **missing**; anon key length WARN |
+| Docs on remote | Feature branch; merge to `main` still L08 |
+| Blocking for honest launch messaging | Preview honesty + fill prod env gaps (H02) + commit remaining WT fixes (H04–H05) + commit H03 |
 
 ---
 
@@ -44,7 +45,7 @@
 | Live Preview | **Pending** / frozen | Flag off; unsafe builder if enabled |
 | Async generation jobs | **Future** | Not built |
 | Placeholder AI providers | **Future** | Stubs only |
-| Production launch checklist | **In Progress** (ops) | Env/migrations/E2E still open |
+| Production launch checklist | **In Progress** (ops) | H01 OK; H02 local audit done — prod still needs SITE_URL, service role, Upstash; E2E open |
 
 ---
 
@@ -59,14 +60,16 @@
 - Phases 12–22 hardening work in-repo  
 - Phase 1 audit documentation (`docs/PROJECT_AUDIT.md`)  
 - Docs SSOT pack (this folder)  
+- **H01:** Migrations `001`–`030` confirmed on configured `.env.local` Supabase (`public.schema_migrations` = 30/30; platform `db:verify` PASS). Staging/prod not separately verified.  
+- **H03:** Website Builder SSR slim-list reconciled in WT (`website-product-page.tsx`) — no full blueprint on list/fallback; awaiting commit to remote.  
 
 ### Working-tree fixes (not yet guaranteed on remote `main`)
 
 Treat as **In Progress** until committed/pushed:
 
-- Theme: React 19–safe provider (no `next-themes` script crash)  
-- Website list SSR: slim columns, no full blueprint on list  
-- Generation: 18-file cap + soft-pass validation  
+- ~~Website list SSR: slim columns, no full blueprint on list~~ → **done in WT (H03)**; commit still required  
+- Theme: React 19–safe provider (no `next-themes` script crash) — **H04**  
+- Generation: 18-file cap + soft-pass validation — **H05**  
 - Dev: avoid immutable cache on `/_next/static` in development  
 
 ---
@@ -75,8 +78,8 @@ Treat as **In Progress** until committed/pushed:
 
 | Item | Owner | Notes |
 |------|-------|-------|
-| Reconcile WT critical fixes → `main` | Pending approval | Theme, SSR list, generation bounds |
-| Ops production readiness | Pending | Env, migrations apply, Upstash, SITE_URL |
+| Reconcile WT critical fixes → `main` | Pending approval | **H03 done locally**; theme (H04), generation bounds (H05) next |
+| Ops production readiness | Pending | **H01+H02** local done; fill SITE_URL / service role / Upstash on real prod; E2E open |
 | Docs as SSOT | Active | This pack |
 
 ---
