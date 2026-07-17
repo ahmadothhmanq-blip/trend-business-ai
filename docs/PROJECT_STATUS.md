@@ -15,14 +15,14 @@
 | Overall | **Beta / pre-production** |
 | Product type today | Multi-AI SaaS + **code project** generator |
 | Hosted live websites | **Not delivered** |
-| Live Preview | **Off** (`LIVE_PREVIEW_ENABLED = false`); UI honesty via **H07** (Download/ZIP messaging) |
+| Live Preview | **Off** — H07 UI honesty + **H08** production hard-disable of preview builder |
 | Default AI | DeepSeek (real) |
 | Dashboard routes | 40 dirs / 42 pages |
 | API routes | 73 |
 | Migrations | **30/30 applied** on configured `.env.local` DB (H01) |
 | Local env (H02) | Core AI/Supabase **partial** — SITE_URL / service role / Upstash **missing**; anon key length WARN |
 | Docs on remote | Feature branch; merge to `main` still L08 |
-| Blocking for honest launch messaging | H08 preview env policy + fill prod env gaps (H02) + re-run H06 with confirmed user + merge H03–H05 to `main` + M01 marketing copy |
+| Blocking for honest launch messaging | Fill prod env gaps (H02) + re-run H06 with confirmed user + merge Phase 2 to `main` + M01 marketing copy |
 
 ---
 
@@ -42,7 +42,7 @@
 | Orgs / Team | **Completed** (partial) | DB + UI; invite email ESP incomplete |
 | SEO / AI Search / Growth | **Completed** (core) | Phase 17/22 |
 | Security baseline | **Completed** (advanced) | RLS, rate limits, headers |
-| Live Preview | **Off** (honest UI) | Flag off; H07 Download messaging; unsafe builder if enabled (H08) |
+| Live Preview | **Off** (honest + guarded) | H07 Download UI; H08 hard-disables builder in production |
 | Async generation jobs | **Future** | Not built |
 | Placeholder AI providers | **Future** | Stubs only |
 | Production launch checklist | **In Progress** (ops) | H01 OK; H02 local audit done — prod still needs SITE_URL, service role, Upstash; E2E open |
@@ -66,6 +66,7 @@
 - **H05:** Generation **18-file cap + soft-pass** verified (committed on branch).  
 - **H06:** Smoke **partial** — health + login redirect PASS; in-process generate→ZIP PASS (18 files/~77s). Cookie-auth HTTP generate blocked by Supabase email confirmation (ops), not app code.  
 - **H07:** Live Preview honesty — frozen “Live Preview” replaced with **Download project / ZIP** messaging; preview remains off.  
+- **H08:** Preview builder **production hard-disable** + fail-closed env policy until F01 sandbox redesign.  
 
 ### Working-tree fixes (not yet guaranteed on remote `main`)
 
@@ -116,7 +117,7 @@ See `TASK_QUEUE.md` High/Medium. Summary:
 
 ## Known Risks (Open)
 
-1. ~~Preview UI trust gap (frozen Live Preview)~~ → mitigated by H07; keep H08 env policy  
+1. ~~Preview UI trust gap / unsafe builder~~ → mitigated by H07 + H08; F01 for safe preview later  
 
 2. Uncommitted fixes may diverge local vs GitHub  
 3. Sequential DeepSeek latency; progress can look stuck  

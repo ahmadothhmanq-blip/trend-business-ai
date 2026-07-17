@@ -12,8 +12,24 @@ import { z } from "zod";
 
 const execAsync = promisify(exec);
 const GENERATED_ROOT = path.join(process.cwd(), ".next", "generated-projects");
-const PREVIEW_BUILDER_ENABLED =
-  process.env.WEBSITE_PREVIEW_BUILDER_ENABLED === "true";
+
+/**
+ * Preview builder runs npm install + next build on untrusted generated trees (RCE risk).
+ * H08 / D-004: keep disabled until a sandboxed design is Accepted (F01).
+ * - Fail closed unless WEBSITE_PREVIEW_BUILDER_ENABLED === "true"
+ * - Always disabled in production / Vercel production, even if the flag is set
+ */
+function isPreviewBuilderEnabled() {
+  const flagOn = process.env.WEBSITE_PREVIEW_BUILDER_ENABLED === "true";
+  if (!flagOn) return false;
+
+  const isProductionRuntime =
+    process.env.NODE_ENV === "production" ||
+    process.env.VERCEL_ENV === "production";
+
+  if (isProductionRuntime) return false;
+  return true;
+}
 
 export const runtime = "nodejs";
 
@@ -160,9 +176,12 @@ export async function POST(request: Request) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  if (!PREVIEW_BUILDER_ENABLED) {
+  if (!isPreviewBuilderEnabled()) {
     return NextResponse.json(
-      { error: "Live Preview builder is temporarily disabled." },
+      {
+        error:
+          "Preview builder is disabled. Download the project ZIP and run or deploy it yourself. Production builds cannot enable WEBSITE_PREVIEW_BUILDER_ENABLED until a sandboxed preview is approved.",
+      },
       { status: 503 },
     );
   }

@@ -46,7 +46,7 @@
 
 1. **Never** SSR-load full `blueprint` JSONB for list pages. Use slim list columns; hydrate detail via API.  
 2. Keep generation bounded (file cap / soft-pass philosophy from audit — avoid 50–180 file runaway loops).  
-3. Do not enable `WEBSITE_PREVIEW_BUILDER_ENABLED` in production without a security review (RCE risk via install/build).  
+3. Do not enable `WEBSITE_PREVIEW_BUILDER_ENABLED` without a security review (RCE risk via install/build). **H08:** production/`VERCEL_ENV=production` hard-disables the builder even if the flag is `"true"`.  
 4. Progress UI must not fake completion; prefer real status or honest “still generating” states.
 
 ---
