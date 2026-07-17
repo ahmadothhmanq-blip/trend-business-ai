@@ -53,7 +53,7 @@
 | L03 | Normalize naming (`deepseek.ts` facade, slug vs product id) | Pending | Careful, wide touch — pause if blast radius unclear |
 | L04 | Consolidate dual product engines (dedicated vs generic workspace) | Pending | Design first — hard gate |
 | L05 | Dashboard bundle performance budgets | Pending | |
-| L06 | Archive/consolidate root phase report markdown into `docs/` index | Pending | |
+| L06 | Archive/consolidate root phase report markdown into `docs/` index | Done | Index only — files stay at root (`HISTORICAL_REPORTS.md`) |
 | L07 | Remove empty plugin stub dirs + empty `app/api/test-generation/` | Pending | Ready — 8 empty plugin stubs + `app/api/test-generation` (deletion approval skipped) |
 | L08 | Commit `docs/` pack to `main` so SSOT is on remote | Pending | Docs-only commit OK when approved |
 

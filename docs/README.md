@@ -15,12 +15,14 @@ Living documentation for the **existing** Trend Business AI project.
 | [ROADMAP.md](./ROADMAP.md) | Phased implementation plan |
 | [FINAL_REVIEW.md](./FINAL_REVIEW.md) | Docs validation summary |
 | [AUTONOMOUS_EXECUTION.md](./AUTONOMOUS_EXECUTION.md) | Agent loop: explain → implement → test → commit → continue |
+| [HISTORICAL_REPORTS.md](./HISTORICAL_REPORTS.md) | Index of root phase `*_REPORT.md` files (read-only) |
 
 **How to use**
 
 - **Day-to-day planning / agents:** start with `PROJECT_MASTER_BLUEPRINT.md` + `TASK_QUEUE.md` + `DECISIONS_LOG.md`.  
 - **Autonomous execution:** follow `AUTONOMOUS_EXECUTION.md` + next Pending task in `TASK_QUEUE.md`.  
 - **Deep onboarding / full inventory:** read `MASTER_PROJECT_DOCUMENTATION.md`.  
+- **Historical phase reports:** see `HISTORICAL_REPORTS.md` (do not use as the active plan).  
 - **Docs health:** see `FINAL_REVIEW.md`.
 
 **Rules**

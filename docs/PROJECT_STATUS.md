@@ -73,6 +73,7 @@
 - **M04:** Root README updated for multi-product + ZIP delivery reality.  
 - **M05:** Website Builder generation progress uses SSE server stages + elapsed time (no fake 92% bar).  
 - **L02:** Removed unused scaffold files (`platform-dashboard-page`, `dashboard-platform-pages`, `scaffold-page`).  
+- **L06:** Root phase reports indexed in `docs/HISTORICAL_REPORTS.md` (files remain at root).  
 
 ### Working-tree fixes (not yet guaranteed on remote `main`)
 
