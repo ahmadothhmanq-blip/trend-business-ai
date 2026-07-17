@@ -78,16 +78,29 @@
 
 ---
 
-## D-004 — Live Preview stays off until a safe design is approved
+## D-004 — Unsafe npm Live Preview builder stays off
 
 | Field | Value |
 |-------|--------|
 | Date | 2026-07-17 |
-| Status | **Accepted** (H07 UI honesty + H08 production hard-disable landed; preview still off) |
-| Context | `LIVE_PREVIEW_ENABLED = false`; preview builder can run install/build on generated projects (RCE risk) |
-| Decision | Keep preview disabled in production. Either (a) honest “Download / Deploy” messaging, or (b) a future **sandboxed** preview that does not execute arbitrary package installs. |
-| Consequences | Do not flip `WEBSITE_PREVIEW_BUILDER_ENABLED=true` without security review. H07: Download/ZIP UI. H08: API hard-disables builder when `NODE_ENV` or `VERCEL_ENV` is production, even if the env flag is `"true"`. |
-| Related | Tasks H07 (done), H08 (done), F01 |
+| Status | **Accepted** (refined by D-017) |
+| Context | Preview builder can run install/build on generated projects (RCE risk) |
+| Decision | Keep **`WEBSITE_PREVIEW_BUILDER_ENABLED`** fail-closed / production hard-disabled. Do **not** use npm install + Next build for customer preview. |
+| Consequences | H08 remains. Safe in-platform preview is D-017 (static HTML sandbox), not this builder. |
+| Related | H07, H08, D-017, F01 |
+
+---
+
+## D-017 — Safe sandboxed live preview + prepared hosted URL
+
+| Field | Value |
+|-------|--------|
+| Date | 2026-07-17 |
+| Status | **Accepted** |
+| Context | Core Product Principle requires preview + path to publish without RCE |
+| Decision | **Live preview** = authenticated `GET /api/website-builder/[id]/live-preview` serving sanitized static HTML from the generation blueprint (multi-page, no scripts). **Publish** = prepare `website_publications` + planned `/w/[slug]`; public go-live gated by `WEBSITE_PUBLISH_ENABLED` and `status=published`. |
+| Consequences | Users view generated sites inside the platform. ZIP/export remains. npm preview builder stays off (D-004). See `docs/WEBSITE_PUBLISH_ARCHITECTURE.md`. |
+| Related | D-004, D-003, D-015, F01, F02, F09 |
 
 ---
 

@@ -20,6 +20,7 @@ Living documentation for the **existing** Trend Business AI project.
 | [PERFORMANCE_BUDGETS.md](./PERFORMANCE_BUDGETS.md) | Dashboard bundle budgets (advisory / warn-only) |
 | [PRODUCTION_CLEANUP_REPORT.md](./PRODUCTION_CLEANUP_REPORT.md) | Latest production cleanup results |
 | [WEBSITE_BUILDER_PHASE1_REPORT.md](./WEBSITE_BUILDER_PHASE1_REPORT.md) | Website Builder Phase 1 product gaps completed / remaining |
+| [WEBSITE_PUBLISH_ARCHITECTURE.md](./WEBSITE_PUBLISH_ARCHITECTURE.md) | Safe live preview + hosted `/w/[slug]` publish architecture |
 
 **How to use**
 

@@ -2,7 +2,7 @@ import type { GeneratedProjectFile } from "@/plugins/website/types";
 
 const PREVIEW_PATH = "preview/index.html";
 
-type StaticPreviewInput = {
+export type StaticPreviewInput = {
   title?: string;
   description?: string;
   pages?: string[];
@@ -22,29 +22,53 @@ function escapeHtml(value: string): string {
     .replaceAll("'", "&#39;");
 }
 
+function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 48) || "page";
+}
+
 function pickColor(palette: string[] | undefined, index: number, fallback: string) {
   const raw = palette?.[index]?.trim();
   if (!raw) return fallback;
-  // Accept "#hex" or "Name #hex" / "Name: #hex"
   const match = raw.match(/#([0-9a-fA-F]{3,8})\b/);
   if (match) return `#${match[1]}`;
   if (/^[a-zA-Z]+$/.test(raw)) return raw;
   return fallback;
 }
 
+function sanitizePreviewHtml(html: string): string {
+  return html
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+    .replace(/\son\w+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, "")
+    .replace(/javascript:/gi, "");
+}
+
 /**
- * Build a self-contained marketing preview HTML from blueprint metadata.
- * Safe for iframe srcdoc — no scripts, no external network except system fonts.
+ * Build a self-contained multi-page website preview (CSS :target navigation).
+ * No scripts — safe for sandboxed iframe / live-preview route.
  */
 export function buildStaticPreviewHtml(input: StaticPreviewInput): string {
   const title = escapeHtml(input.title?.trim() || "Website Preview");
   const description = escapeHtml(
-    input.description?.trim() || "AI-generated website concept preview.",
+    input.description?.trim() || "AI-generated website product preview.",
   );
-  const pages = (input.pages ?? []).map((p) => p.trim()).filter(Boolean).slice(0, 8);
+  const pageNames = (input.pages ?? [])
+    .map((p) => p.trim())
+    .filter(Boolean)
+    .slice(0, 8);
+  const pages = (pageNames.length ? pageNames : ["Home", "About", "Services", "Contact"]).map(
+    (name, index) => ({
+      name,
+      slug: slugify(name) || `page-${index + 1}`,
+    }),
+  );
   const sections = (input.sections ?? []).map((s) => s.trim()).filter(Boolean).slice(0, 10);
-  const content = (input.content ?? []).map((c) => c.trim()).filter(Boolean).slice(0, 8);
-  const components = (input.components ?? []).map((c) => c.trim()).filter(Boolean).slice(0, 6);
+  const content = (input.content ?? []).map((c) => c.trim()).filter(Boolean).slice(0, 12);
+  const components = (input.components ?? []).map((c) => c.trim()).filter(Boolean).slice(0, 8);
   const typography = (input.typography ?? []).map((t) => t.trim()).filter(Boolean);
 
   const bg = pickColor(input.colorPalette, 0, "#0a0a0a");
@@ -52,28 +76,48 @@ export function buildStaticPreviewHtml(input: StaticPreviewInput): string {
   const accent = pickColor(input.colorPalette, 2, "#d4af37");
   const text = pickColor(input.colorPalette, 3, "#f5f5f5");
   const muted = pickColor(input.colorPalette, 4, "#a3a3a3");
-
   const headingFont = escapeHtml(typography[0] || "Georgia, serif");
   const bodyFont = escapeHtml(typography[1] || "system-ui, sans-serif");
 
-  const navItems = (pages.length ? pages : ["Home", "About", "Services", "Contact"])
+  const navItems = pages
     .map(
       (page) =>
-        `<a href="#${escapeHtml(page.toLowerCase().replace(/\s+/g, "-"))}">${escapeHtml(page)}</a>`,
+        `<a href="#${escapeHtml(page.slug)}">${escapeHtml(page.name)}</a>`,
     )
     .join("");
 
-  const sectionBlocks = (sections.length ? sections : ["Hero", "Features", "About", "CTA"])
-    .map((section, index) => {
-      const body =
-        content[index] ||
-        content[0] ||
-        "Professional content generated for this section of your website.";
+  const pageViews = pages
+    .map((page, pageIndex) => {
+      const pageSections =
+        sections.length > 0
+          ? sections.slice(0, 4)
+          : ["Overview", "Details", "Benefits", "Get started"];
+      const sectionHtml = pageSections
+        .map((section, sectionIndex) => {
+          const body =
+            content[pageIndex * 2 + sectionIndex] ||
+            content[sectionIndex] ||
+            content[0] ||
+            `${page.name}: professional content for the ${section} section.`;
+          return `
+          <article class="block">
+            <p class="eyebrow">${escapeHtml(section)}</p>
+            <h2>${escapeHtml(section)}</h2>
+            <p class="copy">${escapeHtml(body)}</p>
+          </article>`;
+        })
+        .join("\n");
+
+      const isHome = pageIndex === 0;
       return `
-      <section class="block" id="${escapeHtml(section.toLowerCase().replace(/\s+/g, "-"))}">
-        <p class="eyebrow">${escapeHtml(section)}</p>
-        <h2>${escapeHtml(section)}</h2>
-        <p class="copy">${escapeHtml(body)}</p>
+      <section class="page" id="${escapeHtml(page.slug)}">
+        <div class="hero">
+          <p class="eyebrow">${escapeHtml(page.name)}</p>
+          <h1>${isHome ? title : escapeHtml(page.name)}</h1>
+          <p>${isHome ? description : escapeHtml(`${page.name} page for ${input.title?.trim() || "your website"}.`)}</p>
+          <a class="cta" href="#${escapeHtml(pages[Math.min(1, pages.length - 1)]?.slug || page.slug)}">Continue</a>
+        </div>
+        <div class="grid">${sectionHtml}</div>
       </section>`;
     })
     .join("\n");
@@ -82,12 +126,14 @@ export function buildStaticPreviewHtml(input: StaticPreviewInput): string {
     .map((c) => `<span class="chip">${escapeHtml(c)}</span>`)
     .join("");
 
-  return `<!DOCTYPE html>
+  const defaultSlug = pages[0]?.slug || "home";
+
+  return sanitizePreviewHtml(`<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>${title} — Preview</title>
+  <title>${title} — Live Preview</title>
   <style>
     :root {
       --bg: ${bg};
@@ -97,49 +143,60 @@ export function buildStaticPreviewHtml(input: StaticPreviewInput): string {
       --muted: ${muted};
     }
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
       margin: 0;
       font-family: ${bodyFont};
       background: var(--bg);
       color: var(--text);
       line-height: 1.55;
+      min-height: 100vh;
     }
     header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 1rem;
-      padding: 1.1rem 1.5rem;
+      padding: 1rem 1.5rem;
       border-bottom: 1px solid rgba(212, 175, 55, 0.25);
       background: var(--surface);
       position: sticky;
       top: 0;
-      z-index: 2;
+      z-index: 5;
     }
     .brand {
       font-family: ${headingFont};
       font-weight: 700;
-      letter-spacing: 0.02em;
       color: var(--accent);
+      text-decoration: none;
     }
-    nav { display: flex; flex-wrap: wrap; gap: 0.85rem; }
+    nav { display: flex; flex-wrap: wrap; gap: 0.75rem; }
     nav a {
       color: var(--muted);
       text-decoration: none;
       font-size: 0.85rem;
+      padding: 0.35rem 0.55rem;
+      border-radius: 999px;
     }
-    nav a:hover { color: var(--accent); }
-    .hero {
-      padding: 3.5rem 1.5rem 2.5rem;
-      max-width: 920px;
-    }
+    nav a:hover { color: var(--accent); background: rgba(212,175,55,0.08); }
+    .page { display: none; padding-bottom: 2.5rem; min-height: calc(100vh - 72px); }
+    .page:target { display: block; }
+    body:not(:has(.page:target)) .page#${defaultSlug} { display: block; }
+    .hero { padding: 3rem 1.5rem 1.5rem; max-width: 960px; }
     .hero h1 {
       font-family: ${headingFont};
-      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-size: clamp(2rem, 4vw, 3.1rem);
       line-height: 1.1;
       margin: 0 0 1rem;
     }
-    .hero p { color: var(--muted); max-width: 48ch; margin: 0 0 1.5rem; }
+    .hero p { color: var(--muted); max-width: 52ch; margin: 0 0 1.4rem; }
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 0.7rem;
+      color: var(--accent);
+      margin: 0 0 0.45rem;
+    }
     .cta {
       display: inline-block;
       background: var(--accent);
@@ -149,27 +206,34 @@ export function buildStaticPreviewHtml(input: StaticPreviewInput): string {
       border-radius: 999px;
       text-decoration: none;
     }
-    main { padding: 0 1.5rem 3rem; display: grid; gap: 1rem; max-width: 920px; }
+    .grid {
+      padding: 0 1.5rem;
+      display: grid;
+      gap: 1rem;
+      max-width: 960px;
+    }
+    @media (min-width: 800px) {
+      .grid { grid-template-columns: 1fr 1fr; }
+    }
     .block {
       background: var(--surface);
       border: 1px solid rgba(212, 175, 55, 0.18);
       border-radius: 1.25rem;
-      padding: 1.35rem 1.4rem;
-    }
-    .eyebrow {
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      font-size: 0.7rem;
-      color: var(--accent);
-      margin: 0 0 0.4rem;
+      padding: 1.25rem 1.35rem;
     }
     .block h2 {
       font-family: ${headingFont};
-      margin: 0 0 0.55rem;
-      font-size: 1.35rem;
+      margin: 0 0 0.5rem;
+      font-size: 1.25rem;
     }
     .copy { margin: 0; color: var(--muted); }
-    .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0 1.5rem 2rem; max-width: 920px; }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 1.25rem 1.5rem 0;
+      max-width: 960px;
+    }
     .chip {
       border: 1px solid rgba(212, 175, 55, 0.3);
       color: var(--accent);
@@ -178,6 +242,7 @@ export function buildStaticPreviewHtml(input: StaticPreviewInput): string {
       font-size: 0.75rem;
     }
     footer {
+      margin-top: 2rem;
       padding: 1rem 1.5rem 2rem;
       color: var(--muted);
       font-size: 0.75rem;
@@ -187,21 +252,14 @@ export function buildStaticPreviewHtml(input: StaticPreviewInput): string {
 </head>
 <body>
   <header>
-    <div class="brand">${title}</div>
+    <a class="brand" href="#${escapeHtml(defaultSlug)}">${title}</a>
     <nav>${navItems}</nav>
   </header>
-  <section class="hero">
-    <h1>${title}</h1>
-    <p>${description}</p>
-    <a class="cta" href="#${escapeHtml((sections[0] || "hero").toLowerCase().replace(/\s+/g, "-"))}">Explore</a>
-  </section>
-  <main>
-    ${sectionBlocks}
-  </main>
+  ${pageViews}
   ${componentChips ? `<div class="chips">${componentChips}</div>` : ""}
-  <footer>Interactive product preview · Full Next.js source available via ZIP export</footer>
+  <footer>Live product preview inside Trend Business AI · Navigate pages above · Export ZIP for full Next.js source</footer>
 </body>
-</html>`;
+</html>`);
 }
 
 export function ensureStaticPreviewFile(
@@ -228,13 +286,9 @@ export function extractStaticPreviewHtml(
     (file) => file.path.replaceAll("\\", "/") === PREVIEW_PATH,
   );
   if (preview?.content?.includes("<html")) {
-    // Strip scripts for srcdoc safety even if present.
-    return preview.content.replace(
-      /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-      "",
-    );
+    return sanitizePreviewHtml(preview.content);
   }
   return buildStaticPreviewHtml(fallback);
 }
 
-export { PREVIEW_PATH };
+export { PREVIEW_PATH, sanitizePreviewHtml, slugify };

@@ -17,11 +17,13 @@ import {
   History,
   LayoutDashboard,
   Loader2,
+  Maximize2,
   MonitorSmartphone,
   Palette,
   RefreshCw,
   Search,
   Settings,
+  Smartphone,
   Sparkles,
   Star,
   Trash2,
@@ -42,7 +44,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { GeneratedProjectFile, GeneratedWebsiteProject } from "@/lib/website-generator";
-import { extractStaticPreviewHtml } from "@/lib/website/build-static-preview";
 import type { ProductDefinition } from "@/lib/products/types";
 import type { GenerationMode, PromptVersion, WebsiteGeneration } from "@/types/database";
 import { cn } from "@/lib/utils";
@@ -1267,7 +1268,49 @@ function ThemeButton({
   );
 }
 
-/** Product preview + export (safe static preview; compile Live Preview stays off — D-004). */
+type PreviewViewport = "desktop" | "tablet" | "mobile";
+
+function livePreviewSrc(projectId: string | undefined) {
+  return projectId ? `/api/website-builder/${projectId}/live-preview` : "";
+}
+
+function WebsiteLiveFrame({
+  projectId,
+  title,
+  className,
+  viewport = "desktop",
+}: {
+  projectId?: string;
+  title: string;
+  className?: string;
+  viewport?: PreviewViewport;
+}) {
+  const src = livePreviewSrc(projectId);
+  const widthClass =
+    viewport === "mobile" ? "max-w-[390px]" : viewport === "tablet" ? "max-w-[768px]" : "max-w-none";
+
+  if (!src) {
+    return (
+      <div className="flex h-full min-h-[280px] flex-col items-center justify-center gap-3 px-6 text-center">
+        <Globe2 className="size-10 text-premium-gold/50" />
+        <p className="text-sm text-white/50">Create a website to open live preview inside the platform.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className={cn("mx-auto w-full bg-black/40 transition-all", widthClass, className)}>
+      <iframe
+        title={title}
+        src={src}
+        sandbox=""
+        className="h-full min-h-[420px] w-full bg-black"
+      />
+    </div>
+  );
+}
+
+/** Safe live preview + export (sandboxed static HTML; npm compile builder stays off — D-004/D-017). */
 function PreviewAndExportPanel({
   activeProject,
   onDownload,
@@ -1279,18 +1322,31 @@ function PreviewAndExportPanel({
 }) {
   const generated = activeProject?.generatedProject;
   const fileCount = generated?.files.length ?? 0;
-  const previewHtml = generated
-    ? extractStaticPreviewHtml(generated.files, {
-        title: generated.title || activeProject?.title,
-        description: generated.description || activeProject?.description,
-        pages: generated.pages,
-        sections: generated.sections,
-        colorPalette: generated.colorPalette,
-        typography: generated.typography,
-        content: generated.content,
-        components: generated.components,
-      })
-    : "";
+  const [viewport, setViewport] = useState<PreviewViewport>("desktop");
+  const [liveOpen, setLiveOpen] = useState(false);
+  const [publishBusy, setPublishBusy] = useState(false);
+  const [plannedUrl, setPlannedUrl] = useState<string | null>(null);
+
+  async function preparePublish() {
+    if (!activeProject?.id) return;
+    setPublishBusy(true);
+    try {
+      const res = await fetch(`/api/website-builder/${activeProject.id}/publish`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error ?? "Could not prepare publish.");
+        return;
+      }
+      setPlannedUrl(data.publication?.planned_public_url ?? data.publication?.public_path ?? null);
+      toast.success(data.message ?? "Publish architecture prepared.");
+    } catch {
+      toast.error("Could not prepare publish.");
+    } finally {
+      setPublishBusy(false);
+    }
+  }
 
   return (
     <aside className="space-y-6 xl:sticky xl:top-28 xl:self-start">
@@ -1298,30 +1354,55 @@ function PreviewAndExportPanel({
         <div className="flex items-center gap-3">
           <DashboardIconBox icon={MonitorSmartphone} />
           <div>
-            <h3 className="font-bold text-white">Website preview</h3>
+            <h3 className="font-bold text-white">Live preview</h3>
             <p className="text-[13px] text-white/40">
-              Visual product preview of pages, design, and content.
+              View your generated website inside the platform.
             </p>
           </div>
         </div>
-        <div className="mt-5 overflow-hidden rounded-2xl border border-white/10 bg-black/40">
-          {previewHtml ? (
-            <iframe
-              title="Website product preview"
-              sandbox=""
-              srcDoc={previewHtml}
-              className="h-[420px] w-full bg-black"
-            />
-          ) : (
-            <div className="flex h-[280px] flex-col items-center justify-center gap-3 px-6 text-center">
-              <Globe2 className="size-10 text-premium-gold/50" />
-              <p className="text-sm text-white/50">
-                Create a website to see an interactive product preview here.
-              </p>
-            </div>
-          )}
+        <div className="mt-4 flex flex-wrap gap-2">
+          {(
+            [
+              ["desktop", MonitorSmartphone],
+              ["tablet", LayoutDashboard],
+              ["mobile", Smartphone],
+            ] as const
+          ).map(([key, Icon]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setViewport(key)}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[11px] font-semibold capitalize",
+                viewport === key
+                  ? "border-premium-gold/35 bg-premium-gold/12 text-premium-gold-light"
+                  : "border-white/10 text-white/45 hover:text-white/75",
+              )}
+            >
+              <Icon className="size-3.5" />
+              {key}
+            </button>
+          ))}
+        </div>
+        <div className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-black/40">
+          <WebsiteLiveFrame
+            projectId={activeProject?.id}
+            title="Website live preview"
+            viewport={viewport}
+            className="h-[420px]"
+          />
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            className="btn-ghost-gold h-10 rounded-xl"
+            onClick={() => setLiveOpen(true)}
+            disabled={!activeProject?.id}
+          >
+            <Maximize2 className="size-4" />
+            Open live preview
+          </Button>
           <Button
             type="button"
             variant="outline"
@@ -1343,28 +1424,88 @@ function PreviewAndExportPanel({
           </Button>
         </div>
         <p className="mt-3 text-[11px] leading-relaxed text-white/40">
-          Preview shows the marketing layout of your website product. ZIP exports the full Next.js
-          project for local run or your own hosting (not a hosted live URL yet).
+          Sandboxed live preview (no npm install). Navigate pages inside the preview. ZIP remains
+          available for full Next.js export.
         </p>
       </DashboardPanel>
 
       <DashboardPanel>
         <SectionHeader
-          icon={FileStack}
-          title="Workspace version"
-          description="Saved website versions stay linked for AI iteration."
+          icon={Globe2}
+          title="Publish (prepared)"
+          description="Safe hosted URL architecture — go-live stays gated."
         />
         <div className="mt-5 space-y-3">
           <InfoTile label="Website" value={activeProject?.title ?? "Not created yet"} />
-          <InfoTile label="Type" value={activeProject?.type ?? "—"} />
           <InfoTile label="Mode" value={activeProject?.mode ?? "generate"} />
           <InfoTile label="Files" value={String(fileCount)} />
           <InfoTile
-            label="Workspace project"
-            value={activeProject?.projectId ? "Linked" : "Will link on save"}
+            label="Planned URL"
+            value={plannedUrl ?? "Prepare publish to allocate /w/{slug}"}
           />
+          <Button
+            type="button"
+            variant="outline"
+            className="btn-ghost-gold h-10 w-full rounded-xl"
+            onClick={() => void preparePublish()}
+            disabled={!activeProject?.id || publishBusy}
+          >
+            {publishBusy ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                Preparing…
+              </>
+            ) : (
+              <>
+                <ExternalLink className="size-4" />
+                Prepare hosted URL
+              </>
+            )}
+          </Button>
         </div>
       </DashboardPanel>
+
+      <Dialog open={liveOpen} onOpenChange={setLiveOpen}>
+        <DialogContent className="max-h-[92vh] w-[min(1100px,96vw)] max-w-none border-white/10 bg-[#0c0c0c] p-0 text-white">
+          <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
+            <div>
+              <DialogTitle className="text-base font-bold">
+                {activeProject?.title ?? "Live preview"}
+              </DialogTitle>
+              <DialogDescription className="text-xs text-white/45">
+                In-platform website preview · sandboxed static delivery
+              </DialogDescription>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="btn-ghost-gold h-9 rounded-xl"
+                onClick={onImprove}
+              >
+                <Wand2 className="size-4" />
+                Improve
+              </Button>
+              <Button
+                type="button"
+                className="btn-gold h-9 rounded-xl font-bold text-luxury-black"
+                onClick={() => onDownload(activeProject)}
+              >
+                <Download className="size-4" />
+                ZIP
+              </Button>
+            </div>
+          </div>
+          <div className="h-[min(78vh,820px)] bg-black">
+            <WebsiteLiveFrame
+              projectId={activeProject?.id}
+              title="Fullscreen live preview"
+              viewport="desktop"
+              className="h-full min-h-[78vh]"
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </aside>
   );
 }
@@ -1652,19 +1793,6 @@ function OutputWorkspace({
     file.path.toLowerCase().includes(fileSearch.toLowerCase()),
   );
   const openTabs = files.slice(0, 5);
-  const generated = activeProject?.generatedProject;
-  const staticPreviewHtml = generated
-    ? extractStaticPreviewHtml(generated.files, {
-        title: generated.title || activeProject?.title,
-        description: generated.description || activeProject?.description,
-        pages: generated.pages,
-        sections: generated.sections,
-        colorPalette: generated.colorPalette,
-        typography: generated.typography,
-        content: generated.content,
-        components: generated.components,
-      })
-    : "";
 
   return (
     <DashboardPanel className="overflow-hidden p-0">
@@ -1688,7 +1816,7 @@ function OutputWorkspace({
               : "text-white/45 hover:text-white/75",
           )}
         >
-          Preview
+          Live preview
         </button>
         <button
           type="button"
@@ -1723,18 +1851,13 @@ function OutputWorkspace({
                 onRefreshPreview={onRefreshPreview}
                 onOpenPreview={onOpenPreview}
               />
-            ) : staticPreviewHtml ? (
-              <iframe
-                title="Website product preview"
-                sandbox=""
-                srcDoc={staticPreviewHtml}
-                className="h-full min-h-[720px] w-full bg-black"
-              />
             ) : (
-              <div className="flex h-full min-h-[720px] flex-col items-center justify-center gap-3 text-center text-white/45">
-                <MonitorSmartphone className="size-10 text-premium-gold/40" />
-                <p>Create a website to open the product preview.</p>
-              </div>
+              <WebsiteLiveFrame
+                projectId={activeProject?.id}
+                title="Website live preview workspace"
+                viewport="desktop"
+                className="h-full min-h-[720px]"
+              />
             )
           ) : (
             <CodeEditorWorkspace
