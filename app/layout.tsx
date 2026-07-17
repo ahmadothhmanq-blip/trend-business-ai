@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { AppToaster } from "@/components/providers/app-toaster";
@@ -6,6 +7,7 @@ import { AnalyticsNoscript, AnalyticsScripts } from "@/components/seo/analytics-
 import { CoreWebVitalsHints } from "@/components/seo/core-web-vitals-hints";
 import { rootMetadata } from "@/lib/seo/metadata";
 import { DEFAULT_LOCALE } from "@/lib/seo/site";
+import { THEME_COOKIE, resolveServerThemeClass } from "@/lib/theme/theme";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -26,15 +28,20 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = rootMetadata();
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const themeClass = resolveServerThemeClass(
+    cookieStore.get(THEME_COOKIE)?.value,
+  );
+
   return (
     <html
       lang={DEFAULT_LOCALE}
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${themeClass} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>
@@ -42,12 +49,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <AnalyticsNoscript />
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
+        <ThemeProvider defaultTheme="dark" enableSystem disableTransitionOnChange>
           <a
             href="#main-content"
             className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-premium-gold focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-luxury-black"
