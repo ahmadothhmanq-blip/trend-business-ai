@@ -19,17 +19,8 @@ import type {
   VideoOutput,
   VideoPluginInput,
 } from "@/plugins/video-studio/types";
+import { sanitizeSvgContent } from "@/lib/ai/sanitize";
 import type { GenerationContext, ValidationResult, ExportResult } from "@/lib/ai/types";
-
-function sanitizeSvg(svg: string): string {
-  if (!svg || typeof svg !== "string") return "";
-  let clean = svg.trim();
-  const start = clean.indexOf("<svg");
-  if (start > 0) clean = clean.slice(start);
-  const end = clean.lastIndexOf("</svg>");
-  if (end >= 0) clean = clean.slice(0, end + 6);
-  return clean;
-}
 
 async function analyzeVideo(
   input: VideoPluginInput,
@@ -111,7 +102,7 @@ async function generateVideo(
         musicDirection: result.musicDirection || "",
         sfxNotes: result.sfxNotes || "",
         transition: scene.transition,
-        svgStoryboard: sanitizeSvg(result.svgStoryboard),
+        svgStoryboard: sanitizeSvgContent(result.svgStoryboard),
       });
     } catch {
       scenes.push({
@@ -162,7 +153,7 @@ async function generateVideo(
         prompt: videoThumbnailPrompt(analysis, input.aspectRatio),
         schema: videoThumbnailSchema,
       });
-      thumbnailSvg = sanitizeSvg(result.svgCode);
+      thumbnailSvg = sanitizeSvgContent(result.svgCode);
     } catch { /* fallback */ }
   }
 

@@ -1,3 +1,4 @@
+import type { SupabaseMaybeSingleQueryClient } from "@/lib/api/supabase-query";
 import type { GeneratedProjectFile } from "@/lib/ai/types";
 import type { WebsiteGenerationInput } from "@/plugins/website/types";
 
@@ -75,17 +76,7 @@ type ParentContext = {
 
 /** Load prior website generation for regenerate / continue modes. */
 export async function loadWebsiteParentContext(
-  supabase: {
-    from: (table: string) => {
-      select: (columns: string) => {
-        eq: (col: string, val: string) => {
-          eq: (col: string, val: string) => {
-            maybeSingle: () => PromiseLike<{ data: unknown; error: unknown }>;
-          };
-        };
-      };
-    };
-  },
+  supabase: SupabaseMaybeSingleQueryClient,
   userId: string,
   parentGenerationId?: string,
 ): Promise<ParentContext> {

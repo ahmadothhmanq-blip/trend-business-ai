@@ -44,7 +44,8 @@ export async function POST(request: Request) {
   const data = parsed.data;
 
   if (data.mode === "aeo") {
-    const { mode: _mode, useAi, ...input } = data;
+    const { mode: _ignoredMode, useAi, ...input } = data;
+    void _ignoredMode;
     let result = analyzeAeo(input);
     if (useAi) {
       const limited = await enforceAiUsage(auth.supabase, auth.user!.id, "seo-analyzer");
@@ -55,7 +56,8 @@ export async function POST(request: Request) {
   }
 
   if (data.mode === "geo") {
-    const { mode: _mode, useAi, ...input } = data;
+    const { mode: _ignoredMode, useAi, ...input } = data;
+    void _ignoredMode;
     let result = analyzeGeo(input);
     if (useAi) {
       const limited = await enforceAiUsage(auth.supabase, auth.user!.id, "seo-analyzer");
@@ -66,12 +68,14 @@ export async function POST(request: Request) {
   }
 
   if (data.mode === "schema") {
-    const { mode: _mode, ...input } = data;
+    const { mode: _ignoredMode, ...input } = data;
+    void _ignoredMode;
     const result = validateSchema(input);
     return NextResponse.json({ mode: "schema", result });
   }
 
-  const { mode: _mode, useAi, ...input } = data;
+  const { mode: _ignoredMode, useAi, ...input } = data;
+  void _ignoredMode;
   let result = optimizeContent(input);
   if (useAi) {
     const limited = await enforceAiUsage(auth.supabase, auth.user!.id, "seo-analyzer");

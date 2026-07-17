@@ -19,17 +19,8 @@ import type {
   ImagePluginInput,
   ImageVariation,
 } from "@/plugins/image-generator/types";
+import { sanitizeSvgContent } from "@/lib/ai/sanitize";
 import type { GenerationContext, ValidationResult, ExportResult } from "@/lib/ai/types";
-
-function sanitizeSvg(svg: string): string {
-  if (!svg || typeof svg !== "string") return "";
-  let clean = svg.trim();
-  const svgStart = clean.indexOf("<svg");
-  if (svgStart > 0) clean = clean.slice(svgStart);
-  const svgEnd = clean.lastIndexOf("</svg>");
-  if (svgEnd >= 0) clean = clean.slice(0, svgEnd + 6);
-  return clean;
-}
 
 async function analyzeImage(
   input: ImagePluginInput,
@@ -104,7 +95,7 @@ async function generateImage(
         negativePrompt: result.negativePrompt || input.negativePrompt || "",
         aspectRatio: result.aspectRatio || input.aspectRatio,
         style: result.style || analysis.style,
-        svgConcept: sanitizeSvg(result.svgConcept),
+        svgConcept: sanitizeSvgContent(result.svgConcept),
       });
     } catch {
       concepts.push({

@@ -20,17 +20,8 @@ import type {
   LogoPluginInput,
   LogoVariation,
 } from "@/plugins/logo-designer/types";
+import { sanitizeSvgContent } from "@/lib/ai/sanitize";
 import type { GenerationContext, ValidationResult, ExportResult } from "@/lib/ai/types";
-
-function sanitizeSvg(svg: string): string {
-  if (!svg || typeof svg !== "string") return "";
-  let clean = svg.trim();
-  const svgStart = clean.indexOf("<svg");
-  if (svgStart > 0) clean = clean.slice(svgStart);
-  const svgEnd = clean.lastIndexOf("</svg>");
-  if (svgEnd >= 0) clean = clean.slice(0, svgEnd + 6);
-  return clean;
-}
 
 async function analyzeLogo(
   input: LogoPluginInput,
@@ -103,7 +94,7 @@ async function generateLogo(
       concepts.push({
         name: result.name || concept.name,
         description: result.description || concept.description,
-        svgCode: sanitizeSvg(result.svgCode),
+        svgCode: sanitizeSvgContent(result.svgCode),
       });
     } catch {
       concepts.push({ name: concept.name, description: concept.description, svgCode: "" });
@@ -141,7 +132,7 @@ async function generateLogo(
           name: result.name || varName,
           description: result.description || "",
           useCase: result.useCase || "",
-          svgCode: sanitizeSvg(result.svgCode),
+          svgCode: sanitizeSvgContent(result.svgCode),
         });
       } catch {
         variations.push({ name: varName, description: `${varName} variation`, useCase: "", svgCode: "" });

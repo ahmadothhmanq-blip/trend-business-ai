@@ -88,12 +88,14 @@ export function optimizeContent(input: ContentOptimizeBody): ContentOptimizeResu
           description: metaDescription,
           path,
         });
-        const { ["@context"]: _c, ...rest } = page;
+        const { ["@context"]: _ignoredContext, ...rest } = page;
+        void _ignoredContext;
         return rest;
       })(),
       (() => {
         const faqNode = faqPageJsonLd(faq);
-        const { ["@context"]: _c, ...rest } = faqNode;
+        const { ["@context"]: _ignoredContext, ...rest } = faqNode;
+        void _ignoredContext;
         return rest;
       })(),
     ],
@@ -201,12 +203,14 @@ Improve TITLE (max 60 chars), META (max 155 chars), SUMMARY (2 sentences), CTA (
               description: metaDescription.slice(0, 160),
               path: input.path || "/",
             });
-            const { ["@context"]: _c, ...rest } = page;
+            const { ["@context"]: _ignoredContext, ...rest } = page;
+            void _ignoredContext;
             return rest;
           })(),
           (() => {
             const faqNode = faqPageJsonLd(faq.length ? faq : result.faq);
-            const { ["@context"]: _c, ...rest } = faqNode;
+            const { ["@context"]: _ignoredContext, ...rest } = faqNode;
+            void _ignoredContext;
             return rest;
           })(),
         ],

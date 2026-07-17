@@ -19,6 +19,7 @@ import {
   PROVIDER_REGISTRY,
   getProviderLabel,
 } from "@/lib/ai/provider-config";
+import type { SupabaseSingleQueryClient } from "@/lib/api/supabase-query";
 import type { AIProviderSettings } from "@/types/ai-settings";
 
 class ProviderManager {
@@ -61,18 +62,7 @@ class ProviderManager {
 
   /** Load user settings from Supabase and set the active provider dynamically. */
   async loadUserSettings(
-    supabase: {
-      from: (table: string) => {
-        select: (columns: string) => {
-          eq: (
-            col: string,
-            val: string,
-          ) => {
-            single: () => PromiseLike<{ data: unknown; error: unknown }>;
-          };
-        };
-      };
-    },
+    supabase: SupabaseSingleQueryClient,
     userId: string,
   ): Promise<AIProviderSettings | null> {
     try {

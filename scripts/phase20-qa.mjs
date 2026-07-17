@@ -28,11 +28,6 @@ async function hit(m, p, body, extra = {}) {
   return { status: r ? r.status : 0, loc: r?.headers.get("location") || "", body: j, ms };
 }
 
-function assert(cond, msg) {
-  if (!cond) console.log("FAIL:", msg);
-  else console.log("PASS:", msg);
-}
-
 const results = { pass: 0, fail: 0, notes: [] };
 
 function record(ok, msg) {
