@@ -14,15 +14,17 @@ Living documentation for the **existing** Trend Business AI project.
 | [DECISIONS_LOG.md](./DECISIONS_LOG.md) | Architecture/product decisions |
 | [ROADMAP.md](./ROADMAP.md) | Phased implementation plan |
 | [FINAL_REVIEW.md](./FINAL_REVIEW.md) | Docs validation summary |
+| [AUTONOMOUS_EXECUTION.md](./AUTONOMOUS_EXECUTION.md) | Agent loop: explain → implement → test → commit → continue |
 
 **How to use**
 
 - **Day-to-day planning / agents:** start with `PROJECT_MASTER_BLUEPRINT.md` + `TASK_QUEUE.md` + `DECISIONS_LOG.md`.  
+- **Autonomous execution:** follow `AUTONOMOUS_EXECUTION.md` + next Pending task in `TASK_QUEUE.md`.  
 - **Deep onboarding / full inventory:** read `MASTER_PROJECT_DOCUMENTATION.md`.  
 - **Docs health:** see `FINAL_REVIEW.md`.
 
 **Rules**
 
-1. Do not modify application source code until implementation is explicitly approved.  
+1. Medium/Low Pending tasks may be implemented autonomously per `AUTONOMOUS_EXECUTION.md` (hard gates still apply).  
 2. Inventories describe the **local working tree**; note WT vs HEAD gaps (D-011).  
 3. Merge this docs branch to `main` when approved (task L08) so GitHub matches SSOT.

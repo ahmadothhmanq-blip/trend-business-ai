@@ -125,8 +125,8 @@
 | Status | **Accepted** |
 | Context | Gemini/Grok/Llama adapters throw |
 | Decision | Hide or clearly disable in production UI until implemented. |
-| Consequences | Task M02 before enabling in settings. |
-| Related | Task M02, F08 |
+| Consequences | **M02 (done):** production UI/API hide Gemini/Grok/Llama; stubs remain for local/dev and F08. |
+| Related | Task M02 (done), F08 |
 
 ---
 

@@ -44,7 +44,7 @@
 | Security baseline | **Completed** (advanced) | RLS, rate limits, headers |
 | Live Preview | **Off** (honest + guarded) | H07 Download UI; H08 hard-disables builder in production |
 | Async generation jobs | **Future** | Not built |
-| Placeholder AI providers | **Future** | Stubs only |
+| Placeholder AI providers | **Hidden in prod** | M02 — Gemini/Grok/Llama not in production settings UI; F08 for real adapters |
 | Production launch checklist | **In Progress** (ops) | H01 OK; H02 local audit done — prod still needs SITE_URL, service role, Upstash; E2E open |
 
 ---
@@ -68,6 +68,7 @@
 - **H07:** Live Preview honesty — frozen “Live Preview” replaced with **Download project / ZIP** messaging; preview remains off.  
 - **H08:** Preview builder **production hard-disable** + fail-closed env policy until F01 sandbox redesign.  
 - **M01:** Marketing/SEO/registry/tool copy aligned to ZIP + self-host delivery (D-003); no hosted-live claims.  
+- **M02:** Placeholder AI providers (Gemini/Grok/Llama) hidden from production settings UI/API (D-009).  
 
 ### Working-tree fixes (not yet guaranteed on remote `main`)
 
@@ -97,7 +98,7 @@ See `TASK_QUEUE.md` High/Medium. Summary:
 - ~~Honest Live Preview / Download messaging~~ → **H07 done**  
 - ~~Align marketing copy with ZIP delivery~~ → **M01 done**  
 
-- Hide placeholder providers  
+- ~~Hide placeholder providers~~ → **M02 done**  
 - Collapse duplicate product routes  
 - Authenticated smoke tests  
 - Commit + verify Website Builder load + generate path  

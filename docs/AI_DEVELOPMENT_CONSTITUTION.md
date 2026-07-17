@@ -69,7 +69,7 @@
 2. No drive-by refactors, no unrelated file churn.  
 3. Match existing naming, UI tokens (black/gold), and component patterns.  
 4. Do not downgrade Next/React/Supabase packages to “fix” issues.  
-5. Application source changes require **explicit user approval** after docs phases.
+5. Application source changes for **Pending Medium/Low** tasks may proceed under `docs/AUTONOMOUS_EXECUTION.md` when the user has authorized that workflow. **Future/`F*`**, architecture changes, and destructive ops still require an explicit stop/decision.
 
 ---
 

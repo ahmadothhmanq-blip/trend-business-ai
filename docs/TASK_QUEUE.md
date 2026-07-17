@@ -2,8 +2,8 @@
 
 **Living work queue.** Priorities from `PROJECT_AUDIT.md`.  
 **Statuses:** `Completed` | `In Progress` | `Pending` | `Future`  
-**Rule:** Do not start Pending/Future implementation without approval.  
-**Last updated:** 2026-07-17 (H08 preview builder production policy)  
+**Rule:** Autonomous Medium/Low execution authorized — see `AUTONOMOUS_EXECUTION.md`. Future/`F*` and hard gates still require a decision stop.  
+**Last updated:** 2026-07-17 (autonomous execution + M01 done)  
 
 ---
 
@@ -35,7 +35,7 @@
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
 | M01 | Align Website Builder / marketing copy with ZIP/code delivery | Done | Copy-only; ZIP/source honesty across marketing, SEO, registry, tool fallbacks (D-003) |
-| M02 | Hide placeholder AI providers (Gemini/Grok/Llama) in production UI | Pending | |
+| M02 | Hide placeholder AI providers (Gemini/Grok/Llama) in production UI | Done | `getUserFacingProviderNames` + API/UI sanitize (D-009) |
 | M03 | Collapse duplicate routes (`brand-designer` vs `brand-studio`, `creative-studio` vs `image-generator`, etc.) | Pending | Redirects OK |
 | M04 | Update root README to match current multi-product reality | Pending | Docs only OK anytime |
 | M05 | Real generation progress (avoid fake stuck ~90% feel) | Pending | Prefer server events / clearer status |
@@ -109,16 +109,17 @@
 
 ---
 
-## Execution order (recommended after approval)
+## Execution order (autonomous)
 
 1. ~~H01~~ … ~~H08~~ (Phase 2 High complete aside from merge/ops follow-ups)  
-2. M01–M03 (clarity)  
+2. ~~M01~~ → M02 → M03 → M04 → M05 (clarity + generation UX)  
 3. Re-run H06 with confirmed test user when email confirm / full anon JWT available  
-4. Then Medium/Low / Future per `ROADMAP.md`  
+4. Then remaining Medium/Low per `AUTONOMOUS_EXECUTION.md` hard gates  
+5. Future/`F*` only after `DECISIONS_LOG.md` Accepted entry  
 
 ---
 
-**Wait for approval before implementing any Pending/Future application tasks.**
+**Autonomous mode:** implement → test → commit → continue. Stop only for architecture, destructive ops, or missing secrets (`AUTONOMOUS_EXECUTION.md`).
 
 ### H01 verification notes (2026-07-17)
 
