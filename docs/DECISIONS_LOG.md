@@ -130,6 +130,19 @@
 
 ---
 
+## D-014 — Credit charge timing / refund on AI failure (M06) — Proposed
+
+| Field | Value |
+|-------|--------|
+| Date | 2026-07-17 |
+| Status | **Proposed** (blocks M06) |
+| Context | `enforceAiUsage` deducts 1 credit before AI; no refund on generate/save failure |
+| Open questions | (1) Charge on AI success vs DB persist vs SSE complete? (2) Full refund on any failure? (3) Reverse `lifetime_used` on refund? (4) Idempotent `reference_id` pairing? |
+| Interim | Do not implement refund/charge-after without Accepted answers. |
+| Related | Task M06 (blocked) |
+
+---
+
 ## D-013 — Canonical dashboard product routes (M03)
 
 | Field | Value |

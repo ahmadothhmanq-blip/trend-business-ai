@@ -39,7 +39,7 @@
 | M03 | Collapse duplicate routes (`brand-designer` vs `brand-studio`, `creative-studio` vs `image-generator`, etc.) | Done | Permanent redirects + link cleanup; audit→feasibility-study |
 | M04 | Update root README to match current multi-product reality | Done | Multi-product + ZIP honesty + docs SSOT pointers |
 | M05 | Real generation progress (avoid fake stuck ~90% feel) | Done | Website Builder SSE stream + elapsed/indeterminate UI (no fake %) |
-| M06 | Credit fairness: don’t punish users when AI fails mid-run | Pending | Billing path |
+| M06 | Credit fairness: don’t punish users when AI fails mid-run | Blocked | Hard gate — charge-before-AI; need D-014 success/refund semantics before implement |
 | M07 | Staging E2E for auth + Website Builder + billing (when PayPal configured) | Pending | |
 
 ---
