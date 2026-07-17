@@ -8,9 +8,9 @@
 
 ## Vision (customer outcome)
 
-Ship an **AI Business Operating System** where every service delivers a **complete usable result** (preview / edit / export or publish) — not unfinished source trees presented as the product.
+Ship an **AI Business Operating System** of **AI-powered production tools** (Core Product Principle): complete final products, preview/interaction, natural-language AI editing (D-016), continuous iteration, and outcomes ready for use / publish / export — not developer code-generator UX.
 
-**Current honesty bridge:** Website Builder ships complete projects via **ZIP export** until safe preview/publish is Accepted and built (D-003 + D-015 + D-004 / D-010).
+**Current honesty bridge:** Website Builder ships complete projects via **ZIP export** until safe preview/publish is Accepted and built (D-003 + D-015 + D-016 + D-004 / D-010).
 
 ---
 

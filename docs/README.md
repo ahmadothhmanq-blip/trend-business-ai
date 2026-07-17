@@ -5,7 +5,7 @@ Living documentation for the **existing** Trend Business AI project.
 
 | Document | Purpose |
 |----------|---------|
-| [PRODUCT_VISION.md](./PRODUCT_VISION.md) | **North star** — AI Business OS, finished-product rule, hubs & phases |
+| [PRODUCT_VISION.md](./PRODUCT_VISION.md) | **North star** — Core Product Principle (production tools, not code generators), hubs & phases |
 | [../MASTER_PROJECT_DOCUMENTATION.md](../MASTER_PROJECT_DOCUMENTATION.md) | Full system reference (all features, flows, DB, AI, APIs) |
 | [PROJECT_AUDIT.md](./PROJECT_AUDIT.md) | Phase 1 complete audit |
 | [PROJECT_MASTER_BLUEPRINT.md](./PROJECT_MASTER_BLUEPRINT.md) | Architecture & current product map |

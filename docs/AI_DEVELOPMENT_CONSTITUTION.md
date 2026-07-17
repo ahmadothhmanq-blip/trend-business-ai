@@ -12,7 +12,7 @@
 2. **Do not** create a replacement app or parallel architecture.  
 3. **Do not** remove working features without an entry in `DECISIONS_LOG.md` and explicit approval.  
 4. Prefer **surgical fixes** over large rewrites.  
-5. Follow `PRODUCT_VISION.md` + D-015: customers receive **finished usable products**, not code dumps.
+5. Follow `PRODUCT_VISION.md` Core Product Principle + D-015 / D-016: customers receive **finished usable products** via **AI-powered production tools**, not code-generator UX.
 
 ---
 
@@ -34,15 +34,35 @@
 
 ---
 
-## Article IV — Product Honesty & Finished-Product Bar
+## Article IV — Core Product Principle & Product Honesty
+
+### Core Product Principle (binding)
+
+**Trend Business AI builds AI-powered production tools, not AI code generators.**
+
+AI may use code internally as a technical implementation method, but the customer experience must always focus on delivering **complete, usable, production-ready results**.
+
+The goal is professional **AI-powered business tools that produce real results**, not developer tools that only generate code.
+
+Every AI service must:
+
+1. Generate a **complete final product**.  
+2. Provide **preview and user interaction**.  
+3. Support **AI-powered editing through natural language commands** (D-016).  
+4. Allow **continuous improvement and iteration** (D-016).  
+5. Deliver a **real outcome** ready for use, publishing, or export.
+
+See `PRODUCT_VISION.md` §2. This principle **includes** D-015 (finished products) and D-016 (NL iteration); it does not replace honesty/safety rules below.
+
+### Honesty & delivery rules (still binding)
 
 1. **North star (D-015):** Trend Business AI is **not** a customer-facing code generator. Every service must aim for a complete usable result (use / export / publish) and a full UX.  
-2. **Current delivery (D-003):** Website Builder ships complete projects via **ZIP export** until preview/publish are Accepted and built. Export is allowed; unfinished trees and fake “live site” CTAs are not.  
+2. **Current delivery (D-003):** Website Builder ships complete projects via **ZIP export** until preview/publish are Accepted and built. Export is an allowed delivery channel; unfinished trees and fake “live site” CTAs are not. Preview/interaction remain required product goals under the Core Product Principle.  
 3. Do not market a hosted live website or Live Preview unless the capability actually ships.  
 4. Live Preview remains **off** until a **safe** approach is approved (`DECISIONS_LOG.md` — D-004 / F01).  
 5. Hide or disable placeholder providers (Gemini/Grok/Llama) in user-facing production paths until implemented.  
 6. No demo pages, fake buttons, or unfinished features presented as complete.  
-7. **D-016:** Every AI product must support post-generation **natural-language AI editing / continue / improve** with parent context — not generate-once only.
+7. **D-016 (merged into Core Product Principle):** Every AI product must support post-generation **natural-language AI editing / continue / improve** with parent context — not generate-once only.
 
 ---
 
@@ -129,6 +149,7 @@ Agents/devs must stop and ask the user when asked to:
 - Rewrite the app from scratch  
 - Enable unsafe preview builds  
 - Ship “live website” claims without implementation  
+- Treat AI products as code-generator UX in violation of Article IV Core Product Principle  
 - Delete billing/auth/RLS protections  
 - Ignore `docs/` and invent a parallel plan  
 - Ship temporary or low-quality code that violates Article XI  

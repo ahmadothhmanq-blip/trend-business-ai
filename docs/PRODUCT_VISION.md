@@ -2,7 +2,7 @@
 
 **Role:** North-star product definition (what we are building for customers).  
 **Status:** Accepted product direction (2026-07-17)  
-**Companion docs:** Current architecture → `PROJECT_MASTER_BLUEPRINT.md`; engineering phases → `ROADMAP.md`; decisions → `DECISIONS_LOG.md` (D-015).  
+**Companion docs:** Current architecture → `PROJECT_MASTER_BLUEPRINT.md`; engineering phases → `ROADMAP.md`; decisions → `DECISIONS_LOG.md` (D-015, D-016).  
 **Rule:** Delivery must move toward finished, usable products — not “AI code dumps.”
 
 ---
@@ -15,9 +15,25 @@ Build a complete AI platform that helps individuals and businesses **create, aut
 
 ---
 
-## 2. Critical Product Rule
+## 2. Core Product Principle
 
-**Trend Business AI is NOT a code generator.**
+**Trend Business AI builds AI-powered production tools, not AI code generators.**
+
+AI may use code internally as a technical implementation method, but the **customer experience** must always focus on delivering **complete, usable, production-ready results**.
+
+The goal is to create **professional AI-powered business tools that produce real results**, not developer tools that only generate code.
+
+Every AI service must:
+
+1. **Generate a complete final product.**  
+2. **Provide preview and user interaction.**  
+3. **Support AI-powered editing through natural language commands** (D-016).  
+4. **Allow continuous improvement and iteration** (D-016).  
+5. **Deliver a real outcome** ready for use, publishing, or export.
+
+### 2.1 Critical Product Rule (D-015)
+
+**Trend Business AI is NOT a code generator** for customers.
 
 AI may use code internally, but the customer must receive a **complete, usable final product**.
 
@@ -29,10 +45,10 @@ Every service must deliver:
 - A complete user experience  
 - **AI-powered editing after generation** (D-016)
 
-### AI iteration (required for every AI product)
+### 2.2 AI iteration — required for every AI product (D-016)
 
 After the first result, the user must be able to **continuously improve and edit** the product with **natural-language commands** (continue / improve / regenerate with context).  
-One-shot generate-only flows are incomplete.
+One-shot generate-only flows are incomplete. This is part of the Core Product Principle, not an optional add-on.
 
 | Product | Customer outcome |
 |---------|------------------|
@@ -41,11 +57,13 @@ One-shot generate-only flows are incomplete.
 | Image Generator | Final images ready for use |
 | App Builder | Working application, not only source code |
 
-**Honesty bridge (current engineering truth):** Until preview/publish are safely shipped, Website Builder may still **export** a complete project (ZIP). Export is an allowed delivery channel; presenting raw unfinished trees or fake “live site” buttons is not. See D-003 (current delivery) + D-015 (north star) + D-004 / D-010 (preview/hosted gates).
+**Honesty bridge (current engineering truth):** Until preview/publish are safely shipped, Website Builder may still **export** a complete project (ZIP). Export is an allowed delivery channel; presenting raw unfinished trees or fake “live site” buttons is not. See D-003 (current delivery) + D-015 / Core Product Principle (north star) + D-004 / D-010 (preview/hosted gates). Preview and interaction remain required product goals even while ZIP is the interim delivery channel.
 
 ---
 
-## 3. Product Principles
+## 3. Product Principles (feature completeness)
+
+These apply **in addition to** the Core Product Principle (§2).
 
 Every feature must include:
 
@@ -65,6 +83,7 @@ Every feature must include:
 - No placeholder services marketed as ready  
 - No unfinished features presented as complete  
 - Build real products  
+- Do not ship AI services as “code generator” UX when the Core Product Principle requires a production tool
 
 ---
 

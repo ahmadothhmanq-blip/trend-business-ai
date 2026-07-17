@@ -2,7 +2,7 @@
 
 **Purpose:** Record product and architecture decisions so agents do not re-litigate them.  
 **Rule:** New decisions require a dated entry. Supersede old entries explicitly.  
-**Last updated:** 2026-07-17 (D-015 product vision)  
+**Last updated:** 2026-07-17 (Core Product Principle + D-015 / D-016)  
 
 ---
 
@@ -57,11 +57,11 @@
 | Field | Value |
 |-------|--------|
 | Date | 2026-07-17 |
-| Status | **Accepted** |
+| Status | **Accepted** (folded into Core Product Principle; not superseded) |
 | Context | Product vision: Trend Business AI is an AI Business Operating System |
-| Decision | The platform is **not** a code generator for customers. AI may use code internally; every service must deliver a **real, professional, usable result** (use / export / publish) with a complete UX. See `PRODUCT_VISION.md`. |
-| Consequences | New features judged against finished-product bar. Placeholder/demo/fake CTAs forbidden. Website Builder path: create → preview → AI edit → export/publish; export-only is interim honesty (D-003), not the end state. Preview/hosted still require Accepted F01/F09. |
-| Related | `PRODUCT_VISION.md`, D-003, D-004, D-010, D-016, Constitution Art. IV |
+| Decision | The platform is **not** a code generator for customers. AI may use code internally; every service must deliver a **real, professional, usable result** (use / export / publish) with a complete UX. See `PRODUCT_VISION.md` §2 Core Product Principle. |
+| Consequences | New features judged against finished-product / production-tool bar. Placeholder/demo/fake CTAs forbidden. Website Builder path: create → preview → AI edit → export/publish; export-only is interim honesty (D-003), not the end state. Preview/hosted still require Accepted F01/F09. |
+| Related | Core Product Principle, `PRODUCT_VISION.md` §2, D-003, D-004, D-010, D-016, Constitution Art. IV |
 
 ---
 
@@ -70,11 +70,11 @@
 | Field | Value |
 |-------|--------|
 | Date | 2026-07-17 |
-| Status | **Accepted** |
+| Status | **Accepted** (merged into Core Product Principle; remains binding) |
 | Context | Finished-product UX requires iteration, not one-shot generation |
-| Decision | Every AI product must support **AI-powered editing, improvement, and iteration after generation**. Users continuously modify results via **natural-language commands** (continue/improve with parent context). Regenerate-without-context alone is not enough. |
-| Consequences | APIs load parent generation + apply edit instruction (`lib/ai/iteration.ts`). UI exposes Improve/Continue. Website + Workspace already had continue; dedicated builders must match. |
-| Related | D-015, `PRODUCT_VISION.md` §2 / §12, Constitution Art. IV |
+| Decision | Every AI product must support **AI-powered editing, improvement, and iteration after generation**. Users continuously modify results via **natural-language commands** (continue/improve with parent context). Regenerate-without-context alone is not enough. This is an explicit clause of the Core Product Principle (complete product + preview/interaction + NL edit + continuous iteration + ready outcome). |
+| Consequences | APIs load parent generation + apply edit instruction (`lib/ai/iteration.ts`). UI exposes Improve with AI. Applies to Website, Workspace, and dedicated builders. |
+| Related | Core Product Principle, D-015, `PRODUCT_VISION.md` §2 / §12, Constitution Art. IV |
 
 ---
 

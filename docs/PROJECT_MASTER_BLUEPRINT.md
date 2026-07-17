@@ -10,10 +10,10 @@
 
 ## 1. Product Definition
 
-### 1.1 North star (`PRODUCT_VISION.md`, D-015)
+### 1.1 North star (`PRODUCT_VISION.md` Core Product Principle, D-015, D-016)
 
 **Trend Business AI** is an **AI Business Operating System**: create, automate, manage, and grow a business from one place.  
-Customers must receive **complete usable products** (preview / AI edit / export or publish) — not generator UX that stops at source files.
+It builds **AI-powered production tools, not AI code generators**. Customers must receive **complete usable products** (preview / interaction / NL AI edit / continuous iteration / export or publish) — not developer UX that stops at source files.
 
 ### 1.2 Current reality (honest)
 
