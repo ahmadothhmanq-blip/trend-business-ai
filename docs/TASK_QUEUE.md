@@ -3,7 +3,7 @@
 **Living work queue.** Priorities from `PROJECT_AUDIT.md`.  
 **Statuses:** `Completed` | `In Progress` | `Pending` | `Future`  
 **Rule:** Do not start Pending/Future implementation without approval.  
-**Last updated:** 2026-07-17 (H05 generation bounds verified)  
+**Last updated:** 2026-07-17 (H06 smoke partial — generate/ZIP PASS; auth session blocked)  
 
 ---
 
@@ -23,8 +23,8 @@
 | H02 | Confirm required env (`SUPABASE_*`, `DEEPSEEK_API_KEY`, `NEXT_PUBLIC_SITE_URL`, service role, Upstash for prod) | Completed (local audit) | See H02 notes below. Local gaps: `NEXT_PUBLIC_SITE_URL`. Prod blockers if launching from this file: service role + Upstash + SITE_URL. Anon key length WARN. |
 | H03 | Commit/reconcile Website Builder SSR slim-list fix (no full blueprint on list) | **Completed — verified** | Static verification **PASS** (10/10). On `cursor/docs-ssot-audit-plan` @ `f1f5549`. Merge to `main` still open. |
 | H04 | Commit/reconcile React 19–safe theme migration (no client script crash) | **Completed — verified** | Removed `next-themes`; cookie SSR class + custom provider (no `<script>`). On `cursor/docs-ssot-audit-plan`. Merge to `main` still open. |
-| H05 | Commit/reconcile generation file-cap + soft-pass (prevent runaway loops) | **Completed — verified** | `MAX_WEBSITE_FILES=18`, scaffold, lean merge, soft-pass. Bounds tests PASS; `tsc` OK. Local WT — commit when approved. Authenticated full generate remains H06. |
-| H06 | Authenticated smoke: `/dashboard/website-builder` loads + generate → save → download | Pending | After H03–H05 |
+| H05 | Commit/reconcile generation file-cap + soft-pass (prevent runaway loops) | **Completed — verified** | `MAX_WEBSITE_FILES=18`, scaffold, lean merge, soft-pass. On branch `d51845f`. |
+| H06 | Authenticated smoke: `/dashboard/website-builder` loads + generate → save → download | **Completed — partial** | See H06 notes. Unauth redirect + health PASS. **In-process generate→ZIP PASS** (18 files, ~77s). **HTTP auth session blocked** (signup requires email confirm; anon key len WARN). Not an app-code blocker. |
 | H07 | Fix Live Preview honesty: replace frozen “Live Preview” UI with Download/Deploy messaging (or equivalent honesty) | Pending | UI copy only unless F01 accepted |
 | H08 | Policy: keep `WEBSITE_PREVIEW_BUILDER_ENABLED=false` in production until security redesign | Pending | Not a duplicate of H07 — env/policy vs UI |
 
@@ -77,7 +77,8 @@
 | C12 | H02 env configuration audit (local `.env.local`) | Completed | Prod gaps documented; staging/prod hosting env not separately audited |
 | C13 | H03 Website Builder SSR slim-list (no full blueprint on list) | Completed | On feature branch `f1f5549`; merge to `main` pending |
 | C14 | H04 React 19–safe theme (no next-themes script) | Completed | On feature branch; merge to `main` pending |
-| C15 | H05 generation file-cap + soft-pass | Completed (local WT) | Verified; commit/push pending |
+| C15 | H05 generation file-cap + soft-pass | Completed | On branch |
+| C16 | H06 Website Builder smoke | Completed (partial) | Generate+ZIP PASS; cookie-auth HTTP path blocked by email confirm / env |
 
 ---
 
@@ -108,10 +109,10 @@
 
 ## Execution order (recommended after approval)
 
-1. ~~H01~~ / ~~H02~~ (ops) → ~~H03~~ → ~~H04~~ → ~~H05~~ (**verified**) → next: **H06**  
-2. H06 (authenticated Website Builder smoke)  
-3. H07–H08 (preview honesty/policy)  
-4. M01–M03 (clarity)  
+1. ~~H01~~ … ~~H06~~ (smoke partial) → next: **H07–H08**  
+2. H07–H08 (preview honesty/policy)  
+3. M01–M03 (clarity)  
+4. Re-run H06 with confirmed test user when email confirm / full anon JWT available  
 5. Then Medium/Low / Future per `ROADMAP.md`  
 
 ---
@@ -193,3 +194,18 @@
 | Live authenticated generate → save → download | Deferred to **H06** |
 | Out of scope | Progress UX (M05), `next.config.ts`, theme/SSR |
 | Git | Local WT ready; commit when approved |
+
+### H06 verification notes (2026-07-17)
+
+| Check | Result |
+|-------|--------|
+| Server `/api/health` | **PASS** (~312ms after restart) |
+| Unauth `/dashboard/website-builder` | **PASS** — 307 → `/login?redirect=…` (13ms) |
+| Sign-up session | **BLOCKED** — Supabase returns user without session (email confirmation required) |
+| Sign-in | **BLOCKED** — `Email not confirmed` |
+| Anon key | **WARN** — length 46 (H02); may be incomplete vs classic JWT |
+| HTTP generate → save → download | **NOT RUN** (no cookie session) |
+| In-process `generateWebsite` (DeepSeek) | **PASS** — 18 files in ~77s; soft-pass logged 5 import warnings |
+| ZIP from generated files | **PASS** — ~21KB written under `.tmp/` |
+| App code changes | **None** — blockers are env/ops (email confirm + anon key), not application bugs |
+| Follow-up | Provide confirmed test user **or** disable email confirm in Supabase Auth settings, then re-run HTTP path |
