@@ -40,7 +40,7 @@
 | M04 | Update root README to match current multi-product reality | Done | Multi-product + ZIP honesty + docs SSOT pointers |
 | M05 | Real generation progress (avoid fake stuck ~90% feel) | Done | Website Builder SSE stream + elapsed/indeterminate UI (no fake %) |
 | M06 | Credit fairness: don’t punish users when AI fails mid-run | Blocked | Hard gate — charge-before-AI; need D-014 success/refund semantics before implement |
-| M07 | Staging E2E for auth + Website Builder + billing (when PayPal configured) | Pending | |
+| M07 | Staging E2E for auth + Website Builder + billing (when PayPal configured) | Skipped | Skip until PayPal + confirmed auth env (autonomous policy) |
 
 ---
 
@@ -49,7 +49,7 @@
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
 | L01 | Remove orphan empty App Router directories | Pending | Ready — empty `app/dashboard/*`, `app/login`, `app/(marketing)/*` (deletion approval skipped) |
-| L02 | Remove unused platform dashboard scaffolds | Pending | |
+| L02 | Remove unused platform dashboard scaffolds | Done | Deleted 3 unused files only (not `components/dashboard/platform/` panels) |
 | L03 | Normalize naming (`deepseek.ts` facade, slug vs product id) | Pending | Careful, wide touch — pause if blast radius unclear |
 | L04 | Consolidate dual product engines (dedicated vs generic workspace) | Pending | Design first — hard gate |
 | L05 | Dashboard bundle performance budgets | Pending | |

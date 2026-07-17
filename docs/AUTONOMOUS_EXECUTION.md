@@ -39,10 +39,10 @@ Future (`F*`) tasks stay **Future** until a `DECISIONS_LOG.md` Accepted entry.
 
 ## Queue order (current)
 
-1. M02 → M03 → M04 → M05  
-2. M06 only if credit fail-path is clear and testable  
-3. Skip M07 until PayPal + confirmed auth env  
-4. L01, L07 (dead code) → L06 (docs archive) → L02 / L05 as capacity allows  
+1. ~~M01–M05~~ done  
+2. **Skip M06 / M07** (billing / PayPal — blocked or env-gated)  
+3. **Do not delete directories** (L01/L07 deferred unless user re-approves file-level-only cleanup)  
+4. L02 → L06 → L05 as capacity allows  
 5. L03 / L04 / L08 / all `F*` — stop gates  
 
 ---

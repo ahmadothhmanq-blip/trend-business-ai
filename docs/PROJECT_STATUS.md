@@ -72,6 +72,7 @@
 - **M03:** Duplicate dashboard routes collapsed to canonical product paths (D-013).  
 - **M04:** Root README updated for multi-product + ZIP delivery reality.  
 - **M05:** Website Builder generation progress uses SSE server stages + elapsed time (no fake 92% bar).  
+- **L02:** Removed unused scaffold files (`platform-dashboard-page`, `dashboard-platform-pages`, `scaffold-page`).  
 
 ### Working-tree fixes (not yet guaranteed on remote `main`)
 
