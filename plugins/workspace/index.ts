@@ -15,7 +15,7 @@ import type { WorkspaceType } from "@/lib/workspace/types";
 export const brandWorkspace = createWorkspaceDefinition({
   type: "brand",
   configKey: "brandDesigner",
-  dashboardHref: "/dashboard/brand-designer",
+  dashboardHref: "/dashboard/brand-studio",
   label: "Brand Designer",
   plugin: brandPlugin,
 });
@@ -23,7 +23,7 @@ export const brandWorkspace = createWorkspaceDefinition({
 export const creativeWorkspace = createWorkspaceDefinition({
   type: "creative",
   configKey: "creativeStudio",
-  dashboardHref: "/dashboard/creative-studio",
+  dashboardHref: "/dashboard/image-generator",
   label: "Creative Studio",
   plugin: creativePlugin,
 });
@@ -47,7 +47,7 @@ export const businessWorkspace = createWorkspaceDefinition({
 export const managerWorkspace = createWorkspaceDefinition({
   type: "manager",
   configKey: "businessManager",
-  dashboardHref: "/dashboard/business-manager",
+  dashboardHref: "/dashboard/business-intelligence",
   label: "Business Manager",
   plugin: managerPlugin,
 });
@@ -71,7 +71,7 @@ export const socialWorkspace = createWorkspaceDefinition({
 export const auditWorkspace = createWorkspaceDefinition({
   type: "audit",
   configKey: "businessAudit",
-  dashboardHref: "/dashboard/business-audit",
+  dashboardHref: "/dashboard/feasibility-study",
   label: "Business Audit",
   plugin: auditPlugin,
 });

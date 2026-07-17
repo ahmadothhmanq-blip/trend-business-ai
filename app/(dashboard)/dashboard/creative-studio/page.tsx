@@ -1,5 +1,6 @@
-import { ProductEnginePage } from "@/components/dashboard/product-engine/product-engine-page";
+import { redirect } from "next/navigation";
 
+/** @deprecated Use /dashboard/image-generator (M03). */
 export default function CreativeStudioPage() {
-  return <ProductEnginePage productId="image-generator" />;
+  redirect("/dashboard/image-generator");
 }

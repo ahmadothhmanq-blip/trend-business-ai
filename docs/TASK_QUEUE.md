@@ -36,7 +36,7 @@
 |----|------|--------|-------|
 | M01 | Align Website Builder / marketing copy with ZIP/code delivery | Done | Copy-only; ZIP/source honesty across marketing, SEO, registry, tool fallbacks (D-003) |
 | M02 | Hide placeholder AI providers (Gemini/Grok/Llama) in production UI | Done | `getUserFacingProviderNames` + API/UI sanitize (D-009) |
-| M03 | Collapse duplicate routes (`brand-designer` vs `brand-studio`, `creative-studio` vs `image-generator`, etc.) | Pending | Redirects OK |
+| M03 | Collapse duplicate routes (`brand-designer` vs `brand-studio`, `creative-studio` vs `image-generator`, etc.) | Done | Permanent redirects + link cleanup; audit→feasibility-study |
 | M04 | Update root README to match current multi-product reality | Pending | Docs only OK anytime |
 | M05 | Real generation progress (avoid fake stuck ~90% feel) | Pending | Prefer server events / clearer status |
 | M06 | Credit fairness: don’t punish users when AI fails mid-run | Pending | Billing path |

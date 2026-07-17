@@ -130,6 +130,19 @@
 
 ---
 
+## D-013 — Canonical dashboard product routes (M03)
+
+| Field | Value |
+|-------|--------|
+| Date | 2026-07-17 |
+| Status | **Accepted** |
+| Context | Duplicate entry points (brand-designer/brand-studio, creative-studio/image-generator, business-manager/BI, business-audit, subscription/billing) |
+| Decision | Canonical: `brand-studio`, `image-generator`, `business-intelligence`, `feasibility-study`, `billing`. Legacy paths 308/redirect permanently. `business-audit` → `feasibility-study` (not BI). |
+| Consequences | Workspace `dashboardHref` values updated; dedicated tools remain source of truth. Legacy `workspace_generations` for brand/creative are not migrated (separate follow-up if needed). |
+| Related | Task M03 (done) |
+
+---
+
 ## D-010 — Hosted live website product (proposed only)
 
 | Field | Value |

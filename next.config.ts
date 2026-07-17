@@ -11,6 +11,32 @@ const nextConfig: NextConfig = {
         destination: "/products/:slug",
         permanent: true,
       },
+      // M03 — collapse duplicate dashboard product entry points
+      {
+        source: "/dashboard/brand-designer",
+        destination: "/dashboard/brand-studio",
+        permanent: true,
+      },
+      {
+        source: "/dashboard/creative-studio",
+        destination: "/dashboard/image-generator",
+        permanent: true,
+      },
+      {
+        source: "/dashboard/business-manager",
+        destination: "/dashboard/business-intelligence",
+        permanent: true,
+      },
+      {
+        source: "/dashboard/business-audit",
+        destination: "/dashboard/feasibility-study",
+        permanent: true,
+      },
+      {
+        source: "/dashboard/subscription",
+        destination: "/dashboard/billing",
+        permanent: true,
+      },
     ];
   },
   async headers() {

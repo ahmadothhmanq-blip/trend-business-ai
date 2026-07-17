@@ -69,6 +69,7 @@
 - **H08:** Preview builder **production hard-disable** + fail-closed env policy until F01 sandbox redesign.  
 - **M01:** Marketing/SEO/registry/tool copy aligned to ZIP + self-host delivery (D-003); no hosted-live claims.  
 - **M02:** Placeholder AI providers (Gemini/Grok/Llama) hidden from production settings UI/API (D-009).  
+- **M03:** Duplicate dashboard routes collapsed to canonical product paths (D-013).  
 
 ### Working-tree fixes (not yet guaranteed on remote `main`)
 
@@ -99,7 +100,7 @@ See `TASK_QUEUE.md` High/Medium. Summary:
 - ~~Align marketing copy with ZIP delivery~~ → **M01 done**  
 
 - ~~Hide placeholder providers~~ → **M02 done**  
-- Collapse duplicate product routes  
+- ~~Collapse duplicate product routes~~ → **M03 done**  
 - Authenticated smoke tests  
 - Commit + verify Website Builder load + generate path  
 

@@ -36,7 +36,7 @@ function resolveActionHref(label: string) {
   if (normalized.includes("website") || normalized.includes("project")) return "/dashboard/website-builder";
   if (normalized.includes("history")) return "/dashboard/history";
   if (normalized.includes("billing")) return "/dashboard/billing";
-  if (normalized.includes("subscription") || normalized.includes("plan")) return "/dashboard/subscription";
+  if (normalized.includes("subscription") || normalized.includes("plan")) return "/dashboard/billing";
   if (normalized.includes("analytics")) return "/dashboard/analytics";
   if (normalized.includes("usage")) return "/dashboard/usage";
   if (normalized.includes("notification")) return "/dashboard/notifications";

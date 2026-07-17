@@ -289,7 +289,7 @@ export const REF_FOOTER_SERVICES = REF_FOOTER_SOLUTIONS;
 
 export const REF_FOOTER_PRODUCTS = [
   { label: "Website & App Builder", href: "/dashboard/website-builder" },
-  { label: "Brand Designer", href: "/dashboard/brand-designer" },
+  { label: "Brand Studio", href: "/dashboard/brand-studio" },
   { label: "Content Studio", href: "/dashboard/content-studio" },
   { label: "Business Intelligence", href: "/dashboard/business-intelligence" },
   { label: "Features", href: "/features" },
@@ -738,7 +738,7 @@ export const MARKETING_PRODUCTS: MarketingProduct[] = [
       "Premium identity cues for your brand",
       "A foundation for brand studio expansion",
     ],
-    dashboardHref: "/dashboard/brand-designer",
+    dashboardHref: "/dashboard/logo-maker",
   },
   {
     slug: "brand-studio",
@@ -764,7 +764,7 @@ export const MARKETING_PRODUCTS: MarketingProduct[] = [
       "Consistent luxury positioning",
       "Ready-to-apply identity guidelines",
     ],
-    dashboardHref: "/dashboard/brand-designer",
+    dashboardHref: "/dashboard/brand-studio",
   },
   {
     slug: "image-generator",
@@ -790,7 +790,7 @@ export const MARKETING_PRODUCTS: MarketingProduct[] = [
       "On-brand creative direction",
       "Assets you can refine and export",
     ],
-    dashboardHref: "/dashboard/creative-studio",
+    dashboardHref: "/dashboard/image-generator",
   },
   {
     slug: "video-studio",
@@ -920,7 +920,7 @@ export const MARKETING_PRODUCTS: MarketingProduct[] = [
       "Clear ownership of next steps",
       "Less chaos across projects",
     ],
-    dashboardHref: "/dashboard/business-manager",
+    dashboardHref: "/dashboard/business-intelligence",
   },
   {
     slug: "business-intelligence",
@@ -972,7 +972,7 @@ export const MARKETING_PRODUCTS: MarketingProduct[] = [
       "Risk-aware launch planning",
       "Executive-ready feasibility output",
     ],
-    dashboardHref: "/dashboard/business-audit",
+    dashboardHref: "/dashboard/feasibility-study",
   },
 ];
 

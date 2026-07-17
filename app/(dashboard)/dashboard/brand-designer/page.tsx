@@ -1,5 +1,6 @@
-import { ProductEnginePage } from "@/components/dashboard/product-engine/product-engine-page";
+import { redirect } from "next/navigation";
 
+/** @deprecated Use /dashboard/brand-studio (M03). */
 export default function BrandDesignerPage() {
-  return <ProductEnginePage productId="brand-studio" />;
+  redirect("/dashboard/brand-studio");
 }
