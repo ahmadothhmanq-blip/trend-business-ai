@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
 import { createGrowthAnonClient } from "@/lib/growth/client";
 import { eventTrackSchema } from "@/lib/growth/schemas";
-import { parseJsonBody } from "@/lib/api/helpers";
 import { enforceMutationRateLimitAsync } from "@/lib/api/rate-limit";
 import { createClient } from "@/lib/supabase/server";
+
+/** Fire-and-forget analytics: always succeed from the client's perspective. */
+function trackingOk(extra?: Record<string, unknown>) {
+  return NextResponse.json({ success: true, ...extra });
+}
 
 export async function POST(request: Request) {
   try {
@@ -12,40 +16,28 @@ export async function POST(request: Request) {
       request.headers.get("x-real-ip") ||
       "anon";
 
-    const rateLimited = await enforceMutationRateLimitAsync(`growth-event:${ip}`);
-    // Analytics must never 503: Upstash-missing production fail-closed returns 503 for growth-* keys.
-    if (rateLimited) {
-      if (rateLimited.status >= 500) {
-        console.error(
-          "growth events rate limit unavailable; continuing ingest",
-          await rateLimited
-            .clone()
-            .json()
-            .catch(() => null),
-        );
-      } else {
-        // 429 etc. — fire-and-forget analytics should not break the client
-        console.error("growth events rate limited", rateLimited.status);
-        return NextResponse.json({ success: true });
-      }
+    // Best-effort rate limit only — never return 429/503 from this route.
+    try {
+      await enforceMutationRateLimitAsync(`growth-event:${ip}`);
+    } catch (error) {
+      console.error("growth events rate limit failed; continuing", error);
     }
 
-    const body = await parseJsonBody<unknown>(request);
-    if (body instanceof NextResponse) {
-      // Invalid JSON — still avoid hard failure for analytics beacons
-      if (body.status >= 500) {
-        console.error("growth events body parse failed");
-        return NextResponse.json({ success: true });
-      }
-      return body;
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch (error) {
+      console.error("growth events invalid JSON; skipping", error);
+      return trackingOk({ skipped: true });
     }
 
     const parsed = eventTrackSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: parsed.error.issues[0]?.message ?? "Invalid event" },
-        { status: 400 },
+      console.error(
+        "growth events validation failed; skipping",
+        parsed.error.issues[0]?.message,
       );
+      return trackingOk({ skipped: true });
     }
 
     let userId: string | null = null;
@@ -54,42 +46,52 @@ export async function POST(request: Request) {
       authedClient = await createClient();
       const { data } = await authedClient.auth.getUser();
       userId = data.user?.id ?? null;
-    } catch {
+    } catch (error) {
+      console.error("growth events auth lookup failed; continuing anon", error);
       userId = null;
       authedClient = null;
     }
 
     const metadata = parsed.data.metadata ?? {};
-    if (JSON.stringify(metadata).length > 4000) {
-      return NextResponse.json({ error: "metadata too large" }, { status: 400 });
+    try {
+      if (JSON.stringify(metadata).length > 4000) {
+        console.error("growth events metadata too large; skipping");
+        return trackingOk({ skipped: true });
+      }
+    } catch (error) {
+      console.error("growth events metadata check failed; skipping", error);
+      return trackingOk({ skipped: true });
     }
 
-    const client = userId && authedClient ? authedClient : createGrowthAnonClient();
-    const { error } = await client.from("growth_events").insert({
-      user_id: userId,
-      session_id: parsed.data.sessionId ?? null,
-      event_name: parsed.data.eventName,
-      event_category: parsed.data.eventCategory,
-      page_path: parsed.data.pagePath ?? null,
-      referrer: parsed.data.referrer ?? null,
-      utm_source: parsed.data.utmSource ?? null,
-      utm_medium: parsed.data.utmMedium ?? null,
-      utm_campaign: parsed.data.utmCampaign ?? null,
-      value_cents: parsed.data.valueCents ?? null,
-      metadata,
-    });
+    try {
+      const client =
+        userId && authedClient ? authedClient : createGrowthAnonClient();
+      const { error } = await client.from("growth_events").insert({
+        user_id: userId,
+        session_id: parsed.data.sessionId ?? null,
+        event_name: parsed.data.eventName,
+        event_category: parsed.data.eventCategory,
+        page_path: parsed.data.pagePath ?? null,
+        referrer: parsed.data.referrer ?? null,
+        utm_source: parsed.data.utmSource ?? null,
+        utm_medium: parsed.data.utmMedium ?? null,
+        utm_campaign: parsed.data.utmCampaign ?? null,
+        value_cents: parsed.data.valueCents ?? null,
+        metadata,
+      });
 
-    if (error?.code === "42P01") {
-      return NextResponse.json({ ok: true, skipped: true });
-    }
-    if (error) {
-      console.error(error);
-      return NextResponse.json({ success: true });
+      if (error) {
+        console.error("growth events insert failed", error);
+        return trackingOk({ skipped: true });
+      }
+    } catch (error) {
+      console.error("growth events insert threw; skipping", error);
+      return trackingOk({ skipped: true });
     }
 
-    return NextResponse.json({ ok: true });
+    return trackingOk();
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ success: true });
+    console.error("growth events unexpected failure", error);
+    return trackingOk({ skipped: true });
   }
 }
