@@ -57,11 +57,11 @@
 | Field | Value |
 |-------|--------|
 | Date | 2026-07-17 |
-| Status | **Accepted** |
+| Status | **Accepted** (UI honesty landed via H07; preview still off) |
 | Context | `LIVE_PREVIEW_ENABLED = false`; preview builder can run install/build on generated projects (RCE risk) |
 | Decision | Keep preview disabled in production. Either (a) honest “Download / Deploy” messaging, or (b) a future **sandboxed** preview that does not execute arbitrary package installs. |
-| Consequences | Do not flip `WEBSITE_PREVIEW_BUILDER_ENABLED=true` without security review. |
-| Related | Tasks H07, H08, F01 |
+| Consequences | Do not flip `WEBSITE_PREVIEW_BUILDER_ENABLED=true` without security review. H07 replaced frozen “Live Preview” copy with Download project / ZIP messaging. |
+| Related | Tasks H07 (done), H08, F01 |
 
 ---
 

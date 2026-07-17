@@ -3,7 +3,7 @@
 **Living work queue.** Priorities from `PROJECT_AUDIT.md`.  
 **Statuses:** `Completed` | `In Progress` | `Pending` | `Future`  
 **Rule:** Do not start Pending/Future implementation without approval.  
-**Last updated:** 2026-07-17 (H06 smoke partial — generate/ZIP PASS; auth session blocked)  
+**Last updated:** 2026-07-17 (H07 Live Preview honesty)  
 
 ---
 
@@ -25,7 +25,7 @@
 | H04 | Commit/reconcile React 19–safe theme migration (no client script crash) | **Completed — verified** | Removed `next-themes`; cookie SSR class + custom provider (no `<script>`). On `cursor/docs-ssot-audit-plan`. Merge to `main` still open. |
 | H05 | Commit/reconcile generation file-cap + soft-pass (prevent runaway loops) | **Completed — verified** | `MAX_WEBSITE_FILES=18`, scaffold, lean merge, soft-pass. On branch `d51845f`. |
 | H06 | Authenticated smoke: `/dashboard/website-builder` loads + generate → save → download | **Completed — partial** | See H06 notes. Unauth redirect + health PASS. **In-process generate→ZIP PASS** (18 files, ~77s). **HTTP auth session blocked** (signup requires email confirm; anon key len WARN). Not an app-code blocker. |
-| H07 | Fix Live Preview honesty: replace frozen “Live Preview” UI with Download/Deploy messaging (or equivalent honesty) | Pending | UI copy only unless F01 accepted |
+| H07 | Fix Live Preview honesty: replace frozen “Live Preview” UI with Download/Deploy messaging (or equivalent honesty) | **Completed** | `ProjectExportPanel` — Download project / ZIP messaging; `LIVE_PREVIEW_ENABLED` remains false |
 | H08 | Policy: keep `WEBSITE_PREVIEW_BUILDER_ENABLED=false` in production until security redesign | Pending | Not a duplicate of H07 — env/policy vs UI |
 
 ---
@@ -79,6 +79,7 @@
 | C14 | H04 React 19–safe theme (no next-themes script) | Completed | On feature branch; merge to `main` pending |
 | C15 | H05 generation file-cap + soft-pass | Completed | On branch |
 | C16 | H06 Website Builder smoke | Completed (partial) | Generate+ZIP PASS; cookie-auth HTTP path blocked by email confirm / env |
+| C17 | H07 Live Preview honesty (Download/ZIP messaging) | Completed | UI copy only; preview stays off |
 
 ---
 
@@ -109,8 +110,8 @@
 
 ## Execution order (recommended after approval)
 
-1. ~~H01~~ … ~~H06~~ (smoke partial) → next: **H07–H08**  
-2. H07–H08 (preview honesty/policy)  
+1. ~~H01~~ … ~~H07~~ → next: **H08**  
+2. H08 (preview env policy)  
 3. M01–M03 (clarity)  
 4. Re-run H06 with confirmed test user when email confirm / full anon JWT available  
 5. Then Medium/Low / Future per `ROADMAP.md`  
@@ -209,3 +210,13 @@
 | ZIP from generated files | **PASS** — ~21KB written under `.tmp/` |
 | App code changes | **None** — blockers are env/ops (email confirm + anon key), not application bugs |
 | Follow-up | Provide confirmed test user **or** disable email confirm in Supabase Auth settings, then re-run HTTP path |
+
+### H07 verification notes (2026-07-17)
+
+| Check | Result |
+|-------|--------|
+| Frozen “Live Preview” panel | Replaced by `ProjectExportPanel` |
+| Messaging | Download project / source ZIP; not a hosted live website |
+| `LIVE_PREVIEW_ENABLED` | Remains `false` |
+| Preview builder / env | Unchanged (H08) |
+| Marketing pages | Deferred to M01 |

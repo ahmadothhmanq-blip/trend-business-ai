@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
@@ -904,7 +904,7 @@ export function WebsiteBuilderTool({
             onOpenPreview={openPreviewInNewTab}
           />
         ) : (
-          <ComingSoonPreview activeProject={activeProject} onDownload={downloadProject} />
+          <ProjectExportPanel activeProject={activeProject} onDownload={downloadProject} />
         )}
       </div>
 
@@ -1072,30 +1072,38 @@ function ThemeButton({
   );
 }
 
-function ComingSoonPreview({
+/** Honest export panel while Live Preview stays off (D-003 / D-004 / H07). */
+function ProjectExportPanel({
   activeProject,
   onDownload,
 }: {
   activeProject: WorkspaceProject | null;
   onDownload: (project?: WorkspaceProject | null) => void;
 }) {
+  const fileCount = activeProject?.generatedProject?.files.length ?? 0;
+
   return (
     <aside className="space-y-6 xl:sticky xl:top-28 xl:self-start">
       <DashboardPanel gold>
         <div className="flex items-center gap-3">
-          <DashboardIconBox icon={MonitorSmartphone} />
+          <DashboardIconBox icon={Download} />
           <div>
-            <h3 className="font-bold text-white">Live Preview</h3>
+            <h3 className="font-bold text-white">Download project</h3>
             <p className="text-[13px] text-white/40">
-              Coming soon for generated websites and web applications.
+              AI generates source files you can download as a ZIP and run locally.
             </p>
           </div>
         </div>
         <div className="mt-6 rounded-3xl border border-dashed border-premium-gold/20 bg-black/20 p-6 text-center">
-          <MonitorSmartphone className="mx-auto size-12 text-premium-gold" />
-          <p className="mt-4 text-lg font-bold text-white">Preview is temporarily frozen</p>
+          <Download className="mx-auto size-12 text-premium-gold" />
+          <p className="mt-4 text-lg font-bold text-white">
+            {activeProject ? "Your project is ready to download" : "Generate a project to export"}
+          </p>
           <p className="mt-2 text-sm leading-relaxed text-white/45">
-            Your project files are still generated, saved, and ready to download. Live rendering will return in a future release.
+            This tool delivers a downloadable Next.js code project — not a hosted live website.
+            After download, run <span className="text-white/70">npm install</span> and{" "}
+            <span className="text-white/70">npm run dev</span> on your machine, or deploy the
+            files to your own hosting.
           </p>
           <Button
             type="button"
@@ -1118,12 +1126,13 @@ function ComingSoonPreview({
         <div className="mt-5 space-y-3">
           <InfoTile label="Project" value={activeProject?.title ?? "Not generated yet"} />
           <InfoTile label="Type" value={activeProject?.type ?? "Auto-detected"} />
+          <InfoTile label="Files" value={String(fileCount)} />
           <InfoTile
-            label="Files"
-            value={String(activeProject?.generatedProject?.files.length ?? 0)}
+            label="Delivery"
+            value={activeProject ? "Source code (ZIP)" : "Generate project first"}
           />
           <InfoTile
-            label="Primary Action"
+            label="Primary action"
             value={activeProject ? "Download ZIP" : "Generate project"}
           />
         </div>
@@ -1913,7 +1922,7 @@ function BottomWorkspace({
                     {project.description}
                   </p>
                   <p className="mt-3 text-[12px] text-premium-gold-light/80">
-                    {project.type} · {project.createdAt}
+                    {project.type} ┬╖ {project.createdAt}
                   </p>
                 </button>
                 <div className="mt-4 flex flex-wrap gap-2">
