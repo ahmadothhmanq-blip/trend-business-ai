@@ -59,7 +59,7 @@ See `PRODUCT_VISION.md` §2. This principle **includes** D-015 (finished product
 1. **North star (D-015):** Trend Business AI is **not** a customer-facing code generator. Every service must aim for a complete usable result (use / export / publish) and a full UX.  
 2. **Current delivery (D-003):** Website Builder ships complete projects via **ZIP export** until preview/publish are Accepted and built. Export is an allowed delivery channel; unfinished trees and fake “live site” CTAs are not. Preview/interaction remain required product goals under the Core Product Principle.  
 3. Do not market a hosted live website or Live Preview unless the capability actually ships.  
-4. **Unsafe npm preview builder** remains **off** (D-004 / H08). **Safe** in-platform live preview is D-017 (`/api/website-builder/[id]/live-preview`). Public hosting stays gated (`WEBSITE_PUBLISH_ENABLED`).  
+4. **Unsafe npm preview builder** remains **off** (D-004 / H08). **Safe** live preview is D-017 (`/live-preview`). Public sites use `/w/[slug]` when published; disable with `WEBSITE_PUBLISH_ENABLED=false`.  
 5. Hide or disable placeholder providers (Gemini/Grok/Llama) in user-facing production paths until implemented.  
 6. No demo pages, fake buttons, or unfinished features presented as complete.  
 7. **D-016 (merged into Core Product Principle):** Every AI product must support post-generation **natural-language AI editing / continue / improve** with parent context — not generate-once only.

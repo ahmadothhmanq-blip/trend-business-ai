@@ -34,7 +34,7 @@
 | Marketing site | **Completed** | Strong SEO surface; **M01** ZIP/source honesty (not hosted live sites) |
 | Auth & profiles | **Completed** | Supabase session + dashboard guard |
 | Dashboard shell | **Completed** | Nav, theme (H04 React 19–safe), layout |
-| Website Builder (product) | **In Progress** (Phase 1) | Create → **in-platform live preview** (D-017) → NL Improve → versions + ZIP; publish prepared (`/w/[slug]` gated). npm compile preview still off (D-004). |
+| Website Builder (product) | **Phase 1 core complete** | Create → live preview → NL Improve → **Publish → /w/{slug}** + ZIP. npm compile preview still off (D-004). |
 | AI iteration (all products) | **Completed** (core) | D-016 — NL Improve/Continue with parent context across dedicated builders + workspace |
 | Landing / App builders | **Completed** (core) | Same family as website |
 | Brand / Logo / Image / Video / Content | **Completed** (partial) | Tools exist; media depth limited |

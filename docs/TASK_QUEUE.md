@@ -85,6 +85,7 @@
 | C20 | D-016 post-generation NL AI editing across AI products | Completed | Shared `lib/ai/iteration.ts`; dedicated builders + workspace/website Improve with AI |
 | C21 | Website Builder Phase 1 product pieces (preview + versions + NL edit UX) | Completed | Safe static preview, workspace `projects` link, prompt version chain; report in `WEBSITE_BUILDER_PHASE1_REPORT.md` |
 | C22 | Website Builder safe live preview + publish architecture (D-017) | Completed | `/live-preview`, `/publish`, `/w/[slug]` gate, migration 031 |
+| C23 | Website Builder public publish flow (prepare→publish→/w/slug) | Completed | Publish/unpublish API + UI; publish enabled by default; migration 031 applied |
 
 ---
 

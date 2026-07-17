@@ -7,8 +7,8 @@ import { NextResponse } from "next/server";
 type RouteContext = { params: Promise<{ slug: string }> };
 
 /**
- * Public hosted URL endpoint (architecture ready).
- * Serves only when WEBSITE_PUBLISH_ENABLED=true and publication status is published.
+ * Public hosted website URL.
+ * Serves sanitized static HTML when publishing is enabled and status is published.
  */
 export async function GET(_request: Request, context: RouteContext) {
   const { slug: rawSlug } = await context.params;
@@ -21,12 +21,8 @@ export async function GET(_request: Request, context: RouteContext) {
   if (!isWebsitePublishEnabled()) {
     return NextResponse.json(
       {
-        error: "Public website hosting is prepared but not enabled yet.",
-        architecture: {
-          route: "/w/[slug]",
-          gate: "WEBSITE_PUBLISH_ENABLED",
-          delivery: "static-html-sandbox",
-        },
+        error: "Public website hosting is disabled.",
+        hint: "Unset WEBSITE_PUBLISH_ENABLED or set it to true.",
       },
       { status: 503 },
     );

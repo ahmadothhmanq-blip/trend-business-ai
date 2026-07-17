@@ -1325,24 +1325,80 @@ function PreviewAndExportPanel({
   const [viewport, setViewport] = useState<PreviewViewport>("desktop");
   const [liveOpen, setLiveOpen] = useState(false);
   const [publishBusy, setPublishBusy] = useState(false);
-  const [plannedUrl, setPlannedUrl] = useState<string | null>(null);
+  const [publicUrl, setPublicUrl] = useState<string | null>(null);
+  const [publishStatus, setPublishStatus] = useState<
+    "none" | "prepared" | "published" | "unpublished"
+  >("none");
 
-  async function preparePublish() {
+  useEffect(() => {
+    if (!activeProject?.id) {
+      setPublicUrl(null);
+      setPublishStatus("none");
+      return;
+    }
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await fetch(`/api/website-builder/${activeProject.id}/publish`);
+        if (!res.ok || cancelled) return;
+        const data = await res.json();
+        if (cancelled) return;
+        const status = data.publication?.status as
+          | "prepared"
+          | "published"
+          | "unpublished"
+          | undefined;
+        setPublishStatus(status ?? "none");
+        setPublicUrl(
+          status === "published"
+            ? data.publicUrl ??
+                data.publication?.planned_public_url ??
+                data.publication?.public_path ??
+                null
+            : data.publication?.planned_public_url ??
+                data.publication?.public_path ??
+                null,
+        );
+      } catch {
+        /* ignore */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [activeProject?.id]);
+
+  async function runPublishAction(action: "prepare" | "publish" | "unpublish") {
     if (!activeProject?.id) return;
     setPublishBusy(true);
     try {
       const res = await fetch(`/api/website-builder/${activeProject.id}/publish`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
       });
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.error ?? "Could not prepare publish.");
+        toast.error(data.error ?? `Could not ${action} website.`);
         return;
       }
-      setPlannedUrl(data.publication?.planned_public_url ?? data.publication?.public_path ?? null);
-      toast.success(data.message ?? "Publish architecture prepared.");
+      const status = (data.publication?.status ?? action) as
+        | "prepared"
+        | "published"
+        | "unpublished";
+      setPublishStatus(status);
+      const url =
+        data.publicUrl ??
+        data.publication?.planned_public_url ??
+        data.publication?.public_path ??
+        null;
+      setPublicUrl(url);
+      toast.success(data.message ?? `Website ${action}ed.`);
+      if (action === "publish" && url) {
+        window.open(url.startsWith("http") ? url : url, "_blank", "noopener,noreferrer");
+      }
     } catch {
-      toast.error("Could not prepare publish.");
+      toast.error(`Could not ${action} website.`);
     } finally {
       setPublishBusy(false);
     }
@@ -1432,36 +1488,65 @@ function PreviewAndExportPanel({
       <DashboardPanel>
         <SectionHeader
           icon={Globe2}
-          title="Publish (prepared)"
-          description="Safe hosted URL architecture — go-live stays gated."
+          title="Publish website"
+          description="Publish a public URL for this version (/w/{slug})."
         />
         <div className="mt-5 space-y-3">
           <InfoTile label="Website" value={activeProject?.title ?? "Not created yet"} />
-          <InfoTile label="Mode" value={activeProject?.mode ?? "generate"} />
           <InfoTile label="Files" value={String(fileCount)} />
+          <InfoTile label="Status" value={publishStatus === "none" ? "Not published" : publishStatus} />
           <InfoTile
-            label="Planned URL"
-            value={plannedUrl ?? "Prepare publish to allocate /w/{slug}"}
+            label="Public URL"
+            value={publicUrl ?? "Publish to create a live /w/{slug} link"}
           />
-          <Button
-            type="button"
-            variant="outline"
-            className="btn-ghost-gold h-10 w-full rounded-xl"
-            onClick={() => void preparePublish()}
-            disabled={!activeProject?.id || publishBusy}
-          >
-            {publishBusy ? (
-              <>
-                <Loader2 className="size-4 animate-spin" />
-                Preparing…
-              </>
-            ) : (
-              <>
-                <ExternalLink className="size-4" />
-                Prepare hosted URL
-              </>
-            )}
-          </Button>
+          <div className="flex flex-col gap-2">
+            <Button
+              type="button"
+              className="btn-gold h-10 w-full rounded-xl font-bold text-luxury-black"
+              onClick={() => void runPublishAction("publish")}
+              disabled={!activeProject?.id || publishBusy}
+            >
+              {publishBusy ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" />
+                  Publishing…
+                </>
+              ) : (
+                <>
+                  <ExternalLink className="size-4" />
+                  {publishStatus === "published" ? "Update & republish" : "Publish public URL"}
+                </>
+              )}
+            </Button>
+            {publishStatus === "published" && publicUrl ? (
+              <Button
+                type="button"
+                variant="outline"
+                className="btn-ghost-gold h-10 w-full rounded-xl"
+                onClick={() =>
+                  window.open(
+                    publicUrl.startsWith("http") ? publicUrl : publicUrl,
+                    "_blank",
+                    "noopener,noreferrer",
+                  )
+                }
+              >
+                <Maximize2 className="size-4" />
+                Open public URL
+              </Button>
+            ) : null}
+            {publishStatus === "published" ? (
+              <Button
+                type="button"
+                variant="outline"
+                className="h-10 w-full rounded-xl border-white/10 text-white/60"
+                onClick={() => void runPublishAction("unpublish")}
+                disabled={publishBusy}
+              >
+                Unpublish
+              </Button>
+            ) : null}
+          </div>
         </div>
       </DashboardPanel>
 

@@ -91,16 +91,16 @@
 
 ---
 
-## D-017 — Safe sandboxed live preview + prepared hosted URL
+## D-017 — Safe sandboxed live preview + public publish URL
 
 | Field | Value |
 |-------|--------|
 | Date | 2026-07-17 |
-| Status | **Accepted** |
-| Context | Core Product Principle requires preview + path to publish without RCE |
-| Decision | **Live preview** = authenticated `GET /api/website-builder/[id]/live-preview` serving sanitized static HTML from the generation blueprint (multi-page, no scripts). **Publish** = prepare `website_publications` + planned `/w/[slug]`; public go-live gated by `WEBSITE_PUBLISH_ENABLED` and `status=published`. |
-| Consequences | Users view generated sites inside the platform. ZIP/export remains. npm preview builder stays off (D-004). See `docs/WEBSITE_PUBLISH_ARCHITECTURE.md`. |
-| Related | D-004, D-003, D-015, F01, F02, F09 |
+| Status | **Accepted** (publish flow complete) |
+| Context | Core Product Principle requires preview + publish without RCE |
+| Decision | **Live preview** = authenticated `/api/website-builder/[id]/live-preview` (sanitized static HTML). **Publish** = `website_publications` with prepare/publish/unpublish; public `GET /w/[slug]` when `status=published`. Publishing enabled unless `WEBSITE_PUBLISH_ENABLED=false`. |
+| Consequences | Full flow: generate → preview → improve → publish → open public URL. npm preview builder stays off (D-004). Migration 031 required. |
+| Related | D-004, D-003, D-015, F01, F02, F09, `WEBSITE_PUBLISH_ARCHITECTURE.md` |
 
 ---
 
