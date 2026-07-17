@@ -102,6 +102,22 @@ Before marking a High-priority task done:
 
 ---
 
+## Article XI — Code Quality Standard
+
+All work on Trend Business AI must meet a **global SaaS company** bar—not a prototype or “good enough for now” bar.
+
+1. All code must be **production-ready**, not temporary scaffolding, throwaway hacks, or left-behind TODOs that block ship quality.  
+2. Follow **industry best practices** for the stack in use (Next.js App Router, React, TypeScript, Supabase, Zod, and established repo patterns).  
+3. Code must be **scalable**, **maintainable**, **secure**, and **performant**.  
+4. Avoid duplicated code — apply the **DRY** principle; extract shared helpers when the same logic appears in multiple places.  
+5. Use **clean architecture** and **clear separation of responsibilities** (UI vs API vs domain/`lib` vs plugins vs data access).  
+6. UI code must follow **professional global SaaS standards** (consistent layout, accessibility, clear hierarchy, and the existing product visual language).  
+7. AI integrations must be **flexible** and support a **future multi-provider** architecture (ProviderManager / adapters — do not hard-wire a single vendor into product surfaces).  
+8. No feature is considered **complete** without **testing** and a **documentation update** (`PROJECT_STATUS.md` / `TASK_QUEUE.md` / related docs as applicable).  
+9. **Working code is not enough**; code quality must match a **global SaaS company standard**.
+
+---
+
 ## Violations
 
 Agents/devs must stop and ask the user when asked to:
@@ -111,6 +127,7 @@ Agents/devs must stop and ask the user when asked to:
 - Ship “live website” claims without implementation  
 - Delete billing/auth/RLS protections  
 - Ignore `docs/` and invent a parallel plan  
+- Ship temporary or low-quality code that violates Article XI  
 
 ---
 
