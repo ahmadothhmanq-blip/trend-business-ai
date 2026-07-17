@@ -1,7 +1,7 @@
 # Trend Business AI — Final Documentation Review
 
 **Review date:** 2026-07-17  
-**Scope:** All files under `docs/` validated against the **current local project tree**  
+**Scope:** `docs/` SSOT pack + root `MASTER_PROJECT_DOCUMENTATION.md`, validated against the **current local project tree**  
 **Application source code:** Not modified  
 
 ---
@@ -28,8 +28,10 @@
 
 ### SSOT hygiene
 
-- `docs/README.md` indexes all living docs including this review.  
-- Added tasks **L07** (orphan stubs) and **L08** (commit docs to remote).
+- `docs/README.md` indexes all living docs including this review and the master reference.  
+- Root **`MASTER_PROJECT_DOCUMENTATION.md`** retained as the full system reference (features, flows, DB, AI, APIs).  
+- Added tasks **L07** (orphan stubs) and **L08** (docs to remote / `main`).  
+- Docs SSOT committed on branch `cursor/docs-ssot-audit-plan` (pending merge to `main`).
 
 ---
 
@@ -37,7 +39,7 @@
 
 | Gap | Severity | Notes |
 |-----|----------|-------|
-| Docs not yet on GitHub | High (process) | Local SSOT until L08 commit approved |
+| Docs not yet merged to `main` / GitHub default | Medium (process) | On feature branch; L08 completes on merge |
 | Per-table column-level schema dump | Medium | Domains listed; full ERD not generated |
 | Per-API endpoint catalog (all 73) | Medium | Groups listed; not every path documented |
 | Env var matrix with prod/staging checkmarks | Medium | Listed in tasks H01–H02; not a filled checklist file |
@@ -82,10 +84,11 @@ The docs pack is ready to govern **approved implementation work**:
 - Features/dashboard/AI/DB/security/roadmap are aligned  
 - Decisions and tasks are non-conflicting  
 - WT vs HEAD risks are explicit  
+- Master reference + final review are part of the pack  
 
 ### Caveats (not blockers for “docs SSOT,” blockers for “product production”)
 
-1. Docs should be **committed to `main`** (L08) to be the remote source of truth.  
+1. Merge docs branch to **`main`** (L08) so the remote default branch matches SSOT.  
 2. Application production readiness is **separate** — still beta; see High tasks H01–H08.  
 3. Depth catalogs (every API path / every SQL column) can be added later without blocking Phase 2.
 
@@ -95,15 +98,16 @@ The docs pack is ready to govern **approved implementation work**:
 
 | File | Result |
 |------|--------|
-| `PROJECT_AUDIT.md` | Updated inventory + dashboard map |
-| `PROJECT_MASTER_BLUEPRINT.md` | Major expansion (lib/plugins/API/DB/security/WT) |
-| `AI_DEVELOPMENT_CONSTITUTION.md` | Security pointers strengthened |
-| `PROJECT_STATUS.md` | Counts + WT baseline |
-| `TASK_QUEUE.md` | Clarifications + L07/L08 |
-| `DECISIONS_LOG.md` | D-011, D-012 added |
-| `ROADMAP.md` | Phase 1b review + Phase 7 L07/L08 |
-| `README.md` | Index updated |
-| `FINAL_REVIEW.md` | This file |
+| `MASTER_PROJECT_DOCUMENTATION.md` (repo root) | Full system reference; indexed from `docs/README.md` |
+| `docs/PROJECT_AUDIT.md` | Updated inventory + dashboard map |
+| `docs/PROJECT_MASTER_BLUEPRINT.md` | Major expansion (lib/plugins/API/DB/security/WT) |
+| `docs/AI_DEVELOPMENT_CONSTITUTION.md` | Security pointers strengthened |
+| `docs/PROJECT_STATUS.md` | Counts + WT baseline |
+| `docs/TASK_QUEUE.md` | Clarifications + L07/L08 |
+| `docs/DECISIONS_LOG.md` | D-011, D-012 added |
+| `docs/ROADMAP.md` | Phase 1b review + Phase 7 L07/L08 |
+| `docs/README.md` | Index updated |
+| `docs/FINAL_REVIEW.md` | This file |
 
 ---
 
@@ -111,7 +115,7 @@ The docs pack is ready to govern **approved implementation work**:
 
 **Await approval** before:
 
-1. Committing `docs/` (L08)  
+1. Pushing / merging this docs branch to `main` (finish L08)  
 2. Starting Phase 2 application tasks (H01+)  
 
-No application source code was changed in this review.
+No application source code was changed in this documentation pass.

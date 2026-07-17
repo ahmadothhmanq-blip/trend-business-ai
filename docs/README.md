@@ -5,6 +5,7 @@ Living documentation for the **existing** Trend Business AI project.
 
 | Document | Purpose |
 |----------|---------|
+| [../MASTER_PROJECT_DOCUMENTATION.md](../MASTER_PROJECT_DOCUMENTATION.md) | Full system reference (all features, flows, DB, AI, APIs) |
 | [PROJECT_AUDIT.md](./PROJECT_AUDIT.md) | Phase 1 complete audit |
 | [PROJECT_MASTER_BLUEPRINT.md](./PROJECT_MASTER_BLUEPRINT.md) | Architecture & product map |
 | [AI_DEVELOPMENT_CONSTITUTION.md](./AI_DEVELOPMENT_CONSTITUTION.md) | Rules for humans/agents |
@@ -14,8 +15,14 @@ Living documentation for the **existing** Trend Business AI project.
 | [ROADMAP.md](./ROADMAP.md) | Phased implementation plan |
 | [FINAL_REVIEW.md](./FINAL_REVIEW.md) | Docs validation summary |
 
+**How to use**
+
+- **Day-to-day planning / agents:** start with `PROJECT_MASTER_BLUEPRINT.md` + `TASK_QUEUE.md` + `DECISIONS_LOG.md`.  
+- **Deep onboarding / full inventory:** read `MASTER_PROJECT_DOCUMENTATION.md`.  
+- **Docs health:** see `FINAL_REVIEW.md`.
+
 **Rules**
 
 1. Do not modify application source code until implementation is explicitly approved.  
 2. Inventories describe the **local working tree**; note WT vs HEAD gaps (D-011).  
-3. Commit `docs/` to `main` when approved (task L08) so GitHub matches SSOT.
+3. Merge this docs branch to `main` when approved (task L08) so GitHub matches SSOT.
