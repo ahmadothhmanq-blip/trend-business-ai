@@ -100,7 +100,15 @@ export async function POST(request: Request) {
   const input = parsed.data;
   const projectKind = detectWebsiteProjectKind(input);
   const settings = await providerManager.loadUserSettings(
-    auth.supabase,
+    auth.supabase as unknown as {
+      from: (table: string) => {
+        select: (columns: string) => {
+          eq: (col: string, val: string) => {
+            single: () => PromiseLike<{ data: unknown; error: unknown }>;
+          };
+        };
+      };
+    },
     auth.user!.id,
   );
 

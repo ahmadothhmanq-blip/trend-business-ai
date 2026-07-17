@@ -60,9 +60,19 @@ class ProviderManager {
   }
 
   /** Load user settings from Supabase and set the active provider dynamically. */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Supabase client chain typing is overly deep for this helper
   async loadUserSettings(
-    supabase: { from: (table: string) => any },
+    supabase: {
+      from: (table: string) => {
+        select: (columns: string) => {
+          eq: (
+            col: string,
+            val: string,
+          ) => {
+            single: () => PromiseLike<{ data: unknown; error: unknown }>;
+          };
+        };
+      };
+    },
     userId: string,
   ): Promise<AIProviderSettings | null> {
     try {
