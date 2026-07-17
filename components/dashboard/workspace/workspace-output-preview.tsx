@@ -164,7 +164,7 @@ export function WorkspaceOutputPreview({
                 disabled={Boolean(isStreaming) || project.status === "failed"}
               >
                 <StepForward className="size-4" />
-                Continue
+                Improve with AI
               </Button>
             ) : null}
             {project.status === "failed" && onRetry ? (

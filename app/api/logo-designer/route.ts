@@ -4,6 +4,7 @@ import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import { generateLogo } from "@/lib/logo-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
+import { resolveIteratedPrompt } from "@/lib/ai/iteration";
 import { getLogoStyleLabel } from "@/lib/constants/logo-designer";
 import type { LogoGeneration, LogoBlueprint } from "@/types/logo";
 import { NextResponse } from "next/server";
@@ -21,6 +22,7 @@ const requestSchema = z.object({
   options: z.array(z.string().trim()).default([]),
   mode: z.enum(["generate", "regenerate", "continue", "retry"]).optional(),
   parentGenerationId: z.string().uuid().optional(),
+  continueInstruction: z.string().trim().max(4000).optional(),
   projectId: z.string().uuid().optional(),
 });
 
@@ -86,8 +88,22 @@ export async function POST(request: Request) {
   let stage = "generateLogo";
 
   try {
-    const project = await generateLogo({
+    const iterated = await resolveIteratedPrompt({
+      supabase: auth.supabase,
+      table: "logo_generations",
+      userId: auth.user!.id,
+      mode: input.mode,
       prompt: input.prompt,
+      continueInstruction: input.continueInstruction,
+      parentGenerationId: input.parentGenerationId,
+      titleField: "logo_name",
+    });
+    if (!iterated.ok) {
+      return NextResponse.json({ error: iterated.error }, { status: iterated.status });
+    }
+
+    const project = await generateLogo({
+      prompt: iterated.prompt,
       brandName: input.brandName,
       logoStyle: input.logoStyle,
       industry: input.industry,

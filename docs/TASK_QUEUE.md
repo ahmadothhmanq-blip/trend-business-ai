@@ -82,6 +82,7 @@
 | C17 | H07 Live Preview honesty (Download/ZIP messaging) | Completed | UI copy only; preview stays off |
 | C18 | H08 preview builder production hard-disable | Completed | Env policy + code guard until F01 |
 | C19 | Accept product vision SSOT (`PRODUCT_VISION.md`, D-015) | Completed | Finished-product north star; hubs + P1–P4; ZIP remains interim delivery (D-003) |
+| C20 | D-016 post-generation NL AI editing across AI products | Completed | Shared `lib/ai/iteration.ts`; dedicated builders + workspace/website Improve with AI |
 
 ---
 

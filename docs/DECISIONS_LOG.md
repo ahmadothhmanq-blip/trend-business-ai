@@ -61,7 +61,20 @@
 | Context | Product vision: Trend Business AI is an AI Business Operating System |
 | Decision | The platform is **not** a code generator for customers. AI may use code internally; every service must deliver a **real, professional, usable result** (use / export / publish) with a complete UX. See `PRODUCT_VISION.md`. |
 | Consequences | New features judged against finished-product bar. Placeholder/demo/fake CTAs forbidden. Website Builder path: create → preview → AI edit → export/publish; export-only is interim honesty (D-003), not the end state. Preview/hosted still require Accepted F01/F09. |
-| Related | `PRODUCT_VISION.md`, D-003, D-004, D-010, Constitution Art. IV |
+| Related | `PRODUCT_VISION.md`, D-003, D-004, D-010, D-016, Constitution Art. IV |
+
+---
+
+## D-016 — Post-generation AI editing required on every AI product
+
+| Field | Value |
+|-------|--------|
+| Date | 2026-07-17 |
+| Status | **Accepted** |
+| Context | Finished-product UX requires iteration, not one-shot generation |
+| Decision | Every AI product must support **AI-powered editing, improvement, and iteration after generation**. Users continuously modify results via **natural-language commands** (continue/improve with parent context). Regenerate-without-context alone is not enough. |
+| Consequences | APIs load parent generation + apply edit instruction (`lib/ai/iteration.ts`). UI exposes Improve/Continue. Website + Workspace already had continue; dedicated builders must match. |
+| Related | D-015, `PRODUCT_VISION.md` §2 / §12, Constitution Art. IV |
 
 ---
 

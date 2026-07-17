@@ -27,6 +27,12 @@ Every service must deliver:
 - Professional quality output  
 - Ready for use, export, or publishing  
 - A complete user experience  
+- **AI-powered editing after generation** (D-016)
+
+### AI iteration (required for every AI product)
+
+After the first result, the user must be able to **continuously improve and edit** the product with **natural-language commands** (continue / improve / regenerate with context).  
+One-shot generate-only flows are incomplete.
 
 | Product | Customer outcome |
 |---------|------------------|
@@ -176,7 +182,7 @@ AI Website Builder, AI App Builder, Creative Studio, Marketing Hub, Business Hub
 4. AI understands request  
 5. AI creates result  
 6. User reviews  
-7. User edits with AI  
+7. User edits with AI (**natural language**, repeatable — D-016)  
 8. User exports or publishes  
 
 ---

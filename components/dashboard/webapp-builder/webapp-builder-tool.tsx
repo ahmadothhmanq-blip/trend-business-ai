@@ -64,6 +64,7 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
 
   const [generations, setGenerations] = useState<WebAppGeneration[]>(initialGenerations ?? []);
   const [previewGen, setPreviewGen] = useState<WebAppGeneration | null>(null);
+  const [parentId, setParentId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -88,27 +89,65 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
     if (def) setFeatures([...def.defaultFeatures]);
   };
 
-  const handleGenerate = async (mode: "generate" | "regenerate" | "retry" = "generate", parentId?: string) => {
-    if (!selectedType || !prompt.trim()) { toast.error("Select an app type and describe your app."); return; }
+  const handleGenerate = async (
+    mode: "generate" | "regenerate" | "continue" | "retry" = "generate",
+    parentGenerationId?: string,
+  ) => {
+    if (!selectedType || !prompt.trim()) {
+      toast.error(
+        mode === "continue"
+          ? "Describe the changes you want in natural language."
+          : "Select an app type and describe your app.",
+      );
+      return;
+    }
     setStep("generating");
     setProgressEvents(["Sending request..."]);
     try {
       const res = await fetch("/api/webapp-builder", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt, appType: selectedType, language, designStyle, colorStyle, features, mode, parentGenerationId: parentId }),
+        body: JSON.stringify({
+          prompt,
+          appType: selectedType,
+          language,
+          designStyle,
+          colorStyle,
+          features,
+          mode,
+          parentGenerationId,
+          continueInstruction: mode === "continue" ? prompt : undefined,
+        }),
       });
       const data = await res.json();
       if (!res.ok) { toast.error(data.error ?? "Generation failed"); setStep("config"); return; }
       toast.success(data.message ?? "Web app generated!");
+      setParentId(null);
       if (data.generation) { setPreviewGen(data.generation); setStep("preview"); } else { setStep("history"); }
     } catch { toast.error("Request failed. Check your connection."); setStep("config"); }
   };
 
+  const loadGenerationConfig = (gen: WebAppGeneration) => {
+    setSelectedType(gen.app_type);
+    setLanguage(gen.language);
+    setDesignStyle(gen.design_style);
+    setColorStyle(gen.color_style);
+    setFeatures(gen.features ?? []);
+  };
+
   const handleRegenerate = (gen: WebAppGeneration) => {
-    setSelectedType(gen.app_type); setPrompt(gen.prompt); setLanguage(gen.language);
-    setDesignStyle(gen.design_style); setColorStyle(gen.color_style); setFeatures(gen.features ?? []);
-    handleGenerate("regenerate", gen.id);
+    loadGenerationConfig(gen);
+    setPrompt(gen.prompt);
+    void handleGenerate("regenerate", gen.id);
+  };
+
+  const handleContinue = (gen: WebAppGeneration) => {
+    loadGenerationConfig(gen);
+    setParentId(gen.id);
+    setPrompt("");
+    setPreviewGen(null);
+    setStep("config");
+    toast.message("Describe your changes in natural language, then click Improve with AI.");
   };
 
   const handleFavorite = async (gen: WebAppGeneration) => {
@@ -132,6 +171,8 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
         files={bp?.files ?? []}
         downloadName={bp?.title || previewGen.app_name}
         onBack={() => { setPreviewGen(null); setStep("history"); fetchGenerations(); }}
+        onRegenerate={() => handleRegenerate(previewGen)}
+        onContinue={() => handleContinue(previewGen)}
       />
     );
   }
@@ -180,8 +221,20 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
           <DashboardCardContent>
             <div className="space-y-5">
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-white/60">Describe your app</label>
-                <Textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="Describe the web application you want to build in detail..." rows={4} className={cn(dashboardInputClass, "min-h-[100px] resize-none")} />
+                <label className="mb-1.5 block text-xs font-medium text-white/60">
+                  {parentId ? "Describe changes (natural language)" : "Describe your app"}
+                </label>
+                <Textarea
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder={
+                    parentId
+                      ? "Example: Add a dark mode toggle, simplify the dashboard layout, and add export to CSV..."
+                      : "Describe the web application you want to build in detail..."
+                  }
+                  rows={4}
+                  className={cn(dashboardInputClass, "min-h-[100px] resize-none")}
+                />
               </div>
               <div className="grid gap-4 sm:grid-cols-3">
                 <div><label className="mb-1.5 block text-xs font-medium text-white/60">Language</label><select value={language} onChange={(e) => setLanguage(e.target.value)} className={dashboardSelectClass}>{WEBAPP_LANGUAGES.map((l) => <option key={l} value={l}>{l}</option>)}</select></div>
@@ -192,9 +245,30 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
                 <label className="mb-1.5 block text-xs font-medium text-white/60">Features</label>
                 <div className="flex flex-wrap gap-2">{WEBAPP_FEATURE_OPTIONS.map(({ id, label }) => <CheckboxToggle key={id} label={label} checked={features.includes(id)} onChange={(c) => setFeatures((p) => c ? [...p, id] : p.filter((f) => f !== id))} />)}</div>
               </div>
-              <div className="flex gap-3 pt-2">
-                <Button variant="outline" className="rounded-xl border-white/10 text-white/60 hover:border-white/20" onClick={() => setStep("type")}>Back</Button>
-                <Button onClick={() => handleGenerate()} disabled={!prompt.trim()} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black"><Sparkles className="size-4" /> Generate Web App</Button>
+              <div className="flex flex-wrap gap-3 pt-2">
+                <Button
+                  variant="outline"
+                  className="rounded-xl border-white/10 text-white/60 hover:border-white/20"
+                  onClick={() => {
+                    setParentId(null);
+                    setStep("type");
+                  }}
+                >
+                  Back
+                </Button>
+                {parentId ? (
+                  <Button
+                    onClick={() => void handleGenerate("continue", parentId)}
+                    disabled={!prompt.trim()}
+                    className="btn-gold gap-2 rounded-xl font-bold text-luxury-black"
+                  >
+                    <Sparkles className="size-4" /> Improve with AI
+                  </Button>
+                ) : (
+                  <Button onClick={() => void handleGenerate()} disabled={!prompt.trim()} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">
+                    <Sparkles className="size-4" /> Generate Web App
+                  </Button>
+                )}
               </div>
             </div>
           </DashboardCardContent>
@@ -222,6 +296,7 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
                     onDelete={() => handleDelete(gen.id)}
                     onView={() => { setPreviewGen(gen); setStep("preview"); }}
                     onRegenerate={() => handleRegenerate(gen)}
+                    onContinue={() => handleContinue(gen)}
                   />
                 );
               })}

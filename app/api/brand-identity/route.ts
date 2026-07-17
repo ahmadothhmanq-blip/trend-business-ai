@@ -4,6 +4,7 @@ import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import { generateBrandIdentity } from "@/lib/brand-identity-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
+import { resolveIteratedPrompt } from "@/lib/ai/iteration";
 import { getBrandTypeLabel } from "@/lib/constants/brand-identity-builder";
 import type { BrandIdentityGeneration, BrandIdentityBlueprint } from "@/types/brand-identity";
 import { NextResponse } from "next/server";
@@ -19,6 +20,7 @@ const requestSchema = z.object({
   deliverables: z.array(z.string().trim()).default([]),
   mode: z.enum(["generate", "regenerate", "continue", "retry"]).optional(),
   parentGenerationId: z.string().uuid().optional(),
+  continueInstruction: z.string().trim().max(4000).optional(),
   projectId: z.string().uuid().optional(),
 });
 
@@ -84,8 +86,22 @@ export async function POST(request: Request) {
   let stage = "generateBrandIdentity";
 
   try {
-    const result = await generateBrandIdentity({
+    const iterated = await resolveIteratedPrompt({
+      supabase: auth.supabase,
+      table: "brand_identity_generations",
+      userId: auth.user!.id,
+      mode: input.mode,
       prompt: input.prompt,
+      continueInstruction: input.continueInstruction,
+      parentGenerationId: input.parentGenerationId,
+      titleField: "brand_name",
+    });
+    if (!iterated.ok) {
+      return NextResponse.json({ error: iterated.error }, { status: iterated.status });
+    }
+
+    const result = await generateBrandIdentity({
+      prompt: iterated.prompt,
       brandName: input.brandName,
       brandType: input.brandType,
       industry: input.industry,

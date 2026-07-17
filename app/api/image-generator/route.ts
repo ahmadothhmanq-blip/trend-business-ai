@@ -4,6 +4,7 @@ import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import { generateImage } from "@/lib/image-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
+import { resolveIteratedPrompt } from "@/lib/ai/iteration";
 import { getImageTypeLabel } from "@/lib/constants/image-generator";
 import type { ImageGeneration, ImageBlueprint } from "@/types/image-generation";
 import { NextResponse } from "next/server";
@@ -21,6 +22,7 @@ const requestSchema = z.object({
   brandColors: z.array(z.string().trim()).default([]),
   mode: z.enum(["generate", "regenerate", "continue", "retry"]).optional(),
   parentGenerationId: z.string().uuid().optional(),
+  continueInstruction: z.string().trim().max(4000).optional(),
   projectId: z.string().uuid().optional(),
 });
 
@@ -86,8 +88,22 @@ export async function POST(request: Request) {
   let stage = "generateImage";
 
   try {
-    const result = await generateImage({
+    const iterated = await resolveIteratedPrompt({
+      supabase: auth.supabase,
+      table: "image_generations",
+      userId: auth.user!.id,
+      mode: input.mode,
       prompt: input.prompt,
+      continueInstruction: input.continueInstruction,
+      parentGenerationId: input.parentGenerationId,
+      titleField: "image_name",
+    });
+    if (!iterated.ok) {
+      return NextResponse.json({ error: iterated.error }, { status: iterated.status });
+    }
+
+    const result = await generateImage({
+      prompt: iterated.prompt,
       negativePrompt: input.negativePrompt,
       imageType: input.imageType,
       style: input.style,

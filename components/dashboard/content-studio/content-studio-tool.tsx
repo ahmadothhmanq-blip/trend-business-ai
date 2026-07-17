@@ -13,6 +13,7 @@ import {
   Download,
   FileText,
   Lightbulb,
+  RefreshCw,
   Search,
   Sparkles,
   Wand2,
@@ -62,7 +63,17 @@ type Props = { initialGenerations?: ContentGeneration[] };
 
 type PreviewTab = "content" | "seo" | "headlines" | "review" | "files";
 
-function ContentPreview({ gen, onBack }: { gen: ContentGeneration; onBack: () => void }) {
+function ContentPreview({
+  gen,
+  onBack,
+  onRegenerate,
+  onContinue,
+}: {
+  gen: ContentGeneration;
+  onBack: () => void;
+  onRegenerate?: () => void;
+  onContinue?: () => void;
+}) {
   const bp = gen.blueprint;
   const [tab, setTab] = useState<PreviewTab>("content");
   const [copied, setCopied] = useState(false);
@@ -102,7 +113,17 @@ function ContentPreview({ gen, onBack }: { gen: ContentGeneration; onBack: () =>
           <h3 className="truncate font-bold text-white">{bp.title}</h3>
           <p className="text-xs text-white/40">{getContentTypeLabel(bp.contentType)} &middot; {bp.tone} &middot; {bp.language} &middot; {wordCount} words &middot; {gen.provider ?? "deepseek"}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          {onRegenerate ? (
+            <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:border-white/20" onClick={onRegenerate}>
+              <RefreshCw className="size-3" /> Regenerate
+            </Button>
+          ) : null}
+          {onContinue ? (
+            <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-premium-gold/20 text-xs text-premium-gold-light hover:border-premium-gold/40" onClick={onContinue}>
+              <Wand2 className="size-3" /> Improve with AI
+            </Button>
+          ) : null}
           <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:text-white" onClick={handleCopy}>
             {copied ? <Check className="size-3" /> : <ClipboardCopy className="size-3" />} {copied ? "Copied" : "Copy"}
           </Button>
@@ -332,6 +353,7 @@ export function ContentStudioTool({ initialGenerations }: Props) {
 
   const [generations, setGenerations] = useState<ContentGeneration[]>(initialGenerations ?? []);
   const [previewGen, setPreviewGen] = useState<ContentGeneration | null>(null);
+  const [parentId, setParentId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -366,8 +388,15 @@ export function ContentStudioTool({ initialGenerations }: Props) {
     }
   };
 
-  const handleGenerate = async (mode: ContentGeneration["mode"] = "generate", parentId?: string) => {
-    if (!selectedTool || !prompt.trim()) { toast.error("Select a tool and describe your content."); return; }
+  const handleGenerate = async (mode: ContentGeneration["mode"] = "generate", parentGenerationId?: string) => {
+    if (!selectedTool || !prompt.trim()) {
+      toast.error(
+        mode === "continue"
+          ? "Describe the changes you want in natural language."
+          : "Select a tool and describe your content.",
+      );
+      return;
+    }
     setStep("generating");
     setProgressEvents(["Sending request..."]);
     try {
@@ -377,23 +406,44 @@ export function ContentStudioTool({ initialGenerations }: Props) {
         body: JSON.stringify({
           prompt, contentTool: selectedTool, contentType: selectedType,
           tone, audience, language, brandVoice, writingStyle,
-          creativityLevel, options, seoKeywords, mode, parentGenerationId: parentId,
+          creativityLevel, options, seoKeywords, mode, parentGenerationId,
+          continueInstruction: mode === "continue" ? prompt : undefined,
         }),
       });
       const d = await res.json();
       if (!res.ok) { toast.error(d.error ?? "Generation failed"); setStep("config"); return; }
       toast.success(d.message ?? "Content created!");
+      setParentId(null);
       if (d.generation) { setPreviewGen(d.generation); setStep("preview"); } else { setStep("history"); }
     } catch { toast.error("Request failed."); setStep("config"); }
   };
 
+  const loadGenerationConfig = (gen: ContentGeneration) => {
+    setSelectedTool(gen.content_tool);
+    setSelectedType(gen.content_type);
+    setTone(gen.tone);
+    setAudience(gen.audience);
+    setLanguage(gen.language);
+    setBrandVoice(gen.brand_voice);
+    setWritingStyle(gen.writing_style);
+    setCreativityLevel(gen.creativity_level);
+    setOptions(gen.options ?? []);
+    setSeoKeywords(gen.seo_keywords);
+  };
+
   const handleRegenerate = (gen: ContentGeneration) => {
-    setSelectedTool(gen.content_tool); setSelectedType(gen.content_type);
-    setPrompt(gen.prompt); setTone(gen.tone); setAudience(gen.audience);
-    setLanguage(gen.language); setBrandVoice(gen.brand_voice);
-    setWritingStyle(gen.writing_style); setCreativityLevel(gen.creativity_level);
-    setOptions(gen.options ?? []); setSeoKeywords(gen.seo_keywords);
-    handleGenerate("regenerate", gen.id);
+    loadGenerationConfig(gen);
+    setPrompt(gen.prompt);
+    void handleGenerate("regenerate", gen.id);
+  };
+
+  const handleContinue = (gen: ContentGeneration) => {
+    loadGenerationConfig(gen);
+    setParentId(gen.id);
+    setPrompt("");
+    setPreviewGen(null);
+    setStep("config");
+    toast.message("Describe your changes in natural language, then click Improve with AI.");
   };
 
   const handleFavorite = async (gen: ContentGeneration) => {
@@ -409,7 +459,14 @@ export function ContentStudioTool({ initialGenerations }: Props) {
   };
 
   if (step === "preview" && previewGen) {
-    return <ContentPreview gen={previewGen} onBack={() => { setPreviewGen(null); setStep("history"); fetchGenerations(); }} />;
+    return (
+      <ContentPreview
+        gen={previewGen}
+        onBack={() => { setPreviewGen(null); setStep("history"); fetchGenerations(); }}
+        onRegenerate={() => handleRegenerate(previewGen)}
+        onContinue={() => handleContinue(previewGen)}
+      />
+    );
   }
 
   if (step === "generating") {
@@ -501,8 +558,20 @@ export function ContentStudioTool({ initialGenerations }: Props) {
           <DashboardCardContent>
             <div className="space-y-5">
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-white/60">Content brief *</label>
-                <Textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="Describe the content you want to create — topic, key points, goals, target audience, any specific requirements..." rows={4} className={cn(dashboardInputClass, "min-h-[100px] resize-none")} />
+                <label className="mb-1.5 block text-xs font-medium text-white/60">
+                  {parentId ? "Describe changes (natural language)" : "Content brief *"}
+                </label>
+                <Textarea
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder={
+                    parentId
+                      ? "Example: Make the tone more conversational, shorten the intro, and add a stronger CTA..."
+                      : "Describe the content you want to create — topic, key points, goals, target audience, any specific requirements..."
+                  }
+                  rows={4}
+                  className={cn(dashboardInputClass, "min-h-[100px] resize-none")}
+                />
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -562,11 +631,30 @@ export function ContentStudioTool({ initialGenerations }: Props) {
                 ))}
               </div>
 
-              <div className="flex gap-3 pt-2">
-                <Button variant="outline" className="rounded-xl border-white/10 text-white/60 hover:border-white/20" onClick={() => setStep(selectedTool === "content-calendar" || selectedTool === "campaign-planner" ? "tool" : "type")}>Back</Button>
-                <Button onClick={() => handleGenerate()} disabled={!prompt.trim()} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">
-                  <Sparkles className="size-4" /> Generate Content
+              <div className="flex flex-wrap gap-3 pt-2">
+                <Button
+                  variant="outline"
+                  className="rounded-xl border-white/10 text-white/60 hover:border-white/20"
+                  onClick={() => {
+                    setParentId(null);
+                    setStep(selectedTool === "content-calendar" || selectedTool === "campaign-planner" ? "tool" : "type");
+                  }}
+                >
+                  Back
                 </Button>
+                {parentId ? (
+                  <Button
+                    onClick={() => void handleGenerate("continue", parentId)}
+                    disabled={!prompt.trim()}
+                    className="btn-gold gap-2 rounded-xl font-bold text-luxury-black"
+                  >
+                    <Sparkles className="size-4" /> Improve with AI
+                  </Button>
+                ) : (
+                  <Button onClick={() => void handleGenerate()} disabled={!prompt.trim()} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">
+                    <Sparkles className="size-4" /> Generate Content
+                  </Button>
+                )}
               </div>
             </div>
           </DashboardCardContent>
@@ -593,7 +681,8 @@ export function ContentStudioTool({ initialGenerations }: Props) {
                   <ProjectHistoryCard key={gen.id} item={toHistoryItem(gen)} icon={tool?.icon ?? FileText}
                     onFavorite={() => handleFavorite(gen)} onDelete={() => handleDelete(gen.id)}
                     onView={() => { setPreviewGen(gen); setStep("preview"); }}
-                    onRegenerate={() => handleRegenerate(gen)} />
+                    onRegenerate={() => handleRegenerate(gen)}
+                    onContinue={() => handleContinue(gen)} />
                 );
               })}
             </div>

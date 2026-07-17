@@ -4,6 +4,7 @@ import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import { generateLandingPage } from "@/lib/landing-page-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
+import { resolveIteratedPrompt } from "@/lib/ai/iteration";
 import { getLandingPageTypeLabel } from "@/lib/constants/landing-page-builder";
 import type { LandingPageGeneration, LandingPageBlueprint } from "@/types/landing-page";
 import { NextResponse } from "next/server";
@@ -18,6 +19,7 @@ const lpRequestSchema = z.object({
   sections: z.array(z.string().trim()).default([]),
   mode: z.enum(["generate", "regenerate", "continue", "retry"]).optional(),
   parentGenerationId: z.string().uuid().optional(),
+  continueInstruction: z.string().trim().max(4000).optional(),
   projectId: z.string().uuid().optional(),
 });
 
@@ -88,8 +90,22 @@ export async function POST(request: Request) {
   let stage = "generateLandingPage";
 
   try {
-    const project = await generateLandingPage({
+    const iterated = await resolveIteratedPrompt({
+      supabase: auth.supabase,
+      table: "landing_page_generations",
+      userId: auth.user!.id,
+      mode: input.mode,
       prompt: input.prompt,
+      continueInstruction: input.continueInstruction,
+      parentGenerationId: input.parentGenerationId,
+      titleField: "page_name",
+    });
+    if (!iterated.ok) {
+      return NextResponse.json({ error: iterated.error }, { status: iterated.status });
+    }
+
+    const project = await generateLandingPage({
+      prompt: iterated.prompt,
       pageType: input.pageType,
       language: input.language,
       designStyle: input.designStyle,

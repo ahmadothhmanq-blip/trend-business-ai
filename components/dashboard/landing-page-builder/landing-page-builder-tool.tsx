@@ -63,6 +63,7 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
 
   const [generations, setGenerations] = useState<LandingPageGeneration[]>(initialGenerations ?? []);
   const [previewGen, setPreviewGen] = useState<LandingPageGeneration | null>(null);
+  const [parentId, setParentId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -87,27 +88,66 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
     if (def) setSections([...def.defaultSections]);
   };
 
-  const handleGenerate = async (mode: "generate" | "regenerate" | "retry" = "generate", parentId?: string) => {
-    if (!selectedType || !prompt.trim()) { toast.error("Select a page type and describe your landing page."); return; }
+  const handleGenerate = async (
+    mode: "generate" | "regenerate" | "continue" | "retry" = "generate",
+    parentGenerationId?: string,
+  ) => {
+    if (!selectedType || !prompt.trim()) {
+      toast.error(
+        mode === "continue"
+          ? "Describe the changes you want in natural language."
+          : "Select a page type and describe your landing page.",
+      );
+      return;
+    }
     setStep("generating");
     setProgressEvents(["Sending request..."]);
     try {
       const res = await fetch("/api/landing-page-builder", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt, pageType: selectedType, language, designStyle, colorStyle, sections, mode, parentGenerationId: parentId }),
+        body: JSON.stringify({
+          prompt,
+          pageType: selectedType,
+          language,
+          designStyle,
+          colorStyle,
+          sections,
+          mode,
+          parentGenerationId,
+          continueInstruction: mode === "continue" ? prompt : undefined,
+        }),
       });
       const d = await res.json();
       if (!res.ok) { toast.error(d.error ?? "Generation failed"); setStep("config"); return; }
       toast.success(d.message ?? "Landing page generated!");
+      setParentId(null);
       if (d.generation) { setPreviewGen(d.generation); setStep("preview"); } else { setStep("history"); }
     } catch { toast.error("Request failed."); setStep("config"); }
   };
 
+  const loadGenerationConfig = (gen: LandingPageGeneration) => {
+    setSelectedType(gen.page_type);
+    setLanguage(gen.language);
+    setDesignStyle(gen.design_style);
+    setColorStyle(gen.color_style);
+    setSections(gen.sections ?? []);
+  };
+
   const handleRegenerate = (gen: LandingPageGeneration) => {
-    setSelectedType(gen.page_type); setPrompt(gen.prompt); setLanguage(gen.language);
-    setDesignStyle(gen.design_style); setColorStyle(gen.color_style); setSections(gen.sections ?? []);
-    handleGenerate("regenerate", gen.id);
+    loadGenerationConfig(gen);
+    setPrompt(gen.prompt);
+    setParentId(gen.id);
+    void handleGenerate("regenerate", gen.id);
+  };
+
+  const handleContinue = (gen: LandingPageGeneration) => {
+    loadGenerationConfig(gen);
+    setParentId(gen.id);
+    setPrompt("");
+    setPreviewGen(null);
+    setStep("config");
+    toast.message("Describe your changes in natural language, then click Improve with AI.");
   };
 
   const handleFavorite = async (gen: LandingPageGeneration) => {
@@ -131,6 +171,8 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
         files={bp?.files ?? []}
         downloadName={bp?.title || previewGen.page_name}
         onBack={() => { setPreviewGen(null); setStep("history"); fetchGenerations(); }}
+        onRegenerate={() => handleRegenerate(previewGen)}
+        onContinue={() => handleContinue(previewGen)}
       />
     );
   }
@@ -179,8 +221,20 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
           <DashboardCardContent>
             <div className="space-y-5">
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-white/60">Describe your landing page</label>
-                <Textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="Describe what this landing page is for, your product/service, target audience, and conversion goal..." rows={4} className={cn(dashboardInputClass, "min-h-[100px] resize-none")} />
+                <label className="mb-1.5 block text-xs font-medium text-white/60">
+                  {parentId ? "Describe changes (natural language)" : "Describe your landing page"}
+                </label>
+                <Textarea
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder={
+                    parentId
+                      ? "Example: Make the hero more urgent, add a pricing section, and switch CTA to Start free trial..."
+                      : "Describe what this landing page is for, your product/service, target audience, and conversion goal..."
+                  }
+                  rows={4}
+                  className={cn(dashboardInputClass, "min-h-[100px] resize-none")}
+                />
               </div>
               <div className="grid gap-4 sm:grid-cols-3">
                 <div><label className="mb-1.5 block text-xs font-medium text-white/60">Language</label><select value={language} onChange={(e) => setLanguage(e.target.value)} className={dashboardSelectClass}>{LP_LANGUAGES.map((l) => <option key={l} value={l}>{l}</option>)}</select></div>
@@ -191,9 +245,34 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
                 <label className="mb-1.5 block text-xs font-medium text-white/60">Sections</label>
                 <div className="flex flex-wrap gap-2">{LP_SECTION_OPTIONS.map(({ id, label }) => <CheckboxToggle key={id} label={label} checked={sections.includes(id)} onChange={(c) => setSections((p) => c ? [...p, id] : p.filter((s) => s !== id))} />)}</div>
               </div>
-              <div className="flex gap-3 pt-2">
-                <Button variant="outline" className="rounded-xl border-white/10 text-white/60 hover:border-white/20" onClick={() => setStep("type")}>Back</Button>
-                <Button onClick={() => handleGenerate()} disabled={!prompt.trim()} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black"><Sparkles className="size-4" /> Generate Landing Page</Button>
+              <div className="flex flex-wrap gap-3 pt-2">
+                <Button
+                  variant="outline"
+                  className="rounded-xl border-white/10 text-white/60 hover:border-white/20"
+                  onClick={() => {
+                    setParentId(null);
+                    setStep("type");
+                  }}
+                >
+                  Back
+                </Button>
+                {parentId ? (
+                  <Button
+                    onClick={() => void handleGenerate("continue", parentId)}
+                    disabled={!prompt.trim()}
+                    className="btn-gold gap-2 rounded-xl font-bold text-luxury-black"
+                  >
+                    <Sparkles className="size-4" /> Improve with AI
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => void handleGenerate()}
+                    disabled={!prompt.trim()}
+                    className="btn-gold gap-2 rounded-xl font-bold text-luxury-black"
+                  >
+                    <Sparkles className="size-4" /> Generate Landing Page
+                  </Button>
+                )}
               </div>
             </div>
           </DashboardCardContent>
@@ -221,6 +300,7 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
                     onDelete={() => handleDelete(gen.id)}
                     onView={() => { setPreviewGen(gen); setStep("preview"); }}
                     onRegenerate={() => handleRegenerate(gen)}
+                    onContinue={() => handleContinue(gen)}
                   />
                 );
               })}

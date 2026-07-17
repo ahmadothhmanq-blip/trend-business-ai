@@ -12,9 +12,11 @@ import {
   Minus,
   Music,
   Plus,
+  RefreshCw,
   Search,
   Sparkles,
   Subtitles,
+  Wand2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -57,7 +59,17 @@ type Props = { initialGenerations?: VideoGeneration[] };
 
 type PreviewTab = "storyboard" | "script" | "audio" | "subtitles" | "thumbnail" | "files";
 
-function VideoPreview({ gen, onBack }: { gen: VideoGeneration; onBack: () => void }) {
+function VideoPreview({
+  gen,
+  onBack,
+  onRegenerate,
+  onContinue,
+}: {
+  gen: VideoGeneration;
+  onBack: () => void;
+  onRegenerate?: () => void;
+  onContinue?: () => void;
+}) {
   const bp = gen.blueprint;
   const [tab, setTab] = useState<PreviewTab>("storyboard");
 
@@ -88,7 +100,17 @@ function VideoPreview({ gen, onBack }: { gen: VideoGeneration; onBack: () => voi
           <h3 className="font-bold text-white">{bp.title}</h3>
           <p className="text-xs text-white/40">{bp.style} &middot; {bp.aspectRatio} &middot; {bp.totalDuration} &middot; {bp.scenes.length} scenes &middot; {gen.provider ?? "deepseek"}</p>
         </div>
-        <div className="ml-auto">
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+          {onRegenerate ? (
+            <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:border-white/20" onClick={onRegenerate}>
+              <RefreshCw className="size-3" /> Regenerate
+            </Button>
+          ) : null}
+          {onContinue ? (
+            <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-premium-gold/20 text-xs text-premium-gold-light hover:border-premium-gold/40" onClick={onContinue}>
+              <Wand2 className="size-3" /> Improve with AI
+            </Button>
+          ) : null}
           <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:border-premium-gold/25 hover:text-premium-gold-light"
             onClick={async () => {
               const JSZip = (await import("jszip")).default; const zip = new JSZip();
@@ -245,6 +267,7 @@ export function VideoStudioTool({ initialGenerations }: Props) {
 
   const [generations, setGenerations] = useState<VideoGeneration[]>(initialGenerations ?? []);
   const [previewGen, setPreviewGen] = useState<VideoGeneration | null>(null);
+  const [parentId, setParentId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -269,8 +292,18 @@ export function VideoStudioTool({ initialGenerations }: Props) {
     if (def) setOptions([...def.defaultOptions]);
   };
 
-  const handleGenerate = async (mode: "generate" | "regenerate" | "retry" = "generate", parentId?: string) => {
-    if (!selectedType || !prompt.trim()) { toast.error("Select a video type and describe your video."); return; }
+  const handleGenerate = async (
+    mode: "generate" | "regenerate" | "continue" | "retry" = "generate",
+    parentGenerationId?: string,
+  ) => {
+    if (!selectedType || !prompt.trim()) {
+      toast.error(
+        mode === "continue"
+          ? "Describe the changes you want in natural language."
+          : "Select a video type and describe your video.",
+      );
+      return;
+    }
     setStep("generating");
     setProgressEvents(["Sending request..."]);
     try {
@@ -279,21 +312,40 @@ export function VideoStudioTool({ initialGenerations }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prompt, videoType: selectedType, style, aspectRatio, duration,
-          mood, cameraMove, options, sceneCount, mode, parentGenerationId: parentId,
+          mood, cameraMove, options, sceneCount, mode, parentGenerationId,
+          continueInstruction: mode === "continue" ? prompt : undefined,
         }),
       });
       const d = await res.json();
       if (!res.ok) { toast.error(d.error ?? "Generation failed"); setStep("config"); return; }
       toast.success(d.message ?? "Video project created!");
+      setParentId(null);
       if (d.generation) { setPreviewGen(d.generation); setStep("preview"); } else { setStep("history"); }
     } catch { toast.error("Request failed."); setStep("config"); }
   };
 
-  const handleRegenerate = (gen: VideoGeneration) => {
-    setSelectedType(gen.video_type); setPrompt(gen.prompt); setStyle(gen.style);
-    setAspectRatio(gen.aspect_ratio); setDuration(gen.duration); setMood("Professional");
+  const loadGenerationConfig = (gen: VideoGeneration) => {
+    setSelectedType(gen.video_type);
+    setStyle(gen.style);
+    setAspectRatio(gen.aspect_ratio);
+    setDuration(gen.duration);
+    setMood("Professional");
     setOptions(gen.options ?? []);
-    handleGenerate("regenerate", gen.id);
+  };
+
+  const handleRegenerate = (gen: VideoGeneration) => {
+    loadGenerationConfig(gen);
+    setPrompt(gen.prompt);
+    void handleGenerate("regenerate", gen.id);
+  };
+
+  const handleContinue = (gen: VideoGeneration) => {
+    loadGenerationConfig(gen);
+    setParentId(gen.id);
+    setPrompt("");
+    setPreviewGen(null);
+    setStep("config");
+    toast.message("Describe your changes in natural language, then click Improve with AI.");
   };
 
   const handleFavorite = async (gen: VideoGeneration) => {
@@ -309,7 +361,14 @@ export function VideoStudioTool({ initialGenerations }: Props) {
   };
 
   if (step === "preview" && previewGen) {
-    return <VideoPreview gen={previewGen} onBack={() => { setPreviewGen(null); setStep("history"); fetchGenerations(); }} />;
+    return (
+      <VideoPreview
+        gen={previewGen}
+        onBack={() => { setPreviewGen(null); setStep("history"); fetchGenerations(); }}
+        onRegenerate={() => handleRegenerate(previewGen)}
+        onContinue={() => handleContinue(previewGen)}
+      />
+    );
   }
 
   if (step === "generating") {
@@ -362,8 +421,20 @@ export function VideoStudioTool({ initialGenerations }: Props) {
           <DashboardCardContent>
             <div className="space-y-5">
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-white/60">Video description *</label>
-                <Textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="Describe your video — concept, story, key scenes, messaging, visual direction..." rows={4} className={cn(dashboardInputClass, "min-h-[100px] resize-none")} />
+                <label className="mb-1.5 block text-xs font-medium text-white/60">
+                  {parentId ? "Describe changes (natural language)" : "Video description *"}
+                </label>
+                <Textarea
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder={
+                    parentId
+                      ? "Example: Shorten the intro, make scene 2 more energetic, and add a stronger call-to-action..."
+                      : "Describe your video — concept, story, key scenes, messaging, visual direction..."
+                  }
+                  rows={4}
+                  className={cn(dashboardInputClass, "min-h-[100px] resize-none")}
+                />
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -425,11 +496,30 @@ export function VideoStudioTool({ initialGenerations }: Props) {
                 ))}
               </div>
 
-              <div className="flex gap-3 pt-2">
-                <Button variant="outline" className="rounded-xl border-white/10 text-white/60 hover:border-white/20" onClick={() => setStep("type")}>Back</Button>
-                <Button onClick={() => handleGenerate()} disabled={!prompt.trim()} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">
-                  <Sparkles className="size-4" /> Generate Video Project
+              <div className="flex flex-wrap gap-3 pt-2">
+                <Button
+                  variant="outline"
+                  className="rounded-xl border-white/10 text-white/60 hover:border-white/20"
+                  onClick={() => {
+                    setParentId(null);
+                    setStep("type");
+                  }}
+                >
+                  Back
                 </Button>
+                {parentId ? (
+                  <Button
+                    onClick={() => void handleGenerate("continue", parentId)}
+                    disabled={!prompt.trim()}
+                    className="btn-gold gap-2 rounded-xl font-bold text-luxury-black"
+                  >
+                    <Sparkles className="size-4" /> Improve with AI
+                  </Button>
+                ) : (
+                  <Button onClick={() => void handleGenerate()} disabled={!prompt.trim()} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">
+                    <Sparkles className="size-4" /> Generate Video Project
+                  </Button>
+                )}
               </div>
             </div>
           </DashboardCardContent>
@@ -452,7 +542,8 @@ export function VideoStudioTool({ initialGenerations }: Props) {
                   <ProjectHistoryCard key={gen.id} item={toHistoryItem(gen)} icon={def?.icon ?? Film}
                     onFavorite={() => handleFavorite(gen)} onDelete={() => handleDelete(gen.id)}
                     onView={() => { setPreviewGen(gen); setStep("preview"); }}
-                    onRegenerate={() => handleRegenerate(gen)} />
+                    onRegenerate={() => handleRegenerate(gen)}
+                    onContinue={() => handleContinue(gen)} />
                 );
               })}
             </div>

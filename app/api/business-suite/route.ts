@@ -4,6 +4,7 @@ import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import { generateBusiness } from "@/lib/business-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
+import { resolveIteratedPrompt } from "@/lib/ai/iteration";
 import { getBusinessToolLabel, getBusinessTypeLabel } from "@/lib/constants/business-suite";
 import type { BusinessGeneration, BusinessBlueprint } from "@/types/business";
 import { NextResponse } from "next/server";
@@ -17,8 +18,9 @@ const requestSchema = z.object({
   companyStage: z.string().trim().default("Startup"),
   targetMarket: z.string().trim().default(""),
   options: z.array(z.string().trim()).default([]),
-  mode: z.enum(["generate", "regenerate", "update", "expand"]).optional(),
+  mode: z.enum(["generate", "regenerate", "continue", "update", "expand"]).optional(),
   parentGenerationId: z.string().uuid().optional(),
+  continueInstruction: z.string().trim().max(4000).optional(),
   projectId: z.string().uuid().optional(),
 });
 
@@ -80,8 +82,22 @@ export async function POST(request: Request) {
   let stage = "generateBusiness";
 
   try {
-    const result = await generateBusiness({
+    const iterated = await resolveIteratedPrompt({
+      supabase: auth.supabase,
+      table: "business_generations",
+      userId: auth.user!.id,
+      mode: input.mode,
       prompt: input.prompt,
+      continueInstruction: input.continueInstruction,
+      parentGenerationId: input.parentGenerationId,
+      titleField: "title",
+    });
+    if (!iterated.ok) {
+      return NextResponse.json({ error: iterated.error }, { status: iterated.status });
+    }
+
+    const result = await generateBusiness({
+      prompt: iterated.prompt,
       businessTool: input.businessTool,
       businessType: input.businessType,
       industry: input.industry,

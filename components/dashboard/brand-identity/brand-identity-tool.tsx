@@ -10,9 +10,11 @@ import {
   Download,
   Eye,
   Megaphone,
+  RefreshCw,
   Search,
   Sparkles,
   Type,
+  Wand2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -113,7 +115,17 @@ function AssetPreview({ asset }: { asset: { name: string; category: string; desc
 
 type PreviewTab = "overview" | "strategy" | "story" | "colors" | "typography" | "voice" | "logo" | "assets" | "files";
 
-function BrandPreview({ gen, onBack }: { gen: BrandIdentityGeneration; onBack: () => void }) {
+function BrandPreview({
+  gen,
+  onBack,
+  onRegenerate,
+  onContinue,
+}: {
+  gen: BrandIdentityGeneration;
+  onBack: () => void;
+  onRegenerate?: () => void;
+  onContinue?: () => void;
+}) {
   const bp = gen.blueprint;
   const [tab, setTab] = useState<PreviewTab>("overview");
 
@@ -147,7 +159,17 @@ function BrandPreview({ gen, onBack }: { gen: BrandIdentityGeneration; onBack: (
           <h3 className="font-bold text-white">{bp.title}</h3>
           <p className="text-xs text-white/40">{gen.brand_type} &middot; {gen.provider ?? "deepseek"} &middot; {gen.generation_time_ms ? `${(gen.generation_time_ms / 1000).toFixed(1)}s` : ""}</p>
         </div>
-        <div className="ml-auto">
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+          {onRegenerate ? (
+            <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:border-white/20" onClick={onRegenerate}>
+              <RefreshCw className="size-3" /> Regenerate
+            </Button>
+          ) : null}
+          {onContinue ? (
+            <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-premium-gold/20 text-xs text-premium-gold-light hover:border-premium-gold/40" onClick={onContinue}>
+              <Wand2 className="size-3" /> Improve with AI
+            </Button>
+          ) : null}
           <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:border-premium-gold/25 hover:text-premium-gold-light"
             onClick={async () => {
               const JSZip = (await import("jszip")).default; const zip = new JSZip();
@@ -350,6 +372,7 @@ export function BrandIdentityTool({ initialGenerations }: Props) {
 
   const [generations, setGenerations] = useState<BrandIdentityGeneration[]>(initialGenerations ?? []);
   const [previewGen, setPreviewGen] = useState<BrandIdentityGeneration | null>(null);
+  const [parentId, setParentId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -374,8 +397,16 @@ export function BrandIdentityTool({ initialGenerations }: Props) {
     if (def) setDeliverables([...def.defaultDeliverables]);
   };
 
-  const handleGenerate = async (mode: "generate" | "regenerate" | "retry" = "generate", parentId?: string) => {
-    if (!selectedType || !prompt.trim() || !brandName.trim()) {
+  const handleGenerate = async (
+    mode: "generate" | "regenerate" | "continue" | "retry" = "generate",
+    parentGenerationId?: string,
+  ) => {
+    if (mode === "continue") {
+      if (!prompt.trim()) {
+        toast.error("Describe the changes you want in natural language.");
+        return;
+      }
+    } else if (!selectedType || !prompt.trim() || !brandName.trim()) {
       toast.error("Enter your brand name, select a type, and describe your brand.");
       return;
     }
@@ -387,25 +418,40 @@ export function BrandIdentityTool({ initialGenerations }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prompt, brandName, brandType: selectedType, industry, targetAudience,
-          brandPersonality: personality, deliverables, mode, parentGenerationId: parentId,
+          brandPersonality: personality, deliverables, mode, parentGenerationId,
+          continueInstruction: mode === "continue" ? prompt : undefined,
         }),
       });
       const d = await res.json();
       if (!res.ok) { toast.error(d.error ?? "Generation failed"); setStep("config"); return; }
       toast.success(d.message ?? "Brand identity created!");
+      setParentId(null);
       if (d.generation) { setPreviewGen(d.generation); setStep("preview"); } else { setStep("history"); }
     } catch { toast.error("Request failed."); setStep("config"); }
   };
 
-  const handleRegenerate = (gen: BrandIdentityGeneration) => {
+  const loadGenerationConfig = (gen: BrandIdentityGeneration) => {
     setSelectedType(gen.brand_type);
     setBrandName(gen.brand_name);
-    setPrompt(gen.prompt);
     setIndustry(gen.industry);
     setTargetAudience(gen.target_audience);
     setPersonality(gen.brand_personality);
     setDeliverables(gen.deliverables ?? []);
-    handleGenerate("regenerate", gen.id);
+  };
+
+  const handleRegenerate = (gen: BrandIdentityGeneration) => {
+    loadGenerationConfig(gen);
+    setPrompt(gen.prompt);
+    void handleGenerate("regenerate", gen.id);
+  };
+
+  const handleContinue = (gen: BrandIdentityGeneration) => {
+    loadGenerationConfig(gen);
+    setParentId(gen.id);
+    setPrompt("");
+    setPreviewGen(null);
+    setStep("config");
+    toast.message("Describe your changes in natural language, then click Improve with AI.");
   };
 
   const handleFavorite = async (gen: BrandIdentityGeneration) => {
@@ -421,7 +467,14 @@ export function BrandIdentityTool({ initialGenerations }: Props) {
   };
 
   if (step === "preview" && previewGen) {
-    return <BrandPreview gen={previewGen} onBack={() => { setPreviewGen(null); setStep("history"); fetchGenerations(); }} />;
+    return (
+      <BrandPreview
+        gen={previewGen}
+        onBack={() => { setPreviewGen(null); setStep("history"); fetchGenerations(); }}
+        onRegenerate={() => handleRegenerate(previewGen)}
+        onContinue={() => handleContinue(previewGen)}
+      />
+    );
   }
 
   if (step === "generating") {
@@ -508,8 +561,20 @@ export function BrandIdentityTool({ initialGenerations }: Props) {
 
               {/* Prompt */}
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-white/60">Describe your brand vision *</label>
-                <Textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="Describe your brand, its mission, values, the identity you envision, and what makes it unique..." rows={4} className={cn(dashboardInputClass, "min-h-[100px] resize-none")} />
+                <label className="mb-1.5 block text-xs font-medium text-white/60">
+                  {parentId ? "Describe changes (natural language)" : "Describe your brand vision *"}
+                </label>
+                <Textarea
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder={
+                    parentId
+                      ? "Example: Make the tone more playful, expand the color palette with earth tones, and add social media templates..."
+                      : "Describe your brand, its mission, values, the identity you envision, and what makes it unique..."
+                  }
+                  rows={4}
+                  className={cn(dashboardInputClass, "min-h-[100px] resize-none")}
+                />
               </div>
 
               {/* Deliverables by category */}
@@ -528,11 +593,30 @@ export function BrandIdentityTool({ initialGenerations }: Props) {
               </div>
 
               {/* Actions */}
-              <div className="flex gap-3 pt-2">
-                <Button variant="outline" className="rounded-xl border-white/10 text-white/60 hover:border-white/20" onClick={() => setStep("type")}>Back</Button>
-                <Button onClick={() => handleGenerate()} disabled={!prompt.trim() || !brandName.trim()} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">
-                  <Sparkles className="size-4" /> Generate Brand Identity
+              <div className="flex flex-wrap gap-3 pt-2">
+                <Button
+                  variant="outline"
+                  className="rounded-xl border-white/10 text-white/60 hover:border-white/20"
+                  onClick={() => {
+                    setParentId(null);
+                    setStep("type");
+                  }}
+                >
+                  Back
                 </Button>
+                {parentId ? (
+                  <Button
+                    onClick={() => void handleGenerate("continue", parentId)}
+                    disabled={!prompt.trim()}
+                    className="btn-gold gap-2 rounded-xl font-bold text-luxury-black"
+                  >
+                    <Sparkles className="size-4" /> Improve with AI
+                  </Button>
+                ) : (
+                  <Button onClick={() => void handleGenerate()} disabled={!prompt.trim() || !brandName.trim()} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">
+                    <Sparkles className="size-4" /> Generate Brand Identity
+                  </Button>
+                )}
               </div>
             </div>
           </DashboardCardContent>
@@ -556,7 +640,8 @@ export function BrandIdentityTool({ initialGenerations }: Props) {
                   <ProjectHistoryCard key={gen.id} item={toHistoryItem(gen)} icon={def?.icon ?? Sparkles}
                     onFavorite={() => handleFavorite(gen)} onDelete={() => handleDelete(gen.id)}
                     onView={() => { setPreviewGen(gen); setStep("preview"); }}
-                    onRegenerate={() => handleRegenerate(gen)} />
+                    onRegenerate={() => handleRegenerate(gen)}
+                    onContinue={() => handleContinue(gen)} />
                 );
               })}
             </div>

@@ -4,6 +4,7 @@ import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import { generateVideo } from "@/lib/video-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
+import { resolveIteratedPrompt } from "@/lib/ai/iteration";
 import { getVideoTypeLabel } from "@/lib/constants/video-studio";
 import type { VideoGeneration, VideoBlueprint } from "@/types/video";
 import { NextResponse } from "next/server";
@@ -21,6 +22,7 @@ const requestSchema = z.object({
   sceneCount: z.number().int().min(1).max(8).default(3),
   mode: z.enum(["generate", "regenerate", "continue", "retry"]).optional(),
   parentGenerationId: z.string().uuid().optional(),
+  continueInstruction: z.string().trim().max(4000).optional(),
   projectId: z.string().uuid().optional(),
 });
 
@@ -86,8 +88,22 @@ export async function POST(request: Request) {
   let stage = "generateVideo";
 
   try {
-    const result = await generateVideo({
+    const iterated = await resolveIteratedPrompt({
+      supabase: auth.supabase,
+      table: "video_generations",
+      userId: auth.user!.id,
+      mode: input.mode,
       prompt: input.prompt,
+      continueInstruction: input.continueInstruction,
+      parentGenerationId: input.parentGenerationId,
+      titleField: "video_name",
+    });
+    if (!iterated.ok) {
+      return NextResponse.json({ error: iterated.error }, { status: iterated.status });
+    }
+
+    const result = await generateVideo({
+      prompt: iterated.prompt,
       videoType: input.videoType,
       style: input.style,
       aspectRatio: input.aspectRatio,

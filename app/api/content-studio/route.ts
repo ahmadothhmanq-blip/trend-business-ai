@@ -4,6 +4,7 @@ import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import { generateContent } from "@/lib/content-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
+import { resolveIteratedPrompt } from "@/lib/ai/iteration";
 import { getContentToolLabel, getContentTypeLabel } from "@/lib/constants/content-studio";
 import type { ContentGeneration, ContentBlueprint } from "@/types/content";
 import { NextResponse } from "next/server";
@@ -21,8 +22,9 @@ const requestSchema = z.object({
   creativityLevel: z.string().trim().default("Balanced"),
   options: z.array(z.string().trim()).default([]),
   seoKeywords: z.string().trim().default(""),
-  mode: z.enum(["generate", "regenerate", "rewrite", "expand", "shorten", "translate", "summarize"]).optional(),
+  mode: z.enum(["generate", "regenerate", "continue", "rewrite", "expand", "shorten", "translate", "summarize"]).optional(),
   parentGenerationId: z.string().uuid().optional(),
+  continueInstruction: z.string().trim().max(4000).optional(),
   projectId: z.string().uuid().optional(),
 });
 
@@ -86,8 +88,22 @@ export async function POST(request: Request) {
   let stage = "generateContent";
 
   try {
-    const result = await generateContent({
+    const iterated = await resolveIteratedPrompt({
+      supabase: auth.supabase,
+      table: "content_generations",
+      userId: auth.user!.id,
+      mode: input.mode,
       prompt: input.prompt,
+      continueInstruction: input.continueInstruction,
+      parentGenerationId: input.parentGenerationId,
+      titleField: "title",
+    });
+    if (!iterated.ok) {
+      return NextResponse.json({ error: iterated.error }, { status: iterated.status });
+    }
+
+    const result = await generateContent({
+      prompt: iterated.prompt,
       contentTool: input.contentTool,
       contentType: input.contentType,
       tone: input.tone,

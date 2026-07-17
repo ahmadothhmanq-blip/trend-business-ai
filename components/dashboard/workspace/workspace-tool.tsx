@@ -15,23 +15,27 @@ import { WorkspaceHero } from "@/components/dashboard/workspace/workspace-hero";
 import { WorkspaceOutputPreview } from "@/components/dashboard/workspace/workspace-output-preview";
 import { WorkspaceProjectsList } from "@/components/dashboard/workspace/workspace-projects-list";
 import { useWorkspaceTool } from "@/lib/hooks/use-workspace-tool";
-import type { ProductDefinition } from "@/lib/products/types";
-import type { WorkspaceDefinition } from "@/lib/workspace/definition";
+import { getProductDefinition } from "@/lib/products/registry";
+import type { ProductId } from "@/lib/products/types";
+import { getWorkspaceDefinition } from "@/lib/workspace/registry";
+import type { WorkspaceType } from "@/lib/workspace/types";
 import type { WorkspaceGeneration } from "@/types/database";
 
 type WorkspaceToolProps = {
-  definition: WorkspaceDefinition;
-  product?: ProductDefinition;
+  workspaceType: WorkspaceType;
+  productId?: ProductId;
   initialGenerations?: WorkspaceGeneration[];
   initialTotal?: number;
 };
 
 export function WorkspaceTool({
-  definition,
-  product,
+  workspaceType,
+  productId,
   initialGenerations = [],
   initialTotal = 0,
 }: WorkspaceToolProps) {
+  const definition = getWorkspaceDefinition(workspaceType);
+  const product = productId ? getProductDefinition(productId) : undefined;
   const tool = useWorkspaceTool({
     definition,
     product,
@@ -88,7 +92,7 @@ export function WorkspaceTool({
           onExportDocx={(project) => tool.exportProject(project, "docx")}
           onRename={tool.openRename}
           onRegenerate={tool.regenerate}
-          onContinue={() => tool.continueGeneration()}
+          onContinue={() => tool.continueGeneration(tool.prompt.trim() || undefined)}
           onRetry={tool.retryFailed}
           onToggleFavorite={tool.toggleFavorite}
         />

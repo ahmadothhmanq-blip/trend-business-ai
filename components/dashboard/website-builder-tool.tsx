@@ -997,7 +997,7 @@ export function WebsiteBuilderTool({
             className="btn-ghost-gold h-14 w-full rounded-2xl text-base font-semibold sm:col-span-2 lg:col-span-1"
           >
             <Wand2 className="size-5" />
-            Continue
+            Improve with AI
           </Button>
           </div>
         </div>

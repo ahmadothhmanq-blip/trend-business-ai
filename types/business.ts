@@ -1,5 +1,5 @@
 export type BusinessGenerationStatus = "pending" | "generating" | "completed" | "failed";
-export type BusinessGenerationMode = "generate" | "regenerate" | "update" | "expand";
+export type BusinessGenerationMode = "generate" | "regenerate" | "continue" | "update" | "expand";
 
 export type BusinessScorecard = {
   overall: number;

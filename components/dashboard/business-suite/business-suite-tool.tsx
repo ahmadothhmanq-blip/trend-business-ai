@@ -13,6 +13,7 @@ import {
   Download,
   FileText,
   Lightbulb,
+  RefreshCw,
   Search,
   Sparkles,
   Target,
@@ -96,7 +97,17 @@ function ScorecardDisplay({ sc }: { sc: BusinessScorecard }) {
 
 type PreviewTab = "document" | "scorecard" | "risks" | "action-plan" | "files";
 
-function BusinessPreview({ gen, onBack }: { gen: BusinessGeneration; onBack: () => void }) {
+function BusinessPreview({
+  gen,
+  onBack,
+  onRegenerate,
+  onContinue,
+}: {
+  gen: BusinessGeneration;
+  onBack: () => void;
+  onRegenerate?: () => void;
+  onContinue?: () => void;
+}) {
   const bp = gen.blueprint;
   const [tab, setTab] = useState<PreviewTab>("document");
   const [copied, setCopied] = useState(false);
@@ -127,7 +138,17 @@ function BusinessPreview({ gen, onBack }: { gen: BusinessGeneration; onBack: () 
           <h3 className="truncate font-bold text-white">{bp.title}</h3>
           <p className="text-xs text-white/40">{getBusinessToolLabel(bp.businessTool)} &middot; {getBusinessTypeLabel(bp.businessType)} &middot; {bp.industry} &middot; {gen.provider ?? "deepseek"}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          {onRegenerate ? (
+            <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:border-white/20" onClick={onRegenerate}>
+              <RefreshCw className="size-3" /> Regenerate
+            </Button>
+          ) : null}
+          {onContinue ? (
+            <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-premium-gold/20 text-xs text-premium-gold-light hover:border-premium-gold/40" onClick={onContinue}>
+              <Wand2 className="size-3" /> Improve with AI
+            </Button>
+          ) : null}
           <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:text-white" onClick={() => { navigator.clipboard.writeText(bp.body); setCopied(true); toast.success("Copied"); setTimeout(() => setCopied(false), 2000); }}>
             {copied ? <Check className="size-3" /> : <ClipboardCopy className="size-3" />} {copied ? "Copied" : "Copy"}
           </Button>
@@ -329,6 +350,7 @@ export function BusinessSuiteTool({ initialGenerations }: Props) {
 
   const [generations, setGenerations] = useState<BusinessGeneration[]>(initialGenerations ?? []);
   const [previewGen, setPreviewGen] = useState<BusinessGeneration | null>(null);
+  const [parentId, setParentId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -354,8 +376,15 @@ export function BusinessSuiteTool({ initialGenerations }: Props) {
     setStep("type");
   };
 
-  const handleGenerate = async (mode: BusinessGeneration["mode"] = "generate", parentId?: string) => {
-    if (!selectedTool || !prompt.trim()) { toast.error("Select a tool and describe your business context."); return; }
+  const handleGenerate = async (mode: BusinessGeneration["mode"] = "generate", parentGenerationId?: string) => {
+    if (!selectedTool || !prompt.trim()) {
+      toast.error(
+        mode === "continue"
+          ? "Describe the changes you want in natural language."
+          : "Select a tool and describe your business context.",
+      );
+      return;
+    }
     setStep("generating");
     setProgressEvents(["Sending request..."]);
     try {
@@ -364,22 +393,40 @@ export function BusinessSuiteTool({ initialGenerations }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prompt, businessTool: selectedTool, businessType: selectedType,
-          industry, companyStage, targetMarket, options, mode, parentGenerationId: parentId,
+          industry, companyStage, targetMarket, options, mode, parentGenerationId,
+          continueInstruction: mode === "continue" ? prompt : undefined,
         }),
       });
       const d = await res.json();
       if (!res.ok) { toast.error(d.error ?? "Generation failed"); setStep("config"); return; }
       toast.success(d.message ?? "Analysis complete!");
+      setParentId(null);
       if (d.generation) { setPreviewGen(d.generation); setStep("preview"); } else { setStep("history"); }
     } catch { toast.error("Request failed."); setStep("config"); }
   };
 
-  const handleRegenerate = (gen: BusinessGeneration) => {
-    setSelectedTool(gen.business_tool); setSelectedType(gen.business_type);
-    setPrompt(gen.prompt); setIndustry(gen.industry);
-    setCompanyStage(gen.company_stage); setTargetMarket(gen.target_market);
+  const loadGenerationConfig = (gen: BusinessGeneration) => {
+    setSelectedTool(gen.business_tool);
+    setSelectedType(gen.business_type);
+    setIndustry(gen.industry);
+    setCompanyStage(gen.company_stage);
+    setTargetMarket(gen.target_market);
     setOptions(gen.options ?? []);
-    handleGenerate("regenerate", gen.id);
+  };
+
+  const handleRegenerate = (gen: BusinessGeneration) => {
+    loadGenerationConfig(gen);
+    setPrompt(gen.prompt);
+    void handleGenerate("regenerate", gen.id);
+  };
+
+  const handleContinue = (gen: BusinessGeneration) => {
+    loadGenerationConfig(gen);
+    setParentId(gen.id);
+    setPrompt("");
+    setPreviewGen(null);
+    setStep("config");
+    toast.message("Describe your changes in natural language, then click Improve with AI.");
   };
 
   const handleFavorite = async (gen: BusinessGeneration) => {
@@ -395,7 +442,14 @@ export function BusinessSuiteTool({ initialGenerations }: Props) {
   };
 
   if (step === "preview" && previewGen) {
-    return <BusinessPreview gen={previewGen} onBack={() => { setPreviewGen(null); setStep("history"); fetchGenerations(); }} />;
+    return (
+      <BusinessPreview
+        gen={previewGen}
+        onBack={() => { setPreviewGen(null); setStep("history"); fetchGenerations(); }}
+        onRegenerate={() => handleRegenerate(previewGen)}
+        onContinue={() => handleContinue(previewGen)}
+      />
+    );
   }
 
   if (step === "generating") {
@@ -471,8 +525,20 @@ export function BusinessSuiteTool({ initialGenerations }: Props) {
           <DashboardCardContent>
             <div className="space-y-5">
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-white/60">Business description *</label>
-                <Textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="Describe your business — what you do, your goals, challenges, current situation, what analysis you need..." rows={4} className={cn(dashboardInputClass, "min-h-[100px] resize-none")} />
+                <label className="mb-1.5 block text-xs font-medium text-white/60">
+                  {parentId ? "Describe changes (natural language)" : "Business description *"}
+                </label>
+                <Textarea
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder={
+                    parentId
+                      ? "Example: Add more detail on competitive risks, expand the financial projections section, and prioritize quick wins..."
+                      : "Describe your business — what you do, your goals, challenges, current situation, what analysis you need..."
+                  }
+                  rows={4}
+                  className={cn(dashboardInputClass, "min-h-[100px] resize-none")}
+                />
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -508,11 +574,30 @@ export function BusinessSuiteTool({ initialGenerations }: Props) {
                 ))}
               </div>
 
-              <div className="flex gap-3 pt-2">
-                <Button variant="outline" className="rounded-xl border-white/10 text-white/60 hover:border-white/20" onClick={() => setStep("type")}>Back</Button>
-                <Button onClick={() => handleGenerate()} disabled={!prompt.trim()} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">
-                  <Sparkles className="size-4" /> Generate Analysis
+              <div className="flex flex-wrap gap-3 pt-2">
+                <Button
+                  variant="outline"
+                  className="rounded-xl border-white/10 text-white/60 hover:border-white/20"
+                  onClick={() => {
+                    setParentId(null);
+                    setStep("type");
+                  }}
+                >
+                  Back
                 </Button>
+                {parentId ? (
+                  <Button
+                    onClick={() => void handleGenerate("continue", parentId)}
+                    disabled={!prompt.trim()}
+                    className="btn-gold gap-2 rounded-xl font-bold text-luxury-black"
+                  >
+                    <Sparkles className="size-4" /> Improve with AI
+                  </Button>
+                ) : (
+                  <Button onClick={() => void handleGenerate()} disabled={!prompt.trim()} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">
+                    <Sparkles className="size-4" /> Generate Analysis
+                  </Button>
+                )}
               </div>
             </div>
           </DashboardCardContent>
@@ -539,7 +624,8 @@ export function BusinessSuiteTool({ initialGenerations }: Props) {
                   <ProjectHistoryCard key={gen.id} item={toHistoryItem(gen)} icon={tool?.icon ?? BarChart3}
                     onFavorite={() => handleFavorite(gen)} onDelete={() => handleDelete(gen.id)}
                     onView={() => { setPreviewGen(gen); setStep("preview"); }}
-                    onRegenerate={() => handleRegenerate(gen)} />
+                    onRegenerate={() => handleRegenerate(gen)}
+                    onContinue={() => handleContinue(gen)} />
                 );
               })}
             </div>

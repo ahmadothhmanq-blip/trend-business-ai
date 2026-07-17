@@ -1,5 +1,5 @@
 export type ContentGenerationStatus = "pending" | "generating" | "completed" | "failed";
-export type ContentGenerationMode = "generate" | "regenerate" | "rewrite" | "expand" | "shorten" | "translate" | "summarize";
+export type ContentGenerationMode = "generate" | "regenerate" | "continue" | "rewrite" | "expand" | "shorten" | "translate" | "summarize";
 
 export type ContentSeoData = {
   score: number;

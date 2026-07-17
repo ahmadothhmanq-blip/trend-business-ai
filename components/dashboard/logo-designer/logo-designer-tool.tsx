@@ -7,9 +7,11 @@ import {
   ArrowRight,
   Copy,
   Download,
+  RefreshCw,
   Search,
   Sparkles,
   Type,
+  Wand2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -79,7 +81,17 @@ function ColorSwatch({ color }: { color: { name: string; hex: string; role: stri
 /*  Logo Preview (full brand kit view)                                 */
 /* ------------------------------------------------------------------ */
 
-function LogoPreview({ gen, onBack }: { gen: LogoGeneration; onBack: () => void }) {
+function LogoPreview({
+  gen,
+  onBack,
+  onRegenerate,
+  onContinue,
+}: {
+  gen: LogoGeneration;
+  onBack: () => void;
+  onRegenerate?: () => void;
+  onContinue?: () => void;
+}) {
   const bp = gen.blueprint;
   const [activeTab, setActiveTab] = useState<"concepts" | "variations" | "colors" | "typography" | "guidelines" | "files">("concepts");
 
@@ -110,7 +122,17 @@ function LogoPreview({ gen, onBack }: { gen: LogoGeneration; onBack: () => void 
           <h3 className="font-bold text-white">{bp.title}</h3>
           <p className="text-xs text-white/40">{bp.logoStyle} &middot; {gen.provider ?? "deepseek"} &middot; {gen.generation_time_ms ? `${(gen.generation_time_ms / 1000).toFixed(1)}s` : "N/A"}</p>
         </div>
-        <div className="ml-auto">
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+          {onRegenerate ? (
+            <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:border-white/20" onClick={onRegenerate}>
+              <RefreshCw className="size-3" /> Regenerate
+            </Button>
+          ) : null}
+          {onContinue ? (
+            <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-premium-gold/20 text-xs text-premium-gold-light hover:border-premium-gold/40" onClick={onContinue}>
+              <Wand2 className="size-3" /> Improve with AI
+            </Button>
+          ) : null}
           <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:border-premium-gold/25 hover:text-premium-gold-light"
             onClick={async () => {
               const JSZip = (await import("jszip")).default; const zip = new JSZip();
@@ -251,6 +273,7 @@ export function LogoDesignerTool({ initialGenerations }: Props) {
 
   const [generations, setGenerations] = useState<LogoGeneration[]>(initialGenerations ?? []);
   const [previewGen, setPreviewGen] = useState<LogoGeneration | null>(null);
+  const [parentId, setParentId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -275,8 +298,16 @@ export function LogoDesignerTool({ initialGenerations }: Props) {
     if (def) setOptions([...def.defaultOptions]);
   };
 
-  const handleGenerate = async (mode: "generate" | "regenerate" | "retry" = "generate", parentId?: string) => {
-    if (!selectedStyle || !prompt.trim() || !brandName.trim()) {
+  const handleGenerate = async (
+    mode: "generate" | "regenerate" | "continue" | "retry" = "generate",
+    parentGenerationId?: string,
+  ) => {
+    if (mode === "continue") {
+      if (!prompt.trim()) {
+        toast.error("Describe the changes you want in natural language.");
+        return;
+      }
+    } else if (!selectedStyle || !prompt.trim() || !brandName.trim()) {
       toast.error("Enter your brand name, select a style, and describe your logo.");
       return;
     }
@@ -288,25 +319,40 @@ export function LogoDesignerTool({ initialGenerations }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prompt, brandName, logoStyle: selectedStyle, industry, colorPalette,
-          iconStyle, typography, personality, options, mode, parentGenerationId: parentId,
+          iconStyle, typography, personality, options, mode, parentGenerationId,
+          continueInstruction: mode === "continue" ? prompt : undefined,
         }),
       });
       const d = await res.json();
       if (!res.ok) { toast.error(d.error ?? "Generation failed"); setStep("config"); return; }
       toast.success(d.message ?? "Logo designed!");
+      setParentId(null);
       if (d.generation) { setPreviewGen(d.generation); setStep("preview"); } else { setStep("history"); }
     } catch { toast.error("Request failed."); setStep("config"); }
   };
 
-  const handleRegenerate = (gen: LogoGeneration) => {
+  const loadGenerationConfig = (gen: LogoGeneration) => {
     setSelectedStyle(gen.logo_style);
-    setPrompt(gen.prompt);
     setBrandName(gen.logo_name);
     setIndustry(gen.industry);
     setColorPalette(gen.color_palette);
     setIconStyle(gen.icon_style);
     setOptions(gen.options ?? []);
-    handleGenerate("regenerate", gen.id);
+  };
+
+  const handleRegenerate = (gen: LogoGeneration) => {
+    loadGenerationConfig(gen);
+    setPrompt(gen.prompt);
+    void handleGenerate("regenerate", gen.id);
+  };
+
+  const handleContinue = (gen: LogoGeneration) => {
+    loadGenerationConfig(gen);
+    setParentId(gen.id);
+    setPrompt("");
+    setPreviewGen(null);
+    setStep("config");
+    toast.message("Describe your changes in natural language, then click Improve with AI.");
   };
 
   const handleFavorite = async (gen: LogoGeneration) => {
@@ -322,7 +368,14 @@ export function LogoDesignerTool({ initialGenerations }: Props) {
   };
 
   if (step === "preview" && previewGen) {
-    return <LogoPreview gen={previewGen} onBack={() => { setPreviewGen(null); setStep("history"); fetchGenerations(); }} />;
+    return (
+      <LogoPreview
+        gen={previewGen}
+        onBack={() => { setPreviewGen(null); setStep("history"); fetchGenerations(); }}
+        onRegenerate={() => handleRegenerate(previewGen)}
+        onContinue={() => handleContinue(previewGen)}
+      />
+    );
   }
 
   if (step === "generating") {
@@ -388,8 +441,20 @@ export function LogoDesignerTool({ initialGenerations }: Props) {
 
               {/* Prompt */}
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-white/60">Describe your vision *</label>
-                <Textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="Describe what your brand does, the feeling the logo should convey, any symbols or imagery you envision..." rows={4} className={cn(dashboardInputClass, "min-h-[100px] resize-none")} />
+                <label className="mb-1.5 block text-xs font-medium text-white/60">
+                  {parentId ? "Describe changes (natural language)" : "Describe your vision *"}
+                </label>
+                <Textarea
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder={
+                    parentId
+                      ? "Example: Make the icon bolder, switch to a warmer palette, and add a horizontal lockup variation..."
+                      : "Describe what your brand does, the feeling the logo should convey, any symbols or imagery you envision..."
+                  }
+                  rows={4}
+                  className={cn(dashboardInputClass, "min-h-[100px] resize-none")}
+                />
               </div>
 
               {/* Style selectors */}
@@ -427,11 +492,30 @@ export function LogoDesignerTool({ initialGenerations }: Props) {
               </div>
 
               {/* Actions */}
-              <div className="flex gap-3 pt-2">
-                <Button variant="outline" className="rounded-xl border-white/10 text-white/60 hover:border-white/20" onClick={() => setStep("style")}>Back</Button>
-                <Button onClick={() => handleGenerate()} disabled={!prompt.trim() || !brandName.trim()} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">
-                  <Sparkles className="size-4" /> Generate Logo
+              <div className="flex flex-wrap gap-3 pt-2">
+                <Button
+                  variant="outline"
+                  className="rounded-xl border-white/10 text-white/60 hover:border-white/20"
+                  onClick={() => {
+                    setParentId(null);
+                    setStep("style");
+                  }}
+                >
+                  Back
                 </Button>
+                {parentId ? (
+                  <Button
+                    onClick={() => void handleGenerate("continue", parentId)}
+                    disabled={!prompt.trim()}
+                    className="btn-gold gap-2 rounded-xl font-bold text-luxury-black"
+                  >
+                    <Sparkles className="size-4" /> Improve with AI
+                  </Button>
+                ) : (
+                  <Button onClick={() => void handleGenerate()} disabled={!prompt.trim() || !brandName.trim()} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">
+                    <Sparkles className="size-4" /> Generate Logo
+                  </Button>
+                )}
               </div>
             </div>
           </DashboardCardContent>
@@ -455,7 +539,8 @@ export function LogoDesignerTool({ initialGenerations }: Props) {
                   <ProjectHistoryCard key={gen.id} item={toHistoryItem(gen)} icon={def?.icon ?? Sparkles}
                     onFavorite={() => handleFavorite(gen)} onDelete={() => handleDelete(gen.id)}
                     onView={() => { setPreviewGen(gen); setStep("preview"); }}
-                    onRegenerate={() => handleRegenerate(gen)} />
+                    onRegenerate={() => handleRegenerate(gen)}
+                    onContinue={() => handleContinue(gen)} />
                 );
               })}
             </div>

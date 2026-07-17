@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, Code2, Copy, Download, FolderTree, Sparkles } from "lucide-react";
+import { ArrowLeft, Code2, Copy, Download, FolderTree, RefreshCw, Sparkles, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import { cn } from "@/lib/utils";
@@ -15,12 +15,17 @@ export function ProjectFilePreview({
   files,
   downloadName,
   onBack,
+  onRegenerate,
+  onContinue,
 }: {
   title: string;
   subtitle: string;
   files: FileEntry[];
   downloadName: string;
   onBack: () => void;
+  onRegenerate?: () => void;
+  /** Natural-language AI edit (D-016). */
+  onContinue?: () => void;
 }) {
   const [activeFile, setActiveFile] = useState(0);
 
@@ -58,7 +63,29 @@ export function ProjectFilePreview({
           <h3 className="font-bold text-white">{title}</h3>
           <p className="text-xs text-white/40">{subtitle}</p>
         </div>
-        <div className="ml-auto">
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+          {onRegenerate ? (
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:border-white/20"
+              onClick={onRegenerate}
+            >
+              <RefreshCw className="size-3" />
+              Regenerate
+            </Button>
+          ) : null}
+          {onContinue ? (
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5 rounded-lg border-premium-gold/20 text-xs text-premium-gold-light hover:border-premium-gold/40"
+              onClick={onContinue}
+            >
+              <Wand2 className="size-3" />
+              Improve with AI
+            </Button>
+          ) : null}
           <Button
             variant="outline"
             size="sm"

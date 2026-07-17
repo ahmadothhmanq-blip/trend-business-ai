@@ -399,12 +399,14 @@ export function useWorkspaceTool({
       setApiError("Select a saved project to continue generation.");
       return;
     }
+    const trimmedInstruction = instruction?.trim() ?? prompt.trim();
+    if (!trimmedInstruction) {
+      setApiError("Describe the changes you want in natural language.");
+      return;
+    }
     await generate({
       continue: true,
-      continueInstruction:
-        instruction ||
-        prompt.trim() ||
-        "Continue with more depth, examples, and next actions.",
+      continueInstruction: trimmedInstruction,
     });
   }
 

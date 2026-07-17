@@ -41,7 +41,8 @@
 3. Do not market a hosted live website or Live Preview unless the capability actually ships.  
 4. Live Preview remains **off** until a **safe** approach is approved (`DECISIONS_LOG.md` — D-004 / F01).  
 5. Hide or disable placeholder providers (Gemini/Grok/Llama) in user-facing production paths until implemented.  
-6. No demo pages, fake buttons, or unfinished features presented as complete.
+6. No demo pages, fake buttons, or unfinished features presented as complete.  
+7. **D-016:** Every AI product must support post-generation **natural-language AI editing / continue / improve** with parent context — not generate-once only.
 
 ---
 

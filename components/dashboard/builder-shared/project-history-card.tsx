@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock3, Code2, RefreshCw, Star, Trash2, type LucideIcon } from "lucide-react";
+import { Clock3, Code2, RefreshCw, Star, Trash2, Wand2, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import { cn } from "@/lib/utils";
@@ -31,6 +31,7 @@ export function ProjectHistoryCard({
   onDelete,
   onView,
   onRegenerate,
+  onContinue,
 }: {
   item: ProjectHistoryItem;
   icon: LucideIcon;
@@ -38,6 +39,8 @@ export function ProjectHistoryCard({
   onDelete: () => void;
   onView: () => void;
   onRegenerate: () => void;
+  /** Natural-language AI edit / improve (D-016). */
+  onContinue?: () => void;
 }) {
   return (
     <DashboardPanel className="flex flex-col gap-3">
@@ -119,6 +122,17 @@ export function ProjectHistoryCard({
               <RefreshCw className="size-3" />
               Regenerate
             </Button>
+            {onContinue ? (
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 rounded-lg border-premium-gold/20 text-xs text-premium-gold-light hover:border-premium-gold/40"
+                onClick={onContinue}
+              >
+                <Wand2 className="size-3" />
+                Improve
+              </Button>
+            ) : null}
           </>
         )}
         {item.status === "failed" && (

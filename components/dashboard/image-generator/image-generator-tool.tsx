@@ -10,8 +10,10 @@ import {
   Download,
   Minus,
   Plus,
+  RefreshCw,
   Search,
   Sparkles,
+  Wand2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -61,7 +63,17 @@ type Props = { initialGenerations?: ImageGeneration[] };
 
 type PreviewTab = "gallery" | "prompts" | "mood" | "files";
 
-function ImagePreview({ gen, onBack }: { gen: ImageGeneration; onBack: () => void }) {
+function ImagePreview({
+  gen,
+  onBack,
+  onRegenerate,
+  onContinue,
+}: {
+  gen: ImageGeneration;
+  onBack: () => void;
+  onRegenerate?: () => void;
+  onContinue?: () => void;
+}) {
   const bp = gen.blueprint;
   const [tab, setTab] = useState<PreviewTab>("gallery");
 
@@ -90,7 +102,17 @@ function ImagePreview({ gen, onBack }: { gen: ImageGeneration; onBack: () => voi
           <h3 className="font-bold text-white">{bp.title}</h3>
           <p className="text-xs text-white/40">{bp.style} &middot; {bp.imageType} &middot; {gen.aspect_ratio} &middot; {gen.provider ?? "deepseek"} &middot; {gen.generation_time_ms ? `${(gen.generation_time_ms / 1000).toFixed(1)}s` : ""}</p>
         </div>
-        <div className="ml-auto">
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+          {onRegenerate ? (
+            <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:border-white/20" onClick={onRegenerate}>
+              <RefreshCw className="size-3" /> Regenerate
+            </Button>
+          ) : null}
+          {onContinue ? (
+            <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-premium-gold/20 text-xs text-premium-gold-light hover:border-premium-gold/40" onClick={onContinue}>
+              <Wand2 className="size-3" /> Improve with AI
+            </Button>
+          ) : null}
           <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:border-premium-gold/25 hover:text-premium-gold-light"
             onClick={async () => {
               const JSZip = (await import("jszip")).default; const zip = new JSZip();
@@ -242,6 +264,7 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
 
   const [generations, setGenerations] = useState<ImageGeneration[]>(initialGenerations ?? []);
   const [previewGen, setPreviewGen] = useState<ImageGeneration | null>(null);
+  const [parentId, setParentId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -266,9 +289,16 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
     if (def) setOptions([...def.defaultOptions]);
   };
 
-  const handleGenerate = async (mode: "generate" | "regenerate" | "retry" = "generate", parentId?: string) => {
+  const handleGenerate = async (
+    mode: "generate" | "regenerate" | "continue" | "retry" = "generate",
+    parentGenerationId?: string,
+  ) => {
     if (!selectedType || !prompt.trim()) {
-      toast.error("Select an image type and describe your image.");
+      toast.error(
+        mode === "continue"
+          ? "Describe the changes you want in natural language."
+          : "Select an image type and describe your image.",
+      );
       return;
     }
     setStep("generating");
@@ -279,24 +309,39 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prompt, negativePrompt, imageType: selectedType, style, aspectRatio,
-          mood, options, batchCount, brandColors: [], mode, parentGenerationId: parentId,
+          mood, options, batchCount, brandColors: [], mode, parentGenerationId,
+          continueInstruction: mode === "continue" ? prompt : undefined,
         }),
       });
       const d = await res.json();
       if (!res.ok) { toast.error(d.error ?? "Generation failed"); setStep("config"); return; }
       toast.success(d.message ?? "Images generated!");
+      setParentId(null);
       if (d.generation) { setPreviewGen(d.generation); setStep("preview"); } else { setStep("history"); }
     } catch { toast.error("Request failed."); setStep("config"); }
   };
 
-  const handleRegenerate = (gen: ImageGeneration) => {
+  const loadGenerationConfig = (gen: ImageGeneration) => {
     setSelectedType(gen.image_type);
-    setPrompt(gen.prompt);
     setStyle(gen.style);
     setAspectRatio(gen.aspect_ratio);
     setMood(gen.mood);
     setOptions(gen.options ?? []);
-    handleGenerate("regenerate", gen.id);
+  };
+
+  const handleRegenerate = (gen: ImageGeneration) => {
+    loadGenerationConfig(gen);
+    setPrompt(gen.prompt);
+    void handleGenerate("regenerate", gen.id);
+  };
+
+  const handleContinue = (gen: ImageGeneration) => {
+    loadGenerationConfig(gen);
+    setParentId(gen.id);
+    setPrompt("");
+    setPreviewGen(null);
+    setStep("config");
+    toast.message("Describe your changes in natural language, then click Improve with AI.");
   };
 
   const handleFavorite = async (gen: ImageGeneration) => {
@@ -312,7 +357,14 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
   };
 
   if (step === "preview" && previewGen) {
-    return <ImagePreview gen={previewGen} onBack={() => { setPreviewGen(null); setStep("history"); fetchGenerations(); }} />;
+    return (
+      <ImagePreview
+        gen={previewGen}
+        onBack={() => { setPreviewGen(null); setStep("history"); fetchGenerations(); }}
+        onRegenerate={() => handleRegenerate(previewGen)}
+        onContinue={() => handleContinue(previewGen)}
+      />
+    );
   }
 
   if (step === "generating") {
@@ -369,8 +421,20 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
             <div className="space-y-5">
               {/* Prompt */}
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-white/60">Image description *</label>
-                <Textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="Describe the image in detail — subject, scene, colors, composition, lighting, mood..." rows={4} className={cn(dashboardInputClass, "min-h-[100px] resize-none")} />
+                <label className="mb-1.5 block text-xs font-medium text-white/60">
+                  {parentId ? "Describe changes (natural language)" : "Image description *"}
+                </label>
+                <Textarea
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder={
+                    parentId
+                      ? "Example: Make the lighting warmer, simplify the background, and add more contrast..."
+                      : "Describe the image in detail — subject, scene, colors, composition, lighting, mood..."
+                  }
+                  rows={4}
+                  className={cn(dashboardInputClass, "min-h-[100px] resize-none")}
+                />
               </div>
 
               {/* Negative prompt */}
@@ -441,11 +505,30 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
               </div>
 
               {/* Actions */}
-              <div className="flex gap-3 pt-2">
-                <Button variant="outline" className="rounded-xl border-white/10 text-white/60 hover:border-white/20" onClick={() => setStep("type")}>Back</Button>
-                <Button onClick={() => handleGenerate()} disabled={!prompt.trim()} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">
-                  <Sparkles className="size-4" /> Generate {batchCount > 1 ? `${batchCount} Images` : "Image"}
+              <div className="flex flex-wrap gap-3 pt-2">
+                <Button
+                  variant="outline"
+                  className="rounded-xl border-white/10 text-white/60 hover:border-white/20"
+                  onClick={() => {
+                    setParentId(null);
+                    setStep("type");
+                  }}
+                >
+                  Back
                 </Button>
+                {parentId ? (
+                  <Button
+                    onClick={() => void handleGenerate("continue", parentId)}
+                    disabled={!prompt.trim()}
+                    className="btn-gold gap-2 rounded-xl font-bold text-luxury-black"
+                  >
+                    <Sparkles className="size-4" /> Improve with AI
+                  </Button>
+                ) : (
+                  <Button onClick={() => void handleGenerate()} disabled={!prompt.trim()} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">
+                    <Sparkles className="size-4" /> Generate {batchCount > 1 ? `${batchCount} Images` : "Image"}
+                  </Button>
+                )}
               </div>
             </div>
           </DashboardCardContent>
@@ -469,7 +552,8 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
                   <ProjectHistoryCard key={gen.id} item={toHistoryItem(gen)} icon={def?.icon ?? Sparkles}
                     onFavorite={() => handleFavorite(gen)} onDelete={() => handleDelete(gen.id)}
                     onView={() => { setPreviewGen(gen); setStep("preview"); }}
-                    onRegenerate={() => handleRegenerate(gen)} />
+                    onRegenerate={() => handleRegenerate(gen)}
+                    onContinue={() => handleContinue(gen)} />
                 );
               })}
             </div>
