@@ -71,6 +71,7 @@
 - **M02:** Placeholder AI providers (Gemini/Grok/Llama) hidden from production settings UI/API (D-009).  
 - **M03:** Duplicate dashboard routes collapsed to canonical product paths (D-013).  
 - **M04:** Root README updated for multi-product + ZIP delivery reality.  
+- **M05:** Website Builder generation progress uses SSE server stages + elapsed time (no fake 92% bar).  
 
 ### Working-tree fixes (not yet guaranteed on remote `main`)
 
@@ -124,7 +125,7 @@ See `TASK_QUEUE.md` High/Medium. Summary:
 1. ~~Preview UI trust gap / unsafe builder~~ → mitigated by H07 + H08; F01 for safe preview later  
 
 2. Uncommitted fixes may diverge local vs GitHub  
-3. Sequential DeepSeek latency; progress can look stuck  
+3. Sequential DeepSeek latency — M05 streams real stages; long waits still expected  
 4. Soft-pass may save incomplete trees  
 5. Preview builder RCE if enabled carelessly  
 6. Launch blocked on env/ops P0 from prior enterprise audits  

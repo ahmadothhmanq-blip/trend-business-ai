@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import { readSseStream } from "@/lib/api/sse-client";
 import { apiMutation, usePaginatedResource } from "@/lib/hooks/use-paginated-resource";
 import type { ProductDefinition } from "@/lib/products/types";
 import type { WorkspaceDefinition } from "@/lib/workspace/definition";
@@ -92,68 +93,6 @@ async function streamSections(
   }
 }
 
-async function readSseStream(
-  response: Response,
-  handlers: {
-    onProgress: (message: string, progress: number | null) => void;
-    onComplete: (payload: {
-      generation: WorkspaceGeneration;
-      message?: string;
-    }) => Promise<void> | void;
-    onError: (message: string) => void;
-  },
-) {
-  if (!response.body) {
-    throw new Error("Streaming is not supported by this browser.");
-  }
-
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = "";
-
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
-
-    const chunks = buffer.split("\n\n");
-    buffer = chunks.pop() ?? "";
-
-    for (const chunk of chunks) {
-      const lines = chunk.split("\n");
-      let event = "message";
-      let data = "";
-      for (const line of lines) {
-        if (line.startsWith("event:")) event = line.slice(6).trim();
-        if (line.startsWith("data:")) data += line.slice(5).trim();
-      }
-      if (!data) continue;
-
-      try {
-        const payload = JSON.parse(data) as {
-          message?: string;
-          progress?: number | null;
-          generation?: WorkspaceGeneration;
-          error?: string;
-        };
-
-        if (event === "progress") {
-          handlers.onProgress(payload.message ?? "Working...", payload.progress ?? null);
-        } else if (event === "complete" && payload.generation) {
-          await handlers.onComplete({
-            generation: payload.generation,
-            message: payload.message,
-          });
-        } else if (event === "error") {
-          handlers.onError(payload.error ?? "Generation failed.");
-        }
-      } catch {
-        // ignore malformed event
-      }
-    }
-  }
-}
-
 export function useWorkspaceTool({
   definition,
   product,
@@ -221,7 +160,12 @@ export function useWorkspaceTool({
   useEffect(() => {
     if (!isGenerating) return;
     const timer = window.setInterval(() => {
-      setProgress((value) => (value >= 92 ? 34 : value + 7));
+      // Asymptotic fake progress while waiting on the provider — never reset mid-run.
+      setProgress((value) => {
+        if (value >= 99) return 99;
+        if (value >= 90) return Math.min(99, value + 1);
+        return Math.min(90, value + 7);
+      });
     }, 900);
     return () => window.clearInterval(timer);
   }, [isGenerating]);
@@ -393,18 +337,24 @@ export function useWorkspaceTool({
         toast.success(body.message ?? "Project generated and saved.");
       } else {
         let completed = false;
-        await readSseStream(response, {
+        await readSseStream<{
+          generation?: WorkspaceGeneration;
+          message?: string;
+        }>(response, {
           onProgress: (message, value) => {
             setStreamStatus(message);
             if (typeof value === "number") setProgress(value);
             else setProgress((current) => Math.min(90, current + 4));
           },
-          onComplete: async ({ generation, message }) => {
+          onComplete: async (payload) => {
+            if (!payload.generation) {
+              throw new Error("Stream completed without a generation.");
+            }
             completed = true;
             lastFailedPayloadRef.current = null;
-            const project = toWorkspaceProject(generation);
+            const project = toWorkspaceProject(payload.generation);
             await applyStreamedProject(project);
-            toast.success(message ?? "Project generated and saved.");
+            toast.success(payload.message ?? "Project generated and saved.");
           },
           onError: (message) => {
             throw new Error(message);

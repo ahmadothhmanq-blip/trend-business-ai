@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
+import { readSseStream } from "@/lib/api/sse-client";
 import {
   AlertTriangle,
   ArrowDownToLine,
@@ -204,7 +205,7 @@ export function WebsiteBuilderTool({
   const [advancedOpen, setAdvancedOpen] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
-  const [progress, setProgress] = useState(34);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [streamStatus, setStreamStatus] = useState<string | null>(null);
   const [selectedFilePath, setSelectedFilePath] = useState<string>("");
   const [outputTab, setOutputTab] = useState<"preview" | "code">("preview");
@@ -218,6 +219,18 @@ export function WebsiteBuilderTool({
   const [activeProject, setActiveProject] = useState<WorkspaceProject | null>(
     initialGenerations[0] ? toProject(initialGenerations[0]) : null,
   );
+
+  useEffect(() => {
+    if (!isGenerating) {
+      setElapsedSeconds(0);
+      return;
+    }
+    setElapsedSeconds(0);
+    const timer = window.setInterval(() => {
+      setElapsedSeconds((value) => value + 1);
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [isGenerating]);
 
   useEffect(() => {
     const active = activeProject;
@@ -370,53 +383,23 @@ export function WebsiteBuilderTool({
 
     setIsGenerating(true);
     setApiError(null);
-    setProgress(28);
     setStreamStatus("Connecting to AI website engine...");
 
-    const stages = [
-      "Analyzing product brief...",
-      "Planning pages and architecture...",
-      "Generating file blueprint...",
-      "Saving project to workspace...",
-    ];
+    const requestBody = {
+      prompt: brief,
+      projectType,
+      language,
+      theme: `${colorTheme} ${designStyle}`,
+      features: [...features, ...(product?.id ? [`product:${product.id}`] : [])],
+      productId: product?.id,
+      mode: options?.regenerate ? "regenerate" : "generate",
+      parentGenerationId: options?.regenerate ? activeProject?.id : undefined,
+    };
 
-    let stageIndex = 0;
-    const stageTimer = window.setInterval(() => {
-      stageIndex = Math.min(stageIndex + 1, stages.length - 1);
-      setStreamStatus(stages[stageIndex] ?? null);
-      setProgress((value) => Math.min(92, value + 14));
-    }, 900);
-
-    try {
-      const response = await fetch("/api/website-builder", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt: brief,
-          projectType,
-          language,
-          theme: `${colorTheme} ${designStyle}`,
-          features: [
-            ...features,
-            ...(product?.id ? [`product:${product.id}`] : []),
-          ],
-          productId: product?.id,
-          mode: options?.regenerate ? "regenerate" : "generate",
-          parentGenerationId: options?.regenerate ? activeProject?.id : undefined,
-        }),
-      });
-      const data = (await response.json()) as GenerateProjectResponse;
-
-      if (!response.ok) {
-        throw new Error("error" in data ? data.error : "Unable to generate website.");
-      }
-
-      if (!("project" in data) || !data.project || !data.generation?.id) {
-        throw new Error("AI engine did not return a saved generation.");
-      }
-
-      const generatedProject = data.project;
-      const generation = data.generation;
+    const applySavedGeneration = (
+      generatedProject: GeneratedWebsiteProject,
+      generation: WebsiteGeneration,
+    ) => {
       const nextProject: WorkspaceProject = {
         id: generation.id,
         title: generatedProject.title || `${projectType} Concept`,
@@ -432,24 +415,75 @@ export function WebsiteBuilderTool({
         build: { status: "idle" },
       };
 
-      setStreamStatus("Streaming blueprint into workspace...");
       setActiveProject(nextProject);
       setSelectedFilePath(generatedProject.files[0]?.path ?? "");
       setOutputTab("code");
       setProjects((items) => [nextProject, ...items].slice(0, 8));
-      setProgress(100);
       setStreamStatus("Project saved.");
       toast.success("Project generated and saved to your workspace.");
+    };
+
+    try {
+      let completed = false;
+      const streamResponse = await fetch("/api/website-builder/stream", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "text/event-stream",
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (streamResponse.ok && streamResponse.body) {
+        await readSseStream<{
+          project?: GeneratedWebsiteProject;
+          generation?: WebsiteGeneration;
+          message?: string;
+        }>(streamResponse, {
+          onProgress: (message) => {
+            setStreamStatus(message);
+          },
+          onComplete: (payload) => {
+            if (!payload.project || !payload.generation?.id) {
+              throw new Error("AI engine did not return a saved generation.");
+            }
+            completed = true;
+            applySavedGeneration(payload.project, payload.generation);
+          },
+          onError: (message) => {
+            throw new Error(message);
+          },
+        });
+        if (!completed) {
+          throw new Error("Stream ended before generation completed.");
+        }
+      } else {
+        // Fallback: blocking JSON POST
+        const response = await fetch("/api/website-builder", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(requestBody),
+        });
+        const data = (await response.json()) as GenerateProjectResponse;
+
+        if (!response.ok) {
+          throw new Error("error" in data ? data.error : "Unable to generate website.");
+        }
+
+        if (!("project" in data) || !data.project || !data.generation?.id) {
+          throw new Error("AI engine did not return a saved generation.");
+        }
+
+        applySavedGeneration(data.project, data.generation);
+      }
     } catch (error) {
       setApiError(
         error instanceof Error
           ? error.message
           : "Unable to generate website application.",
       );
-      setProgress(34);
       setStreamStatus(null);
     } finally {
-      window.clearInterval(stageTimer);
       setIsGenerating(false);
       window.setTimeout(() => setStreamStatus(null), 1200);
     }
@@ -661,13 +695,19 @@ export function WebsiteBuilderTool({
                 <DashboardIconBox icon={MonitorSmartphone} className="size-12 rounded-2xl" />
               </div>
               <div className="mt-5 h-2 overflow-hidden rounded-full bg-white/[0.08]">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-premium-gold to-premium-gold-light transition-all duration-700"
-                  style={{ width: `${isGenerating ? progress : activeProject ? 100 : 34}%` }}
-                />
+                {isGenerating ? (
+                  <div className="h-full w-1/3 animate-pulse rounded-full bg-gradient-to-r from-premium-gold to-premium-gold-light" />
+                ) : (
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-premium-gold to-premium-gold-light transition-all duration-700"
+                    style={{ width: activeProject ? "100%" : "34%" }}
+                  />
+                )}
               </div>
               <p className="mt-3 text-[12px] text-white/40">
-                Connected to DeepSeek AI for generated React and Next.js applications.
+                {isGenerating
+                  ? `${streamStatus ?? "Generating..."} · ${formatElapsed(elapsedSeconds)}`
+                  : "Connected to DeepSeek AI for generated React and Next.js applications."}
               </p>
             </div>
           </div>
@@ -843,14 +883,14 @@ export function WebsiteBuilderTool({
             <div className="rounded-2xl border border-premium-gold/20 bg-premium-gold/5 p-4">
               <div className="mb-2 flex items-center justify-between text-[12px] text-premium-gold-light">
                 <span>{streamStatus ?? "Generation in progress"}</span>
-                <span>{progress}%</span>
+                <span>{formatElapsed(elapsedSeconds)}</span>
               </div>
               <div className="h-2 overflow-hidden rounded-full bg-black/30">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-premium-gold to-premium-gold-light transition-all"
-                  style={{ width: `${progress}%` }}
-                />
+                <div className="h-full w-2/5 animate-pulse rounded-full bg-gradient-to-r from-premium-gold to-premium-gold-light" />
               </div>
+              <p className="mt-2 text-[11px] text-white/40">
+                Long runs are normal — status updates come from the server as files generate.
+              </p>
             </div>
           )}
 
@@ -899,7 +939,9 @@ export function WebsiteBuilderTool({
             designStyle={designStyle}
             colorTheme={colorTheme}
             language={language}
-            progress={isGenerating ? progress : activeProject ? 100 : 34}
+            isGenerating={isGenerating}
+            streamStatus={streamStatus}
+            elapsedSeconds={elapsedSeconds}
             onRefreshPreview={refreshPreview}
             onOpenPreview={openPreviewInNewTab}
           />
@@ -1141,6 +1183,13 @@ function ProjectExportPanel({
   );
 }
 
+function formatElapsed(totalSeconds: number) {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  if (minutes <= 0) return `${seconds}s`;
+  return `${minutes}m ${seconds.toString().padStart(2, "0")}s`;
+}
+
 function RightPreview({
   activeProject,
   currentPages,
@@ -1148,7 +1197,9 @@ function RightPreview({
   designStyle,
   colorTheme,
   language,
-  progress,
+  isGenerating,
+  streamStatus,
+  elapsedSeconds,
   onRefreshPreview,
   onOpenPreview,
 }: {
@@ -1158,7 +1209,9 @@ function RightPreview({
   designStyle: string;
   colorTheme: string;
   language: string;
-  progress: number;
+  isGenerating: boolean;
+  streamStatus: string | null;
+  elapsedSeconds: number;
   onRefreshPreview: () => void;
   onOpenPreview: () => void;
 }) {
@@ -1303,20 +1356,36 @@ function RightPreview({
       )}
 
       <DashboardPanel>
-        <SectionHeader icon={Clock3} title="Progress" description="Estimated build readiness." />
+        <SectionHeader
+          icon={Clock3}
+          title="Progress"
+          description="Live server status during generation."
+        />
         <div className="mt-5">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-white/45">Workspace progress</span>
-            <span className="font-bold text-premium-gold-light">{progress}%</span>
+            <span className="text-white/45">
+              {isGenerating
+                ? streamStatus ?? "Generating..."
+                : activeProject
+                  ? "Ready"
+                  : "Idle"}
+            </span>
+            <span className="font-bold text-premium-gold-light">
+              {isGenerating ? formatElapsed(elapsedSeconds) : activeProject ? "Done" : "—"}
+            </span>
           </div>
           <div className="mt-3 h-3 overflow-hidden rounded-full bg-white/[0.07]">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-premium-gold to-premium-gold-light transition-all duration-700"
-              style={{ width: `${progress}%` }}
-            />
+            {isGenerating ? (
+              <div className="h-full w-2/5 animate-pulse rounded-full bg-gradient-to-r from-premium-gold to-premium-gold-light" />
+            ) : (
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-premium-gold to-premium-gold-light transition-all duration-700"
+                style={{ width: activeProject ? "100%" : "20%" }}
+              />
+            )}
           </div>
           <div className="mt-5 grid grid-cols-2 gap-3">
-            <InfoTile label="Estimated Time" value="2-4 min" />
+            <InfoTile label="Typical Time" value="1-3 min" />
             <InfoTile label="Language" value={language} />
           </div>
         </div>

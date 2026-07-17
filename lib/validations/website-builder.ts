@@ -8,6 +8,62 @@ import {
   WEBSITE_TYPES,
 } from "@/lib/constants/website-builder";
 
+/** Dashboard Website Builder generate/regenerate request (API). */
+export const websiteGenerateRequestSchema = z.object({
+  prompt: z.string().trim().min(10, "Describe your project in at least 10 characters."),
+  projectType: z.string().trim().min(1, "Select a project type."),
+  language: z.string().trim().min(1, "Select a language."),
+  theme: z.string().trim().min(1, "Select a theme."),
+  features: z.array(z.string().trim()).default([]),
+  productId: z.string().trim().optional(),
+  mode: z.enum(["generate", "regenerate", "continue", "retry"]).optional(),
+  parentGenerationId: z.string().uuid().optional(),
+  projectId: z.string().uuid().optional(),
+});
+
+export type WebsiteGenerateRequest = z.infer<typeof websiteGenerateRequestSchema>;
+
+export function detectWebsiteProjectKind(input: WebsiteGenerateRequest) {
+  const signal = [input.prompt, input.projectType, ...input.features]
+    .join(" ")
+    .toLowerCase();
+  const appSignals = [
+    "app",
+    "application",
+    "dashboard",
+    "admin",
+    "crm",
+    "erp",
+    "saas",
+    "authentication",
+    "auth",
+    "login",
+    "sign in",
+    "signup",
+    "register",
+    "portal",
+    "platform",
+    "payments",
+    "payment",
+    "analytics",
+    "database",
+    "workflow",
+    "kanban",
+    "management",
+    "booking system",
+    "user roles",
+    "api",
+    "api route",
+    "crud",
+    "mobile app",
+    "web app",
+  ];
+
+  return appSignals.some((keyword) => signal.includes(keyword))
+    ? ("web_application" as const)
+    : ("website" as const);
+}
+
 export const websiteBuilderInputSchema = z.object({
   projectName: z.string().trim().min(1, "Project name is required").max(200),
   websiteType: z.enum(WEBSITE_TYPES, { message: "Select a valid website type" }),

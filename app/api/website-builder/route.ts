@@ -6,66 +6,12 @@ import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import { generateWebsite } from "@/lib/website-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
 import { startTimer } from "@/lib/perf/timing";
+import {
+  detectWebsiteProjectKind,
+  websiteGenerateRequestSchema,
+} from "@/lib/validations/website-builder";
 import type { WebsiteBlueprint, WebsiteGeneration } from "@/types/database";
 import { NextResponse } from "next/server";
-import { z } from "zod";
-
-const websiteRequestSchema = z.object({
-  prompt: z.string().trim().min(10, "Describe your project in at least 10 characters."),
-  projectType: z.string().trim().min(1, "Select a project type."),
-  language: z.string().trim().min(1, "Select a language."),
-  theme: z.string().trim().min(1, "Select a theme."),
-  features: z.array(z.string().trim()).default([]),
-  productId: z.string().trim().optional(),
-  mode: z.enum(["generate", "regenerate", "continue", "retry"]).optional(),
-  parentGenerationId: z.string().uuid().optional(),
-  projectId: z.string().uuid().optional(),
-});
-
-function detectProjectKind(input: z.infer<typeof websiteRequestSchema>) {
-  const signal = [
-    input.prompt,
-    input.projectType,
-    ...input.features,
-  ]
-    .join(" ")
-    .toLowerCase();
-  const appSignals = [
-    "app",
-    "application",
-    "dashboard",
-    "admin",
-    "crm",
-    "erp",
-    "saas",
-    "authentication",
-    "auth",
-    "login",
-    "sign in",
-    "signup",
-    "register",
-    "portal",
-    "platform",
-    "payments",
-    "payment",
-    "analytics",
-    "database",
-    "workflow",
-    "kanban",
-    "management",
-    "booking system",
-    "user roles",
-    "api",
-    "api route",
-    "crud",
-    "mobile app",
-    "web app",
-  ];
-
-  return appSignals.some((keyword) => signal.includes(keyword))
-    ? "web_application"
-    : "website";
-}
 
 function logWebsiteBuilderError(stage: string, error: unknown) {
   const stack =
@@ -141,7 +87,7 @@ export async function POST(request: Request) {
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
 
-  const parsed = websiteRequestSchema.safeParse(body);
+  const parsed = websiteGenerateRequestSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
       { error: parsed.error.issues[0]?.message ?? "Invalid input" },
@@ -150,7 +96,7 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data;
-  const projectKind = detectProjectKind(input);
+  const projectKind = detectWebsiteProjectKind(input);
 
   let stage = "generateWebsite";
 

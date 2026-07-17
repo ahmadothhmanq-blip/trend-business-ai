@@ -38,7 +38,7 @@
 | M02 | Hide placeholder AI providers (Gemini/Grok/Llama) in production UI | Done | `getUserFacingProviderNames` + API/UI sanitize (D-009) |
 | M03 | Collapse duplicate routes (`brand-designer` vs `brand-studio`, `creative-studio` vs `image-generator`, etc.) | Done | Permanent redirects + link cleanup; audit→feasibility-study |
 | M04 | Update root README to match current multi-product reality | Done | Multi-product + ZIP honesty + docs SSOT pointers |
-| M05 | Real generation progress (avoid fake stuck ~90% feel) | Pending | Prefer server events / clearer status |
+| M05 | Real generation progress (avoid fake stuck ~90% feel) | Done | Website Builder SSE stream + elapsed/indeterminate UI (no fake %) |
 | M06 | Credit fairness: don’t punish users when AI fails mid-run | Pending | Billing path |
 | M07 | Staging E2E for auth + Website Builder + billing (when PayPal configured) | Pending | |
 
@@ -112,7 +112,7 @@
 ## Execution order (autonomous)
 
 1. ~~H01~~ … ~~H08~~ (Phase 2 High complete aside from merge/ops follow-ups)  
-2. ~~M01~~ → M02 → M03 → M04 → M05 (clarity + generation UX)  
+2. ~~M01~~ → ~~M02~~ → ~~M03~~ → ~~M04~~ → ~~M05~~ (clarity + generation UX)  
 3. Re-run H06 with confirmed test user when email confirm / full anon JWT available  
 4. Then remaining Medium/Low per `AUTONOMOUS_EXECUTION.md` hard gates  
 5. Future/`F*` only after `DECISIONS_LOG.md` Accepted entry  
