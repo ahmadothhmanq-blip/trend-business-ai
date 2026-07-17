@@ -10,8 +10,23 @@ export async function POST(request: Request) {
     request.headers.get("x-real-ip") ||
     "anon";
 
-  const rateLimited = await enforceMutationRateLimitAsync(`growth-newsletter:${ip}`);
-  if (rateLimited) return rateLimited;
+  const rateLimited = await enforceMutationRateLimitAsync(
+    `growth-newsletter:${ip}`,
+  );
+  // Prod without Upstash fail-closes growth-* keys with 503 — do not block signup.
+  if (rateLimited) {
+    if (rateLimited.status >= 500) {
+      console.error(
+        "growth newsletter rate limit unavailable; continuing ingest",
+        await rateLimited
+          .clone()
+          .json()
+          .catch(() => null),
+      );
+    } else {
+      return rateLimited;
+    }
+  }
 
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;

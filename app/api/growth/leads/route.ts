@@ -12,7 +12,20 @@ export async function POST(request: Request) {
     "anon";
 
   const rateLimited = await enforceMutationRateLimitAsync(`growth-lead:${ip}`);
-  if (rateLimited) return rateLimited;
+  // Prod without Upstash fail-closes growth-* keys with 503 — do not block lead capture.
+  if (rateLimited) {
+    if (rateLimited.status >= 500) {
+      console.error(
+        "growth leads rate limit unavailable; continuing ingest",
+        await rateLimited
+          .clone()
+          .json()
+          .catch(() => null),
+      );
+    } else {
+      return rateLimited;
+    }
+  }
 
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;

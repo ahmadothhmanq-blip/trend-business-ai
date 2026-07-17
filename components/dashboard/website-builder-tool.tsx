@@ -50,9 +50,8 @@ import type { GenerationMode, PromptVersion, WebsiteGeneration } from "@/types/d
 import { cn } from "@/lib/utils";
 
 type WebsiteBuilderToolProps = {
-  /** Prefer productId — ProductDefinition.icon is a function and cannot cross the RSC boundary. */
+  /** Serializable product id only — never pass ProductDefinition (contains LucideIcon). */
   productId?: ProductId;
-  product?: ProductDefinition;
   initialGenerations?: WebsiteGeneration[];
 };
 
@@ -202,12 +201,9 @@ function resolveInitialProjectType(
 
 export function WebsiteBuilderTool({
   productId,
-  product: productProp,
   initialGenerations = [],
 }: WebsiteBuilderToolProps) {
-  const product =
-    productProp ??
-    (productId ? getProductDefinition(productId) : undefined);
+  const product = productId ? getProductDefinition(productId) : undefined;
   const productTemplates = product?.templates?.length
     ? product.templates
     : [...TEMPLATES];

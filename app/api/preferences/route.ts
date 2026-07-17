@@ -3,6 +3,28 @@ import { databaseErrorResponse } from "@/lib/api/errors";
 import { preferencesSchema } from "@/lib/validations/auth";
 import { NextResponse } from "next/server";
 
+function isMissingPreferencesTable(error: {
+  code?: string;
+  message?: string;
+} | null) {
+  if (!error) return false;
+  const msg = (error.message ?? "").toLowerCase();
+  return (
+    error.code === "42P01" ||
+    error.code === "PGRST205" ||
+    msg.includes("does not exist") ||
+    msg.includes("schema cache")
+  );
+}
+
+function defaultPreferences(userId: string) {
+  return {
+    user_id: userId,
+    theme: "dark" as const,
+    email_notifications: true,
+  };
+}
+
 export async function GET() {
   const auth = await requireUser();
   if (auth.response) return auth.response;
@@ -14,15 +36,17 @@ export async function GET() {
     .single();
 
   if (error && error.code !== "PGRST116") {
+    if (isMissingPreferencesTable(error)) {
+      return NextResponse.json({
+        preferences: defaultPreferences(auth.user!.id),
+        skipped: true,
+      });
+    }
     return databaseErrorResponse("preferences.get", error);
   }
 
   return NextResponse.json({
-    preferences: data ?? {
-      user_id: auth.user!.id,
-      theme: "dark",
-      email_notifications: true,
-    },
+    preferences: data ?? defaultPreferences(auth.user!.id),
   });
 }
 
@@ -46,6 +70,17 @@ export async function PUT(request: Request) {
   });
 
   if (error) {
+    if (isMissingPreferencesTable(error)) {
+      return NextResponse.json({
+        message: "Preferences accepted (persistence table unavailable).",
+        skipped: true,
+        preferences: {
+          user_id: auth.user!.id,
+          theme: parsed.data.theme ?? "dark",
+          email_notifications: parsed.data.emailNotifications ?? true,
+        },
+      });
+    }
     return databaseErrorResponse("preferences.update", error);
   }
 
