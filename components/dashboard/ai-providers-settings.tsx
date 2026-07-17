@@ -30,9 +30,11 @@ import {
   dashboardSelectClass,
 } from "@/components/dashboard/ui/dashboard-styles";
 import { cn } from "@/lib/utils";
+import { getUserFacingProviderNames } from "@/lib/ai/provider-config";
 import {
   PROVIDER_MODELS,
   getDefaultSettings,
+  sanitizeSettingsForClient,
   type AIProviderSettings,
   type ProviderSettingsEntry,
   type ProviderStatus,
@@ -228,22 +230,26 @@ export function AIProvidersSettings() {
       .then((res) => res.json())
       .then((data) => {
         if (data.settings) {
-          const loaded = data.settings as AIProviderSettings;
-          const allNames = Object.keys(PROVIDER_MODELS);
-          const existing = new Set((loaded.providers ?? []).map((p: ProviderSettingsEntry) => p.name));
+          const loaded = sanitizeSettingsForClient(data.settings as AIProviderSettings);
+          const facingNames = getUserFacingProviderNames();
+          const existing = new Set(
+            (loaded.providers ?? []).map((p: ProviderSettingsEntry) => p.name),
+          );
           const merged = [
             ...(loaded.providers ?? []),
-            ...allNames
+            ...facingNames
               .filter((n) => !existing.has(n))
               .map((name) => ({
                 name,
                 enabled: false,
                 apiKey: "",
-                model: PROVIDER_MODELS[name].defaultModel,
+                model: PROVIDER_MODELS[name]?.defaultModel ?? "",
                 status: "not_configured" as ProviderStatus,
               })),
           ];
-          setSettings({ ...loaded, providers: merged });
+          setSettings(
+            sanitizeSettingsForClient({ ...loaded, providers: merged }),
+          );
         }
       })
       .catch(() => showToast("error", "Failed to load settings"))

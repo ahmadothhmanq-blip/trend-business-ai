@@ -51,3 +51,22 @@ export function getProviderLabel(name: AIProviderName): string {
 export function getAllProviderNames(): AIProviderName[] {
   return PROVIDER_REGISTRY.map((p) => p.name);
 }
+
+export function isPlaceholderProvider(name: string): boolean {
+  return PROVIDER_REGISTRY.find((p) => p.name === name)?.status === "placeholder";
+}
+
+/** Placeholder adapters stay visible in local/dev; hidden in production builds (M02 / D-009). */
+export function shouldExposePlaceholderProviders(): boolean {
+  return process.env.NODE_ENV !== "production";
+}
+
+export function getUserFacingProviderNames(): AIProviderName[] {
+  return PROVIDER_REGISTRY.filter(
+    (p) => shouldExposePlaceholderProviders() || p.status !== "placeholder",
+  ).map((p) => p.name);
+}
+
+export function isUserFacingProvider(name: string): boolean {
+  return getUserFacingProviderNames().includes(name as AIProviderName);
+}

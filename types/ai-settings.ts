@@ -1,3 +1,8 @@
+import {
+  getUserFacingProviderNames,
+  isUserFacingProvider,
+} from "@/lib/ai/provider-config";
+
 export type ProviderStatus = "connected" | "not_configured" | "error";
 
 export type ProviderSettingsEntry = {
@@ -72,12 +77,28 @@ export function getDefaultSettings(): AIProviderSettings {
     temperature: 0.7,
     max_tokens: 4096,
     timeout_seconds: 120,
-    providers: Object.entries(PROVIDER_MODELS).map(([name, info]) => ({
-      name,
-      enabled: name === "deepseek",
-      apiKey: "",
-      model: info.defaultModel,
-      status: "not_configured" as ProviderStatus,
-    })),
+    providers: getUserFacingProviderNames().map((name) => {
+      const info = PROVIDER_MODELS[name];
+      return {
+        name,
+        enabled: name === "deepseek",
+        apiKey: "",
+        model: info?.defaultModel ?? "",
+        status: "not_configured" as ProviderStatus,
+      };
+    }),
   };
+}
+
+/** Strip placeholder providers from client-facing settings in production. */
+export function sanitizeSettingsForClient(
+  settings: AIProviderSettings,
+): AIProviderSettings {
+  const providers = (settings.providers ?? []).filter((p) =>
+    isUserFacingProvider(p.name),
+  );
+  const default_provider = isUserFacingProvider(settings.default_provider)
+    ? settings.default_provider
+    : "deepseek";
+  return { ...settings, providers, default_provider };
 }

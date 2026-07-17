@@ -1,6 +1,15 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
 import { databaseErrorResponse } from "@/lib/api/errors";
-import { getDefaultSettings, type AIProviderSettings } from "@/types/ai-settings";
+import {
+  isPlaceholderProvider,
+  isUserFacingProvider,
+  shouldExposePlaceholderProviders,
+} from "@/lib/ai/provider-config";
+import {
+  getDefaultSettings,
+  sanitizeSettingsForClient,
+  type AIProviderSettings,
+} from "@/types/ai-settings";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -54,10 +63,10 @@ export async function GET() {
       }))
     : [];
 
-  const settings: AIProviderSettings = {
+  const settings = sanitizeSettingsForClient({
     ...data,
     providers,
-  };
+  } as AIProviderSettings);
 
   return NextResponse.json({ settings });
 }
@@ -103,12 +112,47 @@ export async function PUT(request: Request) {
     }
   }
 
-  const providers = parsed.data.providers.map((p) => ({
+  if (!isUserFacingProvider(parsed.data.default_provider)) {
+    return NextResponse.json(
+      { error: "Default provider is not available" },
+      { status: 400 },
+    );
+  }
+
+  const facingProviders = parsed.data.providers.filter((p) =>
+    isUserFacingProvider(p.name),
+  );
+
+  const providers = facingProviders.map((p) => ({
     ...p,
     apiKey: isMaskedApiKey(p.apiKey)
       ? (existingByName.get(p.name) ?? "")
       : p.apiKey,
   }));
+
+  // Preserve stored placeholder provider rows in production so a save does not wipe them.
+  if (!shouldExposePlaceholderProviders() && Array.isArray(existing?.providers)) {
+    for (const p of existing.providers as Array<{
+      name?: string;
+      enabled?: boolean;
+      apiKey?: string;
+      model?: string;
+      status?: string;
+    }>) {
+      if (!p?.name || !isPlaceholderProvider(p.name)) continue;
+      if (providers.some((x) => x.name === p.name)) continue;
+      providers.push({
+        name: p.name,
+        enabled: false,
+        apiKey: typeof p.apiKey === "string" ? p.apiKey : "",
+        model: typeof p.model === "string" ? p.model : "",
+        status:
+          p.status === "connected" || p.status === "error"
+            ? p.status
+            : "not_configured",
+      });
+    }
+  }
 
   const row = {
     user_id: auth.user!.id,

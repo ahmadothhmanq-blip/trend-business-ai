@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { isUserFacingProvider } from "@/lib/ai/provider-config";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -150,6 +151,14 @@ export async function POST(request: Request) {
   }
 
   const { provider, apiKey, model } = parsed.data;
+
+  if (!isUserFacingProvider(provider)) {
+    return NextResponse.json(
+      { error: `Provider is not available: ${provider}` },
+      { status: 400 },
+    );
+  }
+
   const tester = testers[provider];
 
   if (!tester) {
