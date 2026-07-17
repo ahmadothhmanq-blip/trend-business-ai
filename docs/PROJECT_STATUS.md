@@ -22,7 +22,7 @@
 | Migrations | **30/30 applied** on configured `.env.local` DB (H01) |
 | Local env (H02) | Core AI/Supabase **partial** — SITE_URL / service role / Upstash **missing**; anon key length WARN |
 | Docs on remote | Feature branch; merge to `main` still L08 |
-| Blocking for honest launch messaging | Preview honesty + fill prod env gaps (H02) + commit remaining WT fixes (H04–H05) + commit H03 |
+| Blocking for honest launch messaging | Preview honesty + fill prod env gaps (H02) + H04–H05 + merge H03 to `main` |
 
 ---
 
@@ -33,7 +33,7 @@
 | Marketing site | **Completed** | Strong SEO surface |
 | Auth & profiles | **Completed** | Supabase session + dashboard guard |
 | Dashboard shell | **Completed** | Nav, theme, layout |
-| Website Builder (code/ZIP) | **Completed** (core) | Generate/save/download works; preview not live |
+| Website Builder (code/ZIP) | **Completed** (core) | Generate/save/download works; preview not live; **SSR list slim-list verified (H03)** |
 | Landing / App builders | **Completed** (core) | Same family as website |
 | Brand / Logo / Image / Video / Content | **Completed** (partial) | Tools exist; media depth limited |
 | Business / Agents / Ideas / Reports | **Completed** (core) | Pipelines present |
@@ -61,13 +61,13 @@
 - Phase 1 audit documentation (`docs/PROJECT_AUDIT.md`)  
 - Docs SSOT pack (this folder)  
 - **H01:** Migrations `001`–`030` confirmed on configured `.env.local` Supabase (`public.schema_migrations` = 30/30; platform `db:verify` PASS). Staging/prod not separately verified.  
-- **H03:** Website Builder SSR slim-list reconciled in WT (`website-product-page.tsx`) — no full blueprint on list/fallback; awaiting commit to remote.  
+- **H03:** Website Builder SSR slim-list **verified PASS** and pushed on `cursor/docs-ssot-audit-plan` (`f1f5549`). Merge to `main` still open.  
 
 ### Working-tree fixes (not yet guaranteed on remote `main`)
 
-Treat as **In Progress** until committed/pushed:
+Treat as **In Progress** until committed/pushed / merged:
 
-- ~~Website list SSR: slim columns, no full blueprint on list~~ → **done in WT (H03)**; commit still required  
+- ~~Website list SSR: slim columns, no full blueprint on list~~ → **H03 verified on feature branch**  
 - Theme: React 19–safe provider (no `next-themes` script crash) — **H04**  
 - Generation: 18-file cap + soft-pass validation — **H05**  
 - Dev: avoid immutable cache on `/_next/static` in development  
@@ -78,7 +78,7 @@ Treat as **In Progress** until committed/pushed:
 
 | Item | Owner | Notes |
 |------|-------|-------|
-| Reconcile WT critical fixes → `main` | Pending approval | **H03 done locally**; theme (H04), generation bounds (H05) next |
+| Reconcile WT critical fixes → `main` | Pending approval | **H03 verified on branch**; theme (H04), generation bounds (H05) next |
 | Ops production readiness | Pending | **H01+H02** local done; fill SITE_URL / service role / Upstash on real prod; E2E open |
 | Docs as SSOT | Active | This pack |
 

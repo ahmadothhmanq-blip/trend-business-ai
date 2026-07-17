@@ -96,11 +96,11 @@
 | Field | Value |
 |-------|--------|
 | Date | 2026-07-17 |
-| Status | **Accepted** (direction); code landing pending approval |
+| Status | **Accepted** (implemented on feature branch; merge to `main` pending) |
 | Context | `select("*")` blueprints hung `/dashboard/website-builder` |
 | Decision | List endpoints/pages use slim columns only; detail hydrate via API. |
 | Consequences | Slight delay before file tree fills; page must load fast. |
-| Related | Task H03 |
+| Related | Task H03 — **verified PASS** on `cursor/docs-ssot-audit-plan` @ `f1f5549` |
 
 ---
 

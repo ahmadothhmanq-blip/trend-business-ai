@@ -3,7 +3,7 @@
 **Living work queue.** Priorities from `PROJECT_AUDIT.md`.  
 **Statuses:** `Completed` | `In Progress` | `Pending` | `Future`  
 **Rule:** Do not start Pending/Future implementation without approval.  
-**Last updated:** 2026-07-17 (H03 SSR slim-list reconciled locally)  
+**Last updated:** 2026-07-17 (H03 SSR verification PASS on branch)  
 
 ---
 
@@ -21,7 +21,7 @@
 |----|------|--------|-------|
 | H01 | Confirm Supabase migrations `001`–`030` applied on each environment | Completed (configured env) | Local `.env.local` Supabase: `public.schema_migrations` has all **30** IDs; table probes OK; `npm run db:verify` PASS. Separate staging/prod not configured locally — re-verify when those URLs are available. |
 | H02 | Confirm required env (`SUPABASE_*`, `DEEPSEEK_API_KEY`, `NEXT_PUBLIC_SITE_URL`, service role, Upstash for prod) | Completed (local audit) | See H02 notes below. Local gaps: `NEXT_PUBLIC_SITE_URL`. Prod blockers if launching from this file: service role + Upstash + SITE_URL. Anon key length WARN. |
-| H03 | Commit/reconcile Website Builder SSR slim-list fix (no full blueprint on list) | Completed (local WT) | `website-product-page.tsx`: no SSR `select("*")` / no first-row full blueprint; slim columns + stub; client hydrate via GET `[id]`. Not on remote until committed. |
+| H03 | Commit/reconcile Website Builder SSR slim-list fix (no full blueprint on list) | **Completed — verified** | Static verification **PASS** (10/10). On `cursor/docs-ssot-audit-plan` @ `f1f5549`. Merge to `main` still open. |
 | H04 | Commit/reconcile React 19–safe theme migration (no client script crash) | Pending | Working tree |
 | H05 | Commit/reconcile generation file-cap + soft-pass (prevent runaway loops) | Pending | Working tree |
 | H06 | Authenticated smoke: `/dashboard/website-builder` loads + generate → save → download | Pending | After H03–H05 |
@@ -75,7 +75,7 @@
 | C10 | Generation runaway file-tree mitigation (WT) | Completed (local only) | **Not done on remote until H05 lands** — do not treat as shipped |
 | C11 | H01 migrations `001`–`030` on configured env | Completed | Staging/prod separate URLs not verified |
 | C12 | H02 env configuration audit (local `.env.local`) | Completed | Prod gaps documented; staging/prod hosting env not separately audited |
-| C13 | H03 Website Builder SSR slim-list (no full blueprint on list) | Completed (local WT) | Still needs git commit/push to land on remote `main` |
+| C13 | H03 Website Builder SSR slim-list (no full blueprint on list) | Completed | On feature branch `f1f5549`; merge to `main` pending |
 
 ---
 
@@ -106,7 +106,7 @@
 
 ## Execution order (recommended after approval)
 
-1. ~~H01~~ / ~~H02~~ (ops audits done for local) → ~~H03~~ (SSR local) → next: **H04–H05**  
+1. ~~H01~~ / ~~H02~~ (ops) → ~~H03~~ (**verified PASS**) → next: **H04–H05**  
 2. H04–H05 (land remaining critical WT fixes)  
 3. H06 (smoke)  
 4. H07–H08 (preview honesty/policy)  
@@ -159,6 +159,7 @@
 | Fix file | `components/dashboard/product-engine/website-product-page.tsx` only |
 | List path | `WEBSITE_LIST_COLUMNS` (no blueprint) |
 | Fallback | `WEBSITE_LIST_COLUMNS_CORE` (no blueprint) — never `select("*")` |
-| Detail | Client `GET /api/website-builder/[id]` (unchanged) |
-| Out of scope | Reverted unrelated lazy `productId` prop experiment |
-| Git | Local WT reconciled; **not committed** unless approved |
+| Detail | Client `GET /api/website-builder/[id]` uses `select("*")` (correct) |
+| List API | `GET /api/website-builder` uses `WEBSITE_LIST_COLUMNS` |
+| Static verification | **PASS** (10/10 assertions) |
+| Git | Pushed on `cursor/docs-ssot-audit-plan` @ `f1f5549` (merge to `main` still open) |
