@@ -49,7 +49,7 @@ const INDUSTRIES: IndustryDef[] = [
     name: "Startups",
     title: "AI Planning Workspace for Startups",
     description:
-      "Validate ideas, analyze markets, build launch sites and package investor-ready narratives in one AI workspace.",
+      "Validate ideas, analyze markets, generate launch-site source projects, and package investor-ready narratives in one AI workspace.",
     intent: "startup planning with ai",
     relatedProductSlugs: ["feasibility-study", "website-builder", "business-intelligence"],
     status: "published",

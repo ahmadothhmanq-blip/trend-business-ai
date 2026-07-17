@@ -60,7 +60,7 @@ const COUNTRIES: CountryDef[] = [
     name: "Canada",
     title: "AI Business Platform for Canadian Teams",
     description:
-      "Use Trend Business AI to research markets, design brands and ship websites for Canadian companies.",
+      "Use Trend Business AI to research markets, design brands and generate downloadable website source projects for Canadian companies.",
     localeHint: "en-CA",
     status: "draft",
   },

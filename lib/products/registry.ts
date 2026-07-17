@@ -20,7 +20,7 @@ export const PRODUCT_DEFINITIONS: Record<ProductId, ProductDefinition> = {
     title: "AI Website Builder",
     eyebrow: "Create",
     description:
-      "Generate full website blueprints, page structures, and production-ready file plans for premium brands.",
+      "Generate Next.js website source files, page structure, and a downloadable ZIP — not a hosted live site.",
     icon: Globe2,
     href: "/dashboard/website-builder",
     kind: "website",
@@ -28,7 +28,7 @@ export const PRODUCT_DEFINITIONS: Record<ProductId, ProductDefinition> = {
     promptLabel: "Website brief",
     promptPlaceholder:
       "Describe the business, audience, pages, features, and the premium look you want for the website.",
-    generateLabel: "Generate Website",
+    generateLabel: "Generate Website Project",
     templates: [
       "Luxury real estate marketplace",
       "Premium SaaS marketing site",

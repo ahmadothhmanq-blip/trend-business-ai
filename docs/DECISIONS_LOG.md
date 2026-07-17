@@ -47,8 +47,8 @@
 | Status | **Accepted** (current product truth) |
 | Context | Customer tests showed files + Download ZIP; no live URL |
 | Decision | Treat Website Builder as an **AI source-project generator** until a separate decision ships preview/deploy/hosted mode. |
-| Consequences | UI/marketing must not claim a ready hosted website without implementation. |
-| Related | Tasks M01, H07, F01, F02, F09 |
+| Consequences | UI/marketing must not claim a ready hosted website without implementation. **M01 (done):** marketing/SEO/registry/tool copy aligned to ZIP + self-host delivery. |
+| Related | Tasks M01 (done), H07, F01, F02, F09 |
 
 ---
 

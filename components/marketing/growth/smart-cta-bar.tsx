@@ -19,7 +19,7 @@ const VARIANTS = [
   {
     id: "b",
     eyebrow: "Launch faster",
-    title: "Ship websites, brands and strategy with AI",
+    title: "Generate website projects, brands and strategy with AI",
     href: "/pricing",
     cta: "See plans",
   },

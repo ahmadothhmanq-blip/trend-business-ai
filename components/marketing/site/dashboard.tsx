@@ -114,7 +114,7 @@ function Grid() {
         <Search className="size-3 text-[#5A5A5A]" />
         <span className="text-[10px] text-[#4A4A4A]">Search dashboard...</span>
         <span className="ml-auto rounded-md bg-[rgba(212,175,55,0.12)] px-1.5 py-0.5 text-[9px] font-medium text-[#D4AF37]">
-          Live
+          Workspace
         </span>
       </div>
       <div className="grid grid-cols-12 gap-2 sm:gap-2.5">
@@ -137,7 +137,7 @@ function Grid() {
             <div className="absolute right-[16%] top-[12%] size-4 rounded-full bg-[#FFD700]/75 blur-[1px] sm:size-5" />
           </div>
           <div className="mt-1.5 flex justify-between text-[9px] text-[#7A7A7A] sm:mt-2">
-            <span>Building...</span>
+            <span>Generating...</span>
             <span className="font-semibold text-[#D4AF37]">78%</span>
           </div>
           <div className="mt-1 h-[3px] overflow-hidden rounded-full bg-white/10">

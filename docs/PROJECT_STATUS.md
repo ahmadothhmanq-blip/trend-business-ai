@@ -22,7 +22,7 @@
 | Migrations | **30/30 applied** on configured `.env.local` DB (H01) |
 | Local env (H02) | Core AI/Supabase **partial** — SITE_URL / service role / Upstash **missing**; anon key length WARN |
 | Docs on remote | Feature branch; merge to `main` still L08 |
-| Blocking for honest launch messaging | Fill prod env gaps (H02) + re-run H06 with confirmed user + merge Phase 2 to `main` + M01 marketing copy |
+| Blocking for honest launch messaging | Fill prod env gaps (H02) + re-run H06 with confirmed user + merge Phase 2 to `main` |
 
 ---
 
@@ -30,7 +30,7 @@
 
 | Area | Status | Notes |
 |------|--------|-------|
-| Marketing site | **Completed** | Strong SEO surface |
+| Marketing site | **Completed** | Strong SEO surface; **M01** ZIP/source honesty (not hosted live sites) |
 | Auth & profiles | **Completed** | Supabase session + dashboard guard |
 | Dashboard shell | **Completed** | Nav, theme (H04 React 19–safe), layout |
 | Website Builder (code/ZIP) | **Completed** (core) | Generate/save/download works; preview not live; **SSR list slim-list verified (H03)** |
@@ -67,6 +67,7 @@
 - **H06:** Smoke **partial** — health + login redirect PASS; in-process generate→ZIP PASS (18 files/~77s). Cookie-auth HTTP generate blocked by Supabase email confirmation (ops), not app code.  
 - **H07:** Live Preview honesty — frozen “Live Preview” replaced with **Download project / ZIP** messaging; preview remains off.  
 - **H08:** Preview builder **production hard-disable** + fail-closed env policy until F01 sandbox redesign.  
+- **M01:** Marketing/SEO/registry/tool copy aligned to ZIP + self-host delivery (D-003); no hosted-live claims.  
 
 ### Working-tree fixes (not yet guaranteed on remote `main`)
 
@@ -94,9 +95,9 @@ Treat as **In Progress** until committed/pushed / merged:
 See `TASK_QUEUE.md` High/Medium. Summary:
 
 - ~~Honest Live Preview / Download messaging~~ → **H07 done**  
+- ~~Align marketing copy with ZIP delivery~~ → **M01 done**  
 
 - Hide placeholder providers  
-- Align marketing copy with ZIP delivery  
 - Collapse duplicate product routes  
 - Authenticated smoke tests  
 - Commit + verify Website Builder load + generate path  

@@ -42,9 +42,9 @@ export const AGENT_CATEGORIES = [
 /* ------------------------------------------------------------------ */
 
 export const AGENT_TOOLS = [
-  { id: "website-builder", label: "Website Builder", description: "Generate complete websites" },
-  { id: "landing-page-builder", label: "Landing Page Builder", description: "Build landing pages" },
-  { id: "web-app-builder", label: "Web App Builder", description: "Generate web applications" },
+  { id: "website-builder", label: "Website Builder", description: "Generate website source projects (ZIP)" },
+  { id: "landing-page-builder", label: "Landing Page Builder", description: "Generate landing-page source packages" },
+  { id: "web-app-builder", label: "Web App Builder", description: "Generate web-app source projects (ZIP)" },
   { id: "logo-designer", label: "Logo Designer", description: "Create professional logos" },
   { id: "brand-identity", label: "Brand Identity", description: "Build brand identity systems" },
   { id: "image-generator", label: "Image Generator", description: "Generate visual assets" },
@@ -127,9 +127,11 @@ export const AGENT_TEMPLATES = [
     name: "Website Generation Agent",
     type: "website",
     category: "development",
-    description: "Generates complete websites with pages, components, and deployment-ready code",
+    description:
+      "Generates downloadable website source projects with pages, components, and production-oriented code for self-hosting",
     tools: ["website-builder", "landing-page-builder", "image-generator", "content-studio"],
-    systemPrompt: "You are a web development specialist. Design and generate complete, modern websites with responsive layouts, optimized content, and production-ready code.",
+    systemPrompt:
+      "You are a web development specialist. Design and generate modern Next.js website source projects with responsive layouts, optimized content, and production-oriented code the user can download as ZIP and deploy themselves.",
   },
   {
     id: "video-template",

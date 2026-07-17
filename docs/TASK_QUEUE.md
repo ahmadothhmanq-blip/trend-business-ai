@@ -34,7 +34,7 @@
 
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
-| M01 | Align Website Builder / marketing copy with ZIP/code delivery | Pending | Product honesty |
+| M01 | Align Website Builder / marketing copy with ZIP/code delivery | Done | Copy-only; ZIP/source honesty across marketing, SEO, registry, tool fallbacks (D-003) |
 | M02 | Hide placeholder AI providers (Gemini/Grok/Llama) in production UI | Pending | |
 | M03 | Collapse duplicate routes (`brand-designer` vs `brand-studio`, `creative-studio` vs `image-generator`, etc.) | Pending | Redirects OK |
 | M04 | Update root README to match current multi-product reality | Pending | Docs only OK anytime |
@@ -219,7 +219,7 @@
 | Messaging | Download project / source ZIP; not a hosted live website |
 | `LIVE_PREVIEW_ENABLED` | Remains `false` |
 | Preview builder / env | Unchanged (H08) |
-| Marketing pages | Deferred to M01 |
+| Marketing pages | **M01 done** — ZIP/source honesty across marketing/SEO |
 
 ### H08 verification notes (2026-07-17)
 

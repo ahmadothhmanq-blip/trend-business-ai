@@ -644,7 +644,7 @@ export function WebsiteBuilderTool({
             </h2>
             <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-white/55 sm:text-base">
               {product?.description ??
-                "Generate complete production-ready websites and web applications with AI."}
+                "Generate Next.js website and app source projects you download as ZIP."}
             </p>
           </div>
           <div className="rounded-[2rem] border border-white/[0.08] bg-black/25 p-4 shadow-[0_24px_90px_rgb(0_0_0/0.35)] backdrop-blur-xl">
@@ -652,7 +652,7 @@ export function WebsiteBuilderTool({
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-[11px] font-semibold tracking-[0.16em] text-premium-gold-light uppercase">
-                    Live builder status
+                    Generation status
                   </p>
                   <p className="mt-2 text-3xl font-bold text-white">
                     {isGenerating ? "Designing" : "Ready"}
@@ -1922,7 +1922,7 @@ function BottomWorkspace({
                     {project.description}
                   </p>
                   <p className="mt-3 text-[12px] text-premium-gold-light/80">
-                    {project.type} ┬╖ {project.createdAt}
+                    {project.type} · {project.createdAt}
                   </p>
                 </button>
                 <div className="mt-4 flex flex-wrap gap-2">

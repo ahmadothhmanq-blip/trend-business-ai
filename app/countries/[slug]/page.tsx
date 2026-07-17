@@ -60,7 +60,7 @@ export default async function CountryPage({ params }: PageProps) {
         <p className="mt-4 text-lg leading-relaxed text-[#A8A8A8]">{country.description}</p>
         <p className="mt-8 text-[15px] leading-relaxed text-[#C7C7C7]">
           Teams in {country.name} can use Trend Business AI to research opportunities, design brand
-          systems, and ship websites and campaigns from a single AI business workspace.
+          systems, and generate downloadable website source projects and campaigns from a single AI business workspace.
         </p>
         <div className="mt-14">
           <RelatedLinksSection

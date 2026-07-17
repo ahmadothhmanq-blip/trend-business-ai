@@ -16,9 +16,9 @@ const META: Record<
   { title: string; description: string }
 > = {
   create: {
-    title: "Create — AI Websites, Apps & Landing Pages",
+    title: "Create — AI Website & App Source Projects",
     description:
-      "Build websites, apps and landing pages with Trend Business AI Create products.",
+      "Generate website, app, and landing-page source projects with ZIP export using Trend Business AI Create products.",
   },
   design: {
     title: "Design — AI Logos, Brand & Images",

@@ -33,7 +33,7 @@ const PROGRAMMATIC_DEFS: ProgrammaticPageDef[] = [
     path: "/use-cases/startup-website",
     title: "AI Website Builder for Startups",
     description:
-      "Plan and generate startup website structure, messaging and launch direction with Trend Business AI — from positioning to page architecture.",
+      "Plan and generate startup website source projects with Trend Business AI — positioning, page architecture, and ZIP export for self-hosting.",
     intent: "startup website creation",
     cluster: "use-cases",
     relatedProductSlugs: ["website-builder", "landing-page-builder"],

@@ -2,7 +2,7 @@ export const REF_HERO = {
   badge: "Next-Generation Business Intelligence.",
   headlineLine1: "One AI Platform.",
   headlineLine2: "Every Business Solution.",
-  sub: "Build websites, apps, videos, automate marketing, manage projects, CRM, ERP and grow your business faster with the power of AI.",
+  sub: "Generate website and app source projects, creatives, and growth assets with AI — then download, refine, and deploy on your own stack.",
 } as const;
 
 export const REF_STATS = [
@@ -16,7 +16,8 @@ export const REF_STATS = [
 export const REF_FEATURES = [
   {
     title: "AI Website & App Builder",
-    description: "Generate premium websites, apps and landing pages with structure, flows and launch direction.",
+    description:
+      "Generate Next.js website and app source projects with structure, flows, and ZIP export — not a hosted live site on our platform.",
     icon: "Layout",
   },
   {
@@ -107,7 +108,7 @@ export const AI_PRODUCT_CATEGORIES: AiProductCategory[] = [
   {
     id: "create",
     title: "Create",
-    description: "Build websites, apps and landing pages with AI.",
+    description: "Generate website, app, and landing-page source projects with AI — download as ZIP.",
     href: "/products/create",
     legacyHref: "/solutions/create",
     productCount: 3,
@@ -115,13 +116,13 @@ export const AI_PRODUCT_CATEGORIES: AiProductCategory[] = [
     imageAlt: "AI website and app builder interface in black and gold",
     accent: "from-[#D4AF37]/25 via-transparent to-transparent",
     eyebrow: "AI Products · Create",
-    headline: "Ship websites, apps and landing pages with AI.",
-    body: "Turn a product brief into structured pages, conversion sections, and launch-ready build direction — without starting from a blank canvas.",
+    headline: "Generate website and app source projects with AI.",
+    body: "Turn a product brief into structured pages, conversion sections, and downloadable Next.js file packages — ready to run locally or deploy to your own hosting.",
     products: [
       {
         title: "AI Website & App Builder",
         description:
-          "Generate premium website and app concepts with structure, pages, user flows and conversion sections.",
+          "Generate production-oriented Next.js source files, page structure, and ZIP export from a brief.",
         image: "/images/ai/website-builder.png",
         imageAlt: "Luxury black and gold website and app builder illustration",
         href: "/products/website-builder",
@@ -311,7 +312,8 @@ export const REF_LEGAL = [
 export const REF_SERVICES = [
   {
     title: "AI Website & App Builder",
-    description: "Generate premium website and app concepts with structure, pages, user flows, conversion sections and launch direction.",
+    description:
+      "Generate Next.js website and app source projects with structure, flows, and ZIP export for self-hosting.",
     eyebrow: "Web & Apps",
   },
   {
@@ -370,12 +372,14 @@ export const REF_WORKFLOW = [
   {
     step: "03",
     title: "Generate premium assets",
-    description: "Receive structured websites, brand systems, content plans, campaigns, and business intelligence.",
+    description:
+      "Receive website and app source projects, brand systems, content plans, campaigns, and business intelligence.",
   },
   {
     step: "04",
     title: "Save, export, and execute",
-    description: "Keep results in your private dashboard, export what you need, and turn insights into next steps.",
+    description:
+      "Keep results in your private dashboard, download ZIP packages where applicable, and deploy or refine on your own stack.",
   },
 ] as const;
 
@@ -559,7 +563,12 @@ export const REF_FAQ = [
   {
     question: "What can I build with Trend Business AI?",
     answer:
-      "Websites, apps, landing pages, logos, brand systems, images, video concepts, social content, campaigns, business intelligence and feasibility studies — all from one authenticated workspace.",
+      "Website and app source projects (ZIP), landing-page packages, logos, brand systems, images, video concepts, social content, campaigns, business intelligence and feasibility studies — all from one authenticated workspace.",
+  },
+  {
+    question: "Does Website Builder publish a live website URL?",
+    answer:
+      "No. Website Builder generates downloadable Next.js source files and a ZIP export. You run or deploy the project on your own hosting — we do not host a live customer site from this tool today.",
   },
   {
     question: "Is the Free Beta really free?",
@@ -574,12 +583,12 @@ export const REF_FAQ = [
   {
     question: "Can I export my projects?",
     answer:
-      "Yes. Generated projects can be saved, revisited and exported so you are never locked into the platform.",
+      "Yes. Website and app generations can be downloaded as ZIP packages; other products save and export from your private dashboard so you are never locked into the platform.",
   },
   {
     question: "Do I need design or coding experience?",
     answer:
-      "No. Describe your brief, choose a product category, and generate structured premium assets you can refine and ship.",
+      "No. Describe your brief, choose a product category, and generate structured assets. For Website Builder, download the ZIP and follow the included setup steps (or hand off to a developer).",
   },
   {
     question: "How is this different from other AI tools?",
@@ -633,23 +642,23 @@ export const MARKETING_PRODUCTS: MarketingProduct[] = [
     title: "AI Website & App Builder",
     eyebrow: "Create · Website Builder",
     description:
-      "Generate premium website and app concepts with structure, pages, user flows, conversion sections and launch direction.",
+      "Generate Next.js website and app source projects — pages, components, and file trees you download as ZIP and deploy yourself.",
     image: "/images/ai/website-builder.png",
     imageAlt: "AI website and app builder",
     highlights: [
       "Structured pages and conversion sections",
-      "User flows and launch-ready direction",
-      "Exportable project packages",
+      "Production-oriented Next.js source files",
+      "Downloadable ZIP export (not a hosted live site)",
     ],
     capabilities: [
       "Generate structured page maps and conversion sections from a brief",
-      "Define user flows for websites and app experiences",
-      "Export project packages ready for refinement and handoff",
+      "Produce a bounded Next.js file tree ready for local development",
+      "Download ZIP packages to run locally or deploy to your own hosting",
     ],
     outcomes: [
       "A clear build direction instead of a blank canvas",
-      "Premium section hierarchy with launch-ready messaging",
-      "Assets saved to your private authenticated dashboard",
+      "Source files you own — npm install / npm run dev on your machine",
+      "Projects saved to your private authenticated dashboard",
     ],
     dashboardHref: "/dashboard/website-builder",
   },
