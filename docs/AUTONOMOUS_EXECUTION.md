@@ -41,9 +41,9 @@ Future (`F*`) tasks stay **Future** until a `DECISIONS_LOG.md` Accepted entry.
 
 1. ~~M01–M05~~ done  
 2. **Skip M06 / M07** (billing / PayPal — blocked or env-gated)  
-3. **Do not delete directories** (L01/L07 deferred unless user re-approves file-level-only cleanup)  
-4. L02 → L06 → L05 as capacity allows  
-5. L03 / L04 / L08 / all `F*` — stop gates  
+3. **Do not delete directories** (L01/L07 deferred)  
+4. ~~L02~~ → ~~L06~~ → ~~L05~~ done  
+5. Remaining stop gates: L03 (wide rename), L04 (design), L08 (merge `main`), all `F*`  
 
 ---
 
