@@ -2,6 +2,8 @@ import { requireUser, parseJsonBody } from "@/lib/api/helpers";
 import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { generateWebsite } from "@/lib/website-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
+import { providerManager } from "@/lib/ai/provider-manager";
+import type { AIProviderName } from "@/lib/ai/types";
 import {
   detectWebsiteProjectKind,
   websiteGenerateRequestSchema,
@@ -30,6 +32,10 @@ export async function POST(request: Request) {
 
   const input = parsed.data;
   const projectKind = detectWebsiteProjectKind(input);
+  const settings = await providerManager.loadUserSettings(
+    auth.supabase,
+    auth.user!.id,
+  );
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
@@ -44,6 +50,10 @@ export async function POST(request: Request) {
         const project = await generateWebsite({
           ...input,
           projectKind,
+          preferredProvider: settings?.default_provider as
+            | AIProviderName
+            | undefined,
+          autoFallback: settings?.auto_fallback ?? true,
           onProgress: (message) => {
             send("progress", { message });
           },

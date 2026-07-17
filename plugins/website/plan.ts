@@ -1,4 +1,5 @@
 import type { ProjectCapabilityFlags } from "@/lib/ai/validator";
+import { generateJsonWithValidation } from "@/lib/ai/generator";
 import {
   inferCategoryFromPath,
   normalizeCategory,
@@ -12,6 +13,10 @@ import {
 import { mergeProductionRequirements } from "@/lib/ai/validator";
 import { capPlannedFiles, MAX_WEBSITE_FILES } from "@/lib/ai/website-scaffold";
 import { sanitizeProjectPath } from "@/lib/ai/zipper";
+import {
+  validateWebsiteBlueprint,
+  validateWebsiteDynamicPlan,
+} from "@/plugins/website/pipeline-validate";
 import {
   websiteBlueprintSchema,
   websiteDynamicPlanSchema,
@@ -68,16 +73,22 @@ export async function planWebsite(
 ): Promise<WebsitePlanResult> {
   ctx.progress.emit("Creating blueprint...");
 
-  const blueprint = await ctx.provider.generateJson<WebsiteProjectBlueprint>({
+  const blueprint = await generateJsonWithValidation<WebsiteProjectBlueprint>({
+    provider: ctx.provider,
     prompt: websiteBlueprintPrompt(input, analysis),
     schema: websiteBlueprintSchema,
+    maxAttempts: 3,
+    validate: validateWebsiteBlueprint,
   });
 
   ctx.progress.emit("Planning files...");
 
-  const dynamicPlan = await ctx.provider.generateJson<WebsiteDynamicPlan>({
+  const dynamicPlan = await generateJsonWithValidation<WebsiteDynamicPlan>({
+    provider: ctx.provider,
     prompt: websitePlanPrompt(input, analysis, blueprint),
     schema: websiteDynamicPlanSchema,
+    maxAttempts: 3,
+    validate: validateWebsiteDynamicPlan,
   });
 
   const flags = getCapabilityFlags(analysis);

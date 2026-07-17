@@ -9,6 +9,7 @@ import {
 import {
   buildWebsiteScaffold,
   SCAFFOLD_PATHS,
+  syncPackageJsonDependencies,
 } from "@/lib/ai/website-scaffold";
 import { sanitizeProjectPath } from "@/lib/ai/zipper";
 import { logger } from "@/lib/logger";
@@ -22,7 +23,7 @@ import type {
 import type { GenerationContext } from "@/lib/ai/types";
 
 const FILE_GENERATION_RETRIES = 2;
-const PROJECT_VALIDATION_ROUNDS = 1;
+const PROJECT_VALIDATION_ROUNDS = 2;
 
 async function generateFileWithValidation(
   input: WebsiteGenerationInput,
@@ -146,6 +147,8 @@ async function validateAndRepairProject(
       .map((entry) => regenerated.get(entry.path))
       .filter((file): file is GeneratedProjectFile => Boolean(file));
   }
+
+  currentFiles = syncPackageJsonDependencies(currentFiles);
 
   const finalValidation = validateGeneratedProject(currentFiles, plan.flags, {
     requiredPaths,

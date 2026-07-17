@@ -5,6 +5,8 @@ import { WEBSITE_LIST_COLUMNS } from "@/lib/api/list-selects";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import { generateWebsite } from "@/lib/website-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
+import { providerManager } from "@/lib/ai/provider-manager";
+import type { AIProviderName } from "@/lib/ai/types";
 import { startTimer } from "@/lib/perf/timing";
 import {
   detectWebsiteProjectKind,
@@ -97,6 +99,10 @@ export async function POST(request: Request) {
 
   const input = parsed.data;
   const projectKind = detectWebsiteProjectKind(input);
+  const settings = await providerManager.loadUserSettings(
+    auth.supabase,
+    auth.user!.id,
+  );
 
   let stage = "generateWebsite";
 
@@ -104,6 +110,8 @@ export async function POST(request: Request) {
     const project = await generateWebsite({
       ...input,
       projectKind,
+      preferredProvider: settings?.default_provider as AIProviderName | undefined,
+      autoFallback: settings?.auto_fallback ?? true,
     });
     const savedProjectKind = project.projectKind ?? projectKind;
     const savedProject = {

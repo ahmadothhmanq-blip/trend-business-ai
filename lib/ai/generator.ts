@@ -1,6 +1,6 @@
 import type { AIProvider, GeneratedProjectFile } from "@/lib/ai/types";
 
-export type GenerateFileOptions<T> = {
+export type GenerateJsonOptions<T> = {
   provider: AIProvider;
   prompt: string;
   schema: object;
@@ -8,8 +8,11 @@ export type GenerateFileOptions<T> = {
   validate: (result: T) => { valid: boolean; reason?: string };
 };
 
-export async function generateWithValidation<T extends GeneratedProjectFile>(
-  options: GenerateFileOptions<T>,
+export type GenerateFileOptions<T> = GenerateJsonOptions<T>;
+
+/** Retry JSON generation until validate() passes (analyze/plan/file stages). */
+export async function generateJsonWithValidation<T>(
+  options: GenerateJsonOptions<T>,
 ): Promise<T> {
   const maxAttempts = options.maxAttempts ?? 3;
   let validationReason = "";
@@ -33,4 +36,10 @@ export async function generateWithValidation<T extends GeneratedProjectFile>(
   }
 
   throw new Error(`Generation failed after ${maxAttempts} attempts: ${validationReason}`);
+}
+
+export async function generateWithValidation<T extends GeneratedProjectFile>(
+  options: GenerateFileOptions<T>,
+): Promise<T> {
+  return generateJsonWithValidation(options);
 }

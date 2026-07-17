@@ -240,3 +240,127 @@ npm run dev
 export const SCAFFOLD_PATHS = new Set(
   buildWebsiteScaffold().map((file) => file.path),
 );
+
+/** Conservative versions for packages commonly imported by generated Next apps. */
+const KNOWN_PACKAGE_VERSIONS: Record<string, { version: string; dev?: boolean }> = {
+  next: { version: "^15.0.0" },
+  react: { version: "^19.0.0" },
+  "react-dom": { version: "^19.0.0" },
+  clsx: { version: "^2.1.1" },
+  "tailwind-merge": { version: "^2.5.0" },
+  "lucide-react": { version: "^0.460.0" },
+  zod: { version: "^3.23.0" },
+  "framer-motion": { version: "^11.0.0" },
+  "class-variance-authority": { version: "^0.7.0" },
+  "date-fns": { version: "^3.6.0" },
+  recharts: { version: "^2.12.0" },
+  sonner: { version: "^1.5.0" },
+  "@radix-ui/react-slot": { version: "^1.1.0" },
+  "@radix-ui/react-dialog": { version: "^1.1.0" },
+  "@radix-ui/react-dropdown-menu": { version: "^2.1.0" },
+  "@supabase/supabase-js": { version: "^2.45.0" },
+  "@supabase/ssr": { version: "^0.5.0" },
+  typescript: { version: "^5.6.0", dev: true },
+  "@types/node": { version: "^22.0.0", dev: true },
+  "@types/react": { version: "^19.0.0", dev: true },
+  "@types/react-dom": { version: "^19.0.0", dev: true },
+  tailwindcss: { version: "^3.4.0", dev: true },
+  postcss: { version: "^8.4.0", dev: true },
+  autoprefixer: { version: "^10.4.0", dev: true },
+  eslint: { version: "^9.0.0", dev: true },
+  "eslint-config-next": { version: "^15.0.0", dev: true },
+  prettier: { version: "^3.3.0", dev: true },
+};
+
+/**
+ * Merge missing npm imports from generated source into package.json.
+ * Only known packages are added (no arbitrary registry names).
+ */
+export function syncPackageJsonDependencies(
+  files: GeneratedProjectFile[],
+): GeneratedProjectFile[] {
+  const pkgIndex = files.findIndex((file) => file.path === "package.json");
+  if (pkgIndex < 0) return files;
+
+  let pkg: {
+    dependencies?: Record<string, string>;
+    devDependencies?: Record<string, string>;
+    [key: string]: unknown;
+  };
+  try {
+    pkg = JSON.parse(files[pkgIndex]!.content) as typeof pkg;
+  } catch {
+    return files;
+  }
+
+  const dependencies = { ...(pkg.dependencies ?? {}) };
+  const devDependencies = { ...(pkg.devDependencies ?? {}) };
+  const declared = new Set([
+    ...Object.keys(dependencies),
+    ...Object.keys(devDependencies),
+  ]);
+
+  const importPattern = /from\s+['"]([^'"]+)['"]/g;
+  const needed = new Set<string>();
+
+  for (const file of files) {
+    if (!file.path.endsWith(".ts") && !file.path.endsWith(".tsx")) continue;
+    let match = importPattern.exec(file.content);
+    while (match) {
+      const importPath = match[1] ?? "";
+      if (
+        importPath.startsWith(".") ||
+        importPath.startsWith("@/") ||
+        importPath.startsWith("next/") ||
+        importPath === "next" ||
+        importPath === "react" ||
+        importPath === "react-dom" ||
+        importPath.startsWith("react/") ||
+        importPath.startsWith("react-dom/")
+      ) {
+        match = importPattern.exec(file.content);
+        continue;
+      }
+      const root = importPath.startsWith("@")
+        ? importPath.split("/").slice(0, 2).join("/")
+        : importPath.split("/")[0]!;
+      needed.add(root);
+      match = importPattern.exec(file.content);
+    }
+  }
+
+  let changed = false;
+  for (const name of needed) {
+    if (declared.has(name)) continue;
+    const known = KNOWN_PACKAGE_VERSIONS[name];
+    if (!known) continue;
+    if (known.dev) {
+      devDependencies[name] = known.version;
+    } else {
+      dependencies[name] = known.version;
+    }
+    declared.add(name);
+    changed = true;
+  }
+
+  // Ensure next/react always present
+  for (const [name, meta] of Object.entries(KNOWN_PACKAGE_VERSIONS)) {
+    if (!["next", "react", "react-dom"].includes(name)) continue;
+    if (declared.has(name)) continue;
+    dependencies[name] = meta.version;
+    changed = true;
+  }
+
+  if (!changed) return files;
+
+  const nextFiles = [...files];
+  nextFiles[pkgIndex] = {
+    ...files[pkgIndex]!,
+    content: JSON.stringify(
+      { ...pkg, dependencies, devDependencies },
+      null,
+      2,
+    ),
+  };
+  return nextFiles;
+}

@@ -38,14 +38,15 @@ export function websiteBlueprintPrompt(
   input: WebsiteAnalyzeInput,
   analysis: unknown,
 ) {
-  return `Create a complete production-grade project blueprint for a Next.js 16 App Router project.
+  return `Create a focused MVP blueprint for a Next.js 16 App Router project (shippable under 18 files).
 
 Original prompt: ${input.prompt}
 Analysis: ${JSON.stringify(analysis)}
 
 ${PRODUCTION_ARCHITECTURE_GUIDE}
 
-The blueprint must define SEO, responsive sections, reusable components, and realistic content.
+Keep pages, sections, and components lean — prefer one home page plus 1-2 feature pages.
+Define SEO, responsive sections, reusable components, and realistic content.
 Return only JSON.`;
 }
 
@@ -54,7 +55,7 @@ export function websitePlanPrompt(
   analysis: unknown,
   blueprint: unknown,
 ) {
-  return `Analyze the blueprint and build a dynamic production-grade project file plan.
+  return `Build a dynamic MVP file plan for a Next.js 16 App Router project.
 
 Original prompt: ${input.prompt}
 Analysis: ${JSON.stringify(analysis)}
@@ -63,23 +64,21 @@ Blueprint: ${JSON.stringify(blueprint)}
 ${COMPLEXITY_GUIDE}
 ${PRODUCTION_ARCHITECTURE_GUIDE}
 
-You must NOT use a fixed template file list.
-Decide automatically based on the blueprint:
-- required pages, layouts, components, API routes, hooks, utilities, types, configs
+HARD RULES:
+- estimatedFileCount MUST be <= 18 (including configs already provided by scaffold).
+- Plan at most 8 AI-authored app files beyond static scaffold configs (package.json, tsconfig, next/tailwind/postcss, globals.css, lib/utils.ts).
+- Prefer a shippable MVP over a large incomplete tree. Do NOT plan full production module trees.
 
-Build the complete file tree dynamically with realistic production scope.
+Capability budgets (when flags are true — pick the MINIMUM files):
+- requiresAuth: one login page + one session/auth helper (max 2 files). No full auth suite.
+- requiresDashboard: one dashboard page + optional sidebar/nav component (max 2 files).
+- requiresDatabase: one lib/db helper OR one API route — not a full schema + CRUD suite.
+- isEcommerce: one products page OR one cart component — not cart+checkout+orders+admin.
+- isSaas: one pricing section/page — not billing + team + subscription modules.
+
 Every file must include: path, purpose, language, category (layout | lib | types | hooks | components | pages | api | configs)
-
-Rules:
-- Match complexity to estimated file count.
-- Include auth module files when requiresAuth is true.
-- Include database schema + CRUD APIs when requiresDatabase is true (Prisma if databaseProvider is prisma, otherwise Supabase).
-- Include dashboard shell and data UI when requiresDashboard is true.
-- Include full commerce module when isEcommerce is true.
-- Include SaaS marketing + billing + team modules when isSaas is true.
-- Reuse shared UI primitives — do not plan duplicate button/card/input implementations.
-- Do not plan unused files.
-- Do not include file contents.
+- Reuse components/ui and lib/utils — never duplicate primitives.
+- Do not plan unused files or file contents.
 - Return only JSON.`;
 }
 

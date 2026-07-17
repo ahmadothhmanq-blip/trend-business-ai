@@ -599,54 +599,90 @@ export function WebsiteBuilderTool({
   }
 
   async function downloadProject(project = activeProject) {
-    if (!project) return;
+    if (!project?.id) return;
 
-    const JSZip = (await import("jszip")).default; const zip = new JSZip();
-    const files =
-      project.generatedProject?.files.length
-        ? project.generatedProject.files
-        : [
-            {
-              path: "README.md",
-              language: "markdown",
-              content: [
-                `# ${project.title}`,
-                "",
-                project.description,
-                "",
-                `Type: ${project.type}`,
-                `Design Style: ${project.style}`,
-                `Color Theme: ${project.theme}`,
-                `Language: ${project.language}`,
-                `Features: ${project.features.join(", ")}`,
-                `Pages: ${currentPages.join(", ")}`,
-              ].join("\n"),
-            },
-          ];
+    try {
+      // Prefer server export — always hydrates full blueprint from DB.
+      const exportResponse = await fetch(
+        `/api/website-builder/${project.id}/export`,
+      );
 
-    let skippedFiles = 0;
-    files.forEach((file) => {
-      const safePath = sanitizeZipPath(file.path);
-      if (!safePath) {
-        skippedFiles += 1;
+      if (exportResponse.ok) {
+        const blob = await exportResponse.blob();
+        const disposition = exportResponse.headers.get("Content-Disposition");
+        const match = disposition?.match(/filename="([^"]+)"/);
+        const filename =
+          match?.[1] ??
+          `${project.title.toLowerCase().replace(/[^a-z0-9]+/g, "-") || "website-project"}.zip`;
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        link.click();
+        URL.revokeObjectURL(url);
+        toast.success("ZIP download started");
         return;
       }
 
-      zip.file(safePath, file.content);
-    });
+      if (exportResponse.status === 409) {
+        // Hydrate client copy, then fall back to client ZIP if files appear.
+        const detail = await fetch(`/api/website-builder/${project.id}`);
+        if (detail.ok) {
+          const data = (await detail.json()) as {
+            generation?: WebsiteGeneration;
+          };
+          if (data.generation) {
+            patchProject(project.id, data.generation);
+            const hydrated = toProject(data.generation);
+            if (hydrated.generatedProject?.files?.length) {
+              project = hydrated;
+            }
+          }
+        }
+      } else {
+        const data = (await exportResponse.json().catch(() => null)) as {
+          error?: string;
+        } | null;
+        throw new Error(data?.error ?? "Unable to export project ZIP.");
+      }
 
-    const blob = await zip.generateAsync({ type: "blob" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `${project.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.zip`;
-    link.click();
-    URL.revokeObjectURL(url);
-    toast.success(
-      skippedFiles
-        ? `ZIP download started. Skipped ${skippedFiles} unsafe file path${skippedFiles === 1 ? "" : "s"}.`
-        : "ZIP download started",
-    );
+      const files = project.generatedProject?.files ?? [];
+      if (!files.length) {
+        toast.error(
+          "Project source files are not available yet. Open the project or regenerate, then download again.",
+        );
+        return;
+      }
+
+      const JSZip = (await import("jszip")).default;
+      const zip = new JSZip();
+      let skippedFiles = 0;
+      files.forEach((file) => {
+        const safePath = sanitizeZipPath(file.path);
+        if (!safePath) {
+          skippedFiles += 1;
+          return;
+        }
+        zip.file(safePath, file.content);
+      });
+
+      const blob = await zip.generateAsync({ type: "blob" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${project.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.zip`;
+      link.click();
+      URL.revokeObjectURL(url);
+      toast.success(
+        skippedFiles
+          ? `ZIP download started. Skipped ${skippedFiles} unsafe file path${skippedFiles === 1 ? "" : "s"}.`
+          : "ZIP download started",
+      );
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Unable to download project ZIP.",
+      );
+    }
   }
 
   function refreshPreview() {

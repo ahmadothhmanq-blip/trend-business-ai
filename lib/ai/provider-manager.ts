@@ -60,7 +60,11 @@ class ProviderManager {
   }
 
   /** Load user settings from Supabase and set the active provider dynamically. */
-  async loadUserSettings(supabase: { from: (table: string) => { select: (columns: string) => { eq: (col: string, val: string) => { single: () => Promise<{ data: AIProviderSettings | null; error: unknown }> } } } }, userId: string): Promise<AIProviderSettings | null> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Supabase client chain typing is overly deep for this helper
+  async loadUserSettings(
+    supabase: { from: (table: string) => any },
+    userId: string,
+  ): Promise<AIProviderSettings | null> {
     try {
       const { data } = await supabase
         .from("ai_provider_settings")
@@ -68,10 +72,13 @@ class ProviderManager {
         .eq("user_id", userId)
         .single();
 
-      if (data) {
-        this._userSettings = data as AIProviderSettings;
-        setActiveProvider(this._userSettings.default_provider as AIProviderName);
-        return this._userSettings;
+      if (data && typeof data === "object") {
+        const settings = data as AIProviderSettings;
+        this._userSettings = settings;
+        if (settings.default_provider) {
+          setActiveProvider(settings.default_provider as AIProviderName);
+        }
+        return settings;
       }
     } catch {
       // Table may not exist yet — fall through to defaults
