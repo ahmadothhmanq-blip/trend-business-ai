@@ -18,6 +18,7 @@ export const websiteGenerateRequestSchema = z.object({
   productId: z.string().trim().optional(),
   mode: z.enum(["generate", "regenerate", "continue", "retry"]).optional(),
   parentGenerationId: z.string().uuid().optional(),
+  continueInstruction: z.string().trim().max(4000).optional(),
   projectId: z.string().uuid().optional(),
 });
 

@@ -13,6 +13,7 @@ import {
 import { mergeProductionRequirements } from "@/lib/ai/validator";
 import { capPlannedFiles, MAX_WEBSITE_FILES } from "@/lib/ai/website-scaffold";
 import { sanitizeProjectPath } from "@/lib/ai/zipper";
+import { buildWebsiteIterationPrompt } from "@/plugins/website/iteration";
 import {
   validateWebsiteBlueprint,
   validateWebsiteDynamicPlan,
@@ -71,11 +72,16 @@ export async function planWebsite(
   analysis: WebsiteProjectAnalysis,
   ctx: GenerationContext,
 ): Promise<WebsitePlanResult> {
+  const iterationInput = {
+    ...input,
+    prompt: buildWebsiteIterationPrompt(input),
+  };
+
   ctx.progress.emit("Creating blueprint...");
 
   const blueprint = await generateJsonWithValidation<WebsiteProjectBlueprint>({
     provider: ctx.provider,
-    prompt: websiteBlueprintPrompt(input, analysis),
+    prompt: websiteBlueprintPrompt(iterationInput, analysis),
     schema: websiteBlueprintSchema,
     maxAttempts: 3,
     validate: validateWebsiteBlueprint,
@@ -85,7 +91,7 @@ export async function planWebsite(
 
   const dynamicPlan = await generateJsonWithValidation<WebsiteDynamicPlan>({
     provider: ctx.provider,
-    prompt: websitePlanPrompt(input, analysis, blueprint),
+    prompt: websitePlanPrompt(iterationInput, analysis, blueprint),
     schema: websiteDynamicPlanSchema,
     maxAttempts: 3,
     validate: validateWebsiteDynamicPlan,

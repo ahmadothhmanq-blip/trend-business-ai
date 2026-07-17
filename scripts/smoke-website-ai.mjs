@@ -19,6 +19,7 @@ const required = [
   "lib/ai/website-scaffold.ts",
   "lib/deepseek.ts",
   "plugins/website/pipeline-validate.ts",
+  "plugins/website/iteration.ts",
   "plugins/website/analyze.ts",
   "plugins/website/plan.ts",
   "plugins/website/generate.ts",
@@ -53,5 +54,10 @@ assert.match(exportRoute, /application\/zip/);
 
 const tool = read("components/dashboard/website-builder-tool.tsx");
 assert.match(tool, /\/api\/website-builder\/\$\{project\.id\}\/export/);
+assert.match(tool, /continue:\s*true/);
+
+const iteration = read("plugins/website/iteration.ts");
+assert.match(iteration, /buildWebsiteIterationPrompt/);
+assert.match(iteration, /loadWebsiteParentContext/);
 
 console.log("smoke-website-ai: PASS (structure + contracts)");

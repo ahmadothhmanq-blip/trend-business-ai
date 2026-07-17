@@ -12,8 +12,21 @@ import {
   detectWebsiteProjectKind,
   websiteGenerateRequestSchema,
 } from "@/lib/validations/website-builder";
+import { loadWebsiteParentContext } from "@/plugins/website/iteration";
 import type { WebsiteBlueprint, WebsiteGeneration } from "@/types/database";
 import { NextResponse } from "next/server";
+
+type SupabaseSettingsClient = {
+  from: (table: string) => {
+    select: (columns: string) => {
+      eq: (col: string, val: string) => {
+        single: () => PromiseLike<{ data: unknown; error: unknown }>;
+      };
+    };
+  };
+};
+
+type SupabaseParentClient = Parameters<typeof loadWebsiteParentContext>[0];
 
 function logWebsiteBuilderError(stage: string, error: unknown) {
   const stack =
@@ -100,16 +113,13 @@ export async function POST(request: Request) {
   const input = parsed.data;
   const projectKind = detectWebsiteProjectKind(input);
   const settings = await providerManager.loadUserSettings(
-    auth.supabase as unknown as {
-      from: (table: string) => {
-        select: (columns: string) => {
-          eq: (col: string, val: string) => {
-            single: () => PromiseLike<{ data: unknown; error: unknown }>;
-          };
-        };
-      };
-    },
+    auth.supabase as unknown as SupabaseSettingsClient,
     auth.user!.id,
+  );
+  const parentContext = await loadWebsiteParentContext(
+    auth.supabase as unknown as SupabaseParentClient,
+    auth.user!.id,
+    input.parentGenerationId,
   );
 
   let stage = "generateWebsite";
@@ -118,6 +128,7 @@ export async function POST(request: Request) {
     const project = await generateWebsite({
       ...input,
       projectKind,
+      ...parentContext,
       preferredProvider: settings?.default_provider as AIProviderName | undefined,
       autoFallback: settings?.auto_fallback ?? true,
     });

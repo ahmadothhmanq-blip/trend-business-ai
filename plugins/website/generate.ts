@@ -191,9 +191,31 @@ export async function generateWebsite(
     (file) => !SCAFFOLD_PATHS.has(file.path),
   );
 
+  const previousByPath = new Map(
+    (input.previousFiles ?? []).map((file) => [file.path, file]),
+  );
+  const reusePrevious =
+    (input.mode === "continue" || input.mode === "regenerate") &&
+    previousByPath.size > 0;
+
   let index = 0;
   for (const filePlan of aiFilePlans) {
     index += 1;
+    const prior = reusePrevious ? previousByPath.get(filePlan.path) : undefined;
+
+    // Continue mode: keep unchanged prior files; only regenerate when instruction asks or path is new.
+    if (
+      input.mode === "continue" &&
+      prior &&
+      !input.continueInstruction?.toLowerCase().includes(filePlan.path.toLowerCase())
+    ) {
+      ctx.progress.emit(
+        `Reusing file ${index}/${aiFilePlans.length}: ${filePlan.path}`,
+      );
+      files.push(prior);
+      continue;
+    }
+
     ctx.progress.emit(
       `Generating file ${index}/${aiFilePlans.length}: ${filePlan.path}`,
     );
@@ -206,6 +228,9 @@ export async function generateWebsite(
         files,
         filePlan,
         ctx,
+        prior
+          ? `Improve this existing file while preserving working imports:\n${prior.content.slice(0, 4000)}`
+          : "",
       ),
     );
   }

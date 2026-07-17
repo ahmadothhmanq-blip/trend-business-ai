@@ -2,6 +2,12 @@ import type { ProjectCapabilityFlags } from "@/lib/ai/validator";
 import type { GeneratedProjectFile, GenerationProgressEvent } from "@/lib/ai/types";
 import type { PlannedFile } from "@/lib/ai/planner";
 
+export type WebsiteGenerationMode =
+  | "generate"
+  | "regenerate"
+  | "continue"
+  | "retry";
+
 export type WebsiteGenerationInput = {
   prompt: string;
   projectType: string;
@@ -9,6 +15,13 @@ export type WebsiteGenerationInput = {
   language: string;
   theme: string;
   features: string[];
+  mode?: WebsiteGenerationMode;
+  parentGenerationId?: string;
+  continueInstruction?: string;
+  /** Prior project files when regenerating / continuing */
+  previousFiles?: GeneratedProjectFile[];
+  previousTitle?: string;
+  previousDescription?: string;
 };
 
 export type WebsiteGenerationProgressEvent =

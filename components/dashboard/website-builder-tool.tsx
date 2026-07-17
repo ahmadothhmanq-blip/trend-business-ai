@@ -370,20 +370,35 @@ export function WebsiteBuilderTool({
     setSelectedFilePath((path) => path || nextProject.generatedProject?.files[0]?.path || "");
   }
 
-  async function createInterfaceProject(options?: { regenerate?: boolean }) {
+  async function createInterfaceProject(options?: {
+    regenerate?: boolean;
+    continue?: boolean;
+  }) {
     const brief =
       projectBrief.trim() ||
-      (options?.regenerate ? activeProject?.description.trim() : "") ||
+      (options?.regenerate || options?.continue
+        ? activeProject?.description.trim()
+        : "") ||
       productTemplates[0] ||
       "I need a luxury real estate web application with booking system, authentication and admin dashboard.";
 
-    if (options?.regenerate && !projectBrief.trim() && activeProject?.description) {
+    if (
+      (options?.regenerate || options?.continue) &&
+      !projectBrief.trim() &&
+      activeProject?.description
+    ) {
       setProjectBrief(activeProject.description);
     }
 
     setIsGenerating(true);
     setApiError(null);
     setStreamStatus("Connecting to AI website engine...");
+
+    const mode = options?.continue
+      ? "continue"
+      : options?.regenerate
+        ? "regenerate"
+        : "generate";
 
     const requestBody = {
       prompt: brief,
@@ -392,8 +407,11 @@ export function WebsiteBuilderTool({
       theme: `${colorTheme} ${designStyle}`,
       features: [...features, ...(product?.id ? [`product:${product.id}`] : [])],
       productId: product?.id,
-      mode: options?.regenerate ? "regenerate" : "generate",
-      parentGenerationId: options?.regenerate ? activeProject?.id : undefined,
+      mode,
+      parentGenerationId:
+        mode === "generate" ? undefined : activeProject?.id,
+      continueInstruction:
+        mode === "continue" ? projectBrief.trim() || undefined : undefined,
     };
 
     const applySavedGeneration = (
@@ -930,7 +948,7 @@ export function WebsiteBuilderTool({
             </div>
           )}
 
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <Button
             type="button"
             onClick={() => void createInterfaceProject()}
@@ -958,11 +976,28 @@ export function WebsiteBuilderTool({
               }
               void createInterfaceProject({ regenerate: true });
             }}
-            disabled={isGenerating}
+            disabled={isGenerating || !activeProject?.id}
             className="btn-ghost-gold h-14 w-full rounded-2xl text-base font-semibold"
           >
             <RefreshCw className="size-5" />
             Regenerate
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              if (!projectBrief.trim() && activeProject?.description) {
+                setProjectBrief(
+                  `Improve the existing project: ${activeProject.description}`,
+                );
+              }
+              void createInterfaceProject({ continue: true });
+            }}
+            disabled={isGenerating || !activeProject?.id}
+            className="btn-ghost-gold h-14 w-full rounded-2xl text-base font-semibold sm:col-span-2 lg:col-span-1"
+          >
+            <Wand2 className="size-5" />
+            Continue
           </Button>
           </div>
         </div>

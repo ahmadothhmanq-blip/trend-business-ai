@@ -1,6 +1,7 @@
 import type { ProjectCapabilityFlags } from "@/lib/ai/validator";
 import { generateJsonWithValidation } from "@/lib/ai/generator";
 import { websiteAnalyzePrompt } from "@/lib/ai/prompts/website";
+import { buildWebsiteIterationPrompt } from "@/plugins/website/iteration";
 import { validateWebsiteAnalysis } from "@/plugins/website/pipeline-validate";
 import { websiteAnalysisSchema } from "@/plugins/website/schemas";
 import type { WebsiteGenerationInput, WebsiteProjectAnalysis } from "@/plugins/website/types";
@@ -21,9 +22,14 @@ export async function analyzeWebsite(
 ): Promise<WebsiteProjectAnalysis> {
   ctx.progress.emit("Analyzing...");
 
+  const iterationInput = {
+    ...input,
+    prompt: buildWebsiteIterationPrompt(input),
+  };
+
   const analysis = await generateJsonWithValidation<WebsiteProjectAnalysis>({
     provider: ctx.provider,
-    prompt: websiteAnalyzePrompt(input),
+    prompt: websiteAnalyzePrompt(iterationInput),
     schema: websiteAnalysisSchema,
     maxAttempts: 3,
     validate: validateWebsiteAnalysis,
