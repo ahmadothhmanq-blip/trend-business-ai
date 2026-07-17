@@ -122,7 +122,12 @@ export function ThemeProvider({
     document.head.appendChild(style);
     apply();
     void window.getComputedStyle(style).opacity;
-    document.head.removeChild(style);
+    // Safe cleanup — never throw during theme apply (blank-page risk).
+    try {
+      style.remove();
+    } catch {
+      // ignore
+    }
   }, [mounted, resolvedTheme, disableTransitionOnChange]);
 
   const setTheme = React.useCallback(
