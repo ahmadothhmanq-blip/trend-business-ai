@@ -143,8 +143,11 @@ Complete on the **production host**. Check every P0 box before GO.
 
 ### A. Environment (P0)
 
+**Operator checklist:** [`WEBSITE_BUILDER_PRODUCTION_ENV_CHECKLIST.md`](./WEBSITE_BUILDER_PRODUCTION_ENV_CHECKLIST.md)
+
 | ☐ | Action |
 |---|--------|
+| ☐ | Complete `WEBSITE_BUILDER_PRODUCTION_ENV_CHECKLIST.md` on the host |
 | ☐ | Set all P0 variables from §1 on the host |
 | ☐ | `NEXT_PUBLIC_SITE_URL` is HTTPS production origin |
 | ☐ | Anon key confirmed from Dashboard (not truncated) |
@@ -182,18 +185,19 @@ Complete on the **production host**. Check every P0 box before GO.
 
 | ☐ | Action |
 |---|--------|
-| ☐ | No service role in client env |
-| ☐ | Unpublished `/w/{slug}` → 404 |
-| ☐ | Kill-switch known: `WEBSITE_PUBLISH_ENABLED=false` |
+| ☑ | No service role in client env (verified by `verify:wb-launch`) |
+| ☑ | Unpublished `/w/{slug}` → 404 (local E2E 2026-07-18) |
+| ☐ | Kill-switch known: `WEBSITE_PUBLISH_ENABLED=false` (ops drill on host) |
 
 ### F. Deploy + journey (P0)
 
 | ☐ | Action |
 |---|--------|
-| ☐ | `npm run build` succeeds for launch commit |
+| ☑ | `npm run build` succeeds for launch commit (PASS 2026-07-18) |
 | ☐ | App deployed; `/api/health` OK on production URL |
-| ☐ | Full journey: login → create → generate → preview → improve → publish → open `/w/{slug}` → unpublish → ZIP |
-| ☐ | Marketing/FAQ updated to mention preview + AI improve + public URL + ZIP (still outdated in `lib/constants/marketing-content.ts` — content gate, not a code feature) |
+| ☑ | Full journey locally: login → create → generate → preview → improve → publish → open `/w/{slug}` → ZIP → unpublish → 404 (`scripts/e2e-website-builder-journey.mjs`, 2026-07-18) |
+| ☐ | Repeat full journey on **production/staging** with real mailbox |
+| ☑ | Marketing/FAQ updated to mention preview + AI improve + public URL + ZIP (`lib/constants/marketing-content.ts`, 2026-07-18) |
 
 ### G. P1 (launch day)
 
@@ -222,7 +226,7 @@ Complete on the **production host**. Check every P0 box before GO.
 - Does not deploy to Vercel for you  
 - Does not create Supabase keys or SMTP  
 - Does not change generate / preview / publish product code  
-- Does not rewrite marketing copy (listed as remaining content gate)
+- Marketing Phase 1 honesty copy is updated in `lib/constants/marketing-content.ts` (remaining gates are host env / auth mailbox / deploy)
 
 ---
 

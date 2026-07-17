@@ -247,21 +247,21 @@ Checklist requires **staging/production + real mailbox**. Local E2E used a confi
 
 ### Must fix (P0 blockers)
 
-1. **Deploy** Phase 1 to a real HTTPS host; set `NEXT_PUBLIC_SITE_URL` to that origin.  
-2. **Set `SUPABASE_SERVICE_ROLE_KEY`** on the host (server-only).  
-3. **Verify full Supabase anon key** (current local length is suspicious).  
-4. **Prove auth email:** signup → inbox confirm → login → `/dashboard/website-builder`.  
-5. **Configure Supabase redirect URLs** for production `/auth/callback`.  
-6. **Update marketing/FAQ** to match Phase 1 (preview + AI improve + public `/w/{slug}` + ZIP) — currently still ZIP-only / “no live URL”.  
-7. **Re-run full journey on staging/production** with a real mailbox (include unpublish + ZIP).  
+1. **Set production env vars** using [`WEBSITE_BUILDER_PRODUCTION_ENV_CHECKLIST.md`](./WEBSITE_BUILDER_PRODUCTION_ENV_CHECKLIST.md) (HTTPS `SITE_URL`, full anon key, `SUPABASE_SERVICE_ROLE_KEY`, `DEEPSEEK_API_KEY`, flags).  
+2. **Deploy** Phase 1 to that HTTPS host and redeploy after `NEXT_PUBLIC_*` changes.  
+3. **Prove auth email:** signup → inbox confirm → login → `/dashboard/website-builder`.  
+4. **Configure Supabase redirect URLs** for production `/auth/callback`.  
+6. ~~**Update marketing/FAQ**~~ **DONE** (2026-07-18) — Phase 1 preview / AI improve / public URL / ZIP reflected in `marketing-content.ts`.  
+7. ~~**Local journey including unpublish + ZIP**~~ **DONE** (2026-07-18) — E2E PASS through unpublish→404 + ZIP.  
+8. **Re-run full journey on staging/production** with a real mailbox.
 
 ### Should do before or at launch (P1)
 
-8. Configure **Upstash** for distributed rate limits.  
-9. Confirm **credits `402`** and burst **`429`** behavior.  
-10. Support/abuse runbook (unpublish, confirmation email help).  
-11. Monitoring + on-call for stream/publish/public routes.  
-12. `npm run build` + CI green on the launch commit.
+9. Configure **Upstash** for distributed rate limits.  
+10. Confirm **credits `402`** and burst **`429`** behavior.  
+11. Support/abuse runbook (unpublish, confirmation email help).  
+12. Monitoring + on-call for stream/publish/public routes.  
+13. ~~`npm run build`~~ **DONE** locally (2026-07-18); keep CI green on launch commit.
 
 ### Already good enough (do not re-build)
 

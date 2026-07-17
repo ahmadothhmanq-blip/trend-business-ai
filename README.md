@@ -1,8 +1,8 @@
 # Trend Business AI
 
-Multi-product AI SaaS for business creation, design, content, and strategy. Generate website/app **source projects** (ZIP export), brand systems, campaigns, and intelligence from one authenticated workspace.
+Multi-product AI SaaS for business creation, design, content, and strategy. Generate websites (preview, AI improve, public URL, ZIP), brand systems, campaigns, and intelligence from one authenticated workspace.
 
-**Product truth today:** Website Builder delivers Next.js source files + ZIP for self-hosting — not a hosted live customer site. Live Preview stays off until a safe design ships. See [`docs/`](./docs/).
+**Product truth today:** Website Builder supports in-platform live preview, natural-language AI editing, public URL publish (`/w/{slug}`), and Next.js ZIP export. Custom domains are not included yet. See [`docs/WEBSITE_BUILDER_DEPLOYMENT_READY.md`](./docs/WEBSITE_BUILDER_DEPLOYMENT_READY.md).
 
 ## Tech stack
 

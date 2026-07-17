@@ -1,5 +1,6 @@
-import { requireUser } from "@/lib/api/helpers";
+import { requireUser, parseJsonBody } from "@/lib/api/helpers";
 import { databaseErrorResponse } from "@/lib/api/errors";
+import { profileSchema } from "@/lib/validations/auth";
 import { NextResponse } from "next/server";
 
 const AVATAR_TYPES = {
@@ -41,9 +42,60 @@ export async function GET() {
   });
 }
 
+export async function PUT(request: Request) {
+  const auth = await requireUser();
+  if (auth.response) return auth.response;
+
+  const body = await parseJsonBody<unknown>(request);
+  if (body instanceof NextResponse) return body;
+
+  const parsed = profileSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: parsed.error.issues[0]?.message ?? "Invalid profile data" },
+      { status: 400 },
+    );
+  }
+
+  const { fullName = "", company = "", role = "" } = parsed.data;
+
+  const { error: authError } = await auth.supabase.auth.updateUser({
+    data: { full_name: fullName, company, role },
+  });
+
+  if (authError) {
+    return NextResponse.json({ error: authError.message }, { status: 400 });
+  }
+
+  const { error: profileError } = await auth.supabase.from("profiles").upsert({
+    id: auth.user!.id,
+    full_name: fullName,
+    company,
+    role,
+    updated_at: new Date().toISOString(),
+  });
+
+  if (profileError) {
+    return databaseErrorResponse("profile.update", profileError);
+  }
+
+  return NextResponse.json({ message: "Profile updated successfully." });
+}
+
 export async function POST(request: Request) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
+
+  const contentType = request.headers.get("content-type") ?? "";
+  if (!contentType.includes("multipart/form-data")) {
+    return NextResponse.json(
+      {
+        error:
+          "Avatar upload requires multipart/form-data. Use PUT /api/profile with JSON to update profile fields.",
+      },
+      { status: 415 },
+    );
+  }
 
   const formData = await request.formData();
   const file = formData.get("avatar") as File | null;

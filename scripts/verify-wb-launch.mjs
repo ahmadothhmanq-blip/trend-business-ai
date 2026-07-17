@@ -76,12 +76,22 @@ else if (!/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test(supabaseUrl.replace(/\
 if (!anonKey) fail("NEXT_PUBLIC_SUPABASE_ANON_KEY", "required");
 else {
   const looksJwt = anonKey.startsWith("eyJ") && anonKey.length >= 100;
-  const looksSb = anonKey.startsWith("sb_");
-  if (looksJwt || looksSb) pass("NEXT_PUBLIC_SUPABASE_ANON_KEY", `set len=${anonKey.length}`);
-  else warn(
-    "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-    `len=${anonKey.length} — confirm full anon/publishable key from Supabase Dashboard → Settings → API`,
-  );
+  const looksSbPublishable =
+    anonKey.startsWith("sb_publishable_") && anonKey.length >= 40;
+  const looksSbLegacy = anonKey.startsWith("sb_") && anonKey.length >= 40;
+  if (looksJwt || looksSbPublishable || looksSbLegacy) {
+    pass("NEXT_PUBLIC_SUPABASE_ANON_KEY", `set len=${anonKey.length}`);
+  } else if (productionMode) {
+    fail(
+      "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+      `len=${anonKey.length} — confirm full anon/publishable key from Supabase Dashboard → Settings → API`,
+    );
+  } else {
+    warn(
+      "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+      `len=${anonKey.length} — confirm full anon/publishable key from Supabase Dashboard → Settings → API`,
+    );
+  }
 }
 
 if (!siteUrl) {

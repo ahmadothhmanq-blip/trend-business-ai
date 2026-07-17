@@ -69,8 +69,8 @@ export default async function WebsiteBuilderSettingsPage() {
                 <h2 className="text-xl font-bold text-white">Workspace Defaults</h2>
                 <p className="mt-1 text-sm leading-relaxed text-white/45">
                   Generated projects are saved to Supabase with the prompt, files,
-                  framework metadata and favorite state. Live Preview remains frozen
-                  while ZIP export and source review stay production-ready.
+                  and framework metadata. Live preview, AI improve, public URL
+                  publish, and ZIP export are available from the main workspace.
                 </p>
               </div>
             </div>
@@ -123,8 +123,8 @@ export default async function WebsiteBuilderSettingsPage() {
             <div>
               <h2 className="text-xl font-bold text-white">Generation History</h2>
               <p className="text-sm text-white/45">
-                Reopen previous projects from the main workspace and continue with
-                ZIP export, source review, rename, delete and favorite actions.
+                Reopen previous projects from the main workspace for preview,
+                AI improve, publish, ZIP export, rename, delete, and favorites.
               </p>
             </div>
           </div>

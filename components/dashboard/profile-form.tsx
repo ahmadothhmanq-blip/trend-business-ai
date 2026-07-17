@@ -2,7 +2,7 @@
 
 import { useActionState, useRef } from "react";
 import { Loader2, Upload, User, LockKeyhole, Settings2 } from "lucide-react";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/components/theme/theme-provider";
 import {
   updateProfile,
   updatePassword,

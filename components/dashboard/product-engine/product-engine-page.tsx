@@ -3,7 +3,6 @@ import { DashboardHeader } from "@/components/dashboard/header";
 import { WorkspaceTool } from "@/components/dashboard/workspace/workspace-tool";
 import { getProductDefinition } from "@/lib/products/registry";
 import type { ProductId } from "@/lib/products/types";
-import { getWorkspaceDefinition } from "@/lib/workspace/registry";
 import type { WorkspaceGeneration } from "@/types/database";
 
 export async function ProductEnginePage({ productId }: { productId: ProductId }) {
@@ -12,7 +11,6 @@ export async function ProductEnginePage({ productId }: { productId: ProductId })
     throw new Error(`Product ${productId} is not a workspace engine product.`);
   }
 
-  const definition = getWorkspaceDefinition(product.workspaceType);
   const supabase = await createClient();
   const {
     data: { user },
@@ -39,8 +37,8 @@ export async function ProductEnginePage({ productId }: { productId: ProductId })
       />
       <main className="flex-1 p-4 sm:p-6 lg:p-8 xl:p-10">
         <WorkspaceTool
-          definition={definition}
-          product={product}
+          workspaceType={product.workspaceType}
+          productId={productId}
           initialGenerations={(data ?? []) as WorkspaceGeneration[]}
           initialTotal={count ?? 0}
         />

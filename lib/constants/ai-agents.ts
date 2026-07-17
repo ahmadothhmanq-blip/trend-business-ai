@@ -42,7 +42,7 @@ export const AGENT_CATEGORIES = [
 /* ------------------------------------------------------------------ */
 
 export const AGENT_TOOLS = [
-  { id: "website-builder", label: "Website Builder", description: "Generate website source projects (ZIP)" },
+  { id: "website-builder", label: "Website Builder", description: "Generate, preview, AI-improve, publish URL, ZIP" },
   { id: "landing-page-builder", label: "Landing Page Builder", description: "Generate landing-page source packages" },
   { id: "web-app-builder", label: "Web App Builder", description: "Generate web-app source projects (ZIP)" },
   { id: "logo-designer", label: "Logo Designer", description: "Create professional logos" },

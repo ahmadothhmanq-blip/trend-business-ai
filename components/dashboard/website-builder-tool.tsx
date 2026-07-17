@@ -745,7 +745,7 @@ export function WebsiteBuilderTool({
             </h2>
             <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-white/55 sm:text-base">
               {product?.description ??
-                "Generate Next.js website and app source projects you download as ZIP."}
+                "Generate a website, preview it, improve with AI, publish a public URL, and export ZIP."}
             </p>
           </div>
           <div className="rounded-[2rem] border border-white/[0.08] bg-black/25 p-4 shadow-[0_24px_90px_rgb(0_0_0/0.35)] backdrop-blur-xl">

@@ -258,14 +258,14 @@ async function main() {
     fail("6. Publish", `${pub.status} ${pub.text.slice(0, 220)}`);
   }
 
+  let resolvedPath = null;
   if (publicPath || publicUrl) {
-    const path =
-      publicPath || new URL(publicUrl, base).pathname;
-    const live = await fetch(base + path, { redirect: "manual" });
+    resolvedPath = publicPath || new URL(publicUrl, base).pathname;
+    const live = await fetch(base + resolvedPath, { redirect: "manual" });
     const text = await live.text();
     const ct = live.headers.get("content-type") || "";
     if (live.status === 200 && ct.includes("text/html") && text.length > 200) {
-      pass("7. Open public URL", `${path} bytes=${text.length}`);
+      pass("7. Open public URL", `${resolvedPath} bytes=${text.length}`);
     } else {
       fail(
         "7. Open public URL",
@@ -274,6 +274,66 @@ async function main() {
     }
   } else {
     fail("7. Open public URL", "No public path from publish");
+  }
+
+  // 8. ZIP export (launch checklist)
+  {
+    const zipRes = await fetch(
+      `${base}/api/website-builder/${generationId}/export`,
+      { headers: { Cookie: cookie }, redirect: "manual" },
+    );
+    const buf = Buffer.from(await zipRes.arrayBuffer());
+    const ct = zipRes.headers.get("content-type") || "";
+    const looksZip =
+      zipRes.status === 200 &&
+      buf.length > 100 &&
+      buf[0] === 0x50 &&
+      buf[1] === 0x4b; // PK..
+    if (looksZip) {
+      pass("8. ZIP export", `status=200 ct=${ct || "n/a"} bytes=${buf.length}`);
+    } else {
+      fail(
+        "8. ZIP export",
+        `${zipRes.status} ct=${ct} bytes=${buf.length} head=${buf.slice(0, 80).toString("utf8")}`,
+      );
+    }
+  }
+
+  // 9. Unpublish → public URL must 404 (security + launch checklist)
+  if (resolvedPath) {
+    const unpub = await api(
+      cookie,
+      "POST",
+      `/api/website-builder/${generationId}/publish`,
+      { action: "unpublish" },
+    );
+    if (unpub.status === 200) {
+      const json = JSON.parse(unpub.text);
+      if (json.publication?.status === "unpublished") {
+        pass("9. Unpublish", `status=unpublished`);
+      } else {
+        fail(
+          "9. Unpublish",
+          `status=${json.publication?.status} ${unpub.text.slice(0, 160)}`,
+        );
+      }
+    } else {
+      fail("9. Unpublish", `${unpub.status} ${unpub.text.slice(0, 200)}`);
+    }
+
+    const after = await fetch(base + resolvedPath, { redirect: "manual" });
+    const afterText = await after.text();
+    if (after.status === 404) {
+      pass("10. Public URL after unpublish", "404 as expected");
+    } else {
+      fail(
+        "10. Public URL after unpublish",
+        `${after.status} ${afterText.slice(0, 160)}`,
+      );
+    }
+  } else {
+    fail("9. Unpublish", "Skipped — no public path");
+    fail("10. Public URL after unpublish", "Skipped — no public path");
   }
 
   finish();

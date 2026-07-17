@@ -17,7 +17,7 @@ export const REF_FEATURES = [
   {
     title: "AI Website & App Builder",
     description:
-      "Generate Next.js website and app source projects with structure, flows, and ZIP export — not a hosted live site on our platform.",
+      "Generate a website, preview it in-platform, improve with AI, publish a public URL, and download Next.js source as ZIP.",
     icon: "Layout",
   },
   {
@@ -108,7 +108,8 @@ export const AI_PRODUCT_CATEGORIES: AiProductCategory[] = [
   {
     id: "create",
     title: "Create",
-    description: "Generate website, app, and landing-page source projects with AI — download as ZIP.",
+    description:
+      "Generate websites and apps with AI — preview, improve, publish a public URL, and export Next.js source as ZIP.",
     href: "/products/create",
     legacyHref: "/solutions/create",
     productCount: 3,
@@ -117,12 +118,12 @@ export const AI_PRODUCT_CATEGORIES: AiProductCategory[] = [
     accent: "from-[#D4AF37]/25 via-transparent to-transparent",
     eyebrow: "AI Products · Create",
     headline: "Generate website and app source projects with AI.",
-    body: "Turn a product brief into structured pages, conversion sections, and downloadable Next.js file packages — ready to run locally or deploy to your own hosting.",
+    body: "Turn a product brief into a finished website flow: generate, live preview, natural-language AI edits, public URL publish, plus ZIP export for self-hosting.",
     products: [
       {
         title: "AI Website & App Builder",
         description:
-          "Generate production-oriented Next.js source files, page structure, and ZIP export from a brief.",
+          "Generate from a brief, preview in-platform, improve with AI, publish a public /w URL, and export Next.js ZIP.",
         image: "/images/ai/website-builder.png",
         imageAlt: "Luxury black and gold website and app builder illustration",
         href: "/products/website-builder",
@@ -313,7 +314,7 @@ export const REF_SERVICES = [
   {
     title: "AI Website & App Builder",
     description:
-      "Generate Next.js website and app source projects with structure, flows, and ZIP export for self-hosting.",
+      "Generate, preview, AI-improve, and publish a public website URL — with Next.js ZIP export for self-hosting.",
     eyebrow: "Web & Apps",
   },
   {
@@ -563,12 +564,12 @@ export const REF_FAQ = [
   {
     question: "What can I build with Trend Business AI?",
     answer:
-      "Website and app source projects (ZIP), landing-page packages, logos, brand systems, images, video concepts, social content, campaigns, business intelligence and feasibility studies — all from one authenticated workspace.",
+      "Websites with in-platform preview, AI editing, and a public URL (plus ZIP export), landing-page packages, logos, brand systems, images, video concepts, social content, campaigns, business intelligence and feasibility studies — all from one authenticated workspace.",
   },
   {
     question: "Does Website Builder publish a live website URL?",
     answer:
-      "No. Website Builder generates downloadable Next.js source files and a ZIP export. You run or deploy the project on your own hosting — we do not host a live customer site from this tool today.",
+      "Yes. After you generate and preview, you can publish a public URL on our platform (/w/{slug}) as a safe static site. You can also download the full Next.js project as ZIP to self-host. Custom domains are not included yet.",
   },
   {
     question: "Is the Free Beta really free?",
@@ -583,12 +584,12 @@ export const REF_FAQ = [
   {
     question: "Can I export my projects?",
     answer:
-      "Yes. Website and app generations can be downloaded as ZIP packages; other products save and export from your private dashboard so you are never locked into the platform.",
+      "Yes. Website Builder supports ZIP export of the Next.js source project, and you can publish a public URL for sharing. Other products save and export from your private dashboard so you are never locked into the platform.",
   },
   {
     question: "Do I need design or coding experience?",
     answer:
-      "No. Describe your brief, choose a product category, and generate structured assets. For Website Builder, download the ZIP and follow the included setup steps (or hand off to a developer).",
+      "No. Describe your brief, generate the site, preview it, and improve it with natural-language AI commands. Publish a public URL when ready, or download the ZIP if you want to self-host or hand off to a developer.",
   },
   {
     question: "How is this different from other AI tools?",
@@ -642,23 +643,23 @@ export const MARKETING_PRODUCTS: MarketingProduct[] = [
     title: "AI Website & App Builder",
     eyebrow: "Create · Website Builder",
     description:
-      "Generate Next.js website and app source projects — pages, components, and file trees you download as ZIP and deploy yourself.",
+      "Generate a website from a brief, preview it in-platform, improve it with AI, publish a public URL, and download Next.js source as ZIP.",
     image: "/images/ai/website-builder.png",
     imageAlt: "AI website and app builder",
     highlights: [
-      "Structured pages and conversion sections",
-      "Production-oriented Next.js source files",
-      "Downloadable ZIP export (not a hosted live site)",
+      "In-platform live preview after generation",
+      "Natural-language AI improvements",
+      "Public URL publish (/w/{slug}) plus ZIP export",
     ],
     capabilities: [
-      "Generate structured page maps and conversion sections from a brief",
-      "Produce a bounded Next.js file tree ready for local development",
-      "Download ZIP packages to run locally or deploy to your own hosting",
+      "Generate structured pages and conversion sections from a brief",
+      "Preview the site inside the dashboard and iterate with AI edit commands",
+      "Publish a public static URL, or download ZIP to self-host the Next.js project",
     ],
     outcomes: [
-      "A clear build direction instead of a blank canvas",
-      "Source files you own — npm install / npm run dev on your machine",
-      "Projects saved to your private authenticated dashboard",
+      "A finished website flow: generate → preview → improve → publish",
+      "A shareable public URL without custom-domain setup",
+      "Source files you own via ZIP when you want full self-hosting control",
     ],
     dashboardHref: "/dashboard/website-builder",
   },

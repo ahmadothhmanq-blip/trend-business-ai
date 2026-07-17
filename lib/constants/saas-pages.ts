@@ -24,7 +24,7 @@ export const PUBLIC_SAAS_PAGES = {
         title: "AI creation suite",
         description: "Generate full projects, business plans and campaign assets without switching tools.",
         items: [
-          "AI Website & App Builder with source files and ZIP export",
+          "AI Website Builder with preview, AI edit, public URL, and ZIP export",
           "Brand, creative, content, marketing and social workspaces",
           "Business intelligence, feasibility and audit modules",
         ],
