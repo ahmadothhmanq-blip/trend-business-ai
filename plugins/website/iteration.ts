@@ -1,6 +1,86 @@
 import type { SupabaseMaybeSingleQueryClient } from "@/lib/api/supabase-query";
 import type { GeneratedProjectFile } from "@/lib/ai/types";
-import type { WebsiteGenerationInput } from "@/plugins/website/types";
+import type {
+  WebsiteGenerationInput,
+  WebsiteProjectBlueprint,
+} from "@/plugins/website/types";
+
+/** True for natural-language improve / continue iteration (not first-time generate). */
+export function isWebsiteImproveMode(
+  input: Pick<WebsiteGenerationInput, "mode" | "continueInstruction">,
+): boolean {
+  return (
+    input.mode === "continue" ||
+    Boolean(input.continueInstruction?.trim())
+  );
+}
+
+/**
+ * Coerce AI blueprint list fields into string[] before improve processing.
+ * Models sometimes return a string, object map, or mixed array instead of string[].
+ */
+export function normalizeWebsiteStringList(value: unknown): string[] {
+  if (value == null) return [];
+
+  if (Array.isArray(value)) {
+    const out: string[] = [];
+    for (const item of value) {
+      if (typeof item === "string") {
+        const trimmed = item.trim();
+        if (trimmed) out.push(trimmed);
+        continue;
+      }
+      if (item && typeof item === "object") {
+        const record = item as { text?: unknown; content?: unknown; value?: unknown };
+        const nested = record.text ?? record.content ?? record.value;
+        if (typeof nested === "string" && nested.trim()) {
+          out.push(nested.trim());
+        }
+      }
+    }
+    return out;
+  }
+
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (!trimmed) return [];
+    const lines = trimmed
+      .split(/\n+/)
+      .map((line) => line.trim())
+      .filter(Boolean);
+    return lines.length > 0 ? lines : [trimmed];
+  }
+
+  if (typeof value === "object") {
+    return Object.values(value as Record<string, unknown>).flatMap((entry) =>
+      typeof entry === "string" && entry.trim() ? [entry.trim()] : [],
+    );
+  }
+
+  return [];
+}
+
+/** Normalize blueprint arrays used by the improve/continue iteration path. */
+export function normalizeWebsiteBlueprint(
+  blueprint: WebsiteProjectBlueprint,
+): WebsiteProjectBlueprint {
+  return {
+    ...blueprint,
+    title: typeof blueprint.title === "string" ? blueprint.title : String(blueprint.title ?? ""),
+    description:
+      typeof blueprint.description === "string"
+        ? blueprint.description
+        : String(blueprint.description ?? ""),
+    pages: normalizeWebsiteStringList(blueprint.pages),
+    sections: normalizeWebsiteStringList(blueprint.sections),
+    colorPalette: normalizeWebsiteStringList(blueprint.colorPalette),
+    typography: normalizeWebsiteStringList(blueprint.typography),
+    components: normalizeWebsiteStringList(blueprint.components),
+    content: normalizeWebsiteStringList(blueprint.content),
+    seo: normalizeWebsiteStringList(blueprint.seo),
+    roadmap: normalizeWebsiteStringList(blueprint.roadmap),
+  };
+}
 
 /** Build the effective user brief for analyze/plan, including regenerate/continue context. */
 export function buildWebsiteIterationPrompt(input: WebsiteGenerationInput): string {

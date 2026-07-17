@@ -9,6 +9,7 @@
     "lint": "eslint",
     "type-check": "tsc --noEmit",
     "verify": "node scripts/verify.mjs",
+    "verify:wb-launch": "node scripts/verify-wb-launch.mjs",
     "perf:budget": "node scripts/check-dashboard-budgets.mjs",
     "smoke:website-ai": "node scripts/smoke-website-ai.mjs",
     "db:apply": "node scripts/apply-migrations.mjs",

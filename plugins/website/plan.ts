@@ -13,7 +13,11 @@ import {
 import { mergeProductionRequirements } from "@/lib/ai/validator";
 import { capPlannedFiles, MAX_WEBSITE_FILES } from "@/lib/ai/website-scaffold";
 import { sanitizeProjectPath } from "@/lib/ai/zipper";
-import { buildWebsiteIterationPrompt } from "@/plugins/website/iteration";
+import {
+  buildWebsiteIterationPrompt,
+  isWebsiteImproveMode,
+  normalizeWebsiteBlueprint,
+} from "@/plugins/website/iteration";
 import {
   validateWebsiteBlueprint,
   validateWebsiteDynamicPlan,
@@ -79,13 +83,34 @@ export async function planWebsite(
 
   ctx.progress.emit("Creating blueprint...");
 
-  const blueprint = await generateJsonWithValidation<WebsiteProjectBlueprint>({
+  const rawBlueprint = await generateJsonWithValidation<WebsiteProjectBlueprint>({
     provider: ctx.provider,
     prompt: websiteBlueprintPrompt(iterationInput, analysis),
     schema: websiteBlueprintSchema,
     maxAttempts: 3,
     validate: validateWebsiteBlueprint,
   });
+
+  // Improve/continue: coerce unexpected list shapes before file planning + product assembly.
+  const blueprint = isWebsiteImproveMode(input)
+    ? normalizeWebsiteBlueprint(rawBlueprint)
+    : rawBlueprint;
+
+  if (
+    isWebsiteImproveMode(input) &&
+    (!blueprint.pages.length || !blueprint.content.length)
+  ) {
+    // Keep iteration architecture; refill critical lists from analysis when AI omitted arrays.
+    if (!blueprint.pages.length && analysis.pages?.length) {
+      blueprint.pages = [...analysis.pages];
+    }
+    if (!blueprint.content.length) {
+      blueprint.content = [
+        blueprint.description,
+        input.continueInstruction?.trim() || input.prompt,
+      ].filter(Boolean);
+    }
+  }
 
   ctx.progress.emit("Planning files...");
 
