@@ -39,11 +39,13 @@ Future (`F*`) tasks stay **Future** until a `DECISIONS_LOG.md` Accepted entry.
 
 ## Queue order (current)
 
+**Product lens:** `PRODUCT_VISION.md` + D-015 (finished products). Do not expand unfinished hubs as “complete.”
+
 1. ~~M01–M05~~ done  
 2. **Skip M06 / M07** (billing / PayPal — blocked or env-gated)  
 3. **Do not delete directories** (L01/L07 deferred)  
 4. ~~L02~~ → ~~L06~~ → ~~L05~~ done  
-5. Remaining stop gates: L03 (wide rename), L04 (design), L08 (merge `main`), all `F*`  
+5. Remaining stop gates: L03 (wide rename), L04 (design), L08 (merge `main`), all `F*` (esp. F01/F09 for preview/publish)  
 
 ---
 

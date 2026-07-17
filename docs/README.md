@@ -5,14 +5,15 @@ Living documentation for the **existing** Trend Business AI project.
 
 | Document | Purpose |
 |----------|---------|
+| [PRODUCT_VISION.md](./PRODUCT_VISION.md) | **North star** — AI Business OS, finished-product rule, hubs & phases |
 | [../MASTER_PROJECT_DOCUMENTATION.md](../MASTER_PROJECT_DOCUMENTATION.md) | Full system reference (all features, flows, DB, AI, APIs) |
 | [PROJECT_AUDIT.md](./PROJECT_AUDIT.md) | Phase 1 complete audit |
-| [PROJECT_MASTER_BLUEPRINT.md](./PROJECT_MASTER_BLUEPRINT.md) | Architecture & product map |
+| [PROJECT_MASTER_BLUEPRINT.md](./PROJECT_MASTER_BLUEPRINT.md) | Architecture & current product map |
 | [AI_DEVELOPMENT_CONSTITUTION.md](./AI_DEVELOPMENT_CONSTITUTION.md) | Rules for humans/agents |
 | [PROJECT_STATUS.md](./PROJECT_STATUS.md) | Living status board |
 | [TASK_QUEUE.md](./TASK_QUEUE.md) | Prioritized tasks |
-| [DECISIONS_LOG.md](./DECISIONS_LOG.md) | Architecture/product decisions |
-| [ROADMAP.md](./ROADMAP.md) | Phased implementation plan |
+| [DECISIONS_LOG.md](./DECISIONS_LOG.md) | Architecture/product decisions (incl. D-015) |
+| [ROADMAP.md](./ROADMAP.md) | Product phases + engineering execution track |
 | [FINAL_REVIEW.md](./FINAL_REVIEW.md) | Docs validation summary |
 | [AUTONOMOUS_EXECUTION.md](./AUTONOMOUS_EXECUTION.md) | Agent loop: explain → implement → test → commit → continue |
 | [HISTORICAL_REPORTS.md](./HISTORICAL_REPORTS.md) | Index of root phase `*_REPORT.md` files (read-only) |
@@ -21,7 +22,7 @@ Living documentation for the **existing** Trend Business AI project.
 
 **How to use**
 
-- **Day-to-day planning / agents:** start with `PROJECT_MASTER_BLUEPRINT.md` + `TASK_QUEUE.md` + `DECISIONS_LOG.md`.  
+- **Day-to-day planning / agents:** start with `PRODUCT_VISION.md` + `PROJECT_MASTER_BLUEPRINT.md` + `TASK_QUEUE.md` + `DECISIONS_LOG.md`.  
 - **Autonomous execution:** follow `AUTONOMOUS_EXECUTION.md` + next Pending task in `TASK_QUEUE.md`.  
 - **Deep onboarding / full inventory:** read `MASTER_PROJECT_DOCUMENTATION.md`.  
 - **Historical phase reports:** see `HISTORICAL_REPORTS.md` (do not use as the active plan).  

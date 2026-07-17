@@ -1,17 +1,18 @@
 # Trend Business AI — AI Development Constitution
 
 **Purpose:** Binding rules for humans and AI agents working on Trend Business AI.  
-**Based on:** `docs/PROJECT_AUDIT.md`, `docs/PROJECT_MASTER_BLUEPRINT.md`  
+**Based on:** `docs/PRODUCT_VISION.md`, `docs/PROJECT_AUDIT.md`, `docs/PROJECT_MASTER_BLUEPRINT.md`  
 **Last updated:** 2026-07-17  
 
 ---
 
 ## Article I — Project Continuity
 
-1. This is an **existing** project named **Trend Business AI**.  
+1. This is an **existing** project named **Trend Business AI** — an **AI Business Operating System**.  
 2. **Do not** create a replacement app or parallel architecture.  
 3. **Do not** remove working features without an entry in `DECISIONS_LOG.md` and explicit approval.  
-4. Prefer **surgical fixes** over large rewrites.
+4. Prefer **surgical fixes** over large rewrites.  
+5. Follow `PRODUCT_VISION.md` + D-015: customers receive **finished usable products**, not code dumps.
 
 ---
 
@@ -33,12 +34,14 @@
 
 ---
 
-## Article IV — Product Honesty
+## Article IV — Product Honesty & Finished-Product Bar
 
-1. Website Builder currently delivers **source files + ZIP**, not a hosted live site.  
-2. Do not add marketing or UI that claims a live ready-to-use website unless preview/deploy is actually shipped.  
-3. Live Preview remains **off** until a **safe** approach is approved (`DECISIONS_LOG.md`).  
-4. Hide or disable placeholder providers (Gemini/Grok/Llama) in user-facing production paths until implemented.
+1. **North star (D-015):** Trend Business AI is **not** a customer-facing code generator. Every service must aim for a complete usable result (use / export / publish) and a full UX.  
+2. **Current delivery (D-003):** Website Builder ships complete projects via **ZIP export** until preview/publish are Accepted and built. Export is allowed; unfinished trees and fake “live site” CTAs are not.  
+3. Do not market a hosted live website or Live Preview unless the capability actually ships.  
+4. Live Preview remains **off** until a **safe** approach is approved (`DECISIONS_LOG.md` — D-004 / F01).  
+5. Hide or disable placeholder providers (Gemini/Grok/Llama) in user-facing production paths until implemented.  
+6. No demo pages, fake buttons, or unfinished features presented as complete.
 
 ---
 

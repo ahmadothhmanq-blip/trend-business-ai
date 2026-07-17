@@ -1,26 +1,33 @@
 # Trend Business AI — Project Master Blueprint
 
 **Role:** Single architectural map of the **current** Trend Business AI project.  
-**Source of truth chain:** `PROJECT_AUDIT.md` → this blueprint → `TASK_QUEUE.md` / `ROADMAP.md`  
-**Last updated:** 2026-07-17 (docs review pass)  
-**Code baseline:** Working tree on branch `main` (local may differ from remote HEAD `fa44510` — see §10)  
-**Rule:** Extend this project. Do not replace the architecture. Do not invent unrelated products.
+**Source of truth chain:** `PRODUCT_VISION.md` (north star) → `PROJECT_AUDIT.md` → this blueprint → `TASK_QUEUE.md` / `ROADMAP.md`  
+**Last updated:** 2026-07-17 (product vision accepted)  
+**Code baseline:** Feature branch `cursor/docs-ssot-audit-plan` ahead of remote `main` (see §10 / D-011)  
+**Rule:** Extend this project. Do not replace the architecture. Ship finished products (D-015), not code dumps.
 
 ---
 
-## 1. Product Definition (Current Reality)
+## 1. Product Definition
 
-**Trend Business AI** is an authenticated multi-product SaaS that:
+### 1.1 North star (`PRODUCT_VISION.md`, D-015)
+
+**Trend Business AI** is an **AI Business Operating System**: create, automate, manage, and grow a business from one place.  
+Customers must receive **complete usable products** (preview / AI edit / export or publish) — not generator UX that stops at source files.
+
+### 1.2 Current reality (honest)
+
+Authenticated multi-product SaaS that:
 
 - Markets Create / Design / Content / Business AI tools  
 - Authenticates users via Supabase  
-- Generates **AI project artifacts** (primarily source files / blueprints) via DeepSeek (default)  
-- Saves generations to Supabase and allows **Download ZIP**  
+- Generates website/app/landing artifacts via DeepSeek (default) + ProviderManager  
+- Saves generations to Supabase and delivers **Download ZIP** (primary Website Builder channel today)  
 - Provides platform ops: billing UI, team, usage, SEO, AI Search, Growth  
 
-**It is not (yet):** a hosted website publisher that gives customers a live URL with zero deploy steps.
+**Not yet shipped:** safe Live Preview, one-click publish/hosted live URL (D-004, D-010).
 
-**Primary Website Builder deliverable today:** source-code project + ZIP export.
+**Primary Website Builder deliverable today:** complete site project + ZIP export (interim channel under D-003; north star remains finished-product UX).
 
 ---
 

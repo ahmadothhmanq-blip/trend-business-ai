@@ -81,6 +81,7 @@
 | C16 | H06 Website Builder smoke | Completed (partial) | Generate+ZIP PASS; cookie-auth HTTP path blocked by email confirm / env |
 | C17 | H07 Live Preview honesty (Download/ZIP messaging) | Completed | UI copy only; preview stays off |
 | C18 | H08 preview builder production hard-disable | Completed | Env policy + code guard until F01 |
+| C19 | Accept product vision SSOT (`PRODUCT_VISION.md`, D-015) | Completed | Finished-product north star; hubs + P1–P4; ZIP remains interim delivery (D-003) |
 
 ---
 
@@ -111,11 +112,13 @@
 
 ## Execution order (autonomous)
 
+**Lens:** `PRODUCT_VISION.md` / D-015 — prefer Website Builder finished-product gaps over new hub sprawl. Preview/publish stay hard-gated (F01/F09).
+
 1. ~~H01~~ … ~~H08~~ (Phase 2 High complete aside from merge/ops follow-ups)  
 2. ~~M01~~ → ~~M02~~ → ~~M03~~ → ~~M04~~ → ~~M05~~ (clarity + generation UX)  
 3. Re-run H06 with confirmed test user when email confirm / full anon JWT available  
 4. Then remaining Medium/Low per `AUTONOMOUS_EXECUTION.md` hard gates  
-5. Future/`F*` only after `DECISIONS_LOG.md` Accepted entry  
+5. Future/`F*` (esp. F01/F02/F09 for P1 preview/publish) only after `DECISIONS_LOG.md` Accepted entry  
 
 ---
 

@@ -2,7 +2,7 @@
 
 **Purpose:** Record product and architecture decisions so agents do not re-litigate them.  
 **Rule:** New decisions require a dated entry. Supersede old entries explicitly.  
-**Last updated:** 2026-07-17  
+**Last updated:** 2026-07-17 (D-015 product vision)  
 
 ---
 
@@ -39,16 +39,29 @@
 
 ---
 
-## D-003 — Website Builder delivers code projects (ZIP), not hosted sites
+## D-003 — Website Builder current delivery is ZIP export (not hosted live URL)
 
 | Field | Value |
 |-------|--------|
 | Date | 2026-07-17 |
-| Status | **Accepted** (current product truth) |
+| Status | **Accepted** (current delivery mechanism; refined by D-015) |
 | Context | Customer tests showed files + Download ZIP; no live URL |
-| Decision | Treat Website Builder as an **AI source-project generator** until a separate decision ships preview/deploy/hosted mode. |
-| Consequences | UI/marketing must not claim a ready hosted website without implementation. **M01 (done):** marketing/SEO/registry/tool copy aligned to ZIP + self-host delivery. |
-| Related | Tasks M01 (done), H07, F01, F02, F09 |
+| Decision | Until preview/publish ship, Website Builder **delivers via ZIP/export**. Do not claim a hosted live URL. ZIP is a **delivery channel for a complete site project**, not permission to ship unfinished code dumps as the product. |
+| Consequences | UI/marketing must not claim a ready hosted website without implementation. **M01 (done):** marketing/SEO/registry/tool copy aligned to ZIP + self-host delivery. Product north star remains finished-product UX (D-015). |
+| Related | D-015, Tasks M01 (done), H07, F01, F02, F09 |
+
+---
+
+## D-015 — Critical product rule: finished products, not code generators
+
+| Field | Value |
+|-------|--------|
+| Date | 2026-07-17 |
+| Status | **Accepted** |
+| Context | Product vision: Trend Business AI is an AI Business Operating System |
+| Decision | The platform is **not** a code generator for customers. AI may use code internally; every service must deliver a **real, professional, usable result** (use / export / publish) with a complete UX. See `PRODUCT_VISION.md`. |
+| Consequences | New features judged against finished-product bar. Placeholder/demo/fake CTAs forbidden. Website Builder path: create → preview → AI edit → export/publish; export-only is interim honesty (D-003), not the end state. Preview/hosted still require Accepted F01/F09. |
+| Related | `PRODUCT_VISION.md`, D-003, D-004, D-010, Constitution Art. IV |
 
 ---
 

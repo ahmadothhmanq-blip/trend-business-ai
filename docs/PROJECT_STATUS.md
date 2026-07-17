@@ -13,7 +13,8 @@
 | Field | Value |
 |-------|--------|
 | Overall | **Beta / pre-production** |
-| Product type today | Multi-AI SaaS + **code project** generator |
+| Product north star | AI Business OS — **finished products** (D-015 / `PRODUCT_VISION.md`) |
+| Product type today | Multi-AI SaaS; Website Builder delivers via **ZIP export** (interim) |
 | Hosted live websites | **Not delivered** |
 | Live Preview | **Off** — H07 UI honesty + **H08** production hard-disable of preview builder |
 | Default AI | DeepSeek (real) |
