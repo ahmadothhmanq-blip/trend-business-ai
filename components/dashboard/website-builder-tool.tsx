@@ -42,8 +42,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { GeneratedProjectFile, GeneratedWebsiteProject } from "@/lib/website-generator";
+import { extractStaticPreviewHtml } from "@/lib/website/build-static-preview";
 import type { ProductDefinition } from "@/lib/products/types";
-import type { WebsiteGeneration } from "@/types/database";
+import type { GenerationMode, PromptVersion, WebsiteGeneration } from "@/types/database";
 import { cn } from "@/lib/utils";
 
 type WebsiteBuilderToolProps = {
@@ -64,6 +65,10 @@ type WorkspaceProject = {
   description: string;
   generatedProject?: GeneratedWebsiteProject;
   build?: PreviewBuildState;
+  mode?: GenerationMode;
+  parentGenerationId?: string | null;
+  projectId?: string | null;
+  promptVersions?: PromptVersion[];
 };
 
 type PreviewBuildState = {
@@ -174,6 +179,10 @@ function toProject(generation: WebsiteGeneration): WorkspaceProject {
     description: generation.business_description,
     generatedProject,
     build: { status: "idle" },
+    mode: generation.mode,
+    parentGenerationId: generation.parent_generation_id,
+    projectId: generation.project_id,
+    promptVersions: generation.prompt_versions,
   };
 }
 
@@ -207,6 +216,7 @@ export function WebsiteBuilderTool({
   const [apiError, setApiError] = useState<string | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [streamStatus, setStreamStatus] = useState<string | null>(null);
+  const [editMode, setEditMode] = useState(false);
   const [selectedFilePath, setSelectedFilePath] = useState<string>("");
   const [outputTab, setOutputTab] = useState<"preview" | "code">("preview");
   const [fileSearch, setFileSearch] = useState("");
@@ -374,19 +384,31 @@ export function WebsiteBuilderTool({
     regenerate?: boolean;
     continue?: boolean;
   }) {
+    const mode = options?.continue
+      ? "continue"
+      : options?.regenerate
+        ? "regenerate"
+        : "generate";
+
+    if (mode === "continue") {
+      if (!activeProject?.id) {
+        toast.error("Select a saved website first.");
+        return;
+      }
+      if (!projectBrief.trim()) {
+        toast.error("Describe the changes you want in natural language.");
+        setEditMode(true);
+        return;
+      }
+    }
+
     const brief =
       projectBrief.trim() ||
-      (options?.regenerate || options?.continue
-        ? activeProject?.description.trim()
-        : "") ||
+      (mode === "regenerate" ? activeProject?.description.trim() : "") ||
       productTemplates[0] ||
-      "I need a luxury real estate web application with booking system, authentication and admin dashboard.";
+      "I need a luxury real estate website with booking, clear services pages, and a premium brand look.";
 
-    if (
-      (options?.regenerate || options?.continue) &&
-      !projectBrief.trim() &&
-      activeProject?.description
-    ) {
+    if (mode === "regenerate" && !projectBrief.trim() && activeProject?.description) {
       setProjectBrief(activeProject.description);
     }
 
@@ -394,51 +416,41 @@ export function WebsiteBuilderTool({
     setApiError(null);
     setStreamStatus("Connecting to AI website engine...");
 
-    const mode = options?.continue
-      ? "continue"
-      : options?.regenerate
-        ? "regenerate"
-        : "generate";
-
     const requestBody = {
-      prompt: brief,
+      prompt: mode === "continue" ? activeProject?.description || brief : brief,
       projectType,
       language,
       theme: `${colorTheme} ${designStyle}`,
       features: [...features, ...(product?.id ? [`product:${product.id}`] : [])],
-      productId: product?.id,
+      productId: product?.id ?? "website-builder",
+      projectId: activeProject?.projectId ?? undefined,
       mode,
       parentGenerationId:
         mode === "generate" ? undefined : activeProject?.id,
       continueInstruction:
-        mode === "continue" ? projectBrief.trim() || undefined : undefined,
+        mode === "continue" ? projectBrief.trim() : undefined,
     };
 
     const applySavedGeneration = (
       generatedProject: GeneratedWebsiteProject,
       generation: WebsiteGeneration,
     ) => {
-      const nextProject: WorkspaceProject = {
-        id: generation.id,
-        title: generatedProject.title || `${projectType} Concept`,
-        type: generation.website_type,
-        style: designStyle,
-        theme: colorTheme,
-        language,
-        features,
-        createdAt: formatGenerationDate(generation.created_at),
-        favorite: false,
-        description: generatedProject.description || brief,
-        generatedProject,
-        build: { status: "idle" },
-      };
+      const nextProject = toProject({
+        ...generation,
+        blueprint: generatedProject as unknown as WebsiteGeneration["blueprint"],
+      });
 
       setActiveProject(nextProject);
-      setSelectedFilePath(generatedProject.files[0]?.path ?? "");
-      setOutputTab("code");
-      setProjects((items) => [nextProject, ...items].slice(0, 8));
-      setStreamStatus("Project saved.");
-      toast.success("Project generated and saved to your workspace.");
+      setSelectedFilePath(
+        generatedProject.files.find((f) => f.path.includes("preview/"))?.path ||
+          generatedProject.files[0]?.path ||
+          "",
+      );
+      setOutputTab("preview");
+      setEditMode(false);
+      setProjects((items) => [nextProject, ...items.filter((p) => p.id !== nextProject.id)].slice(0, 24));
+      setStreamStatus("Website saved to workspace.");
+      toast.success("Website created and saved. Review the preview, then improve with AI.");
     };
 
     try {
@@ -773,18 +785,31 @@ export function WebsiteBuilderTool({
           <DashboardPanel>
             <SectionHeader
               icon={Wand2}
-              title="Project Input"
-              description="Describe the product, audience, features and visual direction."
+              title={editMode ? "Improve with AI" : "Website brief"}
+              description={
+                editMode
+                  ? "Describe changes in natural language — colors, pages, content, or design. AI creates an improved version linked to the previous one."
+                  : "Describe the business, pages, design, and content you want. AI creates a complete website product you can preview and refine."
+              }
             />
+            {editMode && activeProject ? (
+              <div className="mt-4 rounded-2xl border border-premium-gold/25 bg-premium-gold/10 px-4 py-3 text-sm text-premium-gold-light">
+                Editing <span className="font-semibold text-white">{activeProject.title}</span>.
+                Previous version stays in history. Example: “Change colors to navy and gold, add a Pricing page, tighten the hero copy.”
+              </div>
+            ) : null}
             <Textarea
               value={projectBrief}
               onChange={(event) => setProjectBrief(event.target.value)}
               placeholder={
-                product?.promptPlaceholder ??
-                'Describe your project...\n\nExample: "I need a luxury real estate web application with booking system, authentication and admin dashboard."'
+                editMode
+                  ? 'Example: "Make the hero more luxury, switch palette to black and gold, add a Testimonials page, and shorten the About copy."'
+                  : product?.promptPlaceholder ??
+                    'Describe your website...\n\nExample: "Luxury real estate site with listings, booking, and premium brand look."'
               }
               className="mt-5 min-h-[190px] rounded-3xl border-white/[0.08] bg-black/25 p-5 text-[15px] leading-relaxed text-white placeholder:text-white/30 focus-visible:border-premium-gold/35 focus-visible:ring-premium-gold/15"
             />
+            {!editMode ? (
             <div className="mt-5">
               <p className="mb-2 text-[12px] font-semibold tracking-wide text-white/45 uppercase">
                 Templates
@@ -807,6 +832,7 @@ export function WebsiteBuilderTool({
                 ))}
               </div>
             </div>
+            ) : null}
             {apiError && (
               <p
                 role="alert"
@@ -949,21 +975,59 @@ export function WebsiteBuilderTool({
           )}
 
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {editMode ? (
+            <>
+              <Button
+                type="button"
+                onClick={() => void createInterfaceProject({ continue: true })}
+                disabled={isGenerating || !activeProject?.id}
+                className="btn-gold h-14 w-full rounded-2xl text-base font-bold text-luxury-black shadow-[0_18px_60px_rgb(212_175_55/0.18)] sm:col-span-2"
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="size-5 animate-spin" />
+                    Improving...
+                  </>
+                ) : (
+                  <>
+                    <Wand2 className="size-5" />
+                    Improve with AI
+                  </>
+                )}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setEditMode(false);
+                  setProjectBrief("");
+                }}
+                disabled={isGenerating}
+                className="btn-ghost-gold h-14 w-full rounded-2xl text-base font-semibold"
+              >
+                Cancel edit
+              </Button>
+            </>
+          ) : (
+            <>
           <Button
             type="button"
-            onClick={() => void createInterfaceProject()}
+            onClick={() => {
+              setEditMode(false);
+              void createInterfaceProject();
+            }}
             disabled={isGenerating}
             className="btn-gold h-14 w-full rounded-2xl text-base font-bold text-luxury-black shadow-[0_18px_60px_rgb(212_175_55/0.18)]"
           >
             {isGenerating ? (
               <>
                 <Loader2 className="size-5 animate-spin" />
-                Generating...
+                Creating...
               </>
             ) : (
               <>
                 <Sparkles className="size-5" />
-                {product?.generateLabel ?? "Generate Website"}
+                {product?.generateLabel ?? "Create Website"}
               </>
             )}
           </Button>
@@ -974,6 +1038,7 @@ export function WebsiteBuilderTool({
               if (activeProject?.description && !projectBrief.trim()) {
                 setProjectBrief(activeProject.description);
               }
+              setEditMode(false);
               void createInterfaceProject({ regenerate: true });
             }}
             disabled={isGenerating || !activeProject?.id}
@@ -986,12 +1051,13 @@ export function WebsiteBuilderTool({
             type="button"
             variant="outline"
             onClick={() => {
-              if (!projectBrief.trim() && activeProject?.description) {
-                setProjectBrief(
-                  `Improve the existing project: ${activeProject.description}`,
-                );
+              if (!activeProject?.id) {
+                toast.error("Create or select a website first.");
+                return;
               }
-              void createInterfaceProject({ continue: true });
+              setEditMode(true);
+              setProjectBrief("");
+              toast.message("Describe your changes, then click Improve with AI.");
             }}
             disabled={isGenerating || !activeProject?.id}
             className="btn-ghost-gold h-14 w-full rounded-2xl text-base font-semibold sm:col-span-2 lg:col-span-1"
@@ -999,6 +1065,8 @@ export function WebsiteBuilderTool({
             <Wand2 className="size-5" />
             Improve with AI
           </Button>
+            </>
+          )}
           </div>
         </div>
 
@@ -1017,13 +1085,23 @@ export function WebsiteBuilderTool({
             onOpenPreview={openPreviewInNewTab}
           />
         ) : (
-          <ProjectExportPanel activeProject={activeProject} onDownload={downloadProject} />
+          <PreviewAndExportPanel
+            activeProject={activeProject}
+            onDownload={downloadProject}
+            onImprove={() => {
+              if (!activeProject?.id) return;
+              setEditMode(true);
+              setProjectBrief("");
+              toast.message("Describe your changes, then click Improve with AI.");
+            }}
+          />
         )}
       </div>
 
       <OutputWorkspace
         activeProject={activeProject}
         outputTab={outputTab}
+        onOutputTabChange={setOutputTab}
         previewEnabled={LIVE_PREVIEW_ENABLED}
         files={activeFiles}
         selectedFile={activeFile}
@@ -1032,7 +1110,11 @@ export function WebsiteBuilderTool({
         fileSearch={fileSearch}
         onFileSearch={setFileSearch}
         projects={projects}
-        onSelectProject={selectProject}
+        onSelectProject={(project) => {
+          setEditMode(false);
+          selectProject(project);
+          setOutputTab("preview");
+        }}
         onDownload={downloadProject}
         onCopy={copyActiveFile}
         onRename={() => {
@@ -1185,42 +1267,74 @@ function ThemeButton({
   );
 }
 
-/** Honest export panel while Live Preview stays off (D-003 / D-004 / H07). */
-function ProjectExportPanel({
+/** Product preview + export (safe static preview; compile Live Preview stays off — D-004). */
+function PreviewAndExportPanel({
   activeProject,
   onDownload,
+  onImprove,
 }: {
   activeProject: WorkspaceProject | null;
   onDownload: (project?: WorkspaceProject | null) => void;
+  onImprove: () => void;
 }) {
-  const fileCount = activeProject?.generatedProject?.files.length ?? 0;
+  const generated = activeProject?.generatedProject;
+  const fileCount = generated?.files.length ?? 0;
+  const previewHtml = generated
+    ? extractStaticPreviewHtml(generated.files, {
+        title: generated.title || activeProject?.title,
+        description: generated.description || activeProject?.description,
+        pages: generated.pages,
+        sections: generated.sections,
+        colorPalette: generated.colorPalette,
+        typography: generated.typography,
+        content: generated.content,
+        components: generated.components,
+      })
+    : "";
 
   return (
     <aside className="space-y-6 xl:sticky xl:top-28 xl:self-start">
-      <DashboardPanel gold>
+      <DashboardPanel gold className="overflow-hidden">
         <div className="flex items-center gap-3">
-          <DashboardIconBox icon={Download} />
+          <DashboardIconBox icon={MonitorSmartphone} />
           <div>
-            <h3 className="font-bold text-white">Download project</h3>
+            <h3 className="font-bold text-white">Website preview</h3>
             <p className="text-[13px] text-white/40">
-              AI generates source files you can download as a ZIP and run locally.
+              Visual product preview of pages, design, and content.
             </p>
           </div>
         </div>
-        <div className="mt-6 rounded-3xl border border-dashed border-premium-gold/20 bg-black/20 p-6 text-center">
-          <Download className="mx-auto size-12 text-premium-gold" />
-          <p className="mt-4 text-lg font-bold text-white">
-            {activeProject ? "Your project is ready to download" : "Generate a project to export"}
-          </p>
-          <p className="mt-2 text-sm leading-relaxed text-white/45">
-            This tool delivers a downloadable Next.js code project — not a hosted live website.
-            After download, run <span className="text-white/70">npm install</span> and{" "}
-            <span className="text-white/70">npm run dev</span> on your machine, or deploy the
-            files to your own hosting.
-          </p>
+        <div className="mt-5 overflow-hidden rounded-2xl border border-white/10 bg-black/40">
+          {previewHtml ? (
+            <iframe
+              title="Website product preview"
+              sandbox=""
+              srcDoc={previewHtml}
+              className="h-[420px] w-full bg-black"
+            />
+          ) : (
+            <div className="flex h-[280px] flex-col items-center justify-center gap-3 px-6 text-center">
+              <Globe2 className="size-10 text-premium-gold/50" />
+              <p className="text-sm text-white/50">
+                Create a website to see an interactive product preview here.
+              </p>
+            </div>
+          )}
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
           <Button
             type="button"
-            className="btn-gold mt-6 h-11 rounded-xl px-5 font-bold text-luxury-black"
+            variant="outline"
+            className="btn-ghost-gold h-10 rounded-xl"
+            onClick={onImprove}
+            disabled={!activeProject}
+          >
+            <Wand2 className="size-4" />
+            Improve with AI
+          </Button>
+          <Button
+            type="button"
+            className="btn-gold h-10 rounded-xl font-bold text-luxury-black"
             onClick={() => onDownload(activeProject)}
             disabled={!activeProject}
           >
@@ -1228,25 +1342,26 @@ function ProjectExportPanel({
             Download ZIP
           </Button>
         </div>
+        <p className="mt-3 text-[11px] leading-relaxed text-white/40">
+          Preview shows the marketing layout of your website product. ZIP exports the full Next.js
+          project for local run or your own hosting (not a hosted live URL yet).
+        </p>
       </DashboardPanel>
 
       <DashboardPanel>
         <SectionHeader
           icon={FileStack}
-          title="Project Summary"
-          description="Saved generated project details."
+          title="Workspace version"
+          description="Saved website versions stay linked for AI iteration."
         />
         <div className="mt-5 space-y-3">
-          <InfoTile label="Project" value={activeProject?.title ?? "Not generated yet"} />
-          <InfoTile label="Type" value={activeProject?.type ?? "Auto-detected"} />
+          <InfoTile label="Website" value={activeProject?.title ?? "Not created yet"} />
+          <InfoTile label="Type" value={activeProject?.type ?? "—"} />
+          <InfoTile label="Mode" value={activeProject?.mode ?? "generate"} />
           <InfoTile label="Files" value={String(fileCount)} />
           <InfoTile
-            label="Delivery"
-            value={activeProject ? "Source code (ZIP)" : "Generate project first"}
-          />
-          <InfoTile
-            label="Primary action"
-            value={activeProject ? "Download ZIP" : "Generate project"}
+            label="Workspace project"
+            value={activeProject?.projectId ? "Linked" : "Will link on save"}
           />
         </div>
       </DashboardPanel>
@@ -1495,6 +1610,7 @@ function InfoTile({ label, value }: { label: string; value: string }) {
 function OutputWorkspace({
   activeProject,
   outputTab,
+  onOutputTabChange,
   previewEnabled,
   files,
   selectedFile,
@@ -1514,6 +1630,7 @@ function OutputWorkspace({
 }: {
   activeProject: WorkspaceProject | null;
   outputTab: "preview" | "code";
+  onOutputTabChange: (tab: "preview" | "code") => void;
   previewEnabled: boolean;
   files: GeneratedProjectFile[];
   selectedFile: GeneratedProjectFile | null;
@@ -1535,6 +1652,19 @@ function OutputWorkspace({
     file.path.toLowerCase().includes(fileSearch.toLowerCase()),
   );
   const openTabs = files.slice(0, 5);
+  const generated = activeProject?.generatedProject;
+  const staticPreviewHtml = generated
+    ? extractStaticPreviewHtml(generated.files, {
+        title: generated.title || activeProject?.title,
+        description: generated.description || activeProject?.description,
+        pages: generated.pages,
+        sections: generated.sections,
+        colorPalette: generated.colorPalette,
+        typography: generated.typography,
+        content: generated.content,
+        components: generated.components,
+      })
+    : "";
 
   return (
     <DashboardPanel className="overflow-hidden p-0">
@@ -1547,6 +1677,32 @@ function OutputWorkspace({
         onDelete={onDelete}
         onFavorite={onFavorite}
       />
+      <div className="flex items-center gap-2 border-b border-white/[0.08] px-4 py-2">
+        <button
+          type="button"
+          onClick={() => onOutputTabChange("preview")}
+          className={cn(
+            "rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors",
+            outputTab === "preview"
+              ? "bg-premium-gold/15 text-premium-gold-light"
+              : "text-white/45 hover:text-white/75",
+          )}
+        >
+          Preview
+        </button>
+        <button
+          type="button"
+          onClick={() => onOutputTabChange("code")}
+          className={cn(
+            "rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors",
+            outputTab === "code"
+              ? "bg-premium-gold/15 text-premium-gold-light"
+              : "text-white/45 hover:text-white/75",
+          )}
+        >
+          Source files
+        </button>
+      </div>
       <div className="grid min-h-[760px] lg:grid-cols-[290px_minmax(0,1fr)_330px]">
         <ProjectLeftSidebar
           activeProject={activeProject}
@@ -1560,12 +1716,26 @@ function OutputWorkspace({
           onSelectProject={onSelectProject}
         />
         <div className="min-w-0 border-x border-white/[0.08] bg-[#050505]">
-          {previewEnabled && outputTab === "preview" ? (
-            <GeneratedPreviewWorkspace
-              activeProject={activeProject}
-              onRefreshPreview={onRefreshPreview}
-              onOpenPreview={onOpenPreview}
-            />
+          {outputTab === "preview" ? (
+            previewEnabled ? (
+              <GeneratedPreviewWorkspace
+                activeProject={activeProject}
+                onRefreshPreview={onRefreshPreview}
+                onOpenPreview={onOpenPreview}
+              />
+            ) : staticPreviewHtml ? (
+              <iframe
+                title="Website product preview"
+                sandbox=""
+                srcDoc={staticPreviewHtml}
+                className="h-full min-h-[720px] w-full bg-black"
+              />
+            ) : (
+              <div className="flex h-full min-h-[720px] flex-col items-center justify-center gap-3 text-center text-white/45">
+                <MonitorSmartphone className="size-10 text-premium-gold/40" />
+                <p>Create a website to open the product preview.</p>
+              </div>
+            )
           ) : (
             <CodeEditorWorkspace
               files={files}
@@ -1741,8 +1911,18 @@ function ProjectLeftSidebar({
                   : "border-white/[0.08] bg-white/[0.02] hover:border-premium-gold/20",
               )}
             >
-              <p className="truncate text-sm font-semibold text-white">{project.title}</p>
-              <p className="mt-1 text-[11px] text-white/35">{project.createdAt}</p>
+              <div className="flex items-start justify-between gap-2">
+                <p className="truncate text-sm font-semibold text-white">{project.title}</p>
+                {project.mode && project.mode !== "generate" ? (
+                  <span className="shrink-0 rounded-full border border-premium-gold/25 bg-premium-gold/10 px-2 py-0.5 text-[10px] text-premium-gold-light">
+                    {project.mode}
+                  </span>
+                ) : null}
+              </div>
+              <p className="mt-1 text-[11px] text-white/35">
+                {project.createdAt}
+                {project.parentGenerationId ? " · linked version" : ""}
+              </p>
             </button>
           ))}
         </div>

@@ -20,7 +20,7 @@ export const PRODUCT_DEFINITIONS: Record<ProductId, ProductDefinition> = {
     title: "AI Website Builder",
     eyebrow: "Create",
     description:
-      "Generate Next.js website source files, page structure, and a downloadable ZIP — not a hosted live site.",
+      "Describe your idea — AI builds a complete website product with pages, design, content, preview, and natural-language improvements. Export the full project as ZIP when ready.",
     icon: Globe2,
     href: "/dashboard/website-builder",
     kind: "website",
@@ -28,7 +28,7 @@ export const PRODUCT_DEFINITIONS: Record<ProductId, ProductDefinition> = {
     promptLabel: "Website brief",
     promptPlaceholder:
       "Describe the business, audience, pages, features, and the premium look you want for the website.",
-    generateLabel: "Generate Website Project",
+    generateLabel: "Create Website",
     templates: [
       "Luxury real estate marketplace",
       "Premium SaaS marketing site",
@@ -36,13 +36,13 @@ export const PRODUCT_DEFINITIONS: Record<ProductId, ProductDefinition> = {
       "Restaurant ordering platform",
       "Executive portfolio website",
     ],
-    outputs: ["Sitemap", "Page copy", "Component plan", "File blueprint", "Export ZIP"],
+    outputs: ["Pages", "Design", "Content", "Live preview", "AI edits", "Export ZIP"],
     settingsHints: ["Project type", "Design style", "Color theme", "Language", "Features"],
     metrics: [
-      { label: "Pages", value: "7+" },
+      { label: "Pages", value: "MVP" },
+      { label: "Preview", value: "Visual" },
+      { label: "Edit", value: "AI" },
       { label: "Export", value: "ZIP" },
-      { label: "Preview", value: "Code" },
-      { label: "Quality", value: "Pro" },
     ],
   },
   "landing-page-builder": {

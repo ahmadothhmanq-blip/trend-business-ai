@@ -83,6 +83,7 @@
 | C18 | H08 preview builder production hard-disable | Completed | Env policy + code guard until F01 |
 | C19 | Accept product vision SSOT (`PRODUCT_VISION.md`, D-015) | Completed | Finished-product north star; hubs + P1–P4; ZIP remains interim delivery (D-003) |
 | C20 | D-016 post-generation NL AI editing across AI products | Completed | Shared `lib/ai/iteration.ts`; dedicated builders + workspace/website Improve with AI |
+| C21 | Website Builder Phase 1 product pieces (preview + versions + NL edit UX) | Completed | Safe static preview, workspace `projects` link, prompt version chain; report in `WEBSITE_BUILDER_PHASE1_REPORT.md` |
 
 ---
 

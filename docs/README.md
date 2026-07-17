@@ -19,6 +19,7 @@ Living documentation for the **existing** Trend Business AI project.
 | [HISTORICAL_REPORTS.md](./HISTORICAL_REPORTS.md) | Index of root phase `*_REPORT.md` files (read-only) |
 | [PERFORMANCE_BUDGETS.md](./PERFORMANCE_BUDGETS.md) | Dashboard bundle budgets (advisory / warn-only) |
 | [PRODUCTION_CLEANUP_REPORT.md](./PRODUCTION_CLEANUP_REPORT.md) | Latest production cleanup results |
+| [WEBSITE_BUILDER_PHASE1_REPORT.md](./WEBSITE_BUILDER_PHASE1_REPORT.md) | Website Builder Phase 1 product gaps completed / remaining |
 
 **How to use**
 
