@@ -79,7 +79,7 @@ export async function WebsiteProductPage({ productId }: { productId: ProductId }
       />
       <main className="flex-1 p-4 sm:p-6 lg:p-8 xl:p-10">
         <WebsiteBuilderToolLazy
-          product={product}
+          productId={productId}
           initialGenerations={initialGenerations}
         />
       </main>

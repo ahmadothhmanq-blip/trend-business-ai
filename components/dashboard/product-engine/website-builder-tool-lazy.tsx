@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import type { ProductDefinition } from "@/lib/products/types";
+import type { ProductId } from "@/lib/products/types";
 import type { WebsiteGeneration } from "@/types/database";
 
 const WebsiteBuilderTool = dynamic(
@@ -18,13 +18,16 @@ const WebsiteBuilderTool = dynamic(
 );
 
 export function WebsiteBuilderToolLazy({
-  product,
+  productId,
   initialGenerations,
 }: {
-  product: ProductDefinition;
+  productId: ProductId;
   initialGenerations: WebsiteGeneration[];
 }) {
   return (
-    <WebsiteBuilderTool product={product} initialGenerations={initialGenerations} />
+    <WebsiteBuilderTool
+      productId={productId}
+      initialGenerations={initialGenerations}
+    />
   );
 }

@@ -44,11 +44,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { GeneratedProjectFile, GeneratedWebsiteProject } from "@/lib/website-generator";
-import type { ProductDefinition } from "@/lib/products/types";
+import { getProductDefinition } from "@/lib/products/registry";
+import type { ProductDefinition, ProductId } from "@/lib/products/types";
 import type { GenerationMode, PromptVersion, WebsiteGeneration } from "@/types/database";
 import { cn } from "@/lib/utils";
 
 type WebsiteBuilderToolProps = {
+  /** Prefer productId — ProductDefinition.icon is a function and cannot cross the RSC boundary. */
+  productId?: ProductId;
   product?: ProductDefinition;
   initialGenerations?: WebsiteGeneration[];
 };
@@ -198,9 +201,13 @@ function resolveInitialProjectType(
 }
 
 export function WebsiteBuilderTool({
-  product,
+  productId,
+  product: productProp,
   initialGenerations = [],
 }: WebsiteBuilderToolProps) {
+  const product =
+    productProp ??
+    (productId ? getProductDefinition(productId) : undefined);
   const productTemplates = product?.templates?.length
     ? product.templates
     : [...TEMPLATES];
