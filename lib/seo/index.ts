@@ -24,6 +24,7 @@ export * from "@/lib/seo/knowledge";
 export * from "@/lib/seo/programmatic";
 export * from "@/lib/seo/industries";
 export * from "@/lib/seo/countries";
+export * from "@/lib/seo/cities";
 export * from "@/lib/seo/dynamic-engine";
 export * from "@/lib/seo/breadcrumbs";
 export * from "@/lib/seo/analyzer";

@@ -228,6 +228,34 @@ export function howToJsonLd(input: {
   });
 }
 
+export function reviewJsonLd(input: {
+  itemName: string;
+  itemPath: string;
+  reviewBody: string;
+  ratingValue: number;
+  bestRating?: number;
+  authorName?: string;
+}): JsonLd {
+  return withContext({
+    "@type": "Review",
+    itemReviewed: {
+      "@type": "SoftwareApplication",
+      name: input.itemName,
+      url: absoluteUrl(input.itemPath),
+    },
+    reviewBody: input.reviewBody,
+    reviewRating: {
+      "@type": "Rating",
+      ratingValue: input.ratingValue,
+      bestRating: input.bestRating ?? 5,
+    },
+    author: {
+      "@type": "Person",
+      name: input.authorName ?? "Verified user",
+    },
+  });
+}
+
 export function videoObjectJsonLd(input: {
   name: string;
   description: string;

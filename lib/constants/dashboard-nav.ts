@@ -17,6 +17,7 @@ import {
   Megaphone,
   Palette,
   PenLine,
+  Radar,
   SearchCheck,
   Settings,
   Sparkles,
@@ -160,6 +161,12 @@ export const DASHBOARD_SECONDARY_NAV: DashboardNavItem[] = [
     href: "/dashboard/seo",
     icon: SearchCheck,
     description: "SEO health and analyzer",
+  },
+  {
+    label: "AI Search Center",
+    href: "/dashboard/ai-search",
+    icon: Radar,
+    description: "AEO, GEO and AI search domination",
   },
   {
     label: "Growth Engine",
