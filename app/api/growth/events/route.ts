@@ -13,10 +13,32 @@ export async function POST(request: Request) {
       "anon";
 
     const rateLimited = await enforceMutationRateLimitAsync(`growth-event:${ip}`);
-    if (rateLimited) return rateLimited;
+    // Analytics must never 503: Upstash-missing production fail-closed returns 503 for growth-* keys.
+    if (rateLimited) {
+      if (rateLimited.status >= 500) {
+        console.error(
+          "growth events rate limit unavailable; continuing ingest",
+          await rateLimited
+            .clone()
+            .json()
+            .catch(() => null),
+        );
+      } else {
+        // 429 etc. — fire-and-forget analytics should not break the client
+        console.error("growth events rate limited", rateLimited.status);
+        return NextResponse.json({ success: true });
+      }
+    }
 
     const body = await parseJsonBody<unknown>(request);
-    if (body instanceof NextResponse) return body;
+    if (body instanceof NextResponse) {
+      // Invalid JSON — still avoid hard failure for analytics beacons
+      if (body.status >= 500) {
+        console.error("growth events body parse failed");
+        return NextResponse.json({ success: true });
+      }
+      return body;
+    }
 
     const parsed = eventTrackSchema.safeParse(body);
     if (!parsed.success) {
