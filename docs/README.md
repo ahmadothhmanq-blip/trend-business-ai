@@ -16,6 +16,7 @@ Living documentation for the **existing** Trend Business AI project.
 | [FINAL_REVIEW.md](./FINAL_REVIEW.md) | Docs validation summary |
 | [AUTONOMOUS_EXECUTION.md](./AUTONOMOUS_EXECUTION.md) | Agent loop: explain → implement → test → commit → continue |
 | [HISTORICAL_REPORTS.md](./HISTORICAL_REPORTS.md) | Index of root phase `*_REPORT.md` files (read-only) |
+| [PERFORMANCE_BUDGETS.md](./PERFORMANCE_BUDGETS.md) | Dashboard bundle budgets (advisory / warn-only) |
 
 **How to use**
 

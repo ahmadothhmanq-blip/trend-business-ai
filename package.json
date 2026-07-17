@@ -9,6 +9,7 @@
     "lint": "eslint",
     "type-check": "tsc --noEmit",
     "verify": "node scripts/verify.mjs",
+    "perf:budget": "node scripts/check-dashboard-budgets.mjs",
     "db:apply": "node scripts/apply-migrations.mjs",
     "db:verify": "node scripts/verify-platform-db.mjs"
   },
