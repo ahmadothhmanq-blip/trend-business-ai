@@ -3,7 +3,7 @@
 **Living work queue.** Priorities from `PROJECT_AUDIT.md`.  
 **Statuses:** `Completed` | `In Progress` | `Pending` | `Future`  
 **Rule:** Do not start Pending/Future implementation without approval.  
-**Last updated:** 2026-07-17 (H04 React 19–safe theme verified)  
+**Last updated:** 2026-07-17 (H05 generation bounds verified)  
 
 ---
 
@@ -23,7 +23,7 @@
 | H02 | Confirm required env (`SUPABASE_*`, `DEEPSEEK_API_KEY`, `NEXT_PUBLIC_SITE_URL`, service role, Upstash for prod) | Completed (local audit) | See H02 notes below. Local gaps: `NEXT_PUBLIC_SITE_URL`. Prod blockers if launching from this file: service role + Upstash + SITE_URL. Anon key length WARN. |
 | H03 | Commit/reconcile Website Builder SSR slim-list fix (no full blueprint on list) | **Completed — verified** | Static verification **PASS** (10/10). On `cursor/docs-ssot-audit-plan` @ `f1f5549`. Merge to `main` still open. |
 | H04 | Commit/reconcile React 19–safe theme migration (no client script crash) | **Completed — verified** | Removed `next-themes`; cookie SSR class + custom provider (no `<script>`). On `cursor/docs-ssot-audit-plan`. Merge to `main` still open. |
-| H05 | Commit/reconcile generation file-cap + soft-pass (prevent runaway loops) | Pending | Working tree |
+| H05 | Commit/reconcile generation file-cap + soft-pass (prevent runaway loops) | **Completed — verified** | `MAX_WEBSITE_FILES=18`, scaffold, lean merge, soft-pass. Bounds tests PASS; `tsc` OK. Local WT — commit when approved. Authenticated full generate remains H06. |
 | H06 | Authenticated smoke: `/dashboard/website-builder` loads + generate → save → download | Pending | After H03–H05 |
 | H07 | Fix Live Preview honesty: replace frozen “Live Preview” UI with Download/Deploy messaging (or equivalent honesty) | Pending | UI copy only unless F01 accepted |
 | H08 | Policy: keep `WEBSITE_PREVIEW_BUILDER_ENABLED=false` in production until security redesign | Pending | Not a duplicate of H07 — env/policy vs UI |
@@ -72,11 +72,12 @@
 | C07 | SEO / AI Search / Growth modules | Completed | Core present |
 | C08 | Security baseline (RLS, rate limits, headers) | Completed | Ongoing vigilance |
 | C09 | Profile API content-type / PUT fixes | Completed | See FIX_REPORT (historical) |
-| C10 | Generation runaway file-tree mitigation (WT) | Completed (local only) | **Not done on remote until H05 lands** — do not treat as shipped |
+| C10 | Generation runaway file-tree mitigation (WT) | Completed | Landed as H05 (local WT; commit/push pending) |
 | C11 | H01 migrations `001`–`030` on configured env | Completed | Staging/prod separate URLs not verified |
 | C12 | H02 env configuration audit (local `.env.local`) | Completed | Prod gaps documented; staging/prod hosting env not separately audited |
 | C13 | H03 Website Builder SSR slim-list (no full blueprint on list) | Completed | On feature branch `f1f5549`; merge to `main` pending |
 | C14 | H04 React 19–safe theme (no next-themes script) | Completed | On feature branch; merge to `main` pending |
+| C15 | H05 generation file-cap + soft-pass | Completed (local WT) | Verified; commit/push pending |
 
 ---
 
@@ -107,12 +108,11 @@
 
 ## Execution order (recommended after approval)
 
-1. ~~H01~~ / ~~H02~~ (ops) → ~~H03~~ (**verified PASS**) → ~~H04~~ (**verified**) → next: **H05**  
-2. H05 (land generation bounds WT fix)  
-3. H06 (smoke)  
-4. H07–H08 (preview honesty/policy)  
-5. M01–M03 (clarity)  
-6. Then Medium/Low / Future per `ROADMAP.md`  
+1. ~~H01~~ / ~~H02~~ (ops) → ~~H03~~ → ~~H04~~ → ~~H05~~ (**verified**) → next: **H06**  
+2. H06 (authenticated Website Builder smoke)  
+3. H07–H08 (preview honesty/policy)  
+4. M01–M03 (clarity)  
+5. Then Medium/Low / Future per `ROADMAP.md`  
 
 ---
 
@@ -178,3 +178,18 @@
 | `tsc --noEmit` | PASS |
 | Out of scope | `next.config.ts`, generation (H05), other WT diffs |
 | Git | Landed on `cursor/docs-ssot-audit-plan` (merge to `main` still open) |
+
+### H05 verification notes (2026-07-17)
+
+| Check | Result |
+|-------|--------|
+| Problem | Unbounded 50–180 file plans → hangs / soft-stuck progress |
+| Cap | `MAX_WEBSITE_FILES = 18` via `capPlannedFiles` |
+| Scaffold | Static configs/utils skip DeepSeek (`buildWebsiteScaffold`) |
+| Merge | Lean core + few feature extras (no full production balloon) |
+| Soft-pass | Final generate warns via `logger`; plugin `validateWebsite` always save-safe |
+| Prompts | Shared guides enforce 18-file hard limit |
+| Tests | Cap 83→18; SaaS merge 26→18; scaffold validate; soft-pass; `tsc --noEmit` PASS |
+| Live authenticated generate → save → download | Deferred to **H06** |
+| Out of scope | Progress UX (M05), `next.config.ts`, theme/SSR |
+| Git | Local WT ready; commit when approved |

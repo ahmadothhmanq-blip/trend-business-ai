@@ -10,6 +10,7 @@ import {
   websitePlanPrompt,
 } from "@/lib/ai/prompts/website";
 import { mergeProductionRequirements } from "@/lib/ai/validator";
+import { capPlannedFiles, MAX_WEBSITE_FILES } from "@/lib/ai/website-scaffold";
 import { sanitizeProjectPath } from "@/lib/ai/zipper";
 import {
   websiteBlueprintSchema,
@@ -56,7 +57,8 @@ function normalizePlannedFiles(
     byPath.set(file.path, file);
   }
 
-  return sortFilesByDependency([...byPath.values()]);
+  const capped = capPlannedFiles([...byPath.values()], MAX_WEBSITE_FILES);
+  return sortFilesByDependency(capped);
 }
 
 export async function planWebsite(
@@ -79,11 +81,24 @@ export async function planWebsite(
   });
 
   const flags = getCapabilityFlags(analysis);
-  const filePlans = normalizePlannedFiles(dynamicPlan, flags);
+  const filePlans = normalizePlannedFiles(
+    {
+      ...dynamicPlan,
+      estimatedFileCount: Math.min(
+        dynamicPlan.estimatedFileCount || MAX_WEBSITE_FILES,
+        MAX_WEBSITE_FILES,
+      ),
+    },
+    flags,
+  );
 
   return {
     blueprint,
-    dynamicPlan,
+    dynamicPlan: {
+      ...dynamicPlan,
+      estimatedFileCount: filePlans.length,
+      files: filePlans,
+    },
     filePlans,
     flags,
   };

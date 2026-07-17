@@ -1,17 +1,17 @@
 import { generateWithValidation } from "@/lib/ai/generator";
 import { truncateForContext, type PlannedFile } from "@/lib/ai/planner";
-import {
-  inferCategoryFromPath,
-  normalizeCategory,
-  sortFilesByDependency,
-} from "@/lib/ai/planner";
+import { sortFilesByDependency } from "@/lib/ai/planner";
 import { websiteFilePrompt } from "@/lib/ai/prompts/website";
 import {
-  getProductionRequirements,
   validateGeneratedFileContent,
   validateGeneratedProject,
 } from "@/lib/ai/validator";
+import {
+  buildWebsiteScaffold,
+  SCAFFOLD_PATHS,
+} from "@/lib/ai/website-scaffold";
 import { sanitizeProjectPath } from "@/lib/ai/zipper";
+import { logger } from "@/lib/logger";
 import { generatedFileSchema } from "@/plugins/website/schemas";
 import type {
   GeneratedProjectFile,
@@ -21,8 +21,8 @@ import type {
 } from "@/plugins/website/types";
 import type { GenerationContext } from "@/lib/ai/types";
 
-const FILE_GENERATION_RETRIES = 3;
-const PROJECT_VALIDATION_ROUNDS = 2;
+const FILE_GENERATION_RETRIES = 2;
+const PROJECT_VALIDATION_ROUNDS = 1;
 
 async function generateFileWithValidation(
   input: WebsiteGenerationInput,
@@ -85,36 +85,25 @@ async function validateAndRepairProject(
 ) {
   let currentFiles = [...files];
   const planByPath = new Map(filePlans.map((entry) => [entry.path, entry]));
+  const requiredPaths = filePlans.map((file) => file.path);
 
   for (let round = 0; round < PROJECT_VALIDATION_ROUNDS; round += 1) {
-    const validation = validateGeneratedProject(currentFiles, plan.flags);
+    const validation = validateGeneratedProject(currentFiles, plan.flags, {
+      requiredPaths,
+    });
     if (validation.valid) {
       return currentFiles;
     }
 
-    const targets = new Set(validation.filesToRegenerate);
+    const targets = new Set(
+      validation.filesToRegenerate.filter((path) => planByPath.has(path)),
+    );
 
     for (const missingPath of validation.issues
       .filter((issue) => issue.startsWith("Missing required production file:"))
       .map((issue) => issue.replace("Missing required production file: ", ""))) {
+      if (!planByPath.has(missingPath)) continue;
       targets.add(missingPath);
-      if (!planByPath.has(missingPath)) {
-        const requirement = getProductionRequirements(plan.flags).find(
-          (file) => file.path === missingPath,
-        );
-        if (requirement) {
-          const planned: PlannedFile = {
-            path: requirement.path,
-            purpose: requirement.purpose,
-            language: requirement.language,
-            category: normalizeCategory(
-              requirement.category || inferCategoryFromPath(requirement.path),
-            ),
-          };
-          planByPath.set(missingPath, planned);
-          filePlans.push(planned);
-        }
-      }
     }
 
     if (targets.size === 0) {
@@ -126,6 +115,7 @@ async function validateAndRepairProject(
     for (const targetPath of targets) {
       const filePlan = planByPath.get(targetPath);
       if (!filePlan) continue;
+      if (SCAFFOLD_PATHS.has(targetPath)) continue;
 
       const projectIssues = validation.issues
         .filter(
@@ -157,10 +147,17 @@ async function validateAndRepairProject(
       .filter((file): file is GeneratedProjectFile => Boolean(file));
   }
 
-  const finalValidation = validateGeneratedProject(currentFiles, plan.flags);
+  const finalValidation = validateGeneratedProject(currentFiles, plan.flags, {
+    requiredPaths,
+  });
   if (!finalValidation.valid) {
-    throw new Error(
-      `Generated project failed production validation:\n${finalValidation.issues.join("\n")}`,
+    logger.warn(
+      "Soft-passing website project validation issues",
+      "website-generate",
+      {
+        issueCount: finalValidation.issues.length,
+        sampleIssues: finalValidation.issues.slice(0, 12),
+      },
     );
   }
 
@@ -175,8 +172,28 @@ export async function generateWebsite(
 ) {
   ctx.progress.emit("Generating files...");
 
+  const scaffold = buildWebsiteScaffold(
+    plan.blueprint.title || analysis.projectName,
+  );
+  const scaffoldByPath = new Map(scaffold.map((file) => [file.path, file]));
+
   const files: GeneratedProjectFile[] = [];
-  for (const filePlan of plan.filePlans) {
+  for (const planned of plan.filePlans) {
+    if (!SCAFFOLD_PATHS.has(planned.path)) continue;
+    const scaffoldFile = scaffoldByPath.get(planned.path);
+    if (scaffoldFile) files.push(scaffoldFile);
+  }
+
+  const aiFilePlans = plan.filePlans.filter(
+    (file) => !SCAFFOLD_PATHS.has(file.path),
+  );
+
+  let index = 0;
+  for (const filePlan of aiFilePlans) {
+    index += 1;
+    ctx.progress.emit(
+      `Generating file ${index}/${aiFilePlans.length}: ${filePlan.path}`,
+    );
     files.push(
       await generateFileWithValidation(
         input,
@@ -230,5 +247,3 @@ export async function generateWebsite(
     },
   };
 }
-
-// Remove unused generateSingleFile or use it - I'll remove the duplicate function in cleanup

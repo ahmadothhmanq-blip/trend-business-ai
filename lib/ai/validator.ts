@@ -516,7 +516,76 @@ export function mergeProductionRequirements<T extends PlannedFileLike>(
 ): T[] {
   const byPath = new Map(plannedFiles.map((file) => [file.path, file]));
 
-  for (const requirement of getProductionRequirements(flags)) {
+  // Only merge a lean core — full production module lists balloon to 50–180
+  // files and make DeepSeek generation hang indefinitely for real users.
+  const coreRequirements = getProductionRequirements({
+    requiresAuth: false,
+    requiresDatabase: false,
+    requiresDashboard: false,
+    isEcommerce: false,
+    isSaas: false,
+    databaseProvider: "none",
+  });
+
+  for (const requirement of coreRequirements) {
+    if (!byPath.has(requirement.path)) {
+      byPath.set(requirement.path, requirement as T);
+    }
+  }
+
+  if (!byPath.has("app/page.tsx")) {
+    byPath.set("app/page.tsx", {
+      path: "app/page.tsx",
+      purpose: "Primary landing / home page",
+      language: "tsx",
+      category: "pages",
+    } as T);
+  }
+
+  // Keep at most a few high-value feature files when flags are set.
+  const featureExtras: PlannedFileLike[] = [];
+  if (flags.requiresAuth) {
+    featureExtras.push(
+      {
+        path: "app/login/page.tsx",
+        purpose: "Login page with email/password form",
+        language: "tsx",
+        category: "pages",
+      },
+      {
+        path: "lib/auth/session.ts",
+        purpose: "Session helpers for reading and validating auth state",
+        language: "typescript",
+        category: "lib",
+      },
+    );
+  }
+  if (flags.requiresDashboard) {
+    featureExtras.push(
+      {
+        path: "app/dashboard/page.tsx",
+        purpose: "Dashboard overview with KPI cards",
+        language: "tsx",
+        category: "pages",
+      },
+      {
+        path: "components/dashboard/sidebar.tsx",
+        purpose: "Responsive dashboard sidebar navigation",
+        language: "tsx",
+        category: "components",
+      },
+    );
+  }
+  if (flags.requiresDatabase) {
+    featureExtras.push({
+      path: "types/database.ts",
+      purpose: "Database entity TypeScript types",
+      language: "typescript",
+      category: "types",
+    });
+  }
+
+  for (const requirement of featureExtras) {
     if (!byPath.has(requirement.path)) {
       byPath.set(requirement.path, requirement as T);
     }
@@ -768,15 +837,30 @@ function validatePackageImports(files: GeneratedProjectFile[]) {
 export function validateGeneratedProject(
   files: GeneratedProjectFile[],
   flags: ProjectCapabilityFlags,
+  options?: { requiredPaths?: Iterable<string> },
 ): ProjectValidationResult {
   const issues: string[] = [];
   const filesToRegenerate = new Set<string>();
   const projectPaths = new Set(files.map((file) => file.path));
 
-  for (const requirement of getProductionRequirements(flags)) {
-    if (!projectPaths.has(requirement.path)) {
-      issues.push(`Missing required production file: ${requirement.path}`);
-      filesToRegenerate.add(requirement.path);
+  const requiredPaths = options?.requiredPaths
+    ? [...options.requiredPaths]
+    : getProductionRequirements({
+        requiresAuth: false,
+        requiresDatabase: false,
+        requiresDashboard: false,
+        isEcommerce: false,
+        isSaas: false,
+        databaseProvider: "none",
+      }).map((file) => file.path);
+
+  // Keep flags referenced so call sites that still pass capability flags remain valid.
+  void flags;
+
+  for (const requiredPath of requiredPaths) {
+    if (!projectPaths.has(requiredPath)) {
+      issues.push(`Missing required production file: ${requiredPath}`);
+      filesToRegenerate.add(requiredPath);
     }
   }
 

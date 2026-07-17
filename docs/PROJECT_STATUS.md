@@ -22,7 +22,7 @@
 | Migrations | **30/30 applied** on configured `.env.local` DB (H01) |
 | Local env (H02) | Core AI/Supabase **partial** — SITE_URL / service role / Upstash **missing**; anon key length WARN |
 | Docs on remote | Feature branch; merge to `main` still L08 |
-| Blocking for honest launch messaging | Preview honesty + fill prod env gaps (H02) + H05 + merge H03/H04 to `main` |
+| Blocking for honest launch messaging | Preview honesty + fill prod env gaps (H02) + H06 smoke + merge H03–H05 to `main` |
 
 ---
 
@@ -63,6 +63,7 @@
 - **H01:** Migrations `001`–`030` confirmed on configured `.env.local` Supabase (`public.schema_migrations` = 30/30; platform `db:verify` PASS). Staging/prod not separately verified.  
 - **H03:** Website Builder SSR slim-list **verified PASS** and pushed on `cursor/docs-ssot-audit-plan` (`f1f5549`). Merge to `main` still open.  
 - **H04:** React 19–safe theme **verified and landed** on `cursor/docs-ssot-audit-plan` — `next-themes` removed; cookie SSR + custom provider. Merge to `main` still open.  
+- **H05:** Generation **18-file cap + soft-pass** verified in local WT (scaffold, lean merge, soft-pass). Commit/push pending; full auth smoke is H06.  
 
 ### Working-tree fixes (not yet guaranteed on remote `main`)
 
@@ -70,7 +71,7 @@ Treat as **In Progress** until committed/pushed / merged:
 
 - ~~Website list SSR: slim columns, no full blueprint on list~~ → **H03 verified on feature branch**  
 - ~~Theme: React 19–safe provider (no `next-themes` script crash)~~ → **H04 on feature branch**  
-- Generation: 18-file cap + soft-pass validation — **H05**  
+- ~~Generation: 18-file cap + soft-pass validation~~ → **H05 verified in local WT**  
 - Dev: avoid immutable cache on `/_next/static` in development  
 
 ---
@@ -79,7 +80,7 @@ Treat as **In Progress** until committed/pushed / merged:
 
 | Item | Owner | Notes |
 |------|-------|-------|
-| Reconcile WT critical fixes → `main` | Pending approval | H03+H04 on branch; generation bounds (**H05**) next |
+| Reconcile WT critical fixes → `main` | Pending approval | H03+H04 on branch; **H05 done locally** — commit next; then **H06** smoke |
 | Ops production readiness | Pending | **H01+H02** local done; fill SITE_URL / service role / Upstash on real prod; E2E open |
 | Docs as SSOT | Active | This pack |
 

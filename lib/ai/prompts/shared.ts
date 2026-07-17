@@ -1,29 +1,25 @@
 export const COMPLEXITY_GUIDE = `
-Estimate project size and file count from the blueprint:
-- Simple Landing Page: ~15 files
-- Portfolio: ~25 files
-- Restaurant / local business: ~35 files
-- Dashboard SaaS: ~80 files
-- CRM / internal app: ~120 files
-- E-commerce: ~180 files
-- Marketplace / multi-vendor platform: ~250 files
+Estimate project size and file count from the blueprint.
+HARD LIMIT: never plan more than 18 files total (configs + app code).
+Prefer a focused, shippable MVP over a large incomplete tree.
+
+Guidance:
+- Simple Landing Page / Portfolio: 10-14 files
+- Local business / brochure site: 12-16 files
+- Dashboard or booking app MVP: 14-18 files
+- Never exceed 18 files even for SaaS, CRM, ecommerce, or marketplace briefs
 `;
 
 export const PRODUCTION_ARCHITECTURE_GUIDE = `
 Every generated project must be production-grade and include:
 - ESLint + Prettier + TypeScript + Tailwind + Next.js App Router
-- Root metadata, responsive layout, SEO helpers, loading states, error boundaries, 404 page
-- Reusable UI primitives in components/ui (button, card, input) — no duplicated components
-- Shared utilities in lib/ — no duplicated helpers
+- Root metadata, responsive layout, SEO helpers
+- Reusable UI primitives in components/ui (button, card, input)
+- Shared utilities in lib/
 - Clean architecture: types/, hooks/, lib/, components/, app/
 
-Conditional modules (include only when required by the blueprint):
-- Authentication: login, register, forgot password, middleware protection, session handling
-- Database: Prisma OR Supabase schema, CRUD APIs, types, Zod validation
-- Dashboard: sidebar, navbar, cards, chart panels, tables, pagination, search, filters
-- E-commerce: products, categories, cart, checkout, orders, payments, wishlist, profile
-- SaaS: landing, pricing, authentication, dashboard, settings, billing, team, API routes
-
+Keep scope to an MVP under the 18-file hard limit.
+Prioritize: configs, root layout, home page, 1-2 feature pages, shared UI, and only essential feature modules.
 Do not generate unused files. Every file must be imported or referenced by the project.
 `;
 

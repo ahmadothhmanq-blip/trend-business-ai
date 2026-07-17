@@ -83,11 +83,11 @@
 | Field | Value |
 |-------|--------|
 | Date | 2026-07-17 |
-| Status | **Accepted** (direction); code landing pending approval |
+| Status | **Accepted** (implemented locally; commit/push pending) |
 | Context | Unbounded production file lists caused multi-minute hangs / 92% UX freeze |
 | Decision | Keep generation bounded (file cap ~18 + soft-pass / non-infinite validation). Prefer finishing a usable project over perfect trees. |
 | Consequences | Soft-pass may save imperfect trees; document warnings if needed. |
-| Related | Tasks H05, H06 |
+| Related | Tasks H05 (verified), H06 |
 
 ---
 
