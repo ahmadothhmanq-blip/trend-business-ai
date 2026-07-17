@@ -1,57 +1,64 @@
 # Trend Business AI
 
-A modern SaaS platform for AI-powered business intelligence — generate startup ideas, analyze markets, and create strategic reports.
+Multi-product AI SaaS for business creation, design, content, and strategy. Generate website/app **source projects** (ZIP export), brand systems, campaigns, and intelligence from one authenticated workspace.
 
-## Tech Stack
+**Product truth today:** Website Builder delivers Next.js source files + ZIP for self-hosting — not a hosted live customer site. Live Preview stays off until a safe design ships. See [`docs/`](./docs/).
 
-- **Next.js 16** — App Router, Server Components, Server Actions
-- **TypeScript** — Full type safety
-- **Tailwind CSS 4** — Utility-first styling with dark mode
-- **Supabase** — Authentication and database
-- **shadcn/ui** — Accessible UI components
+## Tech stack
 
-## Features
+| Layer | Choice |
+|-------|--------|
+| App | Next.js 16 (App Router), React 19, TypeScript |
+| UI | Tailwind CSS 4, shadcn-style components |
+| Auth / DB | Supabase Auth + Postgres + RLS |
+| AI | ProviderManager — DeepSeek default; OpenAI/Claude supported |
+| Billing | PayPal adapters (env-gated) |
 
-- Modern landing page with features and pricing
-- Supabase authentication (sign up, sign in, sign out)
-- Protected dashboard with sidebar navigation
-- Business ideas generator (AI-powered)
-- Market analysis tool
-- AI reports generator with download
-- User profile management
-- Responsive design
-- Dark / light mode toggle
+## Product areas
 
-## Getting Started
+- **Create** — Website Builder, Landing Page Builder, App Builder (source + ZIP)
+- **Design** — Logo Maker, Brand Studio, Image Generator
+- **Content** — Video Studio, Content Studio, Social Media
+- **Business** — Marketing, Business Intelligence, Feasibility Study, Agents, Ideas, Reports
+- **Platform** — Billing, team/orgs, usage, SEO / AI Search / Growth tools
 
-### 1. Install dependencies
+## Documentation (SSOT)
+
+Start here for planning and agent work:
+
+| Doc | Purpose |
+|-----|---------|
+| [`docs/TASK_QUEUE.md`](./docs/TASK_QUEUE.md) | Prioritized tasks |
+| [`docs/PROJECT_STATUS.md`](./docs/PROJECT_STATUS.md) | Living status |
+| [`docs/DECISIONS_LOG.md`](./docs/DECISIONS_LOG.md) | Product/architecture decisions |
+| [`docs/AUTONOMOUS_EXECUTION.md`](./docs/AUTONOMOUS_EXECUTION.md) | Agent execution loop |
+| [`docs/AI_DEVELOPMENT_CONSTITUTION.md`](./docs/AI_DEVELOPMENT_CONSTITUTION.md) | Binding rules |
+| [`docs/README.md`](./docs/README.md) | Full docs index |
+
+## Getting started
 
 ```bash
 npm install
+cp .env.example .env.local   # if present; otherwise create .env.local
 ```
 
-### 2. Configure Supabase
+Minimum local env:
 
-Create a project at [supabase.com](https://supabase.com), then copy your credentials:
+```
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+DEEPSEEK_API_KEY=
+SUPABASE_DB_URL=             # for migrations / db scripts
+```
+
+Production also needs `NEXT_PUBLIC_SITE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, and preferably Upstash Redis for rate limits. Details: `docs/TASK_QUEUE.md` (H02 notes).
+
+Apply migrations (30 SQL files under `supabase/migrations/`):
 
 ```bash
-cp .env.example .env.local
+npm run db:apply
+npm run db:verify
 ```
-
-Update `.env.local`:
-
-```
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-```
-
-Run the SQL schema in the Supabase SQL Editor (optional, for profile storage):
-
-```
-supabase/schema.sql
-```
-
-### 3. Run the development server
 
 ```bash
 npm run dev
@@ -59,40 +66,27 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-## Project Structure
+## Useful scripts
+
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Development server |
+| `npm run build` | Production build |
+| `npm run type-check` | `tsc --noEmit` |
+| `npm run db:apply` | Apply SQL migrations |
+| `npm run db:verify` | Verify platform DB objects |
+| `npm run verify` | Repo verification script |
+
+## Project layout (high level)
 
 ```
-app/
-├── (auth)/           # Login & signup pages
-├── (dashboard)/      # Protected dashboard routes
-├── api/              # API routes for AI features
-├── auth/callback/    # Supabase OAuth callback
-components/
-├── auth/             # Auth forms
-├── dashboard/        # Dashboard UI components
-├── hero/             # Landing page hero
-├── landing/          # Features & pricing sections
-├── theme/            # Dark mode provider
-└── ui/               # shadcn UI primitives
-lib/
-├── actions/          # Server actions
-├── ai/               # AI generation logic
-├── constants/        # Navigation & config
-└── supabase/         # Supabase clients
+app/                 # Marketing, auth, dashboard, API routes
+components/          # Marketing + dashboard UI
+lib/                 # AI, billing, SEO, products, Supabase helpers
+plugins/             # Product generation pipelines
+supabase/migrations/ # Schema 001–030
+docs/                # Living source of truth
 ```
-
-## Routes
-
-| Route | Description |
-|-------|-------------|
-| `/` | Landing page |
-| `/login` | Sign in |
-| `/signup` | Create account |
-| `/dashboard` | Overview |
-| `/dashboard/ideas` | Business ideas generator |
-| `/dashboard/market-analysis` | Market analysis |
-| `/dashboard/reports` | AI reports |
-| `/dashboard/profile` | User profile |
 
 ## License
 

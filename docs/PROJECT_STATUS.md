@@ -70,6 +70,7 @@
 - **M01:** Marketing/SEO/registry/tool copy aligned to ZIP + self-host delivery (D-003); no hosted-live claims.  
 - **M02:** Placeholder AI providers (Gemini/Grok/Llama) hidden from production settings UI/API (D-009).  
 - **M03:** Duplicate dashboard routes collapsed to canonical product paths (D-013).  
+- **M04:** Root README updated for multi-product + ZIP delivery reality.  
 
 ### Working-tree fixes (not yet guaranteed on remote `main`)
 
