@@ -20,7 +20,8 @@ export type AiRateLimitResource =
   | "business-suite"
   | "ai-agents"
   | "workspace"
-  | "seo-analyzer";
+  | "seo-analyzer"
+  | "ai-core";
 
 const AI_RATE_LIMITS: Record<
   AiRateLimitResource,
@@ -41,6 +42,7 @@ const AI_RATE_LIMITS: Record<
   "ai-agents": { requests: 10, window: "1 m" },
   workspace: { requests: 10, window: "1 m" },
   "seo-analyzer": { requests: 20, window: "1 m" },
+  "ai-core": { requests: 10, window: "1 m" },
 };
 
 function isUpstashConfigured(): boolean {

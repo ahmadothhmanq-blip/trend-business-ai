@@ -1,8 +1,8 @@
 import type { ProductEngineAdapter } from "@/lib/ai-core/adapter";
 
 /**
- * Product → Core adapter registry.
- * Phase 4: + video-studio, marketing-ai registered.
+ * Legacy adapter instance map (side-effect registration from adapter modules).
+ * Phase 5 canonical catalog + factories live in `lib/ai-core/products.ts`.
  */
 const adapters = new Map<string, ProductEngineAdapter<unknown, unknown>>();
 

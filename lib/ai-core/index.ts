@@ -1,5 +1,5 @@
 /**
- * AI Core Engine — Phase 4: + Video Studio + Marketing AI on LayerRunner.
+ * AI Core Engine — Phase 5: unified registry + /api/ai-core/runs.
  *
  * Layer pipeline: Idea → Strategy → Design → Assets → Generation → Quality → Finalize
  * Runtime: existing AIGenerationEngine + ProviderManager (re-exported).
@@ -55,6 +55,28 @@ export {
   createMarketingAiAdapter,
   marketingInputToBrief,
 } from "@/lib/ai-core/adapters/marketing-ai";
+
+export {
+  AI_CORE_PRODUCTS,
+  resolveAiCoreProduct,
+  listAiCoreProducts,
+  isAiCoreProductId,
+  createAdapterForProduct,
+  type AiCoreProductId,
+  type AiCoreProductDefinition,
+} from "@/lib/ai-core/products";
+
+export {
+  buildCoreBrief,
+  type AiCoreRunRequestBody,
+} from "@/lib/ai-core/brief-builder";
+
+export {
+  executeAiCoreRun,
+  continueAiCoreRun,
+  getAiCoreRun,
+  type AiCoreRunExecuteResult,
+} from "@/lib/ai-core/runs/service";
 
 export type {
   ProductEngineAdapter,

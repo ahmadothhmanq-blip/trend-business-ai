@@ -306,7 +306,7 @@ export type PaginatedResponse<T> = {
   totalPages: number;
 };
 
-/** AI Core Engine run ledger (migration 033). Unused by product routes in Phase 0. */
+/** AI Core Engine run ledger (migration 033). Used by /api/ai-core/runs (Phase 5). */
 export type AiRunStatus =
   | "pending"
   | "running"

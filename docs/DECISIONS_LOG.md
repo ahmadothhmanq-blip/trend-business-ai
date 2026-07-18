@@ -247,6 +247,19 @@
 
 ---
 
+## D-024 — Unified AI Core registry + run API (Phase 5)
+
+| Field | Value |
+|-------|--------|
+| Date | 2026-07-18 |
+| Status | Accepted |
+| Context | Finalize Core integration with a single product catalog and generic run endpoints |
+| Decision | Add `lib/ai-core/products.ts` catalog (canonical ids + aliases including `app-builder`), `POST/GET /api/ai-core/runs`, `POST /api/ai-core/runs/[id]/continue`, `GET /api/ai-core/products`; persist to `ai_runs`; keep product-specific APIs/generators unchanged |
+| Consequences | Clients can invoke any migrated product through one API; existing dashboards continue on legacy routes |
+| Related | D-023, `docs/AI_CORE_ENGINE.md` |
+
+---
+
 ## D-023 — Video Studio + Marketing AI on AI Core LayerRunner (Phase 4)
 
 | Field | Value |
