@@ -1,5 +1,10 @@
 import { providerManager } from "@/lib/ai/provider-manager";
 import type { AIProviderName, TokenUsage } from "@/lib/ai/types";
+import { layerRunner } from "@/lib/ai-core";
+import {
+  createMarketingAiAdapter,
+  marketingInputToBrief,
+} from "@/lib/ai-core/adapters/marketing-ai";
 import { getWorkspaceDefinition } from "@/lib/workspace/registry";
 import type {
   WorkspaceGenerationInput,
@@ -132,7 +137,45 @@ export async function generateWorkspaceProject(
     if (!providerManager.isConfigured(providerName)) continue;
     try {
       options?.onProgress?.(`Connecting to ${providerName}...`);
-      const result = await providerManager.runPlugin(plugin, toPluginInput(input), {
+      const pluginInput = toPluginInput(input);
+
+      // Phase 4: Marketing AI runs through AI Core LayerRunner.
+      if (workspaceType === "marketing") {
+        const adapter = createMarketingAiAdapter();
+        const coreResult = await layerRunner.run(
+          adapter,
+          {
+            brief: marketingInputToBrief(pluginInput),
+            mode: input.mode,
+            continueInstruction: input.continueInstruction,
+            userId: undefined,
+            parentRunId: input.parentGenerationId,
+          },
+          { provider: providerName, onProgress: options?.onProgress },
+        );
+        const project = coreResult.finalOutput ?? coreResult.generation;
+        return {
+          output: toWorkspaceOutput(
+            project,
+            coreResult.progressEvents,
+            providerName,
+            {
+              productId: input.productId,
+              depth: input.depth,
+              tokenUsage: coreResult.usage,
+              generationTimeMs: coreResult.generationTimeMs,
+              mode: input.mode ?? "generate",
+              continuedFrom: input.parentGenerationId,
+            },
+          ),
+          source: providerName,
+          provider: providerName,
+          usage: coreResult.usage,
+          generationTimeMs: coreResult.generationTimeMs,
+        };
+      }
+
+      const result = await providerManager.runPlugin(plugin, pluginInput, {
         provider: providerName,
         onProgress: options?.onProgress,
       });

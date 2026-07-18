@@ -1,5 +1,5 @@
 /**
- * AI Core Engine — Phase 3: Website, App, Landing, Brand, Content on LayerRunner.
+ * AI Core Engine — Phase 4: + Video Studio + Marketing AI on LayerRunner.
  *
  * Layer pipeline: Idea → Strategy → Design → Assets → Generation → Quality → Finalize
  * Runtime: existing AIGenerationEngine + ProviderManager (re-exported).
@@ -10,6 +10,8 @@ import "@/lib/ai-core/adapters/webapp-builder";
 import "@/lib/ai-core/adapters/landing-page-builder";
 import "@/lib/ai-core/adapters/brand-designer";
 import "@/lib/ai-core/adapters/content-studio";
+import "@/lib/ai-core/adapters/video-studio";
+import "@/lib/ai-core/adapters/marketing-ai";
 
 export {
   WEBSITE_BUILDER_PRODUCT_ID,
@@ -41,6 +43,18 @@ export {
   createContentStudioAdapter,
   contentInputToBrief,
 } from "@/lib/ai-core/adapters/content-studio";
+
+export {
+  VIDEO_STUDIO_PRODUCT_ID,
+  createVideoStudioAdapter,
+  videoInputToBrief,
+} from "@/lib/ai-core/adapters/video-studio";
+
+export {
+  MARKETING_AI_PRODUCT_ID,
+  createMarketingAiAdapter,
+  marketingInputToBrief,
+} from "@/lib/ai-core/adapters/marketing-ai";
 
 export type {
   ProductEngineAdapter,

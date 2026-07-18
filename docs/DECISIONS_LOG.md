@@ -247,6 +247,19 @@
 
 ---
 
+## D-023 — Video Studio + Marketing AI on AI Core LayerRunner (Phase 4)
+
+| Field | Value |
+|-------|--------|
+| Date | 2026-07-18 |
+| Status | Accepted |
+| Context | Move Video Studio and Marketing AI through LayerRunner without rewriting generators/APIs |
+| Decision | Add `video-studio` and `marketing-ai` ProductEngineAdapters reusing `plugins/video-studio` and workspace `marketingPlugin`; wire `generateVideo` and marketing branch of `generateWorkspaceProject` through `layerRunner` |
+| Consequences | Seven products on shared Core flow; Marketing keeps `/api/workspaces/marketing` while Core id is `marketing-ai` |
+| Related | D-022, `docs/AI_CORE_ENGINE.md` |
+
+---
+
 ## D-022 — Brand Designer + Content Studio on AI Core LayerRunner (Phase 3)
 
 | Field | Value |
