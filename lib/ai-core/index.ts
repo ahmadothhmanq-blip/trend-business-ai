@@ -1,11 +1,13 @@
 /**
- * AI Core Engine — Phase 1: Website Builder on LayerRunner.
+ * AI Core Engine — Phase 2: Website + Web App + Landing Page on LayerRunner.
  *
  * Layer pipeline: Idea → Strategy → Design → Assets → Generation → Quality → Finalize
  * Runtime: existing AIGenerationEngine + ProviderManager (re-exported).
  */
 
 import "@/lib/ai-core/adapters/website-builder";
+import "@/lib/ai-core/adapters/webapp-builder";
+import "@/lib/ai-core/adapters/landing-page-builder";
 
 export {
   WEBSITE_BUILDER_PRODUCT_ID,
@@ -13,6 +15,18 @@ export {
   websiteInputToBrief,
   priorArtifactsFromWebsiteInput,
 } from "@/lib/ai-core/adapters/website-builder";
+
+export {
+  WEBAPP_BUILDER_PRODUCT_ID,
+  createWebappBuilderAdapter,
+  webappInputToBrief,
+} from "@/lib/ai-core/adapters/webapp-builder";
+
+export {
+  LANDING_PAGE_BUILDER_PRODUCT_ID,
+  createLandingPageBuilderAdapter,
+  landingPageInputToBrief,
+} from "@/lib/ai-core/adapters/landing-page-builder";
 
 export type {
   ProductEngineAdapter,

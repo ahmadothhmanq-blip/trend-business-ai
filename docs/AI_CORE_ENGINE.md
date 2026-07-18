@@ -1,8 +1,8 @@
 # AI Core Engine
 
-**Status:** Phase 1 — Website Builder on LayerRunner  
+**Status:** Phase 2 — Website + Web App + Landing Page on LayerRunner  
 **Scope:** Shared layer pipeline for all Trend Business AI products  
-**Related:** Website Design Engine (D-018), `docs/WEBSITE_BUILDER_DESIGN_ENGINE.md`, D-019 / D-020
+**Related:** D-018, D-019, D-020, D-021, `docs/WEBSITE_BUILDER_DESIGN_ENGINE.md`
 
 ---
 
@@ -14,7 +14,7 @@ Power every AI product with one reusable pipeline:
 Business Idea → Strategy → Design → Assets → Generation → Quality Check → Final Output
 ```
 
-Website Builder execution now goes through `LayerRunner` via `ProductEngineAdapter`. UI, preview, ZIP, and publish are unchanged.
+Website Builder, Web App Builder, and Landing Page Builder execute through `LayerRunner` via `ProductEngineAdapter`. Existing UIs and APIs stay unchanged.
 
 ---
 
@@ -22,27 +22,19 @@ Website Builder execution now goes through `LayerRunner` via `ProductEngineAdapt
 
 ```
 lib/ai-core/
-  index.ts                 # public barrel (+ registers Website adapter)
+  index.ts                 # public barrel (+ registers adapters)
   adapter.ts               # ProductEngineAdapter + runner I/O types
   registry.ts              # productId → adapter map
   adapters/
-    website-builder.ts     # Phase 1 Website Builder adapter
+    website-builder.ts     # Phase 1
+    webapp-builder.ts      # Phase 2
+    landing-page-builder.ts # Phase 2
+    derive-layers.ts       # deterministic Core mappings for plugin products
   runtime/index.ts         # re-exports existing lib/ai engine/providers
   layers/
-    types.ts               # generic Core* layer contracts
-    schemas.ts             # JSON schemas for provider validation
-    runner.ts              # LayerRunner orchestration
-```
-
-Import:
-
-```ts
-import {
-  layerRunner,
-  createWebsiteBuilderAdapter,
-  type ProductEngineAdapter,
-  type CoreBrief,
-} from "@/lib/ai-core";
+    types.ts
+    schemas.ts
+    runner.ts
 ```
 
 ---
@@ -59,85 +51,63 @@ import {
 6. `quality` → `qualityReport`
 7. `finalize` → delivery payload
 
-A layer runs only when `adapter.layers.<name> === true` **and** the corresponding `run*` method exists.
-
-Progress lines are prefixed: `[idea] …`, `[strategy] …`, etc.
-
 Result includes `usage`, `generationTimeMs`, and `provider`.
 
 ---
 
-## Website Builder (Phase 1)
+## Registered products
 
-| Piece | Role |
-|-------|------|
-| `createWebsiteBuilderAdapter()` | Fresh per-run adapter (session state for analysis/plan) |
-| `lib/deepseek.ts` → `generateWebsite` | Provider fallback loop + `layerRunner.run` |
-| `plugins/website/layers/*` | Reused Idea / Strategy / Design / Assets / Quality |
-| `plugins/website/plan.ts` + `generate.ts` | Blueprint/files + code gen (skip assets/quality when Core already ran them) |
-| Stream / route + `persistWebsiteGeneration` | Unchanged — preview, ZIP, publish |
+| Product id | Entry generator | Plugin reuse |
+|------------|-----------------|--------------|
+| `website-builder` | `lib/deepseek.ts` → `generateWebsite` | `plugins/website` layers + generate/quality |
+| `webapp-builder` | `lib/webapp-generator.ts` | `plugins/webapp` analyze/plan/generate/validate/export |
+| `landing-page-builder` | `lib/landing-page-generator.ts` | `plugins/landing-page` analyze/plan/generate/validate/export |
 
-Flow:
+### Web App / Landing mapping (Phase 2)
 
-```
-Business Idea → Strategy → Design → Assets → Website Generation → Quality Check → Preview / ZIP / Publish
-```
+These products do not have Design Engine AI layers yet. Adapters map existing plugin stages onto Core:
 
-Production entry remains `/api/website-builder/stream` and `/api/website-builder` (no UI rewrite).
+| Core layer | Web App / Landing |
+|------------|-------------------|
+| Idea | `analyze*` → `CoreBusinessProfile` |
+| Strategy | `plan*` (blueprint + files) → `CoreProductStrategy` |
+| Design | Derived from `designStyle` / `colorStyle` + blueprint |
+| Assets | Pending placeholder manifest from pages/sections |
+| Generation | existing `generate*` |
+| Quality | existing `validate*` |
+| Finalize | existing `export*` (ZIP progress) + return output |
+
+UI routes (`/api/webapp-builder`, `/api/landing-page-builder`) are unchanged.
 
 ---
 
 ## ProductEngineAdapter
 
-Thin bridge from Core → existing product plugins/generators:
-
-| Field / method | Purpose |
-|----------------|---------|
-| `productId`, `label` | Identity |
-| `layers` | Enablement flags (`generation: true` required) |
-| `runIdea?` … `runAssets?` | Optional upstream layers |
-| `runGeneration` | Required product generation |
-| `runQuality?` | Optional QA |
-| `finalize?` | Optional persist/delivery mapping |
-
-Adapters are registered via `registerProductEngineAdapter`. Phase 1 registers `website-builder`.
+Thin bridge from Core → existing product plugins/generators. Register via `registerProductEngineAdapter`. Create a **fresh adapter instance per run** when the adapter holds session state.
 
 ---
 
 ## Database
 
-Migration: `supabase/migrations/033_ai_runs.sql`
-
-- Table `public.ai_runs` — Core run ledger (`brief`, `artifacts`, `layers_executed`, provider/usage, lineage)
-- RLS: users CRUD own rows
-- Storage bucket `ai-assets` for future shared assets (Website continues using `website-assets`)
-
-TypeScript type: `AiRun` in `types/database.ts`
-
-Phase 1 does **not** yet write production Website runs into `ai_runs`.
+Migration: `supabase/migrations/033_ai_runs.sql` — `ai_runs` ledger + `ai-assets` bucket.  
+Production product routes do **not** write `ai_runs` yet.
 
 ---
 
-## What Phase 1 does **not** do
+## What Phase 2 does **not** do
 
-- Does not rewrite Website Builder UI
-- Does not change preview / ZIP / publish contracts
-- Does not migrate Landing, App, Brand, Content, Video
+- Does not rewrite App / Landing UI or APIs
+- Does not add Design Engine AI layers to App / Landing (deterministic Core design/assets)
+- Does not migrate Brand, Content, Video
 - Does not add `/api/ai-core/*` routes yet
 
 ---
 
-## Next phases (not implemented)
+## Next phases
 
-1. ~~**Phase 1** — Website Builder adapter on LayerRunner~~ **done**
-2. **Phase 2** — Landing + App Builder  
+1. ~~Phase 1 — Website Builder~~ **done**
+2. ~~Phase 2 — Landing + App Builder~~ **done**
 3. **Phase 3** — Brand + Content  
 4. **Phase 4** — Video + Marketing  
 5. **Phase 5** — `/api/ai-core/runs` + unified registry  
 6. **Phase 6** — Hardening / metrics / BYOK  
-
----
-
-## Runtime reuse
-
-`lib/ai-core/runtime` re-exports the existing stack (`AIGenerationEngine`, `providerManager`, adapters, generator helpers). Website generation now prefers Core `layerRunner`; other products still call `providerManager.runPlugin` until later phases.

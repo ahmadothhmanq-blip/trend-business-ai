@@ -247,15 +247,16 @@
 
 ---
 
-## D-020 — Website Builder on AI Core LayerRunner (Phase 1)
+## D-021 — Web App + Landing Page on AI Core LayerRunner (Phase 2)
 
 | Field | Value |
-|-------|-------|
-| Status | Accepted |
+|-------|--------|
 | Date | 2026-07-18 |
-| Context | Move Website Builder execution through LayerRunner without rewriting UI/delivery |
-| Decision | Add `website-builder` ProductEngineAdapter that reuses `plugins/website` layers; `generateWebsite` (`lib/deepseek.ts`) calls `layerRunner.run`; preview/ZIP/publish stay on existing routes |
-| Consequences | Core owns Idea→Strategy→Design→Assets→Generation→Quality→Finalize for WB; plugin remains for scaffolds/compat; other products unchanged |
+| Status | Accepted |
+| Context | Move App Builder and Landing Page Builder through LayerRunner without rewriting UI/generators |
+| Decision | Add `webapp-builder` and `landing-page-builder` ProductEngineAdapters that reuse `plugins/webapp` and `plugins/landing-page` stages; map Idea=analyze, Strategy=plan, Design/Assets=derived, Generation/Quality/Finalize=generate/validate/export; wire generators through `layerRunner` |
+| Consequences | Shared Core flow for three builders; App/Landing keep existing APIs and plugin AI; Design/Assets are deterministic until a later Design Engine upgrade |
+| Related | D-020, D-019, `docs/AI_CORE_ENGINE.md` |
 
 ---
 

@@ -2,7 +2,7 @@ import type { ProductEngineAdapter } from "@/lib/ai-core/adapter";
 
 /**
  * Product → Core adapter registry.
- * Phase 1: Website Builder registered via adapters/website-builder.ts.
+ * Phase 2: website-builder, webapp-builder, landing-page-builder registered.
  */
 const adapters = new Map<string, ProductEngineAdapter<unknown, unknown>>();
 

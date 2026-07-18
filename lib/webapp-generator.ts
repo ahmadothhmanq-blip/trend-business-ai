@@ -1,7 +1,11 @@
 import { providerManager } from "@/lib/ai/provider-manager";
 import { emptyTokenUsage } from "@/lib/ai/usage";
 import type { TokenUsage } from "@/lib/ai/types";
-import { webappPlugin } from "@/plugins/webapp";
+import { layerRunner } from "@/lib/ai-core";
+import {
+  createWebappBuilderAdapter,
+  webappInputToBrief,
+} from "@/lib/ai-core/adapters/webapp-builder";
 import type {
   WebAppOutput,
   WebAppPluginInput,
@@ -27,16 +31,33 @@ export type WebAppGenerationResult = WebAppOutput & {
   provider: string;
 };
 
+/**
+ * Web App Builder entrypoint — Phase 2 runs through AI Core LayerRunner
+ * (Idea → Strategy → Design → Assets → Generation → Quality → Finalize).
+ */
 export async function generateWebApp(
   input: GenerateWebAppInput,
 ): Promise<WebAppGenerationResult> {
   const { onProgress, ...pluginInput } = input;
-  const result = await providerManager.runPlugin(webappPlugin, pluginInput, {
-    onProgress,
-  });
+
+  const resolved = providerManager.resolve();
+  if (!resolved || !providerManager.isConfigured(resolved)) {
+    throw new Error(
+      "No AI provider configured. Set DEEPSEEK_API_KEY to enable generation.",
+    );
+  }
+
+  const adapter = createWebappBuilderAdapter();
+  const result = await layerRunner.run(
+    adapter,
+    { brief: webappInputToBrief(pluginInput) },
+    { provider: resolved, onProgress },
+  );
+
+  const project = result.finalOutput ?? result.generation;
 
   return {
-    ...result.output,
+    ...project,
     progressEvents: result.progressEvents as WebAppProgressEvent[],
     usage: result.usage ?? emptyTokenUsage(),
     generationTimeMs: result.generationTimeMs,
