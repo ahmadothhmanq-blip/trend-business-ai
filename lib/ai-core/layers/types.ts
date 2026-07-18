@@ -4,6 +4,8 @@
  */
 
 import type { TemplateSelection } from "@/lib/ai-core/templates/types";
+import type { CorePerformanceReport } from "@/lib/ai-core/performance/types";
+import type { CoreSeoPackage } from "@/lib/ai-core/seo/types";
 
 export type CoreRunMode = "generate" | "regenerate" | "continue" | "retry";
 
@@ -178,7 +180,8 @@ export type CoreQualityDimensionName =
   | "seo"
   | "content"
   | "brand"
-  | "media";
+  | "media"
+  | "performance";
 
 export type CoreQualityDimension = {
   name: CoreQualityDimensionName;
@@ -193,6 +196,12 @@ export type CoreQualityReport = {
   improveApplied: boolean;
   improveNotes?: string[];
   issues: string[];
+  /** Phase 8 Auto Quality extensions */
+  score?: number;
+  publishReady?: boolean;
+  seoReadinessScore?: number;
+  performanceScore?: number;
+  designConsistencyPassed?: boolean;
 };
 
 /** Artifacts accumulated across the Core layer pipeline. */
@@ -205,6 +214,10 @@ export type CoreLayerArtifacts = {
   designSystem?: CoreDesignSystem;
   assetManifest?: CoreAssetManifest;
   qualityReport?: CoreQualityReport;
+  /** Phase 8 SEO Engine package */
+  seoPackage?: CoreSeoPackage;
+  /** Phase 8 Performance Engine report */
+  performanceReport?: CorePerformanceReport;
   /** Opaque product generation payload (files, media, copy, etc.) */
   generationOutput?: unknown;
   /** Opaque finalized delivery payload for persistence/UI */
@@ -218,6 +231,8 @@ export type CoreLayerName =
   | "assets"
   | "generation"
   | "quality"
+  | "seo"
+  | "performance"
   | "finalize"
   | "template";
 
@@ -229,8 +244,14 @@ export type CoreLayerFlags = {
   /** Always required for a useful run */
   generation: true;
   quality?: boolean;
+  /** Phase 8 SEO Engine */
+  seo?: boolean;
+  /** Phase 8 Performance Engine */
+  performance?: boolean;
   finalize?: boolean;
 };
+
+export type { CoreSeoPackage, CorePerformanceReport };
 
 export type CoreRunStatus =
   | "pending"

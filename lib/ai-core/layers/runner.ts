@@ -9,6 +9,13 @@ import type {
 } from "@/lib/ai-core/adapter";
 import type { CoreLayerArtifacts, CoreLayerName } from "@/lib/ai-core/layers/types";
 import { enrichBriefWithIndustryTemplate } from "@/lib/ai-core/templates/apply";
+import { runPerformanceChecks } from "@/lib/ai-core/performance";
+import {
+  buildSeoPackageFromStrategy,
+  checkSeoReadiness,
+  withSeoReadiness,
+} from "@/lib/ai-core/seo";
+import { finalizeQualityForPublish } from "@/lib/ai-core/quality";
 
 export type LayerRunnerOptions = {
   provider?: AIProviderName;
@@ -26,11 +33,23 @@ function emit(
   onProgress?.(line);
 }
 
+function generationFiles(generation: unknown):
+  | { path: string; content: string }[]
+  | undefined {
+  if (
+    generation &&
+    typeof generation === "object" &&
+    "files" in generation &&
+    Array.isArray((generation as { files: unknown }).files)
+  ) {
+    return (generation as { files: { path: string; content: string }[] }).files;
+  }
+  return undefined;
+}
+
 /**
- * Orchestrates Idea → Strategy → Design → Assets → Generation → Quality → Finalize
+ * Orchestrates Idea → Strategy → Design → Assets → Generation → Quality → SEO → Performance → Finalize
  * according to the product adapter's layer flags.
- *
- * Orchestrates product adapters. Website Builder is wired in Phase 1.
  */
 export class LayerRunner {
   async run<TGeneration = unknown, TFinal = unknown>(
@@ -66,6 +85,8 @@ export class LayerRunner {
       designSystem: input.priorArtifacts?.designSystem,
       assetManifest: input.priorArtifacts?.assetManifest,
       qualityReport: input.priorArtifacts?.qualityReport,
+      seoPackage: input.priorArtifacts?.seoPackage,
+      performanceReport: input.priorArtifacts?.performanceReport,
     };
 
     emit(progress, onProgress, "start", `${adapter.label} Core run starting`);
@@ -144,6 +165,75 @@ export class LayerRunner {
         ctx,
       );
       layersExecuted.push("quality");
+    }
+
+    // Phase 8: SEO Engine (adapter override or Core default from Strategy).
+    if (adapter.layers.seo) {
+      emit(progress, onProgress, "seo", "Building SEO package...");
+      if (adapter.runSeo) {
+        artifacts.seoPackage = await adapter.runSeo(
+          brief,
+          artifacts,
+          generation,
+          ctx,
+        );
+      } else if (artifacts.strategy) {
+        const pkg = buildSeoPackageFromStrategy({
+          strategy: artifacts.strategy,
+          profile: artifacts.businessProfile,
+          language: brief.language,
+        });
+        const files = generationFiles(generation);
+        artifacts.seoPackage = withSeoReadiness(
+          pkg,
+          checkSeoReadiness({
+            files: files ?? [],
+            strategy: artifacts.strategy,
+            seoPackage: pkg,
+          }),
+        );
+      } else {
+        throw new Error(
+          `Adapter "${adapter.productId}" enabled seo but strategy artifact is missing.`,
+        );
+      }
+      layersExecuted.push("seo");
+    }
+
+    // Phase 8: Performance Engine (adapter override or Core default checks).
+    if (adapter.layers.performance) {
+      emit(progress, onProgress, "performance", "Running performance checks...");
+      if (adapter.runPerformance) {
+        artifacts.performanceReport = await adapter.runPerformance(
+          brief,
+          artifacts,
+          generation,
+          ctx,
+        );
+      } else {
+        artifacts.performanceReport = runPerformanceChecks({
+          files: generationFiles(generation),
+          assetManifest: artifacts.assetManifest,
+        });
+      }
+      layersExecuted.push("performance");
+    }
+
+    // Refresh Auto Quality report with SEO + Performance before finalize / publish.
+    if (
+      artifacts.qualityReport &&
+      (artifacts.seoPackage || artifacts.performanceReport)
+    ) {
+      artifacts.qualityReport = finalizeQualityForPublish({
+        qualityReport: artifacts.qualityReport,
+        seoPackage: artifacts.seoPackage,
+        performanceReport: artifacts.performanceReport,
+        files: generationFiles(generation),
+        strategy: artifacts.strategy,
+        designSystem: artifacts.designSystem,
+        assetManifest: artifacts.assetManifest,
+        profile: artifacts.businessProfile,
+      });
     }
 
     let finalOutput: TFinal | undefined;

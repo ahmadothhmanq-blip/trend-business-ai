@@ -120,7 +120,14 @@ export type AssetManifest = {
 };
 
 export type QualityCheckDimension = {
-  name: "structure" | "responsive" | "seo" | "content";
+  name:
+    | "structure"
+    | "responsive"
+    | "seo"
+    | "content"
+    | "brand"
+    | "media"
+    | "performance";
   passed: boolean;
   issues: string[];
 };
@@ -132,4 +139,10 @@ export type QualityReport = {
   improveApplied: boolean;
   improveNotes?: string[];
   issues: string[];
+  /** Phase 8 Auto Quality extensions */
+  score?: number;
+  publishReady?: boolean;
+  seoReadinessScore?: number;
+  performanceScore?: number;
+  designConsistencyPassed?: boolean;
 };

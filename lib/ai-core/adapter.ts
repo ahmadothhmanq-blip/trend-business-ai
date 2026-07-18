@@ -6,9 +6,11 @@ import type {
   CoreDesignSystem,
   CoreLayerArtifacts,
   CoreLayerFlags,
+  CorePerformanceReport,
   CoreProductStrategy,
   CoreQualityReport,
   CoreRunMode,
+  CoreSeoPackage,
 } from "@/lib/ai-core/layers/types";
 
 /**
@@ -68,6 +70,22 @@ export type ProductEngineAdapter<TGeneration = unknown, TFinal = unknown> = {
     generation: TGeneration,
     ctx: GenerationContext,
   ): Promise<CoreQualityReport>;
+
+  /** Optional: SEO Engine — metadata / OG / schema / sitemap from Strategy */
+  runSeo?(
+    brief: CoreBrief,
+    artifacts: CoreLayerArtifacts,
+    generation: TGeneration,
+    ctx: GenerationContext,
+  ): Promise<CoreSeoPackage>;
+
+  /** Optional: Performance Engine — optimization checks before publish */
+  runPerformance?(
+    brief: CoreBrief,
+    artifacts: CoreLayerArtifacts,
+    generation: TGeneration,
+    ctx: GenerationContext,
+  ): Promise<CorePerformanceReport>;
 
   /** Optional: map generation → delivery payload (persist shape, export, etc.) */
   finalize?(

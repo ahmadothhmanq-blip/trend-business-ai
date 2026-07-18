@@ -214,6 +214,109 @@ export const coreQualityReportSchema = {
     improveApplied: { type: "boolean" },
     improveNotes: stringArray,
     issues: stringArray,
+    score: { type: "number" },
+    publishReady: { type: "boolean" },
+    seoReadinessScore: { type: "number" },
+    performanceScore: { type: "number" },
+    designConsistencyPassed: { type: "boolean" },
   },
   required: ["passed", "dimensions", "weakSections", "improveApplied", "issues"],
+} as const;
+
+export const coreSeoPackageSchema = {
+  type: "object",
+  properties: {
+    metadata: {
+      type: "object",
+      properties: {
+        title: { type: "string" },
+        description: { type: "string" },
+        keywords: stringArray,
+        canonicalPath: { type: "string" },
+        robots: { type: "string" },
+      },
+      required: ["title", "description", "keywords", "canonicalPath", "robots"],
+    },
+    openGraph: {
+      type: "object",
+      properties: {
+        title: { type: "string" },
+        description: { type: "string" },
+        type: { type: "string" },
+        siteName: { type: "string" },
+        locale: { type: "string" },
+        imageAlt: { type: "string" },
+      },
+      required: ["title", "description", "type", "siteName", "locale", "imageAlt"],
+    },
+    keywords: stringArray,
+    structuredData: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          type: { type: "string" },
+          jsonLd: { type: "object" },
+        },
+        required: ["type", "jsonLd"],
+      },
+    },
+    sitemap: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          path: { type: "string" },
+          priority: { type: "number" },
+          changefreq: { type: "string" },
+        },
+        required: ["path", "priority", "changefreq"],
+      },
+    },
+    readiness: {
+      type: "object",
+      properties: {
+        passed: { type: "boolean" },
+        score: { type: "number" },
+        issues: stringArray,
+      },
+      required: ["passed", "score", "issues"],
+    },
+    generatedAt: { type: "string" },
+  },
+  required: [
+    "metadata",
+    "openGraph",
+    "keywords",
+    "structuredData",
+    "sitemap",
+    "readiness",
+    "generatedAt",
+  ],
+} as const;
+
+export const corePerformanceReportSchema = {
+  type: "object",
+  properties: {
+    passed: { type: "boolean" },
+    score: { type: "number" },
+    checks: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          name: { type: "string" },
+          passed: { type: "boolean" },
+          score: { type: "number" },
+          issues: stringArray,
+          recommendations: stringArray,
+        },
+        required: ["name", "passed", "score", "issues", "recommendations"],
+      },
+    },
+    issues: stringArray,
+    recommendations: stringArray,
+    generatedAt: { type: "string" },
+  },
+  required: ["passed", "score", "checks", "issues", "recommendations", "generatedAt"],
 } as const;

@@ -247,6 +247,19 @@
 
 ---
 
+## D-027 — SEO + Performance + Auto Quality Engines (Phase 8)
+
+| Field | Value |
+|-------|--------|
+| Date | 2026-07-18 |
+| Status | Accepted |
+| Context | Add publish-readiness stages: SEO metadata from Strategy, performance checks, and Auto Quality Report |
+| Decision | Add `lib/ai-core/seo`, `lib/ai-core/performance`, `lib/ai-core/quality`; extend LayerRunner with `seo` + `performance` layers after quality; Website adapter injects SEO artifacts and runs full Auto Quality; Landing/Web App use Core defaults; persist `seoPackage` / `performanceReport` on `ai_runs` artifacts; keep product APIs unchanged |
+| Consequences | Pipeline is Idea → Strategy → Design → Assets → Generation → Quality → SEO → Performance → Ready to Publish; platform `lib/seo` remains marketing-site only |
+| Related | D-026, `docs/AI_CORE_ENGINE.md` |
+
+---
+
 ## D-026 — AI Design System + AI Assets Engine (Phase 7)
 
 | Field | Value |

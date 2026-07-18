@@ -55,6 +55,8 @@ function serializeArtifacts(artifacts: CoreLayerArtifacts): Record<string, unkno
     designSystem: artifacts.designSystem ?? null,
     assetManifest: artifacts.assetManifest ?? null,
     qualityReport: artifacts.qualityReport ?? null,
+    seoPackage: artifacts.seoPackage ?? null,
+    performanceReport: artifacts.performanceReport ?? null,
     generationOutput: artifacts.generationOutput ?? null,
     finalOutput: artifacts.finalOutput ?? null,
   };
@@ -87,6 +89,13 @@ function priorFromArtifacts(
   if (artifacts.qualityReport) {
     prior.qualityReport =
       artifacts.qualityReport as CoreLayerArtifacts["qualityReport"];
+  }
+  if (artifacts.seoPackage) {
+    prior.seoPackage = artifacts.seoPackage as CoreLayerArtifacts["seoPackage"];
+  }
+  if (artifacts.performanceReport) {
+    prior.performanceReport =
+      artifacts.performanceReport as CoreLayerArtifacts["performanceReport"];
   }
   return Object.keys(prior).length ? prior : undefined;
 }

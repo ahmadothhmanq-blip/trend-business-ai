@@ -76,6 +76,8 @@ export function createLandingPageBuilderAdapter(): ProductEngineAdapter<
       assets: true,
       generation: true,
       quality: true,
+      seo: true,
+      performance: true,
       finalize: true,
     },
 

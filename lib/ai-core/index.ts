@@ -1,7 +1,8 @@
 /**
- * AI Core Engine — Phase 7: Design System + Assets Engine.
+ * AI Core Engine — Phase 8: SEO + Performance + Auto Quality.
  *
- * Pipeline: Template → Idea → Strategy → Design System → Assets → Generation → Quality → Finalize
+ * Pipeline: Template → Idea → Strategy → Design System → Assets → Generation
+ *           → Quality Check → SEO → Performance → Finalize (Ready to Publish)
  * Runtime: existing AIGenerationEngine + ProviderManager (re-exported).
  */
 
@@ -124,6 +125,37 @@ export {
   type GenerateCoreAssetsParams,
 } from "@/lib/ai-core/assets";
 
+export {
+  buildSeoPackageFromStrategy,
+  seoPackageToSerializable,
+  checkSeoReadiness,
+  withSeoReadiness,
+  injectSeoArtifacts,
+  type CoreSeoPackage,
+  type CoreSeoMetadata,
+  type CoreOpenGraphData,
+  type CoreStructuredDataItem,
+  type CoreSitemapEntry,
+  type CoreSeoReadiness,
+  type BuildSeoPackageInput,
+} from "@/lib/ai-core/seo";
+
+export {
+  runPerformanceChecks,
+  type CorePerformanceReport,
+  type CorePerformanceCheck,
+  type CorePerformanceCheckName,
+  type RunPerformanceChecksInput,
+} from "@/lib/ai-core/performance";
+
+export {
+  buildAutoQualityReport,
+  finalizeQualityForPublish,
+  type CoreAutoQualityReport,
+  type CorePublishReadiness,
+  type BuildAutoQualityReportInput,
+} from "@/lib/ai-core/quality";
+
 export type {
   ProductEngineAdapter,
   LayerRunnerInput,
@@ -170,8 +202,10 @@ export {
   coreAssetManifestSchema,
   coreBusinessProfileSchema,
   coreDesignSystemSchema,
+  corePerformanceReportSchema,
   coreProductStrategySchema,
   coreQualityReportSchema,
+  coreSeoPackageSchema,
 } from "@/lib/ai-core/layers/schemas";
 
 export {

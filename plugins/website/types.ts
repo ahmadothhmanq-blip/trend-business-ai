@@ -1,6 +1,8 @@
 import type { ProjectCapabilityFlags } from "@/lib/ai/validator";
 import type { GeneratedProjectFile, GenerationProgressEvent } from "@/lib/ai/types";
 import type { PlannedFile } from "@/lib/ai/planner";
+import type { CorePerformanceReport } from "@/lib/ai-core/performance/types";
+import type { CoreSeoPackage } from "@/lib/ai-core/seo/types";
 import type {
   AssetManifest,
   BusinessProfile,
@@ -152,6 +154,10 @@ export type GeneratedWebsiteProject = {
   designSystem?: DesignSystem;
   assetManifest?: AssetManifest;
   qualityReport?: QualityReport;
+  /** Phase 8 SEO Engine package (optional; Core path) */
+  seoPackage?: CoreSeoPackage;
+  /** Phase 8 Performance Engine report (optional; Core path) */
+  performanceReport?: CorePerformanceReport;
 };
 
 export type { GeneratedProjectFile };

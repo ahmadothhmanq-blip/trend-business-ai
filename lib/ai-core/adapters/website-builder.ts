@@ -25,6 +25,14 @@ import {
   generateCoreAssets,
   planCoreAssets,
 } from "@/lib/ai-core/assets";
+import {
+  buildSeoPackageFromStrategy,
+  checkSeoReadiness,
+  injectSeoArtifacts,
+  withSeoReadiness,
+} from "@/lib/ai-core/seo";
+import { runPerformanceChecks } from "@/lib/ai-core/performance";
+import { buildAutoQualityReport } from "@/lib/ai-core/quality";
 import { analyzeBusinessIdea } from "@/plugins/website/layers/business-idea";
 import { buildDesignSystem } from "@/plugins/website/layers/design-engine";
 import { buildWebsiteStrategy } from "@/plugins/website/layers/strategy";
@@ -44,7 +52,6 @@ import type {
   WebsiteProjectAnalysis,
   WebsiteStrategy,
 } from "@/plugins/website/types";
-
 export const WEBSITE_BUILDER_PRODUCT_ID = "website-builder";
 
 const INPUT_META_KEY = "websiteGenerationInput";
@@ -95,6 +102,8 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
       assets: true,
       generation: true,
       quality: true,
+      seo: true,
+      performance: true,
       finalize: true,
     },
 
@@ -309,17 +318,78 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
         ctx,
       });
 
+      // Phase 8: Auto Quality Engine — sections + design consistency on top of plugin check.
+      const autoReport = buildAutoQualityReport({
+        baseReport: qualityResult.qualityReport as CoreQualityReport,
+        files: qualityResult.files,
+        strategy: artifacts.strategy,
+        designSystem: artifacts.designSystem,
+        assetManifest,
+        profile: artifacts.businessProfile ?? analysis.businessProfile,
+        improveApplied: qualityResult.qualityReport.improveApplied,
+        improveNotes: qualityResult.qualityReport.improveNotes,
+      });
+
       project = {
         ...generation,
         files: qualityResult.files,
-        qualityReport: qualityResult.qualityReport,
+        qualityReport: autoReport as QualityReport,
         businessProfile: analysis.businessProfile,
         strategy: plan.strategy,
         designSystem: plan.designSystem,
         assetManifest,
       };
 
-      return qualityResult.qualityReport as CoreQualityReport;
+      return autoReport;
+    },
+
+    async runSeo(brief, artifacts, generation) {
+      if (!artifacts.strategy) {
+        throw new Error(
+          "Website Builder adapter: SEO requires strategy artifact.",
+        );
+      }
+      const input = getWebsiteInput(brief);
+      const pkg = buildSeoPackageFromStrategy({
+        strategy: artifacts.strategy,
+        profile: artifacts.businessProfile ?? analysis?.businessProfile,
+        language: input.language || brief.language,
+      });
+      const files = project?.files ?? generation.files;
+      const readiness = checkSeoReadiness({
+        files,
+        strategy: artifacts.strategy,
+        seoPackage: pkg,
+      });
+      const seoPackage = withSeoReadiness(pkg, readiness);
+      const nextFiles = injectSeoArtifacts(files, seoPackage);
+
+      project = {
+        ...(project ?? generation),
+        files: nextFiles,
+        seo: seoPackage.keywords,
+        seoPackage,
+      };
+
+      return seoPackage;
+    },
+
+    async runPerformance(_brief, artifacts, generation) {
+      const files = project?.files ?? generation.files;
+      const report = runPerformanceChecks({
+        files,
+        assetManifest:
+          artifacts.assetManifest ??
+          project?.assetManifest ??
+          generation.assetManifest,
+      });
+
+      project = {
+        ...(project ?? generation),
+        performanceReport: report,
+      };
+
+      return report;
     },
 
     async finalize(_brief, artifacts, generation) {
@@ -345,6 +415,18 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
           (artifacts.qualityReport as QualityReport | undefined) ??
           project?.qualityReport ??
           generation.qualityReport,
+        seoPackage:
+          (artifacts.seoPackage as GeneratedWebsiteProject["seoPackage"]) ??
+          project?.seoPackage ??
+          generation.seoPackage,
+        performanceReport:
+          (artifacts.performanceReport as GeneratedWebsiteProject["performanceReport"]) ??
+          project?.performanceReport ??
+          generation.performanceReport,
+        seo:
+          artifacts.seoPackage?.keywords ??
+          project?.seo ??
+          generation.seo,
       };
       project = finished;
       return finished;
