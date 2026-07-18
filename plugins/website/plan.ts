@@ -106,23 +106,29 @@ function blueprintFromStrategy(
   };
 }
 
+export type PlanWebsiteOptions = {
+  /** When set (typically by AI Core LayerRunner), skip strategy AI call. */
+  strategy?: WebsitePlanResult["strategy"];
+  /** When set with strategy, skip design AI call. */
+  designSystem?: WebsitePlanResult["designSystem"];
+};
+
 export async function planWebsite(
   input: WebsiteGenerationInput,
   analysis: WebsiteProjectAnalysis,
   ctx: GenerationContext,
+  options?: PlanWebsiteOptions,
 ): Promise<WebsitePlanResult> {
   const iterationInput = {
     ...input,
     prompt: buildWebsiteIterationPrompt(input),
   };
 
-  const strategy = await buildWebsiteStrategy(input, analysis, ctx);
-  const designSystem = await buildDesignSystem(
-    input,
-    analysis,
-    strategy,
-    ctx,
-  );
+  const strategy =
+    options?.strategy ?? (await buildWebsiteStrategy(input, analysis, ctx));
+  const designSystem =
+    options?.designSystem ??
+    (await buildDesignSystem(input, analysis, strategy, ctx));
 
   ctx.progress.emit("Creating blueprint...");
 

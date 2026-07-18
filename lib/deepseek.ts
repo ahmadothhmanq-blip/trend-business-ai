@@ -2,7 +2,12 @@ import { providerManager } from "@/lib/ai/provider-manager";
 import type { AIProviderName } from "@/lib/ai/types";
 import { emptyTokenUsage } from "@/lib/ai/usage";
 import type { TokenUsage } from "@/lib/ai/types";
-import { websitePlugin } from "@/plugins/website";
+import { layerRunner } from "@/lib/ai-core";
+import {
+  createWebsiteBuilderAdapter,
+  priorArtifactsFromWebsiteInput,
+  websiteInputToBrief,
+} from "@/lib/ai-core/adapters/website-builder";
 import type {
   GeneratedProjectFile,
   GeneratedWebsiteProject,
@@ -38,6 +43,11 @@ export async function generateWebsiteWithDeepSeek(input: GenerateWebsiteInput): 
   return generateWebsite(input);
 }
 
+/**
+ * Website Builder entrypoint — Phase 1 runs through AI Core LayerRunner
+ * (Idea → Strategy → Design → Assets → Generation → Quality → Finalize).
+ * Preview / ZIP / publish remain on existing API routes after this returns.
+ */
 export async function generateWebsite(input: GenerateWebsiteInput): Promise<
   GeneratedWebsiteProject & {
     progressEvents: WebsiteGenerationProgressEvent[];
@@ -78,17 +88,28 @@ export async function generateWebsite(input: GenerateWebsiteInput): Promise<
     if (!providerManager.isConfigured(providerName)) continue;
     try {
       onProgress?.(`Connecting to ${providerName}...`);
-      const result = await providerManager.runPlugin(
-        websitePlugin,
-        pluginInput,
+
+      const adapter = createWebsiteBuilderAdapter();
+      const result = await layerRunner.run(
+        adapter,
+        {
+          brief: websiteInputToBrief(pluginInput),
+          mode: pluginInput.mode,
+          continueInstruction: pluginInput.continueInstruction,
+          priorArtifacts: priorArtifactsFromWebsiteInput(pluginInput),
+          userId: pluginInput.userId,
+          parentRunId: pluginInput.parentGenerationId,
+        },
         {
           provider: providerName,
           onProgress,
         },
       );
 
+      const project = result.finalOutput ?? result.generation;
+
       return {
-        ...result.output,
+        ...project,
         progressEvents: result.progressEvents as WebsiteGenerationProgressEvent[],
         usage: result.usage ?? emptyTokenUsage(),
         generationTimeMs: result.generationTimeMs,

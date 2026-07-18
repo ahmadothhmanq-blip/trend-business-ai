@@ -24,7 +24,9 @@ import {
 } from "@/plugins/website/layers/quality";
 import { generatedFileSchema } from "@/plugins/website/schemas";
 import type {
+  AssetManifest,
   GeneratedProjectFile,
+  QualityReport,
   WebsiteGenerationInput,
   WebsitePlanResult,
   WebsiteProjectAnalysis,
@@ -182,7 +184,7 @@ async function validateAndRepairProject(
   return currentFiles;
 }
 
-async function applyQualityImprovePass(
+export async function applyQualityImprovePass(
   input: WebsiteGenerationInput,
   analysis: WebsiteProjectAnalysis,
   plan: WebsitePlanResult,
@@ -238,21 +240,34 @@ async function applyQualityImprovePass(
     .concat(current.filter((f) => !planByPath.has(f.path)));
 }
 
+export type GenerateWebsiteOptions = {
+  /** Precomputed assets from AI Core assets layer */
+  assetManifest?: AssetManifest;
+  /** Skip asset generation (requires assetManifest) */
+  skipAssetGeneration?: boolean;
+  /** Skip quality check/improve (Core quality layer will run) */
+  skipQuality?: boolean;
+};
+
 export async function generateWebsite(
   input: WebsiteGenerationInput,
   analysis: WebsiteProjectAnalysis,
   plan: WebsitePlanResult,
   ctx: GenerationContext,
+  options?: GenerateWebsiteOptions,
 ) {
-  const assetManifest = await generateWebsiteAssets({
-    input,
-    businessProfile: analysis.businessProfile,
-    strategy: plan.strategy,
-    designSystem: plan.designSystem,
-    ctx,
-    userId: input.userId,
-    generationKey: input.parentGenerationId ?? `draft-${Date.now()}`,
-  });
+  const assetManifest =
+    options?.skipAssetGeneration && options.assetManifest
+      ? options.assetManifest
+      : await generateWebsiteAssets({
+          input,
+          businessProfile: analysis.businessProfile,
+          strategy: plan.strategy,
+          designSystem: plan.designSystem,
+          ctx,
+          userId: input.userId,
+          generationKey: input.parentGenerationId ?? `draft-${Date.now()}`,
+        });
   const assetSummary = assetManifestForPrompt(assetManifest);
 
   ctx.progress.emit("Generating files...");
@@ -344,6 +359,76 @@ export async function generateWebsite(
     assetSummary,
   );
 
+  let qualityReport: QualityReport | undefined;
+  if (options?.skipQuality) {
+    qualityReport = {
+      passed: true,
+      dimensions: [],
+      weakSections: [],
+      improveApplied: false,
+      issues: [],
+    };
+  } else {
+    const qualityResult = await runWebsiteQualityLayer({
+      input,
+      analysis,
+      plan,
+      files: validatedFiles,
+      assetManifest,
+      ctx,
+    });
+    validatedFiles = qualityResult.files;
+    qualityReport = qualityResult.qualityReport;
+  }
+
+  return {
+    projectKind: input.projectKind,
+    title: plan.blueprint.title || analysis.projectName,
+    description: plan.blueprint.description,
+    pages: plan.blueprint.pages,
+    sections: plan.blueprint.sections,
+    colorPalette: plan.blueprint.colorPalette,
+    typography: plan.blueprint.typography,
+    components: plan.blueprint.components,
+    content: plan.blueprint.content,
+    seo: plan.blueprint.seo,
+    roadmap: plan.blueprint.roadmap,
+    files: validatedFiles,
+    businessProfile: analysis.businessProfile,
+    strategy: plan.strategy,
+    designSystem: plan.designSystem,
+    assetManifest,
+    qualityReport,
+    settings: {
+      framework: "Next.js App Router",
+      styling: "Tailwind CSS",
+      packageManager: "npm",
+      deploymentTarget: "Vercel or Node hosting",
+      complexity: plan.dynamicPlan.complexity,
+      estimatedFileCount: String(validatedFiles.length),
+      requiresAuth: String(plan.flags.requiresAuth),
+      requiresDatabase: String(plan.flags.requiresDatabase),
+      requiresDashboard: String(plan.flags.requiresDashboard),
+      isEcommerce: String(plan.flags.isEcommerce),
+      isSaas: String(plan.flags.isSaas),
+      databaseProvider: plan.flags.databaseProvider,
+    },
+  };
+}
+
+/** Quality check + optional improve pass (used by plugin and AI Core quality layer). */
+export async function runWebsiteQualityLayer(params: {
+  input: WebsiteGenerationInput;
+  analysis: WebsiteProjectAnalysis;
+  plan: WebsitePlanResult;
+  files: GeneratedProjectFile[];
+  assetManifest: AssetManifest;
+  ctx: GenerationContext;
+}): Promise<{ files: GeneratedProjectFile[]; qualityReport: QualityReport }> {
+  const { input, analysis, plan, assetManifest, ctx } = params;
+  let validatedFiles = params.files;
+  const assetSummary = assetManifestForPrompt(assetManifest);
+
   ctx.progress.emit("Running quality check...");
   let qualityReport = runWebsiteQualityCheck({
     files: validatedFiles,
@@ -387,37 +472,5 @@ export async function generateWebsite(
     }
   }
 
-  return {
-    projectKind: input.projectKind,
-    title: plan.blueprint.title || analysis.projectName,
-    description: plan.blueprint.description,
-    pages: plan.blueprint.pages,
-    sections: plan.blueprint.sections,
-    colorPalette: plan.blueprint.colorPalette,
-    typography: plan.blueprint.typography,
-    components: plan.blueprint.components,
-    content: plan.blueprint.content,
-    seo: plan.blueprint.seo,
-    roadmap: plan.blueprint.roadmap,
-    files: validatedFiles,
-    businessProfile: analysis.businessProfile,
-    strategy: plan.strategy,
-    designSystem: plan.designSystem,
-    assetManifest,
-    qualityReport,
-    settings: {
-      framework: "Next.js App Router",
-      styling: "Tailwind CSS",
-      packageManager: "npm",
-      deploymentTarget: "Vercel or Node hosting",
-      complexity: plan.dynamicPlan.complexity,
-      estimatedFileCount: String(validatedFiles.length),
-      requiresAuth: String(plan.flags.requiresAuth),
-      requiresDatabase: String(plan.flags.requiresDatabase),
-      requiresDashboard: String(plan.flags.requiresDashboard),
-      isEcommerce: String(plan.flags.isEcommerce),
-      isSaas: String(plan.flags.isSaas),
-      databaseProvider: plan.flags.databaseProvider,
-    },
-  };
+  return { files: validatedFiles, qualityReport };
 }

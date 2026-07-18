@@ -247,6 +247,44 @@
 
 ---
 
+## D-020 — Website Builder on AI Core LayerRunner (Phase 1)
+
+| Field | Value |
+|-------|-------|
+| Status | Accepted |
+| Date | 2026-07-18 |
+| Context | Move Website Builder execution through LayerRunner without rewriting UI/delivery |
+| Decision | Add `website-builder` ProductEngineAdapter that reuses `plugins/website` layers; `generateWebsite` (`lib/deepseek.ts`) calls `layerRunner.run`; preview/ZIP/publish stay on existing routes |
+| Consequences | Core owns Idea→Strategy→Design→Assets→Generation→Quality→Finalize for WB; plugin remains for scaffolds/compat; other products unchanged |
+
+---
+
+## D-020 — Website Builder on AI Core LayerRunner (Phase 1)
+
+| Field | Value |
+|-------|--------|
+| Date | 2026-07-18 |
+| Status | Accepted |
+| Context | Move Website Builder execution through LayerRunner without rewriting UI/delivery |
+| Decision | Add `website-builder` ProductEngineAdapter that reuses `plugins/website` layers; `generateWebsite` (`lib/deepseek.ts`) calls `layerRunner.run`; preview/ZIP/publish stay on existing routes |
+| Consequences | Core owns Idea→Strategy→Design→Assets→Generation→Quality→Finalize for WB; plugin remains for scaffolds/compat; other products unchanged |
+| Related | D-019, D-018, `docs/AI_CORE_ENGINE.md` |
+
+---
+
+## D-019 — AI Core Engine foundation (Phase 0)
+
+| Field | Value |
+|-------|--------|
+| Date | 2026-07-18 |
+| Status | Accepted |
+| Context | Extract reusable Idea→Strategy→Design→Assets→Generation→QA pipeline for all products without rewriting AIGenerationEngine |
+| Decision | Add `lib/ai-core` with generic layer types/schemas, `LayerRunner`, `ProductEngineAdapter`, empty registry, and `ai_runs` + `ai-assets` migration. Do not migrate Website Builder or other products in Phase 0. |
+| Consequences | Foundation ready for Phase 1 Website adapter; existing product routes unchanged. |
+| Related | D-018, `docs/AI_CORE_ENGINE.md` |
+
+---
+
 ## Template for new entries
 
 ```markdown

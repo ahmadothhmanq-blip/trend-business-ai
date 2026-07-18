@@ -305,3 +305,30 @@ export type PaginatedResponse<T> = {
   total: number;
   totalPages: number;
 };
+
+/** AI Core Engine run ledger (migration 033). Unused by product routes in Phase 0. */
+export type AiRunStatus =
+  | "pending"
+  | "running"
+  | "completed"
+  | "failed"
+  | "cancelled";
+
+export type AiRun = {
+  id: string;
+  user_id: string;
+  product_id: string;
+  status: AiRunStatus;
+  mode: GenerationMode;
+  parent_run_id: string | null;
+  brief: Record<string, unknown>;
+  artifacts: Record<string, unknown>;
+  layers_executed: string[];
+  provider: string | null;
+  token_usage: TokenUsage | null;
+  generation_time_ms: number | null;
+  error_message: string | null;
+  continue_instruction: string | null;
+  created_at: string;
+  updated_at: string;
+};
