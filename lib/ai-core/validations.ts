@@ -13,6 +13,7 @@ export const aiCoreRunCreateSchema = z.object({
   language: z.string().trim().optional(),
   theme: z.string().trim().optional(),
   features: z.array(z.string().trim()).optional(),
+  industry: z.string().trim().optional(),
   continueInstruction: z.string().trim().max(4000).optional(),
   parentRunId: z.string().uuid().optional(),
   provider: z.string().trim().optional(),

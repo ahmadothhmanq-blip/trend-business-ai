@@ -8,6 +8,7 @@ import type {
   ProductEngineAdapter,
 } from "@/lib/ai-core/adapter";
 import type { CoreLayerArtifacts, CoreLayerName } from "@/lib/ai-core/layers/types";
+import { enrichBriefWithIndustryTemplate } from "@/lib/ai-core/templates/apply";
 
 export type LayerRunnerOptions = {
   provider?: AIProviderName;
@@ -52,13 +53,14 @@ export class LayerRunner {
     const onProgress = options.onProgress;
     const layersExecuted: string[] = [];
 
-    const brief = {
+    let brief = {
       ...input.brief,
       productId: input.brief.productId || adapter.productId,
     };
 
     const artifacts: CoreLayerArtifacts = {
       brief,
+      templateSelection: input.priorArtifacts?.templateSelection,
       businessProfile: input.priorArtifacts?.businessProfile,
       strategy: input.priorArtifacts?.strategy,
       designSystem: input.priorArtifacts?.designSystem,
@@ -67,6 +69,17 @@ export class LayerRunner {
     };
 
     emit(progress, onProgress, "start", `${adapter.label} Core run starting`);
+
+    // Phase 6: Industry Template Engine — select layout/sections/preset/features.
+    emit(progress, onProgress, "template", "Selecting industry template...");
+    const enriched = enrichBriefWithIndustryTemplate(brief);
+    brief = enriched.brief;
+    artifacts.brief = brief;
+    artifacts.templateSelection = enriched.selection;
+    layersExecuted.push("template");
+    onProgress?.(
+      `[template] ${enriched.selection.label} · ${enriched.selection.layoutStyle} · ${enriched.selection.designPreset}`,
+    );
 
     if (adapter.layers.idea && adapter.runIdea) {
       emit(progress, onProgress, "idea", "Analyzing business idea...");

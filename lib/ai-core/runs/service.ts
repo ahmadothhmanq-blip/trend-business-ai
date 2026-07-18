@@ -49,6 +49,7 @@ function isMissingTableError(error: { code?: string; message?: string } | null) 
 function serializeArtifacts(artifacts: CoreLayerArtifacts): Record<string, unknown> {
   return {
     brief: artifacts.brief,
+    templateSelection: artifacts.templateSelection ?? null,
     businessProfile: artifacts.businessProfile ?? null,
     strategy: artifacts.strategy ?? null,
     designSystem: artifacts.designSystem ?? null,
@@ -64,6 +65,10 @@ function priorFromArtifacts(
 ): Partial<CoreLayerArtifacts> | undefined {
   if (!artifacts || typeof artifacts !== "object") return undefined;
   const prior: Partial<CoreLayerArtifacts> = {};
+  if (artifacts.templateSelection) {
+    prior.templateSelection =
+      artifacts.templateSelection as CoreLayerArtifacts["templateSelection"];
+  }
   if (artifacts.businessProfile) {
     prior.businessProfile =
       artifacts.businessProfile as CoreLayerArtifacts["businessProfile"];

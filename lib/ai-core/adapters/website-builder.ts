@@ -16,6 +16,7 @@ import type {
   CoreQualityReport,
 } from "@/lib/ai-core/layers/types";
 import { registerProductEngineAdapter } from "@/lib/ai-core/registry";
+import { getTemplateSelectionFromBrief } from "@/lib/ai-core/templates/apply";
 import { analyzeBusinessIdea } from "@/plugins/website/layers/business-idea";
 import { generateWebsiteAssets } from "@/plugins/website/layers/assets";
 import { buildDesignSystem } from "@/plugins/website/layers/design-engine";
@@ -91,7 +92,36 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
 
     async runIdea(brief, ctx) {
       const input = getWebsiteInput(brief);
+      const template = getTemplateSelectionFromBrief(brief);
       analysis = await analyzeBusinessIdea(input, ctx);
+      if (template) {
+        const requiredSections = Array.from(
+          new Set([
+            ...analysis.businessProfile.requiredSections,
+            ...template.sections,
+          ]),
+        );
+        analysis = {
+          ...analysis,
+          pages:
+            analysis.pages.length > 0
+              ? analysis.pages
+              : template.suggestedPages,
+          features: Array.from(
+            new Set([...analysis.features, ...template.requiredFeatures]),
+          ),
+          isEcommerce:
+            analysis.isEcommerce || template.industryId === "ecommerce",
+          isSaas: analysis.isSaas || template.industryId === "saas",
+          businessProfile: {
+            ...analysis.businessProfile,
+            industry:
+              analysis.businessProfile.industry || template.label,
+            requiredSections,
+            tone: analysis.businessProfile.tone || template.contentTone,
+          },
+        };
+      }
       return analysis.businessProfile as CoreBusinessProfile;
     },
 
@@ -120,6 +150,7 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
 
     async runDesign(brief, profile, strategy, ctx) {
       const input = getWebsiteInput(brief);
+      const template = getTemplateSelectionFromBrief(brief);
       if (!analysis) {
         throw new Error(
           "Website Builder adapter: design requires prior idea analysis.",
@@ -130,12 +161,24 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
         ...analysis,
         businessProfile: profile as WebsiteProjectAnalysis["businessProfile"],
       };
-      return (await buildDesignSystem(
-        input,
+      const designInput = template
+        ? {
+            ...input,
+            theme: input.theme || template.designPreset,
+          }
+        : input;
+      const design = await buildDesignSystem(
+        designInput,
         analysis,
         strategy as WebsiteStrategy,
         ctx,
-      )) as CoreDesignSystem;
+      );
+      if (template) {
+        design.stylePreset = template.designPreset;
+        design.layoutStyle = template.layoutStyle;
+        design.industryPattern = template.industryPattern;
+      }
+      return design as CoreDesignSystem;
     },
 
     async runAssets(brief, artifacts, ctx) {

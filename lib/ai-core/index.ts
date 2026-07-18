@@ -1,7 +1,7 @@
 /**
- * AI Core Engine — Phase 5: unified registry + /api/ai-core/runs.
+ * AI Core Engine — Phase 6: Template Engine + Industry Intelligence.
  *
- * Layer pipeline: Idea → Strategy → Design → Assets → Generation → Quality → Finalize
+ * Pipeline: Template → Idea → Strategy → Design → Assets → Generation → Quality → Finalize
  * Runtime: existing AIGenerationEngine + ProviderManager (re-exported).
  */
 
@@ -77,6 +77,22 @@ export {
   getAiCoreRun,
   type AiCoreRunExecuteResult,
 } from "@/lib/ai-core/runs/service";
+
+export {
+  INDUSTRY_PROFILES,
+  INDUSTRY_IDS,
+  getIndustryProfile,
+  listIndustryProfiles,
+  isIndustryId,
+  selectIndustryTemplate,
+  enrichBriefWithIndustryTemplate,
+  getTemplateSelectionFromBrief,
+  type IndustryId,
+  type IndustryProfile,
+  type LayoutStyle,
+  type TemplateDesignPreset,
+  type TemplateSelection,
+} from "@/lib/ai-core/templates";
 
 export type {
   ProductEngineAdapter,

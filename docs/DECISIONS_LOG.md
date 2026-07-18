@@ -247,6 +247,19 @@
 
 ---
 
+## D-025 — AI Template Engine + Industry Intelligence (Phase 6)
+
+| Field | Value |
+|-------|--------|
+| Date | 2026-07-18 |
+| Status | Accepted |
+| Context | Add shared industry templates so Core can select layout, sections, design preset, and required features |
+| Decision | Add `lib/ai-core/templates` with 7 industry profiles; `LayerRunner` enriches briefs via `enrichBriefWithIndustryTemplate` before Idea; Website adapter applies selection to profile/design; expose `GET /api/ai-core/industries`; keep product APIs unchanged |
+| Consequences | All Core runs get industry-aware defaults; artifacts store `templateSelection` |
+| Related | D-024, `docs/AI_CORE_ENGINE.md` |
+
+---
+
 ## D-024 — Unified AI Core registry + run API (Phase 5)
 
 | Field | Value |

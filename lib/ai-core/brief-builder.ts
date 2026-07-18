@@ -27,6 +27,8 @@ export type AiCoreRunRequestBody = {
   language?: string;
   theme?: string;
   features?: string[];
+  /** Explicit industry for Template Engine (restaurant, saas, …). */
+  industry?: string;
   continueInstruction?: string;
   parentRunId?: string;
   provider?: string;
@@ -48,6 +50,18 @@ function num(value: unknown, fallback: number): number {
   return typeof value === "number" && Number.isFinite(value) ? value : fallback;
 }
 
+function withIndustryMeta(brief: CoreBrief, industry: string): CoreBrief {
+  if (!industry) return brief;
+  return {
+    ...brief,
+    metadata: {
+      ...(brief.metadata ?? {}),
+      industry,
+      industryId: industry,
+    },
+  };
+}
+
 export function buildCoreBrief(
   canonicalProductId: AiCoreProductId,
   body: AiCoreRunRequestBody,
@@ -57,12 +71,18 @@ export function buildCoreBrief(
   const language = body.language ?? str(extra.language, "English");
   const theme = body.theme ?? str(extra.theme, "modern");
   const features = body.features ?? strArr(extra.features);
+  const industry = body.industry ?? str(extra.industry, "");
+
+  let brief: CoreBrief;
 
   switch (canonicalProductId) {
     case "website-builder": {
       const input: WebsiteGenerationInput = {
         prompt,
-        projectType: str(extra.projectType, "business-website"),
+        projectType: str(
+          extra.projectType,
+          industry || "business-website",
+        ),
         projectKind:
           extra.projectKind === "web_application" ? "web_application" : "website",
         language,
@@ -76,36 +96,39 @@ export function buildCoreBrief(
           ? (extra.previousFiles as WebsiteGenerationInput["previousFiles"])
           : undefined,
       };
-      return websiteInputToBrief(input);
+      brief = websiteInputToBrief(input);
+      break;
     }
     case "app-builder": {
       const input: WebAppPluginInput = {
         prompt,
-        appType: str(extra.appType, "saas"),
+        appType: str(extra.appType, industry || "saas"),
         language,
         designStyle: str(extra.designStyle, theme),
         colorStyle: str(extra.colorStyle, "neutral"),
         features,
       };
-      return webappInputToBrief(input);
+      brief = webappInputToBrief(input);
+      break;
     }
     case "landing-page-builder": {
       const input: LandingPagePluginInput = {
         prompt,
-        pageType: str(extra.pageType, "product"),
+        pageType: str(extra.pageType, industry || "product"),
         language,
         designStyle: str(extra.designStyle, theme),
         colorStyle: str(extra.colorStyle, "neutral"),
         sections: strArr(extra.sections, features.length ? features : ["Hero", "Features", "CTA"]),
       };
-      return landingPageInputToBrief(input);
+      brief = landingPageInputToBrief(input);
+      break;
     }
     case "brand-designer": {
       const input: BrandIdentityPluginInput = {
         prompt,
         brandName: str(extra.brandName, "Brand"),
         brandType: str(extra.brandType, "startup"),
-        industry: str(extra.industry, "General"),
+        industry: industry || str(extra.industry, "General"),
         targetAudience: str(extra.targetAudience, "General"),
         brandPersonality: str(extra.brandPersonality, theme || "Professional"),
         deliverables: strArr(
@@ -115,7 +138,8 @@ export function buildCoreBrief(
             : ["brand-strategy", "color-palette", "typography", "voice-tone"],
         ),
       };
-      return brandInputToBrief(input);
+      brief = brandInputToBrief(input);
+      break;
     }
     case "content-studio": {
       const input: ContentPluginInput = {
@@ -131,7 +155,8 @@ export function buildCoreBrief(
         options: strArr(extra.options, features),
         seoKeywords: str(extra.seoKeywords, ""),
       };
-      return contentInputToBrief(input);
+      brief = contentInputToBrief(input);
+      break;
     }
     case "video-studio": {
       const input: VideoPluginInput = {
@@ -145,7 +170,8 @@ export function buildCoreBrief(
         options: strArr(extra.options, features),
         sceneCount: num(extra.sceneCount, 4),
       };
-      return videoInputToBrief(input);
+      brief = videoInputToBrief(input);
+      break;
     }
     case "marketing-ai": {
       const input: PluginBriefInput = {
@@ -154,11 +180,14 @@ export function buildCoreBrief(
         theme,
         features,
       };
-      return marketingInputToBrief(input);
+      brief = marketingInputToBrief(input);
+      break;
     }
     default: {
       const _exhaustive: never = canonicalProductId;
       throw new Error(`Unsupported AI Core product: ${_exhaustive}`);
     }
   }
+
+  return withIndustryMeta(brief, industry);
 }

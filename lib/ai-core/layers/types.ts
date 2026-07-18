@@ -3,6 +3,8 @@
  * Product-agnostic — Website Builder keeps its own layer types until Phase 1 migration.
  */
 
+import type { TemplateSelection } from "@/lib/ai-core/templates/types";
+
 export type CoreRunMode = "generate" | "regenerate" | "continue" | "retry";
 
 export type CoreBrief = {
@@ -157,6 +159,8 @@ export type CoreQualityReport = {
 /** Artifacts accumulated across the Core layer pipeline. */
 export type CoreLayerArtifacts = {
   brief: CoreBrief;
+  /** Industry template selection (Phase 6 Template Engine). */
+  templateSelection?: TemplateSelection;
   businessProfile?: CoreBusinessProfile;
   strategy?: CoreProductStrategy;
   designSystem?: CoreDesignSystem;
@@ -175,7 +179,8 @@ export type CoreLayerName =
   | "assets"
   | "generation"
   | "quality"
-  | "finalize";
+  | "finalize"
+  | "template";
 
 export type CoreLayerFlags = {
   idea?: boolean;
