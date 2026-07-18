@@ -13,8 +13,11 @@ Supersedes day-of use of `docs/LAUNCH_CHECKLIST.md` (keep that doc for detailed 
 - [x] Phase 11 audit documented (`PHASE_11_FINAL_AUDIT.md`)  
 - [x] Known issues published (`KNOWN_ISSUES.md`)  
 - [x] Phase 12 staging tooling (`verify:staging`, `smoke:staging`, `STAGING_SETUP.md`)  
+- [x] Phase 13 go-live tooling (`verify:golive`, `smoke:uat`, `FINAL_GO_LIVE_CHECKLIST.md`)  
 - [ ] `npm run verify:staging -- --strict` on staging host (0 fail)  
 - [ ] `STAGING_TEST_REPORT.md` manual UX signed off  
+- [ ] `npm run verify:golive -- --production` on production (0 fail)  
+- [ ] `FINAL_GO_LIVE_CHECKLIST.md` complete  
 - [ ] `LAUNCH_BLOCKERS.md` CRITICAL cleared  
 - [ ] `npm run verify:launch -- --production` on deploy host (0 fail)  
 

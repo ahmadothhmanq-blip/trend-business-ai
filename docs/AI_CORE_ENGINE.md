@@ -1,8 +1,8 @@
 # AI Core Engine
 
-**Status:** Phase 12 — Staging validation (Core pipeline unchanged)  
+**Status:** Phase 13 — Production go-live prep (Core pipeline unchanged)  
 **Scope:** Shared layer pipeline for all Trend Business AI products  
-**Related:** D-018–D-031
+**Related:** D-018–D-032
 
 ---
 
@@ -24,7 +24,18 @@ User-facing One Prompt progress:
 
 **Idea → Strategy → Design → Assets → Generation → Quality → Ready Product**
 
-Phases 10–12 do **not** change this pipeline. They harden ops, audit, and staging validation around it. Existing product APIs remain compatible.
+Phases 10–13 do **not** change this pipeline. They harden ops, audit, staging, and go-live prep around it. Existing product APIs remain compatible.
+
+---
+
+## Phase 13 — Production go-live
+
+| Area | Docs / code |
+|------|-------------|
+| Go-live verify | `npm run verify:golive`, `lib/production/golive.ts` |
+| Final UAT smoke | `npm run smoke:uat` |
+| Launch report | `docs/PRODUCTION_LAUNCH_REPORT.md` |
+| Go-live checklist | `docs/FINAL_GO_LIVE_CHECKLIST.md` |
 
 ---
 

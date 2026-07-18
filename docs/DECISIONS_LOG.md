@@ -247,6 +247,19 @@
 
 ---
 
+## D-032 — Production Go-Live Preparation (Phase 13)
+
+| Field | Value |
+|-------|--------|
+| Date | 2026-07-18 |
+| Status | Accepted |
+| Context | Execute final production launch preparation: env, migrations, storage, AI, domain, billing, UAT |
+| Decision | Add `lib/production/golive.ts`, `npm run verify:golive` (production env, critical migrations, DB tables, storage buckets, AI probe, optional `PRODUCTION_BASE_URL` routing/SSL), `npm run smoke:uat` final UAT gates + checklist; ship `PRODUCTION_LAUNCH_REPORT.md` and `FINAL_GO_LIVE_CHECKLIST.md`; keep AI Core and product APIs unchanged; fix only launch blockers |
+| Consequences | Go-live is checklist- and script-gated; paid day-one requires `--paid` (PayPal live + webhook); free-only launch allowed with billing warn |
+| Related | D-031, `docs/PRODUCTION_LAUNCH_REPORT.md`, `docs/FINAL_GO_LIVE_CHECKLIST.md` |
+
+---
+
 ## D-031 — Staging Environment & UX Validation (Phase 12)
 
 | Field | Value |

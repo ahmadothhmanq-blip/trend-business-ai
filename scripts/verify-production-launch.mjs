@@ -119,6 +119,8 @@ const docs = [
   "docs/LAUNCH_CHECKLIST.md",
   "docs/BILLING_ARCHITECTURE.md",
   "docs/SECURITY_PRODUCTION.md",
+  "docs/PRODUCTION_LAUNCH_REPORT.md",
+  "docs/FINAL_GO_LIVE_CHECKLIST.md",
   "DEPLOYMENT.md",
 ];
 

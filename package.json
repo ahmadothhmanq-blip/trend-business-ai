@@ -12,11 +12,13 @@
     "verify:wb-launch": "node scripts/verify-wb-launch.mjs",
     "verify:launch": "node scripts/verify-production-launch.mjs",
     "verify:staging": "node scripts/verify-staging.mjs",
+    "verify:golive": "node scripts/verify-production-golive.mjs",
     "perf:budget": "node scripts/check-dashboard-budgets.mjs",
     "smoke:website-ai": "node scripts/smoke-website-ai.mjs",
     "smoke:ai-core": "node scripts/smoke-ai-core.mjs",
     "smoke:core-products": "node scripts/smoke-core-products.mjs",
     "smoke:staging": "node scripts/smoke-staging-journey.mjs",
+    "smoke:uat": "node scripts/smoke-uat-journey.mjs",
     "db:apply": "node scripts/apply-migrations.mjs",
     "db:verify": "node scripts/verify-platform-db.mjs"
   },
