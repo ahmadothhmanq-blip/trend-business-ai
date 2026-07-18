@@ -226,7 +226,7 @@ export const INDUSTRY_PROFILES: Record<IndustryId, IndustryProfile> = {
       "Testimonials",
       "Contact",
     ],
-    designPreset: "minimal",
+    designPreset: "creative",
     requiredFeatures: [
       "portfolio",
       "services",

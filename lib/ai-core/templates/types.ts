@@ -21,7 +21,8 @@ export type TemplateDesignPreset =
   | "luxury"
   | "modern"
   | "corporate"
-  | "minimal";
+  | "minimal"
+  | "creative";
 
 /** Industry intelligence profile used by the AI Template Engine. */
 export type IndustryProfile = {

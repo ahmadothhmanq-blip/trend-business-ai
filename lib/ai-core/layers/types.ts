@@ -70,7 +70,8 @@ export type CoreDesignStylePreset =
   | "luxury"
   | "modern"
   | "corporate"
-  | "minimal";
+  | "minimal"
+  | "creative";
 
 export type CoreDesignColorTokens = {
   primary: string;
@@ -89,6 +90,39 @@ export type CoreDesignTypography = {
   notes: string;
 };
 
+/** Phase 7 extended design decisions (optional for backward compatibility). */
+export type CoreDesignSpacingSystem = {
+  unit: string;
+  scale: string[];
+  sectionGap: string;
+  containerMax: string;
+  notes: string;
+};
+
+export type CoreDesignUiStyle = {
+  density: "airy" | "balanced" | "compact";
+  corners: "sharp" | "soft" | "pill";
+  elevation: "flat" | "soft" | "elevated";
+  contrast: "subtle" | "medium" | "high";
+  notes: string;
+};
+
+export type CoreDesignComponentStyle = {
+  buttons: string;
+  cards: string;
+  inputs: string;
+  navigation: string;
+  palette: string[];
+};
+
+export type CoreDesignAnimationStyle = {
+  motion: "none" | "subtle" | "expressive";
+  easing: string;
+  duration: string;
+  entrances: string[];
+  notes: string;
+};
+
 export type CoreDesignSystem = {
   style: string;
   stylePreset: CoreDesignStylePreset;
@@ -102,6 +136,11 @@ export type CoreDesignSystem = {
   spacingScale: string[];
   borderRadius: string;
   shadowStyle: string;
+  /** Phase 7 AI Design System extensions */
+  spacingSystem?: CoreDesignSpacingSystem;
+  uiStyle?: CoreDesignUiStyle;
+  componentStyle?: CoreDesignComponentStyle;
+  animationStyle?: CoreDesignAnimationStyle;
 };
 
 export type CoreAssetRole =

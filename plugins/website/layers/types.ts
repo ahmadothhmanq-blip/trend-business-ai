@@ -55,7 +55,8 @@ export type DesignStylePreset =
   | "luxury"
   | "modern"
   | "corporate"
-  | "minimal";
+  | "minimal"
+  | "creative";
 
 export type DesignColorTokens = {
   primary: string;

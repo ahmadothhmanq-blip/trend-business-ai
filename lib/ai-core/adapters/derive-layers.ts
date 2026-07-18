@@ -29,6 +29,14 @@ export function toStylePreset(style: string): CoreDesignStylePreset {
   if (s.includes("minimal") || s.includes("clean") || s.includes("simple")) {
     return "minimal";
   }
+  if (
+    s.includes("creative") ||
+    s.includes("agency") ||
+    s.includes("studio") ||
+    s.includes("playful")
+  ) {
+    return "creative";
+  }
   return "modern";
 }
 

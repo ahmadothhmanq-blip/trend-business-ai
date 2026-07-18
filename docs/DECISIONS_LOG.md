@@ -247,6 +247,19 @@
 
 ---
 
+## D-026 — AI Design System + AI Assets Engine (Phase 7)
+
+| Field | Value |
+|-------|--------|
+| Date | 2026-07-18 |
+| Status | Accepted |
+| Context | Add shared design decisions from Strategy and a reusable asset generation layer |
+| Decision | Add `lib/ai-core/design-system` (presets including creative; colors/type/spacing/UI/component/animation) and `lib/ai-core/assets` (plan + OpenAI/SVG generate); Website Core adapter merges design foundation and uses Assets Engine; expose `GET /api/ai-core/design-presets`; keep product APIs unchanged |
+| Consequences | Design/Assets are Core-native; Website still uses plugin AI design refine + website-assets storage |
+| Related | D-025, `docs/AI_CORE_ENGINE.md` |
+
+---
+
 ## D-025 — AI Template Engine + Industry Intelligence (Phase 6)
 
 | Field | Value |

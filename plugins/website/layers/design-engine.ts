@@ -150,6 +150,36 @@ const STYLE_PRESETS: Record<
     borderRadius: "0.25rem",
     shadowStyle: "none",
   },
+  creative: {
+    style: "Creative expressive",
+    stylePreset: "creative",
+    colors: {
+      primary: "#F43F5E",
+      secondary: "#0F172A",
+      accent: "#A78BFA",
+      neutral: "#94A3B8",
+      surface: "#FFF1F2",
+      background: "#FFFBF7",
+      foreground: "#0F172A",
+    },
+    typography: {
+      headingFont: "Clash Display",
+      bodyFont: "Satoshi",
+      scale: ["text-5xl", "text-3xl", "text-xl", "text-base"],
+      notes: "Expressive display + friendly body",
+    },
+    layoutRules: [
+      "Asymmetric hero compositions",
+      "Portfolio-forward sections",
+      "Strong accent moments",
+    ],
+    layoutStyle: "studio portfolio with offset gallery",
+    uiPatterns: ["Offset gallery", "Marquee proof", "Bold CTA band"],
+    componentPalette: ["Hero", "Work", "Services", "Process", "Contact"],
+    spacingScale: ["4", "8", "14", "22", "36"],
+    borderRadius: "1.25rem",
+    shadowStyle: "colorful soft elevation",
+  },
 };
 
 export function resolveStylePreset(
@@ -162,6 +192,9 @@ export function resolveStylePreset(
     return "corporate";
   }
   if (/minimal|clean|simple|light|sparse/.test(hay)) return "minimal";
+  if (/creative|agency|studio|bold|playful|expressive/.test(hay)) {
+    return "creative";
+  }
   if (/modern|startup|saas|tech|product/.test(hay)) return "modern";
   return "modern";
 }
@@ -170,7 +203,13 @@ function normalizeStylePreset(value: unknown): DesignStylePreset {
   const v = String(value ?? "")
     .toLowerCase()
     .trim();
-  if (v === "luxury" || v === "modern" || v === "corporate" || v === "minimal") {
+  if (
+    v === "luxury" ||
+    v === "modern" ||
+    v === "corporate" ||
+    v === "minimal" ||
+    v === "creative"
+  ) {
     return v;
   }
   return resolveStylePreset(v);

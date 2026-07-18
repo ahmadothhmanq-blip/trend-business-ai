@@ -1,113 +1,107 @@
 # AI Core Engine
 
-**Status:** Phase 6 — Template Engine + Industry Intelligence  
+**Status:** Phase 7 — AI Design System + AI Assets Engine  
 **Scope:** Shared layer pipeline for all Trend Business AI products  
-**Related:** D-018–D-025
+**Related:** D-018–D-026
 
 ---
 
-## Goal
-
-Power every AI product with one reusable pipeline:
+## Pipeline
 
 ```
-Template (industry) → Idea → Strategy → Design → Assets → Generation → Quality → Finalize
+Business Idea
+→ Strategy
+→ Design System
+→ Assets
+→ Generation
+→ Quality Check
+→ Final Product
 ```
 
-Public product flow remains:
-
-```
-Business Idea → Strategy → Design → Assets → Generation → Quality Check → Finalize
-```
-
-Industry template selection runs at pipeline start (does not change product APIs).
+Industry **Template** selection still runs at LayerRunner start (Phase 6). Existing product APIs remain unchanged.
 
 ---
 
-## Phase 6 — AI Template Engine
+## Phase 7 — AI Design System
 
-Package: `lib/ai-core/templates/`
+Package: `lib/ai-core/design-system/`
 
-| Module | Role |
+Builds design decisions from **Strategy** (+ optional industry template):
+
+| Decision | Description |
+|----------|-------------|
+| Color palette | primary / secondary / accent / surfaces |
+| Typography | heading + body fonts, type scale |
+| Spacing system | unit, scale, section gap, container |
+| UI style | density, corners, elevation, contrast |
+| Component style | buttons, cards, inputs, navigation |
+| Animation style | motion level, easing, entrances |
+
+### Presets
+
+`luxury` · `modern` · `corporate` · `minimal` · `creative`
+
+```ts
+import { buildAiDesignSystemFromStrategy } from "@/lib/ai-core";
+
+const design = buildAiDesignSystemFromStrategy({
+  strategy,
+  profile,
+  preferredPreset: "luxury",
+  templateSelection,
+});
+```
+
+Website Builder merges this foundation with its existing design-engine AI output.
+
+`GET /api/ai-core/design-presets` lists presets.
+
+---
+
+## Phase 7 — AI Assets Engine
+
+Package: `lib/ai-core/assets/`
+
+Shared asset layer for:
+
+- realistic images  
+- hero images  
+- product images  
+- backgrounds  
+- brand assets  
+
+**Provider:** OpenAI DALL·E 3 when `OPENAI_API_KEY` is set; SVG gradient fallback otherwise. Website Builder reuses `website-assets` upload storage.
+
+```ts
+import { planCoreAssets, generateCoreAssets } from "@/lib/ai-core";
+
+const items = planCoreAssets({ strategy, designSystem, profile });
+const manifest = await generateCoreAssets({
+  items,
+  colors: designSystem.colors,
+  upload: /* optional */,
+});
+```
+
+---
+
+## Product registry & run API
+
+Canonical products: `website-builder`, `app-builder`, `landing-page-builder`, `brand-designer`, `content-studio`, `video-studio`, `marketing-ai`.
+
+| Method | Path |
 |--------|------|
-| `industries.ts` | Industry Intelligence profiles |
-| `select.ts` | Choose industry from explicit id / keywords / default |
-| `apply.ts` | Enrich `CoreBrief` with layout, sections, preset, features |
-
-### Industry profiles
-
-| Id | Layout style | Design preset |
-|----|--------------|---------------|
-| `restaurant` | editorial-hero | luxury |
-| `ecommerce` | commerce-grid | modern |
-| `saas` | product-saas | modern |
-| `real-estate` | property-showcase | corporate |
-| `automotive` | vehicle-showroom | modern |
-| `agency` | studio-portfolio | minimal |
-| `business` | corporate-trust | corporate |
-
-Each profile defines: **layout style**, **sections**, **design preset**, **required features**, suggested pages, content tone.
-
-Selection sources:
-
-1. **explicit** — `industry` / `industryId` on brief or `/api/ai-core/runs`
-2. **keyword** — scored against prompt, theme, features, nested plugin fields
-3. **default** — `business`
-
-Website Builder adapter merges selected sections/features into the business profile and applies preset/layout/pattern on the design system.
-
----
-
-## Unified product registry
-
-Canonical catalog: `lib/ai-core/products.ts`
-
-| Canonical id | Aliases |
-|--------------|---------|
-| `website-builder` | — |
-| `app-builder` | `webapp-builder` |
-| `landing-page-builder` | — |
-| `brand-designer` | `brand-identity` |
-| `content-studio` | — |
-| `video-studio` | — |
-| `marketing-ai` | `marketing-strategy`, `marketing` |
-
----
-
-## APIs
-
-| Method | Path | Purpose |
-|--------|------|---------|
-| `GET` | `/api/ai-core/products` | Product catalog |
-| `GET` | `/api/ai-core/industries` | Industry profiles |
-| `POST` | `/api/ai-core/runs` | Start Core run (`industry` optional) |
-| `GET` | `/api/ai-core/runs/[id]` | Fetch run |
-| `POST` | `/api/ai-core/runs/[id]/continue` | Continue run |
-
-Existing product APIs (`/api/website-builder`, `/api/webapp-builder`, …) are unchanged.
-
-Example:
-
-```json
-{
-  "productId": "website-builder",
-  "prompt": "Luxury sushi restaurant in Dubai Marina",
-  "industry": "restaurant"
-}
-```
-
-Artifacts include `templateSelection` (persisted on `ai_runs`).
+| `GET` | `/api/ai-core/products` |
+| `GET` | `/api/ai-core/industries` |
+| `GET` | `/api/ai-core/design-presets` |
+| `POST` | `/api/ai-core/runs` |
+| `GET` | `/api/ai-core/runs/[id]` |
+| `POST` | `/api/ai-core/runs/[id]/continue` |
 
 ---
 
 ## Compatibility
 
-- Generators and product routes are not rewritten.
-- Template enrichment is Core-internal (LayerRunner + adapters).
-- Legacy product ids remain valid aliases.
-
----
-
-## Next
-
-Hardening / metrics / BYOK / streaming runs (optional future work).
+- Product dashboards and legacy `/api/*` generators unchanged  
+- Website plugin `generateWebsiteAssets` still available for non-Core paths  
+- Core Website adapter uses Design System + Assets Engine foundations  

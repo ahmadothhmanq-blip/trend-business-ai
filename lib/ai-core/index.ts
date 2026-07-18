@@ -1,7 +1,7 @@
 /**
- * AI Core Engine — Phase 6: Template Engine + Industry Intelligence.
+ * AI Core Engine — Phase 7: Design System + Assets Engine.
  *
- * Pipeline: Template → Idea → Strategy → Design → Assets → Generation → Quality → Finalize
+ * Pipeline: Template → Idea → Strategy → Design System → Assets → Generation → Quality → Finalize
  * Runtime: existing AIGenerationEngine + ProviderManager (re-exported).
  */
 
@@ -94,6 +94,36 @@ export {
   type TemplateSelection,
 } from "@/lib/ai-core/templates";
 
+export {
+  DESIGN_PRESETS,
+  DESIGN_PRESET_IDS,
+  getDesignPreset,
+  normalizeDesignPreset,
+  buildAiDesignSystemFromStrategy,
+  aiDesignSystemToCore,
+  mergeCoreDesignWithAiDecisions,
+  type AiDesignSystem,
+  type DesignPresetId,
+  type DesignColorPalette,
+  type DesignTypographySystem,
+  type DesignSpacingSystem,
+  type DesignUiStyle,
+  type DesignComponentStyle,
+  type DesignAnimationStyle,
+  type BuildAiDesignSystemInput,
+} from "@/lib/ai-core/design-system";
+
+export {
+  planCoreAssets,
+  generateCoreAssets,
+  generateRealisticImage,
+  isImageProviderConfigured,
+  coreAssetManifestSummary,
+  type AssetKind,
+  type CoreAssetPlanItem,
+  type GenerateCoreAssetsParams,
+} from "@/lib/ai-core/assets";
+
 export type {
   ProductEngineAdapter,
   LayerRunnerInput,
@@ -114,9 +144,13 @@ export type {
   CoreBrief,
   CoreBusinessProfile,
   CoreContentStrategy,
+  CoreDesignAnimationStyle,
   CoreDesignColorTokens,
+  CoreDesignComponentStyle,
+  CoreDesignSpacingSystem,
   CoreDesignStylePreset,
   CoreDesignSystem,
+  CoreDesignUiStyle,
   CoreDesignTypography,
   CoreLayerArtifacts,
   CoreLayerFlags,

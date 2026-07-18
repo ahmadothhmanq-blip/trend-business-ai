@@ -1,5 +1,5 @@
 /**
- * Smoke: AI Core Engine Phase 6 modules exist.
+ * Smoke: AI Core Engine Phase 7 modules exist.
  * Usage: node scripts/smoke-ai-core.mjs
  */
 import assert from "node:assert/strict";
@@ -25,6 +25,15 @@ const required = [
   "lib/ai-core/templates/select.ts",
   "lib/ai-core/templates/apply.ts",
   "lib/ai-core/templates/index.ts",
+  "lib/ai-core/design-system/types.ts",
+  "lib/ai-core/design-system/presets.ts",
+  "lib/ai-core/design-system/build.ts",
+  "lib/ai-core/design-system/index.ts",
+  "lib/ai-core/assets/types.ts",
+  "lib/ai-core/assets/provider.ts",
+  "lib/ai-core/assets/plan.ts",
+  "lib/ai-core/assets/generate.ts",
+  "lib/ai-core/assets/index.ts",
   "lib/ai-core/adapters/website-builder.ts",
   "lib/ai-core/adapters/webapp-builder.ts",
   "lib/ai-core/adapters/landing-page-builder.ts",
@@ -35,6 +44,7 @@ const required = [
   "lib/ai-core/adapters/derive-layers.ts",
   "app/api/ai-core/products/route.ts",
   "app/api/ai-core/industries/route.ts",
+  "app/api/ai-core/design-presets/route.ts",
   "app/api/ai-core/runs/route.ts",
   "app/api/ai-core/runs/[id]/route.ts",
   "app/api/ai-core/runs/[id]/continue/route.ts",
@@ -46,5 +56,5 @@ for (const rel of required) {
   await access(path.join(root, rel));
 }
 
-assert.ok(required.length >= 30);
+assert.ok(required.length >= 40);
 console.log("smoke-ai-core: OK", { files: required.length });

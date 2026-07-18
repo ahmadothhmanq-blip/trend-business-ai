@@ -17,10 +17,18 @@ import type {
 } from "@/lib/ai-core/layers/types";
 import { registerProductEngineAdapter } from "@/lib/ai-core/registry";
 import { getTemplateSelectionFromBrief } from "@/lib/ai-core/templates/apply";
+import {
+  buildAiDesignSystemFromStrategy,
+  mergeCoreDesignWithAiDecisions,
+} from "@/lib/ai-core/design-system";
+import {
+  generateCoreAssets,
+  planCoreAssets,
+} from "@/lib/ai-core/assets";
 import { analyzeBusinessIdea } from "@/plugins/website/layers/business-idea";
-import { generateWebsiteAssets } from "@/plugins/website/layers/assets";
 import { buildDesignSystem } from "@/plugins/website/layers/design-engine";
 import { buildWebsiteStrategy } from "@/plugins/website/layers/strategy";
+import { uploadWebsiteAsset } from "@/lib/website/assets-storage";
 import {
   generateWebsite as generateWebsiteFiles,
   runWebsiteQualityLayer,
@@ -178,7 +186,20 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
         design.layoutStyle = template.layoutStyle;
         design.industryPattern = template.industryPattern;
       }
-      return design as CoreDesignSystem;
+
+      // Phase 7: AI Design System foundation from Strategy.
+      const aiDesign = buildAiDesignSystemFromStrategy({
+        strategy: strategy as CoreProductStrategy,
+        profile,
+        preferredPreset: template?.designPreset || design.stylePreset,
+        templateSelection: template,
+        industryPattern: design.industryPattern,
+        layoutStyle: design.layoutStyle,
+      });
+      return mergeCoreDesignWithAiDecisions(
+        design as CoreDesignSystem,
+        aiDesign,
+      );
     },
 
     async runAssets(brief, artifacts, ctx) {
@@ -188,16 +209,52 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
           "Website Builder adapter: assets require idea/strategy/design artifacts.",
         );
       }
-      const manifest = await generateWebsiteAssets({
-        input,
-        businessProfile: analysis.businessProfile,
-        strategy: artifacts.strategy as WebsiteStrategy,
-        designSystem: artifacts.designSystem as DesignSystem,
-        ctx,
-        userId: input.userId,
-        generationKey: input.parentGenerationId ?? `draft-${Date.now()}`,
+
+      const instruction = input.continueInstruction?.toLowerCase() ?? "";
+      if (
+        input.mode === "continue" &&
+        input.previousAssetManifest?.items?.length &&
+        !instruction.includes("[assets]")
+      ) {
+        return input.previousAssetManifest as CoreAssetManifest;
+      }
+
+      // Phase 7: shared AI Assets Engine (OpenAI when available).
+      const planned = planCoreAssets({
+        strategy: artifacts.strategy,
+        designSystem: artifacts.designSystem,
+        profile: analysis.businessProfile,
+        maxItems: 4,
       });
-      return manifest as CoreAssetManifest;
+      const generationKey =
+        input.parentGenerationId ?? `draft-${Date.now()}`;
+
+      return generateCoreAssets({
+        items: planned,
+        colors: artifacts.designSystem.colors,
+        userId: input.userId,
+        generationKey,
+        maxImages: 4,
+        onProgress: (message) => ctx.progress.emit(message),
+        upload:
+          input.userId
+            ? async ({ assetId, bytes, contentType }) => {
+                const uploaded = await uploadWebsiteAsset({
+                  userId: input.userId!,
+                  generationKey,
+                  assetId,
+                  bytes,
+                  contentType,
+                });
+                return uploaded
+                  ? {
+                      publicUrl: uploaded.publicUrl,
+                      storagePath: uploaded.storagePath,
+                    }
+                  : null;
+              }
+            : undefined,
+      });
     },
 
     async runGeneration(brief, artifacts, ctx) {
