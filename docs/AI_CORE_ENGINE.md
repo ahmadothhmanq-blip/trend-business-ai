@@ -1,8 +1,8 @@
 # AI Core Engine
 
-**Status:** Phase 2 — Website + Web App + Landing Page on LayerRunner  
+**Status:** Phase 3 — Website, App, Landing, Brand, Content on LayerRunner  
 **Scope:** Shared layer pipeline for all Trend Business AI products  
-**Related:** D-018, D-019, D-020, D-021, `docs/WEBSITE_BUILDER_DESIGN_ENGINE.md`
+**Related:** D-018–D-022, `docs/WEBSITE_BUILDER_DESIGN_ENGINE.md`
 
 ---
 
@@ -14,7 +14,7 @@ Power every AI product with one reusable pipeline:
 Business Idea → Strategy → Design → Assets → Generation → Quality Check → Final Output
 ```
 
-Website Builder, Web App Builder, and Landing Page Builder execute through `LayerRunner` via `ProductEngineAdapter`. Existing UIs and APIs stay unchanged.
+Website Builder, Web App Builder, Landing Page Builder, Brand Designer, and Content Studio execute through `LayerRunner` via `ProductEngineAdapter`. Existing UIs and APIs stay unchanged.
 
 ---
 
@@ -29,8 +29,10 @@ lib/ai-core/
     website-builder.ts     # Phase 1
     webapp-builder.ts      # Phase 2
     landing-page-builder.ts # Phase 2
+    brand-designer.ts      # Phase 3
+    content-studio.ts      # Phase 3
     derive-layers.ts       # deterministic Core mappings for plugin products
-  runtime/index.ts         # re-exports existing lib/ai engine/providers
+  runtime/index.ts
   layers/
     types.ts
     schemas.ts
@@ -59,25 +61,23 @@ Result includes `usage`, `generationTimeMs`, and `provider`.
 
 | Product id | Entry generator | Plugin reuse |
 |------------|-----------------|--------------|
-| `website-builder` | `lib/deepseek.ts` → `generateWebsite` | `plugins/website` layers + generate/quality |
-| `webapp-builder` | `lib/webapp-generator.ts` | `plugins/webapp` analyze/plan/generate/validate/export |
-| `landing-page-builder` | `lib/landing-page-generator.ts` | `plugins/landing-page` analyze/plan/generate/validate/export |
+| `website-builder` | `lib/deepseek.ts` → `generateWebsite` | `plugins/website` |
+| `webapp-builder` | `lib/webapp-generator.ts` | `plugins/webapp` |
+| `landing-page-builder` | `lib/landing-page-generator.ts` | `plugins/landing-page` |
+| `brand-designer` | `lib/brand-identity-generator.ts` | `plugins/brand-identity` (API: `/api/brand-identity`) |
+| `content-studio` | `lib/content-generator.ts` | `plugins/content-studio` |
 
-### Web App / Landing mapping (Phase 2)
+### Plugin products mapping (Phase 2–3)
 
-These products do not have Design Engine AI layers yet. Adapters map existing plugin stages onto Core:
-
-| Core layer | Web App / Landing |
-|------------|-------------------|
-| Idea | `analyze*` → `CoreBusinessProfile` |
-| Strategy | `plan*` (blueprint + files) → `CoreProductStrategy` |
-| Design | Derived from `designStyle` / `colorStyle` + blueprint |
-| Assets | Pending placeholder manifest from pages/sections |
-| Generation | existing `generate*` |
-| Quality | existing `validate*` |
-| Finalize | existing `export*` (ZIP progress) + return output |
-
-UI routes (`/api/webapp-builder`, `/api/landing-page-builder`) are unchanged.
+| Core layer | Mapping |
+|------------|---------|
+| Idea | plugin `analyze` → `CoreBusinessProfile` |
+| Strategy | plugin `plan` → `CoreProductStrategy` |
+| Design | Derived from plan/style (brand palette/typography for Brand Designer) |
+| Assets | Pending placeholder manifest |
+| Generation | plugin `generate` |
+| Quality | plugin `validate` |
+| Finalize | plugin `export` + return output |
 
 ---
 
@@ -94,11 +94,11 @@ Production product routes do **not** write `ai_runs` yet.
 
 ---
 
-## What Phase 2 does **not** do
+## What Phase 3 does **not** do
 
-- Does not rewrite App / Landing UI or APIs
-- Does not add Design Engine AI layers to App / Landing (deterministic Core design/assets)
-- Does not migrate Brand, Content, Video
+- Does not rewrite Brand / Content UI or APIs
+- Does not rename `/api/brand-identity` (Core id is `brand-designer`)
+- Does not migrate Video / Marketing / Logo / Image
 - Does not add `/api/ai-core/*` routes yet
 
 ---
@@ -107,7 +107,7 @@ Production product routes do **not** write `ai_runs` yet.
 
 1. ~~Phase 1 — Website Builder~~ **done**
 2. ~~Phase 2 — Landing + App Builder~~ **done**
-3. **Phase 3** — Brand + Content  
+3. ~~Phase 3 — Brand + Content~~ **done**
 4. **Phase 4** — Video + Marketing  
 5. **Phase 5** — `/api/ai-core/runs` + unified registry  
 6. **Phase 6** — Hardening / metrics / BYOK  

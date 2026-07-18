@@ -1,7 +1,11 @@
 import { providerManager } from "@/lib/ai/provider-manager";
 import { emptyTokenUsage } from "@/lib/ai/usage";
 import type { TokenUsage } from "@/lib/ai/types";
-import { brandIdentityPlugin } from "@/plugins/brand-identity";
+import { layerRunner } from "@/lib/ai-core";
+import {
+  brandInputToBrief,
+  createBrandDesignerAdapter,
+} from "@/lib/ai-core/adapters/brand-designer";
 import type {
   BrandOutput,
   BrandIdentityPluginInput,
@@ -21,16 +25,34 @@ export type BrandGenerationResult = BrandOutput & {
   provider: string;
 };
 
+/**
+ * Brand Designer entrypoint — Phase 3 runs through AI Core LayerRunner
+ * (Idea → Strategy → Design → Assets → Generation → Quality → Finalize).
+ * API route remains /api/brand-identity.
+ */
 export async function generateBrandIdentity(
   input: GenerateBrandInput,
 ): Promise<BrandGenerationResult> {
   const { onProgress, ...pluginInput } = input;
-  const result = await providerManager.runPlugin(brandIdentityPlugin, pluginInput, {
-    onProgress,
-  });
+
+  const resolved = providerManager.resolve();
+  if (!resolved || !providerManager.isConfigured(resolved)) {
+    throw new Error(
+      "No AI provider configured. Set DEEPSEEK_API_KEY to enable generation.",
+    );
+  }
+
+  const adapter = createBrandDesignerAdapter();
+  const result = await layerRunner.run(
+    adapter,
+    { brief: brandInputToBrief(pluginInput) },
+    { provider: resolved, onProgress },
+  );
+
+  const project = result.finalOutput ?? result.generation;
 
   return {
-    ...result.output,
+    ...project,
     progressEvents: result.progressEvents as BrandProgressEvent[],
     usage: result.usage ?? emptyTokenUsage(),
     generationTimeMs: result.generationTimeMs,

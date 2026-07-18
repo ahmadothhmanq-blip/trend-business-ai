@@ -247,6 +247,19 @@
 
 ---
 
+## D-022 — Brand Designer + Content Studio on AI Core LayerRunner (Phase 3)
+
+| Field | Value |
+|-------|--------|
+| Date | 2026-07-18 |
+| Status | Accepted |
+| Context | Move Brand Designer and Content Studio through LayerRunner without rewriting UI/generators |
+| Decision | Add `brand-designer` and `content-studio` ProductEngineAdapters that reuse `plugins/brand-identity` and `plugins/content-studio` stages via plugin methods; wire `generateBrandIdentity` and `generateContent` through `layerRunner`; keep `/api/brand-identity` and `/api/content-studio` unchanged |
+| Consequences | Five products on shared Core flow; Brand Core id is `brand-designer` while HTTP/API id remains `brand-identity` |
+| Related | D-021, D-020, `docs/AI_CORE_ENGINE.md` |
+
+---
+
 ## D-021 — Web App + Landing Page on AI Core LayerRunner (Phase 2)
 
 | Field | Value |

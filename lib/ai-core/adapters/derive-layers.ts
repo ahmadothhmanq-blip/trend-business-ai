@@ -3,7 +3,7 @@
  * outputs. Used by products that do not yet have Design Engine AI layers.
  */
 
-import type { ValidationResult } from "@/lib/ai/types";
+import type { GenerationContext, ValidationResult } from "@/lib/ai/types";
 import type {
   CoreAssetManifest,
   CoreBusinessProfile,
@@ -12,6 +12,11 @@ import type {
   CoreProductStrategy,
   CoreQualityReport,
 } from "@/lib/ai-core/layers/types";
+
+/** Capture last provider usage into the Core run tracker (matches AIGenerationEngine). */
+export function trackProviderUsage(ctx: GenerationContext): void {
+  ctx.usage.add(ctx.provider.getLastUsage?.() ?? null);
+}
 
 export function toStylePreset(style: string): CoreDesignStylePreset {
   const s = style.toLowerCase();
@@ -183,5 +188,54 @@ export function validationToQualityReport(
     improveApplied: false,
     improveNotes: result.reason ? [result.reason] : undefined,
     issues,
+  };
+}
+
+/** Build a Core design system from brand palette + typography plan fields. */
+export function deriveDesignSystemFromBrand(params: {
+  personality: string;
+  colors: { name: string; hex: string }[];
+  typography: { primary: string; secondary: string; notes?: string };
+  industry?: string;
+}): CoreDesignSystem {
+  const primary =
+    params.colors.find((c) => /primary/i.test(c.name))?.hex ||
+    params.colors[0]?.hex ||
+    "#111827";
+  const secondary =
+    params.colors.find((c) => /secondary/i.test(c.name))?.hex ||
+    params.colors[1]?.hex ||
+    "#64748b";
+  const accent =
+    params.colors.find((c) => /accent|highlight/i.test(c.name))?.hex ||
+    params.colors[2]?.hex ||
+    "#f59e0b";
+
+  return {
+    style: params.personality || "professional",
+    stylePreset: toStylePreset(params.personality),
+    industryPattern: params.industry || "brand",
+    colors: {
+      primary,
+      secondary,
+      accent,
+      neutral: "#94a3b8",
+      surface: "#f8fafc",
+      background: "#ffffff",
+      foreground: "#0f172a",
+    },
+    typography: {
+      headingFont: params.typography.primary || "Geist",
+      bodyFont: params.typography.secondary || "Geist",
+      scale: ["text-sm", "text-base", "text-lg", "text-2xl", "text-4xl"],
+      notes: params.typography.notes || "",
+    },
+    layoutRules: ["Consistent brand spacing", "Accessible contrast", "Clear hierarchy"],
+    layoutStyle: "branded",
+    uiPatterns: ["logo-lockup", "color-swatch", "type-specimen"],
+    componentPalette: ["Logo", "ColorSwatch", "TypePair", "BusinessCard"],
+    spacingScale: ["4", "8", "12", "16", "24", "32"],
+    borderRadius: "0.5rem",
+    shadowStyle: "soft",
   };
 }
