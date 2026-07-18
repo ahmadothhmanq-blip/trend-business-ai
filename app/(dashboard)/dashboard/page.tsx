@@ -35,6 +35,8 @@ export default async function DashboardPage() {
           saved: 0,
         },
         recentActivity: [],
+        recentAiRuns: [],
+        generatedProducts: [],
       };
 
   return (

@@ -22,6 +22,7 @@ import {
   ProjectHistoryCard,
   EmptyHistory,
   HistoryPagination,
+  OnePromptExperience,
   type ProjectHistoryItem,
 } from "@/components/dashboard/builder-shared";
 import { cn } from "@/lib/utils";
@@ -33,6 +34,8 @@ import {
   WEBAPP_FEATURE_OPTIONS,
   getWebAppType,
 } from "@/lib/constants/webapp-builder";
+import { getOnePromptProduct } from "@/lib/constants/one-prompt-products";
+import { useIdeaQueryParam } from "@/lib/hooks/use-idea-query-param";
 import type { WebAppGeneration } from "@/types/webapp";
 
 type WebAppBuilderToolProps = { initialGenerations?: WebAppGeneration[] };
@@ -53,6 +56,7 @@ function toHistoryItem(gen: WebAppGeneration): ProjectHistoryItem {
 }
 
 export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps) {
+  const onePrompt = getOnePromptProduct("app-builder");
   const [step, setStep] = useState<"type" | "config" | "history" | "generating" | "preview">("type");
   const [selectedType, setSelectedType] = useState("");
   const [prompt, setPrompt] = useState("");
@@ -68,6 +72,17 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+
+  const applyIdea = useCallback((idea: string) => {
+    setPrompt(idea);
+    setStep("config");
+    if (!selectedType) {
+      const def = WEBAPP_TYPES[0];
+      setSelectedType(def.id);
+      setFeatures([...def.defaultFeatures]);
+    }
+  }, [selectedType]);
+  useIdeaQueryParam(applyIdea);
 
   const fetchGenerations = useCallback(async () => {
     try {
@@ -92,31 +107,46 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
   const handleGenerate = async (
     mode: "generate" | "regenerate" | "continue" | "retry" = "generate",
     parentGenerationId?: string,
+    overridePrompt?: string,
   ) => {
-    if (!selectedType || !prompt.trim()) {
+    const idea = (overridePrompt ?? prompt).trim();
+    let appType = selectedType;
+    let appFeatures = features;
+    if (!appType) {
+      const def = WEBAPP_TYPES[0];
+      appType = def.id;
+      appFeatures = [...def.defaultFeatures];
+      setSelectedType(appType);
+      setFeatures(appFeatures);
+    }
+    if (!appType || !idea) {
       toast.error(
         mode === "continue"
           ? "Describe the changes you want in natural language."
-          : "Select an app type and describe your app.",
+          : "Enter your business idea to generate an app.",
       );
       return;
     }
+    if (overridePrompt) setPrompt(overridePrompt);
     setStep("generating");
-    setProgressEvents(["Sending request..."]);
+    setProgressEvents([
+      "[idea] Understanding your product idea...",
+      "[strategy] Planning screens and flows...",
+    ]);
     try {
       const res = await fetch("/api/webapp-builder", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          prompt,
-          appType: selectedType,
+          prompt: idea,
+          appType,
           language,
           designStyle,
           colorStyle,
-          features,
+          features: appFeatures,
           mode,
           parentGenerationId,
-          continueInstruction: mode === "continue" ? prompt : undefined,
+          continueInstruction: mode === "continue" ? idea : undefined,
         }),
       });
       const data = await res.json();
@@ -125,6 +155,10 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
       setParentId(null);
       if (data.generation) { setPreviewGen(data.generation); setStep("preview"); } else { setStep("history"); }
     } catch { toast.error("Request failed. Check your connection."); setStep("config"); }
+  };
+
+  const handleOnePrompt = (idea: string) => {
+    void handleGenerate("generate", undefined, idea);
   };
 
   const loadGenerationConfig = (gen: WebAppGeneration) => {
@@ -189,11 +223,24 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
         ))}
       </div>
 
+      {(step === "type" || step === "config") && (
+        <OnePromptExperience
+          product={onePrompt}
+          value={prompt}
+          onChange={setPrompt}
+          onSubmit={handleOnePrompt}
+          showPipelinePreview={step === "type"}
+          compact={step === "config"}
+        />
+      )}
+
       {step === "type" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Choose App Type</DashboardCardTitle>
-            <DashboardCardDescription>Select the type of web application you want to build</DashboardCardDescription>
+            <DashboardCardTitle>Or choose an app type</DashboardCardTitle>
+            <DashboardCardDescription>
+              Optional — One Prompt uses a smart default if you skip this
+            </DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

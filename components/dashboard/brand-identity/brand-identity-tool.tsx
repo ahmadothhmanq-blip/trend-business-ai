@@ -35,6 +35,7 @@ import {
   ProjectHistoryCard,
   EmptyHistory,
   HistoryPagination,
+  OnePromptExperience,
   type ProjectHistoryItem,
 } from "@/components/dashboard/builder-shared";
 import { cn } from "@/lib/utils";
@@ -46,6 +47,8 @@ import {
   BRAND_DELIVERABLE_OPTIONS,
   getBrandType,
 } from "@/lib/constants/brand-identity-builder";
+import { getOnePromptProduct } from "@/lib/constants/one-prompt-products";
+import { useIdeaQueryParam } from "@/lib/hooks/use-idea-query-param";
 import type { BrandIdentityGeneration } from "@/types/brand-identity";
 
 type Props = { initialGenerations?: BrandIdentityGeneration[] };
@@ -360,6 +363,7 @@ function toHistoryItem(gen: BrandIdentityGeneration): ProjectHistoryItem {
 /* ------------------------------------------------------------------ */
 
 export function BrandIdentityTool({ initialGenerations }: Props) {
+  const onePrompt = getOnePromptProduct("brand-designer");
   const [step, setStep] = useState<"type" | "config" | "history" | "generating" | "preview">("type");
   const [selectedType, setSelectedType] = useState("");
   const [brandName, setBrandName] = useState("");
@@ -376,6 +380,20 @@ export function BrandIdentityTool({ initialGenerations }: Props) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+
+  const applyIdea = useCallback((idea: string) => {
+    setPrompt(idea);
+    if (!brandName.trim()) {
+      setBrandName(idea.split(/\s+/).slice(0, 3).join(" ").replace(/[^\w\s-]/g, "").trim() || "New Brand");
+    }
+    setStep("config");
+    if (!selectedType) {
+      const def = BRAND_TYPES[0];
+      setSelectedType(def.id);
+      setDeliverables([...def.defaultDeliverables]);
+    }
+  }, [brandName, selectedType]);
+  useIdeaQueryParam(applyIdea);
 
   const fetchGenerations = useCallback(async () => {
     try {
@@ -400,26 +418,46 @@ export function BrandIdentityTool({ initialGenerations }: Props) {
   const handleGenerate = async (
     mode: "generate" | "regenerate" | "continue" | "retry" = "generate",
     parentGenerationId?: string,
+    overridePrompt?: string,
   ) => {
+    const idea = (overridePrompt ?? prompt).trim();
+    let brandType = selectedType;
+    let brandDeliverables = deliverables;
+    let name = brandName.trim();
+    if (!brandType) {
+      const def = BRAND_TYPES[0];
+      brandType = def.id;
+      brandDeliverables = [...def.defaultDeliverables];
+      setSelectedType(brandType);
+      setDeliverables(brandDeliverables);
+    }
+    if (!name && idea) {
+      name = idea.split(/\s+/).slice(0, 3).join(" ").replace(/[^\w\s-]/g, "").trim() || "New Brand";
+      setBrandName(name);
+    }
     if (mode === "continue") {
-      if (!prompt.trim()) {
+      if (!idea) {
         toast.error("Describe the changes you want in natural language.");
         return;
       }
-    } else if (!selectedType || !prompt.trim() || !brandName.trim()) {
-      toast.error("Enter your brand name, select a type, and describe your brand.");
+    } else if (!brandType || !idea || !name) {
+      toast.error("Enter your business idea to generate a brand system.");
       return;
     }
+    if (overridePrompt) setPrompt(overridePrompt);
     setStep("generating");
-    setProgressEvents(["Sending request..."]);
+    setProgressEvents([
+      "[idea] Understanding your brand...",
+      "[strategy] Defining positioning and voice...",
+    ]);
     try {
       const res = await fetch("/api/brand-identity", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          prompt, brandName, brandType: selectedType, industry, targetAudience,
-          brandPersonality: personality, deliverables, mode, parentGenerationId,
-          continueInstruction: mode === "continue" ? prompt : undefined,
+          prompt: idea, brandName: name, brandType, industry, targetAudience,
+          brandPersonality: personality, deliverables: brandDeliverables, mode, parentGenerationId,
+          continueInstruction: mode === "continue" ? idea : undefined,
         }),
       });
       const d = await res.json();
@@ -428,6 +466,10 @@ export function BrandIdentityTool({ initialGenerations }: Props) {
       setParentId(null);
       if (d.generation) { setPreviewGen(d.generation); setStep("preview"); } else { setStep("history"); }
     } catch { toast.error("Request failed."); setStep("config"); }
+  };
+
+  const handleOnePrompt = (idea: string) => {
+    void handleGenerate("generate", undefined, idea);
   };
 
   const loadGenerationConfig = (gen: BrandIdentityGeneration) => {
@@ -497,12 +539,25 @@ export function BrandIdentityTool({ initialGenerations }: Props) {
         ))}
       </div>
 
+      {(step === "type" || step === "config") && (
+        <OnePromptExperience
+          product={onePrompt}
+          value={prompt}
+          onChange={setPrompt}
+          onSubmit={handleOnePrompt}
+          showPipelinePreview={step === "type"}
+          compact={step === "config"}
+        />
+      )}
+
       {/* Step 1: Select brand type */}
       {step === "type" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Choose Brand Type</DashboardCardTitle>
-            <DashboardCardDescription>Select the type of brand identity you want to build</DashboardCardDescription>
+            <DashboardCardTitle>Or choose a brand type</DashboardCardTitle>
+            <DashboardCardDescription>
+              Optional — One Prompt uses a smart default if you skip this
+            </DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

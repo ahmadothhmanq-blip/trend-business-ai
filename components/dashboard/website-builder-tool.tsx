@@ -1,9 +1,13 @@
 ﻿"use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { readSseStream } from "@/lib/api/sse-client";
+import { CoreProgressStepper } from "@/components/dashboard/one-prompt";
+import { useCoreProgress } from "@/components/dashboard/one-prompt/use-core-progress";
+import { getOnePromptProduct } from "@/lib/constants/one-prompt-products";
+import { useIdeaQueryParam } from "@/lib/hooks/use-idea-query-param";
 import {
   AlertTriangle,
   ArrowDownToLine,
@@ -208,6 +212,11 @@ export function WebsiteBuilderTool({
     ? product.templates
     : [...TEMPLATES];
   const [projectBrief, setProjectBrief] = useState("");
+  const onePrompt = getOnePromptProduct("website-builder");
+  const applyIdea = useCallback((idea: string) => {
+    setProjectBrief(idea);
+  }, []);
+  useIdeaQueryParam(applyIdea);
   const [projectType, setProjectType] = useState<(typeof PROJECT_TYPES)[number]>(
     () => resolveInitialProjectType(product),
   );
@@ -233,6 +242,11 @@ export function WebsiteBuilderTool({
   const [activeProject, setActiveProject] = useState<WorkspaceProject | null>(
     initialGenerations[0] ? toProject(initialGenerations[0]) : null,
   );
+  const progressStep = useCoreProgress({
+    events: streamStatus ? [`[generation] ${streamStatus}`] : [],
+    active: isGenerating,
+    complete: !isGenerating && !!activeProject,
+  });
 
   useEffect(() => {
     if (!isGenerating) {
@@ -747,8 +761,10 @@ export function WebsiteBuilderTool({
               {product?.title ?? "AI Website & App Builder"}
             </h2>
             <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-white/55 sm:text-base">
-              {product?.description ??
-                "Generate a website, preview it, improve with AI, publish a public URL, and export ZIP."}
+              {product?.description ?? onePrompt.valueProposition}
+            </p>
+            <p className="mt-3 text-[12px] font-medium text-premium-gold/80">
+              One Prompt · Idea → Strategy → Design → Assets → Generation → Quality → Ready
             </p>
           </div>
           <div className="rounded-[2rem] border border-white/[0.08] bg-black/25 p-4 shadow-[0_24px_90px_rgb(0_0_0/0.35)] backdrop-blur-xl">
@@ -793,7 +809,7 @@ export function WebsiteBuilderTool({
               description={
                 editMode
                   ? "Describe changes in natural language — colors, pages, content, or design. AI creates an improved version linked to the previous one."
-                  : "Describe the business, pages, design, and content you want. AI creates a complete website product you can preview and refine."
+                  : onePrompt.valueProposition
               }
             />
             {editMode && activeProject ? (
@@ -808,13 +824,30 @@ export function WebsiteBuilderTool({
               placeholder={
                 editMode
                   ? 'Example: "Make the hero more luxury, switch palette to black and gold, add a Testimonials page, and shorten the About copy."'
-                  : product?.promptPlaceholder ??
-                    'Describe your website...\n\nExample: "Luxury real estate site with listings, booking, and premium brand look."'
+                  : product?.promptPlaceholder ?? onePrompt.placeholder
               }
               className="mt-5 min-h-[190px] rounded-3xl border-white/[0.08] bg-black/25 p-5 text-[15px] leading-relaxed text-white placeholder:text-white/30 focus-visible:border-premium-gold/35 focus-visible:ring-premium-gold/15"
             />
             {!editMode ? (
-            <div className="mt-5">
+            <div className="mt-5 space-y-4">
+              <div>
+                <p className="mb-2 text-[12px] font-semibold tracking-wide text-white/45 uppercase">
+                  Examples
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {onePrompt.examples.map((example) => (
+                    <button
+                      key={example.label}
+                      type="button"
+                      onClick={() => setProjectBrief(example.prompt)}
+                      className="rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-[12px] text-white/45 transition-all hover:border-premium-gold/25 hover:text-white/75"
+                    >
+                      {example.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
               <p className="mb-2 text-[12px] font-semibold tracking-wide text-white/45 uppercase">
                 Templates
               </p>
@@ -834,6 +867,7 @@ export function WebsiteBuilderTool({
                     {template}
                   </button>
                 ))}
+              </div>
               </div>
             </div>
             ) : null}
@@ -964,16 +998,17 @@ export function WebsiteBuilderTool({
           ) : null}
 
           {(isGenerating || streamStatus) && (
-            <div className="rounded-2xl border border-premium-gold/20 bg-premium-gold/5 p-4">
-              <div className="mb-2 flex items-center justify-between text-[12px] text-premium-gold-light">
+            <div className="space-y-4 rounded-2xl border border-premium-gold/20 bg-premium-gold/5 p-4">
+              <div className="flex items-center justify-between text-[12px] text-premium-gold-light">
                 <span>{streamStatus ?? "Generation in progress"}</span>
                 <span>{formatElapsed(elapsedSeconds)}</span>
               </div>
+              <CoreProgressStepper currentStep={progressStep} compact />
               <div className="h-2 overflow-hidden rounded-full bg-black/30">
                 <div className="h-full w-2/5 animate-pulse rounded-full bg-gradient-to-r from-premium-gold to-premium-gold-light" />
               </div>
-              <p className="mt-2 text-[11px] text-white/40">
-                Long runs are normal — status updates come from the server as files generate.
+              <p className="text-[11px] text-white/40">
+                AI Core pipeline: Idea → Strategy → Design → Assets → Generation → Quality → Ready
               </p>
             </div>
           )}

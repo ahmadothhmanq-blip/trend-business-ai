@@ -1,4 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import {
+  mapAiRunToDashboardItem,
+  type AiRunRow,
+} from "@/lib/ai-core/dashboard-runs";
 import type { DashboardActivityItem, DashboardHomeData, DashboardStats } from "@/types/database";
 import { getWorkspaceDefinition } from "@/lib/workspace/registry";
 import type { WorkspaceType } from "@/lib/workspace/types";
@@ -93,7 +97,8 @@ export async function getDashboardHomeData(
   supabase: SupabaseClient,
   userId: string,
 ): Promise<DashboardHomeData> {
-  const [stats, ideas, analyses, reports, websites, workspaceRows] = await Promise.all([
+  const [stats, ideas, analyses, reports, websites, workspaceRows, aiRuns] =
+    await Promise.all([
     getDashboardStats(supabase, userId),
     supabase
       .from("business_ideas")
@@ -125,6 +130,14 @@ export async function getDashboardHomeData(
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(3),
+    supabase
+      .from("ai_runs")
+      .select(
+        "id, product_id, status, layers_executed, artifacts, created_at",
+      )
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(8),
   ]);
 
   const activity = [
@@ -172,8 +185,18 @@ export async function getDashboardHomeData(
     })),
   ];
 
+  // ai_runs may be unavailable if migration not applied — keep dashboard resilient.
+  const recentAiRuns = aiRuns.error
+    ? []
+    : ((aiRuns.data ?? []) as AiRunRow[]).map(mapAiRunToDashboardItem);
+  const generatedProducts = recentAiRuns.filter(
+    (run) => run.status === "completed" || run.publishReady !== null,
+  );
+
   return {
     stats,
     recentActivity: sortRecentActivity(activity),
+    recentAiRuns,
+    generatedProducts,
   };
 }

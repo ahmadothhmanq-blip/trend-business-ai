@@ -278,6 +278,10 @@ export type DashboardActivityItem = {
 export type DashboardHomeData = {
   stats: DashboardStats;
   recentActivity: DashboardActivityItem[];
+  /** Recent AI Core Engine runs */
+  recentAiRuns: DashboardAiRunItem[];
+  /** Generated products with quality / publish signals when available */
+  generatedProducts: DashboardAiRunItem[];
 };
 
 export type HistoryItemType =
@@ -313,6 +317,20 @@ export type AiRunStatus =
   | "completed"
   | "failed"
   | "cancelled";
+
+/** Phase 9 — dashboard AI run summary (from ai_runs). */
+export type DashboardAiRunItem = {
+  id: string;
+  productId: string;
+  productLabel: string;
+  status: AiRunStatus;
+  title: string;
+  layersExecuted: string[];
+  qualityScore: number | null;
+  publishReady: boolean | null;
+  href: string;
+  createdAt: string;
+};
 
 export type AiRun = {
   id: string;

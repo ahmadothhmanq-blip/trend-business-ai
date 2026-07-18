@@ -254,6 +254,8 @@ export function useWorkspaceTool({
     continue?: boolean;
     retry?: boolean;
     continueInstruction?: string;
+    /** One Prompt handoff — use immediately without waiting for state flush */
+    promptOverride?: string;
   }) {
     const mode: GenerationMode = options?.retry
       ? "retry"
@@ -263,11 +265,17 @@ export function useWorkspaceTool({
           ? "regenerate"
           : "generate";
 
-    const brief = options?.regenerate || options?.retry
+    const brief = options?.promptOverride?.trim()
+      ? options.promptOverride.trim()
+      : options?.regenerate || options?.retry
       ? lastBriefRef.current || prompt.trim() || selectedTemplate.trim()
       : options?.continue
         ? activeProject?.brief || lastBriefRef.current || prompt.trim()
         : prompt.trim() || selectedTemplate.trim();
+
+    if (options?.promptOverride?.trim()) {
+      setPrompt(options.promptOverride.trim());
+    }
 
     const features =
       selectedOutputs.length > 0 ? selectedOutputs : metadata.outputs.slice(0, 3);
@@ -644,7 +652,7 @@ export function useWorkspaceTool({
     uploadFiles,
     removeAttachment,
     restorePromptVersion,
-    generate: () => generate(),
+    generate,
     regenerate,
     continueGeneration,
     retryFailed,

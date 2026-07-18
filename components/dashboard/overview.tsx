@@ -9,6 +9,10 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { DASHBOARD_QUICK_ACTIONS } from "@/lib/constants/dashboard-nav";
+import {
+  PublishReadinessBadge,
+  publishStatusFromQuality,
+} from "@/components/dashboard/one-prompt";
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import { DashboardIconBox } from "@/components/dashboard/ui/icon-box";
 import { DashboardEmptyState } from "@/components/dashboard/ui/dashboard-empty-state";
@@ -63,7 +67,12 @@ function QuickActionsGrid() {
 }
 
 export function DashboardOverview({ data, userName }: DashboardOverviewProps) {
-  const { stats, recentActivity } = data;
+  const {
+    stats,
+    recentActivity,
+    recentAiRuns = [],
+    generatedProducts = [],
+  } = data;
   const totalProjects =
     stats.ideas + stats.analyses + stats.reports + stats.websites + stats.workspaces;
   const aiCreditsUsed = Math.min(250, 36 + totalProjects * 8);
@@ -165,6 +174,126 @@ export function DashboardOverview({ data, userName }: DashboardOverviewProps) {
         </div>
         <QuickActionsGrid />
       </section>
+
+      {/* AI Runs + Generated products (Phase 9) */}
+      <div className="grid gap-6 xl:grid-cols-2">
+        <DashboardPanel className="p-5 sm:p-6">
+          <div className="mb-5 flex items-center justify-between gap-3">
+            <div>
+              <h3 className="text-lg font-bold text-white">AI Runs</h3>
+              <p className="mt-1 text-[13px] text-white/40">
+                Core Engine pipeline activity across products.
+              </p>
+            </div>
+          </div>
+          {recentAiRuns.length === 0 ? (
+            <DashboardEmptyState
+              icon={Sparkles}
+              title="No AI runs yet"
+              description="Start with one business idea — AI guides Idea through Ready Product."
+              action={{ label: "Website Builder", href: "/dashboard/website-builder" }}
+            />
+          ) : (
+            <ul className="space-y-3">
+              {recentAiRuns.slice(0, 6).map((run) => {
+                const publish =
+                  run.status === "running" || run.status === "pending"
+                    ? { status: "generating" as const, score: run.qualityScore ?? undefined }
+                    : run.status === "failed"
+                      ? { status: "failed" as const, score: run.qualityScore ?? undefined }
+                      : publishStatusFromQuality({
+                          publishReady: run.publishReady ?? undefined,
+                          score: run.qualityScore ?? undefined,
+                        });
+                return (
+                  <li key={run.id}>
+                    <Link
+                      href={run.href}
+                      className="flex items-start gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 transition-colors hover:border-premium-gold/25 hover:bg-premium-gold/[0.05]"
+                    >
+                      <DashboardIconBox icon={Sparkles} size="sm" />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="truncate text-[14px] font-semibold text-white">
+                            {run.productLabel}
+                          </p>
+                          <PublishReadinessBadge
+                            status={publish.status}
+                            score={publish.score}
+                          />
+                        </div>
+                        <p className="mt-1 truncate text-[12px] text-white/40">
+                          {run.title}
+                        </p>
+                        <p className="mt-1 text-[11px] text-white/30">
+                          {run.layersExecuted.length
+                            ? run.layersExecuted.slice(-4).join(" · ")
+                            : run.status}
+                          {" · "}
+                          {formatActivityDate(run.createdAt)}
+                        </p>
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </DashboardPanel>
+
+        <DashboardPanel className="p-5 sm:p-6">
+          <div className="mb-5 flex items-center justify-between gap-3">
+            <div>
+              <h3 className="text-lg font-bold text-white">Generated products</h3>
+              <p className="mt-1 text-[13px] text-white/40">
+                Quality reports and publish readiness.
+              </p>
+            </div>
+          </div>
+          {generatedProducts.length === 0 ? (
+            <DashboardEmptyState
+              icon={FolderKanban}
+              title="No products yet"
+              description="Completed Core runs with quality scores will appear here."
+              action={{ label: "Start creating", href: "/dashboard/website-builder" }}
+            />
+          ) : (
+            <ul className="space-y-3">
+              {generatedProducts.slice(0, 6).map((run) => {
+                const publish = publishStatusFromQuality({
+                  publishReady: run.publishReady ?? undefined,
+                  score: run.qualityScore ?? undefined,
+                });
+                return (
+                  <li key={`product-${run.id}`}>
+                    <Link
+                      href={run.href}
+                      className="flex items-center justify-between gap-3 rounded-xl border border-white/[0.06] px-4 py-3 hover:border-premium-gold/25"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate text-[14px] font-medium text-white">
+                          {run.productLabel}
+                        </p>
+                        <p className="truncate text-[12px] text-white/40">{run.title}</p>
+                      </div>
+                      <PublishReadinessBadge
+                        status={
+                          run.publishReady === true
+                            ? "ready"
+                            : run.publishReady === false
+                              ? "needs_review"
+                              : publish.status
+                        }
+                        score={run.qualityScore}
+                      />
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </DashboardPanel>
+      </div>
 
       <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         {/* Recent Projects */}

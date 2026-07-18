@@ -37,6 +37,7 @@ import {
   ProjectHistoryCard,
   EmptyHistory,
   HistoryPagination,
+  OnePromptExperience,
   type ProjectHistoryItem,
 } from "@/components/dashboard/builder-shared";
 import { cn } from "@/lib/utils";
@@ -53,6 +54,8 @@ import {
   getContentTypesForTool,
   getContentTypeLabel,
 } from "@/lib/constants/content-studio";
+import { getOnePromptProduct } from "@/lib/constants/one-prompt-products";
+import { useIdeaQueryParam } from "@/lib/hooks/use-idea-query-param";
 import type { ContentGeneration } from "@/types/content";
 
 type Props = { initialGenerations?: ContentGeneration[] };
@@ -337,6 +340,7 @@ function toHistoryItem(gen: ContentGeneration): ProjectHistoryItem {
 export function ContentStudioTool({ initialGenerations }: Props) {
   type Step = "tool" | "type" | "config" | "generating" | "preview" | "history";
 
+  const onePrompt = getOnePromptProduct("content-studio");
   const [step, setStep] = useState<Step>("tool");
   const [selectedTool, setSelectedTool] = useState("");
   const [selectedType, setSelectedType] = useState("");
@@ -357,6 +361,18 @@ export function ContentStudioTool({ initialGenerations }: Props) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+
+  const applyIdea = useCallback((idea: string) => {
+    setPrompt(idea);
+    if (!selectedTool) {
+      const tool = CONTENT_TOOLS[0];
+      setSelectedTool(tool.id);
+      setOptions([...tool.defaultOptions]);
+      setSelectedType(tool.defaultType);
+    }
+    setStep("config");
+  }, [selectedTool]);
+  useIdeaQueryParam(applyIdea);
 
   const availableTypes = useMemo(() => selectedTool ? getContentTypesForTool(selectedTool) : [], [selectedTool]);
 
@@ -388,26 +404,47 @@ export function ContentStudioTool({ initialGenerations }: Props) {
     }
   };
 
-  const handleGenerate = async (mode: ContentGeneration["mode"] = "generate", parentGenerationId?: string) => {
-    if (!selectedTool || !prompt.trim()) {
+  const handleGenerate = async (
+    mode: ContentGeneration["mode"] = "generate",
+    parentGenerationId?: string,
+    overridePrompt?: string,
+  ) => {
+    const idea = (overridePrompt ?? prompt).trim();
+    let contentTool = selectedTool;
+    let contentType = selectedType;
+    let contentOptions = options;
+    if (!contentTool) {
+      const tool = CONTENT_TOOLS[0];
+      contentTool = tool.id;
+      contentType = tool.defaultType;
+      contentOptions = [...tool.defaultOptions];
+      setSelectedTool(contentTool);
+      setSelectedType(contentType);
+      setOptions(contentOptions);
+    }
+    if (!contentTool || !idea) {
       toast.error(
         mode === "continue"
           ? "Describe the changes you want in natural language."
-          : "Select a tool and describe your content.",
+          : "Enter your idea to generate content.",
       );
       return;
     }
+    if (overridePrompt) setPrompt(overridePrompt);
     setStep("generating");
-    setProgressEvents(["Sending request..."]);
+    setProgressEvents([
+      "[idea] Understanding your topic...",
+      "[strategy] Structuring channel-ready copy...",
+    ]);
     try {
       const res = await fetch("/api/content-studio", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          prompt, contentTool: selectedTool, contentType: selectedType,
+          prompt: idea, contentTool, contentType,
           tone, audience, language, brandVoice, writingStyle,
-          creativityLevel, options, seoKeywords, mode, parentGenerationId,
-          continueInstruction: mode === "continue" ? prompt : undefined,
+          creativityLevel, options: contentOptions, seoKeywords, mode, parentGenerationId,
+          continueInstruction: mode === "continue" ? idea : undefined,
         }),
       });
       const d = await res.json();
@@ -416,6 +453,10 @@ export function ContentStudioTool({ initialGenerations }: Props) {
       setParentId(null);
       if (d.generation) { setPreviewGen(d.generation); setStep("preview"); } else { setStep("history"); }
     } catch { toast.error("Request failed."); setStep("config"); }
+  };
+
+  const handleOnePrompt = (idea: string) => {
+    void handleGenerate("generate", undefined, idea);
   };
 
   const loadGenerationConfig = (gen: ContentGeneration) => {
@@ -491,12 +532,25 @@ export function ContentStudioTool({ initialGenerations }: Props) {
         ))}
       </div>
 
+      {(step === "tool" || step === "config") && (
+        <OnePromptExperience
+          product={onePrompt}
+          value={prompt}
+          onChange={setPrompt}
+          onSubmit={handleOnePrompt}
+          showPipelinePreview={step === "tool"}
+          compact={step === "config"}
+        />
+      )}
+
       {/* Step 1: Tool Selection */}
       {step === "tool" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Content Studio</DashboardCardTitle>
-            <DashboardCardDescription>Choose a content tool to get started</DashboardCardDescription>
+            <DashboardCardTitle>Or choose a content tool</DashboardCardTitle>
+            <DashboardCardDescription>
+              Optional — One Prompt uses Content Writer by default
+            </DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

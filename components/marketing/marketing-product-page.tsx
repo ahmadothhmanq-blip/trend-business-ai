@@ -24,6 +24,11 @@ import {
 import { SeoBreadcrumbs } from "@/components/seo/breadcrumbs";
 import { RelatedLinksGroups } from "@/components/seo/related-links";
 import { getProductInternalLinks } from "@/lib/seo/internal-links";
+import { OnePromptProductSection } from "@/components/marketing/one-prompt-product-section";
+import {
+  MARKETING_SLUG_TO_ONE_PROMPT,
+  getOnePromptProduct,
+} from "@/lib/constants/one-prompt-products";
 
 /** Individual product landing — dedicated page per product slug. */
 export function MarketingProductPage({ slug }: { slug: MarketingProductSlug }) {
@@ -32,6 +37,9 @@ export function MarketingProductPage({ slug }: { slug: MarketingProductSlug }) {
   const category = AI_PRODUCT_CATEGORIES.find((c) => c.id === product.categoryId)!;
   const siblings = category.products.filter((p) => p.href !== `/products/${slug}`);
   const related = getProductInternalLinks(slug);
+  const onePromptId = MARKETING_SLUG_TO_ONE_PROMPT[slug];
+  const onePrompt = onePromptId ? getOnePromptProduct(onePromptId) : null;
+  const primaryHref = onePrompt?.dashboardHref ?? product.dashboardHref;
 
   return (
     <SiteShell>
@@ -49,11 +57,11 @@ export function MarketingProductPage({ slug }: { slug: MarketingProductSlug }) {
             <SiteH1 className="mt-5">{product.title}</SiteH1>
             <SiteBody className="mt-5 max-w-xl">{product.description}</SiteBody>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <SiteButton href="/signup" size="lg">
-                Start Free <ArrowRight className="size-4" />
+              <SiteButton href={primaryHref} size="lg">
+                Open {product.title} <ArrowRight className="size-4" />
               </SiteButton>
-              <SiteButton href={category.href} variant="dark" size="lg">
-                View {category.title}
+              <SiteButton href="/signup" variant="dark" size="lg">
+                Start Free
               </SiteButton>
             </div>
             <ul className="mt-8 space-y-3">
@@ -121,45 +129,49 @@ export function MarketingProductPage({ slug }: { slug: MarketingProductSlug }) {
         </div>
       </section>
 
-      <section className="border-t border-[rgba(212,175,55,0.12)]">
-        <div className="landing-container py-16 lg:py-20">
-          <SiteSectionHead
-            label="How it works"
-            title="Brief → generate → save & export"
-            description="The same private workflow across every Trend Business AI product."
-          />
-          <div className="mt-12 grid gap-5 sm:grid-cols-3">
-            {[
-              {
-                step: "01",
-                title: "Open the product",
-                body: `Start from ${category.title} or jump straight into ${product.title} after signup.`,
-              },
-              {
-                step: "02",
-                title: "Describe your brief",
-                body: "Share goals, audience and constraints. Clearer briefs produce stronger output.",
-              },
-              {
-                step: "03",
-                title: "Save and export",
-                body: "Keep results in your authenticated dashboard and export when you are ready to execute.",
-              },
-            ].map((item) => (
-              <div
-                key={item.step}
-                className="rounded-2xl border border-[rgba(212,175,55,0.16)] bg-[#111111] p-6"
-              >
-                <span className="inline-flex size-9 items-center justify-center rounded-full border border-[rgba(212,175,55,0.3)] bg-[rgba(212,175,55,0.1)] text-[12px] font-bold text-[#D4AF37]">
-                  {item.step}
-                </span>
-                <h3 className="mt-4 text-lg font-bold text-white">{item.title}</h3>
-                <p className="mt-2 text-[14px] leading-[1.7] text-[#B5B5B5]">{item.body}</p>
-              </div>
-            ))}
+      {onePrompt ? (
+        <OnePromptProductSection product={onePrompt} />
+      ) : (
+        <section className="border-t border-[rgba(212,175,55,0.12)]">
+          <div className="landing-container py-16 lg:py-20">
+            <SiteSectionHead
+              label="How it works"
+              title="Brief → generate → save & export"
+              description="The same private workflow across every Trend Business AI product."
+            />
+            <div className="mt-12 grid gap-5 sm:grid-cols-3">
+              {[
+                {
+                  step: "01",
+                  title: "Open the product",
+                  body: `Start from ${category.title} or jump straight into ${product.title} after signup.`,
+                },
+                {
+                  step: "02",
+                  title: "Describe your brief",
+                  body: "Share goals, audience and constraints. Clearer briefs produce stronger output.",
+                },
+                {
+                  step: "03",
+                  title: "Save and export",
+                  body: "Keep results in your authenticated dashboard and export when you are ready to execute.",
+                },
+              ].map((item) => (
+                <div
+                  key={item.step}
+                  className="rounded-2xl border border-[rgba(212,175,55,0.16)] bg-[#111111] p-6"
+                >
+                  <span className="inline-flex size-9 items-center justify-center rounded-full border border-[rgba(212,175,55,0.3)] bg-[rgba(212,175,55,0.1)] text-[12px] font-bold text-[#D4AF37]">
+                    {item.step}
+                  </span>
+                  <h3 className="mt-4 text-lg font-bold text-white">{item.title}</h3>
+                  <p className="mt-2 text-[14px] leading-[1.7] text-[#B5B5B5]">{item.body}</p>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       <section className="border-t border-[rgba(212,175,55,0.12)]">
         <div className="landing-container py-16 lg:py-20">
@@ -225,7 +237,9 @@ export function MarketingProductPage({ slug }: { slug: MarketingProductSlug }) {
 
       <SiteCtaBand
         title={`Start ${product.title} free`}
-        description="Create your account and open your private Trend Business AI dashboard."
+        description="Enter one business idea — AI guides Idea through Ready Product in your private dashboard."
+        primaryHref={primaryHref}
+        primaryLabel={`Open ${product.title}`}
         secondaryHref={category.href}
         secondaryLabel={`Browse ${category.title}`}
       />

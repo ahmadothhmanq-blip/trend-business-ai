@@ -22,6 +22,7 @@ import {
   ProjectHistoryCard,
   EmptyHistory,
   HistoryPagination,
+  OnePromptExperience,
   type ProjectHistoryItem,
 } from "@/components/dashboard/builder-shared";
 import { cn } from "@/lib/utils";
@@ -33,6 +34,8 @@ import {
   LP_SECTION_OPTIONS,
   getLandingPageType,
 } from "@/lib/constants/landing-page-builder";
+import { getOnePromptProduct } from "@/lib/constants/one-prompt-products";
+import { useIdeaQueryParam } from "@/lib/hooks/use-idea-query-param";
 import type { LandingPageGeneration } from "@/types/landing-page";
 
 type LPBuilderToolProps = { initialGenerations?: LandingPageGeneration[] };
@@ -52,6 +55,7 @@ function toHistoryItem(gen: LandingPageGeneration): ProjectHistoryItem {
 }
 
 export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProps) {
+  const onePrompt = getOnePromptProduct("landing-page-builder");
   const [step, setStep] = useState<"type" | "config" | "history" | "generating" | "preview">("type");
   const [selectedType, setSelectedType] = useState("");
   const [prompt, setPrompt] = useState("");
@@ -67,6 +71,17 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+
+  const applyIdea = useCallback((idea: string) => {
+    setPrompt(idea);
+    setStep("config");
+    if (!selectedType) {
+      const def = LANDING_PAGE_TYPES[0];
+      setSelectedType(def.id);
+      setSections([...def.defaultSections]);
+    }
+  }, [selectedType]);
+  useIdeaQueryParam(applyIdea);
 
   const fetchGenerations = useCallback(async () => {
     try {
@@ -91,31 +106,46 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
   const handleGenerate = async (
     mode: "generate" | "regenerate" | "continue" | "retry" = "generate",
     parentGenerationId?: string,
+    overridePrompt?: string,
   ) => {
-    if (!selectedType || !prompt.trim()) {
+    const idea = (overridePrompt ?? prompt).trim();
+    let pageType = selectedType;
+    let pageSections = sections;
+    if (!pageType) {
+      const def = LANDING_PAGE_TYPES[0];
+      pageType = def.id;
+      pageSections = [...def.defaultSections];
+      setSelectedType(pageType);
+      setSections(pageSections);
+    }
+    if (!pageType || !idea) {
       toast.error(
         mode === "continue"
           ? "Describe the changes you want in natural language."
-          : "Select a page type and describe your landing page.",
+          : "Enter your business idea to generate a landing page.",
       );
       return;
     }
+    if (overridePrompt) setPrompt(overridePrompt);
     setStep("generating");
-    setProgressEvents(["Sending request..."]);
+    setProgressEvents([
+      "[idea] Understanding your business idea...",
+      "[strategy] Building conversion strategy...",
+    ]);
     try {
       const res = await fetch("/api/landing-page-builder", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          prompt,
-          pageType: selectedType,
+          prompt: idea,
+          pageType,
           language,
           designStyle,
           colorStyle,
-          sections,
+          sections: pageSections,
           mode,
           parentGenerationId,
-          continueInstruction: mode === "continue" ? prompt : undefined,
+          continueInstruction: mode === "continue" ? idea : undefined,
         }),
       });
       const d = await res.json();
@@ -124,6 +154,10 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
       setParentId(null);
       if (d.generation) { setPreviewGen(d.generation); setStep("preview"); } else { setStep("history"); }
     } catch { toast.error("Request failed."); setStep("config"); }
+  };
+
+  const handleOnePrompt = (idea: string) => {
+    void handleGenerate("generate", undefined, idea);
   };
 
   const loadGenerationConfig = (gen: LandingPageGeneration) => {
@@ -189,11 +223,24 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
         ))}
       </div>
 
+      {(step === "type" || step === "config") && (
+        <OnePromptExperience
+          product={onePrompt}
+          value={prompt}
+          onChange={setPrompt}
+          onSubmit={handleOnePrompt}
+          showPipelinePreview={step === "type"}
+          compact={step === "config"}
+        />
+      )}
+
       {step === "type" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Choose Landing Page Type</DashboardCardTitle>
-            <DashboardCardDescription>Select the type of landing page you want to generate</DashboardCardDescription>
+            <DashboardCardTitle>Or choose a landing page type</DashboardCardTitle>
+            <DashboardCardDescription>
+              Optional — One Prompt uses a smart default if you skip this
+            </DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

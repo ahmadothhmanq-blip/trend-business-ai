@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -10,10 +11,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { OnePromptExperience } from "@/components/dashboard/one-prompt";
 import { WorkspaceGeneratorForm } from "@/components/dashboard/workspace/workspace-generator-form";
 import { WorkspaceHero } from "@/components/dashboard/workspace/workspace-hero";
 import { WorkspaceOutputPreview } from "@/components/dashboard/workspace/workspace-output-preview";
 import { WorkspaceProjectsList } from "@/components/dashboard/workspace/workspace-projects-list";
+import { getOnePromptProduct } from "@/lib/constants/one-prompt-products";
+import { useIdeaQueryParam } from "@/lib/hooks/use-idea-query-param";
 import { useWorkspaceTool } from "@/lib/hooks/use-workspace-tool";
 import { getProductDefinition } from "@/lib/products/registry";
 import type { ProductId } from "@/lib/products/types";
@@ -42,10 +46,33 @@ export function WorkspaceTool({
     initialGenerations,
     initialTotal,
   });
+  const isMarketing = workspaceType === "marketing";
+  const onePrompt = isMarketing ? getOnePromptProduct("marketing-ai") : null;
+  const setPrompt = tool.setPrompt;
+  const applyIdea = useCallback(
+    (idea: string) => {
+      setPrompt(idea);
+    },
+    [setPrompt],
+  );
+  useIdeaQueryParam(applyIdea);
 
   return (
     <div className="space-y-6 lg:space-y-8">
       <WorkspaceHero metadata={tool.metadata} />
+
+      {onePrompt ? (
+        <OnePromptExperience
+          product={onePrompt}
+          value={tool.prompt}
+          onChange={tool.setPrompt}
+          onSubmit={(idea) => {
+            void tool.generate({ promptOverride: idea });
+          }}
+          submitting={tool.isGenerating}
+          showPipelinePreview
+        />
+      ) : null}
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(340px,0.9fr)]">
         <WorkspaceGeneratorForm

@@ -6,3 +6,9 @@ export { ProjectHistoryCard, type ProjectHistoryItem } from "./project-history-c
 export { EmptyHistory } from "./empty-history";
 export { HistoryPagination } from "./history-pagination";
 export { SvgPreview } from "./svg-preview";
+export {
+  OnePromptExperience,
+  CoreProgressStepper,
+  PublishReadinessBadge,
+  useCoreProgress,
+} from "@/components/dashboard/one-prompt";

@@ -687,7 +687,7 @@ export const MARKETING_PRODUCTS: MarketingProduct[] = [
       "Offer messaging that matches your audience",
       "Faster launches with reusable page patterns",
     ],
-    dashboardHref: "/dashboard/website-builder",
+    dashboardHref: "/dashboard/landing-page-builder",
   },
   {
     slug: "app-builder",
@@ -713,7 +713,7 @@ export const MARKETING_PRODUCTS: MarketingProduct[] = [
       "Screen and flow clarity before development",
       "Premium app direction aligned to your brand",
     ],
-    dashboardHref: "/dashboard/website-builder",
+    dashboardHref: "/dashboard/app-builder",
   },
   {
     slug: "logo-maker",
@@ -817,7 +817,7 @@ export const MARKETING_PRODUCTS: MarketingProduct[] = [
       "Channel-ready narrative concepts",
       "Faster creative alignment before shoot or edit",
     ],
-    dashboardHref: "/dashboard/content-studio",
+    dashboardHref: "/dashboard/video-studio",
   },
   {
     slug: "content-studio",

@@ -247,6 +247,19 @@
 
 ---
 
+## D-028 — One Prompt Experience + Service UX (Phase 9)
+
+| Field | Value |
+|-------|--------|
+| Date | 2026-07-18 |
+| Status | Accepted |
+| Context | Improve final UX: single business-idea entry, Core progress visibility, stronger service pages, dashboard AI runs |
+| Decision | Add `components/dashboard/one-prompt` (stepper + One Prompt input), product configs in `lib/constants/one-prompt-products.ts`, enhance seven service marketing pages + dashboard tools; show AI runs / quality / publish on dashboard home; add additive `GET /api/ai-core/runs`; keep generators and existing product APIs unchanged |
+| Consequences | Users enter one idea and see Idea→Ready Product progress; Core Engine remains the pipeline authority |
+| Related | D-027, `docs/AI_CORE_ENGINE.md` |
+
+---
+
 ## D-027 — SEO + Performance + Auto Quality Engines (Phase 8)
 
 | Field | Value |

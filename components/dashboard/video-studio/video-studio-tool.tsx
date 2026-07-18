@@ -38,9 +38,12 @@ import {
   EmptyHistory,
   HistoryPagination,
   SvgPreview,
+  OnePromptExperience,
   type ProjectHistoryItem,
 } from "@/components/dashboard/builder-shared";
 import { cn } from "@/lib/utils";
+import { getOnePromptProduct } from "@/lib/constants/one-prompt-products";
+import { useIdeaQueryParam } from "@/lib/hooks/use-idea-query-param";
 import {
   VIDEO_TYPES,
   VIDEO_STYLES,
@@ -253,6 +256,7 @@ function toHistoryItem(gen: VideoGeneration): ProjectHistoryItem {
 }
 
 export function VideoStudioTool({ initialGenerations }: Props) {
+  const onePrompt = getOnePromptProduct("video-studio");
   const [step, setStep] = useState<"type" | "config" | "history" | "generating" | "preview">("type");
   const [selectedType, setSelectedType] = useState("");
   const [prompt, setPrompt] = useState("");
@@ -271,6 +275,17 @@ export function VideoStudioTool({ initialGenerations }: Props) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+
+  const applyIdea = useCallback((idea: string) => {
+    setPrompt(idea);
+    setStep("config");
+    if (!selectedType) {
+      const def = VIDEO_TYPES[0];
+      setSelectedType(def.id);
+      setOptions([...def.defaultOptions]);
+    }
+  }, [selectedType]);
+  useIdeaQueryParam(applyIdea);
 
   const fetchGenerations = useCallback(async () => {
     try {
@@ -295,25 +310,40 @@ export function VideoStudioTool({ initialGenerations }: Props) {
   const handleGenerate = async (
     mode: "generate" | "regenerate" | "continue" | "retry" = "generate",
     parentGenerationId?: string,
+    overridePrompt?: string,
   ) => {
-    if (!selectedType || !prompt.trim()) {
+    const idea = (overridePrompt ?? prompt).trim();
+    let videoType = selectedType;
+    let videoOptions = options;
+    if (!videoType) {
+      const def = VIDEO_TYPES[0];
+      videoType = def.id;
+      videoOptions = [...def.defaultOptions];
+      setSelectedType(videoType);
+      setOptions(videoOptions);
+    }
+    if (!videoType || !idea) {
       toast.error(
         mode === "continue"
           ? "Describe the changes you want in natural language."
-          : "Select a video type and describe your video.",
+          : "Enter your idea to generate a video concept.",
       );
       return;
     }
+    if (overridePrompt) setPrompt(overridePrompt);
     setStep("generating");
-    setProgressEvents(["Sending request..."]);
+    setProgressEvents([
+      "[idea] Understanding your story...",
+      "[strategy] Building narrative direction...",
+    ]);
     try {
       const res = await fetch("/api/video-studio", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          prompt, videoType: selectedType, style, aspectRatio, duration,
-          mood, cameraMove, options, sceneCount, mode, parentGenerationId,
-          continueInstruction: mode === "continue" ? prompt : undefined,
+          prompt: idea, videoType, style, aspectRatio, duration,
+          mood, cameraMove, options: videoOptions, sceneCount, mode, parentGenerationId,
+          continueInstruction: mode === "continue" ? idea : undefined,
         }),
       });
       const d = await res.json();
@@ -322,6 +352,10 @@ export function VideoStudioTool({ initialGenerations }: Props) {
       setParentId(null);
       if (d.generation) { setPreviewGen(d.generation); setStep("preview"); } else { setStep("history"); }
     } catch { toast.error("Request failed."); setStep("config"); }
+  };
+
+  const handleOnePrompt = (idea: string) => {
+    void handleGenerate("generate", undefined, idea);
   };
 
   const loadGenerationConfig = (gen: VideoGeneration) => {
@@ -389,11 +423,24 @@ export function VideoStudioTool({ initialGenerations }: Props) {
         ))}
       </div>
 
+      {(step === "type" || step === "config") && (
+        <OnePromptExperience
+          product={onePrompt}
+          value={prompt}
+          onChange={setPrompt}
+          onSubmit={handleOnePrompt}
+          showPipelinePreview={step === "type"}
+          compact={step === "config"}
+        />
+      )}
+
       {step === "type" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Choose Video Type</DashboardCardTitle>
-            <DashboardCardDescription>Select the type of video you want to produce</DashboardCardDescription>
+            <DashboardCardTitle>Or choose a video type</DashboardCardTitle>
+            <DashboardCardDescription>
+              Optional — One Prompt uses a smart default if you skip this
+            </DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
