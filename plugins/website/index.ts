@@ -29,3 +29,4 @@ export const websitePlugin: AIPlugin<
 };
 
 export * from "@/plugins/website/types";
+export type * from "@/plugins/website/layers/types";

@@ -11,6 +11,8 @@ export type StaticPreviewInput = {
   typography?: string[];
   content?: string[];
   components?: string[];
+  heroImageUrl?: string | null;
+  primaryCta?: string;
 };
 
 function escapeHtml(value: string): string {
@@ -71,13 +73,16 @@ export function buildStaticPreviewHtml(input: StaticPreviewInput): string {
   const components = (input.components ?? []).map((c) => c.trim()).filter(Boolean).slice(0, 8);
   const typography = (input.typography ?? []).map((t) => t.trim()).filter(Boolean);
 
-  const bg = pickColor(input.colorPalette, 0, "#0a0a0a");
-  const surface = pickColor(input.colorPalette, 1, "#141414");
-  const accent = pickColor(input.colorPalette, 2, "#d4af37");
-  const text = pickColor(input.colorPalette, 3, "#f5f5f5");
-  const muted = pickColor(input.colorPalette, 4, "#a3a3a3");
+  // designSystemToPalette order: primary, secondary, accent, neutral, surface, background, foreground
+  const accent = pickColor(input.colorPalette, 0, "#d4af37");
+  const bg = pickColor(input.colorPalette, 5, "#0a0a0a");
+  const surface = pickColor(input.colorPalette, 4, "#141414");
+  const text = pickColor(input.colorPalette, 6, "#f5f5f5");
+  const muted = pickColor(input.colorPalette, 3, "#a3a3a3");
   const headingFont = escapeHtml(typography[0] || "Georgia, serif");
   const bodyFont = escapeHtml(typography[1] || "system-ui, sans-serif");
+  const heroImage = input.heroImageUrl?.trim();
+  const ctaLabel = escapeHtml(input.primaryCta?.trim() || "Continue");
 
   const navItems = pages
     .map(
@@ -109,13 +114,18 @@ export function buildStaticPreviewHtml(input: StaticPreviewInput): string {
         .join("\n");
 
       const isHome = pageIndex === 0;
+      const heroMedia =
+        isHome && heroImage
+          ? `<div class="hero-media" style="background-image:url('${escapeHtml(heroImage)}')"></div>`
+          : "";
       return `
       <section class="page" id="${escapeHtml(page.slug)}">
+        ${heroMedia}
         <div class="hero">
           <p class="eyebrow">${escapeHtml(page.name)}</p>
           <h1>${isHome ? title : escapeHtml(page.name)}</h1>
           <p>${isHome ? description : escapeHtml(`${page.name} page for ${input.title?.trim() || "your website"}.`)}</p>
-          <a class="cta" href="#${escapeHtml(pages[Math.min(1, pages.length - 1)]?.slug || page.slug)}">Continue</a>
+          <a class="cta" href="#${escapeHtml(pages[Math.min(1, pages.length - 1)]?.slug || page.slug)}">${ctaLabel}</a>
         </div>
         <div class="grid">${sectionHtml}</div>
       </section>`;
@@ -182,6 +192,13 @@ export function buildStaticPreviewHtml(input: StaticPreviewInput): string {
     .page { display: none; padding-bottom: 2.5rem; min-height: calc(100vh - 72px); }
     .page:target { display: block; }
     body:not(:has(.page:target)) .page#${defaultSlug} { display: block; }
+    .hero-media {
+      width: 100%;
+      min-height: 42vh;
+      background-size: cover;
+      background-position: center;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    }
     .hero { padding: 3rem 1.5rem 1.5rem; max-width: 960px; }
     .hero h1 {
       font-family: ${headingFont};

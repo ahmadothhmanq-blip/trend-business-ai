@@ -18,6 +18,11 @@ import {
   isWebsiteImproveMode,
   normalizeWebsiteBlueprint,
 } from "@/plugins/website/iteration";
+import { buildWebsiteStrategy } from "@/plugins/website/layers/strategy";
+import {
+  buildDesignSystem,
+  designSystemToPalette,
+} from "@/plugins/website/layers/design-engine";
 import {
   validateWebsiteBlueprint,
   validateWebsiteDynamicPlan,
@@ -71,6 +76,36 @@ function normalizePlannedFiles(
   return sortFilesByDependency(capped);
 }
 
+function blueprintFromStrategy(
+  analysis: WebsiteProjectAnalysis,
+  strategy: Awaited<ReturnType<typeof buildWebsiteStrategy>>,
+  design: Awaited<ReturnType<typeof buildDesignSystem>>,
+): WebsiteProjectBlueprint {
+  return {
+    title: analysis.businessProfile.projectName || analysis.projectName,
+    description:
+      strategy.positioning ||
+      analysis.businessProfile.summary ||
+      analysis.businessProfile.offer,
+    pages: strategy.pages.map((p) => p.name),
+    sections: strategy.sectionPlan.map((s) => `${s.page}: ${s.name}`),
+    colorPalette: designSystemToPalette(design),
+    typography: [
+      design.typography.headingFont,
+      design.typography.bodyFont,
+      ...design.typography.scale,
+    ],
+    components: design.componentPalette,
+    content: [
+      analysis.businessProfile.offer,
+      ...strategy.contentStructure,
+      ...strategy.ctas,
+    ],
+    seo: strategy.seoFocus,
+    roadmap: strategy.conversionFunnel,
+  };
+}
+
 export async function planWebsite(
   input: WebsiteGenerationInput,
   analysis: WebsiteProjectAnalysis,
@@ -81,26 +116,51 @@ export async function planWebsite(
     prompt: buildWebsiteIterationPrompt(input),
   };
 
+  const strategy = await buildWebsiteStrategy(input, analysis, ctx);
+  const designSystem = await buildDesignSystem(
+    input,
+    analysis,
+    strategy,
+    ctx,
+  );
+
   ctx.progress.emit("Creating blueprint...");
 
-  const rawBlueprint = await generateJsonWithValidation<WebsiteProjectBlueprint>({
-    provider: ctx.provider,
-    prompt: websiteBlueprintPrompt(iterationInput, analysis),
-    schema: websiteBlueprintSchema,
-    maxAttempts: 3,
-    validate: validateWebsiteBlueprint,
-  });
+  let blueprint: WebsiteProjectBlueprint;
+  try {
+    const rawBlueprint = await generateJsonWithValidation<WebsiteProjectBlueprint>({
+      provider: ctx.provider,
+      prompt: `${websiteBlueprintPrompt(iterationInput, analysis)}
 
-  // Improve/continue: coerce unexpected list shapes before file planning + product assembly.
-  const blueprint = isWebsiteImproveMode(input)
-    ? normalizeWebsiteBlueprint(rawBlueprint)
-    : rawBlueprint;
+Strategy: ${JSON.stringify(strategy)}
+DesignSystem: ${JSON.stringify(designSystem)}
+
+Align blueprint pages/sections/colors/typography with Strategy and DesignSystem.`,
+      schema: websiteBlueprintSchema,
+      maxAttempts: 3,
+      validate: validateWebsiteBlueprint,
+    });
+
+    blueprint = isWebsiteImproveMode(input)
+      ? normalizeWebsiteBlueprint(rawBlueprint)
+      : rawBlueprint;
+
+    // Prefer design-engine tokens when AI returns weak palette.
+    if (!blueprint.colorPalette?.length) {
+      blueprint.colorPalette = designSystemToPalette(designSystem);
+    }
+    if (!blueprint.pages?.length) {
+      blueprint.pages = strategy.pages.map((p) => p.name);
+    }
+  } catch (error) {
+    console.error("blueprint generation failed; deriving from strategy/design", error);
+    blueprint = blueprintFromStrategy(analysis, strategy, designSystem);
+  }
 
   if (
     isWebsiteImproveMode(input) &&
     (!blueprint.pages.length || !blueprint.content.length)
   ) {
-    // Keep iteration architecture; refill critical lists from analysis when AI omitted arrays.
     if (!blueprint.pages.length && analysis.pages?.length) {
       blueprint.pages = [...analysis.pages];
     }
@@ -116,7 +176,11 @@ export async function planWebsite(
 
   const dynamicPlan = await generateJsonWithValidation<WebsiteDynamicPlan>({
     provider: ctx.provider,
-    prompt: websitePlanPrompt(iterationInput, analysis, blueprint),
+    prompt: `${websitePlanPrompt(iterationInput, analysis, blueprint)}
+
+Strategy sitemap: ${JSON.stringify(strategy.sitemap)}
+Design pattern: ${designSystem.industryPattern}
+Prefer pages matching strategy paths. Inject design tokens via app/globals.css.`,
     schema: websiteDynamicPlanSchema,
     maxAttempts: 3,
     validate: validateWebsiteDynamicPlan,
@@ -143,5 +207,7 @@ export async function planWebsite(
     },
     filePlans,
     flags,
+    strategy,
+    designSystem,
   };
 }

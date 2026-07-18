@@ -234,6 +234,19 @@
 
 ---
 
+## D-018 — Website Builder Design Engine layers (Idea→Strategy→Design→Assets→Code→QA)
+
+| Field | Value |
+|-------|--------|
+| Date | 2026-07-18 |
+| Status | Accepted |
+| Context | Upgrade Website Builder from Prompt→Code into a multi-layer design/development engine without replacing AIGenerationEngine |
+| Decision | Map layers into existing analyze/plan/generate/validate stages. Real AI images via OpenAI DALL·E when keyed, else SVG fallback. Automatic pipeline with Strategy/Design/Assets panels for post-hoc NL improve (`[strategy]` / `[design]` / `[assets]`). |
+| Consequences | Richer blueprint JSONB; `website-assets` bucket; quality soft-gates + one improve pass; file cap raised to 22. |
+| Related | D-015, D-016, D-017, `docs/WEBSITE_BUILDER_DESIGN_ENGINE.md` |
+
+---
+
 ## Template for new entries
 
 ```markdown

@@ -1,8 +1,12 @@
 import type { SupabaseMaybeSingleQueryClient } from "@/lib/api/supabase-query";
 import type { GeneratedProjectFile } from "@/lib/ai/types";
 import type {
+  AssetManifest,
+  BusinessProfile,
+  DesignSystem,
   WebsiteGenerationInput,
   WebsiteProjectBlueprint,
+  WebsiteStrategy,
 } from "@/plugins/website/types";
 
 /** True for natural-language improve / continue iteration (not first-time generate). */
@@ -152,7 +156,18 @@ type ParentContext = {
   previousFiles?: GeneratedProjectFile[];
   previousTitle?: string;
   previousDescription?: string;
+  previousBusinessProfile?: BusinessProfile;
+  previousStrategy?: WebsiteStrategy;
+  previousDesignSystem?: DesignSystem;
+  previousAssetManifest?: AssetManifest;
 };
+
+function extractLayerArtifact<T>(blueprint: unknown, key: string): T | undefined {
+  if (!blueprint || typeof blueprint !== "object") return undefined;
+  const value = (blueprint as Record<string, unknown>)[key];
+  if (!value || typeof value !== "object") return undefined;
+  return value as T;
+}
 
 /** Load prior website generation for regenerate / continue modes. */
 export async function loadWebsiteParentContext(
@@ -182,6 +197,22 @@ export async function loadWebsiteParentContext(
       previousFiles: extractWebsiteFilesFromBlueprint(row.blueprint),
       previousTitle: row.project_name,
       previousDescription: row.business_description,
+      previousBusinessProfile: extractLayerArtifact<BusinessProfile>(
+        row.blueprint,
+        "businessProfile",
+      ),
+      previousStrategy: extractLayerArtifact<WebsiteStrategy>(
+        row.blueprint,
+        "strategy",
+      ),
+      previousDesignSystem: extractLayerArtifact<DesignSystem>(
+        row.blueprint,
+        "designSystem",
+      ),
+      previousAssetManifest: extractLayerArtifact<AssetManifest>(
+        row.blueprint,
+        "assetManifest",
+      ),
     };
   } catch {
     return {};

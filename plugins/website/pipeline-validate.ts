@@ -21,6 +21,13 @@ export function validateWebsiteAnalysis(analysis: WebsiteProjectAnalysis): {
   if (typeof analysis.requiresDatabase !== "boolean") {
     return { valid: false, reason: "requiresDatabase must be a boolean." };
   }
+  if (
+    analysis.businessProfile &&
+    typeof analysis.businessProfile === "object" &&
+    !String(analysis.businessProfile.industry ?? "").trim()
+  ) {
+    return { valid: false, reason: "businessProfile.industry is required." };
+  }
   return { valid: true };
 }
 

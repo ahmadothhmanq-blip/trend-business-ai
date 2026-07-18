@@ -13,6 +13,15 @@ import {
 } from "@/lib/ai/website-scaffold";
 import { sanitizeProjectPath } from "@/lib/ai/zipper";
 import { logger } from "@/lib/logger";
+import {
+  assetManifestForPrompt,
+  generateWebsiteAssets,
+} from "@/plugins/website/layers/assets";
+import { designSystemCssVariables } from "@/plugins/website/layers/design-engine";
+import {
+  buildQualityImproveInstruction,
+  runWebsiteQualityCheck,
+} from "@/plugins/website/layers/quality";
 import { generatedFileSchema } from "@/plugins/website/schemas";
 import type {
   GeneratedProjectFile,
@@ -34,6 +43,7 @@ async function generateFileWithValidation(
   filePlan: PlannedFile,
   ctx: GenerationContext,
   extraValidationReason = "",
+  assetSummary = "",
 ) {
   return generateWithValidation({
     provider: ctx.provider,
@@ -66,6 +76,9 @@ async function generateFileWithValidation(
         content: truncateForContext(file.content),
       })),
       validationReason: extraValidationReason,
+      strategy: plan.strategy,
+      designSystem: plan.designSystem,
+      assetManifestSummary: assetSummary,
     }),
     schema: generatedFileSchema,
     validate: (result) => validateGeneratedFileContent(result, filePlan.path),
@@ -83,6 +96,7 @@ async function validateAndRepairProject(
   filePlans: PlannedFile[],
   files: GeneratedProjectFile[],
   ctx: GenerationContext,
+  assetSummary: string,
 ) {
   let currentFiles = [...files];
   const planByPath = new Map(filePlans.map((entry) => [entry.path, entry]));
@@ -138,6 +152,7 @@ async function validateAndRepairProject(
         filePlan,
         ctx,
         projectIssues,
+        assetSummary,
       );
 
       regenerated.set(targetPath, repaired);
@@ -167,16 +182,88 @@ async function validateAndRepairProject(
   return currentFiles;
 }
 
+async function applyQualityImprovePass(
+  input: WebsiteGenerationInput,
+  analysis: WebsiteProjectAnalysis,
+  plan: WebsitePlanResult,
+  files: GeneratedProjectFile[],
+  ctx: GenerationContext,
+  assetSummary: string,
+  improveInstruction: string,
+) {
+  const planByPath = new Map(plan.filePlans.map((entry) => [entry.path, entry]));
+  const targets = plan.filePlans.filter(
+    (f) =>
+      f.path.includes("page.tsx") ||
+      f.path.includes("layout.tsx") ||
+      f.path.includes("Hero") ||
+      f.path.includes("components/"),
+  );
+
+  let current = [...files];
+  for (const filePlan of targets.slice(0, 4)) {
+    if (SCAFFOLD_PATHS.has(filePlan.path) && !filePlan.path.includes("page")) {
+      continue;
+    }
+    const existingWithoutTarget = current.filter((f) => f.path !== filePlan.path);
+    try {
+      const improved = await generateFileWithValidation(
+        { ...input, continueInstruction: improveInstruction, mode: "continue" },
+        analysis,
+        plan,
+        plan.filePlans,
+        existingWithoutTarget,
+        filePlan,
+        ctx,
+        improveInstruction,
+        assetSummary,
+      );
+      current = [
+        ...existingWithoutTarget,
+        improved,
+      ];
+    } catch (error) {
+      logger.warn("quality improve file failed", "website-generate", {
+        path: filePlan.path,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
+  // Ensure plan order
+  const byPath = new Map(current.map((f) => [f.path, f]));
+  return sortFilesByDependency([...planByPath.values()])
+    .map((p) => byPath.get(p.path))
+    .filter((f): f is GeneratedProjectFile => Boolean(f))
+    .concat(current.filter((f) => !planByPath.has(f.path)));
+}
+
 export async function generateWebsite(
   input: WebsiteGenerationInput,
   analysis: WebsiteProjectAnalysis,
   plan: WebsitePlanResult,
   ctx: GenerationContext,
 ) {
+  const assetManifest = await generateWebsiteAssets({
+    input,
+    businessProfile: analysis.businessProfile,
+    strategy: plan.strategy,
+    designSystem: plan.designSystem,
+    ctx,
+    generationKey: input.parentGenerationId ?? `draft-${Date.now()}`,
+  });
+  const assetSummary = assetManifestForPrompt(assetManifest);
+
   ctx.progress.emit("Generating files...");
 
   const scaffold = buildWebsiteScaffold(
     plan.blueprint.title || analysis.projectName,
+    {
+      cssVariables: designSystemCssVariables(plan.designSystem),
+      primary: plan.designSystem.colors.primary,
+      background: plan.designSystem.colors.background,
+      foreground: plan.designSystem.colors.foreground,
+    },
   );
   const scaffoldByPath = new Map(scaffold.map((file) => [file.path, file]));
 
@@ -185,6 +272,12 @@ export async function generateWebsite(
     if (!SCAFFOLD_PATHS.has(planned.path)) continue;
     const scaffoldFile = scaffoldByPath.get(planned.path);
     if (scaffoldFile) files.push(scaffoldFile);
+  }
+
+  // Always ensure design-token globals.css is present even if not in filePlans.
+  if (!files.some((f) => f.path === "app/globals.css")) {
+    const globals = scaffoldByPath.get("app/globals.css");
+    if (globals) files.push(globals);
   }
 
   const aiFilePlans = plan.filePlans.filter(
@@ -203,11 +296,13 @@ export async function generateWebsite(
     index += 1;
     const prior = reusePrevious ? previousByPath.get(filePlan.path) : undefined;
 
-    // Continue mode: keep unchanged prior files; only regenerate when instruction asks or path is new.
     if (
       input.mode === "continue" &&
       prior &&
-      !input.continueInstruction?.toLowerCase().includes(filePlan.path.toLowerCase())
+      !input.continueInstruction?.toLowerCase().includes(filePlan.path.toLowerCase()) &&
+      !input.continueInstruction?.toLowerCase().includes("[quality]") &&
+      !input.continueInstruction?.toLowerCase().includes("[design]") &&
+      !input.continueInstruction?.toLowerCase().includes("[strategy]")
     ) {
       ctx.progress.emit(
         `Reusing file ${index}/${aiFilePlans.length}: ${filePlan.path}`,
@@ -231,20 +326,63 @@ export async function generateWebsite(
         prior
           ? `Improve this existing file while preserving working imports:\n${prior.content.slice(0, 4000)}`
           : "",
+        assetSummary,
       ),
     );
   }
 
   ctx.progress.emit("Validating project...");
 
-  const validatedFiles = await validateAndRepairProject(
+  let validatedFiles = await validateAndRepairProject(
     input,
     analysis,
     plan,
     plan.filePlans,
     files,
     ctx,
+    assetSummary,
   );
+
+  ctx.progress.emit("Running quality check...");
+  let qualityReport = runWebsiteQualityCheck({
+    files: validatedFiles,
+    strategy: plan.strategy,
+    designSystem: plan.designSystem,
+    assetManifest,
+    pages: plan.blueprint.pages,
+  });
+
+  if (!qualityReport.passed || qualityReport.weakSections.length > 0) {
+    ctx.progress.emit("Improving weak sections...");
+    const improveInstruction = buildQualityImproveInstruction(qualityReport);
+    try {
+      validatedFiles = await applyQualityImprovePass(
+        input,
+        analysis,
+        plan,
+        validatedFiles,
+        ctx,
+        assetSummary,
+        improveInstruction,
+      );
+      qualityReport = {
+        ...runWebsiteQualityCheck({
+          files: validatedFiles,
+          strategy: plan.strategy,
+          designSystem: plan.designSystem,
+          assetManifest,
+          pages: plan.blueprint.pages,
+        }),
+        improveApplied: true,
+        improveNotes: [improveInstruction],
+      };
+    } catch (error) {
+      logger.warn("quality improve pass failed", "website-generate", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      qualityReport = { ...qualityReport, improveApplied: false };
+    }
+  }
 
   return {
     projectKind: input.projectKind,
@@ -259,6 +397,11 @@ export async function generateWebsite(
     seo: plan.blueprint.seo,
     roadmap: plan.blueprint.roadmap,
     files: validatedFiles,
+    businessProfile: analysis.businessProfile,
+    strategy: plan.strategy,
+    designSystem: plan.designSystem,
+    assetManifest,
+    qualityReport,
     settings: {
       framework: "Next.js App Router",
       styling: "Tailwind CSS",

@@ -2,7 +2,7 @@ import type { GeneratedProjectFile } from "@/lib/ai/types";
 import type { PlannedFileLike } from "@/lib/ai/validator";
 
 /** Hard ceiling so Website Builder completes within a real user session. */
-export const MAX_WEBSITE_FILES = 18;
+export const MAX_WEBSITE_FILES = 22;
 
 const CATEGORY_PRIORITY: Record<string, number> = {
   configs: 0,
@@ -65,8 +65,25 @@ export function capPlannedFiles<T extends PlannedFileLike>(
   return selected;
 }
 
+export type ScaffoldDesignTokens = {
+  cssVariables: string;
+  primary?: string;
+  background?: string;
+  foreground?: string;
+};
+
 /** Static scaffold files — skip DeepSeek for these to keep generation fast. */
-export function buildWebsiteScaffold(projectName = "generated-website"): GeneratedProjectFile[] {
+export function buildWebsiteScaffold(
+  projectName = "generated-website",
+  design?: ScaffoldDesignTokens,
+): GeneratedProjectFile[] {
+  const rootCss = design?.cssVariables?.trim()
+    ? design.cssVariables.trim()
+    : `:root {
+  color-scheme: light;
+}`;
+  const bodyBg = design?.background ?? "#ffffff";
+  const bodyFg = design?.foreground ?? "#0f172a";
   const pkg = {
     name: projectName
       .toLowerCase()
@@ -201,13 +218,22 @@ export default config;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  color-scheme: light;
-}
+${rootCss}
 
 body {
-  @apply bg-white text-slate-900 antialiased;
+  background: ${bodyBg};
+  color: ${bodyFg};
+  font-family: var(--font-body, system-ui, sans-serif);
+  -webkit-font-smoothing: antialiased;
 }
+
+h1, h2, h3, h4 {
+  font-family: var(--font-heading, Georgia, serif);
+}
+
+.bg-brand-primary { background-color: var(--color-primary); }
+.text-brand-primary { color: var(--color-primary); }
+.bg-brand-accent { background-color: var(--color-accent); }
 `,
     },
     {

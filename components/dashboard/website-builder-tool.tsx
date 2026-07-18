@@ -1102,6 +1102,20 @@ export function WebsiteBuilderTool({
         )}
       </div>
 
+      <DesignEnginePanels
+        project={activeProject?.generatedProject}
+        disabled={isGenerating || !activeProject?.id}
+        onImproveLayer={(prefix, hint) => {
+          if (!activeProject?.id) {
+            toast.error("Create or select a website first.");
+            return;
+          }
+          setEditMode(true);
+          setProjectBrief(`${prefix} ${hint}`.trim());
+          toast.message("Edit the instruction, then click Improve with AI.");
+        }}
+      />
+
       <OutputWorkspace
         activeProject={activeProject}
         outputTab={outputTab}
@@ -1314,6 +1328,162 @@ function WebsiteLiveFrame({
 }
 
 /** Safe live preview + export (sandboxed static HTML; npm compile builder stays off — D-004/D-017). */
+function DesignEnginePanels({
+  project,
+  disabled,
+  onImproveLayer,
+}: {
+  project?: GeneratedWebsiteProject;
+  disabled?: boolean;
+  onImproveLayer: (prefix: string, hint: string) => void;
+}) {
+  const strategy = project?.strategy;
+  const design = project?.designSystem;
+  const assets = project?.assetManifest?.items ?? [];
+  const profile = project?.businessProfile;
+  const quality = project?.qualityReport;
+
+  if (!project) return null;
+
+  return (
+    <div className="grid gap-4 lg:grid-cols-3">
+      <DashboardPanel>
+        <SectionHeader
+          icon={Sparkles}
+          title="Strategy"
+          description={profile ? `${profile.industry} · ${profile.targetAudience}` : "Business strategy layer"}
+        />
+        <div className="mt-4 space-y-2 text-sm text-white/65">
+          <p className="text-white/85">{strategy?.positioning || "Strategy will appear after generation."}</p>
+          {strategy?.sitemap?.length ? (
+            <p className="text-xs text-white/45">Sitemap: {strategy.sitemap.join(" → ")}</p>
+          ) : null}
+          {strategy?.ctas?.length ? (
+            <p className="text-xs text-white/45">CTAs: {strategy.ctas.slice(0, 3).join(", ")}</p>
+          ) : null}
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          className="btn-ghost-gold mt-4 h-9 w-full rounded-xl text-xs"
+          disabled={disabled}
+          onClick={() =>
+            onImproveLayer(
+              "[strategy]",
+              "Refine positioning, sitemap, and conversion CTAs for higher conversions.",
+            )
+          }
+        >
+          Improve strategy
+        </Button>
+      </DashboardPanel>
+
+      <DashboardPanel>
+        <SectionHeader
+          icon={Palette}
+          title="Design system"
+          description={design?.style || "Design engine tokens"}
+        />
+        <div className="mt-4 space-y-3 text-sm text-white/65">
+          {design ? (
+            <>
+              <div className="flex flex-wrap gap-2">
+                {Object.values(design.colors)
+                  .slice(0, 6)
+                  .map((hex) => (
+                    <span
+                      key={hex}
+                      className="size-7 rounded-full border border-white/15"
+                      style={{ background: hex }}
+                      title={hex}
+                    />
+                  ))}
+              </div>
+              <p className="text-xs text-white/45">
+                {design.typography.headingFont} / {design.typography.bodyFont}
+              </p>
+              <p className="text-xs text-white/45">Pattern: {design.industryPattern}</p>
+            </>
+          ) : (
+            <p>Design tokens will appear after generation.</p>
+          )}
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          className="btn-ghost-gold mt-4 h-9 w-full rounded-xl text-xs"
+          disabled={disabled}
+          onClick={() =>
+            onImproveLayer(
+              "[design]",
+              "Refresh the color system, typography, and layout rules for a more premium look.",
+            )
+          }
+        >
+          Improve design
+        </Button>
+      </DashboardPanel>
+
+      <DashboardPanel>
+        <SectionHeader
+          icon={FileStack}
+          title="Assets"
+          description={
+            project.assetManifest?.provider
+              ? `Provider: ${project.assetManifest.provider}`
+              : "Hero and section visuals"
+          }
+        />
+        <div className="mt-4 space-y-2">
+          {assets.length ? (
+            assets.slice(0, 4).map((asset) => (
+              <div key={asset.id} className="flex items-center gap-3">
+                {asset.url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={asset.url}
+                    alt={asset.alt}
+                    className="size-10 rounded-lg object-cover ring-1 ring-white/10"
+                  />
+                ) : (
+                  <div className="size-10 rounded-lg bg-white/5" />
+                )}
+                <div className="min-w-0">
+                  <p className="truncate text-xs font-medium text-white/80">{asset.name}</p>
+                  <p className="truncate text-[11px] text-white/40">
+                    {asset.role} · {asset.status}
+                  </p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-white/55">Assets will appear after generation.</p>
+          )}
+          {quality?.weakSections?.length ? (
+            <p className="pt-2 text-[11px] text-amber-200/70">
+              QA: {quality.weakSections.slice(0, 2).join("; ")}
+            </p>
+          ) : null}
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          className="btn-ghost-gold mt-4 h-9 w-full rounded-xl text-xs"
+          disabled={disabled}
+          onClick={() =>
+            onImproveLayer(
+              "[assets]",
+              "Regenerate hero and section visuals to better match the brand and audience.",
+            )
+          }
+        >
+          Improve assets
+        </Button>
+      </DashboardPanel>
+    </div>
+  );
+}
+
 function PreviewAndExportPanel({
   activeProject,
   onDownload,

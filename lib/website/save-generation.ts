@@ -92,15 +92,41 @@ export async function persistWebsiteGeneration(args: {
   | { ok: true; generation: WebsiteGeneration; project: GeneratedWebsiteProject }
   | { ok: false; error: string }
 > {
+  const heroAsset = args.project.assetManifest?.items?.find(
+    (item) => item.role === "hero" && item.url,
+  );
+  const primaryCta =
+    args.project.strategy?.ctas?.[0] ||
+    args.project.strategy?.pages?.[0]?.primaryCta;
+
   const files = ensureStaticPreviewFile({
     title: args.project.title,
     description: args.project.description,
     pages: args.project.pages,
     sections: args.project.sections,
-    colorPalette: args.project.colorPalette,
-    typography: args.project.typography,
+    colorPalette:
+      args.project.designSystem
+        ? [
+            args.project.designSystem.colors.primary,
+            args.project.designSystem.colors.secondary,
+            args.project.designSystem.colors.accent,
+            args.project.designSystem.colors.neutral,
+            args.project.designSystem.colors.surface,
+            args.project.designSystem.colors.background,
+            args.project.designSystem.colors.foreground,
+          ]
+        : args.project.colorPalette,
+    typography: args.project.designSystem
+      ? [
+          args.project.designSystem.typography.headingFont,
+          args.project.designSystem.typography.bodyFont,
+          ...args.project.designSystem.typography.scale,
+        ]
+      : args.project.typography,
     content: args.project.content,
     components: args.project.components,
+    heroImageUrl: heroAsset?.url,
+    primaryCta,
     files: args.project.files,
   });
 
@@ -159,10 +185,14 @@ export async function persistWebsiteGeneration(args: {
     website_type:
       args.projectKind === "web_application" ? "Web Application" : "Website",
     business_description: savedProject.description,
-    target_audience: "Auto-detected from project prompt",
+    target_audience:
+      savedProject.businessProfile?.targetAudience ||
+      "Auto-detected from project prompt",
     language: args.input.language,
-    color_style: args.input.theme,
-    design_style: args.input.theme,
+    color_style:
+      savedProject.designSystem?.colors.primary || args.input.theme,
+    design_style:
+      savedProject.designSystem?.style || args.input.theme,
     page_count: String(savedProject.pages.length || 1),
     features: [
       ...args.input.features,

@@ -53,37 +53,51 @@ export type AIReport = {
 };
 
 export type WebsiteBlueprint = {
-  structure: {
+  structure?: {
     overview: string;
     hierarchy: string[];
   };
-  suggestedPages: Array<{
+  suggestedPages?: Array<{
     name: string;
     purpose: string;
     keySections: string[];
   }>;
-  uiComponents: Array<{
+  uiComponents?: Array<{
     name: string;
     description: string;
     placement: string;
   }>;
-  colorPalette: Array<{
+  colorPalette?: Array<{
     name: string;
     hex: string;
     role: string;
-  }>;
-  typography: {
+  }> | string[];
+  typography?: {
     headingFont: string;
     bodyFont: string;
     notes: string;
     scale: string[];
-  };
-  seo: {
+  } | string[];
+  seo?: {
     metaTitle: string;
     metaDescription: string;
     keywords: string[];
     tips: string[];
-  };
+  } | string[];
+  /** Design Engine layer artifacts (persisted on GeneratedWebsiteProject shape). */
+  businessProfile?: Record<string, unknown>;
+  strategy?: Record<string, unknown>;
+  designSystem?: Record<string, unknown>;
+  assetManifest?: Record<string, unknown>;
+  qualityReport?: Record<string, unknown>;
+  files?: Array<{ path: string; content: string; language?: string }>;
+  title?: string;
+  description?: string;
+  pages?: string[];
+  sections?: string[];
+  components?: string[];
+  content?: string[];
+  roadmap?: string[];
 };
 
 export type TokenUsage = {

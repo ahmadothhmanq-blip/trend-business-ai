@@ -38,7 +38,7 @@ export function websiteBlueprintPrompt(
   input: WebsiteAnalyzeInput,
   analysis: unknown,
 ) {
-  return `Create a focused MVP blueprint for a Next.js 16 App Router project (shippable under 18 files).
+  return `Create a focused MVP blueprint for a Next.js 16 App Router project (shippable under 22 files).
 
 Original prompt: ${input.prompt}
 Analysis: ${JSON.stringify(analysis)}
@@ -65,9 +65,10 @@ ${COMPLEXITY_GUIDE}
 ${PRODUCTION_ARCHITECTURE_GUIDE}
 
 HARD RULES:
-- estimatedFileCount MUST be <= 18 (including configs already provided by scaffold).
-- Plan at most 8 AI-authored app files beyond static scaffold configs (package.json, tsconfig, next/tailwind/postcss, globals.css, lib/utils.ts).
+- estimatedFileCount MUST be <= 22 (including configs already provided by scaffold).
+- Plan at most 10 AI-authored app files beyond static scaffold configs (package.json, tsconfig, next/tailwind/postcss, globals.css, lib/utils.ts).
 - Prefer a shippable MVP over a large incomplete tree. Do NOT plan full production module trees.
+- Align pages with the Strategy sitemap and Design System tokens.
 
 Capability budgets (when flags are true — pick the MINIMUM files):
 - requiresAuth: one login page + one session/auth helper (max 2 files). No full auth suite.
@@ -96,10 +97,25 @@ export function websiteFilePrompt(args: {
   projectTree: unknown;
   existingFiles: unknown;
   validationReason?: string;
+  strategy?: unknown;
+  designSystem?: unknown;
+  assetManifestSummary?: string;
 }) {
   const validationNote = args.validationReason
     ? `\nPrevious attempt failed validation:\n${args.validationReason}\nFix all issues and regenerate this file correctly.`
     : "";
+
+  const layerNote = [
+    args.strategy ? `Strategy: ${JSON.stringify(args.strategy)}` : "",
+    args.designSystem
+      ? `DesignSystem (use CSS variables --color-primary etc.): ${JSON.stringify(args.designSystem)}`
+      : "",
+    args.assetManifestSummary
+      ? `Assets to reference with next/image or <img>:\n${args.assetManifestSummary}`
+      : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
 
   return `Generate exactly one production-ready file for this Next.js 16 App Router project.
 
@@ -114,7 +130,15 @@ Blueprint: ${JSON.stringify(args.blueprint)}
 Dynamic project plan: ${JSON.stringify(args.dynamicPlan)}
 Project tree: ${JSON.stringify(args.projectTree)}
 Existing generated files: ${JSON.stringify(args.existingFiles)}
+${layerNote}
 ${validationNote}
+
+Architecture rules:
+- Clean App Router pages/components; shared UI primitives under components/
+- Responsive layouts (sm/md/lg); conversion CTAs from strategy
+- Apply design tokens via CSS variables when editing globals.css or styles
+- Wire hero/section image URLs from Assets when present
+- Include metadata title/description for layout or page files
 
 ${PRODUCTION_ARCHITECTURE_GUIDE}
 ${FILE_GENERATION_RULES}`;

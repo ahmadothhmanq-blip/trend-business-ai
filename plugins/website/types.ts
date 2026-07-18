@@ -1,6 +1,23 @@
 import type { ProjectCapabilityFlags } from "@/lib/ai/validator";
 import type { GeneratedProjectFile, GenerationProgressEvent } from "@/lib/ai/types";
 import type { PlannedFile } from "@/lib/ai/planner";
+import type {
+  AssetManifest,
+  BusinessProfile,
+  DesignSystem,
+  QualityReport,
+  WebsiteStrategy,
+} from "@/plugins/website/layers/types";
+
+export type {
+  AssetManifest,
+  AssetItem,
+  AssetRole,
+  BusinessProfile,
+  DesignSystem,
+  QualityReport,
+  WebsiteStrategy,
+} from "@/plugins/website/layers/types";
 
 export type WebsiteGenerationMode =
   | "generate"
@@ -22,17 +39,30 @@ export type WebsiteGenerationInput = {
   previousFiles?: GeneratedProjectFile[];
   previousTitle?: string;
   previousDescription?: string;
+  /** Prior layer artifacts for scoped continue */
+  previousBusinessProfile?: BusinessProfile;
+  previousStrategy?: WebsiteStrategy;
+  previousDesignSystem?: DesignSystem;
+  previousAssetManifest?: AssetManifest;
 };
 
 export type WebsiteGenerationProgressEvent =
-  | "Analyzing..."
+  | "Analyzing business idea..."
+  | "Building strategy..."
+  | "Creating design system..."
+  | "Generating assets..."
   | "Creating blueprint..."
   | "Planning files..."
   | "Generating files..."
+  | "Running quality check..."
+  | "Improving weak sections..."
   | "Validating project..."
   | "Building ZIP..."
   | "Saving project..."
+  | "Building product preview..."
+  | "Saving project to workspace..."
   | "Done."
+  | "Analyzing..."
   | GenerationProgressEvent;
 
 export type WebsiteProjectAnalysis = ProjectCapabilityFlags & {
@@ -43,6 +73,8 @@ export type WebsiteProjectAnalysis = ProjectCapabilityFlags & {
   designSystem: string[];
   technologies: string[];
   databaseProvider: "prisma" | "supabase" | "none";
+  /** Full business idea profile (Design Engine layer 1) */
+  businessProfile: BusinessProfile;
 };
 
 export type WebsiteProjectBlueprint = {
@@ -77,6 +109,8 @@ export type WebsitePlanResult = {
   dynamicPlan: WebsiteDynamicPlan;
   filePlans: PlannedFile[];
   flags: ProjectCapabilityFlags;
+  strategy: WebsiteStrategy;
+  designSystem: DesignSystem;
 };
 
 export type GeneratedWebsiteProject = {
@@ -109,6 +143,11 @@ export type GeneratedWebsiteProject = {
   seo: string[];
   roadmap: string[];
   files: GeneratedProjectFile[];
+  businessProfile?: BusinessProfile;
+  strategy?: WebsiteStrategy;
+  designSystem?: DesignSystem;
+  assetManifest?: AssetManifest;
+  qualityReport?: QualityReport;
 };
 
 export type { GeneratedProjectFile };
