@@ -23,8 +23,10 @@ export function runWebsiteQualityCheck(params: {
   designSystem?: DesignSystem;
   assetManifest?: AssetManifest;
   pages: string[];
+  requiredSections?: string[];
 }): QualityReport {
-  const { files, strategy, designSystem, assetManifest, pages } = params;
+  const { files, strategy, designSystem, assetManifest, pages, requiredSections } =
+    params;
   const content = allContent(files);
   const layout = fileContent(files, "layout.tsx") + fileContent(files, "globals.css");
   const home = fileContent(files, "page.tsx");
@@ -35,6 +37,14 @@ export function runWebsiteQualityCheck(params: {
   }
   if (!files.some((f) => f.path.includes("layout.tsx"))) {
     structureIssues.push("Missing layout");
+  }
+  for (const section of (requiredSections ?? strategy?.contentStructure ?? []).slice(
+    0,
+    6,
+  )) {
+    if (section && !content.toLowerCase().includes(section.toLowerCase().slice(0, 12))) {
+      structureIssues.push(`Required section weakly covered: ${section}`);
+    }
   }
   if (strategy?.pages?.length) {
     const missingPages = strategy.pages

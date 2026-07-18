@@ -121,6 +121,7 @@ export async function POST(request: Request) {
       ...input,
       projectKind,
       ...parentContext,
+      userId: auth.user!.id,
       preferredProvider: settings?.default_provider as AIProviderName | undefined,
       autoFallback: settings?.auto_fallback ?? true,
     });

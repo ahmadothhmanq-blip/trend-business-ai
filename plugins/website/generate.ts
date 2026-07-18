@@ -250,6 +250,7 @@ export async function generateWebsite(
     strategy: plan.strategy,
     designSystem: plan.designSystem,
     ctx,
+    userId: input.userId,
     generationKey: input.parentGenerationId ?? `draft-${Date.now()}`,
   });
   const assetSummary = assetManifestForPrompt(assetManifest);
@@ -350,6 +351,7 @@ export async function generateWebsite(
     designSystem: plan.designSystem,
     assetManifest,
     pages: plan.blueprint.pages,
+    requiredSections: analysis.businessProfile.requiredSections,
   });
 
   if (!qualityReport.passed || qualityReport.weakSections.length > 0) {
@@ -372,6 +374,7 @@ export async function generateWebsite(
           designSystem: plan.designSystem,
           assetManifest,
           pages: plan.blueprint.pages,
+          requiredSections: analysis.businessProfile.requiredSections,
         }),
         improveApplied: true,
         improveNotes: [improveInstruction],

@@ -14,6 +14,13 @@
 | Code | `generate` | `plugins/website/generate.ts` + scaffold |
 | Quality Check | `generate` + `validate` | `plugins/website/layers/quality.ts` |
 
+## Design style presets
+
+`stylePreset` is one of: `luxury` | `modern` | `corporate` | `minimal`.  
+Resolved from user theme hints and coerced after AI output. CSS exposes `--style-preset`.
+
+Business profiles include `requiredSections`. Strategies include `contentStrategy` (voice, pillars, proof, objections, SEO topics).
+
 ## Persisted artifacts
 
 Stored on `website_generations.blueprint` (JSONB):

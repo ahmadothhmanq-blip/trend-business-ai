@@ -1361,6 +1361,16 @@ function DesignEnginePanels({
           {strategy?.ctas?.length ? (
             <p className="text-xs text-white/45">CTAs: {strategy.ctas.slice(0, 3).join(", ")}</p>
           ) : null}
+          {strategy?.contentStrategy?.brandVoice ? (
+            <p className="text-xs text-white/40">
+              Voice: {strategy.contentStrategy.brandVoice}
+            </p>
+          ) : null}
+          {profile?.requiredSections?.length ? (
+            <p className="text-xs text-white/40">
+              Sections: {profile.requiredSections.slice(0, 5).join(", ")}
+            </p>
+          ) : null}
         </div>
         <Button
           type="button"
@@ -1402,7 +1412,13 @@ function DesignEnginePanels({
               <p className="text-xs text-white/45">
                 {design.typography.headingFont} / {design.typography.bodyFont}
               </p>
-              <p className="text-xs text-white/45">Pattern: {design.industryPattern}</p>
+              <p className="text-xs text-white/45">
+                Preset: {design.stylePreset ?? "modern"} · Pattern:{" "}
+                {design.industryPattern}
+              </p>
+              {design.layoutStyle ? (
+                <p className="text-xs text-white/40">{design.layoutStyle}</p>
+              ) : null}
             </>
           ) : (
             <p>Design tokens will appear after generation.</p>

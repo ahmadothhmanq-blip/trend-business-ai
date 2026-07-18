@@ -2,70 +2,127 @@ import { generateJsonWithValidation } from "@/lib/ai/generator";
 import { designEnginePrompt } from "@/lib/ai/prompts/website-layers";
 import { buildWebsiteIterationPrompt } from "@/plugins/website/iteration";
 import { designSystemSchema } from "@/plugins/website/layers/schemas";
-import type { DesignSystem } from "@/plugins/website/layers/types";
+import type {
+  DesignStylePreset,
+  DesignSystem,
+  WebsiteStrategy,
+} from "@/plugins/website/layers/types";
 import type {
   WebsiteGenerationInput,
   WebsiteProjectAnalysis,
 } from "@/plugins/website/types";
-import type { WebsiteStrategy } from "@/plugins/website/layers/types";
 import type { GenerationContext } from "@/lib/ai/types";
 
-const INDUSTRY_DEFAULTS: Record<string, Partial<DesignSystem>> = {
-  clinic: {
-    style: "Calm clinical",
-    industryPattern: "clinic",
-    colors: {
-      primary: "#0F766E",
-      secondary: "#134E4A",
-      accent: "#F59E0B",
-      neutral: "#64748B",
-      surface: "#F8FAFC",
-      background: "#FFFFFF",
-      foreground: "#0F172A",
-    },
-  },
-  saas: {
-    style: "Modern product",
-    industryPattern: "saas",
-    colors: {
-      primary: "#2563EB",
-      secondary: "#1E293B",
-      accent: "#22D3EE",
-      neutral: "#64748B",
-      surface: "#F1F5F9",
-      background: "#FFFFFF",
-      foreground: "#0F172A",
-    },
-  },
-  restaurant: {
-    style: "Warm hospitality",
-    industryPattern: "restaurant",
-    colors: {
-      primary: "#9A3412",
-      secondary: "#1C1917",
-      accent: "#D4AF37",
-      neutral: "#78716C",
-      surface: "#FAF7F2",
-      background: "#FFFBF5",
-      foreground: "#1C1917",
-    },
-  },
-  real_estate: {
+const STYLE_PRESETS: Record<
+  DesignStylePreset,
+  Pick<
+    DesignSystem,
+    | "style"
+    | "stylePreset"
+    | "colors"
+    | "typography"
+    | "layoutRules"
+    | "layoutStyle"
+    | "uiPatterns"
+    | "componentPalette"
+    | "spacingScale"
+    | "borderRadius"
+    | "shadowStyle"
+  >
+> = {
+  luxury: {
     style: "Luxury editorial",
-    industryPattern: "real_estate",
+    stylePreset: "luxury",
     colors: {
       primary: "#D4AF37",
       secondary: "#1A1A1A",
       accent: "#C9A227",
       neutral: "#6B7280",
       surface: "#F5F5F4",
-      background: "#FAFAF9",
-      foreground: "#111827",
+      background: "#0A0A0A",
+      foreground: "#FAFAF9",
     },
+    typography: {
+      headingFont: "Playfair Display",
+      bodyFont: "Source Sans 3",
+      scale: ["text-5xl", "text-3xl", "text-xl", "text-base"],
+      notes: "Serif display + refined sans body",
+    },
+    layoutRules: [
+      "Full-bleed hero imagery",
+      "Generous whitespace",
+      "Gold accent CTAs",
+    ],
+    layoutStyle: "full-bleed cinematic hero + editorial sections",
+    uiPatterns: ["Split hero", "Masonry proof", "Sticky CTA bar"],
+    componentPalette: ["Hero", "Gallery", "Testimonials", "CTA", "Footer"],
+    spacingScale: ["6", "10", "16", "24", "32"],
+    borderRadius: "0.75rem",
+    shadowStyle: "soft gold glow",
   },
-  portfolio: {
-    style: "Minimal creative",
-    industryPattern: "portfolio",
+  modern: {
+    style: "Modern product",
+    stylePreset: "modern",
+    colors: {
+      primary: "#2563EB",
+      secondary: "#0F172A",
+      accent: "#22D3EE",
+      neutral: "#64748B",
+      surface: "#F1F5F9",
+      background: "#FFFFFF",
+      foreground: "#0F172A",
+    },
+    typography: {
+      headingFont: "Space Grotesk",
+      bodyFont: "IBM Plex Sans",
+      scale: ["text-4xl", "text-2xl", "text-lg", "text-base"],
+      notes: "Geometric product UI typography",
+    },
+    layoutRules: [
+      "Card grids with clear hierarchy",
+      "Mobile-first breakpoints",
+      "High-contrast CTAs",
+    ],
+    layoutStyle: "product marketing grid with feature cards",
+    uiPatterns: ["Bento features", "Logo cloud", "Pricing cards"],
+    componentPalette: ["Hero", "FeatureGrid", "Pricing", "FAQ", "CTA"],
+    spacingScale: ["4", "8", "12", "16", "24"],
+    borderRadius: "1rem",
+    shadowStyle: "soft elevated",
+  },
+  corporate: {
+    style: "Corporate trust",
+    stylePreset: "corporate",
+    colors: {
+      primary: "#1E3A5F",
+      secondary: "#334155",
+      accent: "#0EA5E9",
+      neutral: "#64748B",
+      surface: "#F8FAFC",
+      background: "#FFFFFF",
+      foreground: "#0F172A",
+    },
+    typography: {
+      headingFont: "Libre Franklin",
+      bodyFont: "Source Sans 3",
+      scale: ["text-4xl", "text-2xl", "text-lg", "text-base"],
+      notes: "Clear institutional hierarchy",
+    },
+    layoutRules: [
+      "Structured section rhythm",
+      "Trust badges and metrics",
+      "Accessible contrast",
+    ],
+    layoutStyle: "structured enterprise marketing layout",
+    uiPatterns: ["Stats strip", "Case studies", "Contact form"],
+    componentPalette: ["Hero", "Stats", "Services", "CaseStudies", "Contact"],
+    spacingScale: ["4", "8", "12", "20", "28"],
+    borderRadius: "0.5rem",
+    shadowStyle: "subtle card",
+  },
+  minimal: {
+    style: "Minimal clean",
+    stylePreset: "minimal",
     colors: {
       primary: "#111827",
       secondary: "#374151",
@@ -75,50 +132,66 @@ const INDUSTRY_DEFAULTS: Record<string, Partial<DesignSystem>> = {
       background: "#FFFFFF",
       foreground: "#111827",
     },
+    typography: {
+      headingFont: "DM Sans",
+      bodyFont: "DM Sans",
+      scale: ["text-4xl", "text-2xl", "text-lg", "text-base"],
+      notes: "Single-family minimal system",
+    },
+    layoutRules: [
+      "Sparse composition",
+      "Strong typography hierarchy",
+      "Few accent moments",
+    ],
+    layoutStyle: "whitespace-first single column narrative",
+    uiPatterns: ["Text-led hero", "Inline CTA", "Quiet footer"],
+    componentPalette: ["Hero", "Features", "Work", "About", "Contact"],
+    spacingScale: ["8", "12", "16", "24", "40"],
+    borderRadius: "0.25rem",
+    shadowStyle: "none",
   },
 };
+
+export function resolveStylePreset(
+  theme: string,
+  styleHint?: string,
+): DesignStylePreset {
+  const hay = `${theme} ${styleHint ?? ""}`.toLowerCase();
+  if (/luxury|gold|premium|editorial|opulent/.test(hay)) return "luxury";
+  if (/corporate|enterprise|business|professional|trust/.test(hay)) {
+    return "corporate";
+  }
+  if (/minimal|clean|simple|light|sparse/.test(hay)) return "minimal";
+  if (/modern|startup|saas|tech|product/.test(hay)) return "modern";
+  return "modern";
+}
+
+function normalizeStylePreset(value: unknown): DesignStylePreset {
+  const v = String(value ?? "")
+    .toLowerCase()
+    .trim();
+  if (v === "luxury" || v === "modern" || v === "corporate" || v === "minimal") {
+    return v;
+  }
+  return resolveStylePreset(v);
+}
 
 function fallbackDesign(
   input: WebsiteGenerationInput,
   analysis: WebsiteProjectAnalysis,
 ): DesignSystem {
-  const industryKey = analysis.businessProfile.industry
-    .toLowerCase()
-    .replace(/\s+/g, "_");
-  const preset =
-    INDUSTRY_DEFAULTS[industryKey] ||
-    INDUSTRY_DEFAULTS[
-      Object.keys(INDUSTRY_DEFAULTS).find((k) => industryKey.includes(k)) ?? ""
-    ] ||
-    INDUSTRY_DEFAULTS.saas;
+  const presetKey = resolveStylePreset(
+    input.theme,
+    analysis.designSystem?.join(" "),
+  );
+  const preset = STYLE_PRESETS[presetKey];
+  const industry =
+    analysis.businessProfile.industry.toLowerCase().replace(/\s+/g, "_") ||
+    "generic";
 
   return {
-    style: preset.style ?? input.theme ?? "Modern",
-    industryPattern: preset.industryPattern ?? "generic",
-    colors: preset.colors ?? {
-      primary: "#D4AF37",
-      secondary: "#1A1A1A",
-      accent: "#C9A227",
-      neutral: "#6B7280",
-      surface: "#F5F5F4",
-      background: "#FFFFFF",
-      foreground: "#111827",
-    },
-    typography: {
-      headingFont: "Playfair Display",
-      bodyFont: "Source Sans 3",
-      scale: ["text-4xl", "text-2xl", "text-lg", "text-base"],
-      notes: "Expressive heading + readable body",
-    },
-    layoutRules: [
-      "Full-bleed hero",
-      "Single-column mobile, 12-col desktop",
-      "Generous section spacing",
-    ],
-    componentPalette: ["Hero", "FeatureGrid", "Testimonials", "CTA", "Footer"],
-    spacingScale: ["4", "8", "12", "16", "24"],
-    borderRadius: "1rem",
-    shadowStyle: "soft elevated",
+    ...preset,
+    industryPattern: industry,
   };
 }
 
@@ -156,7 +229,43 @@ export function designSystemCssVariables(design: DesignSystem): string {
   --font-heading: "${design.typography.headingFont}", Georgia, serif;
   --font-body: "${design.typography.bodyFont}", system-ui, sans-serif;
   --radius: ${design.borderRadius};
+  --style-preset: ${design.stylePreset};
 }`;
+}
+
+function coerceDesignSystem(raw: DesignSystem, input: WebsiteGenerationInput): DesignSystem {
+  const stylePreset = normalizeStylePreset(
+    raw.stylePreset || raw.style || input.theme,
+  );
+  const preset = STYLE_PRESETS[stylePreset];
+  return {
+    ...preset,
+    ...raw,
+    stylePreset,
+    style: raw.style || preset.style,
+    layoutStyle: raw.layoutStyle || preset.layoutStyle,
+    uiPatterns:
+      Array.isArray(raw.uiPatterns) && raw.uiPatterns.length
+        ? raw.uiPatterns
+        : preset.uiPatterns,
+    colors: raw.colors ?? preset.colors,
+    typography: raw.typography ?? preset.typography,
+    layoutRules:
+      Array.isArray(raw.layoutRules) && raw.layoutRules.length
+        ? raw.layoutRules
+        : preset.layoutRules,
+    componentPalette:
+      Array.isArray(raw.componentPalette) && raw.componentPalette.length
+        ? raw.componentPalette
+        : preset.componentPalette,
+    spacingScale:
+      Array.isArray(raw.spacingScale) && raw.spacingScale.length
+        ? raw.spacingScale
+        : preset.spacingScale,
+    borderRadius: raw.borderRadius || preset.borderRadius,
+    shadowStyle: raw.shadowStyle || preset.shadowStyle,
+    industryPattern: raw.industryPattern || "generic",
+  };
 }
 
 export async function buildDesignSystem(
@@ -174,7 +283,7 @@ export async function buildDesignSystem(
     !instruction.includes("[design]") &&
     !instruction.includes("[idea]")
   ) {
-    return input.previousDesignSystem;
+    return coerceDesignSystem(input.previousDesignSystem, input);
   }
 
   const iterationInput = {
@@ -183,13 +292,14 @@ export async function buildDesignSystem(
   };
 
   try {
-    return await generateJsonWithValidation<DesignSystem>({
+    const raw = await generateJsonWithValidation<DesignSystem>({
       provider: ctx.provider,
       prompt: designEnginePrompt(iterationInput, analysis, strategy),
       schema: designSystemSchema,
       maxAttempts: 3,
       validate: validateDesignSystem,
     });
+    return coerceDesignSystem(raw, input);
   } catch (error) {
     console.error("design engine failed; using fallback", error);
     return fallbackDesign(input, analysis);

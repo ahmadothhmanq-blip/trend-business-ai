@@ -135,10 +135,14 @@ ${validationNote}
 
 Architecture rules:
 - Clean App Router pages/components; shared UI primitives under components/
-- Responsive layouts (sm/md/lg); conversion CTAs from strategy
-- Apply design tokens via CSS variables when editing globals.css or styles
-- Wire hero/section image URLs from Assets when present
+- Prefer components from DesignSystem.componentPalette and uiPatterns
+- Responsive layouts with sm:/md:/lg: utilities; mobile-first
+- Apply design tokens via CSS variables (--color-primary, --font-heading, etc.)
+- Honor DesignSystem.stylePreset (luxury|modern|corporate|minimal) in spacing/radius/shadows
+- Follow Strategy contentStrategy brand voice and required section goals
+- Wire hero/section image URLs from Assets when present (next/image or <img>)
 - Include metadata title/description for layout or page files
+- Include clear primary CTAs from strategy.ctas
 
 ${PRODUCTION_ARCHITECTURE_GUIDE}
 ${FILE_GENERATION_RULES}`;

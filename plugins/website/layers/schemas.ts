@@ -13,6 +13,7 @@ export const businessProfileSchema = {
     competitors: stringArraySchema,
     kpis: stringArraySchema,
     summary: { type: "string" },
+    requiredSections: stringArraySchema,
   },
   required: [
     "projectName",
@@ -25,6 +26,7 @@ export const businessProfileSchema = {
     "competitors",
     "kpis",
     "summary",
+    "requiredSections",
   ],
 };
 
@@ -97,6 +99,23 @@ export const websiteStrategySchema = {
     },
     conversionFunnel: stringArraySchema,
     contentStructure: stringArraySchema,
+    contentStrategy: {
+      type: "object",
+      properties: {
+        brandVoice: { type: "string" },
+        messagingPillars: stringArraySchema,
+        proofPoints: stringArraySchema,
+        objectionHandlers: stringArraySchema,
+        seoTopics: stringArraySchema,
+      },
+      required: [
+        "brandVoice",
+        "messagingPillars",
+        "proofPoints",
+        "objectionHandlers",
+        "seoTopics",
+      ],
+    },
     ctas: stringArraySchema,
     seoFocus: stringArraySchema,
   },
@@ -107,6 +126,7 @@ export const websiteStrategySchema = {
     "sectionPlan",
     "conversionFunnel",
     "contentStructure",
+    "contentStrategy",
     "ctas",
     "seoFocus",
   ],
@@ -116,6 +136,7 @@ export const designSystemSchema = {
   type: "object",
   properties: {
     style: { type: "string" },
+    stylePreset: { type: "string" },
     industryPattern: { type: "string" },
     colors: {
       type: "object",
@@ -149,6 +170,8 @@ export const designSystemSchema = {
       required: ["headingFont", "bodyFont", "scale", "notes"],
     },
     layoutRules: stringArraySchema,
+    layoutStyle: { type: "string" },
+    uiPatterns: stringArraySchema,
     componentPalette: stringArraySchema,
     spacingScale: stringArraySchema,
     borderRadius: { type: "string" },
@@ -156,10 +179,13 @@ export const designSystemSchema = {
   },
   required: [
     "style",
+    "stylePreset",
     "industryPattern",
     "colors",
     "typography",
     "layoutRules",
+    "layoutStyle",
+    "uiPatterns",
     "componentPalette",
     "spacingScale",
     "borderRadius",

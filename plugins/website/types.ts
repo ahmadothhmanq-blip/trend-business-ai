@@ -14,6 +14,8 @@ export type {
   AssetItem,
   AssetRole,
   BusinessProfile,
+  ContentStrategy,
+  DesignStylePreset,
   DesignSystem,
   QualityReport,
   WebsiteStrategy,
@@ -44,6 +46,8 @@ export type WebsiteGenerationInput = {
   previousStrategy?: WebsiteStrategy;
   previousDesignSystem?: DesignSystem;
   previousAssetManifest?: AssetManifest;
+  /** Authenticated user id for asset storage uploads */
+  userId?: string;
 };
 
 export type WebsiteGenerationProgressEvent =

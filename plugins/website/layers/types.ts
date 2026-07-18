@@ -11,6 +11,8 @@ export type BusinessProfile = {
   competitors: string[];
   kpis: string[];
   summary: string;
+  /** Sections the business site must include (hero, proof, pricing, etc.) */
+  requiredSections: string[];
 };
 
 export type StrategyPage = {
@@ -29,6 +31,14 @@ export type StrategySection = {
   contentNotes: string;
 };
 
+export type ContentStrategy = {
+  brandVoice: string;
+  messagingPillars: string[];
+  proofPoints: string[];
+  objectionHandlers: string[];
+  seoTopics: string[];
+};
+
 export type WebsiteStrategy = {
   positioning: string;
   sitemap: string[];
@@ -36,9 +46,16 @@ export type WebsiteStrategy = {
   sectionPlan: StrategySection[];
   conversionFunnel: string[];
   contentStructure: string[];
+  contentStrategy: ContentStrategy;
   ctas: string[];
   seoFocus: string[];
 };
+
+export type DesignStylePreset =
+  | "luxury"
+  | "modern"
+  | "corporate"
+  | "minimal";
 
 export type DesignColorTokens = {
   primary: string;
@@ -59,10 +76,14 @@ export type DesignTypography = {
 
 export type DesignSystem = {
   style: string;
+  /** Canonical style bucket used by scaffolds and prompts */
+  stylePreset: DesignStylePreset;
   industryPattern: string;
   colors: DesignColorTokens;
   typography: DesignTypography;
   layoutRules: string[];
+  layoutStyle: string;
+  uiPatterns: string[];
   componentPalette: string[];
   spacingScale: string[];
   borderRadius: string;

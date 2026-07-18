@@ -31,6 +31,14 @@ function fallbackProfile(input: WebsiteGenerationInput): BusinessProfile {
     competitors: [],
     kpis: ["Conversion rate", "Engagement"],
     summary: input.prompt.slice(0, 280),
+    requiredSections: [
+      "Hero",
+      "Value proposition",
+      "Social proof",
+      "Features",
+      "CTA",
+      "Contact",
+    ],
   };
 }
 
@@ -79,6 +87,11 @@ export async function analyzeBusinessIdea(
       businessProfile: {
         ...profile,
         projectName: profile.projectName || analysis.projectName,
+        requiredSections:
+          Array.isArray(profile.requiredSections) &&
+          profile.requiredSections.length
+            ? profile.requiredSections
+            : fallbackProfile(input).requiredSections,
       },
     };
   } catch (error) {
