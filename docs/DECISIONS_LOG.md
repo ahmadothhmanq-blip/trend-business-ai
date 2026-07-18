@@ -247,6 +247,19 @@
 
 ---
 
+## D-029 — Production Launch Hardening (Phase 10)
+
+| Field | Value |
+|-------|--------|
+| Date | 2026-07-18 |
+| Status | Accepted |
+| Context | Prepare public launch: auth/billing/security/ops without rewriting AI Core or product APIs |
+| Decision | Document and harden existing Supabase auth + PayPal-first billing + credits; wire dashboard to live credit balances; add `lib/production/readiness`, ownership helper, error-monitoring hook, `docs/PRODUCTION_LAUNCH.md` + `LAUNCH_CHECKLIST.md` + billing/security docs; add `verify:launch` and `smoke:core-products` for seven Core services; keep AI Core pipeline and product API contracts unchanged |
+| Consequences | Launch readiness is ops + honesty (real credits UI) + checklists; monetization stays PayPal/`card` adapters |
+| Related | D-028, `docs/PRODUCTION_LAUNCH.md`, `docs/BILLING_ARCHITECTURE.md` |
+
+---
+
 ## D-028 — One Prompt Experience + Service UX (Phase 9)
 
 | Field | Value |

@@ -37,6 +37,7 @@ export default async function DashboardPage() {
         recentActivity: [],
         recentAiRuns: [],
         generatedProducts: [],
+        billing: null,
       };
 
   return (

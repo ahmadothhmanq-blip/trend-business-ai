@@ -3,7 +3,13 @@ import {
   mapAiRunToDashboardItem,
   type AiRunRow,
 } from "@/lib/ai-core/dashboard-runs";
-import type { DashboardActivityItem, DashboardHomeData, DashboardStats } from "@/types/database";
+import { createBillingManager } from "@/lib/billing";
+import type {
+  DashboardActivityItem,
+  DashboardBillingSummary,
+  DashboardHomeData,
+  DashboardStats,
+} from "@/types/database";
 import { getWorkspaceDefinition } from "@/lib/workspace/registry";
 import type { WorkspaceType } from "@/lib/workspace/types";
 
@@ -193,10 +199,26 @@ export async function getDashboardHomeData(
     (run) => run.status === "completed" || run.publishReady !== null,
   );
 
+  let billing: DashboardBillingSummary | null = null;
+  try {
+    const status = await createBillingManager(supabase).getStatus(userId);
+    billing = {
+      planId: status.currentPlanId,
+      creditBalance: status.credits.balance,
+      lifetimeUsed: status.credits.lifetime_used,
+      lifetimePurchased: status.credits.lifetime_purchased,
+      billingConfigured: status.billingConfigured,
+      providersConfigured: status.providersConfigured,
+    };
+  } catch {
+    billing = null;
+  }
+
   return {
     stats,
     recentActivity: sortRecentActivity(activity),
     recentAiRuns,
     generatedProducts,
+    billing,
   };
 }

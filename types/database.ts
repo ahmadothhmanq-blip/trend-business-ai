@@ -275,6 +275,16 @@ export type DashboardActivityItem = {
   createdAt: string;
 };
 
+/** Phase 10 — real billing snapshot for dashboard (not synthetic). */
+export type DashboardBillingSummary = {
+  planId: string;
+  creditBalance: number;
+  lifetimeUsed: number;
+  lifetimePurchased: number;
+  billingConfigured: boolean;
+  providersConfigured: string[];
+};
+
 export type DashboardHomeData = {
   stats: DashboardStats;
   recentActivity: DashboardActivityItem[];
@@ -282,6 +292,8 @@ export type DashboardHomeData = {
   recentAiRuns: DashboardAiRunItem[];
   /** Generated products with quality / publish signals when available */
   generatedProducts: DashboardAiRunItem[];
+  /** Live credit / plan status from billing system */
+  billing?: DashboardBillingSummary | null;
 };
 
 export type HistoryItemType =

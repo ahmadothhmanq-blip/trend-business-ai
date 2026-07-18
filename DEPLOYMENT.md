@@ -1,5 +1,9 @@
 # Deployment checklist
 
+> **Phase 10 platform launch:** see [`docs/PRODUCTION_LAUNCH.md`](docs/PRODUCTION_LAUNCH.md) and [`docs/LAUNCH_CHECKLIST.md`](docs/LAUNCH_CHECKLIST.md).  
+> Billing: [`docs/BILLING_ARCHITECTURE.md`](docs/BILLING_ARCHITECTURE.md) · Security: [`docs/SECURITY_PRODUCTION.md`](docs/SECURITY_PRODUCTION.md)  
+> Quick verify: `npm run verify:launch` · Product smoke: `npm run smoke:core-products`
+
 ## Supabase
 
 ### 1. Run migrations (in order)

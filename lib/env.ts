@@ -17,6 +17,13 @@ export function getRequiredEnv(name: RequiredEnvName): string {
   return value;
 }
 
+export {
+  evaluateProductionReadiness,
+  readinessSummary,
+  type ReadinessCheck,
+  type ReadinessLevel,
+} from "@/lib/production/readiness";
+
 export function getSupabaseEnv() {
   return {
     url: getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL"),

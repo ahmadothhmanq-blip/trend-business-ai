@@ -1,5 +1,5 @@
 /**
- * Smoke: AI Core Engine Phase 9 modules exist.
+ * Smoke: AI Core Engine modules exist (through Phase 10 launch prep).
  * Usage: node scripts/smoke-ai-core.mjs
  */
 import assert from "node:assert/strict";
@@ -51,6 +51,11 @@ const required = [
   "components/dashboard/one-prompt/core-progress-stepper.tsx",
   "components/dashboard/one-prompt/one-prompt-experience.tsx",
   "components/marketing/one-prompt-product-section.tsx",
+  "lib/production/readiness.ts",
+  "lib/auth/ownership.ts",
+  "lib/monitoring/errors.ts",
+  "docs/PRODUCTION_LAUNCH.md",
+  "docs/LAUNCH_CHECKLIST.md",
   "lib/ai-core/adapters/website-builder.ts",
   "lib/ai-core/adapters/webapp-builder.ts",
   "lib/ai-core/adapters/landing-page-builder.ts",

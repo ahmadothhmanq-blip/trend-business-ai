@@ -72,12 +72,26 @@ export function DashboardOverview({ data, userName }: DashboardOverviewProps) {
     recentActivity,
     recentAiRuns = [],
     generatedProducts = [],
+    billing = null,
   } = data;
   const totalProjects =
     stats.ideas + stats.analyses + stats.reports + stats.websites + stats.workspaces;
-  const aiCreditsUsed = Math.min(250, 36 + totalProjects * 8);
-  const aiCreditsRemaining = Math.max(0, 250 - aiCreditsUsed);
-  const usagePct = Math.round((aiCreditsUsed / 250) * 100);
+  const aiCreditsRemaining = billing?.creditBalance ?? 0;
+  const aiCreditsUsed = billing?.lifetimeUsed ?? 0;
+  const creditPool =
+    aiCreditsRemaining + aiCreditsUsed > 0
+      ? aiCreditsRemaining + aiCreditsUsed
+      : 50;
+  const usagePct = Math.min(
+    100,
+    Math.round((aiCreditsUsed / Math.max(creditPool, 1)) * 100),
+  );
+  const planLabel =
+    billing?.planId === "pro"
+      ? "Pro"
+      : billing?.planId === "business"
+        ? "Business"
+        : "Free";
   const recentProjects = recentActivity.filter(
     (item) => item.type === "website" || item.type === "workspace",
   );
@@ -131,7 +145,9 @@ export function DashboardOverview({ data, userName }: DashboardOverviewProps) {
           {
             label: "AI Credits",
             value: aiCreditsRemaining,
-            hint: `${aiCreditsUsed} used this month`,
+            hint: billing
+              ? `${aiCreditsUsed} used · ${planLabel} plan`
+              : "Sign in to load balance",
             icon: Coins,
           },
           {
@@ -346,22 +362,32 @@ export function DashboardOverview({ data, userName }: DashboardOverviewProps) {
           )}
         </DashboardPanel>
 
-        {/* Credits / Plan */}
+        {/* Credits / Plan — live billing balance (Phase 10) */}
         <DashboardPanel className="p-5 sm:p-6">
           <h3 className="text-lg font-bold text-white">Credits / Plan</h3>
-          <p className="mt-1 text-[13px] text-white/40">Free Beta · monthly allowance</p>
+          <p className="mt-1 text-[13px] text-white/40">
+            {planLabel} plan
+            {billing?.billingConfigured
+              ? " · PayPal & card checkout ready"
+              : " · Paid checkout when PayPal is configured"}
+          </p>
           <div className="mt-6">
             <div className="flex items-end justify-between">
               <p className="text-3xl font-bold text-premium-gold">{aiCreditsRemaining}</p>
-              <p className="text-[13px] text-white/40">of 250 left</p>
+              <p className="text-[13px] text-white/40">credits left</p>
             </div>
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/[0.08]">
               <div
                 className="h-full rounded-full bg-[linear-gradient(90deg,#D4AF37,#FFD700)]"
-                style={{ width: `${usagePct}%` }}
+                style={{ width: `${Math.max(4, 100 - usagePct)}%` }}
               />
             </div>
-            <p className="mt-3 text-[12px] text-white/35">{usagePct}% of monthly credits used</p>
+            <p className="mt-3 text-[12px] text-white/35">
+              {aiCreditsUsed} lifetime used
+              {billing?.lifetimePurchased
+                ? ` · ${billing.lifetimePurchased} purchased`
+                : ""}
+            </p>
           </div>
           <Button
             asChild

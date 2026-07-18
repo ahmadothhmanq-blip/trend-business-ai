@@ -10,8 +10,11 @@
     "type-check": "tsc --noEmit",
     "verify": "node scripts/verify.mjs",
     "verify:wb-launch": "node scripts/verify-wb-launch.mjs",
+    "verify:launch": "node scripts/verify-production-launch.mjs",
     "perf:budget": "node scripts/check-dashboard-budgets.mjs",
     "smoke:website-ai": "node scripts/smoke-website-ai.mjs",
+    "smoke:ai-core": "node scripts/smoke-ai-core.mjs",
+    "smoke:core-products": "node scripts/smoke-core-products.mjs",
     "db:apply": "node scripts/apply-migrations.mjs",
     "db:verify": "node scripts/verify-platform-db.mjs"
   },

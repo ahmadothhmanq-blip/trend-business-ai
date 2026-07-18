@@ -1,8 +1,8 @@
 # AI Core Engine
 
-**Status:** Phase 9 — One Prompt Experience + Service UX  
+**Status:** Phase 10 — Production Launch Prep (Core pipeline stable at Phase 9 UX)  
 **Scope:** Shared layer pipeline for all Trend Business AI products  
-**Related:** D-018–D-028
+**Related:** D-018–D-029
 
 ---
 
@@ -20,44 +20,25 @@ Business Idea
 → Ready to Publish
 ```
 
-User-facing One Prompt progress simplifies this to:
+User-facing One Prompt progress:
 
 **Idea → Strategy → Design → Assets → Generation → Quality → Ready Product**
 
-Industry **Template** selection still runs at LayerRunner start (Phase 6). Existing product APIs remain unchanged.
+Phase 10 does **not** change this pipeline. It hardens auth, billing, security, and launch ops around it. Existing product APIs remain compatible.
 
 ---
 
-## Phase 9 — One Prompt Experience
+## Phase 10 — Production launch (ops)
 
-UX layer on top of AI Core (no generator rewrites):
-
-| Surface | Package / path |
-|---------|----------------|
-| Progress stepper | `components/dashboard/one-prompt/` |
-| Product configs / examples | `lib/constants/one-prompt-products.ts` |
-| Marketing service pages | `OnePromptProductSection` on product landings |
-| Dashboard AI Runs | `getDashboardHomeData` + `GET /api/ai-core/runs` |
-
-Supported products: Website Builder, App Builder, Landing Page Builder, Video Studio, Brand Designer, Content Studio, Marketing AI.
-
----
-
-## Phase 8 — SEO + Performance + Auto Quality
-
-Packages: `lib/ai-core/seo/`, `lib/ai-core/performance/`, `lib/ai-core/quality/`
-
-See Phase 8 sections in git history / D-027 for full details.
-
----
-
-## Phase 7 — AI Design System + Assets
-
-Packages: `lib/ai-core/design-system/`, `lib/ai-core/assets/`
-
-Presets: `luxury` · `modern` · `corporate` · `minimal` · `creative`
-
-`GET /api/ai-core/design-presets` lists presets.
+| Area | Docs / code |
+|------|-------------|
+| Launch guide | `docs/PRODUCTION_LAUNCH.md` |
+| Checklist | `docs/LAUNCH_CHECKLIST.md` |
+| Billing | `docs/BILLING_ARCHITECTURE.md`, `lib/billing/` |
+| Security | `docs/SECURITY_PRODUCTION.md`, `lib/auth/ownership.ts` |
+| Env readiness | `lib/production/readiness.ts`, `npm run verify:launch` |
+| Product smoke | `npm run smoke:core-products` |
+| Error monitoring prep | `lib/monitoring/errors.ts` |
 
 ---
 
@@ -80,5 +61,5 @@ Canonical products: `website-builder`, `app-builder`, `landing-page-builder`, `b
 ## Compatibility
 
 - Product dashboards and legacy `/api/*` generators unchanged  
-- One Prompt UX wraps existing tools; LayerRunner still powers Core adapters  
-- Platform marketing SEO (`lib/seo`) remains separate from customer-project SEO Engine  
+- Billing remains PayPal-first (`paypal` + `card` hosted); credits gate AI usage  
+- Phase 9 One Prompt UX remains the user-facing creation path  
