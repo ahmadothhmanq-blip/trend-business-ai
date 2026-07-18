@@ -505,8 +505,12 @@ export function WebsiteBuilderTool({
         if (!completed) {
           throw new Error("Stream ended before generation completed.");
         }
-      } else {
-        // Fallback: blocking JSON POST
+      } else if (
+        // Only fall back when the stream route is missing — never after a charged
+        // stream attempt (401/402/429/5xx), which would double-debit AI credits.
+        streamResponse.status === 404 ||
+        streamResponse.status === 405
+      ) {
         const response = await fetch("/api/website-builder", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -523,6 +527,15 @@ export function WebsiteBuilderTool({
         }
 
         applySavedGeneration(data.project, data.generation);
+      } else {
+        let detail = `Unable to generate website (${streamResponse.status}).`;
+        try {
+          const errBody = (await streamResponse.json()) as { error?: string };
+          if (errBody.error) detail = errBody.error;
+        } catch {
+          // keep status-based message
+        }
+        throw new Error(detail);
       }
     } catch (error) {
       setApiError(

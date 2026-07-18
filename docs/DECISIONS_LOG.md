@@ -247,6 +247,19 @@
 
 ---
 
+## D-030 — Final Audit & Launch Prep (Phase 11)
+
+| Field | Value |
+|-------|--------|
+| Date | 2026-07-18 |
+| Status | Accepted |
+| Context | Final product/UX/AI/performance audit before public launch; fix only critical issues |
+| Decision | Audit all seven Core products (UI, generation, AI Core, DB, errors); document UX/AI/performance results; ship `PHASE_11_FINAL_AUDIT.md`, `KNOWN_ISSUES.md`, `PRODUCTION_READINESS_REPORT.md`, `FINAL_LAUNCH_CHECKLIST.md`; fix Website Builder stream→JSON fallback so non-404/405 stream failures do not double-charge credits; keep AI Core architecture and product APIs unchanged |
+| Consequences | Code-ready for launch; remaining blockers are ops env/migrations/PayPal; known limitations (video≠MP4, SEO layers on site builders only) are explicit |
+| Related | D-029, `docs/PHASE_11_FINAL_AUDIT.md`, `docs/KNOWN_ISSUES.md` |
+
+---
+
 ## D-029 — Production Launch Hardening (Phase 10)
 
 | Field | Value |

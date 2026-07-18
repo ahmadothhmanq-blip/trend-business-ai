@@ -1,8 +1,8 @@
 # AI Core Engine
 
-**Status:** Phase 10 — Production Launch Prep (Core pipeline stable at Phase 9 UX)  
+**Status:** Phase 11 — Final audit & launch prep (Core pipeline unchanged)  
 **Scope:** Shared layer pipeline for all Trend Business AI products  
-**Related:** D-018–D-029
+**Related:** D-018–D-030
 
 ---
 
@@ -24,7 +24,20 @@ User-facing One Prompt progress:
 
 **Idea → Strategy → Design → Assets → Generation → Quality → Ready Product**
 
-Phase 10 does **not** change this pipeline. It hardens auth, billing, security, and launch ops around it. Existing product APIs remain compatible.
+Phases 10–11 do **not** change this pipeline. They harden ops and complete launch audit around it. Existing product APIs remain compatible.
+
+---
+
+## Phase 11 — Final audit
+
+| Area | Docs |
+|------|------|
+| Product audit | `docs/PHASE_11_FINAL_AUDIT.md` |
+| Known issues | `docs/KNOWN_ISSUES.md` |
+| Production readiness | `docs/PRODUCTION_READINESS_REPORT.md` |
+| Final checklist | `docs/FINAL_LAUNCH_CHECKLIST.md` |
+
+Critical fairness fix only: Website Builder stream fallback no longer double-charges credits after a billed stream attempt.
 
 ---
 
@@ -33,7 +46,7 @@ Phase 10 does **not** change this pipeline. It hardens auth, billing, security, 
 | Area | Docs / code |
 |------|-------------|
 | Launch guide | `docs/PRODUCTION_LAUNCH.md` |
-| Checklist | `docs/LAUNCH_CHECKLIST.md` |
+| Checklist | `docs/LAUNCH_CHECKLIST.md`, `docs/FINAL_LAUNCH_CHECKLIST.md` |
 | Billing | `docs/BILLING_ARCHITECTURE.md`, `lib/billing/` |
 | Security | `docs/SECURITY_PRODUCTION.md`, `lib/auth/ownership.ts` |
 | Env readiness | `lib/production/readiness.ts`, `npm run verify:launch` |
