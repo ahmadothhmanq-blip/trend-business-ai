@@ -247,6 +247,19 @@
 
 ---
 
+## D-031 — Staging Environment & UX Validation (Phase 12)
+
+| Field | Value |
+|-------|--------|
+| Date | 2026-07-18 |
+| Status | Accepted |
+| Context | Prepare staging and validate real user experience before public launch without changing AI Core |
+| Decision | Add staging setup guide + `.env.staging.example`; `lib/production/staging.ts`; `npm run verify:staging` (env, DB, storage buckets, AI provider probe, optional `STAGING_BASE_URL` HTTP); `npm run smoke:staging` journey gates + manual checklist; ship `STAGING_TEST_REPORT.md` and `LAUNCH_BLOCKERS.md`; fix only launch-blocking defects found during validation |
+| Consequences | Staging sign-off is explicit and scriptable; public launch remains blocked on ops/manual UX until CRITICAL rows in `LAUNCH_BLOCKERS.md` clear |
+| Related | D-030, `docs/STAGING_SETUP.md`, `docs/LAUNCH_BLOCKERS.md` |
+
+---
+
 ## D-030 — Final Audit & Launch Prep (Phase 11)
 
 | Field | Value |

@@ -1,8 +1,8 @@
 # AI Core Engine
 
-**Status:** Phase 11 — Final audit & launch prep (Core pipeline unchanged)  
+**Status:** Phase 12 — Staging validation (Core pipeline unchanged)  
 **Scope:** Shared layer pipeline for all Trend Business AI products  
-**Related:** D-018–D-030
+**Related:** D-018–D-031
 
 ---
 
@@ -24,7 +24,19 @@ User-facing One Prompt progress:
 
 **Idea → Strategy → Design → Assets → Generation → Quality → Ready Product**
 
-Phases 10–11 do **not** change this pipeline. They harden ops and complete launch audit around it. Existing product APIs remain compatible.
+Phases 10–12 do **not** change this pipeline. They harden ops, audit, and staging validation around it. Existing product APIs remain compatible.
+
+---
+
+## Phase 12 — Staging
+
+| Area | Docs / code |
+|------|-------------|
+| Staging setup | `docs/STAGING_SETUP.md`, `.env.staging.example` |
+| Staging verify | `npm run verify:staging`, `lib/production/staging.ts` |
+| Journey smoke | `npm run smoke:staging` |
+| Test report | `docs/STAGING_TEST_REPORT.md` |
+| Launch blockers | `docs/LAUNCH_BLOCKERS.md` |
 
 ---
 

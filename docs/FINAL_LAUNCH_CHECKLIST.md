@@ -12,6 +12,10 @@ Supersedes day-of use of `docs/LAUNCH_CHECKLIST.md` (keep that doc for detailed 
 - [x] `npm run smoke:core-products` passes (7 services)  
 - [x] Phase 11 audit documented (`PHASE_11_FINAL_AUDIT.md`)  
 - [x] Known issues published (`KNOWN_ISSUES.md`)  
+- [x] Phase 12 staging tooling (`verify:staging`, `smoke:staging`, `STAGING_SETUP.md`)  
+- [ ] `npm run verify:staging -- --strict` on staging host (0 fail)  
+- [ ] `STAGING_TEST_REPORT.md` manual UX signed off  
+- [ ] `LAUNCH_BLOCKERS.md` CRITICAL cleared  
 - [ ] `npm run verify:launch -- --production` on deploy host (0 fail)  
 
 ---

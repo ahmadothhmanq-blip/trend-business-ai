@@ -33,6 +33,7 @@ yarn-error.log*
 # env files — keep template tracked for onboarding
 .env*
 !.env.example
+!.env.staging.example
 
 # local artifacts (never ship)
 .tmp/

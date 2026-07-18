@@ -1,7 +1,7 @@
 # Production Launch Guide
 
 **Status:** Phase 10 — Production Launch Prep  
-**Related:** D-029, D-030, `DEPLOYMENT.md`, `docs/LAUNCH_CHECKLIST.md`, `docs/FINAL_LAUNCH_CHECKLIST.md`, `docs/BILLING_ARCHITECTURE.md`, `docs/PRODUCTION_READINESS_REPORT.md`
+**Related:** D-029–D-031, `DEPLOYMENT.md`, `docs/LAUNCH_CHECKLIST.md`, `docs/FINAL_LAUNCH_CHECKLIST.md`, `docs/STAGING_SETUP.md`, `docs/BILLING_ARCHITECTURE.md`, `docs/PRODUCTION_READINESS_REPORT.md`
 
 This guide prepares **Trend Business AI** (all Core products) for public launch without changing the AI Core Engine or product API contracts.
 
