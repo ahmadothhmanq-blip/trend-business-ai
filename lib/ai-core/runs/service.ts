@@ -2,6 +2,7 @@
  * AI Core run orchestration + ai_runs persistence (Phase 5).
  */
 
+import { getDefaultTextProvider } from "@/lib/ai/provider-config";
 import { providerManager } from "@/lib/ai/provider-manager";
 import type { AIProviderName } from "@/lib/ai/types";
 import { layerRunner } from "@/lib/ai-core/layers/runner";
@@ -244,7 +245,8 @@ async function executeWithBrief(params: {
     (params.provider as AIProviderName | undefined) ??
     (providerManager.getUserSettings()?.default_provider as
       | AIProviderName
-      | undefined);
+      | undefined) ??
+    getDefaultTextProvider();
   const resolved = providerManager.resolve(preferred);
   if (!resolved || !providerManager.isConfigured(resolved)) {
     await updateRun(params.supabase, runId, params.userId, {

@@ -7,7 +7,7 @@ import type { CoreAssetPlanItem } from "@/lib/ai-core/assets/types";
 
 /**
  * Plan shared assets from Strategy + Design System.
- * Covers hero, product, background, brand, and realistic imagery.
+ * Covers hero, product, service, background, brand, and realistic imagery.
  */
 export function planCoreAssets(params: {
   strategy: CoreProductStrategy;
@@ -16,7 +16,7 @@ export function planCoreAssets(params: {
   maxItems?: number;
 }): CoreAssetPlanItem[] {
   const { strategy, designSystem, profile } = params;
-  const maxItems = params.maxItems ?? 5;
+  const maxItems = params.maxItems ?? 6;
   const project = profile?.projectName || "Brand";
   const industry = profile?.industry || designSystem.industryPattern;
   const offer = profile?.offer || strategy.positioning;
@@ -37,8 +37,17 @@ export function planCoreAssets(params: {
       kind: "product",
       role: "product",
       name: "Product visual",
-      prompt: `Photorealistic product or service visual for ${offer}, ${style}, clean composition, no text.`,
+      prompt: `Photorealistic product visual for ${offer}, ${style}, clean composition, no text.`,
       alt: `${project} product`,
+      realistic: true,
+    },
+    {
+      id: "service",
+      kind: "service",
+      role: "service",
+      name: "Service visual",
+      prompt: `Photorealistic service imagery for ${offer} in ${industry}, people or craft in context, ${style}, no text.`,
+      alt: `${project} services`,
       realistic: true,
     },
     {
@@ -55,7 +64,7 @@ export function planCoreAssets(params: {
       kind: "brand",
       role: "brand",
       name: "Brand mood",
-      prompt: `Brand mood board style photograph for ${project}, ${style}, premium, no text overlays.`,
+      prompt: `Brand mood board style photograph for ${project}, ${style}, premium brand visual, no text overlays.`,
       alt: `${project} brand mood`,
       realistic: true,
     },

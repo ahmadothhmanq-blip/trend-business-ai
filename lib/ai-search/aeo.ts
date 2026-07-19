@@ -186,7 +186,8 @@ export async function enrichAeoWithAi(
 ): Promise<AeoAnalyzeResult> {
   try {
     const { providerManager } = await import("@/lib/ai/provider-manager");
-    const providerName = providerManager.resolve();
+    const { getDefaultTextProvider } = await import("@/lib/ai/provider-config");
+    const providerName = providerManager.resolve(getDefaultTextProvider());
     if (!providerName) return result;
 
     const insights = await providerManager.generateText(

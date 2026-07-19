@@ -7,17 +7,29 @@ export type ProviderRegistration = {
   status: "active" | "placeholder";
 };
 
-const DEFAULT_PROVIDER: AIProviderName = "deepseek";
+/**
+ * System default for all text/code generation.
+ * Optional providers (OpenAI, Claude, …) remain available via Multi AI Providers.
+ * Image assets may still use OpenAI DALL·E when OPENAI_API_KEY is set.
+ */
+export const DEFAULT_TEXT_PROVIDER: AIProviderName = "deepseek";
+
+const DEFAULT_PROVIDER: AIProviderName = DEFAULT_TEXT_PROVIDER;
 
 let _dynamicProvider: AIProviderName | null = null;
 
 /**
  * Returns the active AI provider.
  * Dynamically overridden when user settings are loaded from Supabase;
- * falls back to DEFAULT_PROVIDER ("deepseek") when no override is set.
+ * falls back to DEFAULT_TEXT_PROVIDER ("deepseek") when no override is set.
  */
 export function getActiveProvider(): AIProviderName {
   return _dynamicProvider ?? DEFAULT_PROVIDER;
+}
+
+/** Canonical default for text/code services (Website, App, Landing, Content, Agents, …). */
+export function getDefaultTextProvider(): AIProviderName {
+  return DEFAULT_TEXT_PROVIDER;
 }
 
 /** Called by ProviderManager when loading user settings from the database. */

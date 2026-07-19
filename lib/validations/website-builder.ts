@@ -16,9 +16,13 @@ export const websiteGenerateRequestSchema = z.object({
   theme: z.string().trim().min(1, "Select a theme."),
   features: z.array(z.string().trim()).default([]),
   productId: z.string().trim().optional(),
+  /** Optional Smart Template Engine override (auto-selected when omitted). */
+  templateId: z.string().trim().min(1).optional(),
   mode: z.enum(["generate", "regenerate", "continue", "retry"]).optional(),
   parentGenerationId: z.string().uuid().optional(),
   continueInstruction: z.string().trim().max(4000).optional(),
+  /** AI Website Optimizer — audit + apply fixes (Improve with AI). */
+  optimizeWithAi: z.boolean().optional(),
   projectId: z.string().uuid().optional(),
 });
 

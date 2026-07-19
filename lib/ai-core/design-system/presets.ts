@@ -277,6 +277,61 @@ export const DESIGN_PRESETS: Record<DesignPresetId, PresetBase> = {
     borderRadius: "1.25rem",
     shadowStyle: "colorful soft elevation",
   },
+  tech: {
+    preset: "tech",
+    style: "Tech futurist",
+    colors: {
+      primary: "#22D3EE",
+      secondary: "#0B1220",
+      accent: "#818CF8",
+      neutral: "#64748B",
+      surface: "#111827",
+      background: "#020617",
+      foreground: "#E2E8F0",
+    },
+    typography: {
+      headingFont: "JetBrains Mono",
+      bodyFont: "Inter",
+      scale: ["text-4xl", "text-2xl", "text-lg", "text-base"],
+      notes: "Technical mono display + readable sans body",
+    },
+    spacing: {
+      unit: "4px",
+      scale: ["4", "8", "12", "20", "32", "48"],
+      sectionGap: "5rem",
+      containerMax: "72rem",
+      notes: "Dense product/tech marketing rhythm",
+    },
+    uiStyle: {
+      density: "compact",
+      corners: "soft",
+      elevation: "elevated",
+      contrast: "high",
+      notes: "Dark tech UI with cyan/indigo accents",
+    },
+    componentStyle: {
+      buttons: "Glow cyan primary + ghost secondary",
+      cards: "Dark glass panels with hairline borders",
+      inputs: "Dark fields with cyan focus rings",
+      navigation: "Compact sticky tech bar with product CTA",
+      palette: ["Hero", "Features", "Integrations", "Pricing", "CTA"],
+    },
+    animationStyle: {
+      motion: "subtle",
+      easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+      duration: "450ms",
+      entrances: ["fade-up", "glow-in"],
+      notes: "Precise product motion, subtle glow",
+    },
+    layoutRules: [
+      "Dark full-bleed hero with product UI",
+      "Grid of capability cards",
+      "High-contrast accent CTAs",
+    ],
+    uiPatterns: ["Code/product frame", "Logo cloud", "Integration grid"],
+    borderRadius: "0.75rem",
+    shadowStyle: "cyan soft glow",
+  },
 };
 
 export const DESIGN_PRESET_IDS = Object.keys(DESIGN_PRESETS) as DesignPresetId[];
@@ -285,16 +340,43 @@ export function getDesignPreset(id: DesignPresetId): PresetBase {
   return DESIGN_PRESETS[id];
 }
 
+export function listDesignPresets(): Array<{
+  id: DesignPresetId;
+  style: string;
+  borderRadius: string;
+  shadowStyle: string;
+}> {
+  return DESIGN_PRESET_IDS.map((id) => {
+    const preset = DESIGN_PRESETS[id];
+    return {
+      id,
+      style: preset.style,
+      borderRadius: preset.borderRadius,
+      shadowStyle: preset.shadowStyle,
+    };
+  });
+}
+
 export function normalizeDesignPreset(value: unknown): DesignPresetId {
   const v = String(value ?? "")
     .toLowerCase()
     .trim();
-  if (v === "luxury" || v === "modern" || v === "corporate" || v === "minimal" || v === "creative") {
+  if (
+    v === "luxury" ||
+    v === "modern" ||
+    v === "corporate" ||
+    v === "minimal" ||
+    v === "creative" ||
+    v === "tech"
+  ) {
     return v;
   }
   if (/luxury|premium|gold|editorial/.test(v)) return "luxury";
   if (/corporate|enterprise|trust|professional/.test(v)) return "corporate";
   if (/minimal|clean|sparse/.test(v)) return "minimal";
   if (/creative|agency|studio|bold|playful|expressive/.test(v)) return "creative";
+  if (/tech|saas|software|startup|ai|fintech|cyber|developer/.test(v)) {
+    return "tech";
+  }
   return "modern";
 }

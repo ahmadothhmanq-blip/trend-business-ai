@@ -64,6 +64,14 @@ function explicitIndustry(brief: CoreBrief): IndustryId | null {
     if (normalized.includes("e-commerce") || normalized.includes("ecom")) {
       return "ecommerce";
     }
+    if (
+      normalized.includes("clinic") ||
+      normalized.includes("medical") ||
+      normalized.includes("dental") ||
+      normalized.includes("healthcare")
+    ) {
+      return "clinic";
+    }
   }
   return null;
 }

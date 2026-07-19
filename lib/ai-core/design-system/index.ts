@@ -1,5 +1,6 @@
 /**
- * AI Design System engine (Phase 7).
+ * AI Design System Engine.
+ * Presets → DeepSeek generation → persist → Website Builder apply.
  */
 
 export type {
@@ -17,6 +18,7 @@ export {
   DESIGN_PRESETS,
   DESIGN_PRESET_IDS,
   getDesignPreset,
+  listDesignPresets,
   normalizeDesignPreset,
 } from "@/lib/ai-core/design-system/presets";
 
@@ -26,3 +28,15 @@ export {
   mergeCoreDesignWithAiDecisions,
   type BuildAiDesignSystemInput,
 } from "@/lib/ai-core/design-system/build";
+
+export {
+  generateDesignSystem,
+  type GenerateDesignSystemInput,
+  type GenerateDesignSystemResult,
+} from "@/lib/ai-core/design-system/generate";
+
+export {
+  persistGeneratedDesign,
+  type PersistGeneratedDesignParams,
+  type PersistGeneratedDesignResult,
+} from "@/lib/ai-core/design-system/persist";

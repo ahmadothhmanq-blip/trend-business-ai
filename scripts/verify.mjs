@@ -170,15 +170,18 @@ async function verifySupabase() {
   } else {
     pass("NEXT_PUBLIC_SITE_URL", siteUrl.replace(/\/+$/, ""));
   }
-  if (!openAiKey) {
-    fail("OPENAI_API_KEY", "missing — live AI generation disabled");
-  } else {
-    pass("OPENAI_API_KEY", "set");
-  }
   if (!deepseekKey) {
-    fail("DEEPSEEK_API_KEY", "missing — Website/App Builder generation disabled");
+    fail("DEEPSEEK_API_KEY", "missing — default text/code AI provider (required)");
   } else {
-    pass("DEEPSEEK_API_KEY", "set");
+    pass("DEEPSEEK_API_KEY", "set (default text/code provider)");
+  }
+  if (!openAiKey) {
+    pass(
+      "OPENAI_API_KEY",
+      "optional — text fallback + image assets (DALL·E) when unset",
+    );
+  } else {
+    pass("OPENAI_API_KEY", "set (optional fallback / images)");
   }
   if (!upstashUrl || !upstashToken) {
     pass(

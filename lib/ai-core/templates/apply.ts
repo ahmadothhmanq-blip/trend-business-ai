@@ -59,6 +59,9 @@ function patchNestedInput(
       }
       row.templateIndustry = selection.industryId;
       row.templateLayoutStyle = selection.layoutStyle;
+      if (selection.smartTemplateId) {
+        row.templateId = selection.smartTemplateId;
+      }
     }
 
     if (key === "webappPluginInput") {

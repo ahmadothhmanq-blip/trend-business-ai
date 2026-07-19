@@ -1,10 +1,60 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getActiveProvider } from "@/lib/ai/provider-config";
+import { emptyTokenUsage } from "@/lib/ai/usage";
 import { appendPromptVersion } from "@/lib/workspace/persist";
 import { ensureStaticPreviewFile } from "@/lib/website/build-static-preview";
-import type { PromptVersion, WebsiteBlueprint, WebsiteGeneration } from "@/types/database";
+import { logger } from "@/lib/logger";
+import type {
+  PromptVersion,
+  TokenUsage,
+  WebsiteBlueprint,
+  WebsiteGeneration,
+} from "@/types/database";
 import type { GeneratedWebsiteProject } from "@/plugins/website/types";
 import type { GenerationMode } from "@/types/database";
+
+function isUuid(value: unknown): value is string {
+  return (
+    typeof value === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      value,
+    )
+  );
+}
+
+function normalizeTokenUsage(usage: unknown): TokenUsage {
+  if (!usage || typeof usage !== "object") return emptyTokenUsage();
+  const u = usage as Partial<TokenUsage>;
+  const promptTokens = Number(u.promptTokens) || 0;
+  const completionTokens = Number(u.completionTokens) || 0;
+  return {
+    promptTokens,
+    completionTokens,
+    totalTokens:
+      Number(u.totalTokens) || promptTokens + completionTokens,
+  };
+}
+
+function isMissingColumnError(message: string): boolean {
+  const msg = message.toLowerCase();
+  return (
+    msg.includes("column") ||
+    msg.includes("does not exist") ||
+    msg.includes("schema cache") ||
+    msg.includes("could not find")
+  );
+}
+
+function isFkOrNullConstraintError(message: string, code?: string): boolean {
+  const msg = message.toLowerCase();
+  return (
+    code === "23503" ||
+    code === "23502" ||
+    msg.includes("foreign key") ||
+    msg.includes("violates not-null") ||
+    msg.includes("null value in column")
+  );
+}
 
 export async function ensureWebsiteWorkspaceProject(
   supabase: SupabaseClient,
@@ -157,15 +207,42 @@ export async function persistWebsiteGeneration(args: {
     projectId: args.input.projectId,
   });
 
+  // Resolve parent FK safely — never insert a dangling parent_generation_id.
   let parentPromptVersions: PromptVersion[] = [];
-  if (args.input.parentGenerationId) {
+  let parentGenerationId: string | null = null;
+  if (isUuid(args.input.parentGenerationId)) {
     const { data: parent } = await args.supabase
       .from("website_generations")
-      .select("prompt_versions")
+      .select("id, prompt_versions")
       .eq("id", args.input.parentGenerationId)
       .eq("user_id", args.userId)
       .maybeSingle();
-    parentPromptVersions = (parent?.prompt_versions as PromptVersion[] | null) ?? [];
+    if (parent?.id) {
+      parentGenerationId = parent.id;
+      parentPromptVersions =
+        (parent.prompt_versions as PromptVersion[] | null) ?? [];
+    } else {
+      logger.warn("wb-save parent generation missing; clearing FK", "wb-save", {
+        parentGenerationId: args.input.parentGenerationId,
+      });
+    }
+  }
+
+  // Resolve project_id safely — prefer ensured workspace project; verify client id.
+  let projectId: string | null = workspaceProject?.id ?? null;
+  if (!projectId && isUuid(args.input.projectId)) {
+    const { data: existingProject } = await args.supabase
+      .from("projects")
+      .select("id")
+      .eq("id", args.input.projectId)
+      .eq("user_id", args.userId)
+      .maybeSingle();
+    projectId = existingProject?.id ?? null;
+    if (!projectId) {
+      logger.warn("wb-save project_id missing; clearing FK", "wb-save", {
+        projectId: args.input.projectId,
+      });
+    }
   }
 
   const versionPrompt =
@@ -179,41 +256,62 @@ export async function persistWebsiteGeneration(args: {
     args.input.mode ?? "generate",
   );
 
+  const tokenUsage = normalizeTokenUsage(args.project.usage);
+
   const coreRow = {
     user_id: args.userId,
-    project_name: savedProject.title,
+    project_name: savedProject.title || "Untitled website",
     website_type:
       args.projectKind === "web_application" ? "Web Application" : "Website",
-    business_description: savedProject.description,
+    business_description:
+      savedProject.description || args.input.prompt || "Generated website",
     target_audience:
       savedProject.businessProfile?.targetAudience ||
       "Auto-detected from project prompt",
-    language: args.input.language,
+    language: args.input.language || "English",
     color_style:
-      savedProject.designSystem?.colors.primary || args.input.theme,
+      savedProject.designSystem?.colors.primary || args.input.theme || "modern",
     design_style:
-      savedProject.designSystem?.style || args.input.theme,
-    page_count: String(savedProject.pages.length || 1),
-    features: [
-      ...args.input.features,
-      ...(args.input.productId ? [`product:${args.input.productId}`] : []),
-    ],
+      savedProject.designSystem?.style || args.input.theme || "modern",
+    page_count: String(savedProject.pages?.length || 1),
+    features: Array.isArray(args.input.features)
+      ? [
+          ...args.input.features.filter((f) => typeof f === "string" && f.trim()),
+          ...(args.input.productId ? [`product:${args.input.productId}`] : []),
+        ]
+      : args.input.productId
+        ? [`product:${args.input.productId}`]
+        : [],
     blueprint: savedProject as unknown as WebsiteBlueprint,
   };
 
   const phase5Row = {
     ...coreRow,
     product_id: args.input.productId ?? "website-builder",
-    project_id: workspaceProject?.id ?? args.input.projectId ?? null,
-    status: "completed",
+    project_id: projectId,
+    status: "completed" as const,
     mode: args.input.mode ?? "generate",
-    parent_generation_id: args.input.parentGenerationId ?? null,
+    parent_generation_id: parentGenerationId,
     provider: args.project.provider ?? getActiveProvider(),
-    token_usage: args.project.usage,
-    generation_time_ms: args.project.generationTimeMs,
+    // NOT NULL column — never send null/undefined
+    token_usage: tokenUsage,
+    generation_time_ms:
+      typeof args.project.generationTimeMs === "number"
+        ? Math.max(0, Math.round(args.project.generationTimeMs))
+        : null,
     prompt_versions: promptVersions,
-    attachments: [],
+    attachments: [] as unknown[],
   };
+
+  logger.info("Final database save start", "wb-save", {
+    userId: args.userId,
+    title: savedProject.title,
+    fileCount: savedProject.files.length,
+    mode: phase5Row.mode,
+    parentGenerationId,
+    projectId,
+    tokenUsage,
+  });
 
   let result = await args.supabase
     .from("website_generations")
@@ -222,11 +320,22 @@ export async function persistWebsiteGeneration(args: {
     .single();
 
   if (result.error) {
-    const msg = result.error.message?.toLowerCase() ?? "";
-    const missingCol =
-      msg.includes("column") ||
-      msg.includes("does not exist") ||
-      msg.includes("schema cache");
+    const message = result.error.message ?? "";
+    const code = result.error.code;
+    const missingCol = isMissingColumnError(message);
+    const fkOrNull = isFkOrNullConstraintError(message, code);
+
+    logger.warn("Final database save primary insert failed", "wb-save", {
+      message,
+      code,
+      details: result.error.details,
+      hint: result.error.hint,
+      fallback: missingCol
+        ? "coreRow"
+        : fkOrNull
+          ? "phase5Row_cleared_fks"
+          : "none",
+    });
 
     if (missingCol) {
       result = await args.supabase
@@ -234,12 +343,42 @@ export async function persistWebsiteGeneration(args: {
         .insert(coreRow)
         .select("*")
         .single();
+    } else if (fkOrNull) {
+      // Retry without nullable FKs; keep required token_usage / prompt_versions.
+      result = await args.supabase
+        .from("website_generations")
+        .insert({
+          ...phase5Row,
+          project_id: null,
+          parent_generation_id: null,
+          token_usage: tokenUsage,
+          prompt_versions: promptVersions,
+          attachments: [],
+        })
+        .select("*")
+        .single();
     }
   }
 
   if (result.error || !result.data) {
-    return { ok: false, error: result.error?.message ?? "Failed to save generation." };
+    logger.error("Final database save failed", "wb-save", {
+      message: result.error?.message ?? "Failed to save generation.",
+      code: result.error?.code,
+      details: result.error?.details,
+      hint: result.error?.hint,
+    });
+    return {
+      ok: false,
+      error: result.error?.message ?? "Failed to save generation.",
+    };
   }
+
+  logger.info("Final database save ok", "wb-save", {
+    generationId: result.data.id,
+    fileCount: savedProject.files.length,
+    projectId: result.data.project_id ?? null,
+    parentGenerationId: result.data.parent_generation_id ?? null,
+  });
 
   return {
     ok: true,

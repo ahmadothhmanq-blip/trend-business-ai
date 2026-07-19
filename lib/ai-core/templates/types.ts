@@ -5,6 +5,7 @@ export type IndustryId =
   | "real-estate"
   | "automotive"
   | "agency"
+  | "clinic"
   | "business";
 
 export type LayoutStyle =
@@ -22,7 +23,8 @@ export type TemplateDesignPreset =
   | "modern"
   | "corporate"
   | "minimal"
-  | "creative";
+  | "creative"
+  | "tech";
 
 /** Industry intelligence profile used by the AI Template Engine. */
 export type IndustryProfile = {
@@ -51,5 +53,9 @@ export type TemplateSelection = {
   contentTone: string;
   industryPattern: string;
   confidence: number;
-  source: "explicit" | "keyword" | "default";
+  source: "explicit" | "keyword" | "analysis" | "default";
+  /** Website Builder Smart Template Engine id when selected. */
+  smartTemplateId?: string;
+  /** Full design configuration from Smart Template Engine. */
+  designConfiguration?: Record<string, unknown>;
 };

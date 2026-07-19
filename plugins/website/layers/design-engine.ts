@@ -180,6 +180,36 @@ const STYLE_PRESETS: Record<
     borderRadius: "1.25rem",
     shadowStyle: "colorful soft elevation",
   },
+  tech: {
+    style: "Tech futurist",
+    stylePreset: "tech",
+    colors: {
+      primary: "#22D3EE",
+      secondary: "#0B1220",
+      accent: "#818CF8",
+      neutral: "#64748B",
+      surface: "#111827",
+      background: "#020617",
+      foreground: "#E2E8F0",
+    },
+    typography: {
+      headingFont: "JetBrains Mono",
+      bodyFont: "Inter",
+      scale: ["text-4xl", "text-2xl", "text-lg", "text-base"],
+      notes: "Technical mono display + readable sans body",
+    },
+    layoutRules: [
+      "Dark full-bleed hero with product UI",
+      "Grid of capability cards",
+      "High-contrast accent CTAs",
+    ],
+    layoutStyle: "dark product-tech marketing with capability grids",
+    uiPatterns: ["Code/product frame", "Logo cloud", "Integration grid"],
+    componentPalette: ["Hero", "Features", "Integrations", "Pricing", "CTA"],
+    spacingScale: ["4", "8", "12", "20", "32"],
+    borderRadius: "0.75rem",
+    shadowStyle: "cyan soft glow",
+  },
 };
 
 export function resolveStylePreset(
@@ -195,7 +225,10 @@ export function resolveStylePreset(
   if (/creative|agency|studio|bold|playful|expressive/.test(hay)) {
     return "creative";
   }
-  if (/modern|startup|saas|tech|product/.test(hay)) return "modern";
+  if (/tech|saas|software|startup|ai|fintech|cyber|developer/.test(hay)) {
+    return "tech";
+  }
+  if (/modern|product/.test(hay)) return "modern";
   return "modern";
 }
 
@@ -208,7 +241,8 @@ function normalizeStylePreset(value: unknown): DesignStylePreset {
     v === "modern" ||
     v === "corporate" ||
     v === "minimal" ||
-    v === "creative"
+    v === "creative" ||
+    v === "tech"
   ) {
     return v;
   }

@@ -1,3 +1,4 @@
+import { getDefaultTextProvider } from "@/lib/ai/provider-config";
 import { providerManager } from "@/lib/ai/provider-manager";
 import { emptyTokenUsage } from "@/lib/ai/usage";
 import type { TokenUsage } from "@/lib/ai/types";
@@ -40,7 +41,7 @@ export async function generateLandingPage(
 ): Promise<LPGenerationResult> {
   const { onProgress, ...pluginInput } = input;
 
-  const resolved = providerManager.resolve();
+  const resolved = providerManager.resolve(getDefaultTextProvider());
   if (!resolved || !providerManager.isConfigured(resolved)) {
     throw new Error(
       "No AI provider configured. Set DEEPSEEK_API_KEY to enable generation.",

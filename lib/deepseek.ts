@@ -1,3 +1,4 @@
+import { getDefaultTextProvider } from "@/lib/ai/provider-config";
 import { providerManager } from "@/lib/ai/provider-manager";
 import type { AIProviderName } from "@/lib/ai/types";
 import { emptyTokenUsage } from "@/lib/ai/usage";
@@ -68,7 +69,7 @@ export async function generateWebsite(input: GenerateWebsiteInput): Promise<
   const preferred =
     preferredProvider ??
     (settings?.default_provider as AIProviderName | undefined) ??
-    undefined;
+    getDefaultTextProvider();
 
   const primary = providerManager.resolve(preferred);
   const providers = useFallback

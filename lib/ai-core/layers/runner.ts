@@ -1,4 +1,5 @@
 import { getAIProvider } from "@/lib/ai/adapters";
+import { getDefaultTextProvider } from "@/lib/ai/provider-config";
 import { createProgressTracker } from "@/lib/ai/progress";
 import { createUsageTracker, emptyTokenUsage } from "@/lib/ai/usage";
 import type { AIProviderName, GenerationContext } from "@/lib/ai/types";
@@ -66,7 +67,7 @@ export class LayerRunner {
     const startedAt = Date.now();
     const progress = createProgressTracker();
     const usage = createUsageTracker();
-    const providerName = options.provider ?? "deepseek";
+    const providerName = options.provider ?? getDefaultTextProvider();
     const provider = getAIProvider(providerName);
     const ctx: GenerationContext = { provider, progress, usage };
     const onProgress = options.onProgress;
@@ -91,16 +92,34 @@ export class LayerRunner {
 
     emit(progress, onProgress, "start", `${adapter.label} Core run starting`);
 
-    // Phase 6: Industry Template Engine — select layout/sections/preset/features.
-    emit(progress, onProgress, "template", "Selecting industry template...");
-    const enriched = enrichBriefWithIndustryTemplate(brief);
-    brief = enriched.brief;
-    artifacts.brief = brief;
-    artifacts.templateSelection = enriched.selection;
-    layersExecuted.push("template");
-    onProgress?.(
-      `[template] ${enriched.selection.label} · ${enriched.selection.layoutStyle} · ${enriched.selection.designPreset}`,
-    );
+    // Template selection:
+    // Website Builder → Smart Template Engine (DeepSeek analysis → template + design config)
+    // Other products → Industry Template Engine (Phase 6)
+    emit(progress, onProgress, "template", "Selecting template...");
+    if (adapter.productId === "website-builder") {
+      const { selectSmartTemplate, enrichBriefWithSmartTemplate } = await import(
+        "@/lib/website/smart-templates"
+      );
+      onProgress?.("[template] Analyzing business with DeepSeek for best template...");
+      const smart = await selectSmartTemplate(brief);
+      const enriched = enrichBriefWithSmartTemplate(brief, smart);
+      brief = enriched.brief;
+      artifacts.brief = brief;
+      artifacts.templateSelection = enriched.selection;
+      layersExecuted.push("template");
+      onProgress?.(
+        `[template] ${smart.template.name} (${smart.templateId}) · ${smart.designConfiguration.layoutStyle} · ${smart.designConfiguration.designPreset} · ${smart.source}`,
+      );
+    } else {
+      const enriched = enrichBriefWithIndustryTemplate(brief);
+      brief = enriched.brief;
+      artifacts.brief = brief;
+      artifacts.templateSelection = enriched.selection;
+      layersExecuted.push("template");
+      onProgress?.(
+        `[template] ${enriched.selection.label} · ${enriched.selection.layoutStyle} · ${enriched.selection.designPreset}`,
+      );
+    }
 
     if (adapter.layers.idea && adapter.runIdea) {
       emit(progress, onProgress, "idea", "Analyzing business idea...");

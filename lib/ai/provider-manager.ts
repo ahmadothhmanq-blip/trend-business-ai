@@ -15,6 +15,7 @@ import {
 import { aiGenerationEngine, type AIPlugin, type EngineRunOptions } from "@/lib/ai/engine";
 import {
   getActiveProvider,
+  getDefaultTextProvider,
   setActiveProvider,
   PROVIDER_REGISTRY,
   getProviderLabel,
@@ -136,7 +137,9 @@ class ProviderManager {
     input: TInput,
     options: EngineRunOptions = {},
   ) {
-    const resolved = this.resolve(options.provider);
+    const preferred =
+      options.provider ?? plugin.preferredProvider ?? getDefaultTextProvider();
+    const resolved = this.resolve(preferred);
     if (!resolved) {
       throw new Error(
         "No AI provider configured. Set DEEPSEEK_API_KEY to enable generation.",

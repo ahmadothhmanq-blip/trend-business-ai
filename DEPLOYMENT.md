@@ -113,8 +113,11 @@ Expect all tables, RLS checks, and `avatars` bucket to pass.
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Project URL from Supabase |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Anon / publishable key |
 | `NEXT_PUBLIC_SITE_URL` | Yes | Production URL, e.g. `https://your-app.vercel.app` |
-| `OPENAI_API_KEY` | Yes | Required for production live AI generation |
-| `DEEPSEEK_API_KEY` | Recommended | Default AI provider for live generation |
+| `DEEPSEEK_API_KEY` | Yes | Default AI provider for all text/code generation |
+| `OPENAI_API_KEY` | Optional | Text fallback + DALL·E (AI Real Images) |
+| `IMAGE_PROVIDER` | Optional | Preferred image engine: `openai` \| `replicate` \| `stability` |
+| `REPLICATE_API_TOKEN` | Optional | Flux images via Replicate |
+| `STABILITY_API_KEY` | Optional | Stability AI images |
 | `UPSTASH_REDIS_REST_URL` | Recommended | Global per-user AI rate limiting |
 | `UPSTASH_REDIS_REST_TOKEN` | Recommended | Global per-user AI rate limiting |
 | `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | Optional | Google Search Console HTML tag verification |

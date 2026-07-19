@@ -1,27 +1,32 @@
 import type { CoreAssetItem, CoreAssetManifest } from "@/lib/ai-core/layers/types";
+import { persistImageGenerationRecords } from "@/lib/ai-core/assets/persist";
 import {
   generateRealisticImage,
   isImageProviderConfigured,
   svgFallbackDataUrl,
 } from "@/lib/ai-core/assets/provider";
+import { getDefaultImageSettings } from "@/lib/ai-core/assets/settings";
 import type { GenerateCoreAssetsParams } from "@/lib/ai-core/assets/types";
 
-const DEFAULT_MAX = 4;
+const DEFAULT_MAX = 5;
 
 /**
- * Shared AI Assets Engine — generates hero/product/background/brand/realistic images.
- * Uses OpenAI when configured; SVG fallback otherwise.
+ * AI Real Images Engine — generates hero/product/service/background/brand images.
+ * Uses OpenAI / Replicate / Stability when configured; SVG fallback otherwise.
+ * DeepSeek is not used for pixels (prompts may be refined separately).
  */
 export async function generateCoreAssets(
   params: GenerateCoreAssetsParams,
 ): Promise<CoreAssetManifest> {
   const maxImages = params.maxImages ?? DEFAULT_MAX;
+  const settings = params.imageSettings ?? getDefaultImageSettings();
   const items: CoreAssetItem[] = [];
   let providerUsed: string | undefined;
+  let modelUsed: string | undefined;
 
   params.onProgress?.(
     isImageProviderConfigured()
-      ? "Generating assets with image provider..."
+      ? "Generating real AI images..."
       : "Generating asset fallbacks (no image provider configured)...",
   );
 
@@ -51,7 +56,10 @@ export async function generateCoreAssets(
       ? `Photorealistic, high detail. ${planned.prompt}. Brand colors roughly ${params.colors.primary} and ${params.colors.secondary}.`
       : `${planned.prompt}. Brand colors roughly ${params.colors.primary} and ${params.colors.secondary}.`;
 
-    const generated = await generateRealisticImage(enrichedPrompt);
+    const generated = await generateRealisticImage(enrichedPrompt, {
+      settings,
+      negativePrompt: params.negativePrompt,
+    });
 
     if (!generated) {
       items.push({
@@ -73,6 +81,7 @@ export async function generateCoreAssets(
     }
 
     providerUsed = generated.provider;
+    modelUsed = generated.model;
     let url: string | null = null;
     let storagePath: string | null = null;
 
@@ -105,11 +114,26 @@ export async function generateCoreAssets(
     });
   }
 
-  return {
+  const manifest: CoreAssetManifest = {
     items,
     provider: providerUsed ?? "fallback-svg",
     generatedAt: new Date().toISOString(),
   };
+
+  if (params.persist !== false && params.userId) {
+    await persistImageGenerationRecords({
+      userId: params.userId,
+      websiteGenerationId: params.websiteGenerationId,
+      aiRunId: params.aiRunId,
+      settings,
+      planned: params.items.slice(0, maxImages),
+      items,
+      provider: providerUsed,
+      model: modelUsed,
+    });
+  }
+
+  return manifest;
 }
 
 export function coreAssetManifestSummary(manifest: CoreAssetManifest): string {

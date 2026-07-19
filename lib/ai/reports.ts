@@ -24,7 +24,8 @@ export async function generateReport(
 }> {
   const startedAt = Date.now();
   const { providerManager } = await import("@/lib/ai/provider-manager");
-  const providerName = providerManager.resolve();
+  const { getDefaultTextProvider } = await import("@/lib/ai/provider-config");
+  const providerName = providerManager.resolve(getDefaultTextProvider());
 
   if (!providerName) {
     throw new Error(

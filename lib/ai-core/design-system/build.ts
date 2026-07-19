@@ -52,12 +52,68 @@ export function buildAiDesignSystemFromStrategy(
   const sectionHints = input.strategy.sectionPlan
     .slice(0, 6)
     .map((s) => s.name);
+  const smartSections = Array.isArray(
+    input.templateSelection?.designConfiguration?.sections,
+  )
+    ? (input.templateSelection!.designConfiguration!.sections as string[])
+    : [];
   const componentPalette = Array.from(
-    new Set([...base.componentStyle.palette, ...sectionHints]),
+    new Set([
+      ...base.componentStyle.palette,
+      ...sectionHints,
+      ...smartSections.slice(0, 6),
+    ]),
   );
+
+  const smartColors = input.templateSelection?.designConfiguration?.colorPalette as
+    | {
+        primary?: string;
+        secondary?: string;
+        accent?: string;
+        background?: string;
+        surface?: string;
+        text?: string;
+        muted?: string;
+      }
+    | undefined;
+  const smartType = input.templateSelection?.designConfiguration?.typography as
+    | { display?: string; body?: string }
+    | undefined;
+  const smartCta = input.templateSelection?.designConfiguration?.ctaStyle as
+    | { primaryLabel?: string; secondaryLabel?: string }
+    | undefined;
+
+  const colors = smartColors
+    ? {
+        ...base.colors,
+        primary: smartColors.primary ?? base.colors.primary,
+        secondary: smartColors.secondary ?? base.colors.secondary,
+        accent: smartColors.accent ?? base.colors.accent,
+        background: smartColors.background ?? base.colors.background,
+        surface: smartColors.surface ?? base.colors.surface,
+        foreground: smartColors.text ?? base.colors.foreground,
+        neutral: smartColors.muted ?? base.colors.neutral,
+      }
+    : base.colors;
+
+  const typography = smartType
+    ? {
+        ...base.typography,
+        headingFont: smartType.display ?? base.typography.headingFont,
+        bodyFont: smartType.body ?? base.typography.bodyFont,
+      }
+    : base.typography;
+
+  const ctaHints = [
+    smartCta?.primaryLabel,
+    smartCta?.secondaryLabel,
+    ...input.strategy.ctas.slice(0, 3),
+  ].filter(Boolean);
 
   return {
     ...base,
+    colors,
+    typography,
     industryPattern,
     layoutStyle,
     componentStyle: {
@@ -70,7 +126,10 @@ export function buildAiDesignSystemFromStrategy(
         .slice(0, 5)
         .map((p) => p.name)
         .join(", ")}`,
-      `Primary CTAs: ${input.strategy.ctas.slice(0, 3).join(", ") || "Get started"}`,
+      `Primary CTAs: ${ctaHints.join(", ") || "Get started"}`,
+      ...(input.templateSelection?.smartTemplateId
+        ? [`Smart template: ${input.templateSelection.smartTemplateId}`]
+        : []),
     ],
   };
 }

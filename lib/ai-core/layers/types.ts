@@ -73,7 +73,8 @@ export type CoreDesignStylePreset =
   | "modern"
   | "corporate"
   | "minimal"
-  | "creative";
+  | "creative"
+  | "tech";
 
 export type CoreDesignColorTokens = {
   primary: string;
@@ -148,6 +149,7 @@ export type CoreDesignSystem = {
 export type CoreAssetRole =
   | "hero"
   | "product"
+  | "service"
   | "background"
   | "brand"
   | "icon"

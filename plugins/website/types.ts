@@ -3,6 +3,7 @@ import type { GeneratedProjectFile, GenerationProgressEvent } from "@/lib/ai/typ
 import type { PlannedFile } from "@/lib/ai/planner";
 import type { CorePerformanceReport } from "@/lib/ai-core/performance/types";
 import type { CoreSeoPackage } from "@/lib/ai-core/seo/types";
+import type { WebsiteOptimizationReport } from "@/lib/ai-core/optimizer/types";
 import type {
   AssetManifest,
   BusinessProfile,
@@ -36,9 +37,13 @@ export type WebsiteGenerationInput = {
   language: string;
   theme: string;
   features: string[];
+  /** Smart Template Engine id (auto-selected by DeepSeek when omitted). */
+  templateId?: string;
   mode?: WebsiteGenerationMode;
   parentGenerationId?: string;
   continueInstruction?: string;
+  /** AI Website Optimizer Engine — audit + apply improvements */
+  optimizeWithAi?: boolean;
   /** Prior project files when regenerating / continuing */
   previousFiles?: GeneratedProjectFile[];
   previousTitle?: string;
@@ -158,6 +163,8 @@ export type GeneratedWebsiteProject = {
   seoPackage?: CoreSeoPackage;
   /** Phase 8 Performance Engine report (optional; Core path) */
   performanceReport?: CorePerformanceReport;
+  /** AI Website Optimizer Engine report */
+  optimizationReport?: WebsiteOptimizationReport;
 };
 
 export type { GeneratedProjectFile };

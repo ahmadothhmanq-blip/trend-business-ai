@@ -18,13 +18,10 @@ import type {
 import { registerProductEngineAdapter } from "@/lib/ai-core/registry";
 import { getTemplateSelectionFromBrief } from "@/lib/ai-core/templates/apply";
 import {
-  buildAiDesignSystemFromStrategy,
+  generateDesignSystem,
   mergeCoreDesignWithAiDecisions,
 } from "@/lib/ai-core/design-system";
-import {
-  generateCoreAssets,
-  planCoreAssets,
-} from "@/lib/ai-core/assets";
+import { generateCoreAssets } from "@/lib/ai-core/assets";
 import {
   buildSeoPackageFromStrategy,
   checkSeoReadiness,
@@ -33,6 +30,10 @@ import {
 } from "@/lib/ai-core/seo";
 import { runPerformanceChecks } from "@/lib/ai-core/performance";
 import { buildAutoQualityReport } from "@/lib/ai-core/quality";
+import {
+  runWebsiteOptimizer,
+  shouldApplyOptimizerFixes,
+} from "@/lib/ai-core/optimizer";
 import { analyzeBusinessIdea } from "@/plugins/website/layers/business-idea";
 import { buildDesignSystem } from "@/plugins/website/layers/design-engine";
 import { buildWebsiteStrategy } from "@/plugins/website/layers/strategy";
@@ -67,6 +68,7 @@ export function websiteInputToBrief(
     features: input.features,
     metadata: {
       [INPUT_META_KEY]: input,
+      ...(input.templateId ? { templateId: input.templateId } : {}),
     },
   };
 }
@@ -196,14 +198,26 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
         design.industryPattern = template.industryPattern;
       }
 
-      // Phase 7: AI Design System foundation from Strategy.
-      const aiDesign = buildAiDesignSystemFromStrategy({
+      // AI Design System Engine: business + template → DeepSeek → apply.
+      ctx.progress.emit("Generating design system…");
+      const websiteGenerationId =
+        input.parentGenerationId &&
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+          input.parentGenerationId,
+        )
+          ? input.parentGenerationId
+          : undefined;
+      const { design: aiDesign } = await generateDesignSystem({
         strategy: strategy as CoreProductStrategy,
         profile,
         preferredPreset: template?.designPreset || design.stylePreset,
         templateSelection: template,
         industryPattern: design.industryPattern,
         layoutStyle: design.layoutStyle,
+        brief,
+        userId: input.userId,
+        websiteGenerationId,
+        persist: Boolean(input.userId),
       });
       return mergeCoreDesignWithAiDecisions(
         design as CoreDesignSystem,
@@ -228,13 +242,20 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
         return input.previousAssetManifest as CoreAssetManifest;
       }
 
-      // Phase 7: shared AI Assets Engine (OpenAI when available).
-      const planned = planCoreAssets({
-        strategy: artifacts.strategy,
-        designSystem: artifacts.designSystem,
-        profile: analysis.businessProfile,
-        maxItems: 4,
-      });
+      // AI Real Images Engine: DeepSeek prompts → image providers → website assets.
+      const template = getTemplateSelectionFromBrief(brief);
+      const { buildImagePrompts } = await import(
+        "@/lib/ai-core/assets/prompt-engine"
+      );
+      const { items: planned, settings, negativePrompt } =
+        await buildImagePrompts({
+          strategy: artifacts.strategy,
+          designSystem: artifacts.designSystem,
+          profile: analysis.businessProfile,
+          templateSelection: template,
+          maxItems: 5,
+          onProgress: (message) => ctx.progress.emit(message),
+        });
       const generationKey =
         input.parentGenerationId ?? `draft-${Date.now()}`;
 
@@ -243,7 +264,10 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
         colors: artifacts.designSystem.colors,
         userId: input.userId,
         generationKey,
-        maxImages: 4,
+        maxImages: 5,
+        imageSettings: settings,
+        negativePrompt,
+        persist: Boolean(input.userId),
         onProgress: (message) => ctx.progress.emit(message),
         upload:
           input.userId
@@ -392,8 +416,9 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
       return report;
     },
 
-    async finalize(_brief, artifacts, generation) {
-      const finished: GeneratedWebsiteProject = {
+    async finalize(brief, artifacts, generation, ctx) {
+      const input = getWebsiteInput(brief);
+      let base: GeneratedWebsiteProject = {
         ...(project ?? generation),
         businessProfile:
           (artifacts.businessProfile as GeneratedWebsiteProject["businessProfile"]) ??
@@ -428,8 +453,68 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
           project?.seo ??
           generation.seo,
       };
-      project = finished;
-      return finished;
+
+      // AI Website Optimizer Engine — audit + score; apply fixes on Improve with AI.
+      const applyFixes = shouldApplyOptimizerFixes({
+        optimizeWithAi: input.optimizeWithAi,
+        continueInstruction: input.continueInstruction,
+        mode: input.mode,
+      });
+      const websiteGenerationId =
+        input.parentGenerationId &&
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+          input.parentGenerationId,
+        )
+          ? input.parentGenerationId
+          : undefined;
+
+      try {
+        const optimized = await runWebsiteOptimizer({
+          files: base.files,
+          strategy: artifacts.strategy,
+          designSystem: artifacts.designSystem,
+          profile: artifacts.businessProfile ?? analysis?.businessProfile,
+          qualityReport: artifacts.qualityReport,
+          seoPackage: artifacts.seoPackage,
+          performanceReport: artifacts.performanceReport,
+          applyFixes,
+          userInstruction: input.continueInstruction,
+          userId: input.userId,
+          websiteGenerationId,
+          parentGenerationId: websiteGenerationId,
+          persist: Boolean(input.userId),
+          onProgress: (message) => ctx.progress.emit(message),
+        });
+
+        base = {
+          ...base,
+          files: optimized.files,
+          optimizationReport: optimized.report,
+          qualityReport: {
+            passed: base.qualityReport?.passed ?? optimized.report.publishReady,
+            dimensions: base.qualityReport?.dimensions ?? [],
+            weakSections: base.qualityReport?.weakSections ?? [],
+            issues: base.qualityReport?.issues ?? [],
+            score: optimized.report.scores.overall,
+            publishReady: optimized.report.publishReady,
+            improveApplied:
+              Boolean(base.qualityReport?.improveApplied) ||
+              optimized.filesChanged,
+            improveNotes: [
+              ...(base.qualityReport?.improveNotes ?? []),
+              ...(optimized.report.appliedFixes.length
+                ? optimized.report.appliedFixes
+                : [optimized.report.summary]),
+            ],
+          } as QualityReport,
+        };
+      } catch (error) {
+        console.error("Website Optimizer finalize failed", error);
+        ctx.progress.emit("Optimizer skipped — delivering current build.");
+      }
+
+      project = base;
+      return base;
     },
   };
 }

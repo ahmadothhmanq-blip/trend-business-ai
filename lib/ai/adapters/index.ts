@@ -1,6 +1,7 @@
 import type { AIProvider, AIProviderName } from "@/lib/ai/types";
 import {
   getActiveProvider,
+  getDefaultTextProvider,
   PROVIDER_REGISTRY,
   getProviderEnvKey,
   getAllProviderNames,
@@ -64,32 +65,27 @@ export function listConfiguredProviders(): AIProviderName[] {
 export function resolveAvailableProvider(
   preferred?: AIProviderName,
 ): AIProviderName | null {
+  const defaultText = getDefaultTextProvider();
   const active = getActiveProvider();
-  const target = preferred ?? active;
-
-  if (isProviderConfigured(target) && isProviderImplemented(target)) {
-    return target;
-  }
-
-  if (
-    target !== active &&
-    isProviderConfigured(active) &&
-    isProviderImplemented(active)
-  ) {
-    return active;
-  }
-
+  // Prefer explicit request → DeepSeek system default → user active → other configured providers.
+  const candidates: AIProviderName[] = [];
+  const push = (name: AIProviderName | undefined) => {
+    if (name && !candidates.includes(name)) candidates.push(name);
+  };
+  push(preferred);
+  push(defaultText);
+  push(active);
   for (const reg of PROVIDER_REGISTRY) {
-    if (
-      reg.name !== target &&
-      reg.status === "active" &&
-      isProviderConfigured(reg.name)
-    ) {
-      return reg.name;
-    }
+    if (reg.status === "active") push(reg.name);
   }
   for (const name of customFactories.keys()) {
-    if (isProviderConfigured(name)) return name as AIProviderName;
+    push(name as AIProviderName);
+  }
+
+  for (const name of candidates) {
+    if (isProviderConfigured(name) && isProviderImplemented(name)) {
+      return name;
+    }
   }
   return null;
 }

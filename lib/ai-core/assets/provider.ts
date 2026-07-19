@@ -1,55 +1,53 @@
 /**
- * Shared image provider for AI Assets Engine.
- * Reuses OpenAI DALL·E when OPENAI_API_KEY is set; otherwise SVG fallback.
+ * AI Real Images Engine — provider façade.
+ * Image providers only (OpenAI DALL·E / Replicate Flux / Stability).
+ * DeepSeek remains text/code only.
  */
+
+import {
+  getDefaultImageSettings,
+  type ImageGenerationSettings,
+} from "@/lib/ai-core/assets/settings";
+import {
+  generateWithImageProviders,
+  isAnyImageProviderConfigured,
+} from "@/lib/ai-core/assets/providers/router";
+
+export type GenerateImageOptions = {
+  settings?: Partial<ImageGenerationSettings>;
+  negativePrompt?: string;
+};
 
 export async function generateRealisticImage(
   prompt: string,
-): Promise<{ bytes: Buffer; mimeType: string; provider: string } | null> {
-  const apiKey = process.env.OPENAI_API_KEY?.trim();
-  if (!apiKey) return null;
-
-  try {
-    const response = await fetch("https://api.openai.com/v1/images/generations", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "dall-e-3",
-        prompt: prompt.slice(0, 3900),
-        n: 1,
-        size: "1792x1024",
-        response_format: "b64_json",
-        quality: "standard",
-      }),
-    });
-
-    if (!response.ok) {
-      const text = await response.text().catch(() => "");
-      console.error(
-        "AI Assets Engine: OpenAI image failed",
-        response.status,
-        text.slice(0, 400),
-      );
-      return null;
-    }
-
-    const json = (await response.json()) as {
-      data?: Array<{ b64_json?: string }>;
-    };
-    const b64 = json.data?.[0]?.b64_json;
-    if (!b64) return null;
-    return {
-      bytes: Buffer.from(b64, "base64"),
-      mimeType: "image/png",
-      provider: "openai-dall-e-3",
-    };
-  } catch (error) {
-    console.error("AI Assets Engine: OpenAI image threw", error);
-    return null;
-  }
+  options?: GenerateImageOptions,
+): Promise<{
+  bytes: Buffer;
+  mimeType: string;
+  provider: string;
+  model?: string;
+  width?: number;
+  height?: number;
+} | null> {
+  const settings = getDefaultImageSettings(options?.settings);
+  const result = await generateWithImageProviders(
+    {
+      prompt,
+      aspectRatio: settings.aspectRatio,
+      quality: settings.quality,
+      negativePrompt: options?.negativePrompt,
+    },
+    settings,
+  );
+  if (!result) return null;
+  return {
+    bytes: result.bytes,
+    mimeType: result.mimeType,
+    provider: result.provider,
+    model: result.model,
+    width: result.width,
+    height: result.height,
+  };
 }
 
 export function svgFallbackDataUrl(
@@ -71,5 +69,5 @@ export function svgFallbackDataUrl(
 }
 
 export function isImageProviderConfigured(): boolean {
-  return Boolean(process.env.OPENAI_API_KEY?.trim());
+  return isAnyImageProviderConfigured();
 }

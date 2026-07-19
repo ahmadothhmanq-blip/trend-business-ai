@@ -401,8 +401,10 @@ export function WebsiteBuilderTool({
   async function createInterfaceProject(options?: {
     regenerate?: boolean;
     continue?: boolean;
+    /** AI Website Optimizer Engine — audit + apply fixes */
+    optimize?: boolean;
   }) {
-    const mode = options?.continue
+    const mode = options?.continue || options?.optimize
       ? "continue"
       : options?.regenerate
         ? "regenerate"
@@ -413,12 +415,15 @@ export function WebsiteBuilderTool({
         toast.error("Select a saved website first.");
         return;
       }
-      if (!projectBrief.trim()) {
-        toast.error("Describe the changes you want in natural language.");
+      if (!options?.optimize && !projectBrief.trim()) {
+        toast.error("Describe the changes you want, or run Optimize website.");
         setEditMode(true);
         return;
       }
     }
+
+    const optimizeInstruction =
+      "[optimize] Improve headlines, CTA buttons, service descriptions, layout structure, mobile responsiveness, conversion, and brand consistency.";
 
     const brief =
       projectBrief.trim() ||
@@ -432,7 +437,11 @@ export function WebsiteBuilderTool({
 
     setIsGenerating(true);
     setApiError(null);
-    setStreamStatus("Connecting to AI website engine...");
+    setStreamStatus(
+      options?.optimize
+        ? "Running AI Website Optimizer…"
+        : "Connecting to AI website engine...",
+    );
 
     const requestBody = {
       prompt: mode === "continue" ? activeProject?.description || brief : brief,
@@ -446,7 +455,10 @@ export function WebsiteBuilderTool({
       parentGenerationId:
         mode === "generate" ? undefined : activeProject?.id,
       continueInstruction:
-        mode === "continue" ? projectBrief.trim() : undefined,
+        mode === "continue"
+          ? projectBrief.trim() || (options?.optimize ? optimizeInstruction : undefined)
+          : undefined,
+      optimizeWithAi: Boolean(options?.optimize),
     };
 
     const applySavedGeneration = (
@@ -1031,7 +1043,13 @@ export function WebsiteBuilderTool({
             <>
               <Button
                 type="button"
-                onClick={() => void createInterfaceProject({ continue: true })}
+                onClick={() =>
+                  void createInterfaceProject(
+                    projectBrief.trim()
+                      ? { continue: true }
+                      : { optimize: true },
+                  )
+                }
                 disabled={isGenerating || !activeProject?.id}
                 className="btn-gold h-14 w-full rounded-2xl text-base font-bold text-luxury-black shadow-[0_18px_60px_rgb(212_175_55/0.18)] sm:col-span-2"
               >
@@ -1107,9 +1125,7 @@ export function WebsiteBuilderTool({
                 toast.error("Create or select a website first.");
                 return;
               }
-              setEditMode(true);
-              setProjectBrief("");
-              toast.message("Describe your changes, then click Improve with AI.");
+              void createInterfaceProject({ optimize: true });
             }}
             disabled={isGenerating || !activeProject?.id}
             className="btn-ghost-gold h-14 w-full rounded-2xl text-base font-semibold sm:col-span-2 lg:col-span-1"
@@ -1142,9 +1158,7 @@ export function WebsiteBuilderTool({
             onDownload={downloadProject}
             onImprove={() => {
               if (!activeProject?.id) return;
-              setEditMode(true);
-              setProjectBrief("");
-              toast.message("Describe your changes, then click Improve with AI.");
+              void createInterfaceProject({ optimize: true });
             }}
           />
         )}
@@ -1390,10 +1404,52 @@ function DesignEnginePanels({
   const assets = project?.assetManifest?.items ?? [];
   const profile = project?.businessProfile;
   const quality = project?.qualityReport;
+  const scores = project?.optimizationReport?.scores;
 
   if (!project) return null;
 
   return (
+    <div className="space-y-4">
+      {scores ? (
+        <DashboardPanel>
+          <SectionHeader
+            icon={Sparkles}
+            title="Website Quality Score"
+            description={
+              project.optimizationReport?.summary ||
+              "AI Website Optimizer audit"
+            }
+          />
+          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
+            {(
+              [
+                ["Overall", scores.overall],
+                ["Design", scores.design],
+                ["SEO", scores.seo],
+                ["UX", scores.ux],
+                ["Perf", scores.performance],
+              ] as const
+            ).map(([label, value]) => (
+              <div
+                key={label}
+                className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-center"
+              >
+                <p className="text-[10px] uppercase tracking-wide text-white/40">
+                  {label}
+                </p>
+                <p className="text-lg font-semibold text-premium-gold-light">
+                  {value}
+                </p>
+              </div>
+            ))}
+          </div>
+          {project.optimizationReport?.appliedFixes?.length ? (
+            <p className="mt-3 text-[11px] text-white/45">
+              Applied: {project.optimizationReport.appliedFixes.slice(0, 3).join(" · ")}
+            </p>
+          ) : null}
+        </DashboardPanel>
+      ) : null}
     <div className="grid gap-4 lg:grid-cols-3">
       <DashboardPanel>
         <SectionHeader
@@ -1544,6 +1600,7 @@ function DesignEnginePanels({
           Improve assets
         </Button>
       </DashboardPanel>
+    </div>
     </div>
   );
 }

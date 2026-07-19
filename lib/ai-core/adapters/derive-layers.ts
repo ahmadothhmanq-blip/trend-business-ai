@@ -37,6 +37,15 @@ export function toStylePreset(style: string): CoreDesignStylePreset {
   ) {
     return "creative";
   }
+  if (
+    s.includes("tech") ||
+    s.includes("saas") ||
+    s.includes("software") ||
+    s.includes("startup") ||
+    s.includes("fintech")
+  ) {
+    return "tech";
+  }
   return "modern";
 }
 

@@ -99,8 +99,11 @@ export {
   DESIGN_PRESETS,
   DESIGN_PRESET_IDS,
   getDesignPreset,
+  listDesignPresets,
   normalizeDesignPreset,
   buildAiDesignSystemFromStrategy,
+  generateDesignSystem,
+  persistGeneratedDesign,
   aiDesignSystemToCore,
   mergeCoreDesignWithAiDecisions,
   type AiDesignSystem,
@@ -112,6 +115,8 @@ export {
   type DesignComponentStyle,
   type DesignAnimationStyle,
   type BuildAiDesignSystemInput,
+  type GenerateDesignSystemInput,
+  type GenerateDesignSystemResult,
 } from "@/lib/ai-core/design-system";
 
 export {
@@ -147,6 +152,18 @@ export {
   type CorePerformanceCheckName,
   type RunPerformanceChecksInput,
 } from "@/lib/ai-core/performance";
+
+export {
+  runWebsiteOptimizer,
+  shouldApplyOptimizerFixes,
+  runHeuristicWebsiteAudit,
+  computeWebsiteQualityScore,
+  type WebsiteQualityScore,
+  type WebsiteAuditResult,
+  type WebsiteOptimizationReport,
+  type RunWebsiteOptimizerResult,
+  type RunWebsiteOptimizerParams,
+} from "@/lib/ai-core/optimizer";
 
 export {
   buildAutoQualityReport,

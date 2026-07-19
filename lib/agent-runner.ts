@@ -1,3 +1,4 @@
+import { getDefaultTextProvider } from "@/lib/ai/provider-config";
 import { providerManager } from "@/lib/ai/provider-manager";
 import { aiAgentPlugin } from "@/plugins/ai-agents";
 import type { AgentPluginInput, AgentOutput } from "@/plugins/ai-agents/types";
@@ -31,7 +32,9 @@ export async function runAgent(input: RunAgentInput): Promise<AgentRunResult> {
     maxSteps: input.maxSteps,
   };
 
-  const result = await providerManager.runPlugin(aiAgentPlugin, pluginInput);
+  const result = await providerManager.runPlugin(aiAgentPlugin, pluginInput, {
+    provider: getDefaultTextProvider(),
+  });
 
   return {
     output: result.output,

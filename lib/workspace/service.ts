@@ -1,3 +1,4 @@
+import { getDefaultTextProvider } from "@/lib/ai/provider-config";
 import { providerManager } from "@/lib/ai/provider-manager";
 import type { AIProviderName, TokenUsage } from "@/lib/ai/types";
 import { layerRunner } from "@/lib/ai-core";
@@ -124,7 +125,7 @@ export async function generateWorkspaceProject(
   const definition = getWorkspaceDefinition(workspaceType);
   const plugin = definition.plugin;
   const preferred =
-    (input.provider as AIProviderName | undefined) ?? undefined;
+    (input.provider as AIProviderName | undefined) ?? getDefaultTextProvider();
   const primary = providerManager.resolve(preferred);
 
   const providers = primary

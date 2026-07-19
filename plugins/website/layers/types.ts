@@ -56,7 +56,8 @@ export type DesignStylePreset =
   | "modern"
   | "corporate"
   | "minimal"
-  | "creative";
+  | "creative"
+  | "tech";
 
 export type DesignColorTokens = {
   primary: string;
@@ -94,6 +95,7 @@ export type DesignSystem = {
 export type AssetRole =
   | "hero"
   | "product"
+  | "service"
   | "background"
   | "brand"
   | "icon"
