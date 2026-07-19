@@ -2,6 +2,7 @@
  * AI Real Images Engine / AI Assets Engine.
  * Image providers: OpenAI DALL·E, Replicate Flux, Stability AI.
  * DeepSeek is used only for text prompt refinement — never for pixels.
+ * Website Builder prefers lib/ai-core/image-engine (AI Image Engine).
  */
 
 export type {

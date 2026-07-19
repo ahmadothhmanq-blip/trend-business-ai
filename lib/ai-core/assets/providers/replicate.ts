@@ -1,5 +1,9 @@
 import { pixelsForAspect } from "@/lib/ai-core/assets/settings";
 import type { ImageProviderAdapter } from "@/lib/ai-core/assets/providers/types";
+import {
+  clampImagePrompt,
+  getImageGenerationTimeoutMs,
+} from "@/lib/ai/timeouts";
 
 const DEFAULT_FLUX_MODEL =
   process.env.REPLICATE_FLUX_MODEL?.trim() ||
@@ -7,7 +11,9 @@ const DEFAULT_FLUX_MODEL =
 
 async function fetchImageBytes(url: string): Promise<Buffer | null> {
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(60000) });
+    const res = await fetch(url, {
+      signal: AbortSignal.timeout(getImageGenerationTimeoutMs()),
+    });
     if (!res.ok) return null;
     const ab = await res.arrayBuffer();
     return Buffer.from(ab);
@@ -44,7 +50,7 @@ export const replicateImageProvider: ImageProviderAdapter = {
         body: JSON.stringify({
           model,
           input: {
-            prompt: request.prompt.slice(0, 3900),
+            prompt: clampImagePrompt(request.prompt),
             aspect_ratio: request.aspectRatio,
             output_format: "png",
             num_outputs: 1,
@@ -53,7 +59,7 @@ export const replicateImageProvider: ImageProviderAdapter = {
               : {}),
           },
         }),
-        signal: AbortSignal.timeout(90000),
+        signal: AbortSignal.timeout(getImageGenerationTimeoutMs()),
       });
 
       if (!create.ok) {

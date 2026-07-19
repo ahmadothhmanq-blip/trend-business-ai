@@ -70,12 +70,15 @@ export function planCoreAssets(params: {
     },
   ];
 
-  const section = strategy.sectionPlan[0] || strategy.pages[0];
+  const sections = Array.isArray(strategy.sectionPlan)
+    ? strategy.sectionPlan
+    : [];
+  const section = sections.find((s) => !/hero/i.test(s.name)) || sections[0];
   if (section) {
     const name = section.name;
     planned.push({
       id: "section-1",
-      kind: "realistic",
+      kind: "section",
       role: "section",
       name: `${name} visual`,
       prompt: `Supporting photorealistic image for section "${name}" in ${industry}, ${style}, no text.`,
@@ -83,6 +86,16 @@ export function planCoreAssets(params: {
       realistic: true,
     });
   }
+
+  planned.push({
+    id: "gallery-1",
+    kind: "gallery",
+    role: "gallery",
+    name: "Gallery image",
+    prompt: `Premium gallery photograph for ${project} in ${industry}, ${style}, editorial composition, no text.`,
+    alt: `${project} gallery`,
+    realistic: true,
+  });
 
   return planned.slice(0, maxItems);
 }

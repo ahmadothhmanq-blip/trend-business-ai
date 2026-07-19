@@ -221,9 +221,18 @@ export async function generateWebsiteAssets(params: {
 
 export function assetManifestForPrompt(manifest: AssetManifest): string {
   return manifest.items
-    .map(
-      (item) =>
-        `- ${item.role}/${item.name}: ${item.alt} → ${item.url ? "URL available" : "missing"} (${item.status})`,
-    )
+    .map((item) => {
+      const meta = item.metadata;
+      const metaBits = [
+        meta?.purpose ? `purpose=${meta.purpose}` : null,
+        meta?.section ? `section=${meta.section}` : null,
+        meta?.style ? `style=${meta.style}` : null,
+        meta?.provider ? `provider=${meta.provider}` : null,
+      ]
+        .filter(Boolean)
+        .join(", ");
+      return `- id=${item.id} role=${item.role} name=${item.name}: alt="${item.alt}" url=${item.url || "missing"} (${item.status})${metaBits ? ` [${metaBits}]` : ""}
+  Use this exact URL in next/image or <img>. Prefer import from @/lib/site-images (HERO_IMAGE, SECTION_IMAGES, GALLERY_IMAGES, etc.).`;
+    })
     .join("\n");
 }

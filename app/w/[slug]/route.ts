@@ -1,14 +1,16 @@
 import { createClient } from "@/lib/supabase/server";
 import { isWebsitePublishEnabled } from "@/lib/website/publish";
-import { sanitizePreviewHtml } from "@/lib/website/build-static-preview";
-import { livePreviewResponseHeaders } from "@/lib/website/live-preview";
+import {
+  publicSiteResponseHeaders,
+  sanitizePublicHtml,
+} from "@/lib/website/public-site";
 import { NextResponse } from "next/server";
 
 type RouteContext = { params: Promise<{ slug: string }> };
 
 /**
  * Public hosted website URL.
- * Serves sanitized static HTML when publishing is enabled and status is published.
+ * Serves production-ready static HTML with SEO metadata when published.
  */
 export async function GET(_request: Request, context: RouteContext) {
   const { slug: rawSlug } = await context.params;
@@ -40,12 +42,8 @@ export async function GET(_request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Published website not found." }, { status: 404 });
   }
 
-  return new NextResponse(sanitizePreviewHtml(data.preview_html), {
+  return new NextResponse(sanitizePublicHtml(data.preview_html), {
     status: 200,
-    headers: {
-      ...livePreviewResponseHeaders(),
-      "Cache-Control": "public, max-age=60",
-      "X-Robots-Tag": "noindex",
-    },
+    headers: publicSiteResponseHeaders({ indexable: true }),
   });
 }

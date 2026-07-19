@@ -20,11 +20,14 @@ Theme hint: ${input.theme}
 Features: ${input.features.join(", ") || "None"}
 
 Detect:
-- industry (specific, e.g. "dental clinic", "B2B SaaS", "luxury real estate")
+- industry (specific, e.g. "Tourism", "Healthcare", "B2B SaaS", "luxury real estate")
 - targetAudience (who buys / converts)
 - businessGoals (3–6 measurable outcomes)
-- requiredSections (must-have page sections, e.g. Hero, Social Proof, Pricing, FAQ, Contact)
+- requiredSections (must-have page sections for that industry — think global agency structure)
+- pages (complete professional sitemap for the industry, e.g. Tourism → Home, Destinations, Tours, Packages, About, Testimonials, Contact, Booking)
 - offer, tone, geography, competitors, kpis, summary
+
+When the brief implies a clear vertical, return a full agency-grade page list and sections — not a generic 3-page stub.
 
 Technical flags for Next.js:
 - requiresAuth, requiresDatabase, requiresDashboard, isEcommerce, isSaas
@@ -79,6 +82,8 @@ Deliver:
 4. Conversion funnel + CTAs
 
 Honor businessProfile.requiredSections when planning sectionPlan.
+Build a complete professional sitemap from analysis.pages (industry-specific pages such as Destinations/Tours for tourism, Inventory for automotive, Programs for education).
+Primary CTAs should match industry conversion goals (Book, Reserve, Apply, Shop, Book demo, etc.).
 
 Return ONLY JSON:
 {
@@ -105,28 +110,35 @@ export function designEnginePrompt(
   analysis: unknown,
   strategy: unknown,
 ) {
-  return `You are an AI Design Engine. Create a professional Design System.
+  return `You are an AI Design Engine for world-class premium websites.
 
 Brief: ${input.prompt}
 Theme hint: ${input.theme}
 Analysis: ${JSON.stringify(analysis)}
 Strategy: ${JSON.stringify(strategy)}
 
-stylePreset MUST be exactly one of: "luxury" | "modern" | "corporate" | "minimal"
-Map theme hints (Gold/Luxury → luxury, Startup/Modern → modern, Corporate → corporate, Minimal/Light → minimal).
+stylePreset MUST be exactly one of: "luxury" | "modern" | "corporate" | "minimal" | "creative" | "tech"
+Map theme hints:
+- Gold/Luxury/Travel premium → luxury
+- Startup/Modern/Product → modern
+- Corporate/Healthcare/Trust → corporate
+- Minimal/Light/Clean → minimal
+- Creative/Agency/Studio → creative
+- Futuristic/Tech/SaaS/Cyber → tech
 
 Also set:
-- industryPattern (clinic, saas, restaurant, real_estate, portfolio, ecommerce, agency, generic)
+- industryPattern (tourism, clinic, saas, restaurant, real_estate, portfolio, ecommerce, agency, generic)
 - layoutStyle (e.g. "full-bleed hero + asymmetric grids")
-- uiPatterns (array of reusable UI patterns)
-- colors as real hex
+- uiPatterns (hero style, card style, nav style, footer style cues)
+- colors as real hex with strong harmony
 - typography: distinctive fonts (avoid Inter/Roboto/Arial as display)
 - spacingScale, borderRadius, shadowStyle, componentPalette, layoutRules
+Aim for premium agency quality — not generic bootstrap layouts.
 
 Return ONLY JSON:
 {
   "style": string,
-  "stylePreset": "luxury" | "modern" | "corporate" | "minimal",
+  "stylePreset": "luxury" | "modern" | "corporate" | "minimal" | "creative" | "tech",
   "industryPattern": string,
   "colors": {
     "primary": "#hex",

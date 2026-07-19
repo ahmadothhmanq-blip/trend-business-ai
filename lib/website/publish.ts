@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { slugify } from "@/lib/website/build-static-preview";
-import { resolveLivePreviewHtml } from "@/lib/website/live-preview";
+import { resolveProductionPublishHtml } from "@/lib/website/public-site";
 import type { WebsiteGeneration } from "@/types/database";
 
 export type WebsitePublication = {
@@ -16,6 +16,9 @@ export type WebsitePublication = {
   created_at: string;
   updated_at: string;
   published_at: string | null;
+  seo_json?: unknown;
+  robots_txt?: string | null;
+  sitemap_xml?: string | null;
 };
 
 export type PublishAction = "prepare" | "publish" | "unpublish";
@@ -45,13 +48,38 @@ function isMissingTableError(error: { code?: string; message?: string } | null) 
   );
 }
 
+function isMissingColumnError(error: { code?: string; message?: string } | null) {
+  if (!error) return false;
+  const msg = error.message?.toLowerCase() ?? "";
+  return (
+    error.code === "42703" ||
+    msg.includes("seo_json") ||
+    msg.includes("robots_txt") ||
+    msg.includes("sitemap_xml") ||
+    (msg.includes("column") && msg.includes("does not exist"))
+  );
+}
+
 function allocationFor(generation: WebsiteGeneration) {
   const title = generation.project_name || "website";
   const baseSlug = slugify(title);
   const slug = `${baseSlug}-${generation.id.slice(0, 8)}`;
   const { publicPath, plannedPublicUrl } = buildPlannedPublicUrl(slug);
-  const html = resolveLivePreviewHtml(generation);
-  return { title, slug, publicPath, plannedPublicUrl, html };
+  // Prefer absolute public URL when NEXT_PUBLIC_SITE_URL is set; else path-based.
+  const absoluteUrl = plannedPublicUrl.startsWith("http")
+    ? plannedPublicUrl
+    : plannedPublicUrl;
+  const produced = resolveProductionPublishHtml(generation, absoluteUrl);
+  return {
+    title,
+    slug,
+    publicPath,
+    plannedPublicUrl,
+    html: produced.html,
+    robotsTxt: produced.robotsTxt,
+    sitemapXml: produced.sitemapXml,
+    seoJson: produced.seoPackage,
+  };
 }
 
 async function upsertPublication(args: {
@@ -63,12 +91,19 @@ async function upsertPublication(args: {
   | { ok: true; publication: WebsitePublication; htmlBytes: number }
   | { ok: false; error: string; status: number }
 > {
-  const { title, slug, publicPath, plannedPublicUrl, html } = allocationFor(
-    args.generation,
-  );
+  const {
+    title,
+    slug,
+    publicPath,
+    plannedPublicUrl,
+    html,
+    robotsTxt,
+    sitemapXml,
+    seoJson,
+  } = allocationFor(args.generation);
   const now = new Date().toISOString();
 
-  const row = {
+  const baseRow = {
     user_id: args.userId,
     generation_id: args.generation.id,
     project_id: args.generation.project_id ?? null,
@@ -82,11 +117,29 @@ async function upsertPublication(args: {
     updated_at: now,
   };
 
-  const { data, error } = await args.supabase
+  const withSeoRow = {
+    ...baseRow,
+    seo_json: seoJson,
+    robots_txt: robotsTxt,
+    sitemap_xml: sitemapXml,
+  };
+
+  let { data, error } = await args.supabase
     .from("website_publications")
-    .upsert(row, { onConflict: "generation_id" })
+    .upsert(withSeoRow, { onConflict: "generation_id" })
     .select("*")
     .single();
+
+  // Graceful fallback before migration 039 is applied.
+  if (error && isMissingColumnError(error)) {
+    const retry = await args.supabase
+      .from("website_publications")
+      .upsert(baseRow, { onConflict: "generation_id" })
+      .select("*")
+      .single();
+    data = retry.data;
+    error = retry.error;
+  }
 
   if (error) {
     if (isMissingTableError(error)) {

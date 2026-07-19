@@ -70,8 +70,18 @@ export type UsageTracker = {
   get: () => TokenUsage;
 };
 
+export type GenerationCheckpointPayload = {
+  message: string;
+  files: GeneratedProjectFile[];
+};
+
 export type GenerationContext = {
   provider: AIProvider;
   progress: ProgressTracker;
   usage: UsageTracker;
+  /** Optional mid-run file checkpoint (Website Builder stream resilience). */
+  onFilesCheckpoint?: (
+    files: GeneratedProjectFile[],
+    meta: { message: string },
+  ) => void | Promise<void>;
 };

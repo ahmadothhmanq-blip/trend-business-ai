@@ -1,5 +1,9 @@
 import { pixelsForAspect } from "@/lib/ai-core/assets/settings";
 import type { ImageProviderAdapter } from "@/lib/ai-core/assets/providers/types";
+import {
+  clampImagePrompt,
+  getImageGenerationTimeoutMs,
+} from "@/lib/ai/timeouts";
 
 /**
  * Stability AI text-to-image (SD3 / core REST).
@@ -21,7 +25,7 @@ export const stabilityImageProvider: ImageProviderAdapter = {
 
     try {
       const form = new FormData();
-      form.append("prompt", request.prompt.slice(0, 3900));
+      form.append("prompt", clampImagePrompt(request.prompt));
       form.append("output_format", "png");
       form.append("aspect_ratio", request.aspectRatio);
       form.append("model", model);
@@ -38,7 +42,7 @@ export const stabilityImageProvider: ImageProviderAdapter = {
             Accept: "image/*",
           },
           body: form,
-          signal: AbortSignal.timeout(120000),
+          signal: AbortSignal.timeout(getImageGenerationTimeoutMs()),
         },
       );
 

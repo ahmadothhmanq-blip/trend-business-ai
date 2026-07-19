@@ -58,8 +58,14 @@ function checkImages(
   const missingAlt = assets?.items.filter((a) => a.url && !a.alt?.trim()) ?? [];
   if (missingAlt.length > 0) {
     issues.push(`${missingAlt.length} asset(s) missing alt text`);
-    recommendations.push("Add descriptive alt text for accessibility and SEO");
+    recommendations.push(
+      "Add descriptive alt text from the AI Image Engine for accessibility and SEO",
+    );
     score -= 10;
+  } else if (assets?.items.some((a) => a.alt?.trim())) {
+    recommendations.push(
+      "Keep Image Engine alt text wired into next/image for LCP-safe SEO",
+    );
   }
 
   const failedAssets =

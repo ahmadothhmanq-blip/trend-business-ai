@@ -6,6 +6,7 @@
 import type { TemplateSelection } from "@/lib/ai-core/templates/types";
 import type { CorePerformanceReport } from "@/lib/ai-core/performance/types";
 import type { CoreSeoPackage } from "@/lib/ai-core/seo/types";
+import type { VisualDesignPlan } from "@/lib/ai-core/design-plan/types";
 
 export type CoreRunMode = "generate" | "regenerate" | "continue" | "retry";
 
@@ -54,6 +55,8 @@ export type CoreContentStrategy = {
   proofPoints: string[];
   objectionHandlers: string[];
   seoTopics: string[];
+  /** Optional AI quirk; always treat as string[] when present. */
+  sections?: string[];
 };
 
 export type CoreProductStrategy = {
@@ -74,7 +77,8 @@ export type CoreDesignStylePreset =
   | "corporate"
   | "minimal"
   | "creative"
-  | "tech";
+  | "tech"
+  | "premium-brand";
 
 export type CoreDesignColorTokens = {
   primary: string;
@@ -144,6 +148,8 @@ export type CoreDesignSystem = {
   uiStyle?: CoreDesignUiStyle;
   componentStyle?: CoreDesignComponentStyle;
   animationStyle?: CoreDesignAnimationStyle;
+  /** Premium Design System Engine package (world-class tokens + layout IQ). */
+  premium?: import("@/lib/ai-core/design-system/premium/types").PremiumDesignSystem;
 };
 
 export type CoreAssetRole =
@@ -154,6 +160,8 @@ export type CoreAssetRole =
   | "brand"
   | "icon"
   | "section"
+  | "gallery"
+  | "testimonial"
   | "other";
 
 export type CoreAssetStatus = "generated" | "fallback" | "pending" | "failed";
@@ -168,12 +176,35 @@ export type CoreAssetItem = {
   storagePath: string | null;
   status: CoreAssetStatus;
   mimeType?: string;
+  /** AI Image Engine metadata (purpose, section, style, prompt, provider). */
+  metadata?: {
+    purpose?:
+      | "hero"
+      | "section"
+      | "product"
+      | "service"
+      | "background"
+      | "gallery"
+      | "brand"
+      | "testimonial";
+    section?: string;
+    style?: string;
+    prompt?: string;
+    provider?: string;
+    artDirection?: string;
+  };
 };
 
 export type CoreAssetManifest = {
   items: CoreAssetItem[];
   provider?: string;
   generatedAt?: string;
+  /** Set when produced by AI Image Engine. */
+  engine?: string;
+  /** Advanced AI Assets Engine quality report. */
+  qualityReport?: import("@/lib/ai-core/image-engine/validate").AssetQualityReport;
+  /** Prepared video briefs (poster-first). */
+  videoPackage?: import("@/lib/ai-core/image-engine/video").VideoAssetPackage;
 };
 
 export type CoreQualityDimensionName =
@@ -214,6 +245,10 @@ export type CoreLayerArtifacts = {
   businessProfile?: CoreBusinessProfile;
   strategy?: CoreProductStrategy;
   designSystem?: CoreDesignSystem;
+  /** Brand Identity Intelligence — complete brand system before design. */
+  brandIdentity?: import("@/lib/ai-core/brand-identity/types").BrandIdentityBrief;
+  /** Approved Visual Design Plan — required before website code generation. */
+  designPlan?: VisualDesignPlan;
   assetManifest?: CoreAssetManifest;
   qualityReport?: CoreQualityReport;
   /** Phase 8 SEO Engine package */

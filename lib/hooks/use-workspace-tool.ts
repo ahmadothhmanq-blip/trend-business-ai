@@ -344,8 +344,8 @@ export function useWorkspaceTool({
         await applyStreamedProject(project);
         toast.success(body.message ?? "Project generated and saved.");
       } else {
-        let completed = false;
-        await readSseStream<{
+        let streamError: string | null = null;
+        const sseResult = await readSseStream<{
           generation?: WorkspaceGeneration;
           message?: string;
         }>(response, {
@@ -358,18 +358,21 @@ export function useWorkspaceTool({
             if (!payload.generation) {
               throw new Error("Stream completed without a generation.");
             }
-            completed = true;
             lastFailedPayloadRef.current = null;
             const project = toWorkspaceProject(payload.generation);
             await applyStreamedProject(project);
             toast.success(payload.message ?? "Project generated and saved.");
           },
           onError: (message) => {
-            throw new Error(message);
+            streamError = message;
           },
         });
-        if (!completed) {
-          throw new Error("Stream ended before generation completed.");
+        if (!sseResult.completed) {
+          throw new Error(
+            streamError ||
+              sseResult.error ||
+              "Stream ended before generation completed.",
+          );
         }
       }
 

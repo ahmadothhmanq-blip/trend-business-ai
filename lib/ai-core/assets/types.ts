@@ -12,6 +12,7 @@ export type AssetKind =
   | "background"
   | "brand"
   | "section"
+  | "gallery"
   | "icon";
 
 export type CoreAssetPlanItem = {
@@ -23,12 +24,30 @@ export type CoreAssetPlanItem = {
   alt: string;
   /** Prefer photorealistic generation when provider available */
   realistic?: boolean;
+  metadata?: {
+    purpose?:
+      | "hero"
+      | "section"
+      | "product"
+      | "service"
+      | "background"
+      | "gallery"
+      | "brand"
+      | "testimonial";
+    section?: string;
+    style?: string;
+    prompt?: string;
+    provider?: string;
+    artDirection?: string;
+  };
 };
 
 export type GenerateCoreAssetsParams = {
   items: CoreAssetPlanItem[];
-  /** Brand colors for prompt + SVG fallback */
+  /** Brand colors for prompt + icon SVG fallback */
   colors: { primary: string; secondary: string };
+  /** Industry hint for curated premium stock photography */
+  industry?: string | null;
   userId?: string;
   generationKey?: string;
   websiteGenerationId?: string;

@@ -9,7 +9,8 @@ export type DesignPresetId =
   | "corporate"
   | "minimal"
   | "creative"
-  | "tech";
+  | "tech"
+  | "premium-brand";
 
 export type DesignColorPalette = {
   primary: string;

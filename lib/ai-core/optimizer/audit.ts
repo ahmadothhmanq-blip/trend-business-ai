@@ -163,9 +163,17 @@ export function runHeuristicWebsiteAudit(params: {
   }
 
   // Missing sections
+  const requiredSections = Array.isArray(profile?.requiredSections)
+    ? profile.requiredSections
+    : [];
+  const contentStructure = Array.isArray(strategy?.contentStructure)
+    ? strategy.contentStructure
+    : Array.isArray(strategy?.contentStrategy?.sections)
+      ? strategy.contentStrategy.sections
+      : [];
   const required = [
-    ...(profile?.requiredSections ?? []),
-    ...(strategy?.contentStructure ?? []),
+    ...requiredSections,
+    ...contentStructure,
     "Services",
     "Contact",
   ].slice(0, 10);

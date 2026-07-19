@@ -119,7 +119,7 @@ export async function withRetry<T>(
   fn: () => Promise<T>,
   options: RetryOptions = {},
 ): Promise<T> {
-  const maxAttempts = options.maxAttempts ?? 3;
+  const maxAttempts = options.maxAttempts ?? 4;
   const delaysMs = options.delaysMs ?? DEFAULT_DELAYS_MS;
   const shouldRetry = options.shouldRetry ?? isRetryableError;
 

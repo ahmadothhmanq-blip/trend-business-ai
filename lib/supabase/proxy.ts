@@ -21,8 +21,27 @@ const SECURITY_HEADERS: Record<string, string> = {
     "form-action 'self';",
 };
 
-function applySecurityHeaders(response: NextResponse): NextResponse {
+/** Routes served inside dashboard iframes (D-017 static live preview). */
+function isEmbeddablePreviewPath(pathname: string): boolean {
+  return (
+    /^\/api\/website-builder\/[^/]+\/live-preview\/?$/.test(pathname) ||
+    pathname.startsWith("/api/website-builder/preview/")
+  );
+}
+
+function applySecurityHeaders(
+  response: NextResponse,
+  pathname?: string,
+): NextResponse {
   for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
+    // Let live-preview / compile-preview routes set their own framing CSP.
+    if (
+      pathname &&
+      isEmbeddablePreviewPath(pathname) &&
+      (key === "X-Frame-Options" || key === "Content-Security-Policy")
+    ) {
+      continue;
+    }
     response.headers.set(key, value);
   }
   return response;
@@ -63,18 +82,20 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith("/forgot-password");
   const isProtectedRoute = request.nextUrl.pathname.startsWith("/dashboard");
 
+  const pathname = request.nextUrl.pathname;
+
   if (!user && isProtectedRoute) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/login";
     redirectUrl.searchParams.set("redirect", request.nextUrl.pathname);
-    return applySecurityHeaders(NextResponse.redirect(redirectUrl));
+    return applySecurityHeaders(NextResponse.redirect(redirectUrl), pathname);
   }
 
   if (user && isAuthRoute) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/dashboard";
-    return applySecurityHeaders(NextResponse.redirect(redirectUrl));
+    return applySecurityHeaders(NextResponse.redirect(redirectUrl), pathname);
   }
 
-  return applySecurityHeaders(supabaseResponse);
+  return applySecurityHeaders(supabaseResponse, pathname);
 }

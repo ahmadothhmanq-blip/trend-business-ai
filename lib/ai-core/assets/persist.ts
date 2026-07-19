@@ -37,8 +37,16 @@ export async function persistImageGenerationRecords(params: {
           style: params.settings.style,
           aspect_ratio: params.settings.aspectRatio,
           quality: params.settings.quality,
-          source: "ai-real-images-engine",
-          metadata: { name: planned.name, alt: planned.alt },
+          source: "ai-image-engine",
+          metadata: {
+            name: planned.name,
+            alt: planned.alt,
+            purpose: planned.metadata?.purpose,
+            section: planned.metadata?.section,
+            style: planned.metadata?.style ?? params.settings.style,
+            prompt: planned.prompt,
+            provider: planned.metadata?.provider,
+          },
         })
         .select("id")
         .single();
@@ -61,7 +69,17 @@ export async function persistImageGenerationRecords(params: {
           mime_type: generated?.mimeType ?? null,
           storage_path: generated?.storagePath ?? null,
           public_url: generated?.url ?? null,
-          metadata: { assetId: planned.id },
+          metadata: {
+            assetId: planned.id,
+            purpose: planned.metadata?.purpose,
+            section: planned.metadata?.section,
+            style: planned.metadata?.style ?? params.settings.style,
+            prompt: planned.prompt,
+            provider:
+              generated?.status === "generated"
+                ? params.provider ?? "unknown"
+                : "fallback-svg",
+          },
         })
         .select("id")
         .single();
@@ -79,7 +97,17 @@ export async function persistImageGenerationRecords(params: {
         public_url: generated?.url ?? null,
         storage_path: generated?.storagePath ?? null,
         status: generated?.status ?? "fallback",
-        metadata: { kind: planned.kind },
+        metadata: {
+          kind: planned.kind,
+          purpose: planned.metadata?.purpose,
+          section: planned.metadata?.section,
+          style: planned.metadata?.style ?? params.settings.style,
+          prompt: planned.prompt,
+          provider:
+            generated?.status === "generated"
+              ? params.provider ?? "unknown"
+              : "fallback-svg",
+        },
       });
     }
   } catch (error) {

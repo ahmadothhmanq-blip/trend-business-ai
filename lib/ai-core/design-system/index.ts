@@ -40,3 +40,15 @@ export {
   type PersistGeneratedDesignParams,
   type PersistGeneratedDesignResult,
 } from "@/lib/ai-core/design-system/persist";
+
+export {
+  buildPremiumDesignSystem,
+  applyPremiumDesignToCore,
+  normalizePremiumStyleId,
+  listPremiumStyles,
+  PREMIUM_STYLE_IDS,
+  premiumDesignCssVariables,
+  type PremiumDesignSystem,
+  type PremiumStyleId,
+  type BuildPremiumDesignInput,
+} from "@/lib/ai-core/design-system/premium";

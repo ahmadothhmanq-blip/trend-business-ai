@@ -37,6 +37,11 @@ export type ContentStrategy = {
   proofPoints: string[];
   objectionHandlers: string[];
   seoTopics: string[];
+  /**
+   * Optional AI quirk field. Models sometimes return `sections` here;
+   * always normalized to string[] before use (never iterated raw).
+   */
+  sections?: string[];
 };
 
 export type WebsiteStrategy = {
@@ -57,7 +62,8 @@ export type DesignStylePreset =
   | "corporate"
   | "minimal"
   | "creative"
-  | "tech";
+  | "tech"
+  | "premium-brand";
 
 export type DesignColorTokens = {
   primary: string;
@@ -90,6 +96,8 @@ export type DesignSystem = {
   spacingScale: string[];
   borderRadius: string;
   shadowStyle: string;
+  /** Premium Design System Engine package when applied. */
+  premium?: import("@/lib/ai-core/design-system/premium/types").PremiumDesignSystem;
 };
 
 export type AssetRole =
@@ -99,7 +107,10 @@ export type AssetRole =
   | "background"
   | "brand"
   | "icon"
-  | "section";
+  | "section"
+  | "gallery"
+  | "testimonial"
+  | "other";
 
 export type AssetStatus = "generated" | "fallback" | "pending" | "failed";
 
@@ -113,12 +124,33 @@ export type AssetItem = {
   storagePath: string | null;
   status: AssetStatus;
   mimeType?: string;
+  metadata?: {
+    purpose?:
+      | "hero"
+      | "section"
+      | "product"
+      | "service"
+      | "background"
+      | "gallery"
+      | "brand"
+      | "testimonial";
+    section?: string;
+    style?: string;
+    prompt?: string;
+    provider?: string;
+    artDirection?: string;
+  };
 };
 
 export type AssetManifest = {
   items: AssetItem[];
   provider?: string;
   generatedAt?: string;
+  engine?: string;
+  /** Advanced AI Assets Engine quality report */
+  qualityReport?: import("@/lib/ai-core/image-engine/validate").AssetQualityReport;
+  /** Poster-first video preparation package */
+  videoPackage?: import("@/lib/ai-core/image-engine/video").VideoAssetPackage;
 };
 
 export type QualityCheckDimension = {

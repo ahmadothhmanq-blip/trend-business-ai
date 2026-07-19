@@ -21,6 +21,10 @@ import { finalizeQualityForPublish } from "@/lib/ai-core/quality";
 export type LayerRunnerOptions = {
   provider?: AIProviderName;
   onProgress?: (message: string) => void;
+  onFilesCheckpoint?: (
+    files: import("@/lib/ai/types").GeneratedProjectFile[],
+    meta: { message: string },
+  ) => void | Promise<void>;
 };
 
 function emit(
@@ -69,7 +73,12 @@ export class LayerRunner {
     const usage = createUsageTracker();
     const providerName = options.provider ?? getDefaultTextProvider();
     const provider = getAIProvider(providerName);
-    const ctx: GenerationContext = { provider, progress, usage };
+    const ctx: GenerationContext = {
+      provider,
+      progress,
+      usage,
+      onFilesCheckpoint: options.onFilesCheckpoint,
+    };
     const onProgress = options.onProgress;
     const layersExecuted: string[] = [];
 
@@ -93,22 +102,87 @@ export class LayerRunner {
     emit(progress, onProgress, "start", `${adapter.label} Core run starting`);
 
     // Template selection:
-    // Website Builder → Smart Template Engine (DeepSeek analysis → template + design config)
+    // Website Builder → Industry Intelligence → Premium Templates System → design config
     // Other products → Industry Template Engine (Phase 6)
     emit(progress, onProgress, "template", "Selecting template...");
     if (adapter.productId === "website-builder") {
-      const { selectSmartTemplate, enrichBriefWithSmartTemplate } = await import(
-        "@/lib/website/smart-templates"
+      const {
+        detectWebsiteIndustry,
+        applyIndustryIntelligenceToBrief,
+      } = await import("@/lib/ai-core/industry-intelligence");
+      onProgress?.(
+        "[industry] Detecting industry with DeepSeek for agency-grade structure...",
       );
-      onProgress?.("[template] Analyzing business with DeepSeek for best template...");
-      const smart = await selectSmartTemplate(brief);
-      const enriched = enrichBriefWithSmartTemplate(brief, smart);
+      const detection = await detectWebsiteIndustry(brief);
+      const withIndustry = applyIndustryIntelligenceToBrief(brief, detection);
+      brief = withIndustry.brief;
+      onProgress?.(
+        `[industry] ${detection.profile.label} · ${detection.profile.designStyle} · pages=${detection.profile.recommendedPages.length} · ${detection.source}`,
+      );
+
+      onProgress?.(
+        "[template] Selecting premium template with AI (industry · goal · style)...",
+      );
+      const { selectPremiumTemplate, applyPremiumTemplateToBrief } =
+        await import("@/lib/ai-core/premium-templates");
+      const premium = await selectPremiumTemplate(brief, {
+        preferredIndustryId: detection.industryId,
+      });
+      const enriched = applyPremiumTemplateToBrief(brief, premium);
       brief = enriched.brief;
       artifacts.brief = brief;
       artifacts.templateSelection = enriched.selection;
       layersExecuted.push("template");
       onProgress?.(
-        `[template] ${smart.template.name} (${smart.templateId}) · ${smart.designConfiguration.layoutStyle} · ${smart.designConfiguration.designPreset} · ${smart.source}`,
+        `[template] ${premium.template.name} (${premium.template.id}) · goal=${premium.websiteGoal} · ${premium.brandStyle} · ${premium.designPreset} · ${premium.source}`,
+      );
+
+      // Template Intelligence — visual style / category layer (auto or explicit)
+      onProgress?.(
+        "[template-intelligence] Selecting visual template (industry · audience · brand style)...",
+      );
+      const {
+        selectTemplateIntelligence,
+        selectionInputFromBrief,
+        applyTemplateIntelligenceToBrief,
+      } = await import("@/lib/ai-core/template-intelligence");
+      const { runAutoDesignDecision } = await import(
+        "@/lib/ai-core/website-design-platform"
+      );
+      const autoDesign = runAutoDesignDecision({
+        prompt: brief.prompt,
+        language: brief.language,
+        brandStyle:
+          typeof brief.metadata?.brandStyle === "string"
+            ? brief.metadata.brandStyle
+            : null,
+        industry: detection.industryId,
+        explicitTemplateId:
+          typeof brief.metadata?.templateIntelligenceId === "string"
+            ? brief.metadata.templateIntelligenceId
+            : null,
+      });
+      brief.metadata = {
+        ...(brief.metadata || {}),
+        autoDesignDecision: autoDesign,
+        designPlatformFamily: autoDesign.family,
+        designPlatformVertical: autoDesign.vertical,
+        requiredSections: autoDesign.requiredSections,
+        localeDir: autoDesign.locale.dir,
+      };
+      const tiSelection = selectTemplateIntelligence({
+        ...selectionInputFromBrief(brief),
+        explicitTemplateId:
+          autoDesign.templateIntelligenceId ||
+          selectionInputFromBrief(brief).explicitTemplateId,
+      });
+      brief = applyTemplateIntelligenceToBrief(brief, tiSelection.template);
+      artifacts.brief = brief;
+      onProgress?.(
+        `[auto-design] ${autoDesign.vertical} · ${autoDesign.family} · ${autoDesign.templateIntelligenceId} · confidence=${autoDesign.confidence.toFixed(2)}`,
+      );
+      onProgress?.(
+        `[template-intelligence] ${tiSelection.template.name} · ${tiSelection.template.category} · ${tiSelection.source} · confidence=${tiSelection.confidence.toFixed(2)}`,
       );
     } else {
       const enriched = enrichBriefWithIndustryTemplate(brief);
@@ -153,7 +227,12 @@ export class LayerRunner {
           `Adapter "${adapter.productId}" enabled design but strategy/idea artifacts are missing.`,
         );
       }
-      emit(progress, onProgress, "design", "Creating design system...");
+      emit(
+        progress,
+        onProgress,
+        "design",
+        "Design Planning Phase → approved plan → design system...",
+      );
       artifacts.designSystem = await adapter.runDesign(
         brief,
         artifacts.businessProfile,
@@ -161,6 +240,15 @@ export class LayerRunner {
         ctx,
         artifacts,
       );
+      // Adapter may attach approved plan onto artifacts / brief.metadata.
+      if (
+        !artifacts.designPlan &&
+        brief.metadata?.designPlan &&
+        typeof brief.metadata.designPlan === "object"
+      ) {
+        artifacts.designPlan =
+          brief.metadata.designPlan as CoreLayerArtifacts["designPlan"];
+      }
       layersExecuted.push("design");
     }
 

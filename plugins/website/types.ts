@@ -37,8 +37,40 @@ export type WebsiteGenerationInput = {
   language: string;
   theme: string;
   features: string[];
-  /** Smart Template Engine id (auto-selected by DeepSeek when omitted). */
+  /** Smart / Premium Template Engine id (auto-selected when omitted). */
   templateId?: string;
+  /** Template Marketplace Engine selection id (e.g. restaurant-luxury). */
+  marketplaceTemplateId?: string;
+  /** Marketplace style variation (luxury, modern, premium-saas…). */
+  templateStyle?: string;
+  /** Design preset hint for Design Intelligence / Brand Identity. */
+  designPreset?: string;
+  /** Template Intelligence System visual template id. */
+  templateIntelligenceId?: string;
+  /** Template Intelligence category. */
+  templateIntelligenceCategory?: string;
+  /** Brand Identity generation id for brand kit lock. */
+  brandIdentityId?: string;
+  /** Explicit locale (falls back to language). */
+  locale?: string;
+  /** Form lead email destination. */
+  formEmailTo?: string;
+  /** Form lead CRM webhook. */
+  formWebhookUrl?: string;
+  /** Industry seed from Template Marketplace selection. */
+  industryId?: string;
+  /** Preferred section/component keys from the selected template. */
+  components?: string[];
+  /** Design-system color/typography seed from the selected template. */
+  designSystem?: {
+    primary?: string;
+    secondary?: string;
+    accent?: string;
+    background?: string;
+    foreground?: string;
+    displayFont?: string;
+    bodyFont?: string;
+  };
   mode?: WebsiteGenerationMode;
   parentGenerationId?: string;
   continueInstruction?: string;
@@ -165,6 +197,18 @@ export type GeneratedWebsiteProject = {
   performanceReport?: CorePerformanceReport;
   /** AI Website Optimizer Engine report */
   optimizationReport?: WebsiteOptimizationReport;
+  /** AI Conversion Optimization Engine report */
+  conversionReport?: import("@/lib/ai-core/conversion").ConversionOptimizationReport;
+  /** AI SEO + Performance Engine quality report */
+  seoPerformanceReport?: import("@/lib/ai-core/seo-performance").SeoPerformanceReport;
+  /** AI Design Critic report (premium visual review) */
+  designCriticReport?: import("@/lib/ai-core/design-critic").DesignCriticReport;
+  /** Approved Visual Design Plan (created before code generation) */
+  designPlan?: import("@/lib/ai-core/design-plan").VisualDesignPlan;
+  /** Website Editor Intelligence — post-generation improvement suggestions */
+  editorSuggestions?: import("@/lib/ai-core/website-editor").WebsiteEditorSuggestionsReport;
+  /** Final Website Quality Intelligence — unified pre-publish scores + actions */
+  finalQualityReport?: import("@/lib/ai-core/final-quality").FinalWebsiteQualityReport;
 };
 
 export type { GeneratedProjectFile };

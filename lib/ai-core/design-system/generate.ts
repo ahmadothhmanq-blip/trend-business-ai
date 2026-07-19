@@ -153,10 +153,12 @@ ${business}
 """
 
 Industry: ${params.profile?.industry ?? params.base.industryPattern}
-Tone: ${params.profile?.tone ?? "n/a"}
+Industry design style: ${params.templateSelection?.industryIntelligence?.designStyle ?? params.base.style}
+Tone: ${params.profile?.tone ?? params.templateSelection?.industryIntelligence?.contentStyle ?? "n/a"}
 Positioning: ${params.strategy.positioning}
 Template: ${params.templateSelection?.smartTemplateId ?? params.templateSelection?.industryPattern ?? "n/a"}
 Template design preset: ${params.templateSelection?.designPreset ?? "n/a"}
+Recommended sections: ${(params.templateSelection?.industryIntelligence?.requiredSections ?? params.templateSelection?.sections ?? []).slice(0, 8).join(", ") || "n/a"}
 Current foundation preset: ${params.base.preset}
 Available presets: ${DESIGN_PRESET_IDS.join(", ")}
 

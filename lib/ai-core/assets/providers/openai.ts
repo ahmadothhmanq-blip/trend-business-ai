@@ -3,6 +3,10 @@ import {
   pixelsForAspect,
 } from "@/lib/ai-core/assets/settings";
 import type { ImageProviderAdapter } from "@/lib/ai-core/assets/providers/types";
+import {
+  clampImagePrompt,
+  getImageGenerationTimeoutMs,
+} from "@/lib/ai/timeouts";
 
 export const openaiImageProvider: ImageProviderAdapter = {
   id: "openai",
@@ -27,13 +31,13 @@ export const openaiImageProvider: ImageProviderAdapter = {
         },
         body: JSON.stringify({
           model: "dall-e-3",
-          prompt: request.prompt.slice(0, 3900),
+          prompt: clampImagePrompt(request.prompt),
           n: 1,
           size,
           response_format: "b64_json",
           quality,
         }),
-        signal: AbortSignal.timeout(120000),
+        signal: AbortSignal.timeout(getImageGenerationTimeoutMs()),
       });
 
       if (!response.ok) {

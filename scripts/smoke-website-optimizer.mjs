@@ -13,6 +13,7 @@ const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 const files = [
   "supabase/migrations/037_ai_website_optimizer.sql",
+  "supabase/migrations/043_ensure_website_audits.sql",
   "lib/ai-core/optimizer/types.ts",
   "lib/ai-core/optimizer/audit.ts",
   "lib/ai-core/optimizer/analyze.ts",
@@ -36,6 +37,16 @@ const migration = readFileSync(
 assert.match(migration, /create table if not exists public\.website_audits/);
 assert.match(migration, /create table if not exists public\.optimization_reports/);
 assert.match(migration, /create table if not exists public\.improvement_history/);
+
+const ensureMigration = readFileSync(
+  path.join(root, "supabase/migrations/043_ensure_website_audits.sql"),
+  "utf8",
+);
+assert.match(ensureMigration, /create table if not exists public\.website_audits/);
+assert.match(ensureMigration, /conversion_score/);
+assert.match(ensureMigration, /seo_results/);
+assert.match(ensureMigration, /conversion_results/);
+assert.match(ensureMigration, /updated_at/);
 
 const run = readFileSync(
   path.join(root, "lib/ai-core/optimizer/run.ts"),

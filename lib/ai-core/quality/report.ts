@@ -186,9 +186,37 @@ export function buildAutoQualityReport(
 
   if (input.assetManifest) {
     const mediaIssues: string[] = [];
-    const hero = input.assetManifest.items.find((a) => a.role === "hero");
-    if (hero && !hero.url) {
-      mediaIssues.push("Hero asset missing URL");
+    const isPhoto = (url: string | null | undefined) =>
+      Boolean(
+        url &&
+          !url.startsWith("data:image/svg") &&
+          !url.includes("image/svg+xml") &&
+          !/placehold\.co|via\.placeholder|picsum\.photos/i.test(url),
+      );
+    const requiredRoles = [
+      "hero",
+      "product",
+      "service",
+      "background",
+      "section",
+      "gallery",
+      "testimonial",
+    ] as const;
+    for (const role of requiredRoles) {
+      const hit = input.assetManifest.items.find(
+        (a) => a.role === role && isPhoto(a.url),
+      );
+      if (!hit) {
+        mediaIssues.push(`Missing photographic ${role} asset`);
+      }
+    }
+    if (input.assetManifest.qualityReport && !input.assetManifest.qualityReport.passed) {
+      mediaIssues.push(
+        ...input.assetManifest.qualityReport.issues
+          .filter((i) => i.severity === "critical" || i.severity === "major")
+          .slice(0, 4)
+          .map((i) => i.title),
+      );
     }
     extras.push({
       name: "media",

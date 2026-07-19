@@ -2,7 +2,7 @@ import type { GeneratedProjectFile } from "@/lib/ai/types";
 import type { PlannedFileLike } from "@/lib/ai/validator";
 
 /** Hard ceiling so Website Builder completes within a real user session. */
-export const MAX_WEBSITE_FILES = 22;
+export const MAX_WEBSITE_FILES = 48;
 
 const CATEGORY_PRIORITY: Record<string, number> = {
   configs: 0,
@@ -234,6 +234,32 @@ h1, h2, h3, h4 {
 .bg-brand-primary { background-color: var(--color-primary); }
 .text-brand-primary { color: var(--color-primary); }
 .bg-brand-accent { background-color: var(--color-accent); }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes slowReveal {
+  from { opacity: 0; transform: translateY(28px); filter: blur(4px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-safe {
+    animation: none !important;
+  }
+}
+
+.bg-gradient-hero {
+  background: var(--gradient-hero, linear-gradient(135deg, var(--color-primary), var(--color-secondary, #333)));
+}
+.bg-gradient-cta {
+  background: var(--gradient-cta, linear-gradient(135deg, var(--color-primary), var(--color-accent, var(--color-secondary, #333))));
+}
 `,
     },
     {

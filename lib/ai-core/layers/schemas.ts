@@ -246,8 +246,19 @@ export const coreSeoPackageSchema = {
         siteName: { type: "string" },
         locale: { type: "string" },
         imageAlt: { type: "string" },
+        imagePath: { type: "string" },
       },
       required: ["title", "description", "type", "siteName", "locale", "imageAlt"],
+    },
+    twitter: {
+      type: "object",
+      properties: {
+        card: { type: "string" },
+        title: { type: "string" },
+        description: { type: "string" },
+        imageAlt: { type: "string" },
+      },
+      required: ["card", "title", "description", "imageAlt"],
     },
     keywords: stringArray,
     structuredData: {
@@ -279,6 +290,7 @@ export const coreSeoPackageSchema = {
         passed: { type: "boolean" },
         score: { type: "number" },
         issues: stringArray,
+        recommendations: stringArray,
       },
       required: ["passed", "score", "issues"],
     },

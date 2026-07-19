@@ -332,6 +332,61 @@ export const DESIGN_PRESETS: Record<DesignPresetId, PresetBase> = {
     borderRadius: "0.75rem",
     shadowStyle: "cyan soft glow",
   },
+  "premium-brand": {
+    preset: "premium-brand",
+    style: "Premium Brand flagship",
+    colors: {
+      primary: "#111827",
+      secondary: "#6B7280",
+      accent: "#B45309",
+      neutral: "#9CA3AF",
+      surface: "#F9FAFB",
+      background: "#FFFFFF",
+      foreground: "#111827",
+    },
+    typography: {
+      headingFont: "Cormorant Garamond",
+      bodyFont: "Manrope",
+      scale: ["text-5xl", "text-3xl", "text-xl", "text-base"],
+      notes: "Flagship serif display + contemporary sans body",
+    },
+    spacing: {
+      unit: "4px",
+      scale: ["6", "10", "16", "24", "40", "56"],
+      sectionGap: "6rem",
+      containerMax: "74rem",
+      notes: "Flagship brand whitespace — calm and decisive",
+    },
+    uiStyle: {
+      density: "airy",
+      corners: "soft",
+      elevation: "soft",
+      contrast: "high",
+      notes: "Global brand polish — quiet luxury without cliché gold",
+    },
+    componentStyle: {
+      buttons: "Ink primary CTA + amber accent secondary",
+      cards: "Soft surface cards with precise borders",
+      inputs: "Quiet fields with ink focus",
+      navigation: "Logo-led sticky with reserved CTA",
+      palette: ["Hero", "Story", "Services", "Proof", "CTA"],
+    },
+    animationStyle: {
+      motion: "subtle",
+      easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+      duration: "650ms",
+      entrances: ["fade-up", "slow-reveal"],
+      notes: "Restrained brand motion — premium, never loud",
+    },
+    layoutRules: [
+      "Flagship full-bleed or editorial split hero",
+      "Story before features",
+      "One decisive accent color",
+    ],
+    uiPatterns: ["Brand manifesto", "Proof strip", "Quiet CTA band"],
+    borderRadius: "0.65rem",
+    shadowStyle: "soft brand elevation",
+  },
 };
 
 export const DESIGN_PRESET_IDS = Object.keys(DESIGN_PRESETS) as DesignPresetId[];
@@ -367,11 +422,14 @@ export function normalizeDesignPreset(value: unknown): DesignPresetId {
     v === "corporate" ||
     v === "minimal" ||
     v === "creative" ||
-    v === "tech"
+    v === "tech" ||
+    v === "premium-brand"
   ) {
     return v;
   }
-  if (/luxury|premium|gold|editorial/.test(v)) return "luxury";
+  if (/premium.?brand|flagship|heritage|iconic/.test(v)) return "premium-brand";
+  if (/futur|neon|cyberpunk|technology/.test(v)) return "tech";
+  if (/luxury|gold|editorial/.test(v)) return "luxury";
   if (/corporate|enterprise|trust|professional/.test(v)) return "corporate";
   if (/minimal|clean|sparse/.test(v)) return "minimal";
   if (/creative|agency|studio|bold|playful|expressive/.test(v)) return "creative";

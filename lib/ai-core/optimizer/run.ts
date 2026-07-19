@@ -40,8 +40,11 @@ export type RunWebsiteOptimizerParams = {
   /** Apply DeepSeek file fixes (Improve with AI / optimize mode). */
   applyFixes?: boolean;
   userInstruction?: string;
+  /** Seed themes from Conversion Optimization Engine. */
+  seedImproveThemes?: string[];
   userId?: string;
   websiteGenerationId?: string;
+  projectId?: string;
   parentGenerationId?: string;
   aiRunId?: string;
   persist?: boolean;
@@ -111,7 +114,7 @@ export async function runWebsiteOptimizer(
   });
 
   params.onProgress?.("Analyzing pages with AI…");
-  const { audit: analyzed, improveThemes, summary } =
+  const { audit: analyzed, improveThemes: aiThemes, summary } =
     await analyzeWebsiteWithDeepSeek({
       heuristic,
       files: params.files,
@@ -120,6 +123,10 @@ export async function runWebsiteOptimizer(
       profile: params.profile,
       userInstruction: params.userInstruction,
     });
+
+  const improveThemes = Array.from(
+    new Set([...(params.seedImproveThemes ?? []), ...aiThemes]),
+  ).slice(0, 16);
 
   // Recompute scores after AI-merged issues
   const scores = computeWebsiteQualityScore({
@@ -190,6 +197,7 @@ export async function runWebsiteOptimizer(
     const persisted = await persistOptimizerArtifacts({
       userId: params.userId,
       websiteGenerationId: params.websiteGenerationId,
+      projectId: params.projectId,
       parentGenerationId: params.parentGenerationId,
       aiRunId: params.aiRunId,
       report,

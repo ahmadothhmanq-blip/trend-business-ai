@@ -49,9 +49,10 @@ export function buildAiDesignSystemFromStrategy(
     input.templateSelection?.layoutStyle ||
     `${base.style} layout aligned to ${input.strategy.positioning.slice(0, 80)}`;
 
-  const sectionHints = input.strategy.sectionPlan
-    .slice(0, 6)
-    .map((s) => s.name);
+  const sectionPlan = Array.isArray(input.strategy.sectionPlan)
+    ? input.strategy.sectionPlan
+    : [];
+  const sectionHints = sectionPlan.slice(0, 6).map((s) => s.name);
   const smartSections = Array.isArray(
     input.templateSelection?.designConfiguration?.sections,
   )
@@ -185,5 +186,6 @@ export function mergeCoreDesignWithAiDecisions(
     uiStyle: ai.uiStyle,
     componentStyle: ai.componentStyle,
     animationStyle: ai.animationStyle,
+    premium: core.premium,
   };
 }

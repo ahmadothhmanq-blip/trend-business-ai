@@ -21,8 +21,8 @@ import type { WebsiteGeneration } from "@/types/database";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
-/** Long Website Builder generations (multiple DeepSeek calls). */
-export const maxDuration = 800;
+/** Long Website Builder generations (multiple DeepSeek + image calls). */
+export const maxDuration = 900;
 
 function logWebsiteBuilderError(stage: string, error: unknown) {
   const stack =

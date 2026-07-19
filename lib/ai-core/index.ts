@@ -1,8 +1,9 @@
 /**
- * AI Core Engine — Phase 8: SEO + Performance + Auto Quality.
+ * AI Core Engine — Phase 8+: SEO + Performance + Auto Quality + Conversion.
  *
  * Pipeline: Template → Idea → Strategy → Design System → Assets → Generation
- *           → Quality Check → SEO → Performance → Finalize (Ready to Publish)
+ *           → Quality Check → SEO → Performance → Finalize
+ *           (Conversion + SEO/Performance quality reports before publish)
  * Runtime: existing AIGenerationEngine + ProviderManager (re-exported).
  */
 
@@ -96,6 +97,60 @@ export {
 } from "@/lib/ai-core/templates";
 
 export {
+  WEBSITE_INDUSTRY_INTELLIGENCE,
+  PRIMARY_WEBSITE_INDUSTRIES,
+  getWebsiteIndustryIntelligence,
+  listWebsiteIndustryIntelligence,
+  listPrimaryWebsiteIndustryIntelligence,
+  detectWebsiteIndustry,
+  applyIndustryIntelligenceToBrief,
+  getIndustryDetectionFromBrief,
+  type WebsiteIndustryIntelligence,
+  type IndustryDetectionResult,
+} from "@/lib/ai-core/industry-intelligence";
+
+export {
+  selectPremiumTemplate,
+  applyPremiumTemplateToBrief,
+  configurePremiumTemplate,
+  PREMIUM_TEMPLATE_CATALOG,
+  listPremiumTemplates,
+  getPremiumTemplate,
+  isPremiumTemplateId,
+  premiumTemplateForIndustry,
+  type PremiumTemplateId,
+  type PremiumTemplateDefinition,
+  type ConfiguredPremiumTemplate,
+  type PremiumContentStrategy,
+} from "@/lib/ai-core/premium-templates";
+
+export {
+  MARKETPLACE_CATEGORIES,
+  MARKETPLACE_TEMPLATES,
+  MARKETPLACE_STYLE_VARIATIONS,
+  listMarketplaceTemplates,
+  getMarketplaceTemplate,
+  recommendMarketplaceTemplates,
+  resolveMarketplaceSelection,
+  buildMarketplacePreviewHtml,
+  marketplaceStyleLabel,
+  type MarketplaceTemplate,
+  type MarketplaceCategory,
+  type MarketplaceRecommendResult,
+  type MarketplaceStyleVariation,
+} from "@/lib/ai-core/template-marketplace";
+
+export {
+  renderWebsiteDesign,
+  INDUSTRY_DESIGN_PRESETS,
+  getIndustryDesignPreset,
+  DESIGN_RENDERER_COMPONENTS,
+  type DesignRenderPlan,
+  type DesignRendererResult,
+  type DesignRendererComponentId,
+} from "@/lib/ai-core/design-renderer";
+
+export {
   DESIGN_PRESETS,
   DESIGN_PRESET_IDS,
   getDesignPreset,
@@ -106,6 +161,9 @@ export {
   persistGeneratedDesign,
   aiDesignSystemToCore,
   mergeCoreDesignWithAiDecisions,
+  buildPremiumDesignSystem,
+  applyPremiumDesignToCore,
+  listPremiumStyles,
   type AiDesignSystem,
   type DesignPresetId,
   type DesignColorPalette,
@@ -114,6 +172,8 @@ export {
   type DesignUiStyle,
   type DesignComponentStyle,
   type DesignAnimationStyle,
+  type PremiumDesignSystem,
+  type PremiumStyleId,
   type BuildAiDesignSystemInput,
   type GenerateDesignSystemInput,
   type GenerateDesignSystemResult,
@@ -129,6 +189,51 @@ export {
   type CoreAssetPlanItem,
   type GenerateCoreAssetsParams,
 } from "@/lib/ai-core/assets";
+
+export {
+  runAiImageEngine,
+  planWebsiteImages,
+  buildImageIntelligence,
+  buildImageArtDirection,
+  buildArtDirectionMap,
+  injectAiImagesIntoProject,
+  ensureRequiredPhotoAssets,
+  hasPublishableHeroImage,
+  preferAiImages,
+  resolveImageEngineStyle,
+  resolvePremiumStockUrl,
+  isPremiumStockUrl,
+  validateAssetManifest,
+  assertPublishableAssets,
+  prepareVideoAssets,
+  buildSiteVideoModule,
+  type ImagePurpose,
+  type ImageAssetMetadata,
+  type ImageEnginePlanItem,
+  type ImageIntelligenceContext,
+  type ImageArtDirection,
+  type AssetQualityReport,
+  type AssetQualityIssue,
+  type VideoAssetPackage,
+  type VideoAssetBrief,
+} from "@/lib/ai-core/image-engine";
+
+export {
+  selectProfessionalComponents,
+  injectProfessionalComponents,
+  hasProfessionalScaffold,
+  composeHomePage,
+  resolveWebsiteGoal,
+  PROFESSIONAL_COMPONENT_CATALOG,
+  getCatalogEntry,
+  type SectionKind,
+  type HeroVariant,
+  type NavVariant,
+  type WebsiteGoal,
+  type ProfessionalComponentDefinition,
+  type ComponentSelectionContext,
+  type ComponentSelectionResult,
+} from "@/lib/ai-core/components";
 
 export {
   buildSeoPackageFromStrategy,
@@ -166,12 +271,248 @@ export {
 } from "@/lib/ai-core/optimizer";
 
 export {
+  runConversionOptimization,
+  mergeConversionIntoOptimizerReport,
+  conversionPublishChecklist,
+  detectConversionGoal,
+  getIndustryConversionRules,
+  analyzeConversion,
+  type ConversionGoal,
+  type ConversionOptimizationReport,
+  type ConversionRecommendation,
+  type IndustryConversionRule,
+} from "@/lib/ai-core/conversion";
+
+export {
+  trackAnalyticsEvent,
+  buildWebsiteAnalyticsSummary,
+  ensureSeededAnalytics,
+  type WebsiteAnalyticsSummary,
+  type WebsiteAnalyticsEvent,
+  type TrackAnalyticsInput,
+} from "@/lib/ai-core/analytics";
+
+export {
+  createExperiment,
+  listExperiments,
+  listExperimentResults,
+  evaluateExperimentResults,
+  assignVariant,
+  type WebsiteExperiment,
+  type ExperimentResults,
+  type CreateExperimentInput,
+} from "@/lib/ai-core/ab-testing";
+
+export {
+  runConversionOptimizer,
+  type ConversionOptimizerReport,
+  type ConversionInsight,
+  type RunConversionOptimizerParams,
+} from "@/lib/ai-core/conversion-optimizer";
+
+export {
+  runSeoAnalysis,
+  type SeoAnalysisReport,
+  type SeoIssue,
+  type RunSeoAnalysisParams,
+} from "@/lib/ai-core/seo-analysis";
+
+export {
+  runSeoOptimizer,
+  applySeoPackageFix,
+  getSeoFix,
+  type SeoOptimizerResult,
+  type SeoFix,
+  type SeoGeneratedAssets,
+} from "@/lib/ai-core/seo-optimizer";
+
+export {
+  runSeoAgent,
+  syncKeywordTracking,
+  getKeywordTracking,
+  type SeoAgentReport,
+  type AiSearchOptimization,
+  type KeywordTrackingPoint,
+  type RunSeoAgentParams,
+} from "@/lib/ai-core/seo-agent";
+
+export {
+  buildPublishingSummary,
+  runPublishingAction,
+  getPublicationForGeneration,
+  mapLifecycleStatus,
+  type PublishingSummary,
+  type PublishingLifecycleStatus,
+  type PublishEngineAction,
+} from "@/lib/ai-core/publishing";
+
+export {
+  validateCustomHostname,
+  addCustomDomain,
+  verifyWebsiteDomain,
+  resolveHostToSlug,
+  buildSubdomainUrl,
+  type WebsiteDomain,
+  type DnsRecordInstruction,
+} from "@/lib/ai-core/domains";
+
+export {
+  buildDeploymentDashboard,
+  recordDeploymentEvent,
+  listDeploymentHistory,
+  type DeploymentDashboard,
+  type DeploymentHistoryEvent,
+} from "@/lib/ai-core/deployment";
+
+export {
+  runSeoPerformanceEngine,
+  mergeSeoPerformanceIntoOptimizerReport,
+  seoPerformancePublishChecklist,
+  analyzeSeoPerformance,
+  buildKeywordPlan,
+  analyzeHeadingStructure,
+  type SeoPerformanceReport,
+  type SeoPerformanceRecommendation,
+  type KeywordPlan,
+  type SeoPerformanceScores,
+} from "@/lib/ai-core/seo-performance";
+
+export {
+  buildIndustryCopyPack,
+  enrichStrategyWithIndustryCopy,
+  industryContentForPreview,
+  type IndustryCopyPack,
+} from "@/lib/ai-core/content";
+
+export {
+  runBrandIdentityIntelligence,
+  analyzeBrandIdentity,
+  analyzeBrandStrategy,
+  selectBrandPreset,
+  getBrandPreset,
+  listBrandPresets,
+  normalizeBrandPresetId,
+  brandIdentityPlanSeeds,
+  applyBrandIdentityToDesignSystem,
+  applyBrandIdentityToDesignPlan,
+  buildLogoDirection,
+  BRAND_PRESET_IDS,
+  type BrandIdentityBrief,
+  type BrandPresetId,
+  type BrandStrategyBrief,
+  type BrandLogoDirection,
+  type BrandColorSystem,
+  type BrandTypographySystem,
+} from "@/lib/ai-core/brand-identity";
+
+export {
+  runDesignIntelligence,
+  analyzeDesignIntelligence,
+  selectWebsiteLayout,
+  resolveLayoutIndustryKey,
+  type DesignIntelligenceBrief,
+  type LayoutVariationId,
+  type LayoutSelectionResult,
+} from "@/lib/ai-core/design-intelligence";
+
+export {
+  runDesignPlanningPhase,
+  runDesignPlanningPhaseWithBrand,
+  assertDesignPlanApproved,
+  buildVisualDesignPlan,
+  applyDesignPlanToStrategy,
+  applyDesignPlanToDesignSystem,
+  designPlanSectionLabels,
+  designPlanRequiredImageRoles,
+} from "@/lib/ai-core/design-plan";
+
+export type {
+  VisualDesignPlan,
+  DesignPlanSection,
+  DesignPlanImageRequirement,
+  DesignPlanColorSystem,
+  DesignPlanTypographySystem,
+  DesignPlanStatus,
+  RunDesignPlanningPhaseParams,
+  DesignPlanningPhaseResult,
+} from "@/lib/ai-core/design-plan";
+
+export {
+  runDesignCritic,
+  mergeDesignCriticIntoOptimizerReport,
+  analyzeDesignCritic,
+  type DesignCriticReport,
+  type DesignCriticFinding,
+} from "@/lib/ai-core/design-critic";
+
+export {
+  runWebsiteEditor,
+  suggestWebsiteImprovements,
+  understandWebsite,
+  parseWebsiteEditCommand,
+  buildWebsiteImprovementSuggestions,
+  type WebsiteEditResult,
+  type WebsiteEditAction,
+  type WebsiteUnderstanding,
+  type WebsiteImprovementSuggestion,
+  type WebsiteEditorSuggestionsReport,
+} from "@/lib/ai-core/website-editor";
+
+export {
+  buildVisualDocument,
+  createVisualHistory,
+  documentToSaveActions,
+  insertNode,
+  insertMarketplaceComponent,
+  moveNode,
+  duplicateNode,
+  deleteNode,
+  VISUAL_EDITOR_CAPABILITIES,
+  type VisualDocument,
+  type VisualNode,
+  type VisualViewport,
+  type VisualEditorCapability,
+} from "@/lib/ai-core/visual-editor";
+
+export {
+  COMPONENT_MARKETPLACE_CATEGORIES,
+  COMPONENT_INDUSTRY_PACKS,
+  COMPONENT_MARKETPLACE_CATALOG,
+  COMPONENT_STYLE_VARIANTS,
+  listMarketplaceComponents,
+  getMarketplaceComponent,
+  listComponentsByIndustry,
+  buildComponentPreviewHtml,
+  type MarketplaceComponent,
+  type ComponentMarketplaceCategory,
+  type ComponentIndustryPack,
+} from "@/lib/ai-core/component-marketplace";
+
+export {
   buildAutoQualityReport,
   finalizeQualityForPublish,
   type CoreAutoQualityReport,
   type CorePublishReadiness,
   type BuildAutoQualityReportInput,
 } from "@/lib/ai-core/quality";
+
+export {
+  runFinalWebsiteQualityIntelligence,
+  buildFinalWebsiteQualityReport,
+  runWebsiteQualityAuditor,
+  runFinalSeoReview,
+  computeFinalWebsiteScores,
+  isFinalPublishReady,
+  buildFinalImprovementActions,
+  finalActionsToOptimizeThemes,
+  finalActionsToEditorActions,
+  finalQualityPublishChecklist,
+  type FinalWebsiteQualityReport,
+  type FinalWebsiteScores,
+  type FinalImprovementAction,
+  type FinalQualityFinding,
+  type FinalQualityPublishChecklist,
+} from "@/lib/ai-core/final-quality";
 
 export type {
   ProductEngineAdapter,

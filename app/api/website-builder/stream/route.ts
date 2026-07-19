@@ -13,14 +13,21 @@ import {
 } from "@/lib/api/supabase-query";
 import { loadWebsiteParentContext } from "@/plugins/website/iteration";
 import { persistWebsiteGeneration } from "@/lib/website/save-generation";
+import {
+  beginWebsiteGenerationSession,
+  checkpointWebsiteGeneration,
+  failWebsiteGenerationSession,
+} from "@/lib/website/generation-session";
 import { createSseStreamHelpers } from "@/lib/api/sse-stream";
-import { isStreamDisconnectError } from "@/lib/ai/retry";
+import { isRetryableError, isStreamDisconnectError, withRetry } from "@/lib/ai/retry";
+import { clampWebsitePrompt } from "@/lib/ai/timeouts";
 import { logger } from "@/lib/logger";
+import type { GeneratedProjectFile } from "@/plugins/website/types";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
-/** Long Website Builder generations (multiple DeepSeek calls). */
-export const maxDuration = 800;
+/** Long Website Builder generations (multiple DeepSeek + image calls). */
+export const maxDuration = 900;
 
 const WB_STREAM_LOG = "wb-stream";
 
@@ -42,7 +49,13 @@ export async function POST(request: Request) {
     );
   }
 
-  const input = parsed.data;
+  const input = {
+    ...parsed.data,
+    prompt: clampWebsitePrompt(parsed.data.prompt),
+    continueInstruction: parsed.data.continueInstruction
+      ? clampWebsitePrompt(parsed.data.continueInstruction, 6000)
+      : parsed.data.continueInstruction,
+  };
   const projectKind = detectWebsiteProjectKind(input);
   const runId = `wb-${Date.now().toString(36)}`;
   logger.info("Website Builder stream start", WB_STREAM_LOG, {
@@ -72,44 +85,127 @@ export async function POST(request: Request) {
         WB_STREAM_LOG,
       );
       const startedAt = Date.now();
+      let sessionId: string | null = null;
+      let lastFiles: GeneratedProjectFile[] = [];
+      let checkpointQueue: Promise<void> = Promise.resolve();
+      let lastCheckpointAt = 0;
+
+      const queueCheckpoint = (message?: string, files?: GeneratedProjectFile[]) => {
+        if (!sessionId) return;
+        if (files) lastFiles = files;
+        const now = Date.now();
+        // Throttle DB writes — keep progress fresh without hammering Supabase.
+        if (!files && now - lastCheckpointAt < 4000) return;
+        lastCheckpointAt = now;
+        checkpointQueue = checkpointQueue
+          .then(async () => {
+            if (!sessionId) return;
+            await checkpointWebsiteGeneration({
+              supabase: auth.supabase,
+              userId: auth.user!.id,
+              generationId: sessionId,
+              message,
+              files: lastFiles.length ? lastFiles : undefined,
+            });
+          })
+          .catch((error) => {
+            logger.warn("Checkpoint failed (non-fatal)", WB_STREAM_LOG, {
+              runId,
+              sessionId,
+              error: error instanceof Error ? error.message : String(error),
+            });
+          });
+      };
 
       try {
+        const session = await beginWebsiteGenerationSession({
+          supabase: auth.supabase,
+          userId: auth.user!.id,
+          input: {
+            prompt: input.prompt,
+            language: input.language,
+            theme: input.theme,
+            features: input.features,
+            productId: input.productId,
+            projectId: input.projectId,
+            mode: input.mode,
+            parentGenerationId: input.parentGenerationId,
+            continueInstruction: input.continueInstruction,
+            projectKind,
+          },
+        });
+        if (session.ok) {
+          sessionId = session.generation.id;
+          send("session", {
+            generationId: sessionId,
+            message: "Generation session started — progress is saved as we go.",
+          });
+        }
+
         const okConnect = send("progress", {
           message: "Connecting to AI website engine...",
+          generationId: sessionId,
         });
         if (!okConnect) {
           logger.error("Website Builder stream aborted before generation", WB_STREAM_LOG, {
             runId,
             phase: "initial_progress",
+            sessionId,
           });
         }
 
         logger.info("Website Builder generateWebsite start", WB_STREAM_LOG, {
           runId,
           provider: settings?.default_provider ?? "default",
+          sessionId,
         });
 
-        const project = await generateWebsite({
-          ...input,
-          projectKind,
-          ...parentContext,
-          userId: auth.user!.id,
-          preferredProvider: settings?.default_provider as
-            | AIProviderName
-            | undefined,
-          autoFallback: settings?.auto_fallback ?? true,
-          onProgress: (message) => {
-            // Client may disconnect mid-run; keep generating until save when possible.
-            const delivered = send("progress", { message });
-            if (!delivered) {
-              logger.warn("SSE progress dropped (client disconnected)", WB_STREAM_LOG, {
-                runId,
-                message,
-                elapsedMs: Date.now() - startedAt,
-              });
-            }
+        // Retry transient AI / disconnect failures once the session row exists.
+        const project = await withRetry(
+          () =>
+            generateWebsite({
+              ...input,
+              projectKind,
+              ...parentContext,
+              userId: auth.user!.id,
+              preferredProvider: settings?.default_provider as
+                | AIProviderName
+                | undefined,
+              autoFallback: settings?.auto_fallback ?? true,
+              onProgress: (message) => {
+                const delivered = send("progress", {
+                  message,
+                  generationId: sessionId,
+                });
+                if (!delivered) {
+                  logger.warn("SSE progress dropped (client disconnected)", WB_STREAM_LOG, {
+                    runId,
+                    message,
+                    sessionId,
+                    elapsedMs: Date.now() - startedAt,
+                  });
+                }
+                queueCheckpoint(message);
+              },
+              onFilesCheckpoint: async (files, meta) => {
+                lastFiles = files;
+                queueCheckpoint(meta.message, files);
+                send("progress", {
+                  message: meta.message,
+                  generationId: sessionId,
+                  fileCount: files.length,
+                });
+              },
+            }),
+          {
+            maxAttempts: 3,
+            delaysMs: [2500, 5000, 10000],
+            shouldRetry: (error) =>
+              isRetryableError(error) || isStreamDisconnectError(error),
           },
-        });
+        );
+
+        await checkpointQueue;
 
         logger.info("Website Builder generateWebsite done", WB_STREAM_LOG, {
           runId,
@@ -117,14 +213,19 @@ export async function POST(request: Request) {
           fileCount: project.files?.length ?? 0,
           title: project.title,
           sseClosed: isClosed(),
+          sessionId,
         });
 
-        send("progress", { message: "Building product preview..." });
+        send("progress", {
+          message: "Building product preview...",
+          generationId: sessionId,
+        });
 
         logger.info("Final database save start", WB_STREAM_LOG, {
           runId,
           userId: auth.user!.id,
           fileCount: project.files?.length ?? 0,
+          sessionId,
         });
 
         const saved = await persistWebsiteGeneration({
@@ -132,6 +233,7 @@ export async function POST(request: Request) {
           userId: auth.user!.id,
           project,
           projectKind: project.projectKind ?? projectKind,
+          existingGenerationId: sessionId,
           input: {
             prompt: input.prompt,
             language: input.language,
@@ -150,8 +252,18 @@ export async function POST(request: Request) {
             runId,
             error: saved.error,
             sseClosed: isClosed(),
+            sessionId,
           });
-          send("error", { error: saved.error });
+          if (sessionId) {
+            await failWebsiteGenerationSession({
+              supabase: auth.supabase,
+              userId: auth.user!.id,
+              generationId: sessionId,
+              errorMessage: saved.error,
+              files: project.files,
+            });
+          }
+          send("error", { error: saved.error, generationId: sessionId });
           return;
         }
 
@@ -165,6 +277,7 @@ export async function POST(request: Request) {
         const completeDelivered = send("complete", {
           project: saved.project,
           generation: saved.generation,
+          generationId: saved.generation.id,
           message: "Website saved to your workspace.",
         });
 
@@ -187,8 +300,9 @@ export async function POST(request: Request) {
           });
         }
       } catch (error) {
+        await checkpointQueue;
         const message = isStreamDisconnectError(error)
-          ? "AI provider connection interrupted during generation. Please retry."
+          ? "AI provider connection interrupted during generation. Progress was saved — use Resume to continue."
           : error instanceof Error
             ? error.message
             : "Unable to generate website application.";
@@ -201,16 +315,27 @@ export async function POST(request: Request) {
             disconnect: isStreamDisconnectError(error),
             sseClosed: isClosed(),
             elapsedMs: Date.now() - startedAt,
+            sessionId,
             message,
           },
           error,
         );
-        send("error", { error: message });
+        if (sessionId) {
+          await failWebsiteGenerationSession({
+            supabase: auth.supabase,
+            userId: auth.user!.id,
+            generationId: sessionId,
+            errorMessage: message,
+            files: lastFiles,
+          });
+        }
+        send("error", { error: message, generationId: sessionId });
       } finally {
         logger.info("Website Builder stream finally close", WB_STREAM_LOG, {
           runId,
           elapsedMs: Date.now() - startedAt,
           sseClosed: isClosed(),
+          sessionId,
         });
         close();
       }

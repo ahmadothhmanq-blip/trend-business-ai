@@ -1,5 +1,5 @@
 /**
- * AI SEO Engine (Phase 8).
+ * AI SEO Engine (Phase 8 + SEO Performance Engine).
  */
 
 export type {
@@ -9,6 +9,7 @@ export type {
   CoreSeoReadiness,
   CoreSitemapEntry,
   CoreStructuredDataItem,
+  CoreTwitterCardData,
 } from "@/lib/ai-core/seo/types";
 
 export {

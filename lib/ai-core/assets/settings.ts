@@ -7,7 +7,10 @@ export type ImageStylePreset =
   | "luxury"
   | "modern"
   | "minimal"
-  | "corporate";
+  | "corporate"
+  | "realistic"
+  | "cinematic"
+  | "premium-commercial";
 
 export type ImageAspectRatio =
   | "16:9"
@@ -37,9 +40,18 @@ const STYLE_PROMPT: Record<ImageStylePreset, string> = {
     "minimalist photography, negative space, soft light, calm composition, uncluttered",
   corporate:
     "professional corporate photography, trustworthy, polished, business-appropriate",
+  realistic:
+    "ultra-realistic photography, natural light, authentic detail, true-to-life textures",
+  cinematic:
+    "cinematic wide photography, dramatic lighting, shallow depth of field, filmic color grade",
+  "premium-commercial":
+    "premium commercial photography, agency advertising quality, polished staging, brand-ready",
 };
 
-const ASPECT_TO_OPENAI: Record<ImageAspectRatio, "1792x1024" | "1024x1024" | "1024x1792"> = {
+const ASPECT_TO_OPENAI: Record<
+  ImageAspectRatio,
+  "1792x1024" | "1024x1024" | "1024x1792"
+> = {
   "16:9": "1792x1024",
   "3:2": "1792x1024",
   "1:1": "1024x1024",
@@ -48,7 +60,10 @@ const ASPECT_TO_OPENAI: Record<ImageAspectRatio, "1792x1024" | "1024x1024" | "10
 };
 
 /** Stability / generic pixel sizes */
-const ASPECT_TO_PIXELS: Record<ImageAspectRatio, { width: number; height: number }> = {
+const ASPECT_TO_PIXELS: Record<
+  ImageAspectRatio,
+  { width: number; height: number }
+> = {
   "16:9": { width: 1344, height: 768 },
   "3:2": { width: 1216, height: 832 },
   "1:1": { width: 1024, height: 1024 },
@@ -92,9 +107,20 @@ export function pixelsForAspect(aspect: ImageAspectRatio) {
 
 export function normalizeImageStyle(value?: string | null): ImageStylePreset {
   const v = (value ?? "").toLowerCase().trim();
+  if (v.includes("cinematic")) return "cinematic";
+  if (
+    v.includes("premium-commercial") ||
+    v.includes("premium commercial") ||
+    (v.includes("premium") && v.includes("commercial"))
+  ) {
+    return "premium-commercial";
+  }
+  if (v.includes("realistic") || v.includes("photo-real")) return "realistic";
   if (v.includes("luxury")) return "luxury";
   if (v.includes("minimal")) return "minimal";
   if (v.includes("corporate") || v.includes("business")) return "corporate";
-  if (v.includes("modern") || v.includes("creative")) return "modern";
+  if (v.includes("modern") || v.includes("creative") || v.includes("tech")) {
+    return "modern";
+  }
   return "modern";
 }

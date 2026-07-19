@@ -136,7 +136,7 @@ export const DASHBOARD_SECONDARY_NAV: DashboardNavItem[] = [
     label: "Templates",
     href: "/dashboard/templates",
     icon: LayoutTemplate,
-    description: "Starter kits and presets",
+    description: "Creator template marketplace",
   },
   {
     label: "History",

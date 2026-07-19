@@ -1,4 +1,8 @@
 import { generateJsonWithValidation } from "@/lib/ai/generator";
+import {
+  premiumDesignCssVariables,
+  premiumUtilityCss,
+} from "@/lib/ai-core/design-system/premium/css";
 import { designEnginePrompt } from "@/lib/ai/prompts/website-layers";
 import { buildWebsiteIterationPrompt } from "@/plugins/website/iteration";
 import { designSystemSchema } from "@/plugins/website/layers/schemas";
@@ -210,6 +214,36 @@ const STYLE_PRESETS: Record<
     borderRadius: "0.75rem",
     shadowStyle: "cyan soft glow",
   },
+  "premium-brand": {
+    style: "Premium Brand flagship",
+    stylePreset: "premium-brand",
+    colors: {
+      primary: "#111827",
+      secondary: "#6B7280",
+      accent: "#B45309",
+      neutral: "#9CA3AF",
+      surface: "#F9FAFB",
+      background: "#FFFFFF",
+      foreground: "#111827",
+    },
+    typography: {
+      headingFont: "Cormorant Garamond",
+      bodyFont: "Manrope",
+      scale: ["text-5xl", "text-3xl", "text-xl", "text-base"],
+      notes: "Flagship serif display + contemporary sans body",
+    },
+    layoutRules: [
+      "Flagship full-bleed or editorial split hero",
+      "Story before features",
+      "One decisive accent color",
+    ],
+    layoutStyle: "editorial flagship brand narrative with proof bands",
+    uiPatterns: ["Brand manifesto", "Proof strip", "Quiet CTA band"],
+    componentPalette: ["Hero", "Story", "Services", "Proof", "CTA"],
+    spacingScale: ["6", "10", "16", "24", "40"],
+    borderRadius: "0.65rem",
+    shadowStyle: "soft brand elevation",
+  },
 };
 
 export function resolveStylePreset(
@@ -217,7 +251,9 @@ export function resolveStylePreset(
   styleHint?: string,
 ): DesignStylePreset {
   const hay = `${theme} ${styleHint ?? ""}`.toLowerCase();
-  if (/luxury|gold|premium|editorial|opulent/.test(hay)) return "luxury";
+  if (/premium.?brand|flagship|heritage|iconic/.test(hay)) return "premium-brand";
+  if (/futur|neon|cyberpunk|technology/.test(hay)) return "tech";
+  if (/luxury|gold|editorial|opulent/.test(hay)) return "luxury";
   if (/corporate|enterprise|business|professional|trust/.test(hay)) {
     return "corporate";
   }
@@ -242,7 +278,8 @@ function normalizeStylePreset(value: unknown): DesignStylePreset {
     v === "corporate" ||
     v === "minimal" ||
     v === "creative" ||
-    v === "tech"
+    v === "tech" ||
+    v === "premium-brand"
   ) {
     return v;
   }
@@ -291,6 +328,16 @@ export function designSystemToPalette(design: DesignSystem): string[] {
 }
 
 export function designSystemCssVariables(design: DesignSystem): string {
+  const premium = design.premium;
+  if (premium) {
+    return `:root {
+  --style-preset: ${design.stylePreset};
+${premiumDesignCssVariables(premium)}
+}
+
+${premiumUtilityCss(premium)}`;
+  }
+
   return `:root {
   --color-primary: ${design.colors.primary};
   --color-secondary: ${design.colors.secondary};

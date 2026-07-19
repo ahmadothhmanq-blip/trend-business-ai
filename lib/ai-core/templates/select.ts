@@ -58,6 +58,21 @@ function explicitIndustry(brief: CoreBrief): IndustryId | null {
     if (typeof raw !== "string") continue;
     const normalized = raw.trim().toLowerCase().replace(/\s+/g, "-");
     if (isIndustryId(normalized)) return normalized;
+    if (
+      normalized.includes("tourism") ||
+      normalized.includes("travel") ||
+      normalized.includes("tour")
+    ) {
+      return "tourism";
+    }
+    if (
+      normalized.includes("education") ||
+      normalized.includes("school") ||
+      normalized.includes("university") ||
+      normalized.includes("academy")
+    ) {
+      return "education";
+    }
     if (normalized.includes("real") && normalized.includes("estate")) {
       return "real-estate";
     }

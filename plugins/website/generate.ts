@@ -17,6 +17,12 @@ import {
   assetManifestForPrompt,
   generateWebsiteAssets,
 } from "@/plugins/website/layers/assets";
+import {
+  hasProfessionalScaffold,
+  injectProfessionalComponents,
+  getProfessionalScaffoldByPath,
+} from "@/lib/ai-core/components";
+import { injectAiImagesIntoProject } from "@/lib/ai-core/image-engine";
 import { designSystemCssVariables } from "@/plugins/website/layers/design-engine";
 import {
   buildQualityImproveInstruction,
@@ -33,7 +39,7 @@ import type {
 } from "@/plugins/website/types";
 import type { GenerationContext } from "@/lib/ai/types";
 
-const FILE_GENERATION_RETRIES = 2;
+const FILE_GENERATION_RETRIES = 3;
 const PROJECT_VALIDATION_ROUNDS = 2;
 
 async function generateFileWithValidation(
@@ -304,7 +310,9 @@ export async function generateWebsite(
     (input.previousFiles ?? []).map((file) => [file.path, file]),
   );
   const reusePrevious =
-    (input.mode === "continue" || input.mode === "regenerate") &&
+    (input.mode === "continue" ||
+      input.mode === "regenerate" ||
+      input.mode === "retry") &&
     previousByPath.size > 0;
 
   let index = 0;
@@ -327,6 +335,19 @@ export async function generateWebsite(
       continue;
     }
 
+    const scaffold = getProfessionalScaffoldByPath(filePlan.path);
+    if (scaffold && hasProfessionalScaffold(filePlan.path)) {
+      ctx.progress.emit(
+        `Using Professional Components Library ${index}/${aiFilePlans.length}: ${filePlan.path}`,
+      );
+      files.push({
+        path: filePlan.path,
+        content: scaffold,
+        language: filePlan.language || "tsx",
+      });
+      continue;
+    }
+
     ctx.progress.emit(
       `Generating file ${index}/${aiFilePlans.length}: ${filePlan.path}`,
     );
@@ -345,7 +366,85 @@ export async function generateWebsite(
         assetSummary,
       ),
     );
+
+    // Persist partial file progress so disconnects can resume instead of losing work.
+    try {
+      await ctx.onFilesCheckpoint?.(files, {
+        message: `Saved progress · ${files.length} files · ${filePlan.path}`,
+      });
+    } catch {
+      // Checkpoint failures must never abort generation.
+    }
   }
+
+  // AI Image Engine: inject lib/site-images.ts and wire photographic URLs into components.
+  const industryHint =
+    analysis.businessProfile?.industry || plan.designSystem.industryPattern;
+  const coreManifest =
+    assetManifest as import("@/lib/ai-core/layers/types").CoreAssetManifest;
+  const filesWithImages = injectAiImagesIntoProject({
+    files,
+    assetManifest: coreManifest,
+    industry: industryHint,
+  });
+
+  // Industry copy → hero/CTA props on composed home page.
+  const { buildIndustryCopyPack } = await import(
+    "@/lib/ai-core/content/industry-copy"
+  );
+  const { buildProductionContentPack } = await import(
+    "@/lib/ai-core/content/production-content"
+  );
+  const { polishGeneratedProject } = await import(
+    "@/lib/ai-core/content/polish-project"
+  );
+  const brandName =
+    analysis.businessProfile?.projectName || analysis.projectName;
+  const copyPack = buildIndustryCopyPack({
+    industryId: analysis.businessProfile?.industry,
+    profile: analysis.businessProfile,
+    strategy: plan.strategy,
+  });
+  const productionContent = buildProductionContentPack(copyPack, brandName);
+  const componentIds = plan.designSystem.componentPalette?.map(String);
+
+  // Professional Components Library: scaffolds + composed home page.
+  let filesWithComponents = injectProfessionalComponents({
+    files: filesWithImages,
+    componentPaths: plan.filePlans
+      .map((f) => f.path)
+      .filter(
+        (p) =>
+          p.startsWith("components/sections/") ||
+          p.startsWith("components/layout/") ||
+          p.startsWith("components/ui/"),
+      ),
+    componentIds,
+    brandName,
+    pageTitle:
+      plan.blueprint.title || productionContent.heroHeadline || analysis.projectName,
+    pageDescription:
+      plan.blueprint.description || productionContent.heroSubheadline,
+    heroHeadline: productionContent.heroHeadline,
+    heroSubheadline: productionContent.heroSubheadline,
+    primaryCta: productionContent.primaryCta,
+    secondaryCta: productionContent.secondaryCta,
+    heroEyebrow: productionContent.heroEyebrow,
+    content: productionContent,
+    composePage: true,
+  });
+
+  // Production content polish — realistic copy, brand, typography (pipeline unchanged).
+  filesWithComponents = polishGeneratedProject({
+    files: filesWithComponents,
+    componentIds,
+    brandName,
+    pageTitle:
+      plan.blueprint.title || productionContent.heroHeadline || analysis.projectName,
+    pageDescription:
+      plan.blueprint.description || productionContent.heroSubheadline,
+    content: productionContent,
+  });
 
   ctx.progress.emit("Validating project...");
 
@@ -354,10 +453,17 @@ export async function generateWebsite(
     analysis,
     plan,
     plan.filePlans,
-    files,
+    filesWithComponents,
     ctx,
     assetSummary,
   );
+
+  // Re-inject after validation repairs so LLM rewrites cannot drop site imagery.
+  validatedFiles = injectAiImagesIntoProject({
+    files: validatedFiles,
+    assetManifest: coreManifest,
+    industry: industryHint,
+  });
 
   let qualityReport: QualityReport | undefined;
   if (options?.skipQuality) {
@@ -380,6 +486,13 @@ export async function generateWebsite(
     validatedFiles = qualityResult.files;
     qualityReport = qualityResult.qualityReport;
   }
+
+  // Final image pass — quality improve must never leave empty placeholders.
+  validatedFiles = injectAiImagesIntoProject({
+    files: validatedFiles,
+    assetManifest: coreManifest,
+    industry: industryHint,
+  });
 
   return {
     projectKind: input.projectKind,
@@ -471,6 +584,15 @@ export async function runWebsiteQualityLayer(params: {
       qualityReport = { ...qualityReport, improveApplied: false };
     }
   }
+
+  // Restore AI Image Engine wiring after improve rewrites.
+  validatedFiles = injectAiImagesIntoProject({
+    files: validatedFiles,
+    assetManifest:
+      assetManifest as import("@/lib/ai-core/layers/types").CoreAssetManifest,
+    industry:
+      analysis.businessProfile?.industry || plan.designSystem.industryPattern,
+  });
 
   return { files: validatedFiles, qualityReport };
 }

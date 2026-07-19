@@ -138,6 +138,8 @@ export async function persistWebsiteGeneration(args: {
     continueInstruction?: string;
   };
   projectKind: "website" | "web_application";
+  /** When set, update the running session row instead of inserting a new one. */
+  existingGenerationId?: string | null;
 }): Promise<
   | { ok: true; generation: WebsiteGeneration; project: GeneratedWebsiteProject }
   | { ok: false; error: string }
@@ -145,13 +147,27 @@ export async function persistWebsiteGeneration(args: {
   const heroAsset = args.project.assetManifest?.items?.find(
     (item) => item.role === "hero" && item.url,
   );
+  const { buildIndustryCopyPack, industryContentForPreview } = await import(
+    "@/lib/ai-core/content/industry-copy"
+  );
+  const copyPack = buildIndustryCopyPack({
+    industryId: args.project.businessProfile?.industry,
+    profile: args.project.businessProfile as never,
+    strategy: args.project.strategy as never,
+  });
   const primaryCta =
     args.project.strategy?.ctas?.[0] ||
-    args.project.strategy?.pages?.[0]?.primaryCta;
+    args.project.strategy?.pages?.[0]?.primaryCta ||
+    copyPack.primaryCta;
+  const previewContent =
+    args.project.content?.length && args.project.content.join("").length > 80
+      ? args.project.content
+      : industryContentForPreview(copyPack);
 
   const files = ensureStaticPreviewFile({
-    title: args.project.title,
-    description: args.project.description,
+    title: args.project.title || copyPack.heroHeadline,
+    description:
+      args.project.description || copyPack.heroSubheadline,
     pages: args.project.pages,
     sections: args.project.sections,
     colorPalette:
@@ -173,7 +189,7 @@ export async function persistWebsiteGeneration(args: {
           ...args.project.designSystem.typography.scale,
         ]
       : args.project.typography,
-    content: args.project.content,
+    content: previewContent,
     components: args.project.components,
     heroImageUrl: heroAsset?.url,
     primaryCta,
@@ -303,6 +319,9 @@ export async function persistWebsiteGeneration(args: {
     attachments: [] as unknown[],
   };
 
+  const existingId =
+    isUuid(args.existingGenerationId) ? args.existingGenerationId : null;
+
   logger.info("Final database save start", "wb-save", {
     userId: args.userId,
     title: savedProject.title,
@@ -311,52 +330,105 @@ export async function persistWebsiteGeneration(args: {
     parentGenerationId,
     projectId,
     tokenUsage,
+    existingGenerationId: existingId,
   });
 
-  let result = await args.supabase
-    .from("website_generations")
-    .insert(phase5Row)
-    .select("*")
-    .single();
+  let result: {
+    data: WebsiteGeneration | null;
+    error: { message?: string; code?: string; details?: string; hint?: string } | null;
+  };
 
-  if (result.error) {
-    const message = result.error.message ?? "";
-    const code = result.error.code;
-    const missingCol = isMissingColumnError(message);
-    const fkOrNull = isFkOrNullConstraintError(message, code);
+  if (existingId) {
+    const updated = await args.supabase
+      .from("website_generations")
+      .update({
+        ...phase5Row,
+        status: "completed",
+        error_message: null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", existingId)
+      .eq("user_id", args.userId)
+      .select("*")
+      .single();
+    result = {
+      data: (updated.data as WebsiteGeneration | null) ?? null,
+      error: updated.error,
+    };
 
-    logger.warn("Final database save primary insert failed", "wb-save", {
-      message,
-      code,
-      details: result.error.details,
-      hint: result.error.hint,
-      fallback: missingCol
-        ? "coreRow"
-        : fkOrNull
-          ? "phase5Row_cleared_fks"
-          : "none",
-    });
-
-    if (missingCol) {
-      result = await args.supabase
+    if (result.error && isMissingColumnError(result.error.message ?? "")) {
+      const coreUpdate = await args.supabase
         .from("website_generations")
-        .insert(coreRow)
-        .select("*")
-        .single();
-    } else if (fkOrNull) {
-      // Retry without nullable FKs; keep required token_usage / prompt_versions.
-      result = await args.supabase
-        .from("website_generations")
-        .insert({
-          ...phase5Row,
-          project_id: null,
-          parent_generation_id: null,
-          token_usage: tokenUsage,
-          prompt_versions: promptVersions,
-          attachments: [],
+        .update({
+          ...coreRow,
+          updated_at: new Date().toISOString(),
         })
+        .eq("id", existingId)
+        .eq("user_id", args.userId)
         .select("*")
         .single();
+      result = {
+        data: (coreUpdate.data as WebsiteGeneration | null) ?? null,
+        error: coreUpdate.error,
+      };
+    }
+  } else {
+    const inserted = await args.supabase
+      .from("website_generations")
+      .insert(phase5Row)
+      .select("*")
+      .single();
+    result = {
+      data: (inserted.data as WebsiteGeneration | null) ?? null,
+      error: inserted.error,
+    };
+
+    if (result.error) {
+      const message = result.error.message ?? "";
+      const code = result.error.code;
+      const missingCol = isMissingColumnError(message);
+      const fkOrNull = isFkOrNullConstraintError(message, code);
+
+      logger.warn("Final database save primary insert failed", "wb-save", {
+        message,
+        code,
+        details: result.error.details,
+        hint: result.error.hint,
+        fallback: missingCol
+          ? "coreRow"
+          : fkOrNull
+            ? "phase5Row_cleared_fks"
+            : "none",
+      });
+
+      if (missingCol) {
+        const coreInsert = await args.supabase
+          .from("website_generations")
+          .insert(coreRow)
+          .select("*")
+          .single();
+        result = {
+          data: (coreInsert.data as WebsiteGeneration | null) ?? null,
+          error: coreInsert.error,
+        };
+      } else if (fkOrNull) {
+        const cleared = await args.supabase
+          .from("website_generations")
+          .insert({
+            ...phase5Row,
+            project_id: null,
+            parent_generation_id: null,
+            token_usage: tokenUsage,
+            prompt_versions: promptVersions,
+            attachments: [],
+          })
+          .select("*")
+          .single();
+        result = {
+          data: (cleared.data as WebsiteGeneration | null) ?? null,
+          error: cleared.error,
+        };
+      }
     }
   }
 

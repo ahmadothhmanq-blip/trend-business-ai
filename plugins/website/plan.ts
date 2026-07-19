@@ -81,28 +81,49 @@ function blueprintFromStrategy(
   strategy: Awaited<ReturnType<typeof buildWebsiteStrategy>>,
   design: Awaited<ReturnType<typeof buildDesignSystem>>,
 ): WebsiteProjectBlueprint {
+  const pages = Array.isArray(strategy.pages) ? strategy.pages : [];
+  const sectionPlan = Array.isArray(strategy.sectionPlan)
+    ? strategy.sectionPlan
+    : [];
+  const contentStructure = Array.isArray(strategy.contentStructure)
+    ? strategy.contentStructure
+    : Array.isArray(strategy.contentStrategy?.sections)
+      ? strategy.contentStrategy.sections
+      : [];
+  const ctas = Array.isArray(strategy.ctas) ? strategy.ctas : [];
+  const seoFocus = Array.isArray(strategy.seoFocus) ? strategy.seoFocus : [];
+  const conversionFunnel = Array.isArray(strategy.conversionFunnel)
+    ? strategy.conversionFunnel
+    : [];
+  const typeScale = Array.isArray(design.typography.scale)
+    ? design.typography.scale
+    : [];
+  const components = Array.isArray(design.componentPalette)
+    ? design.componentPalette
+    : [];
+
   return {
     title: analysis.businessProfile.projectName || analysis.projectName,
     description:
       strategy.positioning ||
       analysis.businessProfile.summary ||
       analysis.businessProfile.offer,
-    pages: strategy.pages.map((p) => p.name),
-    sections: strategy.sectionPlan.map((s) => `${s.page}: ${s.name}`),
+    pages: pages.map((p) => p.name),
+    sections: sectionPlan.map((s) => `${s.page}: ${s.name}`),
     colorPalette: designSystemToPalette(design),
     typography: [
       design.typography.headingFont,
       design.typography.bodyFont,
-      ...design.typography.scale,
+      ...typeScale,
     ],
-    components: design.componentPalette,
+    components,
     content: [
       analysis.businessProfile.offer,
-      ...strategy.contentStructure,
-      ...strategy.ctas,
+      ...contentStructure,
+      ...ctas,
     ],
-    seo: strategy.seoFocus,
-    roadmap: strategy.conversionFunnel,
+    seo: seoFocus,
+    roadmap: conversionFunnel,
   };
 }
 
@@ -111,7 +132,53 @@ export type PlanWebsiteOptions = {
   strategy?: WebsitePlanResult["strategy"];
   /** When set with strategy, skip design AI call. */
   designSystem?: WebsitePlanResult["designSystem"];
+  /** AI Design Renderer Engine — concrete component paths to force into file plan. */
+  designRenderComponentPaths?: string[];
 };
+
+function injectRendererComponentFiles(
+  files: PlannedFile[],
+  componentPaths: string[] | undefined,
+): PlannedFile[] {
+  const byPath = new Map(files.map((f) => [f.path, f]));
+  // Shared Professional Components Library primitives.
+  if (!byPath.has("components/ui/section-shell.tsx")) {
+    byPath.set("components/ui/section-shell.tsx", {
+      path: "components/ui/section-shell.tsx",
+      purpose:
+        "Reusable SectionShell primitive from Professional Components Library",
+      language: "tsx",
+      category: "components",
+    });
+  }
+  if (!byPath.has("components/ui/motion.tsx")) {
+    byPath.set("components/ui/motion.tsx", {
+      path: "components/ui/motion.tsx",
+      purpose: "Motion helper for premium section entrance animations",
+      language: "tsx",
+      category: "components",
+    });
+  }
+  if (!componentPaths?.length) {
+    return sortFilesByDependency(
+      capPlannedFiles([...byPath.values()], MAX_WEBSITE_FILES),
+    );
+  }
+  for (const rawPath of componentPaths.slice(0, 18)) {
+    const path = sanitizeProjectPath(rawPath);
+    if (!path || byPath.has(path)) continue;
+    const name = path.split("/").pop()?.replace(/\.tsx?$/, "") || "section";
+    byPath.set(path, {
+      path,
+      purpose: `Professional Components Library section (${name}) — Design Renderer`,
+      language: "tsx",
+      category: "components",
+    });
+  }
+  return sortFilesByDependency(
+    capPlannedFiles([...byPath.values()], MAX_WEBSITE_FILES),
+  );
+}
 
 export async function planWebsite(
   input: WebsiteGenerationInput,
@@ -141,7 +208,9 @@ export async function planWebsite(
 Strategy: ${JSON.stringify(strategy)}
 DesignSystem: ${JSON.stringify(designSystem)}
 
-Align blueprint pages/sections/colors/typography with Strategy and DesignSystem.`,
+Align blueprint pages/sections/colors/typography with Strategy and DesignSystem.
+Prefer DesignSystem.componentPalette as real React components under components/sections/ and components/layout/.
+Section order must follow Strategy.sectionPlan (Design Renderer output).`,
       schema: websiteBlueprintSchema,
       maxAttempts: 3,
       validate: validateWebsiteBlueprint,
@@ -157,6 +226,19 @@ Align blueprint pages/sections/colors/typography with Strategy and DesignSystem.
     }
     if (!blueprint.pages?.length) {
       blueprint.pages = strategy.pages.map((p) => p.name);
+    }
+    if (designSystem.componentPalette?.length) {
+      blueprint.components = Array.from(
+        new Set([
+          ...(blueprint.components ?? []),
+          ...designSystem.componentPalette,
+        ]),
+      );
+    }
+    if (strategy.sectionPlan?.length) {
+      blueprint.sections = strategy.sectionPlan.map(
+        (s) => `${s.page}: ${s.name}`,
+      );
     }
   } catch (error) {
     console.error("blueprint generation failed; deriving from strategy/design", error);
@@ -186,22 +268,27 @@ Align blueprint pages/sections/colors/typography with Strategy and DesignSystem.
 
 Strategy sitemap: ${JSON.stringify(strategy.sitemap)}
 Design pattern: ${designSystem.industryPattern}
-Prefer pages matching strategy paths. Inject design tokens via app/globals.css.`,
+Prefer pages matching strategy paths. Inject design tokens via app/globals.css.
+Must include Design Renderer components as separate files when listed in DesignSystem.componentPalette:
+${JSON.stringify(options?.designRenderComponentPaths ?? designSystem.componentPalette ?? [])}`,
     schema: websiteDynamicPlanSchema,
     maxAttempts: 3,
     validate: validateWebsiteDynamicPlan,
   });
 
   const flags = getCapabilityFlags(analysis);
-  const filePlans = normalizePlannedFiles(
-    {
-      ...dynamicPlan,
-      estimatedFileCount: Math.min(
-        dynamicPlan.estimatedFileCount || MAX_WEBSITE_FILES,
-        MAX_WEBSITE_FILES,
-      ),
-    },
-    flags,
+  const filePlans = injectRendererComponentFiles(
+    normalizePlannedFiles(
+      {
+        ...dynamicPlan,
+        estimatedFileCount: Math.min(
+          dynamicPlan.estimatedFileCount || MAX_WEBSITE_FILES,
+          MAX_WEBSITE_FILES,
+        ),
+      },
+      flags,
+    ),
+    options?.designRenderComponentPaths,
   );
 
   return {

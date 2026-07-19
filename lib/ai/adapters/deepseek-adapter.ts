@@ -16,7 +16,7 @@ import { getDeepSeekTimeoutMs } from "@/lib/ai/timeouts";
 import { logger } from "@/lib/logger";
 import { withTiming } from "@/lib/perf/timing";
 
-const DEEPSEEK_RETRY_DELAYS_MS = [2000, 4000, 8000] as const;
+const DEEPSEEK_RETRY_DELAYS_MS = [2000, 4000, 8000, 12000] as const;
 const DEFAULT_MODEL = "deepseek-chat";
 const DEEPSEEK_BASE_URL = "https://api.deepseek.com";
 /** Partial stream body long enough to treat a disconnect as recoverable content. */

@@ -41,8 +41,12 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
+      // Deny framing site-wide, except Website Builder preview APIs (D-017).
+      // Those routes set X-Frame-Options: SAMEORIGIN themselves so the
+      // dashboard iframe can load live preview without Chrome's
+      // "localhost refused to connect" framing error.
       {
-        source: "/((?!api/website-builder/preview).*)",
+        source: "/((?!api/website-builder/).*)",
         headers: [
           { key: "X-Frame-Options", value: "DENY" },
           { key: "X-Content-Type-Options", value: "nosniff" },
@@ -55,6 +59,21 @@ const nextConfig: NextConfig = {
             key: "Strict-Transport-Security",
             value: "max-age=63072000; includeSubDomains; preload",
           },
+        ],
+      },
+      {
+        source: "/api/website-builder/:id/live-preview",
+        headers: [
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "same-origin" },
+        ],
+      },
+      {
+        source: "/api/website-builder/preview/:path*",
+        headers: [
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
         ],
       },
       {

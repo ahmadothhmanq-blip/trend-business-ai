@@ -4,6 +4,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { readSseStream } from "@/lib/api/sse-client";
+import {
+  CLIENT_STREAM_RECOVERY_INTERVAL_MS,
+  CLIENT_STREAM_RECOVERY_POLL_MS,
+} from "@/lib/ai/timeouts";
 import { CoreProgressStepper } from "@/components/dashboard/one-prompt";
 import { useCoreProgress } from "@/components/dashboard/one-prompt/use-core-progress";
 import { getOnePromptProduct } from "@/lib/constants/one-prompt-products";
@@ -50,8 +54,41 @@ import {
 import type { GeneratedProjectFile, GeneratedWebsiteProject } from "@/lib/website-generator";
 import { getProductDefinition } from "@/lib/products/registry";
 import type { ProductDefinition, ProductId } from "@/lib/products/types";
-import type { GenerationMode, PromptVersion, WebsiteGeneration } from "@/types/database";
+import type {
+  GenerationMode,
+  GenerationStatus,
+  PromptVersion,
+  WebsiteGeneration,
+} from "@/types/database";
 import { cn } from "@/lib/utils";
+import { VisualWebsiteEditor } from "@/components/dashboard/visual-editor/visual-website-editor";
+import { AnalyticsIntelligencePanel } from "@/components/dashboard/website-builder/analytics-intelligence-panel";
+import { ExperimentsPanel } from "@/components/dashboard/website-builder/experiments-panel";
+import { SeoAgentPanel } from "@/components/dashboard/website-builder/seo-agent-panel";
+import { DeploymentDashboardPanel } from "@/components/dashboard/website-builder/deployment-dashboard-panel";
+import {
+  TemplateDetailsDialog,
+  TemplateSelectionPanel,
+  TemplateSelectionRail,
+  type TemplateUsePayload,
+} from "@/components/dashboard/website-builder/template-selection-panel";
+import {
+  TemplateIntelligencePanel,
+  type TemplateIntelligenceChoice,
+} from "@/components/dashboard/website-builder/template-intelligence-panel";
+import { WebsiteIntelligencePanel } from "@/components/dashboard/website-builder/website-intelligence-panel";
+import { BrandKitPanel } from "@/components/dashboard/website-builder/brand-kit-panel";
+import type { MarketplaceTemplate } from "@/lib/ai-core/template-marketplace";
+
+type OutputTab =
+  | "preview"
+  | "code"
+  | "canvas"
+  | "analytics"
+  | "experiments"
+  | "seo"
+  | "deploy"
+  | "intelligence";
 
 type WebsiteBuilderToolProps = {
   /** Serializable product id only — never pass ProductDefinition (contains LucideIcon). */
@@ -73,6 +110,8 @@ type WorkspaceProject = {
   generatedProject?: GeneratedWebsiteProject;
   build?: PreviewBuildState;
   mode?: GenerationMode;
+  status?: GenerationStatus;
+  errorMessage?: string | null;
   parentGenerationId?: string | null;
   projectId?: string | null;
   promptVersions?: PromptVersion[];
@@ -103,7 +142,15 @@ const PROJECT_TYPES = [
 
 const DESIGN_STYLES = ["Luxury", "Minimal", "Corporate", "Startup", "Modern", "Glass", "Dark", "Light"] as const;
 const COLOR_THEMES = ["Gold", "Blue", "Purple", "Green", "Custom"] as const;
-const LANGUAGES = ["English", "Arabic", "Bilingual"] as const;
+const LANGUAGES = [
+  "English",
+  "Arabic",
+  "Bilingual",
+  "Spanish",
+  "French",
+  "German",
+  "Portuguese",
+] as const;
 const FEATURES = [
   "Authentication",
   "Dashboard",
@@ -187,10 +234,69 @@ function toProject(generation: WebsiteGeneration): WorkspaceProject {
     generatedProject,
     build: { status: "idle" },
     mode: generation.mode,
+    status: generation.status,
+    errorMessage: generation.error_message,
     parentGenerationId: generation.parent_generation_id,
     projectId: generation.project_id,
     promptVersions: generation.prompt_versions,
   };
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+/** After SSE disconnect, poll the saved generation until it finishes or times out. */
+async function recoverGenerationAfterDisconnect(
+  generationId: string,
+  onStatus: (message: string) => void,
+): Promise<{ project: GeneratedWebsiteProject; generation: WebsiteGeneration } | null> {
+  const deadline = Date.now() + CLIENT_STREAM_RECOVERY_POLL_MS;
+  onStatus("Connection interrupted — recovering saved progress…");
+
+  while (Date.now() < deadline) {
+    try {
+      const response = await fetch(`/api/website-builder/${generationId}`);
+      if (response.ok) {
+        const data = (await response.json()) as {
+          generation?: WebsiteGeneration;
+        };
+        const generation = data.generation;
+        if (generation?.status === "completed" && generation.blueprint) {
+          const project = isGeneratedWebsiteProject(generation.blueprint)
+            ? generation.blueprint
+            : null;
+          if (project?.files?.length) {
+            return { project, generation };
+          }
+        }
+        if (generation?.status === "failed") {
+          onStatus(
+            generation.error_message ||
+              "Generation failed — you can Resume from saved progress.",
+          );
+          return null;
+        }
+        if (generation?.status === "running") {
+          const fileCount = Array.isArray(
+            (generation.blueprint as { files?: unknown[] } | null)?.files,
+          )
+            ? ((generation.blueprint as { files: unknown[] }).files.length)
+            : 0;
+          onStatus(
+            fileCount > 0
+              ? `Still generating on server… ${fileCount} files saved`
+              : "Still generating on server…",
+          );
+        }
+      }
+    } catch {
+      // keep polling
+    }
+    await sleep(CLIENT_STREAM_RECOVERY_INTERVAL_MS);
+  }
+
+  return null;
 }
 
 function resolveInitialProjectType(
@@ -201,6 +307,51 @@ function resolveInitialProjectType(
     return candidate as (typeof PROJECT_TYPES)[number];
   }
   return "Web Application";
+}
+
+function mapMarketplaceStyleToDesignStyle(
+  style: string,
+): (typeof DESIGN_STYLES)[number] | null {
+  const key = style.toLowerCase().replace(/_/g, "-");
+  if (key === "luxury") return "Luxury";
+  if (key === "minimal") return "Minimal";
+  if (key === "corporate") return "Corporate";
+  if (key === "modern" || key === "creative") return "Modern";
+  if (key === "premium-saas" || key === "technology") return "Startup";
+  return null;
+}
+
+function mapIndustryToProjectType(
+  industry: string,
+): (typeof PROJECT_TYPES)[number] | null {
+  const key = industry.toLowerCase().replace(/_/g, "-");
+  if (key === "restaurant") return "Restaurant";
+  if (key === "healthcare" || key === "clinic") return "Clinic";
+  if (key === "real-estate") return "Real Estate";
+  if (key === "education") return "Education";
+  if (key === "saas") return "AI SaaS";
+  if (key === "ecommerce") return "E-commerce";
+  if (key === "agency" || key === "luxury-business" || key === "automotive") {
+    return "Business Website";
+  }
+  return null;
+}
+
+function buildBriefFromTemplate(payload: TemplateUsePayload): string {
+  return [
+    `Build a ${payload.name} website.`,
+    payload.tagline,
+    payload.description,
+    `Industry: ${payload.industry}. Style: ${payload.style}. Layout: ${payload.layoutType}.`,
+    payload.features.length
+      ? `Include: ${payload.features.slice(0, 8).join(", ")}.`
+      : "",
+    payload.components.length
+      ? `Preferred sections: ${payload.components.join(", ")}.`
+      : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 }
 
 export function WebsiteBuilderTool({
@@ -217,6 +368,30 @@ export function WebsiteBuilderTool({
     setProjectBrief(idea);
   }, []);
   useIdeaQueryParam(applyIdea);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+  const [marketplaceTemplateId, setMarketplaceTemplateId] = useState<string | null>(
+    null,
+  );
+  const [templateStyle, setTemplateStyle] = useState<string | null>(null);
+  const [designPreset, setDesignPreset] = useState<string | null>(null);
+  const [templateIndustry, setTemplateIndustry] = useState<string | null>(null);
+  const [templateComponents, setTemplateComponents] = useState<string[]>([]);
+  const [templateDesignSystem, setTemplateDesignSystem] = useState<
+    TemplateUsePayload["designSystem"] | null
+  >(null);
+  const [templateIntelligenceId, setTemplateIntelligenceId] = useState<
+    string | null
+  >(null);
+  const [templateIntelligenceCategory, setTemplateIntelligenceCategory] =
+    useState<string | null>(null);
+  const [brandIdentityId, setBrandIdentityId] = useState<string | null>(null);
+  const [autoDesignHint, setAutoDesignHint] = useState<string | null>(null);
+  const [catalogTemplates, setCatalogTemplates] = useState<MarketplaceTemplate[]>(
+    [],
+  );
+  const [railDetailsTpl, setRailDetailsTpl] = useState<MarketplaceTemplate | null>(
+    null,
+  );
   const [projectType, setProjectType] = useState<(typeof PROJECT_TYPES)[number]>(
     () => resolveInitialProjectType(product),
   );
@@ -224,6 +399,31 @@ export function WebsiteBuilderTool({
   const [colorTheme, setColorTheme] = useState<(typeof COLOR_THEMES)[number]>("Gold");
   const [language, setLanguage] = useState<(typeof LANGUAGES)[number]>("English");
   const [features, setFeatures] = useState<string[]>(["Dashboard", "Booking", "Admin Panel"]);
+
+  // Template Marketplace handoff: ?templateId=&marketplaceTemplateId=&templateStyle=
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const tid = params.get("templateId")?.trim();
+    const mid = params.get("marketplaceTemplateId")?.trim();
+    const style = params.get("templateStyle")?.trim();
+    const preset = params.get("designPreset")?.trim();
+    if (tid) setSelectedTemplateId(tid);
+    if (mid) setMarketplaceTemplateId(mid);
+    if (style) {
+      setTemplateStyle(style);
+      const mapped = mapMarketplaceStyleToDesignStyle(style);
+      if (mapped) setDesignStyle(mapped);
+    }
+    if (preset) setDesignPreset(preset);
+    if (tid || mid) {
+      setStreamStatus(
+        mid
+          ? `Marketplace template selected: ${mid}`
+          : `Template selected: ${tid}`,
+      );
+    }
+  }, []);
   const [advancedOpen, setAdvancedOpen] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
@@ -231,7 +431,10 @@ export function WebsiteBuilderTool({
   const [streamStatus, setStreamStatus] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [selectedFilePath, setSelectedFilePath] = useState<string>("");
-  const [outputTab, setOutputTab] = useState<"preview" | "code">("preview");
+  const [outputTab, setOutputTab] = useState<OutputTab>(
+    "preview",
+  );
+  const [previewRevision, setPreviewRevision] = useState(0);
   const [fileSearch, setFileSearch] = useState("");
   const [renameOpen, setRenameOpen] = useState(false);
   const [renameValue, setRenameValue] = useState("");
@@ -401,21 +604,32 @@ export function WebsiteBuilderTool({
   async function createInterfaceProject(options?: {
     regenerate?: boolean;
     continue?: boolean;
+    /** Resume an incomplete / failed generation from saved partial files. */
+    resume?: boolean;
     /** AI Website Optimizer Engine — audit + apply fixes */
     optimize?: boolean;
+    /** Start a new project from a marketplace template selection. */
+    fromTemplate?: TemplateUsePayload;
   }) {
-    const mode = options?.continue || options?.optimize
+    const tpl = options?.fromTemplate;
+    const mode = options?.resume
       ? "continue"
-      : options?.regenerate
-        ? "regenerate"
-        : "generate";
+      : options?.continue || options?.optimize
+        ? "continue"
+        : options?.regenerate
+          ? "regenerate"
+          : "generate";
 
     if (mode === "continue") {
       if (!activeProject?.id) {
         toast.error("Select a saved website first.");
         return;
       }
-      if (!options?.optimize && !projectBrief.trim()) {
+      if (
+        !options?.optimize &&
+        !options?.resume &&
+        !projectBrief.trim()
+      ) {
         toast.error("Describe the changes you want, or run Optimize website.");
         setEditMode(true);
         return;
@@ -424,10 +638,16 @@ export function WebsiteBuilderTool({
 
     const optimizeInstruction =
       "[optimize] Improve headlines, CTA buttons, service descriptions, layout structure, mobile responsiveness, conversion, and brand consistency.";
+    const resumeInstruction =
+      "[resume] Finish the incomplete website generation. Reuse already generated files, complete missing files, and finalize the project without starting over.";
 
+    const templateBrief = tpl ? buildBriefFromTemplate(tpl) : null;
     const brief =
+      templateBrief ||
       projectBrief.trim() ||
-      (mode === "regenerate" ? activeProject?.description.trim() : "") ||
+      (mode === "regenerate" || options?.resume
+        ? activeProject?.description.trim()
+        : "") ||
       productTemplates[0] ||
       "I need a luxury real estate website with booking, clear services pages, and a premium brand look.";
 
@@ -435,29 +655,143 @@ export function WebsiteBuilderTool({
       setProjectBrief(activeProject.description);
     }
 
+    const resolvedTemplateId = tpl?.templateId ?? selectedTemplateId;
+    const resolvedMarketplaceId =
+      tpl?.marketplaceTemplateId ?? marketplaceTemplateId;
+    const resolvedStyle = tpl?.style ?? templateStyle;
+    const resolvedPreset = tpl?.designPreset ?? designPreset;
+    const resolvedIndustry = tpl?.industry ?? templateIndustry;
+    const resolvedComponents = tpl?.components?.length
+      ? tpl.components
+      : templateComponents;
+    const resolvedDesignSystem = tpl?.designSystem ?? templateDesignSystem;
+    const resolvedThemeStyle = resolvedStyle
+      ? ` ${resolvedStyle}`
+      : templateStyle
+        ? ` ${templateStyle}`
+        : "";
+    const resolvedProjectType =
+      (tpl?.industry ? mapIndustryToProjectType(tpl.industry) : null) ||
+      projectType;
+
     setIsGenerating(true);
     setApiError(null);
+    setOutputTab("preview");
+
+    let autoTiId = templateIntelligenceId;
+    let autoTiCategory = templateIntelligenceCategory;
+    let autoPreset = resolvedPreset;
+    let autoComponents = resolvedComponents;
+    let autoTemplateId = resolvedTemplateId;
+    let autoHint: string | null = autoDesignHint;
+
+    // Phase 1 — Auto Design when no explicit template chosen
+    if (
+      !tpl &&
+      !templateIntelligenceId &&
+      mode === "generate" &&
+      !options?.resume &&
+      !options?.optimize
+    ) {
+      try {
+        setStreamStatus(
+          "AI Auto Design: analyzing industry, audience & brand style…",
+        );
+        const autoRes = await fetch("/api/website-builder/design-platform", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            prompt: brief,
+            language,
+            brandStyle: designStyle,
+            industry: templateIndustry || undefined,
+          }),
+        });
+        if (autoRes.ok) {
+          const autoData = (await autoRes.json()) as {
+            decision?: {
+              templateIntelligenceId: string;
+              vertical: string;
+              family: string;
+              reason: string;
+              designPreset: string;
+              components: string[];
+              premiumTemplateId?: string;
+            };
+          };
+          if (autoData.decision) {
+            autoTiId = autoData.decision.templateIntelligenceId;
+            autoTiCategory = autoData.decision.family;
+            autoPreset = autoData.decision.designPreset || autoPreset;
+            if (autoData.decision.components?.length) {
+              autoComponents = autoData.decision.components;
+            }
+            if (autoData.decision.premiumTemplateId) {
+              autoTemplateId = autoData.decision.premiumTemplateId;
+            }
+            autoHint = `${autoData.decision.vertical} · ${autoData.decision.family} — ${autoData.decision.reason}`;
+            setTemplateIntelligenceId(autoTiId);
+            setTemplateIntelligenceCategory(autoTiCategory);
+            if (autoPreset) setDesignPreset(autoPreset);
+            if (autoComponents.length) setTemplateComponents(autoComponents);
+            if (autoTemplateId) setSelectedTemplateId(autoTemplateId);
+            setAutoDesignHint(autoHint);
+          }
+        }
+      } catch {
+        // Runner still auto-designs server-side
+      }
+    }
+
     setStreamStatus(
       options?.optimize
         ? "Running AI Website Optimizer…"
-        : "Connecting to AI website engine...",
+        : options?.resume
+          ? "Resuming generation from saved progress…"
+          : tpl
+            ? `Creating website from template: ${tpl.name}…`
+            : autoHint || "Connecting to AI website engine...",
     );
 
     const requestBody = {
       prompt: mode === "continue" ? activeProject?.description || brief : brief,
-      projectType,
+      projectType: resolvedProjectType,
       language,
-      theme: `${colorTheme} ${designStyle}`,
-      features: [...features, ...(product?.id ? [`product:${product.id}`] : [])],
+      theme: `${colorTheme} ${designStyle}${resolvedThemeStyle}`,
+      features: [
+        ...features,
+        ...(product?.id ? [`product:${product.id}`] : []),
+        ...(autoTemplateId ? [`template:${autoTemplateId}`] : []),
+        ...(resolvedMarketplaceId
+          ? [`marketplace:${resolvedMarketplaceId}`]
+          : []),
+        ...(autoComponents.length
+          ? autoComponents.map((c) => `component:${c}`)
+          : []),
+      ],
       productId: product?.id ?? "website-builder",
-      projectId: activeProject?.projectId ?? undefined,
-      mode,
+      projectId: tpl ? undefined : activeProject?.projectId ?? undefined,
+      templateId: autoTemplateId || undefined,
+      marketplaceTemplateId: resolvedMarketplaceId || undefined,
+      templateStyle: resolvedStyle || undefined,
+      designPreset: autoPreset || undefined,
+      industryId: resolvedIndustry || undefined,
+      components: autoComponents.length ? autoComponents : undefined,
+      designSystem: resolvedDesignSystem || undefined,
+      templateIntelligenceId: autoTiId || undefined,
+      templateIntelligenceCategory: autoTiCategory || undefined,
+      brandIdentityId: brandIdentityId || undefined,
+      locale: language || undefined,
+      mode: tpl ? "generate" : mode,
       parentGenerationId:
-        mode === "generate" ? undefined : activeProject?.id,
+        tpl || mode === "generate" ? undefined : activeProject?.id,
       continueInstruction:
-        mode === "continue"
-          ? projectBrief.trim() || (options?.optimize ? optimizeInstruction : undefined)
-          : undefined,
+        tpl || mode !== "continue"
+          ? undefined
+          : options?.resume
+            ? resumeInstruction
+            : projectBrief.trim() ||
+              (options?.optimize ? optimizeInstruction : undefined),
       optimizeWithAi: Boolean(options?.optimize),
     };
 
@@ -484,7 +818,7 @@ export function WebsiteBuilderTool({
     };
 
     try {
-      let completed = false;
+      let sessionGenerationId: string | null = null;
       const streamResponse = await fetch("/api/website-builder/stream", {
         method: "POST",
         headers: {
@@ -495,27 +829,80 @@ export function WebsiteBuilderTool({
       });
 
       if (streamResponse.ok && streamResponse.body) {
-        await readSseStream<{
+        const sseResult = await readSseStream<{
           project?: GeneratedWebsiteProject;
           generation?: WebsiteGeneration;
           message?: string;
+          generationId?: string;
         }>(streamResponse, {
           onProgress: (message) => {
             setStreamStatus(message);
+          },
+          onSession: (generationId) => {
+            sessionGenerationId = generationId;
           },
           onComplete: (payload) => {
             if (!payload.project || !payload.generation?.id) {
               throw new Error("AI engine did not return a saved generation.");
             }
-            completed = true;
             applySavedGeneration(payload.project, payload.generation);
+            setPreviewRevision((n) => n + 1);
           },
           onError: (message) => {
-            throw new Error(message);
+            setApiError(message);
+            setStreamStatus(message);
           },
         });
-        if (!completed) {
-          throw new Error("Stream ended before generation completed.");
+
+        if (sseResult.generationId) {
+          sessionGenerationId = sseResult.generationId;
+        }
+
+        if (!sseResult.completed) {
+          // Stream dropped — recover from the running/completed session row.
+          if (sessionGenerationId) {
+            const recovered = await recoverGenerationAfterDisconnect(
+              sessionGenerationId,
+              setStreamStatus,
+            );
+            if (recovered) {
+              applySavedGeneration(recovered.project, recovered.generation);
+              setPreviewRevision((n) => n + 1);
+              setApiError(null);
+            } else {
+              // Keep partial project selectable for Resume.
+              try {
+                const detail = await fetch(
+                  `/api/website-builder/${sessionGenerationId}`,
+                );
+                if (detail.ok) {
+                  const data = (await detail.json()) as {
+                    generation?: WebsiteGeneration;
+                  };
+                  if (data.generation) {
+                    const partial = toProject(data.generation);
+                    setActiveProject(partial);
+                    setProjects((items) =>
+                      [partial, ...items.filter((p) => p.id !== partial.id)].slice(
+                        0,
+                        24,
+                      ),
+                    );
+                  }
+                }
+              } catch {
+                // ignore
+              }
+              throw new Error(
+                sseResult.error ||
+                  "Stream ended before generation completed. Progress was saved — click Resume generation.",
+              );
+            }
+          } else {
+            throw new Error(
+              sseResult.error || "Stream ended before generation completed.",
+            );
+          }
         }
       } else if (
         // Only fall back when the stream route is missing — never after a charged
@@ -539,6 +926,7 @@ export function WebsiteBuilderTool({
         }
 
         applySavedGeneration(data.project, data.generation);
+        setPreviewRevision((n) => n + 1);
       } else {
         let detail = `Unable to generate website (${streamResponse.status}).`;
         try {
@@ -556,6 +944,149 @@ export function WebsiteBuilderTool({
           : "Unable to generate website application.",
       );
       setStreamStatus(null);
+    } finally {
+      setIsGenerating(false);
+      window.setTimeout(() => setStreamStatus(null), 1200);
+    }
+  }
+
+  const handleCatalogLoaded = useCallback((templates: MarketplaceTemplate[]) => {
+    setCatalogTemplates(templates);
+  }, []);
+
+  function clearTemplateSelection() {
+    setSelectedTemplateId(null);
+    setMarketplaceTemplateId(null);
+    setTemplateStyle(null);
+    setDesignPreset(null);
+    setTemplateIndustry(null);
+    setTemplateComponents([]);
+    setTemplateDesignSystem(null);
+    setTemplateIntelligenceId(null);
+    setTemplateIntelligenceCategory(null);
+    setBrandIdentityId(null);
+    setAutoDesignHint(null);
+    setStreamStatus(null);
+  }
+
+  function handleTemplateIntelligenceSelect(choice: TemplateIntelligenceChoice) {
+    setTemplateIntelligenceId(choice.templateIntelligenceId);
+    setTemplateIntelligenceCategory(choice.category);
+    if (choice.designPreset) setDesignPreset(choice.designPreset);
+    if (choice.designStyle) {
+      const mapped = mapMarketplaceStyleToDesignStyle(choice.designStyle);
+      if (mapped) setDesignStyle(mapped);
+      else setTemplateStyle(choice.designStyle);
+    }
+    if (choice.premiumTemplateId) {
+      setSelectedTemplateId(choice.premiumTemplateId);
+    }
+    if (choice.components.length) {
+      setTemplateComponents(choice.components);
+    }
+    toast.success(`Template Intelligence: ${choice.name}`);
+  }
+
+  function handleTemplateIntelligenceApplied(payload: {
+    generation: unknown;
+    project: unknown;
+  }) {
+    const generation = payload.generation as WebsiteGeneration;
+    const project = payload.project as GeneratedWebsiteProject;
+    if (!generation?.id || !project) return;
+    const nextProject = toProject({
+      ...generation,
+      blueprint: project as unknown as WebsiteGeneration["blueprint"],
+    });
+    setActiveProject(nextProject);
+    setSelectedFilePath(
+      project.files.find((f) => f.path.includes("preview/"))?.path ||
+        project.files[0]?.path ||
+        "",
+    );
+    setOutputTab("preview");
+    setPreviewRevision((n) => n + 1);
+    setProjects((items) =>
+      [nextProject, ...items.filter((p) => p.id !== nextProject.id)].slice(0, 24),
+    );
+    toast.success("Visual template applied — content & images preserved.");
+  }
+
+  function handleUseTemplate(payload: TemplateUsePayload) {
+    setSelectedTemplateId(payload.templateId);
+    setMarketplaceTemplateId(payload.marketplaceTemplateId);
+    setTemplateStyle(payload.style);
+    setDesignPreset(payload.designPreset);
+    setTemplateIndustry(payload.industry);
+    setTemplateComponents(payload.components);
+    setTemplateDesignSystem(payload.designSystem);
+    setProjectBrief(buildBriefFromTemplate(payload));
+    setEditMode(false);
+    setRailDetailsTpl(null);
+    const mappedStyle = mapMarketplaceStyleToDesignStyle(payload.style);
+    if (mappedStyle) setDesignStyle(mappedStyle);
+    const mappedType = mapIndustryToProjectType(payload.industry);
+    if (mappedType) setProjectType(mappedType);
+    setOutputTab("preview");
+    toast.success(`Using template: ${payload.name}`);
+    void createInterfaceProject({ fromTemplate: payload });
+  }
+
+  async function applyWebsiteEditorEdit(params: {
+    generationId: string;
+    command: string;
+    suggestionId?: string;
+  }) {
+    setIsGenerating(true);
+    setApiError(null);
+    setStreamStatus("Website Editor Intelligence: applying edit…");
+    try {
+      const response = await fetch(
+        `/api/website-builder/${params.generationId}/edit`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            command: params.command,
+            suggestionId: params.suggestionId,
+            applyAi: true,
+          }),
+        },
+      );
+      const data = (await response.json()) as {
+        project?: GeneratedWebsiteProject;
+        generation?: WebsiteGeneration;
+        editResult?: { summary?: string };
+        error?: string;
+        message?: string;
+      };
+      if (!response.ok || !data.project || !data.generation) {
+        throw new Error(data.error ?? "Unable to edit website.");
+      }
+      const nextProject = toProject({
+        ...data.generation,
+        blueprint: data.project as unknown as WebsiteGeneration["blueprint"],
+      });
+      setActiveProject(nextProject);
+      setSelectedFilePath(
+        data.project.files.find((f) => f.path.includes("preview/"))?.path ||
+          data.project.files[0]?.path ||
+          "",
+      );
+      setOutputTab("preview");
+      setProjects((items) =>
+        [nextProject, ...items.filter((p) => p.id !== nextProject.id)].slice(
+          0,
+          24,
+        ),
+      );
+      setStreamStatus("Website edit saved.");
+      toast.success(data.editResult?.summary || data.message || "Website edited.");
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unable to edit website.";
+      setApiError(message);
+      toast.error(message);
     } finally {
       setIsGenerating(false);
       window.setTimeout(() => setStreamStatus(null), 1200);
@@ -759,13 +1290,19 @@ export function WebsiteBuilderTool({
   }
 
   function refreshPreview() {
-    if (activeProject) {
-      void buildGeneratedProject(activeProject);
+    if (!activeProject) return;
+    // Prefer in-platform static live preview (D-017). npm compile builder stays off.
+    if (!LIVE_PREVIEW_ENABLED) {
+      setPreviewRevision((n) => n + 1);
+      return;
     }
+    void buildGeneratedProject(activeProject);
   }
 
   function openPreviewInNewTab() {
-    const previewUrl = activeProject?.build?.previewUrl;
+    const previewUrl =
+      activeProject?.build?.previewUrl ||
+      (activeProject?.id ? livePreviewSrc(activeProject.id) : "");
 
     if (previewUrl) {
       window.open(previewUrl, "_blank", "noopener,noreferrer");
@@ -843,6 +1380,77 @@ export function WebsiteBuilderTool({
                 Previous version stays in history. Example: “Change colors to navy and gold, add a Pricing page, tighten the hero copy.”
               </div>
             ) : null}
+            {!editMode && autoDesignHint ? (
+              <div className="mt-4 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-100">
+                <p className="font-semibold text-white">AI Auto Design ready</p>
+                <p className="text-[12px] text-white/55">{autoDesignHint}</p>
+              </div>
+            ) : null}
+            {!editMode && (marketplaceTemplateId || selectedTemplateId) ? (
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-premium-gold/25 bg-premium-gold/10 px-4 py-3 text-sm text-premium-gold-light">
+                <div>
+                  <p className="font-semibold text-white">
+                    Marketplace template ready
+                  </p>
+                  <p className="text-[12px] text-white/55">
+                    {marketplaceTemplateId || selectedTemplateId}
+                    {templateStyle ? ` · ${templateStyle}` : ""}
+                    {templateIndustry ? ` · ${templateIndustry}` : ""}
+                    {" · "}seeds Design Intelligence, Brand Identity, Assets, Editor, Quality
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Link href="/dashboard/templates">
+                    <Button size="sm" variant="outline" className="border-white/15 text-white">
+                      Browse all
+                    </Button>
+                  </Link>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-white/15 text-white"
+                    onClick={clearTemplateSelection}
+                  >
+                    Clear
+                  </Button>
+                </div>
+              </div>
+            ) : !editMode && templateIntelligenceId ? (
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-premium-gold/25 bg-premium-gold/10 px-4 py-3 text-sm text-premium-gold-light">
+                <div>
+                  <p className="font-semibold text-white">
+                    Template Intelligence selected
+                  </p>
+                  <p className="text-[12px] text-white/55">
+                    {templateIntelligenceId}
+                    {templateIntelligenceCategory
+                      ? ` · ${templateIntelligenceCategory}`
+                      : ""}
+                    {" · "}auto layout, theme & components for generation
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-white/15 text-white"
+                  onClick={() => {
+                    setTemplateIntelligenceId(null);
+                    setTemplateIntelligenceCategory(null);
+                  }}
+                >
+                  Clear
+                </Button>
+              </div>
+            ) : !editMode ? (
+              <div className="mt-4">
+                <Link
+                  href="/dashboard/templates"
+                  className="text-[12px] font-medium text-premium-gold hover:underline"
+                >
+                  Browse Template Marketplace →
+                </Link>
+              </div>
+            ) : null}
             <Textarea
               value={projectBrief}
               onChange={(event) => setProjectBrief(event.target.value)}
@@ -873,36 +1481,81 @@ export function WebsiteBuilderTool({
                 </div>
               </div>
               <div>
-              <p className="mb-2 text-[12px] font-semibold tracking-wide text-white/45 uppercase">
-                Templates
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {productTemplates.map((template) => (
-                  <button
-                    key={template}
-                    type="button"
-                    onClick={() => setProjectBrief(template)}
-                    className={cn(
-                      "rounded-full border px-3 py-1.5 text-[12px] transition-all",
-                      projectBrief === template
-                        ? "border-premium-gold/35 bg-premium-gold/12 text-premium-gold-light"
-                        : "border-white/[0.08] bg-white/[0.03] text-white/45 hover:border-premium-gold/25 hover:text-white/75",
-                    )}
-                  >
-                    {template}
-                  </button>
-                ))}
+                <BrandKitPanel
+                  selectedId={brandIdentityId}
+                  disabled={isGenerating}
+                  onSelect={(kit) => {
+                    setBrandIdentityId(kit?.id || null);
+                    if (kit) toast.success(`Brand kit: ${kit.name}`);
+                  }}
+                />
               </div>
+              <div>
+                <TemplateIntelligencePanel
+                  selectedId={templateIntelligenceId}
+                  disabled={isGenerating}
+                  activeGenerationId={activeProject?.id || null}
+                  selectionContext={{
+                    businessType: projectType,
+                    industry: templateIndustry || projectType,
+                    brandStyle: designStyle,
+                    designStyle,
+                    prompt: projectBrief,
+                  }}
+                  onSelect={handleTemplateIntelligenceSelect}
+                  onApplied={handleTemplateIntelligenceApplied}
+                />
+              </div>
+              <div>
+                <TemplateSelectionPanel
+                  selectedMarketplaceId={marketplaceTemplateId}
+                  disabled={isGenerating}
+                  onUseTemplate={handleUseTemplate}
+                  onCatalogLoaded={handleCatalogLoaded}
+                />
               </div>
             </div>
+            ) : activeProject?.id ? (
+              <div className="mt-5">
+                <TemplateIntelligencePanel
+                  selectedId={templateIntelligenceId}
+                  disabled={isGenerating}
+                  activeGenerationId={activeProject.id}
+                  selectionContext={{
+                    businessType: projectType,
+                    industry: templateIndustry || projectType,
+                    brandStyle: designStyle,
+                    designStyle,
+                    prompt: projectBrief || activeProject.description,
+                  }}
+                  onSelect={handleTemplateIntelligenceSelect}
+                  onApplied={handleTemplateIntelligenceApplied}
+                />
+              </div>
             ) : null}
             {apiError && (
-              <p
+              <div
                 role="alert"
-                className="mt-4 rounded-2xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200"
+                className="mt-4 space-y-3 rounded-2xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200"
               >
-                {apiError}
-              </p>
+                <p>{apiError}</p>
+                {activeProject?.id &&
+                (activeProject.status === "failed" ||
+                  activeProject.status === "running" ||
+                  /resume/i.test(apiError)) ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={isGenerating}
+                    onClick={() => void createInterfaceProject({ resume: true })}
+                    className="border-red-300/30 bg-black/20 text-red-50 hover:bg-black/35"
+                  >
+                    <RefreshCw className="size-3.5" />
+                    Resume generation
+                  </Button>
+                ) : null}
+              </div>
             )}
             {actionError && (
               <p
@@ -1133,6 +1786,19 @@ export function WebsiteBuilderTool({
             <Wand2 className="size-5" />
             Improve with AI
           </Button>
+          {(activeProject?.status === "failed" ||
+            activeProject?.status === "running") && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => void createInterfaceProject({ resume: true })}
+              disabled={isGenerating || !activeProject?.id}
+              className="btn-ghost-gold h-14 w-full rounded-2xl text-base font-semibold sm:col-span-2 lg:col-span-3"
+            >
+              <RefreshCw className="size-5" />
+              Resume incomplete generation
+            </Button>
+          )}
             </>
           )}
           </div>
@@ -1155,6 +1821,7 @@ export function WebsiteBuilderTool({
         ) : (
           <PreviewAndExportPanel
             activeProject={activeProject}
+            previewRevision={previewRevision}
             onDownload={downloadProject}
             onImprove={() => {
               if (!activeProject?.id) return;
@@ -1176,6 +1843,17 @@ export function WebsiteBuilderTool({
           setProjectBrief(`${prefix} ${hint}`.trim());
           toast.message("Edit the instruction, then click Improve with AI.");
         }}
+        onApplyEditorSuggestion={(command, suggestionId) => {
+          if (!activeProject?.id) {
+            toast.error("Create or select a website first.");
+            return;
+          }
+          void applyWebsiteEditorEdit({
+            generationId: activeProject.id,
+            command,
+            suggestionId,
+          });
+        }}
       />
 
       <OutputWorkspace
@@ -1183,6 +1861,7 @@ export function WebsiteBuilderTool({
         outputTab={outputTab}
         onOutputTabChange={setOutputTab}
         previewEnabled={LIVE_PREVIEW_ENABLED}
+        previewRevision={previewRevision}
         files={activeFiles}
         selectedFile={activeFile}
         selectedFilePath={activeFile?.path ?? selectedFilePath}
@@ -1203,6 +1882,52 @@ export function WebsiteBuilderTool({
         }}
         onDelete={() => {
           if (activeProject) void deleteProject(activeProject.id);
+        }}
+        visualEditorDisabled={isGenerating}
+        onVisualEditorSaved={({ project: savedProject, generation }) => {
+          const nextProject = toProject({
+            ...generation,
+            blueprint:
+              savedProject as unknown as WebsiteGeneration["blueprint"],
+          });
+          setActiveProject(nextProject);
+          setProjects((items) =>
+            [nextProject, ...items.filter((p) => p.id !== nextProject.id)].slice(
+              0,
+              24,
+            ),
+          );
+          setPreviewRevision((n) => n + 1);
+          setSelectedFilePath(
+            savedProject.files.find((f) => f.path.includes("preview/"))?.path ||
+              savedProject.files[0]?.path ||
+              "",
+          );
+        }}
+        onSeoApplied={({ project: savedProject, generation }) => {
+          const nextProject = toProject({
+            ...generation,
+            blueprint:
+              savedProject as unknown as WebsiteGeneration["blueprint"],
+          });
+          setActiveProject(nextProject);
+          setProjects((items) =>
+            [nextProject, ...items.filter((p) => p.id !== nextProject.id)].slice(
+              0,
+              24,
+            ),
+          );
+          setPreviewRevision((n) => n + 1);
+          toast.success("SEO fix applied.");
+        }}
+        onIntelligenceApply={(command) => {
+          if (!activeProject?.id) return;
+          setEditMode(true);
+          setProjectBrief(command);
+          void applyWebsiteEditorEdit({
+            generationId: activeProject.id,
+            command,
+          });
         }}
         onFavorite={() => {
           if (activeProject) void toggleFavorite(activeProject.id);
@@ -1248,13 +1973,23 @@ export function WebsiteBuilderTool({
 
       <BottomWorkspace
         projects={projects}
-        templates={productTemplates}
+        catalogTemplates={catalogTemplates}
+        selectedMarketplaceId={marketplaceTemplateId}
+        isGenerating={isGenerating}
+        onOpenTemplateDetails={setRailDetailsTpl}
         activeProject={activeProject}
         onSelect={selectProject}
         onFavorite={toggleFavorite}
         onDuplicate={duplicateProject}
         onDelete={deleteProject}
         onDownload={downloadProject}
+      />
+
+      <TemplateDetailsDialog
+        template={railDetailsTpl}
+        disabled={isGenerating}
+        onClose={() => setRailDetailsTpl(null)}
+        onUseTemplate={handleUseTemplate}
       />
     </div>
   );
@@ -1349,8 +2084,10 @@ function ThemeButton({
 
 type PreviewViewport = "desktop" | "tablet" | "mobile";
 
-function livePreviewSrc(projectId: string | undefined) {
-  return projectId ? `/api/website-builder/${projectId}/live-preview` : "";
+function livePreviewSrc(projectId: string | undefined, revision = 0) {
+  if (!projectId) return "";
+  const base = `/api/website-builder/${projectId}/live-preview`;
+  return revision > 0 ? `${base}?v=${revision}` : base;
 }
 
 function WebsiteLiveFrame({
@@ -1358,13 +2095,15 @@ function WebsiteLiveFrame({
   title,
   className,
   viewport = "desktop",
+  revision = 0,
 }: {
   projectId?: string;
   title: string;
   className?: string;
   viewport?: PreviewViewport;
+  revision?: number;
 }) {
-  const src = livePreviewSrc(projectId);
+  const src = livePreviewSrc(projectId, revision);
   const widthClass =
     viewport === "mobile" ? "max-w-[390px]" : viewport === "tablet" ? "max-w-[768px]" : "max-w-none";
 
@@ -1380,9 +2119,13 @@ function WebsiteLiveFrame({
   return (
     <div className={cn("mx-auto w-full bg-black/40 transition-all", widthClass, className)}>
       <iframe
+        key={src}
         title={title}
         src={src}
-        sandbox=""
+        // Static HTML preview (no scripts). allow-same-origin keeps auth cookies
+        // working for /api/website-builder/:id/live-preview.
+        sandbox="allow-same-origin"
+        referrerPolicy="same-origin"
         className="h-full min-h-[420px] w-full bg-black"
       />
     </div>
@@ -1394,40 +2137,63 @@ function DesignEnginePanels({
   project,
   disabled,
   onImproveLayer,
+  onApplyEditorSuggestion,
 }: {
   project?: GeneratedWebsiteProject;
   disabled?: boolean;
   onImproveLayer: (prefix: string, hint: string) => void;
+  onApplyEditorSuggestion?: (command: string, suggestionId?: string) => void;
 }) {
   const strategy = project?.strategy;
   const design = project?.designSystem;
   const assets = project?.assetManifest?.items ?? [];
   const profile = project?.businessProfile;
-  const quality = project?.qualityReport;
-  const scores = project?.optimizationReport?.scores;
-
   if (!project) return null;
+
+  const quality = project.qualityReport;
+  const scores = project.optimizationReport?.scores;
+  const seoPerf = project.seoPerformanceReport;
+  const conversion = project.conversionReport;
+  const editorSuggestions = project.editorSuggestions?.suggestions ?? [];
+  const designScore = scores?.design ?? quality?.score ?? null;
+  const seoScore = seoPerf?.scores.seo ?? scores?.seo ?? null;
+  const perfScore =
+    seoPerf?.scores.performance ?? scores?.performance ?? null;
+  const uxScore = scores?.ux ?? conversion?.score ?? null;
+  const overallScore =
+    scores?.overall ??
+    seoPerf?.scores.overall ??
+    quality?.score ??
+    null;
+  const recommendations = [
+    ...(seoPerf?.recommendations ?? []).slice(0, 4).map((r) => r.title),
+    ...(conversion?.recommendations ?? []).slice(0, 3).map((r) => r.title),
+    ...(project.optimizationReport?.audit?.suggestions ?? []).slice(0, 3),
+  ].filter(Boolean);
+  const uniqueRecs = Array.from(new Set(recommendations)).slice(0, 6);
 
   return (
     <div className="space-y-4">
-      {scores ? (
+      {overallScore != null || designScore != null || seoScore != null ? (
         <DashboardPanel>
           <SectionHeader
             icon={Sparkles}
-            title="Website Quality Score"
+            title="Website Quality Report"
             description={
+              seoPerf?.summary ||
               project.optimizationReport?.summary ||
-              "AI Website Optimizer audit"
+              conversion?.summary ||
+              "Design, SEO, performance, and UX readiness"
             }
           />
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
             {(
               [
-                ["Overall", scores.overall],
-                ["Design", scores.design],
-                ["SEO", scores.seo],
-                ["UX", scores.ux],
-                ["Perf", scores.performance],
+                ["Overall", overallScore],
+                ["Design", designScore],
+                ["SEO", seoScore],
+                ["UX", uxScore],
+                ["Perf", perfScore],
               ] as const
             ).map(([label, value]) => (
               <div
@@ -1438,16 +2204,88 @@ function DesignEnginePanels({
                   {label}
                 </p>
                 <p className="text-lg font-semibold text-premium-gold-light">
-                  {value}
+                  {value ?? "—"}
                 </p>
               </div>
             ))}
           </div>
+          {seoPerf ? (
+            <p className="mt-3 text-[11px] text-white/45">
+              Mobile {seoPerf.scores.mobile}
+              {seoPerf.keywordPlan?.primary
+                ? ` · Keyword: “${seoPerf.keywordPlan.primary}”`
+                : ""}
+              {conversion?.goal?.goal
+                ? ` · Goal: ${conversion.goal.goal}`
+                : ""}
+            </p>
+          ) : null}
+          {uniqueRecs.length ? (
+            <ul className="mt-3 space-y-1.5 border-t border-white/10 pt-3">
+              {uniqueRecs.map((rec) => (
+                <li
+                  key={rec}
+                  className="text-[12px] leading-snug text-white/60 before:mr-2 before:text-premium-gold/70 before:content-['•']"
+                >
+                  {rec}
+                </li>
+              ))}
+            </ul>
+          ) : null}
           {project.optimizationReport?.appliedFixes?.length ? (
             <p className="mt-3 text-[11px] text-white/45">
               Applied: {project.optimizationReport.appliedFixes.slice(0, 3).join(" · ")}
             </p>
           ) : null}
+        </DashboardPanel>
+      ) : null}
+
+      {editorSuggestions.length ? (
+        <DashboardPanel>
+          <SectionHeader
+            icon={Sparkles}
+            title="AI Improvement Suggestions"
+            description={
+              project.editorSuggestions?.summary ||
+              "Design, UX, conversion, and missing-section ideas from Website Editor Intelligence"
+            }
+          />
+          <ul className="mt-4 space-y-2">
+            {editorSuggestions.slice(0, 8).map((suggestion) => (
+              <li
+                key={suggestion.id}
+                className="flex flex-col gap-2 rounded-xl border border-white/10 bg-black/20 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div className="min-w-0">
+                  <p className="text-[12px] font-medium text-white/85">
+                    <span className="mr-2 text-[10px] uppercase tracking-wide text-premium-gold/70">
+                      {suggestion.category}
+                    </span>
+                    {suggestion.title}
+                  </p>
+                  <p className="mt-0.5 text-[11px] leading-snug text-white/50">
+                    {suggestion.description}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  disabled={disabled}
+                  onClick={() =>
+                    onApplyEditorSuggestion?.(
+                      suggestion.command,
+                      suggestion.id,
+                    )
+                  }
+                  className="shrink-0 rounded-lg border border-premium-gold/30 px-3 py-1.5 text-[11px] font-semibold text-premium-gold-light transition hover:bg-premium-gold/10 disabled:opacity-40"
+                >
+                  Apply
+                </button>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 text-[11px] text-white/40">
+            Or type a natural-language edit (e.g. “Improve luxury feeling”) and use Improve with AI.
+          </p>
         </DashboardPanel>
       ) : null}
     <div className="grid gap-4 lg:grid-cols-3">
@@ -1607,10 +2445,12 @@ function DesignEnginePanels({
 
 function PreviewAndExportPanel({
   activeProject,
+  previewRevision = 0,
   onDownload,
   onImprove,
 }: {
   activeProject: WorkspaceProject | null;
+  previewRevision?: number;
   onDownload: (project?: WorkspaceProject | null) => void;
   onImprove: () => void;
 }) {
@@ -1623,11 +2463,21 @@ function PreviewAndExportPanel({
   const [publishStatus, setPublishStatus] = useState<
     "none" | "prepared" | "published" | "unpublished"
   >("none");
+  const [publishQuality, setPublishQuality] = useState<{
+    seoScore?: number | null;
+    performanceScore?: number | null;
+    mobileScore?: number | null;
+    conversionReady?: boolean | null;
+    blockers: string[];
+    warnings: string[];
+    opportunities: string[];
+  } | null>(null);
 
   useEffect(() => {
     if (!activeProject?.id) {
       setPublicUrl(null);
       setPublishStatus("none");
+      setPublishQuality(null);
       return;
     }
     let cancelled = false;
@@ -1687,6 +2537,28 @@ function PreviewAndExportPanel({
         data.publication?.public_path ??
         null;
       setPublicUrl(url);
+      const qr = data.qualityRecommendations as
+        | {
+            seoScore?: number | null;
+            performanceScore?: number | null;
+            mobileScore?: number | null;
+            conversionReady?: boolean | null;
+            blockers?: string[];
+            warnings?: string[];
+            opportunities?: string[];
+          }
+        | undefined;
+      if (qr) {
+        setPublishQuality({
+          seoScore: qr.seoScore ?? null,
+          performanceScore: qr.performanceScore ?? null,
+          mobileScore: qr.mobileScore ?? null,
+          conversionReady: qr.conversionReady ?? null,
+          blockers: qr.blockers ?? [],
+          warnings: qr.warnings ?? [],
+          opportunities: qr.opportunities ?? [],
+        });
+      }
       toast.success(data.message ?? `Website ${action}ed.`);
       if (action === "publish" && url) {
         window.open(url.startsWith("http") ? url : url, "_blank", "noopener,noreferrer");
@@ -1739,6 +2611,7 @@ function PreviewAndExportPanel({
             projectId={activeProject?.id}
             title="Website live preview"
             viewport={viewport}
+            revision={previewRevision}
             className="h-[420px]"
           />
         </div>
@@ -1783,7 +2656,7 @@ function PreviewAndExportPanel({
         <SectionHeader
           icon={Globe2}
           title="Publish website"
-          description="Publish a public URL for this version (/w/{slug})."
+          description="Publish a public, SEO-ready URL for this version (/w/{slug})."
         />
         <div className="mt-5 space-y-3">
           <InfoTile label="Website" value={activeProject?.title ?? "Not created yet"} />
@@ -1793,7 +2666,56 @@ function PreviewAndExportPanel({
             label="Public URL"
             value={publicUrl ?? "Publish to create a live /w/{slug} link"}
           />
+          {publishQuality ? (
+            <div className="rounded-xl border border-white/10 bg-black/25 p-3">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-white/45">
+                Pre-publish quality
+              </p>
+              <div className="mt-2 grid grid-cols-3 gap-2 text-center">
+                <div>
+                  <p className="text-[10px] text-white/40">SEO</p>
+                  <p className="text-sm font-semibold text-premium-gold-light">
+                    {publishQuality.seoScore ?? "—"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-white/40">Perf</p>
+                  <p className="text-sm font-semibold text-premium-gold-light">
+                    {publishQuality.performanceScore ?? "—"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-white/40">Mobile</p>
+                  <p className="text-sm font-semibold text-premium-gold-light">
+                    {publishQuality.mobileScore ?? "—"}
+                  </p>
+                </div>
+              </div>
+              {publishQuality.blockers[0] ? (
+                <p className="mt-2 text-[11px] text-amber-200/80">
+                  {publishQuality.blockers[0]}
+                </p>
+              ) : publishQuality.warnings[0] ? (
+                <p className="mt-2 text-[11px] text-white/50">
+                  {publishQuality.warnings[0]}
+                </p>
+              ) : (
+                <p className="mt-2 text-[11px] text-emerald-200/70">
+                  Ready for public publishing
+                </p>
+              )}
+            </div>
+          ) : null}
           <div className="flex flex-col gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="btn-ghost-gold h-10 w-full rounded-xl"
+              onClick={() => void runPublishAction("prepare")}
+              disabled={!activeProject?.id || publishBusy}
+            >
+              Review quality & prepare
+            </Button>
             <Button
               type="button"
               className="btn-gold h-10 w-full rounded-xl font-bold text-luxury-black"
@@ -1880,6 +2802,7 @@ function PreviewAndExportPanel({
               projectId={activeProject?.id}
               title="Fullscreen live preview"
               viewport="desktop"
+              revision={previewRevision}
               className="h-full min-h-[78vh]"
             />
           </div>
@@ -2132,6 +3055,7 @@ function OutputWorkspace({
   outputTab,
   onOutputTabChange,
   previewEnabled,
+  previewRevision = 0,
   files,
   selectedFile,
   selectedFilePath,
@@ -2147,11 +3071,16 @@ function OutputWorkspace({
   onFavorite,
   onRefreshPreview,
   onOpenPreview,
+  visualEditorDisabled,
+  onVisualEditorSaved,
+  onSeoApplied,
+  onIntelligenceApply,
 }: {
   activeProject: WorkspaceProject | null;
-  outputTab: "preview" | "code";
-  onOutputTabChange: (tab: "preview" | "code") => void;
+  outputTab: OutputTab;
+  onOutputTabChange: (tab: OutputTab) => void;
   previewEnabled: boolean;
+  previewRevision?: number;
   files: GeneratedProjectFile[];
   selectedFile: GeneratedProjectFile | null;
   selectedFilePath: string;
@@ -2167,6 +3096,16 @@ function OutputWorkspace({
   onFavorite: () => void;
   onRefreshPreview: () => void;
   onOpenPreview: () => void;
+  visualEditorDisabled?: boolean;
+  onVisualEditorSaved: (payload: {
+    project: GeneratedWebsiteProject;
+    generation: WebsiteGeneration;
+  }) => void;
+  onSeoApplied: (payload: {
+    project: GeneratedWebsiteProject;
+    generation: WebsiteGeneration;
+  }) => void;
+  onIntelligenceApply?: (command: string) => void;
 }) {
   const filteredFiles = files.filter((file) =>
     file.path.toLowerCase().includes(fileSearch.toLowerCase()),
@@ -2199,6 +3138,18 @@ function OutputWorkspace({
         </button>
         <button
           type="button"
+          onClick={() => onOutputTabChange("canvas")}
+          className={cn(
+            "rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors",
+            outputTab === "canvas"
+              ? "bg-premium-gold/15 text-premium-gold-light"
+              : "text-white/45 hover:text-white/75",
+          )}
+        >
+          Visual editor
+        </button>
+        <button
+          type="button"
           onClick={() => onOutputTabChange("code")}
           className={cn(
             "rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors",
@@ -2209,7 +3160,113 @@ function OutputWorkspace({
         >
           Source files
         </button>
+        <button
+          type="button"
+          onClick={() => onOutputTabChange("analytics")}
+          className={cn(
+            "rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors",
+            outputTab === "analytics"
+              ? "bg-premium-gold/15 text-premium-gold-light"
+              : "text-white/45 hover:text-white/75",
+          )}
+        >
+          Analytics
+        </button>
+        <button
+          type="button"
+          onClick={() => onOutputTabChange("experiments")}
+          className={cn(
+            "rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors",
+            outputTab === "experiments"
+              ? "bg-premium-gold/15 text-premium-gold-light"
+              : "text-white/45 hover:text-white/75",
+          )}
+        >
+          Experiments
+        </button>
+        <button
+          type="button"
+          onClick={() => onOutputTabChange("intelligence")}
+          className={cn(
+            "rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors",
+            outputTab === "intelligence"
+              ? "bg-premium-gold/15 text-premium-gold-light"
+              : "text-white/45 hover:text-white/75",
+          )}
+        >
+          Intelligence
+        </button>
+        <button
+          type="button"
+          onClick={() => onOutputTabChange("seo")}
+          className={cn(
+            "rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors",
+            outputTab === "seo"
+              ? "bg-premium-gold/15 text-premium-gold-light"
+              : "text-white/45 hover:text-white/75",
+          )}
+        >
+          SEO Agent
+        </button>
+        <button
+          type="button"
+          onClick={() => onOutputTabChange("deploy")}
+          className={cn(
+            "rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors",
+            outputTab === "deploy"
+              ? "bg-premium-gold/15 text-premium-gold-light"
+              : "text-white/45 hover:text-white/75",
+          )}
+        >
+          Publish
+        </button>
       </div>
+      {outputTab === "canvas" ? (
+        <div className="min-h-[760px]">
+          {activeProject?.id && files.length ? (
+            <VisualWebsiteEditor
+              generationId={activeProject.id}
+              files={files}
+              project={activeProject.generatedProject}
+              disabled={visualEditorDisabled}
+              onSaved={onVisualEditorSaved}
+            />
+          ) : (
+            <div className="flex h-[420px] items-center justify-center text-sm text-white/40">
+              Generate a website first to open the visual editor.
+            </div>
+          )}
+        </div>
+      ) : outputTab === "analytics" ? (
+        <div className="min-h-[760px] overflow-y-auto">
+          <AnalyticsIntelligencePanel generationId={activeProject?.id ?? null} />
+        </div>
+      ) : outputTab === "experiments" ? (
+        <div className="min-h-[760px] overflow-y-auto">
+          <ExperimentsPanel generationId={activeProject?.id ?? null} />
+        </div>
+      ) : outputTab === "seo" ? (
+        <div className="min-h-[760px] overflow-y-auto">
+          <SeoAgentPanel
+            generationId={activeProject?.id ?? null}
+            onApplied={onSeoApplied}
+          />
+        </div>
+      ) : outputTab === "intelligence" ? (
+        <div className="min-h-[760px] overflow-y-auto p-4">
+          <WebsiteIntelligencePanel
+            generationId={activeProject?.id ?? null}
+            disabled={visualEditorDisabled}
+            onApplySuggestion={onIntelligenceApply}
+          />
+        </div>
+      ) : outputTab === "deploy" ? (
+        <div className="min-h-[760px] overflow-y-auto">
+          <DeploymentDashboardPanel
+            generationId={activeProject?.id ?? null}
+          />
+        </div>
+      ) : (
       <div className="grid min-h-[760px] lg:grid-cols-[290px_minmax(0,1fr)_330px]">
         <ProjectLeftSidebar
           activeProject={activeProject}
@@ -2235,6 +3292,7 @@ function OutputWorkspace({
                 projectId={activeProject?.id}
                 title="Website live preview workspace"
                 viewport="desktop"
+                revision={previewRevision}
                 className="h-full min-h-[720px]"
               />
             )
@@ -2256,6 +3314,7 @@ function OutputWorkspace({
           onRename={onRename}
         />
       </div>
+      )}
     </DashboardPanel>
   );
 }
@@ -2288,6 +3347,18 @@ function ProjectToolbar({
         </h3>
       </div>
       <div className="flex flex-wrap gap-2">
+        {activeProject?.id ? (
+          <Link href={`/dashboard/website-builder/${activeProject.id}`}>
+            <Button
+              type="button"
+              variant="outline"
+              className="btn-ghost-gold rounded-xl"
+            >
+              <LayoutDashboard className="size-4" />
+              Manage website
+            </Button>
+          </Link>
+        ) : null}
         <Button
           type="button"
           className="btn-gold rounded-xl font-bold text-luxury-black"
@@ -2678,7 +3749,10 @@ function GeneratedPreviewWorkspace({
 
 function BottomWorkspace({
   projects,
-  templates,
+  catalogTemplates,
+  selectedMarketplaceId,
+  isGenerating,
+  onOpenTemplateDetails,
   activeProject,
   onSelect,
   onFavorite,
@@ -2687,7 +3761,10 @@ function BottomWorkspace({
   onDownload,
 }: {
   projects: WorkspaceProject[];
-  templates: readonly string[];
+  catalogTemplates: MarketplaceTemplate[];
+  selectedMarketplaceId?: string | null;
+  isGenerating?: boolean;
+  onOpenTemplateDetails: (tpl: MarketplaceTemplate) => void;
   activeProject: WorkspaceProject | null;
   onSelect: (project: WorkspaceProject) => void;
   onFavorite: (id: string) => void;
@@ -2769,17 +3846,17 @@ function BottomWorkspace({
 
       <div className="space-y-6">
         <DashboardPanel>
-          <SectionHeader icon={LayoutDashboard} title="Templates" description="Production-ready starting points." />
-          <div className="mt-5 space-y-3">
-            {templates.map((template) => (
-              <div
-                key={template}
-                className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-3 text-sm font-medium text-white/65"
-              >
-                {template}
-              </div>
-            ))}
-          </div>
+          <SectionHeader
+            icon={LayoutDashboard}
+            title="Templates"
+            description="Click a card to review details, then Use Template."
+          />
+          <TemplateSelectionRail
+            templates={catalogTemplates}
+            selectedMarketplaceId={selectedMarketplaceId}
+            disabled={isGenerating}
+            onOpenDetails={onOpenTemplateDetails}
+          />
         </DashboardPanel>
 
         <DashboardPanel>

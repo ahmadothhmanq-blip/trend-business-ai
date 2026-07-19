@@ -135,12 +135,19 @@ ${validationNote}
 
 Architecture rules:
 - Clean App Router pages/components; shared UI primitives under components/
-- Prefer components from DesignSystem.componentPalette and uiPatterns
-- Responsive layouts with sm:/md:/lg: utilities; mobile-first
-- Apply design tokens via CSS variables (--color-primary, --font-heading, etc.)
-- Honor DesignSystem.stylePreset (luxury|modern|corporate|minimal) in spacing/radius/shadows
+- Professional Components Library + Design Renderer: implement DesignSystem.componentPalette as REAL named React components (HeroLuxury/Video/Split/Image/Product, SiteHeader/SiteHeaderTransparent/NavModern, ServicesModern, FeaturesModern, ProductShowcase, PortfolioGallery, TestimonialsModern, PricingModern, FaqAccordion, BookingForm, ContactSection, MapsSection, TeamSection, BlogSection, CtaSplit, etc.) under components/sections/ or components/layout/ — do NOT invent generic placeholder Section blocks
+- Prefer existing library scaffolds when present; keep export names and file paths from Strategy.sectionPlan (Component: / File: hints)
+- Compose pages by importing and ordering those components to match Strategy.sectionPlan; page.tsx should only compose library sections (nav + sections + footer), not redefine them inline
+- Use shared SectionShell + Motion from components/ui/ for consistent rhythm and entrance animation
+- Honor website goal signals in uiPatterns (goal-lead-gen|booking|ecommerce|brand|content|conversion) when choosing emphasis and CTAs
+- Prefer DesignSystem.uiPatterns and layoutRules for visual structure
+- Responsive layouts with sm:/md:/lg: utilities; mobile-first; include subtle entrance motion (fade/slide) via CSS or Tailwind animate
+- Apply design tokens via CSS variables (--color-primary, --font-heading, --radius, --shadow-*, --gradient-*, --glass-*, --section-y, etc.)
+- Honor DesignSystem.stylePreset (luxury|modern|corporate|minimal|creative|tech) and Premium Design System tokens when present (glass, gradients, animation easing)
+- Use DesignSystem.uiPatterns for hero/card/nav/footer treatments (e.g. luxury-hero, split-hero, full-bleed-cinematic)
+- Match DesignSystem.layoutRules and spacing/radius/shadow tokens for premium polish
 - Follow Strategy contentStrategy brand voice and required section goals
-- Wire hero/section image URLs from Assets when present (next/image or <img>)
+- Wire AI Image Engine URLs from Assets (exact url fields) via next/image or <img>; import from @/lib/site-images (HERO_IMAGE, PRODUCT_IMAGE, SERVICE_IMAGE, BACKGROUND_IMAGE, SECTION_IMAGES, GALLERY_IMAGES). Never invent placeholder URLs when Assets provide real URLs.
 - Include metadata title/description for layout or page files
 - Include clear primary CTAs from strategy.ctas
 

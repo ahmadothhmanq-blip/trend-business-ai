@@ -20,7 +20,15 @@ export function trackProviderUsage(ctx: GenerationContext): void {
 
 export function toStylePreset(style: string): CoreDesignStylePreset {
   const s = style.toLowerCase();
-  if (s.includes("luxury") || s.includes("premium") || s.includes("elegant")) {
+  if (
+    s.includes("premium-brand") ||
+    s.includes("premium brand") ||
+    s.includes("flagship") ||
+    s.includes("heritage")
+  ) {
+    return "premium-brand";
+  }
+  if (s.includes("luxury") || s.includes("elegant") || s.includes("gold")) {
     return "luxury";
   }
   if (s.includes("corporate") || s.includes("business") || s.includes("professional")) {
@@ -39,6 +47,7 @@ export function toStylePreset(style: string): CoreDesignStylePreset {
   }
   if (
     s.includes("tech") ||
+    s.includes("technology") ||
     s.includes("saas") ||
     s.includes("software") ||
     s.includes("startup") ||

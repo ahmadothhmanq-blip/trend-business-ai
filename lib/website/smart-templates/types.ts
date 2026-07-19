@@ -5,12 +5,14 @@ import type {
 } from "@/lib/ai-core/templates/types";
 
 export type SmartTemplateId =
+  | "tourism-premium"
   | "automotive-luxury"
   | "restaurant-premium"
   | "real-estate"
   | "saas-startup"
   | "agency"
   | "clinic"
+  | "education-campus"
   | "ecommerce-store";
 
 export type SmartTemplateColorPalette = {

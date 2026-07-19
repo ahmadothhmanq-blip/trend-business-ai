@@ -1,3 +1,7 @@
+import {
+  getIndustryDetectionFromBrief,
+  mergeIndustryIntelligenceIntoSelection,
+} from "@/lib/ai-core/industry-intelligence/apply";
 import type { CoreBrief } from "@/lib/ai-core/layers/types";
 import type { TemplateSelection } from "@/lib/ai-core/templates/types";
 import { mergeSmartTemplateFeatures } from "@/lib/website/smart-templates/select";
@@ -50,7 +54,14 @@ export function enrichBriefWithSmartTemplate(
   brief: CoreBrief,
   selection: SmartTemplateSelectionResult,
 ): { brief: CoreBrief; selection: TemplateSelection } {
-  const templateSelection = smartSelectionToTemplateSelection(selection);
+  let templateSelection = smartSelectionToTemplateSelection(selection);
+  const detection = getIndustryDetectionFromBrief(brief);
+  if (detection) {
+    templateSelection = mergeIndustryIntelligenceIntoSelection(
+      templateSelection,
+      detection,
+    );
+  }
   const features = mergeSmartTemplateFeatures(brief.features, selection);
 
   const metadata: Record<string, unknown> = {
@@ -59,8 +70,8 @@ export function enrichBriefWithSmartTemplate(
     smartTemplateSelection: selection,
     templateId: selection.templateId,
     smartTemplateId: selection.templateId,
-    industryId: selection.template.industryId,
-    industry: selection.template.industryId,
+    industryId: templateSelection.industryId,
+    industry: templateSelection.label,
   };
 
   const nested = metadata[WEBSITE_INPUT_KEY];

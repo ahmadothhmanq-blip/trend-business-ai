@@ -122,9 +122,12 @@ export async function analyzeWebsiteWithDeepSeek(params: {
           "You are a senior website QA and conversion optimizer. Analyze the generated Next.js site for design quality, UX, content, missing sections, mobile responsiveness, conversion, and brand consistency. Respond with JSON only.",
         prompt: `Business: ${params.profile?.summary ?? params.strategy?.positioning ?? "n/a"}
 Industry: ${params.profile?.industry ?? "n/a"}
+Expected sections for this industry: ${(params.profile?.requiredSections ?? []).slice(0, 10).join(", ") || "n/a"}
 Design preset: ${params.designSystem?.stylePreset ?? "n/a"}
+Design style: ${params.designSystem?.style ?? "n/a"}
 Primary color: ${params.designSystem?.colors?.primary ?? "n/a"}
 User instruction: ${params.userInstruction ?? "Full quality optimization pass"}
+Judge missing pages/sections against industry expectations (e.g. Tourism needs Destinations/Tours/Booking; Healthcare needs Services/Doctors/Appointments).
 
 Heuristic findings (merge + improve, do not ignore critical ones):
 ${JSON.stringify(

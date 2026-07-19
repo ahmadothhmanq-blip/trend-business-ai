@@ -1,4 +1,5 @@
 export type IndustryId =
+  | "tourism"
   | "restaurant"
   | "ecommerce"
   | "saas"
@@ -6,6 +7,7 @@ export type IndustryId =
   | "automotive"
   | "agency"
   | "clinic"
+  | "education"
   | "business";
 
 export type LayoutStyle =
@@ -15,7 +17,9 @@ export type LayoutStyle =
   | "property-showcase"
   | "vehicle-showroom"
   | "studio-portfolio"
-  | "corporate-trust";
+  | "corporate-trust"
+  | "travel-premium"
+  | "campus-education";
 
 /** Matches Core / Website design presets (kept local to avoid circular imports). */
 export type TemplateDesignPreset =
@@ -24,7 +28,8 @@ export type TemplateDesignPreset =
   | "corporate"
   | "minimal"
   | "creative"
-  | "tech";
+  | "tech"
+  | "premium-brand";
 
 /** Industry intelligence profile used by the AI Template Engine. */
 export type IndustryProfile = {
@@ -39,6 +44,10 @@ export type IndustryProfile = {
   suggestedPages: string[];
   contentTone: string;
   industryPattern: string;
+  /** Website Builder intelligence extensions (optional for older callers). */
+  ctaTypes?: string[];
+  designStyle?: string;
+  imageRequirements?: string[];
 };
 
 /** Resolved template choices applied at the start of a Core run. */
@@ -58,4 +67,16 @@ export type TemplateSelection = {
   smartTemplateId?: string;
   /** Full design configuration from Smart Template Engine. */
   designConfiguration?: Record<string, unknown>;
+  /** Agency-grade industry blueprint when Industry Website Intelligence ran. */
+  industryIntelligence?: {
+    id?: string;
+    label?: string;
+    industryPattern?: string;
+    recommendedPages: string[];
+    requiredSections: string[];
+    ctaTypes: string[];
+    contentStyle: string;
+    designStyle: string;
+    imageRequirements: string[];
+  };
 };

@@ -135,6 +135,8 @@ export async function POST(request: Request, context: RouteContext) {
       project: saved.project,
       generation: saved.generation,
       optimizationReport: saved.project.optimizationReport ?? null,
+      conversionReport: saved.project.conversionReport ?? null,
+      seoPerformanceReport: saved.project.seoPerformanceReport ?? null,
       message: "Website optimized with AI and saved as a new version.",
     });
   } catch (err) {

@@ -25,6 +25,10 @@ export type {
 
 type GenerateWebsiteInput = WebsiteGenerationInput & {
   onProgress?: (event: string) => void;
+  onFilesCheckpoint?: (
+    files: GeneratedProjectFile[],
+    meta: { message: string },
+  ) => void | Promise<void>;
   preferredProvider?: AIProviderName;
   autoFallback?: boolean;
 };
@@ -59,6 +63,7 @@ export async function generateWebsite(input: GenerateWebsiteInput): Promise<
 > {
   const {
     onProgress,
+    onFilesCheckpoint,
     preferredProvider,
     autoFallback,
     ...pluginInput
@@ -104,6 +109,7 @@ export async function generateWebsite(input: GenerateWebsiteInput): Promise<
         {
           provider: providerName,
           onProgress,
+          onFilesCheckpoint,
         },
       );
 

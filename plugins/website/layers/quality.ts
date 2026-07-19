@@ -93,13 +93,41 @@ export function runWebsiteQualityCheck(params: {
     weakSections.push("Primary CTA may be missing");
     contentIssues.push("Primary CTA language not detected");
   }
+  const hasHeroUrl = assetManifest?.items?.some(
+    (a) =>
+      a.role === "hero" &&
+      Boolean(a.url) &&
+      !String(a.url).startsWith("data:image/svg"),
+  );
+  const siteImagesWired = files.some(
+    (f) =>
+      (f.path === "lib/site-images.ts" || f.path === "lib/site-images.js") &&
+      /HERO_IMAGE\s*=\s*"(https?:|data:image\/(?!svg))/i.test(f.content),
+  );
+  if (!hasHeroUrl && !siteImagesWired) {
+    weakSections.push("Hero visual missing");
+    contentIssues.push("No publishable hero image URL in asset manifest");
+  }
   if (
-    assetManifest?.items?.some((a) => a.role === "hero") &&
-    !assetManifest.items.some((a) => a.role === "hero" && a.url) &&
-    !/<img|Image |background/i.test(home)
+    hasHeroUrl &&
+    !/HERO_IMAGE|site-images|<img|backgroundImage/i.test(home) &&
+    !files.some(
+      (f) =>
+        /components\/sections\/hero/i.test(f.path) &&
+        /HERO_IMAGE|resolveSiteImage|<img/i.test(f.content),
+    )
   ) {
-    weakSections.push("Hero visual not wired into home page");
-    contentIssues.push("Hero asset not referenced in home page");
+    weakSections.push("Hero visual not wired into components");
+    contentIssues.push("Hero asset not referenced in hero components");
+  }
+  const requiredRoles = ["hero", "service", "product", "background"] as const;
+  for (const role of requiredRoles) {
+    const hasRole = assetManifest?.items?.some(
+      (a) => a.role === role && Boolean(a.url),
+    );
+    if (!hasRole) {
+      contentIssues.push(`Missing ${role} photographic asset`);
+    }
   }
   if (designSystem && !content.includes(designSystem.colors.primary) && !content.includes("--color-primary")) {
     contentIssues.push("Design tokens may not be applied in CSS/components");

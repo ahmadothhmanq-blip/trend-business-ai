@@ -166,6 +166,51 @@ export type WebsiteGeneration = {
   attachments?: GenerationAttachmentMeta[];
 };
 
+/** Persisted Website Optimizer audit row (public.website_audits). */
+export type WebsiteAudit = {
+  id: string;
+  user_id: string | null;
+  website_generation_id: string | null;
+  project_id: string | null;
+  ai_run_id: string | null;
+  status: string;
+  design_score: number;
+  seo_score: number;
+  ux_score: number;
+  performance_score: number;
+  conversion_score: number;
+  quality_score: number;
+  overall_score: number;
+  issues: unknown;
+  missing_sections: unknown;
+  suggestions: unknown;
+  seo_results: Record<string, unknown>;
+  quality_results: Record<string, unknown>;
+  design_results: Record<string, unknown>;
+  conversion_results: Record<string, unknown>;
+  audit_json: Record<string, unknown>;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+};
+
+export type OptimizationReportRow = {
+  id: string;
+  user_id: string | null;
+  website_generation_id: string | null;
+  ai_run_id: string | null;
+  audit_id: string | null;
+  status: string;
+  summary: string | null;
+  scores: Record<string, unknown>;
+  improvements: unknown;
+  applied_fixes: unknown;
+  report_json: Record<string, unknown>;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at?: string;
+};
+
 export type FavoriteItemType =
   | "business_idea"
   | "market_analysis"

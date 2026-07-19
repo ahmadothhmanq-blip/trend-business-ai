@@ -4,6 +4,7 @@ import type { WebsiteOptimizationReport } from "@/lib/ai-core/optimizer/types";
 export type PersistOptimizerParams = {
   userId: string;
   websiteGenerationId?: string;
+  projectId?: string;
   parentGenerationId?: string;
   aiRunId?: string;
   report: WebsiteOptimizationReport;
@@ -18,6 +19,13 @@ export type PersistOptimizerResult = {
   historyId?: string;
 };
 
+function issuesByCategory(
+  report: WebsiteOptimizationReport,
+  categories: string[],
+) {
+  return report.audit.issues.filter((i) => categories.includes(i.category));
+}
+
 export async function persistOptimizerArtifacts(
   params: PersistOptimizerParams,
 ): Promise<PersistOptimizerResult> {
@@ -25,27 +33,54 @@ export async function persistOptimizerArtifacts(
   if (!admin) return {};
 
   try {
+    const conversionScore = params.report.audit.conversionReady ? 85 : 45;
+    const now = new Date().toISOString();
+
     const { data: auditRow, error: auditError } = await admin
       .from("website_audits")
       .insert({
         user_id: params.userId,
         website_generation_id: params.websiteGenerationId ?? null,
+        project_id: params.projectId ?? null,
         ai_run_id: params.aiRunId ?? null,
         status: "completed",
         design_score: params.report.scores.design,
         seo_score: params.report.scores.seo,
         ux_score: params.report.scores.ux,
         performance_score: params.report.scores.performance,
+        conversion_score: conversionScore,
+        quality_score: params.report.scores.overall,
         overall_score: params.report.scores.overall,
         issues: params.report.audit.issues,
         missing_sections: params.report.audit.missingSections,
         suggestions: params.report.audit.suggestions,
+        seo_results: {
+          score: params.report.scores.seo,
+          issues: issuesByCategory(params.report, ["seo"]),
+        },
+        quality_results: {
+          score: params.report.scores.overall,
+          publishReady: params.report.publishReady,
+          suggestions: params.report.audit.suggestions,
+        },
+        design_results: {
+          score: params.report.scores.design,
+          brandConsistent: params.report.audit.brandConsistent,
+          issues: issuesByCategory(params.report, ["design", "brand"]),
+        },
+        conversion_results: {
+          score: conversionScore,
+          conversionReady: params.report.audit.conversionReady,
+          issues: issuesByCategory(params.report, ["conversion"]),
+        },
+        audit_json: params.report.audit,
         metadata: {
           source: params.report.audit.source,
           brandConsistent: params.report.audit.brandConsistent,
           mobileReady: params.report.audit.mobileReady,
           conversionReady: params.report.audit.conversionReady,
         },
+        updated_at: now,
       })
       .select("id")
       .single();
@@ -69,6 +104,7 @@ export async function persistOptimizerArtifacts(
         applied_fixes: params.report.appliedFixes,
         report_json: params.report,
         metadata: { publishReady: params.report.publishReady },
+        updated_at: now,
       })
       .select("id")
       .single();
@@ -91,9 +127,11 @@ export async function persistOptimizerArtifacts(
           category: "website-optimizer",
           before_score: params.beforeScore ?? null,
           after_score: params.report.scores.overall,
-          instruction: params.instruction ?? params.report.improveInstruction ?? null,
+          instruction:
+            params.instruction ?? params.report.improveInstruction ?? null,
           changes: params.report.appliedFixes,
           metadata: { scores: params.report.scores },
+          updated_at: now,
         })
         .select("id")
         .single();

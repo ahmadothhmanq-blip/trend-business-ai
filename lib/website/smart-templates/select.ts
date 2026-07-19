@@ -1,6 +1,8 @@
 import { getDefaultTextProvider } from "@/lib/ai/provider-config";
 import { providerManager } from "@/lib/ai/provider-manager";
+import { getWebsiteIndustryIntelligence } from "@/lib/ai-core/industry-intelligence/profiles";
 import type { CoreBrief } from "@/lib/ai-core/layers/types";
+import type { IndustryId } from "@/lib/ai-core/templates/types";
 import {
   getSmartTemplate,
   isSmartTemplateId,
@@ -11,6 +13,18 @@ import type {
   SmartTemplateId,
   SmartTemplateSelectionResult,
 } from "@/lib/website/smart-templates/types";
+
+export type SelectSmartTemplateOptions = {
+  /** Preferred industry from AI Industry Website Intelligence. */
+  preferredIndustryId?: IndustryId;
+};
+
+function templateForIndustry(industryId: IndustryId): SmartTemplateId | null {
+  const preferred =
+    getWebsiteIndustryIntelligence(industryId).preferredSmartTemplateId;
+  if (preferred && isSmartTemplateId(preferred)) return preferred;
+  return null;
+}
 
 function uniqueFeatures(values: string[]): string[] {
   const seen = new Set<string>();
@@ -151,41 +165,72 @@ type AnalysisPayload = {
 
 /**
  * Analyze business description with DeepSeek and choose the best smart template.
- * Falls back to keyword scoring when the model is unavailable.
+ * Honors Industry Website Intelligence when provided; falls back to keywords.
  */
 export async function selectSmartTemplate(
   brief: CoreBrief,
+  options?: SelectSmartTemplateOptions,
 ): Promise<SmartTemplateSelectionResult> {
   const explicit = explicitTemplateId(brief);
   if (explicit) {
     return toResult(explicit, 1, "Explicit template override.", "explicit");
   }
 
+  const preferredIndustry =
+    options?.preferredIndustryId ||
+    (typeof brief.metadata?.industryId === "string"
+      ? (brief.metadata.industryId as IndustryId)
+      : undefined);
+  const preferredTemplate = preferredIndustry
+    ? templateForIndustry(preferredIndustry)
+    : null;
+
   const catalog = listSmartTemplates().map((t) => ({
     id: t.id,
     name: t.name,
     category: t.category,
+    industryId: t.industryId,
     description: t.description,
     keywords: t.keywords.slice(0, 8),
   }));
 
   const resolved = providerManager.resolve(getDefaultTextProvider());
   if (!resolved) {
+    if (preferredTemplate) {
+      const intel = preferredIndustry
+        ? getWebsiteIndustryIntelligence(preferredIndustry)
+        : null;
+      return toResult(
+        preferredTemplate,
+        0.82,
+        intel
+          ? `Industry intelligence mapped ${intel.label} → ${getSmartTemplate(preferredTemplate).name}.`
+          : `Preferred industry template ${preferredTemplate}.`,
+        "keyword",
+      );
+    }
     return selectByKeywords(brief);
   }
 
   try {
+    const industryHint = preferredIndustry
+      ? `\nDetected industry: ${preferredIndustry} (prefer matching template when fit is strong).`
+      : "";
+    const preferredHint = preferredTemplate
+      ? `\nPreferred template id from industry intelligence: ${preferredTemplate}`
+      : "";
+
     const analysis = await providerManager.generateJson<AnalysisPayload>(
       {
         system:
-          "You are a website template strategist for a Webflow/Wix/Framer-class builder. Pick exactly one template id from the catalog that best fits the business. Respond with JSON only.",
+          "You are a website template strategist for a Webflow/Wix/Framer-class builder. Pick exactly one template id from the catalog that best fits the business and industry. Respond with JSON only.",
         prompt: `Business description / brief:
 """
 ${brief.prompt}
 """
 
 Theme: ${brief.theme ?? "n/a"}
-Features: ${(brief.features ?? []).join(", ") || "n/a"}
+Features: ${(brief.features ?? []).join(", ") || "n/a"}${industryHint}${preferredHint}
 
 Template catalog:
 ${JSON.stringify(catalog, null, 2)}
@@ -220,7 +265,16 @@ Return JSON:
       );
     }
   } catch {
-    // Fall through to keyword selection
+    // Fall through
+  }
+
+  if (preferredTemplate) {
+    return toResult(
+      preferredTemplate,
+      0.8,
+      `Fallback to industry-preferred template ${getSmartTemplate(preferredTemplate).name}.`,
+      "keyword",
+    );
   }
 
   return selectByKeywords(brief);

@@ -54,6 +54,7 @@ function serializeArtifacts(artifacts: CoreLayerArtifacts): Record<string, unkno
     businessProfile: artifacts.businessProfile ?? null,
     strategy: artifacts.strategy ?? null,
     designSystem: artifacts.designSystem ?? null,
+    designPlan: artifacts.designPlan ?? null,
     assetManifest: artifacts.assetManifest ?? null,
     qualityReport: artifacts.qualityReport ?? null,
     seoPackage: artifacts.seoPackage ?? null,
@@ -82,6 +83,10 @@ function priorFromArtifacts(
   if (artifacts.designSystem) {
     prior.designSystem =
       artifacts.designSystem as CoreLayerArtifacts["designSystem"];
+  }
+  if (artifacts.designPlan) {
+    prior.designPlan =
+      artifacts.designPlan as CoreLayerArtifacts["designPlan"];
   }
   if (artifacts.assetManifest) {
     prior.assetManifest =
