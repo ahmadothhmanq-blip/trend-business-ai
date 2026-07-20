@@ -4,7 +4,10 @@
 
 import type { ImageDesignModel, ImageRasterAsset } from "@/lib/ai-core/image-design-platform/types";
 
-export type ExportFormat = "png" | "jpg" | "webp" | "zip" | "json";
+import type { CanvasDocumentModel } from "@/lib/ai-core/image-design-platform/editor/types";
+import { flattenElements } from "@/lib/ai-core/image-design-platform/editor/document";
+
+export type ExportFormat = "png" | "jpg" | "webp" | "zip" | "json" | "pdf" | "project";
 
 export function buildExportManifest(model: ImageDesignModel) {
   const rasterFiles = model.rasterAssets
@@ -39,4 +42,49 @@ export function convertBufferFormat(
     target === "jpg" ? "image/jpeg" : target === "webp" ? "image/webp" : "image/png";
   const ext = target;
   return { bytes, mimeType: mime, ext };
+}
+
+export function buildProjectExport(document: CanvasDocumentModel) {
+  return {
+    format: "design-project-v2",
+    exportedAt: new Date().toISOString(),
+    document,
+    layers: document.layers,
+    elements: flattenElements(document),
+    brand: document.brand ?? null,
+  };
+}
+
+export async function buildPdfFromCanvas(document: CanvasDocumentModel): Promise<Uint8Array> {
+  const { jsPDF } = await import("jspdf");
+  const orientation = document.width >= document.height ? "landscape" : "portrait";
+  const pdf = new jsPDF({
+    orientation,
+    unit: "px",
+    format: [document.width, document.height],
+  });
+
+  pdf.setFillColor(document.backgroundColor || "#FFFFFF");
+  pdf.rect(0, 0, document.width, document.height, "F");
+
+  for (const el of flattenElements(document)) {
+    const { x, y, width, height, opacity, rotation } = el.transform;
+    if (el.type === "text") {
+      pdf.setFontSize(el.fontSize);
+      pdf.setTextColor(el.color);
+      pdf.text(el.content, x, y + el.fontSize, { angle: rotation });
+    } else if (el.type === "shape" || el.type === "background") {
+      pdf.setFillColor(el.fill);
+      pdf.rect(x, y, width, height, "F");
+    } else if (el.type === "image" && el.src) {
+      try {
+        pdf.addImage(el.src, "PNG", x, y, width, height, undefined, "FAST", rotation);
+      } catch {
+        // skip unrasterizable remote images in PDF fallback
+      }
+    }
+    void opacity;
+  }
+
+  return pdf.output("arraybuffer") as unknown as Uint8Array;
 }

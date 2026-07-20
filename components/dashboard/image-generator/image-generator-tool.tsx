@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { toast } from "sonner";
 import {
   ArrowLeft,
@@ -10,6 +11,7 @@ import {
   Download,
   LayoutTemplate,
   Minus,
+  Pencil,
   Plus,
   RefreshCw,
   Search,
@@ -118,6 +120,11 @@ function ImagePreview({
           <p className="text-xs text-white/40">{bp.style} &middot; {bp.imageType} &middot; {gen.aspect_ratio} &middot; {gen.provider ?? "deepseek"} &middot; {gen.generation_time_ms ? `${(gen.generation_time_ms / 1000).toFixed(1)}s` : ""}</p>
         </div>
         <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+          <Link href={`/dashboard/image-generator/${gen.id}/editor`}>
+            <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-premium-gold/25 text-xs text-premium-gold-light hover:border-premium-gold/40">
+              <Pencil className="size-3" /> Open Editor
+            </Button>
+          </Link>
           {onRegenerate ? (
             <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:border-white/20" onClick={onRegenerate}>
               <RefreshCw className="size-3" /> Regenerate
