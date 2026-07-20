@@ -68,6 +68,9 @@ export type VideoOutput = {
   thumbnailSvg: string;
   colorGrade: string;
   files: { path: string; content: string; language: string }[];
+  /** Attached by production platform after generation */
+  productionModel?: import("@/lib/ai-core/video-production-platform/types").VideoProductionModel;
+  versionHistory?: import("@/lib/ai-core/video-production-platform/versions").VideoVersionHistory;
 };
 
 export type VideoProgressEvent = string;

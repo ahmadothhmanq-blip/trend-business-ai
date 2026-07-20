@@ -104,6 +104,9 @@ function VideoPreview({
           <p className="text-xs text-white/40">{bp.style} &middot; {bp.aspectRatio} &middot; {bp.totalDuration} &middot; {bp.scenes.length} scenes &middot; {gen.provider ?? "deepseek"}</p>
         </div>
         <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+          <Button asChild className="btn-gold gap-1.5 rounded-lg font-bold text-luxury-black text-xs">
+            <a href={`/dashboard/video-studio/${gen.id}`}>Open Production Studio</a>
+          </Button>
           {onRegenerate ? (
             <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:border-white/20" onClick={onRegenerate}>
               <RefreshCw className="size-3" /> Regenerate
@@ -588,7 +591,9 @@ export function VideoStudioTool({ initialGenerations }: Props) {
                 return (
                   <ProjectHistoryCard key={gen.id} item={toHistoryItem(gen)} icon={def?.icon ?? Film}
                     onFavorite={() => handleFavorite(gen)} onDelete={() => handleDelete(gen.id)}
-                    onView={() => { setPreviewGen(gen); setStep("preview"); }}
+                    onView={() => {
+                      window.location.href = `/dashboard/video-studio/${gen.id}`;
+                    }}
                     onRegenerate={() => handleRegenerate(gen)}
                     onContinue={() => handleContinue(gen)} />
                 );

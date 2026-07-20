@@ -19,7 +19,10 @@ const requestSchema = z.object({
   mood: z.string().trim().default("Professional"),
   cameraMove: z.string().trim().default("Static"),
   options: z.array(z.string().trim()).default([]),
-  sceneCount: z.number().int().min(1).max(8).default(3),
+  sceneCount: z.number().int().min(1).max(24).default(3),
+  language: z.string().trim().optional(),
+  templateId: z.string().trim().optional(),
+  productImageUrl: z.string().url().optional(),
   mode: z.enum(["generate", "regenerate", "continue", "retry"]).optional(),
   parentGenerationId: z.string().uuid().optional(),
   continueInstruction: z.string().trim().max(4000).optional(),
@@ -133,6 +136,8 @@ export async function POST(request: Request) {
       prompt: input.prompt,
       generatedAt: new Date().toISOString(),
       progressEvents: [...result.progressEvents, "Saving...", "Done."],
+      productionModel: result.productionModel,
+      versionHistory: result.versionHistory,
     };
 
     stage = "supabase.insert.video_generations";

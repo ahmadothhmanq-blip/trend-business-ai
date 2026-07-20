@@ -5,7 +5,7 @@ import { DashboardHeader } from "@/components/dashboard/header";
 import { VideoStudioTool } from "@/components/dashboard/video-studio/video-studio-tool";
 import type { VideoGeneration } from "@/types/video";
 
-export const metadata: Metadata = { title: "AI Video Studio" };
+export const metadata: Metadata = { title: "AI Video Production Platform" };
 
 export default async function VideoStudioPage() {
   const supabase = await createClient();
@@ -39,8 +39,8 @@ export default async function VideoStudioPage() {
   return (
     <>
       <DashboardHeader
-        title="AI Video Studio"
-        description="Create professional video projects with AI — storyboards, scripts, and production plans"
+        title="AI Video Production Platform"
+        description="Design, generate, render, edit, and manage professional AI videos"
         userEmail={user.email}
         userName={(profile?.full_name as string | undefined) ?? (userMeta.full_name as string | undefined)}
         avatarUrl={profile?.avatar_url as string | undefined}

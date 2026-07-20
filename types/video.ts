@@ -1,3 +1,6 @@
+import type { VideoProductionModel } from "@/lib/ai-core/video-production-platform/types";
+import type { VideoVersionHistory } from "@/lib/ai-core/video-production-platform/versions";
+
 export type VideoGenerationStatus = "pending" | "generating" | "completed" | "failed";
 export type VideoGenerationMode = "generate" | "regenerate" | "continue" | "retry";
 
@@ -35,6 +38,8 @@ export type VideoBlueprint = {
   prompt: string;
   generatedAt: string;
   progressEvents?: string[];
+  productionModel?: VideoProductionModel;
+  versionHistory?: VideoVersionHistory;
 };
 
 export type VideoGeneration = {

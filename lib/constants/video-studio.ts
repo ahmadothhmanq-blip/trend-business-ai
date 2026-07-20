@@ -61,11 +61,16 @@ export const VIDEO_ASPECT_RATIOS = [
 ] as const;
 
 export const VIDEO_DURATIONS = [
-  { id: "5s", label: "5 seconds" },
-  { id: "10s", label: "10 seconds" },
-  { id: "15s", label: "15 seconds" },
-  { id: "30s", label: "30 seconds" },
-  { id: "60s", label: "60 seconds" },
+  { id: "5s", label: "5 seconds — Ultra short" },
+  { id: "10s", label: "10 seconds — Hook" },
+  { id: "15s", label: "15 seconds — Short / social" },
+  { id: "30s", label: "30 seconds — Social / ads" },
+  { id: "60s", label: "60 seconds — Marketing" },
+  { id: "90s", label: "90 seconds — Explainer" },
+  { id: "120s", label: "2 minutes — Presentation" },
+  { id: "180s", label: "3 minutes — Training" },
+  { id: "300s", label: "5 minutes — Long video" },
+  { id: "600s", label: "10 minutes — Extended long-form" },
 ] as const;
 
 export const VIDEO_CAMERA_MOVES = [

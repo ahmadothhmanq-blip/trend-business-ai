@@ -21,6 +21,11 @@ import type {
 } from "@/plugins/video-studio/types";
 import { sanitizeSvgContent } from "@/lib/ai/sanitize";
 import type { GenerationContext, ValidationResult, ExportResult } from "@/lib/ai/types";
+import { buildProductionModelFromOutput } from "@/lib/ai-core/video-production-platform/model-builder";
+import { matchVideoTemplate } from "@/lib/ai-core/video-production-platform/templates";
+import { emptyVideoVersionHistory, saveVideoVersion } from "@/lib/ai-core/video-production-platform/versions";
+import { startAndProcessRender } from "@/lib/ai-core/video-production-platform/render-engine";
+import { synthesizeVoicePreview } from "@/lib/ai-core/video-production-platform/voice-audio";
 
 async function analyzeVideo(
   input: VideoPluginInput,
@@ -190,7 +195,7 @@ async function generateVideo(
   ].join("\n");
   files.push({ path: "video-spec.md", content: specDoc, language: "markdown" });
 
-  return {
+  const baseOutput: VideoOutput = {
     title: analysis.title,
     description: `${analysis.style} ${analysis.videoType} — ${analysis.mood}, ${plan.totalDuration}`,
     videoType: input.videoType,
@@ -203,6 +208,56 @@ async function generateVideo(
     thumbnailSvg,
     colorGrade: analysis.mood,
     files,
+  };
+
+  // Attach Video Production Platform model + preview render job
+  ctx.progress.emit("Building production model...");
+  const template = matchVideoTemplate({
+    prompt: input.prompt,
+    videoType: input.videoType,
+  });
+  let productionModel = buildProductionModelFromOutput({
+    output: baseOutput,
+    prompt: input.prompt,
+    aspectRatio: input.aspectRatio,
+    duration: plan.totalDuration || input.duration,
+    mood: input.mood || analysis.mood,
+    template,
+  });
+  productionModel = synthesizeVoicePreview(productionModel);
+  const rendered = startAndProcessRender(productionModel, "preview");
+  productionModel = rendered.model;
+
+  const history = saveVideoVersion(
+    emptyVideoVersionHistory(),
+    productionModel,
+    "Initial generation",
+  );
+
+  // Persist version history pointer via files metadata note
+  files.push({
+    path: "production/README.md",
+    content: [
+      `# Production Model`,
+      ``,
+      `- Template: ${template.id}`,
+      `- Presenter: ${productionModel.presenter?.displayName || "n/a"}`,
+      `- Duration tier: ${productionModel.durationTier}`,
+      `- Scenes: ${productionModel.scenes.length}`,
+      `- Chapters: ${productionModel.chapters.length}`,
+      `- Render job: ${rendered.job.id} (${rendered.job.status})`,
+      `- Provider: ${rendered.job.provider}`,
+      ``,
+      `Preview clips use storyboard posters until VIDEO_PROVIDER_API_KEY is configured.`,
+    ].join("\n"),
+    language: "markdown",
+  });
+
+  return {
+    ...baseOutput,
+    files,
+    productionModel,
+    versionHistory: history,
   };
 }
 
