@@ -2,6 +2,7 @@
  * Domain verification — DNS readiness checks + SSL status progression.
  */
 
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { promises as dns } from "node:dns";
 import {
   getDomainById,
@@ -34,29 +35,35 @@ async function lookupCname(hostname: string): Promise<string[]> {
 export async function verifyWebsiteDomain(params: {
   domainId: string;
   userId: string;
-  /** Force success after user confirms DNS (dev / staging). */
   forceSimulate?: boolean;
+  client?: SupabaseClient | null;
 }): Promise<WebsiteDomain> {
-  const domain = getDomainById(params.domainId);
+  const domain = await getDomainById(params.domainId, params.client);
   if (!domain || domain.userId !== params.userId) {
     throw new Error("Domain not found.");
   }
   if (domain.kind === "subdomain") {
-    return updateDomainCheck({
-      domainId: domain.id,
-      status: "active",
-      sslStatus: "active",
-      message: "Platform subdomain is active.",
-      verified: true,
-    });
+    return updateDomainCheck(
+      {
+        domainId: domain.id,
+        status: "active",
+        sslStatus: "active",
+        message: "Platform subdomain is active.",
+        verified: true,
+      },
+      params.client,
+    );
   }
 
-  updateDomainCheck({
-    domainId: domain.id,
-    status: "verifying",
-    sslStatus: "pending",
-    message: "Checking DNS records…",
-  });
+  await updateDomainCheck(
+    {
+      domainId: domain.id,
+      status: "verifying",
+      sslStatus: "pending",
+      message: "Checking DNS records…",
+    },
+    params.client,
+  );
 
   const labels = domain.hostname.split(".");
   const apex = labels.slice(-2).join(".");
@@ -91,30 +98,39 @@ export async function verifyWebsiteDomain(params: {
   }
 
   if (tokenFound || (params.forceSimulate && process.env.NODE_ENV !== "production")) {
-    return updateDomainCheck({
-      domainId: domain.id,
-      status: "active",
-      sslStatus: "active",
-      message: tokenFound
-        ? `Verified TXT record${cnameOk ? " and CNAME" : ""}. SSL certificate ready.`
-        : "Simulated verification (non-production). SSL marked ready — confirm DNS before go-live.",
-      verified: true,
-    });
+    return updateDomainCheck(
+      {
+        domainId: domain.id,
+        status: "active",
+        sslStatus: "active",
+        message: tokenFound
+          ? `Verified TXT record${cnameOk ? " and CNAME" : ""}. SSL certificate ready.`
+          : "Simulated verification (non-production). SSL marked ready — confirm DNS before go-live.",
+        verified: true,
+      },
+      params.client,
+    );
   }
 
   if (cnameOk && !tokenFound) {
-    return updateDomainCheck({
-      domainId: domain.id,
-      status: "pending_dns",
-      sslStatus: "pending",
-      message: `CNAME looks good. Still waiting for TXT verification at ${txtFqdn}.`,
-    });
+    return updateDomainCheck(
+      {
+        domainId: domain.id,
+        status: "pending_dns",
+        sslStatus: "pending",
+        message: `CNAME looks good. Still waiting for TXT verification at ${txtFqdn}.`,
+      },
+      params.client,
+    );
   }
 
-  return updateDomainCheck({
-    domainId: domain.id,
-    status: "failed",
-    sslStatus: "pending",
-    message: `DNS not detected yet. Ensure TXT ${domain.verificationToken} is published, then retry.`,
-  });
+  return updateDomainCheck(
+    {
+      domainId: domain.id,
+      status: "failed",
+      sslStatus: "pending",
+      message: `DNS not detected yet. Ensure TXT ${domain.verificationToken} is published, then retry.`,
+    },
+    params.client,
+  );
 }

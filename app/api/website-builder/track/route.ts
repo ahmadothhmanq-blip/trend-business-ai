@@ -68,7 +68,7 @@ export async function POST(request: Request) {
   }
 
   const data = parsed.data;
-  const event = trackAnalyticsEvent({
+  const event = await trackAnalyticsEvent({
     generationId: data.generationId,
     eventName: data.eventName as AnalyticsEventName,
     sessionId: data.sessionId,

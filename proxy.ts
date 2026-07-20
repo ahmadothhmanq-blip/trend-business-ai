@@ -8,7 +8,7 @@ import { resolveHostToSlug } from "@/lib/ai-core/domains/resolve";
  */
 export async function proxy(request: NextRequest) {
   const host = request.headers.get("host") || "";
-  const resolution = resolveHostToSlug(host);
+  const resolution = await resolveHostToSlug(host);
 
   if (resolution?.slug) {
     const url = request.nextUrl.clone();

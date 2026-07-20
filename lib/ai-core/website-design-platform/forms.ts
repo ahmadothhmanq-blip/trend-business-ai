@@ -2,26 +2,42 @@
  * Phase 10 — Forms & business logic helpers for generated websites.
  */
 
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
   FormIntegrationConfig,
   FormLeadPayload,
 } from "@/lib/ai-core/website-design-platform/types";
+import {
+  insertWebsiteLeadDb,
+  isLeadsTableMissing,
+  listWebsiteLeadsDb,
+  updateWebsiteLeadStatusDb,
+} from "@/lib/ai-core/website-design-platform/leads-repository";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export type StoredWebsiteLead = FormLeadPayload & {
   id: string;
   userId?: string;
   createdAt: string;
-  status: "new" | "notified" | "forwarded" | "failed";
+  status: "new" | "notified" | "forwarded" | "failed" | "read" | "archived";
   integration?: FormIntegrationConfig;
 };
 
 const leadsByGeneration = new Map<string, StoredWebsiteLead[]>();
 
-export function storeWebsiteLead(
+function memoryStore(lead: StoredWebsiteLead): StoredWebsiteLead {
+  const list = leadsByGeneration.get(lead.generationId) || [];
+  list.unshift(lead);
+  leadsByGeneration.set(lead.generationId, list.slice(0, 200));
+  return lead;
+}
+
+export async function storeWebsiteLead(
   lead: FormLeadPayload,
   integration?: FormIntegrationConfig,
   userId?: string,
-): StoredWebsiteLead {
+  client?: SupabaseClient | null,
+): Promise<StoredWebsiteLead> {
   const row: StoredWebsiteLead = {
     ...lead,
     id: `lead_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
@@ -30,14 +46,51 @@ export function storeWebsiteLead(
     status: "new",
     integration,
   };
-  const list = leadsByGeneration.get(lead.generationId) || [];
-  list.unshift(row);
-  leadsByGeneration.set(lead.generationId, list.slice(0, 200));
-  return row;
+
+  const dbClient = client ?? createAdminClient();
+  if (dbClient) {
+    const persisted = await insertWebsiteLeadDb(dbClient, row);
+    if (persisted) return persisted;
+    const { error } = await dbClient.from("website_leads").select("id").limit(1);
+    if (!isLeadsTableMissing(error)) return row;
+  }
+
+  return memoryStore(row);
 }
 
-export function listWebsiteLeads(generationId: string): StoredWebsiteLead[] {
+export async function listWebsiteLeads(
+  generationId: string,
+  client?: SupabaseClient | null,
+): Promise<StoredWebsiteLead[]> {
+  if (client) {
+    const rows = await listWebsiteLeadsDb(client, generationId);
+    const { error } = await client
+      .from("website_leads")
+      .select("id")
+      .eq("generation_id", generationId)
+      .limit(1);
+    if (!isLeadsTableMissing(error)) return rows;
+  }
   return leadsByGeneration.get(generationId) || [];
+}
+
+export async function updateWebsiteLeadStatus(
+  leadId: string,
+  status: StoredWebsiteLead["status"],
+  client?: SupabaseClient | null,
+): Promise<StoredWebsiteLead | null> {
+  if (client) {
+    const updated = await updateWebsiteLeadStatusDb(client, leadId, status);
+    if (updated) return updated;
+  }
+  for (const list of leadsByGeneration.values()) {
+    const lead = list.find((l) => l.id === leadId);
+    if (lead) {
+      lead.status = status;
+      return lead;
+    }
+  }
+  return null;
 }
 
 /**
@@ -76,7 +129,6 @@ export async function notifyLeadIntegrations(
   }
 
   if (cfg?.emailTo) {
-    // Platform email provider may not be configured — record intent.
     emailed = true;
     notes.push(`Email notification queued for ${cfg.emailTo}`);
   }

@@ -2,6 +2,7 @@
  * Build deployment dashboard aggregating publish + domains + history.
  */
 
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type { WebsitePublication } from "@/lib/website/publish";
 import { buildPublishingSummary } from "@/lib/ai-core/publishing";
 import {
@@ -15,7 +16,7 @@ import {
 } from "@/lib/ai-core/deployment/history";
 import type { DeploymentDashboard } from "@/lib/ai-core/deployment/types";
 
-export function buildDeploymentDashboard(params: {
+export async function buildDeploymentDashboard(params: {
   generationId: string;
   projectName?: string | null;
   publication?: WebsitePublication | null;
@@ -23,7 +24,9 @@ export function buildDeploymentDashboard(params: {
   userHandle?: string | null;
   hasAnalytics?: boolean;
   hasSeoAgent?: boolean;
-}): DeploymentDashboard {
+  client?: SupabaseClient | null;
+}): Promise<DeploymentDashboard> {
+  const client = params.client ?? null;
   const publishing = buildPublishingSummary({
     generationId: params.generationId,
     publication: params.publication,
@@ -31,32 +34,38 @@ export function buildDeploymentDashboard(params: {
   });
 
   if (params.userHandle) {
-    ensurePlatformSubdomain({
-      userId: params.userId,
-      generationId: params.generationId,
-      handle: params.userHandle,
-      publicationId: params.publication?.id,
-      slug: params.publication?.slug,
-    });
+    await ensurePlatformSubdomain(
+      {
+        userId: params.userId,
+        generationId: params.generationId,
+        handle: params.userHandle,
+        publicationId: params.publication?.id,
+        slug: params.publication?.slug,
+      },
+      client,
+    );
   }
 
-  const domains = listDomainsForGeneration(params.generationId);
-  let history = listDeploymentHistory(params.generationId);
+  const domains = await listDomainsForGeneration(params.generationId, client);
+  let history = await listDeploymentHistory(params.generationId, 30, client);
 
-  // Seed a helpful history entry when empty
   if (!history.length && params.publication) {
-    recordDeploymentEvent({
-      generationId: params.generationId,
-      kind:
-        params.publication.status === "published"
-          ? "published"
-          : params.publication.status === "unpublished"
-            ? "archived"
-            : "prepared",
-      message: `Publication status: ${params.publication.status}`,
-      url: params.publication.planned_public_url,
-    });
-    history = listDeploymentHistory(params.generationId);
+    await recordDeploymentEvent(
+      {
+        userId: params.userId,
+        generationId: params.generationId,
+        kind:
+          params.publication.status === "published"
+            ? "published"
+            : params.publication.status === "unpublished"
+              ? "archived"
+              : "prepared",
+        message: `Publication status: ${params.publication.status}`,
+        url: params.publication.planned_public_url,
+      },
+      client,
+    );
+    history = await listDeploymentHistory(params.generationId, 30, client);
   }
 
   const activeCustom = domains.find(

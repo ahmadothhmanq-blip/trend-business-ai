@@ -94,8 +94,8 @@ export async function GET(_request: Request, { params }: Params) {
     files: project.files || [],
     structure,
   });
-  const cms = listCmsEntries(parsedId.id);
-  const leads = listWebsiteLeads(parsedId.id);
+  const cms = await listCmsEntries(parsedId.id, auth.supabase);
+  const leads = await listWebsiteLeads(parsedId.id, auth.supabase);
 
   return NextResponse.json({
     generation,
@@ -236,13 +236,23 @@ export async function POST(request: Request, { params }: Params) {
     }
 
     if (action.action === "cms.upsert") {
-      const entry = upsertCmsEntry(parsedId.id, action.entry);
-      return NextResponse.json({ ok: true, entry, cms: listCmsEntries(parsedId.id) });
+      const entry = await upsertCmsEntry(parsedId.id, action.entry, {
+        userId: auth.user!.id,
+        client: auth.supabase,
+      });
+      return NextResponse.json({
+        ok: true,
+        entry,
+        cms: await listCmsEntries(parsedId.id, auth.supabase),
+      });
     }
 
     if (action.action === "cms.delete") {
-      deleteCmsEntry(parsedId.id, action.id);
-      return NextResponse.json({ ok: true, cms: listCmsEntries(parsedId.id) });
+      await deleteCmsEntry(parsedId.id, action.id, auth.supabase);
+      return NextResponse.json({
+        ok: true,
+        cms: await listCmsEntries(parsedId.id, auth.supabase),
+      });
     }
 
     let catalog = parseCatalogFromFiles(project.files || []);
@@ -325,7 +335,7 @@ export async function POST(request: Request, { params }: Params) {
       ok: true,
       notes,
       catalog: parseCatalogFromFiles(saved.project.files || []),
-      cms: listCmsEntries(parsedId.id),
+      cms: await listCmsEntries(parsedId.id, auth.supabase),
       quality,
       assistant: assistantResult,
       editCommand: assistantResult?.editCommand,

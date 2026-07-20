@@ -32,10 +32,14 @@ function insight(
 /**
  * AI Conversion Optimizer — runtime + structural recommendations.
  */
-export function runConversionOptimizer(
-  params: RunConversionOptimizerParams,
-): ConversionOptimizerReport {
-  const analytics = buildWebsiteAnalyticsSummary(params.generationId, 14);
+export async function runConversionOptimizer(
+  params: RunConversionOptimizerParams & { client?: import("@supabase/supabase-js").SupabaseClient | null },
+): Promise<ConversionOptimizerReport> {
+  const analytics = await buildWebsiteAnalyticsSummary(
+    params.generationId,
+    14,
+    params.client,
+  );
   const experiments = listExperimentResults(params.generationId);
   const insights: ConversionInsight[] = [];
 

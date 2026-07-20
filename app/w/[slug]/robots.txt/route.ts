@@ -52,7 +52,6 @@ export async function GET(_request: Request, context: RouteContext) {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
       "Cache-Control": "public, max-age=300",
-      "X-Robots-Tag": "noindex",
     },
   });
 }

@@ -2512,18 +2512,51 @@ function PreviewAndExportPanel({
     };
   }, [activeProject?.id]);
 
-  async function runPublishAction(action: "prepare" | "publish" | "unpublish") {
+  async function runPublishAction(
+    action: "prepare" | "publish" | "unpublish",
+    force = false,
+  ) {
     if (!activeProject?.id) return;
     setPublishBusy(true);
     try {
       const res = await fetch(`/api/website-builder/${activeProject.id}/publish`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action }),
+        body: JSON.stringify({ action, force }),
       });
       const data = await res.json();
+      const qr = data.qualityRecommendations as
+        | {
+            seoScore?: number | null;
+            performanceScore?: number | null;
+            mobileScore?: number | null;
+            conversionReady?: boolean | null;
+            publishReady?: boolean | null;
+            blockers?: string[];
+            warnings?: string[];
+            opportunities?: string[];
+          }
+        | undefined;
+      if (qr) {
+        setPublishQuality({
+          seoScore: qr.seoScore ?? null,
+          performanceScore: qr.performanceScore ?? null,
+          mobileScore: qr.mobileScore ?? null,
+          conversionReady: qr.conversionReady ?? null,
+          blockers: qr.blockers ?? data.blockers ?? [],
+          warnings: qr.warnings ?? [],
+          opportunities: qr.opportunities ?? [],
+        });
+      }
       if (!res.ok) {
-        toast.error(data.error ?? `Could not ${action} website.`);
+        if (res.status === 422) {
+          toast.error(
+            data.blockers?.[0] ??
+              "Publishing blocked. Resolve SEO, performance, or conversion issues first.",
+          );
+        } else {
+          toast.error(data.error ?? `Could not ${action} website.`);
+        }
         return;
       }
       const status = (data.publication?.status ?? action) as
@@ -2537,28 +2570,6 @@ function PreviewAndExportPanel({
         data.publication?.public_path ??
         null;
       setPublicUrl(url);
-      const qr = data.qualityRecommendations as
-        | {
-            seoScore?: number | null;
-            performanceScore?: number | null;
-            mobileScore?: number | null;
-            conversionReady?: boolean | null;
-            blockers?: string[];
-            warnings?: string[];
-            opportunities?: string[];
-          }
-        | undefined;
-      if (qr) {
-        setPublishQuality({
-          seoScore: qr.seoScore ?? null,
-          performanceScore: qr.performanceScore ?? null,
-          mobileScore: qr.mobileScore ?? null,
-          conversionReady: qr.conversionReady ?? null,
-          blockers: qr.blockers ?? [],
-          warnings: qr.warnings ?? [],
-          opportunities: qr.opportunities ?? [],
-        });
-      }
       toast.success(data.message ?? `Website ${action}ed.`);
       if (action === "publish" && url) {
         window.open(url.startsWith("http") ? url : url, "_blank", "noopener,noreferrer");

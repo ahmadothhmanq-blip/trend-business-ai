@@ -45,6 +45,7 @@ export {
   storeWebsiteLead,
   listWebsiteLeads,
   notifyLeadIntegrations,
+  updateWebsiteLeadStatus,
   buildFormSubmitClientSnippet,
 } from "@/lib/ai-core/website-design-platform/forms";
 

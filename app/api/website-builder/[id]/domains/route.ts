@@ -56,7 +56,7 @@ export async function GET(_request: Request, { params }: Params) {
   );
   if (owned.error) return owned.error;
 
-  const domains = listDomainsForGeneration(parsedId.id);
+  const domains = await listDomainsForGeneration(parsedId.id, auth.supabase);
   return NextResponse.json({ domains, count: domains.length });
 }
 
@@ -109,20 +109,27 @@ export async function POST(request: Request, { params }: Params) {
   });
 
   try {
-    const domain = addCustomDomain({
-      userId: auth.user!.id,
-      generationId: parsedId.id,
-      hostname: validated.hostname,
-      publicationId: publication?.id,
-      slug: publication?.slug,
-    });
+    const domain = await addCustomDomain(
+      {
+        userId: auth.user!.id,
+        generationId: parsedId.id,
+        hostname: validated.hostname,
+        publicationId: publication?.id,
+        slug: publication?.slug,
+      },
+      auth.supabase,
+    );
 
-    recordDeploymentEvent({
-      generationId: parsedId.id,
-      kind: "domain_added",
-      message: `Custom domain added: ${domain.hostname}`,
-      url: `https://${domain.hostname}`,
-    });
+    await recordDeploymentEvent(
+      {
+        userId: auth.user!.id,
+        generationId: parsedId.id,
+        kind: "domain_added",
+        message: `Custom domain added: ${domain.hostname}`,
+        url: `https://${domain.hostname}`,
+      },
+      auth.supabase,
+    );
 
     return NextResponse.json({ domain }, { status: 201 });
   } catch (err) {
@@ -167,18 +174,25 @@ export async function DELETE(request: Request, { params }: Params) {
   }
 
   try {
-    const domain = removeDomain({
-      domainId: parsed.data.domainId,
-      userId: auth.user!.id,
-    });
+    const domain = await removeDomain(
+      {
+        domainId: parsed.data.domainId,
+        userId: auth.user!.id,
+      },
+      auth.supabase,
+    );
     if (domain.generationId !== parsedId.id) {
       return NextResponse.json({ error: "Domain not found." }, { status: 404 });
     }
-    recordDeploymentEvent({
-      generationId: parsedId.id,
-      kind: "domain_removed",
-      message: `Domain removed: ${domain.hostname}`,
-    });
+    await recordDeploymentEvent(
+      {
+        userId: auth.user!.id,
+        generationId: parsedId.id,
+        kind: "domain_removed",
+        message: `Domain removed: ${domain.hostname}`,
+      },
+      auth.supabase,
+    );
     return NextResponse.json({ domain });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Remove failed";

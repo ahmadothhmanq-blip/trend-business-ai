@@ -45,8 +45,12 @@ export async function GET(request: Request, { params }: Params) {
     strategy?: { industry?: string };
   };
 
-  const summary = buildWebsiteAnalyticsSummary(parsedId.id, rangeDays);
-  const optimizer = runConversionOptimizer({
+  const summary = await buildWebsiteAnalyticsSummary(
+    parsedId.id,
+    rangeDays,
+    auth.supabase,
+  );
+  const optimizer = await runConversionOptimizer({
     generationId: parsedId.id,
     conversionReport: blueprint.conversionReport ?? null,
     industry:
@@ -54,6 +58,7 @@ export async function GET(request: Request, { params }: Params) {
       blueprint.strategy?.industry ||
       null,
     projectName: generation.project_name,
+    client: auth.supabase,
   });
 
   return NextResponse.json({

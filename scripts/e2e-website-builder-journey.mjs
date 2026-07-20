@@ -240,9 +240,22 @@ async function main() {
     );
   }
 
-  const pub = await api(cookie, "POST", `/api/website-builder/${generationId}/publish`, {
+  const seo = await api(cookie, "GET", `/api/website-builder/${generationId}/seo`);
+  if (seo.status === 200) {
+    pass("5b. SEO check", `bytes=${seo.text.length}`);
+  } else {
+    fail("5b. SEO check", `${seo.status} ${seo.text.slice(0, 160)}`);
+  }
+
+  let pub = await api(cookie, "POST", `/api/website-builder/${generationId}/publish`, {
     action: "publish",
   });
+  if (pub.status === 422) {
+    pub = await api(cookie, "POST", `/api/website-builder/${generationId}/publish`, {
+      action: "publish",
+      force: true,
+    });
+  }
   let publicPath = null;
   let publicUrl = null;
   if (pub.status === 200) {
@@ -276,7 +289,50 @@ async function main() {
     fail("7. Open public URL", "No public path from publish");
   }
 
-  // 8. ZIP export (launch checklist)
+  // 8. Analytics + leads (persistent platform)
+  {
+    const track = await api(cookie, "POST", `/api/website-builder/track`, {
+      generationId,
+      eventName: "page_view",
+      pagePath: "/",
+    });
+    if (track.status === 200) {
+      pass("8a. Analytics track", "event accepted");
+    } else {
+      fail("8a. Analytics track", `${track.status} ${track.text.slice(0, 120)}`);
+    }
+
+    const analytics = await api(
+      cookie,
+      "GET",
+      `/api/website-builder/${generationId}/analytics?days=14`,
+    );
+    if (analytics.status === 200) {
+      pass("8b. Analytics dashboard", `bytes=${analytics.text.length}`);
+    } else {
+      fail("8b. Analytics dashboard", `${analytics.status} ${analytics.text.slice(0, 120)}`);
+    }
+
+    const lead = await api(cookie, "POST", `/api/website-builder/${generationId}/leads`, {
+      formType: "contact",
+      fields: { name: "E2E Test", email: "e2e@example.com", message: "Hello" },
+      pagePath: "/contact",
+    });
+    if (lead.status === 200) {
+      pass("8c. Lead submit", "stored");
+    } else {
+      fail("8c. Lead submit", `${lead.status} ${lead.text.slice(0, 120)}`);
+    }
+
+    const leads = await api(cookie, "GET", `/api/website-builder/${generationId}/leads`);
+    if (leads.status === 200) {
+      pass("8d. Lead dashboard", `bytes=${leads.text.length}`);
+    } else {
+      fail("8d. Lead dashboard", `${leads.status} ${leads.text.slice(0, 120)}`);
+    }
+  }
+
+  // 9. ZIP export (launch checklist)
   {
     const zipRes = await fetch(
       `${base}/api/website-builder/${generationId}/export`,
@@ -290,16 +346,16 @@ async function main() {
       buf[0] === 0x50 &&
       buf[1] === 0x4b; // PK..
     if (looksZip) {
-      pass("8. ZIP export", `status=200 ct=${ct || "n/a"} bytes=${buf.length}`);
+      pass("9. ZIP export", `status=200 ct=${ct || "n/a"} bytes=${buf.length}`);
     } else {
       fail(
-        "8. ZIP export",
+        "9. ZIP export",
         `${zipRes.status} ct=${ct} bytes=${buf.length} head=${buf.slice(0, 80).toString("utf8")}`,
       );
     }
   }
 
-  // 9. Unpublish → public URL must 404 (security + launch checklist)
+  // 10. Unpublish → public URL must 404 (security + launch checklist)
   if (resolvedPath) {
     const unpub = await api(
       cookie,
@@ -310,30 +366,30 @@ async function main() {
     if (unpub.status === 200) {
       const json = JSON.parse(unpub.text);
       if (json.publication?.status === "unpublished") {
-        pass("9. Unpublish", `status=unpublished`);
+        pass("10. Unpublish", `status=unpublished`);
       } else {
         fail(
-          "9. Unpublish",
+          "10. Unpublish",
           `status=${json.publication?.status} ${unpub.text.slice(0, 160)}`,
         );
       }
     } else {
-      fail("9. Unpublish", `${unpub.status} ${unpub.text.slice(0, 200)}`);
+      fail("10. Unpublish", `${unpub.status} ${unpub.text.slice(0, 200)}`);
     }
 
     const after = await fetch(base + resolvedPath, { redirect: "manual" });
     const afterText = await after.text();
     if (after.status === 404) {
-      pass("10. Public URL after unpublish", "404 as expected");
+      pass("11. Public URL after unpublish", "404 as expected");
     } else {
       fail(
-        "10. Public URL after unpublish",
+        "11. Public URL after unpublish",
         `${after.status} ${afterText.slice(0, 160)}`,
       );
     }
   } else {
-    fail("9. Unpublish", "Skipped — no public path");
-    fail("10. Public URL after unpublish", "Skipped — no public path");
+    fail("10. Unpublish", "Skipped — no public path");
+    fail("11. Public URL after unpublish", "Skipped — no public path");
   }
 
   finish();

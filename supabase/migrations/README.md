@@ -17,6 +17,15 @@ Run these files in order against your Supabase project (SQL Editor or CLI).
 | 45 | `045_video_studio_media_update_rls.sql` | Video Studio `video_media` UPDATE RLS |
 | 46 | `046_webapp_deployments.sql` | App Builder deployments (preview + production) |
 
+| 47 | `047_website_leads_cms.sql` | Website leads + CMS entries + versions |
+
+## Website Builder platform persistence (041–047)
+
+```bash
+npm run db:apply -- --only 041,042,047
+npm run verify:wb-launch
+```
+
 ## App Builder (046)
 
 ```bash

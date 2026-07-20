@@ -60,7 +60,7 @@ export async function GET(_request: Request, { params }: Params) {
   });
 
   const handle = userHandleFromAuth(auth.user!);
-  const dashboard = buildDeploymentDashboard({
+  const dashboard = await buildDeploymentDashboard({
     generationId: parsedId.id,
     projectName: generation.project_name,
     publication,
@@ -68,6 +68,7 @@ export async function GET(_request: Request, { params }: Params) {
     userHandle: handle,
     hasAnalytics: true,
     hasSeoAgent: true,
+    client: auth.supabase,
   });
 
   return NextResponse.json({ dashboard });
@@ -150,14 +151,18 @@ export async function POST(request: Request, { params }: Params) {
     archive: "archived",
   } as const;
 
-  recordDeploymentEvent({
-    generationId: parsedId.id,
-    kind: kindByAction[parsed.data.action],
-    message: `Deployment action: ${parsed.data.action}`,
-    url: result.publication.planned_public_url,
-  });
+  await recordDeploymentEvent(
+    {
+      userId: auth.user!.id,
+      generationId: parsedId.id,
+      kind: kindByAction[parsed.data.action],
+      message: `Deployment action: ${parsed.data.action}`,
+      url: result.publication.planned_public_url,
+    },
+    auth.supabase,
+  );
 
-  const dashboard = buildDeploymentDashboard({
+  const dashboard = await buildDeploymentDashboard({
     generationId: parsedId.id,
     projectName: generation.project_name,
     publication: result.publication,
@@ -165,6 +170,7 @@ export async function POST(request: Request, { params }: Params) {
     userHandle: handle,
     hasAnalytics: true,
     hasSeoAgent: true,
+    client: auth.supabase,
   });
 
   return NextResponse.json({

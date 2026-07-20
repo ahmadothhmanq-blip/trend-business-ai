@@ -11,6 +11,7 @@ import type {
   AnalyticsTimePoint,
   WebsiteAnalyticsSummary,
 } from "@/lib/ai-core/analytics/types";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 function shareItems(
   counts: Map<string, number>,
@@ -34,14 +35,15 @@ function dayKey(iso: string): string {
 /**
  * Build analytics dashboard summary for a website generation.
  */
-export function buildWebsiteAnalyticsSummary(
+export async function buildWebsiteAnalyticsSummary(
   generationId: string,
   rangeDays = 14,
-): WebsiteAnalyticsSummary {
+  client?: SupabaseClient | null,
+): Promise<WebsiteAnalyticsSummary> {
   const since = new Date(
     Date.now() - rangeDays * 86_400_000,
   ).toISOString();
-  const events = listAnalyticsEvents(generationId, since);
+  const events = await listAnalyticsEvents(generationId, since, client);
 
   const pageViews = events.filter((e) => e.eventName === "page_view");
   const clicks = events.filter(

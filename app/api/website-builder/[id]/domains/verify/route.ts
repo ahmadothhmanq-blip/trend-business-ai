@@ -15,7 +15,6 @@ type Params = { params: Promise<{ id: string }> };
 
 const verifySchema = z.object({
   domainId: z.string().trim().min(1),
-  /** Dev/staging helper when DNS is not yet public. */
   simulate: z.boolean().optional(),
 });
 
@@ -45,7 +44,7 @@ export async function POST(request: Request, { params }: Params) {
     );
   }
 
-  const existing = getDomainById(parsed.data.domainId);
+  const existing = await getDomainById(parsed.data.domainId, auth.supabase);
   if (
     !existing ||
     existing.userId !== auth.user!.id ||
@@ -54,7 +53,6 @@ export async function POST(request: Request, { params }: Params) {
     return NextResponse.json({ error: "Domain not found." }, { status: 404 });
   }
 
-  // Attach latest publication slug before activation
   const publication = await getPublicationForGeneration({
     supabase: auth.supabase,
     userId: auth.user!.id,
@@ -70,22 +68,31 @@ export async function POST(request: Request, { params }: Params) {
       domainId: parsed.data.domainId,
       userId: auth.user!.id,
       forceSimulate: parsed.data.simulate === true,
+      client: auth.supabase,
     });
 
     if (domain.status === "active") {
-      recordDeploymentEvent({
-        generationId: parsedId.id,
-        kind: "domain_verified",
-        message: `Domain verified: ${domain.hostname}`,
-        url: `https://${domain.hostname}`,
-      });
-      if (domain.sslStatus === "active") {
-        recordDeploymentEvent({
+      await recordDeploymentEvent(
+        {
+          userId: auth.user!.id,
           generationId: parsedId.id,
-          kind: "ssl_ready",
-          message: `SSL ready for ${domain.hostname}`,
+          kind: "domain_verified",
+          message: `Domain verified: ${domain.hostname}`,
           url: `https://${domain.hostname}`,
-        });
+        },
+        auth.supabase,
+      );
+      if (domain.sslStatus === "active") {
+        await recordDeploymentEvent(
+          {
+            userId: auth.user!.id,
+            generationId: parsedId.id,
+            kind: "ssl_ready",
+            message: `SSL ready for ${domain.hostname}`,
+            url: `https://${domain.hostname}`,
+          },
+          auth.supabase,
+        );
       }
     }
 

@@ -86,12 +86,17 @@ export async function POST(request: Request, { params }: Params) {
     null) as CoreBusinessProfile | null;
   const strategy = (project.strategy || null) as CoreProductStrategy | null;
 
-  const analytics = buildWebsiteAnalyticsSummary(parsedId.id, 14);
-  const conversionOptimizer = runConversionOptimizer({
+  const analytics = await buildWebsiteAnalyticsSummary(
+    parsedId.id,
+    14,
+    auth.supabase,
+  );
+  const conversionOptimizer = await runConversionOptimizer({
     generationId: parsedId.id,
     conversionReport: project.conversionReport ?? null,
     industry: profile?.industry || null,
     projectName: generation.project_name || profile?.projectName || null,
+    client: auth.supabase,
   });
 
   const agent = runSeoAgent({

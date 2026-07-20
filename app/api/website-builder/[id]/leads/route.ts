@@ -5,7 +5,10 @@ import {
   storeWebsiteLead,
   listWebsiteLeads,
   notifyLeadIntegrations,
+  updateWebsiteLeadStatus,
 } from "@/lib/ai-core/website-design-platform";
+import { leadsToCsv } from "@/lib/ai-core/website-design-platform/leads-repository";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -27,10 +30,15 @@ const leadSchema = z.object({
   webhookUrl: z.string().url().optional(),
 });
 
+const statusSchema = z.object({
+  leadId: z.string().uuid(),
+  status: z.enum(["new", "notified", "forwarded", "failed", "read", "archived"]),
+});
+
 /**
- * GET — List leads for a website generation (dashboard).
+ * GET — List leads for a website generation (dashboard) or export CSV.
  */
-export async function GET(_request: Request, { params }: Params) {
+export async function GET(request: Request, { params }: Params) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
@@ -52,15 +60,28 @@ export async function GET(_request: Request, { params }: Params) {
     return NextResponse.json({ error: "Website not found." }, { status: 404 });
   }
 
+  const leads = await listWebsiteLeads(parsedId.id, auth.supabase);
+  const format = new URL(request.url).searchParams.get("format");
+
+  if (format === "csv") {
+    return new NextResponse(leadsToCsv(leads), {
+      status: 200,
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="leads-${parsedId.id}.csv"`,
+      },
+    });
+  }
+
   return NextResponse.json({
-    leads: listWebsiteLeads(parsedId.id),
+    leads,
     generationId: parsedId.id,
+    count: leads.length,
   });
 }
 
 /**
- * POST — Submit contact / booking / quote / registration lead (Phase 10).
- * Accepts authenticated dashboard previews and published-site form posts.
+ * POST — Submit contact / booking / quote / registration lead.
  */
 export async function POST(request: Request, { params }: Params) {
   const { id: rawId } = await params;
@@ -80,6 +101,7 @@ export async function POST(request: Request, { params }: Params) {
 
   const auth = await requireUser();
   const userId = auth.response ? undefined : auth.user?.id;
+  const admin = createAdminClient();
 
   if (!auth.response && auth.user) {
     const { data } = await auth.supabase
@@ -91,9 +113,23 @@ export async function POST(request: Request, { params }: Params) {
     if (!data) {
       return NextResponse.json({ error: "Website not found." }, { status: 404 });
     }
+  } else {
+    const client = admin ?? auth.supabase;
+    const { data: pub } = await client
+      .from("website_publications")
+      .select("generation_id")
+      .eq("generation_id", parsedId.id)
+      .eq("status", "published")
+      .maybeSingle();
+    if (!pub) {
+      return NextResponse.json(
+        { error: "Form submissions are only accepted for published websites." },
+        { status: 403 },
+      );
+    }
   }
 
-  const lead = storeWebsiteLead(
+  const lead = await storeWebsiteLead(
     {
       generationId: parsedId.id,
       formType: parsed.data.formType,
@@ -112,10 +148,14 @@ export async function POST(request: Request, { params }: Params) {
       notifyOnSubmit: true,
     },
     userId,
+    admin ?? auth.supabase,
   );
 
   const notify = await notifyLeadIntegrations(lead);
-  lead.status = notify.webhooked || notify.emailed ? "notified" : "new";
+  if (notify.webhooked || notify.emailed) {
+    await updateWebsiteLeadStatus(lead.id, "notified", admin ?? auth.supabase);
+    lead.status = "notified";
+  }
 
   return NextResponse.json({
     ok: true,
@@ -123,4 +163,35 @@ export async function POST(request: Request, { params }: Params) {
     notify,
     message: "Form submitted successfully.",
   });
+}
+
+/**
+ * PATCH — Update lead status (dashboard).
+ */
+export async function PATCH(request: Request, { params }: Params) {
+  const auth = await requireUser();
+  if (auth.response) return auth.response;
+
+  const { id: rawId } = await params;
+  const parsedId = parseUuidParam(rawId, "generation id");
+  if (parsedId instanceof NextResponse) return parsedId;
+
+  const body = await parseJsonBody<unknown>(request);
+  if (body instanceof NextResponse) return body;
+
+  const parsed = statusSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid status update" }, { status: 400 });
+  }
+
+  const updated = await updateWebsiteLeadStatus(
+    parsed.data.leadId,
+    parsed.data.status,
+    auth.supabase,
+  );
+  if (!updated || updated.generationId !== parsedId.id) {
+    return NextResponse.json({ error: "Lead not found." }, { status: 404 });
+  }
+
+  return NextResponse.json({ ok: true, lead: updated });
 }

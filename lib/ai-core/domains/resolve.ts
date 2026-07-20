@@ -15,12 +15,13 @@ export type HostResolution = {
 /**
  * Map an incoming Host header to a published site slug when configured.
  */
-export function resolveHostToSlug(hostnameRaw: string): HostResolution | null {
+export async function resolveHostToSlug(
+  hostnameRaw: string,
+): Promise<HostResolution | null> {
   const hostname = hostnameRaw.toLowerCase().split(":")[0] || "";
   if (!hostname) return null;
 
-  // Active domain mappings win (custom + platform subdomains).
-  const domain = findActiveDomainByHostname(hostname);
+  const domain = await findActiveDomainByHostname(hostname);
   if (domain?.slug) {
     return {
       hostname,
@@ -30,7 +31,6 @@ export function resolveHostToSlug(hostnameRaw: string): HostResolution | null {
     };
   }
 
-  // Apex / www / localhost — never rewrite.
   if (isPlatformHost(hostname)) return null;
   return null;
 }
