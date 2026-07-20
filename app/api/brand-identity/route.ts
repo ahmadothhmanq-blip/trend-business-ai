@@ -2,10 +2,11 @@ import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers"
 import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
 import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
-import { generateBrandIdentity } from "@/lib/brand-identity-generator";
+import { generateBrandIdentity, modelToBlueprint } from "@/lib/brand-identity-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
 import { resolveIteratedPrompt } from "@/lib/ai/iteration";
 import { getBrandTypeLabel } from "@/lib/constants/brand-identity-builder";
+import { getBrandTemplate } from "@/lib/ai-core/brand-studio/templates";
 import type { BrandIdentityGeneration, BrandIdentityBlueprint } from "@/types/brand-identity";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -22,6 +23,7 @@ const requestSchema = z.object({
   parentGenerationId: z.string().uuid().optional(),
   continueInstruction: z.string().trim().max(4000).optional(),
   projectId: z.string().uuid().optional(),
+  templateId: z.string().optional(),
 });
 
 function logError(stage: string, error: unknown) {
@@ -82,6 +84,7 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data;
+  const template = input.templateId ? getBrandTemplate(input.templateId) : undefined;
   const typeLabel = getBrandTypeLabel(input.brandType);
   let stage = "generateBrandIdentity";
 
@@ -103,14 +106,17 @@ export async function POST(request: Request) {
     const result = await generateBrandIdentity({
       prompt: iterated.prompt,
       brandName: input.brandName,
-      brandType: input.brandType,
-      industry: input.industry,
+      brandType: template?.brandType || input.brandType,
+      industry: template?.industry || input.industry,
       targetAudience: input.targetAudience,
-      brandPersonality: input.brandPersonality,
-      deliverables: input.deliverables,
+      brandPersonality: template?.personality || input.brandPersonality,
+      deliverables: template?.deliverables?.length ? template.deliverables : input.deliverables,
+      templateId: input.templateId,
     });
 
-    const blueprint: BrandIdentityBlueprint = {
+    const blueprint: BrandIdentityBlueprint = result.model
+      ? modelToBlueprint(result.model, input.prompt)
+      : {
       title: result.title,
       description: result.description,
       brandType: result.brandType,
@@ -129,6 +135,9 @@ export async function POST(request: Request) {
       generatedAt: new Date().toISOString(),
       progressEvents: [...result.progressEvents, "Saving...", "Done."],
     };
+    if (result.model) {
+      blueprint.progressEvents = [...result.progressEvents, "Saving...", "Done."];
+    }
 
     stage = "supabase.insert.brand_identity_generations";
 

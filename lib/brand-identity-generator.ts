@@ -1,12 +1,6 @@
-import { getDefaultTextProvider } from "@/lib/ai/provider-config";
-import { providerManager } from "@/lib/ai/provider-manager";
-import { emptyTokenUsage } from "@/lib/ai/usage";
 import type { TokenUsage } from "@/lib/ai/types";
-import { layerRunner } from "@/lib/ai-core";
-import {
-  brandInputToBrief,
-  createBrandDesignerAdapter,
-} from "@/lib/ai-core/adapters/brand-designer";
+import { brandIdentityEngine } from "@/lib/ai-core/brand-studio/engine";
+import { modelToBlueprint } from "@/lib/ai-core/brand-studio/model";
 import type {
   BrandOutput,
   BrandIdentityPluginInput,
@@ -17,6 +11,7 @@ export type { BrandOutput, BrandIdentityPluginInput, BrandProgressEvent };
 
 type GenerateBrandInput = BrandIdentityPluginInput & {
   onProgress?: (event: string) => void;
+  templateId?: string;
 };
 
 export type BrandGenerationResult = BrandOutput & {
@@ -24,39 +19,31 @@ export type BrandGenerationResult = BrandOutput & {
   usage: TokenUsage;
   generationTimeMs: number;
   provider: string;
+  model?: import("@/lib/ai-core/brand-studio/types").BrandIdentityModel;
 };
 
 /**
- * Brand Designer entrypoint — Phase 3 runs through AI Core LayerRunner
- * (Idea → Strategy → Design → Assets → Generation → Quality → Finalize).
+ * Brand Designer entrypoint — unified BrandIdentityEngine via AI Core LayerRunner.
  * API route remains /api/brand-identity.
  */
 export async function generateBrandIdentity(
   input: GenerateBrandInput,
 ): Promise<BrandGenerationResult> {
-  const { onProgress, ...pluginInput } = input;
+  const { onProgress, templateId, ...pluginInput } = input;
 
-  const resolved = providerManager.resolve(getDefaultTextProvider());
-  if (!resolved || !providerManager.isConfigured(resolved)) {
-    throw new Error(
-      "No AI provider configured. Set DEEPSEEK_API_KEY to enable generation.",
-    );
-  }
-
-  const adapter = createBrandDesignerAdapter();
-  const result = await layerRunner.run(
-    adapter,
-    { brief: brandInputToBrief(pluginInput) },
-    { provider: resolved, onProgress },
-  );
-
-  const project = result.finalOutput ?? result.generation;
+  const result = await brandIdentityEngine.generate(pluginInput, {
+    onProgress,
+    templateId,
+  });
 
   return {
-    ...project,
-    progressEvents: result.progressEvents as BrandProgressEvent[],
-    usage: result.usage ?? emptyTokenUsage(),
+    ...result.output,
+    progressEvents: result.progressEvents,
+    usage: result.usage,
     generationTimeMs: result.generationTimeMs,
     provider: result.provider,
+    model: result.model,
   };
 }
+
+export { modelToBlueprint } from "@/lib/ai-core/brand-studio/model";

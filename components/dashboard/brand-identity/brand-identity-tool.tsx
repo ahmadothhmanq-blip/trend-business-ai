@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { toast } from "sonner";
 import {
   ArrowLeft,
@@ -15,6 +16,8 @@ import {
   Sparkles,
   Type,
   Wand2,
+  LayoutTemplate,
+  Settings2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,6 +53,7 @@ import {
 import { getOnePromptProduct } from "@/lib/constants/one-prompt-products";
 import { useIdeaQueryParam } from "@/lib/hooks/use-idea-query-param";
 import type { BrandIdentityGeneration } from "@/types/brand-identity";
+import type { BrandTemplateDefinition } from "@/lib/ai-core/brand-studio/types";
 
 type Props = { initialGenerations?: BrandIdentityGeneration[] };
 
@@ -163,6 +167,11 @@ function BrandPreview({
           <p className="text-xs text-white/40">{gen.brand_type} &middot; {gen.provider ?? "deepseek"} &middot; {gen.generation_time_ms ? `${(gen.generation_time_ms / 1000).toFixed(1)}s` : ""}</p>
         </div>
         <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+          <Link href={`/dashboard/brand-studio/${gen.id}`}>
+            <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:border-premium-gold/25">
+              <Settings2 className="size-3" /> Workspace
+            </Button>
+          </Link>
           {onRegenerate ? (
             <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:border-white/20" onClick={onRegenerate}>
               <RefreshCw className="size-3" /> Regenerate
@@ -373,6 +382,8 @@ export function BrandIdentityTool({ initialGenerations }: Props) {
   const [personality, setPersonality] = useState("Professional");
   const [deliverables, setDeliverables] = useState<string[]>([]);
   const [progressEvents, setProgressEvents] = useState<string[]>([]);
+  const [templates, setTemplates] = useState<BrandTemplateDefinition[]>([]);
+  const [selectedTemplate, setSelectedTemplate] = useState<string>("");
 
   const [generations, setGenerations] = useState<BrandIdentityGeneration[]>(initialGenerations ?? []);
   const [previewGen, setPreviewGen] = useState<BrandIdentityGeneration | null>(null);
@@ -407,7 +418,24 @@ export function BrandIdentityTool({ initialGenerations }: Props) {
     } catch { /* ignore */ }
   }, [page, search]);
 
+  useEffect(() => {
+    fetch("/api/brand-identity/templates")
+      .then((r) => r.json())
+      .then((d) => setTemplates(d.templates ?? []))
+      .catch(() => {});
+  }, []);
+
   useEffect(() => { if (step === "history") fetchGenerations(); }, [step, fetchGenerations]);
+
+  const applyTemplate = (template: BrandTemplateDefinition) => {
+    setSelectedTemplate(template.id);
+    setSelectedType(template.brandType);
+    setPersonality(template.personality);
+    setDeliverables([...template.deliverables]);
+    if (template.industry) setIndustry(template.industry);
+    setStep("config");
+    toast.message(`Template: ${template.label}`);
+  };
 
   const handleSelectType = (id: string) => {
     setSelectedType(id);
@@ -458,6 +486,7 @@ export function BrandIdentityTool({ initialGenerations }: Props) {
           prompt: idea, brandName: name, brandType, industry, targetAudience,
           brandPersonality: personality, deliverables: brandDeliverables, mode, parentGenerationId,
           continueInstruction: mode === "continue" ? idea : undefined,
+          templateId: selectedTemplate || undefined,
         }),
       });
       const d = await res.json();
@@ -552,6 +581,43 @@ export function BrandIdentityTool({ initialGenerations }: Props) {
 
       {/* Step 1: Select brand type */}
       {step === "type" && (
+        <>
+        <DashboardCard>
+          <DashboardCardHeader>
+            <DashboardCardTitle className="flex items-center gap-2">
+              <LayoutTemplate className="size-4" /> Template Gallery
+            </DashboardCardTitle>
+            <DashboardCardDescription>Start from a professional industry or style template</DashboardCardDescription>
+          </DashboardCardHeader>
+          <DashboardCardContent>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {templates.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => applyTemplate(t)}
+                  className={cn(
+                    "rounded-xl border p-4 text-left transition-all",
+                    selectedTemplate === t.id
+                      ? "border-premium-gold/40 bg-premium-gold/10"
+                      : "border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12]",
+                  )}
+                >
+                  <div className="mb-2 flex gap-1">
+                    {t.previewColors.map((c) => (
+                      <div key={c} className="size-4 rounded-full" style={{ backgroundColor: c }} />
+                    ))}
+                  </div>
+                  <p className="text-sm font-semibold text-white/80">{t.label}</p>
+                  <p className="mt-1 text-[11px] text-white/40">{t.description}</p>
+                  {t.recommended ? (
+                    <span className="mt-2 inline-block rounded-full bg-premium-gold/15 px-2 py-0.5 text-[10px] text-premium-gold-light">Recommended</span>
+                  ) : null}
+                </button>
+              ))}
+            </div>
+          </DashboardCardContent>
+        </DashboardCard>
         <DashboardCard>
           <DashboardCardHeader>
             <DashboardCardTitle>Or choose a brand type</DashboardCardTitle>
@@ -570,6 +636,7 @@ export function BrandIdentityTool({ initialGenerations }: Props) {
             )}
           </DashboardCardContent>
         </DashboardCard>
+        </>
       )}
 
       {/* Step 2: Configure brand details */}
@@ -692,11 +759,16 @@ export function BrandIdentityTool({ initialGenerations }: Props) {
               {generations.map((gen) => {
                 const def = getBrandType(gen.brand_type);
                 return (
-                  <ProjectHistoryCard key={gen.id} item={toHistoryItem(gen)} icon={def?.icon ?? Sparkles}
-                    onFavorite={() => handleFavorite(gen)} onDelete={() => handleDelete(gen.id)}
-                    onView={() => { setPreviewGen(gen); setStep("preview"); }}
-                    onRegenerate={() => handleRegenerate(gen)}
-                    onContinue={() => handleContinue(gen)} />
+                  <div key={gen.id} className="relative">
+                    <ProjectHistoryCard item={toHistoryItem(gen)} icon={def?.icon ?? Sparkles}
+                      onFavorite={() => handleFavorite(gen)} onDelete={() => handleDelete(gen.id)}
+                      onView={() => { setPreviewGen(gen); setStep("preview"); }}
+                      onRegenerate={() => handleRegenerate(gen)}
+                      onContinue={() => handleContinue(gen)} />
+                    <Link href={`/dashboard/brand-studio/${gen.id}`} className="absolute right-3 top-14 text-[10px] text-premium-gold-light hover:underline">
+                      Open workspace →
+                    </Link>
+                  </div>
                 );
               })}
             </div>

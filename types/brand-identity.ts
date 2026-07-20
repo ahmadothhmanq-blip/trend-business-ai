@@ -1,4 +1,5 @@
 import type { BrandVoiceTone, BrandColorEntry, BrandTypographySystem, BrandAsset } from "@/plugins/brand-identity/types";
+import type { BrandIdentityModel, BrandLogoConcept, BrandLogoVariant, BrandKitTokens } from "@/lib/ai-core/brand-studio/types";
 
 export type BrandIdentityGenerationStatus = "pending" | "generating" | "completed" | "failed";
 export type BrandIdentityGenerationMode = "generate" | "regenerate" | "continue" | "retry";
@@ -21,6 +22,12 @@ export type BrandIdentityBlueprint = {
   prompt: string;
   generatedAt: string;
   progressEvents?: string[];
+  model?: BrandIdentityModel;
+  logos?: BrandLogoConcept[];
+  logoVariants?: BrandLogoVariant[];
+  tokens?: BrandKitTokens;
+  qualityScore?: number;
+  templateId?: string;
 };
 
 export type BrandIdentityGeneration = {
