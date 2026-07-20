@@ -10,9 +10,13 @@ export {
   listTemplatesByCategory,
   matchVideoTemplate,
   templateCatalogStats,
+  searchVideoTemplates,
+  listMarketplaceIndustries,
   VIDEO_PRESENTER_PERSONAS,
   VIDEO_LOCATIONS,
   VIDEO_CONTENT_TYPES,
+  VIDEO_INDUSTRY_PACKS,
+  VIDEO_VISUAL_VARIANTS,
 } from "@/lib/ai-core/video-production-platform/templates";
 
 export {
@@ -37,9 +41,11 @@ export {
   getConfiguredVideoProviders,
   resolvePreferredProviderId,
   envProviderFlags,
+  isStrictVideoProviderMode,
+  isStubVideoBytes,
 } from "@/lib/ai-core/video-production-platform/providers";
 
-export { runFullRenderPipeline, resumeRenderJob, retryFailedClips, processPendingRenderJobs } from "@/lib/ai-core/video-production-platform/generation-pipeline";
+export { runFullRenderPipeline, resumeRenderJob, retryFailedClips, processPendingRenderJobs, processVideoStudioBackgroundQueue } from "@/lib/ai-core/video-production-platform/generation-pipeline";
 
 export {
   uploadVideoStudioMedia,
@@ -51,7 +57,20 @@ export {
   VIDEO_STUDIO_BUCKET,
 } from "@/lib/ai-core/video-production-platform/media-storage";
 
-export { assembleComposite } from "@/lib/ai-core/video-production-platform/assemble";
+export {
+  assembleComposite,
+  resolveExportPreset,
+  probeFfmpegHealth,
+  probeFfmpegCapabilities,
+  trimClipWithFfmpeg,
+  probeMediaDurationSec,
+} from "@/lib/ai-core/video-production-platform/assemble";
+
+export {
+  recordMediaRevision,
+  revisionsFromRecord,
+  type MediaRevision,
+} from "@/lib/ai-core/video-production-platform/media-revisions";
 
 export {
   synthesizeSpeech,
@@ -98,6 +117,9 @@ export {
   planBatchVideos,
   batchItemToPluginInput,
   createBatchProgress,
+  updateBatchProgressPercent,
+  BATCH_PLAN_MAX,
+  BATCH_GENERATE_MAX,
   type BatchProgressSnapshot,
 } from "@/lib/ai-core/video-production-platform/batch";
 
@@ -150,9 +172,21 @@ export {
   buildSocialExportPackage,
   buildSocialPublishPackage,
   buildCaptionsVtt,
+  persistSocialExportAssets,
+  reencodeForSocialPreset,
 } from "@/lib/ai-core/video-production-platform/social-export";
 
 export {
   requestAvatarPresenterClip,
   applyAvatarProfileToModel,
 } from "@/lib/ai-core/video-production-platform/avatar";
+
+export {
+  getVideoStudioEnvCatalog,
+  validateVideoStudioProductionEnv,
+  isVideoProviderKeyConfigured,
+  isFfmpegPathConfigured,
+  VIDEO_STUDIO_ENV_DOCS,
+} from "@/lib/ai-core/video-production-platform/env-config";
+
+export { buildVideoStudioHealthReport } from "@/lib/ai-core/video-production-platform/production-health";

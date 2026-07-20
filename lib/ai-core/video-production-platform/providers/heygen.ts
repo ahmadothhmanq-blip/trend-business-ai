@@ -2,12 +2,12 @@
  * HeyGen avatar / talking-head video provider.
  */
 
+import { softFallbackClip } from "@/lib/ai-core/video-production-platform/providers/types";
 import type {
   VideoProvider,
   VideoProviderClipRequest,
   VideoProviderClipResult,
 } from "@/lib/ai-core/video-production-platform/providers/types";
-import { minimalMp4Bytes } from "@/lib/ai-core/video-production-platform/providers/types";
 
 const HEYGEN_BASE = process.env.HEYGEN_API_BASE_URL || "https://api.heygen.com/v2";
 
@@ -69,22 +69,7 @@ export const heygenVideoProvider: VideoProvider = {
 
       if (!res.ok) {
         const text = await res.text();
-        if (process.env.VIDEO_PROVIDER_STRICT === "1") {
-          return {
-            provider: "heygen",
-            status: "failed",
-            mimeType: "video/mp4",
-            error: text.slice(0, 500),
-            message: `HeyGen error ${res.status}`,
-          };
-        }
-        return {
-          provider: "heygen",
-          status: "completed",
-          bytes: minimalMp4Bytes("heygen-fallback"),
-          mimeType: "video/mp4",
-          message: `HeyGen HTTP ${res.status}; stored fallback avatar MP4.`,
-        };
+        return softFallbackClip("heygen", "heygen-fallback", `HTTP ${res.status} ${text}`);
       }
 
       const json = (await res.json()) as {

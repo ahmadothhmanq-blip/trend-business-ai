@@ -2,12 +2,12 @@
  * Generic external video provider (VIDEO_PROVIDER_API_KEY + BASE_URL).
  */
 
+import { softFallbackClip } from "@/lib/ai-core/video-production-platform/providers/types";
 import type {
   VideoProvider,
   VideoProviderClipRequest,
   VideoProviderClipResult,
 } from "@/lib/ai-core/video-production-platform/providers/types";
-import { minimalMp4Bytes } from "@/lib/ai-core/video-production-platform/providers/types";
 
 export const externalVideoProvider: VideoProvider = {
   id: "external",
@@ -41,13 +41,11 @@ export const externalVideoProvider: VideoProvider = {
       });
       if (!res.ok) {
         const text = await res.text();
-        return {
-          provider: "external",
-          status: "completed",
-          bytes: minimalMp4Bytes("external-fallback"),
-          mimeType: "video/mp4",
-          message: `External HTTP ${res.status}; fallback MP4. ${text.slice(0, 80)}`,
-        };
+        return softFallbackClip(
+          "external",
+          "external-fallback",
+          `HTTP ${res.status} ${text}`,
+        );
       }
       const contentType = res.headers.get("content-type") || "";
       if (contentType.includes("video/")) {

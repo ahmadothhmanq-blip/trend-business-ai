@@ -7,6 +7,7 @@ import type {
   VideoQualityReport,
 } from "@/lib/ai-core/video-production-platform/types";
 import { getLatestJob } from "@/lib/ai-core/video-production-platform/render-engine";
+import { isStubVideoBytes } from "@/lib/ai-core/video-production-platform/providers/types";
 
 export function runVideoQualityChecks(
   model: VideoProductionModel,
@@ -186,6 +187,128 @@ export function runVideoQualityChecks(
       detail: `Spent ~${job?.costCreditsSpent ?? 0} / est ${job?.costCreditsEstimate ?? 0} credits`,
     });
   }
+
+  // Scene consistency — visual prompts + durations
+  const inconsistent = model.scenes.filter(
+    (s) => !s.visualPrompt || s.visualPrompt.length < 8 || s.durationSec < 1,
+  );
+  checks.push({
+    id: "scene-consistency",
+    label: "Scene consistency",
+    passed: inconsistent.length === 0,
+    severity: "warning",
+    detail:
+      inconsistent.length === 0
+        ? "Scenes have prompts and valid durations"
+        : `${inconsistent.length} scene(s) need visual/duration fixes`,
+  });
+
+  // Human realism for presenter-driven projects
+  const realism = model.presenter?.realismLevel;
+  checks.push({
+    id: "human-realism",
+    label: "Human presenter realism",
+    passed: Boolean(!model.presenter || realism),
+    severity: "info",
+    detail: model.presenter
+      ? `${model.presenter.displayName} · realism ${realism || "standard"} · lip-sync ${model.presenter.lipSyncProfile}`
+      : "No presenter assigned",
+  });
+
+  // Brand compliance
+  const brandOk = !model.brand || Boolean(model.brand.businessName);
+  checks.push({
+    id: "brand-compliance",
+    label: "Brand compliance",
+    passed: brandOk,
+    severity: "info",
+    detail: model.brand?.businessName
+      ? `Brand kit: ${model.brand.businessName}${model.brand.primary ? ` · ${model.brand.primary}` : ""}`
+      : "No brand kit applied (optional)",
+  });
+
+  // Subtitle accuracy vs scene scripts
+  if (model.subtitles.length > 0 && model.scenes.length > 0) {
+    const scriptWords = model.scenes
+      .map((s) => s.script)
+      .join(" ")
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(Boolean);
+    const subWords = model.subtitles
+      .map((s) => s.text)
+      .join(" ")
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(Boolean);
+    const overlap =
+      scriptWords.length === 0
+        ? 1
+        : subWords.filter((w) => scriptWords.includes(w)).length /
+          Math.max(1, subWords.length);
+    checks.push({
+      id: "subtitle-accuracy",
+      label: "Subtitle accuracy",
+      passed: overlap >= 0.35 || model.subtitles.length >= model.scenes.length,
+      severity: "warning",
+      detail: `Cue/script word overlap ~${Math.round(overlap * 100)}% · ${model.subtitles.length} cues`,
+    });
+  }
+
+  checks.push({
+    id: "video-quality-signal",
+    label: "Video quality signal",
+    passed:
+      Boolean(job?.compositeAsset?.url) ||
+      job?.clips.some((c) => c.status === "completed") ||
+      job?.mode === "preview",
+    severity: "info",
+    detail: job?.compositeAsset
+      ? `Composite ready (${job.assemblyManifest?.method || "asset"})`
+      : "Run full render for final quality assessment",
+  });
+
+  const stubAsset = model.assets.some((a) => {
+    if (!a.url.startsWith("data:")) return false;
+    try {
+      const b64 = a.url.split(",")[1];
+      if (!b64) return false;
+      return isStubVideoBytes(new Uint8Array(Buffer.from(b64, "base64")));
+    } catch {
+      return false;
+    }
+  });
+  const previewProvider =
+    job?.provider === "preview" ||
+    job?.provider === "preview-stub" ||
+    model.assets.every((a) => a.provider === "preview");
+
+  checks.push({
+    id: "production-media",
+    label: "Production (non-stub) media",
+    passed: !stubAsset && !(previewProvider && job?.mode === "full"),
+    severity: stubAsset || (previewProvider && job?.mode === "full") ? "blocker" : "info",
+    detail: stubAsset
+      ? "Stub/placeholder MP4 detected — configure video providers"
+      : previewProvider && job?.mode === "full"
+        ? "Full render used preview provider — configure Kling/Runway/HeyGen"
+        : "Media looks production-ready or preview mode",
+  });
+
+  checks.push({
+    id: "ffmpeg-assembly",
+    label: "FFmpeg final assembly",
+    passed:
+      !job ||
+      job.mode === "preview" ||
+      job.assemblyManifest?.method === "ffmpeg" ||
+      job.status === "processing" ||
+      job.status === "queued",
+    severity: "warning",
+    detail: job?.assemblyManifest
+      ? `${job.assemblyManifest.method}: ${job.assemblyManifest.note}`
+      : "No assembly yet — install ffmpeg for multi-scene merge",
+  });
 
   const blockers = checks.filter((c) => c.severity === "blocker" && !c.passed);
   const warnings = checks.filter((c) => c.severity === "warning" && !c.passed);

@@ -36,6 +36,11 @@ import {
   retryFailedClips,
   buildVisualTimeline,
   editorNudgeScene,
+  persistSocialExportAssets,
+  reencodeForSocialPreset,
+  fetchRemoteToBytes,
+  trimClipWithFfmpeg,
+  probeFfmpegHealth,
 } from "@/lib/ai-core/video-production-platform";
 import { z } from "zod";
 
@@ -237,7 +242,10 @@ const manageSchema = z.discriminatedUnion("action", [
       "youtube",
       "linkedin",
     ]),
+    persistAssets: z.boolean().optional().default(true),
+    reencode: z.boolean().optional().default(true),
   }),
+  z.object({ action: z.literal("platform_health") }),
   z.object({ action: z.literal("resume_render") }),
   z.object({
     action: z.literal("retry_clips"),
@@ -300,6 +308,7 @@ export async function POST(request: Request, { params }: Params) {
     let job = getLatestJob(model);
     let socialExport = undefined as ReturnType<typeof buildSocialExportPackage> | undefined;
     let avatarResult = undefined as Awaited<ReturnType<typeof requestAvatarPresenterClip>> | undefined;
+    let platformHealth = undefined as Awaited<ReturnType<typeof probeFfmpegHealth>> | undefined;
 
     switch (action.action) {
       case "render": {
@@ -386,10 +395,53 @@ export async function POST(request: Request, { params }: Params) {
         model = editorUpdateScript(model, action.sceneId, action.script);
         message = "Scene script updated.";
         break;
-      case "trim_scene":
+      case "trim_scene": {
         model = editorTrimScene(model, action.sceneId, action.durationSec);
-        message = "Scene trimmed.";
+        const latest = getLatestJob(model);
+        const clip = latest?.clips.find((c) => c.sceneId === action.sceneId);
+        if (clip?.asset?.url) {
+          const trimmed = await trimClipWithFfmpeg(
+            clip.asset.url,
+            action.durationSec,
+          );
+          if (trimmed) {
+            const uploaded = await uploadVideoStudioMedia({
+              supabase: auth.supabase,
+              userId: auth.user!.id,
+              generationId: parsedId.id,
+              kind: "clip",
+              bytes: trimmed,
+              mimeType: "video/mp4",
+              filename: `trim-${action.sceneId}.mp4`,
+              durationSec: action.durationSec,
+              provider: "ffmpeg-trim",
+              meta: { sceneId: action.sceneId, trimmed: true },
+            });
+            model = {
+              ...model,
+              assets: [...model.assets, uploaded.asset],
+              jobs: model.jobs.map((j) =>
+                j.id === latest?.id
+                  ? {
+                      ...j,
+                      clips: j.clips.map((c) =>
+                        c.sceneId === action.sceneId
+                          ? { ...c, asset: uploaded.asset }
+                          : c,
+                      ),
+                    }
+                  : j,
+              ),
+            };
+            message = "Scene trimmed (duration + media).";
+          } else {
+            message = "Scene duration trimmed (ffmpeg trim unavailable).";
+          }
+        } else {
+          message = "Scene trimmed.";
+        }
         break;
+      }
       case "replace_visual":
         model = editorReplaceSceneVisual(
           model,
@@ -422,6 +474,29 @@ export async function POST(request: Request, { params }: Params) {
           aspectRatio: model.aspectRatio,
         });
         model = applyAvatarProfileToModel(model, avatarResult.profile);
+        if (avatarResult.remoteUrl) {
+          const bytes = await fetchRemoteToBytes(avatarResult.remoteUrl);
+          if (bytes) {
+            const uploaded = await uploadVideoStudioMedia({
+              supabase: auth.supabase,
+              userId: auth.user!.id,
+              generationId: parsedId.id,
+              kind: "clip",
+              bytes,
+              mimeType: avatarResult.mimeType || "video/mp4",
+              filename: `avatar-${action.personaId}.mp4`,
+              provider: avatarResult.provider,
+              meta: {
+                avatar: true,
+                externalJobId: avatarResult.externalJobId,
+              },
+            });
+            model = {
+              ...model,
+              assets: [...model.assets, uploaded.asset],
+            };
+          }
+        }
         message = avatarResult.message;
         break;
       }
@@ -429,10 +504,57 @@ export async function POST(request: Request, { params }: Params) {
         model = editorChangeVoiceStyle(model, action.style);
         message = "Voice style updated.";
         break;
-      case "export_social":
-        socialExport = buildSocialExportPackage(model, action.presetId);
-        message = `Export package ready for ${socialExport.preset.label}.`;
+      case "export_social": {
+        if (action.reencode !== false) {
+          const reencoded = await reencodeForSocialPreset({
+            supabase: auth.supabase,
+            userId: auth.user!.id,
+            generationId: parsedId.id,
+            model,
+            presetId: action.presetId,
+          });
+          socialExport = reencoded.package;
+          if (reencoded.reencoded && reencoded.videoUrl) {
+            model = {
+              ...model,
+              assets: [
+                ...model.assets,
+                {
+                  id: `export-${action.presetId}`,
+                  kind: "composite" as const,
+                  mimeType: "video/mp4",
+                  url: reencoded.videoUrl,
+                  durationSec: Math.min(
+                    model.targetDurationSec,
+                    socialExport.preset.maxDurationSec,
+                  ),
+                  provider: "external",
+                  createdAt: new Date().toISOString(),
+                },
+              ],
+            };
+          }
+          message = reencoded.message;
+        } else {
+          socialExport = buildSocialExportPackage(model, action.presetId);
+          message = `Export package ready for ${socialExport.preset.label}.`;
+        }
+        if (action.persistAssets !== false && socialExport) {
+          const persisted = await persistSocialExportAssets({
+            supabase: auth.supabase,
+            userId: auth.user!.id,
+            generationId: parsedId.id,
+            package: socialExport,
+          });
+          message += ` Captions ${persisted.captionsAssetId ? "saved" : "inline"}.`;
+        }
         break;
+      }
+      case "platform_health": {
+        platformHealth = await probeFfmpegHealth();
+        message = platformHealth.message;
+        break;
+      }
       case "resume_render": {
         const current = getLatestJob(model);
         if (!current) {
@@ -486,8 +608,30 @@ export async function POST(request: Request, { params }: Params) {
       }
     }
 
-    if (action.action !== "save_version") {
+    if (action.action !== "save_version" && action.action !== "platform_health") {
       history = saveVideoVersion(history, model, `After ${action.action}`);
+    }
+
+    if (action.action === "platform_health") {
+      return NextResponse.json({
+        message,
+        model,
+        history,
+        quality: runVideoQualityChecks(model),
+        timeline: timelineSummary(model),
+        visualTimeline: buildVisualTimeline(model),
+        assembly: assemblyPlan(model),
+        latestJob: job ? jobStatusSummary(job) : null,
+        job,
+        ffmpeg: platformHealth,
+        providers: listVideoProviders().map((p) => ({
+          id: p.id,
+          label: p.label,
+          configured: p.configured,
+          supportsImageToVideo: p.supportsImageToVideo,
+          supportsAvatar: p.supportsAvatar,
+        })),
+      });
     }
 
     const blueprint = withProductionModel(

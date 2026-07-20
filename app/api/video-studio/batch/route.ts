@@ -9,8 +9,11 @@ import {
   planBatchVideos,
   batchItemToPluginInput,
   createBatchProgress,
+  updateBatchProgressPercent,
   runFullRenderPipeline,
   withProductionModel,
+  BATCH_PLAN_MAX,
+  BATCH_GENERATE_MAX,
 } from "@/lib/ai-core/video-production-platform";
 import type { VideoProductionModel } from "@/lib/ai-core/video-production-platform/types";
 import type { VideoBlueprint, VideoGeneration } from "@/types/video";
@@ -21,15 +24,24 @@ export const maxDuration = 300;
 
 const batchSchema = z.object({
   prompt: z.string().trim().min(5),
-  count: z.number().int().min(1).max(50).default(5),
+  count: z.number().int().min(1).max(BATCH_PLAN_MAX).default(5),
   durationSec: z.number().int().min(5).max(600).default(30),
   language: z.string().default("English"),
   style: z.string().default("Cinematic"),
   platform: z.string().default("TikTok"),
   videoType: z.string().optional(),
   planOnly: z.boolean().optional().default(false),
-  generateLimit: z.number().int().min(1).max(10).optional().default(5),
+  generateLimit: z
+    .number()
+    .int()
+    .min(1)
+    .max(BATCH_GENERATE_MAX)
+    .optional()
+    .default(5),
   fullRender: z.boolean().optional().default(false),
+  varyTalent: z.boolean().optional().default(true),
+  /** Skip first N planned items (for chunked 50/100 generation) */
+  offset: z.number().int().min(0).max(BATCH_PLAN_MAX).optional().default(0),
 });
 
 /**
@@ -71,12 +83,16 @@ export async function POST(request: Request) {
       batchId: planned.batchId,
       items: planned.items,
       estimatedCredits: planned.estimatedCredits,
+      variation: planned.variation,
       progress,
       message: `Planned ${planned.items.length} videos (~${planned.estimatedCredits} credits).`,
     });
   }
 
-  const toGenerate = planned.items.slice(0, req.generateLimit);
+  const toGenerate = planned.items.slice(
+    req.offset,
+    req.offset + req.generateLimit,
+  );
   const generations: VideoGeneration[] = [];
 
   try {
@@ -187,7 +203,7 @@ export async function POST(request: Request) {
         }
 
         generations.push(generation);
-        progress = {
+        progress = updateBatchProgressPercent({
           ...progress,
           completed: progress.completed + 1,
           spentCredits: progress.spentCredits + 1,
@@ -196,9 +212,9 @@ export async function POST(request: Request) {
               ? { ...p, status: "completed", generationId: generation.id }
               : p,
           ),
-        };
+        });
       } catch (itemError) {
-        progress = {
+        progress = updateBatchProgressPercent({
           ...progress,
           failed: progress.failed + 1,
           items: progress.items.map((p) =>
@@ -213,7 +229,7 @@ export async function POST(request: Request) {
                 }
               : p,
           ),
-        };
+        });
       }
     }
 
@@ -221,9 +237,14 @@ export async function POST(request: Request) {
       batchId: planned.batchId,
       planned: planned.items,
       generated: generations,
-      progress,
+      progress: updateBatchProgressPercent(progress),
+      variation: planned.variation,
       estimatedCredits: planned.estimatedCredits,
-      message: `Generated ${generations.length} of ${planned.items.length} planned videos (limit ${req.generateLimit}).`,
+      message: `Generated ${generations.length} of ${planned.items.length} planned videos (offset ${req.offset}, limit ${req.generateLimit}).`,
+      nextOffset:
+        req.offset + generations.length < planned.items.length
+          ? req.offset + req.generateLimit
+          : null,
     });
   } catch (error) {
     return serverErrorResponse(

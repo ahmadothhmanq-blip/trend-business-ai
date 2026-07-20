@@ -2,12 +2,12 @@
  * Kling AI video provider adapter.
  */
 
+import { softFallbackClip } from "@/lib/ai-core/video-production-platform/providers/types";
 import type {
   VideoProvider,
   VideoProviderClipRequest,
   VideoProviderClipResult,
 } from "@/lib/ai-core/video-production-platform/providers/types";
-import { minimalMp4Bytes } from "@/lib/ai-core/video-production-platform/providers/types";
 
 const KLING_BASE =
   process.env.KLING_API_BASE_URL || "https://api.klingai.com/v1";
@@ -52,22 +52,7 @@ export const klingVideoProvider: VideoProvider = {
 
       if (!res.ok) {
         const text = await res.text();
-        if (process.env.VIDEO_PROVIDER_STRICT === "1") {
-          return {
-            provider: "kling",
-            status: "failed",
-            mimeType: "video/mp4",
-            error: text.slice(0, 500),
-            message: `Kling error ${res.status}`,
-          };
-        }
-        return {
-          provider: "kling",
-          status: "completed",
-          bytes: minimalMp4Bytes("kling-fallback"),
-          mimeType: "video/mp4",
-          message: `Kling HTTP ${res.status}; stored fallback MP4.`,
-        };
+        return softFallbackClip("kling", "kling-fallback", `HTTP ${res.status} ${text}`);
       }
 
       const json = (await res.json()) as {

@@ -69,6 +69,49 @@ export function minimalMp4Bytes(label = "clip"): Uint8Array {
   return out;
 }
 
+/** When true, providers must fail instead of returning stub MP4 fallbacks. */
+export function isStrictVideoProviderMode(): boolean {
+  return (
+    process.env.VIDEO_PROVIDER_STRICT === "1" ||
+    process.env.VIDEO_STUDIO_STRICT === "1"
+  );
+}
+
+/** Detect stub/minimal placeholder MP4s (not real generated media). */
+export function isStubVideoBytes(bytes: Uint8Array | undefined | null): boolean {
+  if (!bytes || bytes.byteLength < 24) return true;
+  if (bytes.byteLength > 4096) return false;
+  try {
+    const text = new TextDecoder().decode(bytes);
+    return text.includes("TB-AI-VIDEO:");
+  } catch {
+    return bytes.byteLength < 512;
+  }
+}
+
+export function softFallbackClip(
+  provider: VideoProviderId,
+  label: string,
+  httpDetail: string,
+): VideoProviderClipResult {
+  if (isStrictVideoProviderMode()) {
+    return {
+      provider,
+      status: "failed",
+      mimeType: "video/mp4",
+      error: httpDetail.slice(0, 500),
+      message: `${provider} error (strict mode)`,
+    };
+  }
+  return {
+    provider,
+    status: "completed",
+    bytes: minimalMp4Bytes(label),
+    mimeType: "video/mp4",
+    message: `${provider} fallback stub MP4. ${httpDetail.slice(0, 120)}`,
+  };
+}
+
 export function envProviderFlags() {
   return {
     runway: Boolean(process.env.RUNWAY_API_KEY),

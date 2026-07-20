@@ -58,8 +58,12 @@ export type VideoRenderJob = {
   assemblyManifest?: {
     clipUrls: string[];
     audioUrl?: string;
+    musicUrl?: string;
     method: "ffmpeg" | "first-clip" | "manifest-only";
     note: string;
+    burnedSubtitles?: boolean;
+    transitions?: boolean;
+    exportPreset?: { aspectRatio: string; width: number; height: number; quality: string };
   };
   createdAt: string;
   updatedAt: string;
@@ -225,7 +229,15 @@ export type VideoProductionModel = {
 export type VideoTemplateDefinition = {
   id: string;
   label: string;
-  category: "product-marketing" | "professional-presenter" | "location" | "content-type" | "combo";
+  category:
+    | "product-marketing"
+    | "professional-presenter"
+    | "location"
+    | "content-type"
+    | "combo"
+    | "marketplace"
+    | "industry";
+  industry?: string;
   contentType: ContentTypeId;
   presenterPersona: PresenterPersonaId;
   location: LocationId;
@@ -272,6 +284,8 @@ export type VideoBatchRequest = {
   style: string;
   platform: string;
   videoType?: string;
+  /** Rotate presenters / voices / locations across items */
+  varyTalent?: boolean;
 };
 
 export type VideoBatchPlanItem = {
@@ -281,4 +295,8 @@ export type VideoBatchPlanItem = {
   scriptOutline: string;
   templateId: string;
   sceneCount: number;
+  presenterPersona?: PresenterPersonaId;
+  voiceStyle?: string;
+  location?: LocationId;
+  angle?: string;
 };

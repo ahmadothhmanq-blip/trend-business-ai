@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
 import { serverErrorResponse } from "@/lib/api/errors";
-import { processPendingRenderJobs } from "@/lib/ai-core/video-production-platform";
+import {
+  processPendingRenderJobs,
+  processVideoStudioBackgroundQueue,
+} from "@/lib/ai-core/video-production-platform";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -12,6 +15,9 @@ const schema = z.object({
   limit: z.number().int().min(1).max(20).optional().default(5),
   /** If true, only process jobs for the authenticated user */
   mineOnly: z.boolean().optional().default(true),
+  /** Resume queued/processing jobs and retry recent failures */
+  fullQueue: z.boolean().optional().default(false),
+  retryFailed: z.boolean().optional().default(true),
 });
 
 /**
@@ -34,10 +40,25 @@ export async function POST(request: Request) {
   }
 
   try {
+    if (parsed.data.fullQueue) {
+      const result = await processVideoStudioBackgroundQueue({
+        supabase: auth.supabase,
+        userId: parsed.data.mineOnly ? auth.user!.id : undefined,
+        limit: parsed.data.limit,
+        pollRounds: 16,
+        retryFailed: parsed.data.retryFailed,
+      });
+      return NextResponse.json({
+        message: `Processed ${result.processed} render job(s) (${result.resumed} resumed, ${result.retried} retried).`,
+        ...result,
+      });
+    }
+
     const result = await processPendingRenderJobs({
       supabase: auth.supabase,
       userId: parsed.data.mineOnly ? auth.user!.id : undefined,
       limit: parsed.data.limit,
+      pollRounds: 12,
     });
 
     return NextResponse.json({

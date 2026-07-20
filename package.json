@@ -25,7 +25,8 @@
     "smoke:staging": "node scripts/smoke-staging-journey.mjs",
     "smoke:uat": "node scripts/smoke-uat-journey.mjs",
     "db:apply": "node scripts/apply-migrations.mjs",
-    "db:verify": "node scripts/verify-platform-db.mjs"
+    "db:verify": "node scripts/verify-platform-db.mjs",
+    "verify:video-studio": "node scripts/verify-video-studio.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.0",

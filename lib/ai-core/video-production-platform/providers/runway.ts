@@ -3,12 +3,12 @@
  * Uses RUNWAY_API_KEY when present; falls back to structured failure for queue retry.
  */
 
+import { softFallbackClip } from "@/lib/ai-core/video-production-platform/providers/types";
 import type {
   VideoProvider,
   VideoProviderClipRequest,
   VideoProviderClipResult,
 } from "@/lib/ai-core/video-production-platform/providers/types";
-import { minimalMp4Bytes } from "@/lib/ai-core/video-production-platform/providers/types";
 
 const RUNWAY_BASE =
   process.env.RUNWAY_API_BASE_URL || "https://api.dev.runwayml.com/v1";
@@ -52,23 +52,7 @@ export const runwayVideoProvider: VideoProvider = {
 
       if (!res.ok) {
         const text = await res.text();
-        // Soft-fallback: keep pipeline producing a file so storage/QC work in staging
-        if (process.env.VIDEO_PROVIDER_STRICT === "1") {
-          return {
-            provider: "runway",
-            status: "failed",
-            mimeType: "video/mp4",
-            error: text.slice(0, 500),
-            message: `Runway error ${res.status}`,
-          };
-        }
-        return {
-          provider: "runway",
-          status: "completed",
-          bytes: minimalMp4Bytes("runway-fallback"),
-          mimeType: "video/mp4",
-          message: `Runway HTTP ${res.status}; stored fallback MP4. ${text.slice(0, 120)}`,
-        };
+        return softFallbackClip("runway", "runway-fallback", `HTTP ${res.status} ${text}`);
       }
 
       const json = (await res.json()) as { id?: string; output?: string[] };

@@ -178,3 +178,165 @@ export function buildSocialPublishPackage(
 ): SocialPublishPackage {
   return buildSocialExportPackage(model, presetId);
 }
+
+/**
+ * Persist captions VTT (+ optional end card) into Video Studio media storage.
+ */
+export async function persistSocialExportAssets(params: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any;
+  userId: string;
+  generationId: string;
+  package: SocialPublishPackage;
+}): Promise<{ captionsAssetId?: string; endCardAssetId?: string }> {
+  const { uploadVideoStudioMedia } = await import(
+    "@/lib/ai-core/video-production-platform/media-storage"
+  );
+  const out: { captionsAssetId?: string; endCardAssetId?: string } = {};
+  const vttBytes = new TextEncoder().encode(params.package.captionsVtt);
+  const captions = await uploadVideoStudioMedia({
+    supabase: params.supabase,
+    userId: params.userId,
+    generationId: params.generationId,
+    kind: "export",
+    bytes: vttBytes,
+    mimeType: "text/vtt",
+    filename: `${params.package.preset.id}-captions.vtt`,
+    provider: "social-export",
+    meta: { presetId: params.package.preset.id, kind: "captions" },
+  });
+  out.captionsAssetId = captions.asset.id;
+
+  const svgBytes = new TextEncoder().encode(params.package.endCardSvg);
+  const endCard = await uploadVideoStudioMedia({
+    supabase: params.supabase,
+    userId: params.userId,
+    generationId: params.generationId,
+    kind: "export",
+    bytes: svgBytes,
+    mimeType: "image/svg+xml",
+    filename: `${params.package.preset.id}-endcard.svg`,
+    provider: "social-export",
+    meta: { presetId: params.package.preset.id, kind: "end-card" },
+  });
+  out.endCardAssetId = endCard.asset.id;
+  return out;
+}
+
+/**
+ * Re-encode primary video to a social preset aspect/quality via FFmpeg when available.
+ */
+export async function reencodeForSocialPreset(params: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any;
+  userId: string;
+  generationId: string;
+  model: VideoProductionModel;
+  presetId: SocialExportPresetId;
+}): Promise<{
+  package: SocialPublishPackage;
+  reencoded: boolean;
+  videoUrl: string | null;
+  message: string;
+}> {
+  const { assembleComposite, resolveExportPreset } = await import(
+    "@/lib/ai-core/video-production-platform/assemble"
+  );
+  const { uploadVideoStudioMedia } = await import(
+    "@/lib/ai-core/video-production-platform/media-storage"
+  );
+
+  let pkg = buildSocialExportPackage(params.model, params.presetId);
+  const preset = pkg.preset;
+  const job = params.model.jobs[params.model.jobs.length - 1];
+  const sourceUrl =
+    job?.compositeAsset?.url ||
+    job?.clips.find((c) => c.asset)?.asset?.url ||
+    null;
+
+  if (!sourceUrl) {
+    return {
+      package: pkg,
+      reencoded: false,
+      videoUrl: null,
+      message: "No source video to re-encode.",
+    };
+  }
+
+  const assembled = await assembleComposite({
+    title: `${params.model.title}-${preset.id}`,
+    clips: [
+      {
+        url: sourceUrl,
+        durationSec: Math.min(
+          params.model.targetDurationSec || 30,
+          preset.maxDurationSec,
+        ),
+      },
+    ],
+    audioUrl: job?.audioAsset?.url,
+    subtitles: params.model.subtitles.map((s, i) => ({
+      startSec: s.startSec ?? i * 3,
+      endSec: s.endSec ?? (s.startSec ?? i * 3) + 3,
+      text: s.text,
+    })),
+    burnSubtitles: preset.captions && params.model.subtitles.length > 0,
+    exportPreset: resolveExportPreset(preset.aspectRatio, preset.quality),
+    outputFormat: "mp4",
+  });
+
+  if (!assembled.bytes) {
+    return {
+      package: pkg,
+      reencoded: false,
+      videoUrl: sourceUrl,
+      message: assembled.note,
+    };
+  }
+
+  const uploaded = await uploadVideoStudioMedia({
+    supabase: params.supabase,
+    userId: params.userId,
+    generationId: params.generationId,
+    kind: "export",
+    bytes: assembled.bytes,
+    mimeType: assembled.mimeType,
+    filename: `${preset.id}-export.mp4`,
+    durationSec: Math.min(
+      params.model.targetDurationSec || 30,
+      preset.maxDurationSec,
+    ),
+    provider: "social-reencode",
+    meta: {
+      presetId: preset.id,
+      aspectRatio: preset.aspectRatio,
+      quality: preset.quality,
+      assembly: assembled.manifest,
+    },
+  });
+
+  pkg = {
+    ...pkg,
+    videoUrl: uploaded.asset.url,
+    publishReady: true,
+    warnings: pkg.warnings.filter(
+      (w) => !w.includes("Aspect") && !w.includes("No rendered"),
+    ),
+    downloadManifest: pkg.downloadManifest.map((d) =>
+      d.kind === "video"
+        ? { ...d, url: uploaded.asset.url }
+        : d,
+    ),
+    checklist: [
+      ...pkg.checklist.filter((c) => !c.startsWith("Aspect")),
+      `Re-encoded ${preset.aspectRatio} ${preset.quality}`,
+    ],
+  };
+
+  return {
+    package: pkg,
+    reencoded: true,
+    videoUrl: uploaded.asset.url,
+    message: `Re-encoded for ${preset.label} (${preset.aspectRatio} ${preset.quality}).`,
+  };
+}

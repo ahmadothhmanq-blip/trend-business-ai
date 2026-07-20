@@ -20,7 +20,7 @@ import {
 } from "@/lib/ai-core/video-production-platform/media-storage";
 import { synthesizeSpeech } from "@/lib/ai-core/video-production-platform/tts";
 import { createRenderJobFromModel } from "@/lib/ai-core/video-production-platform/render-engine";
-import { assembleComposite } from "@/lib/ai-core/video-production-platform/assemble";
+import { assembleComposite, resolveExportPreset } from "@/lib/ai-core/video-production-platform/assemble";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnySupabase = any;
@@ -183,11 +183,25 @@ async function assembleAndUpload(params: {
 
   const assembled = await assembleComposite({
     title: params.model.title,
-    clips: completed.map((c) => ({
-      url: c.asset!.url,
-      durationSec: c.asset!.durationSec || 5,
-    })),
+    clips: completed.map((c) => {
+      const scene = params.model.scenes.find((s) => s.id === c.sceneId);
+      return {
+        url: c.asset!.url,
+        durationSec: c.asset!.durationSec || scene?.durationSec || 5,
+        transition: scene?.transition || "fade",
+      };
+    }),
     audioUrl: params.audioAsset?.url,
+    musicUrl: params.model.audioBeds.find((b) => b.kind === "music" && b.asset?.url)?.asset
+      ?.url,
+    subtitles: params.model.subtitles.map((s, i) => ({
+      startSec: s.startSec ?? i * 3,
+      endSec: s.endSec ?? (s.startSec ?? i * 3) + 3,
+      text: s.text,
+    })),
+    burnSubtitles: params.model.subtitles.length > 0,
+    useTransitions: completed.length > 1,
+    exportPreset: resolveExportPreset(params.model.aspectRatio, "1080p"),
   });
 
   let compositeAsset = assembled.assetStub;
@@ -208,6 +222,23 @@ async function assembleAndUpload(params: {
     });
     compositeAsset = { ...uploaded.asset, kind: "composite" };
     assets.push(compositeAsset);
+    try {
+      const { recordMediaRevision } = await import(
+        "@/lib/ai-core/video-production-platform/media-revisions"
+      );
+      if (uploaded.record) {
+        await recordMediaRevision({
+          supabase: params.supabase,
+          userId: params.userId,
+          mediaId: uploaded.record.id,
+          storagePath: uploaded.storagePath,
+          publicUrl: uploaded.record.publicUrl,
+          note: `Composite ${assembled.method}`,
+        });
+      }
+    } catch {
+      /* revisions optional */
+    }
   } else if (compositeAsset.url) {
     assets.push(compositeAsset);
   }
@@ -672,10 +703,81 @@ export async function retryFailedClips(params: {
 /**
  * Background worker helper — process queued/processing jobs from DB.
  */
+async function processRenderJobRow(params: {
+  supabase: AnySupabase;
+  row: {
+    id: string;
+    user_id: string;
+    generation_id: string;
+    payload: VideoRenderJob;
+  };
+  pollRounds?: number;
+  action: "resume" | "retry";
+}): Promise<{ jobId: string; status: string; action: string }> {
+  const { data: gen } = await params.supabase
+    .from("video_generations")
+    .select("blueprint,prompt,style,aspect_ratio,duration,video_type")
+    .eq("id", params.row.generation_id)
+    .eq("user_id", params.row.user_id)
+    .maybeSingle();
+
+  if (!gen) {
+    return { jobId: params.row.id, status: "skipped", action: params.action };
+  }
+
+  const { extractProductionModel, withProductionModel, extractVideoVersionHistory } =
+    await import("@/lib/ai-core/video-production-platform/management");
+
+  let model = extractProductionModel(gen.blueprint, {
+    prompt: gen.prompt,
+    style: gen.style,
+    aspectRatio: gen.aspect_ratio,
+    duration: gen.duration,
+    videoType: gen.video_type,
+  });
+
+  const jobFromModel =
+    model.jobs.find((j) => j.id === params.row.id) || params.row.payload;
+
+  const outcome =
+    params.action === "retry"
+      ? await retryFailedClips({
+          model,
+          supabase: params.supabase,
+          userId: params.row.user_id,
+          generationId: params.row.generation_id,
+        })
+      : await resumeRenderJob({
+          model,
+          job: jobFromModel,
+          supabase: params.supabase,
+          userId: params.row.user_id,
+          generationId: params.row.generation_id,
+          pollRounds: params.pollRounds,
+        });
+
+  model = outcome.model;
+  const history = extractVideoVersionHistory(gen.blueprint);
+  const blueprint = withProductionModel(gen.blueprint || {}, model, history);
+
+  await params.supabase
+    .from("video_generations")
+    .update({ blueprint, updated_at: nowIso() })
+    .eq("id", params.row.generation_id)
+    .eq("user_id", params.row.user_id);
+
+  return {
+    jobId: params.row.id,
+    status: outcome.job.status,
+    action: params.action,
+  };
+}
+
 export async function processPendingRenderJobs(params: {
   supabase: AnySupabase;
   userId?: string;
   limit?: number;
+  pollRounds?: number;
 }): Promise<{ processed: number; results: Array<{ jobId: string; status: string }> }> {
   let query = params.supabase
     .from("video_render_jobs")
@@ -701,54 +803,106 @@ export async function processPendingRenderJobs(params: {
     generation_id: string;
     payload: VideoRenderJob;
   }>) {
-    const { data: gen } = await params.supabase
-      .from("video_generations")
-      .select("blueprint,prompt,style,aspect_ratio,duration,video_type")
-      .eq("id", row.generation_id)
-      .eq("user_id", row.user_id)
-      .maybeSingle();
-
-    if (!gen) {
-      results.push({ jobId: row.id, status: "skipped" });
-      continue;
-    }
-
-    const { extractProductionModel, withProductionModel } = await import(
-      "@/lib/ai-core/video-production-platform/management"
-    );
-    const { extractVideoVersionHistory } = await import(
-      "@/lib/ai-core/video-production-platform/management"
-    );
-
-    let model = extractProductionModel(gen.blueprint, {
-      prompt: gen.prompt,
-      style: gen.style,
-      aspectRatio: gen.aspect_ratio,
-      duration: gen.duration,
-      videoType: gen.video_type,
-    });
-
-    // Prefer job from model if present
-    const jobFromModel = model.jobs.find((j) => j.id === row.id) || row.payload;
-    const resumed = await resumeRenderJob({
-      model,
-      job: jobFromModel,
+    const result = await processRenderJobRow({
       supabase: params.supabase,
-      userId: row.user_id,
-      generationId: row.generation_id,
+      row,
+      pollRounds: params.pollRounds,
+      action: "resume",
     });
-    model = resumed.model;
-    const history = extractVideoVersionHistory(gen.blueprint);
-    const blueprint = withProductionModel(gen.blueprint || {}, model, history);
-
-    await params.supabase
-      .from("video_generations")
-      .update({ blueprint, updated_at: nowIso() })
-      .eq("id", row.generation_id)
-      .eq("user_id", row.user_id);
-
-    results.push({ jobId: row.id, status: resumed.job.status });
+    results.push({ jobId: result.jobId, status: result.status });
   }
 
   return { processed: results.length, results };
+}
+
+/**
+ * Background queue — resume async jobs and optionally retry recent failures.
+ */
+export async function processVideoStudioBackgroundQueue(params: {
+  supabase: AnySupabase;
+  userId?: string;
+  limit?: number;
+  pollRounds?: number;
+  retryFailed?: boolean;
+  maxRetryAttempts?: number;
+}): Promise<{
+  processed: number;
+  resumed: number;
+  retried: number;
+  results: Array<{ jobId: string; status: string; action: string }>;
+}> {
+  const limit = params.limit ?? 10;
+  const maxAttempts = params.maxRetryAttempts ?? 3;
+  const results: Array<{ jobId: string; status: string; action: string }> = [];
+
+  let pendingQuery = params.supabase
+    .from("video_render_jobs")
+    .select("*")
+    .in("status", ["queued", "processing"])
+    .order("updated_at", { ascending: true })
+    .limit(limit);
+
+  if (params.userId) {
+    pendingQuery = pendingQuery.eq("user_id", params.userId);
+  }
+
+  const { data: pending } = await pendingQuery;
+
+  for (const row of (pending || []) as Array<{
+    id: string;
+    user_id: string;
+    generation_id: string;
+    payload: VideoRenderJob;
+  }>) {
+    results.push(
+      await processRenderJobRow({
+        supabase: params.supabase,
+        row,
+        pollRounds: params.pollRounds ?? MAX_INLINE_POLLS * 2,
+        action: "resume",
+      }),
+    );
+  }
+
+  let retried = 0;
+  if (params.retryFailed !== false && results.length < limit) {
+    let failedQuery = params.supabase
+      .from("video_render_jobs")
+      .select("*")
+      .eq("status", "failed")
+      .order("updated_at", { ascending: true })
+      .limit(limit - results.length);
+
+    if (params.userId) {
+      failedQuery = failedQuery.eq("user_id", params.userId);
+    }
+
+    const { data: failedRows } = await failedQuery;
+
+    for (const row of (failedRows || []) as Array<{
+      id: string;
+      user_id: string;
+      generation_id: string;
+      payload: VideoRenderJob;
+    }>) {
+      const attempts = row.payload?.attemptCount ?? 1;
+      if (attempts >= maxAttempts) continue;
+      results.push(
+        await processRenderJobRow({
+          supabase: params.supabase,
+          row,
+          pollRounds: params.pollRounds ?? MAX_INLINE_POLLS * 2,
+          action: "retry",
+        }),
+      );
+      retried += 1;
+    }
+  }
+
+  return {
+    processed: results.length,
+    resumed: results.filter((r) => r.action === "resume").length,
+    retried,
+    results,
+  };
 }

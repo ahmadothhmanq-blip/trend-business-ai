@@ -119,7 +119,31 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
     warnings?: string[];
     hashtags?: string[];
   } | null>(null);
+  const [dragSceneId, setDragSceneId] = useState<string | null>(null);
+  const [ffmpegStatus, setFfmpegStatus] = useState<string | null>(null);
+  const [healthSummary, setHealthSummary] = useState<string | null>(null);
 
+  const processQueue = async () => {
+    setBusy(true);
+    try {
+      const res = await fetch("/api/video-studio/jobs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fullQueue: true, retryFailed: true, limit: 10 }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        toast.error(json.error ?? "Queue processing failed");
+        return;
+      }
+      toast.success(json.message ?? "Queue processed");
+      await load();
+    } catch {
+      toast.error("Queue processing failed");
+    } finally {
+      setBusy(false);
+    }
+  };
   const load = useCallback(async () => {
     setLoading(true);
     try {
@@ -153,6 +177,34 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    void (async () => {
+      try {
+        const res = await fetch("/api/video-studio/health");
+        if (!res.ok) return;
+        const json = await res.json();
+        setFfmpegStatus(
+          json.ffmpeg?.available
+            ? `FFmpeg ready · ${json.ffmpeg.version || "ok"}`
+            : "FFmpeg missing — multi-scene merge limited",
+        );
+        const dbOk = json.database?.videoMedia && json.database?.videoRenderJobs;
+        const providerOk = json.videoProviderConfigured;
+        const ttsOk = json.tts?.configured;
+        setHealthSummary(
+          [
+            dbOk ? "DB ok" : "DB: apply 044",
+            providerOk ? `Provider: ${json.preferredProvider}` : "No video API key",
+            ttsOk ? `TTS: ${json.tts?.provider}` : "TTS preview",
+            json.strictMode ? "Strict" : "Stub allowed",
+          ].join(" · "),
+        );
+      } catch {
+        /* ignore */
+      }
+    })();
+  }, []);
 
   const post = async (body: Record<string, unknown>) => {
     setBusy(true);
@@ -259,6 +311,14 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
             onClick={() => void post({ action: "render", mode: "full" })}
           >
             <Film className="mr-2 size-4" /> Full MP4 render
+          </Button>
+          <Button
+            variant="outline"
+            className="rounded-xl border-white/10"
+            disabled={busy}
+            onClick={() => void processQueue()}
+          >
+            Process queue
           </Button>
           <Button
             variant="outline"
@@ -408,11 +468,31 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                 </div>
               </div>
             )}
+            <p className="text-xs text-white/40">
+              {ffmpegStatus || "Checking assembly tooling…"}
+            </p>
+            {healthSummary ? (
+              <p className="text-xs text-white/35">{healthSummary}</p>
+            ) : null}
             <div className="space-y-2">
               {timeline.map((t) => (
                 <div
                   key={t.id}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-white/5 px-3 py-2 text-sm"
+                  draggable
+                  onDragStart={() => setDragSceneId(t.id)}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={() => {
+                    if (!dragSceneId || dragSceneId === t.id) return;
+                    const ordered = timeline.map((x) => x.id);
+                    const from = ordered.indexOf(dragSceneId);
+                    const to = ordered.indexOf(t.id);
+                    if (from < 0 || to < 0) return;
+                    ordered.splice(from, 1);
+                    ordered.splice(to, 0, dragSceneId);
+                    setDragSceneId(null);
+                    void post({ action: "reorder_scenes", sceneIds: ordered });
+                  }}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-white/5 px-3 py-2 text-sm cursor-grab active:cursor-grabbing"
                 >
                   <div>
                     <div className="font-medium text-white">{t.name}</div>
@@ -478,6 +558,23 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                     >
                       Trim −25%
                     </Button>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={600}
+                      defaultValue={Math.round(t.endSec - t.startSec)}
+                      className={cn(dashboardInputClass, "h-8 w-16 text-xs")}
+                      title="Trim to seconds"
+                      onBlur={(e) => {
+                        const n = Number(e.target.value);
+                        if (!Number.isFinite(n) || n < 1) return;
+                        void post({
+                          action: "trim_scene",
+                          sceneId: t.id,
+                          durationSec: n,
+                        });
+                      }}
+                    />
                     <Button
                       size="sm"
                       variant="outline"
@@ -945,11 +1042,77 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                 variant="outline"
                 className="rounded-xl border-white/10"
                 disabled={busy}
+                onClick={() => void post({ action: "synthesize_voice", real: true })}
+              >
+                Real TTS
+              </Button>
+              <Button
+                variant="outline"
+                className="rounded-xl border-white/10"
+                disabled={busy}
                 onClick={() => void post({ action: "rebuild_subtitles" })}
               >
                 Rebuild subtitles
               </Button>
             </div>
+            <div className="flex flex-wrap gap-2">
+              {(
+                [
+                  "Natural conversational",
+                  "Motivational energetic",
+                  "Calm authoritative",
+                  "Clear instructional",
+                  "Persuasive warm",
+                ] as const
+              ).map((style) => (
+                <Button
+                  key={style}
+                  size="sm"
+                  variant="outline"
+                  className="rounded-lg border-white/10"
+                  disabled={busy}
+                  onClick={() => void post({ action: "change_voice", style })}
+                >
+                  {style}
+                </Button>
+              ))}
+            </div>
+            {scriptSceneId && (
+              <div className="space-y-2">
+                <label className="text-xs text-white/45">Subtitle cue editor (one line = one cue)</label>
+                <Textarea
+                  value={model.subtitles.map((s) => s.text).join("\n")}
+                  onChange={(e) => {
+                    /* local edit via save button below */
+                    setScriptText(e.target.value);
+                  }}
+                  placeholder="Cue lines…"
+                  className={cn(dashboardInputClass, "min-h-[80px]")}
+                />
+                <Button
+                  variant="outline"
+                  className="rounded-xl border-white/10"
+                  disabled={busy}
+                  onClick={() =>
+                    void post({
+                      action: "update_subtitles",
+                      subtitles: scriptText
+                        .split("\n")
+                        .map((t) => t.trim())
+                        .filter(Boolean)
+                        .map((text, i) => ({
+                          timestamp: `${i * 3}s`,
+                          text,
+                          startSec: i * 3,
+                          endSec: i * 3 + 3,
+                        })),
+                    })
+                  }
+                >
+                  Save subtitle cues
+                </Button>
+              </div>
+            )}
           </DashboardCardContent>
         </DashboardCard>
       )}

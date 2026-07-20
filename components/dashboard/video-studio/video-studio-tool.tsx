@@ -62,6 +62,19 @@ type Props = { initialGenerations?: VideoGeneration[] };
 
 type PreviewTab = "storyboard" | "script" | "audio" | "subtitles" | "thumbnail" | "files";
 
+type MarketplaceTemplate = {
+  id: string;
+  label: string;
+  industry?: string;
+  contentType: string;
+  presenterPersona: string;
+  location: string;
+  voiceStyle: string;
+  visualStyle: string;
+  recommendedDurationSec: number;
+  tags: string[];
+};
+
 function VideoPreview({
   gen,
   onBack,
@@ -278,6 +291,26 @@ export function VideoStudioTool({ initialGenerations }: Props) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const [studioMode, setStudioMode] = useState<"single" | "batch" | "marketplace">("single");
+  const [batchCount, setBatchCount] = useState(20);
+  const [batchBusy, setBatchBusy] = useState(false);
+  const [batchOffset, setBatchOffset] = useState(0);
+  const [batchNextOffset, setBatchNextOffset] = useState<number | null>(null);
+  const [batchProgress, setBatchProgress] = useState<{
+    percent: number;
+    completed: number;
+    failed: number;
+    total: number;
+    estimatedCredits: number;
+    spentCredits: number;
+    items: Array<{ index: number; title: string; status: string; presenterPersona?: string }>;
+  } | null>(null);
+  const [marketQ, setMarketQ] = useState("");
+  const [marketIndustry, setMarketIndustry] = useState("");
+  const [marketTemplates, setMarketTemplates] = useState<MarketplaceTemplate[]>([]);
+  const [marketTotal, setMarketTotal] = useState(0);
+  const [marketStats, setMarketStats] = useState<{ total?: number } | null>(null);
+  const [industries, setIndustries] = useState<Array<{ id: string; label: string }>>([]);
 
   const applyIdea = useCallback((idea: string) => {
     setPrompt(idea);
@@ -303,6 +336,90 @@ export function VideoStudioTool({ initialGenerations }: Props) {
   }, [page, search]);
 
   useEffect(() => { if (step === "history") fetchGenerations(); }, [step, fetchGenerations]);
+
+  const loadMarketplace = useCallback(async () => {
+    try {
+      const p = new URLSearchParams({ limit: "24" });
+      if (marketQ) p.set("q", marketQ);
+      if (marketIndustry) p.set("industry", marketIndustry);
+      const res = await fetch(`/api/video-studio/marketplace?${p}`);
+      if (!res.ok) return;
+      const d = await res.json();
+      setMarketTemplates(d.templates ?? []);
+      setMarketTotal(d.total ?? 0);
+      setMarketStats(d.stats ?? null);
+      setIndustries(d.industries ?? []);
+    } catch {
+      /* ignore */
+    }
+  }, [marketQ, marketIndustry]);
+
+  useEffect(() => {
+    if (studioMode === "marketplace") void loadMarketplace();
+  }, [studioMode, loadMarketplace]);
+
+  const handleBatch = async (planOnly: boolean, continueFrom?: number) => {
+    const idea = prompt.trim();
+    if (idea.length < 5) {
+      toast.error("Enter a batch brief (e.g. Create 20 motivational videos).");
+      return;
+    }
+    const offset = continueFrom ?? (planOnly ? 0 : batchOffset);
+    setBatchBusy(true);
+    try {
+      const res = await fetch("/api/video-studio/batch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: idea,
+          count: batchCount,
+          durationSec: Number.parseInt(duration, 10) || 30,
+          language: "English",
+          style,
+          platform: aspectRatio === "9:16" ? "TikTok" : "YouTube",
+          videoType: selectedType || "social-video",
+          planOnly,
+          generateLimit: Math.min(50, batchCount),
+          varyTalent: true,
+          fullRender: false,
+          offset,
+        }),
+      });
+      const d = await res.json();
+      if (!res.ok) {
+        toast.error(d.error ?? "Batch failed");
+        return;
+      }
+      if (d.progress) setBatchProgress(d.progress);
+      if (typeof d.nextOffset === "number") {
+        setBatchNextOffset(d.nextOffset);
+        setBatchOffset(d.nextOffset);
+      } else {
+        setBatchNextOffset(null);
+        setBatchOffset(0);
+      }
+      toast.success(d.message ?? "Batch updated");
+      if (!planOnly && (d.generated?.length || 0) > 0) {
+        setStep("history");
+        void fetchGenerations();
+      }
+    } catch {
+      toast.error("Batch request failed");
+    } finally {
+      setBatchBusy(false);
+    }
+  };
+
+  const applyTemplate = (t: MarketplaceTemplate) => {
+    setPrompt(
+      `${t.label}. Character: ${t.presenterPersona}. Location: ${t.location}. Voice: ${t.voiceStyle}. Style: ${t.visualStyle}.`,
+    );
+    setDuration(`${t.recommendedDurationSec}s`);
+    setStyle(t.visualStyle.split("·")[0]?.trim() || style);
+    setStudioMode("single");
+    setStep("config");
+    toast.success("Template applied — refine and generate.");
+  };
 
   const handleSelectType = (id: string) => {
     setSelectedType(id);
@@ -420,11 +537,179 @@ export function VideoStudioTool({ initialGenerations }: Props) {
 
   return (
     <div className="space-y-6">
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         {([{ key: "type" as const, label: "New Video" }, { key: "history" as const, label: "My Videos" }]).map(({ key, label }) => (
           <button key={key} onClick={() => setStep(key)} className={cn("rounded-xl px-4 py-2 text-sm font-medium transition-all", step === key || (step === "config" && key === "type") ? "bg-premium-gold/15 text-premium-gold-light" : "text-white/50 hover:bg-white/5 hover:text-white/70")}>{label}</button>
         ))}
+        {(step === "type" || step === "config") &&
+          (
+            [
+              { key: "single" as const, label: "Single" },
+              { key: "batch" as const, label: "Batch" },
+              { key: "marketplace" as const, label: "Templates" },
+            ] as const
+          ).map(({ key, label }) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setStudioMode(key)}
+              className={cn(
+                "rounded-xl px-4 py-2 text-sm font-medium transition-all",
+                studioMode === key
+                  ? "bg-white/10 text-white"
+                  : "text-white/40 hover:bg-white/5 hover:text-white/70",
+              )}
+            >
+              {label}
+            </button>
+          ))}
       </div>
+
+      {studioMode === "batch" && (step === "type" || step === "config") && (
+        <DashboardCard>
+          <DashboardCardHeader>
+            <DashboardCardTitle>Advanced batch production</DashboardCardTitle>
+            <DashboardCardDescription>
+              Plan up to 100 videos · generate up to 50 per request (chunk with offset) · rotate presenters, voices, scenes
+            </DashboardCardDescription>
+          </DashboardCardHeader>
+          <DashboardCardContent className="space-y-4">
+            <Textarea
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              placeholder='Example: Create 20 motivational videos about discipline and morning routines'
+              rows={3}
+              className={cn(dashboardInputClass, "min-h-[80px] resize-none")}
+            />
+            <div className="flex flex-wrap items-end gap-3">
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-white/60">Count</label>
+                <select
+                  value={batchCount}
+                  onChange={(e) => setBatchCount(Number(e.target.value))}
+                  className={dashboardSelectClass}
+                >
+                  {[10, 20, 30, 50, 100].map((n) => (
+                    <option key={n} value={n}>
+                      {n} videos
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <Button
+                variant="outline"
+                className="rounded-xl border-white/10"
+                disabled={batchBusy}
+                onClick={() => void handleBatch(true)}
+              >
+                Plan only
+              </Button>
+              <Button
+                className="btn-gold rounded-xl font-bold text-luxury-black"
+                disabled={batchBusy}
+                onClick={() => void handleBatch(false, 0)}
+              >
+                {batchBusy ? "Generating…" : "Generate batch"}
+              </Button>
+              {batchNextOffset != null && (
+                <Button
+                  variant="outline"
+                  className="rounded-xl border-white/10"
+                  disabled={batchBusy}
+                  onClick={() => void handleBatch(false, batchNextOffset)}
+                >
+                  Continue from #{batchNextOffset + 1}
+                </Button>
+              )}
+            </div>
+            {batchProgress && (
+              <div className="space-y-2 rounded-xl bg-white/5 p-3 text-sm text-white/70">
+                <div className="flex justify-between text-xs text-white/50">
+                  <span>
+                    {batchProgress.completed}/{batchProgress.total} done · {batchProgress.failed} failed
+                  </span>
+                  <span>
+                    Credits {batchProgress.spentCredits}/{batchProgress.estimatedCredits} ·{" "}
+                    {batchProgress.percent}%
+                  </span>
+                </div>
+                <div className="h-2 overflow-hidden rounded-full bg-white/10">
+                  <div
+                    className="h-full bg-premium-gold/70 transition-all"
+                    style={{ width: `${batchProgress.percent}%` }}
+                  />
+                </div>
+                <ul className="max-h-40 space-y-1 overflow-auto text-xs text-white/45">
+                  {batchProgress.items.slice(0, 30).map((it) => (
+                    <li key={it.index}>
+                      #{it.index} {it.title} · {it.status}
+                      {it.presenterPersona ? ` · ${it.presenterPersona}` : ""}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </DashboardCardContent>
+        </DashboardCard>
+      )}
+
+      {studioMode === "marketplace" && (step === "type" || step === "config") && (
+        <DashboardCard>
+          <DashboardCardHeader>
+            <DashboardCardTitle>Template marketplace</DashboardCardTitle>
+            <DashboardCardDescription>
+              {marketStats?.total
+                ? `${marketStats.total.toLocaleString()} scalable templates across industries`
+                : "Browse industry packs, presenters, locations, and visual styles"}
+            </DashboardCardDescription>
+          </DashboardCardHeader>
+          <DashboardCardContent className="space-y-4">
+            <div className="flex flex-wrap gap-2">
+              <Input
+                value={marketQ}
+                onChange={(e) => setMarketQ(e.target.value)}
+                placeholder="Search templates…"
+                className={cn(dashboardInputClass, "max-w-xs")}
+              />
+              <select
+                value={marketIndustry}
+                onChange={(e) => setMarketIndustry(e.target.value)}
+                className={dashboardSelectClass}
+              >
+                <option value="">All industries</option>
+                {industries.map((i) => (
+                  <option key={i.id} value={i.id}>
+                    {i.label}
+                  </option>
+                ))}
+              </select>
+              <Button
+                variant="outline"
+                className="rounded-xl border-white/10"
+                onClick={() => void loadMarketplace()}
+              >
+                <Search className="mr-2 size-4" /> Search
+              </Button>
+            </div>
+            <p className="text-xs text-white/40">{marketTotal} matches</p>
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {marketTemplates.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => applyTemplate(t)}
+                  className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-left transition hover:border-premium-gold/30 hover:bg-white/[0.06]"
+                >
+                  <div className="text-sm font-medium text-white">{t.label}</div>
+                  <div className="mt-1 text-[11px] text-white/40">
+                    {t.contentType} · {t.presenterPersona} · {t.location} · {t.recommendedDurationSec}s
+                  </div>
+                </button>
+              ))}
+            </div>
+          </DashboardCardContent>
+        </DashboardCard>
+      )}
 
       {(step === "type" || step === "config") && (
         <OnePromptExperience

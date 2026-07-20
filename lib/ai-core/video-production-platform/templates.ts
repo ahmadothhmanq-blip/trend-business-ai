@@ -95,22 +95,119 @@ const LOCATION_AFFINITY: Partial<Record<PresenterPersonaId, LocationId[]>> = {
   "real-estate-agent": ["home", "street", "office"],
 };
 
+const VISUAL_VARIANTS = [
+  { id: "cinematic", label: "Cinematic", style: "Cinematic commercial grade", motion: "Dramatic push-ins" },
+  { id: "minimal", label: "Minimal", style: "Clean minimal studio", motion: "Subtle holds" },
+  { id: "bold", label: "Bold Social", style: "High-contrast vertical native", motion: "Punchy jump cuts" },
+  { id: "documentary", label: "Documentary", style: "Natural documentary realism", motion: "Handheld observational" },
+] as const;
+
+const INDUSTRY_PACKS: Array<{
+  id: string;
+  label: string;
+  contentType: ContentTypeId;
+  preferredPresenters: PresenterPersonaId[];
+  preferredLocations: LocationId[];
+  tags: string[];
+}> = [
+  { id: "marketing", label: "Marketing", contentType: "marketing", preferredPresenters: ["sales-representative", "business-expert", "fashion-model"], preferredLocations: ["studio", "office", "street"], tags: ["marketing"] },
+  { id: "education", label: "Education", contentType: "educational", preferredPresenters: ["teacher", "doctor", "business-expert"], preferredLocations: ["studio", "office", "home"], tags: ["education"] },
+  { id: "motivation", label: "Motivation", contentType: "motivational", preferredPresenters: ["fitness-trainer", "business-expert", "news-presenter"], preferredLocations: ["gym", "street", "studio"], tags: ["motivation"] },
+  { id: "product-ads", label: "Product Ads", contentType: "product-ad", preferredPresenters: ["sales-representative", "fashion-model", "chef"], preferredLocations: ["showroom", "store", "studio"], tags: ["product", "ads"] },
+  { id: "ecommerce", label: "Ecommerce", contentType: "ecommerce", preferredPresenters: ["sales-representative", "fashion-model"], preferredLocations: ["store", "studio", "home"], tags: ["ecommerce"] },
+  { id: "real-estate", label: "Real Estate", contentType: "sales", preferredPresenters: ["real-estate-agent", "business-expert"], preferredLocations: ["home", "street", "office"], tags: ["real-estate"] },
+  { id: "automotive", label: "Automotive", contentType: "product-review", preferredPresenters: ["automotive-expert", "sales-representative"], preferredLocations: ["showroom", "street", "factory"], tags: ["automotive"] },
+  { id: "healthcare", label: "Healthcare", contentType: "educational", preferredPresenters: ["doctor", "teacher"], preferredLocations: ["clinic", "studio", "office"], tags: ["healthcare"] },
+  { id: "fitness", label: "Fitness", contentType: "motivational", preferredPresenters: ["fitness-trainer"], preferredLocations: ["gym", "studio", "street"], tags: ["fitness"] },
+  { id: "finance", label: "Finance", contentType: "company-presentation", preferredPresenters: ["business-expert", "news-presenter"], preferredLocations: ["office", "studio"], tags: ["finance"] },
+  { id: "corporate", label: "Corporate", contentType: "company-presentation", preferredPresenters: ["business-expert", "news-presenter"], preferredLocations: ["office", "studio", "factory"], tags: ["corporate"] },
+  { id: "social-media", label: "Social Media", contentType: "social-media", preferredPresenters: ["fashion-model", "fitness-trainer", "sales-representative"], preferredLocations: ["street", "studio", "home"], tags: ["social"] },
+];
+
 function buildComboTemplates(): VideoTemplateDefinition[] {
   const out: VideoTemplateDefinition[] = [];
-  let n = 0;
+  // Full marketplace matrix: every content × presenter × location
   for (const content of CONTENT_TYPES) {
-    const personas =
-      AFFINITY[content.id] || PRESENTERS.map((p) => p.id);
+    for (const presenter of PRESENTERS) {
+      for (const loc of LOCATIONS) {
+        out.push({
+          id: `tpl-${content.id}-${presenter.id}-${loc.id}`,
+          label: `${content.label} · ${presenter.label} · ${loc.label}`,
+          category: "marketplace",
+          contentType: content.id,
+          presenterPersona: presenter.id,
+          location: loc.id,
+          character: presenter.character,
+          environment: loc.environment,
+          cameraStyle: loc.camera,
+          motionStyle: content.motion,
+          voiceStyle: presenter.voiceStyle,
+          scriptStructure: content.scriptStructure,
+          recommendedDurationSec: content.duration,
+          visualStyle: content.visualStyle,
+          tags: [content.id, presenter.id, loc.id, "marketplace", "expandable"],
+          expandable: true,
+        });
+      }
+    }
+  }
+  return out;
+}
+
+function buildIndustryTemplates(): VideoTemplateDefinition[] {
+  const out: VideoTemplateDefinition[] = [];
+  for (const industry of INDUSTRY_PACKS) {
+    const content = CONTENT_TYPES.find((c) => c.id === industry.contentType)!;
+    for (const personaId of industry.preferredPresenters) {
+      const presenter = PRESENTERS.find((p) => p.id === personaId)!;
+      for (const locId of industry.preferredLocations) {
+        const loc = LOCATIONS.find((l) => l.id === locId)!;
+        for (const variant of VISUAL_VARIANTS) {
+          out.push({
+            id: `ind-${industry.id}-${personaId}-${locId}-${variant.id}`,
+            label: `${industry.label} · ${presenter.label} · ${loc.label} · ${variant.label}`,
+            category: "industry",
+            industry: industry.id,
+            contentType: content.id,
+            presenterPersona: personaId,
+            location: locId,
+            character: presenter.character,
+            environment: loc.environment,
+            cameraStyle: loc.camera,
+            motionStyle: variant.motion,
+            voiceStyle: presenter.voiceStyle,
+            scriptStructure: content.scriptStructure,
+            recommendedDurationSec: content.duration,
+            visualStyle: `${content.visualStyle} · ${variant.style}`,
+            tags: [
+              ...industry.tags,
+              industry.id,
+              personaId,
+              locId,
+              variant.id,
+              "industry-pack",
+            ],
+            expandable: true,
+          });
+        }
+      }
+    }
+  }
+  return out;
+}
+
+function buildAffinitySpotlightTemplates(): VideoTemplateDefinition[] {
+  const out: VideoTemplateDefinition[] = [];
+  for (const content of CONTENT_TYPES) {
+    const personas = AFFINITY[content.id] || PRESENTERS.map((p) => p.id).slice(0, 3);
     for (const personaId of personas) {
       const presenter = PRESENTERS.find((p) => p.id === personaId)!;
-      const locs =
-        LOCATION_AFFINITY[personaId] || LOCATIONS.map((l) => l.id).slice(0, 3);
+      const locs = LOCATION_AFFINITY[personaId] || LOCATIONS.map((l) => l.id).slice(0, 3);
       for (const locId of locs) {
         const loc = LOCATIONS.find((l) => l.id === locId)!;
-        n += 1;
         out.push({
-          id: `tpl-${content.id}-${personaId}-${locId}`,
-          label: `${content.label} · ${presenter.label} · ${loc.label}`,
+          id: `spot-${content.id}-${personaId}-${locId}`,
+          label: `Spotlight · ${content.label} · ${presenter.label} · ${loc.label}`,
           category: "combo",
           contentType: content.id,
           presenterPersona: personaId,
@@ -123,7 +220,7 @@ function buildComboTemplates(): VideoTemplateDefinition[] {
           scriptStructure: content.scriptStructure,
           recommendedDurationSec: content.duration,
           visualStyle: content.visualStyle,
-          tags: [content.id, personaId, locId, "expandable"],
+          tags: [content.id, personaId, locId, "spotlight", "affinity"],
           expandable: true,
         });
       }
@@ -211,7 +308,12 @@ let _cache: VideoTemplateDefinition[] | null = null;
 
 export function listVideoTemplates(): VideoTemplateDefinition[] {
   if (!_cache) {
-    _cache = [...PRODUCT_EXPLICIT, ...buildComboTemplates()];
+    _cache = [
+      ...PRODUCT_EXPLICIT,
+      ...buildComboTemplates(),
+      ...buildIndustryTemplates(),
+      ...buildAffinitySpotlightTemplates(),
+    ];
   }
   return _cache;
 }
@@ -224,6 +326,62 @@ export function listTemplatesByCategory(
   category: VideoTemplateDefinition["category"],
 ): VideoTemplateDefinition[] {
   return listVideoTemplates().filter((t) => t.category === category);
+}
+
+export function listMarketplaceIndustries() {
+  return INDUSTRY_PACKS.map((i) => ({
+    id: i.id,
+    label: i.label,
+    contentType: i.contentType,
+    tags: i.tags,
+  }));
+}
+
+export function searchVideoTemplates(params: {
+  q?: string;
+  industry?: string;
+  contentType?: ContentTypeId;
+  presenter?: PresenterPersonaId;
+  location?: LocationId;
+  limit?: number;
+  offset?: number;
+}): {
+  templates: VideoTemplateDefinition[];
+  total: number;
+  industries: ReturnType<typeof listMarketplaceIndustries>;
+} {
+  const hay = (params.q || "").toLowerCase().trim();
+  let list = listVideoTemplates();
+  if (params.industry) {
+    list = list.filter(
+      (t) => t.industry === params.industry || t.tags.includes(params.industry!),
+    );
+  }
+  if (params.contentType) {
+    list = list.filter((t) => t.contentType === params.contentType);
+  }
+  if (params.presenter) {
+    list = list.filter((t) => t.presenterPersona === params.presenter);
+  }
+  if (params.location) {
+    list = list.filter((t) => t.location === params.location);
+  }
+  if (hay) {
+    list = list.filter(
+      (t) =>
+        t.label.toLowerCase().includes(hay) ||
+        t.tags.some((tag) => tag.includes(hay)) ||
+        t.visualStyle.toLowerCase().includes(hay) ||
+        t.character.toLowerCase().includes(hay),
+    );
+  }
+  const offset = Math.max(0, params.offset || 0);
+  const limit = Math.min(100, Math.max(1, params.limit || 40));
+  return {
+    total: list.length,
+    templates: list.slice(offset, offset + limit),
+    industries: listMarketplaceIndustries(),
+  };
 }
 
 export function matchVideoTemplate(params: {
@@ -305,13 +463,33 @@ export function matchVideoTemplate(params: {
 
 export function templateCatalogStats() {
   const all = listVideoTemplates();
+  const byIndustry: Record<string, number> = {};
+  for (const t of all) {
+    if (t.industry) byIndustry[t.industry] = (byIndustry[t.industry] || 0) + 1;
+  }
   return {
     total: all.length,
     productMarketing: all.filter((t) => t.category === "product-marketing").length,
     combos: all.filter((t) => t.category === "combo").length,
+    marketplace: all.filter((t) => t.category === "marketplace").length,
+    industry: all.filter((t) => t.category === "industry").length,
+    byIndustry,
     presenters: PRESENTERS.length,
     locations: LOCATIONS.length,
     contentTypes: CONTENT_TYPES.length,
+    industries: INDUSTRY_PACKS.length,
+    visualVariants: VISUAL_VARIANTS.length,
+    theoreticalMax:
+      CONTENT_TYPES.length * PRESENTERS.length * LOCATIONS.length +
+      INDUSTRY_PACKS.reduce(
+        (s, i) =>
+          s +
+          i.preferredPresenters.length *
+            i.preferredLocations.length *
+            VISUAL_VARIANTS.length,
+        0,
+      ) +
+      PRODUCT_EXPLICIT.length,
   };
 }
 
@@ -319,4 +497,6 @@ export {
   PRESENTERS as VIDEO_PRESENTER_PERSONAS,
   LOCATIONS as VIDEO_LOCATIONS,
   CONTENT_TYPES as VIDEO_CONTENT_TYPES,
+  INDUSTRY_PACKS as VIDEO_INDUSTRY_PACKS,
+  VISUAL_VARIANTS as VIDEO_VISUAL_VARIANTS,
 };

@@ -18,6 +18,7 @@ import {
   isTtsProviderConfigured,
   resolvePreferredProviderId,
   envProviderFlags,
+  listMarketplaceIndustries,
 } from "@/lib/ai-core/video-production-platform";
 
 export const dynamic = "force-dynamic";
@@ -79,7 +80,13 @@ export async function GET(request: Request) {
       ffmpegAssembly: true,
       mediaLibrary: true,
       socialPublishPackages: true,
+      templateMarketplace: true,
+      advancedBatch: true,
+      subtitleBurnIn: true,
+      sceneTransitions: true,
+      exportPresets: true,
     },
+    industries: listMarketplaceIndustries(),
     providers: listVideoProviders().map((p) => ({
       id: p.id,
       label: p.label,
