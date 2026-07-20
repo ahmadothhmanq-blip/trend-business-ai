@@ -2,10 +2,18 @@ import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers"
 import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
 import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
-import { generateImage } from "@/lib/image-generator";
+import { generateImage, modelToBlueprint } from "@/lib/image-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
 import { resolveIteratedPrompt } from "@/lib/ai/iteration";
 import { getImageTypeLabel } from "@/lib/constants/image-generator";
+import { getDesignTemplate } from "@/lib/ai-core/image-design-platform/templates";
+import { brandTokensToContext } from "@/lib/ai-core/image-design-platform/model";
+import {
+  ensureDesignProject,
+  saveDesignAssets,
+  saveDesignGeneration,
+} from "@/lib/ai-core/image-design-platform/assets";
+import type { ImageProviderId, ImageQuality } from "@/lib/ai-core/assets/settings";
 import type { ImageGeneration, ImageBlueprint } from "@/types/image-generation";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -24,6 +32,20 @@ const requestSchema = z.object({
   parentGenerationId: z.string().uuid().optional(),
   continueInstruction: z.string().trim().max(4000).optional(),
   projectId: z.string().uuid().optional(),
+  templateId: z.string().optional(),
+  quality: z.enum(["standard", "hd"]).optional(),
+  preferredProvider: z.enum(["openai", "replicate", "stability"]).optional(),
+  seed: z.number().int().optional(),
+  brandIdentity: z.object({
+    brandName: z.string().optional(),
+    primary: z.string().optional(),
+    secondary: z.string().optional(),
+    accent: z.string().optional(),
+    headingFont: z.string().optional(),
+    bodyFont: z.string().optional(),
+    voiceTone: z.string().optional(),
+    tagline: z.string().optional(),
+  }).optional(),
 });
 
 function logError(stage: string, error: unknown) {
@@ -84,7 +106,9 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data;
+  const template = input.templateId ? getDesignTemplate(input.templateId) : undefined;
   const typeLabel = getImageTypeLabel(input.imageType);
+  const brand = input.brandIdentity ? brandTokensToContext(input.brandIdentity) : undefined;
   let stage = "generateImage";
 
   try {
@@ -105,16 +129,23 @@ export async function POST(request: Request) {
     const result = await generateImage({
       prompt: iterated.prompt,
       negativePrompt: input.negativePrompt,
-      imageType: input.imageType,
-      style: input.style,
-      aspectRatio: input.aspectRatio,
-      mood: input.mood,
-      options: input.options,
+      imageType: template?.imageType || input.imageType,
+      style: template?.style || input.style,
+      aspectRatio: template?.aspectRatio || input.aspectRatio,
+      mood: template?.mood || input.mood,
+      options: template?.deliverables?.length ? template.deliverables : input.options,
       batchCount: input.batchCount,
       brandColors: input.brandColors,
+      templateId: input.templateId,
+      brand,
+      quality: (input.quality ?? "standard") as ImageQuality,
+      preferredProvider: input.preferredProvider as ImageProviderId | undefined,
+      seed: input.seed,
     });
 
-    const blueprint: ImageBlueprint = {
+    const blueprint: ImageBlueprint = result.model
+      ? modelToBlueprint(result.model, input.prompt, input.negativePrompt)
+      : {
       title: result.title,
       description: result.description,
       imageType: result.imageType,
@@ -127,8 +158,8 @@ export async function POST(request: Request) {
       prompt: input.prompt,
       negativePrompt: input.negativePrompt,
       generatedAt: new Date().toISOString(),
-      progressEvents: [...result.progressEvents, "Saving...", "Done."],
     };
+    blueprint.progressEvents = [...result.progressEvents, "Saving...", "Done."];
 
     stage = "supabase.insert.image_generations";
 
@@ -166,9 +197,58 @@ export async function POST(request: Request) {
       return databaseErrorResponse("image-generator.insert", error);
     }
 
+    const generation = data as ImageGeneration;
+    let projectId = input.projectId ?? null;
+
+    if (!projectId && result.model) {
+      const project = await ensureDesignProject({
+        supabase: auth.supabase,
+        userId: auth.user!.id,
+        name: generation.image_name,
+        description: generation.description,
+      });
+      projectId = project.projectId;
+    }
+
+    if (result.model) {
+      await saveDesignGeneration({
+        supabase: auth.supabase,
+        userId: auth.user!.id,
+        imageGenerationId: generation.id,
+        projectId,
+        model: result.model,
+        status: result.model.rasterAssets.some((a) => a.status === "completed") ? "completed" : "fallback",
+        provider: result.model.providerUsed,
+      });
+
+      if (result.model.rasterAssets.length) {
+        const saved = await saveDesignAssets({
+          supabase: auth.supabase,
+          userId: auth.user!.id,
+          generationId: generation.id,
+          projectId,
+          assets: result.model.rasterAssets,
+        });
+        if (saved.assets.length && blueprint.model) {
+          blueprint.rasterAssets = saved.assets.map((a, i) => ({
+            ...(result.model!.rasterAssets[i] ?? result.model!.rasterAssets[0]!),
+            storagePath: a.storage_path,
+            publicUrl: a.public_url,
+          }));
+          blueprint.model = { ...result.model, rasterAssets: blueprint.rasterAssets };
+          await auth.supabase
+            .from("image_generations")
+            .update({ blueprint: blueprint as unknown as Record<string, unknown> })
+            .eq("id", generation.id);
+        }
+      }
+    }
+
     return NextResponse.json({
-      generation: data as ImageGeneration,
-      message: "Image concepts generated and saved.",
+      generation,
+      message: result.model?.rasterAssets.some((a) => a.status === "completed")
+        ? "Images generated and saved."
+        : "Image concepts generated and saved.",
     });
   } catch (error) {
     logError(stage, error);

@@ -5,7 +5,7 @@ import { DashboardHeader } from "@/components/dashboard/header";
 import { ImageGeneratorTool } from "@/components/dashboard/image-generator/image-generator-tool";
 import type { ImageGeneration } from "@/types/image-generation";
 
-export const metadata: Metadata = { title: "AI Image Generator" };
+export const metadata: Metadata = { title: "AI Design Studio" };
 
 export default async function ImageGeneratorPage() {
   const supabase = await createClient();
@@ -39,8 +39,8 @@ export default async function ImageGeneratorPage() {
   return (
     <>
       <DashboardHeader
-        title="AI Image Generator"
-        description="Generate professional image concepts and visual assets with AI"
+        title="AI Design Studio"
+        description="Generate production images, concepts, and design assets with AI"
         userEmail={user.email}
         userName={(profile?.full_name as string | undefined) ?? (userMeta.full_name as string | undefined)}
         avatarUrl={profile?.avatar_url as string | undefined}

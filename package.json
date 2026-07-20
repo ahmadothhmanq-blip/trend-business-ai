@@ -28,7 +28,8 @@
     "db:verify": "node scripts/verify-platform-db.mjs",
     "verify:video-studio": "node scripts/verify-video-studio.mjs",
     "verify:app-builder": "node scripts/verify-app-builder.mjs",
-    "verify:brand-studio": "node scripts/verify-brand-studio.mjs"
+    "verify:brand-studio": "node scripts/verify-brand-studio.mjs",
+    "verify:image-generator": "node scripts/verify-image-generator.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.0",

@@ -1,4 +1,9 @@
 import type { ImageVariation } from "@/plugins/image-generator/types";
+import type {
+  BrandKitContext,
+  ImageDesignModel,
+  ImageRasterAsset,
+} from "@/lib/ai-core/image-design-platform/types";
 
 export type ImageGenerationStatus = "pending" | "generating" | "completed" | "failed";
 export type ImageGenerationMode = "generate" | "regenerate" | "continue" | "retry";
@@ -17,6 +22,12 @@ export type ImageBlueprint = {
   negativePrompt: string;
   generatedAt: string;
   progressEvents?: string[];
+  model?: ImageDesignModel;
+  rasterAssets?: ImageRasterAsset[];
+  qualityScore?: number;
+  templateId?: string;
+  brand?: BrandKitContext;
+  providerUsed?: string;
 };
 
 export type ImageGeneration = {
