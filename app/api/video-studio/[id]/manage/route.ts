@@ -32,6 +32,10 @@ import {
   requestAvatarPresenterClip,
   applyAvatarProfileToModel,
   listVideoProviders,
+  resumeRenderJob,
+  retryFailedClips,
+  buildVisualTimeline,
+  editorNudgeScene,
 } from "@/lib/ai-core/video-production-platform";
 import { z } from "zod";
 
@@ -114,6 +118,7 @@ export async function GET(_request: Request, { params }: Params) {
       history,
       quality: runVideoQualityChecks(model),
       timeline: timelineSummary(model),
+      visualTimeline: buildVisualTimeline(model),
       assembly: assemblyPlan(model),
       latestJob: job ? jobStatusSummary(job) : null,
       job,
@@ -232,6 +237,16 @@ const manageSchema = z.discriminatedUnion("action", [
       "youtube",
       "linkedin",
     ]),
+  }),
+  z.object({ action: z.literal("resume_render") }),
+  z.object({
+    action: z.literal("retry_clips"),
+    useAvatar: z.boolean().optional(),
+  }),
+  z.object({
+    action: z.literal("nudge_scene"),
+    sceneId: z.string().min(1),
+    direction: z.enum(["left", "right"]),
   }),
   z.object({
     action: z.literal("save_version"),
@@ -418,6 +433,43 @@ export async function POST(request: Request, { params }: Params) {
         socialExport = buildSocialExportPackage(model, action.presetId);
         message = `Export package ready for ${socialExport.preset.label}.`;
         break;
+      case "resume_render": {
+        const current = getLatestJob(model);
+        if (!current) {
+          return NextResponse.json(
+            { error: "No render job to resume." },
+            { status: 400 },
+          );
+        }
+        const resumed = await resumeRenderJob({
+          model,
+          job: current,
+          supabase: auth.supabase,
+          userId: auth.user!.id,
+          generationId: parsedId.id,
+        });
+        model = resumed.model;
+        job = resumed.job;
+        message = resumed.job.message;
+        break;
+      }
+      case "retry_clips": {
+        const retried = await retryFailedClips({
+          model,
+          supabase: auth.supabase,
+          userId: auth.user!.id,
+          generationId: parsedId.id,
+          useAvatar: action.useAvatar,
+        });
+        model = retried.model;
+        job = retried.job;
+        message = retried.job.message;
+        break;
+      }
+      case "nudge_scene":
+        model = editorNudgeScene(model, action.sceneId, action.direction);
+        message = "Scene order updated.";
+        break;
       case "save_version":
         history = saveVideoVersion(history, model, action.note);
         message = "Version saved.";
@@ -459,6 +511,7 @@ export async function POST(request: Request, { params }: Params) {
       history,
       quality: runVideoQualityChecks(model),
       timeline: timelineSummary(model),
+      visualTimeline: buildVisualTimeline(model),
       assembly: assemblyPlan(model),
       latestJob: job ? jobStatusSummary(job) : null,
       job,

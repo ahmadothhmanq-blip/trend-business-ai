@@ -39,13 +39,19 @@ export {
   envProviderFlags,
 } from "@/lib/ai-core/video-production-platform/providers";
 
-export { runFullRenderPipeline } from "@/lib/ai-core/video-production-platform/generation-pipeline";
+export { runFullRenderPipeline, resumeRenderJob, retryFailedClips, processPendingRenderJobs } from "@/lib/ai-core/video-production-platform/generation-pipeline";
 
 export {
   uploadVideoStudioMedia,
   fetchRemoteToBytes,
+  listVideoStudioMedia,
+  getVideoStudioMediaPreview,
+  deleteVideoStudioMedia,
+  purgeGenerationMedia,
   VIDEO_STUDIO_BUCKET,
 } from "@/lib/ai-core/video-production-platform/media-storage";
+
+export { assembleComposite } from "@/lib/ai-core/video-production-platform/assemble";
 
 export {
   synthesizeSpeech,
@@ -102,6 +108,8 @@ export {
   editorChangePresenter,
   editorChangeVoiceStyle,
   timelineSummary,
+  buildVisualTimeline,
+  editorNudgeScene,
   editorTrimScene,
   editorReplaceSceneVisual,
   editorUpdateSubtitles,
@@ -140,6 +148,8 @@ export {
   SOCIAL_EXPORT_PRESETS,
   getSocialExportPreset,
   buildSocialExportPackage,
+  buildSocialPublishPackage,
+  buildCaptionsVtt,
 } from "@/lib/ai-core/video-production-platform/social-export";
 
 export {

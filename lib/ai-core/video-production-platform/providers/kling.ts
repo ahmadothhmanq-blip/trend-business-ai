@@ -103,4 +103,75 @@ export const klingVideoProvider: VideoProvider = {
       };
     }
   },
+  async pollJob(externalJobId: string): Promise<VideoProviderClipResult> {
+    const key = process.env.KLING_API_KEY;
+    if (!key) {
+      return {
+        provider: "kling",
+        status: "failed",
+        mimeType: "video/mp4",
+        error: "KLING_API_KEY missing",
+        message: "Not configured",
+      };
+    }
+    try {
+      const res = await fetch(`${KLING_BASE}/videos/${externalJobId}`, {
+        headers: { Authorization: `Bearer ${key}` },
+      });
+      if (!res.ok) {
+        return {
+          provider: "kling",
+          status: "processing",
+          externalJobId,
+          mimeType: "video/mp4",
+          message: `Kling poll HTTP ${res.status}`,
+        };
+      }
+      const json = (await res.json()) as {
+        data?: {
+          task_status?: string;
+          task_result?: { videos?: Array<{ url?: string }> };
+        };
+      };
+      const status = (json.data?.task_status || "").toLowerCase();
+      const url = json.data?.task_result?.videos?.[0]?.url;
+      if ((status === "succeed" || status === "completed") && url) {
+        return {
+          provider: "kling",
+          status: "completed",
+          externalJobId,
+          remoteUrl: url,
+          mimeType: "video/mp4",
+          message: "Kling task succeeded.",
+        };
+      }
+      if (status === "failed") {
+        return {
+          provider: "kling",
+          status: "failed",
+          externalJobId,
+          mimeType: "video/mp4",
+          error: "Kling task failed",
+          message: "Kling task failed.",
+        };
+      }
+      return {
+        provider: "kling",
+        status: "processing",
+        externalJobId,
+        mimeType: "video/mp4",
+        message: `Kling status: ${status || "processing"}`,
+      };
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : "Kling poll failed";
+      return {
+        provider: "kling",
+        status: "failed",
+        externalJobId,
+        mimeType: "video/mp4",
+        error: msg,
+        message: msg,
+      };
+    }
+  },
 };

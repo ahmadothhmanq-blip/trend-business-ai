@@ -49,7 +49,21 @@ type ManagePayload = {
     startSec: number;
     endSec: number;
     hasClip: boolean;
+    durationSec?: number;
   }>;
+  visualTimeline?: {
+    totalSec: number;
+    tracks: Array<{
+      id: string;
+      name: string;
+      startSec: number;
+      endSec: number;
+      widthPct: number;
+      offsetPct: number;
+      hasClip: boolean;
+      color: string;
+    }>;
+  };
   assembly: { totalSec: number; chapters: number; scenes: number; steps: string[] };
   latestJob: {
     status: string;
@@ -60,12 +74,18 @@ type ManagePayload = {
   job?: {
     id: string;
     message: string;
-    compositeAsset?: { url: string; posterUrl?: string };
+    status?: string;
+    progress?: number;
+    costCreditsSpent?: number;
+    costCreditsEstimate?: number;
+    attemptCount?: number;
+    assemblyManifest?: { method: string; note: string };
+    compositeAsset?: { url: string; posterUrl?: string; mimeType?: string };
     clips: Array<{
       id: string;
       sceneId: string;
       status: string;
-      asset?: { url: string; posterUrl?: string };
+      asset?: { url: string; posterUrl?: string; mimeType?: string };
     }>;
   };
 };
@@ -95,6 +115,9 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
     videoUrl: string | null;
     captionsVtt: string;
     checklist: string[];
+    publishReady?: boolean;
+    warnings?: string[];
+    hashtags?: string[];
   } | null>(null);
 
   const load = useCallback(async () => {
@@ -154,6 +177,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
               history: json.history ?? prev.history,
               quality: json.quality ?? prev.quality,
               timeline: json.timeline ?? prev.timeline,
+              visualTimeline: json.visualTimeline ?? prev.visualTimeline,
               assembly: json.assembly ?? prev.assembly,
               latestJob: json.latestJob ?? prev.latestJob,
               job: json.job ?? prev.job,
@@ -235,6 +259,22 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
             onClick={() => void post({ action: "render", mode: "full" })}
           >
             <Film className="mr-2 size-4" /> Full MP4 render
+          </Button>
+          <Button
+            variant="outline"
+            className="rounded-xl border-white/10"
+            disabled={busy}
+            onClick={() => void post({ action: "resume_render" })}
+          >
+            Resume job
+          </Button>
+          <Button
+            variant="outline"
+            className="rounded-xl border-white/10"
+            disabled={busy}
+            onClick={() => void post({ action: "retry_clips" })}
+          >
+            Retry failed
           </Button>
           <Button
             variant="outline"
@@ -331,9 +371,43 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
       {tab === "timeline" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Editor timeline foundation</DashboardCardTitle>
+            <DashboardCardTitle>Professional timeline</DashboardCardTitle>
+            <DashboardCardDescription>
+              Visual track · trim · reorder · replace scene / voice / music
+            </DashboardCardDescription>
           </DashboardCardHeader>
-          <DashboardCardContent className="space-y-3">
+          <DashboardCardContent className="space-y-4">
+            {data.visualTimeline && (
+              <div className="space-y-2 rounded-xl bg-black/40 p-3">
+                <div className="flex justify-between text-[10px] uppercase tracking-wide text-white/40">
+                  <span>0s</span>
+                  <span>{data.visualTimeline.totalSec}s</span>
+                </div>
+                <div className="relative h-14 w-full overflow-hidden rounded-lg bg-white/5">
+                  {data.visualTimeline.tracks.map((tr) => (
+                    <button
+                      key={tr.id}
+                      type="button"
+                      title={`${tr.name} (${tr.startSec}–${tr.endSec}s)`}
+                      onClick={() => {
+                        const scene = model.scenes.find((s) => s.id === tr.id);
+                        setScriptSceneId(tr.id);
+                        setScriptText(scene?.script || "");
+                      }}
+                      className="absolute top-2 h-10 rounded-md border border-white/10 px-1 text-[10px] font-medium text-black/80 transition hover:brightness-110"
+                      style={{
+                        left: `${tr.offsetPct}%`,
+                        width: `${tr.widthPct}%`,
+                        background: tr.color,
+                        opacity: tr.hasClip ? 1 : 0.55,
+                      }}
+                    >
+                      <span className="block truncate">{tr.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             <div className="space-y-2">
               {timeline.map((t) => (
                 <div
@@ -347,6 +421,36 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-1">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="rounded-lg border-white/10"
+                      disabled={busy}
+                      onClick={() =>
+                        void post({
+                          action: "nudge_scene",
+                          sceneId: t.id,
+                          direction: "left",
+                        })
+                      }
+                    >
+                      ←
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="rounded-lg border-white/10"
+                      disabled={busy}
+                      onClick={() =>
+                        void post({
+                          action: "nudge_scene",
+                          sceneId: t.id,
+                          direction: "right",
+                        })
+                      }
+                    >
+                      →
+                    </Button>
                     <Button
                       size="sm"
                       variant="outline"
@@ -491,6 +595,22 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
             >
               Avatar render
             </Button>
+            <Button
+              variant="outline"
+              className="rounded-xl border-white/10"
+              disabled={busy}
+              onClick={() => void post({ action: "resume_render" })}
+            >
+              Resume async jobs
+            </Button>
+            <Button
+              variant="outline"
+              className="rounded-xl border-white/10"
+              disabled={busy}
+              onClick={() => void post({ action: "retry_clips" })}
+            >
+              Retry failed clips
+            </Button>
             {job?.compositeAsset?.url && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -498,6 +618,24 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                 alt="Composite preview"
                 className="max-h-72 w-full rounded-xl object-contain bg-black/40"
               />
+            )}
+            {job?.compositeAsset?.url &&
+            (/\.(mp4|webm)(\?|$)/i.test(job.compositeAsset.url) ||
+              job.compositeAsset.mimeType?.includes("video")) ? (
+              <video
+                src={job.compositeAsset.url}
+                controls
+                className="max-h-72 w-full rounded-xl bg-black"
+              />
+            ) : null}
+            {job && (
+              <p className="text-xs text-white/45">
+                {job.status || "—"} · {job.progress ?? 0}% · cost {job.costCreditsSpent ?? 0}/
+                {job.costCreditsEstimate ?? "?"} · attempts {job.attemptCount ?? 1}
+                {job.assemblyManifest
+                  ? ` · assembly ${job.assemblyManifest.method}`
+                  : ""}
+              </p>
             )}
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
               {(job?.clips || []).map((c) =>
@@ -509,7 +647,14 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                     alt={c.sceneId}
                     className="h-36 w-full rounded-xl object-cover bg-black/40"
                   />
-                ) : null,
+                ) : (
+                  <div
+                    key={c.id}
+                    className="flex h-36 items-center justify-center rounded-xl bg-white/5 text-xs text-white/40"
+                  >
+                    {c.status}
+                  </div>
+                ),
               )}
             </div>
           </DashboardCardContent>
@@ -605,12 +750,31 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                 <div className="font-medium text-white">
                   {socialExport.preset.label} · {socialExport.preset.aspectRatio} ·{" "}
                   {socialExport.preset.quality}
+                  {socialExport.publishReady ? " · publish-ready" : ""}
                 </div>
                 <ul className="list-inside list-disc text-xs text-white/50">
                   {socialExport.checklist.map((c) => (
                     <li key={c}>{c}</li>
                   ))}
                 </ul>
+                {socialExport.warnings && socialExport.warnings.length > 0 && (
+                  <ul className="list-inside list-disc text-xs text-amber-200/70">
+                    {socialExport.warnings.map((w) => (
+                      <li key={w}>{w}</li>
+                    ))}
+                  </ul>
+                )}
+                {socialExport.hashtags && (
+                  <p className="text-xs text-white/40">{socialExport.hashtags.join(" ")}</p>
+                )}
+                {socialExport.captionsVtt && (
+                  <details className="text-xs text-white/40">
+                    <summary className="cursor-pointer text-white/60">Captions VTT</summary>
+                    <pre className="mt-2 max-h-40 overflow-auto whitespace-pre-wrap rounded bg-black/30 p-2">
+                      {socialExport.captionsVtt.slice(0, 1200)}
+                    </pre>
+                  </details>
+                )}
                 {socialExport.videoUrl && (
                   <a
                     href={socialExport.videoUrl}
@@ -654,18 +818,62 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                       {m.provider} · {new Date(m.created_at).toLocaleString()}
                     </div>
                   </div>
-                  {m.public_url ? (
-                    <a
-                      href={m.public_url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-premium-gold-light underline"
+                  <div className="flex gap-2">
+                    {m.public_url ? (
+                      <a
+                        href={m.public_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-premium-gold-light underline"
+                      >
+                        Preview
+                      </a>
+                    ) : (
+                      <button
+                        type="button"
+                        className="underline opacity-70"
+                        onClick={async () => {
+                          const res = await fetch(
+                            `/api/video-studio/${generationId}/media?mediaId=${encodeURIComponent(m.id)}`,
+                          );
+                          const json = await res.json();
+                          if (json.previewUrl) window.open(json.previewUrl, "_blank");
+                          else toast.error("No preview URL");
+                        }}
+                      >
+                        Sign URL
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      className="text-red-300/80 underline"
+                      disabled={busy}
+                      onClick={async () => {
+                        setBusy(true);
+                        try {
+                          const res = await fetch(
+                            `/api/video-studio/${generationId}/media`,
+                            {
+                              method: "DELETE",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ mediaId: m.id }),
+                            },
+                          );
+                          const json = await res.json();
+                          if (!res.ok) {
+                            toast.error(json.error ?? "Delete failed");
+                            return;
+                          }
+                          toast.success("Media deleted");
+                          setMedia((prev) => prev.filter((x) => x.id !== m.id));
+                        } finally {
+                          setBusy(false);
+                        }
+                      }}
                     >
-                      Open
-                    </a>
-                  ) : (
-                    <span className="opacity-40">{m.storage_path}</span>
-                  )}
+                      Delete
+                    </button>
+                  </div>
                 </div>
               ))
             )}

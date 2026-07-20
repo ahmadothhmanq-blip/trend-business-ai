@@ -64,22 +64,38 @@ export function resolveTtsProviderId(): TtsProviderId {
 }
 
 export const TTS_VOICE_CATALOG = [
-  { id: "alloy", label: "Alloy", style: "Neutral conversational", languages: ["English"] },
-  { id: "verse", label: "Verse", style: "Motivational energetic", languages: ["English"] },
-  { id: "aria", label: "Aria", style: "Soft aspirational", languages: ["English", "Spanish"] },
-  { id: "merlin", label: "Merlin", style: "Calm authoritative", languages: ["English"] },
-  { id: "nova", label: "Nova", style: "Clear instructional", languages: ["English"] },
-  { id: "echo", label: "Echo", style: "Broadcast", languages: ["English"] },
+  { id: "alloy", label: "Alloy", style: "Neutral conversational", languages: ["English"], accents: ["US"], emotions: ["neutral", "calm"] },
+  { id: "verse", label: "Verse", style: "Motivational energetic", languages: ["English"], accents: ["US"], emotions: ["energetic", "confident"] },
+  { id: "aria", label: "Aria", style: "Soft aspirational", languages: ["English", "Spanish"], accents: ["US", "LATAM"], emotions: ["warm", "empathetic"] },
+  { id: "merlin", label: "Merlin", style: "Calm authoritative", languages: ["English"], accents: ["UK"], emotions: ["authoritative", "calm"] },
+  { id: "nova", label: "Nova", style: "Clear instructional", languages: ["English"], accents: ["US"], emotions: ["clear", "friendly"] },
+  { id: "echo", label: "Echo", style: "Broadcast", languages: ["English"], accents: ["US", "AU"], emotions: ["broadcast", "serious"] },
+  { id: "shimmer", label: "Shimmer", style: "Bright commercial", languages: ["English"], accents: ["US"], emotions: ["upbeat", "sales"] },
+  { id: "onyx", label: "Onyx", style: "Deep narration", languages: ["English"], accents: ["US"], emotions: ["dramatic", "calm"] },
 ] as const;
+
+function buildTtsInstruction(req: TtsRequest): string {
+  const parts = [req.text.slice(0, 4000)];
+  if (req.language) parts.unshift(`[Language: ${req.language}]`);
+  if (req.accent) parts.unshift(`[Accent: ${req.accent}]`);
+  if (req.emotion) parts.unshift(`[Emotion: ${req.emotion}]`);
+  if (req.style) parts.unshift(`[Style: ${req.style}]`);
+  return parts.join("\n");
+}
 
 export async function synthesizeSpeech(req: TtsRequest): Promise<TtsResult> {
   const provider = resolveTtsProviderId();
   const estimate = Math.max(1, Math.ceil(req.text.split(/\s+/).length / 2.5));
+  const instructed = buildTtsInstruction(req);
 
   if (provider === "elevenlabs") {
     const key = process.env.ELEVENLABS_API_KEY!;
     const voice = req.voiceId || process.env.ELEVENLABS_VOICE_ID || "21m00Tcm4TlvDq8ikWAM";
     try {
+      const styleBoost =
+        req.emotion || req.style
+          ? Math.min(0.75, 0.25 + (req.emotion ? 0.25 : 0) + (req.style ? 0.15 : 0))
+          : 0.2;
       const res = await fetch(
         `https://api.elevenlabs.io/v1/text-to-speech/${voice}`,
         {
@@ -90,12 +106,13 @@ export async function synthesizeSpeech(req: TtsRequest): Promise<TtsResult> {
             Accept: "audio/mpeg",
           },
           body: JSON.stringify({
-            text: req.text.slice(0, 5000),
+            text: instructed.slice(0, 5000),
             model_id: process.env.ELEVENLABS_MODEL || "eleven_multilingual_v2",
             voice_settings: {
-              stability: 0.4,
+              stability: req.emotion === "energetic" ? 0.3 : 0.45,
               similarity_boost: 0.8,
-              style: req.emotion ? 0.4 : 0.2,
+              style: styleBoost,
+              use_speaker_boost: true,
             },
           }),
         },
@@ -107,7 +124,7 @@ export async function synthesizeSpeech(req: TtsRequest): Promise<TtsResult> {
           bytes: new Uint8Array(await res.arrayBuffer()),
           mimeType: "audio/mpeg",
           durationSecEstimate: estimate,
-          message: "ElevenLabs TTS completed.",
+          message: `ElevenLabs TTS completed (${req.language || "en"}${req.emotion ? `, ${req.emotion}` : ""}).`,
         };
       }
     } catch {
@@ -127,8 +144,11 @@ export async function synthesizeSpeech(req: TtsRequest): Promise<TtsResult> {
         body: JSON.stringify({
           model: process.env.OPENAI_TTS_MODEL || "gpt-4o-mini-tts",
           voice: req.voiceId || "alloy",
-          input: req.text.slice(0, 4000),
+          input: instructed.slice(0, 4000),
           response_format: "mp3",
+          ...(req.style || req.emotion
+            ? { instructions: `Speak with ${req.style || "natural"} style, emotion ${req.emotion || "neutral"}, accent ${req.accent || "neutral"}.` }
+            : {}),
         }),
       });
       if (res.ok) {
@@ -138,7 +158,7 @@ export async function synthesizeSpeech(req: TtsRequest): Promise<TtsResult> {
           bytes: new Uint8Array(await res.arrayBuffer()),
           mimeType: "audio/mpeg",
           durationSecEstimate: estimate,
-          message: "OpenAI TTS completed.",
+          message: `OpenAI TTS completed (${req.voiceId || "alloy"}).`,
         };
       }
     } catch {

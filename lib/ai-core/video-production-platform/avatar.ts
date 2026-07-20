@@ -1,5 +1,5 @@
 /**
- * Real AI Avatar Presenter — generation requests beyond static profiles.
+ * Real AI Avatar Presenter — generation + poll beyond static profiles.
  */
 
 import type { AiPresenterProfile, VideoProductionModel } from "@/lib/ai-core/video-production-platform/types";
@@ -13,6 +13,8 @@ export type AvatarGenerationRequest = {
   language?: string;
   emotion?: string;
   aspectRatio?: string;
+  /** Poll for completion when provider returns async job */
+  waitForResult?: boolean;
 };
 
 export async function requestAvatarPresenterClip(
@@ -24,16 +26,16 @@ export async function requestAvatarPresenterClip(
   remoteUrl?: string;
   externalJobId?: string;
   message: string;
+  mimeType?: string;
 }> {
   const profile = buildPresenterProfile(req.personaId, {
     language: req.language || "English",
   });
-  // Prefer HeyGen for avatars when configured
   const provider = getVideoProvider(
     process.env.HEYGEN_API_KEY ? "heygen" : undefined,
   );
-  const result = await provider.generateClip({
-    prompt: `${profile.appearance}. Emotion: ${req.emotion || "natural"}. ${req.script}`,
+  let result = await provider.generateClip({
+    prompt: `${profile.appearance}. Emotion: ${req.emotion || "natural"}. Natural facial expressions, body motion, lip sync. ${req.script}`,
     durationSec: Math.min(30, Math.max(5, Math.ceil(req.script.split(/\s+/).length / 2.5))),
     aspectRatio: req.aspectRatio || "9:16",
     avatar: {
@@ -43,16 +45,33 @@ export async function requestAvatarPresenterClip(
     },
   });
 
+  if (
+    req.waitForResult !== false &&
+    result.status === "processing" &&
+    result.externalJobId &&
+    provider.pollJob
+  ) {
+    const jobId = result.externalJobId;
+    for (let i = 0; i < 10; i++) {
+      await new Promise((r) => setTimeout(r, 1500));
+      result = await provider.pollJob(jobId);
+      if (result.status !== "processing") break;
+    }
+  }
+
   return {
     profile: {
       ...profile,
       realismLevel: provider.id === "heygen" ? "ultra" : "high",
       facialExpressionStyle: `${profile.facialExpressionStyle} Emotion=${req.emotion || "natural"}`,
+      lipSyncProfile: `${profile.lipSyncProfile} · voice-matched`,
+      bodyMotionStyle: `${profile.bodyMotionStyle} · natural movement`,
     },
     provider: provider.id,
     status: result.status,
     remoteUrl: result.remoteUrl,
     externalJobId: result.externalJobId,
+    mimeType: result.mimeType,
     message: result.message,
   };
 }

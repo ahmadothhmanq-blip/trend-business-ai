@@ -73,6 +73,10 @@ export function timelineSummary(model: VideoProductionModel): Array<{
   startSec: number;
   endSec: number;
   hasClip: boolean;
+  durationSec: number;
+  order: number;
+  visualPrompt?: string;
+  scriptPreview?: string;
 }> {
   let t = 0;
   return [...model.scenes]
@@ -86,10 +90,67 @@ export function timelineSummary(model: VideoProductionModel): Array<{
         name: s.name,
         startSec: start,
         endSec: end,
+        durationSec: s.durationSec,
+        order: s.order,
         hasClip: Boolean(s.clipId),
+        visualPrompt: s.visualPrompt?.slice(0, 120),
+        scriptPreview: s.script?.slice(0, 80),
       };
     });
 }
+
+/** Visual timeline track layout for UI (percent widths). */
+export function buildVisualTimeline(model: VideoProductionModel): {
+  totalSec: number;
+  tracks: Array<{
+    id: string;
+    name: string;
+    startSec: number;
+    endSec: number;
+    widthPct: number;
+    offsetPct: number;
+    hasClip: boolean;
+    color: string;
+  }>;
+  playheadHintSec: number;
+} {
+  const rows = timelineSummary(model);
+  const totalSec = Math.max(1, rows.at(-1)?.endSec || model.targetDurationSec || 1);
+  const colors = ["#D4AF37", "#5B8DEF", "#34D399", "#F472B6", "#A78BFA", "#FB923C"];
+  return {
+    totalSec,
+    playheadHintSec: 0,
+    tracks: rows.map((r, i) => ({
+      id: r.id,
+      name: r.name,
+      startSec: r.startSec,
+      endSec: r.endSec,
+      widthPct: Math.max(4, (r.durationSec / totalSec) * 100),
+      offsetPct: (r.startSec / totalSec) * 100,
+      hasClip: r.hasClip,
+      color: colors[i % colors.length]!,
+    })),
+  };
+}
+
+/** Move a scene earlier/later by one slot. */
+export function editorNudgeScene(
+  model: VideoProductionModel,
+  sceneId: string,
+  direction: "left" | "right",
+): VideoProductionModel {
+  const ordered = [...model.scenes].sort((a, b) => a.order - b.order);
+  const idx = ordered.findIndex((s) => s.id === sceneId);
+  if (idx < 0) return model;
+  const swapWith = direction === "left" ? idx - 1 : idx + 1;
+  if (swapWith < 0 || swapWith >= ordered.length) return model;
+  const ids = ordered.map((s) => s.id);
+  const tmp = ids[idx]!;
+  ids[idx] = ids[swapWith]!;
+  ids[swapWith] = tmp;
+  return editorReorder(model, ids);
+}
+
 
 /** Trim scene duration (seconds). */
 export function editorTrimScene(

@@ -4,6 +4,7 @@ import { databaseErrorResponse } from "@/lib/api/errors";
 import type { VideoGeneration } from "@/types/video";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { purgeGenerationMedia } from "@/lib/ai-core/video-production-platform";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -89,6 +90,11 @@ export async function DELETE(_request: Request, context: RouteContext) {
   if (auth.response) return auth.response;
 
   await syncFavorite(auth.supabase, auth.user!.id, "video_generation", id, false);
+  await purgeGenerationMedia({
+    supabase: auth.supabase,
+    userId: auth.user!.id,
+    generationId: id,
+  });
   const { data, error } = await auth.supabase.from("video_generations").delete().eq("id", id).eq("user_id", auth.user!.id).select("id").single();
   if (error || !data) return NextResponse.json({ error: "Video not found" }, { status: 404 });
   return NextResponse.json({ message: "Video deleted." });

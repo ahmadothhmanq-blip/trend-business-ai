@@ -52,6 +52,15 @@ export type VideoRenderJob = {
   provider: string;
   message: string;
   costCreditsEstimate?: number;
+  costCreditsSpent?: number;
+  attemptCount?: number;
+  /** Ordered assembly plan for multi-clip merge */
+  assemblyManifest?: {
+    clipUrls: string[];
+    audioUrl?: string;
+    method: "ffmpeg" | "first-clip" | "manifest-only";
+    note: string;
+  };
   createdAt: string;
   updatedAt: string;
   completedAt?: string;

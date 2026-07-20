@@ -25,6 +25,7 @@ const schema = z.object({
   duration: z.string().optional(),
   aspectRatio: z.string().optional(),
   kind: z.enum(["product", "person", "scene"]).optional(),
+  intensity: z.enum(["subtle", "medium", "dynamic"]).optional(),
   render: z.boolean().optional().default(true),
   providerId: z.enum(["preview", "kling", "runway", "heygen", "external"]).optional(),
 });
@@ -59,7 +60,11 @@ export async function POST(request: Request) {
     const result = await generateVideo(brief.pluginInput);
 
     let productionModel = result.productionModel
-      ? attachSourceImageToModel(result.productionModel, parsed.data.imageUrl)
+      ? attachSourceImageToModel(
+          result.productionModel,
+          parsed.data.imageUrl,
+          parsed.data.kind,
+        )
       : undefined;
 
     const blueprint: VideoBlueprint = {

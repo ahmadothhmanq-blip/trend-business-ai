@@ -73,7 +73,12 @@ export async function GET(request: Request) {
       editorFoundation: true,
       brandIntegration: true,
       socialExport: true,
-      mediaStorage: true,
+      asyncRender: true,
+      jobResume: true,
+      jobRetry: true,
+      ffmpegAssembly: true,
+      mediaLibrary: true,
+      socialPublishPackages: true,
     },
     providers: listVideoProviders().map((p) => ({
       id: p.id,

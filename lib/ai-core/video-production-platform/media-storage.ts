@@ -126,10 +126,146 @@ export async function uploadVideoStudioMedia(params: {
 
 export async function fetchRemoteToBytes(url: string): Promise<Uint8Array | null> {
   try {
+    if (url.startsWith("data:")) {
+      const comma = url.indexOf(",");
+      if (comma < 0) return null;
+      const meta = url.slice(5, comma);
+      const data = url.slice(comma + 1);
+      if (!meta.includes("base64")) return null;
+      return new Uint8Array(Buffer.from(data, "base64"));
+    }
     const res = await fetch(url);
     if (!res.ok) return null;
     return new Uint8Array(await res.arrayBuffer());
   } catch {
     return null;
   }
+}
+
+export async function listVideoStudioMedia(params: {
+  supabase: AnySupabase;
+  userId: string;
+  generationId?: string | null;
+}): Promise<StoredMediaRecord[]> {
+  let query = params.supabase
+    .from("video_media")
+    .select("*")
+    .eq("user_id", params.userId)
+    .order("created_at", { ascending: false });
+  if (params.generationId) {
+    query = query.eq("generation_id", params.generationId);
+  }
+  const { data, error } = await query;
+  if (error || !data) return [];
+  return (data as Record<string, unknown>[]).map((row) => ({
+    id: String(row.id),
+    userId: String(row.user_id),
+    generationId: (row.generation_id as string) || null,
+    kind: String(row.kind),
+    mimeType: String(row.mime_type),
+    storagePath: String(row.storage_path),
+    publicUrl: (row.public_url as string) || null,
+    sizeBytes: Number(row.size_bytes || 0),
+    durationSec: row.duration_sec == null ? null : Number(row.duration_sec),
+    provider: String(row.provider || ""),
+    meta: (row.meta as Record<string, unknown>) || {},
+    createdAt: String(row.created_at || nowIso()),
+  }));
+}
+
+export async function getVideoStudioMediaPreview(params: {
+  supabase: AnySupabase;
+  userId: string;
+  mediaId: string;
+  expiresInSec?: number;
+}): Promise<{ url: string | null; record: StoredMediaRecord | null }> {
+  const { data, error } = await params.supabase
+    .from("video_media")
+    .select("*")
+    .eq("id", params.mediaId)
+    .eq("user_id", params.userId)
+    .maybeSingle();
+
+  if (error || !data) return { url: null, record: null };
+
+  const record: StoredMediaRecord = {
+    id: String(data.id),
+    userId: String(data.user_id),
+    generationId: (data.generation_id as string) || null,
+    kind: String(data.kind),
+    mimeType: String(data.mime_type),
+    storagePath: String(data.storage_path),
+    publicUrl: (data.public_url as string) || null,
+    sizeBytes: Number(data.size_bytes || 0),
+    durationSec: data.duration_sec == null ? null : Number(data.duration_sec),
+    provider: String(data.provider || ""),
+    meta: (data.meta as Record<string, unknown>) || {},
+    createdAt: String(data.created_at || nowIso()),
+  };
+
+  const signed = await params.supabase.storage
+    .from(VIDEO_STUDIO_BUCKET)
+    .createSignedUrl(record.storagePath, params.expiresInSec ?? 3600);
+
+  return {
+    url: signed.data?.signedUrl || record.publicUrl,
+    record,
+  };
+}
+
+export async function deleteVideoStudioMedia(params: {
+  supabase: AnySupabase;
+  userId: string;
+  mediaId: string;
+}): Promise<{ ok: boolean; error?: string }> {
+  const { data, error } = await params.supabase
+    .from("video_media")
+    .select("*")
+    .eq("id", params.mediaId)
+    .eq("user_id", params.userId)
+    .maybeSingle();
+
+  if (error || !data) return { ok: false, error: "Media not found" };
+
+  const storagePath = String(data.storage_path || "");
+  if (storagePath) {
+    await params.supabase.storage.from(VIDEO_STUDIO_BUCKET).remove([storagePath]);
+  }
+
+  const { error: delErr } = await params.supabase
+    .from("video_media")
+    .delete()
+    .eq("id", params.mediaId)
+    .eq("user_id", params.userId);
+
+  if (delErr) return { ok: false, error: delErr.message };
+  return { ok: true };
+}
+
+/** Delete all media + storage objects for a generation. */
+export async function purgeGenerationMedia(params: {
+  supabase: AnySupabase;
+  userId: string;
+  generationId: string;
+}): Promise<{ deleted: number }> {
+  const rows = await listVideoStudioMedia({
+    supabase: params.supabase,
+    userId: params.userId,
+    generationId: params.generationId,
+  });
+  const paths = rows.map((r) => r.storagePath).filter(Boolean);
+  if (paths.length) {
+    await params.supabase.storage.from(VIDEO_STUDIO_BUCKET).remove(paths);
+  }
+  await params.supabase
+    .from("video_media")
+    .delete()
+    .eq("user_id", params.userId)
+    .eq("generation_id", params.generationId);
+  await params.supabase
+    .from("video_render_jobs")
+    .delete()
+    .eq("user_id", params.userId)
+    .eq("generation_id", params.generationId);
+  return { deleted: rows.length };
 }

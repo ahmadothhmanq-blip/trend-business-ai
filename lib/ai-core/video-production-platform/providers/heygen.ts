@@ -108,4 +108,72 @@ export const heygenVideoProvider: VideoProvider = {
       };
     }
   },
+  async pollJob(externalJobId: string): Promise<VideoProviderClipResult> {
+    const key = process.env.HEYGEN_API_KEY;
+    if (!key) {
+      return {
+        provider: "heygen",
+        status: "failed",
+        mimeType: "video/mp4",
+        error: "HEYGEN_API_KEY missing",
+        message: "Not configured",
+      };
+    }
+    try {
+      const res = await fetch(
+        `https://api.heygen.com/v1/video_status.get?video_id=${encodeURIComponent(externalJobId)}`,
+        { headers: { "X-Api-Key": key } },
+      );
+      if (!res.ok) {
+        return {
+          provider: "heygen",
+          status: "processing",
+          externalJobId,
+          mimeType: "video/mp4",
+          message: `HeyGen poll HTTP ${res.status}`,
+        };
+      }
+      const json = (await res.json()) as {
+        data?: { status?: string; video_url?: string; error?: { message?: string } };
+      };
+      const status = (json.data?.status || "").toLowerCase();
+      if ((status === "completed" || status === "done") && json.data?.video_url) {
+        return {
+          provider: "heygen",
+          status: "completed",
+          externalJobId,
+          remoteUrl: json.data.video_url,
+          mimeType: "video/mp4",
+          message: "HeyGen avatar ready.",
+        };
+      }
+      if (status === "failed" || status === "error") {
+        return {
+          provider: "heygen",
+          status: "failed",
+          externalJobId,
+          mimeType: "video/mp4",
+          error: json.data?.error?.message || "HeyGen failed",
+          message: "HeyGen task failed.",
+        };
+      }
+      return {
+        provider: "heygen",
+        status: "processing",
+        externalJobId,
+        mimeType: "video/mp4",
+        message: `HeyGen status: ${status || "processing"}`,
+      };
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : "HeyGen poll failed";
+      return {
+        provider: "heygen",
+        status: "failed",
+        externalJobId,
+        mimeType: "video/mp4",
+        error: msg,
+        message: msg,
+      };
+    }
+  },
 };

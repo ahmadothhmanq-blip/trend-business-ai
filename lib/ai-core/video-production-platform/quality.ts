@@ -126,6 +126,67 @@ export function runVideoQualityChecks(
       : "No synthesized voice asset — run TTS/full render",
   });
 
+  if (job?.audioAsset && job.compositeAsset) {
+    const audioDur = job.audioAsset.durationSec || 0;
+    const videoDur = job.compositeAsset.durationSec || model.targetDurationSec;
+    const drift = Math.abs(audioDur - videoDur);
+    checks.push({
+      id: "av-duration-align",
+      label: "A/V duration alignment",
+      passed: audioDur === 0 || drift <= Math.max(3, videoDur * 0.25),
+      severity: "warning",
+      detail:
+        audioDur === 0
+          ? "Audio duration unknown"
+          : `Audio ~${audioDur}s vs video ~${videoDur}s (drift ${drift.toFixed(1)}s)`,
+    });
+  }
+
+  const providerFailed = job?.clips.some(
+    (c) => c.status === "failed" && Boolean(c.error),
+  );
+  checks.push({
+    id: "provider-failures",
+    label: "Provider failures",
+    passed: !providerFailed,
+    severity: providerFailed ? "blocker" : "info",
+    detail: providerFailed
+      ? job!.clips
+          .filter((c) => c.error)
+          .map((c) => c.error)
+          .join("; ")
+      : `Provider ${job?.provider || "n/a"} · attempts ${job?.attemptCount || 0}`,
+  });
+
+  checks.push({
+    id: "missing-scenes",
+    label: "All scenes present",
+    passed: model.scenes.length > 0 && model.scenes.every((s) => s.name && s.order >= 0),
+    severity: "blocker",
+    detail: `${model.scenes.length} scenes in timeline`,
+  });
+
+  if (job?.assemblyManifest) {
+    checks.push({
+      id: "assembly",
+      label: "Final assembly",
+      passed: job.assemblyManifest.method === "ffmpeg" || job.assemblyManifest.method === "first-clip",
+      severity: "info",
+      detail: `${job.assemblyManifest.method}: ${job.assemblyManifest.note}`,
+    });
+  }
+
+  const cost = job?.costCreditsSpent ?? job?.costCreditsEstimate;
+  if (typeof cost === "number") {
+    checks.push({
+      id: "cost",
+      label: "Render cost tracking",
+      passed: true,
+      severity: "info",
+      detail: `Spent ~${job?.costCreditsSpent ?? 0} / est ${job?.costCreditsEstimate ?? 0} credits`,
+    });
+  }
+
   const blockers = checks.filter((c) => c.severity === "blocker" && !c.passed);
   const warnings = checks.filter((c) => c.severity === "warning" && !c.passed);
   const passed = checks.filter((c) => c.passed).length;

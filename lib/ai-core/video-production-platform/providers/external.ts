@@ -92,4 +92,75 @@ export const externalVideoProvider: VideoProvider = {
       };
     }
   },
+  async pollJob(externalJobId: string): Promise<VideoProviderClipResult> {
+    const key = process.env.VIDEO_PROVIDER_API_KEY;
+    const base = process.env.VIDEO_PROVIDER_BASE_URL;
+    if (!key || !base) {
+      return {
+        provider: "external",
+        status: "failed",
+        mimeType: "video/mp4",
+        error: "External provider not configured",
+        message: "Not configured",
+      };
+    }
+    try {
+      const res = await fetch(
+        `${base.replace(/\/$/, "")}/jobs/${encodeURIComponent(externalJobId)}`,
+        { headers: { Authorization: `Bearer ${key}` } },
+      );
+      if (!res.ok) {
+        return {
+          provider: "external",
+          status: "processing",
+          externalJobId,
+          mimeType: "video/mp4",
+          message: `External poll HTTP ${res.status}`,
+        };
+      }
+      const json = (await res.json()) as {
+        status?: string;
+        url?: string;
+        error?: string;
+      };
+      const status = (json.status || "").toLowerCase();
+      if ((status === "completed" || status === "done" || status === "succeeded") && json.url) {
+        return {
+          provider: "external",
+          status: "completed",
+          externalJobId,
+          remoteUrl: json.url,
+          mimeType: "video/mp4",
+          message: "External job completed.",
+        };
+      }
+      if (status === "failed" || status === "error") {
+        return {
+          provider: "external",
+          status: "failed",
+          externalJobId,
+          mimeType: "video/mp4",
+          error: json.error || "failed",
+          message: "External job failed.",
+        };
+      }
+      return {
+        provider: "external",
+        status: "processing",
+        externalJobId,
+        mimeType: "video/mp4",
+        message: `External status: ${status || "processing"}`,
+      };
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : "External poll failed";
+      return {
+        provider: "external",
+        status: "failed",
+        externalJobId,
+        mimeType: "video/mp4",
+        error: msg,
+        message: msg,
+      };
+    }
+  },
 };
