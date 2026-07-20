@@ -25,6 +25,7 @@ const SECURITY_HEADERS: Record<string, string> = {
 function isEmbeddablePreviewPath(pathname: string): boolean {
   return (
     /^\/api\/website-builder\/[^/]+\/live-preview\/?$/.test(pathname) ||
+    /^\/api\/webapp-builder\/[^/]+\/live-preview\/?$/.test(pathname) ||
     pathname.startsWith("/api/website-builder/preview/")
   );
 }

@@ -20,6 +20,11 @@ import type {
   WebAppAnalysis,
 } from "@/plugins/webapp/types";
 import type { GenerationContext } from "@/lib/ai/types";
+import {
+  emptyVersionHistory,
+  saveAppVersion,
+} from "@/lib/ai-core/app-design-platform/versions";
+import { runAppDesignEngine } from "@/lib/ai-core/app-design-platform/design-engine";
 
 const FILE_GENERATION_RETRIES = 3;
 const PROJECT_VALIDATION_ROUNDS = 2;
@@ -200,11 +205,36 @@ export async function generateWebApp(
     ctx,
   );
 
-  const pageList = plan.blueprint.pages.map((pageName, idx) => ({
-    name: pageName,
-    path: plan.dynamicPlan.pages[idx] ?? `/${pageName.toLowerCase().replace(/\s+/g, "-")}`,
-    description: pageName,
-  }));
+  const pageList =
+    plan.appModel?.screens.map((s) => ({
+      name: s.name,
+      path: s.path,
+      description: s.purpose,
+    })) ??
+    plan.blueprint.pages.map((pageName, idx) => ({
+      name: pageName,
+      path:
+        plan.dynamicPlan.pages[idx] ??
+        `/${pageName.toLowerCase().replace(/\s+/g, "-")}`,
+      description: pageName,
+    }));
+
+  const appModel =
+    plan.appModel ??
+    runAppDesignEngine({
+      prompt: input.prompt,
+      appType: input.appType,
+      language: input.language,
+      designStyle: input.designStyle,
+      colorStyle: input.colorStyle,
+      features: input.features,
+    }).model;
+
+  const versionHistory = saveAppVersion(
+    emptyVersionHistory(),
+    appModel,
+    "Initial generation",
+  );
 
   return {
     title: plan.blueprint.title || analysis.appName,
@@ -227,6 +257,11 @@ export async function generateWebApp(
       isEcommerce: String(plan.flags.isEcommerce),
       isSaas: String(plan.flags.isSaas),
       databaseProvider: plan.flags.databaseProvider,
+      templateId: appModel.templateId,
+      architecture: appModel.architecture,
     },
+    appModel,
+    appDesign: plan.appDesign,
+    versionHistory,
   };
 }

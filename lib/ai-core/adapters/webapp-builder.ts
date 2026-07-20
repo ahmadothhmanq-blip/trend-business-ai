@@ -113,12 +113,34 @@ export function createWebappBuilderAdapter(): ProductEngineAdapter<
       if (!plan) {
         throw new Error("Web App Builder adapter: design requires plan.");
       }
-      return deriveDesignSystem({
+      const base = deriveDesignSystem({
         style: input.designStyle,
         colorStyle: input.colorStyle,
-        components: plan.blueprint.components,
-        industryPattern: analysis?.appType || "web-app",
+        components:
+          plan.appModel?.components.map((c) => c.type) ??
+          plan.blueprint.components,
+        industryPattern:
+          plan.appModel?.industry || analysis?.appType || "web-app",
       });
+      const tokens = plan.appModel?.brand.tokens;
+      if (!tokens) return base;
+      return {
+        ...base,
+        colors: {
+          ...base.colors,
+          primary: tokens.primary,
+          secondary: tokens.secondary,
+          accent: tokens.accent,
+          background: tokens.background,
+          foreground: tokens.foreground,
+          surface: tokens.surface,
+        },
+        typography: {
+          ...base.typography,
+          headingFont: tokens.headingFont,
+          bodyFont: tokens.bodyFont,
+        },
+      };
     },
 
     async runAssets(_brief, artifacts) {

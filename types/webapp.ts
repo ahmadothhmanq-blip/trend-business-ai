@@ -1,4 +1,10 @@
 import type { GeneratedProjectFile } from "@/lib/ai/types";
+import type {
+  AppDesignBlueprint,
+  StructuredAppModel,
+} from "@/lib/ai-core/app-design-platform/types";
+import type { AppVersionHistory } from "@/lib/ai-core/app-design-platform/versions";
+import type { AppDeploymentState } from "@/lib/ai-core/app-design-platform/deploy";
 
 export type WebAppGenerationStatus = "pending" | "generating" | "completed" | "failed";
 export type WebAppGenerationMode = "generate" | "regenerate" | "continue" | "retry";
@@ -14,6 +20,11 @@ export type WebAppBlueprint = {
   prompt: string;
   generatedAt: string;
   progressEvents?: string[];
+  /** Structured editable app model (App Design Platform). */
+  appModel?: StructuredAppModel;
+  appDesign?: AppDesignBlueprint;
+  versionHistory?: AppVersionHistory;
+  deployment?: AppDeploymentState;
 };
 
 export type WebAppGeneration = {

@@ -26,7 +26,8 @@
     "smoke:uat": "node scripts/smoke-uat-journey.mjs",
     "db:apply": "node scripts/apply-migrations.mjs",
     "db:verify": "node scripts/verify-platform-db.mjs",
-    "verify:video-studio": "node scripts/verify-video-studio.mjs"
+    "verify:video-studio": "node scripts/verify-video-studio.mjs",
+    "verify:app-builder": "node scripts/verify-app-builder.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.0",

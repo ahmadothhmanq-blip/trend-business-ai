@@ -199,15 +199,46 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
   if (step === "preview" && previewGen) {
     const bp = previewGen.blueprint;
     return (
-      <ProjectFilePreview
-        title={bp?.title || previewGen.app_name}
-        subtitle={`${bp?.files?.length ?? 0} files · ${previewGen.provider ?? "deepseek"} · ${previewGen.generation_time_ms ? `${(previewGen.generation_time_ms / 1000).toFixed(1)}s` : "N/A"}`}
-        files={bp?.files ?? []}
-        downloadName={bp?.title || previewGen.app_name}
-        onBack={() => { setPreviewGen(null); setStep("history"); fetchGenerations(); }}
-        onRegenerate={() => handleRegenerate(previewGen)}
-        onContinue={() => handleContinue(previewGen)}
-      />
+      <div className="space-y-4">
+        <div className="flex flex-wrap gap-2">
+          <Button
+            asChild
+            className="btn-gold rounded-xl font-bold text-luxury-black"
+          >
+            <a href={`/dashboard/app-builder/${previewGen.id}`}>Open App Management</a>
+          </Button>
+          <Button asChild variant="outline" className="rounded-xl border-white/10">
+            <a href={`/api/webapp-builder/${previewGen.id}/live-preview`} target="_blank" rel="noopener noreferrer">
+              Open Live Preview
+            </a>
+          </Button>
+        </div>
+        <DashboardCard>
+          <DashboardCardHeader>
+            <DashboardCardTitle>Live app preview</DashboardCardTitle>
+            <DashboardCardDescription>
+              Sandbox runtime from your generated app model
+            </DashboardCardDescription>
+          </DashboardCardHeader>
+          <DashboardCardContent className="flex justify-center">
+            <iframe
+              title="Generated app live preview"
+              src={`/api/webapp-builder/${previewGen.id}/live-preview`}
+              className="h-[560px] w-full max-w-4xl rounded-2xl border border-white/15 bg-black"
+              sandbox="allow-same-origin"
+            />
+          </DashboardCardContent>
+        </DashboardCard>
+        <ProjectFilePreview
+          title={bp?.title || previewGen.app_name}
+          subtitle={`${bp?.files?.length ?? 0} files · ${previewGen.provider ?? "deepseek"} · ${previewGen.generation_time_ms ? `${(previewGen.generation_time_ms / 1000).toFixed(1)}s` : "N/A"}${bp?.appModel ? ` · ${bp.appModel.templateId}` : ""}`}
+          files={bp?.files ?? []}
+          downloadName={bp?.title || previewGen.app_name}
+          onBack={() => { setPreviewGen(null); setStep("history"); fetchGenerations(); }}
+          onRegenerate={() => handleRegenerate(previewGen)}
+          onContinue={() => handleContinue(previewGen)}
+        />
+      </div>
     );
   }
 
@@ -341,7 +372,9 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
                     icon={def?.icon ?? Sparkles}
                     onFavorite={() => handleFavorite(gen)}
                     onDelete={() => handleDelete(gen.id)}
-                    onView={() => { setPreviewGen(gen); setStep("preview"); }}
+                    onView={() => {
+                      window.location.href = `/dashboard/app-builder/${gen.id}`;
+                    }}
                     onRegenerate={() => handleRegenerate(gen)}
                     onContinue={() => handleContinue(gen)}
                   />

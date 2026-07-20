@@ -5,7 +5,7 @@ import { DashboardHeader } from "@/components/dashboard/header";
 import { WebAppBuilderTool } from "@/components/dashboard/webapp-builder/webapp-builder-tool";
 import type { WebAppGeneration } from "@/types/webapp";
 
-export const metadata: Metadata = { title: "AI Web App Builder" };
+export const metadata: Metadata = { title: "AI App Design Platform" };
 
 export default async function AppBuilderPage() {
   const supabase = await createClient();
@@ -39,8 +39,8 @@ export default async function AppBuilderPage() {
   return (
     <>
       <DashboardHeader
-        title="AI Web App Builder"
-        description="Generate full-stack web applications with AI"
+        title="AI App Design Platform"
+        description="Design, generate, preview, and manage full-stack applications with AI"
         userEmail={user.email}
         userName={(profile?.full_name as string | undefined) ?? (metadata.full_name as string | undefined)}
         avatarUrl={profile?.avatar_url as string | undefined}

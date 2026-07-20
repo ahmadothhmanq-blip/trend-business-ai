@@ -1,6 +1,11 @@
 import type { ProjectCapabilityFlags } from "@/lib/ai/validator";
 import type { GeneratedProjectFile, GenerationProgressEvent } from "@/lib/ai/types";
 import type { PlannedFile } from "@/lib/ai/planner";
+import type {
+  AppDesignBlueprint,
+  StructuredAppModel,
+} from "@/lib/ai-core/app-design-platform/types";
+import type { AppVersionHistory } from "@/lib/ai-core/app-design-platform/versions";
 
 export type WebAppPluginInput = {
   prompt: string;
@@ -66,6 +71,9 @@ export type WebAppPlanResult = {
   dynamicPlan: WebAppDynamicPlan;
   filePlans: PlannedFile[];
   flags: ProjectCapabilityFlags;
+  /** Structured app design from App Design Platform (before code gen). */
+  appDesign?: AppDesignBlueprint;
+  appModel?: StructuredAppModel;
 };
 
 export type WebAppOutput = {
@@ -76,6 +84,9 @@ export type WebAppOutput = {
   pages: { name: string; path: string; description: string }[];
   files: GeneratedProjectFile[];
   settings: Record<string, string>;
+  appModel?: StructuredAppModel;
+  appDesign?: AppDesignBlueprint;
+  versionHistory?: AppVersionHistory;
 };
 
 export type { GeneratedProjectFile };
