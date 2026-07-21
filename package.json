@@ -29,6 +29,8 @@
     "verify:video-studio": "node scripts/verify-video-studio.mjs",
     "verify:app-builder": "node scripts/verify-app-builder.mjs",
     "verify:content-studio": "node scripts/verify-content-studio.mjs",
+    "verify:social-media": "node scripts/verify-social-media.mjs",
+    "verify:social-media-publishing": "node scripts/verify-social-media-publishing.mjs",
     "verify:content-studio-platform": "node scripts/verify-content-studio-platform.mjs",
     "verify:brand-studio": "node scripts/verify-brand-studio.mjs",
     "verify:image-generator": "node scripts/verify-image-generator.mjs",

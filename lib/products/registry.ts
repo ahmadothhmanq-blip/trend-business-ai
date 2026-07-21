@@ -260,7 +260,7 @@ export const PRODUCT_DEFINITIONS: Record<ProductId, ProductDefinition> = {
     title: "AI Social Media Manager",
     eyebrow: "Content",
     description:
-      "Plan channel strategy, posting systems, engagement angles, and growth plays across social platforms.",
+      "Create, schedule, and manage AI-powered social posts across Facebook, Instagram, LinkedIn, X, and TikTok.",
     icon: Sparkles,
     href: "/dashboard/social-media",
     kind: "workspace",
