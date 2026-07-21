@@ -83,3 +83,117 @@ export type CalendarEntry = {
   created_at: string;
   updated_at: string;
 };
+
+/* ------------------------------------------------------------------ */
+/*  Content Studio Platform                                            */
+/* ------------------------------------------------------------------ */
+
+export type ContentDocumentStatus = "draft" | "published" | "archived";
+
+export type ContentVersionSource =
+  | "manual"
+  | "autosave"
+  | "ai_action"
+  | "generation"
+  | "restore";
+
+export type ContentActionType =
+  | "rewrite"
+  | "improve"
+  | "expand"
+  | "shorten"
+  | "summarize"
+  | "translate"
+  | "change_tone"
+  | "change_style";
+
+export type ContentTemplateCategory =
+  | "Blog"
+  | "Social Media"
+  | "Ads"
+  | "Email"
+  | "Product Description"
+  | "Landing Pages"
+  | "SEO Articles"
+  | "Business Documents";
+
+export type ContentTemplateVariable = {
+  key: string;
+  label: string;
+  placeholder?: string;
+  default?: string;
+};
+
+export type ContentProject = {
+  id: string;
+  user_id: string;
+  parent_id: string | null;
+  name: string;
+  description: string;
+  color: string;
+  is_folder: boolean;
+  is_favorite: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ContentDocument = {
+  id: string;
+  user_id: string;
+  project_id: string | null;
+  title: string;
+  body: string;
+  content_type: string;
+  content_tool: string;
+  status: ContentDocumentStatus;
+  is_favorite: boolean;
+  word_count: number;
+  char_count: number;
+  metadata: Record<string, unknown>;
+  generation_id: string | null;
+  brand_identity_id: string | null;
+  last_edited_at: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ContentVersion = {
+  id: string;
+  user_id: string;
+  document_id: string;
+  version_number: number;
+  title: string;
+  body: string;
+  change_summary: string;
+  source: ContentVersionSource;
+  metadata: Record<string, unknown>;
+  created_at: string;
+};
+
+export type ContentTemplate = {
+  id: string;
+  user_id: string | null;
+  name: string;
+  category: string;
+  description: string;
+  prompt_structure: string;
+  variables: ContentTemplateVariable[];
+  preview: string;
+  content_tool: string;
+  content_type: string;
+  is_system: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type BrandVoiceContext = {
+  brandName: string;
+  tone: string;
+  tagline: string;
+  elevatorPitch: string;
+  doExamples: string[];
+  dontExamples: string[];
+  vocabulary: string[];
+  writingStyle: string;
+};

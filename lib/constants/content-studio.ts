@@ -97,6 +97,38 @@ export const CONTENT_TONES = [
   "Conversational", "Bold", "Luxurious", "Minimalist", "Storytelling",
 ] as const;
 
+/** Platform AI writing tones (Jasper / Copy.ai style) */
+export const CONTENT_PLATFORM_TONES = [
+  "Professional",
+  "Casual",
+  "Luxury",
+  "Friendly",
+  "Technical",
+  "Marketing",
+] as const;
+
+export const CONTENT_PLATFORM_STYLES = [
+  "Standard",
+  "Academic",
+  "Journalistic",
+  "Technical",
+  "Creative",
+  "Copywriting",
+  "SEO-Optimized",
+  "Narrative",
+] as const;
+
+export const CONTENT_TEMPLATE_CATEGORIES = [
+  "Blog",
+  "Social Media",
+  "Ads",
+  "Email",
+  "Product Description",
+  "Landing Pages",
+  "SEO Articles",
+  "Business Documents",
+] as const;
+
 export const CONTENT_AUDIENCES = [
   "General", "Business Owners", "Entrepreneurs", "Startups", "Enterprise",
   "Marketers", "Developers", "Designers", "Students", "Executives",

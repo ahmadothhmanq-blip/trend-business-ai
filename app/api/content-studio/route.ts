@@ -6,6 +6,7 @@ import { generateContent } from "@/lib/content-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
 import { resolveIteratedPrompt } from "@/lib/ai/iteration";
 import { getContentToolLabel, getContentTypeLabel } from "@/lib/constants/content-studio";
+import { fetchBrandVoiceContext, brandVoiceToPromptContext } from "@/lib/content-studio/brand-voice";
 import type { ContentGeneration, ContentBlueprint } from "@/types/content";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -26,6 +27,7 @@ const requestSchema = z.object({
   parentGenerationId: z.string().uuid().optional(),
   continueInstruction: z.string().trim().max(4000).optional(),
   projectId: z.string().uuid().optional(),
+  brandIdentityId: z.string().uuid().optional(),
 });
 
 function logError(stage: string, error: unknown) {
@@ -102,6 +104,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: iterated.error }, { status: iterated.status });
     }
 
+    let brandVoiceText = input.brandVoice;
+    if (input.brandIdentityId) {
+      const voice = await fetchBrandVoiceContext(
+        auth.supabase,
+        auth.user!.id,
+        input.brandIdentityId,
+      );
+      if (voice) brandVoiceText = brandVoiceToPromptContext(voice);
+    }
+
     const result = await generateContent({
       prompt: iterated.prompt,
       contentTool: input.contentTool,
@@ -109,7 +121,7 @@ export async function POST(request: Request) {
       tone: input.tone,
       audience: input.audience,
       language: input.language,
-      brandVoice: input.brandVoice,
+      brandVoice: brandVoiceText,
       writingStyle: input.writingStyle,
       creativityLevel: input.creativityLevel,
       options: input.options,
@@ -149,7 +161,7 @@ export async function POST(request: Request) {
       tone: input.tone,
       audience: input.audience,
       language: input.language,
-      brand_voice: input.brandVoice,
+      brand_voice: brandVoiceText,
       writing_style: input.writingStyle,
       creativity_level: input.creativityLevel,
       options: input.options,

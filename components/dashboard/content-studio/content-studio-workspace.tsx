@@ -2,9 +2,23 @@
 
 import { useState } from "react";
 import dynamic from "next/dynamic";
-import { CalendarDays, PenTool } from "lucide-react";
+import { CalendarDays, FolderKanban, PenTool } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { ContentGeneration } from "@/types/content";
+import type { ContentDocument, ContentGeneration, ContentProject } from "@/types/content";
+
+const ContentPlatformWorkspace = dynamic(
+  () =>
+    import("@/components/dashboard/content-studio/content-platform-workspace").then(
+      (m) => m.ContentPlatformWorkspace,
+    ),
+  {
+    loading: () => (
+      <div className="rounded-xl border border-white/10 p-8 text-sm text-white/40">
+        Loading workspace…
+      </div>
+    ),
+  },
+);
 
 const ContentStudioTool = dynamic(
   () =>
@@ -34,20 +48,29 @@ const ContentCalendar = dynamic(
   },
 );
 
-type Tab = "studio" | "calendar";
+type Tab = "workspace" | "studio" | "calendar";
 
-type Props = { initialGenerations?: ContentGeneration[] };
+type Props = {
+  initialGenerations?: ContentGeneration[];
+  initialDocuments?: ContentDocument[];
+  initialProjects?: ContentProject[];
+};
 
-export function ContentStudioWorkspace({ initialGenerations }: Props) {
-  const [tab, setTab] = useState<Tab>("studio");
+export function ContentStudioWorkspace({
+  initialGenerations,
+  initialDocuments,
+  initialProjects,
+}: Props) {
+  const [tab, setTab] = useState<Tab>("workspace");
 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-1 rounded-xl border border-white/[0.06] bg-white/[0.02] p-1">
         {(
           [
-            { key: "studio" as const, label: "Content Studio", icon: PenTool },
-            { key: "calendar" as const, label: "Content Calendar", icon: CalendarDays },
+            { key: "workspace" as const, label: "Workspace", icon: FolderKanban },
+            { key: "studio" as const, label: "AI Studio", icon: PenTool },
+            { key: "calendar" as const, label: "Calendar", icon: CalendarDays },
           ] as const
         ).map(({ key, label, icon: Icon }) => (
           <button
@@ -66,6 +89,12 @@ export function ContentStudioWorkspace({ initialGenerations }: Props) {
         ))}
       </div>
 
+      {tab === "workspace" && (
+        <ContentPlatformWorkspace
+          initialDocuments={initialDocuments}
+          initialProjects={initialProjects}
+        />
+      )}
       {tab === "studio" && <ContentStudioTool initialGenerations={initialGenerations} />}
       {tab === "calendar" && <ContentCalendar />}
     </div>

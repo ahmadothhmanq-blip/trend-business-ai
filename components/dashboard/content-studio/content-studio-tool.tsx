@@ -349,6 +349,8 @@ export function ContentStudioTool({ initialGenerations }: Props) {
   const [audience, setAudience] = useState("General");
   const [language, setLanguage] = useState("English");
   const [brandVoice, setBrandVoice] = useState("");
+  const [brandIdentityId, setBrandIdentityId] = useState("");
+  const [brandOptions, setBrandOptions] = useState<{ id: string; brand_name: string }[]>([]);
   const [writingStyle, setWritingStyle] = useState("Standard");
   const [creativityLevel, setCreativityLevel] = useState("balanced");
   const [options, setOptions] = useState<string[]>([]);
@@ -389,6 +391,13 @@ export function ContentStudioTool({ initialGenerations }: Props) {
   }, [page, search]);
 
   useEffect(() => { if (step === "history") fetchGenerations(); }, [step, fetchGenerations]);
+
+  useEffect(() => {
+    void fetch("/api/brand-identity?limit=20")
+      .then((r) => r.json())
+      .then((d) => setBrandOptions((d.generations ?? []).map((g: { id: string; brand_name: string }) => ({ id: g.id, brand_name: g.brand_name }))))
+      .catch(() => {});
+  }, []);
 
   const handleSelectTool = (id: string) => {
     setSelectedTool(id);
@@ -444,6 +453,7 @@ export function ContentStudioTool({ initialGenerations }: Props) {
           prompt: idea, contentTool, contentType,
           tone, audience, language, brandVoice, writingStyle,
           creativityLevel, options: contentOptions, seoKeywords, mode, parentGenerationId,
+          brandIdentityId: brandIdentityId || undefined,
           continueInstruction: mode === "continue" ? idea : undefined,
         }),
       });
@@ -659,6 +669,24 @@ export function ContentStudioTool({ initialGenerations }: Props) {
                     {CREATIVITY_LEVELS.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
                   </select>
                 </div>
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-white/60">Brand Identity <span className="text-white/20">(optional)</span></label>
+                {brandOptions.length > 0 ? (
+                  <select
+                    value={brandIdentityId}
+                    onChange={(e) => setBrandIdentityId(e.target.value)}
+                    className={dashboardSelectClass}
+                  >
+                    <option value="">Select from Brand Studio…</option>
+                    {brandOptions.map((b) => (
+                      <option key={b.id} value={b.id}>{b.brand_name}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <p className="text-xs text-white/30">Create a brand in Brand Studio to use brand voice.</p>
+                )}
               </div>
 
               <div>

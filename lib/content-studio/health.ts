@@ -22,12 +22,18 @@ export type ContentStudioHealthReport = {
   database: {
     contentGenerations: boolean;
     contentCalendar: boolean;
+    contentProjects: boolean;
+    contentDocuments: boolean;
+    contentVersions: boolean;
+    contentTemplates: boolean;
     message: string;
   };
   configuration: {
     toolsDefined: boolean;
     promptsPresent: boolean;
     adapterRegistered: boolean;
+    platformModules: boolean;
+    templatesCatalog: boolean;
   };
   checks: Array<{ id: string; ok: boolean; detail?: string }>;
 };
@@ -38,13 +44,30 @@ const REQUIRED_MODULES = [
   "plugins/content-studio/index.ts",
   "lib/ai/prompts/content-studio.ts",
   "lib/constants/content-studio.ts",
+  "lib/content-studio/health.ts",
+  "lib/content-studio/templates.ts",
+  "lib/content-studio/actions.ts",
+  "lib/content-studio/brand-voice.ts",
+  "lib/content-studio/documents.ts",
+  "lib/content-studio/versions.ts",
+  "lib/content-studio/index.ts",
   "types/content.ts",
   "app/api/content-studio/route.ts",
   "app/api/content-studio/[id]/route.ts",
   "app/api/content-studio/calendar/route.ts",
   "app/api/content-studio/health/route.ts",
+  "app/api/content-studio/templates/route.ts",
+  "app/api/content-studio/documents/route.ts",
+  "app/api/content-studio/documents/[id]/route.ts",
+  "app/api/content-studio/versions/route.ts",
+  "app/api/content-studio/actions/route.ts",
+  "app/api/content-studio/stream/route.ts",
+  "app/api/content-studio/projects/route.ts",
   "components/dashboard/content-studio/content-studio-tool.tsx",
   "components/dashboard/content-studio/content-studio-workspace.tsx",
+  "components/dashboard/content-studio/content-platform-workspace.tsx",
+  "components/dashboard/content-studio/content-editor.tsx",
+  "components/dashboard/content-studio/content-templates-panel.tsx",
   "components/dashboard/content-studio/content-calendar.tsx",
   "app/(dashboard)/dashboard/content-studio/page.tsx",
 ];
@@ -65,7 +88,7 @@ export function buildContentStudioFileChecks(root = process.cwd()) {
     detail: existsSync(join(root, rel)) ? "present" : "missing",
   }));
 
-  const migrations = ["019", "060"].map((n) => {
+  const migrations = ["019", "060", "061"].map((n) => {
     const ok =
       existsSync(join(root, "supabase/migrations")) &&
       readdirSync(join(root, "supabase/migrations")).some((f) => f.startsWith(`${n}_`));
@@ -108,35 +131,52 @@ export async function buildContentStudioHealthReport(
   const admin = createAdminClient();
   let contentGenerations = false;
   let contentCalendar = false;
+  let contentProjects = false;
+  let contentDocuments = false;
+  let contentVersions = false;
+  let contentTemplates = false;
   let dbMessage = "Database client not configured.";
 
   if (admin) {
-    [contentGenerations, contentCalendar] = await Promise.all([
-      checkTable(admin, "content_generations"),
-      checkTable(admin, "content_calendar"),
-    ]);
+    [contentGenerations, contentCalendar, contentProjects, contentDocuments, contentVersions, contentTemplates] =
+      await Promise.all([
+        checkTable(admin, "content_generations"),
+        checkTable(admin, "content_calendar"),
+        checkTable(admin, "content_projects"),
+        checkTable(admin, "content_documents"),
+        checkTable(admin, "content_versions"),
+        checkTable(admin, "content_templates"),
+      ]);
     dbMessage =
-      contentGenerations && contentCalendar
-        ? "Content Studio tables reachable."
+      contentGenerations && contentDocuments
+        ? "Content Studio platform tables reachable."
         : contentGenerations
-          ? "content_generations OK; content_calendar missing — apply migration 019."
-          : "content_generations missing — apply migrations 019 and 060.";
+          ? "Core tables OK; apply migration 061 for platform tables."
+          : "content_generations missing — apply migrations 019, 060, and 061.";
   }
 
   const constantsSrc = readFileIfExists(join(root, "lib/constants/content-studio.ts"));
   const adapterSrc = readFileIfExists(join(root, "lib/ai-core/adapters/content-studio.ts"));
   const promptsSrc = readFileIfExists(join(root, "lib/ai/prompts/content-studio.ts"));
+  const templatesSrc = readFileIfExists(join(root, "lib/content-studio/templates.ts"));
+  const indexSrc = readFileIfExists(join(root, "lib/content-studio/index.ts"));
 
   const configuration = {
     toolsDefined: constantsSrc.includes("CONTENT_TOOLS"),
     promptsPresent: promptsSrc.includes("contentAnalyzePrompt"),
     adapterRegistered: adapterSrc.includes("registerProductEngineAdapter"),
+    platformModules: indexSrc.includes("runContentAction") && indexSrc.includes("createDocumentVersion"),
+    templatesCatalog: templatesSrc.includes("SYSTEM_CONTENT_TEMPLATES"),
   };
 
   const runtimeChecks = [
     { id: "ai_provider", ok: aiConfigured, detail: aiConfigured ? providerName : "not configured" },
     { id: "db_content_generations", ok: contentGenerations, detail: contentGenerations ? "reachable" : "missing" },
     { id: "db_content_calendar", ok: contentCalendar, detail: contentCalendar ? "reachable" : "missing" },
+    { id: "db_content_projects", ok: contentProjects, detail: contentProjects ? "reachable" : "missing" },
+    { id: "db_content_documents", ok: contentDocuments, detail: contentDocuments ? "reachable" : "missing" },
+    { id: "db_content_versions", ok: contentVersions, detail: contentVersions ? "reachable" : "missing" },
+    { id: "db_content_templates", ok: contentTemplates, detail: contentTemplates ? "reachable" : "missing" },
     {
       id: "config_tools",
       ok: configuration.toolsDefined,
@@ -152,6 +192,16 @@ export async function buildContentStudioHealthReport(
       ok: configuration.adapterRegistered,
       detail: configuration.adapterRegistered ? "adapter registered" : "missing",
     },
+    {
+      id: "config_platform",
+      ok: configuration.platformModules,
+      detail: configuration.platformModules ? "platform modules exported" : "missing",
+    },
+    {
+      id: "config_templates",
+      ok: configuration.templatesCatalog,
+      detail: configuration.templatesCatalog ? "template catalog present" : "missing",
+    },
   ];
 
   const all = [...fileChecks, ...runtimeChecks];
@@ -160,9 +210,17 @@ export async function buildContentStudioHealthReport(
   return {
     status: ok ? "healthy" : "degraded",
     productId: "content-studio",
-    version: "1.1.0",
+    version: "2.0.0",
     aiProvider: { configured: aiConfigured, name: providerName },
-    database: { contentGenerations, contentCalendar, message: dbMessage },
+    database: {
+      contentGenerations,
+      contentCalendar,
+      contentProjects,
+      contentDocuments,
+      contentVersions,
+      contentTemplates,
+      message: dbMessage,
+    },
     configuration,
     checks: all,
   };

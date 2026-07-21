@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardHeader } from "@/components/dashboard/header";
 import { ContentStudioWorkspace } from "@/components/dashboard/content-studio/content-studio-workspace";
-import type { ContentGeneration } from "@/types/content";
+import type { ContentDocument, ContentGeneration, ContentProject } from "@/types/content";
 
 export const metadata: Metadata = { title: "AI Content Studio" };
 
@@ -18,6 +18,9 @@ export default async function ContentStudioPage() {
   const userMeta = user.user_metadata ?? {};
 
   let initialGenerations: ContentGeneration[] = [];
+  let initialDocuments: ContentDocument[] = [];
+  let initialProjects: ContentProject[] = [];
+
   try {
     const { data } = await supabase
       .from("content_generations")
@@ -28,6 +31,30 @@ export default async function ContentStudioPage() {
     initialGenerations = (data ?? []) as ContentGeneration[];
   } catch {
     // Table may not exist yet
+  }
+
+  try {
+    const { data: docs } = await supabase
+      .from("content_documents")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("last_edited_at", { ascending: false })
+      .range(0, 19);
+    initialDocuments = (docs ?? []) as ContentDocument[];
+  } catch {
+    // Platform tables may not exist yet
+  }
+
+  try {
+    const { data: projects } = await supabase
+      .from("content_projects")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("sort_order")
+      .order("name");
+    initialProjects = (projects ?? []) as ContentProject[];
+  } catch {
+    // Platform tables may not exist yet
   }
 
   const { data: profile } = await supabase
@@ -46,7 +73,11 @@ export default async function ContentStudioPage() {
         avatarUrl={profile?.avatar_url as string | undefined}
       />
       <main className="flex-1 p-4 sm:p-6 lg:p-8 xl:p-10">
-        <ContentStudioWorkspace initialGenerations={initialGenerations} />
+        <ContentStudioWorkspace
+          initialGenerations={initialGenerations}
+          initialDocuments={initialDocuments}
+          initialProjects={initialProjects}
+        />
       </main>
     </>
   );
