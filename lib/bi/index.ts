@@ -1,0 +1,14 @@
+export { runBiAssistant } from "./engine";
+export { listDataSources, createDataSource } from "./data-sources";
+export { listDatasets, createDataset } from "./datasets";
+export { computeMetricsFromIntegrations, ensureDefaultMetrics } from "./metrics";
+export { listDashboards, createDashboard, listWidgets, createWidget, ensureDefaultDashboard } from "./dashboards";
+export { listBiReports, createBiReport, listScheduledReports, createScheduledReport, listQueries, saveQuery } from "./reports";
+export { listAlerts, createAlert, evaluateAlert } from "./alerts";
+export { getBiAnalytics } from "./analytics";
+export type { BiAnalyticsSummary } from "./analytics";
+export { buildBiHealthReport } from "./health";
+export { hasBiPermission, BI_ROLE_PERMISSIONS } from "./permissions";
+export { logBiAudit } from "./audit";
+export * from "./integrations";
+import "@/lib/ai-core/adapters/bi-ai";

@@ -19,6 +19,7 @@ import {
   Megaphone,
   Palette,
   PenLine,
+  PieChart,
   Radar,
   SearchCheck,
   Settings,
@@ -60,6 +61,12 @@ export const DASHBOARD_PRIMARY_NAV: DashboardNavItem[] = [
     href: "/dashboard/erp",
     icon: Building2,
     description: "Finance, inventory, operations, and HR",
+  },
+  {
+    label: "Business Intelligence",
+    href: "/dashboard/bi",
+    icon: PieChart,
+    description: "Analytics dashboards, metrics, and AI insights",
   },
 ];
 

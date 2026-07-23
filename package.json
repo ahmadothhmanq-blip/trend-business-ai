@@ -35,6 +35,7 @@
     "verify:business-manager": "node scripts/verify-business-manager.mjs",
     "verify:crm": "node scripts/verify-crm.mjs",
     "verify:erp": "node scripts/verify-erp.mjs",
+    "verify:bi": "node scripts/verify-bi.mjs",
     "verify:content-studio-platform": "node scripts/verify-content-studio-platform.mjs",
     "verify:brand-studio": "node scripts/verify-brand-studio.mjs",
     "verify:image-generator": "node scripts/verify-image-generator.mjs",
