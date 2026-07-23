@@ -5,6 +5,7 @@ import {
   Bot,
   BrainCircuit,
   Clapperboard,
+  Contact,
   CreditCard,
   FileStack,
   FolderKanban,
@@ -46,6 +47,12 @@ export const DASHBOARD_PRIMARY_NAV: DashboardNavItem[] = [
     href: "/dashboard/projects",
     icon: FolderKanban,
     description: "All generated projects",
+  },
+  {
+    label: "CRM",
+    href: "/dashboard/crm",
+    icon: Contact,
+    description: "Sales pipeline, contacts, and deals",
   },
 ];
 
