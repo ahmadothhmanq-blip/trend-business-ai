@@ -24,6 +24,7 @@ import {
   SearchCheck,
   Settings,
   Sparkles,
+  Shield,
   Smartphone,
   Users,
   type LucideIcon,
@@ -67,6 +68,12 @@ export const DASHBOARD_PRIMARY_NAV: DashboardNavItem[] = [
     href: "/dashboard/bi",
     icon: PieChart,
     description: "Analytics dashboards, metrics, and AI insights",
+  },
+  {
+    label: "Cybersecurity",
+    href: "/dashboard/cybersecurity",
+    icon: Shield,
+    description: "Threat intelligence, monitoring, and incident response",
   },
 ];
 

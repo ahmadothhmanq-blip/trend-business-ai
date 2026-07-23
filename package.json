@@ -37,6 +37,7 @@
     "verify:erp": "node scripts/verify-erp.mjs",
     "verify:bi": "node scripts/verify-bi.mjs",
     "verify:ai-agents": "node scripts/verify-ai-agents.mjs",
+    "verify:cyber": "node scripts/verify-cyber.mjs",
     "verify:content-studio-platform": "node scripts/verify-content-studio-platform.mjs",
     "verify:brand-studio": "node scripts/verify-brand-studio.mjs",
     "verify:image-generator": "node scripts/verify-image-generator.mjs",
