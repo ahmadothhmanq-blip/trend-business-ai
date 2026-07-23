@@ -1,0 +1,15 @@
+export { runPlatformAgent } from "./runner";
+export type { PlatformRunInput, PlatformRunResult } from "./runner";
+export { runAgentsAssistant } from "./engine";
+export { invokeTool, invokeToolsForAgent, PLATFORM_TOOL_KEYS } from "./tool-registry";
+export { listMemory, saveMemory, updateMemory, deleteMemory, loadMemoryForRun } from "./memory";
+export { listKnowledgeBases, createKnowledgeBase, listDocuments, addDocument, loadKnowledgeContext } from "./knowledge";
+export { runWorkflow } from "./workflows";
+export { listSchedules, createSchedule, executeDueSchedules } from "./scheduler";
+export { listTriggers, createTrigger, fireTrigger } from "./triggers";
+export { getAgentAnalytics, recordAnalyticsSnapshot } from "./analytics";
+export { hasAgentPermission, AGENT_ROLE_PERMISSIONS } from "./permissions";
+export { logAgentAudit } from "./audit";
+export { buildAgentsHealthReport } from "./health";
+export * from "./integrations";
+import "@/lib/ai-core/adapters/agents-ai";

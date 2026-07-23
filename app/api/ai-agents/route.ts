@@ -1,7 +1,9 @@
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
 import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
 import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { enforceMutationRateLimit } from "@/lib/api/rate-limit";
 import { runAgent } from "@/lib/agent-runner";
+import { logAgentAudit } from "@/lib/agents/audit";
 import type { Agent, AgentExecution } from "@/types/agents";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -64,6 +66,8 @@ export async function POST(request: Request) {
   const action = (body as Record<string, unknown>).action;
 
   if (action === "create-agent") {
+    const rateLimited = enforceMutationRateLimit(auth.user!.id);
+    if (rateLimited) return rateLimited;
     const parsed = createAgentSchema.safeParse(body);
     if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0]?.message }, { status: 400 });
 
@@ -87,6 +91,7 @@ export async function POST(request: Request) {
       if (error.code === "42P01") return NextResponse.json({ error: "Agents table not ready. Apply migration 022." }, { status: 503 });
       return databaseErrorResponse("agents.create", error);
     }
+    await logAgentAudit(auth.supabase, { user_id: auth.user!.id, action: "create", entity_type: "agent", entity_id: data?.id });
     return NextResponse.json({ agent: data as Agent, message: "Agent created." });
   }
 
@@ -115,6 +120,9 @@ export async function POST(request: Request) {
       tools,
       context: parsed.data.context,
       maxSteps: parsed.data.maxSteps,
+      supabase: auth.supabase,
+      userId: auth.user!.id,
+      agentId: parsed.data.agentId,
     });
 
     const execData = {

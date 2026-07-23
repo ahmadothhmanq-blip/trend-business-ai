@@ -1,5 +1,8 @@
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
 import { databaseErrorResponse } from "@/lib/api/errors";
+import { enforceMutationRateLimit } from "@/lib/api/rate-limit";
+import { runWorkflow } from "@/lib/agents/workflows";
+import { logAgentAudit } from "@/lib/agents/audit";
 import type { AgentWorkflow } from "@/types/agents";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -51,9 +54,22 @@ const createSchema = z.object({
 export async function POST(request: Request) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
+  const rateLimited = enforceMutationRateLimit(auth.user!.id);
+  if (rateLimited) return rateLimited;
 
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
+
+  const runBody = body as { action?: string; workflowId?: string; input?: Record<string, unknown> };
+  if (runBody.action === "run" && runBody.workflowId) {
+    try {
+      const result = await runWorkflow(auth.supabase, auth.user!.id, runBody.workflowId, runBody.input ?? {});
+      await logAgentAudit(auth.supabase, { user_id: auth.user!.id, action: "run", entity_type: "workflow", entity_id: runBody.workflowId });
+      return NextResponse.json({ result });
+    } catch (e) {
+      return NextResponse.json({ error: e instanceof Error ? e.message : "Failed" }, { status: 500 });
+    }
+  }
 
   const parsed = createSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0]?.message }, { status: 400 });
@@ -71,5 +87,6 @@ export async function POST(request: Request) {
     if (error.code === "42P01") return NextResponse.json({ error: "Workflows table not ready. Apply migration 022." }, { status: 503 });
     return databaseErrorResponse("workflows.create", error);
   }
+  await logAgentAudit(auth.supabase, { user_id: auth.user!.id, action: "create", entity_type: "workflow", entity_id: data?.id });
   return NextResponse.json({ workflow: data as AgentWorkflow, message: "Workflow created." });
 }
