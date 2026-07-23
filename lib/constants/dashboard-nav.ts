@@ -7,6 +7,7 @@ import {
   Clapperboard,
   Contact,
   CreditCard,
+  Building2,
   FileStack,
   FolderKanban,
   Globe2,
@@ -53,6 +54,12 @@ export const DASHBOARD_PRIMARY_NAV: DashboardNavItem[] = [
     href: "/dashboard/crm",
     icon: Contact,
     description: "Sales pipeline, contacts, and deals",
+  },
+  {
+    label: "ERP",
+    href: "/dashboard/erp",
+    icon: Building2,
+    description: "Finance, inventory, operations, and HR",
   },
 ];
 
