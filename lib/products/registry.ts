@@ -290,7 +290,7 @@ export const PRODUCT_DEFINITIONS: Record<ProductId, ProductDefinition> = {
     title: "AI Marketing Strategy",
     eyebrow: "Business",
     description:
-      "Build campaign strategy, offers, funnels, messaging angles, and go-to-market plans ready for execution.",
+      "Full marketing intelligence platform — campaigns, personas, calendar, analytics, email & ads foundation, plus AI strategy generation.",
     icon: Megaphone,
     href: "/dashboard/marketing",
     kind: "workspace",

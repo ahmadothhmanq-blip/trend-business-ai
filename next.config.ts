@@ -23,11 +23,6 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
-        source: "/dashboard/business-manager",
-        destination: "/dashboard/business-intelligence",
-        permanent: true,
-      },
-      {
         source: "/dashboard/business-audit",
         destination: "/dashboard/feasibility-study",
         permanent: true,

@@ -1,0 +1,14 @@
+export { generateCampaign, generatePersona, runMarketingAssistant, generatedCampaignToRow, generatedPersonaToRow } from "./engine";
+export { listCampaigns, getCampaign, createCampaign, updateCampaign, DEFAULT_CHANNELS } from "./campaigns";
+export { listPersonas, createPersona, updatePersona } from "./personas";
+export { listPlans, createPlan, planFromCampaign } from "./planning";
+export { getMarketingAnalytics, recordMarketingAnalytics, summarizeMarketingAnalytics } from "./analytics";
+export { listWorkflows, createWorkflow, defaultWelcomeWorkflow, WORKFLOW_STEP_TYPES } from "./automation";
+export { getMergedCalendar, listCalendarEvents, createCalendarEvent } from "./calendar";
+export { listEmailCampaigns, listEmailTemplates, listAudienceLists, queueEmailSend, DEFAULT_EMAIL_TEMPLATES } from "./email";
+export { listAdsDrafts, createAdsDraft, draftFromCampaign } from "./ads";
+export { buildMarketingHealthReport } from "./health";
+export type { MarketingHealthReport } from "./health";
+export { MARKETING_CHANNELS, buildCampaignGenerationPrompt, buildPersonaGenerationPrompt } from "./prompts";
+export * from "./integrations";
+export { encryptMarketingToken, decryptMarketingToken, isMarketingEncryptionConfigured } from "./crypto";

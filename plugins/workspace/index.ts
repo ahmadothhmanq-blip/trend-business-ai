@@ -47,7 +47,7 @@ export const businessWorkspace = createWorkspaceDefinition({
 export const managerWorkspace = createWorkspaceDefinition({
   type: "manager",
   configKey: "businessManager",
-  dashboardHref: "/dashboard/business-intelligence",
+  dashboardHref: "/dashboard/business-manager",
   label: "Business Manager",
   plugin: managerPlugin,
 });
