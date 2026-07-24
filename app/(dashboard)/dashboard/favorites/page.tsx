@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { FavoritesList } from "@/components/dashboard/favorites-list";
 import { loadUserHistoryItems } from "@/lib/db/history-items";
 
@@ -16,9 +16,7 @@ export default async function FavoritesPage() {
 
   return (
     <>
-      <DashboardHeader
-        title="Saved Projects"
-        description="Review favorite ideas, analyses, reports, websites and AI workspace projects"
+      <LocalizedDashboardHeader pageId="favorites"
         userEmail={user?.email}
         userName={metadata.full_name as string | undefined}
       />

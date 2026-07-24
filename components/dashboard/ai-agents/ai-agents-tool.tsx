@@ -20,6 +20,8 @@ import {
   type ProjectHistoryItem,
 } from "@/components/dashboard/builder-shared";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/client";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import { AGENT_TYPES, AGENT_TOOLS, AGENT_TEMPLATES, AGENT_CATEGORIES, getAgentTypeLabel, getToolLabel } from "@/lib/constants/ai-agents";
 import type { Agent, AgentExecution } from "@/types/agents";
 import type { AgentOutput } from "@/plugins/ai-agents/types";
@@ -32,6 +34,8 @@ type Props = {
 };
 
 export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Props) {
+  const { t } = useTranslation();
+  const p = useProductT("aiAgents");
   const [tab, setTab] = useState<Tab>("agents");
   const [agents, setAgents] = useState<Agent[]>(initialAgents);
   const [executions, setExecutions] = useState<AgentExecution[]>(initialExecutions);
@@ -79,7 +83,7 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
   useEffect(() => { if (tab === "history") fetchExecutions(); }, [tab, fetchExecutions]);
 
   const handleCreateAgent = async () => {
-    if (!newName.trim()) { toast.error("Agent name is required"); return; }
+    if (!newName.trim()) { toast.error(p("errors.agentNameRequired")); return; }
     const res = await fetch("/api/ai-agents", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -91,8 +95,8 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
       }),
     });
     const d = await res.json();
-    if (!res.ok) { toast.error(d.error ?? "Failed to create agent"); return; }
-    toast.success("Agent created");
+    if (!res.ok) { toast.error(d.error ?? p("errors.createAgentFailed")); return; }
+    toast.success(p("toasts.agentCreated"));
     setNewName(""); setNewDesc(""); setNewPrompt(""); setNewTools([]);
     fetchAgents();
     setTab("agents");
@@ -109,7 +113,7 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
   };
 
   const handleRunAgent = async () => {
-    if (!task.trim()) { toast.error("Describe your task"); return; }
+    if (!task.trim()) { toast.error(p("errors.describeTask")); return; }
     setGenerating(true);
     setTab("generating");
     try {
@@ -122,17 +126,17 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
         }),
       });
       const d = await res.json();
-      if (!res.ok) { toast.error(d.error ?? "Agent task failed"); setTab("run"); return; }
+      if (!res.ok) { toast.error(d.error ?? p("errors.agentTaskFailed")); setTab("run"); return; }
       setResult({ output: d.output, execution: d.execution });
       setTab("result");
-      toast.success(d.message ?? "Task completed");
-    } catch { toast.error("Request failed"); setTab("run"); }
+      toast.success(d.message ?? p("toasts.taskCompleted"));
+    } catch { toast.error(p("errors.requestFailed")); setTab("run"); }
     finally { setGenerating(false); }
   };
 
   const handleDeleteAgent = async (id: string) => {
     await fetch(`/api/ai-agents/${id}`, { method: "DELETE" });
-    toast.success("Agent deleted");
+    toast.success(p("toasts.agentDeleted"));
     fetchAgents();
   };
 
@@ -167,10 +171,10 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
         <div className="flex items-center justify-between">
           <div className="flex gap-2">
             <Button onClick={() => setTab("create")} size="sm" className="btn-gold gap-1.5 rounded-xl text-xs font-bold text-luxury-black">
-              <Plus className="size-3" /> Create Agent
+              <Plus className="size-3" /> {p("steps.createAgent")}
             </Button>
             <Button onClick={() => setTab("history")} variant="outline" size="sm" className="gap-1.5 rounded-xl border-white/10 text-xs text-white/50">
-              <History className="size-3" /> Execution History
+              <History className="size-3" /> {p("steps.executionHistory")}
             </Button>
           </div>
         </div>
@@ -178,8 +182,8 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
         {/* Templates */}
         <DashboardCard>
           <DashboardCardHeader>
-            <div className="flex items-center gap-2"><Sparkles className="size-5 text-premium-gold-light" /><DashboardCardTitle>Agent Templates</DashboardCardTitle></div>
-            <DashboardCardDescription>Start from a pre-configured agent template</DashboardCardDescription>
+            <div className="flex items-center gap-2"><Sparkles className="size-5 text-premium-gold-light" /><DashboardCardTitle>{p("steps.agentTemplates")}</DashboardCardTitle></div>
+            <DashboardCardDescription>{p("steps.templatesHint")}</DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent>
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -194,7 +198,7 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
                     {tpl.tools.length > 3 && <span className="text-[9px] text-white/20">+{tpl.tools.length - 3}</span>}
                   </div>
                   <Button size="sm" variant="outline" className="mt-1 gap-1.5 rounded-lg border-white/10 text-xs text-white/50" onClick={() => handleFromTemplate(tpl)}>
-                    <Copy className="size-3" /> Use Template
+                    <Copy className="size-3" /> {p("steps.useTemplate")}
                   </Button>
                 </DashboardPanel>
               ))}
@@ -205,13 +209,13 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
         {/* User Agents */}
         <DashboardCard>
           <DashboardCardHeader>
-            <div className="flex items-center gap-2"><Bot className="size-5 text-premium-gold-light" /><DashboardCardTitle>Your Agents ({agents.filter((a) => !a.is_template).length})</DashboardCardTitle></div>
+            <div className="flex items-center gap-2"><Bot className="size-5 text-premium-gold-light" /><DashboardCardTitle>{p("steps.yourAgents", { count: agents.filter((a) => !a.is_template).length })}</DashboardCardTitle></div>
           </DashboardCardHeader>
           <DashboardCardContent>
             {agents.filter((a) => !a.is_template).length === 0 ? (
               <DashboardPanel className="py-10 text-center">
                 <Bot className="mx-auto size-8 text-white/10" />
-                <p className="mt-3 text-xs text-white/30">No agents created yet. Use a template or create a custom agent.</p>
+                <p className="mt-3 text-xs text-white/30">{p("steps.noAgentsYet")}</p>
               </DashboardPanel>
             ) : (
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -220,14 +224,14 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
                     <div className="flex items-start justify-between">
                       <div>
                         <p className="text-sm font-bold text-white/90">{agent.name}</p>
-                        <p className="text-[10px] text-white/30">{getAgentTypeLabel(agent.agent_type)} &middot; {agent.total_runs} runs</p>
+                        <p className="text-[10px] text-white/30">{getAgentTypeLabel(agent.agent_type)} &middot; {p("steps.runs", { count: agent.total_runs })}</p>
                       </div>
                       <div className={cn("size-2 rounded-full", agent.is_active ? "bg-green-400" : "bg-white/20")} />
                     </div>
                     {agent.description && <p className="flex-1 text-[11px] text-white/40">{agent.description}</p>}
                     <div className="flex gap-1.5 pt-1">
                       <Button size="sm" className="btn-gold flex-1 gap-1 rounded-lg text-xs font-bold text-luxury-black" onClick={() => { setSelectedAgent(agent); setTab("run"); }}>
-                        <Play className="size-3" /> Run
+                        <Play className="size-3" /> {p("nav.run")}
                       </Button>
                       <Button size="icon-xs" variant="ghost" className="text-white/30 hover:text-red-400" onClick={() => handleDeleteAgent(agent.id)}>
                         <Trash2 className="size-3" />
@@ -243,14 +247,14 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
         {/* Quick Run */}
         <DashboardCard>
           <DashboardCardHeader>
-            <div className="flex items-center gap-2"><Zap className="size-5 text-premium-gold-light" /><DashboardCardTitle>Quick Task</DashboardCardTitle></div>
-            <DashboardCardDescription>Run a one-off AI agent task without creating an agent</DashboardCardDescription>
+            <div className="flex items-center gap-2"><Zap className="size-5 text-premium-gold-light" /><DashboardCardTitle>{p("steps.quickTask")}</DashboardCardTitle></div>
+            <DashboardCardDescription>{p("steps.quickTaskDescription")}</DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent>
             <div className="flex gap-3">
-              <Input value={task} onChange={(e) => setTask(e.target.value)} placeholder="Describe your task..." className={cn(dashboardInputClass, "flex-1")} />
+              <Input value={task} onChange={(e) => setTask(e.target.value)} placeholder={p("placeholders.task")} className={cn(dashboardInputClass, "flex-1")} />
               <Button onClick={() => { setSelectedAgent(null); handleRunAgent(); }} disabled={generating || !task.trim()} className="btn-gold gap-1.5 rounded-xl font-bold text-luxury-black">
-                <Zap className="size-4" /> Run
+                <Zap className="size-4" /> {p("steps.runQuick")}
               </Button>
             </div>
           </DashboardCardContent>
@@ -266,56 +270,56 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
     return (
       <div className="space-y-6">
         <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-white/40" onClick={() => setTab("agents")}>
-          <ChevronLeft className="size-3" /> Back to Agents
+          <ChevronLeft className="size-3" /> {p("steps.backToAgents")}
         </Button>
 
         <DashboardCard>
           <DashboardCardHeader>
-            <div className="flex items-center gap-2"><Settings2 className="size-5 text-premium-gold-light" /><DashboardCardTitle>Create New Agent</DashboardCardTitle></div>
+            <div className="flex items-center gap-2"><Settings2 className="size-5 text-premium-gold-light" /><DashboardCardTitle>{p("steps.createNewAgent")}</DashboardCardTitle></div>
           </DashboardCardHeader>
           <DashboardCardContent>
             <div className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-white/60">Agent Name *</label>
-                  <Input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="My Marketing Agent" className={dashboardInputClass} />
+                  <label className="mb-1 block text-xs font-medium text-white/60">{p("steps.agentName")}</label>
+                  <Input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder={p("placeholders.agentName")} className={dashboardInputClass} />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-white/60">Type</label>
+                  <label className="mb-1 block text-xs font-medium text-white/60">{p("steps.type")}</label>
                   <select value={newType} onChange={(e) => setNewType(e.target.value)} className={dashboardSelectClass}>
                     {AGENT_TYPES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
                   </select>
                 </div>
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-white/60">Description</label>
-                <Input value={newDesc} onChange={(e) => setNewDesc(e.target.value)} placeholder="What this agent does..." className={dashboardInputClass} />
+                <label className="mb-1 block text-xs font-medium text-white/60">{p("steps.description")}</label>
+                <Input value={newDesc} onChange={(e) => setNewDesc(e.target.value)} placeholder={p("placeholders.agentDescription")} className={dashboardInputClass} />
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-white/60">Category</label>
+                  <label className="mb-1 block text-xs font-medium text-white/60">{p("steps.category")}</label>
                   <select value={newCategory} onChange={(e) => setNewCategory(e.target.value)} className={dashboardSelectClass}>
                     {AGENT_CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-white/60">Temperature</label>
+                  <label className="mb-1 block text-xs font-medium text-white/60">{p("steps.temperature")}</label>
                   <select value={newTemp} onChange={(e) => setNewTemp(e.target.value)} className={dashboardSelectClass}>
-                    <option value="0.3">Conservative (0.3)</option>
-                    <option value="0.5">Balanced (0.5)</option>
-                    <option value="0.7">Creative (0.7)</option>
-                    <option value="1.0">Experimental (1.0)</option>
+                    <option value="0.3">{p("steps.conservative")}</option>
+                    <option value="0.5">{p("steps.balanced")}</option>
+                    <option value="0.7">{p("steps.creative")}</option>
+                    <option value="1.0">{p("steps.experimental")}</option>
                   </select>
                 </div>
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-white/60">System Prompt</label>
+                <label className="mb-1 block text-xs font-medium text-white/60">{p("steps.systemPrompt")}</label>
                 <textarea value={newPrompt} onChange={(e) => setNewPrompt(e.target.value)}
-                  placeholder="You are a specialist in... Help users by..."
+                  placeholder={p("placeholders.systemPrompt")}
                   className={cn(dashboardInputClass, "min-h-[100px] resize-y")} rows={4} />
               </div>
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-white/60">Available Tools</label>
+                <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.availableTools")}</label>
                 <div className="flex flex-wrap gap-2">
                   {AGENT_TOOLS.map((tool) => (
                     <CheckboxToggle key={tool.id} label={tool.label} checked={newTools.includes(tool.id)}
@@ -324,8 +328,8 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
                 </div>
               </div>
               <div className="flex gap-2 pt-2">
-                <Button variant="outline" size="sm" className="rounded-xl border-white/10 text-white/50" onClick={() => setTab("agents")}>Cancel</Button>
-                <Button size="sm" className="btn-gold rounded-xl font-bold text-luxury-black" onClick={handleCreateAgent}>Create Agent</Button>
+                <Button variant="outline" size="sm" className="rounded-xl border-white/10 text-white/50" onClick={() => setTab("agents")}>{t("common.cancel")}</Button>
+                <Button size="sm" className="btn-gold rounded-xl font-bold text-luxury-black" onClick={handleCreateAgent}>{p("steps.createAgentBtn")}</Button>
               </div>
             </div>
           </DashboardCardContent>
@@ -341,7 +345,7 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
     return (
       <div className="space-y-6">
         <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-white/40" onClick={() => setTab("agents")}>
-          <ChevronLeft className="size-3" /> Back to Agents
+          <ChevronLeft className="size-3" /> {p("steps.backToAgents")}
         </Button>
 
         <DashboardCard>
@@ -349,7 +353,7 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
             <div className="flex items-center gap-2">
               <Play className="size-5 text-premium-gold-light" />
               <div>
-                <DashboardCardTitle>{selectedAgent ? `Run: ${selectedAgent.name}` : "Quick Task"}</DashboardCardTitle>
+                <DashboardCardTitle>{selectedAgent ? p("steps.runAgentTitle", { name: selectedAgent.name }) : p("steps.quickTask")}</DashboardCardTitle>
                 {selectedAgent && <DashboardCardDescription>{selectedAgent.description}</DashboardCardDescription>}
               </div>
             </div>
@@ -357,29 +361,29 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
           <DashboardCardContent>
             <div className="space-y-4">
               <div>
-                <label className="mb-1 block text-xs font-medium text-white/60">Task Description *</label>
+                <label className="mb-1 block text-xs font-medium text-white/60">{p("steps.task")}</label>
                 <textarea value={task} onChange={(e) => setTask(e.target.value)}
-                  placeholder="Describe what you want the agent to do..."
+                  placeholder={p("placeholders.task")}
                   className={cn(dashboardInputClass, "min-h-[100px] resize-y")} rows={4} />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-white/60">Additional Context (optional)</label>
+                <label className="mb-1 block text-xs font-medium text-white/60">{p("steps.additionalContext")}</label>
                 <textarea value={context} onChange={(e) => setContext(e.target.value)}
-                  placeholder="Any additional context, data, or requirements..."
+                  placeholder={p("placeholders.context")}
                   className={cn(dashboardInputClass, "min-h-[60px] resize-y")} rows={2} />
               </div>
               <div className="max-w-xs">
-                <label className="mb-1 block text-xs font-medium text-white/60">Max Steps</label>
+                <label className="mb-1 block text-xs font-medium text-white/60">{p("steps.maxStepsLabel")}</label>
                 <select value={maxSteps} onChange={(e) => setMaxSteps(e.target.value)} className={dashboardSelectClass}>
-                  <option value="3">3 steps (Fast)</option>
-                  <option value="6">6 steps (Standard)</option>
-                  <option value="9">9 steps (Thorough)</option>
-                  <option value="12">12 steps (Comprehensive)</option>
+                  <option value="3">{p("steps.stepsFast")}</option>
+                  <option value="6">{p("steps.stepsStandard")}</option>
+                  <option value="9">{p("steps.stepsThorough")}</option>
+                  <option value="12">{p("steps.stepsComprehensive")}</option>
                 </select>
               </div>
               {selectedAgent && selectedAgent.tools.length > 0 && (
                 <div>
-                  <p className="mb-1 text-xs font-medium text-white/60">Tools Available:</p>
+                  <p className="mb-1 text-xs font-medium text-white/60">{p("steps.toolsAvailable")}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {(selectedAgent.tools as string[]).map((t) => (
                       <span key={t} className="rounded-md bg-premium-gold/10 px-2 py-0.5 text-[10px] font-medium text-premium-gold-light">{getToolLabel(t)}</span>
@@ -388,7 +392,7 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
                 </div>
               )}
               <Button className="btn-gold gap-2 rounded-xl font-bold text-luxury-black" onClick={handleRunAgent} disabled={!task.trim() || generating}>
-                <Play className="size-4" /> Execute Agent
+                <Play className="size-4" /> {p("steps.executeAgent")}
               </Button>
             </div>
           </DashboardCardContent>
@@ -417,7 +421,7 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-white/40" onClick={() => { setResult(null); setTab("agents"); }}>
-            <ChevronLeft className="size-3" /> Back to Agents
+            <ChevronLeft className="size-3" /> {p("steps.backToAgents")}
           </Button>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" className="gap-1.5 rounded-xl border-white/10 text-xs text-white/50" onClick={() => { setTab("run"); }}>
@@ -540,7 +544,7 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
     return (
       <div className="space-y-6">
         <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-white/40" onClick={() => setTab("agents")}>
-          <ChevronLeft className="size-3" /> Back to Agents
+          <ChevronLeft className="size-3" /> {p("steps.backToAgents")}
         </Button>
 
         <DashboardCard>

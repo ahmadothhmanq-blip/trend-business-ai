@@ -5,7 +5,6 @@ import Link from "next/link";
 import { toast } from "sonner";
 import {
   ArrowLeft,
-  LayoutDashboard,
   Smartphone,
   Tablet,
   Monitor,
@@ -27,6 +26,7 @@ import {
 } from "@/components/dashboard/ui/dashboard-card";
 import { dashboardInputClass } from "@/components/dashboard/ui/dashboard-styles";
 import { cn } from "@/lib/utils";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import type { StructuredAppModel } from "@/lib/ai-core/app-design-platform/types";
 import type { AppVersionHistory } from "@/lib/ai-core/app-design-platform/versions";
 import type { AppIntelligenceReport, AppQualityReport } from "@/lib/ai-core/app-design-platform/types";
@@ -68,6 +68,7 @@ type Tab =
   | "deploy";
 
 export function AppManagementDashboard({ generationId }: { generationId: string }) {
+  const p = useProductT("webappBuilder");
   const [tab, setTab] = useState<Tab>("overview");
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<ManagePayload | null>(null);
@@ -88,14 +89,14 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
       const res = await fetch(`/api/webapp-builder/${generationId}/manage`);
       const json = await res.json();
       if (!res.ok) {
-        toast.error(json.error ?? "Failed to load app");
+        toast.error(json.error ?? p("errors.loadFailed"));
         return;
       }
       setData(json);
       setAppName(json.model.settings.appName);
       setPrimary(json.model.brand.tokens.primary);
     } catch {
-      toast.error("Failed to load management data");
+      toast.error(p("errors.loadManagementFailed"));
     } finally {
       setLoading(false);
     }
@@ -115,10 +116,10 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
       });
       const json = await res.json();
       if (!res.ok) {
-        toast.error(json.error ?? "Action failed");
+        toast.error(json.error ?? p("errors.actionFailed"));
         return;
       }
-      toast.success(json.message ?? "Updated");
+      toast.success(json.message ?? p("management.updated"));
       if (json.model) {
         setData((prev) =>
           prev
@@ -140,7 +141,7 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
         setData((prev) => (prev ? { ...prev, preview: json.preview } : prev));
       }
     } catch {
-      toast.error("Request failed");
+      toast.error(p("errors.requestFailed"));
     } finally {
       setBusy(false);
     }
@@ -149,7 +150,7 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
   if (loading || !data) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center text-sm text-white/50">
-        Loading app management…
+        {p("management.loading")}
       </div>
     );
   }
@@ -161,17 +162,17 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
     model.screens.find((s) => s.id === preview.activeScreenId) || model.screens[0];
 
   const tabs: Array<{ id: Tab; label: string }> = [
-    { id: "overview", label: "Overview" },
-    { id: "screens", label: "Screens" },
-    { id: "catalog", label: "Content" },
-    { id: "brand", label: "Brand" },
-    { id: "preview", label: "Live Preview" },
-    { id: "editor", label: "Visual Editor" },
-    { id: "deploy", label: "Deploy" },
-    { id: "assistant", label: "AI Assistant" },
-    { id: "intelligence", label: "Intelligence" },
-    { id: "versions", label: "Versions" },
-    { id: "data", label: "Data" },
+    { id: "overview", label: p("management.tabs.overview") },
+    { id: "screens", label: p("management.tabs.screens") },
+    { id: "catalog", label: p("management.tabs.content") },
+    { id: "brand", label: p("management.tabs.brand") },
+    { id: "preview", label: p("management.tabs.livePreview") },
+    { id: "editor", label: p("management.tabs.visualEditor") },
+    { id: "deploy", label: p("management.tabs.deploy") },
+    { id: "assistant", label: p("management.tabs.assistant") },
+    { id: "intelligence", label: p("management.tabs.intelligence") },
+    { id: "versions", label: p("management.tabs.versions") },
+    { id: "data", label: p("management.tabs.data") },
   ];
 
   return (
@@ -180,7 +181,7 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
         <div className="flex items-center gap-3">
           <Button asChild variant="outline" className="rounded-xl border-white/10 text-white/70">
             <Link href="/dashboard/app-builder">
-              <ArrowLeft className="mr-2 size-4" /> Back
+              <ArrowLeft className="mr-2 size-4" /> {p("management.backToBuilder")}
             </Link>
           </Button>
           <div>
@@ -197,7 +198,7 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
             onClick={() => void load()}
             disabled={busy}
           >
-            <RefreshCw className="mr-2 size-4" /> Refresh
+            <RefreshCw className="mr-2 size-4" /> {p("management.refresh")}
           </Button>
           <Button
             variant="outline"
@@ -205,32 +206,32 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
             disabled={busy}
             onClick={() => void postAction({ action: "sync_files" })}
           >
-            Sync code
+            {p("management.syncCode")}
           </Button>
           <Button
             className="btn-gold rounded-xl font-bold text-luxury-black"
             disabled={busy}
-            onClick={() => void postAction({ action: "save_version", note: "Manual checkpoint" })}
+            onClick={() => void postAction({ action: "save_version", note: p("management.manualCheckpoint") })}
           >
-            <Save className="mr-2 size-4" /> Save version
+            <Save className="mr-2 size-4" /> {p("management.saveVersion")}
           </Button>
         </div>
       </div>
 
       <div className="flex flex-wrap gap-2">
-        {tabs.map((t) => (
+        {tabs.map((tabItem) => (
           <button
-            key={t.id}
+            key={tabItem.id}
             type="button"
-            onClick={() => setTab(t.id)}
+            onClick={() => setTab(tabItem.id)}
             className={cn(
               "rounded-xl px-3 py-1.5 text-xs font-medium transition-all",
-              tab === t.id
+              tab === tabItem.id
                 ? "bg-premium-gold/15 text-premium-gold-light"
                 : "text-white/45 hover:bg-white/5 hover:text-white/70",
             )}
           >
-            {t.label}
+            {tabItem.label}
           </button>
         ))}
       </div>
@@ -239,19 +240,19 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
         <div className="grid gap-4 lg:grid-cols-3">
           <DashboardCard className="lg:col-span-2">
             <DashboardCardHeader>
-              <DashboardCardTitle>Application blueprint</DashboardCardTitle>
+              <DashboardCardTitle>{p("management.blueprintTitle")}</DashboardCardTitle>
               <DashboardCardDescription>
-                Structured model — editable without regenerating source files
+                {p("management.blueprintDescription")}
               </DashboardCardDescription>
             </DashboardCardHeader>
             <DashboardCardContent className="space-y-3 text-sm text-white/70">
               <p>{model.settings.tagline}</p>
               <div className="grid gap-2 sm:grid-cols-4">
                 {[
-                  ["Screens", model.screens.length],
-                  ["Data models", model.dataModels.length],
-                  ["Roles", model.roles.length],
-                  ["Catalog", model.catalog.length],
+                  [p("management.stats.screens"), model.screens.length],
+                  [p("management.stats.dataModels"), model.dataModels.length],
+                  [p("management.stats.roles"), model.roles.length],
+                  [p("management.stats.catalog"), model.catalog.length],
                 ].map(([label, value]) => (
                   <div key={String(label)} className="rounded-xl bg-white/5 p-3">
                     <div className="text-lg font-semibold text-white">{value}</div>
@@ -260,7 +261,7 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
                 ))}
               </div>
               <div>
-                <div className="mb-1 text-xs text-white/40">Features</div>
+                <div className="mb-1 text-xs text-white/40">{p("management.features")}</div>
                 <div className="flex flex-wrap gap-1.5">
                   {model.featureFlags.map((f) => (
                     <span key={f} className="rounded-lg bg-white/5 px-2 py-0.5 text-[11px] text-white/60">
@@ -270,19 +271,19 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
                 </div>
               </div>
               {template?.userFlows?.[0] && (
-                <p className="text-xs text-white/45">Flow: {template.userFlows[0]}</p>
+                <p className="text-xs text-white/45">{p("management.flow")}: {template.userFlows[0]}</p>
               )}
             </DashboardCardContent>
           </DashboardCard>
           <DashboardCard>
             <DashboardCardHeader>
-              <DashboardCardTitle>Quality</DashboardCardTitle>
+              <DashboardCardTitle>{p("management.quality")}</DashboardCardTitle>
             </DashboardCardHeader>
             <DashboardCardContent className="space-y-2 text-sm">
               <div className="text-3xl font-semibold text-premium-gold-light">{quality.score}</div>
               <p className="text-white/60">{quality.summary}</p>
               <div className="text-xs text-white/40">
-                Intelligence {intelligence.grade} · {intelligence.score}/100
+                {p("management.intelligenceGrade", { grade: intelligence.grade, score: intelligence.score })}
               </div>
             </DashboardCardContent>
           </DashboardCard>
@@ -292,7 +293,7 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
       {tab === "screens" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Screens & navigation</DashboardCardTitle>
+            <DashboardCardTitle>{p("management.screensNav")}</DashboardCardTitle>
           </DashboardCardHeader>
           <DashboardCardContent className="space-y-4">
             <div className="grid gap-2">
@@ -325,16 +326,16 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
               onClick={() =>
                 void postAction({
                   action: "add_screen",
-                  name: "New Screen",
+                  name: p("management.newScreenName"),
                   path: `/screen-${model.screens.length + 1}`,
-                  purpose: "Custom screen",
+                  purpose: p("management.customScreenPurpose"),
                 })
               }
             >
-              <Plus className="mr-2 size-4" /> Add screen
+              <Plus className="mr-2 size-4" /> {p("management.addScreen")}
             </Button>
             <div>
-              <div className="mb-2 text-xs text-white/40">Navigation</div>
+              <div className="mb-2 text-xs text-white/40">{p("management.navigation")}</div>
               <div className="flex flex-wrap gap-2">
                 {model.navigation.map((n) => (
                   <span key={n.id} className="rounded-lg border border-white/10 px-2 py-1 text-xs text-white/60">
@@ -344,13 +345,17 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
               </div>
             </div>
             <div>
-              <div className="mb-2 text-xs text-white/40">Roles</div>
+              <div className="mb-2 text-xs text-white/40">{p("management.roles")}</div>
               <div className="grid gap-2 sm:grid-cols-2">
-                {permissions.map((p) => (
-                  <div key={p.role} className="rounded-xl bg-white/5 p-3 text-xs text-white/60">
-                    <div className="font-medium text-white">{p.role}</div>
+                {permissions.map((perm) => (
+                  <div key={perm.role} className="rounded-xl bg-white/5 p-3 text-xs text-white/60">
+                    <div className="font-medium text-white">{perm.role}</div>
                     <div>
-                      {p.screens} screens · {p.dataAccess} data · {p.actions.join(", ")}
+                      {p("management.permissionSummary", {
+                        screenCount: perm.screens,
+                        dataAccess: perm.dataAccess,
+                        actions: perm.actions.join(", "),
+                      })}
                     </div>
                   </div>
                 ))}
@@ -363,9 +368,9 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
       {tab === "catalog" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Business content</DashboardCardTitle>
+            <DashboardCardTitle>{p("management.businessContent")}</DashboardCardTitle>
             <DashboardCardDescription>
-              Products, menu items, and catalog — update without rebuilding the app
+              {p("management.businessContentDescription")}
             </DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent className="space-y-4">
@@ -373,13 +378,13 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
               <Input
                 value={newItemTitle}
                 onChange={(e) => setNewItemTitle(e.target.value)}
-                placeholder="Item title"
+                placeholder={p("placeholders.itemTitle")}
                 className={cn(dashboardInputClass, "max-w-xs")}
               />
               <Input
                 value={newItemPrice}
                 onChange={(e) => setNewItemPrice(e.target.value)}
-                placeholder="Price"
+                placeholder={p("placeholders.itemPrice")}
                 className={cn(dashboardInputClass, "max-w-[120px]")}
               />
               <Button
@@ -400,11 +405,11 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
                   });
                 }}
               >
-                <Plus className="mr-2 size-4" /> Add item
+                <Plus className="mr-2 size-4" /> {p("management.addItem")}
               </Button>
             </div>
             {model.catalog.length === 0 ? (
-              <p className="text-sm text-white/40">No catalog items yet.</p>
+              <p className="text-sm text-white/40">{p("management.noCatalogItems")}</p>
             ) : (
               <div className="grid gap-2 sm:grid-cols-2">
                 {model.catalog.map((item) => (
@@ -438,12 +443,12 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
       {tab === "brand" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Brand & settings</DashboardCardTitle>
+            <DashboardCardTitle>{p("management.brandSettings")}</DashboardCardTitle>
           </DashboardCardHeader>
           <DashboardCardContent className="space-y-4">
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-xs text-white/50">App name</label>
+                <label className="mb-1 block text-xs text-white/50">{p("management.appName")}</label>
                 <Input
                   value={appName}
                   onChange={(e) => setAppName(e.target.value)}
@@ -451,7 +456,7 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs text-white/50">Primary color</label>
+                <label className="mb-1 block text-xs text-white/50">{p("management.primaryColor")}</label>
                 <Input
                   value={primary}
                   onChange={(e) => setPrimary(e.target.value)}
@@ -470,7 +475,7 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
                   })
                 }
               >
-                Save name
+                {p("management.saveName")}
               </Button>
               <Button
                 variant="outline"
@@ -485,7 +490,7 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
                   })
                 }
               >
-                Apply brand colors
+                {p("management.applyBrandColors")}
               </Button>
             </div>
             <pre className="overflow-x-auto rounded-xl bg-black/40 p-3 text-[11px] text-white/50">
@@ -500,9 +505,9 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
           <DashboardCardHeader>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <DashboardCardTitle>Live app preview</DashboardCardTitle>
+                <DashboardCardTitle>{p("management.liveAppPreview")}</DashboardCardTitle>
                 <DashboardCardDescription>
-                  Sandbox runtime from generated files + structured app model
+                  {p("management.liveAppPreviewDescription")}
                 </DashboardCardDescription>
               </div>
               <div className="flex gap-1">
@@ -516,6 +521,7 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
                   <button
                     key={id}
                     type="button"
+                    title={p(`management.devices.${id}`)}
                     onClick={() => setDevice(id)}
                     className={cn(
                       "rounded-lg p-2",
@@ -554,7 +560,7 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
             </div>
             <div className="flex justify-center overflow-auto py-2">
               <iframe
-                title="App live preview"
+                title={p("management.livePreviewTitle")}
                 src={`/api/webapp-builder/${generationId}/live-preview${activeScreen ? `?path=${encodeURIComponent(activeScreen.path)}` : ""}`}
                 className="rounded-2xl border border-white/15 bg-black shadow-2xl"
                 style={{
@@ -572,8 +578,8 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
         <div className="grid gap-4 lg:grid-cols-3">
           <DashboardCard className="lg:col-span-1">
             <DashboardCardHeader>
-              <DashboardCardTitle>Component library</DashboardCardTitle>
-              <DashboardCardDescription>Add to selected screen</DashboardCardDescription>
+              <DashboardCardTitle>{p("management.componentLibrary")}</DashboardCardTitle>
+              <DashboardCardDescription>{p("management.addToSelectedScreen")}</DashboardCardDescription>
             </DashboardCardHeader>
             <DashboardCardContent className="max-h-[420px] space-y-2 overflow-auto">
               {(data.componentPalette ?? []).map((c) => (
@@ -598,8 +604,8 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
           </DashboardCard>
           <DashboardCard className="lg:col-span-2">
             <DashboardCardHeader>
-              <DashboardCardTitle>Visual editor</DashboardCardTitle>
-              <DashboardCardDescription>Drag to reorder · edit props · syncs to code</DashboardCardDescription>
+              <DashboardCardTitle>{p("management.visualEditor")}</DashboardCardTitle>
+              <DashboardCardDescription>{p("management.visualEditorDescription")}</DashboardCardDescription>
             </DashboardCardHeader>
             <DashboardCardContent className="space-y-3">
               <div className="flex flex-wrap gap-2">
@@ -678,11 +684,11 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
                   <Input
                     value={propTitle}
                     onChange={(e) => setPropTitle(e.target.value)}
-                    placeholder="Component title"
+                    placeholder={p("management.componentTitlePlaceholder")}
                     className={dashboardInputClass}
                   />
                   <Input
-                    placeholder="Primary color override"
+                    placeholder={p("management.primaryColorPlaceholder")}
                     className={dashboardInputClass}
                     onBlur={(e) => {
                       if (!e.target.value.trim()) return;
@@ -706,7 +712,7 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
                       })
                     }
                   >
-                    Apply properties
+                    {p("management.applyProperties")}
                   </Button>
                 </div>
               )}
@@ -718,8 +724,8 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
       {tab === "deploy" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Deployment</DashboardCardTitle>
-            <DashboardCardDescription>One-click preview or production deploy</DashboardCardDescription>
+            <DashboardCardTitle>{p("management.deployment")}</DashboardCardTitle>
+            <DashboardCardDescription>{p("management.deploymentDescription")}</DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent className="space-y-4">
             {deployStatus ? <p className="text-sm text-white/60">{deployStatus}</p> : null}
@@ -737,19 +743,19 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
                     });
                     const json = await res.json();
                     if (!res.ok) {
-                      toast.error(json.error ?? "Deploy failed");
+                      toast.error(json.error ?? p("management.deployFailed"));
                       return;
                     }
                     setDeployStatus(`${json.deployment?.url} · ${json.deployment?.status}`);
-                    toast.success(json.message ?? "Deployed");
+                    toast.success(json.message ?? p("management.deployed"));
                   } catch {
-                    toast.error("Deploy failed");
+                    toast.error(p("management.deployFailed"));
                   } finally {
                     setBusy(false);
                   }
                 }}
               >
-                Deploy preview
+                {p("management.deployPreview")}
               </Button>
               <Button
                 variant="outline"
@@ -765,19 +771,19 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
                     });
                     const json = await res.json();
                     if (!res.ok) {
-                      toast.error(json.error ?? "Deploy failed");
+                      toast.error(json.error ?? p("management.deployFailed"));
                       return;
                     }
                     setDeployStatus(`${json.deployment?.url} · ${json.deployment?.status}`);
-                    toast.success(json.message ?? "Production deploy started");
+                    toast.success(json.message ?? p("management.productionDeployStarted"));
                   } catch {
-                    toast.error("Deploy failed");
+                    toast.error(p("management.deployFailed"));
                   } finally {
                     setBusy(false);
                   }
                 }}
               >
-                Deploy production
+                {p("management.deployProduction")}
               </Button>
               <Button
                 variant="outline"
@@ -785,11 +791,11 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
                 disabled={busy}
                 onClick={() => void postAction({ action: "provision_backend" })}
               >
-                Provision backend
+                {p("management.provisionBackend")}
               </Button>
             </div>
             <p className="text-xs text-white/40">
-              Live preview: <code className="text-white/60">/api/webapp-builder/{generationId}/live-preview</code>
+              {p("management.livePreviewPath")} <code className="text-white/60">/api/webapp-builder/{generationId}/live-preview</code>
             </p>
           </DashboardCardContent>
         </DashboardCard>
@@ -798,16 +804,16 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
       {tab === "assistant" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>AI App Assistant</DashboardCardTitle>
+            <DashboardCardTitle>{p("management.aiAssistant")}</DashboardCardTitle>
             <DashboardCardDescription>
-              Natural language edits to the structured app model
+              {p("management.aiAssistantDescription")}
             </DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent className="space-y-3">
             <Textarea
               value={assistantMsg}
               onChange={(e) => setAssistantMsg(e.target.value)}
-              placeholder='Try: "Add payment system" · "Create orders dashboard" · "Connect database" · "Create admin panel"'
+              placeholder={p("management.assistantPlaceholder")}
               className={cn(dashboardInputClass, "min-h-[100px]")}
             />
             <Button
@@ -819,7 +825,7 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
                 );
               }}
             >
-              <Sparkles className="mr-2 size-4" /> Apply with AI
+              <Sparkles className="mr-2 size-4" /> {p("management.applyWithAi")}
             </Button>
           </DashboardCardContent>
         </DashboardCard>
@@ -829,7 +835,7 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
         <div className="grid gap-4 lg:grid-cols-2">
           <DashboardCard>
             <DashboardCardHeader>
-              <DashboardCardTitle>App intelligence</DashboardCardTitle>
+              <DashboardCardTitle>{p("management.appIntelligence")}</DashboardCardTitle>
             </DashboardCardHeader>
             <DashboardCardContent className="space-y-3">
               <div className="text-3xl font-semibold text-white">
@@ -850,7 +856,7 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
           </DashboardCard>
           <DashboardCard>
             <DashboardCardHeader>
-              <DashboardCardTitle>Quality checks</DashboardCardTitle>
+              <DashboardCardTitle>{p("management.qualityChecks")}</DashboardCardTitle>
             </DashboardCardHeader>
             <DashboardCardContent className="space-y-2">
               {quality.checks.map((c) => (
@@ -875,11 +881,11 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
       {tab === "versions" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Version history</DashboardCardTitle>
+            <DashboardCardTitle>{p("management.versionHistory")}</DashboardCardTitle>
           </DashboardCardHeader>
           <DashboardCardContent className="space-y-2">
             {history.versions.length === 0 ? (
-              <p className="text-sm text-white/40">No versions saved yet.</p>
+              <p className="text-sm text-white/40">{p("management.noVersions")}</p>
             ) : (
               history.versions.map((v) => (
                 <div
@@ -899,7 +905,7 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
                     disabled={busy}
                     onClick={() => void postAction({ action: "restore_version", versionId: v.id })}
                   >
-                    Restore
+                    {p("management.restore")}
                   </Button>
                 </div>
               ))
@@ -912,21 +918,21 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
         <div className="grid gap-4 lg:grid-cols-2">
           <DashboardCard>
             <DashboardCardHeader>
-              <DashboardCardTitle>Data models</DashboardCardTitle>
+              <DashboardCardTitle>{p("management.dataModels")}</DashboardCardTitle>
             </DashboardCardHeader>
             <DashboardCardContent className="space-y-2">
               {model.dataModels.map((m) => (
                 <div key={m.id} className="rounded-xl bg-white/5 p-3 text-xs text-white/60">
                   <div className="font-medium text-white">{m.label}</div>
                   <div>{m.fields.map((f) => f.name).join(", ")}</div>
-                  <div className="mt-1 text-white/35">CRUD: {m.crud.join(", ")}</div>
+                  <div className="mt-1 text-white/35">{p("management.crud")} {m.crud.join(", ")}</div>
                 </div>
               ))}
             </DashboardCardContent>
           </DashboardCard>
           <DashboardCard>
             <DashboardCardHeader>
-              <DashboardCardTitle>Workflows & schema</DashboardCardTitle>
+              <DashboardCardTitle>{p("management.workflowsSchema")}</DashboardCardTitle>
             </DashboardCardHeader>
             <DashboardCardContent className="space-y-3">
               <ul className="space-y-1 text-xs text-white/55">

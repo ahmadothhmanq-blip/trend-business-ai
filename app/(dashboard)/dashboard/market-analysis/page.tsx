@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { MarketAnalysisTool } from "@/components/dashboard/market-analysis-tool";
 import type { MarketAnalysis } from "@/types/database";
 
@@ -25,9 +25,7 @@ export default async function MarketAnalysisPage() {
 
   return (
     <>
-      <DashboardHeader
-        title="Market Analysis"
-        description="Deep-dive into industry trends and opportunities"
+      <LocalizedDashboardHeader pageId="marketAnalysis"
         userEmail={user?.email}
         userName={metadata.full_name as string | undefined}
       />

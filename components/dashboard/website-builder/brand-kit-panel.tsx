@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Check, Loader2, Palette } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 
 export type BrandKitOption = {
   id: string;
@@ -18,6 +19,7 @@ export function BrandKitPanel(props: {
   disabled?: boolean;
   onSelect: (kit: BrandKitOption | null) => void;
 }) {
+  const wb = useProductT("websiteBuilder");
   const [kits, setKits] = useState<BrandKitOption[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -25,7 +27,7 @@ export function BrandKitPanel(props: {
     setLoading(true);
     try {
       const res = await fetch("/api/brand-identity");
-      if (!res.ok) throw new Error("Failed to load brand kits");
+      if (!res.ok) throw new Error(wb("panels.failedLoadBrandKits"));
       const data = (await res.json()) as {
         generations?: Array<{
           id: string;

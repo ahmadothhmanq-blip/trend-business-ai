@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { ErpWorkspace } from "@/components/dashboard/erp/erp-workspace";
 import { getErpAnalytics } from "@/lib/erp/analytics";
 import type {
@@ -98,9 +98,7 @@ export default async function ErpPage() {
 
   return (
     <>
-      <DashboardHeader
-        title="AI ERP Platform"
-        description="Finance, inventory, operations, HR, analytics, and AI assistant"
+      <LocalizedDashboardHeader pageId="erp"
         userEmail={user.email}
         userName={(profile?.full_name as string | undefined) ?? (userMeta.full_name as string | undefined)}
         avatarUrl={profile?.avatar_url as string | undefined}

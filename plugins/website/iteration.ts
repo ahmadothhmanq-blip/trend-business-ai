@@ -122,6 +122,9 @@ export function buildWebsiteIterationPrompt(input: WebsiteGenerationInput): stri
     prompt = [
       input.prompt,
       "",
+      "Regenerate with a fresh visual design that strictly follows the theme and stylePreset requirements.",
+      input.theme ? `Required theme: ${input.theme}` : "",
+      input.designPreset ? `Required designPreset: ${input.designPreset}` : "",
       "Regenerate with a fresh approach while preserving the brief intent.",
       input.previousTitle ? `Previous title: ${input.previousTitle}` : "",
       input.previousFiles?.length

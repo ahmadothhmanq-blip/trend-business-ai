@@ -4,7 +4,7 @@
 
 import type { AiPresenterProfile, VideoProductionModel } from "@/lib/ai-core/video-production-platform/types";
 import { buildPresenterProfile } from "@/lib/ai-core/video-production-platform/presenters";
-import { getVideoProvider } from "@/lib/ai-core/video-production-platform/providers";
+import { getVideoProviderForMode } from "@/lib/ai-core/video-production-platform/providers";
 import { nowIso } from "@/lib/ai-core/video-production-platform/ids";
 
 export type AvatarGenerationRequest = {
@@ -31,9 +31,7 @@ export async function requestAvatarPresenterClip(
   const profile = buildPresenterProfile(req.personaId, {
     language: req.language || "English",
   });
-  const provider = getVideoProvider(
-    process.env.HEYGEN_API_KEY ? "heygen" : undefined,
-  );
+  const provider = getVideoProviderForMode("avatar", "heygen");
   let result = await provider.generateClip({
     prompt: `${profile.appearance}. Emotion: ${req.emotion || "natural"}. Natural facial expressions, body motion, lip sync. ${req.script}`,
     durationSec: Math.min(30, Math.max(5, Math.ceil(req.script.split(/\s+/).length / 2.5))),

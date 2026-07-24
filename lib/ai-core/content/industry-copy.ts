@@ -4,6 +4,7 @@
  */
 
 import { WEBSITE_INDUSTRY_INTELLIGENCE } from "@/lib/ai-core/industry-intelligence/profiles";
+import { sanitizeCtaForIndustry } from "@/lib/ai-core/template-intelligence/industry-palettes";
 import type {
   CoreBusinessProfile,
   CoreProductStrategy,
@@ -220,11 +221,20 @@ export function resolveCopyIndustryId(
   if (raw.includes("real") || raw.includes("estate") || raw.includes("property")) {
     return "real-estate";
   }
-  if (raw.includes("saas") || raw.includes("software")) return "saas";
+  if (raw.includes("saas") || raw.includes("software") || raw.includes("technology")) {
+    return "saas";
+  }
   if (raw.includes("shop") || raw.includes("ecom") || raw.includes("store")) {
     return "ecommerce";
   }
-  if (raw.includes("auto") || raw.includes("car")) return "automotive";
+  if (
+    raw.includes("automotive") ||
+    raw.includes("dealership") ||
+    /\bcar\b/.test(raw) ||
+    raw.includes("vehicle")
+  ) {
+    return "automotive";
+  }
   if (raw.includes("clinic") || raw.includes("health") || raw.includes("medical")) {
     return "clinic";
   }
@@ -263,8 +273,11 @@ export function buildIndustryCopyPack(params: {
     industryId,
     heroHeadline: heroHeadline.slice(0, 90),
     heroSubheadline: heroSubheadline.slice(0, 220),
-    primaryCta: strategyCta || base.primaryCta,
-    secondaryCta: params.strategy?.ctas?.[1] || base.secondaryCta,
+    primaryCta: sanitizeCtaForIndustry(strategyCta || base.primaryCta, industryId),
+    secondaryCta: sanitizeCtaForIndustry(
+      params.strategy?.ctas?.[1] || base.secondaryCta,
+      industryId,
+    ),
     serviceDescriptions: base.serviceDescriptions,
     trustLine: base.trustLine,
     contentBlocks: [

@@ -193,6 +193,10 @@ export async function persistWebsiteGeneration(args: {
     components: args.project.components,
     heroImageUrl: heroAsset?.url,
     primaryCta,
+    templateIntelligenceId:
+      (args.project.settings as { templateIntelligenceId?: string } | undefined)
+        ?.templateIntelligenceId ?? undefined,
+    language: args.input.language,
     files: args.project.files,
   });
 
@@ -455,6 +459,103 @@ export async function persistWebsiteGeneration(args: {
   return {
     ok: true,
     generation: result.data as WebsiteGeneration,
+    project: savedProject,
+  };
+}
+
+/**
+ * Update an existing generation in place (template switch, visual preset).
+ * Does not create a child generation or append prompt versions.
+ */
+export async function updateWebsiteGenerationInPlace(args: {
+  supabase: SupabaseClient;
+  userId: string;
+  generationId: string;
+  project: GeneratedWebsiteProject;
+  language?: string;
+}): Promise<
+  | { ok: true; generation: WebsiteGeneration; project: GeneratedWebsiteProject }
+  | { ok: false; error: string }
+> {
+  const heroAsset = args.project.assetManifest?.items?.find(
+    (item) => item.role === "hero" && item.url,
+  );
+  const primaryCta =
+    args.project.strategy?.pages?.[0]?.primaryCta ||
+    args.project.strategy?.ctas?.[0];
+
+  const files = ensureStaticPreviewFile({
+    title: args.project.title,
+    description: args.project.description,
+    pages: args.project.pages,
+    sections: args.project.sections,
+    colorPalette: args.project.designSystem
+      ? [
+          args.project.designSystem.colors.primary,
+          args.project.designSystem.colors.secondary,
+          args.project.designSystem.colors.accent,
+          args.project.designSystem.colors.neutral,
+          args.project.designSystem.colors.surface,
+          args.project.designSystem.colors.background,
+          args.project.designSystem.colors.foreground,
+        ]
+      : args.project.colorPalette,
+    typography: args.project.designSystem
+      ? [
+          args.project.designSystem.typography.headingFont,
+          args.project.designSystem.typography.bodyFont,
+          ...args.project.designSystem.typography.scale,
+        ]
+      : args.project.typography,
+    content: args.project.content,
+    components: args.project.components,
+    heroImageUrl: heroAsset?.url,
+    primaryCta,
+    templateIntelligenceId:
+      (args.project.settings as { templateIntelligenceId?: string } | undefined)
+        ?.templateIntelligenceId ?? undefined,
+    language: args.language,
+    files: args.project.files,
+  });
+
+  const savedProject: GeneratedWebsiteProject = {
+    ...args.project,
+    files,
+    settings: {
+      framework: "Next.js App Router",
+      styling: "Tailwind CSS",
+      packageManager: "npm",
+      deploymentTarget: "Vercel or Node hosting",
+      ...args.project.settings,
+    },
+  };
+
+  const { data, error } = await args.supabase
+    .from("website_generations")
+    .update({
+      blueprint: savedProject as unknown as WebsiteBlueprint,
+      design_style:
+        savedProject.designSystem?.style ||
+        savedProject.designSystem?.stylePreset ||
+        undefined,
+      color_style: savedProject.designSystem?.colors?.primary || undefined,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", args.generationId)
+    .eq("user_id", args.userId)
+    .select("*")
+    .single();
+
+  if (error || !data) {
+    return {
+      ok: false,
+      error: error?.message ?? "Failed to update generation.",
+    };
+  }
+
+  return {
+    ok: true,
+    generation: data as WebsiteGeneration,
     project: savedProject,
   };
 }

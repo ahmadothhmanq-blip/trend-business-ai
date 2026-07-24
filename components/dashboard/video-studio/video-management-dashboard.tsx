@@ -22,7 +22,13 @@ import {
   DashboardCardDescription,
 } from "@/components/dashboard/ui/dashboard-card";
 import { dashboardInputClass } from "@/components/dashboard/ui/dashboard-styles";
+import {
+  VideoStudioProviderStatus,
+  useVideoStudioFullRenderReady,
+} from "@/components/dashboard/video-studio/video-studio-provider-status";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/client";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import type { VideoProductionModel } from "@/lib/ai-core/video-production-platform/types";
 import type { VideoVersionHistory } from "@/lib/ai-core/video-production-platform/versions";
 import type { VideoQualityReport } from "@/lib/ai-core/video-production-platform/types";
@@ -91,6 +97,9 @@ type ManagePayload = {
 };
 
 export function VideoManagementDashboard({ generationId }: { generationId: string }) {
+  const { t } = useTranslation();
+  const p = useProductT("videoStudio");
+  const fullRenderGate = useVideoStudioFullRenderReady();
   const [tab, setTab] = useState<Tab>("overview");
   const [data, setData] = useState<ManagePayload | null>(null);
   const [loading, setLoading] = useState(true);
@@ -133,13 +142,13 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
       });
       const json = await res.json();
       if (!res.ok) {
-        toast.error(json.error ?? "Queue processing failed");
+        toast.error(json.error ?? p("management.queueFailed"));
         return;
       }
-      toast.success(json.message ?? "Queue processed");
+      toast.success(json.message ?? p("management.queueProcessed"));
       await load();
     } catch {
-      toast.error("Queue processing failed");
+      toast.error(p("management.queueFailed"));
     } finally {
       setBusy(false);
     }
@@ -153,7 +162,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
       ]);
       const json = await res.json();
       if (!res.ok) {
-        toast.error(json.error ?? "Failed to load");
+        toast.error(json.error ?? p("errors.loadFailed"));
         return;
       }
       setData(json);
@@ -168,7 +177,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
         setMedia(mediaJson.media ?? []);
       }
     } catch {
-      toast.error("Failed to load video management");
+      toast.error(p("management.loadFailed"));
     } finally {
       setLoading(false);
     }
@@ -186,18 +195,18 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
         const json = await res.json();
         setFfmpegStatus(
           json.ffmpeg?.available
-            ? `FFmpeg ready · ${json.ffmpeg.version || "ok"}`
-            : "FFmpeg missing — multi-scene merge limited",
+            ? p("management.ffmpegReady", { version: json.ffmpeg.version || "ok" })
+            : p("management.ffmpegMissing"),
         );
         const dbOk = json.database?.videoMedia && json.database?.videoRenderJobs;
         const providerOk = json.videoProviderConfigured;
         const ttsOk = json.tts?.configured;
         setHealthSummary(
           [
-            dbOk ? "DB ok" : "DB: apply 044",
-            providerOk ? `Provider: ${json.preferredProvider}` : "No video API key",
-            ttsOk ? `TTS: ${json.tts?.provider}` : "TTS preview",
-            json.strictMode ? "Strict" : "Stub allowed",
+            dbOk ? p("management.dbOk") : p("management.dbApply"),
+            providerOk ? p("management.providerOk", { provider: json.preferredProvider }) : p("management.noVideoApiKey"),
+            ttsOk ? p("management.ttsProvider", { provider: json.tts?.provider }) : p("management.ttsPreview"),
+            json.strictMode ? p("management.strict") : p("management.stubAllowed"),
           ].join(" · "),
         );
       } catch {
@@ -216,10 +225,10 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
       });
       const json = await res.json();
       if (!res.ok) {
-        toast.error(json.error ?? "Action failed");
+        toast.error(json.error ?? p("management.actionFailed"));
         return;
       }
-      toast.success(json.message ?? "Updated");
+      toast.success(json.message ?? p("management.updated"));
       if (json.socialExport) setSocialExport(json.socialExport);
       setData((prev) =>
         prev
@@ -249,7 +258,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
         }
       }
     } catch {
-      toast.error("Request failed");
+      toast.error(p("errors.requestFailed"));
     } finally {
       setBusy(false);
     }
@@ -258,23 +267,23 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
   if (loading || !data) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center text-sm text-white/50">
-        Loading video production studio…
+        {p("management.loading")}
       </div>
     );
   }
 
   const { model, quality, timeline, assembly, latestJob, job, history } = data;
   const tabs: Array<{ id: Tab; label: string }> = [
-    { id: "overview", label: "Overview" },
-    { id: "timeline", label: "Timeline" },
-    { id: "preview", label: "Preview / Render" },
-    { id: "presenter", label: "Presenter" },
-    { id: "brand", label: "Brand" },
-    { id: "audio", label: "Voice & Audio" },
-    { id: "export", label: "Social Export" },
-    { id: "media", label: "Media" },
-    { id: "quality", label: "Quality" },
-    { id: "versions", label: "Versions" },
+    { id: "overview", label: p("management.tabs.overview") },
+    { id: "timeline", label: p("management.tabs.timeline") },
+    { id: "preview", label: p("management.tabs.preview") },
+    { id: "presenter", label: p("management.tabs.presenter") },
+    { id: "brand", label: p("management.tabs.brand") },
+    { id: "audio", label: p("management.tabs.audio") },
+    { id: "export", label: p("management.tabs.export") },
+    { id: "media", label: p("management.tabs.media") },
+    { id: "quality", label: p("management.tabs.quality") },
+    { id: "versions", label: p("management.tabs.versions") },
   ];
 
   return (
@@ -283,7 +292,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
         <div className="flex items-center gap-3">
           <Button asChild variant="outline" className="rounded-xl border-white/10 text-white/70">
             <Link href="/dashboard/video-studio">
-              <ArrowLeft className="mr-2 size-4" /> Back
+              <ArrowLeft className="mr-2 size-4" /> {t("common.back")}
             </Link>
           </Button>
           <div>
@@ -296,21 +305,28 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" className="rounded-xl border-white/10" onClick={() => void load()} disabled={busy}>
-            <RefreshCw className="mr-2 size-4" /> Refresh
+            <RefreshCw className="mr-2 size-4" /> {p("management.refresh")}
           </Button>
           <Button
             className="btn-gold rounded-xl font-bold text-luxury-black"
             disabled={busy}
             onClick={() => void post({ action: "render", mode: "preview" })}
           >
-            <Play className="mr-2 size-4" /> Preview render
+            <Play className="mr-2 size-4" /> {p("management.previewRender")}
           </Button>
           <Button
             className="rounded-xl bg-white/10 font-semibold text-white hover:bg-white/15"
-            disabled={busy}
-            onClick={() => void post({ action: "render", mode: "full" })}
+            disabled={busy || fullRenderGate.loading || !fullRenderGate.canFullRender}
+            title={fullRenderGate.message || undefined}
+            onClick={() => {
+              if (!fullRenderGate.canFullRender) {
+                toast.error(fullRenderGate.message || p("providerStatus.fullRenderBlocked"));
+                return;
+              }
+              void post({ action: "render", mode: "full" });
+            }}
           >
-            <Film className="mr-2 size-4" /> Full MP4 render
+            <Film className="mr-2 size-4" /> {p("management.fullRender")}
           </Button>
           <Button
             variant="outline"
@@ -318,7 +334,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
             disabled={busy}
             onClick={() => void processQueue()}
           >
-            Process queue
+            {p("management.processQueue")}
           </Button>
           <Button
             variant="outline"
@@ -326,7 +342,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
             disabled={busy}
             onClick={() => void post({ action: "resume_render" })}
           >
-            Resume job
+            {p("management.resumeJob")}
           </Button>
           <Button
             variant="outline"
@@ -334,7 +350,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
             disabled={busy}
             onClick={() => void post({ action: "retry_clips" })}
           >
-            Retry failed
+            {p("management.retryFailed")}
           </Button>
           <Button
             variant="outline"
@@ -342,7 +358,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
             disabled={busy}
             onClick={() => void post({ action: "synthesize_voice", real: true })}
           >
-            <Sparkles className="mr-2 size-4" /> Real TTS
+            <Sparkles className="mr-2 size-4" /> {p("management.realTts")}
           </Button>
           <Button
             variant="outline"
@@ -350,15 +366,15 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
             disabled={busy}
             onClick={() => void post({ action: "export_social", presetId: "tiktok" })}
           >
-            Export TikTok
+            {p("management.exportTiktok")}
           </Button>
           <Button
             variant="outline"
             className="rounded-xl border-white/10"
             disabled={busy}
-            onClick={() => void post({ action: "save_version", note: "Manual checkpoint" })}
+            onClick={() => void post({ action: "save_version", note: p("management.manualCheckpoint") })}
           >
-            <Save className="mr-2 size-4" /> Save version
+            <Save className="mr-2 size-4" /> {p("management.saveVersion")}
           </Button>
         </div>
       </div>
@@ -383,19 +399,22 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
 
       {tab === "overview" && (
         <div className="grid gap-4 lg:grid-cols-3">
+          <div className="lg:col-span-3">
+            <VideoStudioProviderStatus />
+          </div>
           <DashboardCard className="lg:col-span-2">
             <DashboardCardHeader>
-              <DashboardCardTitle>Production model</DashboardCardTitle>
+              <DashboardCardTitle>{p("management.productionModel")}</DashboardCardTitle>
               <DashboardCardDescription>
-                Structured video project — editable without regenerating from scratch
+                {p("management.productionDescription")}
               </DashboardCardDescription>
             </DashboardCardHeader>
             <DashboardCardContent className="grid gap-2 sm:grid-cols-4 text-sm">
               {[
-                ["Scenes", model.scenes.length],
-                ["Chapters", model.chapters.length],
-                ["Assets", model.assets.length],
-                ["Jobs", model.jobs.length],
+                [p("management.scenes"), model.scenes.length],
+                [p("management.chapters"), model.chapters.length],
+                [p("management.assets"), model.assets.length],
+                [p("management.jobs"), model.jobs.length],
               ].map(([l, v]) => (
                 <div key={String(l)} className="rounded-xl bg-white/5 p-3">
                   <div className="text-lg font-semibold text-white">{v}</div>
@@ -403,24 +422,27 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                 </div>
               ))}
               <div className="sm:col-span-4 text-xs text-white/50">
-                Presenter: {model.presenter?.displayName || "—"} · Location:{" "}
-                {model.locationId || "—"} · Content: {model.contentTypeId || "—"}
+                {p("management.presenterLabel")}: {model.presenter?.displayName || "—"} · {p("management.locationLabel")}:{" "}
+                {model.locationId || "—"} · {p("management.contentLabel")}: {model.contentTypeId || "—"}
               </div>
               <div className="sm:col-span-4 text-xs text-white/40">
-                Assembly: {assembly.steps.join(" → ")}
+                {p("management.assemblyLabel")}: {assembly.steps.join(" → ")}
               </div>
             </DashboardCardContent>
           </DashboardCard>
           <DashboardCard>
             <DashboardCardHeader>
-              <DashboardCardTitle>Quality · {quality.score}</DashboardCardTitle>
+              <DashboardCardTitle>{p("management.qualityTitle", { score: quality.score })}</DashboardCardTitle>
             </DashboardCardHeader>
             <DashboardCardContent className="text-sm text-white/60">
               <p>{quality.summary}</p>
               <p className="mt-2 text-xs text-white/40">
-                Render: {latestJob?.status || "none"} ·{" "}
+                {p("management.renderLabel")}: {latestJob?.status || "none"} ·{" "}
                 {latestJob
-                  ? `${latestJob.completedClips}/${latestJob.totalClips} clips`
+                  ? p("management.clipsProgress", {
+                      completed: latestJob.completedClips,
+                      total: latestJob.totalClips,
+                    })
                   : "—"}
               </p>
             </DashboardCardContent>
@@ -431,9 +453,9 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
       {tab === "timeline" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Professional timeline</DashboardCardTitle>
+            <DashboardCardTitle>{p("management.professionalTimeline")}</DashboardCardTitle>
             <DashboardCardDescription>
-              Visual track · trim · reorder · replace scene / voice / music
+              {p("management.timelineDescription")}
             </DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent className="space-y-4">
@@ -469,7 +491,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
               </div>
             )}
             <p className="text-xs text-white/40">
-              {ffmpegStatus || "Checking assembly tooling…"}
+              {ffmpegStatus || p("management.checkingTooling")}
             </p>
             {healthSummary ? (
               <p className="text-xs text-white/35">{healthSummary}</p>
@@ -497,7 +519,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                   <div>
                     <div className="font-medium text-white">{t.name}</div>
                     <div className="text-xs text-white/40">
-                      {t.startSec}s – {t.endSec}s · {t.hasClip ? "clip ready" : "no clip"}
+                      {t.startSec}s – {t.endSec}s · {t.hasClip ? p("management.clipReady") : p("management.noClip")}
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-1">
@@ -541,7 +563,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                         setScriptText(scene?.script || "");
                       }}
                     >
-                      Edit script
+                      {p("management.editScript")}
                     </Button>
                     <Button
                       size="sm"
@@ -556,7 +578,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                         })
                       }
                     >
-                      Trim −25%
+                      {p("management.trim25")}
                     </Button>
                     <Input
                       type="number"
@@ -564,7 +586,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                       max={600}
                       defaultValue={Math.round(t.endSec - t.startSec)}
                       className={cn(dashboardInputClass, "h-8 w-16 text-xs")}
-                      title="Trim to seconds"
+                      title={p("management.trimToSeconds")}
                       onBlur={(e) => {
                         const n = Number(e.target.value);
                         if (!Number.isFinite(n) || n < 1) return;
@@ -589,7 +611,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                         });
                       }}
                     >
-                      Replace visual
+                      {p("management.replaceVisual")}
                     </Button>
                   </div>
                 </div>
@@ -614,7 +636,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                       })
                     }
                   >
-                    Save script
+                    {p("management.saveScript")}
                   </Button>
                   <Button
                     variant="outline"
@@ -630,7 +652,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                       })
                     }
                   >
-                    Replace music
+                    {p("management.replaceMusic")}
                   </Button>
                 </div>
               </div>
@@ -649,7 +671,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                 })
               }
             >
-              Reverse scene order (demo)
+              {p("management.reverseSceneOrder")}
             </Button>
           </DashboardCardContent>
         </DashboardCard>
@@ -658,9 +680,9 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
       {tab === "preview" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Render preview</DashboardCardTitle>
+            <DashboardCardTitle>{p("management.renderPreview")}</DashboardCardTitle>
             <DashboardCardDescription>
-              {job?.message || "Run a preview render to generate clip posters from storyboards."}
+              {job?.message || p("management.previewRenderHint")}
             </DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent className="space-y-4">
@@ -669,14 +691,21 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
               disabled={busy}
               onClick={() => void post({ action: "render", mode: "preview" })}
             >
-              <Film className="mr-2 size-4" /> Preview render
+              <Film className="mr-2 size-4" /> {p("management.previewRenderBtn")}
             </Button>
             <Button
               className="rounded-xl bg-white/10 text-white"
-              disabled={busy}
-              onClick={() => void post({ action: "render", mode: "full" })}
+              disabled={busy || fullRenderGate.loading || !fullRenderGate.canFullRender}
+              title={fullRenderGate.message || undefined}
+              onClick={() => {
+                if (!fullRenderGate.canFullRender) {
+                  toast.error(fullRenderGate.message || p("providerStatus.fullRenderBlocked"));
+                  return;
+                }
+                void post({ action: "render", mode: "full" });
+              }}
             >
-              Full MP4 / WebM render
+              {p("management.fullMp4Render")}
             </Button>
             <Button
               variant="outline"
@@ -690,7 +719,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                 })
               }
             >
-              Avatar render
+              {p("management.avatarRender")}
             </Button>
             <Button
               variant="outline"
@@ -698,7 +727,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
               disabled={busy}
               onClick={() => void post({ action: "resume_render" })}
             >
-              Resume async jobs
+              {p("management.resumeAsyncJobs")}
             </Button>
             <Button
               variant="outline"
@@ -706,13 +735,13 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
               disabled={busy}
               onClick={() => void post({ action: "retry_clips" })}
             >
-              Retry failed clips
+              {p("management.retryFailedClips")}
             </Button>
             {job?.compositeAsset?.url && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={job.compositeAsset.posterUrl || job.compositeAsset.url}
-                alt="Composite preview"
+                alt={p("management.compositePreview")}
                 className="max-h-72 w-full rounded-xl object-contain bg-black/40"
               />
             )}
@@ -761,16 +790,16 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
       {tab === "presenter" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>AI Human Presenter</DashboardCardTitle>
+            <DashboardCardTitle>{p("management.aiPresenter")}</DashboardCardTitle>
             <DashboardCardDescription>
               {model.presenter?.appearance}
             </DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent className="space-y-3 text-sm text-white/60">
-            <p>Lip sync: {model.presenter?.lipSyncProfile}</p>
-            <p>Body: {model.presenter?.bodyMotionStyle}</p>
+            <p>{p("management.lipSync")}: {model.presenter?.lipSyncProfile}</p>
+            <p>{p("management.bodyLabel")}: {model.presenter?.bodyMotionStyle}</p>
             <p>
-              Voice: {model.presenter?.voiceStyle} · Languages:{" "}
+              {p("management.voiceLabel")}: {model.presenter?.voiceStyle} · {p("management.languagesLabel")}:{" "}
               {model.presenter?.languages.slice(0, 4).join(", ")}
             </p>
             <div className="flex flex-wrap gap-2">
@@ -806,7 +835,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                 })
               }
             >
-              Generate real avatar clip
+              {p("management.generateAvatarClip")}
             </Button>
           </DashboardCardContent>
         </DashboardCard>
@@ -815,20 +844,20 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
       {tab === "export" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Social media export</DashboardCardTitle>
+            <DashboardCardTitle>{p("management.socialExportTitle")}</DashboardCardTitle>
             <DashboardCardDescription>
-              Aspect ratios, quality presets, and caption packages
+              {p("management.socialExportDescription")}
             </DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent className="space-y-3">
             <div className="flex flex-wrap gap-2">
               {(
                 [
-                  ["tiktok", "TikTok"],
-                  ["instagram-reels", "Instagram Reels"],
-                  ["youtube-shorts", "YouTube Shorts"],
-                  ["youtube", "YouTube"],
-                  ["linkedin", "LinkedIn"],
+                  ["tiktok", p("management.platforms.tiktok")],
+                  ["instagram-reels", p("management.platforms.instagramReels")],
+                  ["youtube-shorts", p("management.platforms.youtubeShorts")],
+                  ["youtube", p("management.platforms.youtube")],
+                  ["linkedin", p("management.platforms.linkedin")],
                 ] as const
               ).map(([id, label]) => (
                 <Button
@@ -847,7 +876,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                 <div className="font-medium text-white">
                   {socialExport.preset.label} · {socialExport.preset.aspectRatio} ·{" "}
                   {socialExport.preset.quality}
-                  {socialExport.publishReady ? " · publish-ready" : ""}
+                  {socialExport.publishReady ? p("management.publishReady") : ""}
                 </div>
                 <ul className="list-inside list-disc text-xs text-white/50">
                   {socialExport.checklist.map((c) => (
@@ -866,7 +895,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                 )}
                 {socialExport.captionsVtt && (
                   <details className="text-xs text-white/40">
-                    <summary className="cursor-pointer text-white/60">Captions VTT</summary>
+                    <summary className="cursor-pointer text-white/60">{p("management.captionsVtt")}</summary>
                     <pre className="mt-2 max-h-40 overflow-auto whitespace-pre-wrap rounded bg-black/30 p-2">
                       {socialExport.captionsVtt.slice(0, 1200)}
                     </pre>
@@ -879,7 +908,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                     rel="noreferrer"
                     className="text-xs text-premium-gold-light underline"
                   >
-                    Open video asset
+                    {p("management.openVideoAsset")}
                   </a>
                 )}
               </div>
@@ -891,15 +920,15 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
       {tab === "media" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Media library</DashboardCardTitle>
+            <DashboardCardTitle>{p("management.mediaLibrary")}</DashboardCardTitle>
             <DashboardCardDescription>
-              Stored clips, audio, and thumbnails (not JSONB-only)
+              {p("management.mediaLibraryDescription")}
             </DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent className="space-y-2">
             {media.length === 0 ? (
               <p className="text-sm text-white/40">
-                No media yet. Run Full MP4 render or Real TTS.
+                {p("management.noMediaYet")}
               </p>
             ) : (
               media.map((m) => (
@@ -923,7 +952,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                         rel="noreferrer"
                         className="text-premium-gold-light underline"
                       >
-                        Preview
+                        {p("management.previewLink")}
                       </a>
                     ) : (
                       <button
@@ -935,10 +964,10 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                           );
                           const json = await res.json();
                           if (json.previewUrl) window.open(json.previewUrl, "_blank");
-                          else toast.error("No preview URL");
+                          else toast.error(p("management.noPreviewUrl"));
                         }}
                       >
-                        Sign URL
+                        {p("management.signUrl")}
                       </button>
                     )}
                     <button
@@ -958,17 +987,17 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                           );
                           const json = await res.json();
                           if (!res.ok) {
-                            toast.error(json.error ?? "Delete failed");
+                            toast.error(json.error ?? p("management.deleteFailed"));
                             return;
                           }
-                          toast.success("Media deleted");
+                          toast.success(p("management.mediaDeleted"));
                           setMedia((prev) => prev.filter((x) => x.id !== m.id));
                         } finally {
                           setBusy(false);
                         }
                       }}
                     >
-                      Delete
+                      {t("common.delete")}
                     </button>
                   </div>
                 </div>
@@ -981,19 +1010,19 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
       {tab === "brand" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Brand integration</DashboardCardTitle>
+            <DashboardCardTitle>{p("management.brandIntegration")}</DashboardCardTitle>
           </DashboardCardHeader>
           <DashboardCardContent className="space-y-3">
             <Input
               value={brandName}
               onChange={(e) => setBrandName(e.target.value)}
-              placeholder="Business name"
+              placeholder={p("placeholders.brandName")}
               className={dashboardInputClass}
             />
             <Input
               value={primary}
               onChange={(e) => setPrimary(e.target.value)}
-              placeholder="Primary color"
+              placeholder={p("placeholders.primaryColor")}
               className={dashboardInputClass}
             />
             <Button
@@ -1008,7 +1037,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                 })
               }
             >
-              Apply brand
+              {p("management.applyBrand")}
             </Button>
           </DashboardCardContent>
         </DashboardCard>
@@ -1017,7 +1046,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
       {tab === "audio" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Voice & audio</DashboardCardTitle>
+            <DashboardCardTitle>{p("management.voiceAudio")}</DashboardCardTitle>
           </DashboardCardHeader>
           <DashboardCardContent className="space-y-3 text-sm text-white/60">
             {model.voiceTracks.map((v) => (
@@ -1036,7 +1065,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                 disabled={busy}
                 onClick={() => void post({ action: "synthesize_voice" })}
               >
-                <Sparkles className="mr-2 size-4" /> Synthesize voice preview
+                <Sparkles className="mr-2 size-4" /> {p("management.synthesizeVoicePreview")}
               </Button>
               <Button
                 variant="outline"
@@ -1044,7 +1073,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                 disabled={busy}
                 onClick={() => void post({ action: "synthesize_voice", real: true })}
               >
-                Real TTS
+                {p("management.realTts")}
               </Button>
               <Button
                 variant="outline"
@@ -1052,7 +1081,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                 disabled={busy}
                 onClick={() => void post({ action: "rebuild_subtitles" })}
               >
-                Rebuild subtitles
+                {p("management.rebuildSubtitles")}
               </Button>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -1079,14 +1108,14 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
             </div>
             {scriptSceneId && (
               <div className="space-y-2">
-                <label className="text-xs text-white/45">Subtitle cue editor (one line = one cue)</label>
+                <label className="text-xs text-white/45">{p("management.subtitleCueEditor")}</label>
                 <Textarea
                   value={model.subtitles.map((s) => s.text).join("\n")}
                   onChange={(e) => {
                     /* local edit via save button below */
                     setScriptText(e.target.value);
                   }}
-                  placeholder="Cue lines…"
+                  placeholder={p("management.cueLinesPlaceholder")}
                   className={cn(dashboardInputClass, "min-h-[80px]")}
                 />
                 <Button
@@ -1109,7 +1138,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                     })
                   }
                 >
-                  Save subtitle cues
+                  {p("management.saveSubtitleCues")}
                 </Button>
               </div>
             )}
@@ -1120,7 +1149,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
       {tab === "quality" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Quality system</DashboardCardTitle>
+            <DashboardCardTitle>{p("management.qualitySystem")}</DashboardCardTitle>
           </DashboardCardHeader>
           <DashboardCardContent className="space-y-2">
             {quality.checks.map((c) => (
@@ -1144,11 +1173,11 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
       {tab === "versions" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Version control</DashboardCardTitle>
+            <DashboardCardTitle>{p("management.versionControl")}</DashboardCardTitle>
           </DashboardCardHeader>
           <DashboardCardContent className="space-y-2">
             {history.versions.length === 0 ? (
-              <p className="text-sm text-white/40">No versions yet.</p>
+              <p className="text-sm text-white/40">{p("management.noVersionsYet")}</p>
             ) : (
               history.versions.map((v) => (
                 <div
@@ -1168,7 +1197,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                     disabled={busy}
                     onClick={() => void post({ action: "restore_version", versionId: v.id })}
                   >
-                    Restore
+                    {p("management.restore")}
                   </Button>
                 </div>
               ))

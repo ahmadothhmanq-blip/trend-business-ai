@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { BiReport, BiScheduledReport } from "@/types/bi";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 
 type Props = {
   initialReports?: BiReport[];
@@ -12,6 +13,7 @@ type Props = {
 };
 
 export function ReportsPanel({ initialReports = [], initialScheduled = [] }: Props) {
+  const wt = useWorkspaceT("bi");
   const [reports, setReports] = useState(initialReports);
   const [scheduled, setScheduled] = useState(initialScheduled);
   const [title, setTitle] = useState("");
@@ -20,7 +22,7 @@ export function ReportsPanel({ initialReports = [], initialScheduled = [] }: Pro
   const [loading, setLoading] = useState(false);
 
   const createReport = async () => {
-    if (!title.trim()) return toast.error("Enter a report title");
+    if (!title.trim()) return toast.error(wt("panels.reports.reportTitleRequired"));
     setLoading(true);
     try {
       const res = await fetch("/api/bi/reports", {
@@ -29,19 +31,19 @@ export function ReportsPanel({ initialReports = [], initialScheduled = [] }: Pro
         body: JSON.stringify({ title, reportType: "custom", payload: { exportReady: true } }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Failed");
+      if (!res.ok) throw new Error(data.error ?? wt("toasts.failed"));
       setReports((prev) => [data.report, ...prev]);
       setTitle("");
-      toast.success("Report created");
+      toast.success(wt("toasts.reportCreated"));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed");
+      toast.error(e instanceof Error ? e.message : wt("toasts.failed"));
     } finally {
       setLoading(false);
     }
   };
 
   const scheduleReport = async () => {
-    if (!scheduleTitle.trim()) return toast.error("Enter a schedule title");
+    if (!scheduleTitle.trim()) return toast.error(wt("panels.reports.scheduleTitleRequired"));
     setLoading(true);
     try {
       const res = await fetch("/api/bi/reports", {
@@ -50,12 +52,12 @@ export function ReportsPanel({ initialReports = [], initialScheduled = [] }: Pro
         body: JSON.stringify({ title: scheduleTitle, frequency }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Failed");
+      if (!res.ok) throw new Error(data.error ?? wt("toasts.failed"));
       setScheduled((prev) => [data.scheduledReport, ...prev]);
       setScheduleTitle("");
-      toast.success("Report scheduled");
+      toast.success(wt("toasts.reportScheduled"));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed");
+      toast.error(e instanceof Error ? e.message : wt("toasts.failed"));
     } finally {
       setLoading(false);
     }
@@ -64,16 +66,16 @@ export function ReportsPanel({ initialReports = [], initialScheduled = [] }: Pro
   return (
     <div className="space-y-6">
       <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
-        <p className="mb-3 text-xs uppercase text-white/40">Custom reports</p>
+        <p className="mb-3 text-xs uppercase text-white/40">{wt("panels.reports.customReports")}</p>
         <div className="flex flex-wrap gap-2">
           <Input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Report title"
+            placeholder={wt("forms.reportTitle")}
             className="max-w-xs border-white/10 bg-white/5 text-white"
           />
           <Button onClick={() => void createReport()} disabled={loading}>
-            Create report
+            {wt("panels.reports.createReport")}
           </Button>
         </div>
         <ul className="mt-4 space-y-2 text-sm text-white/60">
@@ -82,17 +84,17 @@ export function ReportsPanel({ initialReports = [], initialScheduled = [] }: Pro
               {r.title} · {r.report_type} · {new Date(r.generated_at).toLocaleDateString()}
             </li>
           ))}
-          {reports.length === 0 && <li className="text-white/30">No custom reports yet.</li>}
+          {reports.length === 0 && <li className="text-white/30">{wt("panels.reports.noCustomReports")}</li>}
         </ul>
       </div>
 
       <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
-        <p className="mb-3 text-xs uppercase text-white/40">Scheduled reports</p>
+        <p className="mb-3 text-xs uppercase text-white/40">{wt("panels.reports.scheduledReports")}</p>
         <div className="flex flex-wrap items-center gap-2">
           <Input
             value={scheduleTitle}
             onChange={(e) => setScheduleTitle(e.target.value)}
-            placeholder="Schedule name"
+            placeholder={wt("forms.scheduleName")}
             className="max-w-xs border-white/10 bg-white/5 text-white"
           />
           <select
@@ -100,26 +102,26 @@ export function ReportsPanel({ initialReports = [], initialScheduled = [] }: Pro
             onChange={(e) => setFrequency(e.target.value as typeof frequency)}
             className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
           >
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
+            <option value="daily">{wt("panels.reports.frequency.daily")}</option>
+            <option value="weekly">{wt("panels.reports.frequency.weekly")}</option>
+            <option value="monthly">{wt("panels.reports.frequency.monthly")}</option>
           </select>
           <Button onClick={() => void scheduleReport()} disabled={loading}>
-            Schedule
+            {wt("panels.reports.schedule")}
           </Button>
         </div>
         <ul className="mt-4 space-y-2 text-sm text-white/60">
           {scheduled.map((s) => (
             <li key={s.id} className="rounded-lg border border-white/5 px-3 py-2">
-              {s.title} · {s.frequency} · next: {s.next_run_at ? new Date(s.next_run_at).toLocaleDateString() : "pending"}
+              {s.title} · {s.frequency} · {wt("panels.reports.nextRun")}: {s.next_run_at ? new Date(s.next_run_at).toLocaleDateString() : wt("panels.reports.pending")}
             </li>
           ))}
-          {scheduled.length === 0 && <li className="text-white/30">No scheduled reports.</li>}
+          {scheduled.length === 0 && <li className="text-white/30">{wt("panels.reports.noScheduledReports")}</li>}
         </ul>
       </div>
 
       <p className="text-xs text-white/40">
-        AI executive reports are available in the AI Insights tab. Legacy Business Suite reports remain at /dashboard/business-intelligence.
+        {wt("panels.reports.legacyNote")}
       </p>
     </div>
   );

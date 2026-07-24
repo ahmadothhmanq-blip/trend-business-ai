@@ -13,6 +13,7 @@ import {
   Target,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 import { CrmOverview } from "@/components/dashboard/crm/crm-overview";
 import { AccountsPanel } from "@/components/dashboard/crm/accounts-panel";
 import { ContactsPanel } from "@/components/dashboard/crm/contacts-panel";
@@ -62,6 +63,7 @@ export function CrmWorkspace({
   initialActivities = [],
   analyticsSummary,
 }: Props) {
+  const wt = useWorkspaceT("crm");
   const [tab, setTab] = useState<Tab>("overview");
   const [leads, setLeads] = useState(initialLeads);
   const [deals, setDeals] = useState(initialDeals);
@@ -81,21 +83,21 @@ export function CrmWorkspace({
     };
 
   const tabs = [
-    { key: "overview" as const, label: "Overview", icon: LayoutDashboard },
-    { key: "accounts" as const, label: "Accounts", icon: Building2 },
-    { key: "contacts" as const, label: "Contacts", icon: Contact },
-    { key: "leads" as const, label: "Leads", icon: Target },
-    { key: "deals" as const, label: "Deals", icon: Handshake },
-    { key: "tasks" as const, label: "Tasks", icon: ListTodo },
-    { key: "activities" as const, label: "Activities", icon: CheckSquare },
-    { key: "analytics" as const, label: "Analytics", icon: BarChart3 },
-    { key: "assistant" as const, label: "AI Assistant", icon: Sparkles },
+    { key: "overview" as const, labelKey: "tabs.overview", icon: LayoutDashboard },
+    { key: "accounts" as const, labelKey: "tabs.accounts", icon: Building2 },
+    { key: "contacts" as const, labelKey: "tabs.contacts", icon: Contact },
+    { key: "leads" as const, labelKey: "tabs.leads", icon: Target },
+    { key: "deals" as const, labelKey: "tabs.deals", icon: Handshake },
+    { key: "tasks" as const, labelKey: "tabs.tasks", icon: ListTodo },
+    { key: "activities" as const, labelKey: "tabs.activities", icon: CheckSquare },
+    { key: "analytics" as const, labelKey: "tabs.analytics", icon: BarChart3 },
+    { key: "assistant" as const, labelKey: "tabs.assistant", icon: Sparkles },
   ];
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-1 rounded-xl border border-white/[0.06] bg-white/[0.02] p-1">
-        {tabs.map(({ key, label, icon: Icon }) => (
+        {tabs.map(({ key, labelKey, icon: Icon }) => (
           <button
             key={key}
             onClick={() => setTab(key)}
@@ -105,7 +107,7 @@ export function CrmWorkspace({
             )}
           >
             <Icon className="size-4" />
-            <span className="hidden sm:inline">{label}</span>
+            <span className="hidden sm:inline">{wt(labelKey)}</span>
           </button>
         ))}
       </div>

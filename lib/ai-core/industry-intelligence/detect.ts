@@ -83,7 +83,14 @@ function aliasToIndustryId(raw: string): IndustryId | null {
   ) {
     return "ecommerce";
   }
-  if (normalized.includes("auto") || normalized.includes("car")) {
+  if (
+    normalized.includes("automotive") ||
+    normalized.includes("dealership") ||
+    normalized.includes("vehicle") ||
+    normalized.includes("showroom") ||
+    /\bcar\b/.test(normalized) ||
+    normalized === "ev"
+  ) {
     return "automotive";
   }
   if (normalized.includes("restaurant") || normalized.includes("dining")) {

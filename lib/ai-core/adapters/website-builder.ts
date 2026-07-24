@@ -75,6 +75,16 @@ import type {
   WebsiteProjectAnalysis,
   WebsiteStrategy,
 } from "@/plugins/website/types";
+import {
+  applyWebsiteStyleIntent,
+  resolveWebsiteStyleIntent,
+} from "@/lib/website/style-resolution";
+import {
+  isMinimalWebsiteGeneration,
+  isUltraFastWebsiteGeneration,
+  isUltraFastWebsiteGenerationEnabled,
+  resolveWebsiteGenerationProfile,
+} from "@/lib/website/generation-flags";
 export const WEBSITE_BUILDER_PRODUCT_ID = "website-builder";
 
 const INPUT_META_KEY = "websiteGenerationInput";
@@ -361,6 +371,15 @@ export function websiteInputToBrief(
       ...(input.formWebhookUrl
         ? { formWebhookUrl: input.formWebhookUrl }
         : {}),
+      ...(input.generationProfile
+        ? { generationProfile: input.generationProfile }
+        : resolveWebsiteGenerationProfile(input) !== "professional"
+          ? { generationProfile: resolveWebsiteGenerationProfile(input) }
+          : {}),
+      ...(isUltraFastWebsiteGeneration(input) ||
+      isUltraFastWebsiteGenerationEnabled()
+        ? { ultraFastGeneration: true }
+        : {}),
       ...(input.industryId ? { industryId: input.industryId } : {}),
       ...(input.components?.length
         ? { preferredComponents: input.components }
@@ -607,6 +626,7 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
 
     async runDesign(brief, profile, strategy, ctx, prior) {
       const input = getWebsiteInput(brief);
+      const styleIntent = resolveWebsiteStyleIntent(input);
       const template = getTemplateSelectionFromBrief(brief);
       if (!analysis) {
         throw new Error(
@@ -625,8 +645,15 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
         strategy: strategy as CoreProductStrategy,
         industryId: template?.industryId || profile.industry,
         theme: input.theme,
-        designStyle: template?.industryIntelligence?.designStyle,
-        preferredStyle: template?.designPreset || input.theme,
+        designStyle:
+          input.templateStyle ||
+          styleIntent.styleLabel ||
+          template?.industryIntelligence?.designStyle,
+        preferredStyle:
+          input.designPreset ||
+          styleIntent.stylePreset ||
+          template?.designPreset ||
+          input.theme,
         prompt: brief.prompt || input.prompt,
         onProgress: (message) => ctx.progress.emit(message),
       });
@@ -653,6 +680,7 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
       const designInput = template
         ? {
             ...input,
+            designPreset: input.designPreset || styleIntent.stylePreset,
             theme:
               input.theme ||
               designPlan.websiteStyle.enginePreset ||
@@ -661,6 +689,7 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
           }
         : {
             ...input,
+            designPreset: input.designPreset || styleIntent.stylePreset,
             theme:
               input.theme ||
               designPlan.websiteStyle.enginePreset ||
@@ -672,7 +701,7 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
         plannedStrategy as WebsiteStrategy,
         ctx,
       );
-      if (template) {
+      if (template && !styleIntent.explicit) {
         design.stylePreset = template.designPreset;
         design.layoutStyle = template.layoutStyle;
         design.industryPattern = template.industryPattern;
@@ -680,22 +709,31 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
           design.style = template.industryIntelligence.designStyle;
         }
       }
-      // Lock early tokens to the approved plan (unique premium identity).
-      design.stylePreset =
-        designPlan.websiteStyle.enginePreset || design.stylePreset;
+      // Lock early tokens to the approved plan unless the user picked an explicit style.
+      if (!styleIntent.explicit) {
+        design.stylePreset =
+          designPlan.websiteStyle.enginePreset || design.stylePreset;
+      }
       design.layoutStyle =
         designPlan.websiteStyle.layoutStyle || design.layoutStyle;
       design.style = designPlan.visualIdentity || designIntel.visualStyle || design.style;
-      design.colors = {
-        ...design.colors,
-        primary: designPlan.colorSystem.primary,
-        secondary: designPlan.colorSystem.secondary,
-        accent: designPlan.colorSystem.accent,
-        neutral: designPlan.colorSystem.neutral,
-        surface: designPlan.colorSystem.surface,
-        background: designPlan.colorSystem.background,
-        foreground: designPlan.colorSystem.foreground,
-      };
+      if (!styleIntent.explicit) {
+        design.colors = {
+          ...design.colors,
+          primary: designPlan.colorSystem.primary,
+          secondary: designPlan.colorSystem.secondary,
+          accent: designPlan.colorSystem.accent,
+          neutral: designPlan.colorSystem.neutral,
+          surface: designPlan.colorSystem.surface,
+          background: designPlan.colorSystem.background,
+          foreground: designPlan.colorSystem.foreground,
+        };
+      } else {
+        design.colors = {
+          ...design.colors,
+          ...styleIntent.colors,
+        };
+      }
       design.typography = {
         ...design.typography,
         headingFont: designPlan.typographySystem.headingFont,
@@ -724,6 +762,8 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
         strategy: plannedStrategy,
         profile,
         preferredPreset:
+          input.designPreset ||
+          styleIntent.stylePreset ||
           designPlan.websiteStyle.enginePreset ||
           template?.designPreset ||
           design.stylePreset,
@@ -746,6 +786,8 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
       const intel = template?.industryIntelligence;
       const premium = buildPremiumDesignSystem({
         preferredStyle:
+          input.designPreset ||
+          styleIntent.stylePreset ||
           designPlan.websiteStyle.premiumStyleId ||
           designIntel.premiumStyleId ||
           intel?.designStyle ||
@@ -771,10 +813,10 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
           designPlan.websiteStyle.heroTreatment || designIntel.heroTreatment,
         sectionLayout:
           designPlan.websiteStyle.sectionLayout || designIntel.sectionLayout,
-        seedPrimary: designPlan.colorSystem.primary || merged.colors.primary,
+        seedPrimary: styleIntent.colors.primary || designPlan.colorSystem.primary || merged.colors.primary,
         seedSecondary:
-          designPlan.colorSystem.secondary || merged.colors.secondary,
-        seedAccent: designPlan.colorSystem.accent || merged.colors.accent,
+          styleIntent.colors.secondary || designPlan.colorSystem.secondary || merged.colors.secondary,
+        seedAccent: styleIntent.colors.accent || designPlan.colorSystem.accent || merged.colors.accent,
       });
       let premiumDesign = applyPremiumDesignToCore(merged, premium);
       // Preserve concrete component palette from AI / templates when present.
@@ -799,6 +841,10 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
           `[brand-identity] Applied ${brand.presetId} · ${brand.typography.pairing} · ${brand.colors.primary}`,
         );
       }
+      premiumDesign = applyWebsiteStyleIntent(premiumDesign, styleIntent);
+      ctx.progress.emit(
+        `[style] Applied ${styleIntent.stylePreset} · ${styleIntent.colorTheme} · ${styleIntent.mode} mode · primary ${premiumDesign.colors.primary}`,
+      );
       ctx.progress.emit(
         `[design-plan] ${designPlan.websiteStyle.layoutVariationId || designIntel.layoutVariationId} · ${designPlan.visualIdentity} · ${designPlan.websiteStyle.heroTreatment} · ${designPlan.typographySystem.displayFont}`,
       );
@@ -857,6 +903,7 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
         "Advanced AI Assets Engine: brand + design art direction → premium visuals…",
       );
 
+      const assetProfile = resolveWebsiteGenerationProfile(input);
       const manifest = await runAiImageEngine({
         strategy: artifacts.strategy!,
         designSystem: artifacts.designSystem!,
@@ -867,7 +914,8 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
         designPlanImageRequirements: designPlan?.imageRequirements?.map(
           (r) => `${r.role}: ${r.purpose}. ${r.style}. ${r.notes}`,
         ),
-        maxImages: 14,
+        maxImages:
+          assetProfile === "ultra" ? 6 : assetProfile === "fast" ? 10 : 14,
         userId: input.userId,
         generationKey,
         persist: Boolean(input.userId),
@@ -957,10 +1005,20 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
         designRenderComponentPaths: renderPlan?.componentPaths,
       });
 
+      const generationProfile = resolveWebsiteGenerationProfile(input);
+      if (generationProfile === "ultra") {
+        ctx.progress.emit(
+          "[ultra] Ultra fast profile — essential files, no optimizer passes",
+        );
+      } else if (generationProfile === "fast") {
+        ctx.progress.emit("[fast] Fast generation profile — minimal files, no improve pass");
+      }
+
       project = await generateWebsiteFiles(input, analysis, plan, ctx, {
         assetManifest: artifacts.assetManifest as AssetManifest,
         skipAssetGeneration: true,
         skipQuality: true,
+        generationProfile,
       });
 
       return project;
@@ -989,6 +1047,7 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
         files: generation.files,
         assetManifest,
         ctx,
+        skipImprove: isMinimalWebsiteGeneration(input),
       });
 
       // Phase 8: Auto Quality Engine — sections + design consistency on top of plugin check.
@@ -1149,14 +1208,19 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
           generation.seo,
       };
 
-      // AI Conversion Optimization Engine — goal + industry CRO recommendations.
+      const generationProfile = resolveWebsiteGenerationProfile(input);
+      const isUltra = generationProfile === "ultra";
+      const isMinimal = isMinimalWebsiteGeneration(input);
+
       const { runConversionOptimization, mergeConversionIntoOptimizerReport } =
         await import("@/lib/ai-core/conversion");
-      // AI SEO + Performance Engine — technical SEO, CWV/mobile quality report.
       const {
         runSeoPerformanceEngine,
         mergeSeoPerformanceIntoOptimizerReport,
       } = await import("@/lib/ai-core/seo-performance");
+      const { runDesignCritic, mergeDesignCriticIntoOptimizerReport } =
+        await import("@/lib/ai-core/design-critic");
+
       const template = getTemplateSelectionFromBrief(brief);
       const premiumCfg = template?.designConfiguration?.premiumTemplate as
         | {
@@ -1172,54 +1236,69 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
           ? brief.metadata.industryId
           : undefined) ||
         artifacts.businessProfile?.industry;
-      const conversionReport = runConversionOptimization({
-        files: base.files,
-        strategy: artifacts.strategy,
-        profile: artifacts.businessProfile ?? analysis?.businessProfile,
-        industryId,
-        explicitGoal:
-          typeof brief.metadata?.websiteGoal === "string"
-            ? brief.metadata.websiteGoal
-            : premiumCfg?.websiteGoal,
-        websiteGoal:
-          typeof brief.metadata?.websiteGoal === "string"
-            ? brief.metadata.websiteGoal
-            : premiumCfg?.websiteGoal,
-        onProgress: (message) => ctx.progress.emit(message),
-      });
 
-      const seoPerformanceReport = runSeoPerformanceEngine({
-        files: base.files,
-        strategy: artifacts.strategy,
-        profile: artifacts.businessProfile ?? analysis?.businessProfile,
-        industryId,
-        seoPackage: base.seoPackage ?? artifacts.seoPackage,
-        performanceReport:
-          base.performanceReport ?? artifacts.performanceReport,
-        assetManifest: base.assetManifest ?? artifacts.assetManifest,
-        premiumSeoTopics:
-          premiumCfg?.contentStrategy?.seoTopics ??
-          premiumCfg?.seoTopics ??
-          artifacts.strategy?.contentStrategy?.seoTopics,
-        premiumKeywords: premiumCfg?.keywords,
-        conversionScore: conversionReport.score,
-        onProgress: (message) => ctx.progress.emit(message),
-      });
+      let conversionReport:
+        | import("@/lib/ai-core/conversion").ConversionOptimizationReport
+        | undefined;
+      let seoPerformanceReport:
+        | import("@/lib/ai-core/seo-performance").SeoPerformanceReport
+        | undefined;
+      let designCriticReport:
+        | import("@/lib/ai-core/design-critic").DesignCriticReport
+        | undefined;
 
-      // AI Design Critic — post-generation visual / premium-feel review.
-      const { runDesignCritic, mergeDesignCriticIntoOptimizerReport } =
-        await import("@/lib/ai-core/design-critic");
-      const designCriticReport = runDesignCritic({
-        files: base.files,
-        onProgress: (message) => ctx.progress.emit(message),
-      });
+      if (!isUltra) {
+        conversionReport = runConversionOptimization({
+          files: base.files,
+          strategy: artifacts.strategy,
+          profile: artifacts.businessProfile ?? analysis?.businessProfile,
+          industryId,
+          explicitGoal:
+            typeof brief.metadata?.websiteGoal === "string"
+              ? brief.metadata.websiteGoal
+              : premiumCfg?.websiteGoal,
+          websiteGoal:
+            typeof brief.metadata?.websiteGoal === "string"
+              ? brief.metadata.websiteGoal
+              : premiumCfg?.websiteGoal,
+          onProgress: (message) => ctx.progress.emit(message),
+        });
 
-      // AI Website Optimizer Engine — audit + score; apply fixes on Improve with AI.
-      const applyFixes = shouldApplyOptimizerFixes({
-        optimizeWithAi: input.optimizeWithAi,
-        continueInstruction: input.continueInstruction,
-        mode: input.mode,
-      });
+        seoPerformanceReport = runSeoPerformanceEngine({
+          files: base.files,
+          strategy: artifacts.strategy,
+          profile: artifacts.businessProfile ?? analysis?.businessProfile,
+          industryId,
+          seoPackage: base.seoPackage ?? artifacts.seoPackage,
+          performanceReport:
+            base.performanceReport ?? artifacts.performanceReport,
+          assetManifest: base.assetManifest ?? artifacts.assetManifest,
+          premiumSeoTopics:
+            premiumCfg?.contentStrategy?.seoTopics ??
+            premiumCfg?.seoTopics ??
+            artifacts.strategy?.contentStrategy?.seoTopics,
+          premiumKeywords: premiumCfg?.keywords,
+          conversionScore: conversionReport.score,
+          onProgress: (message) => ctx.progress.emit(message),
+        });
+
+        designCriticReport = runDesignCritic({
+          files: base.files,
+          onProgress: (message) => ctx.progress.emit(message),
+        });
+      } else {
+        ctx.progress.emit(
+          "[ultra] Skipping post-generation analysis and optimizer passes",
+        );
+      }
+
+      const applyFixes =
+        !isMinimal &&
+        shouldApplyOptimizerFixes({
+          optimizeWithAi: input.optimizeWithAi,
+          continueInstruction: input.continueInstruction,
+          mode: input.mode,
+        });
       const websiteGenerationId =
         input.parentGenerationId &&
         /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
@@ -1228,86 +1307,100 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
           ? input.parentGenerationId
           : undefined;
 
-      try {
-        const optimized = await runWebsiteOptimizer({
-          files: base.files,
-          strategy: artifacts.strategy,
-          designSystem: artifacts.designSystem,
-          profile: artifacts.businessProfile ?? analysis?.businessProfile,
-          qualityReport: artifacts.qualityReport,
-          seoPackage: artifacts.seoPackage,
-          performanceReport: artifacts.performanceReport,
-          applyFixes,
-          seedImproveThemes: [
-            ...conversionReport.improveThemes,
-            ...seoPerformanceReport.improveThemes,
-            ...designCriticReport.improveThemes,
-          ],
-          userInstruction: input.continueInstruction,
-          userId: input.userId,
-          websiteGenerationId,
-          parentGenerationId: websiteGenerationId,
-          persist: Boolean(input.userId),
-          onProgress: (message) => ctx.progress.emit(message),
-        });
-
-        let mergedReport = mergeConversionIntoOptimizerReport(
-          optimized.report,
-          conversionReport,
-        );
-        mergedReport = mergeSeoPerformanceIntoOptimizerReport(
-          mergedReport,
-          seoPerformanceReport,
-        );
-        mergedReport = mergeDesignCriticIntoOptimizerReport(
-          mergedReport,
-          designCriticReport,
-        );
-
-        base = {
-          ...base,
-          files: optimized.files,
-          optimizationReport: mergedReport,
-          conversionReport,
-          seoPerformanceReport,
-          designCriticReport,
-          qualityReport: {
-            passed: base.qualityReport?.passed ?? mergedReport.publishReady,
-            dimensions: base.qualityReport?.dimensions ?? [],
-            weakSections: Array.from(
-              new Set([
-                ...(base.qualityReport?.weakSections ?? []),
-                ...designCriticReport.weakSections,
-              ]),
-            ),
-            issues: base.qualityReport?.issues ?? [],
-            score: mergedReport.scores.overall,
-            publishReady: mergedReport.publishReady,
-            seoReadinessScore: seoPerformanceReport.scores.seo,
-            performanceScore: seoPerformanceReport.scores.performance,
-            improveApplied:
-              Boolean(base.qualityReport?.improveApplied) ||
-              optimized.filesChanged,
-            improveNotes: [
-              ...(base.qualityReport?.improveNotes ?? []),
-              conversionReport.summary,
-              seoPerformanceReport.summary,
-              designCriticReport.summary,
-              ...(mergedReport.appliedFixes.length
-                ? mergedReport.appliedFixes
-                : [mergedReport.summary]),
+      if (!isMinimal) {
+        try {
+          const optimized = await runWebsiteOptimizer({
+            files: base.files,
+            strategy: artifacts.strategy,
+            designSystem: artifacts.designSystem,
+            profile: artifacts.businessProfile ?? analysis?.businessProfile,
+            qualityReport: artifacts.qualityReport,
+            seoPackage: artifacts.seoPackage,
+            performanceReport: artifacts.performanceReport,
+            applyFixes,
+            seedImproveThemes: [
+              ...(conversionReport?.improveThemes ?? []),
+              ...(seoPerformanceReport?.improveThemes ?? []),
+              ...(designCriticReport?.improveThemes ?? []),
             ],
-          } as QualityReport,
-        };
-      } catch (error) {
-        console.error("Website Optimizer finalize failed", error);
-        ctx.progress.emit("Optimizer skipped — delivering current build.");
-        base = {
-          ...base,
-          conversionReport,
-          seoPerformanceReport,
-          designCriticReport,
-        };
+            userInstruction: input.continueInstruction,
+            userId: input.userId,
+            websiteGenerationId,
+            parentGenerationId: websiteGenerationId,
+            persist: Boolean(input.userId),
+            onProgress: (message) => ctx.progress.emit(message),
+          });
+
+          let mergedReport = mergeConversionIntoOptimizerReport(
+            optimized.report,
+            conversionReport!,
+          );
+          mergedReport = mergeSeoPerformanceIntoOptimizerReport(
+            mergedReport,
+            seoPerformanceReport!,
+          );
+          mergedReport = mergeDesignCriticIntoOptimizerReport(
+            mergedReport,
+            designCriticReport!,
+          );
+
+          base = {
+            ...base,
+            files: optimized.files,
+            optimizationReport: mergedReport,
+            conversionReport,
+            seoPerformanceReport,
+            designCriticReport,
+            qualityReport: {
+              passed: base.qualityReport?.passed ?? mergedReport.publishReady,
+              dimensions: base.qualityReport?.dimensions ?? [],
+              weakSections: Array.from(
+                new Set([
+                  ...(base.qualityReport?.weakSections ?? []),
+                  ...(designCriticReport?.weakSections ?? []),
+                ]),
+              ),
+              issues: base.qualityReport?.issues ?? [],
+              score: mergedReport.scores.overall,
+              publishReady: mergedReport.publishReady,
+              seoReadinessScore: seoPerformanceReport!.scores.seo,
+              performanceScore: seoPerformanceReport!.scores.performance,
+              improveApplied:
+                Boolean(base.qualityReport?.improveApplied) ||
+                optimized.filesChanged,
+              improveNotes: [
+                ...(base.qualityReport?.improveNotes ?? []),
+                conversionReport!.summary,
+                seoPerformanceReport!.summary,
+                designCriticReport!.summary,
+                ...(mergedReport.appliedFixes.length
+                  ? mergedReport.appliedFixes
+                  : [mergedReport.summary]),
+              ],
+            } as QualityReport,
+          };
+        } catch (error) {
+          console.error("Website Optimizer finalize failed", error);
+          ctx.progress.emit("Optimizer skipped — delivering current build.");
+          base = {
+            ...base,
+            conversionReport,
+            seoPerformanceReport,
+            designCriticReport,
+          };
+        }
+      } else {
+        ctx.progress.emit(
+          `[${isUltra ? "ultra" : "fast"}] Skipping optimizer passes`,
+        );
+        if (conversionReport && seoPerformanceReport && designCriticReport) {
+          base = {
+            ...base,
+            conversionReport,
+            seoPerformanceReport,
+            designCriticReport,
+          };
+        }
       }
 
       // Website Editor Intelligence — improvement suggestions after generation.

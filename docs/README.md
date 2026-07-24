@@ -21,6 +21,9 @@ Living documentation for the **existing** Trend Business AI project.
 | [PRODUCTION_CLEANUP_REPORT.md](./PRODUCTION_CLEANUP_REPORT.md) | Latest production cleanup results |
 | [WEBSITE_BUILDER_PHASE1_REPORT.md](./WEBSITE_BUILDER_PHASE1_REPORT.md) | Website Builder Phase 1 product gaps completed / remaining |
 | [WEBSITE_PUBLISH_ARCHITECTURE.md](./WEBSITE_PUBLISH_ARCHITECTURE.md) | Safe live preview + hosted `/w/[slug]` publish architecture |
+| [VIDEO_STUDIO_LOCAL_SETUP.md](./VIDEO_STUDIO_LOCAL_SETUP.md) | Video Studio FFmpeg setup for Windows local rendering |
+| [VIDEO_STUDIO_PROVIDER_SETUP.md](./VIDEO_STUDIO_PROVIDER_SETUP.md) | Kling / HeyGen provider keys and mode-based routing |
+| [VIDEO_STUDIO_PRODUCTION_READY.md](./VIDEO_STUDIO_PRODUCTION_READY.md) | Production checklist and minimal env setup |
 
 **How to use**
 

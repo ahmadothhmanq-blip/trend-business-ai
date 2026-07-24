@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { LogoDesignerTool } from "@/components/dashboard/logo-designer/logo-designer-tool";
 import type { LogoGeneration } from "@/types/logo";
 
@@ -38,9 +38,7 @@ export default async function LogoMakerPage() {
 
   return (
     <>
-      <DashboardHeader
-        title="AI Logo Designer"
-        description="Create professional logo marks and brand symbols with AI"
+      <LocalizedDashboardHeader pageId="logoMaker"
         userEmail={user.email}
         userName={(profile?.full_name as string | undefined) ?? (userMeta.full_name as string | undefined)}
         avatarUrl={profile?.avatar_url as string | undefined}

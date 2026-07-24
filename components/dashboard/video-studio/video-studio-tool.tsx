@@ -42,7 +42,10 @@ import {
   type ProjectHistoryItem,
 } from "@/components/dashboard/builder-shared";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/client";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import { getOnePromptProduct } from "@/lib/constants/one-prompt-products";
+import { VideoStudioProviderStatus } from "@/components/dashboard/video-studio/video-studio-provider-status";
 import { useIdeaQueryParam } from "@/lib/hooks/use-idea-query-param";
 import {
   VIDEO_TYPES,
@@ -86,6 +89,8 @@ function VideoPreview({
   onRegenerate?: () => void;
   onContinue?: () => void;
 }) {
+  const { t } = useTranslation();
+  const p = useProductT("videoStudio");
   const bp = gen.blueprint;
   const [tab, setTab] = useState<PreviewTab>("storyboard");
 
@@ -93,19 +98,19 @@ function VideoPreview({
     return (
       <DashboardPanel className="py-16 text-center">
         <Film className="mx-auto size-10 text-white/20" />
-        <p className="mt-4 text-white/50">No video project to preview</p>
-        <Button variant="outline" className="mt-4 rounded-xl border-white/10 text-white/60" onClick={onBack}>Back</Button>
+        <p className="mt-4 text-white/50">{p("preview.noProject")}</p>
+        <Button variant="outline" className="mt-4 rounded-xl border-white/10 text-white/60" onClick={onBack}>{t("common.back")}</Button>
       </DashboardPanel>
     );
   }
 
   const tabs: { key: PreviewTab; label: string; show: boolean }[] = [
-    { key: "storyboard", label: `Storyboard (${bp.scenes.length})`, show: bp.scenes.length > 0 },
-    { key: "script", label: "Script", show: !!bp.script || !!bp.voiceoverScript },
-    { key: "audio", label: "Audio", show: bp.musicSuggestions.length > 0 },
-    { key: "subtitles", label: "Subtitles", show: bp.subtitles.length > 0 },
-    { key: "thumbnail", label: "Thumbnail", show: !!bp.thumbnailSvg },
-    { key: "files", label: `Files (${bp.files.length})`, show: bp.files.length > 0 },
+    { key: "storyboard", label: p("preview.storyboard", { count: bp.scenes.length }), show: bp.scenes.length > 0 },
+    { key: "script", label: p("preview.script"), show: !!bp.script || !!bp.voiceoverScript },
+    { key: "audio", label: p("preview.audio"), show: bp.musicSuggestions.length > 0 },
+    { key: "subtitles", label: p("preview.subtitles"), show: bp.subtitles.length > 0 },
+    { key: "thumbnail", label: p("preview.thumbnail"), show: !!bp.thumbnailSvg },
+    { key: "files", label: p("preview.files", { count: bp.files.length }), show: bp.files.length > 0 },
   ];
 
   return (
@@ -114,20 +119,20 @@ function VideoPreview({
         <Button variant="ghost" size="icon-xs" onClick={onBack} className="text-white/40 hover:text-white"><ArrowLeft className="size-4" /></Button>
         <div>
           <h3 className="font-bold text-white">{bp.title}</h3>
-          <p className="text-xs text-white/40">{bp.style} &middot; {bp.aspectRatio} &middot; {bp.totalDuration} &middot; {bp.scenes.length} scenes &middot; {gen.provider ?? "deepseek"}</p>
+          <p className="text-xs text-white/40">{bp.style} &middot; {bp.aspectRatio} &middot; {bp.totalDuration} &middot; {bp.scenes.length} {p("preview.scenes")} &middot; {gen.provider ?? "deepseek"}</p>
         </div>
         <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
           <Button asChild className="btn-gold gap-1.5 rounded-lg font-bold text-luxury-black text-xs">
-            <a href={`/dashboard/video-studio/${gen.id}`}>Open Production Studio</a>
+            <a href={`/dashboard/video-studio/${gen.id}`}>{p("preview.openProductionStudio")}</a>
           </Button>
           {onRegenerate ? (
             <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:border-white/20" onClick={onRegenerate}>
-              <RefreshCw className="size-3" /> Regenerate
+              <RefreshCw className="size-3" /> {p("actions.regenerate")}
             </Button>
           ) : null}
           {onContinue ? (
             <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-premium-gold/20 text-xs text-premium-gold-light hover:border-premium-gold/40" onClick={onContinue}>
-              <Wand2 className="size-3" /> Improve with AI
+              <Wand2 className="size-3" /> {p("actions.improveWithAi")}
             </Button>
           ) : null}
           <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:border-premium-gold/25 hover:text-premium-gold-light"
@@ -138,9 +143,9 @@ function VideoPreview({
               const url = URL.createObjectURL(blob);
               const a = document.createElement("a"); a.href = url;
               a.download = `${bp.title.replace(/\s+/g, "-").toLowerCase()}-video.zip`; a.click();
-              URL.revokeObjectURL(url); toast.success("Video project downloaded");
+              URL.revokeObjectURL(url); toast.success(p("preview.projectDownloaded"));
             }}>
-            <Download className="size-3" /> Download Project
+            <Download className="size-3" /> {p("preview.downloadProject")}
           </Button>
         </div>
       </div>
@@ -157,26 +162,26 @@ function VideoPreview({
             <DashboardPanel key={scene.id} className="space-y-3 p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-semibold text-white/80">Scene {i + 1}: {scene.name}</p>
+                  <p className="text-sm font-semibold text-white/80">{p("preview.sceneLabel", { index: i + 1, name: scene.name })}</p>
                   <p className="text-[10px] text-white/40">{scene.duration} &middot; {scene.cameraMove} &middot; {scene.mood} &middot; → {scene.transition}</p>
                 </div>
                 {scene.visualPrompt && (
-                  <Button variant="ghost" size="icon-xs" className="text-white/30 hover:text-white" onClick={() => { navigator.clipboard.writeText(scene.visualPrompt); toast.success("Prompt copied"); }}>
+                  <Button variant="ghost" size="icon-xs" className="text-white/30 hover:text-white" onClick={() => { navigator.clipboard.writeText(scene.visualPrompt); toast.success(p("preview.promptCopied")); }}>
                     <Copy className="size-3" />
                   </Button>
                 )}
               </div>
-              <SvgPreview svg={scene.svgStoryboard} label={`Scene ${i + 1}`} />
+              <SvgPreview svg={scene.svgStoryboard} label={p("preview.scenePreview", { index: i + 1 })} />
               <p className="text-xs text-white/50">{scene.description}</p>
               {scene.narration && (
                 <div className="rounded-lg bg-white/[0.02] p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-white/30">Narration</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-white/30">{p("preview.narration")}</p>
                   <p className="mt-1 text-xs italic text-white/60">&ldquo;{scene.narration}&rdquo;</p>
                 </div>
               )}
               {scene.visualPrompt && (
                 <div className="rounded-lg bg-white/[0.02] p-2">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-white/30">Video AI Prompt</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-white/30">{p("preview.videoAiPrompt")}</p>
                   <p className="mt-1 text-[11px] text-white/50">{scene.visualPrompt}</p>
                 </div>
               )}
@@ -195,13 +200,13 @@ function VideoPreview({
         <div className="space-y-4">
           {bp.script && (
             <DashboardPanel className="space-y-2 p-5">
-              <div className="flex items-center gap-2 text-premium-gold-light"><FileText className="size-4" /><span className="text-xs font-bold uppercase tracking-wider">Full Script</span></div>
+              <div className="flex items-center gap-2 text-premium-gold-light"><FileText className="size-4" /><span className="text-xs font-bold uppercase tracking-wider">{p("preview.fullScript")}</span></div>
               <pre className="max-h-[500px] overflow-auto whitespace-pre-wrap text-xs leading-relaxed text-white/70">{bp.script}</pre>
             </DashboardPanel>
           )}
           {bp.voiceoverScript && (
             <DashboardPanel className="space-y-2 p-5">
-              <div className="flex items-center gap-2 text-premium-gold-light"><Subtitles className="size-4" /><span className="text-xs font-bold uppercase tracking-wider">Voice-over Script</span></div>
+              <div className="flex items-center gap-2 text-premium-gold-light"><Subtitles className="size-4" /><span className="text-xs font-bold uppercase tracking-wider">{p("preview.voiceoverScript")}</span></div>
               <pre className="max-h-[400px] overflow-auto whitespace-pre-wrap text-xs leading-relaxed text-white/70">{bp.voiceoverScript}</pre>
             </DashboardPanel>
           )}
@@ -234,7 +239,7 @@ function VideoPreview({
       )}
 
       {tab === "thumbnail" && (
-        <SvgPreview svg={bp.thumbnailSvg} label="Thumbnail" />
+        <SvgPreview svg={bp.thumbnailSvg} label={p("preview.thumbnailLabel")} />
       )}
 
       {tab === "files" && (
@@ -245,7 +250,7 @@ function VideoPreview({
                 <p className="truncate text-xs font-semibold text-white/80">{f.path}</p>
                 <p className="text-[10px] text-white/40">{f.language} &middot; {f.content.length} chars</p>
               </div>
-              <Button variant="ghost" size="icon-xs" className="text-white/30 hover:text-white" onClick={() => { navigator.clipboard.writeText(f.content); toast.success("Copied"); }}>
+              <Button variant="ghost" size="icon-xs" className="text-white/30 hover:text-white" onClick={() => { navigator.clipboard.writeText(f.content); toast.success(p("preview.copied")); }}>
                 <Copy className="size-3" />
               </Button>
             </DashboardPanel>
@@ -272,6 +277,8 @@ function toHistoryItem(gen: VideoGeneration): ProjectHistoryItem {
 }
 
 export function VideoStudioTool({ initialGenerations }: Props) {
+  const { t } = useTranslation();
+  const p = useProductT("videoStudio");
   const onePrompt = getOnePromptProduct("video-studio");
   const [step, setStep] = useState<"type" | "config" | "history" | "generating" | "preview">("type");
   const [selectedType, setSelectedType] = useState("");
@@ -361,7 +368,7 @@ export function VideoStudioTool({ initialGenerations }: Props) {
   const handleBatch = async (planOnly: boolean, continueFrom?: number) => {
     const idea = prompt.trim();
     if (idea.length < 5) {
-      toast.error("Enter a batch brief (e.g. Create 20 motivational videos).");
+      toast.error(p("errors.enterBatchBrief"));
       return;
     }
     const offset = continueFrom ?? (planOnly ? 0 : batchOffset);
@@ -387,7 +394,7 @@ export function VideoStudioTool({ initialGenerations }: Props) {
       });
       const d = await res.json();
       if (!res.ok) {
-        toast.error(d.error ?? "Batch failed");
+        toast.error(d.error ?? p("errors.batchFailed"));
         return;
       }
       if (d.progress) setBatchProgress(d.progress);
@@ -398,13 +405,13 @@ export function VideoStudioTool({ initialGenerations }: Props) {
         setBatchNextOffset(null);
         setBatchOffset(0);
       }
-      toast.success(d.message ?? "Batch updated");
+      toast.success(d.message ?? p("toasts.batchUpdated"));
       if (!planOnly && (d.generated?.length || 0) > 0) {
         setStep("history");
         void fetchGenerations();
       }
     } catch {
-      toast.error("Batch request failed");
+      toast.error(p("errors.batchRequestFailed"));
     } finally {
       setBatchBusy(false);
     }
@@ -418,7 +425,7 @@ export function VideoStudioTool({ initialGenerations }: Props) {
     setStyle(t.visualStyle.split("·")[0]?.trim() || style);
     setStudioMode("single");
     setStep("config");
-    toast.success("Template applied — refine and generate.");
+    toast.success(p("toasts.templateApplied"));
   };
 
   const handleSelectType = (id: string) => {
@@ -445,8 +452,8 @@ export function VideoStudioTool({ initialGenerations }: Props) {
     if (!videoType || !idea) {
       toast.error(
         mode === "continue"
-          ? "Describe the changes you want in natural language."
-          : "Enter your idea to generate a video concept.",
+          ? p("errors.describeChanges")
+          : p("errors.enterIdeaVideo"),
       );
       return;
     }
@@ -467,11 +474,11 @@ export function VideoStudioTool({ initialGenerations }: Props) {
         }),
       });
       const d = await res.json();
-      if (!res.ok) { toast.error(d.error ?? "Generation failed"); setStep("config"); return; }
-      toast.success(d.message ?? "Video project created!");
+      if (!res.ok) { toast.error(d.error ?? p("errors.generationFailed")); setStep("config"); return; }
+      toast.success(d.message ?? p("toasts.videoCreated"));
       setParentId(null);
       if (d.generation) { setPreviewGen(d.generation); setStep("preview"); } else { setStep("history"); }
-    } catch { toast.error("Request failed."); setStep("config"); }
+    } catch { toast.error(p("errors.requestFailed")); setStep("config"); }
   };
 
   const handleOnePrompt = (idea: string) => {
@@ -499,7 +506,7 @@ export function VideoStudioTool({ initialGenerations }: Props) {
     setPrompt("");
     setPreviewGen(null);
     setStep("config");
-    toast.message("Describe your changes in natural language, then click Improve with AI.");
+    toast.message(p("errors.editThenImprove"));
   };
 
   const handleFavorite = async (gen: VideoGeneration) => {
@@ -511,7 +518,7 @@ export function VideoStudioTool({ initialGenerations }: Props) {
   const handleDelete = async (id: string) => {
     setGenerations((p) => p.filter((g) => g.id !== id));
     await fetch(`/api/video-studio/${id}`, { method: "DELETE" });
-    toast.success("Deleted");
+    toast.success(p("toasts.deleted"));
   };
 
   if (step === "preview" && previewGen) {
@@ -526,7 +533,7 @@ export function VideoStudioTool({ initialGenerations }: Props) {
   }
 
   if (step === "generating") {
-    return <GenerationProgress title="Creating your video project..." subtitle="AI is building storyboard, script, scenes, and audio direction" events={progressEvents} />;
+    return <GenerationProgress title={p("generating.title")} subtitle={p("generating.subtitle")} events={progressEvents} />;
   }
 
   const optionsByCategory = VIDEO_OPTION_LIST.reduce<Record<string, typeof VIDEO_OPTION_LIST>>((acc, o) => {
@@ -537,16 +544,17 @@ export function VideoStudioTool({ initialGenerations }: Props) {
 
   return (
     <div className="space-y-6">
+      <VideoStudioProviderStatus compact />
       <div className="flex flex-wrap gap-2">
-        {([{ key: "type" as const, label: "New Video" }, { key: "history" as const, label: "My Videos" }]).map(({ key, label }) => (
+        {([{ key: "type" as const, label: p("nav.newVideo") }, { key: "history" as const, label: p("nav.myVideos") }]).map(({ key, label }) => (
           <button key={key} onClick={() => setStep(key)} className={cn("rounded-xl px-4 py-2 text-sm font-medium transition-all", step === key || (step === "config" && key === "type") ? "bg-premium-gold/15 text-premium-gold-light" : "text-white/50 hover:bg-white/5 hover:text-white/70")}>{label}</button>
         ))}
         {(step === "type" || step === "config") &&
           (
             [
-              { key: "single" as const, label: "Single" },
-              { key: "batch" as const, label: "Batch" },
-              { key: "marketplace" as const, label: "Templates" },
+              { key: "single" as const, label: p("nav.single") },
+              { key: "batch" as const, label: p("nav.batch") },
+              { key: "marketplace" as const, label: p("nav.templates") },
             ] as const
           ).map(({ key, label }) => (
             <button
@@ -568,22 +576,22 @@ export function VideoStudioTool({ initialGenerations }: Props) {
       {studioMode === "batch" && (step === "type" || step === "config") && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Advanced batch production</DashboardCardTitle>
+            <DashboardCardTitle>{p("steps.advancedBatch")}</DashboardCardTitle>
             <DashboardCardDescription>
-              Plan up to 100 videos · generate up to 50 per request (chunk with offset) · rotate presenters, voices, scenes
+              {p("steps.batchDescription")}
             </DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent className="space-y-4">
             <Textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              placeholder='Example: Create 20 motivational videos about discipline and morning routines'
+              placeholder={p("placeholders.batchExample")}
               rows={3}
               className={cn(dashboardInputClass, "min-h-[80px] resize-none")}
             />
             <div className="flex flex-wrap items-end gap-3">
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-white/60">Count</label>
+                <label className="mb-1.5 block text-xs font-medium text-white/60">{t("products.common.count")}</label>
                 <select
                   value={batchCount}
                   onChange={(e) => setBatchCount(Number(e.target.value))}
@@ -591,7 +599,7 @@ export function VideoStudioTool({ initialGenerations }: Props) {
                 >
                   {[10, 20, 30, 50, 100].map((n) => (
                     <option key={n} value={n}>
-                      {n} videos
+                      {p("steps.videosCount", { count: n })}
                     </option>
                   ))}
                 </select>
@@ -602,14 +610,14 @@ export function VideoStudioTool({ initialGenerations }: Props) {
                 disabled={batchBusy}
                 onClick={() => void handleBatch(true)}
               >
-                Plan only
+                {p("steps.planOnly")}
               </Button>
               <Button
                 className="btn-gold rounded-xl font-bold text-luxury-black"
                 disabled={batchBusy}
                 onClick={() => void handleBatch(false, 0)}
               >
-                {batchBusy ? "Generating…" : "Generate batch"}
+                {batchBusy ? p("status.generating") : p("steps.generateBatch")}
               </Button>
               {batchNextOffset != null && (
                 <Button
@@ -618,7 +626,7 @@ export function VideoStudioTool({ initialGenerations }: Props) {
                   disabled={batchBusy}
                   onClick={() => void handleBatch(false, batchNextOffset)}
                 >
-                  Continue from #{batchNextOffset + 1}
+                  {p("steps.continueFrom", { index: batchNextOffset + 1 })}
                 </Button>
               )}
             </div>
@@ -626,11 +634,10 @@ export function VideoStudioTool({ initialGenerations }: Props) {
               <div className="space-y-2 rounded-xl bg-white/5 p-3 text-sm text-white/70">
                 <div className="flex justify-between text-xs text-white/50">
                   <span>
-                    {batchProgress.completed}/{batchProgress.total} done · {batchProgress.failed} failed
+                    {p("steps.batchProgress", { completed: batchProgress.completed, total: batchProgress.total, failed: batchProgress.failed })}
                   </span>
                   <span>
-                    Credits {batchProgress.spentCredits}/{batchProgress.estimatedCredits} ·{" "}
-                    {batchProgress.percent}%
+                    {p("steps.batchCredits", { spent: batchProgress.spentCredits, estimated: batchProgress.estimatedCredits, percent: batchProgress.percent })}
                   </span>
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-white/10">
@@ -656,11 +663,11 @@ export function VideoStudioTool({ initialGenerations }: Props) {
       {studioMode === "marketplace" && (step === "type" || step === "config") && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Template marketplace</DashboardCardTitle>
+            <DashboardCardTitle>{p("steps.templateMarketplace")}</DashboardCardTitle>
             <DashboardCardDescription>
               {marketStats?.total
-                ? `${marketStats.total.toLocaleString()} scalable templates across industries`
-                : "Browse industry packs, presenters, locations, and visual styles"}
+                ? p("steps.scalableTemplates", { count: marketStats.total.toLocaleString() })
+                : p("steps.browseTemplatesHint")}
             </DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent className="space-y-4">
@@ -668,7 +675,7 @@ export function VideoStudioTool({ initialGenerations }: Props) {
               <Input
                 value={marketQ}
                 onChange={(e) => setMarketQ(e.target.value)}
-                placeholder="Search templates…"
+                placeholder={p("placeholders.searchTemplates")}
                 className={cn(dashboardInputClass, "max-w-xs")}
               />
               <select
@@ -676,7 +683,7 @@ export function VideoStudioTool({ initialGenerations }: Props) {
                 onChange={(e) => setMarketIndustry(e.target.value)}
                 className={dashboardSelectClass}
               >
-                <option value="">All industries</option>
+                <option value="">{p("labels.allIndustries")}</option>
                 {industries.map((i) => (
                   <option key={i.id} value={i.id}>
                     {i.label}
@@ -688,10 +695,10 @@ export function VideoStudioTool({ initialGenerations }: Props) {
                 className="rounded-xl border-white/10"
                 onClick={() => void loadMarketplace()}
               >
-                <Search className="mr-2 size-4" /> Search
+                <Search className="mr-2 size-4" /> {t("common.search")}
               </Button>
             </div>
-            <p className="text-xs text-white/40">{marketTotal} matches</p>
+            <p className="text-xs text-white/40">{t("products.common.matches", { count: marketTotal })}</p>
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
               {marketTemplates.map((t) => (
                 <button
@@ -725,9 +732,9 @@ export function VideoStudioTool({ initialGenerations }: Props) {
       {step === "type" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Or choose a video type</DashboardCardTitle>
+            <DashboardCardTitle>{p("steps.chooseVideoType")}</DashboardCardTitle>
             <DashboardCardDescription>
-              Optional — One Prompt uses a smart default if you skip this
+              {t("products.common.optionalOnePrompt")}
             </DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent>
@@ -736,7 +743,7 @@ export function VideoStudioTool({ initialGenerations }: Props) {
             </div>
             {selectedType && (
               <div className="mt-6 flex justify-end">
-                <Button onClick={() => setStep("config")} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">Configure Video <ArrowRight className="size-4" /></Button>
+                <Button onClick={() => setStep("config")} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">{p("steps.configureVideo")} <ArrowRight className="size-4" /></Button>
               </div>
             )}
           </DashboardCardContent>
@@ -749,7 +756,7 @@ export function VideoStudioTool({ initialGenerations }: Props) {
             <div className="flex items-center gap-3">
               {(() => { const def = getVideoType(selectedType); const Icon = def?.icon ?? Sparkles; return (<>
                 <div className="flex size-10 items-center justify-center rounded-xl bg-premium-gold/15 text-premium-gold-light"><Icon className="size-5" /></div>
-                <div><DashboardCardTitle>{def?.label ?? "Custom"} Video</DashboardCardTitle><DashboardCardDescription>Describe your video and configure production settings</DashboardCardDescription></div>
+                <div><DashboardCardTitle>{p("steps.customVideo", { type: def?.label ?? t("products.common.custom") })}</DashboardCardTitle><DashboardCardDescription>{p("steps.configureDescription")}</DashboardCardDescription></div>
               </>); })()}
             </div>
           </DashboardCardHeader>
@@ -757,16 +764,12 @@ export function VideoStudioTool({ initialGenerations }: Props) {
             <div className="space-y-5">
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-white/60">
-                  {parentId ? "Describe changes (natural language)" : "Video description *"}
+                  {parentId ? p("steps.describeChanges") : p("steps.videoDescription")}
                 </label>
                 <Textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder={
-                    parentId
-                      ? "Example: Shorten the intro, make scene 2 more energetic, and add a stronger call-to-action..."
-                      : "Describe your video — concept, story, key scenes, messaging, visual direction..."
-                  }
+                  placeholder={parentId ? p("placeholders.editExample") : p("placeholders.videoBrief")}
                   rows={4}
                   className={cn(dashboardInputClass, "min-h-[100px] resize-none")}
                 />
@@ -774,25 +777,25 @@ export function VideoStudioTool({ initialGenerations }: Props) {
 
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-white/60">Style</label>
+                  <label className="mb-1.5 block text-xs font-medium text-white/60">{p("labels.style")}</label>
                   <select value={style} onChange={(e) => setStyle(e.target.value)} className={dashboardSelectClass}>
                     {VIDEO_STYLES.map((s) => <option key={s} value={s}>{s}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-white/60">Aspect Ratio</label>
+                  <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.aspectRatio")}</label>
                   <select value={aspectRatio} onChange={(e) => setAspectRatio(e.target.value)} className={dashboardSelectClass}>
                     {VIDEO_ASPECT_RATIOS.map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-white/60">Duration</label>
+                  <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.duration")}</label>
                   <select value={duration} onChange={(e) => setDuration(e.target.value)} className={dashboardSelectClass}>
                     {VIDEO_DURATIONS.map((d) => <option key={d.id} value={d.id}>{d.label}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-white/60">Mood</label>
+                  <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.mood")}</label>
                   <select value={mood} onChange={(e) => setMood(e.target.value)} className={dashboardSelectClass}>
                     {VIDEO_MOODS.map((m) => <option key={m} value={m}>{m}</option>)}
                   </select>
@@ -801,24 +804,24 @@ export function VideoStudioTool({ initialGenerations }: Props) {
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-white/60">Camera Movement</label>
+                  <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.cameraMove")}</label>
                   <select value={cameraMove} onChange={(e) => setCameraMove(e.target.value)} className={dashboardSelectClass}>
                     {VIDEO_CAMERA_MOVES.map((c) => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-white/60">Number of scenes</label>
+                  <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.numberOfScenes")}</label>
                   <div className="flex items-center gap-3">
                     <Button variant="outline" size="icon-xs" className="border-white/10 text-white/40" onClick={() => setSceneCount((c) => Math.max(1, c - 1))} disabled={sceneCount <= 1}><Minus className="size-3" /></Button>
                     <span className="min-w-[2ch] text-center text-sm font-bold text-white">{sceneCount}</span>
                     <Button variant="outline" size="icon-xs" className="border-white/10 text-white/40" onClick={() => setSceneCount((c) => Math.min(8, c + 1))} disabled={sceneCount >= 8}><Plus className="size-3" /></Button>
-                    <span className="text-xs text-white/30">Max 8</span>
+                    <span className="text-xs text-white/30">{t("products.common.maxScenes")}</span>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-3">
-                <label className="block text-xs font-medium text-white/60">Production Options</label>
+                <label className="block text-xs font-medium text-white/60">{p("steps.productionOptions")}</label>
                 {Object.entries(optionsByCategory).map(([cat, items]) => (
                   <div key={cat}>
                     <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-white/30">{cat}</p>
@@ -840,7 +843,7 @@ export function VideoStudioTool({ initialGenerations }: Props) {
                     setStep("type");
                   }}
                 >
-                  Back
+                  {t("common.back")}
                 </Button>
                 {parentId ? (
                   <Button
@@ -848,11 +851,11 @@ export function VideoStudioTool({ initialGenerations }: Props) {
                     disabled={!prompt.trim()}
                     className="btn-gold gap-2 rounded-xl font-bold text-luxury-black"
                   >
-                    <Sparkles className="size-4" /> Improve with AI
+                    <Sparkles className="size-4" /> {p("actions.improveWithAi")}
                   </Button>
                 ) : (
                   <Button onClick={() => void handleGenerate()} disabled={!prompt.trim()} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">
-                    <Sparkles className="size-4" /> Generate Video Project
+                    <Sparkles className="size-4" /> {p("steps.generateVideoProject")}
                   </Button>
                 )}
               </div>
@@ -864,11 +867,13 @@ export function VideoStudioTool({ initialGenerations }: Props) {
       {step === "history" && (
         <>
           <div className="flex items-center gap-3">
-            <div className="relative flex-1"><Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-white/30" /><Input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Search videos..." className={cn(dashboardInputClass, "pl-10")} /></div>
-            <span className="text-xs text-white/40">{total} video{total !== 1 ? "s" : ""}</span>
+            <div className="relative flex-1"><Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-white/30" /><Input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder={p("placeholders.searchVideos")} className={cn(dashboardInputClass, "pl-10")} /></div>
+            <span className="text-xs text-white/40">
+              {total === 1 ? p("history.count", { count: total }) : p("history.countPlural", { count: total })}
+            </span>
           </div>
           {generations.length === 0 ? (
-            <EmptyHistory noun="video projects" onNew={() => setStep("type")} />
+            <EmptyHistory noun={p("history.emptyNoun")} item={p("history.emptyItem")} onNew={() => setStep("type")} />
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {generations.map((gen) => {

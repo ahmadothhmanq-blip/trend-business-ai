@@ -13,10 +13,14 @@ import {
 } from "@/components/dashboard/ui/dashboard-card";
 import { dashboardInputClass, dashboardSelectClass } from "@/components/dashboard/ui/dashboard-styles";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/client";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import { WORKFLOW_TRIGGERS, WORKFLOW_STEP_TYPES, AGENT_TOOLS } from "@/lib/constants/ai-agents";
 import type { AgentWorkflow, WorkflowStep } from "@/types/agents";
 
 export function WorkflowBuilder() {
+  const { t } = useTranslation();
+  const p = useProductT("aiAgents");
   const [workflows, setWorkflows] = useState<AgentWorkflow[]>([]);
   const [showCreate, setShowCreate] = useState(false);
   const [name, setName] = useState("");
@@ -53,8 +57,8 @@ export function WorkflowBuilder() {
   };
 
   const handleSave = async () => {
-    if (!name.trim()) { toast.error("Workflow name is required"); return; }
-    if (steps.length === 0) { toast.error("Add at least one step"); return; }
+    if (!name.trim()) { toast.error(p("errors.workflowNameRequired")); return; }
+    if (steps.length === 0) { toast.error(p("errors.addStepRequired")); return; }
 
     const res = await fetch("/api/ai-agents/workflows", {
       method: "POST",
@@ -62,8 +66,8 @@ export function WorkflowBuilder() {
       body: JSON.stringify({ name, description, triggerType, steps }),
     });
     const d = await res.json();
-    if (!res.ok) { toast.error(d.error ?? "Failed"); return; }
-    toast.success("Workflow created");
+    if (!res.ok) { toast.error(d.error ?? p("errors.workflowFailed")); return; }
+    toast.success(p("toasts.workflowCreated"));
     setName(""); setDescription(""); setSteps([]); setShowCreate(false);
     fetchWorkflows();
   };
@@ -72,19 +76,19 @@ export function WorkflowBuilder() {
     return (
       <div className="space-y-6">
         <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-white/40" onClick={() => setShowCreate(false)}>
-          <ChevronLeft className="size-3" /> Back
+          <ChevronLeft className="size-3" /> {t("common.back")}
         </Button>
 
         <DashboardCard>
           <DashboardCardHeader>
-            <div className="flex items-center gap-2"><GitBranch className="size-5 text-premium-gold-light" /><DashboardCardTitle>Create Workflow</DashboardCardTitle></div>
+            <div className="flex items-center gap-2"><GitBranch className="size-5 text-premium-gold-light" /><DashboardCardTitle>{p("workflows.createWorkflow")}</DashboardCardTitle></div>
           </DashboardCardHeader>
           <DashboardCardContent>
             <div className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className="mb-1 block text-xs font-medium text-white/60">Name *</label>
-                  <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="My Workflow" className={dashboardInputClass} />
+                  <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={p("placeholders.workflowName")} className={dashboardInputClass} />
                 </div>
                 <div>
                   <label className="mb-1 block text-xs font-medium text-white/60">Trigger</label>
@@ -95,7 +99,7 @@ export function WorkflowBuilder() {
               </div>
               <div>
                 <label className="mb-1 block text-xs font-medium text-white/60">Description</label>
-                <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="What this workflow does..." className={dashboardInputClass} />
+                <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder={p("placeholders.workflowDescription")} className={dashboardInputClass} />
               </div>
             </div>
           </DashboardCardContent>
@@ -133,7 +137,7 @@ export function WorkflowBuilder() {
                     <div className="grid gap-3 sm:grid-cols-3">
                       <div>
                         <label className="mb-1 block text-[10px] font-medium text-white/40">Step Name</label>
-                        <Input value={step.name} onChange={(e) => updateStep(idx, { name: e.target.value })} placeholder="Step name" className={dashboardInputClass} />
+                        <Input value={step.name} onChange={(e) => updateStep(idx, { name: e.target.value })} placeholder={p("placeholders.stepName")} className={dashboardInputClass} />
                       </div>
                       <div>
                         <label className="mb-1 block text-[10px] font-medium text-white/40">Type</label>
@@ -154,7 +158,7 @@ export function WorkflowBuilder() {
                       <div>
                         <label className="mb-1 block text-[10px] font-medium text-white/40">Service</label>
                         <select value={step.service ?? ""} onChange={(e) => updateStep(idx, { service: e.target.value })} className={dashboardSelectClass}>
-                          <option value="">Select service...</option>
+                          <option value="">{p("placeholders.selectService")}</option>
                           {AGENT_TOOLS.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
                         </select>
                       </div>
@@ -167,8 +171,8 @@ export function WorkflowBuilder() {
         </DashboardCard>
 
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="rounded-xl border-white/10 text-white/50" onClick={() => setShowCreate(false)}>Cancel</Button>
-          <Button size="sm" className="btn-gold rounded-xl font-bold text-luxury-black" onClick={handleSave}>Save Workflow</Button>
+          <Button variant="outline" size="sm" className="rounded-xl border-white/10 text-white/50" onClick={() => setShowCreate(false)}> {t("common.cancel")}</Button>
+          <Button size="sm" className="btn-gold rounded-xl font-bold text-luxury-black" onClick={handleSave}> {p("workflows.saveWorkflow")}</Button>
         </div>
       </div>
     );
@@ -177,9 +181,9 @@ export function WorkflowBuilder() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2"><Workflow className="size-5 text-premium-gold-light" /><h2 className="text-sm font-bold text-white/80">Workflows</h2></div>
+        <div className="flex items-center gap-2"><Workflow className="size-5 text-premium-gold-light" /><h2 className="text-sm font-bold text-white/80">{p("workflows.title")}</h2></div>
         <Button onClick={() => setShowCreate(true)} size="sm" className="btn-gold gap-1.5 rounded-xl text-xs font-bold text-luxury-black">
-          <Plus className="size-3" /> Create Workflow
+          <Plus className="size-3" /> {p("workflows.createWorkflow")}
         </Button>
       </div>
 

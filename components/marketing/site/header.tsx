@@ -10,6 +10,8 @@ import {
 } from "@/lib/constants/navigation";
 import { OfficialLogo } from "@/components/marketing/official-logo";
 import { SiteButton } from "@/components/marketing/site/button";
+import { LanguageSelector } from "@/components/i18n/language-selector";
+import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 
 function Dropdown({
@@ -19,8 +21,10 @@ function Dropdown({
 }: {
   label: string;
   href: string;
-  items: readonly { label: string; href: string }[];
+  items: readonly { labelKey: string; label: string; href: string }[];
 }) {
+  const { t } = useTranslation();
+
   return (
     <div className="group relative">
       <Link
@@ -34,11 +38,11 @@ function Dropdown({
         <div className="overflow-hidden rounded-2xl border border-[rgba(212,175,55,0.22)] bg-[#111111]/98 py-2 shadow-[0_24px_70px_rgba(0,0,0,0.65)] backdrop-blur-xl">
           {items.map((item) => (
             <Link
-              key={item.label}
+              key={item.labelKey}
               href={item.href}
               className="block px-4 py-2.5 text-[13px] text-[#B5B5B5] hover:bg-[rgba(212,175,55,0.1)] hover:text-white"
             >
-              {item.label}
+              {t(item.labelKey)}
             </Link>
           ))}
         </div>
@@ -50,6 +54,7 @@ function Dropdown({
 /** Floating pill nav — reference height ~56px, gold hairline border. */
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -77,13 +82,13 @@ export function SiteHeader() {
         <nav aria-label="Main" className="hidden lg:block">
           <ul className="flex items-center gap-5 xl:gap-6">
             {NAV_LINKS.map((l) => (
-              <li key={l.label}>
+              <li key={l.labelKey}>
                 {l.dropdown ? (
                   <Dropdown
-                    label={l.label}
+                    label={t(l.labelKey)}
                     href={l.href}
                     items={
-                      l.label === "Services"
+                      l.labelKey === "nav.services"
                         ? NAV_SERVICES_DROPDOWN
                         : NAV_SOLUTIONS_DROPDOWN
                     }
@@ -93,7 +98,7 @@ export function SiteHeader() {
                     href={l.href}
                     className="text-[13px] font-medium text-white/85 transition-colors hover:text-white xl:text-[14px]"
                   >
-                    {l.label}
+                    {t(l.labelKey)}
                   </Link>
                 )}
               </li>
@@ -102,21 +107,22 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <LanguageSelector variant="compact" className="hidden sm:inline-flex" />
           <Link
             href="/login"
             className="hidden text-[13px] font-medium text-white/80 transition-colors hover:text-white sm:inline xl:text-[14px]"
           >
-            Sign In
+            {t("marketing.signIn")}
           </Link>
           <div className="hidden sm:block">
             <SiteButton href="/signup" size="sm">
-              Get Started <ArrowRight className="size-3.5" />
+              {t("marketing.getStarted")} <ArrowRight className="size-3.5" />
             </SiteButton>
           </div>
           <button
             type="button"
             className="inline-flex size-9 items-center justify-center rounded-full text-[#D4AF37] hover:bg-[rgba(212,175,55,0.1)] lg:hidden"
-            aria-label={open ? "Close menu" : "Open menu"}
+            aria-label={open ? t("marketing.closeMenu") : t("marketing.openMenu")}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
           >
@@ -134,24 +140,27 @@ export function SiteHeader() {
         <nav aria-label="Mobile" className="space-y-1 p-3">
           {NAV_LINKS.map((l) => (
             <Link
-              key={l.label}
+              key={l.labelKey}
               href={l.href}
               onClick={() => setOpen(false)}
               className="block rounded-2xl px-4 py-3 text-[15px] font-medium text-[#C7C7C7] hover:bg-white/[0.04] hover:text-white"
             >
-              {l.label}
+              {t(l.labelKey)}
             </Link>
           ))}
           <div className="flex flex-col gap-2 border-t border-white/10 px-1 pt-3 pb-1 sm:hidden">
+            <div className="px-3">
+              <LanguageSelector variant="ghost" className="w-full justify-start" />
+            </div>
             <Link
               href="/login"
               onClick={() => setOpen(false)}
               className="rounded-2xl px-3 py-3 text-[15px] font-medium text-[#C7C7C7]"
             >
-              Sign In
+              {t("marketing.signIn")}
             </Link>
             <SiteButton href="/signup" size="md" className="w-full">
-              Get Started <ArrowRight className="size-3.5" />
+              {t("marketing.getStarted")} <ArrowRight className="size-3.5" />
             </SiteButton>
           </div>
         </nav>

@@ -15,6 +15,10 @@ import {
 
 export type WebAppTypeDefinition = {
   id: string;
+
+  labelKey?: string;
+
+  descriptionKey?: string;
   label: string;
   description: string;
   icon: LucideIcon;
@@ -130,22 +134,22 @@ export const WEBAPP_COLOR_STYLES = [
 ] as const;
 
 export const WEBAPP_FEATURE_OPTIONS = [
-  { id: "auth", label: "Authentication" },
-  { id: "dashboard", label: "Dashboard" },
-  { id: "roles", label: "User Roles & Permissions" },
-  { id: "search", label: "Search & Filters" },
-  { id: "notifications", label: "Notifications" },
-  { id: "settings", label: "Settings Page" },
-  { id: "dark-mode", label: "Dark Mode" },
-  { id: "export", label: "Data Export (CSV/PDF)" },
-  { id: "api", label: "REST API" },
-  { id: "billing", label: "Billing & Payments" },
-  { id: "reports", label: "Reports & Analytics" },
-  { id: "file-upload", label: "File Uploads" },
-  { id: "real-time", label: "Real-time Updates" },
-  { id: "audit-log", label: "Audit Log" },
-  { id: "i18n", label: "Multi-language (i18n)" },
-  { id: "teams", label: "Team Management" },
+  { id: "auth", labelKey: "constants.webappBuilder.options.auth", label: "Authentication" },
+  { id: "dashboard", labelKey: "constants.webappBuilder.options.dashboard", label: "Dashboard" },
+  { id: "roles", labelKey: "constants.webappBuilder.options.roles", label: "User Roles & Permissions" },
+  { id: "search", labelKey: "constants.webappBuilder.options.search", label: "Search & Filters" },
+  { id: "notifications", labelKey: "constants.webappBuilder.options.notifications", label: "Notifications" },
+  { id: "settings", labelKey: "constants.webappBuilder.options.settings", label: "Settings Page" },
+  { id: "dark-mode", labelKey: "constants.webappBuilder.options.dark_mode", label: "Dark Mode" },
+  { id: "export", labelKey: "constants.webappBuilder.options.export", label: "Data Export (CSV/PDF)" },
+  { id: "api", labelKey: "constants.webappBuilder.options.api", label: "REST API" },
+  { id: "billing", labelKey: "constants.webappBuilder.options.billing", label: "Billing & Payments" },
+  { id: "reports", labelKey: "constants.webappBuilder.options.reports", label: "Reports & Analytics" },
+  { id: "file-upload", labelKey: "constants.webappBuilder.options.file_upload", label: "File Uploads" },
+  { id: "real-time", labelKey: "constants.webappBuilder.options.real_time", label: "Real-time Updates" },
+  { id: "audit-log", labelKey: "constants.webappBuilder.options.audit_log", label: "Audit Log" },
+  { id: "i18n", labelKey: "constants.webappBuilder.options.i18n", label: "Multi-language (i18n)" },
+  { id: "teams", labelKey: "constants.webappBuilder.options.teams", label: "Team Management" },
 ] as const;
 
 export function getWebAppType(id: string): WebAppTypeDefinition | undefined {

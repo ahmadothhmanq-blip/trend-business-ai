@@ -6,10 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import type { CRMDeal, CRMDealStageKey } from "@/types/crm";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 
 const STAGES: CRMDealStageKey[] = ["new", "qualified", "proposal", "negotiation", "won", "lost"];
 
 export function DealsPipeline({ initialDeals = [], onDealsChange }: { initialDeals?: CRMDeal[]; onDealsChange?: (d: CRMDeal[]) => void }) {
+  const wt = useWorkspaceT("crm");
   const [deals, setDeals] = useState(initialDeals);
   const [title, setTitle] = useState("");
   const [value, setValue] = useState("0");
@@ -30,17 +32,17 @@ export function DealsPipeline({ initialDeals = [], onDealsChange }: { initialDea
   };
 
   const create = async () => {
-    if (!title.trim()) return toast.error("Deal title required");
+    if (!title.trim()) return toast.error(wt("panels.deals.dealTitleRequired"));
     const res = await fetch("/api/crm/deals", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title, valueCents: Number(value) * 100, stage: "new" }),
     });
     const data = await res.json();
-    if (!res.ok) return toast.error(data.error ?? "Failed");
+    if (!res.ok) return toast.error(data.error ?? wt("toasts.failed"));
     update([data.deal, ...deals]);
     setTitle("");
-    toast.success("Deal created");
+    toast.success(wt("toasts.dealCreated"));
   };
 
   const moveDeal = async (dealId: string, stage: CRMDealStageKey) => {
@@ -50,7 +52,7 @@ export function DealsPipeline({ initialDeals = [], onDealsChange }: { initialDea
       body: JSON.stringify({ stage }),
     });
     const data = await res.json();
-    if (!res.ok) return toast.error(data.error ?? "Failed");
+    if (!res.ok) return toast.error(data.error ?? wt("toasts.failed"));
     update(deals.map((d) => (d.id === dealId ? data.deal : d)));
   };
 
@@ -59,9 +61,9 @@ export function DealsPipeline({ initialDeals = [], onDealsChange }: { initialDea
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-2">
-        <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Deal title" className="border-white/10 bg-white/5 text-white" />
-        <Input value={value} onChange={(e) => setValue(e.target.value)} placeholder="Value USD" className="w-28 border-white/10 bg-white/5 text-white" />
-        <Button onClick={() => void create()}>Add deal</Button>
+        <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={wt("forms.dealTitle")} className="border-white/10 bg-white/5 text-white" />
+        <Input value={value} onChange={(e) => setValue(e.target.value)} placeholder={wt("forms.valueUsd")} className="w-28 border-white/10 bg-white/5 text-white" />
+        <Button onClick={() => void create()}>{wt("panels.deals.addDeal")}</Button>
       </div>
       <div className="grid gap-3 md:grid-cols-3 xl:grid-cols-6">
         {STAGES.map((stage) => (
@@ -74,7 +76,7 @@ export function DealsPipeline({ initialDeals = [], onDealsChange }: { initialDea
               setDragId(null);
             }}
           >
-            <p className="mb-2 text-xs font-medium uppercase text-white/40">{stage}</p>
+            <p className="mb-2 text-xs font-medium uppercase text-white/40">{wt(`stages.${stage}`)}</p>
             <div className="space-y-2">
               {grouped[stage].map((d) => (
                 <div

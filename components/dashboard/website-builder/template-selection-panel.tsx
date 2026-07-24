@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import type { MarketplaceTemplate } from "@/lib/ai-core/template-marketplace";
 
 export type TemplateUsePayload = {
@@ -77,9 +78,11 @@ export function buildTemplateUsePayload(
 export function TemplateDetailsDialog(props: {
   template: MarketplaceTemplate | null;
   disabled?: boolean;
+  activeGenerationId?: string | null;
   onClose: () => void;
-  onUseTemplate: (payload: TemplateUsePayload) => void;
+  onUseTemplate: (payload: TemplateUsePayload) => void | Promise<void>;
 }) {
+  const wb = useProductT("websiteBuilder");
   const [previewHtml, setPreviewHtml] = useState<string | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [using, setUsing] = useState(false);
@@ -112,12 +115,15 @@ export function TemplateDetailsDialog(props: {
     };
   }, [details]);
 
-  const useTemplate = () => {
+  const useTemplate = async () => {
     if (!details) return;
     setUsing(true);
-    props.onUseTemplate(buildTemplateUsePayload(details));
-    props.onClose();
-    window.setTimeout(() => setUsing(false), 800);
+    try {
+      await props.onUseTemplate(buildTemplateUsePayload(details));
+      props.onClose();
+    } finally {
+      setUsing(false);
+    }
   };
 
   return (
@@ -129,10 +135,10 @@ export function TemplateDetailsDialog(props: {
     >
       <DialogContent className="max-h-[92vh] max-w-3xl overflow-y-auto border-white/10 bg-[#0c0c0c] text-white sm:max-w-3xl">
         <DialogHeader>
-          <DialogTitle>{details?.name || "Template details"}</DialogTitle>
+          <DialogTitle>{details?.name || wb("panels.templateDetails")}</DialogTitle>
           <DialogDescription className="text-white/45">
             {details?.description ||
-              "Review this template, then generate a new website project."}
+              wb("panels.templateReviewHint")}
           </DialogDescription>
         </DialogHeader>
 
@@ -194,7 +200,7 @@ export function TemplateDetailsDialog(props: {
                   </div>
                 ) : previewHtml ? (
                   <iframe
-                    title="Template preview"
+                    title={wb("panels.templatePreview")}
                     srcDoc={previewHtml}
                     className="h-[320px] w-full rounded-lg border border-white/10 bg-white"
                   />
@@ -211,7 +217,9 @@ export function TemplateDetailsDialog(props: {
         <DialogFooter className="gap-2 sm:justify-between">
           <div className="flex items-center gap-2 text-[11px] text-white/35">
             <LayoutTemplate className="size-3.5" />
-            Seeds industry, style, components, and design system
+            {props.activeGenerationId
+              ? "Applies visual preset to your current site — content preserved"
+              : "Seeds industry, style, components, and design system"}
           </div>
           {details ? (
             <Button
@@ -236,9 +244,11 @@ export function TemplateDetailsDialog(props: {
 export function TemplateSelectionPanel(props: {
   selectedMarketplaceId?: string | null;
   disabled?: boolean;
-  onUseTemplate: (payload: TemplateUsePayload) => void;
+  activeGenerationId?: string | null;
+  onUseTemplate: (payload: TemplateUsePayload) => void | Promise<void>;
   onCatalogLoaded?: (templates: MarketplaceTemplate[]) => void;
 }) {
+  const wb = useProductT("websiteBuilder");
   const [templates, setTemplates] = useState<MarketplaceTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [details, setDetails] = useState<MarketplaceTemplate | null>(null);
@@ -249,7 +259,7 @@ export function TemplateSelectionPanel(props: {
     setLoading(true);
     try {
       const res = await fetch("/api/website-builder/marketplace");
-      if (!res.ok) throw new Error("Failed to load templates");
+      if (!res.ok) throw new Error(wb("panels.failedLoadTemplates"));
       const data = (await res.json()) as CatalogResponse;
       const list = data.templates || [];
       setTemplates(list);
@@ -322,6 +332,7 @@ export function TemplateSelectionPanel(props: {
       <TemplateDetailsDialog
         template={details}
         disabled={props.disabled}
+        activeGenerationId={props.activeGenerationId}
         onClose={() => setDetails(null)}
         onUseTemplate={props.onUseTemplate}
       />

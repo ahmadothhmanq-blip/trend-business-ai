@@ -2,10 +2,10 @@
 
 import { ArrowRight, Globe, Play, Shield, Sparkles, Zap } from "lucide-react";
 import { motion } from "framer-motion";
-import { REF_HERO } from "@/lib/constants/marketing-content";
 import { TRUST_BADGES } from "@/lib/constants/navigation";
 import { SiteButton } from "@/components/marketing/site/button";
 import { SiteDashboard } from "@/components/marketing/site/dashboard";
+import { useTranslation } from "@/lib/i18n/client";
 
 const ICONS = { Zap, Shield, Sparkles, Globe } as const;
 
@@ -14,6 +14,8 @@ const ICONS = { Zap, Shield, Sparkles, Globe } as const;
  * Mobile: badge → headline → sub → CTAs → trust 2×2 → dashboard (then stats below).
  */
 export function SiteHero() {
+  const { t } = useTranslation();
+
   return (
     <section
       id="hero"
@@ -33,7 +35,7 @@ export function SiteHero() {
                 className="size-[6px] rounded-full bg-[#FFD700] shadow-[0_0_8px_#FFD700]"
                 aria-hidden="true"
               />
-              {REF_HERO.badge.replace(/\.$/, "")}
+              {t("marketing.hero.badge").replace(/\.$/, "")}
             </motion.p>
 
             <motion.h1
@@ -43,9 +45,9 @@ export function SiteHero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, delay: 0.05 }}
             >
-              <span className="block text-white">One AI Platform.</span>
+              <span className="block text-white">{t("marketing.hero.headlineLine1")}</span>
               <span className="mt-1 block text-[#D4AF37]">
-                Every Business Solution.
+                {t("marketing.hero.headlineLine2")}
               </span>
             </motion.h1>
 
@@ -55,7 +57,7 @@ export function SiteHero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.1 }}
             >
-              {REF_HERO.sub}
+              {t("marketing.hero.sub")}
             </motion.p>
 
             <motion.div
@@ -65,7 +67,7 @@ export function SiteHero() {
               transition={{ duration: 0.45, delay: 0.16 }}
             >
               <SiteButton href="/signup" size="lg" className="w-full sm:w-auto">
-                Start Free <ArrowRight className="size-4" />
+                {t("marketing.hero.startFree")} <ArrowRight className="size-4" />
               </SiteButton>
               <SiteButton
                 href="#demo-desktop"
@@ -74,7 +76,7 @@ export function SiteHero() {
                 className="hidden w-full sm:w-auto lg:inline-flex"
               >
                 <Play className="size-3.5 fill-[#D4AF37] text-[#D4AF37]" />
-                Watch Demo
+                {t("marketing.hero.watchDemo")}
               </SiteButton>
               <SiteButton
                 href="#demo-mobile"
@@ -83,7 +85,7 @@ export function SiteHero() {
                 className="w-full sm:w-auto lg:hidden"
               >
                 <Play className="size-3.5 fill-[#D4AF37] text-[#D4AF37]" />
-                Watch Demo
+                {t("marketing.hero.watchDemo")}
               </SiteButton>
             </motion.div>
 
@@ -97,24 +99,22 @@ export function SiteHero() {
                 const Icon = ICONS[b.icon as keyof typeof ICONS];
                 return (
                   <span
-                    key={b.label}
+                    key={b.labelKey}
                     className="inline-flex items-center gap-2 text-[13px] font-medium text-white"
                   >
                     <Icon className="size-4 text-[#D4AF37]" strokeWidth={1.75} />
-                    {b.label}
+                    {t(b.labelKey)}
                   </span>
                 );
               })}
             </motion.div>
           </div>
 
-          {/* Desktop dashboard */}
           <div id="demo-desktop" className="relative hidden w-full scroll-mt-28 lg:block">
             <SiteDashboard />
           </div>
         </div>
 
-        {/* Mobile dashboard — reference stack: copy → CTAs → trust → dashboard */}
         <div id="demo-mobile" className="relative mt-10 scroll-mt-24 lg:hidden">
           <SiteDashboard mobile />
         </div>

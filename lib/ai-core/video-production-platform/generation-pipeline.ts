@@ -12,7 +12,10 @@ import type {
 import { nowIso, vid } from "@/lib/ai-core/video-production-platform/ids";
 import {
   getVideoProvider,
+  getVideoProviderForMode,
+  ProviderNotConfiguredError,
   type VideoProviderId,
+  type VideoProviderRenderMode,
 } from "@/lib/ai-core/video-production-platform/providers";
 import {
   fetchRemoteToBytes,
@@ -21,6 +24,10 @@ import {
 import { synthesizeSpeech } from "@/lib/ai-core/video-production-platform/tts";
 import { createRenderJobFromModel } from "@/lib/ai-core/video-production-platform/render-engine";
 import { assembleComposite, resolveExportPreset } from "@/lib/ai-core/video-production-platform/assemble";
+import {
+  validateClipMediaForRender,
+  filterClipsForProductionAssembly,
+} from "@/lib/ai-core/video-production-platform/media-validation";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnySupabase = any;
@@ -74,6 +81,7 @@ async function finalizeClipFromResult(params: {
   prompt: string;
   durationSec: number;
   index: number;
+  renderMode: VideoRenderJob["mode"];
 }): Promise<{ clip: VideoRenderClip; asset?: VideoMediaAsset }> {
   const { result } = params;
   if (result.status === "failed") {
@@ -104,6 +112,25 @@ async function finalizeClipFromResult(params: {
   let bytes = result.bytes;
   if (!bytes && result.remoteUrl) {
     bytes = (await fetchRemoteToBytes(result.remoteUrl)) || undefined;
+  }
+
+  const mediaCheck = validateClipMediaForRender({
+    bytes,
+    provider: result.provider,
+    mimeType: result.mimeType,
+    mode: params.renderMode,
+  });
+  if (!mediaCheck.valid) {
+    return {
+      clip: {
+        ...params.clip,
+        status: "failed",
+        progress: 100,
+        error: mediaCheck.error,
+        externalJobId: result.externalJobId || params.clip.externalJobId,
+        updatedAt: nowIso(),
+      },
+    };
   }
 
   if (bytes) {
@@ -176,14 +203,27 @@ async function assembleAndUpload(params: {
   generationId: string;
   assets: VideoMediaAsset[];
 }): Promise<{ compositeAsset?: VideoMediaAsset; assemblyManifest: VideoRenderJob["assemblyManifest"]; assets: VideoMediaAsset[] }> {
-  const completed = params.clips.filter((c) => c.status === "completed" && c.asset?.url);
-  if (!completed.length) {
-    return { assets: params.assets, assemblyManifest: undefined };
+  const { eligible, skipped, message: filterMessage } = filterClipsForProductionAssembly({
+    clips: params.clips,
+    mode: params.job.mode,
+  });
+
+  if (!eligible.length) {
+    return {
+      assets: params.assets,
+      assemblyManifest: filterMessage
+        ? {
+            clipUrls: [],
+            method: "manifest-only",
+            note: filterMessage,
+          }
+        : undefined,
+    };
   }
 
   const assembled = await assembleComposite({
     title: params.model.title,
-    clips: completed.map((c) => {
+    clips: eligible.map((c) => {
       const scene = params.model.scenes.find((s) => s.id === c.sceneId);
       return {
         url: c.asset!.url,
@@ -200,7 +240,7 @@ async function assembleAndUpload(params: {
       text: s.text,
     })),
     burnSubtitles: params.model.subtitles.length > 0,
-    useTransitions: completed.length > 1,
+    useTransitions: eligible.length > 1,
     exportPreset: resolveExportPreset(params.model.aspectRatio, "1080p"),
   });
 
@@ -245,7 +285,9 @@ async function assembleAndUpload(params: {
 
   return {
     compositeAsset,
-    assemblyManifest: assembled.manifest,
+    assemblyManifest: filterMessage
+      ? { ...assembled.manifest, note: `${assembled.manifest.note} ${filterMessage}`.trim() }
+      : assembled.manifest,
     assets,
   };
 }
@@ -288,12 +330,20 @@ export async function runFullRenderPipeline(params: {
   /** When true, poll processing provider jobs inline (bounded). */
   pollInline?: boolean;
 }): Promise<{ model: VideoProductionModel; job: VideoRenderJob }> {
-  const provider = getVideoProvider(params.providerId);
-  const mode = params.mode || "full";
-  let job = createRenderJobFromModel(params.model, mode === "preview" ? "preview" : "full");
+  const mode: VideoProviderRenderMode =
+    params.mode === "preview"
+      ? "preview"
+      : params.useAvatar || params.mode === "avatar"
+        ? "avatar"
+        : params.mode || "full";
+
+  const provider = getVideoProviderForMode(mode, params.providerId);
+  const jobMode: VideoRenderJob["mode"] =
+    mode === "preview" ? "preview" : mode;
+  let job = createRenderJobFromModel(params.model, jobMode);
   job = {
     ...job,
-    mode,
+    mode: jobMode,
     provider: provider.id,
     status: "processing",
     progress: 5,
@@ -358,7 +408,7 @@ export async function runFullRenderPipeline(params: {
       aspectRatio: params.model.aspectRatio,
       imageUrl: params.sourceImageUrl || params.model.productImageUrl,
       avatar:
-        params.useAvatar || mode === "avatar"
+        params.useAvatar || jobMode === "avatar"
           ? {
               personaId: params.model.presenter?.personaId || "business-expert",
               script: scene?.script || prompt,
@@ -393,6 +443,7 @@ export async function runFullRenderPipeline(params: {
       prompt,
       durationSec,
       index: i,
+      renderMode: jobMode,
     });
     clip = finalized.clip;
     if (finalized.asset) assets.push(finalized.asset);
@@ -500,6 +551,7 @@ export async function resumeRenderJob(params: {
         prompt: clip.visualPrompt,
         durationSec: scene?.durationSec || 5,
         index: i,
+        renderMode: params.job.mode,
       });
       if (finalized.asset) assets.push(finalized.asset);
       nextClips.push(finalized.clip);
@@ -639,6 +691,7 @@ export async function retryFailedClips(params: {
       prompt,
       durationSec,
       index: i,
+      renderMode: latest.mode,
     });
     if (finalized.asset) {
       assets.push(finalized.asset);

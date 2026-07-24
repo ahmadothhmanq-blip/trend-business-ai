@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LoginForm } from "@/components/auth/login-form";
+import { LoginStatusMessages } from "@/components/auth/login-status-messages";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = createPageMetadata({
@@ -20,18 +21,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   return (
     <>
       <LoginForm redirect={params.redirect} />
-
-      {params.message === "confirm-email" && (
-        <p className="mt-4 text-sm text-emerald-400" role="status">
-          Check your email to confirm your account before signing in.
-        </p>
-      )}
-
-      {params.error && (
-        <p className="mt-4 text-sm text-red-400" role="alert">
-          Authentication failed. Please try again.
-        </p>
-      )}
+      <LoginStatusMessages message={params.message} error={params.error} />
     </>
   );
 }

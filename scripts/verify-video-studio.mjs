@@ -95,10 +95,18 @@ if (hasTts) ok("TTS provider", "configured");
 else warn("TTS provider", "unset — silent preview WAV");
 
 console.log("\n[3] FFmpeg");
-const ffmpegBin = process.env.FFMPEG_PATH?.trim() || "ffmpeg";
+const ffmpegBin =
+  process.env.FFMPEG_PATH?.trim() ||
+  process.env.FFMPEG_BINARY?.trim() ||
+  "ffmpeg";
+const ffmpegSource = process.env.FFMPEG_PATH?.trim()
+  ? "FFMPEG_PATH"
+  : process.env.FFMPEG_BINARY?.trim()
+    ? "FFMPEG_BINARY"
+    : "PATH";
 const ff = spawnSync(ffmpegBin, ["-version"], { encoding: "utf8" });
 if (ff.status === 0) {
-  ok("ffmpeg", (ff.stdout || ff.stderr || "").split("\n")[0] || "available");
+  ok("ffmpeg", `${(ff.stdout || ff.stderr || "").split("\n")[0] || "available"} (${ffmpegSource})`);
   const filters = spawnSync(ffmpegBin, ["-hide_banner", "-filters"], { encoding: "utf8" });
   const text = `${filters.stdout || ""}${filters.stderr || ""}`.toLowerCase();
   for (const [name, token] of [
@@ -111,7 +119,10 @@ if (ff.status === 0) {
     else warn(`filter:${name}`, "not found");
   }
 } else {
-  fail("ffmpeg", "not found — set FFMPEG_PATH or install ffmpeg");
+  fail(
+    "ffmpeg",
+    `not found (${ffmpegBin}) — set FFMPEG_PATH in .env.local or install via winget; see docs/VIDEO_STUDIO_LOCAL_SETUP.md`,
+  );
 }
 
 console.log("\n[4] Database migration 044/045");

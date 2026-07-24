@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { AIProvidersSettings } from "@/components/dashboard/ai-providers-settings";
 
 export const metadata: Metadata = { title: "AI Providers" };
@@ -24,9 +24,7 @@ export default async function AIProvidersPage() {
 
   return (
     <>
-      <DashboardHeader
-        title="AI Providers"
-        description="Configure AI provider API keys, models, and generation settings"
+      <LocalizedDashboardHeader pageId="aiProviders"
         userEmail={user.email}
         userName={profile?.full_name as string | undefined}
         avatarUrl={profile?.avatar_url as string | undefined}

@@ -7,6 +7,7 @@ import { getActiveProvider } from "@/lib/ai/provider-config";
 import { resolveIteratedPrompt } from "@/lib/ai/iteration";
 import { getContentToolLabel, getContentTypeLabel } from "@/lib/constants/content-studio";
 import { fetchBrandVoiceContext, brandVoiceToPromptContext } from "@/lib/content-studio/brand-voice";
+import { getRequestAiLanguage } from "@/lib/i18n/api";
 import type { ContentGeneration, ContentBlueprint } from "@/types/content";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -87,6 +88,7 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data;
+  const aiLanguage = getRequestAiLanguage(request, input.language);
   let stage = "generateContent";
 
   try {
@@ -120,7 +122,7 @@ export async function POST(request: Request) {
       contentType: input.contentType,
       tone: input.tone,
       audience: input.audience,
-      language: input.language,
+      language: aiLanguage,
       brandVoice: brandVoiceText,
       writingStyle: input.writingStyle,
       creativityLevel: input.creativityLevel,
@@ -142,7 +144,7 @@ export async function POST(request: Request) {
       prompt: input.prompt,
       tone: input.tone,
       audience: input.audience,
-      language: input.language,
+      language: aiLanguage,
       writingStyle: input.writingStyle,
       creativityLevel: input.creativityLevel,
       generatedAt: new Date().toISOString(),
@@ -160,7 +162,7 @@ export async function POST(request: Request) {
       prompt: input.prompt,
       tone: input.tone,
       audience: input.audience,
-      language: input.language,
+      language: aiLanguage,
       brand_voice: brandVoiceText,
       writing_style: input.writingStyle,
       creativity_level: input.creativityLevel,

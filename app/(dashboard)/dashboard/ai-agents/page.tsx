@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { AiAgentsWorkspace } from "@/components/dashboard/ai-agents/ai-agents-workspace";
 import { createClient } from "@/lib/supabase/server";
 import type { Agent, AgentExecution } from "@/types/agents";
@@ -15,6 +15,8 @@ export default async function AiAgentsPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+
+  const userMeta = user.user_metadata ?? {};
 
   let initialAgents: Agent[] = [];
   let initialExecutions: AgentExecution[] = [];
@@ -45,13 +47,26 @@ export default async function AiAgentsPage() {
     analyticsSummary = summary;
   } catch { /* optional */ }
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("full_name, avatar_url")
+    .eq("id", user.id)
+    .single();
+
   return (
-    <div className="space-y-6">
-      <DashboardHeader
-        title="AI Agents & Automation"
-        description="Create intelligent agents, build multi-step workflows, and automate your business processes"
+    <>
+      <LocalizedDashboardHeader pageId="aiAgents"
+        userEmail={user.email}
+        userName={(profile?.full_name as string | undefined) ?? (userMeta.full_name as string | undefined)}
+        avatarUrl={profile?.avatar_url as string | undefined}
       />
-      <AiAgentsWorkspace initialAgents={initialAgents} initialExecutions={initialExecutions} analyticsSummary={analyticsSummary} />
-    </div>
+      <main className="flex-1 p-4 sm:p-6 lg:p-8 xl:p-10">
+        <AiAgentsWorkspace
+          initialAgents={initialAgents}
+          initialExecutions={initialExecutions}
+          analyticsSummary={analyticsSummary}
+        />
+      </main>
+    </>
   );
 }

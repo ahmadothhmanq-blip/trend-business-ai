@@ -74,6 +74,8 @@ export const websiteGenerateRequestSchema = z
       .optional(),
     /** AI Website Optimizer — audit + apply fixes (Improve with AI). */
     optimizeWithAi: z.boolean().optional(),
+    /** fast = minimal files, skip improve/repair/optimizer; professional = full pipeline. */
+    generationProfile: z.enum(["fast", "professional", "ultra"]).optional(),
     projectId: z.string().uuid().optional(),
   })
   .transform((value) => ({

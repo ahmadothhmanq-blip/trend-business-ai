@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import type { BiDashboard, BiWidget } from "@/types/bi";
 import type { BiMetricsSnapshot } from "@/lib/bi/metrics";
 import { BarChartWidget, KpiCard, LineChartWidget, TrendIndicator } from "@/components/dashboard/bi/chart-widgets";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 
 type Props = {
   initialDashboards?: BiDashboard[];
@@ -14,18 +15,8 @@ type Props = {
   metrics?: BiMetricsSnapshot;
 };
 
-const METRIC_LABELS: Record<string, (m: BiMetricsSnapshot) => string> = {
-  revenue: (m) => `$${m.revenue.toLocaleString()}`,
-  expenses: (m) => `$${m.expenses.toLocaleString()}`,
-  profit: (m) => `$${m.profit.toLocaleString()}`,
-  pipeline_value: (m) => `$${m.pipelineValue.toLocaleString()}`,
-  conversion_rate: (m) => `${m.conversionRate.toFixed(1)}%`,
-  customer_growth: (m) => String(m.customerGrowth),
-  inventory_value: (m) => `$${m.inventoryValue.toLocaleString()}`,
-  marketing_roi: (m) => `${m.marketingRoi}%`,
-};
-
 export function DashboardBuilder({ initialDashboards = [], initialWidgets = [], metrics }: Props) {
+  const wt = useWorkspaceT("bi");
   const [dashboards, setDashboards] = useState(initialDashboards);
   const [widgets, setWidgets] = useState(initialWidgets);
   const [selectedId, setSelectedId] = useState(initialDashboards[0]?.id ?? "");
@@ -44,6 +35,17 @@ export function DashboardBuilder({ initialDashboards = [], initialWidgets = [], 
     byPeriod: {},
   };
 
+  const metricLabels: Record<string, (snapshot: BiMetricsSnapshot) => string> = {
+    revenue: (snapshot) => `$${snapshot.revenue.toLocaleString()}`,
+    expenses: (snapshot) => `$${snapshot.expenses.toLocaleString()}`,
+    profit: (snapshot) => `$${snapshot.profit.toLocaleString()}`,
+    pipeline_value: (snapshot) => `$${snapshot.pipelineValue.toLocaleString()}`,
+    conversion_rate: (snapshot) => `${snapshot.conversionRate.toFixed(1)}%`,
+    customer_growth: (snapshot) => String(snapshot.customerGrowth),
+    inventory_value: (snapshot) => `$${snapshot.inventoryValue.toLocaleString()}`,
+    marketing_roi: (snapshot) => `${snapshot.marketingRoi}%`,
+  };
+
   useEffect(() => {
     if (!selectedId) return;
     void fetch(`/api/bi/dashboards?dashboardId=${selectedId}`)
@@ -53,7 +55,7 @@ export function DashboardBuilder({ initialDashboards = [], initialWidgets = [], 
   }, [selectedId]);
 
   const createDashboard = async () => {
-    if (!name.trim()) return toast.error("Enter a dashboard name");
+    if (!name.trim()) return toast.error(wt("panels.dashboards.dashboardNameRequired"));
     setLoading(true);
     try {
       const res = await fetch("/api/bi/dashboards", {
@@ -62,13 +64,13 @@ export function DashboardBuilder({ initialDashboards = [], initialWidgets = [], 
         body: JSON.stringify({ name }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Failed");
+      if (!res.ok) throw new Error(data.error ?? wt("toasts.failed"));
       setDashboards((prev) => [data.dashboard, ...prev]);
       setSelectedId(data.dashboard.id);
       setName("");
-      toast.success("Dashboard created");
+      toast.success(wt("toasts.dashboardCreated"));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed");
+      toast.error(e instanceof Error ? e.message : wt("toasts.failed"));
     } finally {
       setLoading(false);
     }
@@ -83,20 +85,20 @@ export function DashboardBuilder({ initialDashboards = [], initialWidgets = [], 
         body: JSON.stringify({ action: "ensure-default" }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Failed");
+      if (!res.ok) throw new Error(data.error ?? wt("toasts.failed"));
       const list = await fetch("/api/bi/dashboards").then((r) => r.json());
       setDashboards(list.dashboards ?? []);
       setSelectedId(data.dashboardId);
-      toast.success("Default dashboard ready");
+      toast.success(wt("toasts.defaultDashboardReady"));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed");
+      toast.error(e instanceof Error ? e.message : wt("toasts.failed"));
     } finally {
       setLoading(false);
     }
   };
 
   const addWidget = async (widgetType: BiWidget["widget_type"], metricKey: string) => {
-    if (!selectedId) return toast.error("Select or create a dashboard first");
+    if (!selectedId) return toast.error(wt("panels.dashboards.selectDashboardFirst"));
     setLoading(true);
     try {
       const res = await fetch("/api/bi/dashboards", {
@@ -110,18 +112,18 @@ export function DashboardBuilder({ initialDashboards = [], initialWidgets = [], 
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Failed");
+      if (!res.ok) throw new Error(data.error ?? wt("toasts.failed"));
       setWidgets((prev) => [...prev, data.widget]);
-      toast.success("Widget added");
+      toast.success(wt("toasts.widgetAdded"));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed");
+      toast.error(e instanceof Error ? e.message : wt("toasts.failed"));
     } finally {
       setLoading(false);
     }
   };
 
   const renderWidget = (w: BiWidget) => {
-    const fn = METRIC_LABELS[w.metric_key];
+    const fn = metricLabels[w.metric_key];
     const value = fn ? fn(m) : "—";
     switch (w.widget_type) {
       case "kpi":
@@ -132,9 +134,9 @@ export function DashboardBuilder({ initialDashboards = [], initialWidgets = [], 
             key={w.id}
             title={w.title}
             data={[
-              { label: "Rev", value: m.revenue },
-              { label: "Exp", value: m.expenses },
-              { label: "Pipe", value: m.pipelineValue },
+              { label: wt("metrics.rev"), value: m.revenue },
+              { label: wt("metrics.exp"), value: m.expenses },
+              { label: wt("metrics.pipe"), value: m.pipelineValue },
             ]}
           />
         );
@@ -171,14 +173,14 @@ export function DashboardBuilder({ initialDashboards = [], initialWidgets = [], 
         <Input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="New dashboard name"
+          placeholder={wt("forms.dashboardName")}
           className="max-w-xs border-white/10 bg-white/5 text-white"
         />
         <Button onClick={() => void createDashboard()} disabled={loading}>
-          Create dashboard
+          {wt("panels.dashboards.createDashboard")}
         </Button>
         <Button variant="outline" onClick={() => void ensureDefault()} disabled={loading}>
-          Ensure default
+          {wt("panels.dashboards.ensureDefault")}
         </Button>
       </div>
 
@@ -193,23 +195,23 @@ export function DashboardBuilder({ initialDashboards = [], initialWidgets = [], 
             {d.name}
           </button>
         ))}
-        {dashboards.length === 0 && <p className="text-sm text-white/30">No dashboards yet.</p>}
+        {dashboards.length === 0 && <p className="text-sm text-white/30">{wt("panels.dashboards.noDashboards")}</p>}
       </div>
 
       {selectedId ? (
         <>
           <div className="flex flex-wrap gap-2">
             <Button size="sm" variant="outline" onClick={() => void addWidget("kpi", "revenue")} disabled={loading}>
-              + KPI
+              {wt("panels.dashboards.addKpi")}
             </Button>
             <Button size="sm" variant="outline" onClick={() => void addWidget("bar", "pipeline_value")} disabled={loading}>
-              + Bar chart
+              {wt("panels.dashboards.addBarChart")}
             </Button>
             <Button size="sm" variant="outline" onClick={() => void addWidget("line", "revenue")} disabled={loading}>
-              + Line chart
+              {wt("panels.dashboards.addLineChart")}
             </Button>
             <Button size="sm" variant="outline" onClick={() => void addWidget("trend", "conversion_rate")} disabled={loading}>
-              + Trend
+              {wt("panels.dashboards.addTrend")}
             </Button>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{widgets.map(renderWidget)}</div>

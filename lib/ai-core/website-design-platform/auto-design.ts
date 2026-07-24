@@ -7,6 +7,7 @@
 import {
   selectTemplateIntelligence,
   getTemplateIntelligence,
+  resolveComponentsForIndustryAndTemplate,
 } from "@/lib/ai-core/template-intelligence";
 import type {
   AutoDesignDecision,
@@ -246,6 +247,11 @@ export function runAutoDesignDecision(
   });
 
   const template = getTemplateIntelligence(ti.template.id) || ti.template;
+  const resolvedComponents = resolveComponentsForIndustryAndTemplate(
+    template,
+    industry,
+    prompt,
+  );
 
   const controlSurface: TemplateControlSurface =
     buildControlSurfaceForTemplate(template);
@@ -266,7 +272,7 @@ export function runAutoDesignDecision(
     layoutStructure: template.layoutStructure,
     colors: { ...template.colors },
     typography: { ...template.typography },
-    components: template.components.map(String),
+    components: resolvedComponents.map(String),
     animations: {
       id: template.animations.id,
       label: template.animations.label,

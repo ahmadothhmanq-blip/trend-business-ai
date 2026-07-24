@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { ProfileForm } from "@/components/dashboard/profile-form";
 
 export const metadata: Metadata = { title: "User Profile" };
@@ -32,9 +32,7 @@ export default async function ProfilePage() {
 
   return (
     <>
-      <DashboardHeader
-        title="User Profile"
-        description="Manage your personal profile, company details and workspace preferences"
+      <LocalizedDashboardHeader pageId="profile"
         userEmail={user?.email}
         userName={
           (profile?.full_name as string) ||

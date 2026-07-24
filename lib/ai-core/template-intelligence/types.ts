@@ -53,6 +53,97 @@ export type TemplateTypographySystem = {
   body: string;
 };
 
+/** Spacing rhythm for a template preset. */
+export type TemplateSpacingPreset = {
+  sectionY: string;
+  sectionYMobile: string;
+  containerMax: string;
+  stack: string;
+  density: "airy" | "balanced" | "compact";
+};
+
+/** Button styling for a template preset. */
+export type TemplateButtonPreset = {
+  primary: "filled" | "ghost" | "outline";
+  secondary: "filled" | "ghost" | "outline";
+  radius: string;
+  uppercase: boolean;
+  weight: number;
+};
+
+/** Header / footer variant for a template preset. */
+export type TemplateChromePreset = {
+  headerVariant: "solid" | "transparent" | "minimal";
+  headerComponent: string;
+  footerVariant: "multi-column" | "minimal" | "editorial";
+  footerComponent: string;
+  navStyle: "pill" | "underline" | "plain";
+};
+
+/** Section role in the rendered page flow. */
+export type TemplateSectionRole = "header" | "hero" | "section" | "footer";
+
+/** One renderable section driven by a template component id. */
+export type TemplateSectionSpec = {
+  componentId: string;
+  role: TemplateSectionRole;
+  label: string;
+  layoutVariant?: string;
+  /** Index into preserved business content[] for body copy. */
+  contentSlot?: number;
+};
+
+export type TemplateHeroVariant =
+  | "luxury-editorial"
+  | "saas-split"
+  | "cinematic-full"
+  | "minimal-bleed"
+  | "corporate-trust"
+  | "red-premium";
+
+export type TemplateCardVariant =
+  | "borderless"
+  | "soft-shadow"
+  | "structured"
+  | "glass"
+  | "premium-red";
+
+export type TemplateNavigationVariant =
+  | "transparent-underline"
+  | "pill-modern"
+  | "plain-minimal"
+  | "solid-corporate"
+  | "red-bold";
+
+export type TemplateFooterVariant =
+  | "multi-column"
+  | "minimal"
+  | "editorial"
+  | "premium-red";
+
+/** Section layout + card styling for a template preset. */
+export type TemplateLayoutPreset = {
+  heroLayout: string;
+  sectionLayout: "grid" | "editorial" | "asymmetric" | "bento";
+  cardsStyle: "borderless" | "soft-shadow" | "structured" | "glass";
+  componentStyle: string;
+  layoutVariant: string;
+  heroVariant: TemplateHeroVariant;
+  cardVariant: TemplateCardVariant;
+  navigationVariant: TemplateNavigationVariant;
+  footerVariant: TemplateFooterVariant;
+};
+
+/** Full visual preset applied when switching templates. */
+export type TemplateVisualPreset = {
+  spacing: TemplateSpacingPreset;
+  buttons: TemplateButtonPreset;
+  chrome: TemplateChromePreset;
+  layout: TemplateLayoutPreset;
+  /** Ordered page sections — drives live preview + structure. */
+  sections: TemplateSectionSpec[];
+};
+
 export type TemplateIntelligenceDefinition = {
   id: string;
   name: string;
@@ -72,6 +163,7 @@ export type TemplateIntelligenceDefinition = {
   keywords: string[];
   audienceHints: string[];
   brandStyleHints: string[];
+  visualPreset?: TemplateVisualPreset;
 };
 
 export type TemplateIntelligenceSelectionInput = {

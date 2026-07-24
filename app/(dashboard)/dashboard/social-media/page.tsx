@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { SocialMediaWorkspace } from "@/components/dashboard/social-media/social-media-workspace";
 import { getAnalyticsSummary } from "@/lib/social-media/analytics";
 import { listUserBrands } from "@/lib/social-media/brand-integration";
@@ -82,9 +82,7 @@ export default async function SocialMediaPage() {
 
   return (
     <>
-      <DashboardHeader
-        title="AI Social Media Manager"
-        description="Create, schedule, and manage social content with AI"
+      <LocalizedDashboardHeader pageId="socialMedia"
         userEmail={user.email}
         userName={(profile?.full_name as string | undefined) ?? (userMeta.full_name as string | undefined)}
         avatarUrl={profile?.avatar_url as string | undefined}

@@ -6,8 +6,10 @@ import { AppToaster } from "@/components/providers/app-toaster";
 import { AnalyticsNoscript, AnalyticsScripts } from "@/components/seo/analytics-scripts";
 import { CoreWebVitalsHints } from "@/components/seo/core-web-vitals-hints";
 import { rootMetadata } from "@/lib/seo/metadata";
-import { DEFAULT_LOCALE } from "@/lib/seo/site";
 import { THEME_COOKIE, resolveServerThemeClass } from "@/lib/theme/theme";
+import { I18nProvider } from "@/lib/i18n/client";
+import { getLocaleDefinition } from "@/lib/i18n/config";
+import { getServerLocale, getServerMessages, getServerTranslator } from "@/lib/i18n/server";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -37,10 +39,15 @@ export default async function RootLayout({
   const themeClass = resolveServerThemeClass(
     cookieStore.get(THEME_COOKIE)?.value,
   );
+  const locale = await getServerLocale();
+  const messages = await getServerMessages(locale);
+  const { t } = await getServerTranslator(locale);
+  const { htmlLang, dir } = getLocaleDefinition(locale);
 
   return (
     <html
-      lang={DEFAULT_LOCALE}
+      lang={htmlLang}
+      dir={dir}
       className={`${geistSans.variable} ${geistMono.variable} ${themeClass} h-full antialiased`}
       suppressHydrationWarning
     >
@@ -50,14 +57,16 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <AnalyticsNoscript />
         <ThemeProvider defaultTheme="dark" enableSystem disableTransitionOnChange>
-          <a
-            href="#main-content"
-            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-premium-gold focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-luxury-black"
-          >
-            Skip to content
-          </a>
-          <div id="main-content">{children}</div>
-          <AppToaster />
+          <I18nProvider locale={locale} messages={messages}>
+            <a
+              href="#main-content"
+              className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-premium-gold focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-luxury-black"
+            >
+              {t("common.skipToContent")}
+            </a>
+            <div id="main-content">{children}</div>
+            <AppToaster />
+          </I18nProvider>
         </ThemeProvider>
         <AnalyticsScripts />
       </body>

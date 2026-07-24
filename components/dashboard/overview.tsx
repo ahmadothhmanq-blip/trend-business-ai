@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   ArrowRight,
@@ -9,6 +11,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { DASHBOARD_QUICK_ACTIONS } from "@/lib/constants/dashboard-nav";
+import { useTranslation } from "@/lib/i18n/client";
 import {
   PublishReadinessBadge,
   publishStatusFromQuality,
@@ -42,22 +45,24 @@ type DashboardOverviewProps = {
 };
 
 function QuickActionsGrid() {
+  const { t } = useTranslation();
+
   return (
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-7">
       {DASHBOARD_QUICK_ACTIONS.map((action) => {
         const Icon = action.icon;
         return (
           <Link
-            key={action.title}
+            key={action.titleKey}
             href={action.href}
             className="group rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4 transition-all hover:border-premium-gold/30 hover:bg-premium-gold/[0.06]"
           >
             <DashboardIconBox icon={Icon} />
             <p className="mt-3 text-[13px] font-semibold text-white group-hover:text-premium-gold-light">
-              {action.title}
+              {t(action.titleKey)}
             </p>
             <p className="mt-1 text-[11px] leading-relaxed text-white/40">
-              {action.description}
+              {t(action.descriptionKey)}
             </p>
           </Link>
         );
@@ -67,6 +72,7 @@ function QuickActionsGrid() {
 }
 
 export function DashboardOverview({ data, userName }: DashboardOverviewProps) {
+  const { t } = useTranslation();
   const {
     stats,
     recentActivity,
@@ -88,10 +94,10 @@ export function DashboardOverview({ data, userName }: DashboardOverviewProps) {
   );
   const planLabel =
     billing?.planId === "pro"
-      ? "Pro"
+      ? t("dashboard.overview.planPro")
       : billing?.planId === "business"
-        ? "Business"
-        : "Free";
+        ? t("dashboard.overview.planBusiness")
+        : t("dashboard.overview.planFree");
   const recentProjects = recentActivity.filter(
     (item) => item.type === "website" || item.type === "workspace",
   );
@@ -106,20 +112,19 @@ export function DashboardOverview({ data, userName }: DashboardOverviewProps) {
         <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
             <p className="text-[11px] font-semibold tracking-[0.18em] text-premium-gold uppercase">
-              Welcome back
+              {t("dashboard.overview.welcomeBack")}
             </p>
             <h2 className="mt-2 text-[clamp(1.6rem,3vw,2.25rem)] font-bold tracking-[-0.03em] text-white">
-              Good to see you, {firstName}.
+              {t("dashboard.overview.greeting", { name: firstName })}
             </h2>
             <p className="mt-3 text-[15px] leading-relaxed text-white/50">
-              Your private AI workspace for websites, brands, content, marketing and
-              business intelligence — ready when you are.
+              {t("dashboard.overview.welcomeDescription")}
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Button asChild className="rounded-xl bg-[linear-gradient(180deg,#FFD700,#D4AF37)] text-[#111] hover:brightness-110">
               <Link href="/dashboard/website-builder">
-                New Project <ArrowRight className="size-4" />
+                {t("dashboard.overview.newProject")} <ArrowRight className="size-4" />
               </Link>
             </Button>
             <Button
@@ -127,7 +132,7 @@ export function DashboardOverview({ data, userName }: DashboardOverviewProps) {
               variant="outline"
               className="rounded-xl border-white/15 bg-transparent text-white hover:border-premium-gold/40 hover:bg-premium-gold/10"
             >
-              <Link href="/dashboard/projects">View projects</Link>
+              <Link href="/dashboard/projects">{t("dashboard.overview.viewProjects")}</Link>
             </Button>
           </div>
         </div>
@@ -137,29 +142,29 @@ export function DashboardOverview({ data, userName }: DashboardOverviewProps) {
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[
           {
-            label: "Projects",
+            label: t("dashboard.overview.projects"),
             value: totalProjects,
-            hint: "All generated assets",
+            hint: t("dashboard.overview.allGeneratedAssets"),
             icon: FolderKanban,
           },
           {
-            label: "AI Credits",
+            label: t("dashboard.overview.aiCredits"),
             value: aiCreditsRemaining,
             hint: billing
-              ? `${aiCreditsUsed} used · ${planLabel} plan`
-              : "Sign in to load balance",
+              ? t("dashboard.overview.usedPlan", { used: String(aiCreditsUsed), plan: planLabel })
+              : t("dashboard.overview.signInForBalance"),
             icon: Coins,
           },
           {
-            label: "Activity",
+            label: t("dashboard.overview.activity"),
             value: recentActivity.length,
-            hint: "Recent generations",
+            hint: t("dashboard.overview.recentGenerations"),
             icon: Clock3,
           },
           {
-            label: "Saved",
+            label: t("dashboard.overview.saved"),
             value: stats.saved,
-            hint: "Pinned favorites",
+            hint: t("dashboard.overview.pinnedFavorites"),
             icon: Star,
           },
         ].map((item) => (

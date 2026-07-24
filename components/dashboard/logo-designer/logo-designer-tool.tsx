@@ -36,6 +36,8 @@ import {
   type ProjectHistoryItem,
 } from "@/components/dashboard/builder-shared";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/client";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import {
   LOGO_STYLES,
   LOGO_COLOR_PALETTES,
@@ -92,6 +94,7 @@ function LogoPreview({
   onRegenerate?: () => void;
   onContinue?: () => void;
 }) {
+  const { t } = useTranslation();
   const bp = gen.blueprint;
   const [activeTab, setActiveTab] = useState<"concepts" | "variations" | "colors" | "typography" | "guidelines" | "files">("concepts");
 
@@ -100,7 +103,7 @@ function LogoPreview({
       <DashboardPanel className="py-16 text-center">
         <Sparkles className="mx-auto size-10 text-white/20" />
         <p className="mt-4 text-white/50">No generated logo to preview</p>
-        <Button variant="outline" className="mt-4 rounded-xl border-white/10 text-white/60" onClick={onBack}>Back</Button>
+        <Button variant="outline" className="mt-4 rounded-xl border-white/10 text-white/60" onClick={onBack}>{t("common.back")}</Button>
       </DashboardPanel>
     );
   }
@@ -259,6 +262,8 @@ function toHistoryItem(gen: LogoGeneration): ProjectHistoryItem {
 /* ------------------------------------------------------------------ */
 
 export function LogoDesignerTool({ initialGenerations }: Props) {
+  const { t } = useTranslation();
+  const p = useProductT("logoDesigner");
   const [step, setStep] = useState<"style" | "config" | "history" | "generating" | "preview">("style");
   const [selectedStyle, setSelectedStyle] = useState("");
   const [brandName, setBrandName] = useState("");

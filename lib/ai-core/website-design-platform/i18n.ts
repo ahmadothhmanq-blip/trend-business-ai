@@ -62,13 +62,19 @@ const LANGUAGE_MAP: Record<string, SiteLocaleConfig> = {
     rtl: false,
     htmlLang: "pt",
   },
-  hebrew: {
-    language: "Hebrew",
-    localeCode: "he",
+  persian: {
+    language: "Persian",
+    localeCode: "fa",
     dir: "rtl",
     rtl: true,
-    htmlLang: "he",
-    fontHint: "Noto Sans Hebrew, system-ui",
+    htmlLang: "fa",
+  },
+  urdu: {
+    language: "Urdu",
+    localeCode: "ur",
+    dir: "rtl",
+    rtl: true,
+    htmlLang: "ur",
   },
 };
 
@@ -78,8 +84,10 @@ export function resolveLocaleFromLanguage(
   const key = (language || "English").toLowerCase().trim();
   if (LANGUAGE_MAP[key]) return { ...LANGUAGE_MAP[key]! };
   if (key.includes("arab")) return { ...LANGUAGE_MAP.arabic! };
-  if (key.includes("hebr") || key.includes("rtl"))
-    return { ...LANGUAGE_MAP.hebrew! };
+  if (key.includes("persian") || key.includes("farsi"))
+    return { ...LANGUAGE_MAP.persian! };
+  if (key.includes("urdu")) return { ...LANGUAGE_MAP.urdu! };
+  if (key.includes("rtl")) return { ...LANGUAGE_MAP.arabic! };
   return { ...LANGUAGE_MAP.english! };
 }
 

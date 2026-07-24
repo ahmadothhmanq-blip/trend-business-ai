@@ -119,12 +119,13 @@ Strategy: ${JSON.stringify(strategy)}
 
 stylePreset MUST be exactly one of: "luxury" | "modern" | "corporate" | "minimal" | "creative" | "tech"
 Map theme hints:
-- Gold/Luxury/Travel premium → luxury
-- Startup/Modern/Product → modern
+- Gold/Luxury/Travel premium/Dark → luxury (dark surfaces unless Light is specified)
+- Startup/Modern/Product/Glass → modern
 - Corporate/Healthcare/Trust → corporate
-- Minimal/Light/Clean → minimal
+- Minimal/Light/Clean → minimal (light surfaces)
 - Creative/Agency/Studio → creative
 - Futuristic/Tech/SaaS/Cyber → tech
+- Blue/Purple/Green color themes → use those hues as primary/accent, not gold
 
 Also set:
 - industryPattern (tourism, clinic, saas, restaurant, real_estate, portfolio, ecommerce, agency, generic)

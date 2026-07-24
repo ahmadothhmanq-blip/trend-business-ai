@@ -4,6 +4,12 @@ import {
   premiumUtilityCss,
 } from "@/lib/ai-core/design-system/premium/css";
 import { designEnginePrompt } from "@/lib/ai/prompts/website-layers";
+import {
+  applyWebsiteStyleIntent,
+  formatStyleIntentForPrompt,
+  mapDesignStyleLabelToPreset,
+  resolveWebsiteStyleIntent,
+} from "@/lib/website/style-resolution";
 import { buildWebsiteIterationPrompt } from "@/plugins/website/iteration";
 import { designSystemSchema } from "@/plugins/website/layers/schemas";
 import type {
@@ -252,20 +258,10 @@ export function resolveStylePreset(
 ): DesignStylePreset {
   const hay = `${theme} ${styleHint ?? ""}`.toLowerCase();
   if (/premium.?brand|flagship|heritage|iconic/.test(hay)) return "premium-brand";
-  if (/futur|neon|cyberpunk|technology/.test(hay)) return "tech";
-  if (/luxury|gold|editorial|opulent/.test(hay)) return "luxury";
-  if (/corporate|enterprise|business|professional|trust/.test(hay)) {
-    return "corporate";
-  }
-  if (/minimal|clean|simple|light|sparse/.test(hay)) return "minimal";
-  if (/creative|agency|studio|bold|playful|expressive/.test(hay)) {
-    return "creative";
-  }
-  if (/tech|saas|software|startup|ai|fintech|cyber|developer/.test(hay)) {
-    return "tech";
-  }
-  if (/modern|product/.test(hay)) return "modern";
-  return "modern";
+  if (/\bdark\b|noir|night|midnight/.test(hay) && !/\blight\b/.test(hay)) return "luxury";
+  if (/\blight\b|bright|airy/.test(hay) && !/\bdark\b/.test(hay)) return "minimal";
+  if (/glass|frosted|translucent/.test(hay)) return "modern";
+  return mapDesignStyleLabelToPreset(hay);
 }
 
 function normalizeStylePreset(value: unknown): DesignStylePreset {
@@ -290,19 +286,22 @@ function fallbackDesign(
   input: WebsiteGenerationInput,
   analysis: WebsiteProjectAnalysis,
 ): DesignSystem {
-  const presetKey = resolveStylePreset(
-    input.theme,
-    analysis.designSystem?.join(" "),
-  );
+  const styleIntent = resolveWebsiteStyleIntent(input);
+  const presetKey =
+    normalizeStylePreset(input.designPreset) ||
+    resolveStylePreset(input.theme, analysis.designSystem?.join(" "));
   const preset = STYLE_PRESETS[presetKey];
   const industry =
     analysis.businessProfile.industry.toLowerCase().replace(/\s+/g, "_") ||
     "generic";
 
-  return {
-    ...preset,
-    industryPattern: industry,
-  };
+  return applyWebsiteStyleIntent(
+    {
+      ...preset,
+      industryPattern: industry,
+    },
+    styleIntent,
+  );
 }
 
 export function validateDesignSystem(value: DesignSystem): {
@@ -354,11 +353,12 @@ ${premiumUtilityCss(premium)}`;
 }
 
 function coerceDesignSystem(raw: DesignSystem, input: WebsiteGenerationInput): DesignSystem {
+  const styleIntent = resolveWebsiteStyleIntent(input);
   const stylePreset = normalizeStylePreset(
-    raw.stylePreset || raw.style || input.theme,
-  );
+    raw.stylePreset || raw.style || input.designPreset || input.theme,
+  ) || styleIntent.stylePreset;
   const preset = STYLE_PRESETS[stylePreset];
-  return {
+  const merged = {
     ...preset,
     ...raw,
     stylePreset,
@@ -368,7 +368,7 @@ function coerceDesignSystem(raw: DesignSystem, input: WebsiteGenerationInput): D
       Array.isArray(raw.uiPatterns) && raw.uiPatterns.length
         ? raw.uiPatterns
         : preset.uiPatterns,
-    colors: raw.colors ?? preset.colors,
+    colors: { ...preset.colors, ...(raw.colors ?? {}) },
     typography: raw.typography ?? preset.typography,
     layoutRules:
       Array.isArray(raw.layoutRules) && raw.layoutRules.length
@@ -386,6 +386,7 @@ function coerceDesignSystem(raw: DesignSystem, input: WebsiteGenerationInput): D
     shadowStyle: raw.shadowStyle || preset.shadowStyle,
     industryPattern: raw.industryPattern || "generic",
   };
+  return applyWebsiteStyleIntent(merged, styleIntent);
 }
 
 export async function buildDesignSystem(
@@ -396,11 +397,17 @@ export async function buildDesignSystem(
 ): Promise<DesignSystem> {
   ctx.progress.emit("Creating design system...");
 
+  const styleIntent = resolveWebsiteStyleIntent(input);
   const instruction = input.continueInstruction?.toLowerCase() ?? "";
+  const wantsStyleRefresh =
+    input.mode === "regenerate" ||
+    input.mode === "retry" ||
+    instruction.includes("[design]") ||
+    styleIntent.explicit;
   if (
     input.mode === "continue" &&
     input.previousDesignSystem &&
-    !instruction.includes("[design]") &&
+    !wantsStyleRefresh &&
     !instruction.includes("[idea]")
   ) {
     return coerceDesignSystem(input.previousDesignSystem, input);
@@ -409,12 +416,13 @@ export async function buildDesignSystem(
   const iterationInput = {
     ...input,
     prompt: buildWebsiteIterationPrompt(input),
+    designPreset: input.designPreset || styleIntent.stylePreset,
   };
 
   try {
     const raw = await generateJsonWithValidation<DesignSystem>({
       provider: ctx.provider,
-      prompt: designEnginePrompt(iterationInput, analysis, strategy),
+      prompt: `${designEnginePrompt(iterationInput, analysis, strategy)}\n\n${formatStyleIntentForPrompt(styleIntent)}`,
       schema: designSystemSchema,
       maxAttempts: 3,
       validate: validateDesignSystem,

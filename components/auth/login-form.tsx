@@ -16,12 +16,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { OfficialLogo } from "@/components/marketing/official-logo";
+import { LanguageSelector } from "@/components/i18n/language-selector";
+import { useTranslation } from "@/lib/i18n/client";
 
 type LoginFormProps = {
   redirect?: string;
 };
 
 export function LoginForm({ redirect }: LoginFormProps) {
+  const { t } = useTranslation();
   const [state, formAction, pending] = useActionState(
     async (_prev: { error?: string } | null, formData: FormData) => {
       return signIn(formData);
@@ -32,12 +35,16 @@ export function LoginForm({ redirect }: LoginFormProps) {
   return (
     <Card className="w-full max-w-md border-[rgb(212_175_55/0.2)] bg-[#111111] text-white shadow-[0_24px_80px_rgb(0_0_0/0.45)] backdrop-blur-xl">
       <CardHeader className="text-center">
-        <div className="mx-auto mb-2 flex justify-center">
+        <div className="mx-auto mb-2 flex w-full items-center justify-between gap-2">
+          <div className="flex-1" />
           <OfficialLogo size="md" />
+          <div className="flex flex-1 justify-end">
+            <LanguageSelector variant="compact" />
+          </div>
         </div>
-        <CardTitle className="text-xl text-white">Welcome back</CardTitle>
+        <CardTitle className="text-xl text-white">{t("auth.welcomeBack")}</CardTitle>
         <CardDescription className="text-[#B5B5B5]">
-          Sign in to your Trend Business AI account
+          {t("auth.signInDescription")}
         </CardDescription>
       </CardHeader>
       <form action={formAction}>
@@ -54,28 +61,28 @@ export function LoginForm({ redirect }: LoginFormProps) {
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t("auth.email")}</Label>
             <Input
               id="email"
               name="email"
               type="email"
-              placeholder="you@company.com"
+              placeholder={t("auth.emailPlaceholder")}
               required
               autoComplete="email"
             />
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t("auth.password")}</Label>
               <Link href="/forgot-password" className="text-xs text-premium-gold hover:underline">
-                Forgot password?
+                {t("auth.forgotPassword")}
               </Link>
             </div>
             <Input
               id="password"
               name="password"
               type="password"
-              placeholder="••••••••"
+              placeholder={t("auth.passwordPlaceholder")}
               required
               autoComplete="current-password"
             />
@@ -86,19 +93,19 @@ export function LoginForm({ redirect }: LoginFormProps) {
             {pending ? (
               <>
                 <Loader2 className="size-4 animate-spin" />
-                Signing in...
+                {t("auth.signingIn")}
               </>
             ) : (
-              "Sign In"
+              t("auth.signIn")
             )}
           </Button>
           <p className="text-center text-sm text-muted-foreground">
-            Don&apos;t have an account?{" "}
+            {t("auth.noAccount")}{" "}
             <Link
               href="/signup"
               className="font-medium text-premium-gold hover:underline"
             >
-              Sign up
+              {t("auth.createAccount")}
             </Link>
           </p>
         </CardFooter>

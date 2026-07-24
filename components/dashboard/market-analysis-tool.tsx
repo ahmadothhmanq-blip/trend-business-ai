@@ -36,6 +36,8 @@ import { MarketAnalysisChart } from "@/components/dashboard/market-analysis-char
 import { apiMutation, usePaginatedResource } from "@/lib/hooks/use-paginated-resource";
 import type { MarketAnalysis } from "@/types/database";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/client";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 
 type MarketAnalysisToolProps = {
   initialAnalyses?: MarketAnalysis[];
@@ -190,6 +192,8 @@ export function MarketAnalysisTool({
   initialAnalyses = [],
   initialTotal = 0,
 }: MarketAnalysisToolProps) {
+  const { t } = useTranslation();
+  const p = useProductT("marketAnalysis");
   const {
     items: analyses,
     page,

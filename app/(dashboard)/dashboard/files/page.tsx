@@ -3,7 +3,7 @@ import Link from "next/link";
 import { FileStack } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { loadUserHistoryItems } from "@/lib/db/history-items";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import { DashboardEmptyState } from "@/components/dashboard/ui/dashboard-empty-state";
 
@@ -27,9 +27,7 @@ export default async function FilesPage() {
 
   return (
     <>
-      <DashboardHeader
-        title="Files"
-        description="Exports and generated assets from your workspace"
+      <LocalizedDashboardHeader pageId="files"
         userEmail={user?.email}
         userName={metadata.full_name as string | undefined}
       />

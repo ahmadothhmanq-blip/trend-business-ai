@@ -1,6 +1,7 @@
 import { requireUser, parseUuidParam } from "@/lib/api/helpers";
 import { buildProjectZip } from "@/lib/ai/zipper";
 import type { GeneratedProjectFile } from "@/lib/ai/types";
+import { prepareWebsiteProjectForExport } from "@/lib/website/prepare-export";
 import type { WebsiteGeneration } from "@/types/database";
 import { NextResponse } from "next/server";
 
@@ -49,9 +50,9 @@ export async function GET(_request: Request, context: RouteContext) {
   }
 
   const generation = data as WebsiteGeneration;
-  const files = extractFiles(generation);
+  const rawFiles = extractFiles(generation);
 
-  if (files.length === 0) {
+  if (rawFiles.length === 0) {
     return NextResponse.json(
       {
         error:
@@ -61,7 +62,22 @@ export async function GET(_request: Request, context: RouteContext) {
     );
   }
 
-  const zipBytes = await buildProjectZip(files);
+  const prepared = prepareWebsiteProjectForExport(rawFiles);
+
+  if (!prepared.ready) {
+    return NextResponse.json(
+      {
+        error:
+          "This project has export blockers. Fix validation issues in Website Builder, then try again.",
+        issues: prepared.blockingIssues.slice(0, 20),
+        warnings: prepared.warnings.slice(0, 12),
+        fixesApplied: prepared.fixesApplied.slice(0, 12),
+      },
+      { status: 422 },
+    );
+  }
+
+  const zipBytes = await buildProjectZip(prepared.files);
   const filename = safeFilename(generation.project_name || "website-project");
 
   return new Response(Buffer.from(zipBytes), {

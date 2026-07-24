@@ -54,6 +54,10 @@ export function previewInputFromGeneration(
     content: blueprint?.content,
     components: blueprint?.components,
     heroImageUrl: extractHeroImageUrl(blueprint),
+    templateIntelligenceId:
+      (blueprint?.settings as { templateIntelligenceId?: string } | undefined)
+        ?.templateIntelligenceId ?? null,
+    language: generation.language ?? null,
   };
 }
 

@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import type {
   TemplateIntelligenceCategory,
   TemplateIntelligenceDefinition,
@@ -54,6 +55,7 @@ export function TemplateIntelligencePanel(props: {
     template: TemplateIntelligenceDefinition;
   }) => void;
 }) {
+  const wb = useProductT("websiteBuilder");
   const [templates, setTemplates] = useState<TemplateIntelligenceDefinition[]>(
     [],
   );
@@ -70,13 +72,14 @@ export function TemplateIntelligencePanel(props: {
   const [previewHtml, setPreviewHtml] = useState<string | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [applying, setApplying] = useState(false);
+  const [applyingId, setApplyingId] = useState<string | null>(null);
   const [autoHint, setAutoHint] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/website-builder/template-intelligence");
-      if (!res.ok) throw new Error("Failed to load templates");
+      if (!res.ok) throw new Error(wb("panels.failedLoadTemplates"));
       const data = (await res.json()) as CatalogResponse;
       setTemplates(data.templates || []);
       setCategories(data.categories || []);
@@ -137,6 +140,7 @@ export function TemplateIntelligencePanel(props: {
       return;
     }
     setApplying(true);
+    setApplyingId(tpl.id);
     try {
       const res = await fetch(
         `/api/website-builder/${props.activeGenerationId}/template`,
@@ -153,7 +157,6 @@ export function TemplateIntelligencePanel(props: {
         template?: TemplateIntelligenceDefinition;
       };
       if (!res.ok) throw new Error(data.error || "Failed to apply template");
-      props.onSelect(toChoice(tpl));
       if (data.generation && data.project && data.template) {
         props.onApplied?.({
           generation: data.generation,
@@ -165,11 +168,21 @@ export function TemplateIntelligencePanel(props: {
       setAutoHint(`Applied ${tpl.name} — content & images preserved`);
     } catch (error) {
       setAutoHint(
-        error instanceof Error ? error.message : "Could not apply template",
+        error instanceof Error ? error.message : wb("panels.failedApplyTemplate"),
       );
     } finally {
       setApplying(false);
+      setApplyingId(null);
     }
+  };
+
+  const handleTemplateClick = (tpl: TemplateIntelligenceDefinition) => {
+    if (props.activeGenerationId) {
+      void applyToProject(tpl);
+      return;
+    }
+    props.onSelect(toChoice(tpl));
+    void openDetails(tpl);
   };
 
   const runAutoSelect = async () => {
@@ -279,13 +292,14 @@ export function TemplateIntelligencePanel(props: {
               <button
                 key={tpl.id}
                 type="button"
-                disabled={props.disabled}
-                onClick={() => void openDetails(tpl)}
+                disabled={props.disabled || applying}
+                onClick={() => handleTemplateClick(tpl)}
                 className={cn(
                   "overflow-hidden rounded-2xl border text-left transition-all",
                   props.selectedId === tpl.id
                     ? "border-premium-gold/40 bg-premium-gold/10"
                     : "border-white/[0.08] bg-white/[0.03] hover:border-premium-gold/25",
+                  applyingId === tpl.id && "opacity-70",
                 )}
               >
                 <div
@@ -299,7 +313,9 @@ export function TemplateIntelligencePanel(props: {
                     <p className="truncate text-[13px] font-semibold text-white">
                       {tpl.name}
                     </p>
-                    {props.selectedId === tpl.id ? (
+                    {applyingId === tpl.id ? (
+                      <Loader2 className="size-3.5 shrink-0 animate-spin text-premium-gold" />
+                    ) : props.selectedId === tpl.id ? (
                       <Check className="size-3.5 shrink-0 text-premium-gold" />
                     ) : null}
                   </div>
@@ -367,7 +383,7 @@ export function TemplateIntelligencePanel(props: {
                     </div>
                   ) : previewHtml ? (
                     <iframe
-                      title="Template preview"
+                      title={wb("panels.templatePreview")}
                       srcDoc={previewHtml}
                       className="h-[280px] w-full rounded-lg border border-white/10 bg-white"
                     />
@@ -379,31 +395,26 @@ export function TemplateIntelligencePanel(props: {
 
           <DialogFooter className="gap-2 sm:justify-end">
             {details ? (
-              <>
-                <Button
-                  variant="outline"
-                  className="border-white/15 text-white"
-                  disabled={props.disabled || applying}
-                  onClick={() => selectForGenerate(details)}
-                >
+              <Button
+                className="bg-premium-gold text-black hover:bg-premium-gold/90"
+                disabled={props.disabled || applying}
+                onClick={() =>
+                  void (
+                    props.activeGenerationId
+                      ? applyToProject(details)
+                      : selectForGenerate(details)
+                  )
+                }
+              >
+                {applying ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : props.activeGenerationId ? (
+                  <Check className="size-4" />
+                ) : (
                   <Sparkles className="size-4" />
-                  Use for generation
-                </Button>
-                {props.activeGenerationId ? (
-                  <Button
-                    className="bg-premium-gold text-black hover:bg-premium-gold/90"
-                    disabled={props.disabled || applying}
-                    onClick={() => void applyToProject(details)}
-                  >
-                    {applying ? (
-                      <Loader2 className="size-4 animate-spin" />
-                    ) : (
-                      <Check className="size-4" />
-                    )}
-                    Apply to project
-                  </Button>
-                ) : null}
-              </>
+                )}
+                Use Template
+              </Button>
             ) : null}
           </DialogFooter>
         </DialogContent>

@@ -4,6 +4,7 @@ import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { enforceMutationRateLimit } from "@/lib/api/rate-limit";
 import { runAgent } from "@/lib/agent-runner";
 import { logAgentAudit } from "@/lib/agents/audit";
+import { getRequestAiLanguage } from "@/lib/i18n/api";
 import type { Agent, AgentExecution } from "@/types/agents";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -108,6 +109,8 @@ export async function POST(request: Request) {
   }
 
   const systemPrompt = agent?.system_prompt ?? "You are a helpful AI agent. Complete the user's task thoroughly.";
+  const aiLanguage = getRequestAiLanguage(request);
+  const localizedSystemPrompt = `${systemPrompt}\n\nAlways respond in ${aiLanguage}.`;
   const tools = (agent?.tools ?? []) as string[];
   const agentType = agent?.agent_type ?? "custom";
 
@@ -116,7 +119,7 @@ export async function POST(request: Request) {
     const result = await runAgent({
       task: parsed.data.task,
       agentType,
-      systemPrompt,
+      systemPrompt: localizedSystemPrompt,
       tools,
       context: parsed.data.context,
       maxSteps: parsed.data.maxSteps,

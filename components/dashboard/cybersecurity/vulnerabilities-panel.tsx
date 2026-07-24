@@ -5,11 +5,13 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { dashboardInputClass } from "@/components/dashboard/ui/dashboard-styles";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 
 type Vuln = { id: string; title: string; severity: string; cvss_score: number; cve_id: string };
 type Scan = { id: string; name: string; target: string; status: string; findings_count: number };
 
 export function VulnerabilitiesPanel() {
+  const wt = useWorkspaceT("cyber");
   const [vulns, setVulns] = useState<Vuln[]>([]);
   const [scans, setScans] = useState<Scan[]>([]);
   const [title, setTitle] = useState("");
@@ -24,35 +26,35 @@ export function VulnerabilitiesPanel() {
   const addVuln = async () => {
     if (!title.trim()) return;
     await fetch("/api/cyber/vulnerabilities", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title, severity: "high", cvssScore: 7.5 }) });
-    setTitle(""); load(); toast.success("Vulnerability added");
+    setTitle(""); load(); toast.success(wt("toasts.vulnerabilityAdded"));
   };
 
   const runScan = async () => {
     if (!target.trim()) return;
     await fetch("/api/cyber/vulnerabilities", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: `Scan ${target}`, target }) });
-    setTarget(""); load(); toast.success("Scan completed");
+    setTarget(""); load(); toast.success(wt("toasts.scanCompleted"));
   };
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
-        <p className="mb-3 text-xs uppercase text-white/40">Vulnerabilities</p>
+        <p className="mb-3 text-xs uppercase text-white/40">{wt("panels.vulnerabilities.title")}</p>
         <div className="mb-3 flex gap-2">
-          <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="CVE / finding" className={dashboardInputClass} />
-          <Button onClick={() => void addVuln()}>Add</Button>
+          <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={wt("forms.cveFinding")} className={dashboardInputClass} />
+          <Button onClick={() => void addVuln()}>{wt("panels.vulnerabilities.add")}</Button>
         </div>
         <ul className="space-y-1 text-sm text-white/60">
           {vulns.map((v) => <li key={v.id}>{v.title} · {v.severity} · CVSS {v.cvss_score}</li>)}
         </ul>
       </div>
       <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
-        <p className="mb-3 text-xs uppercase text-white/40">Scans</p>
+        <p className="mb-3 text-xs uppercase text-white/40">{wt("panels.vulnerabilities.scans")}</p>
         <div className="mb-3 flex gap-2">
-          <Input value={target} onChange={(e) => setTarget(e.target.value)} placeholder="Scan target" className={dashboardInputClass} />
-          <Button onClick={() => void runScan()}>Run Scan</Button>
+          <Input value={target} onChange={(e) => setTarget(e.target.value)} placeholder={wt("forms.scanTarget")} className={dashboardInputClass} />
+          <Button onClick={() => void runScan()}>{wt("panels.vulnerabilities.runScan")}</Button>
         </div>
         <ul className="space-y-1 text-sm text-white/60">
-          {scans.map((s) => <li key={s.id}>{s.name} · {s.status} · {s.findings_count} findings</li>)}
+          {scans.map((s) => <li key={s.id}>{s.name} · {s.status} · {wt("panels.vulnerabilities.findings", { count: s.findings_count })}</li>)}
         </ul>
       </div>
     </div>

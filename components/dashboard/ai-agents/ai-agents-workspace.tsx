@@ -5,6 +5,7 @@ import {
   BarChart3, BookOpen, Bot, Brain, GitBranch, History, Wrench,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import { AiAgentsTool } from "./ai-agents-tool";
 import { WorkflowBuilder } from "./workflow-builder";
 import { PromptLibrary } from "./prompt-library";
@@ -19,16 +20,16 @@ import type { Agent, AgentExecution } from "@/types/agents";
 import type { AgentAnalyticsSummary } from "@/types/agents-platform";
 
 const TABS = [
-  { id: "agents", label: "Agents", icon: Bot },
-  { id: "builder", label: "Builder", icon: Brain },
-  { id: "tools", label: "Tools", icon: Wrench },
-  { id: "memory", label: "Memory", icon: History },
-  { id: "knowledge", label: "Knowledge", icon: BookOpen },
-  { id: "workflows", label: "Workflows", icon: GitBranch },
-  { id: "runner", label: "Runner", icon: GitBranch },
-  { id: "monitor", label: "Monitor", icon: History },
-  { id: "analytics", label: "Analytics", icon: BarChart3 },
-  { id: "prompts", label: "Prompts", icon: BookOpen },
+  { id: "agents", labelKey: "nav.agents", icon: Bot },
+  { id: "builder", labelKey: "workspace.tabs.builder", icon: Brain },
+  { id: "tools", labelKey: "workspace.tabs.tools", icon: Wrench },
+  { id: "memory", labelKey: "workspace.tabs.memory", icon: History },
+  { id: "knowledge", labelKey: "workspace.tabs.knowledge", icon: BookOpen },
+  { id: "workflows", labelKey: "nav.workflows", icon: GitBranch },
+  { id: "runner", labelKey: "workspace.tabs.runner", icon: GitBranch },
+  { id: "monitor", labelKey: "workspace.tabs.monitor", icon: History },
+  { id: "analytics", labelKey: "workspace.tabs.analytics", icon: BarChart3 },
+  { id: "prompts", labelKey: "nav.prompts", icon: BookOpen },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -40,6 +41,7 @@ type Props = {
 };
 
 export function AiAgentsWorkspace({ initialAgents = [], initialExecutions = [], analyticsSummary }: Props) {
+  const p = useProductT("aiAgents");
   const [tab, setTab] = useState<TabId>("agents");
   const [agents, setAgents] = useState(initialAgents);
 
@@ -50,12 +52,12 @@ export function AiAgentsWorkspace({ initialAgents = [], initialExecutions = [], 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap gap-1 rounded-xl border border-white/[0.06] bg-white/[0.02] p-1">
-        {TABS.map(({ id, label, icon: Icon }) => (
+        {TABS.map(({ id, labelKey, icon: Icon }) => (
           <button key={id} onClick={() => setTab(id)} className={cn(
             "flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-all",
             tab === id ? "bg-premium-gold/10 text-premium-gold-light" : "text-white/40 hover:text-white/60",
           )}>
-            <Icon className="size-3.5" /> <span className="hidden sm:inline">{label}</span>
+            <Icon className="size-3.5" /> <span className="hidden sm:inline">{p(labelKey)}</span>
           </button>
         ))}
       </div>

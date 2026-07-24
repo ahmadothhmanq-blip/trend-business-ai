@@ -11,10 +11,14 @@ import {
 } from "@/components/dashboard/ui/dashboard-card";
 import { dashboardInputClass, dashboardSelectClass } from "@/components/dashboard/ui/dashboard-styles";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/client";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import { PROMPT_CATEGORIES } from "@/lib/constants/ai-agents";
 import type { PromptLibraryEntry } from "@/types/agents";
 
 export function PromptLibrary() {
+  const { t } = useTranslation();
+  const p = useProductT("aiAgents");
   const [prompts, setPrompts] = useState<PromptLibraryEntry[]>([]);
   const [showCreate, setShowCreate] = useState(false);
   const [title, setTitle] = useState("");
@@ -35,22 +39,22 @@ export function PromptLibrary() {
   useEffect(() => { fetchPrompts(); }, [fetchPrompts]);
 
   const handleCreate = async () => {
-    if (!title.trim() || !promptText.trim()) { toast.error("Title and prompt text are required"); return; }
+    if (!title.trim() || !promptText.trim()) { toast.error(p("errors.titleAndPromptRequired")); return; }
     const res = await fetch("/api/ai-agents/prompts", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title, category, promptText }),
     });
     const d = await res.json();
-    if (!res.ok) { toast.error(d.error ?? "Failed"); return; }
-    toast.success("Prompt saved");
+    if (!res.ok) { toast.error(d.error ?? p("errors.workflowFailed")); return; }
+    toast.success(p("toasts.promptSaved"));
     setTitle(""); setPromptText(""); setShowCreate(false);
     fetchPrompts();
   };
 
   const copyPrompt = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("Copied to clipboard");
+    toast.success(p("actions.copyToClipboard"));
   };
 
   return (
@@ -58,28 +62,28 @@ export function PromptLibrary() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <BookOpen className="size-5 text-premium-gold-light" />
-          <h2 className="text-sm font-bold text-white/80">Prompt Library</h2>
+          <h2 className="text-sm font-bold text-white/80">{p("prompts.title")}</h2>
         </div>
         <div className="flex gap-2">
           <select value={filter} onChange={(e) => setFilter(e.target.value)} className={cn(dashboardSelectClass, "w-36")}>
-            <option value="">All Categories</option>
+            <option value="">{p("prompts.allCategories")}</option>
             {PROMPT_CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
           </select>
           <Button onClick={() => setShowCreate(!showCreate)} size="sm" className="btn-gold gap-1.5 rounded-xl text-xs font-bold text-luxury-black">
-            <Plus className="size-3" /> Add Prompt
+            <Plus className="size-3" /> {p("prompts.addPrompt")}
           </Button>
         </div>
       </div>
 
       {showCreate && (
         <DashboardCard>
-          <DashboardCardHeader><DashboardCardTitle>Save New Prompt</DashboardCardTitle></DashboardCardHeader>
+          <DashboardCardHeader><DashboardCardTitle>{p("prompts.saveNewPrompt")}</DashboardCardTitle></DashboardCardHeader>
           <DashboardCardContent>
             <div className="space-y-3">
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
                   <label className="mb-1 block text-xs font-medium text-white/60">Title *</label>
-                  <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Prompt title" className={dashboardInputClass} />
+                  <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={p("placeholders.promptTitle")} className={dashboardInputClass} />
                 </div>
                 <div>
                   <label className="mb-1 block text-xs font-medium text-white/60">Category</label>
@@ -91,12 +95,12 @@ export function PromptLibrary() {
               <div>
                 <label className="mb-1 block text-xs font-medium text-white/60">Prompt Text *</label>
                 <textarea value={promptText} onChange={(e) => setPromptText(e.target.value)}
-                  placeholder="Write your reusable prompt here..."
+                  placeholder={p("placeholders.promptText")}
                   className={cn(dashboardInputClass, "min-h-[100px] resize-y")} rows={4} />
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" className="rounded-lg border-white/10 text-white/50" onClick={() => setShowCreate(false)}>Cancel</Button>
-                <Button size="sm" className="btn-gold rounded-lg font-bold text-luxury-black" onClick={handleCreate}>Save Prompt</Button>
+                <Button size="sm" className="btn-gold rounded-lg font-bold text-luxury-black" onClick={handleCreate}> {p("prompts.savePrompt")}</Button>
               </div>
             </div>
           </DashboardCardContent>

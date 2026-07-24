@@ -13,4 +13,5 @@ export const profileSchema = z.object({
 export const preferencesSchema = z.object({
   theme: z.enum(["light", "dark", "system"]).optional(),
   emailNotifications: z.boolean().optional(),
+  locale: z.string().trim().min(2).max(10).optional(),
 });

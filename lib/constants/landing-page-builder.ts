@@ -18,6 +18,10 @@ import {
 
 export type LandingPageTypeDefinition = {
   id: string;
+
+  labelKey?: string;
+
+  descriptionKey?: string;
   label: string;
   description: string;
   icon: LucideIcon;
@@ -139,23 +143,23 @@ export const LP_COLOR_STYLES = [
 ] as const;
 
 export const LP_SECTION_OPTIONS = [
-  { id: "hero", label: "Hero" },
-  { id: "features", label: "Features" },
-  { id: "benefits", label: "Benefits" },
-  { id: "how-it-works", label: "How It Works" },
-  { id: "pricing", label: "Pricing" },
-  { id: "testimonials", label: "Testimonials" },
-  { id: "faq", label: "FAQ" },
-  { id: "cta", label: "Call to Action" },
-  { id: "contact", label: "Contact Form" },
-  { id: "gallery", label: "Gallery" },
-  { id: "team", label: "Team" },
-  { id: "stats", label: "Stats / Metrics" },
-  { id: "social-proof", label: "Social Proof" },
-  { id: "countdown", label: "Countdown Timer" },
-  { id: "video", label: "Video Embed" },
-  { id: "newsletter", label: "Newsletter Signup" },
-  { id: "footer", label: "Footer" },
+  { id: "hero", labelKey: "constants.landingPageBuilder.options.hero", label: "Hero" },
+  { id: "features", labelKey: "constants.landingPageBuilder.options.features", label: "Features" },
+  { id: "benefits", labelKey: "constants.landingPageBuilder.options.benefits", label: "Benefits" },
+  { id: "how-it-works", labelKey: "constants.landingPageBuilder.options.how_it_works", label: "How It Works" },
+  { id: "pricing", labelKey: "constants.landingPageBuilder.options.pricing", label: "Pricing" },
+  { id: "testimonials", labelKey: "constants.landingPageBuilder.options.testimonials", label: "Testimonials" },
+  { id: "faq", labelKey: "constants.landingPageBuilder.options.faq", label: "FAQ" },
+  { id: "cta", labelKey: "constants.landingPageBuilder.options.cta", label: "Call to Action" },
+  { id: "contact", labelKey: "constants.landingPageBuilder.options.contact", label: "Contact Form" },
+  { id: "gallery", labelKey: "constants.landingPageBuilder.options.gallery", label: "Gallery" },
+  { id: "team", labelKey: "constants.landingPageBuilder.options.team", label: "Team" },
+  { id: "stats", labelKey: "constants.landingPageBuilder.options.stats", label: "Stats / Metrics" },
+  { id: "social-proof", labelKey: "constants.landingPageBuilder.options.social_proof", label: "Social Proof" },
+  { id: "countdown", labelKey: "constants.landingPageBuilder.options.countdown", label: "Countdown Timer" },
+  { id: "video", labelKey: "constants.landingPageBuilder.options.video", label: "Video Embed" },
+  { id: "newsletter", labelKey: "constants.landingPageBuilder.options.newsletter", label: "Newsletter Signup" },
+  { id: "footer", labelKey: "constants.landingPageBuilder.options.footer", label: "Footer" },
 ] as const;
 
 export function getLandingPageType(id: string): LandingPageTypeDefinition | undefined {

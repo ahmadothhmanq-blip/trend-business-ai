@@ -10,6 +10,7 @@ import {
   FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 import { BiOverview } from "@/components/dashboard/bi/bi-overview";
 import { DashboardBuilder } from "@/components/dashboard/bi/dashboard-builder";
 import { DataSourcesPanel } from "@/components/dashboard/bi/data-sources-panel";
@@ -40,6 +41,7 @@ export function BiWorkspace({
   initialReports = [],
   initialScheduled = [],
 }: Props) {
+  const wt = useWorkspaceT("bi");
   const [tab, setTab] = useState<Tab>("overview");
   const summary = analyticsSummary ?? {
     metrics: {
@@ -68,18 +70,18 @@ export function BiWorkspace({
   };
 
   const tabs = [
-    { key: "overview" as const, label: "Overview", icon: LayoutDashboard },
-    { key: "dashboards" as const, label: "Dashboards", icon: BarChart3 },
-    { key: "sources" as const, label: "Data Sources", icon: Database },
-    { key: "metrics" as const, label: "Metrics", icon: LineChart },
-    { key: "reports" as const, label: "Reports", icon: FileText },
-    { key: "insights" as const, label: "AI Insights", icon: Sparkles },
+    { key: "overview" as const, labelKey: "tabs.overview", icon: LayoutDashboard },
+    { key: "dashboards" as const, labelKey: "tabs.dashboards", icon: BarChart3 },
+    { key: "sources" as const, labelKey: "tabs.sources", icon: Database },
+    { key: "metrics" as const, labelKey: "tabs.metrics", icon: LineChart },
+    { key: "reports" as const, labelKey: "tabs.reports", icon: FileText },
+    { key: "insights" as const, labelKey: "tabs.insights", icon: Sparkles },
   ];
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-1 rounded-xl border border-white/[0.06] bg-white/[0.02] p-1">
-        {tabs.map(({ key, label, icon: Icon }) => (
+        {tabs.map(({ key, labelKey, icon: Icon }) => (
           <button
             key={key}
             onClick={() => setTab(key)}
@@ -89,7 +91,7 @@ export function BiWorkspace({
             )}
           >
             <Icon className="size-4" />
-            <span className="hidden sm:inline">{label}</span>
+            <span className="hidden sm:inline">{wt(labelKey)}</span>
           </button>
         ))}
       </div>

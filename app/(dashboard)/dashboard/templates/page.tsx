@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { CreatorMarketplace } from "@/components/dashboard/creator-marketplace/creator-marketplace";
 
 export const metadata: Metadata = {
@@ -18,9 +18,7 @@ export default async function TemplatesPage() {
 
   return (
     <>
-      <DashboardHeader
-        title="Template Marketplace"
-        description="Discover creator templates, live preview, favorite, and duplicate into Website Builder"
+      <LocalizedDashboardHeader pageId="templates"
         userEmail={user?.email}
         userName={metadata.full_name as string | undefined}
       />

@@ -42,6 +42,8 @@ import {
   type ProjectHistoryItem,
 } from "@/components/dashboard/builder-shared";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/client";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import { safeMarkdownToHtml } from "@/lib/ai/sanitize";
 import {
   BUSINESS_TOOLS,
@@ -108,6 +110,7 @@ function BusinessPreview({
   onRegenerate?: () => void;
   onContinue?: () => void;
 }) {
+  const { t } = useTranslation();
   const bp = gen.blueprint;
   const [tab, setTab] = useState<PreviewTab>("document");
   const [copied, setCopied] = useState(false);
@@ -117,7 +120,7 @@ function BusinessPreview({
       <DashboardPanel className="py-16 text-center">
         <FileText className="mx-auto size-10 text-white/20" />
         <p className="mt-4 text-white/50">No analysis to preview</p>
-        <Button variant="outline" className="mt-4 rounded-xl border-white/10 text-white/60" onClick={onBack}>Back</Button>
+        <Button variant="outline" className="mt-4 rounded-xl border-white/10 text-white/60" onClick={onBack}>{t("common.back")}</Button>
       </DashboardPanel>
     );
   }
@@ -336,6 +339,8 @@ function toHistoryItem(gen: BusinessGeneration): ProjectHistoryItem {
 /* ------------------------------------------------------------------ */
 
 export function BusinessSuiteTool({ initialGenerations }: Props) {
+  const { t } = useTranslation();
+  const p = useProductT("businessSuite");
   type Step = "tool" | "type" | "config" | "generating" | "preview" | "history";
 
   const [step, setStep] = useState<Step>("tool");

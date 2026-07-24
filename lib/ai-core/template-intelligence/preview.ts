@@ -1,4 +1,5 @@
 import type { TemplateIntelligenceDefinition } from "@/lib/ai-core/template-intelligence/types";
+import { resolveTemplateVisualPreset } from "@/lib/ai-core/template-intelligence/visual-preset";
 
 /**
  * Lightweight structural preview for Template Intelligence chooser.
@@ -7,12 +8,50 @@ export function buildTemplateIntelligencePreviewHtml(
   template: TemplateIntelligenceDefinition,
 ): string {
   const c = template.colors;
+  const preset = resolveTemplateVisualPreset(template);
   const sections = template.components
     .filter((id) => !/Header|Footer|Nav/i.test(id))
     .slice(0, 5);
 
+  const headerBg =
+    preset.chrome.headerVariant === "transparent"
+      ? "transparent"
+      : preset.chrome.headerVariant === "minimal"
+        ? c.background
+        : c.surface;
+  const btnBg =
+    preset.buttons.primary === "ghost" || preset.buttons.primary === "outline"
+      ? "transparent"
+      : c.accent;
+  const btnColor =
+    preset.buttons.primary === "ghost" || preset.buttons.primary === "outline"
+      ? c.accent
+      : "#0a0a0a";
+  const btnBorder =
+    preset.buttons.primary === "outline" || preset.buttons.primary === "ghost"
+      ? `2px solid ${c.accent}`
+      : "none";
+  const gridCols =
+    preset.layout.sectionLayout === "editorial"
+      ? "1fr"
+      : preset.layout.sectionLayout === "asymmetric"
+        ? "1.2fr 0.8fr"
+        : preset.layout.sectionLayout === "bento"
+          ? "repeat(3, minmax(0, 1fr))"
+          : "repeat(2, minmax(0, 1fr))";
+  const cardRadius =
+    preset.layout.cardsStyle === "borderless"
+      ? "0"
+      : preset.layout.cardsStyle === "glass"
+        ? "1rem"
+        : "14px";
+  const cardShadow =
+    preset.layout.cardsStyle === "soft-shadow"
+      ? `0 16px 32px color-mix(in srgb, ${c.primary} 20%, transparent)`
+      : "none";
+
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-ti-template="${template.id}">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -25,6 +64,8 @@ export function buildTemplateIntelligencePreviewHtml(
     --primary: ${c.primary};
     --accent: ${c.accent};
     --secondary: ${c.secondary};
+    --section-y: ${preset.spacing.sectionYMobile};
+    --container-max: ${preset.spacing.containerMax};
   }
   * { box-sizing: border-box; }
   body {
@@ -33,9 +74,22 @@ export function buildTemplateIntelligencePreviewHtml(
     background: var(--bg);
     color: var(--fg);
   }
+  .site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: ${headerBg};
+    border-bottom: 1px solid color-mix(in srgb, var(--fg) 10%, transparent);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .site-header span { color: var(--accent); }
   .hero {
-    min-height: 220px;
-    padding: 28px 24px 36px;
+    min-height: 200px;
+    padding: var(--section-y) 24px 28px;
     background:
       linear-gradient(135deg, color-mix(in srgb, var(--primary) 70%, black), color-mix(in srgb, var(--accent) 35%, var(--bg)));
   }
@@ -57,25 +111,29 @@ export function buildTemplateIntelligencePreviewHtml(
     display: inline-block;
     margin-top: 18px;
     padding: 10px 16px;
-    border-radius: 999px;
-    background: var(--accent);
-    color: #0a0a0a;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    border-radius: ${preset.buttons.radius};
+    background: ${btnBg};
+    color: ${btnColor};
+    border: ${btnBorder};
+    font-size: ${preset.buttons.uppercase ? "10px" : "12px"};
+    font-weight: ${preset.buttons.weight};
+    letter-spacing: ${preset.buttons.uppercase ? "0.12em" : "0"};
+    text-transform: ${preset.buttons.uppercase ? "uppercase" : "none"};
     text-decoration: none;
   }
   .grid {
     display: grid;
     gap: 10px;
     padding: 16px;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: ${gridCols};
+    max-width: var(--container-max);
+    margin-inline: auto;
   }
   .card {
     border: 1px solid color-mix(in srgb, var(--fg) 12%, transparent);
     background: var(--surface);
-    border-radius: 14px;
+    border-radius: ${cardRadius};
+    box-shadow: ${cardShadow};
     padding: 14px;
     min-height: 72px;
   }
@@ -90,9 +148,20 @@ export function buildTemplateIntelligencePreviewHtml(
     font-size: 11px;
     opacity: 0.55;
   }
+  .site-footer {
+    padding: 12px 16px 16px;
+    font-size: 10px;
+    opacity: 0.45;
+    border-top: 1px solid color-mix(in srgb, var(--accent) 15%, transparent);
+    text-align: ${preset.chrome.footerVariant === "editorial" ? "center" : "left"};
+  }
 </style>
 </head>
 <body>
+  <header class="site-header">
+    <span>${preset.chrome.headerComponent}</span>
+    <span>${preset.chrome.navStyle} nav</span>
+  </header>
   <section class="hero">
     <div class="eyebrow">${template.category} · ${template.designPreset}</div>
     <h1>${template.name}</h1>
@@ -103,11 +172,12 @@ export function buildTemplateIntelligencePreviewHtml(
     ${sections
       .map(
         (id) =>
-          `<article class="card"><strong>${id}</strong><span>${template.layoutStructure}</span></article>`,
+          `<article class="card"><strong>${id}</strong><span>${preset.layout.sectionLayout} · ${preset.layout.cardsStyle}</span></article>`,
       )
       .join("")}
   </div>
   <p class="meta">${template.typography.display} / ${template.typography.body} · ${template.animations.label}</p>
+  <footer class="site-footer">${preset.chrome.footerComponent} · ${preset.chrome.footerVariant}</footer>
 </body>
 </html>`;
 }

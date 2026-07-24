@@ -5,6 +5,29 @@ import { logger } from "@/lib/logger";
 import { isProductionRuntime } from "@/lib/seo/site";
 
 const DEFAULT_FREE_CREDITS = 50;
+/** Development-only balance surfaced when real credits are depleted or unavailable. */
+const DEV_FALLBACK_CREDIT_BALANCE = 1_000_000;
+
+/** Local/test runs only — production always uses real billing. */
+export function isDevelopmentCreditsFallback(): boolean {
+  return process.env.NODE_ENV !== "production";
+}
+
+function developmentCreditBalance(userId: string): CreditBalance {
+  return {
+    user_id: userId,
+    balance: DEV_FALLBACK_CREDIT_BALANCE,
+    lifetime_purchased: 0,
+    lifetime_used: 0,
+    updated_at: new Date().toISOString(),
+  };
+}
+
+function withDevelopmentCreditFallback(userId: string, balance: CreditBalance): CreditBalance {
+  if (!isDevelopmentCreditsFallback()) return balance;
+  if (balance.balance >= DEV_FALLBACK_CREDIT_BALANCE) return balance;
+  return { ...balance, balance: DEV_FALLBACK_CREDIT_BALANCE };
+}
 
 function isMissingTable(error: { code?: string; message?: string } | null) {
   return error?.code === "42P01" || error?.code === "PGRST205";
@@ -38,29 +61,29 @@ export async function ensureCreditBalance(
     if (!billingOptional()) {
       throw Object.assign(new Error("Billing tables missing."), { code: "42P01" });
     }
-    return {
+    return withDevelopmentCreditFallback(userId, {
       user_id: userId,
       balance: initialBalance,
       lifetime_purchased: 0,
       lifetime_used: 0,
       updated_at: new Date().toISOString(),
-    };
+    });
   }
 
-  if (data) return data as CreditBalance;
+  if (data) return withDevelopmentCreditFallback(userId, data as CreditBalance);
 
   const writer = writeClient(supabase);
   if (!writer) {
     if (!billingOptional()) {
       throw new Error("Billing write client unavailable. Set SUPABASE_SERVICE_ROLE_KEY.");
     }
-    return {
+    return withDevelopmentCreditFallback(userId, {
       user_id: userId,
       balance: 0,
       lifetime_purchased: 0,
       lifetime_used: 0,
       updated_at: new Date().toISOString(),
-    };
+    });
   }
 
   const { data: created, error: insertError } = await writer
@@ -77,20 +100,20 @@ export async function ensureCreditBalance(
   if (insertError) {
     if (isMissingTable(insertError)) {
       if (!billingOptional()) throw insertError;
-      return {
+      return withDevelopmentCreditFallback(userId, {
         user_id: userId,
         balance: initialBalance,
         lifetime_purchased: 0,
         lifetime_used: 0,
         updated_at: new Date().toISOString(),
-      };
+      });
     }
     const { data: again } = await supabase
       .from("credit_balances")
       .select("*")
       .eq("user_id", userId)
       .maybeSingle();
-    if (again) return again as CreditBalance;
+    if (again) return withDevelopmentCreditFallback(userId, again as CreditBalance);
     throw insertError;
   }
 
@@ -105,7 +128,7 @@ export async function ensureCreditBalance(
     });
   }
 
-  return created as CreditBalance;
+  return withDevelopmentCreditFallback(userId, created as CreditBalance);
 }
 
 export async function applyCreditDelta(
@@ -187,6 +210,14 @@ export async function consumeCreditsForUsage(
   resource: string,
   amount = 1,
 ): Promise<ConsumeCreditsResult> {
+  if (isDevelopmentCreditsFallback()) {
+    return {
+      ok: true,
+      skipped: true,
+      balance: developmentCreditBalance(userId),
+    };
+  }
+
   try {
     const rpcClient = writeClient(supabase) ?? supabase;
     const { data, error } = await rpcClient.rpc("consume_credits", {
@@ -212,6 +243,13 @@ export async function consumeCreditsForUsage(
 
     const message = String(error?.message ?? "");
     if (message.includes("INSUFFICIENT_CREDITS")) {
+      if (isDevelopmentCreditsFallback()) {
+        return {
+          ok: true,
+          skipped: true,
+          balance: developmentCreditBalance(userId),
+        };
+      }
       const balance = await ensureCreditBalance(supabase, userId).catch(() => ({
         user_id: userId,
         balance: 0,
@@ -246,6 +284,13 @@ export async function consumeCreditsForUsage(
 
       const balance = await ensureCreditBalance(supabase, userId);
       if (balance.balance < amount) {
+        if (isDevelopmentCreditsFallback()) {
+          return {
+            ok: true,
+            skipped: true,
+            balance: developmentCreditBalance(userId),
+          };
+        }
         return {
           ok: false,
           balance,

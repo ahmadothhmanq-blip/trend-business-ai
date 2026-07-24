@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { BusinessSuiteTool } from "@/components/dashboard/business-suite/business-suite-tool";
 import type { BusinessGeneration } from "@/types/business";
 
@@ -38,9 +38,7 @@ export default async function BusinessIntelligencePage() {
 
   return (
     <>
-      <DashboardHeader
-        title="AI Business Suite"
-        description="Business intelligence, planning, analysis, and strategy with AI"
+      <LocalizedDashboardHeader pageId="businessIntelligence"
         userEmail={user.email}
         userName={(profile?.full_name as string | undefined) ?? (userMeta.full_name as string | undefined)}
         avatarUrl={profile?.avatar_url as string | undefined}

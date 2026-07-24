@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { BiWorkspace } from "@/components/dashboard/bi/bi-workspace";
 import { getBiAnalytics, type BiAnalyticsSummary } from "@/lib/bi/analytics";
 import { ensureDefaultMetrics } from "@/lib/bi/metrics";
@@ -100,9 +100,7 @@ export default async function BiPage() {
 
   return (
     <>
-      <DashboardHeader
-        title="Business Intelligence"
-        description="Analytics hub — dashboards, metrics, reports, and AI insights"
+      <LocalizedDashboardHeader pageId="bi"
         userEmail={user.email}
         userName={(profile?.full_name as string | undefined) ?? (userMeta.full_name as string | undefined)}
         avatarUrl={profile?.avatar_url as string | undefined}

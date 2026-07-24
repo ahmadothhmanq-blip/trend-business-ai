@@ -2,6 +2,7 @@ import { requireUser, parseJsonBody } from "@/lib/api/helpers";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { generateCampaign, generatePersona, generatedPersonaToRow, createPersona } from "@/lib/marketing";
+import { getRequestAiLanguage } from "@/lib/i18n/api";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -33,9 +34,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid input" }, { status: 400 });
   }
 
+  const aiLanguage = getRequestAiLanguage(request);
+  const languageSuffix = `\n\nRespond entirely in ${aiLanguage}.`;
+
   if (parsed.data.type === "persona") {
     const generated = await generatePersona({
-      brief: parsed.data.brief,
+      brief: `${parsed.data.brief}${languageSuffix}`,
       industry: parsed.data.industry,
       product: parsed.data.product,
     });
@@ -51,7 +55,7 @@ export async function POST(request: Request) {
   }
 
   const generated = await generateCampaign({
-    brief: parsed.data.brief,
+    brief: `${parsed.data.brief}${languageSuffix}`,
     objective: parsed.data.objective,
     budget: parsed.data.budget,
     channels: parsed.data.channels,

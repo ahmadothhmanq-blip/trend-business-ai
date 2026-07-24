@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { WebAppBuilderTool } from "@/components/dashboard/webapp-builder/webapp-builder-tool";
 import type { WebAppGeneration } from "@/types/webapp";
 
@@ -38,9 +38,7 @@ export default async function AppBuilderPage() {
 
   return (
     <>
-      <DashboardHeader
-        title="AI App Design Platform"
-        description="Design, generate, preview, and manage full-stack applications with AI"
+      <LocalizedDashboardHeader pageId="appBuilder"
         userEmail={user.email}
         userName={(profile?.full_name as string | undefined) ?? (metadata.full_name as string | undefined)}
         avatarUrl={profile?.avatar_url as string | undefined}

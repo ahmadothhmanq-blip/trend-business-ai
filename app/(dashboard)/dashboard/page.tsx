@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { getDashboardHomeData } from "@/lib/db/dashboard-stats";
 import { DashboardOverview } from "@/components/dashboard/overview";
 import type { DashboardHomeData } from "@/types/database";
@@ -42,9 +42,7 @@ export default async function DashboardPage() {
 
   return (
     <>
-      <DashboardHeader
-        title="Dashboard"
-        description="Your AI business workspace overview"
+      <LocalizedDashboardHeader pageId="dashboard"
         userEmail={user?.email}
         userName={userName}
         avatarUrl={avatarUrl}

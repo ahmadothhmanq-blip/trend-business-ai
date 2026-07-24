@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { BusinessManagerWorkspace } from "@/components/dashboard/business-manager/business-manager-workspace";
 import { getBusinessAnalytics } from "@/lib/business-manager/analytics";
 import type {
@@ -192,9 +192,7 @@ export default async function BusinessManagerPage() {
 
   return (
     <>
-      <DashboardHeader
-        title="AI Business Operations"
-        description="Organizations, teams, projects, tasks, workflows, KPIs, and AI strategy"
+      <LocalizedDashboardHeader pageId="businessManager"
         userEmail={user.email}
         userName={(profile?.full_name as string | undefined) ?? (userMeta.full_name as string | undefined)}
         avatarUrl={profile?.avatar_url as string | undefined}

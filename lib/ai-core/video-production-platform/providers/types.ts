@@ -4,6 +4,19 @@
 
 export type VideoProviderId = "preview" | "kling" | "runway" | "heygen" | "external";
 
+/** Render modes that influence provider routing (mirrors VideoRenderJob.mode). */
+export type VideoProviderRenderMode =
+  | "preview"
+  | "full"
+  | "batch-item"
+  | "image-to-video"
+  | "avatar";
+
+export type VideoProviderResolution = {
+  providerId: VideoProviderId;
+  error?: string;
+};
+
 export type VideoProviderClipRequest = {
   prompt: string;
   durationSec: number;
@@ -122,11 +135,83 @@ export function envProviderFlags() {
   };
 }
 
+/**
+ * Default provider for health checks and legacy callers (scene / full render lane).
+ * Avatar renders must use resolveVideoProviderForMode("avatar").
+ */
 export function resolvePreferredProviderId(): VideoProviderId {
   const f = envProviderFlags();
-  if (f.heygen) return "heygen";
   if (f.kling) return "kling";
   if (f.runway) return "runway";
   if (f.external) return "external";
+  if (f.heygen) return "heygen";
   return "preview";
+}
+
+/**
+ * Mode-based provider routing:
+ * - preview → preview stub
+ * - full / image-to-video / batch-item → Kling (primary), then Runway, external; preview if unset
+ * - avatar → HeyGen only
+ */
+export function resolveVideoProviderForMode(
+  mode: VideoProviderRenderMode = "full",
+  explicitId?: VideoProviderId | string,
+): VideoProviderResolution {
+  const validIds: VideoProviderId[] = [
+    "preview",
+    "kling",
+    "runway",
+    "heygen",
+    "external",
+  ];
+
+  if (explicitId && validIds.includes(explicitId as VideoProviderId)) {
+    const id = explicitId as VideoProviderId;
+    if (id === "preview") return { providerId: "preview" };
+    const configured = envProviderFlags();
+    const isConfigured =
+      (id === "kling" && configured.kling) ||
+      (id === "runway" && configured.runway) ||
+      (id === "heygen" && configured.heygen) ||
+      (id === "external" && configured.external);
+    if (!isConfigured) {
+      return {
+        providerId: id,
+        error: `${id} provider requested but API key is not configured.`,
+      };
+    }
+    return { providerId: id };
+  }
+
+  if (mode === "preview") {
+    return { providerId: "preview" };
+  }
+
+  if (mode === "avatar") {
+    if (envProviderFlags().heygen) {
+      return { providerId: "heygen" };
+    }
+    return {
+      providerId: "heygen",
+      error:
+        "Avatar render requires HEYGEN_API_KEY plus HEYGEN_AVATAR_ID and HEYGEN_VOICE_ID.",
+    };
+  }
+
+  // full, image-to-video, batch-item — Kling primary
+  const f = envProviderFlags();
+  if (f.kling) return { providerId: "kling" };
+  if (f.runway) return { providerId: "runway" };
+  if (f.external) return { providerId: "external" };
+
+  if (isStrictVideoProviderMode()) {
+    return {
+      providerId: "preview",
+      error:
+        "Full render requires KLING_API_KEY (recommended) or RUNWAY_API_KEY / external video provider. Preview stubs are disabled when VIDEO_PROVIDER_STRICT=1.",
+    };
+  }
+
+  return { providerId: "preview" };
 }

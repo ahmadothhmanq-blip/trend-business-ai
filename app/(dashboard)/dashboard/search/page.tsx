@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Search } from "lucide-react";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import { createClient } from "@/lib/supabase/server";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
@@ -95,9 +95,7 @@ export default async function SearchPage({
 
   return (
     <>
-      <DashboardHeader
-        title="Search"
-        description="Search across projects, history, favorites and generated assets."
+      <LocalizedDashboardHeader pageId="search"
         userEmail={user?.email}
         userName={metadata.full_name as string | undefined}
       />

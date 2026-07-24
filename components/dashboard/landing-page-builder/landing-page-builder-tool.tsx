@@ -26,6 +26,8 @@ import {
   type ProjectHistoryItem,
 } from "@/components/dashboard/builder-shared";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/client";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import {
   LANDING_PAGE_TYPES,
   LP_LANGUAGES,
@@ -55,6 +57,8 @@ function toHistoryItem(gen: LandingPageGeneration): ProjectHistoryItem {
 }
 
 export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProps) {
+  const { t } = useTranslation();
+  const p = useProductT("landingPageBuilder");
   const onePrompt = getOnePromptProduct("landing-page-builder");
   const [step, setStep] = useState<"type" | "config" | "history" | "generating" | "preview">("type");
   const [selectedType, setSelectedType] = useState("");

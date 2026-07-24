@@ -1,5 +1,7 @@
 import { getOptionalSiteUrl } from "@/lib/env";
 
+import { SUPPORTED_LOCALES as I18N_LOCALES } from "@/lib/i18n/config";
+
 export const SITE_NAME = "Trend Business AI";
 export const SITE_LEGAL_NAME = "Trend Business AI";
 export const SITE_TAGLINE = "AI Business Planning Workspace";
@@ -34,10 +36,21 @@ export const SITE_ORGANIZATION = {
 export const DEFAULT_LOCALE = "en";
 export const DEFAULT_OG_LOCALE = "en_US";
 
-/** Locales prepared for future multilingual expansion. */
-export const SUPPORTED_LOCALES = [
-  { code: "en", ogLocale: "en_US", hreflang: "en", label: "English", isDefault: true },
-] as const;
+/** Locales for SEO hreflang and sitemap expansion. */
+export const SUPPORTED_LOCALES = I18N_LOCALES.map((locale) => ({
+  code: locale.code,
+  ogLocale:
+    locale.code === "en"
+      ? "en_US"
+      : locale.code === "zh-CN"
+        ? "zh_CN"
+        : locale.code === "zh-TW"
+          ? "zh_TW"
+          : locale.code.replace("-", "_"),
+  hreflang: locale.htmlLang,
+  label: locale.nativeName,
+  isDefault: locale.code === "en",
+}));
 
 export type SupportedLocaleCode = (typeof SUPPORTED_LOCALES)[number]["code"];
 

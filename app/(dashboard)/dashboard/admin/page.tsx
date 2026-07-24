@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { AdminPanel } from "@/components/dashboard/platform/admin-panel";
 import { createClient } from "@/lib/supabase/server";
 
@@ -16,7 +16,7 @@ export default async function AdminPage() {
 
   return (
     <div className="space-y-6">
-      <DashboardHeader title="Admin Dashboard" description="System overview, feature flags, and monitoring" />
+      <LocalizedDashboardHeader pageId="admin" />
       <AdminPanel />
     </div>
   );

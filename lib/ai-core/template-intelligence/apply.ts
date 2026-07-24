@@ -1,9 +1,21 @@
 import { getBrandPreset } from "@/lib/ai-core/brand-identity/presets";
 import { injectProfessionalComponents } from "@/lib/ai-core/components/inject";
 import { buildIndustryCopyPack } from "@/lib/ai-core/content/industry-copy";
-import { buildProductionContentPack } from "@/lib/ai-core/content/production-content";
+import {
+  buildProductionContentPack,
+  type ProductionContentPack,
+} from "@/lib/ai-core/content/production-content";
 import { getTemplateIntelligence } from "@/lib/ai-core/template-intelligence/catalog";
+import {
+  resolveComponentsForIndustryAndTemplate,
+  resolveVerticalPaletteId,
+  sanitizeCtaForIndustry,
+} from "@/lib/ai-core/template-intelligence/industry-palettes";
 import type { TemplateIntelligenceDefinition } from "@/lib/ai-core/template-intelligence/types";
+import {
+  buildTemplateVisualCss,
+  resolveTemplateVisualPreset,
+} from "@/lib/ai-core/template-intelligence/visual-preset";
 import type { CoreBrief } from "@/lib/ai-core/layers/types";
 import type { GeneratedProjectFile } from "@/lib/ai/types";
 import type { GeneratedWebsiteProject } from "@/plugins/website/types";
@@ -74,6 +86,16 @@ function applyTokensToGlobals(
 `;
   }
 
+  const visualBlock = buildTemplateVisualCss(template);
+  if (!css.includes("Template Visual Preset")) {
+    css += `\n${visualBlock}\n`;
+  } else {
+    css = css.replace(
+      /\/\* Template Visual Preset[\s\S]*?(?=\n\/\*|$)/,
+      visualBlock.trim(),
+    );
+  }
+
   const next = [...files];
   next[idx] = { ...next[idx]!, content: css };
   return next;
@@ -131,9 +153,11 @@ function patchDesignSystem(
     style: template.designStyle,
     stylePreset: template.designPreset,
     industryPattern:
-      template.industry === "multi"
-        ? base.industryPattern || "business"
-        : template.industry,
+      base.industryPattern && base.industryPattern !== "business"
+        ? base.industryPattern
+        : template.industry === "multi"
+          ? base.industryPattern || "business"
+          : template.industry,
     colors: { ...base.colors, ...colors },
     typography: { ...base.typography, ...typography },
     layoutStyle: template.layoutStructure,
@@ -161,6 +185,73 @@ function shouldPreserveFile(path: string): boolean {
   return false;
 }
 
+function extractPreservedHeroContent(
+  project: GeneratedWebsiteProject,
+  fallback: ProductionContentPack,
+): {
+  heroHeadline: string;
+  heroSubheadline: string;
+  primaryCta: string;
+  secondaryCta: string;
+  heroEyebrow: string;
+  content: ProductionContentPack;
+} {
+  const strategy = project.strategy;
+  const profile = project.businessProfile;
+  const primaryCta =
+    strategy?.ctas?.[0] ||
+    strategy?.pages?.[0]?.primaryCta ||
+    fallback.primaryCta;
+  const secondaryCta =
+    strategy?.ctas?.[1] || fallback.secondaryCta;
+
+  const heroHeadline =
+    project.title?.trim() ||
+    profile?.projectName?.trim() ||
+    fallback.heroHeadline;
+  const heroSubheadline =
+    project.description?.trim() ||
+    profile?.summary?.trim() ||
+    fallback.heroSubheadline;
+  const heroEyebrow =
+    profile?.industry?.replace(/-/g, " ") ||
+    fallback.heroEyebrow;
+
+  const merged: ProductionContentPack = {
+    ...fallback,
+    heroHeadline,
+    heroSubheadline,
+    primaryCta,
+    secondaryCta,
+    heroEyebrow,
+    brandTagline: heroSubheadline || fallback.brandTagline,
+  };
+
+  if (project.content?.length) {
+    const blocks = project.content.filter((c) => c?.trim());
+    if (blocks[0] && blocks[0] !== heroHeadline) {
+      merged.heroSubheadline = blocks[0];
+    }
+    merged.services = merged.services.map((svc, i) => {
+      const body = blocks[i + 1];
+      return body ? { ...svc, body } : svc;
+    });
+    merged.features = merged.features.map((feat, i) => {
+      const body = blocks[i + 2];
+      return body ? { ...feat, body } : feat;
+    });
+  }
+
+  return {
+    heroHeadline,
+    heroSubheadline,
+    primaryCta,
+    secondaryCta,
+    heroEyebrow,
+    content: merged,
+  };
+}
+
 /**
  * Apply Template Intelligence selection onto a Core brief (pre-generation).
  */
@@ -169,8 +260,22 @@ export function applyTemplateIntelligenceToBrief(
   template: TemplateIntelligenceDefinition,
 ): CoreBrief {
   const meta = { ...(brief.metadata || {}) };
+  const industryId =
+    (typeof meta.industryId === "string" && meta.industryId) ||
+    (typeof meta.industry === "string" && meta.industry) ||
+    undefined;
+  const haystack = [brief.prompt, brief.theme, industryId].filter(Boolean).join(" ");
+  const resolvedComponents = resolveComponentsForIndustryAndTemplate(
+    template,
+    industryId,
+    haystack,
+  );
+  const paletteId = resolveVerticalPaletteId(industryId, haystack);
+
   meta.templateIntelligenceId = template.id;
   meta.templateIntelligenceCategory = template.category;
+  meta.templateVisualPalette = paletteId;
+  if (industryId) meta.industryId = industryId;
   meta.designPreset = template.designPreset;
   meta.brandStyle = template.designStyle;
   meta.designStyle = template.designStyle;
@@ -188,7 +293,7 @@ export function applyTemplateIntelligenceToBrief(
     displayFont: template.typography.display,
     bodyFont: template.typography.body,
   };
-  meta.preferredComponents = template.components;
+  meta.preferredComponents = resolvedComponents;
   meta.templateAnimations = template.animations;
   meta.layoutStyle = template.layoutStructure;
 
@@ -231,17 +336,30 @@ export function applyTemplateIntelligenceRetheme(params: {
 
   const profile = params.project.businessProfile;
   const strategy = params.project.strategy;
+  const businessIndustry =
+    profile?.industry ||
+    params.project.designSystem?.industryPattern ||
+    undefined;
   const copyPack = buildIndustryCopyPack({
-    industryId:
-      template.industry !== "multi"
-        ? template.industry
-        : profile?.industry || params.project.designSystem?.industryPattern,
+    industryId: businessIndustry,
     profile: profile || null,
     strategy: strategy || null,
   });
+  copyPack.primaryCta = sanitizeCtaForIndustry(
+    copyPack.primaryCta,
+    copyPack.industryId,
+  );
+  copyPack.secondaryCta = sanitizeCtaForIndustry(
+    copyPack.secondaryCta,
+    copyPack.industryId,
+  );
   const production = buildProductionContentPack(
     copyPack,
     profile?.projectName || params.project.title,
+  );
+  const preservedContent = extractPreservedHeroContent(
+    params.project,
+    production,
   );
 
   const brandName = profile?.projectName || params.project.title || "Brand";
@@ -253,17 +371,18 @@ export function applyTemplateIntelligenceRetheme(params: {
     brandName,
     pageTitle: params.project.title,
     pageDescription: params.project.description,
-    heroHeadline: production.heroHeadline,
-    heroSubheadline: production.heroSubheadline,
-    primaryCta: production.primaryCta,
-    secondaryCta: production.secondaryCta,
-    heroEyebrow: production.heroEyebrow,
-    content: production,
+    heroHeadline: preservedContent.heroHeadline,
+    heroSubheadline: preservedContent.heroSubheadline,
+    primaryCta: preservedContent.primaryCta,
+    secondaryCta: preservedContent.secondaryCta,
+    heroEyebrow: preservedContent.heroEyebrow,
+    content: preservedContent.content,
     composePage: true,
   });
   notes.push(
     `Applied layout components: ${template.components.slice(0, 6).join(", ")}…`,
   );
+  notes.push("Preserved existing headlines, CTAs, and section copy");
 
   // Restore preserved assets if inject stubbed site-images
   for (const file of preserved) {
@@ -276,7 +395,11 @@ export function applyTemplateIntelligenceRetheme(params: {
   }
 
   files = applyTokensToGlobals(files, template);
+  const visualPreset = resolveTemplateVisualPreset(template);
   notes.push(`Applied theme tokens (${template.category} · ${template.designPreset})`);
+  notes.push(
+    `Visual preset: ${visualPreset.chrome.headerVariant} header · ${visualPreset.layout.sectionLayout} sections · ${visualPreset.buttons.primary} buttons`,
+  );
 
   const designSystem = patchDesignSystem(params.project.designSystem, template);
 
@@ -301,11 +424,74 @@ export function applyTemplateIntelligenceRetheme(params: {
       ...params.project.settings,
       templateIntelligenceId: template.id,
       templateIntelligenceCategory: template.category,
+      templateVisualPreset: visualPreset,
     } as GeneratedWebsiteProject["settings"],
   };
 
   notes.push(
     `Template switched to ${template.name} — content, images, and pages preserved`,
+  );
+
+  return { project, template, notes };
+}
+
+/**
+ * Switch template on an existing project without regenerating files or calling AI.
+ * Updates design tokens (globals.css), designSystem, visual preset metadata, and preview input.
+ */
+export function applyTemplateVisualSwitch(params: {
+  project: GeneratedWebsiteProject;
+  templateId: string;
+}): RethemeResult {
+  const template = getTemplateIntelligence(params.templateId);
+  if (!template) {
+    throw new Error(`Unknown template intelligence id: ${params.templateId}`);
+  }
+
+  const notes: string[] = [];
+  const businessIndustry =
+    params.project.businessProfile?.industry ||
+    params.project.designSystem?.industryPattern ||
+    undefined;
+  const resolvedComponents = resolveComponentsForIndustryAndTemplate(
+    template,
+    businessIndustry,
+    params.project.description || params.project.title,
+  );
+  const visualPreset = resolveTemplateVisualPreset(template);
+  const files = applyTokensToGlobals(params.project.files || [], template);
+  notes.push("Updated design tokens in app/globals.css");
+
+  const designSystem = patchDesignSystem(params.project.designSystem, template);
+
+  const project: GeneratedWebsiteProject = {
+    ...params.project,
+    files,
+    designSystem,
+    colorPalette: [
+      template.colors.primary,
+      template.colors.secondary,
+      template.colors.accent,
+      template.colors.background,
+      template.colors.foreground,
+      template.colors.surface,
+    ],
+    typography: [
+      template.typography.display,
+      template.typography.heading,
+      template.typography.body,
+    ],
+    components: resolvedComponents.map(String),
+    settings: {
+      ...params.project.settings,
+      templateIntelligenceId: template.id,
+      templateIntelligenceCategory: template.category,
+      templateVisualPreset: visualPreset,
+    } as GeneratedWebsiteProject["settings"],
+  };
+
+  notes.push(
+    `Template switched to ${template.name} — existing pages and components preserved`,
   );
 
   return { project, template, notes };

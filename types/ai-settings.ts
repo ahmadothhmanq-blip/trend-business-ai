@@ -39,8 +39,8 @@ export type ProviderInfo = {
 export const PROVIDER_MODELS: Record<string, { label: string; models: string[]; defaultModel: string }> = {
   deepseek: {
     label: "DeepSeek",
-    models: ["deepseek-chat", "deepseek-coder", "deepseek-reasoner"],
-    defaultModel: "deepseek-chat",
+    models: ["deepseek-v4-pro", "deepseek-v4-flash"],
+    defaultModel: "deepseek-v4-flash",
   },
   openai: {
     label: "OpenAI",

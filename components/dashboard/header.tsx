@@ -5,6 +5,8 @@ import { Bell, ChevronsUpDown, LogOut, Search, User } from "lucide-react";
 import { signOut } from "@/lib/actions/auth";
 import { DASHBOARD_WORKSPACES } from "@/lib/constants/dashboard-nav";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { LanguageSelector } from "@/components/i18n/language-selector";
+import { useTranslation } from "@/lib/i18n/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +34,7 @@ export function DashboardHeader({
   userName,
   avatarUrl,
 }: DashboardHeaderProps) {
+  const { t } = useTranslation();
   const initials = (userName || userEmail || "U")
     .split(" ")
     .map((n) => n[0])
@@ -74,7 +77,7 @@ export function DashboardHeader({
               className="w-56 border-white/10 bg-[#141414]/95 backdrop-blur-xl"
             >
               <DropdownMenuLabel className="text-white/50">
-                Workspaces
+                {t("dashboard.workspaces")}
               </DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-white/10" />
               {DASHBOARD_WORKSPACES.map((ws) => (
@@ -94,12 +97,12 @@ export function DashboardHeader({
             className="relative min-w-0 flex-1 xl:w-[320px] xl:flex-none"
           >
             <label>
-              <span className="sr-only">Search workspace</span>
+              <span className="sr-only">{t("dashboard.searchWorkspace")}</span>
               <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-white/30" />
               <Input
                 type="search"
                 name="q"
-                placeholder="Search projects, templates, history..."
+                placeholder={t("dashboard.searchPlaceholder")}
                 className="h-11 rounded-2xl border-white/[0.08] bg-white/[0.035] pl-10 pr-4 text-white placeholder:text-white/30 focus-visible:border-premium-gold/30 focus-visible:ring-premium-gold/15"
               />
             </label>
@@ -112,12 +115,13 @@ export function DashboardHeader({
               asChild
               className="relative rounded-xl border border-white/[0.08] bg-white/[0.03] text-white/60 hover:border-premium-gold/25 hover:bg-premium-gold/10 hover:text-premium-gold-light"
             >
-              <Link href="/dashboard/notifications" aria-label="Notifications">
+              <Link href="/dashboard/notifications" aria-label={t("dashboard.notifications")}>
                 <Bell className="size-4" />
                 <span className="absolute right-2.5 top-2.5 size-2 rounded-full bg-premium-gold shadow-[0_0_14px_rgb(212_175_55/0.8)]" />
               </Link>
             </Button>
             <ThemeToggle variant="outline" />
+            <LanguageSelector variant="compact" />
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -155,7 +159,7 @@ export function DashboardHeader({
                 >
                   <Link href="/dashboard/profile">
                     <User className="size-4" />
-                    Profile settings
+                    {t("dashboard.profileSettings")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem
@@ -163,7 +167,7 @@ export function DashboardHeader({
                   className="text-white/70 focus:bg-premium-gold/10 focus:text-premium-gold-light"
                 >
                   <Link href="/dashboard/settings">
-                    Settings
+                    {t("common.settings")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-white/10" />
@@ -172,7 +176,7 @@ export function DashboardHeader({
                   onClick={() => signOut()}
                 >
                   <LogOut className="size-4" />
-                  Sign out
+                  {t("common.signOut")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

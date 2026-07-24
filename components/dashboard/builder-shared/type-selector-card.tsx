@@ -2,12 +2,16 @@
 
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/client";
+import { resolveDescription, resolveLabel } from "@/lib/i18n/resolve-constant-label";
 import type { LucideIcon } from "lucide-react";
 
 export type TypeDefinition = {
   id: string;
   label: string;
   description: string;
+  labelKey?: string;
+  descriptionKey?: string;
   icon: LucideIcon;
 };
 
@@ -20,6 +24,9 @@ export function TypeSelectorCard({
   selected: boolean;
   onSelect: () => void;
 }) {
+  const { t } = useTranslation();
+  const label = resolveLabel(t, def);
+  const description = resolveDescription(t, def);
   const Icon = def.icon;
   return (
     <button
@@ -44,9 +51,9 @@ export function TypeSelectorCard({
       </div>
       <div>
         <p className={cn("text-sm font-semibold", selected ? "text-premium-gold-light" : "text-white/80")}>
-          {def.label}
+          {label}
         </p>
-        <p className="mt-0.5 text-xs leading-relaxed text-white/40">{def.description}</p>
+        <p className="mt-0.5 text-xs leading-relaxed text-white/40">{description}</p>
       </div>
       {selected && (
         <div className="mt-auto self-end">

@@ -4,6 +4,13 @@ import {
   listTemplateIntelligence,
   TEMPLATE_INTELLIGENCE_CATALOG,
 } from "@/lib/ai-core/template-intelligence/catalog";
+import {
+  inferVerticalFromText,
+  normalizeVerticalIndustryId,
+  scoreIndustryTemplateAlignment,
+  SOFTWARE_SIGNALS,
+  AUTOMOTIVE_SIGNALS,
+} from "@/lib/ai-core/template-intelligence/industry-palettes";
 import type {
   TemplateIntelligenceCategory,
   TemplateIntelligenceDefinition,
@@ -27,17 +34,33 @@ function haystack(input: TemplateIntelligenceSelectionInput): string {
     .toLowerCase();
 }
 
+function resolveSelectionIndustry(
+  input: TemplateIntelligenceSelectionInput,
+  text: string,
+): string {
+  const fromInput = normalizeVerticalIndustryId(input.industry);
+  if (fromInput && fromInput !== "business" && fromInput !== "multi") {
+    return fromInput;
+  }
+  const fromBusinessType = normalizeVerticalIndustryId(input.businessType);
+  if (fromBusinessType && fromBusinessType !== "business" && fromBusinessType !== "multi") {
+    return fromBusinessType;
+  }
+  return inferVerticalFromText(text);
+}
+
 function scoreTemplate(
   tpl: TemplateIntelligenceDefinition,
   input: TemplateIntelligenceSelectionInput,
   text: string,
+  resolvedIndustry: string,
 ): number {
   let score = 0;
 
   if (input.category && tpl.category === input.category) score += 40;
 
-  if (input.industry) {
-    const ind = input.industry.toLowerCase();
+  if (resolvedIndustry) {
+    const ind = resolvedIndustry.toLowerCase();
     if (tpl.industry !== "multi" && (tpl.industry === ind || ind.includes(tpl.industry))) {
       score += 35;
     }
@@ -56,21 +79,35 @@ function scoreTemplate(
     if (text.includes(k)) score += 5;
   }
 
-  // Category keyword boosts from free text
   const categoryBoosts: Record<TemplateIntelligenceCategory, string[]> = {
     Luxury: ["luxury", "premium", "exclusive", "fine dining", "michelin"],
     Modern: ["modern", "contemporary", "clean"],
     Minimal: ["minimal", "simple", "stripped"],
     Corporate: ["corporate", "enterprise", "b2b", "professional"],
     Creative: ["creative", "agency", "studio", "portfolio", "artist"],
-    Technology: ["technology", "tech", "ai", "platform", "hardware"],
-    SaaS: ["saas", "software", "subscription", "dashboard"],
-    Automotive: ["automotive", "car", "dealership", "vehicle", "ev"],
-    Restaurant: ["restaurant", "dining", "chef", "menu", "cafe"],
+    Technology: ["technology", "tech", "ai", "platform", "hardware", "software"],
+    SaaS: ["saas", "software", "subscription", "dashboard", "free trial"],
+    Automotive: ["automotive", "car", "dealership", "vehicle", "ev", "showroom"],
+    Restaurant: ["restaurant", "dining", "chef", "menu", "cafe", "bistro"],
     "Real Estate": ["real estate", "property", "homes", "listings", "realtor"],
   };
   for (const word of categoryBoosts[tpl.category] || []) {
     if (text.includes(word)) score += 12;
+  }
+
+  score += scoreIndustryTemplateAlignment(tpl, resolvedIndustry, text);
+
+  const hasSoftware = SOFTWARE_SIGNALS.some((s) => text.includes(s));
+  const hasAutomotive = AUTOMOTIVE_SIGNALS.some((s) => text.includes(s));
+  if (tpl.industry === "automotive" && hasSoftware && !hasAutomotive) {
+    score -= 50;
+  }
+  if (
+    (tpl.category === "Technology" || tpl.category === "SaaS") &&
+    hasSoftware &&
+    !hasAutomotive
+  ) {
+    score += 20;
   }
 
   if (tpl.industry === "multi") score += 2;
@@ -97,20 +134,32 @@ export function selectTemplateIntelligence(
   }
 
   if (input.category && TEMPLATE_INTELLIGENCE_CATEGORIES.includes(input.category)) {
+    const text = haystack(input);
+    const resolvedIndustry = resolveSelectionIndustry(input, text);
     const inCategory = listTemplateIntelligence({ category: input.category });
-    const template = inCategory[0] || TEMPLATE_INTELLIGENCE_CATALOG[0]!;
+    const ranked = inCategory
+      .map((tpl) => ({
+        tpl,
+        score: scoreTemplate(tpl, input, text, resolvedIndustry),
+      }))
+      .sort((a, b) => b.score - a.score);
+    const template = ranked[0]?.tpl || inCategory[0] || TEMPLATE_INTELLIGENCE_CATALOG[0]!;
     return {
       template,
       confidence: 0.82,
       source: "category",
-      reason: `Matched category ${input.category}`,
+      reason: `Matched category ${input.category} for ${resolvedIndustry}`,
       alternatives: inCategory.filter((t) => t.id !== template.id),
     };
   }
 
   const text = haystack(input);
+  const resolvedIndustry = resolveSelectionIndustry(input, text);
   const ranked = [...TEMPLATE_INTELLIGENCE_CATALOG]
-    .map((tpl) => ({ tpl, score: scoreTemplate(tpl, input, text) }))
+    .map((tpl) => ({
+      tpl,
+      score: scoreTemplate(tpl, input, text, resolvedIndustry),
+    }))
     .sort((a, b) => b.score - a.score);
 
   const best = ranked[0]!;
@@ -136,7 +185,7 @@ export function selectTemplateIntelligence(
     template: best.tpl,
     confidence,
     source: "scored",
-    reason: `Best match for industry/audience/style signals (score ${best.score})`,
+    reason: `Best match for ${resolvedIndustry} (score ${best.score})`,
     alternatives,
   };
 }

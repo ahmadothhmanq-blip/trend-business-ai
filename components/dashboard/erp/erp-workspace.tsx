@@ -11,6 +11,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 import { ErpOverview } from "@/components/dashboard/erp/erp-overview";
 import { FinanceDashboard } from "@/components/dashboard/erp/finance-dashboard";
 import { InventoryDashboard } from "@/components/dashboard/erp/inventory-dashboard";
@@ -66,6 +67,7 @@ export function ErpWorkspace({
   initialEmployees = [],
   analyticsSummary,
 }: Props) {
+  const wt = useWorkspaceT("erp");
   const [tab, setTab] = useState<Tab>("overview");
   const summary = analyticsSummary ?? {
     revenueCents: 0,
@@ -83,19 +85,19 @@ export function ErpWorkspace({
   };
 
   const tabs = [
-    { key: "overview" as const, label: "Overview", icon: LayoutDashboard },
-    { key: "finance" as const, label: "Finance", icon: Wallet },
-    { key: "inventory" as const, label: "Inventory", icon: Boxes },
-    { key: "operations" as const, label: "Operations", icon: Briefcase },
-    { key: "hr" as const, label: "HR", icon: Users },
-    { key: "analytics" as const, label: "Analytics", icon: BarChart3 },
-    { key: "assistant" as const, label: "AI Assistant", icon: Sparkles },
+    { key: "overview" as const, labelKey: "tabs.overview", icon: LayoutDashboard },
+    { key: "finance" as const, labelKey: "tabs.finance", icon: Wallet },
+    { key: "inventory" as const, labelKey: "tabs.inventory", icon: Boxes },
+    { key: "operations" as const, labelKey: "tabs.operations", icon: Briefcase },
+    { key: "hr" as const, labelKey: "tabs.hr", icon: Users },
+    { key: "analytics" as const, labelKey: "tabs.analytics", icon: BarChart3 },
+    { key: "assistant" as const, labelKey: "tabs.assistant", icon: Sparkles },
   ];
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-1 rounded-xl border border-white/[0.06] bg-white/[0.02] p-1">
-        {tabs.map(({ key, label, icon: Icon }) => (
+        {tabs.map(({ key, labelKey, icon: Icon }) => (
           <button
             key={key}
             onClick={() => setTab(key)}
@@ -105,7 +107,7 @@ export function ErpWorkspace({
             )}
           >
             <Icon className="size-4" />
-            <span className="hidden sm:inline">{label}</span>
+            <span className="hidden sm:inline">{wt(labelKey)}</span>
           </button>
         ))}
       </div>

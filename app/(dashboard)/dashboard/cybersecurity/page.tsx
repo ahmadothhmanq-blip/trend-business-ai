@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { CyberWorkspace } from "@/components/dashboard/cybersecurity/cyber-workspace";
 import { getCyberAnalytics } from "@/lib/cyber/analytics";
 
@@ -27,9 +27,7 @@ export default async function CybersecurityPage() {
 
   return (
     <>
-      <DashboardHeader
-        title="Cybersecurity"
-        description="Threat intelligence, monitoring, incident response, and security analytics"
+      <LocalizedDashboardHeader pageId="cybersecurity"
         userEmail={user.email}
         userName={(profile?.full_name as string | undefined) ?? (userMeta.full_name as string | undefined)}
         avatarUrl={profile?.avatar_url as string | undefined}

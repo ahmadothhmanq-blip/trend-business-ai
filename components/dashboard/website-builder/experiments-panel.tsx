@@ -20,6 +20,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import type {
   ExperimentChangeType,
   ExperimentResults,
@@ -44,6 +45,7 @@ const CHANGE_TYPES: ExperimentChangeType[] = [
 ];
 
 export function ExperimentsPanel(props: { generationId: string | null }) {
+  const wb = useProductT("websiteBuilder");
   const [data, setData] = useState<ExperimentsResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -63,11 +65,11 @@ export function ExperimentsPanel(props: { generationId: string | null }) {
       );
       if (!res.ok) {
         const body = (await res.json()) as { error?: string };
-        throw new Error(body.error || "Failed to load experiments");
+        throw new Error(body.error || wb("panels.failedLoadExperiments"));
       }
       setData((await res.json()) as ExperimentsResponse);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load");
+      setError(err instanceof Error ? err.message : wb("panels.failedLoad"));
       setData(null);
     } finally {
       setLoading(false);
@@ -97,7 +99,7 @@ export function ExperimentsPanel(props: { generationId: string | null }) {
           }),
         },
       );
-      if (!res.ok) throw new Error("Status update failed");
+      if (!res.ok) throw new Error(wb("panels.statusUpdateFailed"));
       await load();
     } finally {
       setBusyId(null);
@@ -122,7 +124,7 @@ export function ExperimentsPanel(props: { generationId: string | null }) {
   if (!props.generationId) {
     return (
       <div className="flex h-[420px] items-center justify-center text-sm text-white/40">
-        Generate or select a website to run A/B experiments.
+        {wb("panels.selectWebsiteExperiments")}
       </div>
     );
   }
@@ -131,7 +133,7 @@ export function ExperimentsPanel(props: { generationId: string | null }) {
     return (
       <div className="flex h-[420px] items-center justify-center gap-2 text-white/40">
         <Loader2 className="size-4 animate-spin" />
-        Loading experiments…
+        {wb("panels.loadingExperiments")}
       </div>
     );
   }
@@ -154,9 +156,9 @@ export function ExperimentsPanel(props: { generationId: string | null }) {
         <div>
           <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-premium-gold/25 bg-premium-gold/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-premium-gold">
             <FlaskConical className="size-3" />
-            A/B Testing
+            {wb("panels.abTesting")}
           </div>
-          <h3 className="text-lg font-bold text-white">Experiments</h3>
+          <h3 className="text-lg font-bold text-white">{wb("panels.experimentsTitle")}</h3>
           <p className="mt-1 max-w-2xl text-[12px] text-white/40">
             Create Variant A / Variant B, duplicate sections, split traffic, and
             automatically declare winning variants by conversion rate.
@@ -167,13 +169,13 @@ export function ExperimentsPanel(props: { generationId: string | null }) {
           onClick={() => setCreateOpen(true)}
         >
           <Plus className="size-4" />
-          New experiment
+          {wb("panels.newExperiment")}
         </Button>
       </div>
 
       {!data?.experiments.length ? (
         <DashboardPanel className="p-8 text-center text-sm text-white/40">
-          No experiments yet. Create Variant A and B to start optimizing.
+          {wb("panels.noExperimentsYet")}
         </DashboardPanel>
       ) : (
         <div className="space-y-4">
@@ -191,12 +193,12 @@ export function ExperimentsPanel(props: { generationId: string | null }) {
                       {exp.winnerVariantId ? (
                         <span className="inline-flex items-center gap-1 rounded-full bg-premium-gold/20 px-2 py-0.5 text-[10px] font-semibold text-premium-gold">
                           <Trophy className="size-3" />
-                          Winner declared
+                          {wb("panels.winnerDeclared")}
                         </span>
                       ) : null}
                     </div>
                     <p className="mt-1 text-[12px] text-white/45">
-                      {exp.hypothesis || "No hypothesis set"}
+                      {exp.hypothesis || wb("panels.noHypothesis")}
                     </p>
                     <p className="mt-1 text-[11px] text-white/30">
                       Testing: {exp.changeTypes.join(" · ") || "general"}
@@ -340,21 +342,22 @@ function CreateExperimentDialog(props: {
   generationId: string;
   onCreated: () => void;
 }) {
+  const wb = useProductT("websiteBuilder");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [name, setName] = useState("Hero headline & CTA test");
+  const [name, setName] = useState(wb("panels.defaultExperimentName"));
   const [hypothesis, setHypothesis] = useState(
     "A clearer outcome-led CTA will beat the control on conversions.",
   );
   const [changeType, setChangeType] =
     useState<ExperimentChangeType>("headline");
   const [target, setTarget] = useState("hero");
-  const [controlValue, setControlValue] = useState("Original headline");
+  const [controlValue, setControlValue] = useState(wb("panels.defaultControlHeadline"));
   const [variantValue, setVariantValue] = useState(
-    "Grow faster with a conversion-ready website",
+    wb("panels.defaultVariantHeadline"),
   );
-  const [buttonControl, setButtonControl] = useState("Get started");
-  const [buttonVariant, setButtonVariant] = useState("Book a free consult");
+  const [buttonControl, setButtonControl] = useState(wb("panels.defaultButtonControl"));
+  const [buttonVariant, setButtonVariant] = useState(wb("panels.defaultButtonVariant"));
 
   const submit = async () => {
     setSaving(true);
@@ -370,7 +373,7 @@ function CreateExperimentDialog(props: {
             hypothesis,
             changeTypes: [changeType, "button"],
             variantA: {
-              name: "Control (A)",
+              name: wb("panels.controlA"),
               weight: 50,
               changes: [
                 {
@@ -388,7 +391,7 @@ function CreateExperimentDialog(props: {
               ],
             },
             variantB: {
-              name: "Challenger (B)",
+              name: wb("panels.challengerB"),
               weight: 50,
               changes: [
                 {
@@ -411,11 +414,11 @@ function CreateExperimentDialog(props: {
       );
       if (!res.ok) {
         const body = (await res.json()) as { error?: string };
-        throw new Error(body.error || "Create failed");
+        throw new Error(body.error || wb("panels.createFailed"));
       }
       props.onCreated();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Create failed");
+      setError(err instanceof Error ? err.message : wb("panels.createFailed"));
     } finally {
       setSaving(false);
     }
@@ -436,13 +439,13 @@ function CreateExperimentDialog(props: {
           <Input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Experiment name"
+            placeholder={wb("panels.experimentNamePlaceholder")}
             className="border-white/10 bg-white/5 text-white"
           />
           <Textarea
             value={hypothesis}
             onChange={(e) => setHypothesis(e.target.value)}
-            placeholder="Hypothesis"
+            placeholder={wb("panels.hypothesisPlaceholder")}
             className="min-h-[72px] border-white/10 bg-white/5 text-white"
           />
           <div className="grid gap-3 sm:grid-cols-2">
@@ -462,33 +465,33 @@ function CreateExperimentDialog(props: {
             <Input
               value={target}
               onChange={(e) => setTarget(e.target.value)}
-              placeholder="Target section (e.g. hero, pricing)"
+              placeholder={wb("panels.targetSectionPlaceholder")}
               className="border-white/10 bg-white/5 text-white"
             />
           </div>
           <Input
             value={controlValue}
             onChange={(e) => setControlValue(e.target.value)}
-            placeholder="Variant A (control) value"
+            placeholder={wb("panels.variantAPlaceholder")}
             className="border-white/10 bg-white/5 text-white"
           />
           <Input
             value={variantValue}
             onChange={(e) => setVariantValue(e.target.value)}
-            placeholder="Variant B value"
+            placeholder={wb("panels.variantBPlaceholder")}
             className="border-white/10 bg-white/5 text-white"
           />
           <div className="grid gap-3 sm:grid-cols-2">
             <Input
               value={buttonControl}
               onChange={(e) => setButtonControl(e.target.value)}
-              placeholder="Button A"
+              placeholder={wb("panels.buttonAPlaceholder")}
               className="border-white/10 bg-white/5 text-white"
             />
             <Input
               value={buttonVariant}
               onChange={(e) => setButtonVariant(e.target.value)}
-              placeholder="Button B"
+              placeholder={wb("panels.buttonBPlaceholder")}
               className="border-white/10 bg-white/5 text-white"
             />
           </div>

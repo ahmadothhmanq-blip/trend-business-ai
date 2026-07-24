@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { HistoryList } from "@/components/dashboard/history-list";
 import { loadUserHistoryItems } from "@/lib/db/history-items";
 
@@ -14,9 +14,7 @@ export default async function HistoryPage() {
 
   return (
     <>
-      <DashboardHeader
-        title="History"
-        description="Review and manage everything you have generated"
+      <LocalizedDashboardHeader pageId="history"
         userEmail={user?.email}
         userName={metadata.full_name as string | undefined}
       />

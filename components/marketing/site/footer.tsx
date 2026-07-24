@@ -14,6 +14,8 @@ import {
   REF_FOOTER_TAGLINE,
   REF_LEGAL,
 } from "@/lib/constants/marketing-content";
+import { useTranslation } from "@/lib/i18n/client";
+import { translateLinkItems } from "@/lib/i18n/translate-field";
 
 function Col({
   title,
@@ -42,6 +44,7 @@ function Col({
 }
 
 function NewsletterForm() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [honeypot, setHoneypot] = useState("");
   const [loading, setLoading] = useState(false);
@@ -56,11 +59,11 @@ function NewsletterForm() {
         body: JSON.stringify({ email, source: "newsletter", honeypot }),
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Subscribe failed");
-      toast.success("You are subscribed.");
+      if (!res.ok) throw new Error(json.error ?? t("marketing.footer.subscribeFailed"));
+      toast.success(t("marketing.footer.subscribed"));
       setEmail("");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Subscribe failed");
+      toast.error(err instanceof Error ? err.message : t("marketing.footer.subscribeFailed"));
     } finally {
       setLoading(false);
     }
@@ -80,7 +83,7 @@ function NewsletterForm() {
         onChange={(e) => setHoneypot(e.target.value)}
       />
       <label htmlFor="site-newsletter" className="sr-only">
-        Email address
+        {t("auth.email")}
       </label>
       <input
         id="site-newsletter"
@@ -88,13 +91,13 @@ function NewsletterForm() {
         required
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        placeholder="Your email address"
+        placeholder={t("marketing.footer.emailPlaceholder")}
         className="min-w-0 flex-1 bg-transparent px-4 py-2.5 text-[13px] text-white outline-none placeholder:text-[#5A5A5A] sm:py-3"
       />
       <button
         type="submit"
         disabled={loading}
-        aria-label="Subscribe"
+        aria-label={t("marketing.footer.subscribe")}
         className="m-1 inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(180deg,#FFD700,#D4AF37)] text-[#111111] hover:brightness-110 disabled:opacity-60 sm:m-1.5 sm:size-9"
       >
         {loading ? (
@@ -132,6 +135,27 @@ const SOCIAL = [
 
 /** Reference footer — crest watermark, columns, newsletter, legal bar. */
 export function SiteFooter() {
+  const { t } = useTranslation();
+  const servicesLinks = translateLinkItems(t, REF_FOOTER_SERVICES_LINKS.map((item, i) => ({
+    ...item,
+    labelKey: [
+      "marketing.servicesDropdown.aiWebsiteBuilder",
+      "marketing.servicesDropdown.aiAppDevelopment",
+      "marketing.servicesDropdown.aiVideoStudio",
+      "marketing.servicesDropdown.aiMarketing",
+      "marketing.servicesDropdown.aiBusinessManagement",
+      "marketing.servicesDropdown.aiAgents",
+    ][i],
+  })));
+  const companyLinks = translateLinkItems(t, REF_FOOTER_COMPANY.map((item, i) => ({
+    ...item,
+    labelKey: ["marketing.footer.aboutUs", "marketing.footer.careers", "marketing.footer.blog", "nav.pricing", "nav.contact"][i],
+  })));
+  const resourceLinks = translateLinkItems(t, REF_FOOTER_RESOURCES.map((item, i) => ({
+    ...item,
+    labelKey: ["marketing.footer.documentation", "marketing.footer.knowledgeCenter", "marketing.footer.helpCenter", "nav.templates", "marketing.footer.resources"][i],
+  })));
+
   return (
     <footer className="relative z-10 overflow-hidden border-t border-[rgba(212,175,55,0.1)] bg-[#050505]">
       <div
@@ -157,7 +181,7 @@ export function SiteFooter() {
               </span>
             </div>
             <p className="mt-5 text-[13px] leading-[1.7] text-[#7A7A7A] sm:mt-6 sm:text-[14px] sm:leading-[1.75]">
-              {REF_FOOTER_TAGLINE}
+              {t("marketing.footer.tagline")}
             </p>
             <div className="mt-6 flex items-center gap-2.5 sm:mt-7 sm:gap-3">
               {SOCIAL.map(({ label, href, d }) => (
@@ -183,14 +207,14 @@ export function SiteFooter() {
             </div>
           </div>
 
-          <Col title="Services" items={REF_FOOTER_SERVICES_LINKS} />
-          <Col title="Company" items={REF_FOOTER_COMPANY} />
-          <Col title="Resources" items={REF_FOOTER_RESOURCES} />
+          <Col title={t("marketing.footer.services")} items={servicesLinks} />
+          <Col title={t("marketing.footer.company")} items={companyLinks} />
+          <Col title={t("marketing.footer.resources")} items={resourceLinks} />
 
           <div>
-            <p className="text-[13px] font-semibold text-white sm:text-[14px]">Newsletter</p>
+            <p className="text-[13px] font-semibold text-white sm:text-[14px]">{t("marketing.footer.newsletterTitle")}</p>
             <p className="mt-4 text-[13px] leading-[1.7] text-[#7A7A7A] sm:mt-5 sm:text-[14px]">
-              {REF_FOOTER_NEWSLETTER}
+              {t("marketing.footer.newsletter")}
             </p>
             <NewsletterForm />
           </div>
@@ -199,7 +223,7 @@ export function SiteFooter() {
         <div className="mt-12 border-t border-[rgba(255,255,255,0.08)] pt-6 sm:mt-14 sm:pt-7">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <p className="text-[12px] text-[#5A5A5A] sm:text-[13px]">
-              © {new Date().getFullYear()} Trend Business AI. All rights reserved.
+              © {new Date().getFullYear()} {t("common.appName")}. {t("marketing.footer.copyright")}
             </p>
             <nav aria-label="Legal" className="flex flex-wrap gap-x-5 gap-y-2 sm:gap-x-6">
               {REF_LEGAL.map((l) => (

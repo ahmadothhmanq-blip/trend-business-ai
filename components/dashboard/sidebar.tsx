@@ -13,15 +13,20 @@ import {
 import { useDashboardShell } from "@/components/dashboard/shell-context";
 import { BrandLogo } from "@/components/ui/brand-logo";
 import { Button } from "@/components/ui/button";
+import { getNavLabel } from "@/lib/i18n/nav";
+import { useTranslation } from "@/lib/i18n/client";
+import { LanguageSelector } from "@/components/i18n/language-selector";
 import { cn } from "@/lib/utils";
 
 const NavLink = memo(function NavLink({
   item,
+  label,
   collapsed,
   pathname,
   onNavigate,
 }: {
   item: DashboardNavItem;
+  label: string;
   collapsed: boolean;
   pathname: string;
   onNavigate?: () => void;
@@ -36,7 +41,7 @@ const NavLink = memo(function NavLink({
     <Link
       href={item.href}
       onClick={onNavigate}
-      title={collapsed ? item.label : undefined}
+      title={collapsed ? label : undefined}
       className={cn(
         "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200",
         collapsed && "justify-center px-2",
@@ -55,13 +60,14 @@ const NavLink = memo(function NavLink({
       >
         <Icon className="size-4" aria-hidden="true" />
       </span>
-      {!collapsed && <span className="truncate">{item.label}</span>}
+      {!collapsed && <span className="truncate">{label}</span>}
     </Link>
   );
 });
 
 export function DashboardSidebar() {
   const pathname = usePathname();
+  const { t } = useTranslation();
   const { collapsed, mobileOpen, setMobileOpen, toggleCollapsed } =
     useDashboardShell();
   const [aiOpen, setAiOpen] = useState(true);
@@ -99,7 +105,7 @@ export function DashboardSidebar() {
               </span>
               <span className="flex items-center gap-1 text-[10px] text-white/35">
                 <Sparkles className="size-2.5 text-premium-gold/70" />
-                AI Workspace
+                {t("dashboard.aiWorkspace")}
               </span>
             </div>
           )}
@@ -110,13 +116,14 @@ export function DashboardSidebar() {
         <div className="space-y-1">
           {!collapsed && (
             <p className="mb-2 px-2 text-[10px] font-semibold tracking-[0.18em] text-white/30 uppercase">
-              Workspace
+              {t("nav.workspace")}
             </p>
           )}
           {DASHBOARD_PRIMARY_NAV.map((item) => (
             <NavLink
               key={item.href}
               item={item}
+              label={getNavLabel(t, item)}
               collapsed={collapsed}
               pathname={pathname}
               onNavigate={closeMobile}
@@ -131,7 +138,7 @@ export function DashboardSidebar() {
               onClick={() => setAiOpen((v) => !v)}
               className="mb-2 flex w-full items-center justify-between px-2 text-[10px] font-semibold tracking-[0.18em] text-white/30 uppercase"
             >
-              AI Products
+              {t("nav.aiProducts")}
               <ChevronDown
                 className={cn(
                   "size-3.5 transition-transform",
@@ -150,6 +157,7 @@ export function DashboardSidebar() {
                 <NavLink
                   key={item.href}
                   item={item}
+                  label={getNavLabel(t, item)}
                   collapsed={collapsed}
                   pathname={pathname}
                   onNavigate={closeMobile}
@@ -162,13 +170,14 @@ export function DashboardSidebar() {
         <div className="space-y-1">
           {!collapsed && (
             <p className="mb-2 px-2 text-[10px] font-semibold tracking-[0.18em] text-white/30 uppercase">
-              Library
+              {t("nav.templates")}
             </p>
           )}
           {DASHBOARD_SECONDARY_NAV.map((item) => (
             <NavLink
               key={item.href}
               item={item}
+              label={getNavLabel(t, item)}
               collapsed={collapsed}
               pathname={pathname}
               onNavigate={closeMobile}
@@ -177,7 +186,13 @@ export function DashboardSidebar() {
         </div>
       </nav>
 
-      <div className="mt-4 hidden lg:block">
+      <div className="mt-4 space-y-2">
+        {!collapsed && (
+          <div className="px-1">
+            <LanguageSelector variant="ghost" className="w-full justify-start" />
+          </div>
+        )}
+        <div className="hidden lg:block">
         <Button
           type="button"
           variant="ghost"
@@ -193,10 +208,11 @@ export function DashboardSidebar() {
           ) : (
             <>
               <ChevronsLeft className="size-4" />
-              Collapse
+              {t("dashboard.collapseSidebar")}
             </>
           )}
         </Button>
+        </div>
       </div>
     </>
   );

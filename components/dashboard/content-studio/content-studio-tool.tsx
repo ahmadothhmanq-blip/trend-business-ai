@@ -41,6 +41,8 @@ import {
   type ProjectHistoryItem,
 } from "@/components/dashboard/builder-shared";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/client";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import { safeMarkdownToHtml } from "@/lib/ai/sanitize";
 import {
   CONTENT_TOOLS,
@@ -51,6 +53,7 @@ import {
   CREATIVITY_LEVELS,
   CONTENT_OPTION_LIST,
   getContentTool,
+  getContentToolLabel,
   getContentTypesForTool,
   getContentTypeLabel,
 } from "@/lib/constants/content-studio";
@@ -77,6 +80,8 @@ function ContentPreview({
   onRegenerate?: () => void;
   onContinue?: () => void;
 }) {
+  const { t } = useTranslation();
+  const p = useProductT("contentStudio");
   const bp = gen.blueprint;
   const [tab, setTab] = useState<PreviewTab>("content");
   const [copied, setCopied] = useState(false);
@@ -85,8 +90,8 @@ function ContentPreview({
     return (
       <DashboardPanel className="py-16 text-center">
         <FileText className="mx-auto size-10 text-white/20" />
-        <p className="mt-4 text-white/50">No content to preview</p>
-        <Button variant="outline" className="mt-4 rounded-xl border-white/10 text-white/60" onClick={onBack}>Back</Button>
+        <p className="mt-4 text-white/50">{p("preview.noContent")}</p>
+        <Button variant="outline" className="mt-4 rounded-xl border-white/10 text-white/60" onClick={onBack}>{t("common.back")}</Button>
       </DashboardPanel>
     );
   }
@@ -94,17 +99,17 @@ function ContentPreview({
   const wordCount = bp.body.split(/\s+/).filter(Boolean).length;
 
   const tabs: { key: PreviewTab; label: string; show: boolean }[] = [
-    { key: "content", label: "Content", show: true },
-    { key: "seo", label: `SEO ${bp.seo ? `(${bp.seo.score}/100)` : ""}`, show: !!bp.seo },
-    { key: "headlines", label: `Headlines (${bp.headlines.length})`, show: bp.headlines.length > 1 },
-    { key: "review", label: "Review", show: bp.suggestions.length > 0 || bp.improvements.length > 0 },
-    { key: "files", label: `Files (${bp.files.length})`, show: bp.files.length > 0 },
+    { key: "content", label: p("preview.content"), show: true },
+    { key: "seo", label: bp.seo ? p("preview.seoTab", { score: bp.seo.score }) : p("seo.score"), show: !!bp.seo },
+    { key: "headlines", label: p("preview.headlines", { count: bp.headlines.length }), show: bp.headlines.length > 1 },
+    { key: "review", label: p("preview.review"), show: bp.suggestions.length > 0 || bp.improvements.length > 0 },
+    { key: "files", label: p("preview.files", { count: bp.files.length }), show: bp.files.length > 0 },
   ];
 
   const handleCopy = () => {
     navigator.clipboard.writeText(bp.body);
     setCopied(true);
-    toast.success("Content copied to clipboard");
+    toast.success(p("preview.contentCopied"));
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -114,21 +119,21 @@ function ContentPreview({
         <Button variant="ghost" size="icon-xs" onClick={onBack} className="text-white/40 hover:text-white"><ArrowLeft className="size-4" /></Button>
         <div className="min-w-0 flex-1">
           <h3 className="truncate font-bold text-white">{bp.title}</h3>
-          <p className="text-xs text-white/40">{getContentTypeLabel(bp.contentType)} &middot; {bp.tone} &middot; {bp.language} &middot; {wordCount} words &middot; {gen.provider ?? "deepseek"}</p>
+          <p className="text-xs text-white/40">{getContentTypeLabel(bp.contentType)} &middot; {bp.tone} &middot; {bp.language} &middot; {wordCount} {p("preview.words")} &middot; {gen.provider ?? "deepseek"}</p>
         </div>
         <div className="flex flex-wrap gap-2">
           {onRegenerate ? (
             <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:border-white/20" onClick={onRegenerate}>
-              <RefreshCw className="size-3" /> Regenerate
+              <RefreshCw className="size-3" /> {p("actions.regenerate")}
             </Button>
           ) : null}
           {onContinue ? (
             <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-premium-gold/20 text-xs text-premium-gold-light hover:border-premium-gold/40" onClick={onContinue}>
-              <Wand2 className="size-3" /> Improve with AI
+              <Wand2 className="size-3" /> {p("actions.improveWithAi")}
             </Button>
           ) : null}
           <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:text-white" onClick={handleCopy}>
-            {copied ? <Check className="size-3" /> : <ClipboardCopy className="size-3" />} {copied ? "Copied" : "Copy"}
+            {copied ? <Check className="size-3" /> : <ClipboardCopy className="size-3" />} {copied ? p("preview.copied") : t("common.copy")}
           </Button>
           <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:border-premium-gold/25 hover:text-premium-gold-light"
             onClick={async () => {
@@ -138,9 +143,9 @@ function ContentPreview({
               const url = URL.createObjectURL(blob);
               const a = document.createElement("a"); a.href = url;
               a.download = `${bp.title.replace(/\s+/g, "-").toLowerCase()}-content.zip`; a.click();
-              URL.revokeObjectURL(url); toast.success("Content exported");
+              URL.revokeObjectURL(url); toast.success(p("preview.contentExported"));
             }}>
-            <Download className="size-3" /> Export ZIP
+            <Download className="size-3" /> {p("preview.exportZip")}
           </Button>
         </div>
       </div>
@@ -162,19 +167,19 @@ function ContentPreview({
       {tab === "seo" && bp.seo && (
         <div className="space-y-4">
           <div className="grid gap-3 sm:grid-cols-3">
-            <SeoScoreCard label="SEO Score" value={bp.seo.score} max={100} />
-            <SeoScoreCard label="Readability" value={bp.seo.readabilityScore} max={100} />
-            <SeoScoreCard label="Word Count" value={bp.seo.wordCount || wordCount} />
+            <SeoScoreCard label={p("seo.score")} value={bp.seo.score} max={100} />
+            <SeoScoreCard label={p("seo.readability")} value={bp.seo.readabilityScore} max={100} />
+            <SeoScoreCard label={p("seo.wordCount")} value={bp.seo.wordCount || wordCount} />
           </div>
 
           <DashboardPanel className="space-y-4 p-5">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-white/30">Meta Title</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-white/30">{p("seo.metaTitle")}</p>
               <p className="mt-1 text-sm text-white/80">{bp.seo.metaTitle}</p>
               <p className="mt-0.5 text-[10px] text-white/30">{bp.seo.metaTitle.length}/60 chars</p>
             </div>
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-white/30">Meta Description</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-white/30">{p("seo.metaDescription")}</p>
               <p className="mt-1 text-sm text-white/60">{bp.seo.metaDescription}</p>
               <p className="mt-0.5 text-[10px] text-white/30">{bp.seo.metaDescription.length}/160 chars</p>
             </div>
@@ -182,7 +187,7 @@ function ContentPreview({
 
           {Object.keys(bp.seo.keywordDensity).length > 0 && (
             <DashboardPanel className="p-5">
-              <p className="mb-3 text-[10px] font-bold uppercase tracking-wider text-white/30">Keyword Density</p>
+              <p className="mb-3 text-[10px] font-bold uppercase tracking-wider text-white/30">{p("seo.keywordDensity")}</p>
               <div className="space-y-2">
                 {Object.entries(bp.seo.keywordDensity).map(([k, v]) => (
                   <div key={k} className="flex items-center justify-between">
@@ -201,7 +206,7 @@ function ContentPreview({
 
           {bp.seo.faqItems.length > 0 && (
             <DashboardPanel className="p-5">
-              <p className="mb-3 text-[10px] font-bold uppercase tracking-wider text-white/30">Generated FAQ</p>
+              <p className="mb-3 text-[10px] font-bold uppercase tracking-wider text-white/30">{p("seo.generatedFaq")}</p>
               <div className="space-y-3">
                 {bp.seo.faqItems.map((faq, i) => (
                   <FaqItem key={i} question={faq.question} answer={faq.answer} />
@@ -212,21 +217,21 @@ function ContentPreview({
 
           {bp.seo.headingStructure.length > 0 && (
             <DashboardPanel className="p-5">
-              <p className="mb-3 text-[10px] font-bold uppercase tracking-wider text-white/30">Heading Structure</p>
+              <p className="mb-3 text-[10px] font-bold uppercase tracking-wider text-white/30">{p("seo.headingStructure")}</p>
               <ul className="space-y-1">{bp.seo.headingStructure.map((h, i) => <li key={i} className="text-xs text-white/50">{h}</li>)}</ul>
             </DashboardPanel>
           )}
 
           {bp.seo.internalLinkingSuggestions.length > 0 && (
             <DashboardPanel className="p-5">
-              <p className="mb-3 text-[10px] font-bold uppercase tracking-wider text-white/30">Internal Linking Suggestions</p>
+              <p className="mb-3 text-[10px] font-bold uppercase tracking-wider text-white/30">{p("seo.internalLinking")}</p>
               <ul className="space-y-1">{bp.seo.internalLinkingSuggestions.map((l, i) => <li key={i} className="text-xs text-white/50">→ {l}</li>)}</ul>
             </DashboardPanel>
           )}
 
           {bp.seo.schemaSuggestions.length > 0 && (
             <DashboardPanel className="p-5">
-              <p className="mb-3 text-[10px] font-bold uppercase tracking-wider text-white/30">Schema Suggestions</p>
+              <p className="mb-3 text-[10px] font-bold uppercase tracking-wider text-white/30">{p("seo.schemaSuggestions")}</p>
               <div className="flex flex-wrap gap-2">
                 {bp.seo.schemaSuggestions.map((s) => <span key={s} className="rounded-md bg-premium-gold/10 px-2 py-0.5 text-[10px] text-premium-gold-light">{s}</span>)}
               </div>
@@ -241,7 +246,7 @@ function ContentPreview({
             <div key={i} className="flex items-center justify-between gap-3 rounded-lg bg-white/[0.02] p-3">
               <span className="min-w-[1.5rem] text-center text-xs font-bold text-premium-gold-light">{i + 1}</span>
               <span className="flex-1 text-sm text-white/70">{h}</span>
-              <Button variant="ghost" size="icon-xs" className="text-white/30 hover:text-white" onClick={() => { navigator.clipboard.writeText(h); toast.success("Copied"); }}>
+              <Button variant="ghost" size="icon-xs" className="text-white/30 hover:text-white" onClick={() => { navigator.clipboard.writeText(h); toast.success(p("preview.copied")); }}>
                 <Copy className="size-3" />
               </Button>
             </div>
@@ -253,13 +258,13 @@ function ContentPreview({
         <div className="space-y-4">
           {bp.suggestions.length > 0 && (
             <DashboardPanel className="p-5">
-              <div className="mb-3 flex items-center gap-2 text-premium-gold-light"><Lightbulb className="size-4" /><span className="text-xs font-bold uppercase tracking-wider">Suggestions</span></div>
+              <div className="mb-3 flex items-center gap-2 text-premium-gold-light"><Lightbulb className="size-4" /><span className="text-xs font-bold uppercase tracking-wider">{p("preview.suggestions")}</span></div>
               <ul className="space-y-2">{bp.suggestions.map((s, i) => <li key={i} className="text-xs text-white/60">• {s}</li>)}</ul>
             </DashboardPanel>
           )}
           {bp.improvements.length > 0 && (
             <DashboardPanel className="p-5">
-              <div className="mb-3 flex items-center gap-2 text-premium-gold-light"><Wand2 className="size-4" /><span className="text-xs font-bold uppercase tracking-wider">Improvements</span></div>
+              <div className="mb-3 flex items-center gap-2 text-premium-gold-light"><Wand2 className="size-4" /><span className="text-xs font-bold uppercase tracking-wider">{p("preview.improvements")}</span></div>
               <ul className="space-y-2">{bp.improvements.map((im, i) => <li key={i} className="text-xs text-white/60">• {im}</li>)}</ul>
             </DashboardPanel>
           )}
@@ -274,7 +279,7 @@ function ContentPreview({
                 <p className="truncate text-xs font-semibold text-white/80">{f.path}</p>
                 <p className="text-[10px] text-white/40">{f.language} &middot; {f.content.length} chars</p>
               </div>
-              <Button variant="ghost" size="icon-xs" className="text-white/30 hover:text-white" onClick={() => { navigator.clipboard.writeText(f.content); toast.success("Copied"); }}>
+              <Button variant="ghost" size="icon-xs" className="text-white/30 hover:text-white" onClick={() => { navigator.clipboard.writeText(f.content); toast.success(p("preview.copied")); }}>
                 <Copy className="size-3" />
               </Button>
             </DashboardPanel>
@@ -338,6 +343,8 @@ function toHistoryItem(gen: ContentGeneration): ProjectHistoryItem {
 /* ------------------------------------------------------------------ */
 
 export function ContentStudioTool({ initialGenerations }: Props) {
+  const { t } = useTranslation();
+  const p = useProductT("contentStudio");
   type Step = "tool" | "type" | "config" | "generating" | "preview" | "history";
 
   const onePrompt = getOnePromptProduct("content-studio");
@@ -434,16 +441,16 @@ export function ContentStudioTool({ initialGenerations }: Props) {
     if (!contentTool || !idea) {
       toast.error(
         mode === "continue"
-          ? "Describe the changes you want in natural language."
-          : "Enter your idea to generate content.",
+          ? p("errors.describeChanges")
+          : p("errors.enterIdeaContent"),
       );
       return;
     }
     if (overridePrompt) setPrompt(overridePrompt);
     setStep("generating");
     setProgressEvents([
-      "[idea] Understanding your topic...",
-      "[strategy] Structuring channel-ready copy...",
+      p("generating.ideaEvent"),
+      p("generating.strategyEvent"),
     ]);
     try {
       const res = await fetch("/api/content-studio", {
@@ -458,11 +465,11 @@ export function ContentStudioTool({ initialGenerations }: Props) {
         }),
       });
       const d = await res.json();
-      if (!res.ok) { toast.error(d.error ?? "Generation failed"); setStep("config"); return; }
-      toast.success(d.message ?? "Content created!");
+      if (!res.ok) { toast.error(d.error ?? p("errors.generationFailed")); setStep("config"); return; }
+      toast.success(d.message ?? p("toasts.contentCreated"));
       setParentId(null);
       if (d.generation) { setPreviewGen(d.generation); setStep("preview"); } else { setStep("history"); }
-    } catch { toast.error("Request failed."); setStep("config"); }
+    } catch { toast.error(p("errors.requestFailed")); setStep("config"); }
   };
 
   const handleOnePrompt = (idea: string) => {
@@ -494,7 +501,7 @@ export function ContentStudioTool({ initialGenerations }: Props) {
     setPrompt("");
     setPreviewGen(null);
     setStep("config");
-    toast.message("Describe your changes in natural language, then click Improve with AI.");
+    toast.message(p("errors.editThenImprove"));
   };
 
   const handleFavorite = async (gen: ContentGeneration) => {
@@ -506,7 +513,7 @@ export function ContentStudioTool({ initialGenerations }: Props) {
   const handleDelete = async (id: string) => {
     setGenerations((p) => p.filter((g) => g.id !== id));
     await fetch(`/api/content-studio/${id}`, { method: "DELETE" });
-    toast.success("Deleted");
+    toast.success(p("toasts.deleted"));
   };
 
   if (step === "preview" && previewGen) {
@@ -521,7 +528,7 @@ export function ContentStudioTool({ initialGenerations }: Props) {
   }
 
   if (step === "generating") {
-    return <GenerationProgress title="Creating your content..." subtitle="AI is writing, analyzing, and optimizing your content" events={progressEvents} />;
+    return <GenerationProgress title={p("generating.title")} subtitle={p("generating.subtitle")} events={progressEvents} />;
   }
 
   const optionsByCategory = CONTENT_OPTION_LIST.reduce<Record<string, typeof CONTENT_OPTION_LIST>>((acc, o) => {
@@ -535,8 +542,8 @@ export function ContentStudioTool({ initialGenerations }: Props) {
       {/* Navigation */}
       <div className="flex gap-2 overflow-x-auto">
         {([
-          { key: "tool" as const, label: "New Content" },
-          { key: "history" as const, label: "My Content" },
+          { key: "tool" as const, label: p("nav.newContent") },
+          { key: "history" as const, label: p("nav.myContent") },
         ]).map(({ key, label }) => (
           <button key={key} onClick={() => setStep(key)} className={cn("whitespace-nowrap rounded-xl px-4 py-2 text-sm font-medium transition-all", step === key || step === "type" || step === "config" ? (key === "tool" ? "bg-premium-gold/15 text-premium-gold-light" : "text-white/50 hover:bg-white/5 hover:text-white/70") : step === "history" ? (key === "history" ? "bg-premium-gold/15 text-premium-gold-light" : "text-white/50 hover:bg-white/5 hover:text-white/70") : "text-white/50 hover:bg-white/5 hover:text-white/70")}>{label}</button>
         ))}
@@ -557,9 +564,9 @@ export function ContentStudioTool({ initialGenerations }: Props) {
       {step === "tool" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Or choose a content tool</DashboardCardTitle>
+            <DashboardCardTitle>{p("steps.chooseTool")}</DashboardCardTitle>
             <DashboardCardDescription>
-              Optional — One Prompt uses Content Writer by default
+              {p("steps.chooseToolHint")}
             </DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent>
@@ -578,7 +585,7 @@ export function ContentStudioTool({ initialGenerations }: Props) {
               <Button variant="ghost" size="icon-xs" onClick={() => { setStep("tool"); setSelectedTool(""); }} className="text-white/40 hover:text-white"><ArrowLeft className="size-4" /></Button>
               {(() => { const tool = getContentTool(selectedTool); const Icon = tool?.icon ?? FileText; return (
                 <><div className="flex size-10 items-center justify-center rounded-xl bg-premium-gold/15 text-premium-gold-light"><Icon className="size-5" /></div>
-                <div><DashboardCardTitle>{tool?.label ?? "Content"}</DashboardCardTitle><DashboardCardDescription>Choose a content type</DashboardCardDescription></div></>
+                <div><DashboardCardTitle>{tool ? getContentToolLabel(selectedTool, t) : p("sections.create")}</DashboardCardTitle><DashboardCardDescription>{p("labels.chooseContentType")}</DashboardCardDescription></div></>
               ); })()}
             </div>
           </DashboardCardHeader>
@@ -600,7 +607,7 @@ export function ContentStudioTool({ initialGenerations }: Props) {
             })()}
             {selectedType && (
               <div className="mt-4 flex justify-end">
-                <Button onClick={() => setStep("config")} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">Configure <ArrowRight className="size-4" /></Button>
+                <Button onClick={() => setStep("config")} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">{p("nav.configure")} <ArrowRight className="size-4" /></Button>
               </div>
             )}
           </DashboardCardContent>
@@ -615,7 +622,7 @@ export function ContentStudioTool({ initialGenerations }: Props) {
               <Button variant="ghost" size="icon-xs" onClick={() => setStep(selectedTool === "content-calendar" || selectedTool === "campaign-planner" ? "tool" : "type")} className="text-white/40 hover:text-white"><ArrowLeft className="size-4" /></Button>
               {(() => { const tool = getContentTool(selectedTool); const Icon = tool?.icon ?? Sparkles; return (
                 <><div className="flex size-10 items-center justify-center rounded-xl bg-premium-gold/15 text-premium-gold-light"><Icon className="size-5" /></div>
-                <div><DashboardCardTitle>{tool?.label ?? "Content"}: {getContentTypeLabel(selectedType)}</DashboardCardTitle><DashboardCardDescription>Configure your content generation</DashboardCardDescription></div></>
+                <div><DashboardCardTitle>{tool ? getContentToolLabel(selectedTool, t) : p("sections.create")}: {getContentTypeLabel(selectedType, t)}</DashboardCardTitle><DashboardCardDescription>{p("labels.configureGeneration")}</DashboardCardDescription></div></>
               ); })()}
             </div>
           </DashboardCardHeader>
@@ -623,16 +630,12 @@ export function ContentStudioTool({ initialGenerations }: Props) {
             <div className="space-y-5">
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-white/60">
-                  {parentId ? "Describe changes (natural language)" : "Content brief *"}
+                  {parentId ? p("steps.describeChanges") : p("steps.contentBrief")}
                 </label>
                 <Textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder={
-                    parentId
-                      ? "Example: Make the tone more conversational, shorten the intro, and add a stronger CTA..."
-                      : "Describe the content you want to create — topic, key points, goals, target audience, any specific requirements..."
-                  }
+                  placeholder={parentId ? p("placeholders.editExample") : p("placeholders.contentBrief")}
                   rows={4}
                   className={cn(dashboardInputClass, "min-h-[100px] resize-none")}
                 />
@@ -640,31 +643,31 @@ export function ContentStudioTool({ initialGenerations }: Props) {
 
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-white/60">Tone</label>
+                  <label className="mb-1.5 block text-xs font-medium text-white/60">{p("labels.tone")}</label>
                   <select value={tone} onChange={(e) => setTone(e.target.value)} className={dashboardSelectClass}>
                     {CONTENT_TONES.map((t) => <option key={t} value={t}>{t}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-white/60">Audience</label>
+                  <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.audience")}</label>
                   <select value={audience} onChange={(e) => setAudience(e.target.value)} className={dashboardSelectClass}>
                     {CONTENT_AUDIENCES.map((a) => <option key={a} value={a}>{a}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-white/60">Language</label>
+                  <label className="mb-1.5 block text-xs font-medium text-white/60">{p("labels.language")}</label>
                   <select value={language} onChange={(e) => setLanguage(e.target.value)} className={dashboardSelectClass}>
                     {CONTENT_LANGUAGES.map((l) => <option key={l} value={l}>{l}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-white/60">Writing Style</label>
+                  <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.writingStyle")}</label>
                   <select value={writingStyle} onChange={(e) => setWritingStyle(e.target.value)} className={dashboardSelectClass}>
                     {WRITING_STYLES.map((s) => <option key={s} value={s}>{s}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-white/60">Creativity Level</label>
+                  <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.creativity")}</label>
                   <select value={creativityLevel} onChange={(e) => setCreativityLevel(e.target.value)} className={dashboardSelectClass}>
                     {CREATIVITY_LEVELS.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
                   </select>
@@ -691,7 +694,7 @@ export function ContentStudioTool({ initialGenerations }: Props) {
 
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-white/60">Brand Voice <span className="text-white/20">(optional)</span></label>
-                <Input value={brandVoice} onChange={(e) => setBrandVoice(e.target.value)} placeholder="Describe your brand's voice — e.g. 'Tech-savvy, friendly, authoritative'" className={dashboardInputClass} />
+                <Input value={brandVoice} onChange={(e) => setBrandVoice(e.target.value)} placeholder={p("placeholders.brandVoice")} className={dashboardInputClass} />
               </div>
 
               <div>
@@ -730,11 +733,11 @@ export function ContentStudioTool({ initialGenerations }: Props) {
                     disabled={!prompt.trim()}
                     className="btn-gold gap-2 rounded-xl font-bold text-luxury-black"
                   >
-                    <Sparkles className="size-4" /> Improve with AI
+                    <Sparkles className="size-4" /> {p("actions.improveWithAi")}
                   </Button>
                 ) : (
                   <Button onClick={() => void handleGenerate()} disabled={!prompt.trim()} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">
-                    <Sparkles className="size-4" /> Generate Content
+                    <Sparkles className="size-4" /> {p("actions.generate")}
                   </Button>
                 )}
               </div>
@@ -749,7 +752,7 @@ export function ContentStudioTool({ initialGenerations }: Props) {
           <div className="flex items-center gap-3">
             <div className="relative flex-1">
               <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-white/30" />
-              <Input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Search content..." className={cn(dashboardInputClass, "pl-10")} />
+              <Input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder={p("placeholders.searchContent")} className={cn(dashboardInputClass, "pl-10")} />
             </div>
             <span className="text-xs text-white/40">{total} item{total !== 1 ? "s" : ""}</span>
           </div>

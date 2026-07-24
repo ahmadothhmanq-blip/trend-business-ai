@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { LandingPageBuilderTool } from "@/components/dashboard/landing-page-builder/landing-page-builder-tool";
 import type { LandingPageGeneration } from "@/types/landing-page";
 
@@ -38,9 +38,7 @@ export default async function LandingPageBuilderPage() {
 
   return (
     <>
-      <DashboardHeader
-        title="AI Landing Page Builder"
-        description="Generate high-converting landing pages with AI"
+      <LocalizedDashboardHeader pageId="landingPageBuilder"
         userEmail={user.email}
         userName={(profile?.full_name as string | undefined) ?? (userMeta.full_name as string | undefined)}
         avatarUrl={profile?.avatar_url as string | undefined}

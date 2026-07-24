@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { VideoStudioTool } from "@/components/dashboard/video-studio/video-studio-tool";
 import type { VideoGeneration } from "@/types/video";
 
@@ -38,9 +38,7 @@ export default async function VideoStudioPage() {
 
   return (
     <>
-      <DashboardHeader
-        title="AI Video Production Platform"
-        description="Design, generate, render, edit, and manage professional AI videos"
+      <LocalizedDashboardHeader pageId="videoStudio"
         userEmail={user.email}
         userName={(profile?.full_name as string | undefined) ?? (userMeta.full_name as string | undefined)}
         avatarUrl={profile?.avatar_url as string | undefined}

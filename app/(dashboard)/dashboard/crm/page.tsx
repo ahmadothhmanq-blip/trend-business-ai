@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { CrmWorkspace } from "@/components/dashboard/crm/crm-workspace";
 import { getCrmAnalytics } from "@/lib/crm/analytics";
 import type {
@@ -131,9 +131,7 @@ export default async function CrmPage() {
 
   return (
     <>
-      <DashboardHeader
-        title="AI CRM Platform"
-        description="Accounts, contacts, leads, pipeline, tasks, activities, and AI sales assistant"
+      <LocalizedDashboardHeader pageId="crm"
         userEmail={user.email}
         userName={(profile?.full_name as string | undefined) ?? (userMeta.full_name as string | undefined)}
         avatarUrl={profile?.avatar_url as string | undefined}

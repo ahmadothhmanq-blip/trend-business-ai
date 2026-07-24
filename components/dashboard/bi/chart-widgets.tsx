@@ -1,8 +1,11 @@
 "use client";
 
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
+
 type KpiCardProps = { label: string; value: string; trend?: number; unit?: string };
 
 export function KpiCard({ label, value, trend, unit }: KpiCardProps) {
+  const wt = useWorkspaceT("bi");
   const trendLabel = trend === undefined ? null : trend >= 0 ? `+${trend}%` : `${trend}%`;
   const trendColor = trend === undefined ? "" : trend >= 0 ? "text-emerald-400" : "text-rose-400";
 
@@ -13,7 +16,7 @@ export function KpiCard({ label, value, trend, unit }: KpiCardProps) {
         {value}
         {unit ? <span className="ml-1 text-sm font-normal text-white/40">{unit}</span> : null}
       </p>
-      {trendLabel ? <p className={`mt-1 text-xs ${trendColor}`}>{trendLabel} vs prior period</p> : null}
+      {trendLabel ? <p className={`mt-1 text-xs ${trendColor}`}>{trendLabel} {wt("panels.charts.vsPriorPeriod")}</p> : null}
     </div>
   );
 }
@@ -59,18 +62,20 @@ export function LineChartWidget({ title, data }: { title: string; data: number[]
 }
 
 export function TrendIndicator({ label, value, direction }: { label: string; value: string; direction: "up" | "down" | "flat" }) {
+  const wt = useWorkspaceT("bi");
   const arrow = direction === "up" ? "↑" : direction === "down" ? "↓" : "→";
   const color = direction === "up" ? "text-emerald-400" : direction === "down" ? "text-rose-400" : "text-white/40";
   return (
     <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
       <p className="text-xs uppercase text-white/40">{label}</p>
       <p className="mt-1 text-xl font-semibold text-white">{value}</p>
-      <p className={`mt-1 text-sm ${color}`}>{arrow} trend</p>
+      <p className={`mt-1 text-sm ${color}`}>{arrow} {wt("panels.charts.trend")}</p>
     </div>
   );
 }
 
 export function DataTableWidget({ title, columns, rows }: { title: string; columns: string[]; rows: string[][] }) {
+  const wt = useWorkspaceT("bi");
   return (
     <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4 overflow-x-auto">
       <p className="mb-3 text-xs uppercase text-white/40">{title}</p>
@@ -88,7 +93,7 @@ export function DataTableWidget({ title, columns, rows }: { title: string; colum
           {rows.length === 0 ? (
             <tr>
               <td colSpan={columns.length} className="py-4 text-white/30">
-                No data
+                {wt("panels.charts.noData")}
               </td>
             </tr>
           ) : (

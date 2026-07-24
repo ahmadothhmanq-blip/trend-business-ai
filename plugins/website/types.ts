@@ -76,6 +76,11 @@ export type WebsiteGenerationInput = {
   continueInstruction?: string;
   /** AI Website Optimizer Engine — audit + apply improvements */
   optimizeWithAi?: boolean;
+  /**
+   * Generation profile — fast/ultra skip quality improve, optimizer fixes, and non-fatal repairs.
+   * Defaults to ultra when WB_ULTRA_FAST_GENERATION=1, else fast when WB_FAST_GENERATION=1.
+   */
+  generationProfile?: "fast" | "professional" | "ultra";
   /** Prior project files when regenerating / continuing */
   previousFiles?: GeneratedProjectFile[];
   previousTitle?: string;

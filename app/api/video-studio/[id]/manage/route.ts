@@ -41,6 +41,7 @@ import {
   fetchRemoteToBytes,
   trimClipWithFfmpeg,
   probeFfmpegHealth,
+  ProviderNotConfiguredError,
 } from "@/lib/ai-core/video-production-platform";
 import { z } from "zod";
 
@@ -670,6 +671,9 @@ export async function POST(request: Request, { params }: Params) {
       })),
     });
   } catch (error) {
+    if (error instanceof ProviderNotConfiguredError) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
     return serverErrorResponse(
       "video-studio.manage.post",
       error,

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { ReportsGenerator } from "@/components/dashboard/reports-generator";
 import type { AIReport } from "@/types/database";
 
@@ -25,9 +25,7 @@ export default async function ReportsPage() {
 
   return (
     <>
-      <DashboardHeader
-        title="AI Reports"
-        description="Generate strategic business intelligence reports"
+      <LocalizedDashboardHeader pageId="reports"
         userEmail={user?.email}
         userName={metadata.full_name as string | undefined}
       />

@@ -27,6 +27,7 @@ export {
 
 export {
   isExternalVideoProviderConfigured,
+  isKlingVideoProviderConfigured,
   resolveVideoProviderName,
   createRenderJobFromModel,
   processRenderJob,
@@ -37,12 +38,15 @@ export {
 
 export {
   getVideoProvider,
+  getVideoProviderForMode,
   listVideoProviders,
   getConfiguredVideoProviders,
   resolvePreferredProviderId,
+  resolveVideoProviderForMode,
   envProviderFlags,
   isStrictVideoProviderMode,
   isStubVideoBytes,
+  ProviderNotConfiguredError,
 } from "@/lib/ai-core/video-production-platform/providers";
 
 export { runFullRenderPipeline, resumeRenderJob, retryFailedClips, processPendingRenderJobs, processVideoStudioBackgroundQueue } from "@/lib/ai-core/video-production-platform/generation-pipeline";
@@ -190,3 +194,10 @@ export {
 } from "@/lib/ai-core/video-production-platform/env-config";
 
 export { buildVideoStudioHealthReport } from "@/lib/ai-core/video-production-platform/production-health";
+export { buildProviderHealthReport } from "@/lib/ai-core/video-production-platform/provider-health";
+export {
+  validateClipMediaForRender,
+  filterClipsForProductionAssembly,
+  isProductionRenderMode,
+  isRealProductionClipAsset,
+} from "@/lib/ai-core/video-production-platform/media-validation";

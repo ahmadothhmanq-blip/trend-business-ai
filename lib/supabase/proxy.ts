@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseEnv } from "@/lib/env";
+import { stripLocaleFromPathname } from "@/lib/i18n/paths";
 
 const SECURITY_HEADERS: Record<string, string> = {
   "X-Frame-Options": "DENY",
@@ -48,8 +49,21 @@ function applySecurityHeaders(
   return response;
 }
 
-export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request });
+type UpdateSessionOptions = {
+  /** Internal rewrite target when serving locale-prefixed public URLs. */
+  rewriteUrl?: URL;
+};
+
+export async function updateSession(
+  request: NextRequest,
+  options?: UpdateSessionOptions,
+) {
+  const buildResponse = () =>
+    options?.rewriteUrl
+      ? NextResponse.rewrite(options.rewriteUrl)
+      : NextResponse.next({ request });
+
+  let supabaseResponse = buildResponse();
   const { url, anonKey } = getSupabaseEnv();
 
   const supabase = createServerClient(
@@ -64,9 +78,9 @@ export async function updateSession(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value),
           );
-          supabaseResponse = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options),
+          supabaseResponse = buildResponse();
+          cookiesToSet.forEach(({ name, value, options: cookieOptions }) =>
+            supabaseResponse.cookies.set(name, value, cookieOptions),
           );
         },
       },
@@ -77,18 +91,22 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isAuthRoute =
-    request.nextUrl.pathname.startsWith("/login") ||
-    request.nextUrl.pathname.startsWith("/signup") ||
-    request.nextUrl.pathname.startsWith("/forgot-password");
-  const isProtectedRoute = request.nextUrl.pathname.startsWith("/dashboard");
+  const { pathname: routePath } = stripLocaleFromPathname(
+    request.nextUrl.pathname,
+  );
 
-  const pathname = request.nextUrl.pathname;
+  const isAuthRoute =
+    routePath.startsWith("/login") ||
+    routePath.startsWith("/signup") ||
+    routePath.startsWith("/forgot-password");
+  const isProtectedRoute = routePath.startsWith("/dashboard");
+
+  const pathname = routePath;
 
   if (!user && isProtectedRoute) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/login";
-    redirectUrl.searchParams.set("redirect", request.nextUrl.pathname);
+    redirectUrl.searchParams.set("redirect", routePath);
     return applySecurityHeaders(NextResponse.redirect(redirectUrl), pathname);
   }
 

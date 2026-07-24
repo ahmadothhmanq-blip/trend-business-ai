@@ -22,6 +22,11 @@ import {
   injectProfessionalComponents,
   getProfessionalScaffoldByPath,
 } from "@/lib/ai-core/components";
+import {
+  composedHomePagePlaceholder,
+  resolveWebsiteGenerationProfile,
+  shouldSkipLlmForComposedHomePage,
+} from "@/lib/website/generation-flags";
 import { injectAiImagesIntoProject } from "@/lib/ai-core/image-engine";
 import { designSystemCssVariables } from "@/plugins/website/layers/design-engine";
 import {
@@ -105,12 +110,14 @@ async function validateAndRepairProject(
   files: GeneratedProjectFile[],
   ctx: GenerationContext,
   assetSummary: string,
+  repairMode: "full" | "fatal-only" = "full",
 ) {
   let currentFiles = [...files];
   const planByPath = new Map(filePlans.map((entry) => [entry.path, entry]));
   const requiredPaths = filePlans.map((file) => file.path);
+  const maxRounds = repairMode === "fatal-only" ? 1 : PROJECT_VALIDATION_ROUNDS;
 
-  for (let round = 0; round < PROJECT_VALIDATION_ROUNDS; round += 1) {
+  for (let round = 0; round < maxRounds; round += 1) {
     const validation = validateGeneratedProject(currentFiles, plan.flags, {
       requiredPaths,
     });
@@ -118,15 +125,28 @@ async function validateAndRepairProject(
       return currentFiles;
     }
 
-    const targets = new Set(
-      validation.filesToRegenerate.filter((path) => planByPath.has(path)),
-    );
+    const targets = new Set<string>();
 
-    for (const missingPath of validation.issues
-      .filter((issue) => issue.startsWith("Missing required production file:"))
-      .map((issue) => issue.replace("Missing required production file: ", ""))) {
-      if (!planByPath.has(missingPath)) continue;
-      targets.add(missingPath);
+    if (repairMode === "fatal-only") {
+      for (const missingPath of validation.issues
+        .filter((issue) => issue.startsWith("Missing required production file:"))
+        .map((issue) => issue.replace("Missing required production file: ", ""))) {
+        if (!planByPath.has(missingPath)) continue;
+        targets.add(missingPath);
+      }
+    } else {
+      for (const path of validation.filesToRegenerate.filter((path) =>
+        planByPath.has(path),
+      )) {
+        targets.add(path);
+      }
+
+      for (const missingPath of validation.issues
+        .filter((issue) => issue.startsWith("Missing required production file:"))
+        .map((issue) => issue.replace("Missing required production file: ", ""))) {
+        if (!planByPath.has(missingPath)) continue;
+        targets.add(missingPath);
+      }
     }
 
     if (targets.size === 0) {
@@ -253,6 +273,8 @@ export type GenerateWebsiteOptions = {
   skipAssetGeneration?: boolean;
   /** Skip quality check/improve (Core quality layer will run) */
   skipQuality?: boolean;
+  /** fast | professional — controls repair strictness and file scope */
+  generationProfile?: import("@/lib/website/generation-flags").WebsiteGenerationProfile;
 };
 
 export async function generateWebsite(
@@ -262,6 +284,12 @@ export async function generateWebsite(
   ctx: GenerationContext,
   options?: GenerateWebsiteOptions,
 ) {
+  const generationProfile =
+    options?.generationProfile ?? resolveWebsiteGenerationProfile(input);
+  const minimalGeneration =
+    generationProfile === "fast" || generationProfile === "ultra";
+  const ultraGeneration = generationProfile === "ultra";
+
   const assetManifest =
     options?.skipAssetGeneration && options.assetManifest
       ? options.assetManifest
@@ -306,6 +334,12 @@ export async function generateWebsite(
     (file) => !SCAFFOLD_PATHS.has(file.path),
   );
 
+  if (minimalGeneration) {
+    ctx.progress.emit(
+      `[${ultraGeneration ? "ultra" : "fast"}] Generating ${aiFilePlans.length} required production files…`,
+    );
+  }
+
   const previousByPath = new Map(
     (input.previousFiles ?? []).map((file) => [file.path, file]),
   );
@@ -314,6 +348,10 @@ export async function generateWebsite(
       input.mode === "regenerate" ||
       input.mode === "retry") &&
     previousByPath.size > 0;
+
+  const componentPaletteForCompose = plan.designSystem.componentPalette?.map(
+    String,
+  );
 
   let index = 0;
   for (const filePlan of aiFilePlans) {
@@ -332,6 +370,28 @@ export async function generateWebsite(
         `Reusing file ${index}/${aiFilePlans.length}: ${filePlan.path}`,
       );
       files.push(prior);
+      continue;
+    }
+
+    if (
+      shouldSkipLlmForComposedHomePage({
+        filePath: filePlan.path,
+        componentPalette: componentPaletteForCompose,
+        composePage: true,
+        generationProfile,
+      })
+    ) {
+      ctx.progress.emit(
+        `Deferring home page ${index}/${aiFilePlans.length}: ${filePlan.path} (composed after sections)`,
+      );
+      files.push(composedHomePagePlaceholder(filePlan));
+      try {
+        await ctx.onFilesCheckpoint?.(files, {
+          message: `Saved progress · ${files.length} files · ${filePlan.path} (deferred)`,
+        });
+      } catch {
+        // Checkpoint failures must never abort generation.
+      }
       continue;
     }
 
@@ -456,6 +516,7 @@ export async function generateWebsite(
     filesWithComponents,
     ctx,
     assetSummary,
+    minimalGeneration ? "fatal-only" : "full",
   );
 
   // Re-inject after validation repairs so LLM rewrites cannot drop site imagery.
@@ -482,6 +543,7 @@ export async function generateWebsite(
       files: validatedFiles,
       assetManifest,
       ctx,
+      skipImprove: minimalGeneration,
     });
     validatedFiles = qualityResult.files;
     qualityReport = qualityResult.qualityReport;
@@ -525,6 +587,10 @@ export async function generateWebsite(
       isEcommerce: String(plan.flags.isEcommerce),
       isSaas: String(plan.flags.isSaas),
       databaseProvider: plan.flags.databaseProvider,
+      generationProfile: String(generationProfile),
+      ...(input.templateIntelligenceId
+        ? { templateIntelligenceId: input.templateIntelligenceId }
+        : {}),
     },
   };
 }
@@ -537,6 +603,8 @@ export async function runWebsiteQualityLayer(params: {
   files: GeneratedProjectFile[];
   assetManifest: AssetManifest;
   ctx: GenerationContext;
+  /** When true, run checks only — skip applyQualityImprovePass (fast generation). */
+  skipImprove?: boolean;
 }): Promise<{ files: GeneratedProjectFile[]; qualityReport: QualityReport }> {
   const { input, analysis, plan, assetManifest, ctx } = params;
   let validatedFiles = params.files;
@@ -552,7 +620,10 @@ export async function runWebsiteQualityLayer(params: {
     requiredSections: analysis.businessProfile.requiredSections,
   });
 
-  if (!qualityReport.passed || qualityReport.weakSections.length > 0) {
+  if (
+    !params.skipImprove &&
+    (!qualityReport.passed || qualityReport.weakSections.length > 0)
+  ) {
     ctx.progress.emit("Improving weak sections...");
     const improveInstruction = buildQualityImproveInstruction(qualityReport);
     try {

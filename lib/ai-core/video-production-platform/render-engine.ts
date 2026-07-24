@@ -13,6 +13,10 @@ import type {
   VideoJobStatus,
 } from "@/lib/ai-core/video-production-platform/types";
 import { nowIso, vid } from "@/lib/ai-core/video-production-platform/ids";
+import {
+  resolveVideoProviderForMode,
+  type VideoProviderRenderMode,
+} from "@/lib/ai-core/video-production-platform/providers/types";
 
 export function isExternalVideoProviderConfigured(): boolean {
   return Boolean(
@@ -23,12 +27,14 @@ export function isExternalVideoProviderConfigured(): boolean {
   );
 }
 
-export function resolveVideoProviderName(): string {
-  if (process.env.RUNWAY_API_KEY) return "runway";
-  if (process.env.KLING_API_KEY) return "kling";
-  if (process.env.HEYGEN_API_KEY) return "heygen";
-  if (process.env.VIDEO_PROVIDER_API_KEY) return "external";
-  return "preview-stub";
+export function isKlingVideoProviderConfigured(): boolean {
+  return Boolean(process.env.KLING_API_KEY?.trim());
+}
+
+export function resolveVideoProviderName(
+  mode: VideoProviderRenderMode = "preview",
+): string {
+  return resolveVideoProviderForMode(mode).providerId;
 }
 
 function posterDataUrl(label: string, color = "#D4AF37"): string {
@@ -85,10 +91,14 @@ export function createRenderJobFromModel(
     progress: 0,
     mode,
     clips,
-    provider: resolveVideoProviderName(),
+    provider: resolveVideoProviderName(
+      mode === "preview" ? "preview" : mode === "avatar" ? "avatar" : "full",
+    ),
     message: isExternalVideoProviderConfigured()
       ? "Queued for external video provider."
-      : "Queued for preview render (configure VIDEO_PROVIDER_API_KEY for full MP4).",
+      : mode === "preview"
+        ? "Queued for preview render."
+        : "Queued for full render (configure KLING_API_KEY for real video clips).",
     createdAt,
     updatedAt: createdAt,
   };

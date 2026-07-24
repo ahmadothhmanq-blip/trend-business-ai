@@ -17,6 +17,7 @@ import {
 } from "@/lib/api/supabase-query";
 import { loadWebsiteParentContext } from "@/plugins/website/iteration";
 import { persistWebsiteGeneration } from "@/lib/website/save-generation";
+import { getRequestAiLanguage } from "@/lib/i18n/api";
 import type { WebsiteGeneration } from "@/types/database";
 import { NextResponse } from "next/server";
 
@@ -107,6 +108,7 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data;
+  const aiLanguage = getRequestAiLanguage(request, input.language);
   const projectKind = detectWebsiteProjectKind(input);
   const settings = await providerManager.loadUserSettings(
     asSupabaseSingleClient(auth.supabase),
@@ -123,6 +125,8 @@ export async function POST(request: Request) {
   try {
     const project = await generateWebsite({
       ...input,
+      language: aiLanguage,
+      locale: aiLanguage,
       projectKind,
       ...parentContext,
       userId: auth.user!.id,
@@ -138,7 +142,7 @@ export async function POST(request: Request) {
       projectKind: project.projectKind ?? projectKind,
       input: {
         prompt: input.prompt,
-        language: input.language,
+        language: aiLanguage,
         theme: input.theme,
         features: input.features,
         productId: input.productId,

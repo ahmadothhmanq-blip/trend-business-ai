@@ -26,6 +26,8 @@ import {
   type ProjectHistoryItem,
 } from "@/components/dashboard/builder-shared";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/client";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import {
   WEBAPP_TYPES,
   WEBAPP_LANGUAGES,
@@ -56,6 +58,8 @@ function toHistoryItem(gen: WebAppGeneration): ProjectHistoryItem {
 }
 
 export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps) {
+  const { t } = useTranslation();
+  const p = useProductT("webappBuilder");
   const onePrompt = getOnePromptProduct("app-builder");
   const [step, setStep] = useState<"type" | "config" | "history" | "generating" | "preview">("type");
   const [selectedType, setSelectedType] = useState("");
@@ -122,8 +126,8 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
     if (!appType || !idea) {
       toast.error(
         mode === "continue"
-          ? "Describe the changes you want in natural language."
-          : "Enter your business idea to generate an app.",
+          ? p("errors.describeChanges")
+          : p("errors.enterIdeaApp"),
       );
       return;
     }
@@ -150,11 +154,11 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
         }),
       });
       const data = await res.json();
-      if (!res.ok) { toast.error(data.error ?? "Generation failed"); setStep("config"); return; }
-      toast.success(data.message ?? "Web app generated!");
+      if (!res.ok) { toast.error(data.error ?? p("errors.generationFailed")); setStep("config"); return; }
+      toast.success(data.message ?? p("toasts.appCreated"));
       setParentId(null);
       if (data.generation) { setPreviewGen(data.generation); setStep("preview"); } else { setStep("history"); }
-    } catch { toast.error("Request failed. Check your connection."); setStep("config"); }
+    } catch { toast.error(p("errors.requestFailedConnection")); setStep("config"); }
   };
 
   const handleOnePrompt = (idea: string) => {
@@ -181,7 +185,7 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
     setPrompt("");
     setPreviewGen(null);
     setStep("config");
-    toast.message("Describe your changes in natural language, then click Improve with AI.");
+    toast.message(p("errors.editThenImprove"));
   };
 
   const handleFavorite = async (gen: WebAppGeneration) => {
@@ -193,7 +197,7 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
   const handleDelete = async (id: string) => {
     setGenerations((prev) => prev.filter((g) => g.id !== id));
     await fetch(`/api/webapp-builder/${id}`, { method: "DELETE" });
-    toast.success("Deleted");
+    toast.success(p("toasts.deleted"));
   };
 
   if (step === "preview" && previewGen) {
@@ -205,24 +209,24 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
             asChild
             className="btn-gold rounded-xl font-bold text-luxury-black"
           >
-            <a href={`/dashboard/app-builder/${previewGen.id}`}>Open App Management</a>
+            <a href={`/dashboard/app-builder/${previewGen.id}`}>{p("preview.openManagement")}</a>
           </Button>
           <Button asChild variant="outline" className="rounded-xl border-white/10">
             <a href={`/api/webapp-builder/${previewGen.id}/live-preview`} target="_blank" rel="noopener noreferrer">
-              Open Live Preview
+              {p("preview.openLivePreview")}
             </a>
           </Button>
         </div>
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Live app preview</DashboardCardTitle>
+            <DashboardCardTitle>{p("preview.liveAppPreview")}</DashboardCardTitle>
             <DashboardCardDescription>
-              Sandbox runtime from your generated app model
+              {p("preview.liveAppPreviewDescription")}
             </DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent className="flex justify-center">
             <iframe
-              title="Generated app live preview"
+              title={p("preview.livePreviewIframeTitle")}
               src={`/api/webapp-builder/${previewGen.id}/live-preview`}
               className="h-[560px] w-full max-w-4xl rounded-2xl border border-white/15 bg-black"
               sandbox="allow-same-origin"
@@ -243,13 +247,13 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
   }
 
   if (step === "generating") {
-    return <GenerationProgress title="Generating your web app..." subtitle="This may take 1-3 minutes depending on complexity" events={progressEvents} />;
+    return <GenerationProgress title={p("generating.titleLong")} subtitle={p("generating.subtitleLong")} events={progressEvents} />;
   }
 
   return (
     <div className="space-y-6">
       <div className="flex gap-2">
-        {([{ key: "type" as const, label: "New App" }, { key: "history" as const, label: "My Apps" }]).map(({ key, label }) => (
+        {([{ key: "type" as const, label: p("nav.newApp") }, { key: "history" as const, label: p("nav.myApps") }]).map(({ key, label }) => (
           <button key={key} onClick={() => setStep(key)} className={cn("rounded-xl px-4 py-2 text-sm font-medium transition-all", step === key || (step === "config" && key === "type") ? "bg-premium-gold/15 text-premium-gold-light" : "text-white/50 hover:bg-white/5 hover:text-white/70")}>{label}</button>
         ))}
       </div>
@@ -268,9 +272,9 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
       {step === "type" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Or choose an app type</DashboardCardTitle>
+            <DashboardCardTitle>{p("steps.orChooseAppType")}</DashboardCardTitle>
             <DashboardCardDescription>
-              Optional — One Prompt uses a smart default if you skip this
+              {t("products.common.optionalOnePrompt")}
             </DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent>
@@ -279,7 +283,7 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
             </div>
             {selectedType && (
               <div className="mt-6 flex justify-end">
-                <Button onClick={() => setStep("config")} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">Configure App <ArrowRight className="size-4" /></Button>
+                <Button onClick={() => setStep("config")} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">{p("steps.configureApp")} <ArrowRight className="size-4" /></Button>
               </div>
             )}
           </DashboardCardContent>
@@ -292,7 +296,7 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
             <div className="flex items-center gap-3">
               {(() => { const def = getWebAppType(selectedType); const Icon = def?.icon ?? Sparkles; return (<>
                 <div className="flex size-10 items-center justify-center rounded-xl bg-premium-gold/15 text-premium-gold-light"><Icon className="size-5" /></div>
-                <div><DashboardCardTitle>{def?.label ?? "Custom"} App</DashboardCardTitle><DashboardCardDescription>Describe your app and configure generation options</DashboardCardDescription></div>
+                <div><DashboardCardTitle>{p("steps.customApp", { type: def?.label ?? t("products.common.custom") })}</DashboardCardTitle><DashboardCardDescription>{p("steps.configureDescription")}</DashboardCardDescription></div>
               </>); })()}
             </div>
           </DashboardCardHeader>
@@ -300,27 +304,23 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
             <div className="space-y-5">
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-white/60">
-                  {parentId ? "Describe changes (natural language)" : "Describe your app"}
+                  {parentId ? p("steps.describeChanges") : p("steps.describeYourApp")}
                 </label>
                 <Textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder={
-                    parentId
-                      ? "Example: Add a dark mode toggle, simplify the dashboard layout, and add export to CSV..."
-                      : "Describe the web application you want to build in detail..."
-                  }
+                  placeholder={parentId ? p("placeholders.appBriefContinue") : p("placeholders.appBriefNew")}
                   rows={4}
                   className={cn(dashboardInputClass, "min-h-[100px] resize-none")}
                 />
               </div>
               <div className="grid gap-4 sm:grid-cols-3">
-                <div><label className="mb-1.5 block text-xs font-medium text-white/60">Language</label><select value={language} onChange={(e) => setLanguage(e.target.value)} className={dashboardSelectClass}>{WEBAPP_LANGUAGES.map((l) => <option key={l} value={l}>{l}</option>)}</select></div>
-                <div><label className="mb-1.5 block text-xs font-medium text-white/60">Design Style</label><select value={designStyle} onChange={(e) => setDesignStyle(e.target.value)} className={dashboardSelectClass}>{WEBAPP_DESIGN_STYLES.map((s) => <option key={s} value={s}>{s}</option>)}</select></div>
-                <div><label className="mb-1.5 block text-xs font-medium text-white/60">Color Style</label><select value={colorStyle} onChange={(e) => setColorStyle(e.target.value)} className={dashboardSelectClass}>{WEBAPP_COLOR_STYLES.map((c) => <option key={c} value={c}>{c}</option>)}</select></div>
+                <div><label className="mb-1.5 block text-xs font-medium text-white/60">{p("labels.language")}</label><select value={language} onChange={(e) => setLanguage(e.target.value)} className={dashboardSelectClass}>{WEBAPP_LANGUAGES.map((l) => <option key={l} value={l}>{l}</option>)}</select></div>
+                <div><label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.designStyle")}</label><select value={designStyle} onChange={(e) => setDesignStyle(e.target.value)} className={dashboardSelectClass}>{WEBAPP_DESIGN_STYLES.map((s) => <option key={s} value={s}>{s}</option>)}</select></div>
+                <div><label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.colorStyle")}</label><select value={colorStyle} onChange={(e) => setColorStyle(e.target.value)} className={dashboardSelectClass}>{WEBAPP_COLOR_STYLES.map((c) => <option key={c} value={c}>{c}</option>)}</select></div>
               </div>
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-white/60">Features</label>
+                <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.features")}</label>
                 <div className="flex flex-wrap gap-2">{WEBAPP_FEATURE_OPTIONS.map(({ id, label }) => <CheckboxToggle key={id} label={label} checked={features.includes(id)} onChange={(c) => setFeatures((p) => c ? [...p, id] : p.filter((f) => f !== id))} />)}</div>
               </div>
               <div className="flex flex-wrap gap-3 pt-2">
@@ -332,7 +332,7 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
                     setStep("type");
                   }}
                 >
-                  Back
+                  {t("common.back")}
                 </Button>
                 {parentId ? (
                   <Button
@@ -340,11 +340,11 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
                     disabled={!prompt.trim()}
                     className="btn-gold gap-2 rounded-xl font-bold text-luxury-black"
                   >
-                    <Sparkles className="size-4" /> Improve with AI
+                    <Sparkles className="size-4" /> {p("actions.improveWithAi")}
                   </Button>
                 ) : (
                   <Button onClick={() => void handleGenerate()} disabled={!prompt.trim()} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">
-                    <Sparkles className="size-4" /> Generate Web App
+                    <Sparkles className="size-4" /> {p("steps.generateWebApp")}
                   </Button>
                 )}
               </div>
@@ -356,11 +356,13 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
       {step === "history" && (
         <>
           <div className="flex items-center gap-3">
-            <div className="relative flex-1"><Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-white/30" /><Input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Search apps..." className={cn(dashboardInputClass, "pl-10")} /></div>
-            <span className="text-xs text-white/40">{total} app{total !== 1 ? "s" : ""}</span>
+            <div className="relative flex-1"><Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-white/30" /><Input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder={p("placeholders.searchApps")} className={cn(dashboardInputClass, "pl-10")} /></div>
+            <span className="text-xs text-white/40">
+              {total === 1 ? p("history.count", { count: total }) : p("history.countPlural", { count: total })}
+            </span>
           </div>
           {generations.length === 0 ? (
-            <EmptyHistory noun="web apps" onNew={() => setStep("type")} />
+            <EmptyHistory noun={p("history.emptyNoun")} item={p("history.emptyItem")} onNew={() => setStep("type")} />
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {generations.map((gen) => {

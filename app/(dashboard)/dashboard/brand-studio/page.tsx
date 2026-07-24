@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { BrandIdentityTool } from "@/components/dashboard/brand-identity/brand-identity-tool";
 import type { BrandIdentityGeneration } from "@/types/brand-identity";
 
@@ -38,9 +38,7 @@ export default async function BrandStudioPage() {
 
   return (
     <>
-      <DashboardHeader
-        title="Brand Studio"
-        description="Professional AI brand design platform"
+      <LocalizedDashboardHeader pageId="brandStudio"
         userEmail={user.email}
         userName={(profile?.full_name as string | undefined) ?? (userMeta.full_name as string | undefined)}
         avatarUrl={profile?.avatar_url as string | undefined}

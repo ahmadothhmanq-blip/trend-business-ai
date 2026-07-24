@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import { cn } from "@/lib/utils";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import type { WebsiteAnalyticsSummary } from "@/lib/ai-core/analytics";
 import type { ConversionOptimizerReport } from "@/lib/ai-core/conversion-optimizer";
 
@@ -23,6 +24,7 @@ type AnalyticsResponse = {
 export function AnalyticsIntelligencePanel(props: {
   generationId: string | null;
 }) {
+  const wb = useProductT("websiteBuilder");
   const [data, setData] = useState<AnalyticsResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,11 +42,11 @@ export function AnalyticsIntelligencePanel(props: {
       );
       if (!res.ok) {
         const body = (await res.json()) as { error?: string };
-        throw new Error(body.error || "Failed to load analytics");
+        throw new Error(body.error || wb("panels.failedLoadAnalytics"));
       }
       setData((await res.json()) as AnalyticsResponse);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load analytics");
+      setError(err instanceof Error ? err.message : wb("panels.failedLoadAnalytics"));
       setData(null);
     } finally {
       setLoading(false);
@@ -91,20 +93,20 @@ export function AnalyticsIntelligencePanel(props: {
         <div>
           <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-premium-gold/25 bg-premium-gold/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-premium-gold">
             <BarChart3 className="size-3" />
-            Analytics Engine
+            {wb("panels.analyticsEngine")}
           </div>
           <h3 className="text-lg font-bold text-white">
-            {data.projectName || "Website"} performance
+            {wb("panels.performanceTitle", { name: data.projectName || wb("labels.website") })}
           </h3>
           <p className="mt-1 max-w-2xl text-[12px] text-white/40">
             Page views, visitors, sessions, clicks, conversions, traffic sources,
-            and devices — with AI conversion recommendations.
-            {summary.seeded ? " Includes seeded baseline traffic until live events accumulate." : null}
+            and devices — with {wb("panels.aiConversionRecommendations")}.
+            {summary.seeded ? wb("panels.analyticsSeededHint") : null}
           </p>
         </div>
         <div className="rounded-xl border border-premium-gold/30 bg-premium-gold/10 px-4 py-3 text-center">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-premium-gold">
-            Conversion score
+            {wb("panels.conversionScore")}
           </p>
           <p className="text-2xl font-bold text-white">{optimizer.overallScore}</p>
         </div>
@@ -113,32 +115,32 @@ export function AnalyticsIntelligencePanel(props: {
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
           icon={Users}
-          label="Unique visitors"
+          label={wb("panels.uniqueVisitors")}
           value={summary.uniqueVisitors.toLocaleString()}
           hint={`${summary.sessions.toLocaleString()} sessions`}
         />
         <MetricCard
           icon={BarChart3}
-          label="Page views"
+          label={wb("panels.pageViews")}
           value={summary.pageViews.toLocaleString()}
           hint={`${summary.avgSessionPages} pages / session`}
         />
         <MetricCard
           icon={MousePointerClick}
-          label="Button clicks"
+          label={wb("panels.buttonClicks")}
           value={summary.buttonClicks.toLocaleString()}
           hint={`${summary.bounceRate}% bounce`}
         />
         <MetricCard
           icon={Target}
-          label="Conversions"
+          label={wb("panels.conversions")}
           value={summary.conversions.toLocaleString()}
           hint={`${summary.conversionRate}% CR`}
         />
       </div>
 
       <DashboardPanel className="p-4 sm:p-5">
-        <h4 className="text-sm font-semibold text-white">Performance (14 days)</h4>
+        <h4 className="text-sm font-semibold text-white">{wb("panels.performance14Days")}</h4>
         <div className="mt-4 flex h-36 items-end gap-1">
           {summary.series.map((point) => (
             <div
@@ -162,25 +164,25 @@ export function AnalyticsIntelligencePanel(props: {
       </DashboardPanel>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <BreakdownPanel title="Traffic sources" items={summary.trafficSources} />
-        <BreakdownPanel title="Devices" items={summary.devices} />
-        <BreakdownPanel title="Top pages" items={summary.topPages} />
-        <BreakdownPanel title="Top buttons" items={summary.topButtons} />
+        <BreakdownPanel title={wb("panels.trafficSources")} items={summary.trafficSources} />
+        <BreakdownPanel title={wb("panels.devices")} items={summary.devices} />
+        <BreakdownPanel title={wb("panels.topPages")} items={summary.topPages} />
+        <BreakdownPanel title={wb("panels.topButtons")} items={summary.topButtons} />
       </div>
 
       <DashboardPanel className="p-4 sm:p-5">
         <div className="mb-3 flex items-center gap-2">
           <Sparkles className="size-4 text-premium-gold" />
           <h4 className="text-sm font-semibold text-white">
-            AI conversion recommendations
+            {wb("panels.aiConversionRecommendations")}
           </h4>
         </div>
         <p className="mb-4 text-[12px] text-white/45">{optimizer.summary}</p>
 
         <div className="mb-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          <SuggestionList title="Better CTA text" items={optimizer.betterCtaSuggestions} />
-          <SuggestionList title="Layout" items={optimizer.layoutSuggestions} />
-          <SuggestionList title="Missing trust" items={optimizer.missingTrustSections} />
+          <SuggestionList title={wb("panels.betterCta")} items={optimizer.betterCtaSuggestions} />
+          <SuggestionList title={wb("panels.layout")} items={optimizer.layoutSuggestions} />
+          <SuggestionList title={wb("panels.missingTrust")} items={optimizer.missingTrustSections} />
           <SuggestionList title="SEO" items={optimizer.seoImprovements} />
           <SuggestionList title="UX" items={optimizer.uxImprovements} />
         </div>

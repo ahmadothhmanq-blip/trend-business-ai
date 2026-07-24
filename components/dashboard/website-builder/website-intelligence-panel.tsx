@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Loader2, Sparkles, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import type { WebsiteIntelligenceReport } from "@/lib/ai-core/website-design-platform";
 
 export function WebsiteIntelligencePanel(props: {
@@ -11,6 +12,7 @@ export function WebsiteIntelligencePanel(props: {
   disabled?: boolean;
   onApplySuggestion?: (command: string) => void;
 }) {
+  const wb = useProductT("websiteBuilder");
   const [report, setReport] = useState<WebsiteIntelligenceReport | null>(null);
   const [performance, setPerformance] = useState<{
     score: number;
@@ -36,7 +38,7 @@ export function WebsiteIntelligencePanel(props: {
       setReport(data.intelligence || null);
       setPerformance(data.performance || null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Analysis failed");
+      setError(err instanceof Error ? err.message : wb("panels.failedAnalyze"));
     } finally {
       setLoading(false);
     }

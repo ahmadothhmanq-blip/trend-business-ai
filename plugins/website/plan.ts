@@ -39,6 +39,18 @@ import type {
   WebsiteDynamicPlan,
 } from "@/plugins/website/types";
 import type { GenerationContext } from "@/lib/ai/types";
+import {
+  isMinimalWebsiteGeneration,
+  isUltraFastWebsiteGeneration,
+  resolveWebsiteGenerationProfile,
+  shouldUseDeterministicBlueprint,
+} from "@/lib/website/generation-flags";
+import {
+  buildEssentialWebsiteFilePlan,
+  filterFilePlansForFastGeneration,
+} from "@/lib/website/fast-generation";
+import type { WebsiteStrategy } from "@/plugins/website/layers/types";
+import type { DesignSystem } from "@/plugins/website/layers/types";
 
 export function getCapabilityFlags(
   analysis: WebsiteProjectAnalysis,
@@ -74,6 +86,32 @@ function normalizePlannedFiles(
 
   const capped = capPlannedFiles([...byPath.values()], MAX_WEBSITE_FILES);
   return sortFilesByDependency(capped);
+}
+
+function enrichBlueprintFromLayers(
+  blueprint: WebsiteProjectBlueprint,
+  strategy: WebsiteStrategy,
+  designSystem: DesignSystem,
+): WebsiteProjectBlueprint {
+  const next = { ...blueprint };
+  if (!next.colorPalette?.length) {
+    next.colorPalette = designSystemToPalette(designSystem);
+  }
+  if (!next.pages?.length) {
+    next.pages = strategy.pages.map((p) => p.name);
+  }
+  if (designSystem.componentPalette?.length) {
+    next.components = Array.from(
+      new Set([
+        ...(next.components ?? []),
+        ...designSystem.componentPalette,
+      ]),
+    );
+  }
+  if (strategy.sectionPlan?.length) {
+    next.sections = strategy.sectionPlan.map((s) => `${s.page}: ${s.name}`);
+  }
+  return next;
 }
 
 function blueprintFromStrategy(
@@ -199,11 +237,31 @@ export async function planWebsite(
 
   ctx.progress.emit("Creating blueprint...");
 
+  const generationProfile = resolveWebsiteGenerationProfile(input);
+
   let blueprint: WebsiteProjectBlueprint;
-  try {
-    const rawBlueprint = await generateJsonWithValidation<WebsiteProjectBlueprint>({
-      provider: ctx.provider,
-      prompt: `${websiteBlueprintPrompt(iterationInput, analysis)}
+  const useDeterministicBlueprint = shouldUseDeterministicBlueprint({
+    mode: input.mode,
+    continueInstruction: input.continueInstruction,
+    hasUpstreamStrategy: Boolean(options?.strategy),
+    hasUpstreamDesignSystem: Boolean(options?.designSystem),
+    generationProfile,
+  });
+
+  if (useDeterministicBlueprint) {
+    ctx.progress.emit(
+      "Deriving blueprint from strategy and design system (deterministic)...",
+    );
+    blueprint = enrichBlueprintFromLayers(
+      blueprintFromStrategy(analysis, strategy, designSystem),
+      strategy,
+      designSystem,
+    );
+  } else {
+    try {
+      const rawBlueprint = await generateJsonWithValidation<WebsiteProjectBlueprint>({
+        provider: ctx.provider,
+        prompt: `${websiteBlueprintPrompt(iterationInput, analysis)}
 
 Strategy: ${JSON.stringify(strategy)}
 DesignSystem: ${JSON.stringify(designSystem)}
@@ -211,38 +269,24 @@ DesignSystem: ${JSON.stringify(designSystem)}
 Align blueprint pages/sections/colors/typography with Strategy and DesignSystem.
 Prefer DesignSystem.componentPalette as real React components under components/sections/ and components/layout/.
 Section order must follow Strategy.sectionPlan (Design Renderer output).`,
-      schema: websiteBlueprintSchema,
-      maxAttempts: 3,
-      validate: validateWebsiteBlueprint,
-    });
+        schema: websiteBlueprintSchema,
+        maxAttempts: 3,
+        validate: validateWebsiteBlueprint,
+      });
 
-    blueprint = isWebsiteImproveMode(input)
-      ? normalizeWebsiteBlueprint(rawBlueprint)
-      : rawBlueprint;
+      blueprint = isWebsiteImproveMode(input)
+        ? normalizeWebsiteBlueprint(rawBlueprint)
+        : rawBlueprint;
 
-    // Prefer design-engine tokens when AI returns weak palette.
-    if (!blueprint.colorPalette?.length) {
-      blueprint.colorPalette = designSystemToPalette(designSystem);
-    }
-    if (!blueprint.pages?.length) {
-      blueprint.pages = strategy.pages.map((p) => p.name);
-    }
-    if (designSystem.componentPalette?.length) {
-      blueprint.components = Array.from(
-        new Set([
-          ...(blueprint.components ?? []),
-          ...designSystem.componentPalette,
-        ]),
+      blueprint = enrichBlueprintFromLayers(blueprint, strategy, designSystem);
+    } catch (error) {
+      console.error("blueprint generation failed; deriving from strategy/design", error);
+      blueprint = enrichBlueprintFromLayers(
+        blueprintFromStrategy(analysis, strategy, designSystem),
+        strategy,
+        designSystem,
       );
     }
-    if (strategy.sectionPlan?.length) {
-      blueprint.sections = strategy.sectionPlan.map(
-        (s) => `${s.page}: ${s.name}`,
-      );
-    }
-  } catch (error) {
-    console.error("blueprint generation failed; deriving from strategy/design", error);
-    blueprint = blueprintFromStrategy(analysis, strategy, designSystem);
   }
 
   if (
@@ -262,22 +306,51 @@ Section order must follow Strategy.sectionPlan (Design Renderer output).`,
 
   ctx.progress.emit("Planning files...");
 
-  const dynamicPlan = await generateJsonWithValidation<WebsiteDynamicPlan>({
-    provider: ctx.provider,
-    prompt: `${websitePlanPrompt(iterationInput, analysis, blueprint)}
+  const flags = getCapabilityFlags(analysis);
+  const componentPaths = options?.designRenderComponentPaths;
+  const componentIds = designSystem.componentPalette;
+
+  let dynamicPlan: WebsiteDynamicPlan;
+  if (isUltraFastWebsiteGeneration(input)) {
+    ctx.progress.emit(
+      "[ultra] Building essential file plan (skipping plan LLM)…",
+    );
+    const essentialFiles = buildEssentialWebsiteFilePlan({
+      componentPaths,
+      componentIds,
+      flags,
+      blueprintPages: blueprint.pages,
+    });
+    dynamicPlan = {
+      complexity: "essential",
+      estimatedFileCount: essentialFiles.length,
+      layouts: [],
+      pages: blueprint.pages,
+      components: componentIds?.map(String) ?? [],
+      apiRoutes: [],
+      hooks: [],
+      utilities: [],
+      types: [],
+      configs: [],
+      files: essentialFiles,
+    };
+  } else {
+    dynamicPlan = await generateJsonWithValidation<WebsiteDynamicPlan>({
+      provider: ctx.provider,
+      prompt: `${websitePlanPrompt(iterationInput, analysis, blueprint)}
 
 Strategy sitemap: ${JSON.stringify(strategy.sitemap)}
 Design pattern: ${designSystem.industryPattern}
 Prefer pages matching strategy paths. Inject design tokens via app/globals.css.
 Must include Design Renderer components as separate files when listed in DesignSystem.componentPalette:
-${JSON.stringify(options?.designRenderComponentPaths ?? designSystem.componentPalette ?? [])}`,
-    schema: websiteDynamicPlanSchema,
-    maxAttempts: 3,
-    validate: validateWebsiteDynamicPlan,
-  });
+${JSON.stringify(componentPaths ?? designSystem.componentPalette ?? [])}`,
+      schema: websiteDynamicPlanSchema,
+      maxAttempts: 3,
+      validate: validateWebsiteDynamicPlan,
+    });
+  }
 
-  const flags = getCapabilityFlags(analysis);
-  const filePlans = injectRendererComponentFiles(
+  let filePlans = injectRendererComponentFiles(
     normalizePlannedFiles(
       {
         ...dynamicPlan,
@@ -288,8 +361,20 @@ ${JSON.stringify(options?.designRenderComponentPaths ?? designSystem.componentPa
       },
       flags,
     ),
-    options?.designRenderComponentPaths,
+    isUltraFastWebsiteGeneration(input)
+      ? componentPaths?.slice(0, 8)
+      : componentPaths,
   );
+
+  if (isMinimalWebsiteGeneration(input)) {
+    const label = isUltraFastWebsiteGeneration(input) ? "ultra" : "fast";
+    ctx.progress.emit(`Planning required production files (${label} mode)...`);
+    filePlans = filterFilePlansForFastGeneration(filePlans, {
+      componentPaths,
+      componentIds,
+      flags,
+    });
+  }
 
   return {
     blueprint,

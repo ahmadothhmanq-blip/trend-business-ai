@@ -49,6 +49,19 @@ const CORE_LUXURY = comps(
   "SiteFooter",
 );
 
+/** Red Premium — cinematic hero, gallery proof, pricing band (distinct from Luxury Noir). */
+const CORE_RED_PREMIUM = comps(
+  "SiteHeaderTransparent",
+  "HeroCinematic",
+  "GalleryExperience",
+  "BrandTrust",
+  "TestimonialsSlider",
+  "PricingModern",
+  "CtaBand",
+  "ContactCta",
+  "SiteFooter",
+);
+
 const CORE_MODERN = comps(
   "NavModern",
   "HeroSplit",
@@ -93,68 +106,19 @@ const CORE_CREATIVE = comps(
   "SiteFooter",
 );
 
-const CORE_TECH = comps(
-  "NavModern",
-  "HeroInteractive",
-  "FeaturesBento",
-  "ProductInteractive",
-  "IntegrationsLogoCloud",
-  "PricingModern",
-  "FaqAccordion",
-  "CtaBand",
-  "SiteFooter",
-);
+import {
+  PALETTE_AUTOMOTIVE,
+  PALETTE_REAL_ESTATE,
+  PALETTE_RESTAURANT,
+  PALETTE_SAAS,
+  PALETTE_TECHNOLOGY,
+} from "@/lib/ai-core/template-intelligence/industry-palettes";
 
-const CORE_SAAS = comps(
-  "NavModern",
-  "HeroProduct",
-  "FeaturesModern",
-  "ProductInteractive",
-  "PricingModern",
-  "TestimonialsSlider",
-  "FaqAccordion",
-  "CtaSplit",
-  "SiteFooter",
-);
-
-const CORE_AUTO = comps(
-  "SiteHeaderTransparent",
-  "HeroLuxuryShowcase",
-  "VehicleShowcase",
-  "VehicleComparison",
-  "InventoryGrid",
-  "FinanceCalculator",
-  "TestimonialsSlider",
-  "BranchesMap",
-  "AppointmentCalendar",
-  "BookingCta",
-  "SiteFooter",
-);
-
-const CORE_RESTAURANT = comps(
-  "SiteHeaderTransparent",
-  "HeroCinematic",
-  "MenuHighlights",
-  "GalleryExperience",
-  "FeatureStorytelling",
-  "TestimonialsSlider",
-  "ReservationSection",
-  "MapsSection",
-  "ContactCta",
-  "SiteFooter",
-);
-
-const CORE_REAL_ESTATE = comps(
-  "SiteHeader",
-  "HeroProperty",
-  "PropertyListings",
-  "FeatureHighlights",
-  "GalleryGrid",
-  "TestimonialsModern",
-  "LocationSections",
-  "ContactSection",
-  "SiteFooter",
-);
+const CORE_TECH = PALETTE_TECHNOLOGY;
+const CORE_SAAS = PALETTE_SAAS;
+const CORE_AUTO = PALETTE_AUTOMOTIVE;
+const CORE_RESTAURANT = PALETTE_RESTAURANT;
+const CORE_REAL_ESTATE = PALETTE_REAL_ESTATE;
 
 export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   {
@@ -188,6 +152,41 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
     keywords: ["luxury", "premium", "noir", "gold", "editorial"],
     audienceHints: ["affluent", "executive", "luxury"],
     brandStyleHints: ["luxury", "premium", "cinematic"],
+    visualPreset: {
+      spacing: {
+        sectionY: "7rem",
+        sectionYMobile: "4.25rem",
+        containerMax: "72rem",
+        stack: "1.5rem",
+        density: "airy",
+      },
+      buttons: {
+        primary: "ghost",
+        secondary: "outline",
+        radius: "999px",
+        uppercase: true,
+        weight: 700,
+      },
+      chrome: {
+        headerVariant: "transparent",
+        headerComponent: "SiteHeaderTransparent",
+        footerVariant: "editorial",
+        footerComponent: "SiteFooter",
+        navStyle: "underline",
+      },
+      layout: {
+        heroLayout: "HeroLuxury · editorial-hero",
+        sectionLayout: "editorial",
+        cardsStyle: "soft-shadow",
+        componentStyle: "Dark luxury editorial · Cinematic",
+        layoutVariant: "editorial-hero",
+        heroVariant: "luxury-editorial",
+        cardVariant: "soft-shadow",
+        navigationVariant: "transparent-underline",
+        footerVariant: "editorial",
+      },
+      sections: [],
+    },
   },
   {
     id: "ti-modern-clean",
@@ -219,6 +218,41 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
     keywords: ["modern", "clean", "product", "startup"],
     audienceHints: ["startup", "smb", "product"],
     brandStyleHints: ["modern", "clean", "contemporary"],
+    visualPreset: {
+      spacing: {
+        sectionY: "5rem",
+        sectionYMobile: "3rem",
+        containerMax: "68rem",
+        stack: "1.25rem",
+        density: "balanced",
+      },
+      buttons: {
+        primary: "filled",
+        secondary: "outline",
+        radius: "999px",
+        uppercase: false,
+        weight: 700,
+      },
+      chrome: {
+        headerVariant: "solid",
+        headerComponent: "NavModern",
+        footerVariant: "multi-column",
+        footerComponent: "SiteFooter",
+        navStyle: "pill",
+      },
+      layout: {
+        heroLayout: "HeroSplit · product-saas",
+        sectionLayout: "bento",
+        cardsStyle: "structured",
+        componentStyle: "Modern product · Fade up",
+        layoutVariant: "product-saas",
+        heroVariant: "saas-split",
+        cardVariant: "structured",
+        navigationVariant: "pill-modern",
+        footerVariant: "multi-column",
+      },
+      sections: [],
+    },
   },
   {
     id: "ti-minimal-white",
@@ -230,7 +264,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
     industry: "multi",
     designStyle: "Minimal light",
     designPreset: "minimal",
-    layoutStructure: "corporate-trust",
+    layoutStructure: "minimal-white",
     colors: {
       primary: "#111111",
       secondary: "#6B7280",
@@ -250,6 +284,41 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
     keywords: ["minimal", "simple", "white", "quiet"],
     audienceHints: ["design-conscious", "creative", "professional"],
     brandStyleHints: ["minimal", "simple", "clean"],
+    visualPreset: {
+      spacing: {
+        sectionY: "6.5rem",
+        sectionYMobile: "4rem",
+        containerMax: "60rem",
+        stack: "2rem",
+        density: "airy",
+      },
+      buttons: {
+        primary: "outline",
+        secondary: "ghost",
+        radius: "0.25rem",
+        uppercase: false,
+        weight: 600,
+      },
+      chrome: {
+        headerVariant: "solid",
+        headerComponent: "SiteHeader",
+        footerVariant: "minimal",
+        footerComponent: "SiteFooter",
+        navStyle: "plain",
+      },
+      layout: {
+        heroLayout: "HeroFullBleed · minimal-white",
+        sectionLayout: "editorial",
+        cardsStyle: "borderless",
+        componentStyle: "Minimal light · Fade up",
+        layoutVariant: "minimal-white",
+        heroVariant: "minimal-bleed",
+        cardVariant: "borderless",
+        navigationVariant: "plain-minimal",
+        footerVariant: "minimal",
+      },
+      sections: [],
+    },
   },
   {
     id: "ti-corporate-trust",
@@ -282,6 +351,41 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
     keywords: ["corporate", "enterprise", "b2b", "trust"],
     audienceHints: ["enterprise", "b2b", "executive"],
     brandStyleHints: ["corporate", "professional", "trust"],
+    visualPreset: {
+      spacing: {
+        sectionY: "5.5rem",
+        sectionYMobile: "3.25rem",
+        containerMax: "70rem",
+        stack: "1.35rem",
+        density: "balanced",
+      },
+      buttons: {
+        primary: "filled",
+        secondary: "outline",
+        radius: "0.375rem",
+        uppercase: false,
+        weight: 700,
+      },
+      chrome: {
+        headerVariant: "solid",
+        headerComponent: "SiteHeader",
+        footerVariant: "multi-column",
+        footerComponent: "SiteFooter",
+        navStyle: "underline",
+      },
+      layout: {
+        heroLayout: "HeroSplit · corporate-trust",
+        sectionLayout: "grid",
+        cardsStyle: "structured",
+        componentStyle: "Corporate professional · Fade up",
+        layoutVariant: "corporate-trust",
+        heroVariant: "corporate-trust",
+        cardVariant: "structured",
+        navigationVariant: "solid-corporate",
+        footerVariant: "multi-column",
+      },
+      sections: [],
+    },
   },
   {
     id: "ti-creative-studio",
@@ -314,6 +418,107 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
     keywords: ["creative", "agency", "studio", "portfolio"],
     audienceHints: ["creative", "brand", "agency"],
     brandStyleHints: ["creative", "bold", "artistic"],
+    visualPreset: {
+      spacing: {
+        sectionY: "6rem",
+        sectionYMobile: "3.5rem",
+        containerMax: "76rem",
+        stack: "1.75rem",
+        density: "airy",
+      },
+      buttons: {
+        primary: "filled",
+        secondary: "ghost",
+        radius: "0.5rem",
+        uppercase: false,
+        weight: 800,
+      },
+      chrome: {
+        headerVariant: "transparent",
+        headerComponent: "SiteHeaderTransparent",
+        footerVariant: "minimal",
+        footerComponent: "SiteFooter",
+        navStyle: "plain",
+      },
+      layout: {
+        heroLayout: "HeroCinematic · studio-portfolio",
+        sectionLayout: "asymmetric",
+        cardsStyle: "glass",
+        componentStyle: "Creative agency · Cinematic",
+        layoutVariant: "studio-portfolio",
+        heroVariant: "cinematic-full",
+        cardVariant: "glass",
+        navigationVariant: "plain-minimal",
+        footerVariant: "minimal",
+      },
+      sections: [],
+    },
+  },
+  {
+    id: "ti-red-premium",
+    name: "Red Premium",
+    tagline: "Bold red luxury with high-contrast drama",
+    description:
+      "Premium red palette with editorial hero, gallery showcase, and conversion-focused CTA bands.",
+    category: "Luxury",
+    industry: "multi",
+    designStyle: "Red premium editorial",
+    designPreset: "luxury",
+    layoutStructure: "red-premium",
+    colors: {
+      primary: "#DC2626",
+      secondary: "#7F1D1D",
+      accent: "#EF4444",
+      background: "#0C0A0A",
+      foreground: "#FAFAFA",
+      surface: "#1A0A0A",
+    },
+    typography: {
+      display: "Playfair Display",
+      heading: "Playfair Display",
+      body: "Source Sans 3",
+    },
+    components: CORE_RED_PREMIUM,
+    animations: cinematic,
+    brandPresetId: "luxury-brand",
+    keywords: ["red", "premium", "luxury", "bold"],
+    audienceHints: ["premium", "bold", "brand"],
+    brandStyleHints: ["red", "premium", "luxury"],
+    visualPreset: {
+      spacing: {
+        sectionY: "6.5rem",
+        sectionYMobile: "4rem",
+        containerMax: "72rem",
+        stack: "1.5rem",
+        density: "airy",
+      },
+      buttons: {
+        primary: "filled",
+        secondary: "outline",
+        radius: "0.5rem",
+        uppercase: true,
+        weight: 800,
+      },
+      chrome: {
+        headerVariant: "transparent",
+        headerComponent: "SiteHeaderTransparent",
+        footerVariant: "editorial",
+        footerComponent: "SiteFooter",
+        navStyle: "underline",
+      },
+      layout: {
+        heroLayout: "HeroLuxury · editorial-hero",
+        sectionLayout: "editorial",
+        cardsStyle: "soft-shadow",
+        componentStyle: "Red premium · Cinematic",
+        layoutVariant: "editorial-hero",
+        heroVariant: "red-premium",
+        cardVariant: "premium-red",
+        navigationVariant: "red-bold",
+        footerVariant: "premium-red",
+      },
+      sections: [],
+    },
   },
   {
     id: "ti-technology-dark",
@@ -563,7 +768,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
       heading: "Satoshi",
       body: "Inter",
     },
-    components: CORE_SAAS,
+    components: CORE_TECH,
     animations: crisp,
     brandPresetId: "technology-brand",
     premiumTemplateId: "saas",

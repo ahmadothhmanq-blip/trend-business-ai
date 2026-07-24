@@ -17,6 +17,7 @@ import {
   TTS_VOICE_CATALOG,
   isTtsProviderConfigured,
   resolvePreferredProviderId,
+  resolveVideoProviderForMode,
   envProviderFlags,
   listMarketplaceIndustries,
 } from "@/lib/ai-core/video-production-platform";
@@ -60,8 +61,10 @@ export async function GET(request: Request) {
     stats: templateCatalogStats(),
     capabilities: {
       videoProviderConfigured: isExternalVideoProviderConfigured(),
-      videoProvider: resolveVideoProviderName(),
+      videoProvider: resolveVideoProviderName("full"),
       preferredProvider: resolvePreferredProviderId(),
+      fullRenderProvider: resolveVideoProviderForMode("full").providerId,
+      avatarProvider: resolveVideoProviderForMode("avatar").providerId,
       providerFlags: flags,
       ttsConfigured: isTtsConfigured() || isTtsProviderConfigured(),
       previewRender: true,

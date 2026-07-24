@@ -22,6 +22,11 @@ import { createSseStreamHelpers } from "@/lib/api/sse-stream";
 import { isRetryableError, isStreamDisconnectError, withRetry } from "@/lib/ai/retry";
 import { clampWebsitePrompt } from "@/lib/ai/timeouts";
 import { logger } from "@/lib/logger";
+import {
+  isWebsiteIncrementalPreviewEnabled,
+  isUltraFastWebsiteGenerationEnabled,
+  resolveWebsiteGenerationProfile,
+} from "@/lib/website/generation-flags";
 import type { GeneratedProjectFile } from "@/plugins/website/types";
 import { NextResponse } from "next/server";
 
@@ -136,8 +141,14 @@ export async function POST(request: Request) {
         });
         if (session.ok) {
           sessionId = session.generation.id;
+          const generationProfile = resolveWebsiteGenerationProfile(input);
           send("session", {
             generationId: sessionId,
+            incrementalPreview:
+              isWebsiteIncrementalPreviewEnabled() ||
+              isUltraFastWebsiteGenerationEnabled() ||
+              generationProfile === "ultra",
+            generationProfile,
             message: "Generation session started — progress is saved as we go.",
           });
         }

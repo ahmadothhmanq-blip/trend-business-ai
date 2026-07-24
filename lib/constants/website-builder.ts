@@ -1,3 +1,12 @@
+export const WEBSITE_TYPE_KEYS: Record<string, string> = {
+  Business: "business",
+  Portfolio: "portfolio",
+  "E-commerce": "e_commerce",
+  SaaS: "saas",
+  Blog: "blog",
+  "Landing Page": "landing_page",
+};
+
 export const WEBSITE_TYPES = [
   "Business",
   "Portfolio",
@@ -16,6 +25,14 @@ export const WEBSITE_LANGUAGES = [
   "Arabic",
 ] as const;
 
+export const WEBSITE_COLOR_STYLE_KEYS: Record<string, string> = {
+  "Black & Gold (Premium)": "black_gold_premium",
+  "Dark Minimal": "dark_minimal",
+  "Light Professional": "light_professional",
+  "Bold Contrast": "bold_contrast",
+  "Soft Neutral": "soft_neutral",
+};
+
 export const WEBSITE_COLOR_STYLES = [
   "Black & Gold (Premium)",
   "Dark Minimal",
@@ -23,6 +40,14 @@ export const WEBSITE_COLOR_STYLES = [
   "Bold Contrast",
   "Soft Neutral",
 ] as const;
+
+export const WEBSITE_DESIGN_STYLE_KEYS: Record<string, string> = {
+  "Modern SaaS": "modern_saas",
+  Corporate: "corporate",
+  Minimal: "minimal",
+  Creative: "creative",
+  Luxury: "luxury",
+};
 
 export const WEBSITE_DESIGN_STYLES = [
   "Modern SaaS",
@@ -33,6 +58,16 @@ export const WEBSITE_DESIGN_STYLES = [
 ] as const;
 
 export const WEBSITE_PAGE_COUNTS = ["1-3", "4-6", "7-10", "10+"] as const;
+
+export const WEBSITE_FEATURE_LABEL_KEYS: Record<string, string> = {
+  login: "websiteFeatures.login",
+  dashboard: "websiteFeatures.dashboard",
+  blog: "websiteFeatures.blog",
+  contact: "websiteFeatures.contact",
+  booking: "websiteFeatures.booking",
+  payment: "websiteFeatures.payment",
+  chat: "websiteFeatures.chat",
+};
 
 export const WEBSITE_FEATURE_IDS = [
   "login",

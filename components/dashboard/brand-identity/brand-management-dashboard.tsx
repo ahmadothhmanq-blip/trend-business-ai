@@ -28,6 +28,8 @@ import {
 } from "@/components/dashboard/ui/dashboard-card";
 import { dashboardInputClass } from "@/components/dashboard/ui/dashboard-styles";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/client";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import { sanitizeSvgContent } from "@/lib/ai/sanitize";
 import type { BrandIdentityGeneration } from "@/types/brand-identity";
 
@@ -38,6 +40,8 @@ type Props = {
 type Tab = "overview" | "colors" | "typography" | "voice" | "logos" | "assets" | "assistant" | "apply";
 
 export function BrandManagementDashboard({ generation: initial }: Props) {
+  const { t } = useTranslation();
+  const p = useProductT("brandIdentity");
   const router = useRouter();
   const [generation, setGeneration] = useState(initial);
   const [tab, setTab] = useState<Tab>("overview");
@@ -70,7 +74,7 @@ export function BrandManagementDashboard({ generation: initial }: Props) {
       body: JSON.stringify({ colors }),
     });
     if (res.ok) {
-      toast.success("Colors updated");
+      toast.success(p("toasts.colorsUpdated"));
       await refresh();
     }
   };
@@ -83,7 +87,7 @@ export function BrandManagementDashboard({ generation: initial }: Props) {
       body: JSON.stringify({ typography: bp.typography }),
     });
     if (res.ok) {
-      toast.success("Typography saved");
+      toast.success(p("toasts.typographySaved"));
       await refresh();
     }
   };
@@ -98,10 +102,10 @@ export function BrandManagementDashboard({ generation: initial }: Props) {
       });
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.error ?? "Logo generation failed");
+        toast.error(data.error ?? p("errors.logoGenerationFailed"));
         return;
       }
-      toast.success(data.message ?? "Logos generated");
+      toast.success(data.message ?? p("toasts.logosGenerated"));
       if (data.generation) setGeneration(data.generation);
     } finally {
       setLogoBusy(false);
@@ -118,11 +122,11 @@ export function BrandManagementDashboard({ generation: initial }: Props) {
       });
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.error ?? "Kit creation failed");
+        toast.error(data.error ?? p("errors.kitCreationFailed"));
         return;
       }
       setShareUrl(data.shareUrl ?? null);
-      toast.success(data.message ?? "Brand kit created");
+      toast.success(data.message ?? p("toasts.kitCreated"));
     } finally {
       setKitBusy(false);
     }
@@ -139,7 +143,7 @@ export function BrandManagementDashboard({ generation: initial }: Props) {
       });
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.error ?? "Assistant failed");
+        toast.error(data.error ?? p("errors.assistantFailed"));
         return;
       }
       toast.success(data.message);
@@ -159,30 +163,30 @@ export function BrandManagementDashboard({ generation: initial }: Props) {
     const data = await res.json();
     if (res.ok) {
       await navigator.clipboard.writeText(JSON.stringify(data.apply, null, 2));
-      toast.success(`${target} tokens copied — paste in target builder`);
+      toast.success(p("management.tokensCopied", { target }));
     }
   };
 
   if (!bp) {
     return (
       <DashboardPanel className="py-16 text-center">
-        <p className="text-white/50">No blueprint available for this brand.</p>
+        <p className="text-white/50">{p("management.noBlueprint")}</p>
         <Button variant="outline" className="mt-4" onClick={() => router.push("/dashboard/brand-studio")}>
-          Back to Brand Studio
+          {p("management.backToStudio")}
         </Button>
       </DashboardPanel>
     );
   }
 
   const tabs: { key: Tab; label: string }[] = [
-    { key: "overview", label: "Overview" },
-    { key: "colors", label: "Colors" },
-    { key: "typography", label: "Fonts" },
-    { key: "voice", label: "Voice" },
-    { key: "logos", label: "Logos" },
-    { key: "assets", label: "Assets" },
-    { key: "assistant", label: "Assistant" },
-    { key: "apply", label: "Apply" },
+    { key: "overview", label: p("management.tabs.overview") },
+    { key: "colors", label: p("management.tabs.colors") },
+    { key: "typography", label: p("management.tabs.fonts") },
+    { key: "voice", label: p("management.tabs.voice") },
+    { key: "logos", label: p("management.tabs.logos") },
+    { key: "assets", label: p("management.tabs.assets") },
+    { key: "assistant", label: p("management.tabs.assistant") },
+    { key: "apply", label: p("management.tabs.apply") },
   ];
 
   return (
@@ -196,22 +200,22 @@ export function BrandManagementDashboard({ generation: initial }: Props) {
         <div className="min-w-0 flex-1">
           <h2 className="truncate text-xl font-bold text-white">{bp.title}</h2>
           <p className="text-xs text-white/40">
-            {generation.brand_type} · Quality {bp.qualityScore ?? "—"}/100
+            {generation.brand_type} · {p("management.qualityScore", { score: bp.qualityScore ?? "—" })}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" size="sm" className="gap-1.5 text-xs" onClick={() => void handleGenerateLogos()} disabled={logoBusy}>
-            <RefreshCw className={cn("size-3", logoBusy && "animate-spin")} /> Logos
+            <RefreshCw className={cn("size-3", logoBusy && "animate-spin")} /> {p("management.logosBtn")}
           </Button>
           <Button variant="outline" size="sm" className="gap-1.5 text-xs" onClick={() => void handleCreateKit()} disabled={kitBusy}>
-            <Sparkles className="size-3" /> Create Kit
+            <Sparkles className="size-3" /> {p("management.createKit")}
           </Button>
           <Button variant="outline" size="sm" className="gap-1.5 text-xs" onClick={() => void handleExport("html")}>
-            <Download className="size-3" /> PDF/HTML
+            <Download className="size-3" /> {p("management.pdfHtml")}
           </Button>
           {shareUrl ? (
-            <Button variant="outline" size="sm" className="gap-1.5 text-xs" onClick={() => { navigator.clipboard.writeText(shareUrl); toast.success("Share link copied"); }}>
-              <Share2 className="size-3" /> Share
+            <Button variant="outline" size="sm" className="gap-1.5 text-xs" onClick={() => { navigator.clipboard.writeText(shareUrl); toast.success(p("management.shareLinkCopied")); }}>
+              <Share2 className="size-3" /> {p("management.share")}
             </Button>
           ) : null}
         </div>
@@ -235,15 +239,15 @@ export function BrandManagementDashboard({ generation: initial }: Props) {
       {tab === "overview" && (
         <div className="grid gap-4 sm:grid-cols-2">
           <DashboardPanel className="space-y-2 p-5">
-            <span className="text-xs font-bold uppercase tracking-wider text-premium-gold-light">Mission</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-premium-gold-light">{p("management.mission")}</span>
             <p className="text-sm text-white/70">{bp.mission}</p>
           </DashboardPanel>
           <DashboardPanel className="space-y-2 p-5">
-            <span className="text-xs font-bold uppercase tracking-wider text-premium-gold-light">Vision</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-premium-gold-light">{p("management.vision")}</span>
             <p className="text-sm text-white/70">{bp.vision}</p>
           </DashboardPanel>
           <DashboardPanel className="space-y-2 p-5 sm:col-span-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-premium-gold-light">Tagline</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-premium-gold-light">{p("management.tagline")}</span>
             <p className="text-lg font-semibold text-white/80">{bp.voiceTone.tagline || "—"}</p>
           </DashboardPanel>
         </div>
@@ -272,11 +276,11 @@ export function BrandManagementDashboard({ generation: initial }: Props) {
       {tab === "typography" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle className="flex items-center gap-2"><Type className="size-4" /> Typography</DashboardCardTitle>
+            <DashboardCardTitle className="flex items-center gap-2"><Type className="size-4" /> {p("management.typography")}</DashboardCardTitle>
           </DashboardCardHeader>
           <DashboardCardContent className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-xs text-white/50">Primary / Headings</label>
+              <label className="mb-1 block text-xs text-white/50">{p("management.primaryHeadings")}</label>
               <Input
                 value={bp.typography.primary}
                 onChange={(e) =>
@@ -289,7 +293,7 @@ export function BrandManagementDashboard({ generation: initial }: Props) {
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs text-white/50">Secondary / Body</label>
+              <label className="mb-1 block text-xs text-white/50">{p("management.secondaryBody")}</label>
               <Input
                 value={bp.typography.secondary}
                 onChange={(e) =>
@@ -310,7 +314,7 @@ export function BrandManagementDashboard({ generation: initial }: Props) {
 
       {tab === "voice" && (
         <DashboardPanel className="space-y-4 p-5">
-          <p className="text-sm text-white/70"><strong>Tone:</strong> {bp.voiceTone.tone}</p>
+          <p className="text-sm text-white/70"><strong>{p("management.toneLabel")}</strong> {bp.voiceTone.tone}</p>
           <p className="text-sm text-white/70">{bp.voiceTone.elevatorPitch}</p>
         </DashboardPanel>
       )}
@@ -320,7 +324,7 @@ export function BrandManagementDashboard({ generation: initial }: Props) {
           {!logos.length ? (
             <DashboardPanel className="py-12 text-center">
               <Palette className="mx-auto size-8 text-white/20" />
-              <p className="mt-3 text-sm text-white/50">No logos yet</p>
+              <p className="mt-3 text-sm text-white/50">{p("management.noLogosYet")}</p>
               <Button className="btn-gold mt-4" onClick={() => void handleGenerateLogos()} disabled={logoBusy}>
                 Generate Logo Concepts
               </Button>
@@ -357,20 +361,20 @@ export function BrandManagementDashboard({ generation: initial }: Props) {
       {tab === "assistant" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle className="flex items-center gap-2"><MessageSquare className="size-4" /> Brand Assistant</DashboardCardTitle>
+            <DashboardCardTitle className="flex items-center gap-2"><MessageSquare className="size-4" /> {p("management.brandAssistant")}</DashboardCardTitle>
           </DashboardCardHeader>
           <DashboardCardContent className="space-y-3">
             <p className="text-xs text-white/40">
-              Try: &quot;Make it more luxury&quot;, &quot;Change colors to gold&quot;, &quot;Create younger identity&quot;
+              {p("management.assistantHint")}
             </p>
             <Textarea
               value={assistantMsg}
               onChange={(e) => setAssistantMsg(e.target.value)}
-              placeholder="Describe how to improve your brand..."
+              placeholder={p("placeholders.assistantMessage")}
               className={cn(dashboardInputClass, "min-h-[100px]")}
             />
             <Button onClick={() => void handleAssistant()} disabled={assistantBusy || !assistantMsg.trim()} className="btn-gold gap-2">
-              <Wand2 className="size-4" /> {assistantBusy ? "Applying..." : "Apply"}
+              <Wand2 className="size-4" /> {assistantBusy ? p("management.applying") : p("management.apply")}
             </Button>
           </DashboardCardContent>
         </DashboardCard>
@@ -381,9 +385,9 @@ export function BrandManagementDashboard({ generation: initial }: Props) {
           {(["website-builder", "app-builder", "video-studio"] as const).map((target) => (
             <DashboardPanel key={target} className="space-y-3 p-5">
               <p className="text-sm font-semibold capitalize text-white/80">{target.replace("-", " ")}</p>
-              <p className="text-xs text-white/40">Copy brand tokens for {target}</p>
+              <p className="text-xs text-white/40">{p("management.copyTokensFor", { target })}</p>
               <Button variant="outline" size="sm" className="gap-1.5 text-xs" onClick={() => void handleApply(target)}>
-                <ExternalLink className="size-3" /> Copy Tokens
+                <ExternalLink className="size-3" /> {p("management.copyTokens")}
               </Button>
             </DashboardPanel>
           ))}

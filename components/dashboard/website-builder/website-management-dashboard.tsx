@@ -18,6 +18,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import { cn } from "@/lib/utils";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
+import { useTranslation } from "@/lib/i18n/client";
 import type { CatalogItem, CmsEntry } from "@/lib/ai-core/website-management";
 
 type Tab =
@@ -34,6 +36,8 @@ export function WebsiteManagementDashboard({
 }: {
   generationId: string;
 }) {
+  const { t } = useTranslation();
+  const wb = useProductT("websiteBuilder");
   const [tab, setTab] = useState<Tab>("overview");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -81,7 +85,7 @@ export function WebsiteManagementDashboard({
     try {
       const res = await fetch(`/api/website-builder/${generationId}/manage`);
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error || "Failed to load");
+      if (!res.ok) throw new Error(json.error || wb("management.errors.loadFailed"));
       setData(json);
       setBrandForm({
         businessName: json.brand?.businessName || "",
@@ -93,7 +97,7 @@ export function WebsiteManagementDashboard({
         logoUrl: "",
       });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Load failed");
+      toast.error(error instanceof Error ? error.message : wb("management.errors.loadFailed"));
     } finally {
       setLoading(false);
     }
@@ -112,7 +116,7 @@ export function WebsiteManagementDashboard({
         body: JSON.stringify(payload),
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error || "Action failed");
+      if (!res.ok) throw new Error(json.error || wb("management.errors.actionFailed"));
       if (json.catalog) setData((d) => (d ? { ...d, catalog: json.catalog } : d));
       if (json.cms) setData((d) => (d ? { ...d, cms: json.cms } : d));
       if (json.quality) setData((d) => (d ? { ...d, quality: json.quality } : d));
@@ -130,34 +134,34 @@ export function WebsiteManagementDashboard({
           });
         }
       }
-      toast.success(json.notes?.[0] || "Saved");
+      toast.success(json.notes?.[0] || wb("management.saved"));
       if (payload.action === "brand.apply" || payload.action === "catalog.upsert") {
         await load();
       }
       return json;
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed");
+      toast.error(error instanceof Error ? error.message : wb("management.failed"));
       return null;
     } finally {
       setSaving(false);
     }
   }
 
-  const tabs: Array<{ id: Tab; label: string; icon: typeof Package }> = [
-    { id: "overview", label: "Overview", icon: ShieldCheck },
-    { id: "catalog", label: "Catalog", icon: Package },
-    { id: "cms", label: "Content", icon: ImageIcon },
-    { id: "brand", label: "Brand", icon: Palette },
-    { id: "leads", label: "Leads", icon: MessageSquare },
-    { id: "assistant", label: "AI Assistant", icon: Sparkles },
-    { id: "quality", label: "Quality", icon: ShieldCheck },
+  const tabs = [
+    { id: "overview" as const, labelKey: "management.tabs.overview", icon: ShieldCheck },
+    { id: "catalog" as const, labelKey: "management.tabs.catalog", icon: Package },
+    { id: "cms" as const, labelKey: "management.tabs.cms", icon: ImageIcon },
+    { id: "brand" as const, labelKey: "management.tabs.brand", icon: Palette },
+    { id: "leads" as const, labelKey: "management.tabs.leads", icon: MessageSquare },
+    { id: "assistant" as const, labelKey: "management.tabs.assistant", icon: Sparkles },
+    { id: "quality" as const, labelKey: "management.tabs.quality", icon: ShieldCheck },
   ];
 
   if (loading) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center gap-2 text-white/50">
         <Loader2 className="size-5 animate-spin" />
-        Loading website management…
+        {wb("management.loading")}
       </div>
     );
   }
@@ -171,19 +175,19 @@ export function WebsiteManagementDashboard({
             className="mb-2 inline-flex items-center gap-1 text-[12px] text-premium-gold hover:underline"
           >
             <ArrowLeft className="size-3.5" />
-            Back to Website Builder
+            {wb("management.backToBuilder")}
           </Link>
           <h1 className="text-2xl font-semibold text-white">
-            {data?.project?.title || "Website Management"}
+            {data?.project?.title || wb("management.title")}
           </h1>
           <p className="text-sm text-white/45">
-            {data?.structure?.businessType || "Business"} · manage content, brand, catalog & quality
+            {data?.structure?.businessType || wb("management.business")} · {wb("management.subtitle")}
           </p>
         </div>
         <div className="flex gap-2">
           <Link href={`/dashboard/website-builder?generation=${generationId}`}>
             <Button variant="outline" className="border-white/15 text-white">
-              Open editor
+              {wb("management.openEditor")}
             </Button>
           </Link>
           <Button
@@ -191,26 +195,26 @@ export function WebsiteManagementDashboard({
             disabled={saving}
             onClick={() => void postAction({ action: "quality" })}
           >
-            Re-check quality
+            {wb("management.recheckQuality")}
           </Button>
         </div>
       </div>
 
       <div className="flex flex-wrap gap-1.5">
-        {tabs.map((t) => (
+        {tabs.map((tabItem) => (
           <button
-            key={t.id}
+            key={tabItem.id}
             type="button"
-            onClick={() => setTab(t.id)}
+            onClick={() => setTab(tabItem.id)}
             className={cn(
               "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] transition",
-              tab === t.id
+              tab === tabItem.id
                 ? "bg-premium-gold/20 text-premium-gold"
                 : "bg-white/[0.04] text-white/45 hover:text-white/70",
             )}
           >
-            <t.icon className="size-3.5" />
-            {t.label}
+            <tabItem.icon className="size-3.5" />
+            {wb(tabItem.labelKey)}
           </button>
         ))}
       </div>
@@ -249,9 +253,9 @@ export function WebsiteManagementDashboard({
             {data?.quality ? (
               <div className="mt-6 rounded-xl border border-white/[0.08] bg-black/20 p-4">
                 <p className="text-sm text-white">
-                  Quality score{" "}
+                  {wb("management.qualityScore")}{" "}
                   <span className="text-premium-gold">{data.quality.score}</span>
-                  {data.quality.ready ? " · Ready" : " · Needs fixes"}
+                  {data.quality.ready ? ` · ${wb("management.ready")}` : ` · ${wb("management.needsFixes")}`}
                 </p>
                 <p className="mt-1 text-[12px] text-white/45">{data.quality.summary}</p>
               </div>
@@ -264,7 +268,7 @@ export function WebsiteManagementDashboard({
         <DashboardPanel>
           <div className="mb-4 flex items-center justify-between">
             <p className="text-[12px] font-semibold uppercase tracking-wide text-white/40">
-              Business catalog
+              {wb("management.businessCatalog")}
             </p>
             <Button
               size="sm"
@@ -275,14 +279,14 @@ export function WebsiteManagementDashboard({
                   action: "catalog.upsert",
                   item: {
                     type: "service",
-                    title: "New item",
-                    price: "Custom",
-                    description: "Added from management dashboard",
+                    title: wb("management.catalog.newItem"),
+                    price: wb("management.customPrice"),
+                    description: wb("management.catalog.newItemDescription"),
                   },
                 })
               }
             >
-              Add item
+              {wb("management.addItem")}
             </Button>
           </div>
           <div className="space-y-2">
@@ -304,7 +308,7 @@ export function WebsiteManagementDashboard({
                     className="border-white/15 text-white"
                     disabled={saving}
                     onClick={() => {
-                      const price = window.prompt("New price", item.price || "");
+                      const price = window.prompt(wb("management.catalog.pricePrompt"), item.price || "");
                       if (!price) return;
                       void postAction({
                         action: "catalog.upsert",
@@ -312,7 +316,7 @@ export function WebsiteManagementDashboard({
                       });
                     }}
                   >
-                    Edit price
+                    {wb("management.editPrice")}
                   </Button>
                   <Button
                     size="sm"
@@ -335,18 +339,18 @@ export function WebsiteManagementDashboard({
       {tab === "cms" ? (
         <DashboardPanel className="space-y-4">
           <p className="text-[12px] font-semibold uppercase tracking-wide text-white/40">
-            Content management
+            {wb("management.contentManagement")}
           </p>
           <Input
             value={cmsTitle}
             onChange={(e) => setCmsTitle(e.target.value)}
-            placeholder="Content title"
+            placeholder={wb("management.cms.titlePlaceholder")}
             className="border-white/10 bg-black/30 text-white"
           />
           <Textarea
             value={cmsBody}
             onChange={(e) => setCmsBody(e.target.value)}
-            placeholder="Body / announcement / media note"
+            placeholder={wb("management.bodyPlaceholder")}
             className="min-h-[100px] border-white/10 bg-black/30 text-white"
           />
           <Button
@@ -367,7 +371,7 @@ export function WebsiteManagementDashboard({
               });
             }}
           >
-            Publish content
+            {wb("management.publishContent")}
           </Button>
           <div className="space-y-2 pt-2">
             {(data?.cms || []).map((entry) => (
@@ -379,7 +383,7 @@ export function WebsiteManagementDashboard({
                   <p className="text-sm text-white">{entry.title}</p>
                   <p className="text-[11px] text-white/40">
                     {entry.kind}
-                    {entry.scheduledAt ? ` · scheduled ${entry.scheduledAt}` : ""}
+                    {entry.scheduledAt ? ` · ${wb("management.scheduled")} ${entry.scheduledAt}` : ""}
                   </p>
                 </div>
                 <Button
@@ -401,17 +405,17 @@ export function WebsiteManagementDashboard({
       {tab === "brand" ? (
         <DashboardPanel className="space-y-3">
           <p className="text-[12px] font-semibold uppercase tracking-wide text-white/40">
-            Brand management
+            {wb("management.brandManagement")}
           </p>
           {(
             [
-              ["businessName", "Business name"],
-              ["logoUrl", "Logo URL"],
-              ["primary", "Primary color"],
-              ["secondary", "Secondary color"],
-              ["accent", "Accent color"],
-              ["displayFont", "Display font"],
-              ["bodyFont", "Body font"],
+              ["businessName", wb("management.brand.businessName")],
+              ["logoUrl", wb("management.logoUrl")],
+              ["primary", wb("management.brand.primary")],
+              ["secondary", wb("management.brand.secondary")],
+              ["accent", wb("management.brand.accent")],
+              ["displayFont", wb("management.brand.displayFont")],
+              ["bodyFont", wb("management.brand.bodyFont")],
             ] as const
           ).map(([key, label]) => (
             <div key={key}>
@@ -443,7 +447,7 @@ export function WebsiteManagementDashboard({
               })
             }
           >
-            Apply brand to website
+            {wb("management.applyBrand")}
           </Button>
         </DashboardPanel>
       ) : null}
@@ -451,10 +455,10 @@ export function WebsiteManagementDashboard({
       {tab === "leads" ? (
         <DashboardPanel>
           <p className="mb-3 text-[12px] font-semibold uppercase tracking-wide text-white/40">
-            Form leads
+            {wb("management.formLeads")}
           </p>
           {(data?.leads || []).length === 0 ? (
-            <p className="text-sm text-white/40">No leads yet.</p>
+            <p className="text-sm text-white/40">{wb("management.noLeads")}</p>
           ) : (
             <div className="space-y-2">
               {(data?.leads || []).map((lead) => (
@@ -486,7 +490,7 @@ export function WebsiteManagementDashboard({
             value={assistantMsg}
             onChange={(e) => setAssistantMsg(e.target.value)}
             className="min-h-[100px] border-white/10 bg-black/30 text-white"
-            placeholder="Tell the assistant what to change…"
+            placeholder={wb("management.assistant.placeholder")}
           />
           <Button
             disabled={saving || !assistantMsg.trim()}
@@ -517,7 +521,7 @@ export function WebsiteManagementDashboard({
             <>
               <p className="text-lg text-white">
                 Score {data.quality.score} ·{" "}
-                {data.quality.ready ? "Ready to publish" : "Blocked"}
+                {data.quality.ready ? wb("management.quality.readyToPublish") : wb("management.quality.blocked")}
               </p>
               <p className="mt-1 text-sm text-white/45">{data.quality.summary}</p>
               <div className="mt-4 space-y-2">

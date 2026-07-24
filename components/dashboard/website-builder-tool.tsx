@@ -1,17 +1,22 @@
 ﻿"use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { readSseStream } from "@/lib/api/sse-client";
-import {
-  CLIENT_STREAM_RECOVERY_INTERVAL_MS,
-  CLIENT_STREAM_RECOVERY_POLL_MS,
-} from "@/lib/ai/timeouts";
+import { isWebsiteIncrementalPreviewEnabled } from "@/lib/website/generation-flags";
+import { tryRecoverCompletedWebsiteGeneration } from "@/lib/website/stream-recovery";
+import { useTranslation } from "@/lib/i18n/client";
+import { translateOption } from "@/lib/i18n/product-options";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import { CoreProgressStepper } from "@/components/dashboard/one-prompt";
 import { useCoreProgress } from "@/components/dashboard/one-prompt/use-core-progress";
 import { getOnePromptProduct } from "@/lib/constants/one-prompt-products";
 import { useIdeaQueryParam } from "@/lib/hooks/use-idea-query-param";
+import {
+  dashboardColorThemeToDesignSystem,
+  dashboardDesignStyleToPreset,
+} from "@/lib/website/style-resolution";
 import {
   AlertTriangle,
   ArrowDownToLine,
@@ -79,6 +84,7 @@ import {
 import { WebsiteIntelligencePanel } from "@/components/dashboard/website-builder/website-intelligence-panel";
 import { BrandKitPanel } from "@/components/dashboard/website-builder/brand-kit-panel";
 import type { MarketplaceTemplate } from "@/lib/ai-core/template-marketplace";
+import { resolveTemplateIntelligenceForMarketplace } from "@/lib/ai-core/template-intelligence/resolve-marketplace";
 
 type OutputTab =
   | "preview"
@@ -140,6 +146,22 @@ const PROJECT_TYPES = [
   "Mobile App",
 ] as const;
 
+const PROJECT_TYPE_KEYS: Record<(typeof PROJECT_TYPES)[number], string> = {
+  "Business Website": "businessWebsite",
+  "Web Application": "webApplication",
+  "E-commerce": "eCommerce",
+  "Landing Page": "landingPage",
+  Portfolio: "portfolio",
+  Restaurant: "restaurant",
+  Clinic: "clinic",
+  "Real Estate": "realEstate",
+  Education: "education",
+  "AI SaaS": "aiSaas",
+  CRM: "crm",
+  ERP: "erp",
+  "Mobile App": "mobileApp",
+};
+
 const DESIGN_STYLES = ["Luxury", "Minimal", "Corporate", "Startup", "Modern", "Glass", "Dark", "Light"] as const;
 const COLOR_THEMES = ["Gold", "Blue", "Purple", "Green", "Custom"] as const;
 const LANGUAGES = [
@@ -164,6 +186,38 @@ const FEATURES = [
   "CRM",
   "Admin Panel",
 ] as const;
+
+const COLOR_THEME_KEYS: Record<(typeof COLOR_THEMES)[number], string> = {
+  Gold: "gold",
+  Blue: "blue",
+  Purple: "purple",
+  Green: "green",
+  Custom: "custom",
+};
+
+const LANGUAGE_KEYS: Record<(typeof LANGUAGES)[number], string> = {
+  English: "english",
+  Arabic: "arabic",
+  Bilingual: "bilingual",
+  Spanish: "spanish",
+  French: "french",
+  German: "german",
+  Portuguese: "portuguese",
+};
+
+const FEATURE_KEYS: Record<(typeof FEATURES)[number], string> = {
+  Authentication: "authentication",
+  Dashboard: "dashboard",
+  CMS: "cms",
+  Blog: "blog",
+  Payments: "payments",
+  Booking: "booking",
+  Chat: "chat",
+  Notifications: "notifications",
+  Analytics: "analytics",
+  CRM: "crm",
+  "Admin Panel": "adminPanel",
+};
 
 const TEMPLATES = [
   "Luxury real estate marketplace",
@@ -215,6 +269,48 @@ function sanitizeZipPath(filePath: string) {
   return parts.join("/");
 }
 
+function stubRunningProject(params: {
+  id: string;
+  title: string;
+  description: string;
+  type: string;
+  style: string;
+  theme: string;
+  language: string;
+  features: string[];
+  mode?: GenerationMode;
+}): WorkspaceProject {
+  return {
+    id: params.id,
+    title: params.title,
+    type: params.type,
+    style: params.style,
+    theme: params.theme,
+    language: params.language,
+    features: params.features,
+    createdAt: formatGenerationDate(new Date().toISOString()),
+    favorite: false,
+    description: params.description,
+    generatedProject: {
+      projectKind: "website",
+      title: params.title,
+      description: params.description,
+      pages: [],
+      sections: [],
+      colorPalette: [],
+      typography: [],
+      components: [],
+      content: [],
+      seo: [],
+      roadmap: [],
+      files: [],
+    },
+    build: { status: "idle" },
+    mode: params.mode,
+    status: "running",
+  };
+}
+
 function toProject(generation: WebsiteGeneration): WorkspaceProject {
   const generatedProject = isGeneratedWebsiteProject(generation.blueprint)
     ? generation.blueprint
@@ -240,63 +336,6 @@ function toProject(generation: WebsiteGeneration): WorkspaceProject {
     projectId: generation.project_id,
     promptVersions: generation.prompt_versions,
   };
-}
-
-function sleep(ms: number) {
-  return new Promise((resolve) => window.setTimeout(resolve, ms));
-}
-
-/** After SSE disconnect, poll the saved generation until it finishes or times out. */
-async function recoverGenerationAfterDisconnect(
-  generationId: string,
-  onStatus: (message: string) => void,
-): Promise<{ project: GeneratedWebsiteProject; generation: WebsiteGeneration } | null> {
-  const deadline = Date.now() + CLIENT_STREAM_RECOVERY_POLL_MS;
-  onStatus("Connection interrupted — recovering saved progress…");
-
-  while (Date.now() < deadline) {
-    try {
-      const response = await fetch(`/api/website-builder/${generationId}`);
-      if (response.ok) {
-        const data = (await response.json()) as {
-          generation?: WebsiteGeneration;
-        };
-        const generation = data.generation;
-        if (generation?.status === "completed" && generation.blueprint) {
-          const project = isGeneratedWebsiteProject(generation.blueprint)
-            ? generation.blueprint
-            : null;
-          if (project?.files?.length) {
-            return { project, generation };
-          }
-        }
-        if (generation?.status === "failed") {
-          onStatus(
-            generation.error_message ||
-              "Generation failed — you can Resume from saved progress.",
-          );
-          return null;
-        }
-        if (generation?.status === "running") {
-          const fileCount = Array.isArray(
-            (generation.blueprint as { files?: unknown[] } | null)?.files,
-          )
-            ? ((generation.blueprint as { files: unknown[] }).files.length)
-            : 0;
-          onStatus(
-            fileCount > 0
-              ? `Still generating on server… ${fileCount} files saved`
-              : "Still generating on server…",
-          );
-        }
-      }
-    } catch {
-      // keep polling
-    }
-    await sleep(CLIENT_STREAM_RECOVERY_INTERVAL_MS);
-  }
-
-  return null;
 }
 
 function resolveInitialProjectType(
@@ -358,6 +397,8 @@ export function WebsiteBuilderTool({
   productId,
   initialGenerations = [],
 }: WebsiteBuilderToolProps) {
+  const { t } = useTranslation();
+  const wb = useProductT("websiteBuilder");
   const product = productId ? getProductDefinition(productId) : undefined;
   const productTemplates = product?.templates?.length
     ? product.templates
@@ -426,6 +467,7 @@ export function WebsiteBuilderTool({
   }, []);
   const [advancedOpen, setAdvancedOpen] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isApplyingTemplate, setIsApplyingTemplate] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [streamStatus, setStreamStatus] = useState<string | null>(null);
@@ -445,6 +487,8 @@ export function WebsiteBuilderTool({
   const [activeProject, setActiveProject] = useState<WorkspaceProject | null>(
     initialGenerations[0] ? toProject(initialGenerations[0]) : null,
   );
+  const streamAbortRef = useRef<AbortController | null>(null);
+  const activeStreamSessionRef = useRef<string | null>(null);
   const progressStep = useCoreProgress({
     events: streamStatus ? [`[generation] ${streamStatus}`] : [],
     active: isGenerating,
@@ -489,6 +533,42 @@ export function WebsiteBuilderTool({
     // Only hydrate once on mount when SSR stub is empty.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!isWebsiteIncrementalPreviewEnabled() || !isGenerating) return;
+    const generationId = activeProject?.id;
+    if (!generationId || activeProject?.status !== "running") return;
+
+    let cancelled = false;
+    void (async () => {
+      try {
+        const response = await fetch(`/api/website-builder/${generationId}`);
+        if (!response.ok || cancelled) return;
+        const data = (await response.json()) as { generation?: WebsiteGeneration };
+        if (!data.generation || cancelled) return;
+        const hydrated = toProject(data.generation);
+        setProjects((items) =>
+          items.map((item) => (item.id === hydrated.id ? hydrated : item)),
+        );
+        setActiveProject((current) =>
+          current?.id === hydrated.id ? hydrated : current,
+        );
+        if (hydrated.generatedProject?.files?.length) {
+          setSelectedFilePath((current) =>
+            current && hydrated.generatedProject?.files.some((f) => f.path === current)
+              ? current
+              : (hydrated.generatedProject?.files[0]?.path ?? ""),
+          );
+        }
+      } catch {
+        // Keep last checkpoint snapshot
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [previewRevision, isGenerating, activeProject?.id, activeProject?.status]);
 
   const currentPages = useMemo(() => {
     const featurePages = features.includes("Blog") ? ["Blog"] : [];
@@ -562,7 +642,7 @@ export function WebsiteBuilderTool({
           };
 
       if (!response.ok || !data.ok) {
-        throw new Error("error" in data ? data.error : "Generated project failed to build.");
+        throw new Error("error" in data ? data.error : wb("errors.build"));
       }
 
       updateProject(project.id, {
@@ -579,7 +659,7 @@ export function WebsiteBuilderTool({
           error:
             error instanceof Error
               ? error.message
-              : "Generated project failed to build.",
+              : wb("errors.build"),
         },
       });
     }
@@ -622,7 +702,7 @@ export function WebsiteBuilderTool({
 
     if (mode === "continue") {
       if (!activeProject?.id) {
-        toast.error("Select a saved website first.");
+        toast.error(wb("toasts.selectWebsiteFirst"));
         return;
       }
       if (
@@ -630,7 +710,7 @@ export function WebsiteBuilderTool({
         !options?.resume &&
         !projectBrief.trim()
       ) {
-        toast.error("Describe the changes you want, or run Optimize website.");
+        toast.error(wb("toasts.describeChanges"));
         setEditMode(true);
         return;
       }
@@ -695,7 +775,7 @@ export function WebsiteBuilderTool({
     ) {
       try {
         setStreamStatus(
-          "AI Auto Design: analyzing industry, audience & brand style…",
+          wb("stream.aiAutoDesign"),
         );
         const autoRes = await fetch("/api/website-builder/design-platform", {
           method: "POST",
@@ -745,13 +825,20 @@ export function WebsiteBuilderTool({
 
     setStreamStatus(
       options?.optimize
-        ? "Running AI Website Optimizer…"
+        ? wb("stream.runningOptimizer")
         : options?.resume
-          ? "Resuming generation from saved progress…"
+          ? wb("stream.resuming")
           : tpl
             ? `Creating website from template: ${tpl.name}…`
-            : autoHint || "Connecting to AI website engine...",
+            : autoHint || wb("stream.connecting"),
     );
+
+    const pickerDesignSystem = dashboardColorThemeToDesignSystem(colorTheme, designStyle);
+    const pickerPreset = dashboardDesignStyleToPreset(designStyle);
+    const mergedDesignSystem = {
+      ...pickerDesignSystem,
+      ...(resolvedDesignSystem ?? {}),
+    };
 
     const requestBody = {
       prompt: mode === "continue" ? activeProject?.description || brief : brief,
@@ -773,11 +860,11 @@ export function WebsiteBuilderTool({
       projectId: tpl ? undefined : activeProject?.projectId ?? undefined,
       templateId: autoTemplateId || undefined,
       marketplaceTemplateId: resolvedMarketplaceId || undefined,
-      templateStyle: resolvedStyle || undefined,
-      designPreset: autoPreset || undefined,
+      templateStyle: resolvedStyle || designStyle || undefined,
+      designPreset: autoPreset || pickerPreset || undefined,
       industryId: resolvedIndustry || undefined,
       components: autoComponents.length ? autoComponents : undefined,
-      designSystem: resolvedDesignSystem || undefined,
+      designSystem: mergedDesignSystem,
       templateIntelligenceId: autoTiId || undefined,
       templateIntelligenceCategory: autoTiCategory || undefined,
       brandIdentityId: brandIdentityId || undefined,
@@ -813,9 +900,38 @@ export function WebsiteBuilderTool({
       setOutputTab("preview");
       setEditMode(false);
       setProjects((items) => [nextProject, ...items.filter((p) => p.id !== nextProject.id)].slice(0, 24));
-      setStreamStatus("Website saved to workspace.");
-      toast.success("Website created and saved. Review the preview, then improve with AI.");
+      setStreamStatus(wb("stream.websiteSaved"));
+      toast.success(wb("toasts.createdAndSaved"));
     };
+
+    const recoveryMessages = {
+      connectionInterrupted: wb("stream.connectionInterrupted"),
+      generationFailedResume: wb("stream.generationFailedResume"),
+      stillGenerating: wb("stream.stillGenerating"),
+      stillGeneratingWithFiles: wb("stream.stillGeneratingWithFiles"),
+      finalizing: wb("stream.finalizingSavedProject"),
+    };
+
+    const tryApplyRecoveredGeneration = async (
+      generationId: string,
+      lastProgressMessage: string | null,
+    ): Promise<boolean> => {
+      const recovered = await tryRecoverCompletedWebsiteGeneration(generationId, {
+        onStatus: setStreamStatus,
+        messages: recoveryMessages,
+        lastProgressMessage,
+      });
+      if (!recovered) return false;
+      applySavedGeneration(recovered.project, recovered.generation);
+      setPreviewRevision((n) => n + 1);
+      setApiError(null);
+      return true;
+    };
+
+    streamAbortRef.current?.abort();
+    const streamAbort = new AbortController();
+    streamAbortRef.current = streamAbort;
+    activeStreamSessionRef.current = null;
 
     try {
       let sessionGenerationId: string | null = null;
@@ -826,20 +942,59 @@ export function WebsiteBuilderTool({
           Accept: "text/event-stream",
         },
         body: JSON.stringify(requestBody),
+        signal: streamAbort.signal,
       });
 
       if (streamResponse.ok && streamResponse.body) {
+        let incrementalPreview = isWebsiteIncrementalPreviewEnabled();
+        let lastPreviewBumpAt = 0;
+
         const sseResult = await readSseStream<{
           project?: GeneratedWebsiteProject;
           generation?: WebsiteGeneration;
           message?: string;
           generationId?: string;
+          fileCount?: number;
         }>(streamResponse, {
-          onProgress: (message) => {
+          onProgress: (message, _progress, meta) => {
             setStreamStatus(message);
+            if (meta?.generationId) {
+              sessionGenerationId = meta.generationId;
+              activeStreamSessionRef.current = meta.generationId;
+            }
+            if (!incrementalPreview) return;
+            const fileCount = meta?.fileCount ?? 0;
+            if (fileCount <= 0) return;
+            const now = Date.now();
+            if (now - lastPreviewBumpAt < 4000) return;
+            lastPreviewBumpAt = now;
+            setPreviewRevision((n) => n + 1);
           },
-          onSession: (generationId) => {
-            sessionGenerationId = generationId;
+          onSession: (session) => {
+            sessionGenerationId = session.generationId;
+            activeStreamSessionRef.current = session.generationId;
+            if (session.incrementalPreview) incrementalPreview = true;
+            if (!incrementalPreview) return;
+            const stub = stubRunningProject({
+              id: session.generationId,
+              title: "Generating website…",
+              description:
+                typeof requestBody.prompt === "string"
+                  ? requestBody.prompt
+                  : brief,
+              type: resolvedProjectType,
+              style: designStyle,
+              theme: colorTheme,
+              language,
+              features,
+              mode: requestBody.mode as GenerationMode | undefined,
+            });
+            setActiveProject(stub);
+            setProjects((items) =>
+              [stub, ...items.filter((p) => p.id !== session.generationId)].slice(0, 24),
+            );
+            setOutputTab("preview");
+            setPreviewRevision((n) => n + 1);
           },
           onComplete: (payload) => {
             if (!payload.project || !payload.generation?.id) {
@@ -852,29 +1007,24 @@ export function WebsiteBuilderTool({
             setApiError(message);
             setStreamStatus(message);
           },
-        });
+        }, { signal: streamAbort.signal });
 
         if (sseResult.generationId) {
           sessionGenerationId = sseResult.generationId;
+          activeStreamSessionRef.current = sseResult.generationId;
         }
 
-        if (!sseResult.completed) {
-          // Stream dropped — recover from the running/completed session row.
-          if (sessionGenerationId) {
-            const recovered = await recoverGenerationAfterDisconnect(
-              sessionGenerationId,
-              setStreamStatus,
+        if (!sseResult.completed && !sseResult.aborted) {
+          const recoveryId = sessionGenerationId ?? sseResult.generationId;
+          if (recoveryId) {
+            const recovered = await tryApplyRecoveredGeneration(
+              recoveryId,
+              sseResult.lastProgressMessage,
             );
-            if (recovered) {
-              applySavedGeneration(recovered.project, recovered.generation);
-              setPreviewRevision((n) => n + 1);
-              setApiError(null);
-            } else {
+            if (!recovered) {
               // Keep partial project selectable for Resume.
               try {
-                const detail = await fetch(
-                  `/api/website-builder/${sessionGenerationId}`,
-                );
+                const detail = await fetch(`/api/website-builder/${recoveryId}`);
                 if (detail.ok) {
                   const data = (await detail.json()) as {
                     generation?: WebsiteGeneration;
@@ -894,15 +1044,24 @@ export function WebsiteBuilderTool({
                 // ignore
               }
               throw new Error(
-                sseResult.error ||
-                  "Stream ended before generation completed. Progress was saved — click Resume generation.",
+                sseResult.error || wb("errors.generationDisconnected"),
               );
             }
           } else {
             throw new Error(
-              sseResult.error || "Stream ended before generation completed.",
+              sseResult.error || wb("errors.generationDisconnected"),
             );
           }
+        } else if (!sseResult.completed && sseResult.error) {
+          const recoveryId = sessionGenerationId ?? sseResult.generationId;
+          if (recoveryId) {
+            const recovered = await tryApplyRecoveredGeneration(
+              recoveryId,
+              sseResult.lastProgressMessage,
+            );
+            if (recovered) return;
+          }
+          throw new Error(sseResult.error);
         }
       } else if (
         // Only fall back when the stream route is missing — never after a charged
@@ -918,7 +1077,7 @@ export function WebsiteBuilderTool({
         const data = (await response.json()) as GenerateProjectResponse;
 
         if (!response.ok) {
-          throw new Error("error" in data ? data.error : "Unable to generate website.");
+          throw new Error("error" in data ? data.error : wb("errors.generic"));
         }
 
         if (!("project" in data) || !data.project || !data.generation?.id) {
@@ -938,13 +1097,26 @@ export function WebsiteBuilderTool({
         throw new Error(detail);
       }
     } catch (error) {
+      const recoveryId = activeStreamSessionRef.current;
+      if (
+        recoveryId &&
+        !streamAbort.signal.aborted &&
+        !(error instanceof DOMException && error.name === "AbortError")
+      ) {
+        const ok = await tryApplyRecoveredGeneration(recoveryId, null);
+        if (ok) return;
+      }
+
       setApiError(
         error instanceof Error
           ? error.message
-          : "Unable to generate website application.",
+          : wb("errors.generic"),
       );
       setStreamStatus(null);
     } finally {
+      if (streamAbortRef.current === streamAbort) {
+        streamAbortRef.current = null;
+      }
       setIsGenerating(false);
       window.setTimeout(() => setStreamStatus(null), 1200);
     }
@@ -969,7 +1141,7 @@ export function WebsiteBuilderTool({
     setStreamStatus(null);
   }
 
-  function handleTemplateIntelligenceSelect(choice: TemplateIntelligenceChoice) {
+  function syncTemplateIntelligenceChoice(choice: TemplateIntelligenceChoice) {
     setTemplateIntelligenceId(choice.templateIntelligenceId);
     setTemplateIntelligenceCategory(choice.category);
     if (choice.designPreset) setDesignPreset(choice.designPreset);
@@ -984,16 +1156,110 @@ export function WebsiteBuilderTool({
     if (choice.components.length) {
       setTemplateComponents(choice.components);
     }
-    toast.success(`Template Intelligence: ${choice.name}`);
+  }
+
+  function handleTemplateIntelligenceSelect(choice: TemplateIntelligenceChoice) {
+    syncTemplateIntelligenceChoice(choice);
+    toast.success(wb("templates.intelligenceApplied", { name: choice.name }));
+  }
+
+  async function applyTemplateIntelligenceToActiveProject(
+    templateIntelligenceId: string,
+  ): Promise<boolean> {
+    if (!activeProject?.id) return false;
+    setIsApplyingTemplate(true);
+    setApiError(null);
+    setStreamStatus(wb("stream.applyingEdit"));
+    try {
+      const res = await fetch(
+        `/api/website-builder/${activeProject.id}/template`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ templateIntelligenceId }),
+        },
+      );
+      const data = (await res.json()) as {
+        error?: string;
+        generation?: unknown;
+        project?: unknown;
+        template?: {
+          id: string;
+          name: string;
+          category: string;
+          designPreset: string;
+          designStyle: string;
+          premiumTemplateId?: string;
+          components: string[];
+        };
+      };
+      if (!res.ok) {
+        throw new Error(data.error || wb("panels.failedApplyTemplate"));
+      }
+      if (data.generation && data.project) {
+        handleTemplateIntelligenceApplied({
+          generation: data.generation,
+          project: data.project,
+          template: data.template,
+        });
+      }
+      return true;
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : wb("errors.generic");
+      setApiError(message);
+      toast.error(message);
+      return false;
+    } finally {
+      setIsApplyingTemplate(false);
+      window.setTimeout(() => setStreamStatus(null), 800);
+    }
   }
 
   function handleTemplateIntelligenceApplied(payload: {
     generation: unknown;
     project: unknown;
+    template?: {
+      id: string;
+      name: string;
+      category: string;
+      designPreset: string;
+      designStyle: string;
+      premiumTemplateId?: string;
+      components: string[];
+      colors?: TemplateIntelligenceChoice["colors"];
+      typography?: TemplateIntelligenceChoice["typography"];
+    };
   }) {
     const generation = payload.generation as WebsiteGeneration;
     const project = payload.project as GeneratedWebsiteProject;
     if (!generation?.id || !project) return;
+
+    if (payload.template) {
+      syncTemplateIntelligenceChoice({
+        templateIntelligenceId: payload.template.id,
+        category: payload.template.category as TemplateIntelligenceChoice["category"],
+        designPreset: payload.template.designPreset,
+        designStyle: payload.template.designStyle,
+        premiumTemplateId: payload.template.premiumTemplateId,
+        components: payload.template.components.map(String),
+        colors: payload.template.colors ?? {
+          primary: project.designSystem?.colors.primary ?? "#111",
+          secondary: project.designSystem?.colors.secondary ?? "#333",
+          accent: project.designSystem?.colors.accent ?? "#2563EB",
+          background: project.designSystem?.colors.background ?? "#fff",
+          foreground: project.designSystem?.colors.foreground ?? "#111",
+          surface: project.designSystem?.colors.surface ?? "#f5f5f5",
+        },
+        typography: payload.template.typography ?? {
+          display: project.typography?.[0] ?? "Inter",
+          heading: project.typography?.[0] ?? "Inter",
+          body: project.typography?.[1] ?? "Inter",
+        },
+        name: payload.template.name,
+      });
+    }
+
     const nextProject = toProject({
       ...generation,
       blueprint: project as unknown as WebsiteGeneration["blueprint"],
@@ -1007,12 +1273,12 @@ export function WebsiteBuilderTool({
     setOutputTab("preview");
     setPreviewRevision((n) => n + 1);
     setProjects((items) =>
-      [nextProject, ...items.filter((p) => p.id !== nextProject.id)].slice(0, 24),
+      items.map((p) => (p.id === nextProject.id ? nextProject : p)),
     );
-    toast.success("Visual template applied — content & images preserved.");
+    toast.success(wb("toasts.templateApplied"));
   }
 
-  function handleUseTemplate(payload: TemplateUsePayload) {
+  async function handleUseTemplate(payload: TemplateUsePayload) {
     setSelectedTemplateId(payload.templateId);
     setMarketplaceTemplateId(payload.marketplaceTemplateId);
     setTemplateStyle(payload.style);
@@ -1028,7 +1294,22 @@ export function WebsiteBuilderTool({
     const mappedType = mapIndustryToProjectType(payload.industry);
     if (mappedType) setProjectType(mappedType);
     setOutputTab("preview");
-    toast.success(`Using template: ${payload.name}`);
+
+    if (activeProject?.id) {
+      const templateIntelligenceId = resolveTemplateIntelligenceForMarketplace({
+        style: payload.style,
+        designPreset: payload.designPreset,
+        marketplaceTemplateId: payload.marketplaceTemplateId,
+      });
+      if (!templateIntelligenceId) {
+        toast.error(wb("panels.failedApplyTemplate"));
+        return;
+      }
+      await applyTemplateIntelligenceToActiveProject(templateIntelligenceId);
+      return;
+    }
+
+    toast.success(wb("templates.usingTemplate", { name: payload.name }));
     void createInterfaceProject({ fromTemplate: payload });
   }
 
@@ -1039,7 +1320,7 @@ export function WebsiteBuilderTool({
   }) {
     setIsGenerating(true);
     setApiError(null);
-    setStreamStatus("Website Editor Intelligence: applying edit…");
+    setStreamStatus(wb("stream.applyingEdit"));
     try {
       const response = await fetch(
         `/api/website-builder/${params.generationId}/edit`,
@@ -1061,7 +1342,7 @@ export function WebsiteBuilderTool({
         message?: string;
       };
       if (!response.ok || !data.project || !data.generation) {
-        throw new Error(data.error ?? "Unable to edit website.");
+        throw new Error(data.error ?? wb("errors.generic"));
       }
       const nextProject = toProject({
         ...data.generation,
@@ -1080,11 +1361,11 @@ export function WebsiteBuilderTool({
           24,
         ),
       );
-      setStreamStatus("Website edit saved.");
-      toast.success(data.editResult?.summary || data.message || "Website edited.");
+      setStreamStatus(wb("stream.editSaved"));
+      toast.success(data.editResult?.summary || data.message || wb("toasts.edited"));
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "Unable to edit website.";
+        error instanceof Error ? error.message : wb("errors.generic");
       setApiError(message);
       toast.error(message);
     } finally {
@@ -1106,13 +1387,13 @@ export function WebsiteBuilderTool({
       const data = (await response.json()) as { generation?: WebsiteGeneration; error?: string };
 
       if (!response.ok || !data.generation) {
-        throw new Error(data.error ?? "Unable to update favorite.");
+        throw new Error(data.error ?? wb("errors.favorite"));
       }
 
       patchProject(id, data.generation);
-      toast.success(project.favorite ? "Removed from favorites" : "Added to favorites");
+      toast.success(project.favorite ? wb("toasts.removedFromFavorites") : wb("toasts.addedToFavorites"));
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to update favorite.";
+      const message = error instanceof Error ? error.message : wb("errors.favorite");
       setActionError(message);
       toast.error(message);
     }
@@ -1126,15 +1407,15 @@ export function WebsiteBuilderTool({
       const data = (await response.json()) as { generation?: WebsiteGeneration; error?: string };
 
       if (!response.ok || !data.generation) {
-        throw new Error(data.error ?? "Unable to duplicate project.");
+        throw new Error(data.error ?? wb("errors.duplicate"));
       }
 
       const copyProject = toProject(data.generation);
       setProjects((items) => [copyProject, ...items].slice(0, 8));
       selectProject(copyProject);
-      toast.success("Project duplicated");
+      toast.success(wb("toasts.projectDuplicated"));
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to duplicate project.";
+      const message = error instanceof Error ? error.message : wb("errors.duplicate");
       setActionError(message);
       toast.error(message);
     }
@@ -1148,10 +1429,10 @@ export function WebsiteBuilderTool({
 
       if (!response.ok) {
         const data = (await response.json()) as { error?: string };
-        throw new Error(data.error ?? "Unable to delete project.");
+        throw new Error(data.error ?? wb("errors.delete"));
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to delete project.";
+      const message = error instanceof Error ? error.message : wb("errors.delete");
       setActionError(message);
       toast.error(message);
       return;
@@ -1167,7 +1448,7 @@ export function WebsiteBuilderTool({
         setSelectedFilePath("");
       }
     }
-    toast.success("Project deleted");
+    toast.success(wb("toasts.projectDeleted"));
   }
 
   async function renameProject() {
@@ -1182,15 +1463,15 @@ export function WebsiteBuilderTool({
       const data = (await response.json()) as { generation?: WebsiteGeneration; error?: string };
 
       if (!response.ok || !data.generation) {
-        throw new Error(data.error ?? "Unable to rename project.");
+        throw new Error(data.error ?? wb("errors.rename"));
       }
 
       patchProject(activeProject.id, data.generation);
       setRenameOpen(false);
       setRenameValue("");
-      toast.success("Project renamed");
+      toast.success(wb("toasts.projectRenamed"));
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to rename project.";
+      const message = error instanceof Error ? error.message : wb("errors.rename");
       setActionError(message);
       toast.error(message);
     }
@@ -1199,7 +1480,7 @@ export function WebsiteBuilderTool({
   async function copyActiveFile() {
     if (!activeFile) return;
     await navigator.clipboard.writeText(activeFile.content);
-    toast.success("File copied to clipboard");
+    toast.success(wb("toasts.fileCopied"));
   }
 
   async function downloadProject(project = activeProject) {
@@ -1224,7 +1505,7 @@ export function WebsiteBuilderTool({
         link.download = filename;
         link.click();
         URL.revokeObjectURL(url);
-        toast.success("ZIP download started");
+        toast.success(wb("toasts.zipDownloadStarted"));
         return;
       }
 
@@ -1247,13 +1528,13 @@ export function WebsiteBuilderTool({
         const data = (await exportResponse.json().catch(() => null)) as {
           error?: string;
         } | null;
-        throw new Error(data?.error ?? "Unable to export project ZIP.");
+        throw new Error(data?.error ?? wb("errors.download"));
       }
 
       const files = project.generatedProject?.files ?? [];
       if (!files.length) {
         toast.error(
-          "Project source files are not available yet. Open the project or regenerate, then download again.",
+          wb("errors.download"),
         );
         return;
       }
@@ -1280,11 +1561,11 @@ export function WebsiteBuilderTool({
       toast.success(
         skippedFiles
           ? `ZIP download started. Skipped ${skippedFiles} unsafe file path${skippedFiles === 1 ? "" : "s"}.`
-          : "ZIP download started",
+          : wb("toasts.zipDownloadStarted"),
       );
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Unable to download project ZIP.",
+        error instanceof Error ? error.message : wb("errors.download"),
       );
     }
   }
@@ -1317,16 +1598,16 @@ export function WebsiteBuilderTool({
           <div>
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-premium-gold/25 bg-premium-gold/10 px-3 py-1 text-[11px] font-semibold tracking-[0.16em] text-premium-gold-light uppercase">
               <Sparkles className="size-3.5" />
-              {product?.eyebrow ?? "Website and app generation workspace"}
+              {product?.eyebrow ?? wb("meta.eyebrow")}
             </div>
             <h2 className="text-3xl font-bold tracking-[-0.04em] text-white sm:text-4xl lg:text-5xl">
-              {product?.title ?? "AI Website & App Builder"}
+              {product?.title ?? wb("meta.title")}
             </h2>
             <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-white/55 sm:text-base">
               {product?.description ?? onePrompt.valueProposition}
             </p>
             <p className="mt-3 text-[12px] font-medium text-premium-gold/80">
-              One Prompt · Idea → Strategy → Design → Assets → Generation → Quality → Ready
+              {wb("hero.tagline")}
             </p>
           </div>
           <div className="rounded-[2rem] border border-white/[0.08] bg-black/25 p-4 shadow-[0_24px_90px_rgb(0_0_0/0.35)] backdrop-blur-xl">
@@ -1334,10 +1615,10 @@ export function WebsiteBuilderTool({
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-[11px] font-semibold tracking-[0.16em] text-premium-gold-light uppercase">
-                    Generation status
+                    {wb("sections.generationStatus")}
                   </p>
                   <p className="mt-2 text-3xl font-bold text-white">
-                    {isGenerating ? "Designing" : "Ready"}
+                    {isGenerating ? wb("labels.designing") : wb("labels.ready")}
                   </p>
                 </div>
                 <DashboardIconBox icon={MonitorSmartphone} className="size-12 rounded-2xl" />
@@ -1354,8 +1635,8 @@ export function WebsiteBuilderTool({
               </div>
               <p className="mt-3 text-[12px] text-white/40">
                 {isGenerating
-                  ? `${streamStatus ?? "Generating..."} · ${formatElapsed(elapsedSeconds)}`
-                  : "Connected to DeepSeek AI for generated React and Next.js applications."}
+                  ? `${streamStatus ?? wb("stream.generating")} · ${formatElapsed(elapsedSeconds)}`
+                  : wb("meta.connectedProvider")}
               </p>
             </div>
           </div>
@@ -1367,22 +1648,23 @@ export function WebsiteBuilderTool({
           <DashboardPanel>
             <SectionHeader
               icon={Wand2}
-              title={editMode ? "Improve with AI" : "Website brief"}
+              title={editMode ? wb("sections.improveWithAi") : wb("sections.websiteBrief")}
               description={
                 editMode
-                  ? "Describe changes in natural language — colors, pages, content, or design. AI creates an improved version linked to the previous one."
+                  ? wb("sectionDescriptions.improveWithAi")
                   : onePrompt.valueProposition
               }
             />
             {editMode && activeProject ? (
               <div className="mt-4 rounded-2xl border border-premium-gold/25 bg-premium-gold/10 px-4 py-3 text-sm text-premium-gold-light">
-                Editing <span className="font-semibold text-white">{activeProject.title}</span>.
-                Previous version stays in history. Example: “Change colors to navy and gold, add a Pricing page, tighten the hero copy.”
+                {wb("editMode.editing")}{" "}
+                <span className="font-semibold text-white">{activeProject.title}</span>.{" "}
+                {wb("editMode.historyNote")} {wb("editMode.exampleInline")}
               </div>
             ) : null}
             {!editMode && autoDesignHint ? (
               <div className="mt-4 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-100">
-                <p className="font-semibold text-white">AI Auto Design ready</p>
+                <p className="font-semibold text-white">{wb("hints.aiAutoDesignReady")}</p>
                 <p className="text-[12px] text-white/55">{autoDesignHint}</p>
               </div>
             ) : null}
@@ -1390,19 +1672,19 @@ export function WebsiteBuilderTool({
               <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-premium-gold/25 bg-premium-gold/10 px-4 py-3 text-sm text-premium-gold-light">
                 <div>
                   <p className="font-semibold text-white">
-                    Marketplace template ready
+                    {wb("hints.marketplaceTemplateReady")}
                   </p>
                   <p className="text-[12px] text-white/55">
                     {marketplaceTemplateId || selectedTemplateId}
                     {templateStyle ? ` · ${templateStyle}` : ""}
                     {templateIndustry ? ` · ${templateIndustry}` : ""}
-                    {" · "}seeds Design Intelligence, Brand Identity, Assets, Editor, Quality
+                    {" · "}{wb("hints.seedsPipeline")}
                   </p>
                 </div>
                 <div className="flex gap-2">
                   <Link href="/dashboard/templates">
                     <Button size="sm" variant="outline" className="border-white/15 text-white">
-                      Browse all
+                      {wb("labels.browseAll")}
                     </Button>
                   </Link>
                   <Button
@@ -1411,7 +1693,7 @@ export function WebsiteBuilderTool({
                     className="border-white/15 text-white"
                     onClick={clearTemplateSelection}
                   >
-                    Clear
+                    {wb("labels.clear")}
                   </Button>
                 </div>
               </div>
@@ -1419,14 +1701,14 @@ export function WebsiteBuilderTool({
               <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-premium-gold/25 bg-premium-gold/10 px-4 py-3 text-sm text-premium-gold-light">
                 <div>
                   <p className="font-semibold text-white">
-                    Template Intelligence selected
+                    {wb("hints.templateIntelligenceSelected")}
                   </p>
                   <p className="text-[12px] text-white/55">
                     {templateIntelligenceId}
                     {templateIntelligenceCategory
                       ? ` · ${templateIntelligenceCategory}`
                       : ""}
-                    {" · "}auto layout, theme & components for generation
+                    {" · "}{wb("hints.autoLayoutTheme")}
                   </p>
                 </div>
                 <Button
@@ -1438,7 +1720,7 @@ export function WebsiteBuilderTool({
                     setTemplateIntelligenceCategory(null);
                   }}
                 >
-                  Clear
+                  {wb("labels.clear")}
                 </Button>
               </div>
             ) : !editMode ? (
@@ -1447,7 +1729,7 @@ export function WebsiteBuilderTool({
                   href="/dashboard/templates"
                   className="text-[12px] font-medium text-premium-gold hover:underline"
                 >
-                  Browse Template Marketplace →
+                  {wb("hints.browseMarketplace")}
                 </Link>
               </div>
             ) : null}
@@ -1456,7 +1738,7 @@ export function WebsiteBuilderTool({
               onChange={(event) => setProjectBrief(event.target.value)}
               placeholder={
                 editMode
-                  ? 'Example: "Make the hero more luxury, switch palette to black and gold, add a Testimonials page, and shorten the About copy."'
+                  ? wb("placeholders.improve")
                   : product?.promptPlaceholder ?? onePrompt.placeholder
               }
               className="mt-5 min-h-[190px] rounded-3xl border-white/[0.08] bg-black/25 p-5 text-[15px] leading-relaxed text-white placeholder:text-white/30 focus-visible:border-premium-gold/35 focus-visible:ring-premium-gold/15"
@@ -1465,7 +1747,7 @@ export function WebsiteBuilderTool({
             <div className="mt-5 space-y-4">
               <div>
                 <p className="mb-2 text-[12px] font-semibold tracking-wide text-white/45 uppercase">
-                  Examples
+                  {wb("labels.examples")}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {onePrompt.examples.map((example) => (
@@ -1483,17 +1765,17 @@ export function WebsiteBuilderTool({
               <div>
                 <BrandKitPanel
                   selectedId={brandIdentityId}
-                  disabled={isGenerating}
+                  disabled={isGenerating || isApplyingTemplate}
                   onSelect={(kit) => {
                     setBrandIdentityId(kit?.id || null);
-                    if (kit) toast.success(`Brand kit: ${kit.name}`);
+                    if (kit) toast.success(wb("toasts.brandKit", { name: kit.name }));
                   }}
                 />
               </div>
               <div>
                 <TemplateIntelligencePanel
                   selectedId={templateIntelligenceId}
-                  disabled={isGenerating}
+                  disabled={isGenerating || isApplyingTemplate}
                   activeGenerationId={activeProject?.id || null}
                   selectionContext={{
                     businessType: projectType,
@@ -1509,17 +1791,18 @@ export function WebsiteBuilderTool({
               <div>
                 <TemplateSelectionPanel
                   selectedMarketplaceId={marketplaceTemplateId}
-                  disabled={isGenerating}
+                  disabled={isGenerating || isApplyingTemplate}
+                  activeGenerationId={activeProject?.id || null}
                   onUseTemplate={handleUseTemplate}
                   onCatalogLoaded={handleCatalogLoaded}
                 />
               </div>
             </div>
             ) : activeProject?.id ? (
-              <div className="mt-5">
+              <div className="mt-5 space-y-6">
                 <TemplateIntelligencePanel
                   selectedId={templateIntelligenceId}
-                  disabled={isGenerating}
+                  disabled={isGenerating || isApplyingTemplate}
                   activeGenerationId={activeProject.id}
                   selectionContext={{
                     businessType: projectType,
@@ -1530,6 +1813,13 @@ export function WebsiteBuilderTool({
                   }}
                   onSelect={handleTemplateIntelligenceSelect}
                   onApplied={handleTemplateIntelligenceApplied}
+                />
+                <TemplateSelectionPanel
+                  selectedMarketplaceId={marketplaceTemplateId}
+                  disabled={isGenerating || isApplyingTemplate}
+                  activeGenerationId={activeProject?.id || null}
+                  onUseTemplate={handleUseTemplate}
+                  onCatalogLoaded={handleCatalogLoaded}
                 />
               </div>
             ) : null}
@@ -1547,12 +1837,12 @@ export function WebsiteBuilderTool({
                     type="button"
                     variant="outline"
                     size="sm"
-                    disabled={isGenerating}
+                    disabled={isGenerating || isApplyingTemplate}
                     onClick={() => void createInterfaceProject({ resume: true })}
                     className="border-red-300/30 bg-black/20 text-red-50 hover:bg-black/35"
                   >
                     <RefreshCw className="size-3.5" />
-                    Resume generation
+                    {wb("stream.resumeGeneration")}
                   </Button>
                 ) : null}
               </div>
@@ -1574,7 +1864,7 @@ export function WebsiteBuilderTool({
             className="btn-ghost-gold h-12 w-full rounded-2xl"
           >
             <Settings className="size-4" />
-            {advancedOpen ? "Hide advanced settings" : "Show advanced settings"}
+            {advancedOpen ? wb("labels.hideAdvanced") : wb("labels.showAdvanced")}
           </Button>
 
           {advancedOpen ? (
@@ -1582,14 +1872,14 @@ export function WebsiteBuilderTool({
           <DashboardPanel>
             <SectionHeader
               icon={Globe2}
-              title="Project Type"
-              description="Choose a website or application architecture. DeepSeek will also auto-detect from your prompt."
+              title={wb("sections.projectType")}
+              description={wb("sectionDescriptions.projectType")}
             />
             <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {PROJECT_TYPES.map((type) => (
                 <ChoiceCard
                   key={type}
-                  label={type}
+                  label={wb(`projectTypes.${PROJECT_TYPE_KEYS[type]}`)}
                   active={projectType === type}
                   onClick={() => setProjectType(type)}
                 />
@@ -1599,12 +1889,12 @@ export function WebsiteBuilderTool({
 
           <div className="grid gap-6 lg:grid-cols-2">
             <DashboardPanel>
-              <SectionHeader icon={Palette} title="Design Style" description="Set the visual personality." />
+              <SectionHeader icon={Palette} title={wb("sections.designStyle")} description={wb("sectionDescriptions.designStyle")} />
               <div className="mt-5 grid grid-cols-2 gap-3">
                 {DESIGN_STYLES.map((style) => (
                   <ChoiceCard
                     key={style}
-                    label={style}
+                    label={translateOption(t, "designStyles", style)}
                     active={designStyle === style}
                     onClick={() => setDesignStyle(style)}
                     compact
@@ -1614,12 +1904,12 @@ export function WebsiteBuilderTool({
             </DashboardPanel>
 
             <DashboardPanel>
-              <SectionHeader icon={Sparkles} title="Color Theme" description="Pick the primary brand mood." />
+              <SectionHeader icon={Sparkles} title={wb("sections.colorTheme")} description={wb("sectionDescriptions.colorTheme")} />
               <div className="mt-5 grid gap-3">
                 {COLOR_THEMES.map((theme) => (
                   <ThemeButton
                     key={theme}
-                    label={theme}
+                    label={wb(`colorThemes.${COLOR_THEME_KEYS[theme]}`)}
                     active={colorTheme === theme}
                     onClick={() => setColorTheme(theme)}
                   />
@@ -1630,12 +1920,12 @@ export function WebsiteBuilderTool({
 
           <div className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
             <DashboardPanel>
-              <SectionHeader icon={FileStack} title="Language" description="Select output language." />
+              <SectionHeader icon={FileStack} title={wb("sections.outputLanguage")} description={wb("sectionDescriptions.language")} />
               <div className="mt-5 space-y-3">
                 {LANGUAGES.map((item) => (
                   <ChoiceCard
                     key={item}
-                    label={item}
+                    label={wb(`languages.${LANGUAGE_KEYS[item]}`)}
                     active={language === item}
                     onClick={() => setLanguage(item)}
                     compact
@@ -1645,7 +1935,7 @@ export function WebsiteBuilderTool({
             </DashboardPanel>
 
             <DashboardPanel>
-              <SectionHeader icon={LayoutDashboard} title="Features" description="Select the capabilities this project needs." />
+              <SectionHeader icon={LayoutDashboard} title={wb("sections.features")} description={wb("sectionDescriptions.features")} />
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
                 {FEATURES.map((feature) => {
                   const checked = features.includes(feature);
@@ -1665,7 +1955,7 @@ export function WebsiteBuilderTool({
                         onChange={() => toggleFeature(feature)}
                         className="size-4 rounded border-white/20 accent-[#d4af37]"
                       />
-                      {feature}
+                      {wb(`features.${FEATURE_KEYS[feature]}`)}
                     </label>
                   );
                 })}
@@ -1678,7 +1968,7 @@ export function WebsiteBuilderTool({
           {(isGenerating || streamStatus) && (
             <div className="space-y-4 rounded-2xl border border-premium-gold/20 bg-premium-gold/5 p-4">
               <div className="flex items-center justify-between text-[12px] text-premium-gold-light">
-                <span>{streamStatus ?? "Generation in progress"}</span>
+                <span>{streamStatus ?? wb("statuses.generating")}</span>
                 <span>{formatElapsed(elapsedSeconds)}</span>
               </div>
               <CoreProgressStepper currentStep={progressStep} compact />
@@ -1686,7 +1976,7 @@ export function WebsiteBuilderTool({
                 <div className="h-full w-2/5 animate-pulse rounded-full bg-gradient-to-r from-premium-gold to-premium-gold-light" />
               </div>
               <p className="text-[11px] text-white/40">
-                AI Core pipeline: Idea → Strategy → Design → Assets → Generation → Quality → Ready
+                {wb("workspace.pipelineHint")}
               </p>
             </div>
           )}
@@ -1709,12 +1999,12 @@ export function WebsiteBuilderTool({
                 {isGenerating ? (
                   <>
                     <Loader2 className="size-5 animate-spin" />
-                    Improving...
+                    {wb("actions.improving")}
                   </>
                 ) : (
                   <>
                     <Wand2 className="size-5" />
-                    Improve with AI
+                    {wb("sections.improveWithAi")}
                   </>
                 )}
               </Button>
@@ -1728,7 +2018,7 @@ export function WebsiteBuilderTool({
                 disabled={isGenerating}
                 className="btn-ghost-gold h-14 w-full rounded-2xl text-base font-semibold"
               >
-                Cancel edit
+                {wb("actions.cancelEdit")}
               </Button>
             </>
           ) : (
@@ -1745,12 +2035,12 @@ export function WebsiteBuilderTool({
             {isGenerating ? (
               <>
                 <Loader2 className="size-5 animate-spin" />
-                Creating...
+                {wb("actions.creating")}
               </>
             ) : (
               <>
                 <Sparkles className="size-5" />
-                {product?.generateLabel ?? "Create Website"}
+                {product?.generateLabel ?? wb("actions.createWebsite")}
               </>
             )}
           </Button>
@@ -1768,14 +2058,14 @@ export function WebsiteBuilderTool({
             className="btn-ghost-gold h-14 w-full rounded-2xl text-base font-semibold"
           >
             <RefreshCw className="size-5" />
-            Regenerate
+            {wb("actions.regenerate")}
           </Button>
           <Button
             type="button"
             variant="outline"
             onClick={() => {
               if (!activeProject?.id) {
-                toast.error("Create or select a website first.");
+                toast.error(wb("toasts.createOrSelectFirst"));
                 return;
               }
               void createInterfaceProject({ optimize: true });
@@ -1784,7 +2074,7 @@ export function WebsiteBuilderTool({
             className="btn-ghost-gold h-14 w-full rounded-2xl text-base font-semibold sm:col-span-2 lg:col-span-1"
           >
             <Wand2 className="size-5" />
-            Improve with AI
+            {wb("actions.improveWithAi")}
           </Button>
           {(activeProject?.status === "failed" ||
             activeProject?.status === "running") && (
@@ -1796,7 +2086,7 @@ export function WebsiteBuilderTool({
               className="btn-ghost-gold h-14 w-full rounded-2xl text-base font-semibold sm:col-span-2 lg:col-span-3"
             >
               <RefreshCw className="size-5" />
-              Resume incomplete generation
+              {wb("actions.resumeIncomplete")}
             </Button>
           )}
             </>
@@ -1836,16 +2126,16 @@ export function WebsiteBuilderTool({
         disabled={isGenerating || !activeProject?.id}
         onImproveLayer={(prefix, hint) => {
           if (!activeProject?.id) {
-            toast.error("Create or select a website first.");
+            toast.error(wb("toasts.createOrSelectFirst"));
             return;
           }
           setEditMode(true);
           setProjectBrief(`${prefix} ${hint}`.trim());
-          toast.message("Edit the instruction, then click Improve with AI.");
+          toast.message(wb("toasts.editInstructionHint"));
         }}
         onApplyEditorSuggestion={(command, suggestionId) => {
           if (!activeProject?.id) {
-            toast.error("Create or select a website first.");
+            toast.error(wb("toasts.createOrSelectFirst"));
             return;
           }
           void applyWebsiteEditorEdit({
@@ -1918,7 +2208,7 @@ export function WebsiteBuilderTool({
             ),
           );
           setPreviewRevision((n) => n + 1);
-          toast.success("SEO fix applied.");
+          toast.success(wb("toasts.seoFixApplied"));
         }}
         onIntelligenceApply={(command) => {
           if (!activeProject?.id) return;
@@ -1939,16 +2229,16 @@ export function WebsiteBuilderTool({
       <Dialog open={renameOpen} onOpenChange={setRenameOpen}>
         <DialogContent className="border-white/10 bg-[#141414]/95 text-white">
           <DialogHeader>
-            <DialogTitle>Rename Project</DialogTitle>
+            <DialogTitle>{wb("dialogs.renameTitle")}</DialogTitle>
             <DialogDescription className="text-white/45">
-              Update the saved project name in your workspace history.
+              {wb("dialogs.renameDescriptionWorkspace")}
             </DialogDescription>
           </DialogHeader>
           <Input
             value={renameValue}
             onChange={(event) => setRenameValue(event.target.value)}
             className="h-11 rounded-xl border-white/[0.1] bg-black/25 text-white"
-            placeholder="Project name"
+            placeholder={wb("placeholders.rename")}
           />
           <DialogFooter className="border-white/10 bg-white/[0.03]">
             <Button
@@ -1957,7 +2247,7 @@ export function WebsiteBuilderTool({
               className="btn-ghost-gold"
               onClick={() => setRenameOpen(false)}
             >
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button
               type="button"
@@ -1965,7 +2255,7 @@ export function WebsiteBuilderTool({
               onClick={renameProject}
               disabled={!renameValue.trim()}
             >
-              Save
+              {t("common.save")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1988,6 +2278,7 @@ export function WebsiteBuilderTool({
       <TemplateDetailsDialog
         template={railDetailsTpl}
         disabled={isGenerating}
+        activeGenerationId={activeProject?.id || null}
         onClose={() => setRailDetailsTpl(null)}
         onUseTemplate={handleUseTemplate}
       />
@@ -2026,6 +2317,7 @@ function ChoiceCard({
   onClick: () => void;
   compact?: boolean;
 }) {
+  const wb = useProductT("websiteBuilder");
   return (
     <button
       type="button"
@@ -2041,7 +2333,7 @@ function ChoiceCard({
       <span className="block">{label}</span>
       {!compact && (
         <span className="mt-2 block text-[12px] font-normal leading-relaxed text-white/35">
-          Optimized sections, pages and components for this product type.
+          {wb("choiceCard.description")}
         </span>
       )}
     </button>
@@ -2103,6 +2395,7 @@ function WebsiteLiveFrame({
   viewport?: PreviewViewport;
   revision?: number;
 }) {
+  const wb = useProductT("websiteBuilder");
   const src = livePreviewSrc(projectId, revision);
   const widthClass =
     viewport === "mobile" ? "max-w-[390px]" : viewport === "tablet" ? "max-w-[768px]" : "max-w-none";
@@ -2111,7 +2404,7 @@ function WebsiteLiveFrame({
     return (
       <div className="flex h-full min-h-[280px] flex-col items-center justify-center gap-3 px-6 text-center">
         <Globe2 className="size-10 text-premium-gold/50" />
-        <p className="text-sm text-white/50">Create a website to open live preview inside the platform.</p>
+        <p className="text-sm text-white/50">{wb("outputTabs.createPreviewHint")}</p>
       </div>
     );
   }
@@ -2144,6 +2437,7 @@ function DesignEnginePanels({
   onImproveLayer: (prefix: string, hint: string) => void;
   onApplyEditorSuggestion?: (command: string, suggestionId?: string) => void;
 }) {
+  const wb = useProductT("websiteBuilder");
   const strategy = project?.strategy;
   const design = project?.designSystem;
   const assets = project?.assetManifest?.items ?? [];
@@ -2178,22 +2472,22 @@ function DesignEnginePanels({
         <DashboardPanel>
           <SectionHeader
             icon={Sparkles}
-            title="Website Quality Report"
+            title={wb("sections.quality")}
             description={
               seoPerf?.summary ||
               project.optimizationReport?.summary ||
               conversion?.summary ||
-              "Design, SEO, performance, and UX readiness"
+              wb("qualityScores.description")
             }
           />
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
             {(
               [
-                ["Overall", overallScore],
-                ["Design", designScore],
-                ["SEO", seoScore],
-                ["UX", uxScore],
-                ["Perf", perfScore],
+                [wb("qualityScores.overall"), overallScore],
+                [wb("qualityScores.design"), designScore],
+                [wb("qualityScores.seo"), seoScore],
+                [wb("qualityScores.ux"), uxScore],
+                [wb("qualityScores.perf"), perfScore],
               ] as const
             ).map(([label, value]) => (
               <div
@@ -2216,7 +2510,7 @@ function DesignEnginePanels({
                 ? ` · Keyword: “${seoPerf.keywordPlan.primary}”`
                 : ""}
               {conversion?.goal?.goal
-                ? ` · Goal: ${conversion.goal.goal}`
+                ? ` · ${wb("qualityScores.goal")}: ${conversion.goal.goal}`
                 : ""}
             </p>
           ) : null}
@@ -2234,7 +2528,7 @@ function DesignEnginePanels({
           ) : null}
           {project.optimizationReport?.appliedFixes?.length ? (
             <p className="mt-3 text-[11px] text-white/45">
-              Applied: {project.optimizationReport.appliedFixes.slice(0, 3).join(" · ")}
+              {wb("qualityScores.applied")}: {project.optimizationReport.appliedFixes.slice(0, 3).join(" · ")}
             </p>
           ) : null}
         </DashboardPanel>
@@ -2244,10 +2538,10 @@ function DesignEnginePanels({
         <DashboardPanel>
           <SectionHeader
             icon={Sparkles}
-            title="AI Improvement Suggestions"
+            title={wb("seoAgent.improvementSuggestions")}
             description={
               project.editorSuggestions?.summary ||
-              "Design, UX, conversion, and missing-section ideas from Website Editor Intelligence"
+              wb("designEngine.editorSuggestionsDescription")
             }
           />
           <ul className="mt-4 space-y-2">
@@ -2278,13 +2572,13 @@ function DesignEnginePanels({
                   }
                   className="shrink-0 rounded-lg border border-premium-gold/30 px-3 py-1.5 text-[11px] font-semibold text-premium-gold-light transition hover:bg-premium-gold/10 disabled:opacity-40"
                 >
-                  Apply
+                  {wb("designEngine.apply")}
                 </button>
               </li>
             ))}
           </ul>
           <p className="mt-3 text-[11px] text-white/40">
-            Or type a natural-language edit (e.g. “Improve luxury feeling”) and use Improve with AI.
+            {wb("designEngine.editHint")}
           </p>
         </DashboardPanel>
       ) : null}
@@ -2292,25 +2586,25 @@ function DesignEnginePanels({
       <DashboardPanel>
         <SectionHeader
           icon={Sparkles}
-          title="Strategy"
-          description={profile ? `${profile.industry} · ${profile.targetAudience}` : "Business strategy layer"}
+          title={wb("sections.strategy")}
+          description={profile ? `${profile.industry} · ${profile.targetAudience}` : wb("sections.strategy")}
         />
         <div className="mt-4 space-y-2 text-sm text-white/65">
-          <p className="text-white/85">{strategy?.positioning || "Strategy will appear after generation."}</p>
+          <p className="text-white/85">{strategy?.positioning || wb("emptyStates.strategyPending")}</p>
           {strategy?.sitemap?.length ? (
-            <p className="text-xs text-white/45">Sitemap: {strategy.sitemap.join(" → ")}</p>
+            <p className="text-xs text-white/45">{wb("designEngine.sitemap")}: {strategy.sitemap.join(" → ")}</p>
           ) : null}
           {strategy?.ctas?.length ? (
-            <p className="text-xs text-white/45">CTAs: {strategy.ctas.slice(0, 3).join(", ")}</p>
+            <p className="text-xs text-white/45">{wb("designEngine.ctas")}: {strategy.ctas.slice(0, 3).join(", ")}</p>
           ) : null}
           {strategy?.contentStrategy?.brandVoice ? (
             <p className="text-xs text-white/40">
-              Voice: {strategy.contentStrategy.brandVoice}
+              {wb("designEngine.voice")}: {strategy.contentStrategy.brandVoice}
             </p>
           ) : null}
           {profile?.requiredSections?.length ? (
             <p className="text-xs text-white/40">
-              Sections: {profile.requiredSections.slice(0, 5).join(", ")}
+              {wb("designEngine.sections")}: {profile.requiredSections.slice(0, 5).join(", ")}
             </p>
           ) : null}
         </div>
@@ -2322,32 +2616,32 @@ function DesignEnginePanels({
           onClick={() =>
             onImproveLayer(
               "[strategy]",
-              "Refine positioning, sitemap, and conversion CTAs for higher conversions.",
+              wb("designEngine.improveStrategyHint"),
             )
           }
         >
-          Improve strategy
+          {wb("designEngine.improveStrategy")}
         </Button>
       </DashboardPanel>
 
       <DashboardPanel>
         <SectionHeader
           icon={Palette}
-          title="Design system"
-          description={design?.style || "Design engine tokens"}
+          title={wb("sections.designSystem")}
+          description={design?.style || wb("sections.designSystem")}
         />
         <div className="mt-4 space-y-3 text-sm text-white/65">
           {design ? (
             <>
               <div className="flex flex-wrap gap-2">
-                {Object.values(design.colors)
+                {Object.entries(design.colors)
                   .slice(0, 6)
-                  .map((hex) => (
+                  .map(([token, hex]) => (
                     <span
-                      key={hex}
+                      key={token}
                       className="size-7 rounded-full border border-white/15"
                       style={{ background: hex }}
-                      title={hex}
+                      title={`${token}: ${hex}`}
                     />
                   ))}
               </div>
@@ -2355,7 +2649,7 @@ function DesignEnginePanels({
                 {design.typography.headingFont} / {design.typography.bodyFont}
               </p>
               <p className="text-xs text-white/45">
-                Preset: {design.stylePreset ?? "modern"} · Pattern:{" "}
+                {wb("designEngine.preset")}: {design.stylePreset ?? "modern"} · {wb("designEngine.pattern")}:{" "}
                 {design.industryPattern}
               </p>
               {design.layoutStyle ? (
@@ -2363,7 +2657,7 @@ function DesignEnginePanels({
               ) : null}
             </>
           ) : (
-            <p>Design tokens will appear after generation.</p>
+            <p>{wb("panels.designTokensPending")}</p>
           )}
         </div>
         <Button
@@ -2374,22 +2668,22 @@ function DesignEnginePanels({
           onClick={() =>
             onImproveLayer(
               "[design]",
-              "Refresh the color system, typography, and layout rules for a more premium look.",
+              wb("designEngine.improveDesignHint"),
             )
           }
         >
-          Improve design
+          {wb("designEngine.improveDesign")}
         </Button>
       </DashboardPanel>
 
       <DashboardPanel>
         <SectionHeader
           icon={FileStack}
-          title="Assets"
+          title={wb("labels.assets")}
           description={
             project.assetManifest?.provider
-              ? `Provider: ${project.assetManifest.provider}`
-              : "Hero and section visuals"
+              ? `${wb("designEngine.provider")}: ${project.assetManifest.provider}`
+              : wb("labels.heroVisuals")
           }
         />
         <div className="mt-4 space-y-2">
@@ -2415,11 +2709,11 @@ function DesignEnginePanels({
               </div>
             ))
           ) : (
-            <p className="text-sm text-white/55">Assets will appear after generation.</p>
+            <p className="text-sm text-white/55">{wb("panels.assetsPending")}</p>
           )}
           {quality?.weakSections?.length ? (
             <p className="pt-2 text-[11px] text-amber-200/70">
-              QA: {quality.weakSections.slice(0, 2).join("; ")}
+              {wb("designEngine.qa")}: {quality.weakSections.slice(0, 2).join("; ")}
             </p>
           ) : null}
         </div>
@@ -2431,11 +2725,11 @@ function DesignEnginePanels({
           onClick={() =>
             onImproveLayer(
               "[assets]",
-              "Regenerate hero and section visuals to better match the brand and audience.",
+              wb("designEngine.improveAssetsHint"),
             )
           }
         >
-          Improve assets
+          {wb("designEngine.improveAssets")}
         </Button>
       </DashboardPanel>
     </div>
@@ -2454,6 +2748,7 @@ function PreviewAndExportPanel({
   onDownload: (project?: WorkspaceProject | null) => void;
   onImprove: () => void;
 }) {
+  const wb = useProductT("websiteBuilder");
   const generated = activeProject?.generatedProject;
   const fileCount = generated?.files.length ?? 0;
   const [viewport, setViewport] = useState<PreviewViewport>("desktop");
@@ -2552,10 +2847,10 @@ function PreviewAndExportPanel({
         if (res.status === 422) {
           toast.error(
             data.blockers?.[0] ??
-              "Publishing blocked. Resolve SEO, performance, or conversion issues first.",
+              wb("errors.publishBlocked"),
           );
         } else {
-          toast.error(data.error ?? `Could not ${action} website.`);
+          toast.error(data.error ?? wb("errors.couldNotAction", { action }));
         }
         return;
       }
@@ -2570,12 +2865,12 @@ function PreviewAndExportPanel({
         data.publication?.public_path ??
         null;
       setPublicUrl(url);
-      toast.success(data.message ?? `Website ${action}ed.`);
+      toast.success(data.message ?? wb("publish.publishedSuccess"));
       if (action === "publish" && url) {
         window.open(url.startsWith("http") ? url : url, "_blank", "noopener,noreferrer");
       }
     } catch {
-      toast.error(`Could not ${action} website.`);
+      toast.error(wb("errors.couldNotAction", { action }));
     } finally {
       setPublishBusy(false);
     }
@@ -2587,9 +2882,9 @@ function PreviewAndExportPanel({
         <div className="flex items-center gap-3">
           <DashboardIconBox icon={MonitorSmartphone} />
           <div>
-            <h3 className="font-bold text-white">Live preview</h3>
+            <h3 className="font-bold text-white">{wb("preview.title")}</h3>
             <p className="text-[13px] text-white/40">
-              View your generated website inside the platform.
+              {wb("workspace.viewGeneratedInside")}
             </p>
           </div>
         </div>
@@ -2613,14 +2908,18 @@ function PreviewAndExportPanel({
               )}
             >
               <Icon className="size-3.5" />
-              {key}
+              {key === "desktop"
+                ? wb("preview.deviceDesktop")
+                : key === "tablet"
+                  ? wb("preview.deviceTablet")
+                  : wb("preview.deviceMobile")}
             </button>
           ))}
         </div>
         <div className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-black/40">
           <WebsiteLiveFrame
             projectId={activeProject?.id}
-            title="Website live preview"
+            title={wb("preview.title")}
             viewport={viewport}
             revision={previewRevision}
             className="h-[420px]"
@@ -2635,7 +2934,7 @@ function PreviewAndExportPanel({
             disabled={!activeProject?.id}
           >
             <Maximize2 className="size-4" />
-            Open live preview
+            {wb("previewExport.openLivePreview")}
           </Button>
           <Button
             type="button"
@@ -2645,7 +2944,7 @@ function PreviewAndExportPanel({
             disabled={!activeProject}
           >
             <Wand2 className="size-4" />
-            Improve with AI
+            {wb("actions.improveWithAi")}
           </Button>
           <Button
             type="button"
@@ -2654,49 +2953,48 @@ function PreviewAndExportPanel({
             disabled={!activeProject}
           >
             <Download className="size-4" />
-            Download ZIP
+            {wb("labels.downloadZip")}
           </Button>
         </div>
         <p className="mt-3 text-[11px] leading-relaxed text-white/40">
-          Sandboxed live preview (no npm install). Navigate pages inside the preview. ZIP remains
-          available for full Next.js export.
+          {wb("previewExport.sandboxHint")}
         </p>
       </DashboardPanel>
 
       <DashboardPanel>
         <SectionHeader
           icon={Globe2}
-          title="Publish website"
-          description="Publish a public, SEO-ready URL for this version (/w/{slug})."
+          title={wb("publish.title")}
+          description={wb("publish.description")}
         />
         <div className="mt-5 space-y-3">
-          <InfoTile label="Website" value={activeProject?.title ?? "Not created yet"} />
-          <InfoTile label="Files" value={String(fileCount)} />
-          <InfoTile label="Status" value={publishStatus === "none" ? "Not published" : publishStatus} />
+          <InfoTile label={wb("labels.website")} value={activeProject?.title ?? wb("labels.notCreatedYet")} />
+          <InfoTile label={wb("labels.files")} value={String(fileCount)} />
+          <InfoTile label={wb("labels.status")} value={publishStatus === "none" ? wb("publish.notPublished") : publishStatus} />
           <InfoTile
-            label="Public URL"
-            value={publicUrl ?? "Publish to create a live /w/{slug} link"}
+            label={wb("labels.publicUrl")}
+            value={publicUrl ?? wb("publish.notPublished")}
           />
           {publishQuality ? (
             <div className="rounded-xl border border-white/10 bg-black/25 p-3">
               <p className="text-[11px] font-semibold uppercase tracking-wide text-white/45">
-                Pre-publish quality
+                {wb("qualityScores.prePublish")}
               </p>
               <div className="mt-2 grid grid-cols-3 gap-2 text-center">
                 <div>
-                  <p className="text-[10px] text-white/40">SEO</p>
+                  <p className="text-[10px] text-white/40">{wb("qualityScores.seo")}</p>
                   <p className="text-sm font-semibold text-premium-gold-light">
                     {publishQuality.seoScore ?? "—"}
                   </p>
                 </div>
                 <div>
-                  <p className="text-[10px] text-white/40">Perf</p>
+                  <p className="text-[10px] text-white/40">{wb("qualityScores.perf")}</p>
                   <p className="text-sm font-semibold text-premium-gold-light">
                     {publishQuality.performanceScore ?? "—"}
                   </p>
                 </div>
                 <div>
-                  <p className="text-[10px] text-white/40">Mobile</p>
+                  <p className="text-[10px] text-white/40">{wb("qualityScores.mobile")}</p>
                   <p className="text-sm font-semibold text-premium-gold-light">
                     {publishQuality.mobileScore ?? "—"}
                   </p>
@@ -2712,7 +3010,7 @@ function PreviewAndExportPanel({
                 </p>
               ) : (
                 <p className="mt-2 text-[11px] text-emerald-200/70">
-                  Ready for public publishing
+                  {wb("qualityScores.readyForPublishing")}
                 </p>
               )}
             </div>
@@ -2725,7 +3023,7 @@ function PreviewAndExportPanel({
               onClick={() => void runPublishAction("prepare")}
               disabled={!activeProject?.id || publishBusy}
             >
-              Review quality & prepare
+              {wb("qualityScores.reviewPrepare")}
             </Button>
             <Button
               type="button"
@@ -2736,12 +3034,12 @@ function PreviewAndExportPanel({
               {publishBusy ? (
                 <>
                   <Loader2 className="size-4 animate-spin" />
-                  Publishing…
+                  {wb("qualityScores.publishing")}
                 </>
               ) : (
                 <>
                   <ExternalLink className="size-4" />
-                  {publishStatus === "published" ? "Update & republish" : "Publish public URL"}
+                  {publishStatus === "published" ? wb("publish.updateRepublish") : wb("publish.publishPublicUrl")}
                 </>
               )}
             </Button>
@@ -2759,7 +3057,7 @@ function PreviewAndExportPanel({
                 }
               >
                 <Maximize2 className="size-4" />
-                Open public URL
+                {wb("previewExport.openPublicUrl")}
               </Button>
             ) : null}
             {publishStatus === "published" ? (
@@ -2770,7 +3068,7 @@ function PreviewAndExportPanel({
                 onClick={() => void runPublishAction("unpublish")}
                 disabled={publishBusy}
               >
-                Unpublish
+                {wb("publish.unpublishAction")}
               </Button>
             ) : null}
           </div>
@@ -2782,10 +3080,10 @@ function PreviewAndExportPanel({
           <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
             <div>
               <DialogTitle className="text-base font-bold">
-                {activeProject?.title ?? "Live preview"}
+                {activeProject?.title ?? wb("preview.title")}
               </DialogTitle>
               <DialogDescription className="text-xs text-white/45">
-                In-platform website preview · sandboxed static delivery
+                {wb("previewExport.liveDialogDescription")}
               </DialogDescription>
             </div>
             <div className="flex gap-2">
@@ -2796,7 +3094,7 @@ function PreviewAndExportPanel({
                 onClick={onImprove}
               >
                 <Wand2 className="size-4" />
-                Improve
+                {wb("previewExport.improve")}
               </Button>
               <Button
                 type="button"
@@ -2804,14 +3102,14 @@ function PreviewAndExportPanel({
                 onClick={() => onDownload(activeProject)}
               >
                 <Download className="size-4" />
-                ZIP
+                {wb("previewExport.zip")}
               </Button>
             </div>
           </div>
           <div className="h-[min(78vh,820px)] bg-black">
             <WebsiteLiveFrame
               projectId={activeProject?.id}
-              title="Fullscreen live preview"
+              title={wb("preview.openInNewTab")}
               viewport="desktop"
               revision={previewRevision}
               className="h-full min-h-[78vh]"
@@ -2855,6 +3153,7 @@ function RightPreview({
   onRefreshPreview: () => void;
   onOpenPreview: () => void;
 }) {
+  const wb = useProductT("websiteBuilder");
   const generatedProject = activeProject?.generatedProject;
   const build = activeProject?.build ?? { status: "idle" as const };
   const previewPages = generatedProject?.pages?.length ? generatedProject.pages : currentPages;
@@ -2867,8 +3166,8 @@ function RightPreview({
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <SectionHeader
             icon={MonitorSmartphone}
-            title="Live Preview"
-            description="Compiled generated project rendered in a sandbox."
+            title={wb("preview.title")}
+            description={wb("preview.description")}
           />
           <div className="flex flex-wrap gap-2">
             <Button
@@ -2893,7 +3192,7 @@ function RightPreview({
               disabled={!previewUrl}
             >
               <ExternalLink className="size-4" />
-              Open
+              {wb("previewExport.open")}
             </Button>
           </div>
         </div>
@@ -2907,7 +3206,7 @@ function RightPreview({
           <div className="p-4">
             {previewUrl ? (
               <iframe
-                title={`${activeProject?.title ?? "Generated project"} live preview`}
+                title={`${activeProject?.title ?? wb("previewExport.generatedProject")} ${wb("previewExport.livePreviewSuffix")}`}
                 src={previewUrl}
                 className="h-[520px] w-full rounded-2xl border border-premium-gold/15 bg-white"
                 sandbox="allow-scripts allow-forms allow-popups"
@@ -2915,9 +3214,9 @@ function RightPreview({
             ) : isBuilding ? (
               <div className="flex h-[420px] flex-col items-center justify-center rounded-2xl border border-premium-gold/15 bg-black/30 text-center">
                 <Loader2 className="size-8 animate-spin text-premium-gold" />
-                <p className="mt-4 font-bold text-white">Building generated project</p>
+                <p className="mt-4 font-bold text-white">{wb("panels.buildingProject")}</p>
                 <p className="mt-2 max-w-sm text-sm text-white/40">
-                  The generated React, Next.js and Tailwind files are compiling inside a temporary project.
+                  {wb("previewExport.buildingDescription")}
                 </p>
               </div>
             ) : (
@@ -2926,19 +3225,19 @@ function RightPreview({
                   {activeProject?.type ?? projectType}
                 </p>
                 <h3 className="mt-3 text-2xl font-bold tracking-[-0.04em] text-white">
-                  {activeProject?.title ?? "Premium Project Concept"}
+                  {activeProject?.title ?? wb("previewExport.premiumConcept")}
                 </h3>
                 <p className="mt-3 line-clamp-3 text-[13px] leading-relaxed text-white/45">
                   {activeProject?.description ??
-                    "A polished website and app structure will appear here after you generate the interface concept."}
+                    wb("previewExport.conceptDescription")}
                 </p>
                 <div className="mt-5 grid grid-cols-2 gap-3">
                   <div className="rounded-xl bg-black/30 p-3">
-                    <p className="text-[11px] text-white/35">Style</p>
+                    <p className="text-[11px] text-white/35">{wb("labels.style")}</p>
                     <p className="mt-1 font-semibold text-white">{activeProject?.style ?? designStyle}</p>
                   </div>
                   <div className="rounded-xl bg-black/30 p-3">
-                    <p className="text-[11px] text-white/35">Theme</p>
+                    <p className="text-[11px] text-white/35">{wb("labels.theme")}</p>
                     <p className="mt-1 font-semibold text-white">{activeProject?.theme ?? colorTheme}</p>
                   </div>
                 </div>
@@ -2950,7 +3249,7 @@ function RightPreview({
           <div className="mt-4 rounded-2xl border border-red-400/20 bg-red-400/10 p-4">
             <div className="flex items-center gap-2 text-red-200">
               <AlertTriangle className="size-4" />
-              <p className="font-semibold">Generated project failed to compile</p>
+              <p className="font-semibold">{wb("panels.compileFailed")}</p>
             </div>
             <pre className="mt-3 max-h-56 overflow-auto whitespace-pre-wrap text-[12px] leading-relaxed text-red-100/85">
               {build.error}
@@ -2960,7 +3259,7 @@ function RightPreview({
       </DashboardPanel>
 
       <DashboardPanel>
-        <SectionHeader icon={FileStack} title="Website Structure" description="Pages and flow generated from your brief." />
+        <SectionHeader icon={FileStack} title={wb("sections.websiteStructure")} description={wb("sectionDescriptions.websiteStructure")} />
         <div className="mt-5 space-y-3">
           {previewPages.map((page, index) => (
             <div
@@ -2980,17 +3279,17 @@ function RightPreview({
         <DashboardPanel>
           <SectionHeader
             icon={Sparkles}
-            title="Generated Result"
-            description="DeepSeek output for this project."
+            title={wb("sections.generatedResult")}
+            description={wb("sectionDescriptions.generatedResult")}
           />
           <div className="mt-5 space-y-4">
-            <ResultList title="Sections" items={generatedProject.sections} />
-            <ResultList title="Color Palette" items={generatedProject.colorPalette} />
-            <ResultList title="Typography" items={generatedProject.typography} />
-            <ResultList title="Components" items={generatedProject.components} />
-            <ResultList title="Content" items={generatedProject.content} />
-            <ResultList title="SEO" items={generatedProject.seo} />
-            <ResultList title="Roadmap" items={generatedProject.roadmap} />
+            <ResultList title={wb("resultLists.sections")} items={generatedProject.sections} />
+            <ResultList title={wb("resultLists.colorPalette")} items={generatedProject.colorPalette} />
+            <ResultList title={wb("resultLists.typography")} items={generatedProject.typography} />
+            <ResultList title={wb("resultLists.components")} items={generatedProject.components} />
+            <ResultList title={wb("resultLists.content")} items={generatedProject.content} />
+            <ResultList title={wb("resultLists.seo")} items={generatedProject.seo} />
+            <ResultList title={wb("resultLists.roadmap")} items={generatedProject.roadmap} />
           </div>
         </DashboardPanel>
       )}
@@ -2998,14 +3297,14 @@ function RightPreview({
       <DashboardPanel>
         <SectionHeader
           icon={Clock3}
-          title="Progress"
-          description="Live server status during generation."
+          title={wb("sections.generationStatus")}
+          description={wb("sectionDescriptions.generationStatus")}
         />
         <div className="mt-5">
           <div className="flex items-center justify-between text-sm">
             <span className="text-white/45">
               {isGenerating
-                ? streamStatus ?? "Generating..."
+                ? streamStatus ?? wb("stream.generating")
                 : activeProject
                   ? "Ready"
                   : "Idle"}
@@ -3025,8 +3324,8 @@ function RightPreview({
             )}
           </div>
           <div className="mt-5 grid grid-cols-2 gap-3">
-            <InfoTile label="Typical Time" value="1-3 min" />
-            <InfoTile label="Language" value={language} />
+            <InfoTile label={wb("labels.typicalTime")} value={wb("labels.typicalTimeValue")} />
+            <InfoTile label={wb("labels.language")} value={language} />
           </div>
         </div>
       </DashboardPanel>
@@ -3041,8 +3340,11 @@ function ResultList({ title, items }: { title: string; items: string[] }) {
         {title}
       </p>
       <ul className="mt-3 space-y-2">
-        {items.map((item) => (
-          <li key={item} className="flex gap-2 text-[13px] leading-relaxed text-white/55">
+        {items.map((item, index) => (
+          <li
+            key={`${item}-${index}`}
+            className="flex gap-2 text-[13px] leading-relaxed text-white/55"
+          >
             <span className="mt-2 size-1.5 shrink-0 rounded-full bg-premium-gold/70" />
             <span>{item}</span>
           </li>
@@ -3118,6 +3420,7 @@ function OutputWorkspace({
   }) => void;
   onIntelligenceApply?: (command: string) => void;
 }) {
+  const wb = useProductT("websiteBuilder");
   const filteredFiles = files.filter((file) =>
     file.path.toLowerCase().includes(fileSearch.toLowerCase()),
   );
@@ -3145,7 +3448,7 @@ function OutputWorkspace({
               : "text-white/45 hover:text-white/75",
           )}
         >
-          Live preview
+          {wb("outputTabs.livePreview")}
         </button>
         <button
           type="button"
@@ -3157,7 +3460,7 @@ function OutputWorkspace({
               : "text-white/45 hover:text-white/75",
           )}
         >
-          Visual editor
+          {wb("outputTabs.visualEditor")}
         </button>
         <button
           type="button"
@@ -3169,7 +3472,7 @@ function OutputWorkspace({
               : "text-white/45 hover:text-white/75",
           )}
         >
-          Source files
+          {wb("outputTabs.sourceFiles")}
         </button>
         <button
           type="button"
@@ -3181,7 +3484,7 @@ function OutputWorkspace({
               : "text-white/45 hover:text-white/75",
           )}
         >
-          Analytics
+          {wb("outputTabs.analytics")}
         </button>
         <button
           type="button"
@@ -3193,7 +3496,7 @@ function OutputWorkspace({
               : "text-white/45 hover:text-white/75",
           )}
         >
-          Experiments
+          {wb("outputTabs.experiments")}
         </button>
         <button
           type="button"
@@ -3205,7 +3508,7 @@ function OutputWorkspace({
               : "text-white/45 hover:text-white/75",
           )}
         >
-          Intelligence
+          {wb("outputTabs.intelligence")}
         </button>
         <button
           type="button"
@@ -3217,7 +3520,7 @@ function OutputWorkspace({
               : "text-white/45 hover:text-white/75",
           )}
         >
-          SEO Agent
+          {wb("outputTabs.seoAgent")}
         </button>
         <button
           type="button"
@@ -3229,7 +3532,7 @@ function OutputWorkspace({
               : "text-white/45 hover:text-white/75",
           )}
         >
-          Publish
+          {wb("outputTabs.publish")}
         </button>
       </div>
       {outputTab === "canvas" ? (
@@ -3244,7 +3547,7 @@ function OutputWorkspace({
             />
           ) : (
             <div className="flex h-[420px] items-center justify-center text-sm text-white/40">
-              Generate a website first to open the visual editor.
+              {wb("outputTabs.openEditorHint")}
             </div>
           )}
         </div>
@@ -3301,7 +3604,7 @@ function OutputWorkspace({
             ) : (
               <WebsiteLiveFrame
                 projectId={activeProject?.id}
-                title="Website live preview workspace"
+                title={wb("preview.title")}
                 viewport="desktop"
                 revision={previewRevision}
                 className="h-full min-h-[720px]"
@@ -3347,14 +3650,16 @@ function ProjectToolbar({
   onDelete: () => void;
   onFavorite: () => void;
 }) {
+  const { t } = useTranslation();
+  const wb = useProductT("websiteBuilder");
   return (
     <div className="flex flex-col gap-3 border-b border-white/[0.08] bg-black/25 p-4 xl:flex-row xl:items-center xl:justify-between">
       <div className="min-w-0">
         <p className="text-[11px] font-semibold tracking-[0.16em] text-premium-gold-light uppercase">
-          AI Project Workspace
+          {wb("workspace.title")}
         </p>
         <h3 className="mt-1 truncate text-lg font-bold text-white">
-          {activeProject?.title ?? "No project selected"}
+          {activeProject?.title ?? wb("emptyStates.noProjectSelected")}
         </h3>
       </div>
       <div className="flex flex-wrap gap-2">
@@ -3366,7 +3671,7 @@ function ProjectToolbar({
               className="btn-ghost-gold rounded-xl"
             >
               <LayoutDashboard className="size-4" />
-              Manage website
+              {wb("actions.manageWebsite")}
             </Button>
           </Link>
         ) : null}
@@ -3377,7 +3682,7 @@ function ProjectToolbar({
           disabled={!activeProject}
         >
           <Download className="size-4" />
-          Download ZIP
+          {wb("labels.downloadZip")}
         </Button>
         <Button
           type="button"
@@ -3387,22 +3692,22 @@ function ProjectToolbar({
           disabled={!selectedFile}
         >
           <Copy className="size-4" />
-          Copy
+          {t("common.copy")}
         </Button>
         <Button type="button" variant="outline" className="btn-ghost-gold rounded-xl" onClick={onRename} disabled={!activeProject}>
-          Rename
+          {wb("labels.rename")}
         </Button>
         <Button type="button" variant="outline" className="btn-ghost-gold rounded-xl" onClick={onFavorite} disabled={!activeProject}>
           <Star className={cn("size-4", activeProject?.favorite && "fill-premium-gold text-premium-gold")} />
-          Favorite
+          {wb("labels.favorite")}
         </Button>
         <Button type="button" variant="outline" className="btn-ghost-gold rounded-xl" onClick={() => onDownload(activeProject)} disabled={!activeProject}>
           <ArrowDownToLine className="size-4" />
-          Export
+          {t("common.export")}
         </Button>
         <Button type="button" variant="outline" className="rounded-xl border-red-400/20 text-red-300 hover:bg-red-400/10" onClick={onDelete} disabled={!activeProject}>
           <Trash2 className="size-4" />
-          Delete
+          {t("common.delete")}
         </Button>
       </div>
     </div>
@@ -3430,19 +3735,20 @@ function ProjectLeftSidebar({
   projects: WorkspaceProject[];
   onSelectProject: (project: WorkspaceProject) => void;
 }) {
+  const wb = useProductT("websiteBuilder");
   return (
     <aside className="space-y-5 bg-black/20 p-4">
       <div>
         <div className="mb-3 flex items-center gap-2 text-sm font-bold text-white">
           <FolderTree className="size-4 text-premium-gold" />
-          Project Files
+          {wb("workspace.projectFiles")}
         </div>
         <label className="relative block">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-white/30" />
           <Input
             value={fileSearch}
             onChange={(event) => onFileSearch(event.target.value)}
-            placeholder="Search files..."
+            placeholder={wb("placeholders.searchFiles")}
             className="h-10 rounded-xl border-white/[0.08] bg-black/25 pl-9 text-white"
           />
         </label>
@@ -3470,17 +3776,17 @@ function ProjectLeftSidebar({
 
       <div className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4">
         <p className="text-[11px] font-semibold tracking-wide text-white/35 uppercase">
-          Project Info
+          {wb("workspace.projectInfo")}
         </p>
-        <p className="mt-2 truncate font-semibold text-white">{activeProject?.title ?? "No project"}</p>
-        <p className="mt-1 text-[12px] text-white/40">{activeProject?.type ?? "Generate a project"}</p>
-        <p className="mt-3 text-[12px] text-premium-gold-light">{allFileCount} files</p>
+        <p className="mt-2 truncate font-semibold text-white">{activeProject?.title ?? wb("emptyStates.noProject")}</p>
+        <p className="mt-1 text-[12px] text-white/40">{activeProject?.type ?? wb("emptyStates.generateProject")}</p>
+        <p className="mt-3 text-[12px] text-premium-gold-light">{wb("workspace.fileCount", { count: allFileCount })}</p>
       </div>
 
       <div>
         <div className="mb-3 flex items-center gap-2 text-sm font-bold text-white">
           <History className="size-4 text-premium-gold" />
-          History
+          {wb("workspace.history")}
         </div>
         <div className="max-h-[260px] space-y-2 overflow-auto">
           {projects.map((project) => (
@@ -3505,7 +3811,7 @@ function ProjectLeftSidebar({
               </div>
               <p className="mt-1 text-[11px] text-white/35">
                 {project.createdAt}
-                {project.parentGenerationId ? " · linked version" : ""}
+                {project.parentGenerationId ? ` · ${wb("workspace.linkedVersion")}` : ""}
               </p>
             </button>
           ))}
@@ -3541,6 +3847,7 @@ function CodeEditorWorkspace({
   selectedFilePath: string;
   onSelectFile: (path: string) => void;
 }) {
+  const wb = useProductT("websiteBuilder");
   const tabs = openTabs.length ? openTabs : files.slice(0, 1);
 
   return (
@@ -3567,7 +3874,7 @@ function CodeEditorWorkspace({
           dangerouslySetInnerHTML={{
             __html: selectedFile
               ? highlightCode(selectedFile.content)
-              : "Select a generated file to review source code.",
+              : wb("emptyStates.selectFile"),
           }}
         />
       </pre>
@@ -3588,73 +3895,74 @@ function ProjectRightSidebar({
   onFavorite: () => void;
   onRename: () => void;
 }) {
+  const wb = useProductT("websiteBuilder");
   const project = activeProject?.generatedProject;
 
   return (
     <aside className="space-y-5 bg-black/20 p-4">
       <div className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4">
         <p className="text-[11px] font-semibold tracking-wide text-white/35 uppercase">
-          Project Details
+          {wb("workspace.projectDetails")}
         </p>
-        <h4 className="mt-2 font-bold text-white">{activeProject?.title ?? "No project"}</h4>
+        <h4 className="mt-2 font-bold text-white">{activeProject?.title ?? wb("emptyStates.noProject")}</h4>
         <p className="mt-2 text-[13px] leading-relaxed text-white/45">
-          {activeProject?.description ?? "Generate or reopen a project to see details."}
+          {activeProject?.description ?? wb("emptyStates.noProjectDescription")}
         </p>
       </div>
 
       <div className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4">
         <p className="text-[11px] font-semibold tracking-wide text-white/35 uppercase">
-          Prompt Used
+          {wb("workspaceMeta.promptUsed")}
         </p>
         <p className="mt-2 text-[13px] leading-relaxed text-white/55">
-          {project?.prompt ?? "Prompt metadata will appear here after generation."}
+          {project?.prompt ?? wb("emptyStates.promptMetadata")}
         </p>
       </div>
 
       <div className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4">
         <p className="text-[11px] font-semibold tracking-wide text-white/35 uppercase">
-          Generation Metadata
+          {wb("workspaceMeta.generationMetadata")}
         </p>
         <div className="mt-3 space-y-2 text-[13px] text-white/55">
-          <p>Kind: {project?.projectKind ?? "Unknown"}</p>
-          <p>Generated: {project?.generatedAt ? formatGenerationDate(project.generatedAt) : "Unknown"}</p>
-          <p>Selected file: {selectedFile?.path ?? "None"}</p>
-          <p>Files: {project?.files.length ?? 0}</p>
+          <p>{wb("workspaceMeta.kind")}: {project?.projectKind ?? wb("workspaceMeta.unknown")}</p>
+          <p>{wb("workspaceMeta.generated")}: {project?.generatedAt ? formatGenerationDate(project.generatedAt) : wb("workspaceMeta.unknown")}</p>
+          <p>{wb("workspace.selectedFile")}: {selectedFile?.path ?? wb("workspace.none")}</p>
+          <p>{wb("workspaceMeta.fileCount")}: {project?.files.length ?? 0}</p>
         </div>
       </div>
 
       <div className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4">
         <div className="mb-3 flex items-center gap-2">
           <Settings className="size-4 text-premium-gold" />
-          <p className="font-semibold text-white">Project Settings</p>
+          <p className="font-semibold text-white">{wb("sections.projectSettings")}</p>
         </div>
         <div className="space-y-2 text-[13px] text-white/55">
-          <p>Framework: {project?.settings?.framework ?? "Next.js App Router"}</p>
-          <p>Styling: {project?.settings?.styling ?? "Tailwind CSS"}</p>
-          <p>Package manager: {project?.settings?.packageManager ?? "npm"}</p>
-          <p>Deploy: {project?.settings?.deploymentTarget ?? "Vercel or Node hosting"}</p>
+          <p>{wb("workspaceMeta.framework")}: {project?.settings?.framework ?? wb("workspaceMeta.defaultFramework")}</p>
+          <p>{wb("workspaceMeta.styling")}: {project?.settings?.styling ?? wb("workspaceMeta.defaultStyling")}</p>
+          <p>{wb("workspaceMeta.packageManager")}: {project?.settings?.packageManager ?? "npm"}</p>
+          <p>{wb("workspaceMeta.deployTarget")}: {project?.settings?.deploymentTarget ?? wb("workspaceMeta.defaultDeploy")}</p>
         </div>
         <Button asChild variant="outline" className="btn-ghost-gold mt-4 w-full rounded-xl">
           <Link href="/dashboard/website-builder/settings">
-            Open Settings Page
+            {wb("workspaceMeta.openSettingsPage")}
           </Link>
         </Button>
       </div>
 
       <div className="rounded-2xl border border-premium-gold/15 bg-premium-gold/[0.06] p-4">
         <p className="text-[11px] font-semibold tracking-wide text-premium-gold-light uppercase">
-          AI Actions
+          {wb("workspaceMeta.aiActions")}
         </p>
         <div className="mt-4 grid gap-2">
           <Button className="btn-gold rounded-xl font-bold text-luxury-black" onClick={() => onDownload(activeProject)} disabled={!activeProject}>
             <Download className="size-4" />
-            Download ZIP
+            {wb("labels.downloadZip")}
           </Button>
           <Button variant="outline" className="btn-ghost-gold rounded-xl" onClick={onRename} disabled={!activeProject}>
-            Rename Project
+            {wb("workspaceMeta.renameProject")}
           </Button>
           <Button variant="outline" className="btn-ghost-gold rounded-xl" onClick={onFavorite} disabled={!activeProject}>
-            Toggle Favorite
+            {wb("workspaceMeta.toggleFavorite")}
           </Button>
         </div>
       </div>
@@ -3671,6 +3979,7 @@ function GeneratedPreviewWorkspace({
   onRefreshPreview: () => void;
   onOpenPreview: () => void;
 }) {
+  const wb = useProductT("websiteBuilder");
   const build = activeProject?.build ?? { status: "idle" as const };
   const previewUrl = build.status === "success" ? build.previewUrl : undefined;
   const isBuilding = build.status === "building";
@@ -3680,12 +3989,12 @@ function GeneratedPreviewWorkspace({
       <div className="flex flex-col gap-3 border-b border-white/[0.08] bg-white/[0.035] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="font-semibold text-white">
-            {activeProject?.title ?? "No generated project yet"}
+            {activeProject?.title ?? wb("previewExport.noProjectYet")}
           </p>
           <p className="text-[12px] text-white/35">
             {previewUrl
-              ? "Compiled Next.js export is loaded below."
-              : "Generate a project to build and render the live preview."}
+              ? wb("previewExport.compiledLoaded")
+              : wb("previewExport.generateToPreview")}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -3701,7 +4010,7 @@ function GeneratedPreviewWorkspace({
             ) : (
               <RefreshCw className="size-4" />
             )}
-            Refresh Preview
+            {wb("previewExport.refreshPreview")}
           </Button>
           <Button
             type="button"
@@ -3711,7 +4020,7 @@ function GeneratedPreviewWorkspace({
             disabled={!previewUrl}
           >
             <ExternalLink className="size-4" />
-            Open in New Tab
+            {wb("previewExport.openInNewTab")}
           </Button>
         </div>
       </div>
@@ -3719,7 +4028,7 @@ function GeneratedPreviewWorkspace({
       <div className="p-4">
         {previewUrl ? (
           <iframe
-            title={`${activeProject?.title ?? "Generated project"} full preview`}
+            title={`${activeProject?.title ?? wb("previewExport.generatedProject")} ${wb("previewExport.fullPreviewSuffix")}`}
             src={previewUrl}
             className="h-[760px] w-full rounded-2xl border border-premium-gold/15 bg-white"
             sandbox="allow-scripts allow-forms allow-popups"
@@ -3727,17 +4036,17 @@ function GeneratedPreviewWorkspace({
         ) : isBuilding ? (
           <div className="flex h-[520px] flex-col items-center justify-center rounded-2xl border border-premium-gold/15 bg-black/30 text-center">
             <Loader2 className="size-9 animate-spin text-premium-gold" />
-            <p className="mt-4 font-bold text-white">Building generated Next.js app</p>
+            <p className="mt-4 font-bold text-white">{wb("panels.buildingNextApp")}</p>
             <p className="mt-2 max-w-sm text-sm text-white/40">
-              The generated files are being written to a temporary project and compiled.
+              {wb("previewExport.buildingFilesDescription")}
             </p>
           </div>
         ) : (
           <div className="flex h-[420px] flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.1] text-center">
             <MonitorSmartphone className="size-10 text-premium-gold" />
-            <p className="mt-4 font-bold text-white">Preview will appear here</p>
+            <p className="mt-4 font-bold text-white">{wb("preview.emptyTitle")}</p>
             <p className="mt-2 max-w-sm text-sm text-white/40">
-              Generate a website or web app to build and render the real project.
+              {wb("previewExport.generateToRender")}
             </p>
           </div>
         )}
@@ -3746,7 +4055,7 @@ function GeneratedPreviewWorkspace({
           <div className="mt-4 rounded-2xl border border-red-400/20 bg-red-400/10 p-4">
             <div className="flex items-center gap-2 text-red-200">
               <AlertTriangle className="size-4" />
-              <p className="font-semibold">Build failed</p>
+              <p className="font-semibold">{wb("panels.buildFailed")}</p>
             </div>
             <pre className="mt-3 max-h-72 overflow-auto whitespace-pre-wrap text-[12px] leading-relaxed text-red-100/85">
               {build.error}
@@ -3783,13 +4092,15 @@ function BottomWorkspace({
   onDelete: (id: string) => void;
   onDownload: (project?: WorkspaceProject | null) => void;
 }) {
+  const { t } = useTranslation();
+  const wb = useProductT("websiteBuilder");
   const favorites = projects.filter((project) => project.favorite);
 
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
       <DashboardPanel>
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <SectionHeader icon={History} title="Recent Projects" description="Review generated interface concepts." />
+          <SectionHeader icon={History} title={wb("sections.recentProjects")} description={wb("sectionDescriptions.recentProjects")} />
           <div className="flex flex-wrap gap-2">
             <Button
               type="button"
@@ -3799,7 +4110,7 @@ function BottomWorkspace({
               disabled={!activeProject}
             >
               <ArrowDownToLine className="size-4" />
-              Export
+              {t("common.export")}
             </Button>
             <Button
               type="button"
@@ -3809,7 +4120,7 @@ function BottomWorkspace({
               disabled={!activeProject}
             >
               <Download className="size-4" />
-              Download
+              {t("common.download")}
             </Button>
           </div>
         </div>
@@ -3836,10 +4147,10 @@ function BottomWorkspace({
                   </p>
                 </button>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <IconAction icon={Star} label="Favorite" active={project.favorite} onClick={() => onFavorite(project.id)} />
-                  <IconAction icon={Copy} label="Duplicate" onClick={() => onDuplicate(project)} />
-                  <IconAction icon={Download} label="Download" onClick={() => onDownload(project)} />
-                  <IconAction icon={Trash2} label="Delete" danger onClick={() => onDelete(project.id)} />
+                  <IconAction icon={Star} label={wb("labels.favorite")} active={project.favorite} onClick={() => onFavorite(project.id)} />
+                  <IconAction icon={Copy} label={wb("labels.duplicate")} onClick={() => onDuplicate(project)} />
+                  <IconAction icon={Download} label={wb("labels.downloadZip")} onClick={() => onDownload(project)} />
+                  <IconAction icon={Trash2} label={wb("labels.delete")} danger onClick={() => onDelete(project.id)} />
                 </div>
               </article>
             ))}
@@ -3847,7 +4158,7 @@ function BottomWorkspace({
         ) : (
           <div className="rounded-3xl border border-dashed border-white/[0.1] p-8 text-center">
             <Globe2 className="mx-auto size-10 text-premium-gold" />
-            <p className="mt-4 font-bold text-white">No recent projects yet</p>
+            <p className="mt-4 font-bold text-white">{wb("emptyStates.noRecentProjects")}</p>
             <p className="mt-2 text-sm text-white/40">
               Generate an interface concept to populate your recent projects, favorites and history.
             </p>
@@ -3859,8 +4170,8 @@ function BottomWorkspace({
         <DashboardPanel>
           <SectionHeader
             icon={LayoutDashboard}
-            title="Templates"
-            description="Click a card to review details, then Use Template."
+            title={wb("labels.templates")}
+            description={wb("sectionDescriptions.templates")}
           />
           <TemplateSelectionRail
             templates={catalogTemplates}
@@ -3871,7 +4182,7 @@ function BottomWorkspace({
         </DashboardPanel>
 
         <DashboardPanel>
-          <SectionHeader icon={Star} title="Favorites" description="Pinned workspace concepts." />
+          <SectionHeader icon={Star} title={wb("labels.favorites")} description={wb("sectionDescriptions.favorites")} />
           <div className="mt-5 space-y-3">
             {favorites.length > 0 ? (
               favorites.map((project) => (
@@ -3886,7 +4197,7 @@ function BottomWorkspace({
               ))
             ) : (
               <p className="rounded-2xl border border-white/[0.08] bg-black/20 p-4 text-sm text-white/40">
-                Favorite projects will appear here.
+                {wb("emptyStates.favoriteProjectsHere")}
               </p>
             )}
           </div>

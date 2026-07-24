@@ -331,3 +331,13 @@
   outline: 2px solid var(--color-premium-gold, #d4af37);
   outline-offset: 2px;
 }
+
+/* Global RTL support (Arabic, Persian, Urdu) */
+html[dir="rtl"] body {
+  direction: rtl;
+}
+
+html[dir="rtl"] .dashboard-sidebar,
+html[dir="rtl"] .dashboard-header {
+  text-align: right;
+}

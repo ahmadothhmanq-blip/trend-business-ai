@@ -15,12 +15,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import { cn } from "@/lib/utils";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import type { DeploymentDashboard } from "@/lib/ai-core/deployment";
 import type { WebsiteDomain } from "@/lib/ai-core/domains";
 
 export function DeploymentDashboardPanel(props: {
   generationId: string | null;
 }) {
+  const wb = useProductT("websiteBuilder");
   const [dashboard, setDashboard] = useState<DeploymentDashboard | null>(null);
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
@@ -40,12 +42,12 @@ export function DeploymentDashboardPanel(props: {
       );
       if (!res.ok) {
         const body = (await res.json()) as { error?: string };
-        throw new Error(body.error || "Failed to load deployment");
+        throw new Error(body.error || wb("panels.failedLoadDeployment"));
       }
       const data = (await res.json()) as { dashboard: DeploymentDashboard };
       setDashboard(data.dashboard);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load");
+      setError(err instanceof Error ? err.message : wb("panels.failedLoad"));
       setDashboard(null);
     } finally {
       setLoading(false);
@@ -75,15 +77,15 @@ export function DeploymentDashboardPanel(props: {
         dashboard?: DeploymentDashboard;
         publicUrl?: string;
       };
-      if (!res.ok) throw new Error(data.error || "Action failed");
+      if (!res.ok) throw new Error(data.error || wb("management.errors.actionFailed"));
       if (data.dashboard) setDashboard(data.dashboard);
       toast.success(
         action === "publish" || action === "republish"
-          ? `Published${data.publicUrl ? `: ${data.publicUrl}` : ""}`
-          : `Deployment: ${action}`,
+          ? wb("panels.publishedToast", { url: data.publicUrl ? `: ${data.publicUrl}` : "" })
+          : wb("panels.deploymentAction", { action }),
       );
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Action failed");
+      toast.error(err instanceof Error ? err.message : wb("management.errors.actionFailed"));
     } finally {
       setBusy(null);
     }
@@ -102,12 +104,12 @@ export function DeploymentDashboardPanel(props: {
         },
       );
       const data = (await res.json()) as { error?: string };
-      if (!res.ok) throw new Error(data.error || "Failed to add domain");
+      if (!res.ok) throw new Error(data.error || wb("panels.failedAddDomain"));
       setHostname("");
-      toast.success("Domain added — configure DNS, then verify.");
+      toast.success(wb("panels.domainAdded"));
       await load();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to add domain");
+      toast.error(err instanceof Error ? err.message : wb("panels.failedAddDomain"));
     } finally {
       setBusy(null);
     }
@@ -129,11 +131,11 @@ export function DeploymentDashboardPanel(props: {
         error?: string;
         domain?: WebsiteDomain;
       };
-      if (!res.ok) throw new Error(data.error || "Verification failed");
-      toast.success(data.domain?.lastCheckMessage || "Verification complete");
+      if (!res.ok) throw new Error(data.error || wb("panels.verificationFailed"));
+      toast.success(data.domain?.lastCheckMessage || wb("panels.verificationComplete"));
       await load();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Verification failed");
+      toast.error(err instanceof Error ? err.message : wb("panels.verificationFailed"));
     } finally {
       setBusy(null);
     }
@@ -153,12 +155,12 @@ export function DeploymentDashboardPanel(props: {
       );
       if (!res.ok) {
         const data = (await res.json()) as { error?: string };
-        throw new Error(data.error || "Remove failed");
+        throw new Error(data.error || wb("panels.removeFailed"));
       }
-      toast.success("Domain removed");
+      toast.success(wb("panels.domainRemoved"));
       await load();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Remove failed");
+      toast.error(err instanceof Error ? err.message : wb("panels.removeFailed"));
     } finally {
       setBusy(null);
     }
@@ -176,7 +178,7 @@ export function DeploymentDashboardPanel(props: {
     return (
       <div className="flex h-[420px] items-center justify-center gap-2 text-white/40">
         <Loader2 className="size-4 animate-spin" />
-        Loading deployment dashboard…
+        {wb("panels.loadingDeployment")}
       </div>
     );
   }
@@ -200,10 +202,10 @@ export function DeploymentDashboardPanel(props: {
         <div>
           <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-premium-gold/25 bg-premium-gold/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-premium-gold">
             <Rocket className="size-3" />
-            Publishing & Domains
+            {wb("panels.publishingDomains")}
           </div>
           <h3 className="text-lg font-bold text-white">
-            {dashboard.projectName || "Website"} deployment
+            {wb("panels.deploymentTitle", { name: dashboard.projectName || wb("labels.website") })}
           </h3>
           <p className="mt-1 max-w-2xl text-[12px] text-white/40">
             Publish instantly, connect custom domains, and track SSL + deployment
@@ -234,48 +236,48 @@ export function DeploymentDashboardPanel(props: {
             ) : (
               <Rocket className="size-4" />
             )}
-            {isPublished ? "Update & republish" : "Publish"}
+            {isPublished ? wb("panels.updateRepublish") : wb("panels.publish")}
           </Button>
         </div>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatTile
-          label="Status"
+          label={wb("panels.status")}
           value={publishing.lifecycleStatus}
           hint={publishing.backendStatus}
         />
         <StatTile
-          label="Website URL"
-          value={dashboard.primaryUrl ? "Ready" : "—"}
-          hint={dashboard.primaryUrl || "Publish to get a public URL"}
+          label={wb("panels.websiteUrl")}
+          value={dashboard.primaryUrl ? wb("panels.ready") : "—"}
+          hint={dashboard.primaryUrl || wb("panels.publishForUrl")}
         />
         <StatTile
-          label="SSL"
+          label={wb("panels.ssl")}
           value={dashboard.sslStatus}
           hint={
             dashboard.sslStatus === "active"
-              ? "Certificate ready"
-              : "Activates after publish / domain verify"
+              ? wb("panels.certificateReady")
+              : wb("panels.certificatePending")
           }
         />
         <StatTile
-          label="Integrations"
+          label={wb("panels.integrations")}
           value={
             [
-              dashboard.analyticsReady ? "Analytics" : null,
-              dashboard.seoAgentReady ? "SEO" : null,
+              dashboard.analyticsReady ? wb("sections.analytics") : null,
+              dashboard.seoAgentReady ? wb("sections.seo") : null,
             ]
               .filter(Boolean)
               .join(" · ") || "—"
           }
-          hint="Connected intelligence systems"
+          hint={wb("panels.connectedSystems")}
         />
       </div>
 
       <DashboardPanel className="p-4 sm:p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h4 className="text-sm font-semibold text-white">Website URL</h4>
+          <h4 className="text-sm font-semibold text-white">{wb("panels.websiteUrl")}</h4>
           {dashboard.primaryUrl ? (
             <a
               href={dashboard.primaryUrl}
@@ -283,22 +285,22 @@ export function DeploymentDashboardPanel(props: {
               rel="noreferrer"
               className="inline-flex items-center gap-1 text-[12px] text-premium-gold hover:underline"
             >
-              Open <ExternalLink className="size-3" />
+              {wb("panels.open")} <ExternalLink className="size-3" />
             </a>
           ) : null}
         </div>
         <div className="mt-3 space-y-2 text-[12px]">
           <UrlRow
-            label="Public path"
-            value={publishing.publicUrl || publishing.publicPath || "Not published"}
+            label={wb("panels.publicPath")}
+            value={publishing.publicUrl || publishing.publicPath || wb("panels.notPublished")}
           />
           <UrlRow
-            label="Subdomain"
-            value={dashboard.subdomainUrl || "Assigns from your username"}
+            label={wb("panels.subdomain")}
+            value={dashboard.subdomainUrl || wb("panels.subdomainHint")}
           />
           <UrlRow
-            label="Custom domain"
-            value={dashboard.customDomainUrl || "None connected"}
+            label={wb("panels.customDomain")}
+            value={dashboard.customDomainUrl || wb("panels.noneConnected")}
           />
         </div>
         {isPublished ? (
@@ -328,7 +330,7 @@ export function DeploymentDashboardPanel(props: {
       <DashboardPanel className="p-4 sm:p-5">
         <div className="mb-3 flex items-center gap-2">
           <Globe2 className="size-4 text-premium-gold" />
-          <h4 className="text-sm font-semibold text-white">Domain settings</h4>
+          <h4 className="text-sm font-semibold text-white">{wb("panels.domainSettings")}</h4>
         </div>
         <p className="mb-3 text-[12px] text-white/40">
           Connect customer.com with CNAME / A records and TXT verification. SSL
@@ -338,7 +340,7 @@ export function DeploymentDashboardPanel(props: {
           <Input
             value={hostname}
             onChange={(e) => setHostname(e.target.value)}
-            placeholder="www.yourdomain.com"
+            placeholder={wb("panels.domainPlaceholder")}
             className="border-white/10 bg-white/5 text-white"
           />
           <Button
@@ -349,7 +351,7 @@ export function DeploymentDashboardPanel(props: {
             {busy === "add-domain" ? (
               <Loader2 className="size-4 animate-spin" />
             ) : null}
-            Connect domain
+            {wb("panels.connectDomain")}
           </Button>
         </div>
 
@@ -374,7 +376,7 @@ export function DeploymentDashboardPanel(props: {
       </DashboardPanel>
 
       <DashboardPanel className="p-4 sm:p-5">
-        <h4 className="text-sm font-semibold text-white">Deployment history</h4>
+        <h4 className="text-sm font-semibold text-white">{wb("panels.deploymentHistory")}</h4>
         <div className="mt-3 space-y-2">
           {dashboard.history.length === 0 ? (
             <p className="text-[12px] text-white/35">No deployment events yet.</p>

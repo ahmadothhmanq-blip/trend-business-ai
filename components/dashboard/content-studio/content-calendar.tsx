@@ -23,6 +23,8 @@ import {
 } from "@/components/dashboard/ui/dashboard-card";
 import { dashboardInputClass, dashboardSelectClass } from "@/components/dashboard/ui/dashboard-styles";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/client";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import {
   CONTENT_CALENDAR_CATEGORIES,
   CONTENT_CALENDAR_STATUSES,
@@ -33,8 +35,8 @@ import {
 } from "@/lib/constants/content-studio";
 import type { CalendarEntry } from "@/types/content";
 
-const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const DAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
+const MONTH_KEYS = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"] as const;
 
 function getDaysInMonth(year: number, month: number) {
   return new Date(year, month + 1, 0).getDate();
@@ -76,6 +78,8 @@ const emptyForm = (date: string): EntryFormData => ({
 });
 
 export function ContentCalendar() {
+  const { t } = useTranslation();
+  const p = useProductT("contentStudio");
   const today = new Date();
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth());
@@ -123,7 +127,7 @@ export function ContentCalendar() {
   };
 
   const handleSave = async () => {
-    if (!form.title.trim()) { toast.error("Title is required"); return; }
+    if (!form.title.trim()) { toast.error(p("errors.titleRequired")); return; }
 
     const payload = {
       title: form.title,
@@ -141,22 +145,22 @@ export function ContentCalendar() {
     try {
       if (editingId) {
         const res = await fetch(`/api/content-studio/calendar/${editingId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-        if (!res.ok) { const d = await res.json(); toast.error(d.error ?? "Update failed"); return; }
-        toast.success("Entry updated");
+        if (!res.ok) { const d = await res.json(); toast.error(d.error ?? p("errors.updateFailed")); return; }
+        toast.success(p("calendar.entryUpdated"));
       } else {
         const res = await fetch("/api/content-studio/calendar", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-        if (!res.ok) { const d = await res.json(); toast.error(d.error ?? "Creation failed"); return; }
-        toast.success("Entry created");
+        if (!res.ok) { const d = await res.json(); toast.error(d.error ?? p("errors.creationFailed")); return; }
+        toast.success(p("calendar.entryCreated"));
       }
       setShowForm(false);
       fetchEntries();
-    } catch { toast.error("Request failed"); }
+    } catch { toast.error(p("errors.requestFailed")); }
   };
 
   const handleDelete = async (id: string) => {
     try {
       await fetch(`/api/content-studio/calendar/${id}`, { method: "DELETE" });
-      toast.success("Deleted");
+      toast.success(p("toasts.deleted"));
       fetchEntries();
     } catch { /* ignore */ }
   };
@@ -179,15 +183,15 @@ export function ContentCalendar() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon-xs" onClick={prevMonth} className="text-white/40 hover:text-white"><ChevronLeft className="size-4" /></Button>
-          <h3 className="min-w-[10rem] text-center text-sm font-bold text-white">{MONTHS[month]} {year}</h3>
+          <h3 className="min-w-[10rem] text-center text-sm font-bold text-white">{p(`calendar.months.${MONTH_KEYS[month]}`)} {year}</h3>
           <Button variant="ghost" size="icon-xs" onClick={nextMonth} className="text-white/40 hover:text-white"><ChevronRight className="size-4" /></Button>
         </div>
         <div className="flex items-center gap-2">
           {(["month", "week"] as const).map((v) => (
-            <button key={v} onClick={() => setView(v)} className={cn("rounded-lg px-3 py-1 text-xs font-medium transition-all", view === v ? "bg-premium-gold/15 text-premium-gold-light" : "text-white/40 hover:bg-white/5 hover:text-white/60")}>{v === "month" ? "Month" : "Week"}</button>
+            <button key={v} onClick={() => setView(v)} className={cn("rounded-lg px-3 py-1 text-xs font-medium transition-all", view === v ? "bg-premium-gold/15 text-premium-gold-light" : "text-white/40 hover:bg-white/5 hover:text-white/60")}>{v === "month" ? p("calendar.month") : p("calendar.week")}</button>
           ))}
           <Button onClick={() => openNewForm(todayStr)} size="sm" className="btn-gold gap-1.5 rounded-lg text-xs font-bold text-luxury-black">
-            <Plus className="size-3" /> Add Entry
+            <Plus className="size-3" /> {p("calendar.addEntry")}
           </Button>
         </div>
       </div>
@@ -195,8 +199,8 @@ export function ContentCalendar() {
       {/* Calendar Grid */}
       <DashboardPanel className="overflow-hidden p-0">
         <div className="grid grid-cols-7">
-          {DAYS.map((d) => (
-            <div key={d} className="border-b border-r border-white/[0.06] bg-white/[0.02] px-2 py-2 text-center text-[10px] font-bold uppercase tracking-wider text-white/30 last:border-r-0">{d}</div>
+          {DAY_KEYS.map((d) => (
+            <div key={d} className="border-b border-r border-white/[0.06] bg-white/[0.02] px-2 py-2 text-center text-[10px] font-bold uppercase tracking-wider text-white/30 last:border-r-0">{p(`calendar.days.${d}`)}</div>
           ))}
         </div>
         <div className="grid grid-cols-7">
@@ -224,7 +228,7 @@ export function ContentCalendar() {
                       </button>
                     );
                   })}
-                  {dayEntries.length > 3 && <span className="block text-[9px] text-white/30">+{dayEntries.length - 3} more</span>}
+                  {dayEntries.length > 3 && <span className="block text-[9px] text-white/30">+{p("calendar.moreEntries", { count: dayEntries.length - 3 })}</span>}
                 </div>
               </div>
             );
@@ -236,8 +240,8 @@ export function ContentCalendar() {
       {entries.length > 0 && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Scheduled Content</DashboardCardTitle>
-            <DashboardCardDescription>{entries.length} entries in {MONTHS[month]}</DashboardCardDescription>
+            <DashboardCardTitle>{p("calendar.scheduledContent")}</DashboardCardTitle>
+            <DashboardCardDescription>{p("calendar.entriesInMonth", { count: entries.length, month: p(`calendar.months.${MONTH_KEYS[month]}`) })}</DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent>
             <div className="space-y-2">
@@ -275,36 +279,36 @@ export function ContentCalendar() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setShowForm(false)}>
           <div className="relative mx-4 w-full max-w-lg rounded-2xl border border-white/10 bg-luxury-black p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-white">{editingId ? "Edit Entry" : "New Calendar Entry"}</h3>
+              <h3 className="font-bold text-white">{editingId ? p("calendar.editEntry") : p("calendar.newEntry")}</h3>
               <Button variant="ghost" size="icon-xs" onClick={() => setShowForm(false)} className="text-white/40 hover:text-white"><X className="size-4" /></Button>
             </div>
 
             <div className="mt-4 space-y-3">
               <div>
-                <label className="mb-1 block text-xs font-medium text-white/60">Title *</label>
-                <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className={dashboardInputClass} placeholder="Content title" />
+                <label className="mb-1 block text-xs font-medium text-white/60"> {p("calendar.titleLabel")}</label>
+                <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className={dashboardInputClass} placeholder={p("placeholders.contentTitle")} />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-white/60">Date *</label>
+                  <label className="mb-1 block text-xs font-medium text-white/60"> {p("calendar.dateLabel")}</label>
                   <Input type="date" value={form.scheduled_date} onChange={(e) => setForm({ ...form, scheduled_date: e.target.value })} className={dashboardInputClass} />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-white/60">Time</label>
+                  <label className="mb-1 block text-xs font-medium text-white/60"> {p("calendar.timeLabel")}</label>
                   <Input type="time" value={form.scheduled_time} onChange={(e) => setForm({ ...form, scheduled_time: e.target.value })} className={dashboardInputClass} />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-white/60">Content Type</label>
+                  <label className="mb-1 block text-xs font-medium text-white/60"> {p("calendar.contentType")}</label>
                   <select value={form.content_type} onChange={(e) => setForm({ ...form, content_type: e.target.value })} className={dashboardSelectClass}>
                     {CONTENT_TYPES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-white/60">Status</label>
+                  <label className="mb-1 block text-xs font-medium text-white/60"> {p("calendar.status")}</label>
                   <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className={dashboardSelectClass}>
                     {CONTENT_CALENDAR_STATUSES.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
                   </select>
@@ -313,39 +317,39 @@ export function ContentCalendar() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-white/60">Category</label>
+                  <label className="mb-1 block text-xs font-medium text-white/60"> {p("calendar.category")}</label>
                   <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className={dashboardSelectClass}>
                     {CONTENT_CALENDAR_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-white/60">Platform</label>
+                  <label className="mb-1 block text-xs font-medium text-white/60"> {p("calendar.platform")}</label>
                   <select value={form.platform} onChange={(e) => setForm({ ...form, platform: e.target.value })} className={dashboardSelectClass}>
-                    <option value="">None</option>
+                    <option value="">{p("calendar.none")}</option>
                     {CONTENT_PLATFORMS.map((p) => <option key={p} value={p}>{p}</option>)}
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="mb-1 block text-xs font-medium text-white/60">Description</label>
-                <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2} className={cn(dashboardInputClass, "resize-none")} placeholder="Brief description..." />
+                <label className="mb-1 block text-xs font-medium text-white/60"> {p("calendar.description")}</label>
+                <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2} className={cn(dashboardInputClass, "resize-none")} placeholder={p("placeholders.briefDescription")} />
               </div>
 
               <div>
-                <label className="mb-1 block text-xs font-medium text-white/60">Tags <span className="text-white/20">(comma-separated)</span></label>
-                <Input value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} className={dashboardInputClass} placeholder="e.g. SEO, Product Launch" />
+                <label className="mb-1 block text-xs font-medium text-white/60"> {p("calendar.tags")} <span className="text-white/20">(comma-separated)</span></label>
+                <Input value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} className={dashboardInputClass} placeholder={p("placeholders.tags")} />
               </div>
 
               <div>
-                <label className="mb-1 block text-xs font-medium text-white/60">Notes</label>
-                <Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={2} className={cn(dashboardInputClass, "resize-none")} placeholder="Internal notes..." />
+                <label className="mb-1 block text-xs font-medium text-white/60"> {p("calendar.notes")}</label>
+                <Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={2} className={cn(dashboardInputClass, "resize-none")} placeholder={p("placeholders.internalNotes")} />
               </div>
             </div>
 
             <div className="mt-5 flex justify-end gap-3">
-              <Button variant="outline" className="rounded-xl border-white/10 text-white/60" onClick={() => setShowForm(false)}>Cancel</Button>
-              <Button onClick={handleSave} className="btn-gold rounded-xl font-bold text-luxury-black">{editingId ? "Save Changes" : "Add Entry"}</Button>
+              <Button variant="outline" className="rounded-xl border-white/10 text-white/60" onClick={() => setShowForm(false)}> {t("common.cancel")}</Button>
+              <Button onClick={handleSave} className="btn-gold rounded-xl font-bold text-luxury-black">{editingId ? p("calendar.saveChanges") : p("calendar.addEntry")}</Button>
             </div>
           </div>
         </div>

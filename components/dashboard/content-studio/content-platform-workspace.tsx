@@ -15,6 +15,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/client";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import { ContentEditor } from "@/components/dashboard/content-studio/content-editor";
 import { ContentTemplatesPanel } from "@/components/dashboard/content-studio/content-templates-panel";
 import type { ContentDocument, ContentProject, ContentVersion } from "@/types/content";
@@ -27,6 +29,8 @@ type Props = {
 };
 
 export function ContentPlatformWorkspace({ initialDocuments = [], initialProjects = [] }: Props) {
+  const { t } = useTranslation();
+  const p = useProductT("contentStudio");
   const [documents, setDocuments] = useState<ContentDocument[]>(initialDocuments);
   const [projects, setProjects] = useState<ContentProject[]>(initialProjects);
   const [brands, setBrands] = useState<BrandOption[]>([]);
@@ -98,7 +102,7 @@ export function ContentPlatformWorkspace({ initialDocuments = [], initialProject
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        title: "Untitled Document",
+        title: p("workspace.untitledDocument"),
         body: "",
         projectId: projectId ?? selectedProjectId ?? undefined,
         status: "draft",
@@ -106,7 +110,7 @@ export function ContentPlatformWorkspace({ initialDocuments = [], initialProject
     });
     const data = await res.json();
     if (!res.ok) {
-      toast.error(data.error ?? "Failed to create document");
+      toast.error(data.error ?? p("errors.createDocumentFailed"));
       return;
     }
     await refreshDocuments();
@@ -114,7 +118,7 @@ export function ContentPlatformWorkspace({ initialDocuments = [], initialProject
   };
 
   const createFolder = async () => {
-    const name = window.prompt("Folder name");
+    const name = window.prompt(p("workspace.folderNamePrompt"));
     if (!name?.trim()) return;
     const res = await fetch("/api/content-studio/projects", {
       method: "POST",
@@ -122,14 +126,14 @@ export function ContentPlatformWorkspace({ initialDocuments = [], initialProject
       body: JSON.stringify({ name: name.trim(), isFolder: true, parentId: selectedProjectId }),
     });
     if (!res.ok) {
-      toast.error("Failed to create folder");
+      toast.error(p("errors.createFolderFailed"));
       return;
     }
     await refreshProjects();
   };
 
   const createProject = async () => {
-    const name = window.prompt("Project name");
+    const name = window.prompt(p("workspace.projectNamePrompt"));
     if (!name?.trim()) return;
     const res = await fetch("/api/content-studio/projects", {
       method: "POST",
@@ -137,7 +141,7 @@ export function ContentPlatformWorkspace({ initialDocuments = [], initialProject
       body: JSON.stringify({ name: name.trim(), isFolder: false }),
     });
     if (!res.ok) {
-      toast.error("Failed to create project");
+      toast.error(p("errors.createProjectFailed"));
       return;
     }
     await refreshProjects();
@@ -176,11 +180,11 @@ export function ContentPlatformWorkspace({ initialDocuments = [], initialProject
     });
     const data = await res.json();
     if (!res.ok) {
-      toast.error(data.error ?? "Restore failed");
+      toast.error(data.error ?? p("errors.restoreFailed"));
       return;
     }
     void openDocument(data.document);
-    toast.success("Version restored");
+    toast.success(p("toasts.versionRestored"));
   };
 
   const folders = useMemo(
@@ -197,7 +201,7 @@ export function ContentPlatformWorkspace({ initialDocuments = [], initialProject
       <aside className="space-y-4 rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
         <div className="flex gap-2">
           <Button size="sm" className="flex-1 rounded-lg" onClick={() => void createDocument()}>
-            <Plus className="mr-1 size-4" /> New Doc
+            <Plus className="mr-1 size-4" /> {p("workspace.newDoc")}
           </Button>
           <Button size="sm" variant="outline" className="rounded-lg border-white/10" onClick={() => void createProject()}>
             Project
@@ -212,7 +216,7 @@ export function ContentPlatformWorkspace({ initialDocuments = [], initialProject
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search documents…"
+            placeholder={p("placeholders.searchDocuments")}
             className="rounded-lg border-white/10 bg-white/5 pl-9 text-sm text-white"
           />
         </div>
@@ -234,7 +238,7 @@ export function ContentPlatformWorkspace({ initialDocuments = [], initialProject
         </div>
 
         <div>
-          <p className="mb-2 text-xs font-medium uppercase tracking-wide text-white/40">Projects</p>
+          <p className="mb-2 text-xs font-medium uppercase tracking-wide text-white/40"> {p("workspace.projects")}</p>
           <div className="space-y-1">
             <button
               type="button"
@@ -244,7 +248,7 @@ export function ContentPlatformWorkspace({ initialDocuments = [], initialProject
                 !selectedProjectId ? "bg-white/10 text-white" : "text-white/50 hover:bg-white/5",
               )}
             >
-              <FolderOpen className="size-4" /> All Documents
+              <FolderOpen className="size-4" /> {p("workspace.allDocuments")}
             </button>
             {projectList.map((p) => (
               <button
@@ -264,7 +268,7 @@ export function ContentPlatformWorkspace({ initialDocuments = [], initialProject
 
         {folders.length > 0 && (
           <div>
-            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-white/40">Folders</p>
+            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-white/40"> {p("workspace.folders")}</p>
             <div className="space-y-1">
               {folders.map((f) => (
                 <button
@@ -281,7 +285,7 @@ export function ContentPlatformWorkspace({ initialDocuments = [], initialProject
         )}
 
         <div>
-          <p className="mb-2 text-xs font-medium uppercase tracking-wide text-white/40">Documents</p>
+          <p className="mb-2 text-xs font-medium uppercase tracking-wide text-white/40"> {p("workspace.documents")}</p>
           <div className="max-h-[320px] space-y-1 overflow-y-auto">
             {documents.map((doc) => (
               <div
@@ -309,7 +313,7 @@ export function ContentPlatformWorkspace({ initialDocuments = [], initialProject
               </div>
             ))}
             {documents.length === 0 && (
-              <p className="px-2 py-4 text-center text-xs text-white/30">No documents yet</p>
+              <p className="px-2 py-4 text-center text-xs text-white/30"> {p("workspace.noDocuments")}</p>
             )}
           </div>
         </div>
@@ -332,7 +336,7 @@ export function ContentPlatformWorkspace({ initialDocuments = [], initialProject
               className="rounded-lg border-white/10"
               onClick={() => setShowHistory((v) => !v)}
             >
-              <History className="mr-1 size-4" /> History
+              <History className="mr-1 size-4" /> {p("workspace.history")}
             </Button>
           )}
           {brands.length > 0 && (
@@ -341,7 +345,7 @@ export function ContentPlatformWorkspace({ initialDocuments = [], initialProject
               onChange={(e) => setBrandId(e.target.value || null)}
               className="h-9 rounded-lg border border-white/10 bg-white/5 px-3 text-sm text-white/70"
             >
-              <option value="">No brand voice</option>
+              <option value="">{p("workspace.noBrandVoice")}</option>
               {brands.map((b) => (
                 <option key={b.id} value={b.id}>{b.brand_name}</option>
               ))}
@@ -355,14 +359,14 @@ export function ContentPlatformWorkspace({ initialDocuments = [], initialProject
               if (!activeDoc) await createDocument();
               setBody(prompt);
               setShowTemplates(false);
-              toast.success(`Template loaded — use AI Studio to generate (${contentTool}/${contentType})`);
+              toast.success(p("toasts.templateLoaded", { tool: contentTool, type: contentType }));
             }}
           />
         )}
 
         {showHistory && activeDoc && (
           <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
-            <p className="mb-3 text-sm font-medium text-white">Version History</p>
+            <p className="mb-3 text-sm font-medium text-white"> {p("workspace.versionHistory")}</p>
             <div className="space-y-2">
               {versions.map((v) => (
                 <div key={v.id} className="flex items-center justify-between rounded-lg border border-white/[0.06] px-3 py-2">
@@ -378,7 +382,7 @@ export function ContentPlatformWorkspace({ initialDocuments = [], initialProject
                   </Button>
                 </div>
               ))}
-              {versions.length === 0 && <p className="text-sm text-white/40">No versions yet</p>}
+              {versions.length === 0 && <p className="text-sm text-white/40"> {p("workspace.noVersions")}</p>}
             </div>
           </div>
         )}
@@ -398,9 +402,9 @@ export function ContentPlatformWorkspace({ initialDocuments = [], initialProject
         ) : (
           <div className="flex min-h-[480px] flex-col items-center justify-center rounded-xl border border-dashed border-white/10 bg-white/[0.02] p-8 text-center">
             <FileText className="size-12 text-white/20" />
-            <p className="mt-4 text-white/50">Select or create a document to start writing</p>
+            <p className="mt-4 text-white/50"> {p("workspace.selectDocument")}</p>
             <Button className="mt-4 rounded-xl" onClick={() => void createDocument()}>
-              <Plus className="mr-2 size-4" /> New Document
+              <Plus className="mr-2 size-4" /> {p("workspace.newDocument")}
             </Button>
           </div>
         )}

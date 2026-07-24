@@ -29,8 +29,8 @@ export type VideoStudioEnvStatus = {
 const ENV_CATALOG: Array<Omit<VideoStudioEnvStatus, "set">> = [
   {
     key: "KLING_API_KEY",
-    required: "optional",
-    description: "Kling AI text/image-to-video generation.",
+    required: "recommended",
+    description: "Kling AI text/image-to-video — primary provider for full renders.",
   },
   {
     key: "RUNWAY_API_KEY",
@@ -140,7 +140,11 @@ export function validateVideoStudioProductionEnv(): {
 
   if (!isVideoProviderKeyConfigured()) {
     warnings.push(
-      "No video provider API key configured — renders will use preview/stub clips.",
+      "No video provider API key configured — full renders use preview/stub clips unless VIDEO_PROVIDER_STRICT=1.",
+    );
+  } else if (!process.env.KLING_API_KEY?.trim()) {
+    warnings.push(
+      "KLING_API_KEY not set — full renders will use Runway/HeyGen/external if configured, not Kling.",
     );
   }
 
@@ -177,18 +181,30 @@ export function validateVideoStudioProductionEnv(): {
 }
 
 export const VIDEO_STUDIO_ENV_DOCS = `# Video Studio production environment
+
+# Primary — full / image-to-video renders (recommended)
 KLING_API_KEY=
-RUNWAY_API_KEY=
-HEYGEN_API_KEY=
-HEYGEN_AVATAR_ID=
-HEYGEN_VOICE_ID=
-VIDEO_PROVIDER_API_KEY=
-VIDEO_PROVIDER_BASE_URL=
-ELEVENLABS_API_KEY=
-ELEVENLABS_VOICE_ID=
-OPENAI_API_KEY=
-FFMPEG_PATH=
-FFPROBE_PATH=
+# KLING_API_BASE_URL=https://api.klingai.com/v1
+
+# Avatar renders only (not used for scene B-roll)
+# HEYGEN_API_KEY=
+# HEYGEN_AVATAR_ID=
+# HEYGEN_VOICE_ID=
+
+# Optional premium / fallback video providers
+# RUNWAY_API_KEY=
+# VIDEO_PROVIDER_API_KEY=
+# VIDEO_PROVIDER_BASE_URL=
+
+# Voice / TTS (full render narration)
+# ELEVENLABS_API_KEY=
+# ELEVENLABS_VOICE_ID=
+# OPENAI_API_KEY=
+
+# Assembly (required for multi-scene merge)
+# FFMPEG_PATH=
+
+# Production hardening — fail instead of stub MP4 on provider errors
 VIDEO_PROVIDER_STRICT=1
-VIDEO_STUDIO_CRON_SECRET=
+# VIDEO_STUDIO_CRON_SECRET=
 `;

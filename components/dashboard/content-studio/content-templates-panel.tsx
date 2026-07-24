@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { FileText, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/client";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import { applyTemplateVariables } from "@/lib/content-studio/templates";
 import type { ContentTemplate, ContentTemplateVariable } from "@/types/content";
 
@@ -17,6 +19,8 @@ type Props = {
 };
 
 export function ContentTemplatesPanel({ onSelect }: Props) {
+  const { t } = useTranslation();
+  const p = useProductT("contentStudio");
   const [templates, setTemplates] = useState<ContentTemplate[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [category, setCategory] = useState<string>("all");
@@ -78,7 +82,7 @@ export function ContentTemplatesPanel({ onSelect }: Props) {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search templates…"
+            placeholder={p("placeholders.searchTemplates")}
             className="rounded-xl border-white/10 bg-white/5 pl-9 text-white"
           />
         </div>
@@ -87,7 +91,7 @@ export function ContentTemplatesPanel({ onSelect }: Props) {
           onChange={(e) => setCategory(e.target.value)}
           className="h-10 rounded-xl border border-white/10 bg-white/5 px-3 text-sm text-white/70"
         >
-          <option value="all">All categories</option>
+          <option value="all">{p("sections.templates")}</option>
           {categories.map((c) => (
             <option key={c} value={c}>{c}</option>
           ))}
@@ -137,14 +141,14 @@ export function ContentTemplatesPanel({ onSelect }: Props) {
               onClick={useTemplate}
               className="rounded-lg bg-premium-gold/20 px-4 py-2 text-sm font-medium text-premium-gold-light"
             >
-              Use Template
+              {p("actions.applyTemplate")}
             </button>
             <button
               type="button"
               onClick={() => setActive(null)}
               className="rounded-lg px-4 py-2 text-sm text-white/50"
             >
-              Cancel
+              {t("common.cancel")}
             </button>
           </div>
         </div>

@@ -187,18 +187,7 @@ export function polishGeneratedProject(params: {
     });
   }
 
-  const isAutomotive =
-    content.industryId === "automotive" ||
-    ids.some((id) =>
-      [
-        "VehicleShowcase",
-        "InventoryGrid",
-        "VehicleDetail",
-        "FinanceCalculator",
-        "AppointmentCalendar",
-        "VehicleComparison",
-      ].includes(id),
-    );
+  const isAutomotive = content.industryId === "automotive";
 
   if (isAutomotive) {
     for (const file of composeAutomotiveSecondaryPages(brand)) {

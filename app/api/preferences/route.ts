@@ -22,6 +22,7 @@ function defaultPreferences(userId: string) {
     user_id: userId,
     theme: "dark" as const,
     email_notifications: true,
+    locale: "en",
   };
 }
 
@@ -66,6 +67,9 @@ export async function PUT(request: Request) {
     user_id: auth.user!.id,
     theme: parsed.data.theme ?? "dark",
     email_notifications: parsed.data.emailNotifications ?? true,
+    ...(parsed.data.locale
+      ? { locale: parsed.data.locale }
+      : {}),
     updated_at: new Date().toISOString(),
   });
 

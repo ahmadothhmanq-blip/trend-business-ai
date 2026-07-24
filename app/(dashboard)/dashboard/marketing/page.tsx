@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { MarketingWorkspace } from "@/components/dashboard/marketing/marketing-workspace";
 import { getMarketingAnalytics } from "@/lib/marketing/analytics";
 import { getMergedCalendar } from "@/lib/marketing/calendar";
@@ -96,9 +96,7 @@ export default async function MarketingPage() {
 
   return (
     <>
-      <DashboardHeader
-        title="AI Marketing Intelligence"
-        description="Campaign planning, personas, analytics, email & ads foundation"
+      <LocalizedDashboardHeader pageId="marketing"
         userEmail={user.email}
         userName={(profile?.full_name as string | undefined) ?? (userMeta.full_name as string | undefined)}
         avatarUrl={profile?.avatar_url as string | undefined}

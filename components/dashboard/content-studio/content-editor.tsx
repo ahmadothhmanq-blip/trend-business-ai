@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/client";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import { countCharacters, countWords } from "@/lib/content-studio/documents";
 import { CONTENT_PLATFORM_STYLES, CONTENT_PLATFORM_TONES } from "@/lib/constants/content-studio";
 import type { ContentActionType } from "@/types/content";
@@ -32,15 +34,15 @@ type Props = {
   className?: string;
 };
 
-const AI_ACTIONS: { action: ContentActionType; label: string }[] = [
-  { action: "improve", label: "Improve" },
-  { action: "rewrite", label: "Rewrite" },
-  { action: "expand", label: "Expand" },
-  { action: "shorten", label: "Shorten" },
-  { action: "summarize", label: "Summarize" },
-  { action: "translate", label: "Translate" },
-  { action: "change_tone", label: "Change Tone" },
-  { action: "change_style", label: "Change Style" },
+const AI_ACTION_KEYS: { action: ContentActionType; key: string }[] = [
+  { action: "improve", key: "editor.improve" },
+  { action: "rewrite", key: "editor.rewrite" },
+  { action: "expand", key: "editor.expand" },
+  { action: "shorten", key: "editor.shorten" },
+  { action: "summarize", key: "editor.summarize" },
+  { action: "translate", key: "editor.translate" },
+  { action: "change_tone", key: "editor.changeTone" },
+  { action: "change_style", key: "editor.changeStyle" },
 ];
 
 export function ContentEditor({
@@ -55,6 +57,8 @@ export function ContentEditor({
   onAutosave,
   className,
 }: Props) {
+  const { t } = useTranslation();
+  const p = useProductT("contentStudio");
   const editorRef = useRef<HTMLDivElement>(null);
   const [aiTone, setAiTone] = useState("Professional");
   const [aiStyle, setAiStyle] = useState("Standard");
@@ -100,7 +104,7 @@ export function ContentEditor({
     const selection = window.getSelection()?.toString().trim();
     const text = selection || body;
     if (!text.trim()) {
-      toast.error("Select text or add content first.");
+      toast.error(p("errors.selectTextFirst"));
       return;
     }
 
@@ -120,7 +124,7 @@ export function ContentEditor({
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Action failed");
+      if (!res.ok) throw new Error(data.error ?? p("errors.actionFailed"));
 
       if (selection && editorRef.current) {
         document.execCommand("insertText", false, data.result);
@@ -129,9 +133,9 @@ export function ContentEditor({
         onBodyChange(data.result);
         scheduleAutosave(title, data.result);
       }
-      toast.success(`${action.replace("_", " ")} complete`);
+      toast.success(p("toasts.actionComplete", { action: action.replace("_", " ") }));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "AI action failed");
+      toast.error(e instanceof Error ? e.message : p("errors.aiActionFailed"));
     } finally {
       setAiBusy(false);
     }
@@ -172,8 +176,8 @@ export function ContentEditor({
           onChange={(e) => setViewMode(e.target.value as "rich" | "markdown")}
           className="h-8 rounded-lg border border-white/10 bg-white/5 px-2 text-xs text-white/70"
         >
-          <option value="rich">Rich Text</option>
-          <option value="markdown">Markdown</option>
+          <option value="rich">{p("editor.richText")}</option>
+          <option value="markdown">{p("editor.markdown")}</option>
         </select>
 
         {onStatusChange && (
@@ -182,22 +186,22 @@ export function ContentEditor({
             onChange={(e) => onStatusChange(e.target.value as "draft" | "published" | "archived")}
             className="h-8 rounded-lg border border-white/10 bg-white/5 px-2 text-xs text-white/70"
           >
-            <option value="draft">Draft</option>
-            <option value="published">Published</option>
-            <option value="archived">Archived</option>
+            <option value="draft">{p("editor.draft")}</option>
+            <option value="published">{p("editor.published")}</option>
+            <option value="archived">{p("editor.archived")}</option>
           </select>
         )}
 
         <div className="ml-auto flex items-center gap-2 text-xs text-white/40">
-          <span>{wordCount} words</span>
-          <span>{charCount} chars</span>
+          <span>{p("editor.wordCount", { count: wordCount })}</span>
+          <span>{p("editor.charCount", { count: charCount })}</span>
         </div>
       </div>
 
       <div className="border-b border-white/[0.06] p-2">
         <div className="flex flex-wrap items-center gap-2">
           <Sparkles className="size-4 text-premium-gold" />
-          {AI_ACTIONS.map(({ action, label }) => (
+          {AI_ACTION_KEYS.map(({ action, key }) => (
             <Button
               key={action}
               type="button"
@@ -207,7 +211,7 @@ export function ContentEditor({
               className="h-7 rounded-lg border-white/10 text-xs text-white/70"
               onClick={() => void runAiAction(action)}
             >
-              {label}
+              {p(key)}
             </Button>
           ))}
           <select
@@ -237,7 +241,7 @@ export function ContentEditor({
           onTitleChange(e.target.value);
           scheduleAutosave(e.target.value, body);
         }}
-        placeholder="Document title"
+        placeholder={p("placeholders.documentTitle")}
         className="border-b border-white/[0.06] bg-transparent px-4 py-3 text-lg font-semibold text-white outline-none placeholder:text-white/30"
       />
 
@@ -257,7 +261,7 @@ export function ContentEditor({
             scheduleAutosave(title, e.target.value);
           }}
           className="min-h-[420px] flex-1 resize-none bg-transparent px-4 py-4 font-mono text-sm leading-relaxed text-white/80 outline-none"
-          placeholder="Write in markdown…"
+          placeholder={p("placeholders.writeMarkdown")}
         />
       )}
     </div>

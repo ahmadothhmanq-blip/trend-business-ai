@@ -1,7 +1,7 @@
 import { requireUser, parseJsonBody, parseUuidParam } from "@/lib/api/helpers";
 import { serverErrorResponse } from "@/lib/api/errors";
-import { persistWebsiteGeneration } from "@/lib/website/save-generation";
-import { applyTemplateIntelligenceRetheme } from "@/lib/ai-core/template-intelligence";
+import { updateWebsiteGenerationInPlace } from "@/lib/website/save-generation";
+import { applyTemplateVisualSwitch } from "@/lib/ai-core/template-intelligence";
 import { extractWebsiteFilesFromBlueprint } from "@/plugins/website/iteration";
 import type { GeneratedWebsiteProject } from "@/plugins/website/types";
 import type { WebsiteGeneration } from "@/types/database";
@@ -19,7 +19,7 @@ const bodySchema = z.object({
 
 /**
  * POST /api/website-builder/[id]/template
- * Switch Template Intelligence visual template without regenerating content/images/pages.
+ * Switch Template Intelligence on the active project — no AI, no new generation row.
  */
 export async function POST(request: Request, context: RouteContext) {
   const { id: rawId } = await context.params;
@@ -76,33 +76,20 @@ export async function POST(request: Request, context: RouteContext) {
       strategy: blueprint.strategy,
       designSystem: blueprint.designSystem,
       assetManifest: blueprint.assetManifest,
+      settings: blueprint.settings,
     };
 
-    const retheme = applyTemplateIntelligenceRetheme({
+    const switched = applyTemplateVisualSwitch({
       project,
       templateId: parsed.data.templateIntelligenceId,
     });
 
-    const saved = await persistWebsiteGeneration({
+    const saved = await updateWebsiteGenerationInPlace({
       supabase: auth.supabase,
       userId: auth.user!.id,
-      project: retheme.project,
-      projectKind: retheme.project.projectKind || "website",
-      existingGenerationId: generation.id,
-      input: {
-        prompt:
-          generation.business_description ||
-          retheme.project.description ||
-          "Template switch",
-        language: "English",
-        theme: `${retheme.template.category} ${retheme.template.designStyle}`,
-        features: [],
-        productId: "website-builder",
-        projectId: generation.project_id || undefined,
-        mode: "continue",
-        parentGenerationId: generation.id,
-        continueInstruction: `[template-intelligence] Apply visual template ${retheme.template.id} without rewriting content.`,
-      },
+      generationId: generation.id,
+      project: switched.project,
+      language: generation.language || "English",
     });
 
     if (!saved.ok) {
@@ -111,8 +98,18 @@ export async function POST(request: Request, context: RouteContext) {
 
     return NextResponse.json({
       ok: true,
-      notes: retheme.notes,
-      template: retheme.template,
+      notes: switched.notes,
+      template: {
+        id: switched.template.id,
+        name: switched.template.name,
+        category: switched.template.category,
+        designPreset: switched.template.designPreset,
+        designStyle: switched.template.designStyle,
+        premiumTemplateId: switched.template.premiumTemplateId,
+        components: switched.template.components,
+        colors: switched.template.colors,
+        typography: switched.template.typography,
+      },
       project: saved.project,
       generation: saved.generation,
     });

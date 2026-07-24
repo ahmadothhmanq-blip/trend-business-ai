@@ -1,19 +1,21 @@
 "use client";
 
 import type { CyberAnalyticsSummary } from "@/types/cyber";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 
 type Props = { summary: CyberAnalyticsSummary };
 
 export function CyberOverview({ summary }: Props) {
+  const wt = useWorkspaceT("cyber");
   const cards = [
-    { label: "Risk Score", value: String(summary.riskScore), color: summary.riskScore > 70 ? "text-rose-400" : summary.riskScore > 40 ? "text-amber-400" : "text-emerald-400" },
-    { label: "Active Threats", value: String(summary.activeThreats) },
-    { label: "Open Vulnerabilities", value: String(summary.openVulnerabilities) },
-    { label: "Open Incidents", value: String(summary.openIncidents) },
-    { label: "Open Alerts", value: String(summary.openAlerts) },
-    { label: "Assets", value: String(summary.assetCount) },
-    { label: "Alerts (24h)", value: String(summary.alertVolume24h) },
-    { label: "Critical Findings", value: String(summary.criticalFindings) },
+    { label: wt("overview.metrics.riskScore"), value: String(summary.riskScore), color: summary.riskScore > 70 ? "text-rose-400" : summary.riskScore > 40 ? "text-amber-400" : "text-emerald-400" },
+    { label: wt("overview.metrics.activeThreats"), value: String(summary.activeThreats) },
+    { label: wt("overview.metrics.openVulnerabilities"), value: String(summary.openVulnerabilities) },
+    { label: wt("overview.metrics.openIncidents"), value: String(summary.openIncidents) },
+    { label: wt("overview.metrics.openAlerts"), value: String(summary.openAlerts) },
+    { label: wt("overview.metrics.assets"), value: String(summary.assetCount) },
+    { label: wt("overview.metrics.alerts24h"), value: String(summary.alertVolume24h) },
+    { label: wt("overview.metrics.criticalFindings"), value: String(summary.criticalFindings) },
   ];
 
   return (

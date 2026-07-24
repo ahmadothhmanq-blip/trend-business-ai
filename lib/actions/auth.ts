@@ -206,6 +206,7 @@ export async function updatePreferences(formData: FormData) {
   const parsed = preferencesSchema.safeParse({
     theme: formData.get("theme") || undefined,
     emailNotifications: formData.get("emailNotifications") === "on",
+    locale: formData.get("locale") || undefined,
   });
 
   if (!parsed.success) {
@@ -216,6 +217,7 @@ export async function updatePreferences(formData: FormData) {
     user_id: user.id,
     theme: parsed.data.theme ?? "dark",
     email_notifications: parsed.data.emailNotifications ?? true,
+    ...(parsed.data.locale ? { locale: parsed.data.locale } : {}),
     updated_at: new Date().toISOString(),
   });
 

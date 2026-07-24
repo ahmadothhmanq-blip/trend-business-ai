@@ -9,17 +9,17 @@ import {
 /* ------------------------------------------------------------------ */
 
 export const AGENT_TYPES: TypeDefinition[] = [
-  { id: "business-startup", label: "Business Startup Agent", icon: Rocket, description: "End-to-end startup planning: idea validation, business plan, branding, website" },
-  { id: "marketing", label: "Marketing Agent", icon: Megaphone, description: "Campaign strategy, ad copy, funnel design, audience targeting" },
-  { id: "content", label: "Content Agent", icon: PenLine, description: "Blog posts, articles, social media content, newsletters" },
-  { id: "seo", label: "SEO Agent", icon: Search, description: "Keyword research, on-page optimization, competitor analysis, technical SEO" },
-  { id: "website", label: "Website Agent", icon: Globe2, description: "Full website generation, landing pages, component architecture" },
-  { id: "video-production", label: "Video Production Agent", icon: Video, description: "Storyboards, scripts, shot lists, production schedules" },
-  { id: "research", label: "Research Agent", icon: Microscope, description: "Market research, competitor analysis, trend reports, data synthesis" },
-  { id: "brand", label: "Brand Agent", icon: Palette, description: "Brand identity, logo concepts, color systems, brand guidelines" },
-  { id: "social-media", label: "Social Media Agent", icon: Smartphone, description: "Content calendar, post generation, engagement strategy" },
-  { id: "analytics", label: "Analytics Agent", icon: BarChart3, description: "Data analysis, KPI tracking, performance reports, insights" },
-  { id: "custom", label: "Custom Agent", icon: Settings2, description: "Build your own agent with custom instructions and tools" },
+  { id: "business-startup", labelKey: "constants.aiAgents.types.business_startup.label", descriptionKey: "constants.aiAgents.types.business_startup.description", label: "Business Startup Agent", icon: Rocket, description: "End-to-end startup planning: idea validation, business plan, branding, website" },
+  { id: "marketing", labelKey: "constants.aiAgents.types.marketing.label", descriptionKey: "constants.aiAgents.types.marketing.description", label: "Marketing Agent", icon: Megaphone, description: "Campaign strategy, ad copy, funnel design, audience targeting" },
+  { id: "content", labelKey: "constants.aiAgents.types.content.label", descriptionKey: "constants.aiAgents.types.content.description", label: "Content Agent", icon: PenLine, description: "Blog posts, articles, social media content, newsletters" },
+  { id: "seo", labelKey: "constants.aiAgents.types.seo.label", descriptionKey: "constants.aiAgents.types.seo.description", label: "SEO Agent", icon: Search, description: "Keyword research, on-page optimization, competitor analysis, technical SEO" },
+  { id: "website", labelKey: "constants.aiAgents.types.website.label", descriptionKey: "constants.aiAgents.types.website.description", label: "Website Agent", icon: Globe2, description: "Full website generation, landing pages, component architecture" },
+  { id: "video-production", labelKey: "constants.aiAgents.types.video_production.label", descriptionKey: "constants.aiAgents.types.video_production.description", label: "Video Production Agent", icon: Video, description: "Storyboards, scripts, shot lists, production schedules" },
+  { id: "research", labelKey: "constants.aiAgents.types.research.label", descriptionKey: "constants.aiAgents.types.research.description", label: "Research Agent", icon: Microscope, description: "Market research, competitor analysis, trend reports, data synthesis" },
+  { id: "brand", labelKey: "constants.aiAgents.types.brand.label", descriptionKey: "constants.aiAgents.types.brand.description", label: "Brand Agent", icon: Palette, description: "Brand identity, logo concepts, color systems, brand guidelines" },
+  { id: "social-media", labelKey: "constants.aiAgents.types.social_media.label", descriptionKey: "constants.aiAgents.types.social_media.description", label: "Social Media Agent", icon: Smartphone, description: "Content calendar, post generation, engagement strategy" },
+  { id: "analytics", labelKey: "constants.aiAgents.types.analytics.label", descriptionKey: "constants.aiAgents.types.analytics.description", label: "Analytics Agent", icon: BarChart3, description: "Data analysis, KPI tracking, performance reports, insights" },
+  { id: "custom", labelKey: "constants.aiAgents.types.custom.label", descriptionKey: "constants.aiAgents.types.custom.description", label: "Custom Agent", icon: Settings2, description: "Build your own agent with custom instructions and tools" },
 ];
 
 /* ------------------------------------------------------------------ */

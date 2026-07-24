@@ -10,11 +10,15 @@ import {
 import {
   listVideoProviders,
   resolvePreferredProviderId,
+  resolveVideoProviderForMode,
   envProviderFlags,
   isStrictVideoProviderMode,
   minimalMp4Bytes,
 } from "@/lib/ai-core/video-production-platform/providers";
-import { isExternalVideoProviderConfigured } from "@/lib/ai-core/video-production-platform/render-engine";
+import {
+  isExternalVideoProviderConfigured,
+  isKlingVideoProviderConfigured,
+} from "@/lib/ai-core/video-production-platform/render-engine";
 import {
   isTtsProviderConfigured,
   resolveTtsProviderId,
@@ -25,6 +29,7 @@ import {
   validateVideoStudioProductionEnv,
   getVideoStudioEnvCatalog,
 } from "@/lib/ai-core/video-production-platform/env-config";
+import { buildProviderHealthReport } from "@/lib/ai-core/video-production-platform/provider-health";
 import { VIDEO_STUDIO_BUCKET } from "@/lib/ai-core/video-production-platform/media-storage";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -76,6 +81,10 @@ export type VideoStudioHealthReport = {
     configured: boolean;
     endpoint: string;
   };
+  providerHealth: Awaited<ReturnType<typeof buildProviderHealthReport>>;
+  fullRenderProvider: string;
+  avatarProvider: string;
+  klingConfigured: boolean;
 };
 
 async function checkDatabaseTables(
@@ -191,12 +200,14 @@ export async function buildVideoStudioHealthReport(
     ffmpeg,
     ffmpegCapabilities,
     renderPipeline,
+    providerHealth,
   ] = await Promise.all([
     checkDatabaseTables(dbClient),
     checkStorageBucket(storageClient),
     probeFfmpegHealth(),
     probeFfmpegCapabilities(),
     smokeRenderPipeline(),
+    buildProviderHealthReport(),
   ]);
 
   const environment = validateVideoStudioProductionEnv();
@@ -208,8 +219,8 @@ export async function buildVideoStudioHealthReport(
     supportsAvatar: p.supportsAvatar,
   }));
 
-  const blockers: string[] = [...environment.blockers];
-  const warnings: string[] = [...environment.warnings];
+  const blockers: string[] = [...environment.blockers, ...providerHealth.blockers];
+  const warnings: string[] = [...environment.warnings, ...providerHealth.warnings];
 
   if (!database.videoMedia || !database.videoRenderJobs) {
     blockers.push(database.message);
@@ -223,11 +234,13 @@ export async function buildVideoStudioHealthReport(
   if (!ffmpegCapabilities.merge) {
     warnings.push("FFmpeg merge/xfade filters unavailable — multi-scene merge degraded.");
   }
+  if (!isKlingVideoProviderConfigured()) {
+    warnings.push("KLING_API_KEY not set — full renders cannot use Kling.");
+  } else if (!providerHealth.fullRenderReady) {
+    warnings.push("Kling key set but full-render lane not ready — check API access.");
+  }
   if (!isTtsProviderConfigured()) {
     warnings.push("TTS provider not configured.");
-  }
-  if (!isExternalVideoProviderConfigured()) {
-    warnings.push("No real video provider configured.");
   }
 
   const readyForProduction =
@@ -236,7 +249,7 @@ export async function buildVideoStudioHealthReport(
     storage.bucketExists &&
     ffmpeg.available &&
     ffmpegCapabilities.merge &&
-    isExternalVideoProviderConfigured() &&
+    providerHealth.fullRenderReady &&
     isTtsProviderConfigured() &&
     isStrictVideoProviderMode();
 
@@ -260,6 +273,10 @@ export async function buildVideoStudioHealthReport(
     videoProviderConfigured: isExternalVideoProviderConfigured(),
     providerFlags: envProviderFlags(),
     strictMode: isStrictVideoProviderMode(),
+    fullRenderProvider: providerHealth.fullRenderProvider,
+    avatarProvider: providerHealth.avatarProvider,
+    klingConfigured: providerHealth.klingConfigured,
+    providerHealth,
     tts: {
       configured: isTtsProviderConfigured(),
       provider: resolveTtsProviderId(),

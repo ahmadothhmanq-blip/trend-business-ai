@@ -12,6 +12,8 @@ export type IndustryId =
 
 export type LayoutStyle =
   | "editorial-hero"
+  | "red-premium"
+  | "minimal-white"
   | "commerce-grid"
   | "product-saas"
   | "property-showcase"

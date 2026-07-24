@@ -4,7 +4,17 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import { CalendarDays, FolderKanban, PenTool } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import type { ContentDocument, ContentGeneration, ContentProject } from "@/types/content";
+
+function WorkspaceLoading({ messageKey }: { messageKey: "loadingWorkspace" | "loadingStudio" | "loadingCalendar" }) {
+  const p = useProductT("contentStudio");
+  return (
+    <div className="rounded-xl border border-white/10 p-8 text-sm text-white/40">
+      {p(`workspace.${messageKey}`)}
+    </div>
+  );
+}
 
 const ContentPlatformWorkspace = dynamic(
   () =>
@@ -12,11 +22,7 @@ const ContentPlatformWorkspace = dynamic(
       (m) => m.ContentPlatformWorkspace,
     ),
   {
-    loading: () => (
-      <div className="rounded-xl border border-white/10 p-8 text-sm text-white/40">
-        Loading workspace…
-      </div>
-    ),
+    loading: () => <WorkspaceLoading messageKey="loadingWorkspace" />,
   },
 );
 
@@ -26,11 +32,7 @@ const ContentStudioTool = dynamic(
       (m) => m.ContentStudioTool,
     ),
   {
-    loading: () => (
-      <div className="rounded-xl border border-white/10 p-8 text-sm text-white/40">
-        Loading studio…
-      </div>
-    ),
+    loading: () => <WorkspaceLoading messageKey="loadingStudio" />,
   },
 );
 
@@ -40,11 +42,7 @@ const ContentCalendar = dynamic(
       (m) => m.ContentCalendar,
     ),
   {
-    loading: () => (
-      <div className="rounded-xl border border-white/10 p-8 text-sm text-white/40">
-        Loading calendar…
-      </div>
-    ),
+    loading: () => <WorkspaceLoading messageKey="loadingCalendar" />,
   },
 );
 
@@ -61,6 +59,7 @@ export function ContentStudioWorkspace({
   initialDocuments,
   initialProjects,
 }: Props) {
+  const p = useProductT("contentStudio");
   const [tab, setTab] = useState<Tab>("workspace");
 
   return (
@@ -68,11 +67,11 @@ export function ContentStudioWorkspace({
       <div className="flex items-center gap-1 rounded-xl border border-white/[0.06] bg-white/[0.02] p-1">
         {(
           [
-            { key: "workspace" as const, label: "Workspace", icon: FolderKanban },
-            { key: "studio" as const, label: "AI Studio", icon: PenTool },
-            { key: "calendar" as const, label: "Calendar", icon: CalendarDays },
+            { key: "workspace" as const, labelKey: "nav.workspace", icon: FolderKanban },
+            { key: "studio" as const, labelKey: "nav.aiStudio", icon: PenTool },
+            { key: "calendar" as const, labelKey: "nav.calendar", icon: CalendarDays },
           ] as const
-        ).map(({ key, label, icon: Icon }) => (
+        ).map(({ key, labelKey, icon: Icon }) => (
           <button
             key={key}
             onClick={() => setTab(key)}
@@ -84,7 +83,7 @@ export function ContentStudioWorkspace({
             )}
           >
             <Icon className="size-4" />
-            {label}
+            {p(labelKey)}
           </button>
         ))}
       </div>

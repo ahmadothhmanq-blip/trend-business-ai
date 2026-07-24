@@ -41,6 +41,8 @@ import {
   type ProjectHistoryItem,
 } from "@/components/dashboard/builder-shared";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/client";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import {
   IMAGE_TYPES,
   IMAGE_STYLES,
@@ -90,6 +92,8 @@ function ImagePreview({
   onRegenerate?: () => void;
   onContinue?: () => void;
 }) {
+  const { t } = useTranslation();
+  const p = useProductT("imageGenerator");
   const bp = gen.blueprint;
   const [tab, setTab] = useState<PreviewTab>("gallery");
 
@@ -97,18 +101,18 @@ function ImagePreview({
     return (
       <DashboardPanel className="py-16 text-center">
         <Sparkles className="mx-auto size-10 text-white/20" />
-        <p className="mt-4 text-white/50">No generated concepts to preview</p>
-        <Button variant="outline" className="mt-4 rounded-xl border-white/10 text-white/60" onClick={onBack}>Back</Button>
+        <p className="mt-4 text-white/50">{p("preview.noImages")}</p>
+        <Button variant="outline" className="mt-4 rounded-xl border-white/10 text-white/60" onClick={onBack}>{t("common.back")}</Button>
       </DashboardPanel>
     );
   }
 
   const tabs: { key: PreviewTab; label: string; show: boolean }[] = [
-    { key: "images", label: `Images (${bp.rasterAssets?.length ?? 0})`, show: (bp.rasterAssets?.length ?? 0) > 0 },
-    { key: "gallery", label: `Concepts (${bp.concepts.length})`, show: bp.concepts.length > 0 },
-    { key: "prompts", label: `Prompts (${bp.promptLibrary.length})`, show: bp.promptLibrary.length > 0 },
-    { key: "mood", label: "Mood Board", show: bp.moodBoard.length > 0 },
-    { key: "files", label: `Files (${bp.files.length})`, show: bp.files.length > 0 },
+    { key: "images", label: p("preview.imagesWithCount", { count: bp.rasterAssets?.length ?? 0 }), show: (bp.rasterAssets?.length ?? 0) > 0 },
+    { key: "gallery", label: p("preview.conceptsWithCount", { count: bp.concepts.length }), show: bp.concepts.length > 0 },
+    { key: "prompts", label: p("preview.promptsWithCount", { count: bp.promptLibrary.length }), show: bp.promptLibrary.length > 0 },
+    { key: "mood", label: p("preview.moodBoard"), show: bp.moodBoard.length > 0 },
+    { key: "files", label: p("preview.files", { count: bp.files.length }), show: bp.files.length > 0 },
   ];
 
   return (
@@ -122,22 +126,22 @@ function ImagePreview({
         <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
           <Link href={`/dashboard/image-generator/${gen.id}/editor`}>
             <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-premium-gold/25 text-xs text-premium-gold-light hover:border-premium-gold/40">
-              <Pencil className="size-3" /> Open Editor
+              <Pencil className="size-3" /> {p("preview.openEditor")}
             </Button>
           </Link>
           {onRegenerate ? (
             <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:border-white/20" onClick={onRegenerate}>
-              <RefreshCw className="size-3" /> Regenerate
+              <RefreshCw className="size-3" /> {p("actions.regenerate")}
             </Button>
           ) : null}
           {onContinue ? (
             <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-premium-gold/20 text-xs text-premium-gold-light hover:border-premium-gold/40" onClick={onContinue}>
-              <Wand2 className="size-3" /> Improve with AI
+              <Wand2 className="size-3" /> {p("actions.improveWithAi")}
             </Button>
           ) : null}
           <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:border-premium-gold/25 hover:text-premium-gold-light"
             onClick={() => window.open(`/api/image-generator/${gen.id}/export?format=zip`, "_blank")}>
-            <Download className="size-3" /> Export ZIP
+            <Download className="size-3" /> {p("preview.exportZip")}
           </Button>
           <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60"
             onClick={async () => {
@@ -147,9 +151,9 @@ function ImagePreview({
               const url = URL.createObjectURL(blob);
               const a = document.createElement("a"); a.href = url;
               a.download = `${bp.title.replace(/\s+/g, "-").toLowerCase()}-images.zip`; a.click();
-              URL.revokeObjectURL(url); toast.success("Image kit downloaded");
+              URL.revokeObjectURL(url); toast.success(p("preview.kitDownloaded"));
             }}>
-            <Download className="size-3" /> Download Kit
+            <Download className="size-3" /> {p("preview.downloadKit")}
           </Button>
         </div>
       </div>
@@ -171,7 +175,7 @@ function ImagePreview({
                   <p className="text-xs text-white/40">{asset.provider} · {asset.format} · {asset.status}</p>
                 </div>
                 {asset.publicUrl ? (
-                  <Button variant="ghost" size="icon-xs" onClick={() => { navigator.clipboard.writeText(asset.publicUrl!); toast.success("URL copied"); }}>
+                  <Button variant="ghost" size="icon-xs" onClick={() => { navigator.clipboard.writeText(asset.publicUrl!); toast.success(p("preview.urlCopied")); }}>
                     <Copy className="size-3" />
                   </Button>
                 ) : null}
@@ -193,7 +197,7 @@ function ImagePreview({
                   <p className="text-xs text-white/40">{c.style} &middot; {c.aspectRatio}</p>
                 </div>
                 {c.prompt && (
-                  <Button variant="ghost" size="icon-xs" className="text-white/30 hover:text-white" onClick={() => { navigator.clipboard.writeText(c.prompt); toast.success("Prompt copied"); }}>
+                  <Button variant="ghost" size="icon-xs" className="text-white/30 hover:text-white" onClick={() => { navigator.clipboard.writeText(c.prompt); toast.success(p("preview.promptCopied")); }}>
                     <Copy className="size-3" />
                   </Button>
                 )}
@@ -202,9 +206,9 @@ function ImagePreview({
               <p className="text-xs leading-relaxed text-white/50">{c.description}</p>
               {c.prompt && (
                 <div className="rounded-lg bg-white/[0.02] p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-white/30">AI Prompt</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-white/30">{p("preview.aiPrompt")}</p>
                   <p className="mt-1 text-xs text-white/60">{c.prompt}</p>
-                  {c.negativePrompt && <p className="mt-1.5 text-[10px] text-red-400/60">Negative: {c.negativePrompt}</p>}
+                  {c.negativePrompt && <p className="mt-1.5 text-[10px] text-red-400/60">{p("preview.negativeLabel")}: {c.negativePrompt}</p>}
                 </div>
               )}
             </DashboardPanel>
@@ -215,23 +219,23 @@ function ImagePreview({
       {/* Prompt Library */}
       {tab === "prompts" && (
         <div className="space-y-3">
-          {bp.promptLibrary.map((p, i) => (
+          {bp.promptLibrary.map((entry, i) => (
             <DashboardPanel key={i} className="space-y-2 p-4">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-semibold text-white/80">{p.name}</p>
-                <Button variant="ghost" size="icon-xs" className="text-white/30 hover:text-white" onClick={() => { navigator.clipboard.writeText(p.prompt); toast.success("Prompt copied"); }}>
+                <p className="text-sm font-semibold text-white/80">{entry.name}</p>
+                <Button variant="ghost" size="icon-xs" className="text-white/30 hover:text-white" onClick={() => { navigator.clipboard.writeText(entry.prompt); toast.success(p("preview.promptCopied")); }}>
                   <Copy className="size-3" />
                 </Button>
               </div>
               <div className="rounded-lg bg-white/[0.02] p-3">
-                <p className="text-xs leading-relaxed text-white/60">{p.prompt}</p>
+                <p className="text-xs leading-relaxed text-white/60">{entry.prompt}</p>
               </div>
-              {p.negativePrompt && (
+              {entry.negativePrompt && (
                 <div className="rounded-lg bg-red-500/5 p-2">
-                  <p className="text-[10px] text-red-400/70">Negative: {p.negativePrompt}</p>
+                  <p className="text-[10px] text-red-400/70">{p("preview.negativeLabel")}: {entry.negativePrompt}</p>
                 </div>
               )}
-              <p className="text-[10px] text-white/30">Style: {p.style}</p>
+              <p className="text-[10px] text-white/30">{p("preview.styleLabel", { value: entry.style })}</p>
             </DashboardPanel>
           ))}
         </div>
@@ -242,7 +246,7 @@ function ImagePreview({
         <DashboardPanel className="space-y-4 p-5">
           <div className="flex items-center gap-2 text-premium-gold-light">
             <BookOpen className="size-4" />
-            <span className="text-xs font-bold uppercase tracking-wider">Mood Board Keywords</span>
+            <span className="text-xs font-bold uppercase tracking-wider">{p("preview.moodBoardKeywords")}</span>
           </div>
           <div className="flex flex-wrap gap-2">
             {bp.moodBoard.map((m, i) => (
@@ -250,7 +254,7 @@ function ImagePreview({
             ))}
           </div>
           <div className="pt-2">
-            <p className="text-xs text-white/40">Color Direction: {bp.colorDirection}</p>
+            <p className="text-xs text-white/40">{p("preview.colorDirection", { value: bp.colorDirection })}</p>
           </div>
         </DashboardPanel>
       )}
@@ -264,7 +268,7 @@ function ImagePreview({
                 <p className="truncate text-xs font-semibold text-white/80">{f.path}</p>
                 <p className="text-[10px] text-white/40">{f.language} &middot; {f.content.length} chars</p>
               </div>
-              <Button variant="ghost" size="icon-xs" className="text-white/30 hover:text-white" onClick={() => { navigator.clipboard.writeText(f.content); toast.success("Copied"); }}>
+              <Button variant="ghost" size="icon-xs" className="text-white/30 hover:text-white" onClick={() => { navigator.clipboard.writeText(f.content); toast.success(p("preview.copied")); }}>
                 <Copy className="size-3" />
               </Button>
             </DashboardPanel>
@@ -299,6 +303,8 @@ function toHistoryItem(gen: ImageGeneration): ProjectHistoryItem {
 /* ------------------------------------------------------------------ */
 
 export function ImageGeneratorTool({ initialGenerations }: Props) {
+  const { t } = useTranslation();
+  const p = useProductT("imageGenerator");
   const [step, setStep] = useState<"type" | "config" | "history" | "generating" | "preview">("type");
   const [selectedType, setSelectedType] = useState("");
   const [prompt, setPrompt] = useState("");
@@ -344,15 +350,15 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
       .catch(() => {});
   }, []);
 
-  const applyTemplate = (t: DesignTemplateDefinition) => {
-    setSelectedTemplate(t.id);
-    setSelectedType(t.imageType);
-    setStyle(t.style);
-    setAspectRatio(t.aspectRatio);
-    setMood(t.mood);
-    setOptions([...t.deliverables]);
+  const applyTemplate = (template: DesignTemplateDefinition) => {
+    setSelectedTemplate(template.id);
+    setSelectedType(template.imageType);
+    setStyle(template.style);
+    setAspectRatio(template.aspectRatio);
+    setMood(template.mood);
+    setOptions([...template.deliverables]);
     setStep("config");
-    toast.message(`Template: ${t.label}`);
+    toast.message(`${t("products.common.templateGallery")}: ${template.label}`);
   };
 
   useEffect(() => { if (step === "history") fetchGenerations(); }, [step, fetchGenerations]);
@@ -370,13 +376,13 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
     if (!selectedType || !prompt.trim()) {
       toast.error(
         mode === "continue"
-          ? "Describe the changes you want in natural language."
-          : "Select an image type and describe your image.",
+          ? p("errors.describeChanges")
+          : p("errors.enterIdeaImage"),
       );
       return;
     }
     setStep("generating");
-    setProgressEvents(["Sending request..."]);
+    setProgressEvents([p("generating.sendingRequest")]);
     try {
       const res = await fetch("/api/image-generator", {
         method: "POST",
@@ -392,11 +398,11 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
         }),
       });
       const d = await res.json();
-      if (!res.ok) { toast.error(d.error ?? "Generation failed"); setStep("config"); return; }
-      toast.success(d.message ?? "Images generated!");
+      if (!res.ok) { toast.error(d.error ?? p("errors.generationFailed")); setStep("config"); return; }
+      toast.success(d.message ?? p("toasts.imagesGenerated"));
       setParentId(null);
       if (d.generation) { setPreviewGen(d.generation); setStep("preview"); } else { setStep("history"); }
-    } catch { toast.error("Request failed."); setStep("config"); }
+    } catch { toast.error(p("errors.requestFailed")); setStep("config"); }
   };
 
   const loadGenerationConfig = (gen: ImageGeneration) => {
@@ -419,7 +425,7 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
     setPrompt("");
     setPreviewGen(null);
     setStep("config");
-    toast.message("Describe your changes in natural language, then click Improve with AI.");
+    toast.message(p("errors.editThenImprove"));
   };
 
   const handleFavorite = async (gen: ImageGeneration) => {
@@ -431,7 +437,7 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
   const handleDelete = async (id: string) => {
     setGenerations((p) => p.filter((g) => g.id !== id));
     await fetch(`/api/image-generator/${id}`, { method: "DELETE" });
-    toast.success("Deleted");
+    toast.success(p("toasts.deleted"));
   };
 
   if (step === "preview" && previewGen) {
@@ -446,7 +452,7 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
   }
 
   if (step === "generating") {
-    return <GenerationProgress title="Creating your images..." subtitle="AI is generating concepts, raster images, prompts, and mood board" events={progressEvents} />;
+    return <GenerationProgress title={p("generating.title")} subtitle={p("generating.subtitle")} events={progressEvents} />;
   }
 
   const optionsByCategory = IMAGE_OPTION_LIST.reduce<Record<string, typeof IMAGE_OPTION_LIST>>((acc, o) => {
@@ -459,7 +465,7 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
     <div className="space-y-6">
       {/* Navigation tabs */}
       <div className="flex gap-2">
-        {([{ key: "type" as const, label: "New Image" }, { key: "history" as const, label: "My Images" }]).map(({ key, label }) => (
+        {([{ key: "type" as const, label: p("nav.newImage") }, { key: "history" as const, label: p("nav.myImages") }]).map(({ key, label }) => (
           <button key={key} onClick={() => setStep(key)} className={cn("rounded-xl px-4 py-2 text-sm font-medium transition-all", step === key || (step === "config" && key === "type") ? "bg-premium-gold/15 text-premium-gold-light" : "text-white/50 hover:bg-white/5 hover:text-white/70")}>{label}</button>
         ))}
       </div>
@@ -470,9 +476,9 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
         <DashboardCard>
           <DashboardCardHeader>
             <DashboardCardTitle className="flex items-center gap-2">
-              <LayoutTemplate className="size-4" /> Template Gallery
+              <LayoutTemplate className="size-4" /> {t("products.common.templateGallery")}
             </DashboardCardTitle>
-            <DashboardCardDescription>Start from social, ad, product, or business templates</DashboardCardDescription>
+            <DashboardCardDescription>{p("steps.templateGalleryDescription")}</DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -500,8 +506,8 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
         </DashboardCard>
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Choose Image Type</DashboardCardTitle>
-            <DashboardCardDescription>Select the type of image you want to generate</DashboardCardDescription>
+            <DashboardCardTitle>{p("steps.chooseImageType")}</DashboardCardTitle>
+            <DashboardCardDescription>{p("steps.chooseImageTypeDescription")}</DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -509,7 +515,7 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
             </div>
             {selectedType && (
               <div className="mt-6 flex justify-end">
-                <Button onClick={() => setStep("config")} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">Configure Image <ArrowRight className="size-4" /></Button>
+                <Button onClick={() => setStep("config")} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">{p("steps.configureImage")} <ArrowRight className="size-4" /></Button>
               </div>
             )}
           </DashboardCardContent>
@@ -524,7 +530,7 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
             <div className="flex items-center gap-3">
               {(() => { const def = getImageType(selectedType); const Icon = def?.icon ?? Sparkles; return (<>
                 <div className="flex size-10 items-center justify-center rounded-xl bg-premium-gold/15 text-premium-gold-light"><Icon className="size-5" /></div>
-                <div><DashboardCardTitle>{def?.label ?? "Custom"} Image</DashboardCardTitle><DashboardCardDescription>Describe your image and configure generation options</DashboardCardDescription></div>
+                <div><DashboardCardTitle>{p("steps.customImage", { type: def?.label ?? t("products.common.custom") })}</DashboardCardTitle><DashboardCardDescription>{p("steps.configureDescription")}</DashboardCardDescription></div>
               </>); })()}
             </div>
           </DashboardCardHeader>
@@ -533,16 +539,12 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
               {/* Prompt */}
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-white/60">
-                  {parentId ? "Describe changes (natural language)" : "Image description *"}
+                  {parentId ? p("steps.describeChanges") : p("steps.imageDescription")}
                 </label>
                 <Textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder={
-                    parentId
-                      ? "Example: Make the lighting warmer, simplify the background, and add more contrast..."
-                      : "Describe the image in detail — subject, scene, colors, composition, lighting, mood..."
-                  }
+                  placeholder={parentId ? p("placeholders.editExample") : p("placeholders.imageBrief")}
                   rows={4}
                   className={cn(dashboardInputClass, "min-h-[100px] resize-none")}
                 />
@@ -550,8 +552,11 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
 
               {/* Negative prompt */}
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-white/60">Negative prompt <span className="text-white/30">(what to exclude)</span></label>
-                <Input value={negativePrompt} onChange={(e) => setNegativePrompt(e.target.value)} placeholder="e.g. blurry, text, watermark, low quality..." className={dashboardInputClass} />
+                <label className="mb-1.5 block text-xs font-medium text-white/60">
+                  {p("steps.negativePrompt")}{" "}
+                  <span className="text-white/30">{t("products.common.negativePromptExclude")}</span>
+                </label>
+                <Input value={negativePrompt} onChange={(e) => setNegativePrompt(e.target.value)} placeholder={p("placeholders.negativePrompt")} className={dashboardInputClass} />
                 <div className="mt-1.5 flex flex-wrap gap-1.5">
                   {IMAGE_NEGATIVE_PRESETS.map((preset) => (
                     <button key={preset.id} type="button" onClick={() => {
@@ -570,19 +575,19 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
               {/* Style, Aspect Ratio, Mood */}
               <div className="grid gap-4 sm:grid-cols-3">
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-white/60">Style</label>
+                  <label className="mb-1.5 block text-xs font-medium text-white/60">{p("labels.style")}</label>
                   <select value={style} onChange={(e) => setStyle(e.target.value)} className={dashboardSelectClass}>
                     {IMAGE_STYLES.map((s) => <option key={s} value={s}>{s}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-white/60">Aspect Ratio</label>
+                  <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.aspectRatio")}</label>
                   <select value={aspectRatio} onChange={(e) => setAspectRatio(e.target.value)} className={dashboardSelectClass}>
                     {IMAGE_ASPECT_RATIOS.map((r) => <option key={r} value={r}>{r}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-white/60">Mood</label>
+                  <label className="mb-1.5 block text-xs font-medium text-white/60">{p("labels.mood")}</label>
                   <select value={mood} onChange={(e) => setMood(e.target.value)} className={dashboardSelectClass}>
                     {IMAGE_MOODS.map((m) => <option key={m} value={m}>{m}</option>)}
                   </select>
@@ -592,15 +597,15 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
               {/* Quality + brand */}
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-white/60">Quality</label>
+                  <label className="mb-1.5 block text-xs font-medium text-white/60">{t("products.common.quality")}</label>
                   <select value={quality} onChange={(e) => setQuality(e.target.value as "standard" | "hd")} className={dashboardSelectClass}>
-                    <option value="standard">Standard</option>
-                    <option value="hd">HD</option>
+                    <option value="standard">{t("products.common.standard")}</option>
+                    <option value="hd">{t("products.common.hd")}</option>
                   </select>
                 </div>
                 <div className="flex items-end">
                   <CheckboxToggle
-                    label="Use my brand identity"
+                    label={p("steps.useBrandIdentity")}
                     checked={useBrand}
                     onChange={setUseBrand}
                   />
@@ -609,27 +614,27 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
 
               {useBrand && (
                 <DashboardPanel className="grid gap-3 p-4 sm:grid-cols-2">
-                  <Input value={brandIdentity.brandName} onChange={(e) => setBrandIdentity((b) => ({ ...b, brandName: e.target.value }))} placeholder="Brand name" className={dashboardInputClass} />
-                  <Input value={brandIdentity.primary} onChange={(e) => setBrandIdentity((b) => ({ ...b, primary: e.target.value }))} placeholder="Primary color" className={dashboardInputClass} />
-                  <Input value={brandIdentity.secondary} onChange={(e) => setBrandIdentity((b) => ({ ...b, secondary: e.target.value }))} placeholder="Secondary color" className={dashboardInputClass} />
-                  <Input value={brandIdentity.accent} onChange={(e) => setBrandIdentity((b) => ({ ...b, accent: e.target.value }))} placeholder="Accent color" className={dashboardInputClass} />
+                  <Input value={brandIdentity.brandName} onChange={(e) => setBrandIdentity((b) => ({ ...b, brandName: e.target.value }))} placeholder={p("placeholders.brandName")} className={dashboardInputClass} />
+                  <Input value={brandIdentity.primary} onChange={(e) => setBrandIdentity((b) => ({ ...b, primary: e.target.value }))} placeholder={p("placeholders.primaryColor")} className={dashboardInputClass} />
+                  <Input value={brandIdentity.secondary} onChange={(e) => setBrandIdentity((b) => ({ ...b, secondary: e.target.value }))} placeholder={p("placeholders.secondaryColor")} className={dashboardInputClass} />
+                  <Input value={brandIdentity.accent} onChange={(e) => setBrandIdentity((b) => ({ ...b, accent: e.target.value }))} placeholder={p("placeholders.accentColor")} className={dashboardInputClass} />
                 </DashboardPanel>
               )}
 
               {/* Batch count */}
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-white/60">Number of variations</label>
+                <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.numberOfVariations")}</label>
                 <div className="flex items-center gap-3">
                   <Button variant="outline" size="icon-xs" className="border-white/10 text-white/40" onClick={() => setBatchCount((c) => Math.max(1, c - 1))} disabled={batchCount <= 1}><Minus className="size-3" /></Button>
                   <span className="min-w-[2ch] text-center text-sm font-bold text-white">{batchCount}</span>
                   <Button variant="outline" size="icon-xs" className="border-white/10 text-white/40" onClick={() => setBatchCount((c) => Math.min(4, c + 1))} disabled={batchCount >= 4}><Plus className="size-3" /></Button>
-                  <span className="text-xs text-white/30">Max 4</span>
+                  <span className="text-xs text-white/30">{t("products.common.maxVariations")}</span>
                 </div>
               </div>
 
               {/* Options by category */}
               <div className="space-y-3">
-                <label className="block text-xs font-medium text-white/60">Options</label>
+                <label className="block text-xs font-medium text-white/60">{t("products.common.options")}</label>
                 {Object.entries(optionsByCategory).map(([cat, items]) => (
                   <div key={cat}>
                     <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-white/30">{cat}</p>
@@ -652,7 +657,7 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
                     setStep("type");
                   }}
                 >
-                  Back
+                  {t("common.back")}
                 </Button>
                 {parentId ? (
                   <Button
@@ -660,11 +665,12 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
                     disabled={!prompt.trim()}
                     className="btn-gold gap-2 rounded-xl font-bold text-luxury-black"
                   >
-                    <Sparkles className="size-4" /> Improve with AI
+                    <Sparkles className="size-4" /> {p("actions.improveWithAi")}
                   </Button>
                 ) : (
                   <Button onClick={() => void handleGenerate()} disabled={!prompt.trim()} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">
-                    <Sparkles className="size-4" /> Generate {batchCount > 1 ? `${batchCount} Images` : "Image"}
+                    <Sparkles className="size-4" />{" "}
+                    {batchCount > 1 ? p("steps.generateImages", { count: batchCount }) : p("steps.generateImage")}
                   </Button>
                 )}
               </div>
@@ -677,11 +683,13 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
       {step === "history" && (
         <>
           <div className="flex items-center gap-3">
-            <div className="relative flex-1"><Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-white/30" /><Input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Search images..." className={cn(dashboardInputClass, "pl-10")} /></div>
-            <span className="text-xs text-white/40">{total} image{total !== 1 ? "s" : ""}</span>
+            <div className="relative flex-1"><Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-white/30" /><Input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder={p("placeholders.searchImages")} className={cn(dashboardInputClass, "pl-10")} /></div>
+            <span className="text-xs text-white/40">
+              {total === 1 ? p("history.count", { count: total }) : p("history.countPlural", { count: total })}
+            </span>
           </div>
           {generations.length === 0 ? (
-            <EmptyHistory noun="images" onNew={() => setStep("type")} />
+            <EmptyHistory noun={p("history.emptyNoun")} item={p("history.emptyItem")} onNew={() => setStep("type")} />
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {generations.map((gen) => {

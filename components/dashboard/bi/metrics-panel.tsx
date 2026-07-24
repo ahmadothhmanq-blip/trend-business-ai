@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { BiMetric } from "@/types/bi";
 import type { BiMetricsSnapshot } from "@/lib/bi/metrics";
 import { DataTableWidget } from "@/components/dashboard/bi/chart-widgets";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 
 type Props = {
   initialMetrics?: BiMetric[];
@@ -11,6 +12,7 @@ type Props = {
 };
 
 export function MetricsPanel({ initialMetrics = [], computed }: Props) {
+  const wt = useWorkspaceT("bi");
   const [metrics, setMetrics] = useState(initialMetrics);
 
   useEffect(() => {
@@ -33,26 +35,26 @@ export function MetricsPanel({ initialMetrics = [], computed }: Props) {
   };
 
   const computedRows: [string, string][] = [
-    ["Revenue", `$${c.revenue.toLocaleString()}`],
-    ["Expenses", `$${c.expenses.toLocaleString()}`],
-    ["Profit", `$${c.profit.toLocaleString()}`],
-    ["Conversion Rate", `${c.conversionRate.toFixed(1)}%`],
-    ["Sales Pipeline", `$${c.pipelineValue.toLocaleString()}`],
-    ["Customer Growth", String(c.customerGrowth)],
-    ["Inventory Value", `$${c.inventoryValue.toLocaleString()}`],
-    ["Marketing ROI", `${c.marketingRoi}%`],
+    [wt("metrics.revenue"), `$${c.revenue.toLocaleString()}`],
+    [wt("metrics.expenses"), `$${c.expenses.toLocaleString()}`],
+    [wt("metrics.profit"), `$${c.profit.toLocaleString()}`],
+    [wt("metrics.conversionRate"), `${c.conversionRate.toFixed(1)}%`],
+    [wt("metrics.salesPipeline"), `$${c.pipelineValue.toLocaleString()}`],
+    [wt("metrics.customerGrowth"), String(c.customerGrowth)],
+    [wt("metrics.inventoryValue"), `$${c.inventoryValue.toLocaleString()}`],
+    [wt("metrics.marketingRoi"), `${c.marketingRoi}%`],
   ];
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <DataTableWidget
-        title="Calculated metrics"
-        columns={["Metric", "Current value"]}
+        title={wt("panels.metrics.calculatedMetrics")}
+        columns={[wt("panels.metrics.metricColumn"), wt("panels.metrics.currentValue")]}
         rows={computedRows}
       />
       <DataTableWidget
-        title="Metric definitions"
-        columns={["Key", "Formula", "Aggregation"]}
+        title={wt("panels.metrics.metricDefinitions")}
+        columns={[wt("panels.metrics.keyColumn"), wt("panels.metrics.formulaColumn"), wt("panels.metrics.aggregationColumn")]}
         rows={metrics.map((m) => [m.key, m.formula, m.aggregation])}
       />
     </div>

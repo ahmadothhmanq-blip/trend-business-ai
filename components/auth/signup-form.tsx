@@ -16,8 +16,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { OfficialLogo } from "@/components/marketing/official-logo";
+import { LanguageSelector } from "@/components/i18n/language-selector";
+import { useTranslation } from "@/lib/i18n/client";
 
 export function SignUpForm() {
+  const { t } = useTranslation();
   const [state, formAction, pending] = useActionState(
     async (_prev: { error?: string } | null, formData: FormData) => {
       return signUp(formData);
@@ -28,12 +31,16 @@ export function SignUpForm() {
   return (
     <Card className="w-full max-w-md border-[rgb(212_175_55/0.2)] bg-[#111111] text-white shadow-[0_24px_80px_rgb(0_0_0/0.45)] backdrop-blur-xl">
       <CardHeader className="text-center">
-        <div className="mx-auto mb-2 flex justify-center">
+        <div className="mx-auto mb-2 flex w-full items-center justify-between gap-2">
+          <div className="flex-1" />
           <OfficialLogo size="md" />
+          <div className="flex flex-1 justify-end">
+            <LanguageSelector variant="compact" />
+          </div>
         </div>
-        <CardTitle className="text-xl text-white">Create your account</CardTitle>
+        <CardTitle className="text-xl text-white">{t("auth.signUpTitle")}</CardTitle>
         <CardDescription className="text-[#B5B5B5]">
-          Start generating business insights with AI
+          {t("auth.signUpSubtitle")}
         </CardDescription>
       </CardHeader>
       <form action={formAction}>
@@ -47,34 +54,34 @@ export function SignUpForm() {
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="fullName">Full name</Label>
+            <Label htmlFor="fullName">{t("auth.fullName")}</Label>
             <Input
               id="fullName"
               name="fullName"
               type="text"
-              placeholder="Jane Doe"
+              placeholder={t("auth.fullNamePlaceholder")}
               required
               autoComplete="name"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t("auth.email")}</Label>
             <Input
               id="email"
               name="email"
               type="email"
-              placeholder="you@company.com"
+              placeholder={t("auth.emailPlaceholder")}
               required
               autoComplete="email"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t("auth.password")}</Label>
             <Input
               id="password"
               name="password"
               type="password"
-              placeholder="Min. 6 characters"
+              placeholder={t("auth.passwordMinPlaceholder")}
               required
               minLength={6}
               autoComplete="new-password"
@@ -86,19 +93,19 @@ export function SignUpForm() {
             {pending ? (
               <>
                 <Loader2 className="size-4 animate-spin" />
-                Creating account...
+                {t("auth.creatingAccount")}
               </>
             ) : (
-              "Create Account"
+              t("auth.createAccountButton")
             )}
           </Button>
           <p className="text-center text-sm text-muted-foreground">
-            Already have an account?{" "}
+            {t("auth.haveAccount")}{" "}
             <Link
               href="/login"
               className="font-medium text-premium-gold hover:underline"
             >
-              Sign in
+              {t("auth.signInLink")}
             </Link>
           </p>
         </CardFooter>

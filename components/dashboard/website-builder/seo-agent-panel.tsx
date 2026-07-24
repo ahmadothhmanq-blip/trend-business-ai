@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import { cn } from "@/lib/utils";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import type { SeoAgentReport } from "@/lib/ai-core/seo-agent";
 import type { GeneratedWebsiteProject } from "@/plugins/website/types";
 import type { WebsiteGeneration } from "@/types/database";
@@ -28,6 +29,7 @@ export function SeoAgentPanel(props: {
     generation: WebsiteGeneration;
   }) => void;
 }) {
+  const wb = useProductT("websiteBuilder");
   const [data, setData] = useState<SeoResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,11 +48,11 @@ export function SeoAgentPanel(props: {
       );
       if (!res.ok) {
         const body = (await res.json()) as { error?: string };
-        throw new Error(body.error || "Failed to load SEO Agent");
+        throw new Error(body.error || wb("panels.failedLoadSeo"));
       }
       setData((await res.json()) as SeoResponse);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load SEO");
+      setError(err instanceof Error ? err.message : wb("panels.failedLoadSeo"));
       setData(null);
     } finally {
       setLoading(false);
@@ -80,7 +82,7 @@ export function SeoAgentPanel(props: {
         project?: GeneratedWebsiteProject;
         generation?: WebsiteGeneration;
       };
-      if (!res.ok) throw new Error(body.error || "Apply failed");
+      if (!res.ok) throw new Error(body.error || wb("panels.applyFailed"));
       if (body.report) {
         setData({
           report: body.report,
@@ -94,7 +96,7 @@ export function SeoAgentPanel(props: {
         });
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Apply failed");
+      setError(err instanceof Error ? err.message : wb("panels.applyFailed"));
     } finally {
       setApplyingId(null);
     }
@@ -103,7 +105,7 @@ export function SeoAgentPanel(props: {
   if (!props.generationId) {
     return (
       <div className="flex h-[420px] items-center justify-center text-sm text-white/40">
-        Generate or select a website to open the AI SEO Agent.
+        {wb("panels.selectWebsiteSeo")}
       </div>
     );
   }
@@ -112,7 +114,7 @@ export function SeoAgentPanel(props: {
     return (
       <div className="flex h-[420px] items-center justify-center gap-2 text-white/40">
         <Loader2 className="size-4 animate-spin" />
-        Running AI SEO Agent…
+        {wb("panels.runningSeoAgent")}
       </div>
     );
   }
@@ -136,10 +138,10 @@ export function SeoAgentPanel(props: {
         <div>
           <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-premium-gold/25 bg-premium-gold/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-premium-gold">
             <SearchCheck className="size-3" />
-            AI SEO Agent
+            {wb("panels.aiSeoAgent")}
           </div>
           <h3 className="text-lg font-bold text-white">
-            {data.projectName || "Website"} SEO intelligence
+            {wb("panels.seoIntelligenceTitle", { name: data.projectName || wb("labels.website") })}
           </h3>
           <p className="mt-1 max-w-2xl text-[12px] text-white/40">
             Google Search, AI Overviews, ChatGPT Search, Gemini, and Perplexity —
@@ -154,11 +156,11 @@ export function SeoAgentPanel(props: {
             onClick={() => void load()}
           >
             {loading ? <Loader2 className="size-4 animate-spin" /> : null}
-            Re-analyze
+            {wb("panels.reAnalyze")}
           </Button>
           <div className="rounded-xl border border-premium-gold/30 bg-premium-gold/10 px-4 py-3 text-center">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-premium-gold">
-              SEO Score
+              {wb("panels.seoScoreLabel")}
             </p>
             <p className="text-2xl font-bold text-white">{report.seoScore}</p>
           </div>
@@ -184,18 +186,18 @@ export function SeoAgentPanel(props: {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <DashboardPanel className="p-4">
-          <h4 className="text-sm font-semibold text-white">Optimized assets</h4>
+          <h4 className="text-sm font-semibold text-white">{wb("panels.optimizedAssets")}</h4>
           <dl className="mt-3 space-y-2 text-[12px]">
             <div>
-              <dt className="text-white/35">SEO title</dt>
+              <dt className="text-white/35">{wb("panels.seoTitle")}</dt>
               <dd className="text-white/80">{optimizer.assets.seoTitle}</dd>
             </div>
             <div>
-              <dt className="text-white/35">Meta description</dt>
+              <dt className="text-white/35">{wb("panels.metaDescription")}</dt>
               <dd className="text-white/70">{optimizer.assets.metaDescription}</dd>
             </div>
             <div>
-              <dt className="text-white/35">Target keywords</dt>
+              <dt className="text-white/35">{wb("panels.targetKeywords")}</dt>
               <dd className="text-white/70">
                 {optimizer.assets.targetKeywords.slice(0, 8).join(" · ")}
               </dd>

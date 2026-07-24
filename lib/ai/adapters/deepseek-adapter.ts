@@ -17,7 +17,7 @@ import { logger } from "@/lib/logger";
 import { withTiming } from "@/lib/perf/timing";
 
 const DEEPSEEK_RETRY_DELAYS_MS = [2000, 4000, 8000, 12000] as const;
-const DEFAULT_MODEL = "deepseek-chat";
+const DEFAULT_MODEL = "deepseek-v4-flash";
 const DEEPSEEK_BASE_URL = "https://api.deepseek.com";
 /** Partial stream body long enough to treat a disconnect as recoverable content. */
 const PARTIAL_STREAM_MIN_CHARS = 80;

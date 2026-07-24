@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import { DashboardShellProvider } from "@/components/dashboard/shell-context";
+import { LocaleSync } from "@/components/i18n/locale-sync";
 import { createClient } from "@/lib/supabase/server";
+import { normalizeLocale } from "@/lib/i18n/config";
 
 export const metadata: Metadata = {
   robots: {
@@ -25,8 +27,15 @@ export default async function DashboardLayout({
     redirect("/login?redirect=/dashboard");
   }
 
+  const { data: preferences } = await supabase
+    .from("user_preferences")
+    .select("locale")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
   return (
     <DashboardShellProvider>
+      <LocaleSync profileLocale={normalizeLocale(preferences?.locale)} />
       <div className="dashboard-shell relative flex min-h-screen bg-[#050505]">
         <div
           className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgb(212_175_55_/_0.07),transparent)]"

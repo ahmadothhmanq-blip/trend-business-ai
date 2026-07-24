@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { IdeasGenerator } from "@/components/dashboard/ideas-generator";
 import type { BusinessIdea } from "@/types/database";
 
@@ -25,9 +25,7 @@ export default async function IdeasPage() {
 
   return (
     <>
-      <DashboardHeader
-        title="Business Ideas"
-        description="Generate AI-powered business ideas tailored to you"
+      <LocalizedDashboardHeader pageId="ideas"
         userEmail={user?.email}
         userName={metadata.full_name as string | undefined}
       />
