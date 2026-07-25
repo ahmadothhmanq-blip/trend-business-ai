@@ -3,6 +3,7 @@
 import { Eye, EyeOff, Lock, Unlock, Copy, Trash2, ChevronUp, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { CanvasLayer } from "@/lib/ai-core/image-design-platform/editor/types";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import { cn } from "@/lib/utils";
 
 export function LayersPanel(props: {
@@ -16,14 +17,17 @@ export function LayersPanel(props: {
   onMove: (id: string, direction: "up" | "down") => void;
   onAddLayer: () => void;
 }) {
+  const pt = useProductT("imageGenerator");
   const sorted = [...props.layers].sort((a, b) => b.zIndex - a.zIndex);
 
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-semibold uppercase tracking-wide text-white/50">Layers</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-white/50">
+          {pt("editor.designEditor.layers")}
+        </p>
         <Button size="sm" variant="outline" className="h-7 rounded-lg border-white/10 text-xs" onClick={props.onAddLayer}>
-          Add
+          {pt("editor.designEditor.addLayer")}
         </Button>
       </div>
       <div className="space-y-1">

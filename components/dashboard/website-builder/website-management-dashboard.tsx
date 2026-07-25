@@ -19,7 +19,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import { cn } from "@/lib/utils";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
-import { useTranslation } from "@/lib/i18n/client";
 import type { CatalogItem, CmsEntry } from "@/lib/ai-core/website-management";
 
 type Tab =
@@ -36,7 +35,6 @@ export function WebsiteManagementDashboard({
 }: {
   generationId: string;
 }) {
-  const { t } = useTranslation();
   const wb = useProductT("websiteBuilder");
   const [tab, setTab] = useState<Tab>("overview");
   const [loading, setLoading] = useState(true);
@@ -223,7 +221,7 @@ export function WebsiteManagementDashboard({
         <div className="grid gap-4 lg:grid-cols-2">
           <DashboardPanel>
             <p className="text-[12px] font-semibold uppercase tracking-wide text-white/40">
-              Pages
+              {wb("management.pages")}
             </p>
             <ul className="mt-3 space-y-2">
               {(data?.structure?.pages || []).map((p) => (
@@ -241,7 +239,7 @@ export function WebsiteManagementDashboard({
           </DashboardPanel>
           <DashboardPanel>
             <p className="text-[12px] font-semibold uppercase tracking-wide text-white/40">
-              Navigation
+              {wb("management.navigation")}
             </p>
             <ul className="mt-3 space-y-2">
               {(data?.structure?.navLinks || []).map((l) => (
@@ -327,7 +325,7 @@ export function WebsiteManagementDashboard({
                       void postAction({ action: "catalog.delete", id: item.id })
                     }
                   >
-                    Delete
+                    {wb("management.delete")}
                   </Button>
                 </div>
               </div>
@@ -394,7 +392,7 @@ export function WebsiteManagementDashboard({
                     void postAction({ action: "cms.delete", id: entry.id })
                   }
                 >
-                  Delete
+                  {wb("management.delete")}
                 </Button>
               </div>
             ))}
@@ -481,10 +479,10 @@ export function WebsiteManagementDashboard({
       {tab === "assistant" ? (
         <DashboardPanel className="space-y-3">
           <p className="text-[12px] font-semibold uppercase tracking-wide text-white/40">
-            AI Website Assistant
+            {wb("management.aiAssistantTitle")}
           </p>
           <p className="text-[12px] text-white/45">
-            Try: “Change signature tasting price to $90” or “Add a new service called Concierge”
+            {wb("management.assistantExamples")}
           </p>
           <Textarea
             value={assistantMsg}
@@ -502,7 +500,7 @@ export function WebsiteManagementDashboard({
             }}
           >
             <Sparkles className="size-4" />
-            Run assistant
+            {wb("management.runAssistant")}
           </Button>
           <ul className="space-y-1 text-[12px] text-white/50">
             {assistantLog.map((line, i) => (
@@ -515,12 +513,12 @@ export function WebsiteManagementDashboard({
       {tab === "quality" ? (
         <DashboardPanel>
           <p className="mb-3 text-[12px] font-semibold uppercase tracking-wide text-white/40">
-            Pre-publish quality
+            {wb("management.prePublishQuality")}
           </p>
           {data?.quality ? (
             <>
               <p className="text-lg text-white">
-                Score {data.quality.score} ·{" "}
+                {wb("management.scoreLabel", { score: data.quality.score })} ·{" "}
                 {data.quality.ready ? wb("management.quality.readyToPublish") : wb("management.quality.blocked")}
               </p>
               <p className="mt-1 text-sm text-white/45">{data.quality.summary}</p>
@@ -542,7 +540,7 @@ export function WebsiteManagementDashboard({
               </div>
             </>
           ) : (
-            <p className="text-sm text-white/40">Run a quality check to see results.</p>
+            <p className="text-sm text-white/40">{wb("management.runQualityCheck")}</p>
           )}
         </DashboardPanel>
       ) : null}

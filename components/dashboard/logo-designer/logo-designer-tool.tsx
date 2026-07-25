@@ -37,6 +37,8 @@ import {
 } from "@/components/dashboard/builder-shared";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n/client";
+import { translateOption } from "@/lib/i18n/product-options";
+import { resolveLabel } from "@/lib/i18n/resolve-constant-label";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
 import {
   LOGO_STYLES,
@@ -63,11 +65,12 @@ type Props = { initialGenerations?: LogoGeneration[] };
 /* ------------------------------------------------------------------ */
 
 function ColorSwatch({ color }: { color: { name: string; hex: string; role: string } }) {
+  const p = useProductT("logoDesigner");
   return (
     <button
       type="button"
       className="group flex items-center gap-3 rounded-lg border border-white/[0.06] bg-white/[0.02] p-2 text-left transition-all hover:border-white/[0.12]"
-      onClick={() => { navigator.clipboard.writeText(color.hex); toast.success(`Copied ${color.hex}`); }}
+      onClick={() => { navigator.clipboard.writeText(color.hex); toast.success(p("preview.colorCopied", { hex: color.hex })); }}
     >
       <div className="size-10 rounded-lg shadow-inner" style={{ backgroundColor: color.hex }} />
       <div>
@@ -95,6 +98,7 @@ function LogoPreview({
   onContinue?: () => void;
 }) {
   const { t } = useTranslation();
+  const p = useProductT("logoDesigner");
   const bp = gen.blueprint;
   const [activeTab, setActiveTab] = useState<"concepts" | "variations" | "colors" | "typography" | "guidelines" | "files">("concepts");
 
@@ -102,19 +106,19 @@ function LogoPreview({
     return (
       <DashboardPanel className="py-16 text-center">
         <Sparkles className="mx-auto size-10 text-white/20" />
-        <p className="mt-4 text-white/50">No generated logo to preview</p>
+        <p className="mt-4 text-white/50">{p("preview.noLogo")}</p>
         <Button variant="outline" className="mt-4 rounded-xl border-white/10 text-white/60" onClick={onBack}>{t("common.back")}</Button>
       </DashboardPanel>
     );
   }
 
   const tabs = [
-    { key: "concepts" as const, label: "Concepts" },
-    { key: "variations" as const, label: "Variations" },
-    { key: "colors" as const, label: "Colors" },
-    { key: "typography" as const, label: "Typography" },
-    { key: "guidelines" as const, label: "Guidelines" },
-    { key: "files" as const, label: "Files" },
+    { key: "concepts" as const, label: p("preview.concepts") },
+    { key: "variations" as const, label: p("preview.variations") },
+    { key: "colors" as const, label: p("preview.colors") },
+    { key: "typography" as const, label: p("preview.typography") },
+    { key: "guidelines" as const, label: p("preview.guidelines") },
+    { key: "files" as const, label: p("preview.files") },
   ];
 
   return (
@@ -123,17 +127,17 @@ function LogoPreview({
         <Button variant="ghost" size="icon-xs" onClick={onBack} className="text-white/40 hover:text-white"><ArrowLeft className="size-4" /></Button>
         <div>
           <h3 className="font-bold text-white">{bp.title}</h3>
-          <p className="text-xs text-white/40">{bp.logoStyle} &middot; {gen.provider ?? "deepseek"} &middot; {gen.generation_time_ms ? `${(gen.generation_time_ms / 1000).toFixed(1)}s` : "N/A"}</p>
+          <p className="text-xs text-white/40">{bp.logoStyle} &middot; {gen.provider ?? "deepseek"} &middot; {gen.generation_time_ms ? `${(gen.generation_time_ms / 1000).toFixed(1)}s` : p("preview.notAvailable")}</p>
         </div>
         <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
           {onRegenerate ? (
             <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:border-white/20" onClick={onRegenerate}>
-              <RefreshCw className="size-3" /> Regenerate
+              <RefreshCw className="size-3" /> {p("actions.regenerate")}
             </Button>
           ) : null}
           {onContinue ? (
             <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-premium-gold/20 text-xs text-premium-gold-light hover:border-premium-gold/40" onClick={onContinue}>
-              <Wand2 className="size-3" /> Improve with AI
+              <Wand2 className="size-3" /> {p("actions.improveWithAi")}
             </Button>
           ) : null}
           <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:border-premium-gold/25 hover:text-premium-gold-light"
@@ -144,9 +148,9 @@ function LogoPreview({
               const url = URL.createObjectURL(blob);
               const a = document.createElement("a"); a.href = url;
               a.download = `${bp.title.replace(/\s+/g, "-").toLowerCase()}-logo.zip`; a.click();
-              URL.revokeObjectURL(url); toast.success("Logo kit downloaded");
+              URL.revokeObjectURL(url); toast.success(p("toasts.kitDownloaded"));
             }}>
-            <Download className="size-3" /> Download Kit
+            <Download className="size-3" /> {p("preview.downloadKit")}
           </Button>
         </div>
       </div>
@@ -179,7 +183,7 @@ function LogoPreview({
             ))}
           </div>
         ) : (
-          <DashboardPanel className="py-10 text-center"><p className="text-sm text-white/40">No variations were requested</p></DashboardPanel>
+          <DashboardPanel className="py-10 text-center"><p className="text-sm text-white/40">{p("preview.noVariations")}</p></DashboardPanel>
         )
       )}
 
@@ -194,14 +198,14 @@ function LogoPreview({
           <div className="flex items-center gap-3">
             <Type className="size-5 text-premium-gold-light" />
             <div>
-              <p className="text-sm font-semibold text-white">Primary: {bp.typography.primary}</p>
-              <p className="text-xs text-white/40">Secondary: {bp.typography.secondary}</p>
+              <p className="text-sm font-semibold text-white">{p("preview.primaryTypography", { font: bp.typography.primary })}</p>
+              <p className="text-xs text-white/40">{p("preview.secondaryTypography", { font: bp.typography.secondary })}</p>
             </div>
           </div>
           {bp.typography.notes && <p className="text-xs text-white/50">{bp.typography.notes}</p>}
           <div className="space-y-3 pt-2">
             <p style={{ fontFamily: `"${bp.typography.primary}", sans-serif` }} className="text-3xl font-bold text-white">{bp.title}</p>
-            <p style={{ fontFamily: `"${bp.typography.secondary}", serif` }} className="text-lg text-white/60">The quick brown fox jumps over the lazy dog</p>
+            <p style={{ fontFamily: `"${bp.typography.secondary}", serif` }} className="text-lg text-white/60">{p("preview.typeSample")}</p>
           </div>
         </DashboardPanel>
       )}
@@ -213,7 +217,7 @@ function LogoPreview({
               <pre className="whitespace-pre-wrap text-xs leading-relaxed text-white/70">{bp.guidelines}</pre>
             </div>
           ) : (
-            <p className="text-sm text-white/40">No guidelines were generated</p>
+            <p className="text-sm text-white/40">{p("preview.noGuidelines")}</p>
           )}
         </DashboardPanel>
       )}
@@ -224,14 +228,14 @@ function LogoPreview({
             <DashboardPanel key={i} className="flex items-center justify-between gap-3 p-3">
               <div>
                 <p className="text-xs font-semibold text-white/80">{f.path}</p>
-                <p className="text-[10px] text-white/40">{f.language} &middot; {f.content.length} chars</p>
+                <p className="text-[10px] text-white/40">{f.language} &middot; {f.content.length} {p("preview.chars")}</p>
               </div>
-              <Button variant="ghost" size="icon-xs" className="text-white/30 hover:text-white" onClick={() => { navigator.clipboard.writeText(f.content); toast.success("Copied"); }}>
+              <Button variant="ghost" size="icon-xs" className="text-white/30 hover:text-white" onClick={() => { navigator.clipboard.writeText(f.content); toast.success(p("preview.copied")); }}>
                 <Copy className="size-3" />
               </Button>
             </DashboardPanel>
           ))}
-          {bp.files.length === 0 && <DashboardPanel className="py-10 text-center"><p className="text-sm text-white/40">No files generated</p></DashboardPanel>}
+          {bp.files.length === 0 && <DashboardPanel className="py-10 text-center"><p className="text-sm text-white/40">{p("preview.noFiles")}</p></DashboardPanel>}
         </div>
       )}
     </div>
@@ -309,15 +313,15 @@ export function LogoDesignerTool({ initialGenerations }: Props) {
   ) => {
     if (mode === "continue") {
       if (!prompt.trim()) {
-        toast.error("Describe the changes you want in natural language.");
+        toast.error(p("errors.describeChanges"));
         return;
       }
     } else if (!selectedStyle || !prompt.trim() || !brandName.trim()) {
-      toast.error("Enter your brand name, select a style, and describe your logo.");
+      toast.error(p("errors.enterBrandDetails"));
       return;
     }
     setStep("generating");
-    setProgressEvents(["Sending request..."]);
+    setProgressEvents([p("generating.sendingRequest")]);
     try {
       const res = await fetch("/api/logo-designer", {
         method: "POST",
@@ -329,11 +333,11 @@ export function LogoDesignerTool({ initialGenerations }: Props) {
         }),
       });
       const d = await res.json();
-      if (!res.ok) { toast.error(d.error ?? "Generation failed"); setStep("config"); return; }
-      toast.success(d.message ?? "Logo designed!");
+      if (!res.ok) { toast.error(d.error ?? p("errors.generationFailed")); setStep("config"); return; }
+      toast.success(d.message ?? p("toasts.logoDesigned"));
       setParentId(null);
       if (d.generation) { setPreviewGen(d.generation); setStep("preview"); } else { setStep("history"); }
-    } catch { toast.error("Request failed."); setStep("config"); }
+    } catch { toast.error(p("errors.requestFailed")); setStep("config"); }
   };
 
   const loadGenerationConfig = (gen: LogoGeneration) => {
@@ -357,7 +361,7 @@ export function LogoDesignerTool({ initialGenerations }: Props) {
     setPrompt("");
     setPreviewGen(null);
     setStep("config");
-    toast.message("Describe your changes in natural language, then click Improve with AI.");
+    toast.message(p("errors.editThenImprove"));
   };
 
   const handleFavorite = async (gen: LogoGeneration) => {
@@ -369,7 +373,7 @@ export function LogoDesignerTool({ initialGenerations }: Props) {
   const handleDelete = async (id: string) => {
     setGenerations((p) => p.filter((g) => g.id !== id));
     await fetch(`/api/logo-designer/${id}`, { method: "DELETE" });
-    toast.success("Deleted");
+    toast.success(p("toasts.deleted"));
   };
 
   if (step === "preview" && previewGen) {
@@ -384,14 +388,14 @@ export function LogoDesignerTool({ initialGenerations }: Props) {
   }
 
   if (step === "generating") {
-    return <GenerationProgress title="Designing your logo..." subtitle="AI is creating concepts, variations, and brand guidelines" events={progressEvents} />;
+    return <GenerationProgress title={p("generating.title")} subtitle={p("generating.subtitle")} events={progressEvents} />;
   }
 
   return (
     <div className="space-y-6">
       {/* Navigation tabs */}
       <div className="flex gap-2">
-        {([{ key: "style" as const, label: "New Logo" }, { key: "history" as const, label: "My Logos" }]).map(({ key, label }) => (
+        {([{ key: "style" as const, label: p("nav.newLogo") }, { key: "history" as const, label: p("nav.myLogos") }]).map(({ key, label }) => (
           <button key={key} onClick={() => setStep(key)} className={cn("rounded-xl px-4 py-2 text-sm font-medium transition-all", step === key || (step === "config" && key === "style") ? "bg-premium-gold/15 text-premium-gold-light" : "text-white/50 hover:bg-white/5 hover:text-white/70")}>{label}</button>
         ))}
       </div>
@@ -400,8 +404,8 @@ export function LogoDesignerTool({ initialGenerations }: Props) {
       {step === "style" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Choose Logo Style</DashboardCardTitle>
-            <DashboardCardDescription>Select the visual direction for your logo design</DashboardCardDescription>
+            <DashboardCardTitle>{p("steps.chooseLogoStyle")}</DashboardCardTitle>
+            <DashboardCardDescription>{p("steps.chooseLogoStyleDescription")}</DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -409,7 +413,7 @@ export function LogoDesignerTool({ initialGenerations }: Props) {
             </div>
             {selectedStyle && (
               <div className="mt-6 flex justify-end">
-                <Button onClick={() => setStep("config")} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">Configure Logo <ArrowRight className="size-4" /></Button>
+                <Button onClick={() => setStep("config")} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">{p("steps.configureLogo")} <ArrowRight className="size-4" /></Button>
               </div>
             )}
           </DashboardCardContent>
@@ -423,7 +427,7 @@ export function LogoDesignerTool({ initialGenerations }: Props) {
             <div className="flex items-center gap-3">
               {(() => { const def = getLogoStyle(selectedStyle); const Icon = def?.icon ?? Sparkles; return (<>
                 <div className="flex size-10 items-center justify-center rounded-xl bg-premium-gold/15 text-premium-gold-light"><Icon className="size-5" /></div>
-                <div><DashboardCardTitle>{def?.label ?? "Custom"} Logo</DashboardCardTitle><DashboardCardDescription>Configure your brand details and logo preferences</DashboardCardDescription></div>
+                <div><DashboardCardTitle>{p("steps.customLogo", { type: def?.label ?? t("common.create") })}</DashboardCardTitle><DashboardCardDescription>{p("steps.configureDescription")}</DashboardCardDescription></div>
               </>); })()}
             </div>
           </DashboardCardHeader>
@@ -432,14 +436,14 @@ export function LogoDesignerTool({ initialGenerations }: Props) {
               {/* Brand name + Industry */}
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-white/60">Brand Name *</label>
-                  <Input value={brandName} onChange={(e) => setBrandName(e.target.value)} placeholder="e.g. Trend Business" className={dashboardInputClass} />
+                  <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.brandName")}</label>
+                  <Input value={brandName} onChange={(e) => setBrandName(e.target.value)} placeholder={p("placeholders.brandName")} className={dashboardInputClass} />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-white/60">Industry</label>
+                  <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.industry")}</label>
                   <select value={industry} onChange={(e) => setIndustry(e.target.value)} className={dashboardSelectClass}>
-                    <option value="">Select industry</option>
-                    {LOGO_INDUSTRIES.map((i) => <option key={i} value={i}>{i}</option>)}
+                    <option value="">{p("steps.selectIndustry")}</option>
+                    {LOGO_INDUSTRIES.map((i) => <option key={i} value={i}>{translateOption(t, "constants.logoDesigner.industries", i)}</option>)}
                   </select>
                 </div>
               </div>
@@ -447,16 +451,12 @@ export function LogoDesignerTool({ initialGenerations }: Props) {
               {/* Prompt */}
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-white/60">
-                  {parentId ? "Describe changes (natural language)" : "Describe your vision *"}
+                  {parentId ? p("steps.describeChanges") : p("steps.describeVision")}
                 </label>
                 <Textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder={
-                    parentId
-                      ? "Example: Make the icon bolder, switch to a warmer palette, and add a horizontal lockup variation..."
-                      : "Describe what your brand does, the feeling the logo should convey, any symbols or imagery you envision..."
-                  }
+                  placeholder={parentId ? p("placeholders.editExample") : p("placeholders.logoBrief")}
                   rows={4}
                   className={cn(dashboardInputClass, "min-h-[100px] resize-none")}
                 />
@@ -465,35 +465,35 @@ export function LogoDesignerTool({ initialGenerations }: Props) {
               {/* Style selectors */}
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-white/60">Color Palette</label>
+                  <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.colorPalette")}</label>
                   <select value={colorPalette} onChange={(e) => setColorPalette(e.target.value)} className={dashboardSelectClass}>
-                    {LOGO_COLOR_PALETTES.map((c) => <option key={c} value={c}>{c}</option>)}
+                    {LOGO_COLOR_PALETTES.map((c) => <option key={c} value={c}>{translateOption(t, "constants.logoDesigner.colorPalettes", c)}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-white/60">Icon Style</label>
+                  <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.iconStyle")}</label>
                   <select value={iconStyle} onChange={(e) => setIconStyle(e.target.value)} className={dashboardSelectClass}>
-                    {LOGO_ICON_STYLES.map((s) => <option key={s} value={s}>{s}</option>)}
+                    {LOGO_ICON_STYLES.map((s) => <option key={s} value={s}>{translateOption(t, "constants.logoDesigner.iconStyles", s)}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-white/60">Typography</label>
+                  <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.typography")}</label>
                   <select value={typography} onChange={(e) => setTypography(e.target.value)} className={dashboardSelectClass}>
-                    {LOGO_TYPOGRAPHY_OPTIONS.map((t) => <option key={t} value={t}>{t}</option>)}
+                    {LOGO_TYPOGRAPHY_OPTIONS.map((opt) => <option key={opt} value={opt}>{translateOption(t, "constants.logoDesigner.typography", opt)}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-white/60">Brand Personality</label>
+                  <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.brandPersonality")}</label>
                   <select value={personality} onChange={(e) => setPersonality(e.target.value)} className={dashboardSelectClass}>
-                    {LOGO_BRAND_PERSONALITIES.map((p) => <option key={p} value={p}>{p}</option>)}
+                    {LOGO_BRAND_PERSONALITIES.map((pers) => <option key={pers} value={pers}>{translateOption(t, "constants.logoDesigner.personalities", pers)}</option>)}
                   </select>
                 </div>
               </div>
 
               {/* Deliverables */}
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-white/60">Deliverables &amp; Variations</label>
-                <div className="flex flex-wrap gap-2">{LOGO_OPTION_LIST.map(({ id, label }) => <CheckboxToggle key={id} label={label} checked={options.includes(id)} onChange={(c) => setOptions((p) => c ? [...p, id] : p.filter((o) => o !== id))} />)}</div>
+                <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.deliverables")}</label>
+                <div className="flex flex-wrap gap-2">{LOGO_OPTION_LIST.map((opt) => <CheckboxToggle key={opt.id} label={resolveLabel(t, opt)} checked={options.includes(opt.id)} onChange={(c) => setOptions((p) => c ? [...p, opt.id] : p.filter((o) => o !== opt.id))} />)}</div>
               </div>
 
               {/* Actions */}
@@ -506,7 +506,7 @@ export function LogoDesignerTool({ initialGenerations }: Props) {
                     setStep("style");
                   }}
                 >
-                  Back
+                  {t("common.back")}
                 </Button>
                 {parentId ? (
                   <Button
@@ -514,11 +514,11 @@ export function LogoDesignerTool({ initialGenerations }: Props) {
                     disabled={!prompt.trim()}
                     className="btn-gold gap-2 rounded-xl font-bold text-luxury-black"
                   >
-                    <Sparkles className="size-4" /> Improve with AI
+                    <Sparkles className="size-4" /> {p("actions.improveWithAi")}
                   </Button>
                 ) : (
                   <Button onClick={() => void handleGenerate()} disabled={!prompt.trim() || !brandName.trim()} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">
-                    <Sparkles className="size-4" /> Generate Logo
+                    <Sparkles className="size-4" /> {p("steps.generateLogo")}
                   </Button>
                 )}
               </div>
@@ -531,11 +531,11 @@ export function LogoDesignerTool({ initialGenerations }: Props) {
       {step === "history" && (
         <>
           <div className="flex items-center gap-3">
-            <div className="relative flex-1"><Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-white/30" /><Input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Search logos..." className={cn(dashboardInputClass, "pl-10")} /></div>
-            <span className="text-xs text-white/40">{total} logo{total !== 1 ? "s" : ""}</span>
+            <div className="relative flex-1"><Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-white/30" /><Input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder={p("placeholders.searchLogos")} className={cn(dashboardInputClass, "pl-10")} /></div>
+            <span className="text-xs text-white/40">{total === 1 ? p("history.count", { count: total }) : p("history.countPlural", { count: total })}</span>
           </div>
           {generations.length === 0 ? (
-            <EmptyHistory noun="logos" onNew={() => setStep("style")} />
+            <EmptyHistory noun={p("history.emptyNoun")} onNew={() => setStep("style")} />
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {generations.map((gen) => {

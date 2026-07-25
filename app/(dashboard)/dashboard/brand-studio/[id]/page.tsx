@@ -4,6 +4,7 @@ import { DashboardHeader } from "@/components/dashboard/header";
 import { BrandManagementDashboard } from "@/components/dashboard/brand-identity/brand-management-dashboard";
 import type { BrandIdentityGeneration } from "@/types/brand-identity";
 import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
+import { getServerTranslator } from "@/lib/i18n/server";
 
 export async function generateMetadata() {
   return dashboardPageMetadata("brandWorkspace");
@@ -13,6 +14,7 @@ type Props = { params: Promise<{ id: string }> };
 
 export default async function BrandStudioWorkspacePage({ params }: Props) {
   const { id } = await params;
+  const { t } = await getServerTranslator();
   const supabase = await createClient();
   const {
     data: { user },
@@ -42,7 +44,7 @@ export default async function BrandStudioWorkspacePage({ params }: Props) {
     <>
       <DashboardHeader
         title={gen.brand_name}
-        description="Brand management workspace"
+        description={t("pages.brandWorkspace.headerDescription")}
         userEmail={user.email}
         userName={(profile?.full_name as string | undefined) ?? (userMeta.full_name as string | undefined)}
         avatarUrl={profile?.avatar_url as string | undefined}

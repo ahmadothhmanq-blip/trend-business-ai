@@ -10,6 +10,9 @@ import {
 } from "lucide-react";
 import type { AIWorkspaceConfig } from "@/lib/workspace/metadata";
 
+/** Workspace catalog — localized via `workspaces.aiWorkspaces.*` keys at runtime. */
+export const I18N_CATALOG = true as const;
+
 export const AI_WORKSPACES = {
   brandDesigner: {
     title: "AI Brand Designer",

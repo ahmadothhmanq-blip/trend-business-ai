@@ -4,6 +4,7 @@ import { DashboardHeader } from "@/components/dashboard/header";
 import { DesignEditor } from "@/components/dashboard/image-generator/design-editor";
 import type { ImageGeneration } from "@/types/image-generation";
 import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
+import { getServerTranslator } from "@/lib/i18n/server";
 
 export async function generateMetadata() {
   return dashboardPageMetadata("designEditor");
@@ -13,6 +14,7 @@ type Props = { params: Promise<{ id: string }> };
 
 export default async function ImageGeneratorEditorPage({ params }: Props) {
   const { id } = await params;
+  const { t } = await getServerTranslator();
   const supabase = await createClient();
   const {
     data: { user },
@@ -41,8 +43,8 @@ export default async function ImageGeneratorEditorPage({ params }: Props) {
   return (
     <>
       <DashboardHeader
-        title={`Edit: ${gen.image_name}`}
-        description="Professional AI design editor"
+        title={t("pages.designEditor.headerTitle", { name: gen.image_name })}
+        description={t("pages.designEditor.headerDescription")}
         userEmail={user.email}
         userName={(profile?.full_name as string | undefined) ?? (userMeta.full_name as string | undefined)}
         avatarUrl={profile?.avatar_url as string | undefined}

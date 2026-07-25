@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Check, Loader2, Palette } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import type { BrandKitOption } from "@/lib/ai-core/image-design-platform/brand-kit";
 import { brandKitFromGenerationRow } from "@/lib/ai-core/image-design-platform/brand-kit";
 
@@ -12,6 +13,7 @@ export function BrandKitPicker(props: {
   onSelect: (kit: BrandKitOption | null) => void;
   onApply: (kit: BrandKitOption) => void;
 }) {
+  const p = useProductT("imageGenerator");
   const [kits, setKits] = useState<BrandKitOption[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -19,7 +21,7 @@ export function BrandKitPicker(props: {
     setLoading(true);
     try {
       const res = await fetch("/api/brand-identity");
-      if (!res.ok) throw new Error("Failed to load brand kits");
+      if (!res.ok) throw new Error(p("editor.brandKitPicker.loadFailed"));
       const data = (await res.json()) as {
         generations?: Array<{ id: string; brand_name?: string; blueprint?: unknown }>;
       };
@@ -29,7 +31,7 @@ export function BrandKitPicker(props: {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [p]);
 
   useEffect(() => {
     void load();
@@ -38,18 +40,18 @@ export function BrandKitPicker(props: {
   if (loading) {
     return (
       <div className="flex items-center gap-2 text-xs text-white/40">
-        <Loader2 className="size-3 animate-spin" /> Loading brand kits…
+        <Loader2 className="size-3 animate-spin" /> {p("editor.brandKitPicker.loading")}
       </div>
     );
   }
 
   if (!kits.length) {
-    return <p className="text-xs text-white/40">No brand kits found. Create one in Brand Studio first.</p>;
+    return <p className="text-xs text-white/40">{p("editor.brandKitPicker.empty")}</p>;
   }
 
   return (
     <div className="space-y-2">
-      <p className="text-xs font-semibold uppercase tracking-wide text-white/50">Brand Studio Kits</p>
+      <p className="text-xs font-semibold uppercase tracking-wide text-white/50">{p("editor.brandKitPicker.title")}</p>
       <div className="grid gap-2">
         {kits.map((kit) => (
           <button
@@ -68,7 +70,7 @@ export function BrandKitPicker(props: {
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-xs font-medium text-white">{kit.name}</p>
-              <p className="truncate text-[10px] text-white/40">{kit.tagline || "Brand kit"}</p>
+              <p className="truncate text-[10px] text-white/40">{kit.tagline || p("editor.brandKitPicker.defaultTagline")}</p>
             </div>
             {props.selectedId === kit.id ? <Check className="size-3 text-premium-gold-light" /> : <Palette className="size-3 text-white/30" />}
           </button>
@@ -83,7 +85,7 @@ export function BrandKitPicker(props: {
             if (kit) props.onApply(kit);
           }}
         >
-          Apply brand kit to canvas
+          {p("editor.brandKitPicker.applyToCanvas")}
         </Button>
       )}
     </div>

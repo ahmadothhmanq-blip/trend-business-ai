@@ -1,5 +1,8 @@
+"use client";
+
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/lib/i18n/client";
 
 type PaginationControlsProps = {
   page: number;
@@ -14,15 +17,16 @@ export function PaginationControls({
   total,
   onPageChange,
 }: PaginationControlsProps) {
+  const { t } = useTranslation();
+
   if (totalPages <= 1) return null;
 
   return (
     <div className="flex flex-col gap-3 rounded-2xl border border-white/[0.08] glass-panel px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
       <p className="text-[13px] text-white/45 sm:text-sm">
-        Page <span className="font-semibold text-white/70">{page}</span> of{" "}
-        <span className="font-semibold text-white/70">{totalPages}</span>
+        {t("dashboard.pagination.pageOf", { page, totalPages })}{" "}
         <span className="text-white/30"> · </span>
-        {total} total
+        {t("dashboard.pagination.total", { total })}
       </p>
       <div className="flex gap-2">
         <Button
@@ -34,7 +38,7 @@ export function PaginationControls({
           onClick={() => onPageChange(page - 1)}
         >
           <ChevronLeft className="size-4" />
-          Previous
+          {t("dashboard.pagination.previous")}
         </Button>
         <Button
           type="button"
@@ -44,7 +48,7 @@ export function PaginationControls({
           disabled={page >= totalPages}
           onClick={() => onPageChange(page + 1)}
         >
-          Next
+          {t("dashboard.pagination.next")}
           <ChevronRight className="size-4" />
         </Button>
       </div>

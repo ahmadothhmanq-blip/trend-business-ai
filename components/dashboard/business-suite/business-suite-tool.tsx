@@ -43,6 +43,8 @@ import {
 } from "@/components/dashboard/builder-shared";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n/client";
+import { translateOption } from "@/lib/i18n/product-options";
+import { resolveLabel } from "@/lib/i18n/resolve-constant-label";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
 import { safeMarkdownToHtml } from "@/lib/ai/sanitize";
 import {
@@ -80,15 +82,16 @@ function ScoreGauge({ label, value, max = 100, invert }: { label: string; value:
 }
 
 function ScorecardDisplay({ sc }: { sc: BusinessScorecard }) {
+  const p = useProductT("businessSuite");
   return (
     <DashboardPanel className="grid grid-cols-3 gap-0 divide-x divide-white/[0.06] sm:grid-cols-4 lg:grid-cols-7">
-      <ScoreGauge label="Overall" value={sc.overall} />
-      <ScoreGauge label="Viability" value={sc.viability} />
-      <ScoreGauge label="Market Fit" value={sc.marketFit} />
-      <ScoreGauge label="Financials" value={sc.financialHealth} />
-      <ScoreGauge label="Competitive" value={sc.competitivePosition} />
-      <ScoreGauge label="Growth" value={sc.growthPotential} />
-      <ScoreGauge label="Risk" value={sc.riskLevel} invert />
+      <ScoreGauge label={p("scorecard.overall")} value={sc.overall} />
+      <ScoreGauge label={p("scorecard.viability")} value={sc.viability} />
+      <ScoreGauge label={p("scorecard.marketFit")} value={sc.marketFit} />
+      <ScoreGauge label={p("scorecard.financials")} value={sc.financialHealth} />
+      <ScoreGauge label={p("scorecard.competitive")} value={sc.competitivePosition} />
+      <ScoreGauge label={p("scorecard.growth")} value={sc.growthPotential} />
+      <ScoreGauge label={p("scorecard.risk")} value={sc.riskLevel} invert />
     </DashboardPanel>
   );
 }
@@ -111,6 +114,7 @@ function BusinessPreview({
   onContinue?: () => void;
 }) {
   const { t } = useTranslation();
+  const p = useProductT("businessSuite");
   const bp = gen.blueprint;
   const [tab, setTab] = useState<PreviewTab>("document");
   const [copied, setCopied] = useState(false);
@@ -119,18 +123,18 @@ function BusinessPreview({
     return (
       <DashboardPanel className="py-16 text-center">
         <FileText className="mx-auto size-10 text-white/20" />
-        <p className="mt-4 text-white/50">No analysis to preview</p>
+        <p className="mt-4 text-white/50">{p("preview.noAnalysis")}</p>
         <Button variant="outline" className="mt-4 rounded-xl border-white/10 text-white/60" onClick={onBack}>{t("common.back")}</Button>
       </DashboardPanel>
     );
   }
 
   const tabs: { key: PreviewTab; label: string; show: boolean }[] = [
-    { key: "document", label: "Document", show: true },
-    { key: "scorecard", label: "Scorecard", show: !!bp.scorecard },
-    { key: "risks", label: `Risks (${bp.risks.length})`, show: bp.risks.length > 0 || bp.opportunities.length > 0 },
-    { key: "action-plan", label: `Action Plan (${bp.actionPlan.length})`, show: bp.actionPlan.length > 0 || bp.recommendations.length > 0 },
-    { key: "files", label: `Files (${bp.files.length})`, show: bp.files.length > 0 },
+    { key: "document", label: p("preview.document"), show: true },
+    { key: "scorecard", label: p("preview.scorecard"), show: !!bp.scorecard },
+    { key: "risks", label: p("preview.risks", { count: bp.risks.length }), show: bp.risks.length > 0 || bp.opportunities.length > 0 },
+    { key: "action-plan", label: p("preview.actionPlan", { count: bp.actionPlan.length }), show: bp.actionPlan.length > 0 || bp.recommendations.length > 0 },
+    { key: "files", label: p("preview.files", { count: bp.files.length }), show: bp.files.length > 0 },
   ];
 
   return (
@@ -144,16 +148,16 @@ function BusinessPreview({
         <div className="flex flex-wrap gap-2">
           {onRegenerate ? (
             <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:border-white/20" onClick={onRegenerate}>
-              <RefreshCw className="size-3" /> Regenerate
+              <RefreshCw className="size-3" /> {p("actions.regenerate")}
             </Button>
           ) : null}
           {onContinue ? (
             <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-premium-gold/20 text-xs text-premium-gold-light hover:border-premium-gold/40" onClick={onContinue}>
-              <Wand2 className="size-3" /> Improve with AI
+              <Wand2 className="size-3" /> {p("actions.improveWithAi")}
             </Button>
           ) : null}
-          <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:text-white" onClick={() => { navigator.clipboard.writeText(bp.body); setCopied(true); toast.success("Copied"); setTimeout(() => setCopied(false), 2000); }}>
-            {copied ? <Check className="size-3" /> : <ClipboardCopy className="size-3" />} {copied ? "Copied" : "Copy"}
+          <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:text-white" onClick={() => { navigator.clipboard.writeText(bp.body); setCopied(true); toast.success(p("preview.copied")); setTimeout(() => setCopied(false), 2000); }}>
+            {copied ? <Check className="size-3" /> : <ClipboardCopy className="size-3" />} {copied ? p("preview.copied") : t("common.copy")}
           </Button>
           <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-white/10 text-xs text-white/60 hover:border-premium-gold/25 hover:text-premium-gold-light"
             onClick={async () => {
@@ -163,9 +167,9 @@ function BusinessPreview({
               const url = URL.createObjectURL(blob);
               const a = document.createElement("a"); a.href = url;
               a.download = `${bp.title.replace(/\s+/g, "-").toLowerCase()}.zip`; a.click();
-              URL.revokeObjectURL(url); toast.success("Exported");
+              URL.revokeObjectURL(url); toast.success(p("toasts.exported"));
             }}>
-            <Download className="size-3" /> Export ZIP
+            <Download className="size-3" /> {p("preview.exportZip")}
           </Button>
         </div>
       </div>
@@ -188,7 +192,7 @@ function BusinessPreview({
         <div className="space-y-4">
           <ScorecardDisplay sc={bp.scorecard} />
           <DashboardPanel className="p-5">
-            <p className="text-xs text-white/50">The scorecard provides a quantitative assessment across seven key dimensions. Scores above 70 indicate strong performance, 40-70 needs attention, below 40 requires immediate action. Risk Level is inverted — a lower score is better.</p>
+            <p className="text-xs text-white/50">{p("preview.scorecardHint")}</p>
           </DashboardPanel>
         </div>
       )}
@@ -198,7 +202,7 @@ function BusinessPreview({
           {bp.risks.length > 0 && (
             <DashboardCard>
               <DashboardCardHeader>
-                <div className="flex items-center gap-2"><AlertTriangle className="size-4 text-red-400" /><DashboardCardTitle>Risk Assessment</DashboardCardTitle></div>
+                <div className="flex items-center gap-2"><AlertTriangle className="size-4 text-red-400" /><DashboardCardTitle>{p("preview.riskAssessment")}</DashboardCardTitle></div>
               </DashboardCardHeader>
               <DashboardCardContent>
                 <div className="space-y-3">
@@ -212,7 +216,7 @@ function BusinessPreview({
                         </div>
                         <p className="text-xs text-white/50">{risk.description}</p>
                         <div className="rounded-lg bg-white/[0.02] p-2">
-                          <p className="text-[10px] font-bold uppercase tracking-wider text-white/30">Mitigation</p>
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-white/30">{p("preview.mitigation")}</p>
                           <p className="mt-0.5 text-xs text-white/50">{risk.mitigation}</p>
                         </div>
                       </DashboardPanel>
@@ -226,7 +230,7 @@ function BusinessPreview({
           {bp.opportunities.length > 0 && (
             <DashboardCard>
               <DashboardCardHeader>
-                <div className="flex items-center gap-2"><TrendingUp className="size-4 text-green-400" /><DashboardCardTitle>Opportunities</DashboardCardTitle></div>
+                <div className="flex items-center gap-2"><TrendingUp className="size-4 text-green-400" /><DashboardCardTitle>{p("preview.opportunities")}</DashboardCardTitle></div>
               </DashboardCardHeader>
               <DashboardCardContent>
                 <div className="space-y-3">
@@ -236,11 +240,11 @@ function BusinessPreview({
                       <DashboardPanel key={i} className="space-y-2 p-4">
                         <div className="flex items-center justify-between">
                           <span className="text-xs font-bold text-white/70">{opp.title}</span>
-                          <span className={cn("rounded-md px-2 py-0.5 text-[10px] font-medium", impColor[opp.impact] ?? impColor.medium)}>{opp.impact} impact</span>
+                          <span className={cn("rounded-md px-2 py-0.5 text-[10px] font-medium", impColor[opp.impact] ?? impColor.medium)}>{p("preview.impact", { impact: opp.impact })}</span>
                         </div>
                         <p className="text-xs text-white/50">{opp.description}</p>
                         <div className="flex gap-4 text-[10px] text-white/30">
-                          <span>Timeframe: {opp.timeframe}</span>
+                          <span>{p("preview.timeframe", { timeframe: opp.timeframe })}</span>
                         </div>
                         <p className="text-xs text-premium-gold-light/70">→ {opp.actionRequired}</p>
                       </DashboardPanel>
@@ -258,7 +262,7 @@ function BusinessPreview({
           {bp.actionPlan.length > 0 && (
             <DashboardCard>
               <DashboardCardHeader>
-                <div className="flex items-center gap-2"><Target className="size-4 text-premium-gold-light" /><DashboardCardTitle>Action Plan</DashboardCardTitle></div>
+                <div className="flex items-center gap-2"><Target className="size-4 text-premium-gold-light" /><DashboardCardTitle>{p("preview.actionPlanTitle")}</DashboardCardTitle></div>
               </DashboardCardHeader>
               <DashboardCardContent>
                 <div className="space-y-2">
@@ -281,14 +285,14 @@ function BusinessPreview({
 
           {bp.recommendations.length > 0 && (
             <DashboardPanel className="p-5">
-              <div className="mb-3 flex items-center gap-2 text-premium-gold-light"><Lightbulb className="size-4" /><span className="text-xs font-bold uppercase tracking-wider">Recommendations</span></div>
+              <div className="mb-3 flex items-center gap-2 text-premium-gold-light"><Lightbulb className="size-4" /><span className="text-xs font-bold uppercase tracking-wider">{p("preview.recommendations")}</span></div>
               <ul className="space-y-2">{bp.recommendations.map((r, i) => <li key={i} className="text-xs text-white/60">• {r}</li>)}</ul>
             </DashboardPanel>
           )}
 
           {bp.improvements.length > 0 && (
             <DashboardPanel className="p-5">
-              <div className="mb-3 flex items-center gap-2 text-premium-gold-light"><Wand2 className="size-4" /><span className="text-xs font-bold uppercase tracking-wider">Improvements</span></div>
+              <div className="mb-3 flex items-center gap-2 text-premium-gold-light"><Wand2 className="size-4" /><span className="text-xs font-bold uppercase tracking-wider">{p("preview.improvements")}</span></div>
               <ul className="space-y-2">{bp.improvements.map((im, i) => <li key={i} className="text-xs text-white/60">• {im}</li>)}</ul>
             </DashboardPanel>
           )}
@@ -301,9 +305,9 @@ function BusinessPreview({
             <DashboardPanel key={i} className="flex items-center justify-between gap-3 p-3">
               <div className="min-w-0 flex-1">
                 <p className="truncate text-xs font-semibold text-white/80">{f.path}</p>
-                <p className="text-[10px] text-white/40">{f.language} &middot; {f.content.length} chars</p>
+                <p className="text-[10px] text-white/40">{f.language} &middot; {f.content.length} {p("preview.chars")}</p>
               </div>
-              <Button variant="ghost" size="icon-xs" className="text-white/30 hover:text-white" onClick={() => { navigator.clipboard.writeText(f.content); toast.success("Copied"); }}>
+              <Button variant="ghost" size="icon-xs" className="text-white/30 hover:text-white" onClick={() => { navigator.clipboard.writeText(f.content); toast.success(p("preview.copied")); }}>
                 <Copy className="size-3" />
               </Button>
             </DashboardPanel>
@@ -385,13 +389,13 @@ export function BusinessSuiteTool({ initialGenerations }: Props) {
     if (!selectedTool || !prompt.trim()) {
       toast.error(
         mode === "continue"
-          ? "Describe the changes you want in natural language."
-          : "Select a tool and describe your business context.",
+          ? p("errors.describeChanges")
+          : p("errors.selectToolAndDescribe"),
       );
       return;
     }
     setStep("generating");
-    setProgressEvents(["Sending request..."]);
+    setProgressEvents([p("generating.sendingRequest")]);
     try {
       const res = await fetch("/api/business-suite", {
         method: "POST",
@@ -403,11 +407,11 @@ export function BusinessSuiteTool({ initialGenerations }: Props) {
         }),
       });
       const d = await res.json();
-      if (!res.ok) { toast.error(d.error ?? "Generation failed"); setStep("config"); return; }
-      toast.success(d.message ?? "Analysis complete!");
+      if (!res.ok) { toast.error(d.error ?? p("errors.generationFailed")); setStep("config"); return; }
+      toast.success(d.message ?? p("toasts.analysisComplete"));
       setParentId(null);
       if (d.generation) { setPreviewGen(d.generation); setStep("preview"); } else { setStep("history"); }
-    } catch { toast.error("Request failed."); setStep("config"); }
+    } catch { toast.error(p("errors.requestFailed")); setStep("config"); }
   };
 
   const loadGenerationConfig = (gen: BusinessGeneration) => {
@@ -431,7 +435,7 @@ export function BusinessSuiteTool({ initialGenerations }: Props) {
     setPrompt("");
     setPreviewGen(null);
     setStep("config");
-    toast.message("Describe your changes in natural language, then click Improve with AI.");
+    toast.message(p("errors.editThenImprove"));
   };
 
   const handleFavorite = async (gen: BusinessGeneration) => {
@@ -443,7 +447,7 @@ export function BusinessSuiteTool({ initialGenerations }: Props) {
   const handleDelete = async (id: string) => {
     setGenerations((p) => p.filter((g) => g.id !== id));
     await fetch(`/api/business-suite/${id}`, { method: "DELETE" });
-    toast.success("Deleted");
+    toast.success(p("toasts.deleted"));
   };
 
   if (step === "preview" && previewGen) {
@@ -458,7 +462,7 @@ export function BusinessSuiteTool({ initialGenerations }: Props) {
   }
 
   if (step === "generating") {
-    return <GenerationProgress title="Analyzing your business..." subtitle="AI is performing deep analysis, scoring, risk assessment, and building action plans" events={progressEvents} />;
+    return <GenerationProgress title={p("generating.title")} subtitle={p("generating.subtitle")} events={progressEvents} />;
   }
 
   const optionsByCategory = BUSINESS_OPTION_LIST.reduce<Record<string, typeof BUSINESS_OPTION_LIST>>((acc, o) => {
@@ -470,7 +474,7 @@ export function BusinessSuiteTool({ initialGenerations }: Props) {
   return (
     <div className="space-y-6">
       <div className="flex gap-2 overflow-x-auto">
-        {([{ key: "tool" as const, label: "New Analysis" }, { key: "history" as const, label: "My Projects" }]).map(({ key, label }) => (
+        {([{ key: "tool" as const, label: p("nav.newAnalysis") }, { key: "history" as const, label: p("nav.myProjects") }]).map(({ key, label }) => (
           <button key={key} onClick={() => setStep(key)} className={cn("whitespace-nowrap rounded-xl px-4 py-2 text-sm font-medium transition-all", (step === key || ((step === "type" || step === "config") && key === "tool")) ? "bg-premium-gold/15 text-premium-gold-light" : step === "history" && key === "history" ? "bg-premium-gold/15 text-premium-gold-light" : "text-white/50 hover:bg-white/5 hover:text-white/70")}>{label}</button>
         ))}
       </div>
@@ -479,8 +483,8 @@ export function BusinessSuiteTool({ initialGenerations }: Props) {
       {step === "tool" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Business Suite</DashboardCardTitle>
-            <DashboardCardDescription>Choose a business tool to get started</DashboardCardDescription>
+            <DashboardCardTitle>{p("steps.title")}</DashboardCardTitle>
+            <DashboardCardDescription>{p("steps.chooseTool")}</DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -498,7 +502,7 @@ export function BusinessSuiteTool({ initialGenerations }: Props) {
               <Button variant="ghost" size="icon-xs" onClick={() => { setStep("tool"); setSelectedTool(""); }} className="text-white/40 hover:text-white"><ArrowLeft className="size-4" /></Button>
               {(() => { const tool = getBusinessTool(selectedTool); const Icon = tool?.icon ?? BarChart3; return (
                 <><div className="flex size-10 items-center justify-center rounded-xl bg-premium-gold/15 text-premium-gold-light"><Icon className="size-5" /></div>
-                <div><DashboardCardTitle>{tool?.label ?? "Business Tool"}</DashboardCardTitle><DashboardCardDescription>Select your business type</DashboardCardDescription></div></>
+                <div><DashboardCardTitle>{tool?.label ?? p("steps.businessTool")}</DashboardCardTitle><DashboardCardDescription>{p("steps.selectBusinessType")}</DashboardCardDescription></div></>
               ); })()}
             </div>
           </DashboardCardHeader>
@@ -508,7 +512,7 @@ export function BusinessSuiteTool({ initialGenerations }: Props) {
             </div>
             {selectedType && (
               <div className="mt-6 flex justify-end">
-                <Button onClick={() => setStep("config")} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">Configure <ArrowRight className="size-4" /></Button>
+                <Button onClick={() => setStep("config")} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">{p("steps.configure")} <ArrowRight className="size-4" /></Button>
               </div>
             )}
           </DashboardCardContent>
@@ -523,7 +527,7 @@ export function BusinessSuiteTool({ initialGenerations }: Props) {
               <Button variant="ghost" size="icon-xs" onClick={() => setStep("type")} className="text-white/40 hover:text-white"><ArrowLeft className="size-4" /></Button>
               {(() => { const tool = getBusinessTool(selectedTool); const Icon = tool?.icon ?? Sparkles; return (
                 <><div className="flex size-10 items-center justify-center rounded-xl bg-premium-gold/15 text-premium-gold-light"><Icon className="size-5" /></div>
-                <div><DashboardCardTitle>{tool?.label}: {getBusinessTypeLabel(selectedType)}</DashboardCardTitle><DashboardCardDescription>Describe your business and configure the analysis</DashboardCardDescription></div></>
+                <div><DashboardCardTitle>{tool?.label}: {getBusinessTypeLabel(selectedType)}</DashboardCardTitle><DashboardCardDescription>{p("steps.configureDescription")}</DashboardCardDescription></div></>
               ); })()}
             </div>
           </DashboardCardHeader>
@@ -531,16 +535,12 @@ export function BusinessSuiteTool({ initialGenerations }: Props) {
             <div className="space-y-5">
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-white/60">
-                  {parentId ? "Describe changes (natural language)" : "Business description *"}
+                  {parentId ? p("steps.describeChanges") : p("steps.businessDescription")}
                 </label>
                 <Textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder={
-                    parentId
-                      ? "Example: Add more detail on competitive risks, expand the financial projections section, and prioritize quick wins..."
-                      : "Describe your business — what you do, your goals, challenges, current situation, what analysis you need..."
-                  }
+                  placeholder={parentId ? p("placeholders.editExample") : p("placeholders.businessBrief")}
                   rows={4}
                   className={cn(dashboardInputClass, "min-h-[100px] resize-none")}
                 />
@@ -548,31 +548,31 @@ export function BusinessSuiteTool({ initialGenerations }: Props) {
 
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-white/60">Industry</label>
+                  <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.industry")}</label>
                   <select value={industry} onChange={(e) => setIndustry(e.target.value)} className={dashboardSelectClass}>
-                    {BUSINESS_INDUSTRIES.map((ind) => <option key={ind} value={ind}>{ind}</option>)}
+                    {BUSINESS_INDUSTRIES.map((ind) => <option key={ind} value={ind}>{translateOption(t, "constants.businessSuite.industries", ind)}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-white/60">Company Stage</label>
+                  <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.companyStage")}</label>
                   <select value={companyStage} onChange={(e) => setCompanyStage(e.target.value)} className={dashboardSelectClass}>
-                    {COMPANY_STAGES.map((s) => <option key={s} value={s}>{s}</option>)}
+                    {COMPANY_STAGES.map((s) => <option key={s} value={s}>{translateOption(t, "constants.businessSuite.companyStages", s)}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-white/60">Target Market</label>
-                  <Input value={targetMarket} onChange={(e) => setTargetMarket(e.target.value)} placeholder="e.g. SMBs in North America" className={dashboardInputClass} />
+                  <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.targetMarket")}</label>
+                  <Input value={targetMarket} onChange={(e) => setTargetMarket(e.target.value)} placeholder={p("placeholders.targetMarket")} className={dashboardInputClass} />
                 </div>
               </div>
 
               <div className="space-y-3">
-                <label className="block text-xs font-medium text-white/60">Analysis Options</label>
+                <label className="block text-xs font-medium text-white/60">{p("steps.analysisOptions")}</label>
                 {Object.entries(optionsByCategory).map(([cat, items]) => (
                   <div key={cat}>
-                    <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-white/30">{cat}</p>
+                    <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-white/30">{translateOption(t, "constants.businessSuite.categories", cat)}</p>
                     <div className="flex flex-wrap gap-2">
-                      {items.map(({ id, label }) => (
-                        <CheckboxToggle key={id} label={label} checked={options.includes(id)} onChange={(c) => setOptions((p) => c ? [...p, id] : p.filter((o) => o !== id))} />
+                      {items.map((opt) => (
+                        <CheckboxToggle key={opt.id} label={resolveLabel(t, opt)} checked={options.includes(opt.id)} onChange={(c) => setOptions((p) => c ? [...p, opt.id] : p.filter((o) => o !== opt.id))} />
                       ))}
                     </div>
                   </div>
@@ -588,7 +588,7 @@ export function BusinessSuiteTool({ initialGenerations }: Props) {
                     setStep("type");
                   }}
                 >
-                  Back
+                  {t("common.back")}
                 </Button>
                 {parentId ? (
                   <Button
@@ -596,11 +596,11 @@ export function BusinessSuiteTool({ initialGenerations }: Props) {
                     disabled={!prompt.trim()}
                     className="btn-gold gap-2 rounded-xl font-bold text-luxury-black"
                   >
-                    <Sparkles className="size-4" /> Improve with AI
+                    <Sparkles className="size-4" /> {p("actions.improveWithAi")}
                   </Button>
                 ) : (
                   <Button onClick={() => void handleGenerate()} disabled={!prompt.trim()} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">
-                    <Sparkles className="size-4" /> Generate Analysis
+                    <Sparkles className="size-4" /> {p("steps.generateAnalysis")}
                   </Button>
                 )}
               </div>
@@ -615,12 +615,12 @@ export function BusinessSuiteTool({ initialGenerations }: Props) {
           <div className="flex items-center gap-3">
             <div className="relative flex-1">
               <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-white/30" />
-              <Input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Search analyses..." className={cn(dashboardInputClass, "pl-10")} />
+              <Input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder={p("placeholders.searchAnalyses")} className={cn(dashboardInputClass, "pl-10")} />
             </div>
-            <span className="text-xs text-white/40">{total} project{total !== 1 ? "s" : ""}</span>
+            <span className="text-xs text-white/40">{total === 1 ? p("history.count", { count: total }) : p("history.countPlural", { count: total })}</span>
           </div>
           {generations.length === 0 ? (
-            <EmptyHistory noun="business analyses" onNew={() => setStep("tool")} />
+            <EmptyHistory noun={p("history.emptyNoun")} onNew={() => setStep("tool")} />
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {generations.map((gen) => {

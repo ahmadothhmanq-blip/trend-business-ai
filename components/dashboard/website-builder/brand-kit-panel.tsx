@@ -43,7 +43,7 @@ export function BrandKitPanel(props: {
         );
         return {
           id: g.id,
-          name: g.brand_name || "Brand Kit",
+          name: g.brand_name || wb("panels.brandKitFallback"),
           primary: palette[0],
           secondary: palette[1],
           accent: palette[2],

@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { ArrowLeft, Code2, Copy, Download, FolderTree, RefreshCw, Sparkles, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
+import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 
 type FileEntry = { path: string; content: string; language?: string };
@@ -27,6 +28,7 @@ export function ProjectFilePreview({
   /** Natural-language AI edit (D-016). */
   onContinue?: () => void;
 }) {
+  const { t } = useTranslation();
   const [activeFile, setActiveFile] = useState(0);
 
   const grouped = useMemo(() => {
@@ -43,9 +45,9 @@ export function ProjectFilePreview({
     return (
       <DashboardPanel className="py-16 text-center">
         <Sparkles className="mx-auto size-10 text-white/20" />
-        <p className="mt-4 text-white/50">No generated files to preview</p>
+        <p className="mt-4 text-white/50">{t("dashboard.builderShared.noFilesTitle")}</p>
         <Button variant="outline" className="mt-4 rounded-xl border-white/10 text-white/60" onClick={onBack}>
-          Back
+          {t("dashboard.builderShared.back")}
         </Button>
       </DashboardPanel>
     );
@@ -72,7 +74,7 @@ export function ProjectFilePreview({
               onClick={onRegenerate}
             >
               <RefreshCw className="size-3" />
-              Regenerate
+              {t("dashboard.builderShared.regenerate")}
             </Button>
           ) : null}
           {onContinue ? (
@@ -83,7 +85,7 @@ export function ProjectFilePreview({
               onClick={onContinue}
             >
               <Wand2 className="size-3" />
-              Improve with AI
+              {t("dashboard.builderShared.improveWithAi")}
             </Button>
           ) : null}
           <Button
@@ -100,11 +102,11 @@ export function ProjectFilePreview({
               a.download = `${downloadName.replace(/\s+/g, "-").toLowerCase()}.zip`;
               a.click();
               URL.revokeObjectURL(url);
-              toast.success("Project downloaded");
+              toast.success(t("dashboard.builderShared.projectDownloaded"));
             }}
           >
             <Download className="size-3" />
-            Download ZIP
+            {t("dashboard.builderShared.downloadZip")}
           </Button>
         </div>
       </div>
@@ -113,7 +115,7 @@ export function ProjectFilePreview({
         <DashboardPanel className="max-h-[600px] overflow-y-auto">
           <div className="mb-2 flex items-center gap-2 px-1 text-xs font-semibold text-white/50">
             <FolderTree className="size-3.5" />
-            File Tree
+            {t("dashboard.builderShared.fileTree")}
           </div>
           {grouped.map(([folder, folderFiles]) => (
             <div key={folder} className="mb-2">
@@ -150,7 +152,7 @@ export function ProjectFilePreview({
               onClick={() => {
                 if (currentFile) {
                   navigator.clipboard.writeText(currentFile.content);
-                  toast.success("Copied to clipboard");
+                  toast.success(t("dashboard.builderShared.copiedToClipboard"));
                 }
               }}
             >

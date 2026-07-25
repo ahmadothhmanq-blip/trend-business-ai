@@ -153,7 +153,7 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
 
   const executionItems: ProjectHistoryItem[] = executions.map((e) => ({
     id: e.id,
-    name: e.task_name || "Agent Task",
+    name: e.task_name || p("steps.agentTask"),
     typeLabel: e.provider ?? "AI",
     description: `${e.status} · ${(e.token_usage?.prompt ?? 0) + (e.token_usage?.completion ?? 0)} tokens · ${e.execution_time_ms}ms`,
     status: e.status,
@@ -407,7 +407,7 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
   if (tab === "generating") {
     return (
       <div className="space-y-6">
-        <GenerationProgress title="Agent Executing..." subtitle="AI is working through each step of your task" events={[]} />
+        <GenerationProgress title={p("generating.title")} subtitle={p("generating.subtitle")} events={[]} />
       </div>
     );
   }
@@ -425,10 +425,10 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
           </Button>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" className="gap-1.5 rounded-xl border-white/10 text-xs text-white/50" onClick={() => { setTab("run"); }}>
-              <RotateCcw className="size-3" /> Run Again
+              <RotateCcw className="size-3" /> {p("steps.runAgain")}
             </Button>
             <Button size="sm" className="btn-gold gap-1.5 rounded-xl text-xs font-bold text-luxury-black" onClick={handleDownloadResult}>
-              <Download className="size-3" /> Download Report
+              <Download className="size-3" /> {p("steps.downloadReport")}
             </Button>
           </div>
         </div>
@@ -452,7 +452,7 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
         {/* Step Results */}
         <DashboardCard>
           <DashboardCardHeader>
-            <div className="flex items-center gap-2"><Clock className="size-5 text-premium-gold-light" /><DashboardCardTitle>Execution Steps ({output.stepResults?.length ?? 0})</DashboardCardTitle></div>
+            <div className="flex items-center gap-2"><Clock className="size-5 text-premium-gold-light" /><DashboardCardTitle>{p("steps.executionSteps", { count: output.stepResults?.length ?? 0 })}</DashboardCardTitle></div>
           </DashboardCardHeader>
           <DashboardCardContent>
             <div className="space-y-2">
@@ -475,7 +475,7 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
         {/* Report Sections */}
         {output.sections && output.sections.length > 0 && (
           <DashboardCard>
-            <DashboardCardHeader><DashboardCardTitle>Report</DashboardCardTitle></DashboardCardHeader>
+            <DashboardCardHeader><DashboardCardTitle>{p("steps.report")}</DashboardCardTitle></DashboardCardHeader>
             <DashboardCardContent>
               <div className="space-y-4">
                 {output.sections.map((s, i) => (
@@ -494,7 +494,7 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
         <div className="grid gap-4 sm:grid-cols-2">
           {output.deliverables && output.deliverables.length > 0 && (
             <DashboardCard>
-              <DashboardCardHeader><DashboardCardTitle>Deliverables</DashboardCardTitle></DashboardCardHeader>
+              <DashboardCardHeader><DashboardCardTitle>{p("steps.deliverables")}</DashboardCardTitle></DashboardCardHeader>
               <DashboardCardContent>
                 <ul className="space-y-1">
                   {output.deliverables.map((d, i) => <li key={i} className="flex gap-2 text-xs text-white/60"><span className="text-premium-gold-light">✓</span>{d}</li>)}
@@ -504,7 +504,7 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
           )}
           {output.recommendations && output.recommendations.length > 0 && (
             <DashboardCard>
-              <DashboardCardHeader><DashboardCardTitle>Recommendations</DashboardCardTitle></DashboardCardHeader>
+              <DashboardCardHeader><DashboardCardTitle>{p("steps.recommendations")}</DashboardCardTitle></DashboardCardHeader>
               <DashboardCardContent>
                 <ul className="space-y-1">
                   {output.recommendations.map((r, i) => <li key={i} className="flex gap-2 text-xs text-white/60"><span className="text-premium-gold-light">→</span>{r}</li>)}
@@ -518,7 +518,7 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
         {output.files && output.files.length > 0 && (
           <DashboardCard>
             <DashboardCardHeader>
-              <div className="flex items-center gap-2"><FileText className="size-5 text-premium-gold-light" /><DashboardCardTitle>Generated Files</DashboardCardTitle></div>
+              <div className="flex items-center gap-2"><FileText className="size-5 text-premium-gold-light" /><DashboardCardTitle>{p("steps.outputFiles")}</DashboardCardTitle></div>
             </DashboardCardHeader>
             <DashboardCardContent>
               <div className="space-y-2">
@@ -549,12 +549,12 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
 
         <DashboardCard>
           <DashboardCardHeader>
-            <div className="flex items-center gap-2"><History className="size-5 text-premium-gold-light" /><DashboardCardTitle>Execution History</DashboardCardTitle></div>
-            <DashboardCardDescription>{historyTotal} total executions</DashboardCardDescription>
+            <div className="flex items-center gap-2"><History className="size-5 text-premium-gold-light" /><DashboardCardTitle>{p("steps.executionHistoryTitle")}</DashboardCardTitle></div>
+            <DashboardCardDescription>{p("steps.totalExecutions", { count: historyTotal })}</DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent>
             {executionItems.length === 0 ? (
-              <EmptyHistory noun="executions" onNew={() => setTab("agents")} />
+              <EmptyHistory noun={p("history.emptyNoun")} onNew={() => setTab("agents")} />
             ) : (
               <>
                 <div className="space-y-2">
@@ -570,7 +570,7 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
                           const res = await fetch(`/api/ai-agents/executions/${exec.id}`);
                           const data = await res.json();
                           if (!res.ok || !data.execution) {
-                            throw new Error(data.error || "Unable to load execution.");
+                            throw new Error(data.error || p("errors.loadExecutionFailed"));
                           }
                           const full = data.execution as AgentExecution;
                           setResult({
@@ -582,7 +582,7 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
                           toast.error(
                             error instanceof Error
                               ? error.message
-                              : "Unable to load execution.",
+                              : p("errors.loadExecutionFailed"),
                           );
                         }
                       }}

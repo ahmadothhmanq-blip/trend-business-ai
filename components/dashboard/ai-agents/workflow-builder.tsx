@@ -87,18 +87,18 @@ export function WorkflowBuilder() {
             <div className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-white/60">Name *</label>
+                  <label className="mb-1 block text-xs font-medium text-white/60">{p("workflows.name")}</label>
                   <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={p("placeholders.workflowName")} className={dashboardInputClass} />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-white/60">Trigger</label>
+                  <label className="mb-1 block text-xs font-medium text-white/60">{p("workflows.trigger")}</label>
                   <select value={triggerType} onChange={(e) => setTriggerType(e.target.value)} className={dashboardSelectClass}>
                     {WORKFLOW_TRIGGERS.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
                   </select>
                 </div>
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-white/60">Description</label>
+                <label className="mb-1 block text-xs font-medium text-white/60">{p("workflows.description")}</label>
                 <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder={p("placeholders.workflowDescription")} className={dashboardInputClass} />
               </div>
             </div>
@@ -109,9 +109,9 @@ export function WorkflowBuilder() {
         <DashboardCard>
           <DashboardCardHeader>
             <div className="flex items-center justify-between">
-              <DashboardCardTitle>Steps ({steps.length})</DashboardCardTitle>
+              <DashboardCardTitle>{p("workflows.steps", { count: steps.length })}</DashboardCardTitle>
               <Button onClick={addStep} size="sm" className="btn-gold gap-1 rounded-lg text-xs font-bold text-luxury-black">
-                <Plus className="size-3" /> Add Step
+                <Plus className="size-3" /> {p("workflows.addStep")}
               </Button>
             </div>
           </DashboardCardHeader>
@@ -119,7 +119,7 @@ export function WorkflowBuilder() {
             {steps.length === 0 ? (
               <DashboardPanel className="py-8 text-center">
                 <Workflow className="mx-auto size-8 text-white/10" />
-                <p className="mt-3 text-xs text-white/30">No steps added yet</p>
+                <p className="mt-3 text-xs text-white/30">{p("workflows.noSteps")}</p>
               </DashboardPanel>
             ) : (
               <div className="space-y-3">
@@ -128,7 +128,7 @@ export function WorkflowBuilder() {
                     <div className="flex items-center justify-between">
                       <span className="flex items-center gap-2">
                         <span className="flex size-6 items-center justify-center rounded-full bg-premium-gold/15 text-[10px] font-bold text-premium-gold-light">{idx + 1}</span>
-                        <span className="text-xs font-bold text-white/70">Step {idx + 1}</span>
+                        <span className="text-xs font-bold text-white/70">{p("workflows.step", { number: idx + 1 })}</span>
                       </span>
                       <Button variant="ghost" size="icon-xs" className="text-white/30 hover:text-red-400" onClick={() => removeStep(idx)}>
                         <Trash2 className="size-3" />
@@ -136,27 +136,27 @@ export function WorkflowBuilder() {
                     </div>
                     <div className="grid gap-3 sm:grid-cols-3">
                       <div>
-                        <label className="mb-1 block text-[10px] font-medium text-white/40">Step Name</label>
+                        <label className="mb-1 block text-[10px] font-medium text-white/40">{p("workflows.stepName")}</label>
                         <Input value={step.name} onChange={(e) => updateStep(idx, { name: e.target.value })} placeholder={p("placeholders.stepName")} className={dashboardInputClass} />
                       </div>
                       <div>
-                        <label className="mb-1 block text-[10px] font-medium text-white/40">Type</label>
+                        <label className="mb-1 block text-[10px] font-medium text-white/40">{p("workflows.type")}</label>
                         <select value={step.type} onChange={(e) => updateStep(idx, { type: e.target.value as WorkflowStep["type"] })} className={dashboardSelectClass}>
                           {WORKFLOW_STEP_TYPES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
                         </select>
                       </div>
                       <div>
-                        <label className="mb-1 block text-[10px] font-medium text-white/40">On Error</label>
+                        <label className="mb-1 block text-[10px] font-medium text-white/40">{p("workflows.onError")}</label>
                         <select value={step.on_error} onChange={(e) => updateStep(idx, { on_error: e.target.value as "stop" | "skip" | "retry" })} className={dashboardSelectClass}>
-                          <option value="stop">Stop</option>
-                          <option value="skip">Skip</option>
-                          <option value="retry">Retry</option>
+                          <option value="stop">{p("workflows.stop")}</option>
+                          <option value="skip">{p("workflows.skip")}</option>
+                          <option value="retry">{p("workflows.retry")}</option>
                         </select>
                       </div>
                     </div>
                     {step.type === "service" && (
                       <div>
-                        <label className="mb-1 block text-[10px] font-medium text-white/40">Service</label>
+                        <label className="mb-1 block text-[10px] font-medium text-white/40">{p("workflows.service")}</label>
                         <select value={step.service ?? ""} onChange={(e) => updateStep(idx, { service: e.target.value })} className={dashboardSelectClass}>
                           <option value="">{p("placeholders.selectService")}</option>
                           {AGENT_TOOLS.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
@@ -190,8 +190,8 @@ export function WorkflowBuilder() {
       {workflows.length === 0 ? (
         <DashboardPanel className="py-10 text-center">
           <GitBranch className="mx-auto size-8 text-white/10" />
-          <p className="mt-3 text-xs text-white/30">No workflows created yet</p>
-          <p className="mt-1 text-[10px] text-white/20">Create multi-step automation workflows</p>
+          <p className="mt-3 text-xs text-white/30">{p("workflows.noWorkflows")}</p>
+          <p className="mt-1 text-[10px] text-white/20">{p("workflows.noWorkflowsHint")}</p>
         </DashboardPanel>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
@@ -200,7 +200,7 @@ export function WorkflowBuilder() {
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-sm font-bold text-white/90">{wf.name}</p>
-                  <p className="text-[10px] text-white/30">{wf.trigger_type} · {(wf.steps as WorkflowStep[]).length} steps · {wf.total_runs} runs</p>
+                  <p className="text-[10px] text-white/30">{p("steps.workflowMeta", { trigger: wf.trigger_type, steps: (wf.steps as WorkflowStep[]).length, runs: wf.total_runs })}</p>
                 </div>
                 <div className={cn("size-2 rounded-full", wf.is_active ? "bg-green-400" : "bg-white/20")} />
               </div>

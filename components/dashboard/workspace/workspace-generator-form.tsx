@@ -24,6 +24,7 @@ import {
 } from "@/lib/workspace/metadata";
 import type { GenerationDepth } from "@/lib/hooks/use-workspace-tool";
 import type { GenerationAttachmentMeta, PromptVersion } from "@/types/database";
+import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 
 type WorkspaceGeneratorFormProps = {
@@ -58,11 +59,7 @@ type WorkspaceGeneratorFormProps = {
   autosaveState?: "idle" | "saving" | "saved";
 };
 
-const DEPTH_OPTIONS: { value: GenerationDepth; label: string; hint: string }[] = [
-  { value: "focused", label: "Focused", hint: "Faster, tighter deliverables" },
-  { value: "standard", label: "Standard", hint: "Balanced production output" },
-  { value: "deep", label: "Deep", hint: "Board-ready depth and detail" },
-];
+const DEPTH_VALUES: GenerationDepth[] = ["focused", "standard", "deep"];
 
 export function WorkspaceGeneratorForm({
   metadata,
@@ -95,20 +92,27 @@ export function WorkspaceGeneratorForm({
   onRestorePromptVersion,
   autosaveState = "idle",
 }: WorkspaceGeneratorFormProps) {
+  const { t } = useTranslation();
+  const depthOptions = DEPTH_VALUES.map((value) => ({
+    value,
+    label: t(`dashboard.workspaceGenerator.depth.${value}.label`),
+    hint: t(`dashboard.workspaceGenerator.depth.${value}.hint`),
+  }));
+
   return (
     <DashboardPanel className="relative overflow-hidden">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-premium-gold/50 to-transparent" />
       <div className="mb-5 flex items-center justify-between gap-4">
         <div>
-          <h3 className="text-lg font-bold text-white">Prompt Studio</h3>
+          <h3 className="text-lg font-bold text-white">{t("dashboard.workspaceGenerator.title")}</h3>
           <p className="mt-1 text-[13px] text-white/40">
-            Write a brief, pick a template, tune settings, then generate.
+            {t("dashboard.workspaceGenerator.description")}
           </p>
         </div>
         <div className="flex items-center gap-2">
           {autosaveState !== "idle" ? (
             <span className="text-[11px] text-white/35">
-              {autosaveState === "saving" ? "Autosaving…" : "Draft saved"}
+              {autosaveState === "saving" ? t("dashboard.workspaceGenerator.autosaving") : t("dashboard.workspaceGenerator.draftSaved")}
             </span>
           ) : null}
           <Badge className="border-premium-gold/20 bg-premium-gold/10 text-premium-gold-light">
@@ -133,7 +137,7 @@ export function WorkspaceGeneratorForm({
         {promptVersions.length > 0 && onRestorePromptVersion ? (
           <div>
             <span className="mb-2 block text-[12px] font-semibold tracking-wide text-white/45 uppercase">
-              Prompt version history
+              {t("dashboard.workspaceGenerator.promptVersionHistory")}
             </span>
             <div className="flex flex-wrap gap-2">
               {promptVersions
@@ -158,7 +162,7 @@ export function WorkspaceGeneratorForm({
 
         <div>
           <span className="mb-2 block text-[12px] font-semibold tracking-wide text-white/45 uppercase">
-            Templates
+            {t("dashboard.workspaceGenerator.templates")}
           </span>
           <div className="flex flex-wrap gap-2">
             {metadata.templates.map((template) => (
@@ -187,8 +191,8 @@ export function WorkspaceGeneratorForm({
             value={selectedTemplate}
             onChange={(event) => onTemplateChange(event.target.value)}
             className="h-12 rounded-2xl border-white/[0.08] bg-white/[0.035] px-4 text-white focus-visible:border-premium-gold/35 focus-visible:ring-premium-gold/15"
-            aria-label="Selected template"
-            placeholder="Selected template"
+            aria-label={t("dashboard.workspaceGenerator.selectedTemplateAria")}
+            placeholder={t("dashboard.workspaceGenerator.selectedTemplatePlaceholder")}
           />
           <Button
             type="button"
@@ -201,7 +205,7 @@ export function WorkspaceGeneratorForm({
             ) : (
               <Wand2 className="size-4" />
             )}
-            {isGenerating ? "Generating..." : metadata.generateLabel}
+            {isGenerating ? t("dashboard.workspaceGenerator.generating") : metadata.generateLabel}
           </Button>
         </div>
 
@@ -209,7 +213,7 @@ export function WorkspaceGeneratorForm({
           <div className="flex flex-wrap items-center gap-2">
             <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-[12px] text-white/55 hover:border-premium-gold/25">
               <FileUp className="size-3.5" />
-              {uploading ? "Uploading…" : "Upload file"}
+              {uploading ? t("dashboard.workspaceGenerator.uploading") : t("dashboard.workspaceGenerator.uploadFile")}
               <input
                 type="file"
                 className="hidden"
@@ -221,7 +225,7 @@ export function WorkspaceGeneratorForm({
             </label>
             <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-[12px] text-white/55 hover:border-premium-gold/25">
               <ImagePlus className="size-3.5" />
-              Upload image
+              {t("dashboard.workspaceGenerator.uploadImage")}
               <input
                 type="file"
                 className="hidden"
@@ -241,13 +245,13 @@ export function WorkspaceGeneratorForm({
                 key={file.id}
                 className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1 text-[11px] text-white/55"
               >
-                {file.fileType === "image" ? "Image" : "File"}: {file.fileName}
+                {file.fileType === "image" ? t("dashboard.workspaceGenerator.attachmentImage") : t("dashboard.workspaceGenerator.attachmentFile")}: {file.fileName}
                 {onRemoveAttachment ? (
                   <button
                     type="button"
                     onClick={() => onRemoveAttachment(file.id)}
                     className="text-white/35 hover:text-white/70"
-                    aria-label={`Remove ${file.fileName}`}
+                    aria-label={t("dashboard.workspaceGenerator.removeAttachmentAria", { fileName: file.fileName })}
                   >
                     <X className="size-3" />
                   </button>
@@ -264,7 +268,7 @@ export function WorkspaceGeneratorForm({
         >
           <span className="inline-flex items-center gap-2 text-[13px] font-semibold text-white/75">
             <Settings2 className="size-4 text-premium-gold-light" />
-            Advanced settings
+            {t("dashboard.workspaceGenerator.advancedSettings")}
           </span>
           <ChevronDown
             className={cn(
@@ -279,7 +283,7 @@ export function WorkspaceGeneratorForm({
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="block">
                 <span className="mb-2 block text-[12px] font-semibold tracking-wide text-white/45 uppercase">
-                  Language
+                  {t("dashboard.workspaceGenerator.language")}
                 </span>
                 <select
                   value={language}
@@ -297,7 +301,7 @@ export function WorkspaceGeneratorForm({
               </label>
               <label className="block">
                 <span className="mb-2 block text-[12px] font-semibold tracking-wide text-white/45 uppercase">
-                  Theme
+                  {t("dashboard.workspaceGenerator.theme")}
                 </span>
                 <select
                   value={theme}
@@ -315,10 +319,10 @@ export function WorkspaceGeneratorForm({
 
             <div>
               <span className="mb-2 block text-[12px] font-semibold tracking-wide text-white/45 uppercase">
-                Generation depth
+                {t("dashboard.workspaceGenerator.generationDepth")}
               </span>
               <div className="grid gap-2 sm:grid-cols-3">
-                {DEPTH_OPTIONS.map((option) => (
+                {depthOptions.map((option) => (
                   <button
                     key={option.value}
                     type="button"
@@ -339,7 +343,7 @@ export function WorkspaceGeneratorForm({
 
             <div>
               <span className="mb-2 block text-[12px] font-semibold tracking-wide text-white/45 uppercase">
-                Focus outputs
+                {t("dashboard.workspaceGenerator.focusOutputs")}
               </span>
               <div className="flex flex-wrap gap-2">
                 {metadata.outputs.map((output) => (
@@ -365,7 +369,7 @@ export function WorkspaceGeneratorForm({
         {isGenerating || isStreaming ? (
           <div className="rounded-2xl border border-premium-gold/20 bg-premium-gold/5 p-4">
             <div className="mb-2 flex items-center justify-between text-[12px] text-premium-gold-light">
-              <span>{streamStatus ?? "Generation in progress"}</span>
+              <span>{streamStatus ?? t("dashboard.workspaceGenerator.generationInProgress")}</span>
               <span>{progress}%</span>
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-black/30">
@@ -390,7 +394,7 @@ export function WorkspaceGeneratorForm({
                 className="shrink-0 rounded-xl border-red-400/30 text-red-100"
                 onClick={onRetry}
               >
-                Retry
+                {t("dashboard.workspaceGenerator.retry")}
               </Button>
             ) : null}
           </div>

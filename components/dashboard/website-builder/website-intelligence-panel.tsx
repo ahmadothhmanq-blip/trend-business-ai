@@ -34,7 +34,7 @@ export function WebsiteIntelligencePanel(props: {
         intelligence?: WebsiteIntelligenceReport;
         performance?: { score: number; recommendations: string[] };
       };
-      if (!res.ok) throw new Error(data.error || "Failed to analyze");
+      if (!res.ok) throw new Error(data.error || wb("panels.failedToAnalyze"));
       setReport(data.intelligence || null);
       setPerformance(data.performance || null);
     } catch (err) {
@@ -51,7 +51,7 @@ export function WebsiteIntelligencePanel(props: {
   if (!props.generationId) {
     return (
       <p className="text-sm text-white/45">
-        Generate a website to run Website Intelligence.
+        {wb("panels.generateForIntelligence")}
       </p>
     );
   }
@@ -61,10 +61,10 @@ export function WebsiteIntelligencePanel(props: {
       <div className="flex items-center justify-between gap-2">
         <div>
           <p className="text-[12px] font-semibold tracking-wide text-white/45 uppercase">
-            Website Intelligence
+            {wb("panels.intelligenceTitle")}
           </p>
           <p className="text-[11px] text-white/35">
-            Missing sections · layout · CTA · SEO · conversion
+            {wb("panels.intelligenceSubtitle")}
           </p>
         </div>
         <Button
@@ -79,7 +79,7 @@ export function WebsiteIntelligencePanel(props: {
           ) : (
             <Sparkles className="size-3.5" />
           )}
-          Re-analyze
+          {wb("panels.reAnalyze")}
         </Button>
       </div>
 
@@ -91,21 +91,21 @@ export function WebsiteIntelligencePanel(props: {
         <>
           <div className="flex flex-wrap items-end gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4">
             <div>
-              <p className="text-[11px] text-white/40">Score</p>
+              <p className="text-[11px] text-white/40">{wb("panels.score")}</p>
               <p className="text-3xl font-semibold text-premium-gold">
                 {report.score}
                 <span className="text-base text-white/40">/100</span>
               </p>
             </div>
             <div>
-              <p className="text-[11px] text-white/40">Grade</p>
+              <p className="text-[11px] text-white/40">{wb("panels.grade")}</p>
               <p className="text-2xl font-semibold text-white">{report.grade}</p>
             </div>
             {performance ? (
               <div className="flex items-center gap-2">
                 <TrendingUp className="size-4 text-white/40" />
                 <div>
-                  <p className="text-[11px] text-white/40">Performance</p>
+                  <p className="text-[11px] text-white/40">{wb("panels.performance")}</p>
                   <p className="text-lg font-semibold text-white">
                     {performance.score}/100
                   </p>
@@ -118,7 +118,7 @@ export function WebsiteIntelligencePanel(props: {
           {report.strengths.length ? (
             <div>
               <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-white/40">
-                Strengths
+                {wb("panels.strengths")}
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {report.strengths.map((s) => (
@@ -167,7 +167,7 @@ export function WebsiteIntelligencePanel(props: {
                     disabled={props.disabled}
                     onClick={() => props.onApplySuggestion?.(s.command!)}
                   >
-                    Apply with AI
+                    {wb("panels.applyWithAi")}
                   </Button>
                 ) : null}
               </div>
@@ -177,7 +177,7 @@ export function WebsiteIntelligencePanel(props: {
       ) : loading ? (
         <div className="flex items-center gap-2 py-8 text-white/40">
           <Loader2 className="size-4 animate-spin" />
-          Analyzing website…
+          {wb("panels.analyzingWebsite")}
         </div>
       ) : null}
     </div>

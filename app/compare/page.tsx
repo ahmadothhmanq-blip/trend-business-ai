@@ -2,16 +2,20 @@ import type { Metadata } from "next";
 import { ProgrammaticClusterIndex } from "@/components/seo/programmatic-cluster-index";
 import { SeoService } from "@/lib/seo/engine";
 import { getPublishedProgrammaticPages } from "@/lib/seo/programmatic";
+import { getServerTranslator } from "@/lib/i18n/server";
 
-export const metadata: Metadata = SeoService.createMetadata({
-  title: "Compare AI Business Platforms & Workflows",
-  description:
-    "Compare unified AI business suites against fragmented tools — see when an all-in-one workspace wins for planning, creation and growth.",
-  path: "/compare",
-  type: "collection",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerTranslator();
+  return SeoService.createMetadata({
+    title: t("marketing.publicPages.clusters.compare.metaTitle"),
+    description: t("marketing.publicPages.clusters.compare.metaDescription"),
+    path: "/compare",
+    type: "collection",
+  });
+}
 
-export default function CompareIndexPage() {
+export default async function CompareIndexPage() {
+  const { t } = await getServerTranslator();
   const items = getPublishedProgrammaticPages("comparisons").map((page) => ({
     href: page.path,
     title: page.title,
@@ -21,9 +25,9 @@ export default function CompareIndexPage() {
   return (
     <ProgrammaticClusterIndex
       path="/compare"
-      eyebrow="Comparisons"
-      title="Choose the right AI operating model"
-      description="Side-by-side comparisons that help founders and operators decide between fragmented AI chats and a connected business workspace."
+      eyebrow={t("marketing.publicPages.clusters.compare.eyebrow")}
+      title={t("marketing.publicPages.clusters.compare.title")}
+      description={t("marketing.publicPages.clusters.compare.description")}
       items={items}
     />
   );

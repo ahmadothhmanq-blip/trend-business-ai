@@ -13,15 +13,27 @@ const SKIP_DIRS = new Set(["node_modules", ".next", "locales", "supabase/migrati
 const I18N_MARKERS = [
   "useTranslation",
   "useI18n",
+  "useProductT",
+  "useWorkspaceT",
+  "useScopedT",
   "getServerTranslator",
+  "dashboardPageMetadata",
   "labelKey",
   "titleKey",
   "descriptionKey",
+  "I18N_CATALOG",
   "LocalizedDashboardHeader",
   "getNavLabel",
   "translateOption",
   "translateField",
+  "readLocalizedApiError",
+  "translateApiError",
 ];
+
+const SKIP_FILES = new Set([
+  "components/ui/brand-logo.tsx",
+  "components/marketing/official-logo.tsx",
+]);
 
 const STRING_PATTERNS = [
   />\s*[A-Z][a-zA-Z\s&,'./-]{3,60}\s*</g,
@@ -55,8 +67,14 @@ for (const base of targets) {
   for (const file of walk(base)) {
     const rel = path.relative(ROOT, file).replace(/\\/g, "/");
     if (rel.includes("lib/i18n/")) continue;
+    if (SKIP_FILES.has(rel)) continue;
     const content = fs.readFileSync(file, "utf8");
-    if (rel.startsWith("lib/constants/") && content.includes("labelKey")) continue;
+    if (
+      rel.startsWith("lib/constants/") &&
+      (content.includes("labelKey") || content.includes("I18N_CATALOG"))
+    ) {
+      continue;
+    }
     const usesI18n = I18N_MARKERS.some((m) => content.includes(m));
     let hits = 0;
     for (const pattern of STRING_PATTERNS) {

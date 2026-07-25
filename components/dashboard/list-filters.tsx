@@ -6,6 +6,7 @@ import {
   dashboardFilterSelectClass,
   dashboardInputClass,
 } from "@/components/dashboard/ui/dashboard-styles";
+import { useTranslation } from "@/lib/i18n/client";
 
 type ListFiltersProps = {
   search: string;
@@ -24,6 +25,8 @@ export function ListFilters({
   extraOptions = [],
   onApply,
 }: ListFiltersProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="rounded-2xl border border-white/[0.08] glass-panel p-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
@@ -34,9 +37,9 @@ export function ListFilters({
           />
           <Input
             defaultValue={search}
-            placeholder="Search..."
+            placeholder={t("dashboard.listFilters.searchPlaceholder")}
             className={`pl-9 ${dashboardInputClass}`}
-            aria-label="Search"
+            aria-label={t("dashboard.listFilters.searchAria")}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 onApply(
@@ -54,11 +57,11 @@ export function ListFilters({
             onApply(search, e.target.value as "" | "true" | "false", extraFilter)
           }
           className={dashboardFilterSelectClass}
-          aria-label="Filter favorites"
+          aria-label={t("dashboard.listFilters.filterFavoritesAria")}
         >
-          <option value="">All items</option>
-          <option value="true">Favorites only</option>
-          <option value="false">Non-favorites</option>
+          <option value="">{t("dashboard.listFilters.allItems")}</option>
+          <option value="true">{t("dashboard.listFilters.favoritesOnly")}</option>
+          <option value="false">{t("dashboard.listFilters.nonFavorites")}</option>
         </select>
         {extraLabel && extraOptions.length > 0 && (
           <select
@@ -67,7 +70,9 @@ export function ListFilters({
             className={dashboardFilterSelectClass}
             aria-label={extraLabel}
           >
-            <option value="">All {extraLabel.toLowerCase()}</option>
+            <option value="">
+              {t("dashboard.listFilters.allOption", { label: extraLabel.toLowerCase() })}
+            </option>
             {extraOptions.map((opt) => (
               <option key={opt} value={opt}>
                 {opt}

@@ -6,6 +6,7 @@ import { DashboardHeader } from "@/components/dashboard/header";
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import { DashboardEmptyState } from "@/components/dashboard/ui/dashboard-empty-state";
 import { Button } from "@/components/ui/button";
+import { getServerTranslator } from "@/lib/i18n/server";
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat(undefined, {
@@ -16,6 +17,7 @@ function formatDate(value: string) {
 }
 
 export async function DashboardProjectsPage() {
+  const { t } = await getServerTranslator();
   const supabase = await createClient();
   const {
     data: { user },
@@ -30,8 +32,8 @@ export async function DashboardProjectsPage() {
   return (
     <>
       <DashboardHeader
-        title="Projects"
-        description="Real generations from your authenticated Supabase workspace"
+        title={t("dashboard.projectsPage.title")}
+        description={t("dashboard.projectsPage.description")}
         userEmail={user?.email}
         userName={metadata.full_name as string | undefined}
       />
@@ -39,7 +41,9 @@ export async function DashboardProjectsPage() {
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-[13px] text-white/45">
-              {projects.length} project{projects.length === 1 ? "" : "s"}
+              {projects.length === 1
+                ? t("dashboard.projectsPage.projectCount", { count: projects.length })
+                : t("dashboard.projectsPage.projectCountPlural", { count: projects.length })}
             </p>
           </div>
           <Button
@@ -47,7 +51,7 @@ export async function DashboardProjectsPage() {
             className="rounded-xl bg-[linear-gradient(180deg,#FFD700,#D4AF37)] text-[#111] hover:brightness-110"
           >
             <Link href="/dashboard/website-builder">
-              New Project <ArrowRight className="size-4" />
+              {t("dashboard.projectsPage.newProject")} <ArrowRight className="size-4" />
             </Link>
           </Button>
         </div>
@@ -55,9 +59,9 @@ export async function DashboardProjectsPage() {
         {projects.length === 0 ? (
           <DashboardEmptyState
             icon={FolderKanban}
-            title="No projects yet"
-            description="Generate a website, brand, campaign or business workspace to populate your project library."
-            action={{ label: "Create your first project", href: "/dashboard/website-builder" }}
+            title={t("dashboard.projectsPage.emptyTitle")}
+            description={t("dashboard.projectsPage.emptyDescription")}
+            action={{ label: t("dashboard.projectsPage.emptyAction"), href: "/dashboard/website-builder" }}
           />
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -76,7 +80,7 @@ export async function DashboardProjectsPage() {
                       {formatDate(project.createdAt)}
                     </span>
                     <span className="inline-flex items-center gap-1 text-[13px] font-semibold text-premium-gold">
-                      Open <ArrowRight className="size-3.5" />
+                      {t("dashboard.projectsPage.open")} <ArrowRight className="size-3.5" />
                     </span>
                   </div>
                 </DashboardPanel>

@@ -1,7 +1,9 @@
 /**
  * Phase 9 — One Prompt Experience config for Core products.
  * UX-only; generators and product APIs stay unchanged.
+ * Display strings use `dashboard.onePrompt.products.*` locale keys in UI.
  */
+export const I18N_CATALOG = true as const;
 
 export type OnePromptProductId =
   | "website-builder"

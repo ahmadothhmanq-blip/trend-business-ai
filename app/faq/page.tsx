@@ -6,21 +6,27 @@ import { PUBLIC_SAAS_PAGES } from "@/lib/constants/saas-pages";
 import { REF_FAQ } from "@/lib/constants/marketing-content";
 import { SeoService } from "@/lib/seo/engine";
 import { faqPageJsonLd, webPageJsonLd } from "@/lib/seo/json-ld";
+import { getServerTranslator } from "@/lib/i18n/server";
 
-export const metadata: Metadata = SeoService.createMetadata({
-  title: "FAQ",
-  description: PUBLIC_SAAS_PAGES.faq.description,
-  path: "/faq",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerTranslator();
+  return SeoService.createMetadata({
+    title: t("marketing.faq.label"),
+    description: PUBLIC_SAAS_PAGES.faq.description,
+    path: "/faq",
+  });
+}
 
-export default function FaqPage() {
+export default async function FaqPage() {
+  const { t } = await getServerTranslator();
+
   return (
     <>
       <JsonLdScript
         id="faq-jsonld"
         data={[
           webPageJsonLd({
-            name: "FAQ",
+            name: t("marketing.faq.label"),
             description: PUBLIC_SAAS_PAGES.faq.description,
             path: "/faq",
             type: "FAQPage",
@@ -33,7 +39,7 @@ export default function FaqPage() {
       <PublicSaasPage page={PUBLIC_SAAS_PAGES.faq}>
         <div className="landing-container border-t border-[rgba(212,175,55,0.12)] py-16">
           <RelatedLinksSection
-            title="Related resources"
+            title={t("marketing.publicPages.faqPage.relatedResources")}
             links={[
               ...SeoService.links.articles(),
               ...SeoService.links.resources(3),

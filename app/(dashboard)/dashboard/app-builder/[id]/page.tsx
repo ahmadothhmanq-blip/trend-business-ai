@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { DashboardHeader } from "@/components/dashboard/header";
 import { AppManagementDashboard } from "@/components/dashboard/webapp-builder/app-management-dashboard";
 import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
+import { getServerTranslator } from "@/lib/i18n/server";
 
 export async function generateMetadata() {
   return dashboardPageMetadata("appBuilderManage");
@@ -12,6 +13,7 @@ type PageProps = { params: Promise<{ id: string }> };
 
 export default async function AppBuilderManagePage({ params }: PageProps) {
   const { id } = await params;
+  const { t } = await getServerTranslator();
   const supabase = await createClient();
   const {
     data: { user },
@@ -38,8 +40,8 @@ export default async function AppBuilderManagePage({ params }: PageProps) {
   return (
     <>
       <DashboardHeader
-        title={data.app_name || "Manage App"}
-        description="Design, preview, and manage your AI-generated application"
+        title={data.app_name || t("pages.appBuilderManage.headerFallback")}
+        description={t("pages.appBuilderManage.headerDescription")}
         userEmail={user.email}
         userName={
           (profile?.full_name as string | undefined) ??

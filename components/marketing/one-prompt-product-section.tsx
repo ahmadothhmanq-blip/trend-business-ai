@@ -10,9 +10,10 @@ import {
   SiteLabel,
   SiteSectionHead,
 } from "@/components/marketing/site/ui";
-import { CORE_UX_STEPS } from "@/components/dashboard/one-prompt/steps";
+import { buildCoreUxSteps } from "@/components/dashboard/one-prompt/steps";
 import type { OnePromptProductConfig } from "@/lib/constants/one-prompt-products";
 import { useScopedT } from "@/lib/i18n/use-scoped-t";
+import { useTranslation } from "@/lib/i18n/client";
 
 /**
  * Public service-page One Prompt block — idea input + examples + pipeline.
@@ -24,6 +25,8 @@ export function OnePromptProductSection({
   product: OnePromptProductConfig;
 }) {
   const tCommon = useScopedT("marketing.common");
+  const { t } = useTranslation();
+  const steps = buildCoreUxSteps(t);
   const [idea, setIdea] = useState("");
   const href = idea.trim()
     ? `${product.dashboardHref}?idea=${encodeURIComponent(idea.trim())}`
@@ -82,7 +85,7 @@ export function OnePromptProductSection({
           <SiteH2 className="mt-4">{tCommon("fromIdeaToProduct")}</SiteH2>
           <SiteBody className="mt-4 max-w-2xl">{tCommon("everyRunFollows")}</SiteBody>
           <ol className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
-            {CORE_UX_STEPS.map((step, index) => (
+            {steps.map((step, index) => (
               <li
                 key={step.id}
                 className="rounded-2xl border border-[rgba(212,175,55,0.16)] bg-[#111111] p-4"

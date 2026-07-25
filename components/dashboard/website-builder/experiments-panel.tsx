@@ -160,8 +160,7 @@ export function ExperimentsPanel(props: { generationId: string | null }) {
           </div>
           <h3 className="text-lg font-bold text-white">{wb("panels.experimentsTitle")}</h3>
           <p className="mt-1 max-w-2xl text-[12px] text-white/40">
-            Create Variant A / Variant B, duplicate sections, split traffic, and
-            automatically declare winning variants by conversion rate.
+            {wb("panels.experimentsDescription")}
           </p>
         </div>
         <Button
@@ -201,7 +200,7 @@ export function ExperimentsPanel(props: { generationId: string | null }) {
                       {exp.hypothesis || wb("panels.noHypothesis")}
                     </p>
                     <p className="mt-1 text-[11px] text-white/30">
-                      Testing: {exp.changeTypes.join(" · ") || "general"}
+                      {wb("panels.testingLabel")}: {exp.changeTypes.join(" · ") || wb("panels.general")}
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2">
@@ -212,7 +211,7 @@ export function ExperimentsPanel(props: { generationId: string | null }) {
                         disabled={busyId === exp.id}
                         onClick={() => void setStatus(exp.id, "running")}
                       >
-                        Start
+                        {wb("panels.start")}
                       </Button>
                     ) : null}
                     {exp.status === "running" ? (
@@ -224,7 +223,7 @@ export function ExperimentsPanel(props: { generationId: string | null }) {
                           disabled={busyId === exp.id}
                           onClick={() => void evaluate(exp.id)}
                         >
-                          Check winner
+                          {wb("panels.checkWinner")}
                         </Button>
                         <Button
                           size="sm"
@@ -233,7 +232,7 @@ export function ExperimentsPanel(props: { generationId: string | null }) {
                           disabled={busyId === exp.id}
                           onClick={() => void setStatus(exp.id, "paused")}
                         >
-                          Pause
+                          {wb("panels.pause")}
                         </Button>
                       </>
                     ) : null}
@@ -263,27 +262,27 @@ export function ExperimentsPanel(props: { generationId: string | null }) {
                       >
                         <div className="flex items-center justify-between">
                           <p className="text-[13px] font-semibold text-white">
-                            Variant {v.key} · {v.name}
+                            {wb("panels.variantLabel", { key: v.key, name: v.name })}
                           </p>
                           <span className="text-[11px] text-white/40">
-                            {v.weight}% traffic
+                            {wb("panels.trafficPercent", { weight: v.weight })}
                           </span>
                         </div>
                         <div className="mt-2 grid grid-cols-3 gap-2 text-center text-[11px]">
                           <div>
-                            <p className="text-white/35">Impressions</p>
+                            <p className="text-white/35">{wb("panels.impressions")}</p>
                             <p className="font-semibold text-white">
                               {v.impressions}
                             </p>
                           </div>
                           <div>
-                            <p className="text-white/35">Conversions</p>
+                            <p className="text-white/35">{wb("panels.conversions")}</p>
                             <p className="font-semibold text-white">
                               {v.conversions}
                             </p>
                           </div>
                           <div>
-                            <p className="text-white/35">CR</p>
+                            <p className="text-white/35">{wb("panels.conversionRate")}</p>
                             <p className="font-semibold text-premium-gold">
                               {rate}%
                             </p>
@@ -305,7 +304,10 @@ export function ExperimentsPanel(props: { generationId: string | null }) {
                   <p className="mt-3 text-[12px] text-white/50">
                     {results.summary}
                     {results.liftPercent != null
-                      ? ` · Lift ${results.liftPercent > 0 ? "+" : ""}${results.liftPercent}%`
+                      ? wb("panels.liftPercent", {
+                          sign: results.liftPercent > 0 ? "+" : "",
+                          percent: results.liftPercent,
+                        })
                       : ""}
                   </p>
                 ) : null}
@@ -347,7 +349,7 @@ function CreateExperimentDialog(props: {
   const [error, setError] = useState<string | null>(null);
   const [name, setName] = useState(wb("panels.defaultExperimentName"));
   const [hypothesis, setHypothesis] = useState(
-    "A clearer outcome-led CTA will beat the control on conversions.",
+    wb("panels.defaultHypothesis"),
   );
   const [changeType, setChangeType] =
     useState<ExperimentChangeType>("headline");
@@ -428,10 +430,9 @@ function CreateExperimentDialog(props: {
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto border-white/10 bg-[#0c0c0c] text-white sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>Create A/B experiment</DialogTitle>
+          <DialogTitle>{wb("panels.createExperimentTitle")}</DialogTitle>
           <DialogDescription className="text-white/45">
-            Duplicate a section into Variant A (control) and Variant B
-            (challenger). Traffic splits 50/50 by default.
+            {wb("panels.createExperimentDescription")}
           </DialogDescription>
         </DialogHeader>
 
@@ -504,7 +505,7 @@ function CreateExperimentDialog(props: {
             className="border-white/15 text-white"
             onClick={() => props.onOpenChange(false)}
           >
-            Cancel
+            {wb("dialogs.cancel")}
           </Button>
           <Button
             className="bg-premium-gold text-black"
@@ -512,7 +513,7 @@ function CreateExperimentDialog(props: {
             onClick={() => void submit()}
           >
             {saving ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}
-            Start experiment
+            {wb("panels.startExperiment")}
           </Button>
         </DialogFooter>
       </DialogContent>

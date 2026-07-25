@@ -6,21 +6,27 @@ import { RelatedLinksSection } from "@/components/seo/related-links";
 import { PUBLIC_SAAS_PAGES } from "@/lib/constants/saas-pages";
 import { SeoService } from "@/lib/seo/engine";
 import { webPageJsonLd } from "@/lib/seo/json-ld";
+import { getServerTranslator } from "@/lib/i18n/server";
 
-export const metadata: Metadata = SeoService.createMetadata({
-  title: "Contact",
-  description: PUBLIC_SAAS_PAGES.contact.description,
-  path: "/contact",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerTranslator();
+  return SeoService.createMetadata({
+    title: t("marketing.publicPages.contact.metaTitle"),
+    description: t("marketing.publicPages.contact.metaDescription"),
+    path: "/contact",
+  });
+}
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const { t } = await getServerTranslator();
+
   return (
     <>
       <JsonLdScript
         id="contact-jsonld"
         data={webPageJsonLd({
-          name: "Contact",
-          description: PUBLIC_SAAS_PAGES.contact.description,
+          name: t("marketing.publicPages.contact.metaTitle"),
+          description: t("marketing.publicPages.contact.metaDescription"),
           path: "/contact",
           type: "ContactPage",
         })}
@@ -30,20 +36,19 @@ export default function ContactPage() {
           <div className="mx-auto grid max-w-5xl gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-start">
             <div>
               <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#D4AF37]">
-                Contact sales
+                {t("marketing.publicPages.contact.salesEyebrow")}
               </p>
               <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">
-                Tell us what you are building
+                {t("marketing.publicPages.contact.title")}
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-[#A8A8A8]">
-                Share your goals and we will route you to the right product workflow, partnership
-                conversation, or onboarding path.
+                {t("marketing.publicPages.contact.description")}
               </p>
             </div>
             <LeadCaptureForm source="contact" className="rounded-3xl border border-[rgba(212,175,55,0.16)] bg-[#0B0B0B] p-6" />
           </div>
           <div className="mt-16">
-            <RelatedLinksSection title="Helpful resources" links={SeoService.links.resources()} />
+            <RelatedLinksSection title={t("marketing.publicPages.contact.relatedResources")} links={SeoService.links.resources()} />
           </div>
         </div>
       </PublicSaasPage>

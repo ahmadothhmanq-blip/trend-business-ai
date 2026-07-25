@@ -8,17 +8,17 @@
     "error": "Something went wrong",
     "language": "Langue",
     "selectLanguage": "Choisir la langue",
-    "search": "Search",
+    "search": "Rechercher",
     "settings": "Paramètres",
     "signOut": "Se déconnecter",
     "getStarted": "Commencer",
     "learnMore": "Learn more",
     "viewAll": "View all",
-    "back": "Back",
+    "back": "Retour",
     "next": "Next",
     "submit": "Submit",
-    "close": "Close",
-    "delete": "Delete",
+    "close": "Fermer",
+    "delete": "Supprimer",
     "edit": "Edit",
     "create": "Create",
     "update": "Update",
@@ -29,9 +29,9 @@
     "duplicate": "Duplicate",
     "rename": "Rename",
     "refresh": "Refresh",
-    "filter": "Filter",
+    "filter": "Filtrer",
     "sort": "Sort",
-    "copy": "Copy",
+    "copy": "Copier",
     "share": "Share",
     "publish": "Publish",
     "unpublish": "Unpublish",
@@ -59,14 +59,14 @@
     "cybersecurity": "Cybersecurity",
     "websiteBuilder": "Créateur de sites",
     "landingPages": "Landing Pages",
-    "webAppBuilder": "Web App Builder",
+    "webAppBuilder": "Créateur d'apps",
     "logoDesigner": "Logo Designer",
     "brandIdentity": "Brand Identity",
     "imageGenerator": "Image Generator",
-    "videoStudio": "Video Studio",
+    "videoStudio": "Studio vidéo",
     "contentStudio": "Studio de contenu",
     "socialMedia": "Social Media",
-    "marketingStrategy": "Stratégie marketing",
+    "marketingStrategy": "Marketing",
     "businessSuite": "Business Suite",
     "feasibilityStudy": "Feasibility Study",
     "aiAgents": "Agents IA",
@@ -87,7 +87,7 @@
     "services": "Services",
     "aiSolutions": "AI Solutions",
     "pricing": "Tarifs",
-    "about": "About",
+    "about": "À propos",
     "contact": "Contact",
     "signIn": "Connexion"
   },
@@ -285,6 +285,210 @@
       "stepDescribeBriefBody": "Share goals, audience and constraints. Clearer briefs produce stronger output.",
       "stepSaveExport": "Save and export",
       "stepSaveExportBody": "Keep results in your authenticated dashboard and export when you are ready to execute."
+    },
+    "publicPages": {
+      "resources": {
+        "metaTitle": "Business Resources",
+        "metaDescription": "Curated resources for founders and operators using Trend Business AI — docs, learning, FAQs and growth tools.",
+        "jsonLdName": "Business Resources",
+        "jsonLdDescription": "Docs, learning hubs and growth resources for Trend Business AI.",
+        "eyebrow": "Resources",
+        "title": "Business resources for AI-powered growth.",
+        "description": "A curated hub for documentation, learning paths and platform resources — built for search clarity, not content spam.",
+        "primaryCta": "Knowledge Center",
+        "secondaryCta": "Documentation"
+      },
+      "templates": {
+        "metaTitle": "AI Templates — Websites, Brand & Content",
+        "metaDescription": "Browse Trend Business AI template patterns for landing pages, brand kits and business workflows.",
+        "jsonLdName": "AI Templates",
+        "jsonLdDescription": "Template patterns for websites, brand and content workflows.",
+        "eyebrow": "Templates",
+        "title": "Premium starting points for AI workflows.",
+        "description": "Curated template patterns connected to Trend Business AI products — not thin duplicate pages.",
+        "primaryCta": "Start Free",
+        "secondaryCta": "View Products",
+        "openProduct": "Open {slug}"
+      },
+      "learn": {
+        "metaTitle": "Knowledge Center — Academy, Guides & Docs",
+        "metaDescription": "Learn Trend Business AI with academy tracks, tutorials, guides, documentation, glossary and case studies.",
+        "jsonLdName": "Knowledge Center",
+        "jsonLdDescription": "Academy, tutorials, guides, documentation, glossary and case studies for Trend Business AI.",
+        "jsonLdCollectionDescription": "Learning hubs across Trend Business AI.",
+        "eyebrow": "Knowledge Center",
+        "title": "Learn. Build. Scale with AI.",
+        "description": "Architecture for Academy, Tutorials, Guides, Documentation, Glossary and Case Studies — published only when content meets quality standards.",
+        "primaryCta": "Open Docs",
+        "secondaryCta": "Browse Products",
+        "publishedCount": "{count} published",
+        "foundationReady": "Foundation ready",
+        "startBuildingFree": "Start building free",
+        "sections": {
+          "academy": {
+            "title": "Academy",
+            "description": "Structured learning paths for founders and operators."
+          },
+          "tutorial": {
+            "title": "Tutorials",
+            "description": "Step-by-step walkthroughs for each AI product workflow."
+          },
+          "guide": {
+            "title": "Guides",
+            "description": "Strategic playbooks for launching and growing with AI."
+          },
+          "documentation": {
+            "title": "Documentation",
+            "description": "Reference docs for the dashboard, exports and platform features."
+          },
+          "glossary": {
+            "title": "Glossary",
+            "description": "Clear definitions for AI business and growth terminology."
+          },
+          "case-study": {
+            "title": "Case Studies",
+            "description": "Real-world outcomes from teams using Trend Business AI."
+          }
+        }
+      },
+      "notFound": {
+        "title": "This page is not available.",
+        "description": "The route may have moved, or the workspace area may require a different link. Return home or open your dashboard to continue.",
+        "goHome": "Go Home",
+        "openDashboard": "Open Dashboard"
+      },
+      "contact": {
+        "metaTitle": "Contact",
+        "metaDescription": "Get in touch with Trend Business AI for sales, partnerships, and onboarding.",
+        "salesEyebrow": "Contact sales",
+        "title": "Tell us what you are building",
+        "description": "Share your goals and we will route you to the right product workflow, partnership conversation, or onboarding path.",
+        "relatedResources": "Helpful resources"
+      },
+      "about": {
+        "metaTitle": "About",
+        "metaDescription": "Trend Business AI is a next-generation AI platform to build, automate and scale websites, apps, content, marketing and business intelligence.",
+        "jsonLdName": "About Trend Business AI",
+        "explorePlatform": "Explore the platform"
+      },
+      "privacy": {
+        "metaTitle": "Privacy Policy",
+        "metaDescription": "How Trend Business AI handles account, profile, and generated business planning data.",
+        "eyebrow": "Legal",
+        "title": "Privacy Policy",
+        "intro": "Last updated: July 5, 2026. This MVP policy explains the current data handling model for Trend Business AI.",
+        "related": "Related",
+        "termsTitle": "Terms of Service",
+        "termsDescription": "MVP beta usage expectations.",
+        "sections": {
+          "collect": {
+            "title": "Information We Collect",
+            "body": "Trend Business AI collects the account information you provide, such as your email address, profile details, preferences, and uploaded avatar. The app also stores the business ideas, market analyses, reports, and website blueprints you generate."
+          },
+          "use": {
+            "title": "How We Use Information",
+            "body": "We use your information to authenticate your account, operate your private dashboard, save generated assets, provide exports, and improve the reliability of the MVP experience."
+          },
+          "ai": {
+            "title": "AI-Generated Content",
+            "body": "When AI generation is enabled, prompts and relevant inputs may be sent to the configured AI provider to create business planning outputs. Do not submit confidential, regulated, or sensitive personal information in prompts."
+          },
+          "storage": {
+            "title": "Data Storage",
+            "body": "Account data, generated assets, preferences, and avatar metadata are stored using Supabase services configured for this application. Access is scoped to authenticated users through application checks and database policies."
+          },
+          "choices": {
+            "title": "Your Choices",
+            "body": "You can update your profile, change preferences, delete generated records where supported, and sign out at any time from the dashboard."
+          },
+          "beta": {
+            "title": "Beta Notice",
+            "body": "Trend Business AI is currently an MVP beta. Privacy practices may evolve as billing, team features, analytics, or support workflows are introduced."
+          }
+        }
+      },
+      "terms": {
+        "metaTitle": "Terms of Service",
+        "metaDescription": "Terms for using the Trend Business AI MVP beta.",
+        "eyebrow": "Legal",
+        "title": "Terms of Service",
+        "intro": "Last updated: July 5, 2026. These terms describe the current MVP beta usage expectations for Trend Business AI.",
+        "related": "Related",
+        "privacyTitle": "Privacy Policy",
+        "privacyDescription": "How we handle account and generated data.",
+        "sections": {
+          "use": {
+            "title": "Use of the Service",
+            "body": "Trend Business AI is provided as an MVP beta for business planning, research, reporting, and website blueprint generation. You are responsible for how you use generated outputs and for validating information before making business decisions."
+          },
+          "accounts": {
+            "title": "Accounts",
+            "body": "You must provide accurate account information and keep your login credentials secure. Activity performed through your account is your responsibility."
+          },
+          "ai": {
+            "title": "AI Outputs",
+            "body": "AI-generated content may be incomplete, inaccurate, or unsuitable for your specific situation. Outputs are provided for planning assistance and should not be treated as legal, financial, tax, or professional advice."
+          },
+          "acceptable": {
+            "title": "Acceptable Use",
+            "body": "Do not use the service to submit unlawful, harmful, confidential, regulated, or sensitive personal information. Do not attempt to bypass authentication, rate limits, or security controls."
+          },
+          "beta": {
+            "title": "Beta Availability",
+            "body": "Features, limits, pricing, and availability may change as the product evolves from MVP beta toward production."
+          },
+          "liability": {
+            "title": "Limitation of Liability",
+            "body": "The MVP is provided as-is. To the maximum extent permitted by law, Trend Business AI is not liable for losses resulting from reliance on generated content or service interruptions."
+          }
+        }
+      },
+      "faqPage": {
+        "relatedResources": "Related resources"
+      },
+      "seo": {
+        "exploreProducts": "Explore products",
+        "contactSales": "Contact sales",
+        "browse": "Browse",
+        "relatedTools": "Related tools"
+      },
+      "clusters": {
+        "countries": {
+          "metaTitle": "AI Business Platform by Market",
+          "metaDescription": "Market pages for teams in the US, UK, UAE, Saudi Arabia and more — plan products, brands and growth with Trend Business AI.",
+          "eyebrow": "Markets",
+          "title": "AI workspaces for every market you serve",
+          "description": "Published market landings that help local teams discover Trend Business AI with clear regional context and intent."
+        },
+        "industries": {
+          "metaTitle": "AI Solutions by Industry",
+          "metaDescription": "Industry-specific AI workflows for software, retail, healthcare, finance and more with Trend Business AI.",
+          "eyebrow": "Industries",
+          "title": "Built for how your industry ships",
+          "description": "Explore industry landings that connect planning, branding, content and go-to-market workflows to your market context."
+        },
+        "compare": {
+          "metaTitle": "Compare AI Business Platforms & Workflows",
+          "metaDescription": "Compare unified AI business suites against fragmented tools — see when an all-in-one workspace wins for planning, creation and growth.",
+          "eyebrow": "Comparisons",
+          "title": "Choose the right AI operating model",
+          "description": "Side-by-side comparisons that help founders and operators decide between fragmented AI chats and a connected business workspace."
+        },
+        "services": {
+          "metaTitle": "AI Services for SEO, GTM & Growth",
+          "metaDescription": "Service overviews for SEO growth systems, go-to-market planning and AI-assisted brand launch workflows powered by Trend Business AI.",
+          "eyebrow": "Services",
+          "title": "AI-backed services that compound",
+          "description": "Published service pages covering SEO foundations, go-to-market planning and growth systems built on the Trend Business AI platform."
+        },
+        "useCases": {
+          "metaTitle": "AI Use Cases for Founders & Growth Teams",
+          "metaDescription": "Explore published use cases for startups, agencies and growth teams — websites, branding, content systems and more with Trend Business AI.",
+          "eyebrow": "Use cases",
+          "title": "AI workflows that match how you ship",
+          "description": "Practical landing pages for how teams actually use Trend Business AI — from startup websites to agency branding and content engines."
+        }
+      }
     },
     "cta": {
       "getStartedLabel": "Get started",
@@ -635,6 +839,169 @@
       "pipelineValue": "Pipeline value",
       "videoStudio": "Video Studio",
       "renderingClip": "Rendering clip 3 of 5"
+    },
+    "maisonNocturne": {
+      "brandName": "Maison Nocturne",
+      "heroImageAlt": "Maison Nocturne dining room",
+      "nav": {
+        "menu": "Menu",
+        "chef": "Chef",
+        "gallery": "Gallery",
+        "locations": "Locations",
+        "reserve": "Reserve"
+      },
+      "hero": {
+        "eyebrow": "Michelin Star · Est. 2014",
+        "tagline": "Dark rooms. Exact plates. Evenings composed like a tasting menu — quiet, luminous, unforgettable.",
+        "reserveTable": "Reserve a table",
+        "viewMenu": "View the menu"
+      },
+      "menu": {
+        "eyebrow": "The menu",
+        "title": "Tonight's composition",
+        "description": "A seasonal tasting journey, with à la carte for those who prefer a shorter evening. Wine pairings available upon reservation.",
+        "tastingTitle": "Tasting menu · 9 courses",
+        "tastingPrice": "€245 · pairing +€95",
+        "aLaCarteTitle": "À la carte",
+        "aLaCarteSubtitle": "Selected signatures",
+        "tasting": {
+          "0": {
+            "name": "Amuse — Sea foam & caviar",
+            "note": "Oscietra · cucumber essence · dill oil"
+          },
+          "1": {
+            "name": "Langoustine",
+            "note": "Charred citrus · brown butter · fennel pollen"
+          },
+          "2": {
+            "name": "Turbot",
+            "note": "Champagne beurre blanc · young leeks · pearl barley"
+          },
+          "3": {
+            "name": "Squab",
+            "note": "Black garlic · morel · roasted jus"
+          },
+          "4": {
+            "name": "Cheese — Affineur selection",
+            "note": "Three ages · honeycomb · walnut bread"
+          },
+          "5": {
+            "name": "Dark cacao",
+            "note": "70% origin · smoked salt · olive oil ice"
+          }
+        },
+        "aLaCarte": {
+          "0": {
+            "name": "Hand-dived scallops",
+            "price": "48",
+            "note": "Yuzu · brown butter"
+          },
+          "1": {
+            "name": "Aged duck breast",
+            "price": "62",
+            "note": "Cherry · endive · jus"
+          },
+          "2": {
+            "name": "Dry-aged ribeye",
+            "price": "78",
+            "note": "Bone marrow · thyme"
+          },
+          "3": {
+            "name": "Wild mushroom risotto",
+            "price": "44",
+            "note": "Parmesan veil"
+          }
+        }
+      },
+      "chef": {
+        "eyebrow": "The chef",
+        "name": "Solène Marchand",
+        "imageAlt": "Chef Solène Marchand in the kitchen",
+        "bio1": "Born in Lyon and shaped in kitchens from Kyoto to Copenhagen, Chef Solène opened Maison Nocturne to explore one idea: luxury as restraint. Her Michelin star arrived in 2018 — not as a destination, but as permission to go quieter, darker, more precise.",
+        "bio2": "Each season she rebuilds the tasting menu around fire, acidity, and memory. Guests are invited to surrender the evening to the kitchen — and leave with a story told entirely through taste.",
+        "quote": "The best plate is the one that needs no explanation."
+      },
+      "gallery": {
+        "0": {
+          "alt": "Seared scallop with citrus oil"
+        },
+        "1": {
+          "alt": "Candlelit dining room"
+        },
+        "2": {
+          "alt": "Wagyu course plating"
+        },
+        "3": {
+          "alt": "Champagne service"
+        },
+        "4": {
+          "alt": "Seasonal tasting plate"
+        },
+        "5": {
+          "alt": "Private dining alcove"
+        },
+        "eyebrow": "Gallery",
+        "title": "Atmosphere & plate"
+      },
+      "testimonials": {
+        "0": {
+          "quote": "Every course arrived like a quiet revelation. The room, the pacing, the silence between plates — this is why Michelin exists.",
+          "name": "Isabelle Marchand",
+          "role": "Food critic, Paris"
+        },
+        "1": {
+          "quote": "We reserved for an anniversary and left with a memory that still tastes like champagne and candlelight.",
+          "name": "James & Elena Rowe",
+          "role": "Guests · Dubai"
+        },
+        "2": {
+          "quote": "Chef Solène's tasting menu is disciplined and emotional at once. Dark, precise, unforgettable.",
+          "name": "Hiroshi Tanaka",
+          "role": "Sommelier & writer"
+        },
+        "eyebrow": "Guests & critics",
+        "title": "Words after the last course"
+      },
+      "locations": {
+        "eyebrow": "Locations",
+        "title": "Two cities. One standard.",
+        "paris": {
+          "city": "Paris",
+          "address": "14 Rue des Étoiles, 75007",
+          "hours": "Tue–Sat · 19:00–22:30",
+          "phone": "+33 1 42 00 00 19"
+        },
+        "dubai": {
+          "city": "Dubai",
+          "address": "Level 42, Nocturne Tower, DIFC",
+          "hours": "Sun–Thu · 19:00–23:00",
+          "phone": "+971 4 555 0190"
+        }
+      },
+      "reservations": {
+        "eyebrow": "Reservations",
+        "title": "Claim your evening",
+        "description": "Tables are limited. Tasting menus require a deposit. For private dining or celebrations, note your occasion — our hosts will follow within 24 hours.",
+        "dressCode": "· Dress code: elegant evening",
+        "dietary": "· Dietary needs accommodated with notice",
+        "children": "· Children under 12 on request only",
+        "confirmedEyebrow": "Request received",
+        "confirmedTitle": "We will confirm shortly",
+        "confirmedDescription": "A host from Maison Nocturne will contact you within one day.",
+        "name": "Name",
+        "email": "Email",
+        "date": "Date",
+        "guests": "Guests",
+        "location": "Location",
+        "notes": "Notes",
+        "notesPlaceholder": "Allergies, celebration, wine pairing…",
+        "paris": "Paris",
+        "dubai": "Dubai",
+        "submit": "Request reservation"
+      },
+      "footer": {
+        "tagline": "Michelin Star · Paris & Dubai"
+      }
     }
   },
   "auth": {
@@ -645,13 +1012,13 @@
     "emailPlaceholder": "you@company.com",
     "passwordPlaceholder": "••••••••",
     "forgotPassword": "Forgot password?",
-    "signIn": "Connexion",
+    "signIn": "Se connecter",
     "signingIn": "Connexion en cours...",
     "noAccount": "Don't have an account?",
     "createAccount": "Create account",
     "confirmEmail": "Check your email to confirm your account before signing in.",
     "authFailed": "Authentication failed. Please try again.",
-    "signUp": "Sign Up",
+    "signUp": "S'inscrire",
     "signUpDescription": "Create your Trend Business AI account",
     "fullName": "Full name",
     "haveAccount": "Already have an account?",
@@ -664,6 +1031,7 @@
     "signInLink": "Sign in",
     "fullNamePlaceholder": "Jane Doe",
     "passwordMinPlaceholder": "Min. 6 characters",
+    "backToHome": "← Retour à l'accueil",
     "forgotPasswordTitle": "Forgot your password?",
     "forgotPasswordSubtitle": "Enter your email and we will send you a reset link.",
     "sendingResetLink": "Sending...",
@@ -876,6 +1244,177 @@
     "loading": {
       "dashboard": "Loading dashboard"
     },
+    "projectsPage": {
+      "title": "Projects",
+      "description": "Real generations from your authenticated Supabase workspace",
+      "projectCount": "{count} project",
+      "projectCountPlural": "{count} projects",
+      "newProject": "New Project",
+      "emptyTitle": "No projects yet",
+      "emptyDescription": "Generate a website, brand, campaign or business workspace to populate your project library.",
+      "emptyAction": "Create your first project",
+      "open": "Open"
+    },
+    "listFilters": {
+      "searchPlaceholder": "Search...",
+      "searchAria": "Search",
+      "filterFavoritesAria": "Filter favorites",
+      "allItems": "All items",
+      "favoritesOnly": "Favorites only",
+      "nonFavorites": "Non-favorites",
+      "allOption": "All {label}"
+    },
+    "pagination": {
+      "pageOf": "Page {page} of {totalPages}",
+      "total": "{total} total",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "workspaceGenerator": {
+      "title": "Prompt Studio",
+      "description": "Write a brief, pick a template, tune settings, then generate.",
+      "autosaving": "Autosaving…",
+      "draftSaved": "Draft saved",
+      "promptVersionHistory": "Prompt version history",
+      "templates": "Templates",
+      "selectedTemplateAria": "Selected template",
+      "selectedTemplatePlaceholder": "Selected template",
+      "generating": "Generating...",
+      "uploading": "Uploading…",
+      "uploadFile": "Upload file",
+      "uploadImage": "Upload image",
+      "attachmentImage": "Image",
+      "attachmentFile": "File",
+      "removeAttachmentAria": "Remove {fileName}",
+      "advancedSettings": "Advanced settings",
+      "language": "Language",
+      "theme": "Theme",
+      "generationDepth": "Generation depth",
+      "focusOutputs": "Focus outputs",
+      "generationInProgress": "Generation in progress",
+      "retry": "Retry",
+      "depth": {
+        "focused": {
+          "label": "Focused",
+          "hint": "Faster, tighter deliverables"
+        },
+        "standard": {
+          "label": "Standard",
+          "hint": "Balanced production output"
+        },
+        "deep": {
+          "label": "Deep",
+          "hint": "Board-ready depth and detail"
+        }
+      }
+    },
+    "workspaceOutput": {
+      "title": "Streaming Output",
+      "streaming": "Streaming project output...",
+      "savedToHistory": "Saved to your workspace project history",
+      "generatePrompt": "Generate to stream live output",
+      "live": "Live",
+      "failed": "Failed",
+      "favorite": "Favorite",
+      "composingSummary": "Composing executive summary...",
+      "streamingSections": "Streaming structured sections...",
+      "regenerate": "Regenerate",
+      "improveWithAi": "Improve with AI",
+      "retry": "Retry",
+      "favorited": "Favorited",
+      "renameSave": "Rename / Save",
+      "copy": "Copy",
+      "exportMd": "Export MD",
+      "exportPdf": "Export PDF",
+      "exportDocx": "Export DOCX",
+      "exportJson": "Export JSON",
+      "emptyTitle": "No project selected",
+      "emptyDescription": "Generate your first workspace project to stream structured output here. Every run is saved to your user workspace history."
+    },
+    "workspaceProjects": {
+      "title": "Saved Projects",
+      "description": "Search, favorite, export, download and manage your workspace history",
+      "renameTitle": "Save project",
+      "renameDescription": "Rename and keep this generation in your workspace project history.",
+      "saveProject": "Save project",
+      "emptyTitle": "No projects yet",
+      "emptyDescription": "Generate a project to see it in your workspace history.",
+      "listEmptyTitle": "No saved projects yet",
+      "listEmptyDescription": "Your generated workspace projects will appear here with full history, favorites and export support.",
+      "addFavorite": "Add favorite",
+      "removeFavorite": "Remove favorite",
+      "downloadMarkdown": "Download markdown",
+      "downloadJson": "Download JSON",
+      "duplicateProject": "Duplicate project",
+      "deleteProject": "Delete project",
+      "duplicate": "Duplicate",
+      "exportMd": "Export MD",
+      "exportJson": "Export JSON",
+      "updated": "Updated"
+    },
+    "onePrompt": {
+      "experienceLabel": "One Prompt Experience",
+      "businessIdeaLabel": "Your business idea",
+      "generating": "Generating…",
+      "pipelineHint": "AI guides Idea → Strategy → Design → Assets → Generation → Quality → Ready",
+      "creationPipeline": "Creation pipeline",
+      "progressAria": "Generation progress",
+      "publishStatus": {
+        "ready": "Ready to publish",
+        "needsReview": "Needs review",
+        "generating": "Generating",
+        "failed": "Failed",
+        "unknown": "Status unknown"
+      },
+      "steps": {
+        "idea": {
+          "label": "Idea",
+          "description": "Understanding your business"
+        },
+        "strategy": {
+          "label": "Strategy",
+          "description": "Positioning, pages, and messaging"
+        },
+        "design": {
+          "label": "Design",
+          "description": "Visual system and UI style"
+        },
+        "assets": {
+          "label": "Assets",
+          "description": "Hero and brand visuals"
+        },
+        "generation": {
+          "label": "Generation",
+          "description": "Building your product"
+        },
+        "quality": {
+          "label": "Quality",
+          "description": "Checks, SEO, and performance"
+        },
+        "ready": {
+          "label": "Ready Product",
+          "description": "Publish-ready result"
+        }
+      }
+    },
+    "builderShared": {
+      "noFilesTitle": "No generated files to preview",
+      "back": "Back",
+      "regenerate": "Regenerate",
+      "improveWithAi": "Improve with AI",
+      "downloadZip": "Download ZIP",
+      "projectDownloaded": "Project downloaded",
+      "fileTree": "File Tree",
+      "copiedToClipboard": "Copied to clipboard",
+      "preview": "Preview",
+      "improve": "Improve",
+      "retry": "Retry",
+      "statuses": {
+        "completed": "Completed",
+        "failed": "Failed",
+        "generating": "Generating"
+      }
+    },
     "errors": {
       "headerTitle": "Error",
       "headerDescription": "We couldn't load this page",
@@ -909,26 +1448,26 @@
     "contactSales": "Contact sales"
   },
   "errors": {
-    "generic": "Something went wrong. Please try again.",
-    "notFound": "Page not found",
-    "unauthorized": "You must be signed in to access this page.",
-    "forbidden": "You don't have permission to access this resource.",
+    "generic": "Une erreur s'est produite. Veuillez réessayer.",
+    "notFound": "Page introuvable",
+    "unauthorized": "Vous devez être connecté pour accéder à cette page.",
+    "forbidden": "Vous n'avez pas la permission d'accéder à cette ressource.",
     "validation": "Please check your input and try again.",
     "network": "Network error. Check your connection and try again.",
     "insufficientCredits": "Insufficient credits. Please upgrade your plan.",
     "api": {
-      "INVALID_INPUT": "Invalid input",
-      "NOT_FOUND": "Not found",
-      "UNAUTHORIZED": "Unauthorized",
-      "FORBIDDEN": "Forbidden",
-      "RATE_LIMITED": "Too many requests",
-      "SERVER_ERROR": "Something went wrong",
-      "MIGRATION_REQUIRED": "Database migration required",
-      "GENERATION_NOT_FOUND": "Generation not found",
-      "VIDEO_NOT_FOUND": "Video not found",
-      "TEMPLATE_NOT_FOUND": "Template not found",
-      "CHECKOUT_FAILED": "Checkout failed",
-      "PAYMENT_INCOMPLETE": "Payment could not be completed"
+      "INVALID_INPUT": "Entrée invalide",
+      "NOT_FOUND": "Introuvable",
+      "UNAUTHORIZED": "Non autorisé",
+      "FORBIDDEN": "Interdit",
+      "RATE_LIMITED": "Trop de requêtes",
+      "SERVER_ERROR": "Une erreur s'est produite",
+      "MIGRATION_REQUIRED": "Migration de base de données requise",
+      "GENERATION_NOT_FOUND": "Génération introuvable",
+      "VIDEO_NOT_FOUND": "Vidéo introuvable",
+      "TEMPLATE_NOT_FOUND": "Modèle introuvable",
+      "CHECKOUT_FAILED": "Échec du paiement",
+      "PAYMENT_INCOMPLETE": "Paiement non complété"
     }
   },
   "notifications": {
@@ -937,12 +1476,12 @@
     "markAllRead": "Mark all as read"
   },
   "footer": {
-    "product": "Product",
-    "company": "Company",
-    "legal": "Legal",
-    "privacy": "Privacy",
-    "terms": "Terms",
-    "allRightsReserved": "All rights reserved."
+    "product": "Produit",
+    "company": "Entreprise",
+    "legal": "Mentions légales",
+    "privacy": "Confidentialité",
+    "terms": "Conditions",
+    "allRightsReserved": "Tous droits réservés."
   },
   "pages": {
     "dashboard": {
@@ -1115,19 +1654,26 @@
     },
     "designEditor": {
       "title": "Design Editor",
-      "description": "Edit and refine your AI-generated designs"
+      "description": "Edit and refine your AI-generated designs",
+      "headerTitle": "Edit: {name}",
+      "headerDescription": "Professional AI design editor"
     },
     "brandWorkspace": {
       "title": "Brand Workspace",
-      "description": "Manage your brand identity project"
+      "description": "Manage your brand identity project",
+      "headerDescription": "Brand management workspace"
     },
     "appBuilderManage": {
       "title": "Manage App · App Builder",
-      "description": "Edit and manage your app project"
+      "description": "Edit and manage your app project",
+      "headerFallback": "Manage App",
+      "headerDescription": "Design, preview, and manage your AI-generated application"
     },
     "videoStudioManage": {
       "title": "Manage Video · Video Studio",
-      "description": "Edit and manage your video project"
+      "description": "Edit and manage your video project",
+      "headerFallback": "Manage Video",
+      "headerDescription": "Produce, preview, edit, and manage your AI video project"
     }
   },
   "quickActions": {
@@ -1616,7 +2162,8 @@
         "download": "Could not start download.",
         "generationDisconnected": "Generation interrupted. Attempting to recover…",
         "couldNotAction": "Could not {action} website.",
-        "publishBlocked": "Publishing blocked. Resolve SEO, performance, or conversion issues first."
+        "publishBlocked": "Publishing blocked. Resolve SEO, performance, or conversion issues first.",
+        "noSavedGeneration": "AI engine did not return a saved generation."
       },
       "emptyStates": {
         "noRecentProjects": "No recent projects yet",
@@ -1773,7 +2320,37 @@
         "brandManagement": "Brand management",
         "applyBrand": "Apply brand to website",
         "formLeads": "Form leads",
-        "noLeads": "No leads yet."
+        "noLeads": "No leads yet.",
+        "delete": "Delete",
+        "aiAssistantTitle": "AI Website Assistant",
+        "assistantExamples": "Try: \"Change signature tasting price to $90\" or \"Add a new service called Concierge\"",
+        "runAssistant": "Run assistant",
+        "prePublishQuality": "Pre-publish quality",
+        "scoreLabel": "Score {score}",
+        "runQualityCheck": "Run a quality check to see results."
+      },
+      "settings": {
+        "pageTitle": "AI Project Settings",
+        "pageDescription": "Manage generated project defaults, saved history and workspace metadata.",
+        "backToWorkspace": "Back to Project Workspace",
+        "workspaceDefaults": "Workspace Defaults",
+        "workspaceDefaultsDescription": "Generated projects are saved to Supabase with the prompt, files, and framework metadata. Live preview, AI improve, public URL publish, and ZIP export are available from the main workspace.",
+        "framework": "Framework",
+        "styling": "Styling",
+        "packageManager": "Package manager",
+        "exportFormat": "Export format",
+        "nextjsAppRouter": "Next.js App Router",
+        "tailwindCss": "Tailwind CSS",
+        "npm": "npm",
+        "downloadableZip": "Downloadable ZIP",
+        "savedProjects": "Saved Projects",
+        "generatedFiles": "Generated Files",
+        "favorites": "Favorites",
+        "generationHistory": "Generation History",
+        "generationHistoryDescription": "Reopen previous projects from the main workspace for preview, AI improve, publish, ZIP export, rename, delete, and favorites.",
+        "filesCount": "{count} files",
+        "noProjectsTitle": "No generated projects yet",
+        "noProjectsDescription": "Generate a project to populate workspace settings and history."
       },
       "panels": {
         "designTokensPending": "Design tokens will appear after generation.",
@@ -1790,6 +2367,7 @@
         "failedLoadTemplates": "Failed to load templates",
         "failedApplyTemplate": "Could not apply template",
         "failedLoadBrandKits": "Failed to load brand kits",
+        "brandKitFallback": "Brand Kit",
         "failedAnalyze": "Analysis failed",
         "failedLoadDeployment": "Failed to load deployment",
         "failedLoad": "Failed to load",
@@ -1889,7 +2467,77 @@
         "controlA": "Control (A)",
         "challengerB": "Challenger (B)",
         "publishedToast": "Published{url}",
-        "deploymentAction": "Deployment: {action}"
+        "deploymentAction": "Deployment: {action}",
+        "selectWebsiteDeployment": "Generate or select a website to open publishing & domains.",
+        "noDeploymentEvents": "No deployment events yet.",
+        "urlLabel": "URL",
+        "verifyDns": "Verify DNS",
+        "simulate": "Simulate",
+        "platform": "Platform",
+        "dnsType": "Type",
+        "dnsHost": "Host",
+        "dnsValue": "Value",
+        "dnsPurpose": "Purpose",
+        "sslStatus": "SSL: {status}",
+        "schema": "Schema",
+        "blogSuggestions": "Blog / content suggestions",
+        "aiSearchOptimization": "AI Search optimization",
+        "targets": "Targets",
+        "entityOptimization": "Entity optimization",
+        "brandKnowledgeSignals": "Brand knowledge signals",
+        "keywordTracking": "Keyword tracking",
+        "applyFix": "Apply Fix",
+        "issuesRecommendations": "Issues & AI recommendations",
+        "faqPreview": "FAQ preview",
+        "designSystem": "Design system",
+        "components": "Components",
+        "features": "Features",
+        "liveStructuralPreview": "Live structural preview",
+        "previewUnavailable": "Preview unavailable",
+        "appliesPresetHint": "Applies visual preset to your current site — content preserved",
+        "seedsPipelineHint": "Seeds industry, style, components, and design system",
+        "useTemplate": "Use Template",
+        "clickCardDetails": "Click a card for details",
+        "loadingTemplates": "Loading templates…",
+        "noTemplatesAvailable": "No templates available.",
+        "railEmptyHint": "Templates load from the marketplace catalog.",
+        "testingLabel": "Testing",
+        "general": "general",
+        "start": "Start",
+        "checkWinner": "Check winner",
+        "pause": "Pause",
+        "variantLabel": "Variant {key} · {name}",
+        "trafficPercent": "{weight}% traffic",
+        "impressions": "Impressions",
+        "conversionRate": "CR",
+        "liftPercent": " · Lift {sign}{percent}%",
+        "createExperimentTitle": "Create A/B experiment",
+        "createExperimentDescription": "Duplicate a section into Variant A (control) and Variant B (challenger). Traffic splits 50/50 by default.",
+        "startExperiment": "Start experiment",
+        "defaultHypothesis": "A clearer outcome-led CTA will beat the control on conversions.",
+        "intelligenceTitle": "Website Intelligence",
+        "intelligenceSubtitle": "Missing sections · layout · CTA · SEO · conversion",
+        "generateForIntelligence": "Generate a website to run Website Intelligence.",
+        "score": "Score",
+        "grade": "Grade",
+        "performance": "Performance",
+        "strengths": "Strengths",
+        "applyWithAi": "Apply with AI",
+        "analyzingWebsite": "Analyzing website…",
+        "failedToAnalyze": "Failed to analyze",
+        "templateIntelligenceTitle": "Template Intelligence",
+        "templateIntelligenceSubtitle": "AI picks the best look — or choose one anytime",
+        "autoSelect": "Auto-select",
+        "all": "All",
+        "loadingVisualTemplates": "Loading visual templates…",
+        "template": "Template",
+        "componentsLabel": "Components",
+        "visualPreview": "Visual preview",
+        "selectedReady": "Selected {name} — ready to generate",
+        "appliedPreserved": "Applied {name} — content & images preserved",
+        "autoSelectFailed": "Auto-select failed",
+        "autoSelectUnavailable": "Auto-select unavailable",
+        "autoSelected": "Auto-selected {name}"
       },
       "hero": {
         "tagline": "One Prompt · Idea → Strategy → Design → Assets → Generation → Quality → Ready"
@@ -2076,7 +2724,11 @@
         "seoKeywords": "SEO Keywords",
         "brandVoice": "Brand Voice",
         "useBrandIdentity": "Use brand identity",
-        "options": "Options"
+        "options": "Options",
+        "brandIdentity": "Brand Identity",
+        "brandIdentityOptional": "(optional)",
+        "contentOptions": "Content Options",
+        "seoKeywordsOptional": "(optional, comma-separated)"
       },
       "placeholders": {
         "contentBrief": "Describe the content you want to create — topic, key points, goals, target audience, any specific requirements...",
@@ -2091,7 +2743,8 @@
         "contentTitle": "Content title",
         "briefDescription": "Brief description...",
         "tags": "e.g. SEO, Product Launch",
-        "internalNotes": "Internal notes..."
+        "internalNotes": "Internal notes...",
+        "selectBrandStudio": "Select from Brand Studio…"
       },
       "preview": {
         "noContent": "No content to preview",
@@ -2146,6 +2799,14 @@
         "createFolderFailed": "Failed to create folder",
         "createProjectFailed": "Failed to create project",
         "restoreFailed": "Restore failed"
+      },
+      "brand": {
+        "createBrandHint": "Create a brand in Brand Studio to use brand voice."
+      },
+      "history": {
+        "count": "{count} item",
+        "countPlural": "{count} items",
+        "emptyNoun": "content"
       },
       "workspace": {
         "newDoc": "New Doc",
@@ -2402,6 +3063,24 @@
           "alignCenter": "Center",
           "alignRight": "Right",
           "fill": "Fill"
+        },
+        "designEditor": {
+          "loading": "Loading design editor…",
+          "canvas": "Canvas",
+          "layers": "Layers",
+          "addLayer": "Add",
+          "properties": "Properties",
+          "brandKit": "Brand Kit",
+          "dimensions": "{width}×{height} · v{version}",
+          "appliedBrand": "Applied {name}"
+        },
+        "brandKitPicker": {
+          "loading": "Loading brand kits…",
+          "loadFailed": "Failed to load brand kits",
+          "empty": "No brand kits found. Create one in Brand Studio first.",
+          "title": "Brand Studio Kits",
+          "defaultTagline": "Brand kit",
+          "applyToCanvas": "Apply brand kit to canvas"
         },
         "save": "Save",
         "png": "PNG",
@@ -3040,7 +3719,74 @@
         "deleted": "Deleted successfully",
         "copied": "Copied to clipboard",
         "exportStarted": "Export started",
-        "errorGeneric": "Something went wrong. Please try again."
+        "errorGeneric": "Something went wrong. Please try again.",
+        "logoDesigned": "Logo designed!",
+        "kitDownloaded": "Logo kit downloaded"
+      },
+      "nav": {
+        "newLogo": "New Logo",
+        "myLogos": "My Logos"
+      },
+      "steps": {
+        "chooseLogoStyle": "Choose Logo Style",
+        "chooseLogoStyleDescription": "Select the visual direction for your logo design",
+        "configureLogo": "Configure Logo",
+        "customLogo": "{type} Logo",
+        "configureDescription": "Configure your brand details and logo preferences",
+        "brandName": "Brand Name *",
+        "industry": "Industry",
+        "selectIndustry": "Select industry",
+        "describeVision": "Describe your vision *",
+        "describeChanges": "Describe changes (natural language)",
+        "colorPalette": "Color Palette",
+        "iconStyle": "Icon Style",
+        "typography": "Typography",
+        "brandPersonality": "Brand Personality",
+        "deliverables": "Deliverables & Variations",
+        "generateLogo": "Generate Logo"
+      },
+      "placeholders": {
+        "brandName": "e.g. Trend Business",
+        "logoBrief": "Describe what your brand does, the feeling the logo should convey, any symbols or imagery you envision...",
+        "editExample": "Example: Make the icon bolder, switch to a warmer palette, and add a horizontal lockup variation...",
+        "searchLogos": "Search logos..."
+      },
+      "preview": {
+        "noLogo": "No generated logo to preview",
+        "concepts": "Concepts",
+        "variations": "Variations",
+        "colors": "Colors",
+        "typography": "Typography",
+        "guidelines": "Guidelines",
+        "files": "Files",
+        "downloadKit": "Download Kit",
+        "noVariations": "No variations were requested",
+        "primaryTypography": "Primary: {font}",
+        "secondaryTypography": "Secondary: {font}",
+        "typeSample": "The quick brown fox jumps over the lazy dog",
+        "noGuidelines": "No guidelines were generated",
+        "noFiles": "No files generated",
+        "copied": "Copied",
+        "colorCopied": "Copied {hex}",
+        "chars": "chars",
+        "notAvailable": "N/A"
+      },
+      "generating": {
+        "title": "Designing your logo...",
+        "subtitle": "AI is creating concepts, variations, and brand guidelines",
+        "sendingRequest": "Sending request..."
+      },
+      "errors": {
+        "generationFailed": "Generation failed",
+        "requestFailed": "Request failed.",
+        "describeChanges": "Describe the changes you want in natural language.",
+        "enterBrandDetails": "Enter your brand name, select a style, and describe your logo.",
+        "editThenImprove": "Describe your changes in natural language, then click Improve with AI."
+      },
+      "history": {
+        "count": "{count} logo",
+        "countPlural": "{count} logos",
+        "emptyNoun": "logos"
       }
     },
     "brandIdentity": {
@@ -3339,7 +4085,80 @@
         "deleted": "Deleted successfully",
         "copied": "Copied to clipboard",
         "exportStarted": "Export started",
-        "errorGeneric": "Something went wrong. Please try again."
+        "errorGeneric": "Something went wrong. Please try again.",
+        "analysisComplete": "Analysis complete!",
+        "exported": "Exported"
+      },
+      "nav": {
+        "newAnalysis": "New Analysis",
+        "myProjects": "My Projects"
+      },
+      "steps": {
+        "title": "Business Suite",
+        "chooseTool": "Choose a business tool to get started",
+        "selectBusinessType": "Select your business type",
+        "businessTool": "Business Tool",
+        "configure": "Configure",
+        "configureDescription": "Describe your business and configure the analysis",
+        "businessDescription": "Business description *",
+        "describeChanges": "Describe changes (natural language)",
+        "industry": "Industry",
+        "companyStage": "Company Stage",
+        "targetMarket": "Target Market",
+        "analysisOptions": "Analysis Options",
+        "generateAnalysis": "Generate Analysis"
+      },
+      "placeholders": {
+        "businessBrief": "Describe your business — what you do, your goals, challenges, current situation, what analysis you need...",
+        "editExample": "Example: Add more detail on competitive risks, expand the financial projections section, and prioritize quick wins...",
+        "targetMarket": "e.g. SMBs in North America",
+        "searchAnalyses": "Search analyses..."
+      },
+      "preview": {
+        "noAnalysis": "No analysis to preview",
+        "document": "Document",
+        "scorecard": "Scorecard",
+        "risks": "Risks ({count})",
+        "actionPlan": "Action Plan ({count})",
+        "files": "Files ({count})",
+        "copied": "Copied",
+        "exportZip": "Export ZIP",
+        "scorecardHint": "The scorecard provides a quantitative assessment across seven key dimensions. Scores above 70 indicate strong performance, 40-70 needs attention, below 40 requires immediate action. Risk Level is inverted — a lower score is better.",
+        "riskAssessment": "Risk Assessment",
+        "mitigation": "Mitigation",
+        "opportunities": "Opportunities",
+        "impact": "{impact} impact",
+        "timeframe": "Timeframe: {timeframe}",
+        "actionPlanTitle": "Action Plan",
+        "recommendations": "Recommendations",
+        "improvements": "Improvements",
+        "chars": "chars"
+      },
+      "scorecard": {
+        "overall": "Overall",
+        "viability": "Viability",
+        "marketFit": "Market Fit",
+        "financials": "Financials",
+        "competitive": "Competitive",
+        "growth": "Growth",
+        "risk": "Risk"
+      },
+      "generating": {
+        "title": "Analyzing your business...",
+        "subtitle": "AI is performing deep analysis, scoring, risk assessment, and building action plans",
+        "sendingRequest": "Sending request..."
+      },
+      "errors": {
+        "generationFailed": "Generation failed",
+        "requestFailed": "Request failed.",
+        "describeChanges": "Describe the changes you want in natural language.",
+        "selectToolAndDescribe": "Select a tool and describe your business context.",
+        "editThenImprove": "Describe your changes in natural language, then click Improve with AI."
+      },
+      "history": {
+        "count": "{count} project",
+        "countPlural": "{count} projects",
+        "emptyNoun": "business analyses"
       }
     },
     "aiAgents": {
@@ -3543,7 +4362,14 @@
         "stepsComprehensive": "12 steps (Comprehensive)",
         "toolsAvailable": "Tools Available:",
         "executeAgent": "Execute Agent",
-        "runs": "{count} runs"
+        "runs": "{count} runs",
+        "runAgain": "Run Again",
+        "executionSteps": "Execution Steps ({count})",
+        "report": "Report",
+        "executionHistoryTitle": "Execution History",
+        "totalExecutions": "{count} total executions",
+        "workflowMeta": "{trigger} · {steps} steps · {runs} runs",
+        "generatedFiles": "Generated Files"
       },
       "placeholders": {
         "agentName": "My Agent",
@@ -3578,7 +4404,11 @@
         "workflowNameRequired": "Workflow name is required",
         "addStepRequired": "Add at least one step",
         "workflowFailed": "Failed",
-        "titleAndPromptRequired": "Title and prompt text are required"
+        "titleAndPromptRequired": "Title and prompt text are required",
+        "loadExecutionFailed": "Unable to load execution."
+      },
+      "history": {
+        "emptyNoun": "executions"
       },
       "workflows": {
         "title": "Workflows",
@@ -3722,7 +4552,53 @@
         "deleted": "Deleted successfully",
         "copied": "Copied to clipboard",
         "exportStarted": "Export started",
-        "errorGeneric": "Something went wrong. Please try again."
+        "errorGeneric": "Something went wrong. Please try again.",
+        "pageGenerated": "Landing page generated!"
+      },
+      "nav": {
+        "newPage": "New Page",
+        "myPages": "My Pages"
+      },
+      "steps": {
+        "chooseType": "Or choose a landing page type",
+        "chooseTypeHint": "Optional — One Prompt uses a smart default if you skip this",
+        "configurePage": "Configure Page",
+        "customLandingPage": "{type} Landing Page",
+        "configureDescription": "Describe your page and configure sections",
+        "describePage": "Describe your landing page",
+        "describeChanges": "Describe changes (natural language)",
+        "language": "Language",
+        "designStyle": "Design Style",
+        "colorStyle": "Color Style",
+        "sections": "Sections",
+        "generateLandingPage": "Generate Landing Page"
+      },
+      "placeholders": {
+        "pageBrief": "Describe what this landing page is for, your product/service, target audience, and conversion goal...",
+        "editExample": "Example: Make the hero more urgent, add a pricing section, and switch CTA to Start free trial...",
+        "searchPages": "Search pages..."
+      },
+      "generating": {
+        "title": "Generating your landing page...",
+        "subtitle": "This usually takes 30-90 seconds",
+        "ideaEvent": "[idea] Understanding your business idea...",
+        "strategyEvent": "[strategy] Building conversion strategy..."
+      },
+      "errors": {
+        "generationFailed": "Generation failed",
+        "requestFailed": "Request failed.",
+        "describeChanges": "Describe the changes you want in natural language.",
+        "enterIdea": "Enter your business idea to generate a landing page.",
+        "editThenImprove": "Describe your changes in natural language, then click Improve with AI."
+      },
+      "history": {
+        "count": "{count} page",
+        "countPlural": "{count} pages",
+        "emptyNoun": "landing pages"
+      },
+      "preview": {
+        "filesCount": "{count} files",
+        "notAvailable": "N/A"
       }
     },
     "ideas": {
@@ -3891,7 +4767,48 @@
         "deleted": "Deleted successfully",
         "copied": "Copied to clipboard",
         "exportStarted": "Export started",
-        "errorGeneric": "Something went wrong. Please try again."
+        "errorGeneric": "Something went wrong. Please try again.",
+        "analysisSaved": "Market analysis saved."
+      },
+      "chart": {
+        "title": "Analysis Overview",
+        "subtitle": "Distribution breakdown",
+        "opportunities": "Opportunities",
+        "risks": "Risks",
+        "competitors": "Competitors"
+      },
+      "form": {
+        "title": "Market Parameters",
+        "description": "Define your market scope for AI-powered analysis",
+        "industry": "Industry",
+        "region": "Region",
+        "targetAudience": "Target audience",
+        "industryPlaceholder": "e.g. FinTech, HealthTech, E-commerce...",
+        "regionPlaceholder": "e.g. North America, Europe, Global...",
+        "targetAudiencePlaceholder": "e.g. SMBs, Enterprise, Consumers...",
+        "analyzing": "Analyzing...",
+        "runAnalysis": "Run Analysis"
+      },
+      "results": {
+        "marketSize": "Market Size (TAM)",
+        "growthRate": "Growth Rate",
+        "favorite": "Favorite",
+        "opportunities": "Opportunities",
+        "risks": "Risks",
+        "competitors": "Competitors",
+        "analysesSaved": "{count} Analyses Saved",
+        "analysisSaved": "{count} Analysis Saved",
+        "emptyHeading": "Market analyses will appear here",
+        "industriesFilter": "Industries"
+      },
+      "empty": {
+        "title": "No analyses yet",
+        "description": "Enter market parameters and run analysis to get comprehensive industry insights."
+      },
+      "aria": {
+        "removeFavorite": "Remove from favorites",
+        "addFavorite": "Add to favorites",
+        "deleteAnalysis": "Delete analysis"
       }
     },
     "visualEditor": {
@@ -3949,6 +4866,14 @@
         "saveFailed": "Unable to save edits.",
         "saveError": "Unable to save visual edits.",
         "saved": "Visual edits saved."
+      },
+      "componentLibrary": {
+        "title": "Component library",
+        "searchPlaceholder": "Search components…",
+        "allCategories": "All categories",
+        "allIndustries": "All industries",
+        "allStyles": "All styles",
+        "resultsHint": "{count} components · drag onto canvas or click to insert"
       }
     },
     "creatorMarketplace": {
@@ -5075,7 +6000,8 @@
           "createDraft": "Create draft campaign",
           "campaignRow": "{name} · {subject}",
           "campaignStats": "{status} · sent {sent}",
-          "subscribersCount": "Subscribers in workspace: {count}"
+          "subscribersCount": "Subscribers in workspace: {count}",
+          "demoBodyText": "Thanks for following Trend Business AI."
         },
         "experiments": {
           "title": "A/B testing",
@@ -5083,7 +6009,12 @@
           "namePlaceholder": "Experiment name",
           "launchCtaTest": "Launch CTA test",
           "experimentRow": "{name} · {targetType}",
-          "metrics": "impressions {impressions} · conversions {conversions}"
+          "metrics": "impressions {impressions} · conversions {conversions}",
+          "demoHypothesis": "Stronger CTA increases conversions",
+          "demoControlLabel": "Control",
+          "demoControlValue": "Start free",
+          "demoVariantLabel": "Variant",
+          "demoVariantValue": "Launch your AI workspace"
         },
         "automation": {
           "title": "Marketing automation",
@@ -5094,7 +6025,9 @@
           "eventsEndpoint": "Event tracking endpoint: POST /api/growth/events — use for pageview, cta_click, signup and campaign events.",
           "automationRow": "{name} · {trigger}",
           "automationStats": "{status} · {steps} steps",
-          "segmentsSummary": "Segments: {segments} · Running experiments: {experiments}"
+          "segmentsSummary": "Segments: {segments} · Running experiments: {experiments}",
+          "demoWelcomeSubject": "Welcome — next steps",
+          "demoWelcomeBody": "Thanks for reaching out. Here is how to get started."
         }
       },
       "aiSearch": {
@@ -5560,6 +6493,72 @@
         "titleRequired": "Title required",
         "workflowCreated": "Workflow created",
         "approvalRequested": "Approval requested"
+      },
+      "assistant": {
+        "title": "AI Business Assistant",
+        "contextPlaceholder": "Describe business performance, goals, blockers, team context...",
+        "results": "Results",
+        "emptyResults": "Run an AI action to see insights, recommendations, and bottlenecks.",
+        "running": "Running…",
+        "runAction": "Run AI action",
+        "contextRequired": "Enter business context.",
+        "analysisComplete": "Analysis complete",
+        "actions": {
+          "analyze": "Analyze",
+          "improve": "Improve",
+          "summarize": "Summarize",
+          "recommend": "Recommend"
+        }
+      },
+      "organizations": {
+        "newOrganization": "New organization",
+        "namePlaceholder": "Organization name",
+        "industryPlaceholder": "Industry",
+        "add": "Add",
+        "general": "General",
+        "empty": "Create your first organization to get started.",
+        "nameRequired": "Organization name is required.",
+        "created": "Organization created"
+      },
+      "teams": {
+        "teams": "Teams",
+        "teamNamePlaceholder": "Team name",
+        "noDescription": "No description",
+        "rolesPermissions": "Roles & permissions",
+        "memberNamePlaceholder": "Member name",
+        "addMember": "Add member",
+        "orgAndTeamRequired": "Select organization and enter team name.",
+        "orgAndMemberRequired": "Select organization and enter member name.",
+        "teamCreated": "Team created",
+        "memberAdded": "Member added"
+      },
+      "roleTypes": {
+        "owner": "Owner",
+        "admin": "Admin",
+        "manager": "Manager",
+        "member": "Member"
+      },
+      "analytics": {
+        "loading": "Loading analytics…",
+        "projects": "Projects",
+        "tasksDone": "Tasks done",
+        "kpisOnTrack": "KPIs on track",
+        "kpisOffTrack": "KPIs off track",
+        "integrationBridges": "Integration bridges (read-only)",
+        "crmContacts": "CRM contacts: {count}",
+        "erpInvoices": "ERP invoices: {count}",
+        "marketingCampaigns": "Marketing campaigns: {count}",
+        "socialPosts": "Social posts: {count}",
+        "calendarEvents": "Calendar events: {count}"
+      },
+      "kpis": {
+        "addKpi": "Add KPI",
+        "namePlaceholder": "KPI name",
+        "target": "Target",
+        "current": "Current",
+        "nameRequired": "KPI name required",
+        "added": "KPI added",
+        "progressBump": "+5 progress"
       }
     },
     "marketing": {
@@ -5606,6 +6605,38 @@
           "suggest_improvements": "Suggest improvements",
           "generate_ideas": "Generate ideas"
         }
+      },
+      "campaignList": {
+        "generatorTitle": "AI Campaign Generator",
+        "briefPlaceholder": "Describe product, audience, goals, channels, budget...",
+        "generating": "Generating…",
+        "generateCampaign": "Generate Campaign",
+        "empty": "No campaigns yet. Generate your first campaign.",
+        "selectOrGenerate": "Select or generate a campaign",
+        "briefRequired": "Enter a campaign brief.",
+        "generated": "Campaign generated!",
+        "failed": "Failed"
+      },
+      "analyticsDashboard": {
+        "loading": "Loading analytics…",
+        "conversions": "Conversions",
+        "leads": "Leads",
+        "engagement": "Engagement",
+        "roi": "ROI"
+      },
+      "emailPanel": {
+        "emailCampaigns": "Email Campaigns",
+        "templates": "Templates",
+        "audienceLists": "Audience Lists",
+        "foundationHint": "Email foundation ready — SendGrid & Mailchimp adapters available when configured."
+      },
+      "personaPanel": {
+        "generatorTitle": "Persona Generator",
+        "briefPlaceholder": "Describe your ideal customer...",
+        "generatePersona": "Generate Persona",
+        "generated": "Persona generated!",
+        "failed": "Failed",
+        "painPrefix": "Pain: {points}"
       }
     }
   },
@@ -5682,7 +6713,42 @@
         "creative": "Creative",
         "experimental": "Experimental"
       },
-      "options": {},
+      "options": {
+        "seo": "SEO Optimization",
+        "meta": "Meta Tags",
+        "headings": "Heading Structure",
+        "keywords": "Keyword Optimization",
+        "faq": "FAQ Section",
+        "schema": "Schema Suggestions",
+        "internal_links": "Internal Linking",
+        "readability": "Readability Analysis",
+        "grammar": "Grammar Review",
+        "cta": "Call-to-Action",
+        "headlines": "Multiple Headlines",
+        "subject_line": "Subject Lines",
+        "personalization": "Personalization",
+        "social_proof": "Social Proof",
+        "hero": "Hero Section",
+        "sections": "Sections",
+        "hashtags": "Hashtags",
+        "emoji": "Emoji Usage",
+        "timestamps": "Timestamps",
+        "hooks": "Hooks",
+        "benefits": "Benefits Focus",
+        "channels": "Channel Strategy",
+        "timeline": "Timeline",
+        "budget": "Budget Planning"
+      },
+      "optionCategories": {
+        "seo": "SEO",
+        "quality": "Quality",
+        "content": "Content",
+        "structure": "Structure",
+        "social": "Social",
+        "scripts": "Scripts",
+        "commerce": "Commerce",
+        "planning": "Planning"
+      },
       "templateCategories": {},
       "platforms": {},
       "calendarCategories": {},
@@ -5691,6 +6757,233 @@
         "scheduled": "Scheduled",
         "published": "Published",
         "archived": "Archived"
+      }
+    },
+    "logoDesigner": {
+      "industries": {
+        "technology": "Technology",
+        "finance": "Finance",
+        "healthcare": "Healthcare",
+        "education": "Education",
+        "e_commerce": "E-commerce",
+        "real_estate": "Real Estate",
+        "food_beverage": "Food & Beverage",
+        "fashion": "Fashion",
+        "sports_fitness": "Sports & Fitness",
+        "travel_tourism": "Travel & Tourism",
+        "entertainment": "Entertainment",
+        "legal": "Legal",
+        "construction": "Construction",
+        "automotive": "Automotive",
+        "agriculture": "Agriculture",
+        "non_profit": "Non-Profit",
+        "media": "Media",
+        "consulting": "Consulting",
+        "saas": "SaaS",
+        "other": "Other"
+      },
+      "colorPalettes": {
+        "auto": "Auto",
+        "monochrome": "Monochrome",
+        "black_gold": "Black & Gold",
+        "blue_gradient": "Blue Gradient",
+        "green_nature": "Green Nature",
+        "red_bold": "Red Bold",
+        "purple_luxury": "Purple Luxury",
+        "earth_tones": "Earth Tones",
+        "pastel_soft": "Pastel Soft",
+        "neon_vibrant": "Neon Vibrant",
+        "custom": "Custom"
+      },
+      "iconStyles": {
+        "abstract": "Abstract",
+        "geometric": "Geometric",
+        "organic": "Organic",
+        "line_art": "Line Art",
+        "filled": "Filled",
+        "outlined": "Outlined",
+        "flat": "Flat",
+        "isometric": "Isometric",
+        "hand_drawn": "Hand-drawn",
+        "pixel": "Pixel"
+      },
+      "typography": {
+        "sans_serif_modern": "Sans-serif Modern",
+        "serif_classic": "Serif Classic",
+        "display_bold": "Display Bold",
+        "handwritten": "Handwritten",
+        "slab_serif": "Slab Serif",
+        "monospace": "Monospace",
+        "geometric": "Geometric",
+        "rounded": "Rounded",
+        "condensed": "Condensed",
+        "auto": "Auto"
+      },
+      "personalities": {
+        "professional": "Professional",
+        "friendly": "Friendly",
+        "bold": "Bold",
+        "elegant": "Elegant",
+        "playful": "Playful",
+        "innovative": "Innovative",
+        "trustworthy": "Trustworthy",
+        "luxurious": "Luxurious",
+        "minimalist": "Minimalist",
+        "energetic": "Energetic"
+      },
+      "options": {
+        "wordmark": "Wordmark",
+        "lettermark": "Lettermark",
+        "brandmark": "Brandmark",
+        "combination": "Combination Mark",
+        "emblem": "Emblem",
+        "abstract": "Abstract",
+        "mascot": "Mascot",
+        "minimalist": "Minimalist",
+        "vintage": "Vintage",
+        "three_dimensional": "3D / Gradient",
+        "dynamic": "Dynamic",
+        "custom": "Custom",
+        "favicon": "Favicon",
+        "social_avatar": "Social Avatar",
+        "dark_version": "Dark Version",
+        "light_version": "Light Version",
+        "horizontal": "Horizontal Layout",
+        "vertical": "Vertical Layout",
+        "icon_only": "Icon Only",
+        "brand_guidelines": "Brand Guidelines",
+        "business_card": "Business Card Mockup",
+        "watermark": "Watermark Version"
+      }
+    },
+    "businessSuite": {
+      "industries": {
+        "technology": "Technology",
+        "healthcare": "Healthcare",
+        "finance": "Finance",
+        "education": "Education",
+        "e_commerce": "E-Commerce",
+        "real_estate": "Real Estate",
+        "manufacturing": "Manufacturing",
+        "food_beverage": "Food & Beverage",
+        "media_entertainment": "Media & Entertainment",
+        "travel_hospitality": "Travel & Hospitality",
+        "automotive": "Automotive",
+        "energy": "Energy",
+        "agriculture": "Agriculture",
+        "legal": "Legal",
+        "construction": "Construction",
+        "retail": "Retail",
+        "logistics": "Logistics",
+        "telecom": "Telecom",
+        "other": "Other"
+      },
+      "companyStages": {
+        "idea": "Idea",
+        "pre_seed": "Pre-Seed",
+        "seed": "Seed",
+        "startup": "Startup",
+        "growth": "Growth",
+        "scale_up": "Scale-Up",
+        "mature": "Mature",
+        "enterprise": "Enterprise"
+      },
+      "categories": {
+        "report": "Report",
+        "analysis": "Analysis",
+        "ai": "AI",
+        "metrics": "Metrics",
+        "strategy": "Strategy",
+        "audience": "Audience"
+      },
+      "options": {
+        "executive_summary": "Executive Summary",
+        "financials": "Financial Projections",
+        "market_analysis": "Market Analysis",
+        "operations": "Operations Plan",
+        "analysis": "Deep Analysis",
+        "trends": "Trend Analysis",
+        "recommendations": "AI Recommendations",
+        "risk_assessment": "Risk Assessment",
+        "action_plan": "Action Plan",
+        "scoring": "Business Scoring",
+        "kpis": "KPI Framework",
+        "summary": "Summary Report",
+        "value_proposition": "Value Proposition",
+        "revenue_streams": "Revenue Streams",
+        "cost_structure": "Cost Structure",
+        "positioning": "Market Positioning",
+        "pricing": "Pricing Analysis",
+        "strengths_weaknesses": "Strengths & Weaknesses",
+        "market_size": "Market Size",
+        "segmentation": "Segmentation",
+        "forecast": "Forecast",
+        "demographics": "Demographics",
+        "psychographics": "Psychographics",
+        "pain_points": "Pain Points",
+        "goals": "Goals & Motivations",
+        "tiers": "Pricing Tiers",
+        "competitive_pricing": "Competitive Pricing",
+        "projections": "Revenue Projections",
+        "scenarios": "Scenarios (Best/Worst/Expected)",
+        "assumptions": "Key Assumptions",
+        "budget": "Budget Plan",
+        "cash_flow": "Cash Flow Analysis",
+        "profit_loss": "Profit & Loss",
+        "break_even": "Break-Even Analysis",
+        "channels": "Channel Strategy",
+        "messaging": "Messaging Framework",
+        "timeline": "Timeline",
+        "funnel": "Sales Funnel",
+        "process": "Sales Process",
+        "targets": "Targets & Goals",
+        "incentives": "Incentive Structure",
+        "milestones": "Milestones",
+        "metrics": "Key Metrics",
+        "roadmap": "Growth Roadmap",
+        "tracking": "Performance Tracking",
+        "data_analysis": "Data Analysis",
+        "highlights": "Key Highlights",
+        "decisions": "Decision Points",
+        "next_steps": "Next Steps"
+      }
+    },
+    "landingPageBuilder": {
+      "designStyles": {
+        "modern": "Modern",
+        "minimal": "Minimal",
+        "bold": "Bold",
+        "elegant": "Elegant",
+        "playful": "Playful",
+        "corporate": "Corporate"
+      },
+      "colorStyles": {
+        "dark_minimal": "Dark Minimal",
+        "light_professional": "Light Professional",
+        "black_gold_premium": "Black & Gold (Premium)",
+        "bold_contrast": "Bold Contrast",
+        "soft_neutral": "Soft Neutral",
+        "ocean_blue": "Ocean Blue",
+        "sunset_gradient": "Sunset Gradient"
+      },
+      "options": {
+        "hero": "Hero",
+        "features": "Features",
+        "benefits": "Benefits",
+        "how_it_works": "How It Works",
+        "pricing": "Pricing",
+        "testimonials": "Testimonials",
+        "faq": "FAQ",
+        "cta": "Call to Action",
+        "contact": "Contact Form",
+        "gallery": "Gallery",
+        "team": "Team",
+        "stats": "Stats / Metrics",
+        "social_proof": "Social Proof",
+        "countdown": "Countdown Timer",
+        "video": "Video Embed",
+        "newsletter": "Newsletter Signup",
+        "footer": "Footer"
       }
     },
     "aiAgents": {

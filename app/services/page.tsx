@@ -2,16 +2,20 @@ import type { Metadata } from "next";
 import { ProgrammaticClusterIndex } from "@/components/seo/programmatic-cluster-index";
 import { SeoService } from "@/lib/seo/engine";
 import { getPublishedProgrammaticPages } from "@/lib/seo/programmatic";
+import { getServerTranslator } from "@/lib/i18n/server";
 
-export const metadata: Metadata = SeoService.createMetadata({
-  title: "AI Services for SEO, GTM & Growth",
-  description:
-    "Service overviews for SEO growth systems, go-to-market planning and AI-assisted brand launch workflows powered by Trend Business AI.",
-  path: "/services",
-  type: "collection",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerTranslator();
+  return SeoService.createMetadata({
+    title: t("marketing.publicPages.clusters.services.metaTitle"),
+    description: t("marketing.publicPages.clusters.services.metaDescription"),
+    path: "/services",
+    type: "collection",
+  });
+}
 
-export default function ServicesIndexPage() {
+export default async function ServicesIndexPage() {
+  const { t } = await getServerTranslator();
   const items = getPublishedProgrammaticPages("services").map((page) => ({
     href: page.path,
     title: page.title,
@@ -21,9 +25,9 @@ export default function ServicesIndexPage() {
   return (
     <ProgrammaticClusterIndex
       path="/services"
-      eyebrow="Services"
-      title="AI-backed services that compound"
-      description="Published service pages covering SEO foundations, go-to-market planning and growth systems built on the Trend Business AI platform."
+      eyebrow={t("marketing.publicPages.clusters.services.eyebrow")}
+      title={t("marketing.publicPages.clusters.services.title")}
+      description={t("marketing.publicPages.clusters.services.description")}
       items={items}
     />
   );

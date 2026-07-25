@@ -131,7 +131,7 @@ export function TemplateIntelligencePanel(props: {
   const selectForGenerate = (tpl: TemplateIntelligenceDefinition) => {
     props.onSelect(toChoice(tpl));
     setDetails(null);
-    setAutoHint(`Selected ${tpl.name} — ready to generate`);
+    setAutoHint(wb("panels.selectedReady", { name: tpl.name }));
   };
 
   const applyToProject = async (tpl: TemplateIntelligenceDefinition) => {
@@ -156,7 +156,7 @@ export function TemplateIntelligencePanel(props: {
         project?: unknown;
         template?: TemplateIntelligenceDefinition;
       };
-      if (!res.ok) throw new Error(data.error || "Failed to apply template");
+      if (!res.ok) throw new Error(data.error || wb("panels.failedApplyTemplate"));
       if (data.generation && data.project && data.template) {
         props.onApplied?.({
           generation: data.generation,
@@ -165,7 +165,7 @@ export function TemplateIntelligencePanel(props: {
         });
       }
       setDetails(null);
-      setAutoHint(`Applied ${tpl.name} — content & images preserved`);
+      setAutoHint(wb("panels.appliedPreserved", { name: tpl.name }));
     } catch (error) {
       setAutoHint(
         error instanceof Error ? error.message : wb("panels.failedApplyTemplate"),
@@ -201,17 +201,17 @@ export function TemplateIntelligencePanel(props: {
           category: category === "all" ? undefined : category,
         }),
       });
-      if (!res.ok) throw new Error("Auto-select failed");
+      if (!res.ok) throw new Error(wb("panels.autoSelectFailed"));
       const data = (await res.json()) as {
         template: TemplateIntelligenceDefinition;
         reason?: string;
       };
       if (data.template) {
         props.onSelect(toChoice(data.template));
-        setAutoHint(data.reason || `Auto-selected ${data.template.name}`);
+        setAutoHint(data.reason || wb("panels.autoSelected", { name: data.template.name }));
       }
     } catch {
-      setAutoHint("Auto-select unavailable");
+      setAutoHint(wb("panels.autoSelectUnavailable"));
     } finally {
       setApplying(false);
     }
@@ -228,10 +228,10 @@ export function TemplateIntelligencePanel(props: {
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <p className="text-[12px] font-semibold tracking-wide text-white/45 uppercase">
-              Template Intelligence
+              {wb("panels.templateIntelligenceTitle")}
             </p>
             <p className="text-[11px] text-white/35">
-              AI picks the best look — or choose one anytime
+              {wb("panels.templateIntelligenceSubtitle")}
             </p>
           </div>
           <Button
@@ -243,7 +243,7 @@ export function TemplateIntelligencePanel(props: {
             onClick={() => void runAutoSelect()}
           >
             <Wand2 className="size-3.5" />
-            Auto-select
+            {wb("panels.autoSelect")}
           </Button>
         </div>
 
@@ -258,7 +258,7 @@ export function TemplateIntelligencePanel(props: {
                 : "bg-white/[0.04] text-white/45 hover:text-white/70",
             )}
           >
-            All
+            {wb("panels.all")}
           </button>
           {categories.map((cat) => (
             <button
@@ -284,7 +284,7 @@ export function TemplateIntelligencePanel(props: {
         {loading ? (
           <div className="flex items-center gap-2 py-4 text-[12px] text-white/40">
             <Loader2 className="size-3.5 animate-spin" />
-            Loading visual templates…
+            {wb("panels.loadingVisualTemplates")}
           </div>
         ) : (
           <div className="grid gap-2 sm:grid-cols-2">
@@ -337,7 +337,7 @@ export function TemplateIntelligencePanel(props: {
       >
         <DialogContent className="max-h-[92vh] max-w-3xl overflow-y-auto border-white/10 bg-[#0c0c0c] text-white sm:max-w-3xl">
           <DialogHeader>
-            <DialogTitle>{details?.name || "Template"}</DialogTitle>
+            <DialogTitle>{details?.name || wb("panels.template")}</DialogTitle>
             <DialogDescription className="text-white/45">
               {details?.description}
             </DialogDescription>
@@ -367,14 +367,14 @@ export function TemplateIntelligencePanel(props: {
                 {details.typography.display} / {details.typography.body}
               </p>
               <p className="text-[12px] text-white/45">
-                Components:{" "}
+                {wb("panels.componentsLabel")}:{" "}
                 {details.components.slice(0, 8).join(" · ")}
                 {details.components.length > 8 ? "…" : ""}
               </p>
 
               <div className="overflow-hidden rounded-xl border border-white/10 bg-[#080808]">
                 <div className="border-b border-white/10 px-3 py-2 text-[11px] text-white/40">
-                  Visual preview
+                  {wb("panels.visualPreview")}
                 </div>
                 <div className="p-3">
                   {previewLoading ? (
@@ -413,7 +413,7 @@ export function TemplateIntelligencePanel(props: {
                 ) : (
                   <Sparkles className="size-4" />
                 )}
-                Use Template
+                {wb("panels.useTemplate")}
               </Button>
             ) : null}
           </DialogFooter>

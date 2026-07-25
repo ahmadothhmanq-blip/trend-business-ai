@@ -24,6 +24,7 @@ import type { ProductId } from "@/lib/products/types";
 import { getWorkspaceDefinition } from "@/lib/workspace/registry";
 import type { WorkspaceType } from "@/lib/workspace/types";
 import type { WorkspaceGeneration } from "@/types/database";
+import { useTranslation } from "@/lib/i18n/client";
 
 type WorkspaceToolProps = {
   workspaceType: WorkspaceType;
@@ -56,6 +57,7 @@ export function WorkspaceTool({
     [setPrompt],
   );
   useIdeaQueryParam(applyIdea);
+  const { t } = useTranslation();
 
   return (
     <div className="space-y-6 lg:space-y-8">
@@ -148,9 +150,9 @@ export function WorkspaceTool({
       <Dialog open={tool.renameOpen} onOpenChange={tool.setRenameOpen}>
         <DialogContent className="border-white/10 bg-luxury-black text-white">
           <DialogHeader>
-            <DialogTitle>Save project</DialogTitle>
+            <DialogTitle>{t("dashboard.workspaceProjects.renameTitle")}</DialogTitle>
             <DialogDescription className="text-white/45">
-              Rename and keep this generation in your workspace project history.
+              {t("dashboard.workspaceProjects.renameDescription")}
             </DialogDescription>
           </DialogHeader>
           <Input
@@ -160,10 +162,10 @@ export function WorkspaceTool({
           />
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => tool.setRenameOpen(false)}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button type="button" className="btn-gold text-luxury-black" onClick={tool.saveRename}>
-              Save project
+              {t("dashboard.workspaceProjects.saveProject")}
             </Button>
           </DialogFooter>
         </DialogContent>

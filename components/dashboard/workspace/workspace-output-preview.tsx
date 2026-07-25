@@ -17,6 +17,7 @@ import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import { DashboardIconBox } from "@/components/dashboard/ui/icon-box";
 import type { WorkspaceProject } from "@/lib/workspace/project";
 import { formatGenerationMeta } from "@/lib/workspace/export-meta";
+import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 
 type WorkspaceOutputPreviewProps = {
@@ -52,6 +53,7 @@ export function WorkspaceOutputPreview({
   onRetry,
   onToggleFavorite,
 }: WorkspaceOutputPreviewProps) {
+  const { t } = useTranslation();
   const meta = project ? formatGenerationMeta(project.output) : "";
 
   return (
@@ -60,20 +62,20 @@ export function WorkspaceOutputPreview({
         <div className="flex items-center gap-3">
           <DashboardIconBox icon={FileText} />
           <div>
-            <h3 className="font-bold text-white">Streaming Output</h3>
+            <h3 className="font-bold text-white">{t("dashboard.workspaceOutput.title")}</h3>
             <p className="text-[13px] text-white/40">
               {isStreaming
-                ? streamStatus ?? "Streaming project output..."
+                ? streamStatus ?? t("dashboard.workspaceOutput.streaming")
                 : project
-                  ? meta || "Saved to your workspace project history"
-                  : "Generate to stream live output"}
+                  ? meta || t("dashboard.workspaceOutput.savedToHistory")
+                  : t("dashboard.workspaceOutput.generatePrompt")}
             </p>
           </div>
         </div>
         {isStreaming ? (
           <span className="inline-flex items-center gap-2 rounded-full border border-premium-gold/25 bg-premium-gold/10 px-3 py-1 text-[11px] font-semibold text-premium-gold-light">
             <span className="size-1.5 animate-pulse rounded-full bg-premium-gold" />
-            Live
+            {t("dashboard.workspaceOutput.live")}
           </span>
         ) : null}
       </div>
@@ -86,12 +88,12 @@ export function WorkspaceOutputPreview({
               <div className="flex flex-wrap gap-2">
                 {project.status === "failed" ? (
                   <span className="rounded-full border border-red-400/30 bg-red-500/10 px-2.5 py-1 text-[11px] text-red-200">
-                    Failed
+                    {t("dashboard.workspaceOutput.failed")}
                   </span>
                 ) : null}
                 {project.favorite ? (
                   <span className="rounded-full border border-premium-gold/30 bg-premium-gold/10 px-2.5 py-1 text-[11px] text-premium-gold-light">
-                    Favorite
+                    {t("dashboard.workspaceOutput.favorite")}
                   </span>
                 ) : null}
               </div>
@@ -103,7 +105,7 @@ export function WorkspaceOutputPreview({
               )}
             >
               {project.output.summary ||
-                (isStreaming ? "Composing executive summary..." : "")}
+                (isStreaming ? t("dashboard.workspaceOutput.composingSummary") : "")}
             </p>
             {meta ? (
               <p className="mt-2 text-[11px] text-white/30">{meta}</p>
@@ -124,7 +126,7 @@ export function WorkspaceOutputPreview({
             ))}
             {isStreaming && project.output.sections.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-premium-gold/20 bg-premium-gold/5 p-4 text-[13px] text-premium-gold-light/80">
-                Streaming structured sections...
+                {t("dashboard.workspaceOutput.streamingSections")}
               </div>
             ) : null}
           </div>
@@ -152,7 +154,7 @@ export function WorkspaceOutputPreview({
                 disabled={Boolean(isStreaming)}
               >
                 <RefreshCw className="size-4" />
-                Regenerate
+                {t("dashboard.workspaceOutput.regenerate")}
               </Button>
             ) : null}
             {onContinue ? (
@@ -164,7 +166,7 @@ export function WorkspaceOutputPreview({
                 disabled={Boolean(isStreaming) || project.status === "failed"}
               >
                 <StepForward className="size-4" />
-                Improve with AI
+                {t("dashboard.workspaceOutput.improveWithAi")}
               </Button>
             ) : null}
             {project.status === "failed" && onRetry ? (
@@ -176,7 +178,7 @@ export function WorkspaceOutputPreview({
                 disabled={Boolean(isStreaming)}
               >
                 <RefreshCw className="size-4" />
-                Retry
+                {t("dashboard.workspaceOutput.retry")}
               </Button>
             ) : null}
             {onToggleFavorite ? (
@@ -190,7 +192,7 @@ export function WorkspaceOutputPreview({
                 <Heart
                   className={cn("size-4", project.favorite && "fill-premium-gold text-premium-gold")}
                 />
-                {project.favorite ? "Favorited" : "Favorite"}
+                {project.favorite ? t("dashboard.workspaceOutput.favorited") : t("dashboard.workspaceOutput.favorite")}
               </Button>
             ) : null}
             {onRename ? (
@@ -201,7 +203,7 @@ export function WorkspaceOutputPreview({
                 onClick={() => onRename(project)}
               >
                 <Pencil className="size-4" />
-                Rename / Save
+                {t("dashboard.workspaceOutput.renameSave")}
               </Button>
             ) : null}
             <Button
@@ -211,7 +213,7 @@ export function WorkspaceOutputPreview({
               onClick={() => onCopy(project)}
             >
               <Copy className="size-4" />
-              Copy
+              {t("dashboard.workspaceOutput.copy")}
             </Button>
             <Button
               type="button"
@@ -220,7 +222,7 @@ export function WorkspaceOutputPreview({
               onClick={() => onExportMarkdown(project)}
             >
               <Download className="size-4" />
-              Export MD
+              {t("dashboard.workspaceOutput.exportMd")}
             </Button>
             {onExportPdf ? (
               <Button
@@ -230,7 +232,7 @@ export function WorkspaceOutputPreview({
                 onClick={() => onExportPdf(project)}
               >
                 <FileText className="size-4" />
-                Export PDF
+                {t("dashboard.workspaceOutput.exportPdf")}
               </Button>
             ) : null}
             {onExportDocx ? (
@@ -241,7 +243,7 @@ export function WorkspaceOutputPreview({
                 onClick={() => onExportDocx(project)}
               >
                 <ArrowDownToLine className="size-4" />
-                Export DOCX
+                {t("dashboard.workspaceOutput.exportDocx")}
               </Button>
             ) : null}
             <Button
@@ -251,15 +253,15 @@ export function WorkspaceOutputPreview({
               onClick={() => onExportJson(project)}
             >
               <ArrowDownToLine className="size-4" />
-              Export JSON
+              {t("dashboard.workspaceOutput.exportJson")}
             </Button>
           </div>
         </div>
       ) : (
         <DashboardEmptyState
           icon={Sparkles}
-          title="No project selected"
-          description="Generate your first workspace project to stream structured output here. Every run is saved to your user workspace history."
+          title={t("dashboard.workspaceOutput.emptyTitle")}
+          description={t("dashboard.workspaceOutput.emptyDescription")}
         />
       )}
     </DashboardPanel>

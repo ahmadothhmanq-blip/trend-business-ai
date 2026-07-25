@@ -13,16 +13,20 @@ import {
   getRelatedServices,
   getRelatedTools,
 } from "@/lib/seo/internal-links";
+import { getServerTranslator } from "@/lib/i18n/server";
 
-export const metadata: Metadata = createPageMetadata({
-  title: "AI Templates — Websites, Brand & Content",
-  description:
-    "Browse Trend Business AI template patterns for landing pages, brand kits and business workflows.",
-  path: "/templates",
-  type: "collection",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerTranslator();
+  return createPageMetadata({
+    title: t("marketing.publicPages.templates.metaTitle"),
+    description: t("marketing.publicPages.templates.metaDescription"),
+    path: "/templates",
+    type: "collection",
+  });
+}
 
-export default function TemplatesPage() {
+export default async function TemplatesPage() {
+  const { t } = await getServerTranslator();
   const templates = getTemplateHubItems();
 
   return (
@@ -30,8 +34,8 @@ export default function TemplatesPage() {
       <JsonLdScript
         id="templates-jsonld"
         data={collectionPageJsonLd({
-          name: "AI Templates",
-          description: "Template patterns for websites, brand and content workflows.",
+          name: t("marketing.publicPages.templates.jsonLdName"),
+          description: t("marketing.publicPages.templates.jsonLdDescription"),
           path: "/templates",
           items: templates.map((template) => ({
             name: template.title,
@@ -42,11 +46,11 @@ export default function TemplatesPage() {
       />
       <SiteShell>
         <SitePageHero
-          eyebrow="Templates"
-          title="Premium starting points for AI workflows."
-          description="Curated template patterns connected to Trend Business AI products — not thin duplicate pages."
-          primary={{ label: "Start Free", href: "/signup" }}
-          secondary={{ label: "View Products", href: "/products/create" }}
+          eyebrow={t("marketing.publicPages.templates.eyebrow")}
+          title={t("marketing.publicPages.templates.title")}
+          description={t("marketing.publicPages.templates.description")}
+          primary={{ label: t("marketing.publicPages.templates.primaryCta"), href: "/signup" }}
+          secondary={{ label: t("marketing.publicPages.templates.secondaryCta"), href: "/products/create" }}
         />
 
         <section className="landing-container pb-20">
@@ -68,7 +72,9 @@ export default function TemplatesPage() {
                       href={`/products/${slug}`}
                       className="text-sm font-semibold text-[#D4AF37] hover:underline"
                     >
-                      Open {slug.replace(/-/g, " ")}
+                      {t("marketing.publicPages.templates.openProduct", {
+                        slug: slug.replace(/-/g, " "),
+                      })}
                     </Link>
                   ))}
                 </div>
@@ -77,9 +83,9 @@ export default function TemplatesPage() {
           </div>
 
           <div className="mt-16 space-y-12">
-            <RelatedLinksSection title="Related tools" links={getRelatedTools("landing-page-builder")} />
-            <RelatedLinksSection title="Related services" links={getRelatedServices("create")} />
-            <RelatedLinksSection title="Related articles" links={getRelatedBlogArticles()} />
+            <RelatedLinksSection title={t("marketing.common.relatedTools")} links={getRelatedTools("landing-page-builder")} />
+            <RelatedLinksSection title={t("marketing.common.relatedServices")} links={getRelatedServices("create")} />
+            <RelatedLinksSection title={t("marketing.common.relatedArticles")} links={getRelatedBlogArticles()} />
           </div>
         </section>
       </SiteShell>

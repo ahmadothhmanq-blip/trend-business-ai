@@ -55,18 +55,19 @@ function AnalysisView({
   onDelete: (id: string) => void;
   actionLoading: boolean;
 }) {
+  const p = useProductT("marketAnalysis");
   return (
     <>
       <div className="grid gap-4 sm:grid-cols-2">
         <DashboardCard className="glass-panel glass-panel-premium">
           <DashboardCardHeader className="pb-2">
-            <DashboardCardDescription>Market Size (TAM)</DashboardCardDescription>
+            <DashboardCardDescription>{p("results.marketSize")}</DashboardCardDescription>
             <DashboardCardTitle className="text-xl text-white">{result.market_size}</DashboardCardTitle>
           </DashboardCardHeader>
         </DashboardCard>
         <DashboardCard className="glass-panel glass-panel-premium">
           <DashboardCardHeader className="pb-2">
-            <DashboardCardDescription>Growth Rate</DashboardCardDescription>
+            <DashboardCardDescription>{p("results.growthRate")}</DashboardCardDescription>
             <DashboardCardTitle className="flex items-center gap-2 text-xl text-emerald-400">
               <TrendingUp className="size-5" />
               {result.growth_rate}
@@ -86,7 +87,7 @@ function AnalysisView({
           <div className="flex items-start justify-between gap-4">
             <div>
               {result.is_favorite && (
-                <Badge className={cn("mb-2", dashboardBadgeGold)}>Favorite</Badge>
+                <Badge className={cn("mb-2", dashboardBadgeGold)}>{p("results.favorite")}</Badge>
               )}
               <DashboardCardTitle>
                 {result.industry} — {result.region}
@@ -99,7 +100,7 @@ function AnalysisView({
                 className={dashboardIconButtonClass}
                 onClick={() => onToggleFavorite(result)}
                 disabled={actionLoading}
-                aria-label={result.is_favorite ? "Remove from favorites" : "Add to favorites"}
+                aria-label={result.is_favorite ? p("aria.removeFavorite") : p("aria.addFavorite")}
               >
                 {actionLoading ? (
                   <Loader2 className="size-4 animate-spin" />
@@ -118,7 +119,7 @@ function AnalysisView({
                 className={cn(dashboardIconButtonClass, "text-destructive hover:text-destructive")}
                 onClick={() => onDelete(result.id)}
                 disabled={actionLoading}
-                aria-label="Delete analysis"
+                aria-label={p("aria.deleteAnalysis")}
               >
                 {actionLoading ? (
                   <Loader2 className="size-4 animate-spin" />
@@ -139,7 +140,7 @@ function AnalysisView({
           <DashboardCardHeader>
             <DashboardCardTitle className="flex items-center gap-2 text-base">
               <Target className="size-4 text-blue-500" />
-              Opportunities
+              {p("results.opportunities")}
             </DashboardCardTitle>
           </DashboardCardHeader>
           <DashboardCardContent>
@@ -157,7 +158,7 @@ function AnalysisView({
           <DashboardCardHeader>
             <DashboardCardTitle className="flex items-center gap-2 text-base">
               <AlertTriangle className="size-4 text-amber-500" />
-              Risks
+              {p("results.risks")}
             </DashboardCardTitle>
           </DashboardCardHeader>
           <DashboardCardContent>
@@ -173,7 +174,7 @@ function AnalysisView({
         </DashboardCard>
         <DashboardCard className="glass-panel glass-panel-premium">
           <DashboardCardHeader>
-            <DashboardCardTitle className="text-base">Competitors</DashboardCardTitle>
+            <DashboardCardTitle className="text-base">{p("results.competitors")}</DashboardCardTitle>
           </DashboardCardHeader>
           <DashboardCardContent>
             <ul className="space-y-2">
@@ -237,7 +238,7 @@ export function MarketAnalysisTool({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
         },
-        "Market analysis saved.",
+        p("toasts.analysisSaved"),
       );
       refresh();
     } catch {
@@ -283,40 +284,40 @@ export function MarketAnalysisTool({
         <DashboardCardHeader>
           <DashboardCardTitle className="flex items-center gap-3">
             <DashboardIconBox icon={LineChart} className="size-9" />
-            Market Parameters
+            {p("form.title")}
           </DashboardCardTitle>
           <DashboardCardDescription>
-            Define your market scope for AI-powered analysis
+            {p("form.description")}
           </DashboardCardDescription>
         </DashboardCardHeader>
         <DashboardCardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="industry">Industry</Label>
+              <Label htmlFor="industry">{p("form.industry")}</Label>
               <Input
                 id="industry"
                 name="industry"
-                placeholder="e.g. FinTech, HealthTech, E-commerce..."
+                placeholder={p("form.industryPlaceholder")}
                 className={dashboardInputClass}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="region">Region</Label>
+              <Label htmlFor="region">{p("form.region")}</Label>
               <Input
                 id="region"
                 name="region"
-                placeholder="e.g. North America, Europe, Global..."
+                placeholder={p("form.regionPlaceholder")}
                 className={dashboardInputClass}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="targetAudience">Target audience</Label>
+              <Label htmlFor="targetAudience">{p("form.targetAudience")}</Label>
               <Input
                 id="targetAudience"
                 name="targetAudience"
-                placeholder="e.g. SMBs, Enterprise, Consumers..."
+                placeholder={p("form.targetAudiencePlaceholder")}
                 className={cn(dashboardInputClass, dashboardSelectClass)}
                 required
               />
@@ -329,12 +330,12 @@ export function MarketAnalysisTool({
               {generating ? (
                 <>
                   <Loader2 className="size-4 animate-spin" />
-                  Analyzing...
+                  {p("form.analyzing")}
                 </>
               ) : (
                 <>
                   <LineChart className="size-4" />
-                  Run Analysis
+                  {p("form.runAnalysis")}
                 </>
               )}
             </Button>
@@ -346,14 +347,14 @@ export function MarketAnalysisTool({
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-lg font-bold text-white sm:text-xl">
             {analyses.length > 0
-              ? `${total} Analysis${total === 1 ? "" : "es"} Saved`
-              : "Market analyses will appear here"}
+              ? (total === 1 ? p("results.analysisSaved", { count: total }) : p("results.analysesSaved", { count: total }))
+              : p("results.emptyHeading")}
           </h2>
           <ListFilters
             search={search}
             favoriteFilter={favoriteFilter}
             extraFilter={extraFilter}
-            extraLabel="Industries"
+            extraLabel={p("results.industriesFilter")}
             extraOptions={industries}
             onApply={applyFilters}
           />
@@ -377,8 +378,8 @@ export function MarketAnalysisTool({
         {showEmptyState && (
           <DashboardEmptyState
             icon={LineChart}
-            title="No analyses yet"
-            description="Enter market parameters and run analysis to get comprehensive industry insights."
+            title={p("empty.title")}
+            description={p("empty.description")}
           />
         )}
 

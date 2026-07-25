@@ -12,7 +12,7 @@ export {
   apiValidationError,
   apiNotFoundError,
 } from "@/lib/i18n/api-errors";
-export { dashboardPageMetadata, getDashboardLocale } from "@/lib/i18n/dashboard-metadata";
+export { translateApiError, readLocalizedApiError, isApiErrorCode } from "@/lib/i18n/translate-api-error";
 export { getServerLocale, getServerMessages, getServerTranslator } from "@/lib/i18n/server";
 export { getRequestAiLanguage, getRequestLocale, resolveRequestLanguage } from "@/lib/i18n/api";
 export {

@@ -1,3 +1,5 @@
+"use client";
+
 import { notFound } from "next/navigation";
 import { SiteShell } from "@/components/marketing/site/shell";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
@@ -11,6 +13,7 @@ import {
 } from "@/lib/seo/programmatic";
 import { getRelatedTools } from "@/lib/seo/internal-links";
 import type { MarketingProductSlug } from "@/lib/constants/marketing-content";
+import { useScopedT } from "@/lib/i18n/use-scoped-t";
 
 export function ProgrammaticLandingPage({
   cluster,
@@ -19,6 +22,7 @@ export function ProgrammaticLandingPage({
   cluster: ProgrammaticCluster;
   slug: string;
 }) {
+  const t = useScopedT("marketing.publicPages.seo");
   const page = getProgrammaticPageBySlug(cluster, slug);
   if (!page || page.status !== "published") notFound();
 
@@ -54,7 +58,7 @@ export function ProgrammaticLandingPage({
           ))}
         </div>
         <div className="mt-14">
-          <RelatedLinksSection title="Related tools" links={related} />
+          <RelatedLinksSection title={t("relatedTools")} links={related} />
         </div>
       </div>
     </SiteShell>

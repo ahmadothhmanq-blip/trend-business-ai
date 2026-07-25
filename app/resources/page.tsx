@@ -12,23 +12,28 @@ import {
   getRelatedBusinessResources,
   getRelatedServices,
 } from "@/lib/seo/internal-links";
+import { getServerTranslator } from "@/lib/i18n/server";
 
-export const metadata: Metadata = createPageMetadata({
-  title: "Business Resources",
-  description:
-    "Curated resources for founders and operators using Trend Business AI — docs, learning, FAQs and growth tools.",
-  path: "/resources",
-  type: "collection",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerTranslator();
+  return createPageMetadata({
+    title: t("marketing.publicPages.resources.metaTitle"),
+    description: t("marketing.publicPages.resources.metaDescription"),
+    path: "/resources",
+    type: "collection",
+  });
+}
 
-export default function ResourcesPage() {
+export default async function ResourcesPage() {
+  const { t } = await getServerTranslator();
+
   return (
     <>
       <JsonLdScript
         id="resources-jsonld"
         data={collectionPageJsonLd({
-          name: "Business Resources",
-          description: "Docs, learning hubs and growth resources for Trend Business AI.",
+          name: t("marketing.publicPages.resources.jsonLdName"),
+          description: t("marketing.publicPages.resources.jsonLdDescription"),
           path: "/resources",
           items: KNOWLEDGE_HUBS.map((hub) => ({
             name: hub.title,
@@ -39,11 +44,11 @@ export default function ResourcesPage() {
       />
       <SiteShell>
         <SitePageHero
-          eyebrow="Resources"
-          title="Business resources for AI-powered growth."
-          description="A curated hub for documentation, learning paths and platform resources — built for search clarity, not content spam."
-          primary={{ label: "Knowledge Center", href: "/learn" }}
-          secondary={{ label: "Documentation", href: "/docs" }}
+          eyebrow={t("marketing.publicPages.resources.eyebrow")}
+          title={t("marketing.publicPages.resources.title")}
+          description={t("marketing.publicPages.resources.description")}
+          primary={{ label: t("marketing.publicPages.resources.primaryCta"), href: "/learn" }}
+          secondary={{ label: t("marketing.publicPages.resources.secondaryCta"), href: "/docs" }}
         />
 
         <section className="landing-container pb-20">
@@ -61,9 +66,9 @@ export default function ResourcesPage() {
           </div>
 
           <div className="mt-16 space-y-12">
-            <RelatedLinksSection title="Related services" links={getRelatedServices("business")} />
-            <RelatedLinksSection title="Related articles" links={getRelatedBlogArticles()} />
-            <RelatedLinksSection title="More resources" links={getRelatedBusinessResources()} />
+            <RelatedLinksSection title={t("marketing.common.relatedServices")} links={getRelatedServices("business")} />
+            <RelatedLinksSection title={t("marketing.common.relatedArticles")} links={getRelatedBlogArticles()} />
+            <RelatedLinksSection title={t("marketing.common.businessResources")} links={getRelatedBusinessResources()} />
           </div>
         </section>
       </SiteShell>

@@ -597,7 +597,7 @@ export function GrowthPanel() {
                         kind: "campaign",
                         name: campaignName,
                         subject: campaignSubject,
-                        bodyText: "Thanks for following Trend Business AI.",
+                        bodyText: wt("growth.email.demoBodyText"),
                         status: "draft",
                       }),
                     });
@@ -663,11 +663,11 @@ export function GrowthPanel() {
                         kind: "experiment",
                         name: experimentName,
                         targetType: "cta",
-                        hypothesis: "Stronger CTA increases conversions",
+                        hypothesis: wt("growth.experiments.demoHypothesis"),
                         status: "running",
                         variants: [
-                          { id: "a", label: "Control", value: "Start free", weight: 50 },
-                          { id: "b", label: "Variant", value: "Launch your AI workspace", weight: 50 },
+                          { id: "a", label: wt("growth.experiments.demoControlLabel"), value: wt("growth.experiments.demoControlValue"), weight: 50 },
+                          { id: "b", label: wt("growth.experiments.demoVariantLabel"), value: wt("growth.experiments.demoVariantValue"), weight: 50 },
                         ],
                       }),
                     });
@@ -741,8 +741,8 @@ export function GrowthPanel() {
                           {
                             id: "1",
                             type: "email",
-                            subject: "Welcome — next steps",
-                            body: "Thanks for reaching out. Here is how to get started.",
+                            subject: wt("growth.automation.demoWelcomeSubject"),
+                            body: wt("growth.automation.demoWelcomeBody"),
                           },
                           { id: "2", type: "wait", delayHours: 48 },
                           { id: "3", type: "score", scoreDelta: 10 },

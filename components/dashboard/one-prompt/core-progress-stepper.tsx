@@ -1,9 +1,11 @@
 "use client";
 
+import { useMemo } from "react";
 import { Check } from "lucide-react";
+import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 import {
-  CORE_UX_STEPS,
+  buildCoreUxSteps,
   stepIndex,
   type CoreUxStepId,
 } from "@/components/dashboard/one-prompt/steps";
@@ -17,6 +19,8 @@ export function CoreProgressStepper({
   className?: string;
   compact?: boolean;
 }) {
+  const { t } = useTranslation();
+  const steps = useMemo(() => buildCoreUxSteps(t), [t]);
   const activeIndex = stepIndex(currentStep);
 
   return (
@@ -28,9 +32,9 @@ export function CoreProgressStepper({
           : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-7",
         className,
       )}
-      aria-label="Generation progress"
+      aria-label={t("dashboard.onePrompt.progressAria")}
     >
-      {CORE_UX_STEPS.map((step, index) => {
+      {steps.map((step, index) => {
         const done = index < activeIndex;
         const active = index === activeIndex;
         return (

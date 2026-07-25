@@ -42,6 +42,8 @@ import {
 } from "@/components/dashboard/builder-shared";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n/client";
+import { translateOption } from "@/lib/i18n/product-options";
+import { resolveLabel } from "@/lib/i18n/resolve-constant-label";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
 import { safeMarkdownToHtml } from "@/lib/ai/sanitize";
 import {
@@ -645,71 +647,71 @@ export function ContentStudioTool({ initialGenerations }: Props) {
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-white/60">{p("labels.tone")}</label>
                   <select value={tone} onChange={(e) => setTone(e.target.value)} className={dashboardSelectClass}>
-                    {CONTENT_TONES.map((t) => <option key={t} value={t}>{t}</option>)}
+                    {CONTENT_TONES.map((tone) => <option key={tone} value={tone}>{translateOption(t, "constants.contentStudio.tones", tone)}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.audience")}</label>
                   <select value={audience} onChange={(e) => setAudience(e.target.value)} className={dashboardSelectClass}>
-                    {CONTENT_AUDIENCES.map((a) => <option key={a} value={a}>{a}</option>)}
+                    {CONTENT_AUDIENCES.map((aud) => <option key={aud} value={aud}>{translateOption(t, "constants.contentStudio.audiences", aud)}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-white/60">{p("labels.language")}</label>
                   <select value={language} onChange={(e) => setLanguage(e.target.value)} className={dashboardSelectClass}>
-                    {CONTENT_LANGUAGES.map((l) => <option key={l} value={l}>{l}</option>)}
+                    {CONTENT_LANGUAGES.map((lang) => <option key={lang} value={lang}>{translateOption(t, "constants.contentStudio.languages", lang)}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.writingStyle")}</label>
                   <select value={writingStyle} onChange={(e) => setWritingStyle(e.target.value)} className={dashboardSelectClass}>
-                    {WRITING_STYLES.map((s) => <option key={s} value={s}>{s}</option>)}
+                    {WRITING_STYLES.map((style) => <option key={style} value={style}>{translateOption(t, "constants.contentStudio.writingStyles", style)}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.creativity")}</label>
                   <select value={creativityLevel} onChange={(e) => setCreativityLevel(e.target.value)} className={dashboardSelectClass}>
-                    {CREATIVITY_LEVELS.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+                    {CREATIVITY_LEVELS.map((level) => <option key={level.id} value={level.id}>{resolveLabel(t, level)}</option>)}
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-white/60">Brand Identity <span className="text-white/20">(optional)</span></label>
+                <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.brandIdentity")} <span className="text-white/20">{p("steps.brandIdentityOptional")}</span></label>
                 {brandOptions.length > 0 ? (
                   <select
                     value={brandIdentityId}
                     onChange={(e) => setBrandIdentityId(e.target.value)}
                     className={dashboardSelectClass}
                   >
-                    <option value="">Select from Brand Studio…</option>
+                    <option value="">{p("placeholders.selectBrandStudio")}</option>
                     {brandOptions.map((b) => (
                       <option key={b.id} value={b.id}>{b.brand_name}</option>
                     ))}
                   </select>
                 ) : (
-                  <p className="text-xs text-white/30">Create a brand in Brand Studio to use brand voice.</p>
+                  <p className="text-xs text-white/30">{p("brand.createBrandHint")}</p>
                 )}
               </div>
 
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-white/60">Brand Voice <span className="text-white/20">(optional)</span></label>
+                <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.brandVoice")} <span className="text-white/20">{p("steps.brandIdentityOptional")}</span></label>
                 <Input value={brandVoice} onChange={(e) => setBrandVoice(e.target.value)} placeholder={p("placeholders.brandVoice")} className={dashboardInputClass} />
               </div>
 
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-white/60">SEO Keywords <span className="text-white/20">(optional, comma-separated)</span></label>
-                <Input value={seoKeywords} onChange={(e) => setSeoKeywords(e.target.value)} placeholder="e.g. AI business tools, content automation, marketing AI" className={dashboardInputClass} />
+                <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.seoKeywords")} <span className="text-white/20">{p("steps.seoKeywordsOptional")}</span></label>
+                <Input value={seoKeywords} onChange={(e) => setSeoKeywords(e.target.value)} placeholder={p("placeholders.seoKeywords")} className={dashboardInputClass} />
               </div>
 
               <div className="space-y-3">
-                <label className="block text-xs font-medium text-white/60">Content Options</label>
+                <label className="block text-xs font-medium text-white/60">{p("steps.contentOptions")}</label>
                 {Object.entries(optionsByCategory).map(([cat, items]) => (
                   <div key={cat}>
-                    <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-white/30">{cat}</p>
+                    <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-white/30">{translateOption(t, "constants.contentStudio.optionCategories", cat)}</p>
                     <div className="flex flex-wrap gap-2">
-                      {items.map(({ id, label }) => (
-                        <CheckboxToggle key={id} label={label} checked={options.includes(id)} onChange={(c) => setOptions((p) => c ? [...p, id] : p.filter((o) => o !== id))} />
+                      {items.map((opt) => (
+                        <CheckboxToggle key={opt.id} label={resolveLabel(t, opt)} checked={options.includes(opt.id)} onChange={(c) => setOptions((p) => c ? [...p, opt.id] : p.filter((o) => o !== opt.id))} />
                       ))}
                     </div>
                   </div>
@@ -725,7 +727,7 @@ export function ContentStudioTool({ initialGenerations }: Props) {
                     setStep(selectedTool === "content-calendar" || selectedTool === "campaign-planner" ? "tool" : "type");
                   }}
                 >
-                  Back
+                  {t("common.back")}
                 </Button>
                 {parentId ? (
                   <Button
@@ -754,10 +756,10 @@ export function ContentStudioTool({ initialGenerations }: Props) {
               <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-white/30" />
               <Input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder={p("placeholders.searchContent")} className={cn(dashboardInputClass, "pl-10")} />
             </div>
-            <span className="text-xs text-white/40">{total} item{total !== 1 ? "s" : ""}</span>
+            <span className="text-xs text-white/40">{total === 1 ? p("history.count", { count: total }) : p("history.countPlural", { count: total })}</span>
           </div>
           {generations.length === 0 ? (
-            <EmptyHistory noun="content" onNew={() => setStep("tool")} />
+            <EmptyHistory noun={p("history.emptyNoun")} onNew={() => setStep("tool")} />
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {generations.map((gen) => {

@@ -5,28 +5,30 @@ import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 import type { KPI } from "@/types/business-manager";
 
 type Props = { initialKpis?: KPI[] };
 
 export function KpisPanel({ initialKpis = [] }: Props) {
+  const wt = useWorkspaceT("businessManager");
   const [kpis, setKpis] = useState(initialKpis);
   const [name, setName] = useState("");
   const [target, setTarget] = useState("100");
   const [current, setCurrent] = useState("0");
 
   const create = async () => {
-    if (!name.trim()) return toast.error("KPI name required");
+    if (!name.trim()) return toast.error(wt("kpis.nameRequired"));
     const res = await fetch("/api/business-manager/kpis", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, targetValue: Number(target), currentValue: Number(current) }),
     });
     const data = await res.json();
-    if (!res.ok) return toast.error(data.error ?? "Failed");
+    if (!res.ok) return toast.error(data.error ?? wt("toasts.failed"));
     setKpis([data.kpi, ...kpis]);
     setName("");
-    toast.success("KPI added");
+    toast.success(wt("kpis.added"));
   };
 
   const updateCurrent = async (id: string, value: number) => {
@@ -36,18 +38,18 @@ export function KpisPanel({ initialKpis = [] }: Props) {
       body: JSON.stringify({ id, currentValue: value }),
     });
     const data = await res.json();
-    if (!res.ok) return toast.error(data.error ?? "Failed");
+    if (!res.ok) return toast.error(data.error ?? wt("toasts.failed"));
     setKpis(kpis.map((k) => (k.id === id ? data.kpi : k)));
   };
 
   return (
     <div className="space-y-4">
       <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
-        <p className="mb-3 text-xs font-medium uppercase text-white/40">Add KPI</p>
+        <p className="mb-3 text-xs font-medium uppercase text-white/40">{wt("kpis.addKpi")}</p>
         <div className="flex flex-wrap gap-2">
-          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="KPI name" className="border-white/10 bg-white/5 text-white" />
-          <Input value={target} onChange={(e) => setTarget(e.target.value)} placeholder="Target" className="w-24 border-white/10 bg-white/5 text-white" />
-          <Input value={current} onChange={(e) => setCurrent(e.target.value)} placeholder="Current" className="w-24 border-white/10 bg-white/5 text-white" />
+          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={wt("kpis.namePlaceholder")} className="border-white/10 bg-white/5 text-white" />
+          <Input value={target} onChange={(e) => setTarget(e.target.value)} placeholder={wt("kpis.target")} className="w-24 border-white/10 bg-white/5 text-white" />
+          <Input value={current} onChange={(e) => setCurrent(e.target.value)} placeholder={wt("kpis.current")} className="w-24 border-white/10 bg-white/5 text-white" />
           <Button onClick={() => void create()}><Plus className="size-4" /></Button>
         </div>
       </div>
@@ -73,7 +75,7 @@ export function KpisPanel({ initialKpis = [] }: Props) {
                 className="mt-2"
                 onClick={() => void updateCurrent(kpi.id, kpi.current_value + 5)}
               >
-                +5 progress
+                {wt("kpis.progressBump")}
               </Button>
             </div>
           );

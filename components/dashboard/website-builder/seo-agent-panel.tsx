@@ -144,8 +144,7 @@ export function SeoAgentPanel(props: {
             {wb("panels.seoIntelligenceTitle", { name: data.projectName || wb("labels.website") })}
           </h3>
           <p className="mt-1 max-w-2xl text-[12px] text-white/40">
-            Google Search, AI Overviews, ChatGPT Search, Gemini, and Perplexity —
-            titles, meta, headings, keywords, schema, and Apply Fix actions.
+            {wb("panels.seoDescription")}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -203,7 +202,7 @@ export function SeoAgentPanel(props: {
               </dd>
             </div>
             <div>
-              <dt className="text-white/35">Schema</dt>
+              <dt className="text-white/35">{wb("panels.schema")}</dt>
               <dd className="text-white/70">
                 {optimizer.assets.structuredDataTypes.join(", ")}
               </dd>
@@ -211,7 +210,7 @@ export function SeoAgentPanel(props: {
           </dl>
           <div className="mt-4">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-white/40">
-              Blog / content suggestions
+              {wb("panels.blogSuggestions")}
             </p>
             <ul className="mt-2 space-y-1 text-[12px] text-white/55">
               {optimizer.assets.blogSuggestions.slice(0, 4).map((s) => (
@@ -223,14 +222,14 @@ export function SeoAgentPanel(props: {
 
         <DashboardPanel className="p-4">
           <div className="flex items-center justify-between">
-            <h4 className="text-sm font-semibold text-white">AI Search optimization</h4>
+            <h4 className="text-sm font-semibold text-white">{wb("panels.aiSearchOptimization")}</h4>
             <span className="text-[12px] font-semibold text-premium-gold">
               {aiSearch.readinessScore}/100
             </span>
           </div>
           <p className="mt-2 text-[12px] text-white/45">{aiSearch.summary}</p>
           <p className="mt-3 text-[11px] font-semibold uppercase tracking-wide text-white/40">
-            Targets
+            {wb("panels.targets")}
           </p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {aiSearch.targets.map((t) => (
@@ -243,7 +242,7 @@ export function SeoAgentPanel(props: {
             ))}
           </div>
           <p className="mt-3 text-[11px] font-semibold uppercase tracking-wide text-white/40">
-            Entity optimization
+            {wb("panels.entityOptimization")}
           </p>
           <ul className="mt-2 space-y-1 text-[12px] text-white/55">
             {aiSearch.entityOptimization.slice(0, 4).map((s) => (
@@ -251,7 +250,7 @@ export function SeoAgentPanel(props: {
             ))}
           </ul>
           <p className="mt-3 text-[11px] font-semibold uppercase tracking-wide text-white/40">
-            Brand knowledge signals
+            {wb("panels.brandKnowledgeSignals")}
           </p>
           <ul className="mt-2 space-y-1 text-[12px] text-white/55">
             {aiSearch.brandKnowledgeSignals.slice(0, 4).map((s) => (
@@ -262,7 +261,7 @@ export function SeoAgentPanel(props: {
       </div>
 
       <DashboardPanel className="p-4">
-        <h4 className="text-sm font-semibold text-white">Keyword tracking</h4>
+        <h4 className="text-sm font-semibold text-white">{wb("panels.keywordTracking")}</h4>
         <div className="mt-3 space-y-2">
           {report.keywordTracking.map((kw) => (
             <div
@@ -292,7 +291,7 @@ export function SeoAgentPanel(props: {
         <div className="mb-3 flex items-center gap-2">
           <Sparkles className="size-4 text-premium-gold" />
           <h4 className="text-sm font-semibold text-white">
-            Issues & AI recommendations
+            {wb("panels.issuesRecommendations")}
           </h4>
         </div>
         {error ? (
@@ -324,7 +323,7 @@ export function SeoAgentPanel(props: {
                   {applyingId === rec.fixId ? (
                     <Loader2 className="size-3.5 animate-spin" />
                   ) : null}
-                  Apply Fix
+                  {wb("panels.applyFix")}
                 </Button>
               ) : null}
             </div>
@@ -333,7 +332,7 @@ export function SeoAgentPanel(props: {
 
         <div className="mt-4">
           <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-white/40">
-            FAQ preview
+            {wb("panels.faqPreview")}
           </p>
           <ul className="space-y-2 text-[12px] text-white/55">
             {optimizer.assets.faqItems.slice(0, 3).map((f) => (

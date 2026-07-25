@@ -3,6 +3,7 @@
 import { Clock3, Code2, RefreshCw, Star, Trash2, Wand2, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
+import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 
 export type ProjectHistoryItem = {
@@ -42,6 +43,12 @@ export function ProjectHistoryCard({
   /** Natural-language AI edit / improve (D-016). */
   onContinue?: () => void;
 }) {
+  const { t } = useTranslation();
+  const statusLabel =
+    item.status === "completed" || item.status === "failed" || item.status === "generating"
+      ? t(`dashboard.builderShared.statuses.${item.status}`)
+      : item.status.charAt(0).toUpperCase() + item.status.slice(1);
+
   return (
     <DashboardPanel className="flex flex-col gap-3">
       <div className="flex items-start justify-between gap-3">
@@ -82,8 +89,8 @@ export function ProjectHistoryCard({
 
       {item.tags && item.tags.length > 0 && (
         <div className="flex flex-wrap gap-1">
-          {item.tags.slice(0, 4).map((t) => (
-            <span key={t} className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-white/40">{t}</span>
+          {item.tags.slice(0, 4).map((tag) => (
+            <span key={tag} className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-white/40">{tag}</span>
           ))}
           {item.tags.length > 4 && (
             <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-white/40">+{item.tags.length - 4}</span>
@@ -93,7 +100,7 @@ export function ProjectHistoryCard({
 
       <div className="flex items-center justify-between text-xs text-white/30">
         <span className={getStatusColor(item.status)}>
-          {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+          {statusLabel}
         </span>
         <span className="flex items-center gap-1">
           <Clock3 className="size-3" />
@@ -111,7 +118,7 @@ export function ProjectHistoryCard({
               onClick={onView}
             >
               <Code2 className="size-3" />
-              Preview
+              {t("dashboard.builderShared.preview")}
             </Button>
             <Button
               variant="outline"
@@ -120,7 +127,7 @@ export function ProjectHistoryCard({
               onClick={onRegenerate}
             >
               <RefreshCw className="size-3" />
-              Regenerate
+              {t("dashboard.builderShared.regenerate")}
             </Button>
             {onContinue ? (
               <Button
@@ -130,7 +137,7 @@ export function ProjectHistoryCard({
                 onClick={onContinue}
               >
                 <Wand2 className="size-3" />
-                Improve
+                {t("dashboard.builderShared.improve")}
               </Button>
             ) : null}
           </>
@@ -143,7 +150,7 @@ export function ProjectHistoryCard({
             onClick={onRegenerate}
           >
             <RefreshCw className="size-3" />
-            Retry
+            {t("dashboard.builderShared.retry")}
           </Button>
         )}
       </div>

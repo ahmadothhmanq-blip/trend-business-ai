@@ -1,14 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import { dashboardInputClass } from "@/components/dashboard/ui/dashboard-styles";
 import { CoreProgressStepper } from "@/components/dashboard/one-prompt/core-progress-stepper";
-import { CORE_UX_STEPS } from "@/components/dashboard/one-prompt/steps";
+import { buildCoreUxSteps } from "@/components/dashboard/one-prompt/steps";
 import type { OnePromptProductConfig } from "@/lib/constants/one-prompt-products";
+import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 
 type OnePromptExperienceProps = {
@@ -35,6 +36,8 @@ export function OnePromptExperience({
   className,
   compact = false,
 }: OnePromptExperienceProps) {
+  const { t } = useTranslation();
+  const steps = useMemo(() => buildCoreUxSteps(t), [t]);
   const [internal, setInternal] = useState("");
   const prompt = value ?? internal;
   const setPrompt = onChange ?? setInternal;
@@ -44,7 +47,7 @@ export function OnePromptExperience({
       {!compact && (
         <div className="mb-5 max-w-2xl">
           <p className="text-[11px] font-semibold tracking-[0.18em] text-premium-gold uppercase">
-            One Prompt Experience
+            {t("dashboard.onePrompt.experienceLabel")}
           </p>
           <h3 className="mt-2 text-xl font-bold tracking-tight text-white">
             {product.title}
@@ -56,7 +59,7 @@ export function OnePromptExperience({
       )}
 
       <label className="mb-1.5 block text-xs font-medium text-white/60">
-        Your business idea
+        {t("dashboard.onePrompt.businessIdeaLabel")}
       </label>
       <Textarea
         value={prompt}
@@ -90,7 +93,7 @@ export function OnePromptExperience({
         >
           {submitting ? (
             <>
-              <Sparkles className="size-4 animate-pulse" /> Generating…
+              <Sparkles className="size-4 animate-pulse" /> {t("dashboard.onePrompt.generating")}
             </>
           ) : (
             <>
@@ -100,18 +103,18 @@ export function OnePromptExperience({
           )}
         </Button>
         <p className="text-[12px] text-white/35">
-          AI guides Idea → Strategy → Design → Assets → Generation → Quality → Ready
+          {t("dashboard.onePrompt.pipelineHint")}
         </p>
       </div>
 
       {showPipelinePreview && (
         <div className="mt-6 border-t border-white/[0.06] pt-5">
           <p className="mb-3 text-[12px] font-medium text-white/40">
-            Creation pipeline
+            {t("dashboard.onePrompt.creationPipeline")}
           </p>
           <CoreProgressStepper currentStep="idea" compact />
           <ul className="mt-3 hidden gap-x-4 gap-y-1 text-[11px] text-white/30 sm:grid sm:grid-cols-2 lg:grid-cols-4">
-            {CORE_UX_STEPS.map((s) => (
+            {steps.map((s) => (
               <li key={s.id}>
                 <span className="text-white/45">{s.label}:</span> {s.description}
               </li>

@@ -977,7 +977,7 @@ export function WebsiteBuilderTool({
             if (!incrementalPreview) return;
             const stub = stubRunningProject({
               id: session.generationId,
-              title: "Generating website…",
+              title: wb("statuses.generating"),
               description:
                 typeof requestBody.prompt === "string"
                   ? requestBody.prompt
@@ -998,7 +998,7 @@ export function WebsiteBuilderTool({
           },
           onComplete: (payload) => {
             if (!payload.project || !payload.generation?.id) {
-              throw new Error("AI engine did not return a saved generation.");
+              throw new Error(wb("errors.noSavedGeneration"));
             }
             applySavedGeneration(payload.project, payload.generation);
             setPreviewRevision((n) => n + 1);
@@ -1081,7 +1081,7 @@ export function WebsiteBuilderTool({
         }
 
         if (!("project" in data) || !data.project || !data.generation?.id) {
-          throw new Error("AI engine did not return a saved generation.");
+          throw new Error(wb("errors.noSavedGeneration"));
         }
 
         applySavedGeneration(data.project, data.generation);

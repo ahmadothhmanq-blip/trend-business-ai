@@ -1,3 +1,6 @@
+/** SEO/marketing catalog — display strings use `marketing.*` locale keys in UI components. */
+export const I18N_CATALOG = true as const;
+
 export const REF_HERO = {
   badge: "Next-Generation Business Intelligence.",
   headlineLine1: "One AI Platform.",

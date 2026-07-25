@@ -3,6 +3,8 @@
  * Maps LayerRunner layers into a simpler progress story.
  */
 
+import type { TranslateFn } from "@/lib/i18n/translate";
+
 export type CoreUxStepId =
   | "idea"
   | "strategy"
@@ -18,43 +20,26 @@ export type CoreUxStep = {
   description: string;
 };
 
-export const CORE_UX_STEPS: CoreUxStep[] = [
-  {
-    id: "idea",
-    label: "Idea",
-    description: "Understanding your business",
-  },
-  {
-    id: "strategy",
-    label: "Strategy",
-    description: "Positioning, pages, and messaging",
-  },
-  {
-    id: "design",
-    label: "Design",
-    description: "Visual system and UI style",
-  },
-  {
-    id: "assets",
-    label: "Assets",
-    description: "Hero and brand visuals",
-  },
-  {
-    id: "generation",
-    label: "Generation",
-    description: "Building your product",
-  },
-  {
-    id: "quality",
-    label: "Quality",
-    description: "Checks, SEO, and performance",
-  },
-  {
-    id: "ready",
-    label: "Ready Product",
-    description: "Publish-ready result",
-  },
+export const CORE_UX_STEP_IDS: CoreUxStepId[] = [
+  "idea",
+  "strategy",
+  "design",
+  "assets",
+  "generation",
+  "quality",
+  "ready",
 ];
+
+export function buildCoreUxSteps(
+  t: TranslateFn,
+  scope = "dashboard.onePrompt.steps",
+): CoreUxStep[] {
+  return CORE_UX_STEP_IDS.map((id) => ({
+    id,
+    label: t(`${scope}.${id}.label`),
+    description: t(`${scope}.${id}.description`),
+  }));
+}
 
 const LAYER_TO_STEP: Record<string, CoreUxStepId> = {
   start: "idea",
@@ -72,7 +57,7 @@ const LAYER_TO_STEP: Record<string, CoreUxStepId> = {
 };
 
 export function stepIndex(id: CoreUxStepId): number {
-  return CORE_UX_STEPS.findIndex((s) => s.id === id);
+  return CORE_UX_STEP_IDS.findIndex((s) => s === id);
 }
 
 /** Parse LayerRunner-style `[layer] message` progress lines. */

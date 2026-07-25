@@ -169,7 +169,7 @@ export function DeploymentDashboardPanel(props: {
   if (!props.generationId) {
     return (
       <div className="flex h-[420px] items-center justify-center text-sm text-white/40">
-        Generate or select a website to open publishing & domains.
+        {wb("panels.selectWebsiteDeployment")}
       </div>
     );
   }
@@ -208,8 +208,7 @@ export function DeploymentDashboardPanel(props: {
             {wb("panels.deploymentTitle", { name: dashboard.projectName || wb("labels.website") })}
           </h3>
           <p className="mt-1 max-w-2xl text-[12px] text-white/40">
-            Publish instantly, connect custom domains, and track SSL + deployment
-            history. Integrates with Analytics and SEO Agent readiness.
+            {wb("panels.deploymentDescription")}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -222,7 +221,7 @@ export function DeploymentDashboardPanel(props: {
             {busy === "prepare" ? (
               <Loader2 className="size-4 animate-spin" />
             ) : null}
-            Prepare
+            {wb("panels.prepare")}
           </Button>
           <Button
             className="bg-premium-gold text-black hover:bg-premium-gold/90"
@@ -312,7 +311,7 @@ export function DeploymentDashboardPanel(props: {
               disabled={Boolean(busy)}
               onClick={() => void runAction("unpublish")}
             >
-              Unpublish
+              {wb("panels.unpublish")}
             </Button>
             <Button
               size="sm"
@@ -321,7 +320,7 @@ export function DeploymentDashboardPanel(props: {
               disabled={Boolean(busy)}
               onClick={() => void runAction("archive")}
             >
-              Archive
+              {wb("panels.archive")}
             </Button>
           </div>
         ) : null}
@@ -333,8 +332,7 @@ export function DeploymentDashboardPanel(props: {
           <h4 className="text-sm font-semibold text-white">{wb("panels.domainSettings")}</h4>
         </div>
         <p className="mb-3 text-[12px] text-white/40">
-          Connect customer.com with CNAME / A records and TXT verification. SSL
-          provisioning is marked ready after successful verification.
+          {wb("panels.domainSettingsHint")}
         </p>
         <div className="flex flex-col gap-2 sm:flex-row">
           <Input
@@ -358,8 +356,7 @@ export function DeploymentDashboardPanel(props: {
         <div className="mt-4 space-y-3">
           {dashboard.domains.length === 0 ? (
             <p className="text-[12px] text-white/35">
-              No domains yet. Platform subdomain appears after publish when a
-              username handle is available.
+              {wb("panels.noDomainsYet")}
             </p>
           ) : (
             dashboard.domains.map((domain) => (
@@ -367,6 +364,7 @@ export function DeploymentDashboardPanel(props: {
                 key={domain.id}
                 domain={domain}
                 busy={busy}
+                wb={wb}
                 onVerify={(simulate) => void verifyDomain(domain.id, simulate)}
                 onRemove={() => void removeDomain(domain.id)}
               />
@@ -379,7 +377,7 @@ export function DeploymentDashboardPanel(props: {
         <h4 className="text-sm font-semibold text-white">{wb("panels.deploymentHistory")}</h4>
         <div className="mt-3 space-y-2">
           {dashboard.history.length === 0 ? (
-            <p className="text-[12px] text-white/35">No deployment events yet.</p>
+            <p className="text-[12px] text-white/35">{wb("panels.noDeploymentEvents")}</p>
           ) : (
             dashboard.history.map((ev) => (
               <div
@@ -399,7 +397,7 @@ export function DeploymentDashboardPanel(props: {
                     rel="noreferrer"
                     className="text-premium-gold hover:underline"
                   >
-                    URL
+                    {wb("panels.urlLabel")}
                   </a>
                 ) : null}
               </div>
@@ -435,10 +433,11 @@ function UrlRow(props: { label: string; value: string }) {
 function DomainCard(props: {
   domain: WebsiteDomain;
   busy: string | null;
+  wb: ReturnType<typeof useProductT>;
   onVerify: (simulate?: boolean) => void;
   onRemove: () => void;
 }) {
-  const { domain } = props;
+  const { domain, wb } = props;
   return (
     <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
       <div className="flex flex-wrap items-start justify-between gap-2">
@@ -463,7 +462,7 @@ function DomainCard(props: {
                 ) : (
                   <CheckCircle2 className="size-3.5" />
                 )}
-                Verify DNS
+                {wb("panels.verifyDns")}
               </Button>
               {process.env.NODE_ENV !== "production" ? (
                 <Button
@@ -473,7 +472,7 @@ function DomainCard(props: {
                   disabled={Boolean(props.busy)}
                   onClick={() => props.onVerify(true)}
                 >
-                  Simulate
+                  {wb("panels.simulate")}
                 </Button>
               ) : null}
               <Button
@@ -488,7 +487,7 @@ function DomainCard(props: {
             </>
           ) : (
             <span className="inline-flex items-center gap-1 text-[11px] text-premium-gold">
-              <Lock className="size-3" /> Platform
+              <Lock className="size-3" /> {wb("panels.platform")}
             </span>
           )}
         </div>
@@ -501,10 +500,10 @@ function DomainCard(props: {
           <table className="w-full min-w-[480px] text-left text-[11px] text-white/60">
             <thead className="text-white/35">
               <tr>
-                <th className="py-1 pr-2 font-medium">Type</th>
-                <th className="py-1 pr-2 font-medium">Host</th>
-                <th className="py-1 pr-2 font-medium">Value</th>
-                <th className="py-1 font-medium">Purpose</th>
+                <th className="py-1 pr-2 font-medium">{wb("panels.dnsType")}</th>
+                <th className="py-1 pr-2 font-medium">{wb("panels.dnsHost")}</th>
+                <th className="py-1 pr-2 font-medium">{wb("panels.dnsValue")}</th>
+                <th className="py-1 font-medium">{wb("panels.dnsPurpose")}</th>
               </tr>
             </thead>
             <tbody>
@@ -532,7 +531,7 @@ function DomainCard(props: {
             : "text-white/30",
         )}
       >
-        SSL: {domain.sslStatus}
+        {wb("panels.sslStatus", { status: domain.sslStatus })}
       </p>
     </div>
   );

@@ -1,6 +1,9 @@
+"use client";
+
 import { BarChart3 } from "lucide-react";
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import { DashboardIconBox } from "@/components/dashboard/ui/icon-box";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 
 type MarketAnalysisChartProps = {
   opportunities: string[];
@@ -13,19 +16,21 @@ export function MarketAnalysisChart({
   risks,
   competitors,
 }: MarketAnalysisChartProps) {
+  const pt = useProductT("marketAnalysis");
+
   const items = [
     {
-      label: "Opportunities",
+      label: pt("chart.opportunities"),
       value: opportunities.length,
       gradient: "from-emerald-400/80 to-emerald-400/30",
     },
     {
-      label: "Risks",
+      label: pt("chart.risks"),
       value: risks.length,
       gradient: "from-amber-400/80 to-amber-400/30",
     },
     {
-      label: "Competitors",
+      label: pt("chart.competitors"),
       value: competitors.length,
       gradient: "from-premium-gold/80 to-premium-gold/30",
     },
@@ -37,8 +42,8 @@ export function MarketAnalysisChart({
       <div className="mb-5 flex items-center gap-3">
         <DashboardIconBox icon={BarChart3} />
         <div>
-          <h3 className="font-bold text-white">Analysis Overview</h3>
-          <p className="text-[13px] text-white/40">Distribution breakdown</p>
+          <h3 className="font-bold text-white">{pt("chart.title")}</h3>
+          <p className="text-[13px] text-white/40">{pt("chart.subtitle")}</p>
         </div>
       </div>
       <div className="space-y-4">

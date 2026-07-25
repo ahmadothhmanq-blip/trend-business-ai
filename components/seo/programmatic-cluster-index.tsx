@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { SiteShell } from "@/components/marketing/site/shell";
 import {
@@ -7,6 +9,7 @@ import {
 } from "@/components/marketing/site/ui";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { collectionPageJsonLd, webPageJsonLd } from "@/lib/seo/json-ld";
+import { useScopedT } from "@/lib/i18n/use-scoped-t";
 
 export type ClusterIndexItem = {
   href: string;
@@ -27,6 +30,8 @@ export function ProgrammaticClusterIndex({
   description: string;
   items: ClusterIndexItem[];
 }) {
+  const t = useScopedT("marketing.publicPages.seo");
+
   return (
     <>
       <JsonLdScript
@@ -55,11 +60,11 @@ export function ProgrammaticClusterIndex({
           eyebrow={eyebrow}
           title={title}
           description={description}
-          primary={{ label: "Explore products", href: "/features" }}
-          secondary={{ label: "Contact sales", href: "/contact" }}
+          primary={{ label: t("exploreProducts"), href: "/features" }}
+          secondary={{ label: t("contactSales"), href: "/contact" }}
         />
         <section className="mx-auto max-w-5xl px-6 pb-24">
-          <SiteEyebrow>Browse</SiteEyebrow>
+          <SiteEyebrow>{t("browse")}</SiteEyebrow>
           <ul className="mt-8 grid gap-6 sm:grid-cols-2">
             {items.map((item) => (
               <li key={item.href}>

@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/lib/i18n/client";
 
 export function HistoryPagination({
   page,
@@ -13,6 +14,8 @@ export function HistoryPagination({
   pageSize?: number;
   onPageChange: (page: number) => void;
 }) {
+  const { t } = useTranslation();
+
   if (total <= pageSize) return null;
 
   return (
@@ -24,9 +27,14 @@ export function HistoryPagination({
         onClick={() => onPageChange(page - 1)}
         className="rounded-lg border-white/10 text-white/60"
       >
-        Previous
+        {t("dashboard.pagination.previous")}
       </Button>
-      <span className="flex items-center px-3 text-xs text-white/40">Page {page}</span>
+      <span className="flex items-center px-3 text-xs text-white/40">
+        {t("dashboard.pagination.pageOf", {
+          page,
+          totalPages: Math.max(1, Math.ceil(total / pageSize)),
+        })}
+      </span>
       <Button
         variant="outline"
         size="sm"
@@ -34,7 +42,7 @@ export function HistoryPagination({
         onClick={() => onPageChange(page + 1)}
         className="rounded-lg border-white/10 text-white/60"
       >
-        Next
+        {t("dashboard.pagination.next")}
       </Button>
     </div>
   );

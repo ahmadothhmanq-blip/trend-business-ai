@@ -21,6 +21,7 @@ import { LayersPanel } from "@/components/dashboard/image-generator/editor/layer
 import { PropertiesPanel } from "@/components/dashboard/image-generator/editor/properties-panel";
 import { EditorToolbar } from "@/components/dashboard/image-generator/editor/toolbar";
 import { BrandKitPicker } from "@/components/dashboard/image-generator/editor/brand-kit-picker";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 
 type Props = {
   generationId: string;
@@ -28,6 +29,7 @@ type Props = {
 };
 
 export function DesignEditor({ generationId, generationName }: Props) {
+  const p = useProductT("imageGenerator");
   const [engine] = useState(() => new DesignCanvasEngine());
   const [document, setDocument] = useState<CanvasDocumentModel | null>(null);
   const [canvasId, setCanvasId] = useState<string | null>(null);
@@ -44,16 +46,16 @@ export function DesignEditor({ generationId, generationName }: Props) {
     try {
       const res = await fetch(`/api/image-generator/${generationId}/editor`);
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Failed to load editor");
+      if (!res.ok) throw new Error(data.error ?? p("errors.loadEditorFailed"));
       engine.loadDocument(data.document);
       setDocument(data.document);
       setCanvasId(data.canvas?.id ?? null);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed to load editor");
+      toast.error(e instanceof Error ? e.message : p("errors.loadEditorFailed"));
     } finally {
       setLoading(false);
     }
-  }, [engine, generationId]);
+  }, [engine, generationId, p]);
 
   useEffect(() => {
     void load();
@@ -82,7 +84,7 @@ export function DesignEditor({ generationId, generationName }: Props) {
         body: JSON.stringify({ document: current, brandKitId: current.brand?.brandKitId ?? null }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Save failed");
+      if (!res.ok) throw new Error(data.error ?? p("errors.saveFailed"));
       setCanvasId(data.canvas?.id ?? canvasId);
       setDocument(data.document ?? current);
       if (data.canvas?.id && canvasId) {
@@ -97,13 +99,13 @@ export function DesignEditor({ generationId, generationName }: Props) {
           }),
         });
       }
-      toast.success("Design saved");
+      toast.success(p("toasts.designSaved"));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Save failed");
+      toast.error(e instanceof Error ? e.message : p("errors.saveFailed"));
     } finally {
       setBusy(false);
     }
-  }, [canvasId, engine, generationId]);
+  }, [canvasId, engine, generationId, p]);
 
   const addElement = (type: "text" | "shape" | "image" | "icon" | "logo" | "background") => {
     if (!activeLayerId) return;
@@ -120,10 +122,10 @@ export function DesignEditor({ generationId, generationName }: Props) {
         body: JSON.stringify({ operation }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Edit failed");
-      toast.success(data.message ?? "Edit complete");
+      if (!res.ok) throw new Error(data.error ?? p("errors.editFailed"));
+      toast.success(data.message ?? p("toasts.editComplete"));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Edit failed");
+      toast.error(e instanceof Error ? e.message : p("errors.editFailed"));
     } finally {
       setBusy(false);
     }
@@ -134,11 +136,11 @@ export function DesignEditor({ generationId, generationName }: Props) {
     engine.loadDocument(next);
     setSelectedBrandId(kit.id);
     refresh();
-    toast.success(`Applied ${kit.name}`);
+    toast.success(p("editor.designEditor.appliedBrand", { name: kit.name }));
   };
 
   if (loading || !document) {
-    return <div className="py-20 text-center text-white/50">Loading design editor…</div>;
+    return <div className="py-20 text-center text-white/50">{p("editor.designEditor.loading")}</div>;
   }
 
   return (
@@ -152,7 +154,7 @@ export function DesignEditor({ generationId, generationName }: Props) {
         <div>
           <h2 className="text-lg font-bold text-white">{generationName}</h2>
           <p className="text-xs text-white/40">
-            {doc.width}×{doc.height} · v{doc.version}
+            {p("editor.designEditor.dimensions", { width: doc.width, height: doc.height, version: doc.version })}
           </p>
         </div>
       </div>
@@ -173,7 +175,7 @@ export function DesignEditor({ generationId, generationName }: Props) {
       <div className="grid gap-4 xl:grid-cols-[1fr_280px_280px]">
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Canvas</DashboardCardTitle>
+            <DashboardCardTitle>{p("editor.designEditor.canvas")}</DashboardCardTitle>
           </DashboardCardHeader>
           <DashboardCardContent>
             <CanvasPreview
@@ -188,7 +190,7 @@ export function DesignEditor({ generationId, generationName }: Props) {
         </DashboardCard>
 
         <DashboardCard>
-          <DashboardCardHeader><DashboardCardTitle>Layers</DashboardCardTitle></DashboardCardHeader>
+          <DashboardCardHeader><DashboardCardTitle>{p("editor.designEditor.layers")}</DashboardCardTitle></DashboardCardHeader>
           <DashboardCardContent>
             <LayersPanel
               layers={doc.layers}
@@ -212,7 +214,7 @@ export function DesignEditor({ generationId, generationName }: Props) {
 
         <div className="space-y-4">
           <DashboardCard>
-            <DashboardCardHeader><DashboardCardTitle>Properties</DashboardCardTitle></DashboardCardHeader>
+            <DashboardCardHeader><DashboardCardTitle>{p("editor.designEditor.properties")}</DashboardCardTitle></DashboardCardHeader>
             <DashboardCardContent>
               <PropertiesPanel
                 element={selectedElement}
@@ -227,7 +229,7 @@ export function DesignEditor({ generationId, generationName }: Props) {
 
           {showBrand && (
             <DashboardCard>
-              <DashboardCardHeader><DashboardCardTitle>Brand Kit</DashboardCardTitle></DashboardCardHeader>
+              <DashboardCardHeader><DashboardCardTitle>{p("editor.designEditor.brandKit")}</DashboardCardTitle></DashboardCardHeader>
               <DashboardCardContent>
                 <BrandKitPicker
                   selectedId={selectedBrandId}

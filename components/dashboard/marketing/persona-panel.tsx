@@ -6,10 +6,12 @@ import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import type { CustomerPersona } from "@/types/marketing";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 
 type Props = { initialPersonas?: CustomerPersona[] };
 
 export function PersonaPanel({ initialPersonas = [] }: Props) {
+  const wt = useWorkspaceT("marketing");
   const [personas, setPersonas] = useState(initialPersonas);
   const [brief, setBrief] = useState("");
   const [busy, setBusy] = useState(false);
@@ -26,10 +28,10 @@ export function PersonaPanel({ initialPersonas = [] }: Props) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       if (data.persona) setPersonas((p) => [data.persona, ...p]);
-      toast.success("Persona generated!");
+      toast.success(wt("personaPanel.generated"));
       setBrief("");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed");
+      toast.error(e instanceof Error ? e.message : wt("personaPanel.failed"));
     } finally {
       setBusy(false);
     }
@@ -38,11 +40,11 @@ export function PersonaPanel({ initialPersonas = [] }: Props) {
   return (
     <div className="space-y-4">
       <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
-        <p className="mb-2 text-xs uppercase text-white/40">Persona Generator</p>
-        <Textarea value={brief} onChange={(e) => setBrief(e.target.value)} placeholder="Describe your ideal customer..." rows={3} className="border-white/10 bg-white/5 text-white" />
+        <p className="mb-2 text-xs uppercase text-white/40">{wt("personaPanel.generatorTitle")}</p>
+        <Textarea value={brief} onChange={(e) => setBrief(e.target.value)} placeholder={wt("personaPanel.briefPlaceholder")} rows={3} className="border-white/10 bg-white/5 text-white" />
         <Button className="mt-2 rounded-lg" onClick={() => void generate()} disabled={busy}>
           <Sparkles className="mr-2 size-4" />
-          Generate Persona
+          {wt("personaPanel.generatePersona")}
         </Button>
       </div>
 
@@ -53,7 +55,7 @@ export function PersonaPanel({ initialPersonas = [] }: Props) {
             <p className="text-xs text-white/40">{p.title}</p>
             <p className="mt-2 text-sm text-white/60">{p.summary}</p>
             {p.pain_points?.length > 0 && (
-              <p className="mt-2 text-xs text-white/40">Pain: {p.pain_points.slice(0, 2).join(", ")}</p>
+              <p className="mt-2 text-xs text-white/40">{wt("personaPanel.painPrefix", { points: p.pain_points.slice(0, 2).join(", ") })}</p>
             )}
           </div>
         ))}

@@ -2,16 +2,20 @@ import type { Metadata } from "next";
 import { ProgrammaticClusterIndex } from "@/components/seo/programmatic-cluster-index";
 import { SeoService } from "@/lib/seo/engine";
 import { getPublishedCountries, countryPath } from "@/lib/seo/countries";
+import { getServerTranslator } from "@/lib/i18n/server";
 
-export const metadata: Metadata = SeoService.createMetadata({
-  title: "AI Business Platform by Market",
-  description:
-    "Market pages for teams in the US, UK, UAE, Saudi Arabia and more — plan products, brands and growth with Trend Business AI.",
-  path: "/countries",
-  type: "collection",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerTranslator();
+  return SeoService.createMetadata({
+    title: t("marketing.publicPages.clusters.countries.metaTitle"),
+    description: t("marketing.publicPages.clusters.countries.metaDescription"),
+    path: "/countries",
+    type: "collection",
+  });
+}
 
-export default function CountriesIndexPage() {
+export default async function CountriesIndexPage() {
+  const { t } = await getServerTranslator();
   const items = getPublishedCountries().map((country) => ({
     href: countryPath(country.slug),
     title: country.title,
@@ -21,9 +25,9 @@ export default function CountriesIndexPage() {
   return (
     <ProgrammaticClusterIndex
       path="/countries"
-      eyebrow="Markets"
-      title="AI workspaces for every market you serve"
-      description="Published market landings that help local teams discover Trend Business AI with clear regional context and intent."
+      eyebrow={t("marketing.publicPages.clusters.countries.eyebrow")}
+      title={t("marketing.publicPages.clusters.countries.title")}
+      description={t("marketing.publicPages.clusters.countries.description")}
       items={items}
     />
   );

@@ -14,49 +14,29 @@ import { createPageMetadata } from "@/lib/seo/metadata";
 import { collectionPageJsonLd, webPageJsonLd } from "@/lib/seo/json-ld";
 import { KNOWLEDGE_HUBS, getPublishedKnowledgeByKind } from "@/lib/seo/knowledge";
 import { getRelatedBusinessResources, getRelatedTools } from "@/lib/seo/internal-links";
+import { getServerTranslator } from "@/lib/i18n/server";
 
-export const metadata: Metadata = createPageMetadata({
-  title: "Knowledge Center — Academy, Guides & Docs",
-  description:
-    "Learn Trend Business AI with academy tracks, tutorials, guides, documentation, glossary and case studies.",
-  path: "/learn",
-  type: "collection",
-});
-
-const SECTIONS = [
-  {
-    id: "academy",
-    title: "Academy",
-    description: "Structured learning paths for founders and operators.",
-  },
-  {
-    id: "tutorial",
-    title: "Tutorials",
-    description: "Step-by-step walkthroughs for each AI product workflow.",
-  },
-  {
-    id: "guide",
-    title: "Guides",
-    description: "Strategic playbooks for launching and growing with AI.",
-  },
-  {
-    id: "documentation",
-    title: "Documentation",
-    description: "Reference docs for the dashboard, exports and platform features.",
-  },
-  {
-    id: "glossary",
-    title: "Glossary",
-    description: "Clear definitions for AI business and growth terminology.",
-  },
-  {
-    id: "case-study",
-    title: "Case Studies",
-    description: "Real-world outcomes from teams using Trend Business AI.",
-  },
+const SECTION_IDS = [
+  "academy",
+  "tutorial",
+  "guide",
+  "documentation",
+  "glossary",
+  "case-study",
 ] as const;
 
-export default function LearnPage() {
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerTranslator();
+  return createPageMetadata({
+    title: t("marketing.publicPages.learn.metaTitle"),
+    description: t("marketing.publicPages.learn.metaDescription"),
+    path: "/learn",
+    type: "collection",
+  });
+}
+
+export default async function LearnPage() {
+  const { t } = await getServerTranslator();
   const published = getPublishedKnowledgeByKind();
   const hubs = KNOWLEDGE_HUBS.filter((hub) => hub.path !== "/learn");
 
@@ -66,15 +46,14 @@ export default function LearnPage() {
         id="learn-jsonld"
         data={[
           webPageJsonLd({
-            name: "Knowledge Center",
-            description:
-              "Academy, tutorials, guides, documentation, glossary and case studies for Trend Business AI.",
+            name: t("marketing.publicPages.learn.jsonLdName"),
+            description: t("marketing.publicPages.learn.jsonLdDescription"),
             path: "/learn",
             type: "CollectionPage",
           }),
           collectionPageJsonLd({
-            name: "Knowledge Center",
-            description: "Learning hubs across Trend Business AI.",
+            name: t("marketing.publicPages.learn.jsonLdName"),
+            description: t("marketing.publicPages.learn.jsonLdCollectionDescription"),
             path: "/learn",
             items: [
               ...hubs.map((hub) => ({
@@ -93,39 +72,41 @@ export default function LearnPage() {
       />
       <SiteShell>
         <SitePageHero
-          eyebrow="Knowledge Center"
-          title="Learn. Build. Scale with AI."
-          description="Architecture for Academy, Tutorials, Guides, Documentation, Glossary and Case Studies — published only when content meets quality standards."
-          primary={{ label: "Open Docs", href: "/docs" }}
-          secondary={{ label: "Browse Products", href: "/features" }}
+          eyebrow={t("marketing.publicPages.learn.eyebrow")}
+          title={t("marketing.publicPages.learn.title")}
+          description={t("marketing.publicPages.learn.description")}
+          primary={{ label: t("marketing.publicPages.learn.primaryCta"), href: "/docs" }}
+          secondary={{ label: t("marketing.publicPages.learn.secondaryCta"), href: "/features" }}
         />
 
         <section className="landing-container pb-16 lg:pb-24">
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {SECTIONS.map((section) => {
+            {SECTION_IDS.map((sectionId) => {
               const count =
-                section.id === "academy"
+                sectionId === "academy"
                   ? published.academy.length
-                  : section.id === "tutorial"
+                  : sectionId === "tutorial"
                     ? published.tutorials.length
-                    : section.id === "guide"
+                    : sectionId === "guide"
                       ? published.guides.length
-                      : section.id === "documentation"
+                      : sectionId === "documentation"
                         ? published.documentation.length
-                        : section.id === "glossary"
+                        : sectionId === "glossary"
                           ? published.glossary.length
                           : published.caseStudies.length;
 
               return (
                 <div
-                  key={section.id}
+                  key={sectionId}
                   className="rounded-2xl border border-[rgba(212,175,55,0.16)] bg-[#111111] p-6"
                 >
-                  <SiteEyebrow>{section.title}</SiteEyebrow>
-                  <SiteH2 className="mt-3 text-[22px]">{section.title}</SiteH2>
-                  <SiteBody className="mt-3">{section.description}</SiteBody>
+                  <SiteEyebrow>{t(`marketing.publicPages.learn.sections.${sectionId}.title`)}</SiteEyebrow>
+                  <SiteH2 className="mt-3 text-[22px]">{t(`marketing.publicPages.learn.sections.${sectionId}.title`)}</SiteH2>
+                  <SiteBody className="mt-3">{t(`marketing.publicPages.learn.sections.${sectionId}.description`)}</SiteBody>
                   <p className="mt-4 text-[12px] uppercase tracking-[0.14em] text-[#8A8A8A]">
-                    {count > 0 ? `${count} published` : "Foundation ready"}
+                    {count > 0
+                      ? t("marketing.publicPages.learn.publishedCount", { count })
+                      : t("marketing.publicPages.learn.foundationReady")}
                   </p>
                 </div>
               );
@@ -147,17 +128,17 @@ export default function LearnPage() {
 
           <div className="mt-16">
             <RelatedLinksSection
-              title="Start with these tools"
+              title={t("marketing.common.relatedTools")}
               links={getRelatedTools("website-builder", 3)}
             />
           </div>
           <div className="mt-12">
-            <RelatedLinksSection title="Business resources" links={getRelatedBusinessResources()} />
+            <RelatedLinksSection title={t("marketing.common.businessResources")} links={getRelatedBusinessResources()} />
           </div>
 
           <div className="mt-14 flex justify-center">
             <SiteButton href="/signup" size="lg">
-              Start building free
+              {t("marketing.publicPages.learn.startBuildingFree")}
             </SiteButton>
           </div>
         </section>

@@ -7,7 +7,8 @@ export {
 } from "./publish-readiness-badge";
 export { useCoreProgress } from "./use-core-progress";
 export {
-  CORE_UX_STEPS,
+  CORE_UX_STEP_IDS,
+  buildCoreUxSteps,
   resolveStepFromEvents,
   type CoreUxStep,
   type CoreUxStepId,

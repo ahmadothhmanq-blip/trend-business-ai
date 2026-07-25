@@ -4,6 +4,7 @@ import { DashboardHeader } from "@/components/dashboard/header";
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
+import { getServerTranslator } from "@/lib/i18n/server";
 import type { WebsiteGeneration } from "@/types/database";
 
 function formatGenerationDate(value: string) {
@@ -19,6 +20,10 @@ function getGeneratedFileCount(generation: WebsiteGeneration) {
 }
 
 export default async function WebsiteBuilderSettingsPage() {
+  const { t } = await getServerTranslator();
+  const wb = (key: string, values?: Record<string, string | number>) =>
+    t(`products.websiteBuilder.settings.${key}`, values);
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -41,11 +46,18 @@ export default async function WebsiteBuilderSettingsPage() {
     0,
   );
 
+  const defaults = [
+    [wb("framework"), wb("nextjsAppRouter")],
+    [wb("styling"), wb("tailwindCss")],
+    [wb("packageManager"), wb("npm")],
+    [wb("exportFormat"), wb("downloadableZip")],
+  ] as const;
+
   return (
     <>
       <DashboardHeader
-        title="AI Project Settings"
-        description="Manage generated project defaults, saved history and workspace metadata."
+        title={wb("pageTitle")}
+        description={wb("pageDescription")}
         userEmail={user?.email}
         userName={metadata.full_name as string | undefined}
       />
@@ -54,7 +66,7 @@ export default async function WebsiteBuilderSettingsPage() {
           <Button asChild variant="outline" className="btn-ghost-gold rounded-xl">
             <Link href="/dashboard/website-builder">
               <ArrowLeft className="size-4" />
-              Back to Project Workspace
+              {wb("backToWorkspace")}
             </Link>
           </Button>
         </div>
@@ -66,22 +78,15 @@ export default async function WebsiteBuilderSettingsPage() {
                 <Settings className="size-5" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white">Workspace Defaults</h2>
+                <h2 className="text-xl font-bold text-white">{wb("workspaceDefaults")}</h2>
                 <p className="mt-1 text-sm leading-relaxed text-white/45">
-                  Generated projects are saved to Supabase with the prompt, files,
-                  and framework metadata. Live preview, AI improve, public URL
-                  publish, and ZIP export are available from the main workspace.
+                  {wb("workspaceDefaultsDescription")}
                 </p>
               </div>
             </div>
 
             <div className="mt-6 grid gap-3 md:grid-cols-2">
-              {[
-                ["Framework", "Next.js App Router"],
-                ["Styling", "Tailwind CSS"],
-                ["Package manager", "npm"],
-                ["Export format", "Downloadable ZIP"],
-              ].map(([label, value]) => (
+              {defaults.map(([label, value]) => (
                 <div
                   key={label}
                   className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4"
@@ -98,19 +103,19 @@ export default async function WebsiteBuilderSettingsPage() {
           <div className="grid gap-6 sm:grid-cols-3 xl:grid-cols-1">
             <DashboardPanel>
               <p className="text-[11px] font-semibold tracking-wide text-white/35 uppercase">
-                Saved Projects
+                {wb("savedProjects")}
               </p>
               <p className="mt-2 text-3xl font-black text-white">{generations.length}</p>
             </DashboardPanel>
             <DashboardPanel>
               <p className="text-[11px] font-semibold tracking-wide text-white/35 uppercase">
-                Generated Files
+                {wb("generatedFiles")}
               </p>
               <p className="mt-2 text-3xl font-black text-white">{fileCount}</p>
             </DashboardPanel>
             <DashboardPanel>
               <p className="text-[11px] font-semibold tracking-wide text-white/35 uppercase">
-                Favorites
+                {wb("favorites")}
               </p>
               <p className="mt-2 text-3xl font-black text-white">{favoriteCount}</p>
             </DashboardPanel>
@@ -121,10 +126,9 @@ export default async function WebsiteBuilderSettingsPage() {
           <div className="mb-5 flex items-center gap-3">
             <FileStack className="size-5 text-premium-gold" />
             <div>
-              <h2 className="text-xl font-bold text-white">Generation History</h2>
+              <h2 className="text-xl font-bold text-white">{wb("generationHistory")}</h2>
               <p className="text-sm text-white/45">
-                Reopen previous projects from the main workspace for preview,
-                AI improve, publish, ZIP export, rename, delete, and favorites.
+                {wb("generationHistoryDescription")}
               </p>
             </div>
           </div>
@@ -150,7 +154,11 @@ export default async function WebsiteBuilderSettingsPage() {
                   <div className="mt-4 flex flex-wrap gap-2 text-[12px] text-white/40">
                     <span>{project.website_type}</span>
                     <span>•</span>
-                    <span>{getGeneratedFileCount(project)} files</span>
+                    <span>
+                      {wb("filesCount", {
+                        count: getGeneratedFileCount(project),
+                      })}
+                    </span>
                     <span>•</span>
                     <span>{formatGenerationDate(project.created_at)}</span>
                   </div>
@@ -160,9 +168,9 @@ export default async function WebsiteBuilderSettingsPage() {
           ) : (
             <div className="rounded-3xl border border-dashed border-white/[0.1] p-8 text-center">
               <Download className="mx-auto size-10 text-premium-gold" />
-              <p className="mt-4 font-bold text-white">No generated projects yet</p>
+              <p className="mt-4 font-bold text-white">{wb("noProjectsTitle")}</p>
               <p className="mt-2 text-sm text-white/40">
-                Generate a project to populate workspace settings and history.
+                {wb("noProjectsDescription")}
               </p>
             </div>
           )}

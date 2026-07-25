@@ -1,3 +1,5 @@
+"use client";
+
 import { memo } from "react";
 import {
   ArrowDownToLine,
@@ -14,6 +16,7 @@ import { DashboardIconBox } from "@/components/dashboard/ui/icon-box";
 import { DashboardListSkeleton } from "@/components/dashboard/ui/dashboard-skeleton";
 import { ListFilters } from "@/components/dashboard/list-filters";
 import { PaginationControls } from "@/components/dashboard/pagination-controls";
+import { useTranslation } from "@/lib/i18n/client";
 import type { WorkspaceProject } from "@/lib/workspace/project";
 import { cn } from "@/lib/utils";
 
@@ -56,15 +59,17 @@ export const WorkspaceProjectsList = memo(function WorkspaceProjectsList({
   onExportMarkdown,
   onExportJson,
 }: WorkspaceProjectsListProps) {
+  const { t } = useTranslation();
+
   return (
     <DashboardPanel>
       <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-3">
           <DashboardIconBox icon={History} />
           <div>
-            <h3 className="font-bold text-white">Saved Projects</h3>
+            <h3 className="font-bold text-white">{t("dashboard.workspaceProjects.title")}</h3>
             <p className="text-[13px] text-white/40">
-              Search, favorite, export, download and manage your workspace history
+              {t("dashboard.workspaceProjects.description")}
             </p>
           </div>
         </div>
@@ -80,8 +85,8 @@ export const WorkspaceProjectsList = memo(function WorkspaceProjectsList({
       ) : projects.length === 0 ? (
         <DashboardEmptyState
           icon={Clock3}
-          title="No saved projects yet"
-          description="Your generated workspace projects will appear here with full history, favorites and export support."
+          title={t("dashboard.workspaceProjects.listEmptyTitle")}
+          description={t("dashboard.workspaceProjects.listEmptyDescription")}
         />
       ) : (
         <>
@@ -98,7 +103,7 @@ export const WorkspaceProjectsList = memo(function WorkspaceProjectsList({
               >
                 <button
                   type="button"
-                  className="w-full text-left"
+                  className="w-full text-start"
                   onClick={() => onSelect(project)}
                 >
                   <p className="font-semibold text-white transition-colors group-hover:text-premium-gold-light">
@@ -121,7 +126,11 @@ export const WorkspaceProjectsList = memo(function WorkspaceProjectsList({
                           ? "border-premium-gold/30 bg-premium-gold/15 text-premium-gold"
                           : "border-white/[0.08] text-white/30 hover:border-premium-gold/25 hover:text-premium-gold",
                       )}
-                      aria-label={project.favorite ? "Remove favorite" : "Add favorite"}
+                      aria-label={
+                        project.favorite
+                          ? t("dashboard.workspaceProjects.removeFavorite")
+                          : t("dashboard.workspaceProjects.addFavorite")
+                      }
                     >
                       <Star className={cn("size-4", project.favorite && "fill-current")} />
                     </button>
@@ -130,7 +139,7 @@ export const WorkspaceProjectsList = memo(function WorkspaceProjectsList({
                       disabled={actionLoading === project.id}
                       onClick={() => onExportMarkdown(project)}
                       className="rounded-lg border border-white/[0.08] p-2 text-white/30 transition-colors hover:border-premium-gold/25 hover:text-premium-gold"
-                      aria-label="Download markdown"
+                      aria-label={t("dashboard.workspaceProjects.downloadMarkdown")}
                     >
                       <Download className="size-4" />
                     </button>
@@ -139,7 +148,7 @@ export const WorkspaceProjectsList = memo(function WorkspaceProjectsList({
                       disabled={actionLoading === project.id}
                       onClick={() => onExportJson(project)}
                       className="rounded-lg border border-white/[0.08] p-2 text-white/30 transition-colors hover:border-premium-gold/25 hover:text-premium-gold"
-                      aria-label="Download JSON"
+                      aria-label={t("dashboard.workspaceProjects.downloadJson")}
                     >
                       <ArrowDownToLine className="size-4" />
                     </button>
@@ -148,7 +157,7 @@ export const WorkspaceProjectsList = memo(function WorkspaceProjectsList({
                       disabled={actionLoading === project.id}
                       onClick={() => onDuplicate(project.id)}
                       className="rounded-lg border border-white/[0.08] p-2 text-white/30 transition-colors hover:border-premium-gold/25 hover:text-premium-gold"
-                      aria-label="Duplicate project"
+                      aria-label={t("dashboard.workspaceProjects.duplicateProject")}
                     >
                       <Copy className="size-4" />
                     </button>
@@ -157,7 +166,7 @@ export const WorkspaceProjectsList = memo(function WorkspaceProjectsList({
                       disabled={actionLoading === project.id}
                       onClick={() => onDelete(project.id)}
                       className="rounded-lg border border-white/[0.08] p-2 text-white/30 transition-colors hover:border-red-400/30 hover:text-red-300"
-                      aria-label="Delete project"
+                      aria-label={t("dashboard.workspaceProjects.deleteProject")}
                     >
                       <Trash2 className="size-4" />
                     </button>

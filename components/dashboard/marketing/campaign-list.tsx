@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { MarketingCampaign } from "@/types/marketing";
 import { CampaignEditor } from "@/components/dashboard/marketing/campaign-editor";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 
 type Props = {
   campaigns: MarketingCampaign[];
@@ -17,12 +18,13 @@ type Props = {
 };
 
 export function CampaignList({ campaigns, onCampaignsChange, selectedId, onSelect }: Props) {
+  const wt = useWorkspaceT("marketing");
   const [brief, setBrief] = useState("");
   const [generating, setGenerating] = useState(false);
 
   const generate = async () => {
     if (!brief.trim()) {
-      toast.error("Enter a campaign brief.");
+      toast.error(wt("campaignList.briefRequired"));
       return;
     }
     setGenerating(true);
@@ -33,13 +35,13 @@ export function CampaignList({ campaigns, onCampaignsChange, selectedId, onSelec
         body: JSON.stringify({ brief, generate: true }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Generation failed");
+      if (!res.ok) throw new Error(data.error ?? wt("campaignList.failed"));
       onCampaignsChange([data.campaign, ...campaigns]);
       onSelect(data.campaign.id);
       setBrief("");
-      toast.success("Campaign generated!");
+      toast.success(wt("campaignList.generated"));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed");
+      toast.error(e instanceof Error ? e.message : wt("campaignList.failed"));
     } finally {
       setGenerating(false);
     }
@@ -51,17 +53,17 @@ export function CampaignList({ campaigns, onCampaignsChange, selectedId, onSelec
     <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
       <div className="space-y-4">
         <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
-          <p className="mb-2 text-xs font-medium uppercase text-white/40">AI Campaign Generator</p>
+          <p className="mb-2 text-xs font-medium uppercase text-white/40">{wt("campaignList.generatorTitle")}</p>
           <Textarea
             value={brief}
             onChange={(e) => setBrief(e.target.value)}
-            placeholder="Describe product, audience, goals, channels, budget..."
+            placeholder={wt("campaignList.briefPlaceholder")}
             rows={4}
             className="border-white/10 bg-white/5 text-white"
           />
           <Button className="mt-2 w-full rounded-lg" onClick={() => void generate()} disabled={generating}>
             <Sparkles className="mr-2 size-4" />
-            {generating ? "Generating…" : "Generate Campaign"}
+            {generating ? wt("campaignList.generating") : wt("campaignList.generateCampaign")}
           </Button>
         </div>
 
@@ -82,7 +84,7 @@ export function CampaignList({ campaigns, onCampaignsChange, selectedId, onSelec
             </button>
           ))}
           {campaigns.length === 0 && (
-            <p className="text-sm text-white/30">No campaigns yet. Generate your first campaign.</p>
+            <p className="text-sm text-white/30">{wt("campaignList.empty")}</p>
           )}
         </div>
       </div>
@@ -96,7 +98,7 @@ export function CampaignList({ campaigns, onCampaignsChange, selectedId, onSelec
         />
       ) : (
         <div className="flex items-center justify-center rounded-xl border border-dashed border-white/10 p-12 text-white/30">
-          Select or generate a campaign
+          {wt("campaignList.selectOrGenerate")}
         </div>
       )}
     </div>

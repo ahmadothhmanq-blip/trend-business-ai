@@ -375,3 +375,45 @@ html[dir="rtl"] dialog,
 html[dir="rtl"] [role="dialog"] {
   text-align: start;
 }
+
+html[dir="rtl"] .recharts-wrapper,
+html[dir="rtl"] [data-chart] {
+  direction: ltr;
+}
+
+html[dir="rtl"] [data-kanban],
+html[dir="rtl"] .kanban-board {
+  direction: rtl;
+}
+
+html[dir="rtl"] [data-kanban] .kanban-column,
+html[dir="rtl"] .kanban-column {
+  text-align: start;
+}
+
+html[dir="rtl"] .modal-panel,
+html[dir="rtl"] [data-modal-content] {
+  text-align: start;
+}
+
+html[dir="rtl"] form label,
+html[dir="rtl"] form legend {
+  text-align: start;
+}
+
+html[dir="rtl"] nav[aria-label],
+html[dir="rtl"] [data-dashboard-nav] {
+  text-align: start;
+}
+
+html[dir="rtl"] .justify-end {
+  justify-content: flex-start;
+}
+
+html[dir="rtl"] .text-left {
+  text-align: start;
+}
+
+html[dir="rtl"] .text-right {
+  text-align: end;
+}

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { GripVertical, LayoutGrid, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import { cn } from "@/lib/utils";
 import {
   COMPONENT_INDUSTRY_PACKS,
@@ -65,6 +66,7 @@ export function ComponentLibraryPanel({
   onInsert,
   compact,
 }: ComponentLibraryPanelProps) {
+  const pt = useProductT("visualEditor");
   const [category, setCategory] = useState<ComponentMarketplaceCategory | "all">(
     "all",
   );
@@ -88,7 +90,7 @@ export function ComponentLibraryPanel({
       <div className="mb-2 flex items-center gap-2">
         <LayoutGrid className="size-3.5 text-premium-gold" />
         <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/35">
-          Component library
+          {pt("componentLibrary.title")}
         </p>
       </div>
       <div className="relative mb-2">
@@ -96,7 +98,7 @@ export function ComponentLibraryPanel({
         <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search components…"
+          placeholder={pt("componentLibrary.searchPlaceholder")}
           className="h-8 border-white/10 bg-white/5 pl-7 text-[12px] text-white placeholder:text-white/30"
         />
       </div>
@@ -108,7 +110,7 @@ export function ComponentLibraryPanel({
           }
           className="h-8 rounded-md border border-white/10 bg-[#121212] px-2 text-[11px] text-white"
         >
-          <option value="all">All categories</option>
+          <option value="all">{pt("componentLibrary.allCategories")}</option>
           {COMPONENT_MARKETPLACE_CATEGORIES.map((c) => (
             <option key={c.id} value={c.id}>
               {c.label}
@@ -122,7 +124,7 @@ export function ComponentLibraryPanel({
           }
           className="h-8 rounded-md border border-white/10 bg-[#121212] px-2 text-[11px] text-white"
         >
-          <option value="all">All industries</option>
+          <option value="all">{pt("componentLibrary.allIndustries")}</option>
           {COMPONENT_INDUSTRY_PACKS.map((p) => (
             <option key={p.id} value={p.id}>
               {p.label}
@@ -136,7 +138,7 @@ export function ComponentLibraryPanel({
           }
           className="h-8 rounded-md border border-white/10 bg-[#121212] px-2 text-[11px] text-white"
         >
-          <option value="all">All styles</option>
+          <option value="all">{pt("componentLibrary.allStyles")}</option>
           {COMPONENT_STYLE_VARIANTS.map((s) => (
             <option key={s} value={s}>
               {s}
@@ -145,7 +147,7 @@ export function ComponentLibraryPanel({
         </select>
       </div>
       <p className="mb-2 text-[10px] text-white/30">
-        {items.length} components · drag onto canvas or click to insert
+        {pt("componentLibrary.resultsHint", { count: items.length })}
       </p>
       <ul className="min-h-0 flex-1 space-y-1.5 overflow-auto pr-1">
         {items.map((component) => (

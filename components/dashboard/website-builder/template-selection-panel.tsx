@@ -168,7 +168,7 @@ export function TemplateDetailsDialog(props: {
 
             <div className="grid gap-3 text-[12px] text-white/50 sm:grid-cols-2">
               <div>
-                <p className="font-semibold text-white/80">Design system</p>
+                <p className="font-semibold text-white/80">{wb("panels.designSystem")}</p>
                 <p>
                   {details.typography.display} / {details.typography.body}
                 </p>
@@ -178,20 +178,20 @@ export function TemplateDetailsDialog(props: {
                 </p>
               </div>
               <div>
-                <p className="font-semibold text-white/80">Components</p>
+                <p className="font-semibold text-white/80">{wb("panels.components")}</p>
                 <p>
                   {details.previewSections.map((s) => s.label).join(" · ")}
                 </p>
               </div>
               <div className="sm:col-span-2">
-                <p className="font-semibold text-white/80">Features</p>
+                <p className="font-semibold text-white/80">{wb("panels.features")}</p>
                 <p>{details.features.join(" · ")}</p>
               </div>
             </div>
 
             <DashboardPanel className="overflow-hidden p-0">
               <div className="border-b border-white/10 px-3 py-2 text-[11px] text-white/40">
-                Live structural preview
+                {wb("panels.liveStructuralPreview")}
               </div>
               <div className="bg-[#080808] p-3">
                 {previewLoading ? (
@@ -206,7 +206,7 @@ export function TemplateDetailsDialog(props: {
                   />
                 ) : (
                   <div className="flex h-[200px] items-center justify-center text-sm text-white/35">
-                    Preview unavailable
+                    {wb("panels.previewUnavailable")}
                   </div>
                 )}
               </div>
@@ -218,8 +218,8 @@ export function TemplateDetailsDialog(props: {
           <div className="flex items-center gap-2 text-[11px] text-white/35">
             <LayoutTemplate className="size-3.5" />
             {props.activeGenerationId
-              ? "Applies visual preset to your current site — content preserved"
-              : "Seeds industry, style, components, and design system"}
+              ? wb("panels.appliesPresetHint")
+              : wb("panels.seedsPipelineHint")}
           </div>
           {details ? (
             <Button
@@ -232,7 +232,7 @@ export function TemplateDetailsDialog(props: {
               ) : (
                 <Sparkles className="size-4" />
               )}
-              Use Template
+              {wb("panels.useTemplate")}
             </Button>
           ) : null}
         </DialogFooter>
@@ -281,19 +281,19 @@ export function TemplateSelectionPanel(props: {
       <div>
         <div className="mb-2 flex items-center justify-between gap-2">
           <p className="text-[12px] font-semibold tracking-wide text-white/45 uppercase">
-            Templates
+            {wb("labels.templates")}
           </p>
           <span className="text-[11px] text-white/30">
-            Click a card for details
+            {wb("panels.clickCardDetails")}
           </span>
         </div>
         {loading ? (
           <div className="flex items-center gap-2 py-4 text-[12px] text-white/40">
             <Loader2 className="size-3.5 animate-spin" />
-            Loading templates…
+            {wb("panels.loadingTemplates")}
           </div>
         ) : templates.length === 0 ? (
-          <p className="text-[12px] text-white/40">No templates available.</p>
+          <p className="text-[12px] text-white/40">{wb("panels.noTemplatesAvailable")}</p>
         ) : (
           <div className="grid gap-2 sm:grid-cols-2">
             {templates.slice(0, 12).map((tpl) => (
@@ -347,10 +347,12 @@ export function TemplateSelectionRail(props: {
   disabled?: boolean;
   onOpenDetails: (tpl: MarketplaceTemplate) => void;
 }) {
+  const wb = useProductT("websiteBuilder");
+
   if (!props.templates.length) {
     return (
       <p className="rounded-2xl border border-white/[0.08] bg-black/20 p-4 text-sm text-white/40">
-        Templates load from the marketplace catalog.
+        {wb("panels.railEmptyHint")}
       </p>
     );
   }

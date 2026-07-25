@@ -27,6 +27,8 @@ import {
 } from "@/components/dashboard/builder-shared";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n/client";
+import { translateOption } from "@/lib/i18n/product-options";
+import { resolveLabel } from "@/lib/i18n/resolve-constant-label";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
 import {
   LANDING_PAGE_TYPES,
@@ -125,16 +127,16 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
     if (!pageType || !idea) {
       toast.error(
         mode === "continue"
-          ? "Describe the changes you want in natural language."
-          : "Enter your business idea to generate a landing page.",
+          ? p("errors.describeChanges")
+          : p("errors.enterIdea"),
       );
       return;
     }
     if (overridePrompt) setPrompt(overridePrompt);
     setStep("generating");
     setProgressEvents([
-      "[idea] Understanding your business idea...",
-      "[strategy] Building conversion strategy...",
+      p("generating.ideaEvent"),
+      p("generating.strategyEvent"),
     ]);
     try {
       const res = await fetch("/api/landing-page-builder", {
@@ -153,11 +155,11 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
         }),
       });
       const d = await res.json();
-      if (!res.ok) { toast.error(d.error ?? "Generation failed"); setStep("config"); return; }
-      toast.success(d.message ?? "Landing page generated!");
+      if (!res.ok) { toast.error(d.error ?? p("errors.generationFailed")); setStep("config"); return; }
+      toast.success(d.message ?? p("toasts.pageGenerated"));
       setParentId(null);
       if (d.generation) { setPreviewGen(d.generation); setStep("preview"); } else { setStep("history"); }
-    } catch { toast.error("Request failed."); setStep("config"); }
+    } catch { toast.error(p("errors.requestFailed")); setStep("config"); }
   };
 
   const handleOnePrompt = (idea: string) => {
@@ -185,7 +187,7 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
     setPrompt("");
     setPreviewGen(null);
     setStep("config");
-    toast.message("Describe your changes in natural language, then click Improve with AI.");
+    toast.message(p("errors.editThenImprove"));
   };
 
   const handleFavorite = async (gen: LandingPageGeneration) => {
@@ -197,7 +199,7 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
   const handleDelete = async (id: string) => {
     setGenerations((p) => p.filter((g) => g.id !== id));
     await fetch(`/api/landing-page-builder/${id}`, { method: "DELETE" });
-    toast.success("Deleted");
+    toast.success(p("toasts.deleted"));
   };
 
   if (step === "preview" && previewGen) {
@@ -205,7 +207,7 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
     return (
       <ProjectFilePreview
         title={bp?.title || previewGen.page_name}
-        subtitle={`${bp?.files?.length ?? 0} files · ${previewGen.provider ?? "deepseek"} · ${previewGen.generation_time_ms ? `${(previewGen.generation_time_ms / 1000).toFixed(1)}s` : "N/A"}`}
+        subtitle={`${p("preview.filesCount", { count: bp?.files?.length ?? 0 })} · ${previewGen.provider ?? "deepseek"} · ${previewGen.generation_time_ms ? `${(previewGen.generation_time_ms / 1000).toFixed(1)}s` : p("preview.notAvailable")}`}
         files={bp?.files ?? []}
         downloadName={bp?.title || previewGen.page_name}
         onBack={() => { setPreviewGen(null); setStep("history"); fetchGenerations(); }}
@@ -216,13 +218,13 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
   }
 
   if (step === "generating") {
-    return <GenerationProgress title="Generating your landing page..." subtitle="This usually takes 30-90 seconds" events={progressEvents} />;
+    return <GenerationProgress title={p("generating.title")} subtitle={p("generating.subtitle")} events={progressEvents} />;
   }
 
   return (
     <div className="space-y-6">
       <div className="flex gap-2">
-        {([{ key: "type" as const, label: "New Page" }, { key: "history" as const, label: "My Pages" }]).map(({ key, label }) => (
+        {([{ key: "type" as const, label: p("nav.newPage") }, { key: "history" as const, label: p("nav.myPages") }]).map(({ key, label }) => (
           <button key={key} onClick={() => setStep(key)} className={cn("rounded-xl px-4 py-2 text-sm font-medium transition-all", step === key || (step === "config" && key === "type") ? "bg-premium-gold/15 text-premium-gold-light" : "text-white/50 hover:bg-white/5 hover:text-white/70")}>{label}</button>
         ))}
       </div>
@@ -241,9 +243,9 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
       {step === "type" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Or choose a landing page type</DashboardCardTitle>
+            <DashboardCardTitle>{p("steps.chooseType")}</DashboardCardTitle>
             <DashboardCardDescription>
-              Optional — One Prompt uses a smart default if you skip this
+              {p("steps.chooseTypeHint")}
             </DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent>
@@ -252,7 +254,7 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
             </div>
             {selectedType && (
               <div className="mt-6 flex justify-end">
-                <Button onClick={() => setStep("config")} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">Configure Page <ArrowRight className="size-4" /></Button>
+                <Button onClick={() => setStep("config")} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">{p("steps.configurePage")} <ArrowRight className="size-4" /></Button>
               </div>
             )}
           </DashboardCardContent>
@@ -265,7 +267,7 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
             <div className="flex items-center gap-3">
               {(() => { const def = getLandingPageType(selectedType); const Icon = def?.icon ?? Sparkles; return (<>
                 <div className="flex size-10 items-center justify-center rounded-xl bg-premium-gold/15 text-premium-gold-light"><Icon className="size-5" /></div>
-                <div><DashboardCardTitle>{def?.label ?? "Custom"} Landing Page</DashboardCardTitle><DashboardCardDescription>Describe your page and configure sections</DashboardCardDescription></div>
+                <div><DashboardCardTitle>{p("steps.customLandingPage", { type: def?.label ?? t("common.create") })}</DashboardCardTitle><DashboardCardDescription>{p("steps.configureDescription")}</DashboardCardDescription></div>
               </>); })()}
             </div>
           </DashboardCardHeader>
@@ -273,28 +275,24 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
             <div className="space-y-5">
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-white/60">
-                  {parentId ? "Describe changes (natural language)" : "Describe your landing page"}
+                  {parentId ? p("steps.describeChanges") : p("steps.describePage")}
                 </label>
                 <Textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder={
-                    parentId
-                      ? "Example: Make the hero more urgent, add a pricing section, and switch CTA to Start free trial..."
-                      : "Describe what this landing page is for, your product/service, target audience, and conversion goal..."
-                  }
+                  placeholder={parentId ? p("placeholders.editExample") : p("placeholders.pageBrief")}
                   rows={4}
                   className={cn(dashboardInputClass, "min-h-[100px] resize-none")}
                 />
               </div>
               <div className="grid gap-4 sm:grid-cols-3">
-                <div><label className="mb-1.5 block text-xs font-medium text-white/60">Language</label><select value={language} onChange={(e) => setLanguage(e.target.value)} className={dashboardSelectClass}>{LP_LANGUAGES.map((l) => <option key={l} value={l}>{l}</option>)}</select></div>
-                <div><label className="mb-1.5 block text-xs font-medium text-white/60">Design Style</label><select value={designStyle} onChange={(e) => setDesignStyle(e.target.value)} className={dashboardSelectClass}>{LP_DESIGN_STYLES.map((s) => <option key={s} value={s}>{s}</option>)}</select></div>
-                <div><label className="mb-1.5 block text-xs font-medium text-white/60">Color Style</label><select value={colorStyle} onChange={(e) => setColorStyle(e.target.value)} className={dashboardSelectClass}>{LP_COLOR_STYLES.map((c) => <option key={c} value={c}>{c}</option>)}</select></div>
+                <div><label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.language")}</label><select value={language} onChange={(e) => setLanguage(e.target.value)} className={dashboardSelectClass}>{LP_LANGUAGES.map((l) => <option key={l} value={l}>{translateOption(t, "constants.contentStudio.languages", l)}</option>)}</select></div>
+                <div><label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.designStyle")}</label><select value={designStyle} onChange={(e) => setDesignStyle(e.target.value)} className={dashboardSelectClass}>{LP_DESIGN_STYLES.map((s) => <option key={s} value={s}>{translateOption(t, "constants.landingPageBuilder.designStyles", s)}</option>)}</select></div>
+                <div><label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.colorStyle")}</label><select value={colorStyle} onChange={(e) => setColorStyle(e.target.value)} className={dashboardSelectClass}>{LP_COLOR_STYLES.map((c) => <option key={c} value={c}>{translateOption(t, "constants.landingPageBuilder.colorStyles", c)}</option>)}</select></div>
               </div>
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-white/60">Sections</label>
-                <div className="flex flex-wrap gap-2">{LP_SECTION_OPTIONS.map(({ id, label }) => <CheckboxToggle key={id} label={label} checked={sections.includes(id)} onChange={(c) => setSections((p) => c ? [...p, id] : p.filter((s) => s !== id))} />)}</div>
+                <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.sections")}</label>
+                <div className="flex flex-wrap gap-2">{LP_SECTION_OPTIONS.map((opt) => <CheckboxToggle key={opt.id} label={resolveLabel(t, opt)} checked={sections.includes(opt.id)} onChange={(c) => setSections((p) => c ? [...p, opt.id] : p.filter((s) => s !== opt.id))} />)}</div>
               </div>
               <div className="flex flex-wrap gap-3 pt-2">
                 <Button
@@ -305,7 +303,7 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
                     setStep("type");
                   }}
                 >
-                  Back
+                  {t("common.back")}
                 </Button>
                 {parentId ? (
                   <Button
@@ -313,7 +311,7 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
                     disabled={!prompt.trim()}
                     className="btn-gold gap-2 rounded-xl font-bold text-luxury-black"
                   >
-                    <Sparkles className="size-4" /> Improve with AI
+                    <Sparkles className="size-4" /> {p("actions.improveWithAi")}
                   </Button>
                 ) : (
                   <Button
@@ -321,7 +319,7 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
                     disabled={!prompt.trim()}
                     className="btn-gold gap-2 rounded-xl font-bold text-luxury-black"
                   >
-                    <Sparkles className="size-4" /> Generate Landing Page
+                    <Sparkles className="size-4" /> {p("steps.generateLandingPage")}
                   </Button>
                 )}
               </div>
@@ -333,11 +331,11 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
       {step === "history" && (
         <>
           <div className="flex items-center gap-3">
-            <div className="relative flex-1"><Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-white/30" /><Input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Search pages..." className={cn(dashboardInputClass, "pl-10")} /></div>
-            <span className="text-xs text-white/40">{total} page{total !== 1 ? "s" : ""}</span>
+            <div className="relative flex-1"><Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-white/30" /><Input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder={p("placeholders.searchPages")} className={cn(dashboardInputClass, "pl-10")} /></div>
+            <span className="text-xs text-white/40">{total === 1 ? p("history.count", { count: total }) : p("history.countPlural", { count: total })}</span>
           </div>
           {generations.length === 0 ? (
-            <EmptyHistory noun="landing pages" onNew={() => setStep("type")} />
+            <EmptyHistory noun={p("history.emptyNoun")} onNew={() => setStep("type")} />
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {generations.map((gen) => {

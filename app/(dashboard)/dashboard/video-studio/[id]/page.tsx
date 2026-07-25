@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { DashboardHeader } from "@/components/dashboard/header";
 import { VideoManagementDashboard } from "@/components/dashboard/video-studio/video-management-dashboard";
 import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
+import { getServerTranslator } from "@/lib/i18n/server";
 
 export async function generateMetadata() {
   return dashboardPageMetadata("videoStudioManage");
@@ -12,6 +13,7 @@ type PageProps = { params: Promise<{ id: string }> };
 
 export default async function VideoStudioManagePage({ params }: PageProps) {
   const { id } = await params;
+  const { t } = await getServerTranslator();
   const supabase = await createClient();
   const {
     data: { user },
@@ -38,8 +40,8 @@ export default async function VideoStudioManagePage({ params }: PageProps) {
   return (
     <>
       <DashboardHeader
-        title={data.video_name || "Manage Video"}
-        description="Produce, preview, edit, and manage your AI video project"
+        title={data.video_name || t("pages.videoStudioManage.headerFallback")}
+        description={t("pages.videoStudioManage.headerDescription")}
         userEmail={user.email}
         userName={
           (profile?.full_name as string | undefined) ??
