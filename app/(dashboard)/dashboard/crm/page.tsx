@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
@@ -13,7 +12,11 @@ import type {
   CRMTask,
 } from "@/types/crm";
 
-export const metadata: Metadata = { title: "AI CRM Platform" };
+import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
+
+export async function generateMetadata() {
+  return dashboardPageMetadata("crm");
+}
 
 export default async function CrmPage() {
   const supabase = await createClient();

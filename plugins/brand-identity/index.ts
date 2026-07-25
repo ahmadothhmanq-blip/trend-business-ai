@@ -107,7 +107,7 @@ async function generateBrand(
     ctx.progress.emit("Writing brand strategy...");
     try {
       brandStrategy = ctx.provider.generateText
-        ? await ctx.provider.generateText({ prompt: brandStrategyPrompt(analysis, plan) })
+        ? await ctx.provider.generateText({ prompt: brandStrategyPrompt(analysis, plan, input.language) })
         : "";
     } catch { /* fallback to empty */ }
     if (brandStrategy) files.push({ path: "brand-strategy.md", content: brandStrategy, language: "markdown" });
@@ -119,7 +119,7 @@ async function generateBrand(
     ctx.progress.emit("Crafting brand story...");
     try {
       brandStory = ctx.provider.generateText
-        ? await ctx.provider.generateText({ prompt: brandStoryPrompt(analysis, plan) })
+        ? await ctx.provider.generateText({ prompt: brandStoryPrompt(analysis, plan, input.language) })
         : "";
     } catch { /* fallback */ }
     if (brandStory) files.push({ path: "brand-story.md", content: brandStory, language: "markdown" });
@@ -131,7 +131,7 @@ async function generateBrand(
     ctx.progress.emit("Writing logo usage guidelines...");
     try {
       logoGuidelines = ctx.provider.generateText
-        ? await ctx.provider.generateText({ prompt: logoGuidelinesPrompt(analysis, plan) })
+        ? await ctx.provider.generateText({ prompt: logoGuidelinesPrompt(analysis, plan, input.language) })
         : "";
     } catch { /* fallback */ }
     if (logoGuidelines) files.push({ path: "logo-guidelines.md", content: logoGuidelines, language: "markdown" });
@@ -146,7 +146,7 @@ async function generateBrand(
     ctx.progress.emit(`Creating ${assetType.replace(/-/g, " ")}...`);
     try {
       const asset = await ctx.provider.generateJson<BrandAsset>({
-        prompt: brandAssetPrompt(assetType, analysis, plan),
+        prompt: brandAssetPrompt(assetType, analysis, plan, input.language),
         schema: brandAssetSchema,
       });
       assets.push({

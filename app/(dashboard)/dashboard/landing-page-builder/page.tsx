@@ -1,11 +1,13 @@
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { LandingPageBuilderTool } from "@/components/dashboard/landing-page-builder/landing-page-builder-tool";
 import type { LandingPageGeneration } from "@/types/landing-page";
+import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
 
-export const metadata: Metadata = { title: "AI Landing Page Builder" };
+export async function generateMetadata() {
+  return dashboardPageMetadata("landingPageBuilder");
+}
 
 export default async function LandingPageBuilderPage() {
   const supabase = await createClient();

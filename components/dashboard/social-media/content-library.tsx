@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Copy, Star, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import type { SocialPost } from "@/types/social-media";
 import { cn } from "@/lib/utils";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 
 type Props = {
   onSelect: (post: SocialPost) => void;
@@ -12,6 +12,7 @@ type Props = {
 };
 
 export function ContentLibrary({ onSelect, selectedId }: Props) {
+  const wt = useWorkspaceT("socialMedia");
   const [posts, setPosts] = useState<SocialPost[]>([]);
   const [filter, setFilter] = useState<"all" | "favorites" | "draft">("all");
 
@@ -62,7 +63,7 @@ export function ContentLibrary({ onSelect, selectedId }: Props) {
               filter === f ? "bg-premium-gold/15 text-premium-gold-light" : "text-white/40 hover:bg-white/5",
             )}
           >
-            {f}
+            {wt(`library.filters.${f}`)}
           </button>
         ))}
       </div>
@@ -95,7 +96,7 @@ export function ContentLibrary({ onSelect, selectedId }: Props) {
             </button>
           </div>
         ))}
-        {posts.length === 0 && <p className="py-6 text-center text-xs text-white/30">No posts yet</p>}
+        {posts.length === 0 && <p className="py-6 text-center text-xs text-white/30">{wt("library.empty")}</p>}
       </div>
     </div>
   );

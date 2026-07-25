@@ -6,6 +6,7 @@ export type BrandIdentityPluginInput = {
   targetAudience: string;
   brandPersonality: string;
   deliverables: string[];
+  language?: string;
 };
 
 export type BrandAnalysis = {

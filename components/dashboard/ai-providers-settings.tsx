@@ -30,6 +30,7 @@ import {
   dashboardSelectClass,
 } from "@/components/dashboard/ui/dashboard-styles";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/client";
 import { getUserFacingProviderNames } from "@/lib/ai/provider-config";
 import {
   PROVIDER_MODELS,
@@ -46,11 +47,13 @@ function maskKey(key: string): string {
 }
 
 function StatusBadge({ status }: { status: ProviderStatus }) {
+  const { t } = useTranslation();
+
   if (status === "connected") {
     return (
       <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/15 px-2.5 py-0.5 text-xs font-medium text-emerald-400">
         <span className="size-1.5 rounded-full bg-emerald-400" />
-        Connected
+        {t("dashboard.aiProviders.status.connected")}
       </span>
     );
   }
@@ -58,14 +61,14 @@ function StatusBadge({ status }: { status: ProviderStatus }) {
     return (
       <span className="inline-flex items-center gap-1.5 rounded-full border border-red-500/25 bg-red-500/15 px-2.5 py-0.5 text-xs font-medium text-red-400">
         <span className="size-1.5 rounded-full bg-red-400" />
-        Error
+        {t("dashboard.aiProviders.status.error")}
       </span>
     );
   }
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-2.5 py-0.5 text-xs font-medium text-white/50">
       <span className="size-1.5 rounded-full bg-white/30" />
-      Not Configured
+      {t("dashboard.aiProviders.status.notConfigured")}
     </span>
   );
 }
@@ -83,6 +86,7 @@ function ProviderCard({
   onTest: () => void;
   testing: boolean;
 }) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [showKey, setShowKey] = useState(false);
   const info = PROVIDER_MODELS[entry.name];
@@ -114,7 +118,7 @@ function ProviderCard({
               <span className="font-semibold text-white">{label}</span>
               {isDefault && (
                 <span className="rounded-full border border-premium-gold/30 bg-premium-gold/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-premium-gold-light">
-                  Default
+                  {t("dashboard.aiProviders.default")}
                 </span>
               )}
             </div>
@@ -148,7 +152,7 @@ function ProviderCard({
         <div className="mt-5 space-y-4 border-t border-white/[0.06] pt-5">
           <div>
             <label className="mb-1.5 block text-xs font-medium text-white/60">
-              API Key
+              {t("dashboard.aiProviders.apiKey")}
             </label>
             <div className="flex gap-2">
               <div className="relative flex-1">
@@ -156,7 +160,7 @@ function ProviderCard({
                   type={showKey ? "text" : "password"}
                   value={entry.apiKey}
                   onChange={(e) => onUpdate({ ...entry, apiKey: e.target.value })}
-                  placeholder={`Enter ${label} API key...`}
+                  placeholder={t("dashboard.aiProviders.apiKeyPlaceholder", { label })}
                   className={cn(dashboardInputClass, "pr-10 font-mono text-sm")}
                 />
                 <Button
@@ -181,7 +185,7 @@ function ProviderCard({
                 ) : (
                   <Zap className="size-3.5" />
                 )}
-                Test
+                {t("dashboard.aiProviders.test")}
               </Button>
             </div>
             {entry.apiKey && !showKey && (
@@ -193,7 +197,7 @@ function ProviderCard({
 
           <div>
             <label className="mb-1.5 block text-xs font-medium text-white/60">
-              Model
+              {t("dashboard.aiProviders.model")}
             </label>
             <select
               value={entry.model}
@@ -214,6 +218,7 @@ function ProviderCard({
 }
 
 export function AIProvidersSettings() {
+  const { t } = useTranslation();
   const [settings, setSettings] = useState<AIProviderSettings>(getDefaultSettings());
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -252,9 +257,9 @@ export function AIProvidersSettings() {
           );
         }
       })
-      .catch(() => showToast("error", "Failed to load settings"))
+      .catch(() => showToast("error", t("dashboard.aiProviders.loadFailed")))
       .finally(() => setLoading(false));
-  }, [showToast]);
+  }, [showToast, t]);
 
   const updateProvider = (name: string, updated: ProviderSettingsEntry) => {
     setSettings((prev) => ({
@@ -283,12 +288,18 @@ export function AIProvidersSettings() {
       updateProvider(entry.name, { ...entry, status: newStatus });
 
       if (result.success) {
-        showToast("success", `${PROVIDER_MODELS[entry.name]?.label ?? entry.name} connected (${result.latencyMs}ms)`);
+        showToast(
+          "success",
+          t("dashboard.aiProviders.connectedToast", {
+            label: PROVIDER_MODELS[entry.name]?.label ?? entry.name,
+            latency: String(result.latencyMs),
+          }),
+        );
       } else {
-        showToast("error", result.error ?? "Connection failed");
+        showToast("error", result.error ?? t("dashboard.aiProviders.connectionFailed"));
       }
     } catch {
-      showToast("error", "Connection test failed");
+      showToast("error", t("dashboard.aiProviders.testFailed"));
     } finally {
       setTestingProvider(null);
     }
@@ -303,13 +314,13 @@ export function AIProvidersSettings() {
         body: JSON.stringify(settings),
       });
       if (res.ok) {
-        showToast("success", "Settings saved successfully");
+        showToast("success", t("dashboard.aiProviders.saved"));
       } else {
         const data = await res.json();
-        showToast("error", data.error ?? "Failed to save settings");
+        showToast("error", data.error ?? t("dashboard.aiProviders.saveFailed"));
       }
     } catch {
-      showToast("error", "Failed to save settings");
+      showToast("error", t("dashboard.aiProviders.saveFailed"));
     } finally {
       setSaving(false);
     }
@@ -347,9 +358,9 @@ export function AIProvidersSettings() {
               <BrainCircuit className="size-5" />
             </div>
             <div>
-              <DashboardCardTitle>AI Providers</DashboardCardTitle>
+              <DashboardCardTitle>{t("dashboard.aiProviders.title")}</DashboardCardTitle>
               <DashboardCardDescription>
-                Configure API keys and select models for each provider
+                {t("dashboard.aiProviders.description")}
               </DashboardCardDescription>
             </div>
           </div>
@@ -378,9 +389,9 @@ export function AIProvidersSettings() {
               <Shield className="size-5" />
             </div>
             <div>
-              <DashboardCardTitle>Global Settings</DashboardCardTitle>
+              <DashboardCardTitle>{t("dashboard.aiProviders.globalTitle")}</DashboardCardTitle>
               <DashboardCardDescription>
-                Default behavior for all AI generation features
+                {t("dashboard.aiProviders.globalDescription")}
               </DashboardCardDescription>
             </div>
           </div>
@@ -391,7 +402,7 @@ export function AIProvidersSettings() {
               {/* Default Provider */}
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-white/60">
-                  Default Provider
+                  {t("dashboard.aiProviders.defaultProvider")}
                 </label>
                 <select
                   value={settings.default_provider}
@@ -418,7 +429,7 @@ export function AIProvidersSettings() {
               {/* Auto Fallback */}
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-white/60">
-                  Automatic Fallback
+                  {t("dashboard.aiProviders.automaticFallback")}
                 </label>
                 <div className="flex h-11 items-center gap-3 rounded-xl border border-white/[0.1] bg-black/25 px-3">
                   <label className="relative inline-flex cursor-pointer items-center">
@@ -433,7 +444,9 @@ export function AIProvidersSettings() {
                     <div className="peer h-5 w-9 rounded-full border border-white/10 bg-white/10 after:absolute after:left-[2px] after:top-[2px] after:size-4 after:rounded-full after:bg-white/60 after:transition-all peer-checked:border-premium-gold/30 peer-checked:bg-premium-gold/30 peer-checked:after:translate-x-full peer-checked:after:bg-premium-gold-light" />
                   </label>
                   <span className="text-sm text-white/70">
-                    {settings.auto_fallback ? "Enabled" : "Disabled"}
+                    {settings.auto_fallback
+                      ? t("dashboard.aiProviders.enabled")
+                      : t("dashboard.aiProviders.disabled")}
                   </span>
                 </div>
               </div>
@@ -441,7 +454,7 @@ export function AIProvidersSettings() {
               {/* Retry Count */}
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-white/60">
-                  Retry Count
+                  {t("dashboard.aiProviders.retryCount")}
                 </label>
                 <Input
                   type="number"
@@ -461,7 +474,7 @@ export function AIProvidersSettings() {
               {/* Temperature */}
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-white/60">
-                  Temperature
+                  {t("dashboard.aiProviders.temperature")}
                 </label>
                 <div className="flex items-center gap-3">
                   <input
@@ -486,7 +499,7 @@ export function AIProvidersSettings() {
               {/* Max Tokens */}
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-white/60">
-                  Max Tokens
+                  {t("dashboard.aiProviders.maxTokens")}
                 </label>
                 <Input
                   type="number"
@@ -507,7 +520,7 @@ export function AIProvidersSettings() {
               {/* Timeout */}
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-white/60">
-                  Timeout (seconds)
+                  {t("dashboard.aiProviders.timeoutSeconds")}
                 </label>
                 <Input
                   type="number"
@@ -536,7 +549,7 @@ export function AIProvidersSettings() {
           onClick={() => setSettings(getDefaultSettings())}
         >
           <RefreshCw className="size-4" />
-          Reset to Defaults
+          {t("dashboard.aiProviders.resetDefaults")}
         </Button>
         <Button
           onClick={saveSettings}
@@ -544,7 +557,7 @@ export function AIProvidersSettings() {
           className="btn-gold h-11 gap-2 rounded-xl px-6 font-bold text-luxury-black"
         >
           {saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
-          Save Settings
+          {t("dashboard.aiProviders.saveSettings")}
         </Button>
       </div>
     </div>

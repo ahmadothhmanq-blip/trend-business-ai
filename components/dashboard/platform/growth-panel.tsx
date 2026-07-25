@@ -23,6 +23,8 @@ import {
   DashboardPanel,
 } from "@/components/dashboard/ui/dashboard-card";
 import { dashboardInputClass, dashboardTextareaClass } from "@/components/dashboard/ui/dashboard-styles";
+import { useFormatter } from "@/lib/i18n/use-formatter";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 import { cn } from "@/lib/utils";
 import { affiliateLink, referralLink } from "@/lib/growth/codes";
 import type { GrowthDashboardPayload } from "@/types/growth";
@@ -37,29 +39,14 @@ type TabId =
   | "experiments"
   | "automation";
 
-const TABS: Array<{ id: TabId; label: string; icon: typeof Users }> = [
-  { id: "overview", label: "Overview", icon: BarChart3 },
-  { id: "affiliate", label: "Affiliate", icon: Wallet },
-  { id: "referrals", label: "Referrals", icon: Share2 },
-  { id: "leads", label: "Leads", icon: Target },
-  { id: "crm", label: "CRM", icon: Users },
-  { id: "email", label: "Email", icon: Mail },
-  { id: "experiments", label: "A/B Tests", icon: FlaskConical },
-  { id: "automation", label: "Automation", icon: Megaphone },
-];
-
-function money(cents: number) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
-    cents / 100,
-  );
-}
-
 function origin() {
   if (typeof window === "undefined") return "";
   return window.location.origin;
 }
 
 export function GrowthPanel() {
+  const wt = useWorkspaceT("platform");
+  const { formatCurrency } = useFormatter();
   const [tab, setTab] = useState<TabId>("overview");
   const [data, setData] = useState<GrowthDashboardPayload | null>(null);
   const [loading, setLoading] = useState(true);
@@ -79,12 +66,12 @@ export function GrowthPanel() {
     const res = await fetch("/api/growth/dashboard");
     const json = await res.json();
     if (!res.ok) {
-      setError(json.error ?? "Failed to load growth dashboard");
+      setError(json.error ?? wt("growth.loadFailed"));
       setData(null);
       return;
     }
     setData(json.growth as GrowthDashboardPayload);
-  }, []);
+  }, [wt]);
 
   useEffect(() => {
     void (async () => {
@@ -105,9 +92,9 @@ export function GrowthPanel() {
   async function copy(text: string) {
     try {
       await navigator.clipboard.writeText(text);
-      toast.success("Copied to clipboard");
+      toast.success(wt("toasts.copiedToClipboard"));
     } catch {
-      toast.error("Could not copy");
+      toast.error(wt("toasts.couldNotCopy"));
     }
   }
 
@@ -117,16 +104,27 @@ export function GrowthPanel() {
       await fn();
       await refresh();
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Action failed");
+      toast.error(e instanceof Error ? e.message : wt("toasts.actionFailed"));
     } finally {
       setBusy(null);
     }
   }
 
+  const tabs: Array<{ id: TabId; label: string; icon: typeof Users }> = [
+    { id: "overview", label: wt("growth.tabs.overview"), icon: BarChart3 },
+    { id: "affiliate", label: wt("growth.tabs.affiliate"), icon: Wallet },
+    { id: "referrals", label: wt("growth.tabs.referrals"), icon: Share2 },
+    { id: "leads", label: wt("growth.tabs.leads"), icon: Target },
+    { id: "crm", label: wt("growth.tabs.crm"), icon: Users },
+    { id: "email", label: wt("growth.tabs.email"), icon: Mail },
+    { id: "experiments", label: wt("growth.tabs.experiments"), icon: FlaskConical },
+    { id: "automation", label: wt("growth.tabs.automation"), icon: Megaphone },
+  ];
+
   if (loading) {
     return (
       <DashboardPanel className="flex items-center justify-center gap-2 py-16 text-sm text-white/40">
-        <Loader2 className="size-4 animate-spin" /> Loading growth engine…
+        <Loader2 className="size-4 animate-spin" /> {wt("growth.loading")}
       </DashboardPanel>
     );
   }
@@ -144,7 +142,7 @@ export function GrowthPanel() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap gap-2">
-        {TABS.map((item) => {
+        {tabs.map((item) => {
           const Icon = item.icon;
           return (
             <button
@@ -169,10 +167,10 @@ export function GrowthPanel() {
         <div className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              { label: "Pageviews (30d)", value: data.analytics.pageviews },
-              { label: "Conversions", value: data.analytics.conversions },
-              { label: "Leads", value: data.analytics.leads },
-              { label: "Subscribers", value: data.analytics.subscribers },
+              { label: wt("growth.overview.pageviews30d"), value: data.analytics.pageviews },
+              { label: wt("growth.overview.conversions"), value: data.analytics.conversions },
+              { label: wt("growth.overview.leads"), value: data.analytics.leads },
+              { label: wt("growth.overview.subscribers"), value: data.analytics.subscribers },
             ].map((stat) => (
               <DashboardPanel key={stat.label} className="p-5 text-center">
                 <p className="text-2xl font-black text-white">{stat.value}</p>
@@ -185,8 +183,8 @@ export function GrowthPanel() {
 
           <DashboardCard>
             <DashboardCardHeader>
-              <DashboardCardTitle>Funnel analytics</DashboardCardTitle>
-              <DashboardCardDescription>Attributed growth events for your workspace</DashboardCardDescription>
+              <DashboardCardTitle>{wt("growth.overview.funnelAnalytics")}</DashboardCardTitle>
+              <DashboardCardDescription>{wt("growth.overview.funnelDescription")}</DashboardCardDescription>
             </DashboardCardHeader>
             <DashboardCardContent className="space-y-3">
               {data.analytics.funnel.map((step) => {
@@ -215,9 +213,9 @@ export function GrowthPanel() {
         <div className="space-y-6">
           <DashboardCard>
             <DashboardCardHeader>
-              <DashboardCardTitle>Affiliate dashboard</DashboardCardTitle>
+              <DashboardCardTitle>{wt("growth.affiliate.title")}</DashboardCardTitle>
               <DashboardCardDescription>
-                Share your link, track commissions, and review payouts.
+                {wt("growth.affiliate.description")}
               </DashboardCardDescription>
             </DashboardCardHeader>
             <DashboardCardContent className="space-y-4">
@@ -226,17 +224,17 @@ export function GrowthPanel() {
                   <div className="grid gap-3 sm:grid-cols-3">
                     <DashboardPanel className="p-4 text-center">
                       <p className="text-xl font-black text-white">{data.affiliate.total_clicks}</p>
-                      <p className="text-[10px] uppercase tracking-wider text-white/30">Clicks</p>
+                      <p className="text-[10px] uppercase tracking-wider text-white/30">{wt("growth.affiliate.clicks")}</p>
                     </DashboardPanel>
                     <DashboardPanel className="p-4 text-center">
                       <p className="text-xl font-black text-white">{data.affiliate.total_referrals}</p>
-                      <p className="text-[10px] uppercase tracking-wider text-white/30">Referrals</p>
+                      <p className="text-[10px] uppercase tracking-wider text-white/30">{wt("growth.affiliate.referrals")}</p>
                     </DashboardPanel>
                     <DashboardPanel className="p-4 text-center">
                       <p className="text-xl font-black text-white">
-                        {money(data.affiliate.total_earned_cents)}
+                        {formatCurrency(data.affiliate.total_earned_cents)}
                       </p>
-                      <p className="text-[10px] uppercase tracking-wider text-white/30">Earned</p>
+                      <p className="text-[10px] uppercase tracking-wider text-white/30">{wt("growth.affiliate.earned")}</p>
                     </DashboardPanel>
                   </div>
                   <div className="flex flex-col gap-2 sm:flex-row">
@@ -246,27 +244,29 @@ export function GrowthPanel() {
                       onClick={() => copy(affLink)}
                       className="inline-flex items-center justify-center gap-2 rounded-xl bg-premium-gold px-4 py-2 text-sm font-semibold text-luxury-black"
                     >
-                      <Copy className="size-4" /> Copy link
+                      <Copy className="size-4" /> {wt("common.copyLink")}
                     </button>
                   </div>
                   <p className="text-xs text-white/40">
-                    Code <span className="text-white/70">{data.affiliate.code}</span> · Commission{" "}
-                    {(data.affiliate.commission_rate_bps / 100).toFixed(0)}%
+                    {wt("growth.affiliate.codeCommission", {
+                      code: data.affiliate.code,
+                      rate: (data.affiliate.commission_rate_bps / 100).toFixed(0),
+                    })}
                   </p>
                 </>
               ) : (
-                <p className="text-sm text-white/50">Affiliate profile unavailable.</p>
+                <p className="text-sm text-white/50">{wt("growth.affiliate.unavailable")}</p>
               )}
             </DashboardCardContent>
           </DashboardCard>
 
           <DashboardCard>
             <DashboardCardHeader>
-              <DashboardCardTitle>Commission tracking</DashboardCardTitle>
+              <DashboardCardTitle>{wt("growth.affiliate.commissionTracking")}</DashboardCardTitle>
             </DashboardCardHeader>
             <DashboardCardContent>
               {data.commissions.length === 0 ? (
-                <p className="text-sm text-white/40">No commissions yet.</p>
+                <p className="text-sm text-white/40">{wt("growth.affiliate.noCommissions")}</p>
               ) : (
                 <ul className="space-y-2">
                   {data.commissions.map((c) => (
@@ -275,10 +275,10 @@ export function GrowthPanel() {
                       className="flex items-center justify-between rounded-xl border border-white/5 px-3 py-2 text-xs text-white/70"
                     >
                       <span>
-                        {c.event_type} · {c.referral_email ?? "—"}
+                        {wt("growth.affiliate.commissionRow", { eventType: c.event_type, email: c.referral_email ?? wt("common.emDash") })}
                       </span>
                       <span>
-                        {money(c.amount_cents)} · {c.status}
+                        {wt("growth.affiliate.commissionAmount", { amount: formatCurrency(c.amount_cents), status: c.status })}
                       </span>
                     </li>
                   ))}
@@ -289,11 +289,11 @@ export function GrowthPanel() {
 
           <DashboardCard>
             <DashboardCardHeader>
-              <DashboardCardTitle>Payout history</DashboardCardTitle>
+              <DashboardCardTitle>{wt("growth.affiliate.payoutHistory")}</DashboardCardTitle>
             </DashboardCardHeader>
             <DashboardCardContent>
               {data.payouts.length === 0 ? (
-                <p className="text-sm text-white/40">No payouts yet.</p>
+                <p className="text-sm text-white/40">{wt("growth.affiliate.noPayouts")}</p>
               ) : (
                 <ul className="space-y-2">
                   {data.payouts.map((p) => (
@@ -302,7 +302,7 @@ export function GrowthPanel() {
                       className="flex items-center justify-between rounded-xl border border-white/5 px-3 py-2 text-xs text-white/70"
                     >
                       <span>
-                        {money(p.amount_cents)} · {p.method}
+                        {wt("growth.affiliate.payoutRow", { amount: formatCurrency(p.amount_cents), method: p.method })}
                       </span>
                       <span>{p.status}</span>
                     </li>
@@ -317,9 +317,9 @@ export function GrowthPanel() {
       {tab === "referrals" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Referral program</DashboardCardTitle>
+            <DashboardCardTitle>{wt("growth.referrals.title")}</DashboardCardTitle>
             <DashboardCardDescription>
-              Invite friends and earn {data.referral?.reward_credits ?? 100} credits when they join.
+              {wt("growth.referrals.description", { credits: data.referral?.reward_credits ?? 100 })}
             </DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent className="space-y-4">
@@ -330,13 +330,13 @@ export function GrowthPanel() {
                 onClick={() => copy(refLink)}
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-premium-gold px-4 py-2 text-sm font-semibold text-luxury-black"
               >
-                <Copy className="size-4" /> Copy invite
+                <Copy className="size-4" /> {wt("common.copyInvite")}
               </button>
             </div>
             <div className="flex flex-col gap-2 sm:flex-row">
               <input
                 className={cn(dashboardInputClass, "flex-1")}
-                placeholder="friend@email.com"
+                placeholder={wt("growth.referrals.invitePlaceholder")}
                 value={inviteEmail}
                 onChange={(e) => setInviteEmail(e.target.value)}
               />
@@ -351,24 +351,24 @@ export function GrowthPanel() {
                       body: JSON.stringify({ email: inviteEmail }),
                     });
                     const json = await res.json();
-                    if (!res.ok) throw new Error(json.error ?? "Invite failed");
-                    toast.success("Invite recorded");
+                    if (!res.ok) throw new Error(json.error ?? wt("toasts.inviteFailed"));
+                    toast.success(wt("toasts.inviteRecorded"));
                     setInviteEmail("");
                   })
                 }
                 className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white/80 hover:bg-white/5"
               >
-                {busy === "invite" ? <Loader2 className="size-4 animate-spin" /> : "Send invite"}
+                {busy === "invite" ? <Loader2 className="size-4 animate-spin" /> : wt("common.sendInvite")}
               </button>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <DashboardPanel className="p-4 text-center">
                 <p className="text-xl font-black text-white">{data.referral?.total_invites ?? 0}</p>
-                <p className="text-[10px] uppercase tracking-wider text-white/30">Invites</p>
+                <p className="text-[10px] uppercase tracking-wider text-white/30">{wt("growth.referrals.invites")}</p>
               </DashboardPanel>
               <DashboardPanel className="p-4 text-center">
                 <p className="text-xl font-black text-white">{data.referral?.total_accepted ?? 0}</p>
-                <p className="text-[10px] uppercase tracking-wider text-white/30">Accepted</p>
+                <p className="text-[10px] uppercase tracking-wider text-white/30">{wt("growth.referrals.accepted")}</p>
               </DashboardPanel>
             </div>
             <ul className="space-y-2">
@@ -391,9 +391,9 @@ export function GrowthPanel() {
           <DashboardCardHeader>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <DashboardCardTitle>Lead generation inbox</DashboardCardTitle>
+                <DashboardCardTitle>{wt("growth.leads.title")}</DashboardCardTitle>
                 <DashboardCardDescription>
-                  Scored leads from contact, newsletter, CTAs and exit intent.
+                  {wt("growth.leads.description")}
                 </DashboardCardDescription>
               </div>
               <button
@@ -407,19 +407,19 @@ export function GrowthPanel() {
                       body: JSON.stringify({ kind: "claim-leads" }),
                     });
                     const json = await res.json();
-                    if (!res.ok) throw new Error(json.error ?? "Claim failed");
-                    toast.success(`Claimed ${json.claimed ?? 0} platform leads`);
+                    if (!res.ok) throw new Error(json.error ?? wt("toasts.claimFailed"));
+                    toast.success(wt("toasts.claimedLeads", { count: json.claimed ?? 0 }));
                   })
                 }
                 className="rounded-xl bg-premium-gold px-3 py-2 text-xs font-semibold text-luxury-black"
               >
-                Claim platform leads (admin)
+                {wt("growth.leads.claimButton")}
               </button>
             </div>
           </DashboardCardHeader>
           <DashboardCardContent>
             {data.leads.length === 0 ? (
-              <p className="text-sm text-white/40">No leads yet. Claim platform leads or capture from the site.</p>
+              <p className="text-sm text-white/40">{wt("growth.leads.empty")}</p>
             ) : (
               <ul className="space-y-2">
                 {data.leads.map((lead) => (
@@ -432,7 +432,7 @@ export function GrowthPanel() {
                         {lead.name ?? lead.email}
                       </span>
                       <span>
-                        score {lead.score} · {lead.status} · {lead.source}
+                        {wt("growth.leads.scoreRow", { score: lead.score, status: lead.status, source: lead.source })}
                       </span>
                     </div>
                     <p className="mt-1 text-white/40">{lead.email}</p>
@@ -449,19 +449,19 @@ export function GrowthPanel() {
         <div className="space-y-6">
           <DashboardCard>
             <DashboardCardHeader>
-              <DashboardCardTitle>Contact management</DashboardCardTitle>
+              <DashboardCardTitle>{wt("growth.crm.contactManagement")}</DashboardCardTitle>
             </DashboardCardHeader>
             <DashboardCardContent className="space-y-3">
               <div className="grid gap-2 sm:grid-cols-3">
                 <input
                   className={dashboardInputClass}
-                  placeholder="Email"
+                  placeholder={wt("growth.crm.emailPlaceholder")}
                   value={contactEmail}
                   onChange={(e) => setContactEmail(e.target.value)}
                 />
                 <input
                   className={dashboardInputClass}
-                  placeholder="Name"
+                  placeholder={wt("growth.crm.namePlaceholder")}
                   value={contactName}
                   onChange={(e) => setContactName(e.target.value)}
                 />
@@ -476,15 +476,15 @@ export function GrowthPanel() {
                         body: JSON.stringify({ email: contactEmail, name: contactName }),
                       });
                       const json = await res.json();
-                      if (!res.ok) throw new Error(json.error ?? "Save failed");
-                      toast.success("Contact saved");
+                      if (!res.ok) throw new Error(json.error ?? wt("toasts.saveFailed"));
+                      toast.success(wt("toasts.contactSaved"));
                       setContactEmail("");
                       setContactName("");
                     })
                   }
                   className="rounded-xl bg-premium-gold px-3 py-2 text-sm font-semibold text-luxury-black"
                 >
-                  Add contact
+                  {wt("common.addContact")}
                 </button>
               </div>
               <ul className="space-y-2">
@@ -494,9 +494,9 @@ export function GrowthPanel() {
                     className="flex justify-between rounded-xl border border-white/5 px-3 py-2 text-xs text-white/70"
                   >
                     <span>
-                      {c.name ?? c.email} · {c.lifecycle_stage}
+                      {wt("growth.crm.contactRow", { name: c.name ?? c.email, stage: c.lifecycle_stage })}
                     </span>
-                    <span>score {c.score}</span>
+                    <span>{wt("common.score")} {c.score}</span>
                   </li>
                 ))}
               </ul>
@@ -505,13 +505,13 @@ export function GrowthPanel() {
 
           <DashboardCard>
             <DashboardCardHeader>
-              <DashboardCardTitle>Sales pipeline</DashboardCardTitle>
+              <DashboardCardTitle>{wt("growth.crm.salesPipeline")}</DashboardCardTitle>
             </DashboardCardHeader>
             <DashboardCardContent className="space-y-3">
               <div className="flex flex-col gap-2 sm:flex-row">
                 <input
                   className={cn(dashboardInputClass, "flex-1")}
-                  placeholder="Deal title"
+                  placeholder={wt("growth.crm.dealTitlePlaceholder")}
                   value={dealTitle}
                   onChange={(e) => setDealTitle(e.target.value)}
                 />
@@ -526,14 +526,14 @@ export function GrowthPanel() {
                         body: JSON.stringify({ title: dealTitle, stage: "new", valueCents: 0 }),
                       });
                       const json = await res.json();
-                      if (!res.ok) throw new Error(json.error ?? "Deal failed");
-                      toast.success("Deal created");
+                      if (!res.ok) throw new Error(json.error ?? wt("toasts.dealFailed"));
+                      toast.success(wt("toasts.dealCreated"));
                       setDealTitle("");
                     })
                   }
                   className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white/80"
                 >
-                  Add deal
+                  {wt("common.addDeal")}
                 </button>
               </div>
               <div className="grid gap-3 md:grid-cols-3">
@@ -541,14 +541,14 @@ export function GrowthPanel() {
                   (stage) => (
                     <DashboardPanel key={stage} className="p-3">
                       <p className="text-[10px] font-bold uppercase tracking-wider text-white/30">
-                        {stage}
+                        {wt(`growth.crm.stages.${stage}`)}
                       </p>
                       <ul className="mt-2 space-y-1">
                         {data.deals
                           .filter((d) => d.stage === stage)
                           .map((d) => (
                             <li key={d.id} className="text-xs text-white/70">
-                              {d.title} · {money(d.value_cents)}
+                              {wt("growth.crm.dealRow", { title: d.title, amount: formatCurrency(d.value_cents) })}
                             </li>
                           ))}
                       </ul>
@@ -565,23 +565,22 @@ export function GrowthPanel() {
         <div className="space-y-6">
           <DashboardCard>
             <DashboardCardHeader>
-              <DashboardCardTitle>Email campaigns</DashboardCardTitle>
+              <DashboardCardTitle>{wt("growth.email.title")}</DashboardCardTitle>
               <DashboardCardDescription>
-                  Draft campaigns only — connect an ESP (Resend/SendGrid) before live sends.
-                  Delivery provider can be wired via env later.
+                  {wt("growth.email.description")}
               </DashboardCardDescription>
             </DashboardCardHeader>
             <DashboardCardContent className="space-y-3">
               <div className="grid gap-2 md:grid-cols-2">
                 <input
                   className={dashboardInputClass}
-                  placeholder="Campaign name"
+                  placeholder={wt("growth.email.campaignNamePlaceholder")}
                   value={campaignName}
                   onChange={(e) => setCampaignName(e.target.value)}
                 />
                 <input
                   className={dashboardInputClass}
-                  placeholder="Subject line"
+                  placeholder={wt("growth.email.subjectPlaceholder")}
                   value={campaignSubject}
                   onChange={(e) => setCampaignSubject(e.target.value)}
                 />
@@ -603,15 +602,15 @@ export function GrowthPanel() {
                       }),
                     });
                     const json = await res.json();
-                    if (!res.ok) throw new Error(json.error ?? "Campaign failed");
-                    toast.success("Campaign draft created");
+                    if (!res.ok) throw new Error(json.error ?? wt("toasts.campaignFailed"));
+                    toast.success(wt("toasts.campaignDraftCreated"));
                     setCampaignName("");
                     setCampaignSubject("");
                   })
                 }
                 className="rounded-xl bg-premium-gold px-4 py-2 text-sm font-semibold text-luxury-black"
               >
-                Create draft campaign
+                {wt("growth.email.createDraft")}
               </button>
               <ul className="space-y-2">
                 {data.campaigns.map((c) => (
@@ -620,16 +619,16 @@ export function GrowthPanel() {
                     className="flex justify-between rounded-xl border border-white/5 px-3 py-2 text-xs text-white/70"
                   >
                     <span>
-                      {c.name} · {c.subject}
+                      {wt("growth.email.campaignRow", { name: c.name, subject: c.subject })}
                     </span>
                     <span>
-                      {c.status} · sent {c.stats?.sent ?? 0}
+                      {wt("growth.email.campaignStats", { status: c.status, sent: c.stats?.sent ?? 0 })}
                     </span>
                   </li>
                 ))}
               </ul>
               <p className="text-xs text-white/40">
-                Subscribers in workspace: {data.subscribers.length}
+                {wt("growth.email.subscribersCount", { count: data.subscribers.length })}
               </p>
             </DashboardCardContent>
           </DashboardCard>
@@ -639,16 +638,16 @@ export function GrowthPanel() {
       {tab === "experiments" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>A/B testing</DashboardCardTitle>
+            <DashboardCardTitle>{wt("growth.experiments.title")}</DashboardCardTitle>
             <DashboardCardDescription>
-              Landing, headline, CTA and pricing experiments.
+              {wt("growth.experiments.description")}
             </DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent className="space-y-3">
             <div className="flex flex-col gap-2 sm:flex-row">
               <input
                 className={cn(dashboardInputClass, "flex-1")}
-                placeholder="Experiment name"
+                placeholder={wt("growth.experiments.namePlaceholder")}
                 value={experimentName}
                 onChange={(e) => setExperimentName(e.target.value)}
               />
@@ -673,14 +672,14 @@ export function GrowthPanel() {
                       }),
                     });
                     const json = await res.json();
-                    if (!res.ok) throw new Error(json.error ?? "Experiment failed");
-                    toast.success("Experiment started");
+                    if (!res.ok) throw new Error(json.error ?? wt("toasts.experimentFailed"));
+                    toast.success(wt("toasts.experimentStarted"));
                     setExperimentName("");
                   })
                 }
                 className="rounded-xl bg-premium-gold px-4 py-2 text-sm font-semibold text-luxury-black"
               >
-                Launch CTA test
+                {wt("growth.experiments.launchCtaTest")}
               </button>
             </div>
             <ul className="space-y-2">
@@ -691,14 +690,16 @@ export function GrowthPanel() {
                 >
                   <div className="flex justify-between gap-2">
                     <span className="font-medium text-white/90">
-                      {exp.name} · {exp.target_type}
+                      {wt("growth.experiments.experimentRow", { name: exp.name, targetType: exp.target_type })}
                     </span>
                     <span>{exp.status}</span>
                   </div>
                   <p className="mt-1 text-white/40">{exp.hypothesis}</p>
                   <p className="mt-1">
-                    impressions {exp.metrics?.impressions ?? 0} · conversions{" "}
-                    {exp.metrics?.conversions ?? 0}
+                    {wt("growth.experiments.metrics", {
+                      impressions: exp.metrics?.impressions ?? 0,
+                      conversions: exp.metrics?.conversions ?? 0,
+                    })}
                   </p>
                 </li>
               ))}
@@ -710,16 +711,16 @@ export function GrowthPanel() {
       {tab === "automation" && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Marketing automation</DashboardCardTitle>
+            <DashboardCardTitle>{wt("growth.automation.title")}</DashboardCardTitle>
             <DashboardCardDescription>
-              Trigger-based workflows, email sequences and segmentation hooks.
+              {wt("growth.automation.description")}
             </DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent className="space-y-3">
             <div className="flex flex-col gap-2 sm:flex-row">
               <input
                 className={cn(dashboardInputClass, "flex-1")}
-                placeholder="Automation name"
+                placeholder={wt("growth.automation.namePlaceholder")}
                 value={automationName}
                 onChange={(e) => setAutomationName(e.target.value)}
               />
@@ -733,7 +734,7 @@ export function GrowthPanel() {
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({
                         kind: "automation",
-                        name: automationName || "Lead nurture sequence",
+                        name: automationName || wt("growth.automation.defaultName"),
                         triggerEvent: "lead_created",
                         status: "active",
                         steps: [
@@ -750,20 +751,20 @@ export function GrowthPanel() {
                       }),
                     });
                     const json = await res.json();
-                    if (!res.ok) throw new Error(json.error ?? "Automation failed");
-                    toast.success("Automation created");
+                    if (!res.ok) throw new Error(json.error ?? wt("toasts.automationFailed"));
+                    toast.success(wt("toasts.automationCreated"));
                     setAutomationName("");
                   })
                 }
                 className="rounded-xl bg-premium-gold px-4 py-2 text-sm font-semibold text-luxury-black"
               >
-                Create nurture flow
+                {wt("growth.automation.createNurtureFlow")}
               </button>
             </div>
             <textarea
               className={cn(dashboardTextareaClass, "min-h-[80px]")}
               readOnly
-              value="Event tracking endpoint: POST /api/growth/events — use for pageview, cta_click, signup and campaign events."
+              value={wt("growth.automation.eventsEndpoint")}
             />
             <ul className="space-y-2">
               {data.automations.map((auto) => (
@@ -772,17 +773,19 @@ export function GrowthPanel() {
                   className="flex justify-between rounded-xl border border-white/5 px-3 py-2 text-xs text-white/70"
                 >
                   <span>
-                    {auto.name} · {auto.trigger_event}
+                    {wt("growth.automation.automationRow", { name: auto.name, trigger: auto.trigger_event })}
                   </span>
                   <span>
-                    {auto.status} · {auto.steps?.length ?? 0} steps
+                    {wt("growth.automation.automationStats", { status: auto.status, steps: auto.steps?.length ?? 0 })}
                   </span>
                 </li>
               ))}
             </ul>
             <p className="text-xs text-white/40">
-              Segments: {data.segments.length} · Running experiments:{" "}
-              {data.analytics.experimentsRunning}
+              {wt("growth.automation.segmentsSummary", {
+                segments: data.segments.length,
+                experiments: data.analytics.experimentsRunning,
+              })}
             </p>
           </DashboardCardContent>
         </DashboardCard>

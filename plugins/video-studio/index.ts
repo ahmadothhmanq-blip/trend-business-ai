@@ -92,7 +92,7 @@ async function generateVideo(
         svgStoryboard: string;
         visualPrompt: string;
       }>({
-        prompt: videoScenePrompt(analysis, scene, i, totalScenes, input.aspectRatio),
+        prompt: videoScenePrompt(analysis, scene, i, totalScenes, input.aspectRatio, input.language),
         schema: videoSceneOutputSchema,
       });
       scenes.push({
@@ -124,7 +124,7 @@ async function generateVideo(
     ctx.progress.emit("Writing video script...");
     try {
       script = ctx.provider.generateText
-        ? await ctx.provider.generateText({ prompt: videoScriptPrompt(analysis, plan.scenes) })
+        ? await ctx.provider.generateText({ prompt: videoScriptPrompt(analysis, plan.scenes, input.language) })
         : "";
     } catch { /* fallback */ }
   }
@@ -155,7 +155,7 @@ async function generateVideo(
     ctx.progress.emit("Generating thumbnail...");
     try {
       const result = await ctx.provider.generateJson<{ svgCode: string }>({
-        prompt: videoThumbnailPrompt(analysis, input.aspectRatio),
+        prompt: videoThumbnailPrompt(analysis, input.aspectRatio, input.language),
         schema: videoThumbnailSchema,
       });
       thumbnailSvg = sanitizeSvgContent(result.svgCode);

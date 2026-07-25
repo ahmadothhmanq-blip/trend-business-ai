@@ -1,11 +1,13 @@
-import type { Metadata } from "next";
 import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardHeader } from "@/components/dashboard/header";
 import { DesignEditor } from "@/components/dashboard/image-generator/design-editor";
 import type { ImageGeneration } from "@/types/image-generation";
+import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
 
-export const metadata: Metadata = { title: "Design Editor" };
+export async function generateMetadata() {
+  return dashboardPageMetadata("designEditor");
+}
 
 type Props = { params: Promise<{ id: string }> };
 

@@ -6,6 +6,7 @@ import { generateImage, modelToBlueprint } from "@/lib/image-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
 import { resolveIteratedPrompt } from "@/lib/ai/iteration";
 import { getImageTypeLabel } from "@/lib/constants/image-generator";
+import { resolveRequestLanguage } from "@/lib/i18n/api";
 import { getDesignTemplate } from "@/lib/ai-core/image-design-platform/templates";
 import { brandTokensToContext } from "@/lib/ai-core/image-design-platform/model";
 import {
@@ -106,6 +107,7 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data;
+  const aiLanguage = resolveRequestLanguage(request);
   const template = input.templateId ? getDesignTemplate(input.templateId) : undefined;
   const typeLabel = getImageTypeLabel(input.imageType);
   const brand = input.brandIdentity ? brandTokensToContext(input.brandIdentity) : undefined;
@@ -141,6 +143,7 @@ export async function POST(request: Request) {
       quality: (input.quality ?? "standard") as ImageQuality,
       preferredProvider: input.preferredProvider as ImageProviderId | undefined,
       seed: input.seed,
+      language: aiLanguage,
     });
 
     const blueprint: ImageBlueprint = result.model

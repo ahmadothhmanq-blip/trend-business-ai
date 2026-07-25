@@ -43,6 +43,7 @@ import {
 } from "@/components/dashboard/builder-shared";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n/client";
+import { getLocaleDefinition } from "@/lib/i18n/config";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
 import { getOnePromptProduct } from "@/lib/constants/one-prompt-products";
 import { VideoStudioProviderStatus } from "@/components/dashboard/video-studio/video-studio-provider-status";
@@ -89,8 +90,9 @@ function VideoPreview({
   onRegenerate?: () => void;
   onContinue?: () => void;
 }) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const p = useProductT("videoStudio");
+  const aiLanguage = getLocaleDefinition(locale).aiLanguage;
   const bp = gen.blueprint;
   const [tab, setTab] = useState<PreviewTab>("storyboard");
 
@@ -277,8 +279,9 @@ function toHistoryItem(gen: VideoGeneration): ProjectHistoryItem {
 }
 
 export function VideoStudioTool({ initialGenerations }: Props) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const p = useProductT("videoStudio");
+  const aiLanguage = getLocaleDefinition(locale).aiLanguage;
   const onePrompt = getOnePromptProduct("video-studio");
   const [step, setStep] = useState<"type" | "config" | "history" | "generating" | "preview">("type");
   const [selectedType, setSelectedType] = useState("");
@@ -381,7 +384,7 @@ export function VideoStudioTool({ initialGenerations }: Props) {
           prompt: idea,
           count: batchCount,
           durationSec: Number.parseInt(duration, 10) || 30,
-          language: "English",
+          language: aiLanguage,
           style,
           platform: aspectRatio === "9:16" ? "TikTok" : "YouTube",
           videoType: selectedType || "social-video",
@@ -470,6 +473,7 @@ export function VideoStudioTool({ initialGenerations }: Props) {
         body: JSON.stringify({
           prompt: idea, videoType, style, aspectRatio, duration,
           mood, cameraMove, options: videoOptions, sceneCount, mode, parentGenerationId,
+          language: aiLanguage,
           continueInstruction: mode === "continue" ? idea : undefined,
         }),
       });

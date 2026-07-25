@@ -5,10 +5,12 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { dashboardInputClass } from "@/components/dashboard/ui/dashboard-styles";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 
 type KB = { id: string; name: string; document_count: number; indexing_status: string };
 
 export function KnowledgeManager() {
+  const pt = useProductT("aiAgents");
   const [bases, setBases] = useState<KB[]>([]);
   const [selectedId, setSelectedId] = useState("");
   const [name, setName] = useState("");
@@ -25,42 +27,42 @@ export function KnowledgeManager() {
   const createKb = async () => {
     if (!name.trim()) return;
     const res = await fetch("/api/ai-agents/knowledge", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name }) });
-    if (!res.ok) return toast.error("Failed");
-    setName(""); load(); toast.success("Knowledge base created");
+    if (!res.ok) return toast.error(pt("toasts.failed"));
+    setName(""); load(); toast.success(pt("panels.knowledge.kbCreated"));
   };
 
   const addDoc = async () => {
-    if (!selectedId || !docTitle.trim() || !docContent.trim()) return toast.error("Fill all fields");
+    if (!selectedId || !docTitle.trim() || !docContent.trim()) return toast.error(pt("panels.knowledge.fillAllFields"));
     const res = await fetch("/api/ai-agents/knowledge", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ knowledgeBaseId: selectedId, title: docTitle, content: docContent }),
     });
-    if (!res.ok) return toast.error("Failed");
-    setDocTitle(""); setDocContent(""); load(); toast.success("Document added");
+    if (!res.ok) return toast.error(pt("toasts.failed"));
+    setDocTitle(""); setDocContent(""); load(); toast.success(pt("panels.knowledge.documentAdded"));
   };
 
   return (
     <div className="space-y-4">
       <div className="flex gap-2">
-        <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="New knowledge base" className={dashboardInputClass} />
-        <Button onClick={() => void createKb()}>Create KB</Button>
+        <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={pt("panels.knowledge.newKbPlaceholder")} className={dashboardInputClass} />
+        <Button onClick={() => void createKb()}>{pt("panels.knowledge.createKb")}</Button>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         {bases.map((b) => (
           <button key={b.id} type="button" onClick={() => setSelectedId(b.id)}
             className={`rounded-lg border p-3 text-left ${selectedId === b.id ? "border-premium-gold/40 bg-premium-gold/5" : "border-white/5"}`}>
             <p className="text-sm font-medium text-white">{b.name}</p>
-            <p className="text-xs text-white/40">{b.document_count} docs · {b.indexing_status}</p>
+            <p className="text-xs text-white/40">{pt("panels.knowledge.docsCount", { count: b.document_count, status: b.indexing_status })}</p>
           </button>
         ))}
       </div>
       {selectedId ? (
         <div className="space-y-2 rounded-xl border border-white/[0.08] p-4">
-          <p className="text-xs uppercase text-white/40">Add document (embeddings-ready)</p>
-          <Input value={docTitle} onChange={(e) => setDocTitle(e.target.value)} placeholder="Title" className={dashboardInputClass} />
-          <textarea value={docContent} onChange={(e) => setDocContent(e.target.value)} rows={4} placeholder="Content" className={dashboardInputClass} />
-          <Button onClick={() => void addDoc()}>Add Document</Button>
+          <p className="text-xs uppercase text-white/40">{pt("panels.knowledge.addDocument")}</p>
+          <Input value={docTitle} onChange={(e) => setDocTitle(e.target.value)} placeholder={pt("panels.knowledge.title")} className={dashboardInputClass} />
+          <textarea value={docContent} onChange={(e) => setDocContent(e.target.value)} rows={4} placeholder={pt("panels.knowledge.content")} className={dashboardInputClass} />
+          <Button onClick={() => void addDoc()}>{pt("panels.knowledge.addDocumentBtn")}</Button>
         </div>
       ) : null}
     </div>

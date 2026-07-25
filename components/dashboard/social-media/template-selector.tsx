@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import type { SocialTemplate } from "@/lib/social-media/templates";
 import type { SocialPostPlatform } from "@/types/social-media";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 
 type Props = {
   platform: SocialPostPlatform;
@@ -12,6 +13,7 @@ type Props = {
 };
 
 export function TemplateSelector({ platform, onApply }: Props) {
+  const wt = useWorkspaceT("socialMedia");
   const [templates, setTemplates] = useState<SocialTemplate[]>([]);
   const [active, setActive] = useState<SocialTemplate | null>(null);
   const [values, setValues] = useState<Record<string, string>>({});
@@ -31,7 +33,7 @@ export function TemplateSelector({ platform, onApply }: Props) {
 
   return (
     <div className="space-y-3">
-      <p className="text-xs font-medium uppercase tracking-wide text-white/40">Templates</p>
+      <p className="text-xs font-medium uppercase tracking-wide text-white/40">{wt("templates.title")}</p>
       <div className="grid gap-2 sm:grid-cols-2">
         {templates.map((t) => (
           <button
@@ -74,7 +76,7 @@ export function TemplateSelector({ platform, onApply }: Props) {
               setActive(null);
             }}
           >
-            Use Template
+            {wt("templates.useTemplate")}
           </Button>
         </div>
       )}

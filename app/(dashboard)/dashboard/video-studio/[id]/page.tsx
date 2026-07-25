@@ -1,10 +1,12 @@
-import type { Metadata } from "next";
 import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardHeader } from "@/components/dashboard/header";
 import { VideoManagementDashboard } from "@/components/dashboard/video-studio/video-management-dashboard";
+import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
 
-export const metadata: Metadata = { title: "Manage Video · Video Studio" };
+export async function generateMetadata() {
+  return dashboardPageMetadata("videoStudioManage");
+}
 
 type PageProps = { params: Promise<{ id: string }> };
 

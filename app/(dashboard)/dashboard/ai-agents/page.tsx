@@ -1,15 +1,14 @@
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { AiAgentsWorkspace } from "@/components/dashboard/ai-agents/ai-agents-workspace";
 import { createClient } from "@/lib/supabase/server";
 import type { Agent, AgentExecution } from "@/types/agents";
 import { getAgentAnalytics } from "@/lib/agents/analytics";
+import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
 
-export const metadata: Metadata = {
-  title: "AI Agents & Automation",
-  description: "Create, manage, and run AI agents with multi-step workflows",
-};
+export async function generateMetadata() {
+  return dashboardPageMetadata("aiAgents");
+}
 
 export default async function AiAgentsPage() {
   const supabase = await createClient();

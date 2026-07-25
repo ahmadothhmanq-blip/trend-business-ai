@@ -6,6 +6,7 @@ import { generateLogo } from "@/lib/logo-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
 import { resolveIteratedPrompt } from "@/lib/ai/iteration";
 import { getLogoStyleLabel } from "@/lib/constants/logo-designer";
+import { resolveRequestLanguage } from "@/lib/i18n/api";
 import type { LogoGeneration, LogoBlueprint } from "@/types/logo";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -84,6 +85,7 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data;
+  const aiLanguage = resolveRequestLanguage(request);
   const styleLabel = getLogoStyleLabel(input.logoStyle);
   let stage = "generateLogo";
 
@@ -112,6 +114,7 @@ export async function POST(request: Request) {
       typography: input.typography,
       personality: input.personality,
       options: input.options,
+      language: aiLanguage,
     });
 
     const blueprint: LogoBlueprint = {

@@ -1,4 +1,5 @@
 import type { LogoPluginInput, LogoAnalysis, LogoConcept } from "@/plugins/logo-designer/types";
+import { aiOutputLanguageDirective } from "@/lib/ai/prompts/shared";
 
 function getStyleGuidance(style: string): string {
   const guides: Record<string, string> = {
@@ -43,7 +44,7 @@ Produce a JSON object with:
 - targetAudience: who this brand serves
 - brandValues: array of 3-5 brand values
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(input.language)}`;
 }
 
 export function logoPlanPrompt(input: LogoPluginInput, analysis: LogoAnalysis): string {
@@ -75,7 +76,7 @@ Produce a JSON object with:
 - deliverables: array of deliverable names
 - svgApproach: brief description of how the SVG should be constructed
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(input.language)}`;
 }
 
 export function logoGeneratePrompt(
@@ -119,7 +120,7 @@ Return a JSON object with:
 - description: what the logo represents
 - svgCode: the complete SVG markup as a string (starting with <svg and ending with </svg>)
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(input.language)}`;
 }
 
 export function logoVariationPrompt(
@@ -127,6 +128,7 @@ export function logoVariationPrompt(
   primarySvg: string,
   variationName: string,
   colorPalette: { name: string; hex: string; role: string }[],
+  language?: string,
 ): string {
   return `You are an expert SVG logo designer. Create a "${variationName}" variation of this logo.
 
@@ -158,7 +160,7 @@ Return a JSON object with:
 - useCase: when to use this variation
 - svgCode: the complete SVG markup
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(language)}`;
 }
 
 export function logoGuidelinesPrompt(
@@ -167,6 +169,7 @@ export function logoGuidelinesPrompt(
   colorPalette: { name: string; hex: string; role: string }[],
   typography: { primary: string; secondary: string; notes: string },
   variations: { name: string; description: string }[],
+  language?: string,
 ): string {
   return `Write concise brand guidelines for the "${brandName}" logo. Cover:
 
@@ -177,5 +180,5 @@ export function logoGuidelinesPrompt(
 5. Brand Voice — ${analysis.personality}, targeting ${analysis.targetAudience}.
 
 Keep it professional and concise (300-500 words). Use markdown formatting.
-Return ONLY the guidelines text as a plain string (not JSON).`;
+Return ONLY the guidelines text as a plain string (not JSON).${aiOutputLanguageDirective(language)}`;
 }

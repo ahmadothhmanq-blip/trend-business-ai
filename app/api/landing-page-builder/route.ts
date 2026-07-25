@@ -6,6 +6,7 @@ import { generateLandingPage } from "@/lib/landing-page-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
 import { resolveIteratedPrompt } from "@/lib/ai/iteration";
 import { getLandingPageTypeLabel } from "@/lib/constants/landing-page-builder";
+import { resolveRequestLanguage } from "@/lib/i18n/api";
 import type { LandingPageGeneration, LandingPageBlueprint } from "@/types/landing-page";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -86,6 +87,7 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data;
+  const aiLanguage = resolveRequestLanguage(request, input.language);
   const pageLabel = getLandingPageTypeLabel(input.pageType);
   let stage = "generateLandingPage";
 
@@ -107,7 +109,7 @@ export async function POST(request: Request) {
     const project = await generateLandingPage({
       prompt: iterated.prompt,
       pageType: input.pageType,
-      language: input.language,
+      language: aiLanguage,
       designStyle: input.designStyle,
       colorStyle: input.colorStyle,
       sections: input.sections,
@@ -127,7 +129,7 @@ export async function POST(request: Request) {
       page_name: savedProject.title || `${pageLabel} Landing Page`,
       page_type: input.pageType,
       description: savedProject.description || input.prompt,
-      language: input.language,
+      language: aiLanguage,
       design_style: input.designStyle,
       color_style: input.colorStyle,
       sections: input.sections,

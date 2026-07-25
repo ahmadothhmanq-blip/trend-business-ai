@@ -36,6 +36,7 @@ export type VideoBlueprint = {
   exportPreset: string;
   files: { path: string; content: string; language: string }[];
   prompt: string;
+  language?: string;
   generatedAt: string;
   progressEvents?: string[];
   productionModel?: VideoProductionModel;

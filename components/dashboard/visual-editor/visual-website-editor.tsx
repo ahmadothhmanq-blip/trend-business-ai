@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import type { GeneratedProjectFile } from "@/lib/ai/types";
 import type { GeneratedWebsiteProject } from "@/plugins/website/types";
 import type { WebsiteGeneration } from "@/types/database";
@@ -91,6 +92,7 @@ export function VisualWebsiteEditor({
   disabled,
   onSaved,
 }: VisualWebsiteEditorProps) {
+  const pt = useProductT("visualEditor");
   const initial = useMemo(
     () =>
       buildVisualDocument({
@@ -131,7 +133,7 @@ export function VisualWebsiteEditor({
       setDragIndex(null);
       return;
     }
-    commit(moveNode(doc, dragIndex, toIndex), "Move section");
+    commit(moveNode(doc, dragIndex, toIndex), pt("history.moveSection"));
     setDragIndex(null);
   };
 
@@ -145,9 +147,9 @@ export function VisualWebsiteEditor({
         text: component.name,
         index,
       }),
-      `Insert ${component.name}`,
+      pt("history.insert", { name: component.name }),
     );
-    toast.message(`${component.name} added — Save to apply to project`);
+    toast.message(pt("toasts.componentAdded", { name: component.name }));
   };
 
   const onCanvasLibraryDrop = (e: DragEvent, index?: number) => {
@@ -165,19 +167,19 @@ export function VisualWebsiteEditor({
         text: payload.name,
         index,
       }),
-      `Insert ${payload.name}`,
+      pt("history.insert", { name: payload.name }),
     );
-    toast.message(`${payload.name} added — Save to apply to project`);
+    toast.message(pt("toasts.componentAdded", { name: payload.name }));
   };
 
   const save = async () => {
     if (!doc.dirty) {
-      toast.message("No visual changes to save.");
+      toast.message(pt("toasts.noChanges"));
       return;
     }
     const actions = documentToSaveActions(baseline, doc);
     if (!actions.length) {
-      toast.message("Nothing to persist.");
+      toast.message(pt("toasts.nothingToPersist"));
       return;
     }
     setSaving(true);
@@ -197,7 +199,7 @@ export function VisualWebsiteEditor({
         editResult?: { summary?: string };
       };
       if (!response.ok || !data.project || !data.generation) {
-        throw new Error(data.error || "Unable to save visual edits.");
+        throw new Error(data.error || pt("toasts.saveError"));
       }
       const nextDoc = buildVisualDocument({
         generationId: data.generation.id,
@@ -207,10 +209,10 @@ export function VisualWebsiteEditor({
       setBaseline(nextDoc);
       setHistory(createVisualHistory(nextDoc));
       onSaved({ project: data.project, generation: data.generation });
-      toast.success(data.editResult?.summary || "Visual edits saved.");
+      toast.success(data.editResult?.summary || pt("toasts.saved"));
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Unable to save edits.",
+        error instanceof Error ? error.message : pt("toasts.saveFailed"),
       );
     } finally {
       setSaving(false);
@@ -221,9 +223,9 @@ export function VisualWebsiteEditor({
     <div className="flex h-full min-h-[720px] flex-col bg-[#050505]">
       <div className="flex flex-wrap items-center gap-2 border-b border-white/[0.08] px-3 py-2">
         <p className="mr-auto text-[12px] font-semibold text-white/70">
-          Visual Editor
+          {pt("title")}
           {doc.dirty ? (
-            <span className="ml-2 text-premium-gold">· unsaved</span>
+            <span className="ml-2 text-premium-gold">{pt("unsaved")}</span>
           ) : null}
         </p>
         {(
@@ -252,7 +254,7 @@ export function VisualWebsiteEditor({
             disabled={disabled}
           >
             <Icon className="size-3.5" />
-            {key}
+            {pt(`viewports.${key}`)}
           </Button>
         ))}
         <Button
@@ -284,7 +286,7 @@ export function VisualWebsiteEditor({
           ) : (
             <Save className="size-3.5" />
           )}
-          Save
+          {pt("save")}
         </Button>
       </div>
 
@@ -300,7 +302,7 @@ export function VisualWebsiteEditor({
         {/* Layers */}
         <aside className="border-r border-white/[0.08] bg-black/30 p-3">
           <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/35">
-            Layers
+            {pt("layers")}
           </p>
           <ul className="space-y-1">
             {doc.nodes.map((node, index) => (
@@ -371,7 +373,7 @@ export function VisualWebsiteEditor({
                     }))
                   }
                   onTextChange={(text) =>
-                    commit(updateNodeText(doc, node.id, text), "Edit text")
+                    commit(updateNodeText(doc, node.id, text), pt("history.editText"))
                   }
                   onDragStart={() => setDragIndex(index)}
                   onDrop={(e) => {
@@ -389,7 +391,7 @@ export function VisualWebsiteEditor({
               ))}
               {!doc.nodes.length ? (
                 <div className="flex h-48 items-center justify-center text-sm text-white/40">
-                  Drag a component from the library to start
+                  {pt("emptyCanvas")}
                 </div>
               ) : null}
             </div>
@@ -400,44 +402,44 @@ export function VisualWebsiteEditor({
         <aside className="space-y-4 border-l border-white/[0.08] bg-black/30 p-3">
           <div>
             <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/35">
-              Properties
+              {pt("properties")}
             </p>
             {selected ? (
               <div className="space-y-3">
                 <div>
-                  <p className="text-[11px] text-white/40">Component</p>
+                  <p className="text-[11px] text-white/40">{pt("component")}</p>
                   <p className="text-sm font-semibold text-white">
                     {selected.label}
                   </p>
                 </div>
                 <div>
-                  <p className="mb-1 text-[11px] text-white/40">Canvas text</p>
+                  <p className="mb-1 text-[11px] text-white/40">{pt("canvasText")}</p>
                   <Input
                     value={selected.text || ""}
                     onChange={(e) =>
                       commit(
                         updateNodeText(doc, selected.id, e.target.value),
-                        "Edit text",
+                        pt("history.editText"),
                       )
                     }
                     disabled={disabled || selected.locked}
                     className="border-white/10 bg-white/5 text-white"
-                    placeholder="Headline / title"
+                    placeholder={pt("headlinePlaceholder")}
                   />
                 </div>
                 <div>
-                  <p className="mb-1 text-[11px] text-white/40">Image URL</p>
+                  <p className="mb-1 text-[11px] text-white/40">{pt("imageUrl")}</p>
                   <Input
                     value={selected.imageUrl || ""}
                     onChange={(e) =>
                       commit(
                         updateNodeImage(doc, selected.id, e.target.value),
-                        "Replace image",
+                        pt("history.replaceImage"),
                       )
                     }
                     disabled={disabled || selected.locked}
                     className="border-white/10 bg-white/5 text-white"
-                    placeholder="https://… or /images/…"
+                    placeholder={pt("imagePlaceholder")}
                   />
                 </div>
                 <div className="flex gap-2">
@@ -447,11 +449,11 @@ export function VisualWebsiteEditor({
                     className="flex-1 border-white/15 text-white"
                     disabled={disabled || selected.locked}
                     onClick={() =>
-                      commit(duplicateNode(doc, selected.id), "Duplicate")
+                      commit(duplicateNode(doc, selected.id), pt("history.duplicate"))
                     }
                   >
                     <Copy className="size-3.5" />
-                    Duplicate
+                    {pt("duplicate")}
                   </Button>
                   <Button
                     size="sm"
@@ -459,31 +461,31 @@ export function VisualWebsiteEditor({
                     className="flex-1 border-red-500/30 text-red-300"
                     disabled={disabled || selected.locked}
                     onClick={() =>
-                      commit(deleteNode(doc, selected.id), "Delete")
+                      commit(deleteNode(doc, selected.id), pt("history.delete"))
                     }
                   >
                     <Trash2 className="size-3.5" />
-                    Delete
+                    {pt("delete")}
                   </Button>
                 </div>
               </div>
             ) : (
-              <p className="text-[12px] text-white/35">Select a layer</p>
+              <p className="text-[12px] text-white/35">{pt("selectLayer")}</p>
             )}
           </div>
 
           <div>
             <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/35">
-              Design tokens
+              {pt("designTokens")}
             </p>
             <div className="space-y-2">
               {(
                 [
-                  ["primary", "Primary"],
-                  ["secondary", "Secondary"],
-                  ["accent", "Accent"],
-                  ["background", "Background"],
-                  ["foreground", "Foreground"],
+                  ["primary", pt("tokens.primary")],
+                  ["secondary", pt("tokens.secondary")],
+                  ["accent", pt("tokens.accent")],
+                  ["background", pt("tokens.background")],
+                  ["foreground", pt("tokens.foreground")],
                 ] as const
               ).map(([key, label]) => (
                 <label
@@ -498,7 +500,7 @@ export function VisualWebsiteEditor({
                     onChange={(e) =>
                       commit(
                         updateTokens(doc, { [key]: e.target.value }),
-                        `Color ${label}`,
+                        pt("history.color", { label }),
                       )
                     }
                     className="h-8 w-12 cursor-pointer rounded border border-white/10 bg-transparent"
@@ -506,35 +508,35 @@ export function VisualWebsiteEditor({
                 </label>
               ))}
               <label className="block text-[11px] text-white/50">
-                Heading font
+                {pt("tokens.headingFont")}
                 <Input
                   value={doc.tokens.headingFont}
                   disabled={disabled}
                   onChange={(e) =>
                     commit(
                       updateTokens(doc, { headingFont: e.target.value }),
-                      "Heading font",
+                      pt("history.headingFont"),
                     )
                   }
                   className="mt-1 border-white/10 bg-white/5 text-white"
                 />
               </label>
               <label className="block text-[11px] text-white/50">
-                Body font
+                {pt("tokens.bodyFont")}
                 <Input
                   value={doc.tokens.bodyFont}
                   disabled={disabled}
                   onChange={(e) =>
                     commit(
                       updateTokens(doc, { bodyFont: e.target.value }),
-                      "Body font",
+                      pt("history.bodyFont"),
                     )
                   }
                   className="mt-1 border-white/10 bg-white/5 text-white"
                 />
               </label>
               <label className="block text-[11px] text-white/50">
-                Spacing
+                {pt("tokens.spacing")}
                 <select
                   value={
                     doc.tokens.sectionY.includes("4")
@@ -555,14 +557,14 @@ export function VisualWebsiteEditor({
                       updateTokens(doc, {
                         sectionY: map[e.target.value as keyof typeof map],
                       }),
-                      "Spacing",
+                      pt("history.spacing"),
                     );
                   }}
                   className="mt-1 h-10 w-full rounded-md border border-white/10 bg-[#121212] px-2 text-white"
                 >
-                  <option value="compact">Compact</option>
-                  <option value="balanced">Balanced</option>
-                  <option value="airy">Airy</option>
+                  <option value="compact">{pt("tokens.compact")}</option>
+                  <option value="balanced">{pt("tokens.balanced")}</option>
+                  <option value="airy">{pt("tokens.airy")}</option>
                 </select>
               </label>
             </div>
@@ -583,6 +585,7 @@ function CanvasBlock(props: {
   onDrop: (e?: DragEvent) => void;
   disabled?: boolean;
 }) {
+  const pt = useProductT("visualEditor");
   const { node, tokens, selected, onSelect, onTextChange, onDragStart, onDrop, disabled } =
     props;
   const isHero = node.kind === "hero";
@@ -628,7 +631,7 @@ function CanvasBlock(props: {
             maxWidth: "16ch",
           }}
         >
-          {node.text || `${node.label} headline`}
+          {node.text || pt("headlineFallback", { label: node.label })}
         </div>
       ) : (
         <div
@@ -654,7 +657,7 @@ function CanvasBlock(props: {
         }}
       />
       <p className="mt-3 max-w-prose text-[12px] opacity-55">
-        Drag to reorder · edit text · replace images · tune colors & fonts in Properties
+        {pt("canvasHint")}
       </p>
     </section>
   );

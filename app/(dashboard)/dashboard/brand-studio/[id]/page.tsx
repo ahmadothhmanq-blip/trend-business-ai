@@ -1,11 +1,13 @@
-import type { Metadata } from "next";
 import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardHeader } from "@/components/dashboard/header";
 import { BrandManagementDashboard } from "@/components/dashboard/brand-identity/brand-management-dashboard";
 import type { BrandIdentityGeneration } from "@/types/brand-identity";
+import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
 
-export const metadata: Metadata = { title: "Brand Workspace" };
+export async function generateMetadata() {
+  return dashboardPageMetadata("brandWorkspace");
+}
 
 type Props = { params: Promise<{ id: string }> };
 

@@ -1,11 +1,13 @@
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { BrandIdentityTool } from "@/components/dashboard/brand-identity/brand-identity-tool";
 import type { BrandIdentityGeneration } from "@/types/brand-identity";
+import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
 
-export const metadata: Metadata = { title: "AI Brand Design Platform" };
+export async function generateMetadata() {
+  return dashboardPageMetadata("brandStudio");
+}
 
 export default async function BrandStudioPage() {
   const supabase = await createClient();

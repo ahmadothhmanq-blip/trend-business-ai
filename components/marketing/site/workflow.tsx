@@ -2,11 +2,15 @@
 
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
-import { REF_WORKFLOW, REF_WORKFLOW_ART } from "@/lib/constants/marketing-content";
+import { REF_WORKFLOW_ART } from "@/lib/constants/marketing-content";
 import { SiteSectionHead } from "@/components/marketing/site/ui";
+import { useScopedT } from "@/lib/i18n/use-scoped-t";
+
+const STEP_COUNT = 4;
 
 /** How It Works — four illustrated steps. */
 export function SiteWorkflow() {
+  const t = useScopedT("marketing.workflow");
   const reduce = useReducedMotion();
 
   return (
@@ -18,14 +22,14 @@ export function SiteWorkflow() {
       <div className="landing-container py-20 lg:py-28">
         <SiteSectionHead
           id="workflow-title"
-          label="How It Works"
-          title="From brief to export in four steps."
-          description="A clean workflow for founders and operators who need premium AI output without a complicated setup."
+          label={t("label")}
+          title={t("title")}
+          description={t("description")}
         />
         <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
-          {REF_WORKFLOW.map((item, index) => (
+          {Array.from({ length: STEP_COUNT }, (_, index) => (
             <motion.article
-              key={item.step}
+              key={index}
               initial={reduce ? undefined : { opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
@@ -46,13 +50,13 @@ export function SiteWorkflow() {
                 </div>
               </div>
               <span className="inline-flex size-9 items-center justify-center rounded-full border border-[rgba(212,175,55,0.35)] bg-[rgba(212,175,55,0.1)] text-[12px] font-bold text-[#D4AF37] shadow-[0_0_18px_rgba(212,175,55,0.15)]">
-                {item.step}
+                {t(`steps.${index}.step`)}
               </span>
               <h3 className="mt-4 text-lg font-bold tracking-[-0.02em] text-white">
-                {item.title}
+                {t(`steps.${index}.title`)}
               </h3>
               <p className="mt-2 text-[14px] leading-[1.7] text-[#B5B5B5]">
-                {item.description}
+                {t(`steps.${index}.description`)}
               </p>
             </motion.article>
           ))}

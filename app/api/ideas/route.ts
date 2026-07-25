@@ -6,6 +6,7 @@ import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import {
   ideaInputSchema,
 } from "@/lib/validations/ideas";
+import { resolveRequestLanguage } from "@/lib/i18n/api";
 import type { BusinessIdea } from "@/types/database";
 import { NextResponse } from "next/server";
 
@@ -70,10 +71,12 @@ export async function POST(request: Request) {
     );
   }
 
+  const aiLanguage = resolveRequestLanguage(request);
+
   let generated;
   let source: string;
   try {
-    const result = await generateBusinessIdeas(parsed.data);
+    const result = await generateBusinessIdeas({ ...parsed.data, language: aiLanguage });
     generated = result.ideas;
     source = result.source;
   } catch (error) {

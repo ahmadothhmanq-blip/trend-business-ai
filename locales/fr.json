@@ -1,17 +1,17 @@
 {
   "common": {
+    "appName": "Trend Business AI",
     "skipToContent": "Aller au contenu",
     "save": "Enregistrer",
     "cancel": "Annuler",
     "loading": "Chargement...",
+    "error": "Something went wrong",
     "language": "Langue",
     "selectLanguage": "Choisir la langue",
+    "search": "Search",
     "settings": "Paramètres",
     "signOut": "Se déconnecter",
     "getStarted": "Commencer",
-    "appName": "Trend Business AI",
-    "error": "Something went wrong",
-    "search": "Search",
     "learnMore": "Learn more",
     "viewAll": "View all",
     "back": "Back",
@@ -52,27 +52,24 @@
     "aiProducts": "Produits IA",
     "dashboard": "Tableau de bord",
     "projects": "Projets",
-    "websiteBuilder": "Créateur de sites",
-    "contentStudio": "Studio de contenu",
-    "marketingStrategy": "Stratégie marketing",
-    "aiAgents": "Agents IA",
-    "settings": "Paramètres",
-    "pricing": "Tarifs",
-    "signIn": "Connexion",
     "crm": "CRM",
     "erp": "ERP",
     "businessIntelligence": "Business Intelligence",
     "businessManager": "Business Manager",
     "cybersecurity": "Cybersecurity",
+    "websiteBuilder": "Créateur de sites",
     "landingPages": "Landing Pages",
     "webAppBuilder": "Web App Builder",
     "logoDesigner": "Logo Designer",
     "brandIdentity": "Brand Identity",
     "imageGenerator": "Image Generator",
     "videoStudio": "Video Studio",
+    "contentStudio": "Studio de contenu",
     "socialMedia": "Social Media",
+    "marketingStrategy": "Stratégie marketing",
     "businessSuite": "Business Suite",
     "feasibilityStudy": "Feasibility Study",
+    "aiAgents": "Agents IA",
     "templates": "Templates",
     "history": "History",
     "files": "Files",
@@ -86,16 +83,55 @@
     "notifications": "Notifications",
     "apiKeys": "API Keys",
     "usage": "Usage",
+    "settings": "Paramètres",
     "services": "Services",
     "aiSolutions": "AI Solutions",
+    "pricing": "Tarifs",
     "about": "About",
-    "contact": "Contact"
+    "contact": "Contact",
+    "signIn": "Connexion"
+  },
+  "navDescriptions": {
+    "dashboard": "Overview and quick actions",
+    "projects": "All generated projects",
+    "crm": "Sales pipeline, contacts, and deals",
+    "erp": "Finance, inventory, operations, and HR",
+    "businessIntelligence": "Analytics dashboards, metrics, and AI insights",
+    "businessManager": "Projects, teams, tasks, workflows, and KPIs",
+    "cybersecurity": "Threat intelligence, monitoring, and incident response",
+    "websiteBuilder": "Full website blueprints",
+    "landingPages": "High-converting landing pages",
+    "webAppBuilder": "Full-stack web applications",
+    "logoDesigner": "Professional logo marks and brand symbols",
+    "brandIdentity": "Complete brand identity systems",
+    "imageGenerator": "Visual concepts and image assets",
+    "videoStudio": "AI video production and storyboards",
+    "contentStudio": "AI content creation and calendar",
+    "socialMedia": "Channel planning",
+    "marketingStrategy": "Campaigns and funnels",
+    "businessSuite": "AI business intelligence and strategy",
+    "feasibilityStudy": "Go / no-go assessments",
+    "aiAgents": "Intelligent agents and automation workflows",
+    "templates": "Creator template marketplace",
+    "history": "All generations",
+    "files": "Exports and assets",
+    "analytics": "Usage and insights",
+    "seoEngine": "SEO health and analyzer",
+    "aiSearchCenter": "AEO, GEO and AI search domination",
+    "growthEngine": "Affiliates, CRM and campaigns",
+    "billing": "Plan and invoices",
+    "aiProviders": "Manage AI provider keys and models",
+    "team": "Team members and invitations",
+    "notifications": "Alerts and updates",
+    "apiKeys": "Manage API access keys",
+    "usage": "Track AI usage and tokens",
+    "settings": "Workspace preferences"
   },
   "marketing": {
-    "getStarted": "Commencer",
-    "signIn": "Connexion",
     "homeAriaLabel": "Trend Business AI home",
     "mainNav": "Main",
+    "getStarted": "Commencer",
+    "signIn": "Connexion",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
     "servicesDropdown": {
@@ -176,6 +212,429 @@
         "title": "Private AI Workspace",
         "description": "Authenticated dashboard, saved projects, history and export-ready assets scoped to your account."
       }
+    },
+    "common": {
+      "startFree": "Start Free",
+      "explore": "Explore",
+      "viewProduct": "View product",
+      "useTemplate": "Use template",
+      "recommended": "Recommended",
+      "getStarted": "Get started",
+      "browseSolutions": "Browse Solutions",
+      "browseAiSolutions": "Browse AI Solutions",
+      "browseProducts": "Browse products",
+      "openProductPage": "Open product page",
+      "viewAllAiSolutions": "View all AI Solutions",
+      "contactSales": "Contact Sales",
+      "talkToSales": "Talk to Sales",
+      "productsCount": "{count} products",
+      "home": "Home",
+      "products": "Products",
+      "category": "Category",
+      "close": "Close",
+      "openInDashboard": "Open {title} in dashboard",
+      "preferFullTool": "Prefer the full tool?",
+      "backToSolutions": "← Back to AI Solutions",
+      "backToCategory": "Back to {category}",
+      "allCategoryProducts": "All {category} products",
+      "openProduct": "Open {title}",
+      "startProductFree": "Start {title} free",
+      "startBuildingCategory": "Start building with {category}",
+      "browseCategory": "Browse {category}",
+      "insideCategory": "Inside {category}",
+      "categoryProducts": "{category} products",
+      "categoryProductsDescription": "Only the {category} suite — each card opens a dedicated product landing page.",
+      "moreInCategory": "More in {category}",
+      "otherCategoryProducts": "Other {category} products",
+      "stayInCategory": "Stay in this category or explore the full suite.",
+      "openPage": "Open page",
+      "relatedTools": "Related tools",
+      "relatedServices": "Related services",
+      "relatedTemplates": "Related templates",
+      "relatedArticles": "Related articles",
+      "businessResources": "Business resources",
+      "moreAiProducts": "More AI Products",
+      "exploreOtherCategories": "Explore other categories",
+      "stayConnected": "Stay connected",
+      "beforeYouGo": "Before you go",
+      "platformStatistics": "Platform statistics",
+      "legalNav": "Legal",
+      "generationFlow": "Generation flow",
+      "examplesTemplates": "Examples & templates",
+      "onePromptExperience": "One Prompt Experience",
+      "businessIdea": "Business idea",
+      "capabilities": "Capabilities",
+      "outcomes": "Outcomes",
+      "whatProductDoes": "What this product does",
+      "whatYouWalkAwayWith": "What you walk away with",
+      "howItWorks": "How it works",
+      "briefGenerateSave": "Brief → generate → save & export",
+      "samePrivateWorkflow": "The same private workflow across every Trend Business AI product.",
+      "aiProduct": "AI Product",
+      "productComingSoon": "Product coming soon",
+      "productComingSoonDescription": "The \"{slug}\" product page is being finalized. Explore our AI product categories while we finish this landing.",
+      "continuesInDashboard": "Continues in your private dashboard — existing generators and APIs power the full Core pipeline.",
+      "fromIdeaToProduct": "From idea to ready product",
+      "everyRunFollows": "Every run follows the AI Core Engine path so you always know where creation stands.",
+      "startFromProvenBrief": "Start from a proven brief",
+      "onePromptTitle": "Enter your business idea. AI guides the rest.",
+      "onePromptCtaDescription": "Enter one business idea — AI guides Idea through Ready Product in your private dashboard.",
+      "stepOpenProduct": "Open the product",
+      "stepOpenProductBody": "Start from {category} or jump straight into {product} after signup.",
+      "stepDescribeBrief": "Describe your brief",
+      "stepDescribeBriefBody": "Share goals, audience and constraints. Clearer briefs produce stronger output.",
+      "stepSaveExport": "Save and export",
+      "stepSaveExportBody": "Keep results in your authenticated dashboard and export when you are ready to execute."
+    },
+    "cta": {
+      "getStartedLabel": "Get started",
+      "readyToBuild": "Ready to build with Trend Business AI?",
+      "readyToBuildDescription": "Create your free account and explore Create, Design, Content, and Business products from one premium AI workspace.",
+      "readyToBuildShort": "Create your free account and explore Create, Design, Content, and Business from one premium AI workspace.",
+      "startBuildingToday": "Start building today",
+      "startBuildingTodayDescription": "Create your free account and open every AI product category from one private dashboard.",
+      "buildWithPlatform": "Build with Trend Business AI",
+      "buildWithPlatformDescription": "Start free and explore the full Create, Design, Content and Business product suites."
+    },
+    "faq": {
+      "label": "FAQ",
+      "title": "Answers before you start.",
+      "description": "Everything you need to know about products, privacy, beta access and exports.",
+      "items": [
+        {
+          "question": "What can I build with Trend Business AI?",
+          "answer": "Websites with in-platform preview, AI editing, and a public URL (plus ZIP export), landing-page packages, logos, brand systems, images, video concepts, social content, campaigns, business intelligence and feasibility studies — all from one authenticated workspace."
+        },
+        {
+          "question": "Does Website Builder publish a live website URL?",
+          "answer": "Yes. After you generate and preview, you can publish a public URL on our platform (/w/{slug}) as a safe static site. You can also download the full Next.js project as ZIP to self-host. Custom domains are not included yet."
+        },
+        {
+          "question": "Is the Free Beta really free?",
+          "answer": "Yes. During beta you can explore all four AI product categories, save projects to your private dashboard, and export outputs without a paid plan."
+        },
+        {
+          "question": "Is my work private?",
+          "answer": "Yes. Dashboard records are scoped to your authenticated account. Public marketing pages never expose private workspace data."
+        },
+        {
+          "question": "Can I export my projects?",
+          "answer": "Yes. Website Builder supports ZIP export of the Next.js source project, and you can publish a public URL for sharing. Other products save and export from your private dashboard so you are never locked into the platform."
+        },
+        {
+          "question": "Do I need design or coding experience?",
+          "answer": "No. Describe your brief, generate the site, preview it, and improve it with natural-language AI commands. Publish a public URL when ready, or download the ZIP if you want to self-host or hand off to a developer."
+        },
+        {
+          "question": "How is this different from other AI tools?",
+          "answer": "Trend Business AI is built as one luxury AI company — Create, Design, Content and Business — with a private dashboard, not a pile of disconnected chat prompts."
+        }
+      ]
+    },
+    "pricing": {
+      "label": "Pricing",
+      "title": "Simple pricing for a premium AI platform.",
+      "description": "Start free during beta. Scale into higher limits and team workflows when you are ready.",
+      "recommended": "Recommended",
+      "plans": {
+        "freeBeta": {
+          "name": "Free Beta",
+          "price": "$0",
+          "description": "For founders exploring AI products across create, design, content, and business.",
+          "features": [
+            "Access to all four AI product categories",
+            "Private authenticated dashboard",
+            "Saved projects and history",
+            "Export-ready outputs",
+            "Core workspace tools"
+          ],
+          "cta": "Start Free"
+        },
+        "pro": {
+          "name": "Pro",
+          "price": "Coming Soon",
+          "description": "For teams that need higher limits, collaboration, and advanced usage controls.",
+          "features": [
+            "Higher AI usage limits",
+            "Team workspaces",
+            "Advanced exports",
+            "Priority support",
+            "Billing and plan controls"
+          ],
+          "cta": "Join Beta First"
+        }
+      }
+    },
+    "testimonials": {
+      "label": "Testimonials",
+      "title": "Trusted by founders building premium brands.",
+      "description": "Teams choose Trend Business AI when they want one luxury workspace instead of a scattered stack of tools.",
+      "items": [
+        {
+          "quote": "Trend Business AI feels like a full creative and strategy team in one premium workspace. We went from brief to launch assets in a single afternoon.",
+          "name": "Sara Al-Mansouri",
+          "role": "Founder, Lumen Commerce"
+        },
+        {
+          "quote": "The black-and-gold experience matches the quality of the output. Website concepts, brand marks and campaign angles finally live in one place.",
+          "name": "James Okonkwo",
+          "role": "Head of Growth, Northline"
+        },
+        {
+          "quote": "Private dashboard, exportable projects, and serious AI depth. It replaced four scattered tools for our studio.",
+          "name": "Elena Vargas",
+          "role": "Creative Director, Atelier V"
+        }
+      ]
+    },
+    "trust": {
+      "label": "Trust & privacy",
+      "title": "Private by design. Built for real business work.",
+      "description": "Trend Business AI keeps your workspace authenticated, scoped to your account, and ready for export whenever you need to move faster.",
+      "items": [
+        "Supabase authentication protects every private dashboard session.",
+        "Generated assets stay scoped to your authenticated account.",
+        "Export reports and projects without locking your work inside the platform.",
+        "Built as a focused AI SaaS workspace — not a scattered tool pile."
+      ]
+    },
+    "why": {
+      "label": "Why Trend Business AI",
+      "title": "Built for founders who expect premium.",
+      "description": "A private AI company experience — one brand system, one workspace, and output that feels ready for real business.",
+      "items": [
+        {
+          "title": "One premium platform",
+          "description": "Create, Design, Content and Business live in one black-and-gold workspace — no tool sprawl, no fragmented brand.",
+          "imageAlt": "Unified AI platform workspace illustration"
+        },
+        {
+          "title": "Private by design",
+          "description": "Every session is authenticated. Projects, history and exports stay scoped to your account.",
+          "imageAlt": "Private business intelligence workspace illustration"
+        },
+        {
+          "title": "Export-ready output",
+          "description": "Move from brief to structured assets you can save, refine and take into real execution.",
+          "imageAlt": "Project export and management illustration"
+        }
+      ]
+    },
+    "workflow": {
+      "label": "How It Works",
+      "title": "From brief to export in four steps.",
+      "description": "A clean workflow for founders and operators who need premium AI output without a complicated setup.",
+      "steps": [
+        {
+          "step": "01",
+          "title": "Choose an AI product category",
+          "description": "Start in Create, Design, Content, or Business — each suite is built for a clear stage of growth."
+        },
+        {
+          "step": "02",
+          "title": "Describe your brief",
+          "description": "Share your product, audience, offer, and goals. The clearer the brief, the stronger the output."
+        },
+        {
+          "step": "03",
+          "title": "Generate premium assets",
+          "description": "Receive website and app source projects, brand systems, content plans, campaigns, and business intelligence."
+        },
+        {
+          "step": "04",
+          "title": "Save, export, and execute",
+          "description": "Keep results in your private dashboard, download ZIP packages where applicable, and deploy or refine on your own stack."
+        }
+      ]
+    },
+    "solutions": {
+      "label": "AI Solutions",
+      "title": "Four AI suites. One luxury company.",
+      "description": "Create, Design, Content and Business — premium product categories built for founders who want speed without sacrificing polish."
+    },
+    "featuredProducts": {
+      "label": "Featured AI Products",
+      "title": "Flagship tools inside the platform.",
+      "description": "Explore the most-used AI products across Create, Design, Content and Business — each with a dedicated premium workspace.",
+      "items": [
+        {
+          "title": "AI Website & App Builder",
+          "description": "Structure pages, flows and conversion sections from a single brief.",
+          "category": "Create",
+          "imageAlt": "AI website and app builder"
+        },
+        {
+          "title": "AI Logo Designer",
+          "description": "Generate refined marks, color systems and identity direction.",
+          "category": "Design",
+          "imageAlt": "AI logo designer"
+        },
+        {
+          "title": "AI Video Generator",
+          "description": "Storyboard cinematic ads, explainers and launch narratives.",
+          "category": "Content",
+          "imageAlt": "AI video studio"
+        },
+        {
+          "title": "AI Advertising Campaigns",
+          "description": "Build angles, offers, audiences and conversion-focused concepts.",
+          "category": "Business",
+          "imageAlt": "AI advertising campaigns"
+        },
+        {
+          "title": "AI Image Generator",
+          "description": "Luxury visual concepts for products, campaigns and storytelling.",
+          "category": "Design",
+          "imageAlt": "AI image generator"
+        },
+        {
+          "title": "Business Intelligence",
+          "description": "Map demand, competitors and risks into executive-ready reports.",
+          "category": "Business",
+          "imageAlt": "Business intelligence analytics"
+        }
+      ]
+    },
+    "templates": {
+      "label": "Templates",
+      "title": "Start faster with premium templates.",
+      "description": "Launch-ready structures for websites, brands, content and campaigns — refined in the same black-and-gold language as the rest of the platform.",
+      "items": [
+        {
+          "title": "Luxury Landing Launch",
+          "description": "Hero, proof, offer and CTA structure for a premium product launch.",
+          "tag": "Create",
+          "imageAlt": "Luxury landing page template"
+        },
+        {
+          "title": "Brand Identity System",
+          "description": "Logo direction, palette and typography for a cohesive luxury brand.",
+          "tag": "Design",
+          "imageAlt": "Brand identity template"
+        },
+        {
+          "title": "30-Day Content Calendar",
+          "description": "Hooks, captions and channel plans for consistent social growth.",
+          "tag": "Content",
+          "imageAlt": "Content calendar template"
+        },
+        {
+          "title": "Full-Funnel Campaign",
+          "description": "Meta and Google angles with offer messaging and audience cues.",
+          "tag": "Business",
+          "imageAlt": "Advertising campaign template"
+        }
+      ]
+    },
+    "growth": {
+      "leadCapture": {
+        "namePlaceholder": "Your name",
+        "emailPlaceholder": "Work email",
+        "companyPlaceholder": "Company (optional)",
+        "messagePlaceholder": "How can we help?",
+        "getEarlyAccess": "Get early access",
+        "sendMessage": "Send message",
+        "successToast": "Thanks — we will be in touch shortly.",
+        "submitFailed": "Submission failed"
+      },
+      "exitIntent": {
+        "ariaLabel": "Stay connected",
+        "title": "Get the AI growth playbook",
+        "description": "Join the newsletter for product updates, launch templates and operator playbooks."
+      },
+      "smartCta": {
+        "variantA": {
+          "eyebrow": "Start free",
+          "title": "Build your AI business workspace today",
+          "cta": "Create free account"
+        },
+        "variantB": {
+          "eyebrow": "Launch faster",
+          "title": "Generate website projects, brands and strategy with AI",
+          "cta": "See plans"
+        }
+      }
+    },
+    "about": {
+      "eyebrow": "About Trend Business AI",
+      "title": "Next-generation business intelligence for founders who move fast.",
+      "description": "Trend Business AI is your all-in-one AI platform to build, automate and scale — websites, apps, videos, marketing, projects, CRM, ERP and growth workflows.",
+      "viewProducts": "View Products",
+      "mission": {
+        "label": "Our mission",
+        "title": "One AI company. Every business solution.",
+        "description": "We build a premium operating system for modern businesses — not a scattered pile of disconnected tools."
+      },
+      "pillars": [
+        {
+          "title": "One platform",
+          "description": "Websites, brand, content, marketing, operations and intelligence — unified under Trend Business AI."
+        },
+        {
+          "title": "Premium by design",
+          "description": "Black-and-gold identity, glass surfaces, and dashboard-grade polish across every public surface."
+        },
+        {
+          "title": "Private workspace",
+          "description": "Authenticated dashboards, account-scoped assets, and export-ready outputs for real business work."
+        }
+      ],
+      "aiProducts": {
+        "label": "AI Products",
+        "title": "Four categories. One visual language.",
+        "description": "Create, Design, Content and Business — each suite follows the same black-and-gold system."
+      }
+    },
+    "categories": {
+      "create": {
+        "title": "Create",
+        "description": "Generate websites and apps with AI — preview, improve, publish a public URL, and export Next.js source as ZIP.",
+        "eyebrow": "AI Products · Create",
+        "headline": "Generate website and app source projects with AI.",
+        "body": "Turn a product brief into a finished website flow: generate, live preview, natural-language AI edits, public URL publish, plus ZIP export for self-hosting.",
+        "imageAlt": "AI website and app builder interface in black and gold"
+      },
+      "design": {
+        "title": "Design",
+        "description": "Create logos, brand identities and AI images.",
+        "eyebrow": "AI Products · Design",
+        "headline": "Craft logos, identities and visual systems.",
+        "body": "Generate brand direction, logo concepts, color systems and image prompts that feel premium from the first impression.",
+        "imageAlt": "AI logo and brand identity designer in black and gold"
+      },
+      "content": {
+        "title": "Content",
+        "description": "Generate videos, content and manage social media.",
+        "eyebrow": "AI Products · Content",
+        "headline": "Produce content, video concepts and social plans.",
+        "body": "Build captions, calendars, storyboards and channel strategies so your brand stays consistent across every platform.",
+        "imageAlt": "AI video and content studio in black and gold"
+      },
+      "business": {
+        "title": "Business",
+        "description": "Marketing, Business Management, Business Intelligence and Feasibility Studies.",
+        "eyebrow": "AI Products · Business",
+        "headline": "Run growth, intelligence and feasibility with AI.",
+        "body": "Connect marketing strategy, operations planning, business intelligence and feasibility studies in one decision-ready workspace.",
+        "imageAlt": "AI business intelligence and feasibility analytics in black and gold"
+      }
+    },
+    "dashboardPreview": {
+      "searchPlaceholder": "Search dashboard...",
+      "workspace": "Workspace",
+      "analytics": "Analytics",
+      "totalRevenue": "Total Revenue",
+      "aiAssistant": "AI Assistant",
+      "aiPrompt": "How can I help your business today?",
+      "aiSuggestion": "Generate market analysis",
+      "websiteBuilder": "Website Builder",
+      "generating": "Generating...",
+      "marketing": "Marketing",
+      "campaignReach": "Campaign Reach",
+      "crmPipeline": "CRM Pipeline",
+      "pipelineValue": "Pipeline value",
+      "videoStudio": "Video Studio",
+      "renderingClip": "Rendering clip 3 of 5"
     }
   },
   "auth": {
@@ -183,11 +642,11 @@
     "signInDescription": "Connectez-vous à votre compte Trend Business AI",
     "email": "E-mail",
     "password": "Mot de passe",
-    "signIn": "Connexion",
-    "signingIn": "Connexion en cours...",
     "emailPlaceholder": "you@company.com",
     "passwordPlaceholder": "••••••••",
     "forgotPassword": "Forgot password?",
+    "signIn": "Connexion",
+    "signingIn": "Connexion en cours...",
     "noAccount": "Don't have an account?",
     "createAccount": "Create account",
     "confirmEmail": "Check your email to confirm your account before signing in.",
@@ -215,51 +674,6 @@
     "confirmPassword": "Confirm password",
     "resetPasswordButton": "Reset password",
     "resettingPassword": "Resetting..."
-  },
-  "settings": {
-    "title": "Paramètres",
-    "language": "Langue",
-    "description": "Manage your workspace preferences",
-    "languageDescription": "Choose your preferred interface language",
-    "theme": "Theme",
-    "emailNotifications": "Email notifications",
-    "saved": "Preferences saved."
-  },
-  "navDescriptions": {
-    "dashboard": "Overview and quick actions",
-    "projects": "All generated projects",
-    "crm": "Sales pipeline, contacts, and deals",
-    "erp": "Finance, inventory, operations, and HR",
-    "businessIntelligence": "Analytics dashboards, metrics, and AI insights",
-    "businessManager": "Projects, teams, tasks, workflows, and KPIs",
-    "cybersecurity": "Threat intelligence, monitoring, and incident response",
-    "websiteBuilder": "Full website blueprints",
-    "landingPages": "High-converting landing pages",
-    "webAppBuilder": "Full-stack web applications",
-    "logoDesigner": "Professional logo marks and brand symbols",
-    "brandIdentity": "Complete brand identity systems",
-    "imageGenerator": "Visual concepts and image assets",
-    "videoStudio": "AI video production and storyboards",
-    "contentStudio": "AI content creation and calendar",
-    "socialMedia": "Channel planning",
-    "marketingStrategy": "Campaigns and funnels",
-    "businessSuite": "AI business intelligence and strategy",
-    "feasibilityStudy": "Go / no-go assessments",
-    "aiAgents": "Intelligent agents and automation workflows",
-    "templates": "Creator template marketplace",
-    "history": "All generations",
-    "files": "Exports and assets",
-    "analytics": "Usage and insights",
-    "seoEngine": "SEO health and analyzer",
-    "aiSearchCenter": "AEO, GEO and AI search domination",
-    "growthEngine": "Affiliates, CRM and campaigns",
-    "billing": "Plan and invoices",
-    "aiProviders": "Manage AI provider keys and models",
-    "team": "Team members and invitations",
-    "notifications": "Alerts and updates",
-    "apiKeys": "Manage API access keys",
-    "usage": "Track AI usage and tokens",
-    "settings": "Workspace preferences"
   },
   "dashboard": {
     "aiWorkspace": "AI Workspace",
@@ -331,8 +745,157 @@
       "emptyFeed": {
         "description": "Generate content to populate this feed.",
         "action": "Start generating"
+      },
+      "defaultName": "there",
+      "quickActionsDescription": "Jump into the most-used AI products.",
+      "aiRunsTitle": "AI Runs",
+      "aiRunsDescription": "Core Engine pipeline activity across products.",
+      "generatedProductsDescription": "Quality reports and publish readiness.",
+      "recentProjectsTitle": "Recent Projects",
+      "recentProjectsDescription": "Latest website and workspace generations.",
+      "creditsPlanTitle": "Credits / Plan",
+      "planLabelSuffix": "{plan} plan",
+      "billingReady": " · PayPal & card checkout ready",
+      "billingPending": " · Paid checkout when PayPal is configured",
+      "creditsLeft": "credits left",
+      "lifetimeUsed": "{count} lifetime used",
+      "purchased": " · {count} purchased",
+      "manageBilling": "Manage billing",
+      "activityTimelineTitle": "Activity timeline",
+      "activityTimelineDescription": "Recent workspace events",
+      "latestGenerationsTitle": "Latest AI generations",
+      "latestGenerationsDescription": "Fresh outputs across products",
+      "historyLink": "History"
+    },
+    "history": {
+      "badge": "Complete generation history",
+      "title": "All generated assets in one place",
+      "description": "Browse every business idea, market analysis, AI report, and website blueprint saved to your workspace.",
+      "searchPlaceholder": "Search generated history...",
+      "searchAria": "Search history",
+      "filterAria": "Filter by type",
+      "sortAria": "Sort history",
+      "allTypes": "All types",
+      "newestFirst": "Newest first",
+      "oldestFirst": "Oldest first",
+      "deleteTitle": "Delete history item?",
+      "deleteDescription": "This will permanently remove {title} from your dashboard.",
+      "deleteFallback": "this generated item",
+      "deleteFailed": "Unable to delete this history item.",
+      "deleted": "History item deleted.",
+      "deleteAria": "Delete {title}",
+      "openAria": "Open {title}",
+      "noMatching": "No matching history",
+      "emptyTitle": "No generated history yet",
+      "noMatchingDescription": "Adjust your search, type filter, or sort order to find generated assets.",
+      "emptyDescription": "Generate a business idea, market analysis, AI report, or website blueprint to build your history.",
+      "types": {
+        "idea": "Business Idea",
+        "analysis": "Market Analysis",
+        "report": "AI Report",
+        "website": "Website Blueprint",
+        "workspace": "AI Workspace"
+      },
+      "filters": {
+        "idea": "Business Ideas",
+        "analysis": "Market Analysis",
+        "report": "AI Reports",
+        "website": "Website Blueprints"
       }
+    },
+    "favorites": {
+      "badge": "Favorite assets",
+      "title": "Your best generated work",
+      "description": "Keep high-value ideas, analyses, reports, and website blueprints easy to find while you plan your next move.",
+      "searchPlaceholder": "Search favorites...",
+      "searchAria": "Search favorites",
+      "filterAria": "Filter favorites by type",
+      "sortAria": "Sort favorites",
+      "allTypes": "All types",
+      "newestFirst": "Newest first",
+      "oldestFirst": "Oldest first",
+      "removeAria": "Remove {title} from favorites",
+      "openAria": "Open {title}",
+      "noMatching": "No matching favorites",
+      "emptyTitle": "No favorites yet",
+      "noMatchingDescription": "Adjust your search, type filter, or sort order to find saved favorites.",
+      "emptyDescription": "Mark your best ideas, analyses, reports, and website blueprints as favorites to collect them here.",
+      "removed": "Removed from favorites.",
+      "removeFailed": "Unable to remove this favorite.",
+      "filters": {
+        "all": "All",
+        "favorites": "Favorites",
+        "draft": "Draft"
+      },
+      "types": {
+        "idea": "Business Idea",
+        "analysis": "Market Analysis",
+        "report": "AI Report",
+        "website": "Website Blueprint",
+        "workspace": "AI Workspace"
+      },
+      "filterTypes": {
+        "idea": "Business Ideas",
+        "analysis": "Market Analysis",
+        "report": "AI Reports",
+        "website": "Website Blueprints"
+      }
+    },
+    "aiProviders": {
+      "status": {
+        "connected": "Connected",
+        "error": "Error",
+        "notConfigured": "Not Configured"
+      },
+      "default": "Default",
+      "apiKey": "API Key",
+      "apiKeyPlaceholder": "Enter {label} API key...",
+      "test": "Test",
+      "model": "Model",
+      "title": "AI Providers",
+      "description": "Configure API keys and select models for each provider",
+      "globalTitle": "Global Settings",
+      "globalDescription": "Default behavior for all AI generation features",
+      "defaultProvider": "Default Provider",
+      "automaticFallback": "Automatic Fallback",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "retryCount": "Retry Count",
+      "temperature": "Temperature",
+      "maxTokens": "Max Tokens",
+      "timeoutSeconds": "Timeout (seconds)",
+      "resetDefaults": "Reset to Defaults",
+      "saveSettings": "Save Settings",
+      "loadFailed": "Failed to load settings",
+      "connectedToast": "{label} connected ({latency}ms)",
+      "connectionFailed": "Connection failed",
+      "testFailed": "Connection test failed",
+      "saved": "Settings saved successfully",
+      "saveFailed": "Failed to save settings"
+    },
+    "loading": {
+      "dashboard": "Loading dashboard"
+    },
+    "errors": {
+      "headerTitle": "Error",
+      "headerDescription": "We couldn't load this page",
+      "dashboardUnavailable": "Dashboard unavailable",
+      "dashboardDescription": "We couldn't load this dashboard page. Try again or return to your overview.",
+      "tryAgain": "Try again",
+      "backToDashboard": "Back to dashboard",
+      "backToHome": "Back to home",
+      "genericTitle": "Something went wrong",
+      "genericDescription": "An unexpected error occurred. Please try again or return to a safe page."
     }
+  },
+  "settings": {
+    "title": "Paramètres",
+    "description": "Manage your workspace preferences",
+    "language": "Langue",
+    "languageDescription": "Choose your preferred interface language",
+    "theme": "Theme",
+    "emailNotifications": "Email notifications",
+    "saved": "Preferences saved."
   },
   "pricing": {
     "title": "Pricing",
@@ -352,7 +915,21 @@
     "forbidden": "You don't have permission to access this resource.",
     "validation": "Please check your input and try again.",
     "network": "Network error. Check your connection and try again.",
-    "insufficientCredits": "Insufficient credits. Please upgrade your plan."
+    "insufficientCredits": "Insufficient credits. Please upgrade your plan.",
+    "api": {
+      "INVALID_INPUT": "Invalid input",
+      "NOT_FOUND": "Not found",
+      "UNAUTHORIZED": "Unauthorized",
+      "FORBIDDEN": "Forbidden",
+      "RATE_LIMITED": "Too many requests",
+      "SERVER_ERROR": "Something went wrong",
+      "MIGRATION_REQUIRED": "Database migration required",
+      "GENERATION_NOT_FOUND": "Generation not found",
+      "VIDEO_NOT_FOUND": "Video not found",
+      "TEMPLATE_NOT_FOUND": "Template not found",
+      "CHECKOUT_FAILED": "Checkout failed",
+      "PAYMENT_INCOMPLETE": "Payment could not be completed"
+    }
   },
   "notifications": {
     "title": "Notifications",
@@ -535,6 +1112,22 @@
     "subscription": {
       "title": "Subscription",
       "description": "Manage your subscription plan"
+    },
+    "designEditor": {
+      "title": "Design Editor",
+      "description": "Edit and refine your AI-generated designs"
+    },
+    "brandWorkspace": {
+      "title": "Brand Workspace",
+      "description": "Manage your brand identity project"
+    },
+    "appBuilderManage": {
+      "title": "Manage App · App Builder",
+      "description": "Edit and manage your app project"
+    },
+    "videoStudioManage": {
+      "title": "Manage Video · Video Studio",
+      "description": "Edit and manage your video project"
     }
   },
   "quickActions": {
@@ -749,6 +1342,10 @@
         "templateIntelligence": "Template Intelligence",
         "templateMarketplace": "Template Marketplace",
         "designIntelligence": "Design Intelligence",
+        "strategy": "Strategy",
+        "designSystem": "Design system",
+        "websiteStructure": "Website Structure",
+        "generatedResult": "Generated Result",
         "quality": "Quality",
         "examples": "Examples",
         "projectType": "Type de projet",
@@ -756,18 +1353,12 @@
         "colorTheme": "Thème de couleur",
         "outputLanguage": "Language",
         "features": "Fonctionnalités",
-        "pages": "Pages",
-        "strategy": "Strategy",
-        "designSystem": "Design system",
-        "websiteStructure": "Website Structure",
-        "generatedResult": "Generated Result"
+        "pages": "Pages"
       },
       "sectionDescriptions": {
         "designStyle": "Set the visual personality.",
         "colorTheme": "Pick the primary brand mood.",
         "language": "Select output language.",
-        "improveWithAi": "Describe changes in natural language — colors, pages, content, or design. AI creates an improved version linked to the previous one.",
-        "websiteBrief": "Describe your business, audience, and goals in one brief.",
         "projectType": "Choose a website or application architecture. DeepSeek will also auto-detect from your prompt.",
         "features": "Select the capabilities this project needs.",
         "websiteStructure": "Pages and flow generated from your brief.",
@@ -775,7 +1366,9 @@
         "generationStatus": "Live server status during generation.",
         "recentProjects": "Review generated interface concepts.",
         "templates": "Click a card to review details, then Use Template.",
-        "favorites": "Pinned workspace concepts."
+        "favorites": "Pinned workspace concepts.",
+        "improveWithAi": "Describe changes in natural language — colors, pages, content, or design. AI creates an improved version linked to the previous one.",
+        "websiteBrief": "Describe your business, audience, and goals in one brief."
       },
       "hints": {
         "aiAutoDesignReady": "AI Auto Design ready",
@@ -797,6 +1390,18 @@
         "templates": "Templates",
         "favorites": "Favorites",
         "history": "History",
+        "website": "Website",
+        "files": "Files",
+        "status": "Status",
+        "publicUrl": "Public URL",
+        "typicalTime": "Typical Time",
+        "favorite": "Favorite",
+        "assets": "Assets",
+        "heroVisuals": "Hero and section visuals",
+        "notCreatedYet": "Not created yet",
+        "hideAdvanced": "Hide advanced settings",
+        "showAdvanced": "Show advanced settings",
+        "typicalTimeValue": "1–3 min",
         "rename": "Rename",
         "duplicate": "Duplicate",
         "delete": "Delete",
@@ -819,19 +1424,7 @@
         "clear": "Clear",
         "examples": "Examples",
         "generationMode": "Generation mode",
-        "buildOutput": "Build output",
-        "website": "Website",
-        "files": "Files",
-        "status": "Status",
-        "publicUrl": "Public URL",
-        "typicalTime": "Typical Time",
-        "favorite": "Favorite",
-        "assets": "Assets",
-        "heroVisuals": "Hero and section visuals",
-        "notCreatedYet": "Not created yet",
-        "hideAdvanced": "Hide advanced settings",
-        "showAdvanced": "Show advanced settings",
-        "typicalTimeValue": "1–3 min"
+        "buildOutput": "Build output"
       },
       "placeholders": {
         "improve": "Example: \"Make the hero more luxury, switch palette to black and gold, add a Testimonials page, and shorten the About copy.\"",
@@ -840,14 +1433,23 @@
         "editInstruction": "Describe the changes you want…",
         "searchFiles": "Search files…"
       },
+      "resultLists": {
+        "sections": "Sections",
+        "colorPalette": "Color Palette",
+        "typography": "Typography",
+        "components": "Components",
+        "content": "Content",
+        "seo": "SEO",
+        "roadmap": "Roadmap"
+      },
       "dialogs": {
         "renameTitle": "Rename Project",
         "renameDescription": "Choose a new name for this project.",
+        "renameDescriptionWorkspace": "Update the saved project name in your workspace history.",
         "deleteTitle": "Delete project?",
         "deleteDescription": "This action cannot be undone.",
         "confirm": "Confirm",
-        "cancel": "Cancel",
-        "renameDescriptionWorkspace": "Update the saved project name in your workspace history."
+        "cancel": "Cancel"
       },
       "projectTypes": {
         "businessWebsite": "Business Website",
@@ -1040,6 +1642,8 @@
         "connectionInterrupted": "Connection interrupted — recovering saved progress…",
         "generationFailedResume": "Generation failed — you can Resume from saved progress.",
         "stillGenerating": "Still generating on server…",
+        "stillGeneratingWithFiles": "Still generating on server… {count} files saved",
+        "finalizingSavedProject": "Finalizing your website — loading saved project…",
         "websiteSaved": "Website saved to workspace.",
         "applyingEdit": "Website Editor Intelligence: applying edit…",
         "editSaved": "Website edit saved.",
@@ -1047,8 +1651,7 @@
         "resuming": "Resuming generation from saved progress…",
         "connecting": "Connecting to AI website engine...",
         "aiAutoDesign": "AI Auto Design: analyzing industry, audience & brand style…",
-        "resumeGeneration": "Resume generation",
-        "stillGeneratingWithFiles": "Still generating on server… {count} files saved"
+        "resumeGeneration": "Resume generation"
       },
       "deployment": {
         "title": "Deployment dashboard",
@@ -1062,15 +1665,6 @@
         "runAudit": "Run SEO audit",
         "score": "SEO score",
         "improvementSuggestions": "AI Improvement Suggestions"
-      },
-      "resultLists": {
-        "sections": "Sections",
-        "colorPalette": "Color Palette",
-        "typography": "Typography",
-        "components": "Components",
-        "content": "Content",
-        "seo": "SEO",
-        "roadmap": "Roadmap"
       },
       "actions": {
         "createWebsite": "Créer un site web",
@@ -1432,6 +2026,8 @@
       "labels": {
         "prompt": "Prompt",
         "promptPlaceholder": "Describe what you want to create…",
+        "chooseContentType": "Choose a content type",
+        "configureGeneration": "Configure your content generation",
         "name": "Name",
         "description": "Description",
         "style": "Style",
@@ -1439,9 +2035,7 @@
         "language": "Language",
         "status": "Status",
         "createdAt": "Created",
-        "updatedAt": "Updated",
-        "chooseContentType": "Choose a content type",
-        "configureGeneration": "Configure your content generation"
+        "updatedAt": "Updated"
       },
       "status": {
         "idle": "Ready",
@@ -1691,6 +2285,8 @@
       "labels": {
         "prompt": "Prompt",
         "promptPlaceholder": "Describe what you want to create…",
+        "chooseContentType": "Choose a content type",
+        "configureGeneration": "Configure your content generation",
         "name": "Name",
         "description": "Description",
         "style": "Style",
@@ -1699,8 +2295,6 @@
         "status": "Status",
         "createdAt": "Created",
         "updatedAt": "Updated",
-        "chooseContentType": "Choose a content type",
-        "configureGeneration": "Configure your content generation",
         "mood": "Mood"
       },
       "status": {
@@ -1759,6 +2353,10 @@
         "prompts": "Prompts",
         "moodBoard": "Mood Board",
         "raster": "Raster Images",
+        "openEditor": "Open Editor",
+        "imagesWithCount": "Images ({count})",
+        "conceptsWithCount": "Concepts ({count})",
+        "promptsWithCount": "Prompts ({count})",
         "files": "Files ({count})",
         "downloadKit": "Download Kit",
         "kitDownloaded": "Image kit downloaded",
@@ -1769,10 +2367,6 @@
         "words": "words",
         "scenes": "scenes",
         "chars": "chars",
-        "openEditor": "Open Editor",
-        "imagesWithCount": "Images ({count})",
-        "conceptsWithCount": "Concepts ({count})",
-        "promptsWithCount": "Prompts ({count})",
         "aiPrompt": "AI Prompt",
         "negativeLabel": "Negative",
         "moodBoardKeywords": "Mood Board Keywords",
@@ -1796,6 +2390,19 @@
         "editFailed": "Edit failed"
       },
       "editor": {
+        "properties": {
+          "selectElement": "Select an element to edit properties.",
+          "title": "Properties — {name}",
+          "content": "Content",
+          "fontFamily": "Font family",
+          "fontSize": "Font size",
+          "color": "Color",
+          "alignment": "Alignment",
+          "alignLeft": "Left",
+          "alignCenter": "Center",
+          "alignRight": "Right",
+          "fill": "Fill"
+        },
         "save": "Save",
         "png": "PNG",
         "pdf": "PDF",
@@ -1810,20 +2417,7 @@
         "removeBg": "Remove BG",
         "upscale": "Upscale",
         "brandKitDefault": "Brand kit",
-        "loadBrandKitsFailed": "Failed to load brand kits",
-        "properties": {
-          "selectElement": "Select an element to edit properties.",
-          "title": "Properties — {name}",
-          "content": "Content",
-          "fontFamily": "Font family",
-          "fontSize": "Font size",
-          "color": "Color",
-          "alignment": "Alignment",
-          "alignLeft": "Left",
-          "alignCenter": "Center",
-          "alignRight": "Right",
-          "fill": "Fill"
-        }
+        "loadBrandKitsFailed": "Failed to load brand kits"
       },
       "history": {
         "count": "{count} image",
@@ -1878,6 +2472,8 @@
       "labels": {
         "prompt": "Prompt",
         "promptPlaceholder": "Describe what you want to create…",
+        "chooseContentType": "Choose a content type",
+        "configureGeneration": "Configure your content generation",
         "name": "Name",
         "description": "Description",
         "style": "Style",
@@ -1886,8 +2482,6 @@
         "status": "Status",
         "createdAt": "Created",
         "updatedAt": "Updated",
-        "chooseContentType": "Choose a content type",
-        "configureGeneration": "Configure your content generation",
         "allIndustries": "All industries"
       },
       "status": {
@@ -1992,6 +2586,28 @@
         "batchRequestFailed": "Batch request failed",
         "enterIdeaVideo": "Enter your idea to generate a video concept."
       },
+      "providerStatus": {
+        "title": "Production provider status",
+        "checking": "Checking provider configuration…",
+        "healthUnavailable": "Unable to load Video Studio health.",
+        "productionReady": "Production ready",
+        "setupRequired": "Setup required",
+        "fullRender": "Full render",
+        "avatar": "Avatar",
+        "voice": "Voice",
+        "strict": "Strict mode",
+        "on": "On",
+        "off": "Off",
+        "klingReady": "Kling configured for scene clips.",
+        "klingMissing": "Set KLING_API_KEY for real full renders.",
+        "heygenReady": "HeyGen configured for avatar renders.",
+        "heygenMissing": "Set HEYGEN_API_KEY for avatar mode.",
+        "ttsReady": "TTS provider configured.",
+        "ttsMissing": "Set ELEVENLABS_API_KEY or OPENAI_API_KEY for voice.",
+        "strictOn": "Stub fallbacks disabled on provider errors.",
+        "strictOff": "VIDEO_PROVIDER_STRICT unset — stubs allowed on errors.",
+        "fullRenderBlocked": "Full render requires KLING_API_KEY. Preview mode still works."
+      },
       "management": {
         "loading": "Loading video production studio…",
         "backToStudio": "Back to Video Studio",
@@ -2045,6 +2661,7 @@
         "deleteFailed": "Delete failed",
         "mediaDeleted": "Media deleted",
         "ttsProvider": "TTS: {provider}",
+        "ffmpegReady": "FFmpeg ready · {version}",
         "platforms": {
           "tiktok": "TikTok",
           "instagramReels": "Instagram Reels",
@@ -2052,7 +2669,6 @@
           "youtube": "YouTube",
           "linkedin": "LinkedIn"
         },
-        "ffmpegReady": "FFmpeg ready · {version}",
         "renderPreview": "Render preview",
         "aiPresenter": "AI Human Presenter",
         "socialExportTitle": "Social media export",
@@ -2158,6 +2774,8 @@
       "labels": {
         "prompt": "Prompt",
         "promptPlaceholder": "Describe what you want to create…",
+        "chooseContentType": "Choose a content type",
+        "configureGeneration": "Configure your content generation",
         "name": "Name",
         "description": "Description",
         "style": "Style",
@@ -2165,9 +2783,7 @@
         "language": "Language",
         "status": "Status",
         "createdAt": "Created",
-        "updatedAt": "Updated",
-        "chooseContentType": "Choose a content type",
-        "configureGeneration": "Configure your content generation"
+        "updatedAt": "Updated"
       },
       "status": {
         "idle": "Ready",
@@ -2399,6 +3015,8 @@
       "labels": {
         "prompt": "Prompt",
         "promptPlaceholder": "Describe what you want to create…",
+        "chooseContentType": "Choose a content type",
+        "configureGeneration": "Configure your content generation",
         "name": "Name",
         "description": "Description",
         "style": "Style",
@@ -2406,9 +3024,7 @@
         "language": "Language",
         "status": "Status",
         "createdAt": "Created",
-        "updatedAt": "Updated",
-        "chooseContentType": "Choose a content type",
-        "configureGeneration": "Configure your content generation"
+        "updatedAt": "Updated"
       },
       "status": {
         "idle": "Ready",
@@ -2473,6 +3089,8 @@
       "labels": {
         "prompt": "Prompt",
         "promptPlaceholder": "Describe what you want to create…",
+        "chooseContentType": "Choose a content type",
+        "configureGeneration": "Configure your content generation",
         "name": "Name",
         "description": "Description",
         "style": "Style",
@@ -2480,9 +3098,7 @@
         "language": "Language",
         "status": "Status",
         "createdAt": "Created",
-        "updatedAt": "Updated",
-        "chooseContentType": "Choose a content type",
-        "configureGeneration": "Configure your content generation"
+        "updatedAt": "Updated"
       },
       "status": {
         "idle": "Ready",
@@ -2698,6 +3314,8 @@
       "labels": {
         "prompt": "Prompt",
         "promptPlaceholder": "Describe what you want to create…",
+        "chooseContentType": "Choose a content type",
+        "configureGeneration": "Configure your content generation",
         "name": "Name",
         "description": "Description",
         "style": "Style",
@@ -2705,9 +3323,7 @@
         "language": "Language",
         "status": "Status",
         "createdAt": "Created",
-        "updatedAt": "Updated",
-        "chooseContentType": "Choose a content type",
-        "configureGeneration": "Configure your content generation"
+        "updatedAt": "Updated"
       },
       "status": {
         "idle": "Ready",
@@ -2772,6 +3388,8 @@
       "labels": {
         "prompt": "Prompt",
         "promptPlaceholder": "Describe what you want to create…",
+        "chooseContentType": "Choose a content type",
+        "configureGeneration": "Configure your content generation",
         "name": "Name",
         "description": "Description",
         "style": "Style",
@@ -2779,9 +3397,7 @@
         "language": "Language",
         "status": "Status",
         "createdAt": "Created",
-        "updatedAt": "Updated",
-        "chooseContentType": "Choose a content type",
-        "configureGeneration": "Configure your content generation"
+        "updatedAt": "Updated"
       },
       "status": {
         "idle": "Ready",
@@ -2799,6 +3415,8 @@
         "exportStarted": "Export started",
         "errorGeneric": "Something went wrong. Please try again.",
         "agentCreated": "Agent created",
+        "agentUpdated": "Agent updated",
+        "failed": "Failed",
         "agentDeleted": "Agent deleted",
         "taskCompleted": "Task completed",
         "workflowCreated": "Workflow created",
@@ -2812,6 +3430,66 @@
         "prompts": "Prompts",
         "history": "History",
         "result": "Result"
+      },
+      "workspace": {
+        "tabs": {
+          "builder": "Builder",
+          "tools": "Tools",
+          "memory": "Memory",
+          "knowledge": "Knowledge",
+          "runner": "Runner",
+          "monitor": "Monitor",
+          "analytics": "Analytics"
+        }
+      },
+      "panels": {
+        "knowledge": {
+          "newKbPlaceholder": "New knowledge base",
+          "createKb": "Create KB",
+          "docsCount": "{count} docs · {status}",
+          "addDocument": "Add document (embeddings-ready)",
+          "title": "Title",
+          "content": "Content",
+          "addDocumentBtn": "Add Document",
+          "fillAllFields": "Fill all fields",
+          "kbCreated": "Knowledge base created",
+          "documentAdded": "Document added"
+        },
+        "memory": {
+          "keyPlaceholder": "Key (optional)",
+          "contentPlaceholder": "Memory content",
+          "save": "Save",
+          "selectAgentContent": "Select agent and enter content",
+          "saved": "Memory saved",
+          "empty": "No memory entries."
+        },
+        "workflow": {
+          "running": "Running…",
+          "runWorkflow": "Run Workflow",
+          "selectWorkflow": "Select a workflow",
+          "executed": "Workflow executed"
+        },
+        "tools": {
+          "platformTools": "Platform Tools",
+          "test": "Test",
+          "toolOutput": "Tool Output",
+          "testHint": "Test a tool to see output.",
+          "ran": "Ran {tool}"
+        },
+        "execution": {
+          "recentRuns": "Recent Runs",
+          "executionDetail": "Execution Detail",
+          "selectExecution": "Select an execution."
+        },
+        "analytics": {
+          "loading": "Loading analytics…",
+          "totalRuns": "Total Runs",
+          "successRate": "Success Rate",
+          "failures": "Failures",
+          "avgLatency": "Avg Latency",
+          "tokens": "Tokens",
+          "estCost": "Est. Cost"
+        }
       },
       "steps": {
         "createAgent": "Create Agent",
@@ -2938,15 +3616,38 @@
         "noPromptsHint": "Save reusable prompts for your agents",
         "usedTimes": "Used {count} times"
       },
-      "workspace": {
-        "tabs": {
-          "builder": "Builder",
-          "tools": "Tools",
-          "memory": "Memory",
-          "knowledge": "Knowledge",
-          "runner": "Runner",
-          "monitor": "Monitor",
-          "analytics": "Analytics"
+      "editor": {
+        "titleEdit": "Edit Agent",
+        "titleCreate": "Agent Builder",
+        "agentNamePlaceholder": "Agent name",
+        "descriptionPlaceholder": "Description",
+        "systemPromptPlaceholder": "System prompt",
+        "saving": "Saving…",
+        "saveAgent": "Save Agent",
+        "cancel": "Cancel",
+        "categories": {
+          "business": "Business",
+          "marketing": "Marketing",
+          "content": "Content",
+          "design": "Design",
+          "development": "Development",
+          "research": "Research",
+          "automation": "Automation",
+          "general": "General"
+        },
+        "tools": {
+          "website-builder": "Website Builder",
+          "landing-page-builder": "Landing Page Builder",
+          "web-app-builder": "Web App Builder",
+          "logo-designer": "Logo Designer",
+          "brand-identity": "Brand Identity",
+          "image-generator": "Image Generator",
+          "video-studio": "Video Studio",
+          "content-studio": "Content Studio",
+          "business-suite": "Business Suite",
+          "seo-analyzer": "SEO Analyzer",
+          "market-research": "Market Research",
+          "social-media": "Social Media"
         }
       }
     },
@@ -2996,6 +3697,8 @@
       "labels": {
         "prompt": "Prompt",
         "promptPlaceholder": "Describe what you want to create…",
+        "chooseContentType": "Choose a content type",
+        "configureGeneration": "Configure your content generation",
         "name": "Name",
         "description": "Description",
         "style": "Style",
@@ -3003,9 +3706,7 @@
         "language": "Language",
         "status": "Status",
         "createdAt": "Created",
-        "updatedAt": "Updated",
-        "chooseContentType": "Choose a content type",
-        "configureGeneration": "Configure your content generation"
+        "updatedAt": "Updated"
       },
       "status": {
         "idle": "Ready",
@@ -3022,6 +3723,101 @@
         "copied": "Copied to clipboard",
         "exportStarted": "Export started",
         "errorGeneric": "Something went wrong. Please try again."
+      }
+    },
+    "ideas": {
+      "profileCard": {
+        "title": "Your Profile",
+        "description": "Tell us about yourself to get personalized business ideas",
+        "interests": "Interests & passions",
+        "interestsPlaceholder": "e.g. sustainability, tech, fitness, education...",
+        "skills": "Skills & experience",
+        "skillsPlaceholder": "e.g. marketing, coding, sales...",
+        "budget": "Starting budget",
+        "budgetPlaceholder": "e.g. $5,000, $50,000...",
+        "industry": "Preferred industry (optional)",
+        "industryPlaceholder": "e.g. SaaS, E-commerce...",
+        "generating": "Generating...",
+        "generate": "Generate Ideas"
+      },
+      "list": {
+        "ideasSaved": "{count} Ideas Saved",
+        "ideaSaved": "{count} Idea Saved",
+        "emptyHeading": "Generated ideas will appear here",
+        "ideaNumber": "Idea #{number}",
+        "favorite": "Favorite",
+        "industry": "Industry",
+        "targetMarket": "Target Market",
+        "revenueModel": "Revenue Model"
+      },
+      "empty": {
+        "title": "No ideas yet",
+        "description": "Fill in your profile and click Generate to discover business ideas powered by AI."
+      },
+      "edit": {
+        "title": "Edit Idea",
+        "titleLabel": "Title",
+        "description": "Description",
+        "industry": "Industry",
+        "targetMarket": "Target Market",
+        "revenueModel": "Revenue Model",
+        "saving": "Saving...",
+        "save": "Save Changes"
+      },
+      "aria": {
+        "edit": "Edit idea",
+        "addFavorite": "Add to favorites",
+        "removeFavorite": "Remove from favorites",
+        "copy": "Copy idea",
+        "delete": "Delete idea"
+      },
+      "copy": {
+        "template": "{title}\n\n{description}\n\nIndustry: {industry}\nTarget: {target}\nRevenue: {revenue}"
+      },
+      "toasts": {
+        "generated": "Ideas generated successfully.",
+        "copied": "Copied to clipboard",
+        "updated": "Idea updated."
+      }
+    },
+    "reports": {
+      "settings": {
+        "title": "Report Settings",
+        "description": "Configure your AI-generated business report",
+        "topic": "Report topic",
+        "topicPlaceholder": "e.g. Q1 Growth Strategy, Product Launch...",
+        "reportType": "Report type",
+        "timeframe": "Timeframe",
+        "timeframePlaceholder": "e.g. Q1 2026, Annual, 6-month...",
+        "generating": "Generating...",
+        "generate": "Generate Report"
+      },
+      "types": {
+        "Strategic Analysis": "Strategic Analysis",
+        "Competitive Intelligence": "Competitive Intelligence",
+        "Growth Forecast": "Growth Forecast",
+        "Risk Assessment": "Risk Assessment",
+        "Market Entry Plan": "Market Entry Plan"
+      },
+      "list": {
+        "reportsSaved": "{count} Reports Saved",
+        "reportSaved": "{count} Report Saved",
+        "emptyHeading": "Generated reports will appear here",
+        "favorite": "Favorite",
+        "generatedDescription": "AI-generated business report",
+        "keyInsights": "Key Insights",
+        "reportTypesFilter": "Report types"
+      },
+      "empty": {
+        "title": "No reports yet",
+        "description": "Configure your report settings and generate comprehensive AI business intelligence reports."
+      },
+      "aria": {
+        "toggleFavorite": "Toggle favorite",
+        "delete": "Delete report"
+      },
+      "toasts": {
+        "generated": "Report generated and saved."
       }
     },
     "marketAnalysis": {
@@ -3070,6 +3866,8 @@
       "labels": {
         "prompt": "Prompt",
         "promptPlaceholder": "Describe what you want to create…",
+        "chooseContentType": "Choose a content type",
+        "configureGeneration": "Configure your content generation",
         "name": "Name",
         "description": "Description",
         "style": "Style",
@@ -3077,9 +3875,7 @@
         "language": "Language",
         "status": "Status",
         "createdAt": "Created",
-        "updatedAt": "Updated",
-        "chooseContentType": "Choose a content type",
-        "configureGeneration": "Configure your content generation"
+        "updatedAt": "Updated"
       },
       "status": {
         "idle": "Ready",
@@ -3096,6 +3892,196 @@
         "copied": "Copied to clipboard",
         "exportStarted": "Export started",
         "errorGeneric": "Something went wrong. Please try again."
+      }
+    },
+    "visualEditor": {
+      "title": "Visual Editor",
+      "unsaved": "· unsaved",
+      "viewports": {
+        "desktop": "Desktop",
+        "tablet": "Tablet",
+        "mobile": "Mobile"
+      },
+      "save": "Save",
+      "layers": "Layers",
+      "properties": "Properties",
+      "designTokens": "Design tokens",
+      "component": "Component",
+      "canvasText": "Canvas text",
+      "headlinePlaceholder": "Headline / title",
+      "imageUrl": "Image URL",
+      "imagePlaceholder": "https://… or /images/…",
+      "duplicate": "Duplicate",
+      "delete": "Delete",
+      "selectLayer": "Select a layer",
+      "tokens": {
+        "primary": "Primary",
+        "secondary": "Secondary",
+        "accent": "Accent",
+        "background": "Background",
+        "foreground": "Foreground",
+        "headingFont": "Heading font",
+        "bodyFont": "Body font",
+        "spacing": "Spacing",
+        "compact": "Compact",
+        "balanced": "Balanced",
+        "airy": "Airy"
+      },
+      "emptyCanvas": "Drag a component from the library to start",
+      "canvasHint": "Drag to reorder · edit text · replace images · tune colors & fonts in Properties",
+      "headlineFallback": "{label} headline",
+      "history": {
+        "moveSection": "Move section",
+        "insert": "Insert {name}",
+        "editText": "Edit text",
+        "replaceImage": "Replace image",
+        "duplicate": "Duplicate",
+        "delete": "Delete",
+        "color": "Color {label}",
+        "headingFont": "Heading font",
+        "bodyFont": "Body font",
+        "spacing": "Spacing"
+      },
+      "toasts": {
+        "componentAdded": "{name} added — Save to apply to project",
+        "noChanges": "No visual changes to save.",
+        "nothingToPersist": "Nothing to persist.",
+        "saveFailed": "Unable to save edits.",
+        "saveError": "Unable to save visual edits.",
+        "saved": "Visual edits saved."
+      }
+    },
+    "creatorMarketplace": {
+      "badge": "Creator Marketplace",
+      "title": "Website templates by designers",
+      "description": "Browse, favorite, and duplicate professional templates into the Website Builder. Creators can upload listings, manage versions, and prepare for future payments and revenue.",
+      "creatorProfile": "Creator profile",
+      "uploadTemplate": "Upload template",
+      "searchPlaceholder": "Search templates, authors, features…",
+      "allIndustries": "All industries",
+      "allStyles": "All styles",
+      "anyPrice": "Any price",
+      "free": "Free",
+      "paid": "Paid",
+      "sort": {
+        "popular": "Popular",
+        "newest": "Newest",
+        "rating": "Top rated",
+        "priceAsc": "Price ↑",
+        "priceDesc": "Price ↓"
+      },
+      "favorites": "Favorites",
+      "openWebsiteBuilder": "Open Website Builder",
+      "trending": "Trending templates",
+      "marketplace": "Marketplace",
+      "loading": "Loading marketplace…",
+      "noResults": "No templates match these filters.",
+      "previewTitle": "Template preview",
+      "previewDescription": "Live preview before you duplicate into Website Builder.",
+      "previewUnavailable": "Preview unavailable",
+      "previewIframe": "Template preview",
+      "author": "Author",
+      "rating": "Rating",
+      "reviews": "{count} reviews",
+      "version": "Version",
+      "features": "Features",
+      "favorited": "Favorited",
+      "favorite": "Favorite",
+      "duplicate": "Duplicate",
+      "useTemplate": "Use template",
+      "livePreview": "Live preview",
+      "byAuthor": "by {name}",
+      "favoriteAria": "Favorite",
+      "viewports": {
+        "desktop": "Desktop",
+        "tablet": "Tablet",
+        "mobile": "Mobile"
+      },
+      "upload": {
+        "title": "Upload template",
+        "description": "Publish a listing with metadata and an initial version. Payments and payouts will plug into this commerce layer later.",
+        "titlePlaceholder": "Template title",
+        "taglinePlaceholder": "Short tagline",
+        "descriptionPlaceholder": "Describe the template, audience, and conversion goals…",
+        "featuresPlaceholder": "Features (comma-separated)",
+        "pricePlaceholder": "Price cents (0 = free)",
+        "versionPlaceholder": "Version",
+        "changelogPlaceholder": "Changelog",
+        "publishListing": "Publish listing",
+        "initialChangelog": "Initial marketplace release",
+        "uploadFailed": "Upload failed"
+      },
+      "creator": {
+        "title": "Creator profile",
+        "description": "Manage your public identity, listings, and versions. Revenue share and Stripe Connect are scaffolded for launch.",
+        "loading": "Loading profile…",
+        "templatesCount": "{count} templates",
+        "payoutsReady": "ready",
+        "payoutsPending": "pending",
+        "payouts": "Payouts {status}",
+        "yourListings": "Your listings ({count})",
+        "noUploads": "No uploads yet. Publish your first template from the marketplace.",
+        "preview": "Preview",
+        "newVersion": "New version",
+        "addVersion": "Add version",
+        "versionPlaceholder": "e.g. 1.1.0",
+        "changelogPlaceholder": "What changed in this version?",
+        "saveVersion": "Save version",
+        "loadFailed": "Could not load creator profile.",
+        "versionFailed": "Version failed"
+      },
+      "errors": {
+        "loadFailed": "Failed to load marketplace",
+        "previewFailed": "Preview failed",
+        "useFailed": "Use failed"
+      }
+    },
+    "templateMarketplace": {
+      "badge": "Template Marketplace",
+      "title": "Premium website templates",
+      "description": "Browse industry packs with luxury, modern, corporate, creative, minimal, premium SaaS, and technology variations. Preview on any device, then generate with Design Intelligence, Brand Identity, Assets, Editor, and Final Quality.",
+      "openWebsiteBuilder": "Open Website Builder",
+      "searchPlaceholder": "Search restaurants, SaaS, finance…",
+      "allCategories": "All categories",
+      "allStyles": "All styles",
+      "aiRecommendations": "AI template recommendations",
+      "aiRecommendationsDescription": "Analyze industry, business goal, and audience — then pick the best starting template before generation.",
+      "industryPlaceholder": "Industry (e.g. restaurant)",
+      "goalPlaceholder": "Business goal (leads, bookings…)",
+      "audiencePlaceholder": "Audience",
+      "recommend": "Recommend",
+      "briefPlaceholder": "Optional business brief for smarter matching…",
+      "popular": "Popular",
+      "library": "Library",
+      "loading": "Loading marketplace…",
+      "noResults": "No templates match these filters.",
+      "previewTitle": "Template preview",
+      "previewDescription": "Live structural preview before you generate.",
+      "previewUnavailable": "Preview unavailable",
+      "previewIframe": "Template preview",
+      "intelligence": "Intelligence",
+      "industry": "Industry",
+      "style": "Style",
+      "layout": "Layout",
+      "audience": "Audience",
+      "features": "Features",
+      "pipelineHint": "Connects Design · Brand · Assets · Editor · Quality",
+      "useThisTemplate": "Use this template",
+      "preview": "Preview",
+      "use": "Use",
+      "layoutLabel": "Layout · {type}",
+      "audienceLabel": "Audience · {audience}",
+      "featuresLabel": "Features · {features}",
+      "badgeScore": "{score}% · {reason}",
+      "viewports": {
+        "desktop": "Desktop",
+        "tablet": "Tablet",
+        "mobile": "Mobile"
+      },
+      "errors": {
+        "loadFailed": "Failed to load marketplace",
+        "previewFailed": "Preview failed",
+        "recommendFailed": "Recommend failed"
       }
     }
   },
@@ -3173,59 +4159,13 @@
           "openDeals": "Open deals",
           "totalLeads": "Total leads",
           "conversionRate": "Conversion rate",
+          "leadConversion": "Lead conversion",
           "winRate": "Win rate",
           "avgSalesCycle": "Avg. sales cycle",
-          "forecast": "Forecast",
-          "leadConversion": "Lead conversion"
+          "forecast": "Forecast"
         },
         "recentLeads": "Recent leads",
         "score": "score"
-      },
-      "actions": {
-        "create": "Create",
-        "import": "Import",
-        "export": "Export",
-        "refresh": "Refresh",
-        "filter": "Filter",
-        "search": "Search",
-        "save": "Save",
-        "cancel": "Cancel",
-        "delete": "Delete",
-        "edit": "Edit",
-        "viewAll": "View all",
-        "assign": "Assign",
-        "schedule": "Schedule",
-        "runReport": "Run report"
-      },
-      "emptyStates": {
-        "noRecords": "No records yet",
-        "noRecordsDescription": "Create your first record to populate this workspace.",
-        "noSearchResults": "No matches for your search",
-        "noTasks": "No tasks yet",
-        "noActivities": "No activities logged"
-      },
-      "assistant": {
-        "title": "AI Assistant",
-        "placeholder": "Ask CRM AI about your data…",
-        "actions": {
-          "summarizePipeline": "Summarize pipeline",
-          "suggestNextSteps": "Suggest next steps",
-          "draftEmail": "Draft follow-up email",
-          "scoreLeads": "Score leads",
-          "forecastRevenue": "Forecast revenue",
-          "analyze_customer": "Analyze",
-          "score_lead": "Score lead",
-          "suggest_next_action": "Next action",
-          "summarize_history": "Summarize",
-          "generate_sales_email": "Sales email",
-          "improve_deal_strategy": "Deal strategy"
-        },
-        "thinking": "Thinking…",
-        "error": "Assistant request failed",
-        "results": "Results",
-        "runAction": "Run AI action",
-        "running": "Running…",
-        "emptyResults": "Run an action to see insights."
       },
       "forms": {
         "companyName": "Company name",
@@ -3310,39 +4250,6 @@
         "analysisComplete": "AI analysis complete",
         "emailRequired": "Email required",
         "contextRequired": "Enter CRM context"
-      }
-    },
-    "erp": {
-      "title": "ERP",
-      "tabs": {
-        "overview": "Vue d'ensemble",
-        "finance": "Finance",
-        "inventory": "Inventaire",
-        "operations": "Opérations",
-        "hr": "Ressources humaines",
-        "procurement": "Procurement",
-        "analytics": "Analytique",
-        "assistant": "Assistant IA"
-      },
-      "overview": {
-        "title": "Overview",
-        "metrics": {
-          "revenue": "Revenue",
-          "expenses": "Expenses",
-          "grossMargin": "Gross margin",
-          "inventoryValue": "Inventory value",
-          "openPOs": "Open purchase orders",
-          "headcount": "Headcount",
-          "cashOnHand": "Cash on hand",
-          "utilization": "Utilization",
-          "profit": "Profit"
-        },
-        "operations": "Operations",
-        "companies": "Companies",
-        "salesOrders": "Sales orders",
-        "purchaseOrders": "Purchase orders",
-        "pendingApprovals": "Pending approvals",
-        "noCompanies": "No companies yet — create one in Finance."
       },
       "actions": {
         "create": "Create",
@@ -3369,26 +4276,59 @@
       },
       "assistant": {
         "title": "AI Assistant",
-        "placeholder": "Ask ERP AI about your data…",
-        "actions": {
-          "explainVariance": "Explain variance",
-          "optimizeInventory": "Optimize inventory",
-          "draftPO": "Draft purchase order",
-          "payrollSummary": "Summarize payroll",
-          "cashFlowForecast": "Forecast cash flow",
-          "analyze_financial_data": "Analyze finances",
-          "generate_reports": "Reports",
-          "forecast_revenue": "Forecast",
-          "predict_inventory": "Inventory",
-          "recommend_actions": "Recommend",
-          "summarize_performance": "Summarize"
-        },
-        "thinking": "Thinking…",
-        "error": "Assistant request failed",
+        "placeholder": "Ask CRM AI about your data…",
         "results": "Results",
         "runAction": "Run AI action",
         "running": "Running…",
-        "emptyResults": "Run an action to see insights."
+        "emptyResults": "Run an action to see insights.",
+        "actions": {
+          "analyze_customer": "Analyze",
+          "score_lead": "Score lead",
+          "suggest_next_action": "Next action",
+          "summarize_history": "Summarize",
+          "generate_sales_email": "Sales email",
+          "improve_deal_strategy": "Deal strategy",
+          "summarizePipeline": "Summarize pipeline",
+          "suggestNextSteps": "Suggest next steps",
+          "draftEmail": "Draft follow-up email",
+          "scoreLeads": "Score leads",
+          "forecastRevenue": "Forecast revenue"
+        },
+        "thinking": "Thinking…",
+        "error": "Assistant request failed"
+      }
+    },
+    "erp": {
+      "title": "ERP",
+      "tabs": {
+        "overview": "Vue d'ensemble",
+        "finance": "Finance",
+        "inventory": "Inventaire",
+        "operations": "Opérations",
+        "hr": "Ressources humaines",
+        "procurement": "Procurement",
+        "analytics": "Analytique",
+        "assistant": "Assistant IA"
+      },
+      "overview": {
+        "title": "Overview",
+        "metrics": {
+          "revenue": "Revenue",
+          "expenses": "Expenses",
+          "grossMargin": "Gross margin",
+          "profit": "Profit",
+          "inventoryValue": "Inventory value",
+          "openPOs": "Open purchase orders",
+          "headcount": "Headcount",
+          "cashOnHand": "Cash on hand",
+          "utilization": "Utilization"
+        },
+        "operations": "Operations",
+        "companies": "Companies",
+        "salesOrders": "Sales orders",
+        "purchaseOrders": "Purchase orders",
+        "pendingApprovals": "Pending approvals",
+        "noCompanies": "No companies yet — create one in Finance."
       },
       "forms": {
         "newCompany": "New company",
@@ -3478,6 +4418,52 @@
         "attendanceRecorded": "Attendance recorded",
         "analysisComplete": "AI analysis complete",
         "contextRequired": "Enter ERP context"
+      },
+      "actions": {
+        "create": "Create",
+        "import": "Import",
+        "export": "Export",
+        "refresh": "Refresh",
+        "filter": "Filter",
+        "search": "Search",
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "viewAll": "View all",
+        "assign": "Assign",
+        "schedule": "Schedule",
+        "runReport": "Run report"
+      },
+      "emptyStates": {
+        "noRecords": "No records yet",
+        "noRecordsDescription": "Create your first record to populate this workspace.",
+        "noSearchResults": "No matches for your search",
+        "noTasks": "No tasks yet",
+        "noActivities": "No activities logged"
+      },
+      "assistant": {
+        "title": "AI Assistant",
+        "placeholder": "Ask ERP AI about your data…",
+        "results": "Results",
+        "runAction": "Run AI action",
+        "running": "Running…",
+        "emptyResults": "Run an action to see insights.",
+        "actions": {
+          "analyze_financial_data": "Analyze finances",
+          "generate_reports": "Reports",
+          "forecast_revenue": "Forecast",
+          "predict_inventory": "Inventory",
+          "recommend_actions": "Recommend",
+          "summarize_performance": "Summarize",
+          "explainVariance": "Explain variance",
+          "optimizeInventory": "Optimize inventory",
+          "draftPO": "Draft purchase order",
+          "payrollSummary": "Summarize payroll",
+          "cashFlowForecast": "Forecast cash flow"
+        },
+        "thinking": "Thinking…",
+        "error": "Assistant request failed"
       }
     },
     "bi": {
@@ -3488,10 +4474,10 @@
         "reports": "Rapports",
         "metrics": "Métriques",
         "datasets": "Datasets",
-        "alerts": "Alerts",
-        "assistant": "AI Assistant",
         "sources": "Sources de données",
-        "insights": "Insights IA"
+        "insights": "Insights IA",
+        "alerts": "Alerts",
+        "assistant": "AI Assistant"
       },
       "overview": {
         "title": "Overview",
@@ -3525,62 +4511,6 @@
         "campaigns": "Campaigns",
         "socialImpressions": "Social impressions",
         "websiteEvents": "Website events"
-      },
-      "actions": {
-        "create": "Create",
-        "import": "Import",
-        "export": "Export",
-        "refresh": "Refresh",
-        "filter": "Filter",
-        "search": "Search",
-        "save": "Save",
-        "cancel": "Cancel",
-        "delete": "Delete",
-        "edit": "Edit",
-        "viewAll": "View all",
-        "assign": "Assign",
-        "schedule": "Schedule",
-        "runReport": "Run report"
-      },
-      "emptyStates": {
-        "noRecords": "No records yet",
-        "noRecordsDescription": "Create your first record to populate this workspace.",
-        "noSearchResults": "No matches for your search",
-        "noTasks": "No tasks yet",
-        "noActivities": "No activities logged"
-      },
-      "assistant": {
-        "title": "AI Assistant",
-        "placeholder": "Ask Business Intelligence AI about your data…",
-        "actions": {
-          "explainMetric": "Explain this metric",
-          "buildDashboard": "Suggest dashboard layout",
-          "detectAnomalies": "Detect anomalies",
-          "summarizeReport": "Summarize report",
-          "naturalLanguageQuery": "Ask in plain language",
-          "analyze_performance": "Analyze",
-          "explain_kpi": "Explain KPI",
-          "detect_trends": "Trends",
-          "detect_anomalies": "Anomalies",
-          "forecast_revenue": "Forecast",
-          "generate_executive_report": "Executive report",
-          "natural_language_query": "Ask data"
-        },
-        "thinking": "Thinking…",
-        "error": "Assistant request failed",
-        "insights": "Insights",
-        "runAnalysis": "Run AI analysis",
-        "running": "Running…",
-        "emptyResults": "Ask questions like \"Why did sales drop this month?\"",
-        "placeholders": {
-          "analyze_performance": "Analyze overall business performance this quarter…",
-          "explain_kpi": "Why did revenue drop this month?",
-          "detect_trends": "Which product has the highest growth?",
-          "detect_anomalies": "Find unusual patterns in sales data…",
-          "forecast_revenue": "Forecast revenue for next quarter…",
-          "generate_executive_report": "Generate an executive summary…",
-          "natural_language_query": "Which channel drives the most conversions?"
-        }
       },
       "forms": {
         "dashboardName": "New dashboard name",
@@ -3679,39 +4609,6 @@
         "reportScheduled": "Report scheduled",
         "analysisComplete": "AI analysis complete",
         "contextRequired": "Enter a question or context"
-      }
-    },
-    "cyber": {
-      "title": "Cybersecurity",
-      "tabs": {
-        "overview": "Vue d'ensemble",
-        "threats": "Menaces",
-        "incidents": "Incidents",
-        "assets": "Actifs",
-        "vulnerabilities": "Vulnérabilités",
-        "compliance": "Compliance",
-        "monitoring": "Monitoring",
-        "assistant": "Assistant IA",
-        "alerts": "Alertes",
-        "reports": "Rapports"
-      },
-      "overview": {
-        "title": "Overview",
-        "metrics": {
-          "openIncidents": "Open incidents",
-          "criticalAlerts": "Critical alerts",
-          "assetsMonitored": "Assets monitored",
-          "vulnOpen": "Open vulnerabilities",
-          "meanTimeToRespond": "Mean time to respond",
-          "complianceScore": "Compliance score",
-          "riskScore": "Risk Score",
-          "activeThreats": "Active Threats",
-          "openVulnerabilities": "Open Vulnerabilities",
-          "openAlerts": "Open Alerts",
-          "assets": "Assets",
-          "alerts24h": "Alerts (24h)",
-          "criticalFindings": "Critical Findings"
-        }
       },
       "actions": {
         "create": "Create",
@@ -3738,27 +4635,69 @@
       },
       "assistant": {
         "title": "AI Assistant",
-        "placeholder": "Ask Cybersecurity AI about your data…",
+        "placeholder": "Ask Business Intelligence AI about your data…",
+        "insights": "Insights",
+        "runAnalysis": "Run AI analysis",
+        "running": "Running…",
+        "emptyResults": "Ask questions like \"Why did sales drop this month?\"",
         "actions": {
-          "triageAlert": "Triage alert",
-          "suggestRemediation": "Suggest remediation",
-          "summarizeIncident": "Summarize incident",
-          "generateRunbook": "Generate runbook",
-          "complianceGapAnalysis": "Compliance gap analysis",
-          "analyze_posture": "Posture",
-          "explain_threat": "Explain Threat",
-          "summarize_incident": "Incident",
-          "recommend_remediation": "Remediate",
-          "generate_security_report": "Report",
-          "risk_assessment": "Risk",
-          "compliance_recommendations": "Compliance"
+          "analyze_performance": "Analyze",
+          "explain_kpi": "Explain KPI",
+          "detect_trends": "Trends",
+          "detect_anomalies": "Anomalies",
+          "forecast_revenue": "Forecast",
+          "generate_executive_report": "Executive report",
+          "natural_language_query": "Ask data",
+          "explainMetric": "Explain this metric",
+          "buildDashboard": "Suggest dashboard layout",
+          "detectAnomalies": "Detect anomalies",
+          "summarizeReport": "Summarize report",
+          "naturalLanguageQuery": "Ask in plain language"
+        },
+        "placeholders": {
+          "analyze_performance": "Analyze overall business performance this quarter…",
+          "explain_kpi": "Why did revenue drop this month?",
+          "detect_trends": "Which product has the highest growth?",
+          "detect_anomalies": "Find unusual patterns in sales data…",
+          "forecast_revenue": "Forecast revenue for next quarter…",
+          "generate_executive_report": "Generate an executive summary…",
+          "natural_language_query": "Which channel drives the most conversions?"
         },
         "thinking": "Thinking…",
-        "error": "Assistant request failed",
-        "results": "Results",
-        "runAnalysis": "Run Analysis",
-        "running": "Running…",
-        "emptyResults": "Run an analysis to see insights."
+        "error": "Assistant request failed"
+      }
+    },
+    "cyber": {
+      "title": "Cybersecurity",
+      "tabs": {
+        "overview": "Vue d'ensemble",
+        "threats": "Menaces",
+        "incidents": "Incidents",
+        "assets": "Actifs",
+        "vulnerabilities": "Vulnérabilités",
+        "alerts": "Alertes",
+        "reports": "Rapports",
+        "compliance": "Compliance",
+        "monitoring": "Monitoring",
+        "assistant": "Assistant IA"
+      },
+      "overview": {
+        "title": "Overview",
+        "metrics": {
+          "openIncidents": "Open incidents",
+          "criticalAlerts": "Critical alerts",
+          "assetsMonitored": "Assets monitored",
+          "vulnOpen": "Open vulnerabilities",
+          "meanTimeToRespond": "Mean time to respond",
+          "complianceScore": "Compliance score",
+          "riskScore": "Risk Score",
+          "activeThreats": "Active Threats",
+          "openVulnerabilities": "Open Vulnerabilities",
+          "openAlerts": "Open Alerts",
+          "assets": "Assets",
+          "alerts24h": "Alerts (24h)",
+          "criticalFindings": "Critical Findings"
+        }
       },
       "forms": {
         "threatTitle": "Threat title",
@@ -3822,6 +4761,851 @@
         "reportCreated": "Report created",
         "analysisComplete": "Analysis complete",
         "contextRequired": "Enter context"
+      },
+      "actions": {
+        "create": "Create",
+        "import": "Import",
+        "export": "Export",
+        "refresh": "Refresh",
+        "filter": "Filter",
+        "search": "Search",
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "viewAll": "View all",
+        "assign": "Assign",
+        "schedule": "Schedule",
+        "runReport": "Run report"
+      },
+      "emptyStates": {
+        "noRecords": "No records yet",
+        "noRecordsDescription": "Create your first record to populate this workspace.",
+        "noSearchResults": "No matches for your search",
+        "noTasks": "No tasks yet",
+        "noActivities": "No activities logged"
+      },
+      "assistant": {
+        "title": "AI Assistant",
+        "placeholder": "Ask Cybersecurity AI about your data…",
+        "results": "Results",
+        "runAnalysis": "Run Analysis",
+        "running": "Running…",
+        "emptyResults": "Run an analysis to see insights.",
+        "actions": {
+          "analyze_posture": "Posture",
+          "explain_threat": "Explain Threat",
+          "summarize_incident": "Incident",
+          "recommend_remediation": "Remediate",
+          "generate_security_report": "Report",
+          "risk_assessment": "Risk",
+          "compliance_recommendations": "Compliance",
+          "triageAlert": "Triage alert",
+          "suggestRemediation": "Suggest remediation",
+          "summarizeIncident": "Summarize incident",
+          "generateRunbook": "Generate runbook",
+          "complianceGapAnalysis": "Compliance gap analysis"
+        },
+        "thinking": "Thinking…",
+        "error": "Assistant request failed"
+      }
+    },
+    "platform": {
+      "title": "Platform",
+      "common": {
+        "cancel": "Cancel",
+        "create": "Create",
+        "buy": "Buy",
+        "dismiss": "Dismiss",
+        "copied": "Copied",
+        "previous": "Previous",
+        "next": "Next",
+        "loading": "Loading…",
+        "noItems": "No items",
+        "activate": "Activate",
+        "deactivate": "Deactivate",
+        "enable": "Enable",
+        "disable": "Disable",
+        "active": "Active",
+        "disabled": "Disabled",
+        "pending": "Pending",
+        "healthy": "Healthy",
+        "none": "None",
+        "emDash": "—",
+        "analyze": "Analyze",
+        "copyLink": "Copy link",
+        "copyInvite": "Copy invite",
+        "sendInvite": "Send invite",
+        "addContact": "Add contact",
+        "addDeal": "Add deal",
+        "score": "score",
+        "sent": "sent",
+        "steps": "steps",
+        "grade": "Grade {grade}",
+        "expires": "Expires",
+        "created": "Created",
+        "plans": "Plans",
+        "monthly": "Monthly",
+        "yearly": "Yearly",
+        "yearlyDiscount": "-17%",
+        "perMonth": "/mo",
+        "card": "Card",
+        "paypal": "PayPal",
+        "monthlyInterval": "monthly",
+        "yearlyInterval": "yearly",
+        "canceling": "canceling",
+        "renews": "renews"
+      },
+      "roles": {
+        "owner": "Owner",
+        "admin": "Admin",
+        "member": "Member",
+        "viewer": "Viewer"
+      },
+      "apiKeyScopes": {
+        "read": "Read",
+        "write": "Write",
+        "delete": "Delete",
+        "generate": "Generate",
+        "admin": "Admin"
+      },
+      "webhookEvents": {
+        "generation.completed": "Generation Completed",
+        "generation.failed": "Generation Failed",
+        "member.invited": "Member Invited",
+        "member.joined": "Member Joined",
+        "member.removed": "Member Removed",
+        "api_key.created": "API Key Created",
+        "export.completed": "Export Completed"
+      },
+      "notificationTypes": {
+        "info": "Info",
+        "success": "Success",
+        "warning": "Warning",
+        "error": "Error",
+        "invite": "Invitation",
+        "system": "System"
+      },
+      "settings": {
+        "tabs": {
+          "team": "Team",
+          "notifications": "Notifications",
+          "apiKeys": "API Keys",
+          "webhooks": "Webhooks",
+          "usage": "Usage",
+          "activity": "Activity",
+          "language": "Language"
+        },
+        "language": {
+          "title": "Language & locale",
+          "description": "Choose your preferred interface language. Changes apply immediately across the dashboard."
+        }
+      },
+      "billing": {
+        "currentPlan": "Current Plan:",
+        "subscriptionSummary": "{interval} · {renews}{canceling}",
+        "upgradePrompt": "Upgrade to unlock more features and higher limits",
+        "providersNotConfigured": "Payment providers are not configured yet. Set {paypalClientId} and {paypalClientSecret} to enable checkout.",
+        "paypalClientId": "PAYPAL_CLIENT_ID",
+        "paypalClientSecret": "PAYPAL_CLIENT_SECRET",
+        "mostPopular": "Most Popular",
+        "currentPlanButton": "Current Plan",
+        "upgradeTo": "Upgrade to {plan}",
+        "credits": "Credits",
+        "balanceUsed": "Balance: {balance} · Used: {used}",
+        "creditPacksPending": "Credit packs will appear after billing migration is applied.",
+        "cancelSubscription": "Cancel subscription at period end",
+        "billingHistory": "Billing history",
+        "billingHistoryDescription": "Paid invoices and receipts",
+        "noInvoices": "No invoices yet. Completed payments appear here."
+      },
+      "team": {
+        "loadingWorkspace": "Loading workspace…",
+        "createWorkspace": "Create your workspace",
+        "createWorkspaceDescription": "Set up a personal workspace to invite teammates and manage roles.",
+        "workspaceNamePlaceholder": "Acme Studio",
+        "inviteTeamMember": "Invite Team Member",
+        "emailPlaceholder": "colleague@company.com",
+        "invite": "Invite",
+        "inviteFootnote": "Invitations are stored in your workspace. Email delivery can be connected later.",
+        "teamMembers": "Team Members ({count})",
+        "noTeamMembers": "No team members yet",
+        "pendingInvitations": "Pending Invitations ({count})",
+        "invitedAs": "Invited as {role} · {expires}"
+      },
+      "apiKeys": {
+        "newKeyBanner": "Your new API key (copy it now):",
+        "title": "API Keys",
+        "createKey": "Create Key",
+        "description": "Manage API keys for programmatic access",
+        "keyName": "Key Name *",
+        "keyNamePlaceholder": "My API Key",
+        "expiresIn": "Expires in",
+        "expires30": "30 days",
+        "expires90": "90 days",
+        "expires180": "180 days",
+        "expires365": "1 year",
+        "expiresNever": "Never",
+        "scopes": "Scopes",
+        "noKeys": "No API keys created",
+        "keyMeta": "{prefix}... · {scopes} · {created}",
+        "nameRequired": "Name is required"
+      },
+      "webhooks": {
+        "title": "Webhooks",
+        "addWebhook": "Add Webhook",
+        "description": "Receive HTTP callbacks when events occur",
+        "endpointUrl": "Endpoint URL *",
+        "endpointPlaceholder": "https://example.com/webhook",
+        "events": "Events",
+        "createWebhook": "Create Webhook",
+        "noWebhooks": "No webhooks configured",
+        "failures": "{count} failures",
+        "urlRequired": "URL is required",
+        "selectEvent": "Select at least one event"
+      },
+      "notifications": {
+        "title": "Notifications",
+        "markAllRead": "Mark all read",
+        "empty": "No notifications",
+        "allMarkedRead": "All marked as read"
+      },
+      "usage": {
+        "generations": "Generations",
+        "tokensUsed": "Tokens Used",
+        "activeServices": "Active Services",
+        "usageByService": "Usage by Service",
+        "usageByServiceDescription": "AI generation usage breakdown",
+        "last7Days": "Last 7 days",
+        "last30Days": "Last 30 days",
+        "last90Days": "Last 90 days",
+        "noUsageData": "No usage data yet",
+        "serviceStats": "{generations} gen · {tokens} tokens"
+      },
+      "activity": {
+        "title": "Activity Log",
+        "totalEvents": "{count} total events",
+        "empty": "No activity recorded yet"
+      },
+      "admin": {
+        "accessRequired": "Admin access required",
+        "accessDenied": "You need admin privileges to access this panel.",
+        "loadFailed": "Failed to load admin data",
+        "systemOverview": "System Overview",
+        "systemOverviewDescription": "Database table counts and system health",
+        "loadingStats": "Loading stats...",
+        "featureFlags": "Feature Flags",
+        "featureFlagsDescription": "Control feature availability across plans",
+        "noFeatureFlags": "No feature flags configured",
+        "flagPlans": "{key} · Plans: {plans}"
+      },
+      "growth": {
+        "loading": "Loading growth engine…",
+        "loadFailed": "Failed to load growth dashboard",
+        "tabs": {
+          "overview": "Overview",
+          "affiliate": "Affiliate",
+          "referrals": "Referrals",
+          "leads": "Leads",
+          "crm": "CRM",
+          "email": "Email",
+          "experiments": "A/B Tests",
+          "automation": "Automation"
+        },
+        "overview": {
+          "pageviews30d": "Pageviews (30d)",
+          "conversions": "Conversions",
+          "leads": "Leads",
+          "subscribers": "Subscribers",
+          "funnelAnalytics": "Funnel analytics",
+          "funnelDescription": "Attributed growth events for your workspace"
+        },
+        "affiliate": {
+          "title": "Affiliate dashboard",
+          "description": "Share your link, track commissions, and review payouts.",
+          "clicks": "Clicks",
+          "referrals": "Referrals",
+          "earned": "Earned",
+          "unavailable": "Affiliate profile unavailable.",
+          "codeCommission": "Code {code} · Commission {rate}%",
+          "commissionTracking": "Commission tracking",
+          "noCommissions": "No commissions yet.",
+          "commissionRow": "{eventType} · {email}",
+          "commissionAmount": "{amount} · {status}",
+          "payoutHistory": "Payout history",
+          "noPayouts": "No payouts yet.",
+          "payoutRow": "{amount} · {method}"
+        },
+        "referrals": {
+          "title": "Referral program",
+          "description": "Invite friends and earn {credits} credits when they join.",
+          "invitePlaceholder": "friend@email.com",
+          "invites": "Invites",
+          "accepted": "Accepted"
+        },
+        "leads": {
+          "title": "Lead generation inbox",
+          "description": "Scored leads from contact, newsletter, CTAs and exit intent.",
+          "claimButton": "Claim platform leads (admin)",
+          "empty": "No leads yet. Claim platform leads or capture from the site.",
+          "scoreRow": "score {score} · {status} · {source}"
+        },
+        "crm": {
+          "contactManagement": "Contact management",
+          "emailPlaceholder": "Email",
+          "namePlaceholder": "Name",
+          "contactRow": "{name} · {stage}",
+          "salesPipeline": "Sales pipeline",
+          "dealTitlePlaceholder": "Deal title",
+          "dealRow": "{title} · {amount}",
+          "stages": {
+            "new": "new",
+            "qualified": "qualified",
+            "proposal": "proposal",
+            "negotiation": "negotiation",
+            "won": "won",
+            "lost": "lost"
+          }
+        },
+        "email": {
+          "title": "Email campaigns",
+          "description": "Draft campaigns only — connect an ESP (Resend/SendGrid) before live sends. Delivery provider can be wired via env later.",
+          "campaignNamePlaceholder": "Campaign name",
+          "subjectPlaceholder": "Subject line",
+          "createDraft": "Create draft campaign",
+          "campaignRow": "{name} · {subject}",
+          "campaignStats": "{status} · sent {sent}",
+          "subscribersCount": "Subscribers in workspace: {count}"
+        },
+        "experiments": {
+          "title": "A/B testing",
+          "description": "Landing, headline, CTA and pricing experiments.",
+          "namePlaceholder": "Experiment name",
+          "launchCtaTest": "Launch CTA test",
+          "experimentRow": "{name} · {targetType}",
+          "metrics": "impressions {impressions} · conversions {conversions}"
+        },
+        "automation": {
+          "title": "Marketing automation",
+          "description": "Trigger-based workflows, email sequences and segmentation hooks.",
+          "namePlaceholder": "Automation name",
+          "defaultName": "Lead nurture sequence",
+          "createNurtureFlow": "Create nurture flow",
+          "eventsEndpoint": "Event tracking endpoint: POST /api/growth/events — use for pageview, cta_click, signup and campaign events.",
+          "automationRow": "{name} · {trigger}",
+          "automationStats": "{status} · {steps} steps",
+          "segmentsSummary": "Segments: {segments} · Running experiments: {experiments}"
+        }
+      },
+      "aiSearch": {
+        "loading": "Loading AI Search Center…",
+        "loadFailed": "Failed to load AI Search Center",
+        "unavailable": "AI Search Center unavailable",
+        "unableToLoad": "Unable to load dashboard.",
+        "analyzeFailed": "Analyze failed",
+        "analyzeRequestFailed": "Analyze request failed",
+        "invalidSchemaJson": "Schema JSON is invalid.",
+        "tabs": {
+          "visibility": "Visibility",
+          "aeo": "AEO",
+          "geo": "GEO",
+          "schema": "Schema",
+          "optimize": "Optimizer",
+          "analytics": "Analytics",
+          "programmatic": "Programmatic",
+          "knowledge": "Knowledge",
+          "competitors": "Competitors",
+          "recommendations": "Recommendations"
+        },
+        "visibility": {
+          "aiVisibility": "AI Visibility",
+          "seo": "SEO",
+          "aeo": "AEO",
+          "geo": "GEO",
+          "technicalSeo": "Technical SEO",
+          "contentQuality": "Content Quality",
+          "structuredData": "Structured Data",
+          "aiSearchReadiness": "AI Search Readiness",
+          "engineCoverage": "Engine coverage",
+          "engineCoverageDescription": "Readiness for Google, AI Mode, ChatGPT, Gemini, Claude, Perplexity and Copilot",
+          "visibilityChecks": "Visibility checks"
+        },
+        "analyzer": {
+          "aeoTitle": "AEO Analyzer",
+          "geoTitle": "GEO Analyzer",
+          "optimizeTitle": "AI Content Optimizer",
+          "aeoDescription": "Answer Engine Optimization for FAQs, direct answers and question coverage",
+          "geoDescription": "Generative Engine Optimization for entities, clusters and citation readiness",
+          "optimizeDescription": "Generate SEO title, meta, OpenGraph, FAQ, schema, summary, CTA and internal links",
+          "titlePlaceholder": "Title",
+          "pathPlaceholder": "/path",
+          "metaDescriptionPlaceholder": "Meta description",
+          "pageContentPlaceholder": "Page content",
+          "enrichWithAi": "Enrich with AI insights (uses AI quota)",
+          "runOptimizer": "Run Optimizer",
+          "runMode": "Run {mode}"
+        },
+        "schema": {
+          "title": "Schema Validator",
+          "description": "Validate Organization, Product, SoftwareApplication, FAQ, Article, Breadcrumb, WebSite, SearchAction, HowTo and Review",
+          "jsonLdPlaceholder": "Optional page JSON-LD… e.g. { \"@type\": \"FAQPage\", \"mainEntity\": [] }",
+          "validate": "Validate schema",
+          "schemaScore": "Schema score",
+          "errors": "Errors",
+          "warnings": "Warnings",
+          "platformCoverage": "Platform coverage"
+        },
+        "results": {
+          "aeoResult": "AEO result",
+          "geoResult": "GEO result",
+          "optimizedOutputs": "Optimized outputs ({source})",
+          "seoTitle": "SEO Title",
+          "metaDescription": "Meta Description",
+          "openGraphTitle": "OpenGraph Title",
+          "openGraphDescription": "OpenGraph Description",
+          "aiSummary": "AI Summary",
+          "cta": "CTA",
+          "faq": "FAQ",
+          "internalLinks": "Internal links",
+          "metrics": "Metrics",
+          "strengths": "Strengths",
+          "issues": "Issues",
+          "recommendations": "Recommendations",
+          "aiInsights": "AI insights",
+          "scoreGrade": "{title}: {score}/100 ({grade})",
+          "entities": "entities: {entities}",
+          "clusters": "clusters: {clusters}",
+          "noneDetected": "none"
+        },
+        "analytics": {
+          "mostSearchedTopics": "Most searched topics",
+          "topPerformingPages": "Top performing pages",
+          "aiReadyPages": "AI-ready pages",
+          "weakPages": "Weak pages",
+          "contentOpportunities": "Content opportunities",
+          "keywordOpportunities": "Keyword opportunities",
+          "searchTrends": "Search trends",
+          "topicSignal": "{topic} · signal {signal}",
+          "pageScore": "{score} · {path}",
+          "pageTitle": "{score} · {title}",
+          "opportunity": "[{priority}] {title}",
+          "keyword": "{coverage} · {keyword}",
+          "trend": "{direction} · {label}: {detail}"
+        },
+        "programmatic": {
+          "draftHint": "{draft} draft",
+          "duplicatePrevention": "Duplicate / conflict prevention",
+          "duplicateRow": "{path} ↔ {conflictWith}: {reason}",
+          "qualityGates": "Quality gates",
+          "qualityGateRow": "{status} · {label}: {detail}",
+          "recommendations": "Recommendations"
+        },
+        "knowledge": {
+          "hubs": "Knowledge hubs",
+          "hubRow": "{title} · {path}",
+          "kindBucket": "{kind} ({published} published / {draft} draft)",
+          "entryRow": "{status} · {title}",
+          "noEntries": "No entries yet",
+          "gaps": "Gaps",
+          "gapRow": "[{priority}] {kind}: {message}"
+        },
+        "competitors": {
+          "ourCoverage": "Our coverage",
+          "overlap": "Overlap:",
+          "missingVsUs": "Missing vs us:",
+          "opportunities": "Opportunities:",
+          "platformGaps": "Platform gaps"
+        },
+        "recommendationsEngine": {
+          "title": "AI Recommendations Engine",
+          "description": "Continuous suggestions from visibility, schema, programmatic, knowledge and competitor intelligence"
+        }
+      },
+      "seoHealth": {
+        "loadFailed": "Failed to load SEO health report.",
+        "analyzerFailed": "Analyzer failed.",
+        "analyzerRequestFailed": "Analyzer request failed.",
+        "healthScore": "Health score",
+        "sitemapUrls": "Sitemap URLs",
+        "publicRoutes": "Public routes",
+        "programmaticPages": "Programmatic pages",
+        "sitewideChecks": "Sitewide SEO checks",
+        "sitewideDescription": "Coverage across sitemaps, content registries, analytics and hreflang foundations.",
+        "loadingReport": "Loading health report…",
+        "recommendations": "Recommendations",
+        "analyzerTitle": "AI SEO Analyzer",
+        "analyzerDescription": "Score titles, descriptions and page signals. Optionally enrich with AI recommendations.",
+        "titleLabel": "Title",
+        "pathLabel": "Path",
+        "metaDescriptionLabel": "Meta description",
+        "contentSampleLabel": "Content sample (optional)",
+        "contentPlaceholder": "Paste page body text for thin-content and keyword checks…",
+        "enrichWithAi": "Enrich with AI insights",
+        "strengths": "Strengths",
+        "issues": "Issues",
+        "suggestedTitle": "Suggested title",
+        "suggestedDescription": "Suggested description",
+        "aiInsights": "AI insights",
+        "gradeSource": "Grade {grade} · {source}"
+      },
+      "toasts": {
+        "failed": "Failed",
+        "requestFailed": "Request failed",
+        "couldNotLoadBilling": "Could not load billing.",
+        "couldNotCompletePayment": "Could not complete payment.",
+        "paymentAlreadyRecorded": "Payment already recorded.",
+        "paymentCompleted": "Payment completed.",
+        "checkoutFailed": "Checkout failed.",
+        "noApprovalUrl": "No payment approval URL returned.",
+        "creditsCheckoutFailed": "Credits checkout failed.",
+        "couldNotCancelSubscription": "Could not cancel subscription.",
+        "subscriptionCancelScheduled": "Subscription will end at the current period.",
+        "failedToLoadTeam": "Failed to load team",
+        "workspaceNameRequired": "Enter a workspace name",
+        "failedToCreateWorkspace": "Failed to create workspace",
+        "workspaceCreated": "Workspace created",
+        "workspaceReady": "Workspace ready",
+        "emailRequired": "Enter an email address",
+        "createWorkspaceFirst": "Create a workspace first",
+        "inviteFailed": "Invite failed",
+        "invitationCreated": "Invitation created",
+        "keyRevoked": "Key revoked",
+        "webhookDeleted": "Webhook deleted",
+        "copiedToClipboard": "Copied to clipboard",
+        "couldNotCopy": "Could not copy",
+        "actionFailed": "Action failed",
+        "inviteRecorded": "Invite recorded",
+        "claimedLeads": "Claimed {count} platform leads",
+        "claimFailed": "Claim failed",
+        "contactSaved": "Contact saved",
+        "saveFailed": "Save failed",
+        "dealCreated": "Deal created",
+        "dealFailed": "Deal failed",
+        "campaignDraftCreated": "Campaign draft created",
+        "campaignFailed": "Campaign failed",
+        "experimentStarted": "Experiment started",
+        "experimentFailed": "Experiment failed",
+        "automationCreated": "Automation created",
+        "automationFailed": "Automation failed"
+      }
+    },
+    "profile": {
+      "title": "Your Profile",
+      "upload": "Upload",
+      "accountSettings": {
+        "title": "Account Settings",
+        "description": "Update your personal information"
+      },
+      "password": {
+        "title": "Change Password",
+        "description": "Update your account password",
+        "newPassword": "New password",
+        "confirmPassword": "Confirm password",
+        "updating": "Updating...",
+        "update": "Update Password"
+      },
+      "preferences": {
+        "title": "Preferences",
+        "description": "Theme and notification settings",
+        "theme": "Theme",
+        "emailNotifications": "Email notifications",
+        "saving": "Saving...",
+        "save": "Save Preferences"
+      },
+      "forms": {
+        "email": "Email",
+        "fullName": "Full name",
+        "fullNamePlaceholder": "Jane Doe",
+        "company": "Company",
+        "companyPlaceholder": "Acme Inc.",
+        "role": "Role",
+        "rolePlaceholder": "Founder, CEO, Analyst..."
+      },
+      "themes": {
+        "dark": "Dark",
+        "light": "Light",
+        "system": "System"
+      },
+      "saving": "Saving...",
+      "saveChanges": "Save Changes",
+      "success": {
+        "profileUpdated": "Profile updated successfully."
+      },
+      "errors": {
+        "passwordsDoNotMatch": "Passwords do not match"
+      },
+      "toasts": {
+        "preferencesSaved": "Preferences saved",
+        "avatarUpdated": "Avatar updated"
+      }
+    },
+    "socialMedia": {
+      "composer": {
+        "platform": "Platform",
+        "tone": "Tone",
+        "brand": "Brand (read-only)",
+        "noBrand": "No brand",
+        "publishAccount": "Publish account",
+        "publishingStatus": "Publishing status: {status}",
+        "topicBrief": "Topic / brief",
+        "topicPlaceholder": "What should this post be about?",
+        "generating": "Generating…",
+        "aiGenerate": "AI Generate",
+        "saveDraft": "Save Draft",
+        "visual": "Visual",
+        "title": "Title",
+        "caption": "Caption",
+        "publishing": "Publishing…",
+        "publish": "Publish",
+        "schedule": "Schedule",
+        "defaultTopic": "Social post",
+        "untitledPost": "Untitled Post"
+      },
+      "actions": {
+        "rewrite": "Rewrite",
+        "improve_engagement": "Improve engagement",
+        "shorten": "Shorten",
+        "expand": "Expand",
+        "generate_variations": "Generate variations"
+      },
+      "tones": {
+        "Professional": "Professional",
+        "Casual": "Casual",
+        "Luxury": "Luxury",
+        "Marketing": "Marketing",
+        "Friendly": "Friendly",
+        "Technical": "Technical"
+      },
+      "dashboard": {
+        "drafts": "Drafts",
+        "scheduled": "Scheduled",
+        "published": "Published",
+        "failed": "Failed",
+        "totalPosts": "Total Posts",
+        "liveAnalytics": "Live analytics",
+        "live": "Live",
+        "impressions": "Impressions",
+        "likes": "Likes",
+        "comments": "Comments",
+        "shares": "Shares",
+        "clicks": "Clicks",
+        "avgEngagement": "Avg engagement",
+        "metricsSyncHint": "Metrics sync after publishing and platform webhooks."
+      },
+      "toasts": {
+        "generationFailed": "Generation failed",
+        "postGenerated": "Post generated!",
+        "failed": "Failed",
+        "contentRequired": "Generate or write content first.",
+        "actionFailed": "Action failed",
+        "updated": "Updated!",
+        "draftSaved": "Draft saved",
+        "scheduleRequired": "Save post and pick schedule time.",
+        "connectAccount": "Connect an account first.",
+        "scheduleFailed": "Schedule failed",
+        "scheduled": "Scheduled for publishing!",
+        "savePostFirst": "Save the post first.",
+        "connectToPublish": "Connect an account to publish.",
+        "publishFailed": "Publish failed",
+        "published": "Published!",
+        "openImageGenerator": "Opening Image Generator flow — use dashboard Image Generator with social dimensions."
+      },
+      "workspace": {
+        "tabs": {
+          "dashboard": "Dashboard",
+          "compose": "Composer",
+          "calendar": "Calendar",
+          "accounts": "Accounts",
+          "strategy": "AI Strategy"
+        },
+        "contentLibrary": "Content Library",
+        "loadingStrategy": "Loading AI strategy…",
+        "views": {
+          "month": "Month",
+          "week": "Week"
+        }
+      },
+      "accounts": {
+        "title": "Connected Accounts",
+        "description": "Connect platforms to publish and schedule posts.",
+        "refresh": "Refresh",
+        "connected": "Connected",
+        "notConnected": "Not connected",
+        "connectAccount": "Connect Account",
+        "yourAccounts": "Your accounts",
+        "disconnect": "Disconnect",
+        "loadFailed": "Failed to load accounts",
+        "disconnectFailed": "Disconnect failed",
+        "disconnected": "Account disconnected",
+        "platforms": {
+          "facebook": "Facebook",
+          "instagram": "Instagram",
+          "whatsapp": "WhatsApp Business",
+          "messenger": "Messenger",
+          "linkedin": "LinkedIn",
+          "x": "X (Twitter)"
+        }
+      },
+      "calendar": {
+        "scheduled": "Scheduled",
+        "weekdays": {
+          "sun": "Sun",
+          "mon": "Mon",
+          "tue": "Tue",
+          "wed": "Wed",
+          "thu": "Thu",
+          "fri": "Fri",
+          "sat": "Sat"
+        },
+        "viewLabel": "{month} · {view} view",
+        "month": "month",
+        "week": "week"
+      },
+      "library": {
+        "filters": {
+          "all": "All",
+          "favorites": "Favorites",
+          "draft": "Draft"
+        },
+        "empty": "No posts yet"
+      },
+      "templates": {
+        "title": "Templates",
+        "useTemplate": "Use Template"
+      },
+      "preview": {
+        "title": "{platform} Preview",
+        "bestTime": "Best time: {time}",
+        "mediaAttached": "Media attached",
+        "noVisual": "No visual — use Generate Visual",
+        "placeholder": "Post preview will appear here…",
+        "angle": "Angle: {angle}",
+        "platforms": {
+          "facebook": "Facebook",
+          "instagram": "Instagram",
+          "linkedin": "LinkedIn",
+          "x": "X",
+          "tiktok": "TikTok"
+        }
+      }
+    },
+    "businessManager": {
+      "projects": {
+        "aiPlanner": "AI project planner",
+        "briefPlaceholder": "Describe goals, timeline, team, deliverables...",
+        "creating": "Creating…",
+        "createProject": "Create project",
+        "noDescription": "No description",
+        "kanban": "Kanban",
+        "list": "List",
+        "timeline": "Timeline",
+        "archive": "Archive",
+        "newTaskPlaceholder": "New task title",
+        "advance": "Advance →",
+        "unassigned": "Unassigned",
+        "noTasks": "No tasks yet.",
+        "noDate": "No date",
+        "timelineEmpty": "Add tasks with due dates or milestones for timeline view.",
+        "selectOrCreate": "Select or create a project"
+      },
+      "overview": {
+        "activeProjects": "Active Projects",
+        "taskCompletion": "Task Completion",
+        "teams": "Teams",
+        "pendingApprovals": "Pending Approvals",
+        "operationsSnapshot": "Operations snapshot",
+        "avgProjectProgress": "Avg project progress",
+        "overdueTasks": "Overdue tasks",
+        "urgentTasks": "Urgent tasks",
+        "activeWorkflows": "Active workflows",
+        "recentProjects": "Recent projects",
+        "noProjects": "No projects yet."
+      },
+      "taskStatuses": {
+        "todo": "Todo",
+        "in_progress": "In progress",
+        "review": "Review",
+        "done": "Done",
+        "blocked": "Blocked"
+      },
+      "toasts": {
+        "briefRequired": "Enter a project brief.",
+        "projectCreated": "Project created",
+        "failed": "Failed",
+        "projectArchived": "Project archived"
+      },
+      "workspace": {
+        "loadingStrategy": "Loading AI strategy…",
+        "tabs": {
+          "overview": "Overview",
+          "organizations": "Organizations",
+          "teams": "Teams",
+          "projects": "Projects",
+          "kpis": "KPIs",
+          "operations": "Operations",
+          "analytics": "Analytics",
+          "assistant": "AI Assistant",
+          "strategy": "AI Strategy"
+        }
+      },
+      "operations": {
+        "workflowBuilder": "Workflow builder",
+        "workflowNamePlaceholder": "Workflow name",
+        "approvals": "Approvals",
+        "approvalPlaceholder": "Approval request",
+        "request": "Request",
+        "approve": "Approve",
+        "reject": "Reject",
+        "nameRequired": "Workflow name required",
+        "titleRequired": "Title required",
+        "workflowCreated": "Workflow created",
+        "approvalRequested": "Approval requested"
+      }
+    },
+    "marketing": {
+      "dashboard": {
+        "totalCampaigns": "Total Campaigns",
+        "active": "Active",
+        "plannedDraft": "Planned / Draft",
+        "leads": "Leads",
+        "analytics": "Marketing analytics",
+        "impressions": "Impressions",
+        "clicks": "Clicks",
+        "conversions": "Conversions",
+        "revenue": "Revenue",
+        "spend": "Spend",
+        "avgRoi": "Avg ROI"
+      },
+      "workspace": {
+        "loadingStrategy": "Loading AI strategy…",
+        "tabs": {
+          "dashboard": "Dashboard",
+          "campaigns": "Campaigns",
+          "personas": "Personas",
+          "calendar": "Calendar",
+          "analytics": "Analytics",
+          "email": "Email",
+          "ads": "Ads",
+          "strategy": "AI Strategy"
+        }
+      },
+      "campaignEditor": {
+        "title": "Campaign Editor",
+        "name": "Name",
+        "objective": "Objective",
+        "channels": "Channels",
+        "kpis": "KPIs",
+        "timeline": "Timeline",
+        "save": "Save",
+        "saved": "Campaign saved",
+        "aiCompleted": "AI assistant completed",
+        "actionFailed": "Action failed",
+        "actions": {
+          "improve_campaign": "Improve campaign",
+          "analyze_campaign": "Analyze campaign",
+          "suggest_improvements": "Suggest improvements",
+          "generate_ideas": "Generate ideas"
+        }
       }
     }
   },
@@ -3898,16 +5682,16 @@
         "creative": "Creative",
         "experimental": "Experimental"
       },
+      "options": {},
+      "templateCategories": {},
+      "platforms": {},
+      "calendarCategories": {},
       "calendarStatuses": {
         "draft": "Draft",
         "scheduled": "Scheduled",
         "published": "Published",
         "archived": "Archived"
-      },
-      "options": {},
-      "templateCategories": {},
-      "platforms": {},
-      "calendarCategories": {}
+      }
     },
     "aiAgents": {
       "types": {

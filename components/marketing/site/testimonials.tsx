@@ -1,11 +1,14 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { REF_TESTIMONIALS } from "@/lib/constants/marketing-content";
 import { SiteSectionHead } from "@/components/marketing/site/ui";
+import { useScopedT } from "@/lib/i18n/use-scoped-t";
+
+const TESTIMONIAL_COUNT = 3;
 
 /** Testimonials — premium quote cards. */
 export function SiteTestimonials() {
+  const t = useScopedT("marketing.testimonials");
   const reduce = useReducedMotion();
 
   return (
@@ -17,14 +20,14 @@ export function SiteTestimonials() {
       <div className="landing-container py-20 lg:py-28">
         <SiteSectionHead
           id="testimonials-title"
-          label="Testimonials"
-          title="Trusted by founders building premium brands."
-          description="Teams choose Trend Business AI when they want one luxury workspace instead of a scattered stack of tools."
+          label={t("label")}
+          title={t("title")}
+          description={t("description")}
         />
         <div className="mt-14 grid gap-5 lg:grid-cols-3 lg:gap-6">
-          {REF_TESTIMONIALS.map((item, index) => (
+          {Array.from({ length: TESTIMONIAL_COUNT }, (_, index) => (
             <motion.blockquote
-              key={item.name}
+              key={index}
               initial={reduce ? undefined : { opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
@@ -37,11 +40,11 @@ export function SiteTestimonials() {
                 “
               </p>
               <p className="mt-3 text-[15px] leading-[1.8] text-[#C7C7C7]">
-                {item.quote}
+                {t(`items.${index}.quote`)}
               </p>
               <footer className="mt-7 border-t border-[rgba(212,175,55,0.12)] pt-5">
-                <p className="text-[15px] font-semibold text-white">{item.name}</p>
-                <p className="mt-1 text-[13px] text-[#8A8A8A]">{item.role}</p>
+                <p className="text-[15px] font-semibold text-white">{t(`items.${index}.name`)}</p>
+                <p className="mt-1 text-[13px] text-[#8A8A8A]">{t(`items.${index}.role`)}</p>
               </footer>
             </motion.blockquote>
           ))}

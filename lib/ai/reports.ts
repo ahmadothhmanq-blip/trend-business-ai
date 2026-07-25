@@ -5,7 +5,9 @@ import {
   reportsUserPrompt,
 } from "@/lib/ai/prompts/legacy-services";
 
-export type ReportInput = z.infer<typeof reportInputSchema>;
+export type ReportInput = z.infer<typeof reportInputSchema> & {
+  language?: string;
+};
 
 export type GeneratedReport = {
   title: string;

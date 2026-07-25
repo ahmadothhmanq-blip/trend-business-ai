@@ -1,4 +1,5 @@
 import type { VideoPluginInput, VideoAnalysis, VideoScenePlan } from "@/plugins/video-studio/types";
+import { aiOutputLanguageDirective } from "@/lib/ai/prompts/shared";
 
 function getVideoTypeContext(type: string): string {
   const ctx: Record<string, string> = {
@@ -43,7 +44,7 @@ Produce a JSON object with:
 - visualTheme: description of the visual theme
 - pacing: pacing description (fast, medium, slow, dynamic)
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(input.language)}`;
 }
 
 export function videoPlanPrompt(input: VideoPluginInput, analysis: VideoAnalysis): string {
@@ -76,7 +77,7 @@ Create a JSON object with:
 - totalDuration: total video duration
 - narrativeArc: the story structure (e.g. "hook → problem → solution → CTA")
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(input.language)}`;
 }
 
 export function videoScenePrompt(
@@ -85,6 +86,7 @@ export function videoScenePrompt(
   sceneIndex: number,
   totalScenes: number,
   aspectRatio: string,
+  language?: string,
 ): string {
   const dims: Record<string, string> = {
     "16:9": "640 360",
@@ -114,10 +116,14 @@ Create a JSON object with:
 - svgStoryboard: SVG storyboard frame (viewBox="0 0 ${w} ${h}"). Create a visual composition showing the scene layout, subject placement, and camera framing. Use shapes, text labels, and arrows to indicate motion. Include the scene's color palette. Use generic fonts. No external references.
 - visualPrompt: optimized text-to-video prompt for AI video generators (Runway, Kling, etc.) — detailed, comma-separated descriptors
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(language)}`;
 }
 
-export function videoScriptPrompt(analysis: VideoAnalysis, scenes: VideoScenePlan[]): string {
+export function videoScriptPrompt(
+  analysis: VideoAnalysis,
+  scenes: VideoScenePlan[],
+  language?: string,
+): string {
   const sceneList = scenes.map((s, i) => `Scene ${i + 1}: ${s.name} — ${s.description} (${s.duration})`).join("\n");
   return `Write a professional video script for "${analysis.title}".
 
@@ -136,10 +142,14 @@ Write the script with:
 - Narration/dialogue in regular text
 - Music/SFX cues in (parentheses)
 
-Write 200-500 words. Professional, engaging. Return plain text — no JSON wrapper.`;
+Write 200-500 words. Professional, engaging. Return plain text — no JSON wrapper.${aiOutputLanguageDirective(language)}`;
 }
 
-export function videoThumbnailPrompt(analysis: VideoAnalysis, aspectRatio: string): string {
+export function videoThumbnailPrompt(
+  analysis: VideoAnalysis,
+  aspectRatio: string,
+  language?: string,
+): string {
   const dims: Record<string, string> = { "16:9": "640 360", "9:16": "360 640", "1:1": "400 400", "4:5": "360 450", "21:9": "756 324" };
   const [w, h] = (dims[aspectRatio] || "640 360").split(" ");
 
@@ -161,5 +171,5 @@ Requirements:
 Return a JSON object with:
 - svgCode: the complete SVG markup
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(language)}`;
 }

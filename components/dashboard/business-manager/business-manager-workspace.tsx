@@ -14,6 +14,7 @@ import {
   Workflow,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 import { BusinessOverview } from "@/components/dashboard/business-manager/business-overview";
 import { OrganizationsPanel } from "@/components/dashboard/business-manager/organizations-panel";
 import { TeamsPanel } from "@/components/dashboard/business-manager/teams-panel";
@@ -36,9 +37,14 @@ import type {
 } from "@/types/business-manager";
 import type { WorkspaceGeneration } from "@/types/database";
 
+function StrategyWorkspaceLoading() {
+  const wt = useWorkspaceT("businessManager");
+  return <div className="text-sm text-white/40">{wt("workspace.loadingStrategy")}</div>;
+}
+
 const StrategyWorkspace = dynamic(
   () => import("@/components/dashboard/business-manager/strategy-workspace").then((m) => m.StrategyWorkspace),
-  { loading: () => <div className="text-sm text-white/40">Loading AI strategy…</div> },
+  { loading: () => <StrategyWorkspaceLoading /> },
 );
 
 type Tab =
@@ -79,6 +85,7 @@ export function BusinessManagerWorkspace({
   initialGenerations = [],
   analyticsSummary,
 }: Props) {
+  const wt = useWorkspaceT("businessManager");
   const [tab, setTab] = useState<Tab>("overview");
 
   const summary =
@@ -100,15 +107,15 @@ export function BusinessManagerWorkspace({
     };
 
   const tabs = [
-    { key: "overview" as const, label: "Overview", icon: LayoutDashboard },
-    { key: "organizations" as const, label: "Organizations", icon: Building2 },
-    { key: "teams" as const, label: "Teams", icon: Users },
-    { key: "projects" as const, label: "Projects", icon: Briefcase },
-    { key: "kpis" as const, label: "KPIs", icon: Target },
-    { key: "operations" as const, label: "Operations", icon: Workflow },
-    { key: "analytics" as const, label: "Analytics", icon: BarChart3 },
-    { key: "assistant" as const, label: "AI Assistant", icon: CheckSquare },
-    { key: "strategy" as const, label: "AI Strategy", icon: Sparkles },
+    { key: "overview" as const, label: wt("workspace.tabs.overview"), icon: LayoutDashboard },
+    { key: "organizations" as const, label: wt("workspace.tabs.organizations"), icon: Building2 },
+    { key: "teams" as const, label: wt("workspace.tabs.teams"), icon: Users },
+    { key: "projects" as const, label: wt("workspace.tabs.projects"), icon: Briefcase },
+    { key: "kpis" as const, label: wt("workspace.tabs.kpis"), icon: Target },
+    { key: "operations" as const, label: wt("workspace.tabs.operations"), icon: Workflow },
+    { key: "analytics" as const, label: wt("workspace.tabs.analytics"), icon: BarChart3 },
+    { key: "assistant" as const, label: wt("workspace.tabs.assistant"), icon: CheckSquare },
+    { key: "strategy" as const, label: wt("workspace.tabs.strategy"), icon: Sparkles },
   ];
 
   return (

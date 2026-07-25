@@ -3,12 +3,15 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
-import { REF_FAQ } from "@/lib/constants/marketing-content";
 import { SiteSectionHead } from "@/components/marketing/site/ui";
+import { useScopedT } from "@/lib/i18n/use-scoped-t";
 import { cn } from "@/lib/utils";
+
+const FAQ_COUNT = 7;
 
 /** FAQ — accordion in the same black/gold language. */
 export function SiteFaq() {
+  const t = useScopedT("marketing.faq");
   const reduce = useReducedMotion();
   const [open, setOpen] = useState(0);
 
@@ -21,16 +24,17 @@ export function SiteFaq() {
       <div className="landing-container py-20 lg:py-28">
         <SiteSectionHead
           id="faq-title"
-          label="FAQ"
-          title="Answers before you start."
-          description="Everything you need to know about products, privacy, beta access and exports."
+          label={t("label")}
+          title={t("title")}
+          description={t("description")}
         />
         <div className="mx-auto mt-14 max-w-3xl space-y-3">
-          {REF_FAQ.map((item, index) => {
+          {Array.from({ length: FAQ_COUNT }, (_, index) => {
             const isOpen = open === index;
+            const question = t(`items.${index}.question`);
             return (
               <motion.div
-                key={item.question}
+                key={question}
                 initial={reduce ? undefined : { opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -49,7 +53,7 @@ export function SiteFaq() {
                   onClick={() => setOpen(isOpen ? -1 : index)}
                 >
                   <span className="text-[15px] font-semibold text-white sm:text-[16px]">
-                    {item.question}
+                    {question}
                   </span>
                   <ChevronDown
                     className={cn(
@@ -66,7 +70,7 @@ export function SiteFaq() {
                 >
                   <div className="overflow-hidden">
                     <p className="border-t border-[rgba(212,175,55,0.1)] px-5 pb-5 pt-4 text-[14px] leading-[1.75] text-[#B5B5B5] sm:px-6 sm:pb-6">
-                      {item.answer}
+                      {t(`items.${index}.answer`)}
                     </p>
                   </div>
                 </div>

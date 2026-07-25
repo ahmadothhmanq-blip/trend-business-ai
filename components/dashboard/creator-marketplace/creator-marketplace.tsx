@@ -29,6 +29,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { useFormatter } from "@/lib/i18n/use-formatter";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
+import { useTranslation } from "@/lib/i18n/client";
 import {
   CREATOR_MARKETPLACE_CATEGORIES,
   type CreatorMarketplaceCategory,
@@ -64,12 +67,11 @@ const VIEWPORT_WIDTH: Record<Viewport, string> = {
   mobile: "390px",
 };
 
-function formatPrice(cents: number): string {
-  if (cents <= 0) return "Free";
-  return `$${(cents / 100).toFixed(cents % 100 === 0 ? 0 : 2)}`;
-}
-
 export function CreatorMarketplace() {
+  const pt = useProductT("creatorMarketplace");
+  const { formatCurrency } = useFormatter();
+  const formatListingPrice = (cents: number) =>
+    cents <= 0 ? pt("free") : formatCurrency(cents);
   const router = useRouter();
   const [catalog, setCatalog] = useState<CatalogResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -104,7 +106,7 @@ export function CreatorMarketplace() {
       if (query.trim()) params.set("q", query.trim());
       if (favoritesOnly) params.set("favorites", "1");
       const res = await fetch(`/api/marketplace/templates?${params}`);
-      if (!res.ok) throw new Error("Failed to load marketplace");
+      if (!res.ok) throw new Error(pt("errors.loadFailed"));
       const data = (await res.json()) as CatalogResponse;
       setCatalog(data);
     } catch {
@@ -129,7 +131,7 @@ export function CreatorMarketplace() {
       const res = await fetch(
         `/api/marketplace/templates/${encodeURIComponent(id)}`,
       );
-      if (!res.ok) throw new Error("Preview failed");
+      if (!res.ok) throw new Error(pt("errors.previewFailed"));
       const data = (await res.json()) as DetailResponse;
       setPreview(data);
     } catch {
@@ -166,7 +168,7 @@ export function CreatorMarketplace() {
         `/api/marketplace/templates/${encodeURIComponent(listingId)}/use`,
         { method: "POST" },
       );
-      if (!res.ok) throw new Error("Use failed");
+      if (!res.ok) throw new Error(pt("errors.useFailed"));
       const data = (await res.json()) as { builderHref: string };
       router.push(data.builderHref);
     } catch {
@@ -224,15 +226,13 @@ export function CreatorMarketplace() {
           <div>
             <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-premium-gold/25 bg-premium-gold/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-premium-gold">
               <LayoutTemplate className="size-3" />
-              Creator Marketplace
+              {pt("badge")}
             </div>
             <h2 className="text-xl font-bold text-white sm:text-2xl">
-              Website templates by designers
+              {pt("title")}
             </h2>
             <p className="mt-1 max-w-2xl text-[13px] leading-relaxed text-white/45">
-              Browse, favorite, and duplicate professional templates into the
-              Website Builder. Creators can upload listings, manage versions, and
-              prepare for future payments and revenue.
+              {pt("description")}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -242,14 +242,14 @@ export function CreatorMarketplace() {
               onClick={() => void openCreator()}
             >
               <UserRound className="size-4" />
-              Creator profile
+              {pt("creatorProfile")}
             </Button>
             <Button
               className="bg-premium-gold text-black hover:bg-premium-gold/90"
               onClick={() => setUploadOpen(true)}
             >
               <Upload className="size-4" />
-              Upload template
+              {pt("uploadTemplate")}
             </Button>
           </div>
         </div>
@@ -258,7 +258,7 @@ export function CreatorMarketplace() {
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search templates, authors, features…"
+            placeholder={pt("searchPlaceholder")}
             className="border-white/10 bg-white/5 text-white placeholder:text-white/30 lg:col-span-2"
           />
           <select
@@ -268,7 +268,7 @@ export function CreatorMarketplace() {
             }
             className="h-10 rounded-md border border-white/10 bg-[#121212] px-3 text-sm text-white"
           >
-            <option value="all">All industries</option>
+            <option value="all">{pt("allIndustries")}</option>
             {categories.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.label}
@@ -280,7 +280,7 @@ export function CreatorMarketplace() {
             onChange={(e) => setStyle(e.target.value)}
             className="h-10 rounded-md border border-white/10 bg-[#121212] px-3 text-sm text-white"
           >
-            <option value="all">All styles</option>
+            <option value="all">{pt("allStyles")}</option>
             {styles.map((s) => (
               <option key={s} value={s}>
                 {s}
@@ -294,20 +294,20 @@ export function CreatorMarketplace() {
             }
             className="h-10 rounded-md border border-white/10 bg-[#121212] px-3 text-sm text-white"
           >
-            <option value="all">Any price</option>
-            <option value="free">Free</option>
-            <option value="paid">Paid</option>
+            <option value="all">{pt("anyPrice")}</option>
+            <option value="free">{pt("free")}</option>
+            <option value="paid">{pt("paid")}</option>
           </select>
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value)}
             className="h-10 rounded-md border border-white/10 bg-[#121212] px-3 text-sm text-white"
           >
-            <option value="popular">Popular</option>
-            <option value="newest">Newest</option>
-            <option value="rating">Top rated</option>
-            <option value="price-asc">Price ↑</option>
-            <option value="price-desc">Price ↓</option>
+            <option value="popular">{pt("sort.popular")}</option>
+            <option value="newest">{pt("sort.newest")}</option>
+            <option value="rating">{pt("sort.rating")}</option>
+            <option value="price-asc">{pt("sort.priceAsc")}</option>
+            <option value="price-desc">{pt("sort.priceDesc")}</option>
           </select>
         </div>
 
@@ -323,7 +323,7 @@ export function CreatorMarketplace() {
             onClick={() => setFavoritesOnly((v) => !v)}
           >
             <Heart className={cn("size-3.5", favoritesOnly && "fill-current")} />
-            Favorites
+            {pt("favorites")}
           </Button>
           <Link href="/dashboard/website-builder">
             <Button
@@ -331,7 +331,7 @@ export function CreatorMarketplace() {
               variant="outline"
               className="border-white/15 text-white"
             >
-              Open Website Builder
+              {pt("openWebsiteBuilder")}
             </Button>
           </Link>
         </div>
@@ -340,7 +340,7 @@ export function CreatorMarketplace() {
       {featured.length > 0 && !favoritesOnly && !query ? (
         <section>
           <h3 className="mb-3 text-sm font-semibold text-white/80">
-            Trending templates
+            {pt("trending")}
           </h3>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {featured.map((l) => (
@@ -360,17 +360,17 @@ export function CreatorMarketplace() {
       <section>
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-sm font-semibold text-white/80">
-            Marketplace {catalog ? `(${catalog.count})` : ""}
+            {pt("marketplace")} {catalog ? `(${catalog.count})` : ""}
           </h3>
         </div>
         {loading ? (
           <div className="flex items-center gap-2 py-16 text-white/40">
             <Loader2 className="size-4 animate-spin" />
-            Loading marketplace…
+            {pt("loading")}
           </div>
         ) : listings.length === 0 ? (
           <DashboardPanel className="p-8 text-center text-sm text-white/40">
-            No templates match these filters.
+            {pt("noResults")}
           </DashboardPanel>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -392,11 +392,10 @@ export function CreatorMarketplace() {
         <DialogContent className="max-h-[92vh] max-w-5xl overflow-hidden border-white/10 bg-[#0c0c0c] text-white sm:max-w-5xl">
           <DialogHeader>
             <DialogTitle>
-              {preview?.listing.title || "Template preview"}
+              {preview?.listing.title || pt("previewTitle")}
             </DialogTitle>
             <DialogDescription className="text-white/45">
-              {preview?.listing.description ||
-                "Live preview before you duplicate into Website Builder."}
+              {preview?.listing.description || pt("previewDescription")}
             </DialogDescription>
           </DialogHeader>
 
@@ -420,7 +419,7 @@ export function CreatorMarketplace() {
                 onClick={() => setViewport(key)}
               >
                 <Icon className="size-3.5" />
-                {key}
+                {pt(`viewports.${key}`)}
               </Button>
             ))}
           </div>
@@ -432,14 +431,14 @@ export function CreatorMarketplace() {
               </div>
             ) : preview?.previewHtml ? (
               <iframe
-                title="Template preview"
+                title={pt("previewIframe")}
                 srcDoc={preview.previewHtml}
                 className="h-[520px] rounded-lg border border-white/10 bg-white transition-all"
                 style={{ width: VIEWPORT_WIDTH[viewport], maxWidth: "100%" }}
               />
             ) : (
               <div className="flex h-[320px] items-center justify-center text-sm text-white/40">
-                Preview unavailable
+                {pt("previewUnavailable")}
               </div>
             )}
           </div>
@@ -447,20 +446,20 @@ export function CreatorMarketplace() {
           {preview?.listing ? (
             <div className="grid gap-3 text-[12px] text-white/55 sm:grid-cols-4">
               <div>
-                <p className="font-semibold text-white/80">Author</p>
+                <p className="font-semibold text-white/80">{pt("author")}</p>
                 <p>{preview.listing.author.displayName}</p>
                 <p>@{preview.listing.author.handle}</p>
               </div>
               <div>
-                <p className="font-semibold text-white/80">Rating</p>
+                <p className="font-semibold text-white/80">{pt("rating")}</p>
                 <p>
                   {preview.listing.reviews.averageRating.toFixed(1)} ·{" "}
-                  {preview.listing.reviews.reviewCount} reviews
+                  {pt("reviews", { count: preview.listing.reviews.reviewCount })}
                 </p>
-                <p>{formatPrice(preview.listing.commerce.priceCents)}</p>
+                <p>{formatListingPrice(preview.listing.commerce.priceCents)}</p>
               </div>
               <div>
-                <p className="font-semibold text-white/80">Version</p>
+                <p className="font-semibold text-white/80">{pt("version")}</p>
                 <p>
                   {preview.listing.versions.find((v) => v.isLatest)?.version ||
                     "1.0.0"}
@@ -471,7 +470,7 @@ export function CreatorMarketplace() {
                 </p>
               </div>
               <div>
-                <p className="font-semibold text-white/80">Features</p>
+                <p className="font-semibold text-white/80">{pt("features")}</p>
                 <p className="line-clamp-3">
                   {preview.listing.features.join(" · ")}
                 </p>
@@ -494,7 +493,7 @@ export function CreatorMarketplace() {
                   preview?.listing.favorited && "fill-premium-gold text-premium-gold",
                 )}
               />
-              {preview?.listing.favorited ? "Favorited" : "Favorite"}
+              {preview?.listing.favorited ? pt("favorited") : pt("favorite")}
             </Button>
             {preview?.listing ? (
               <div className="flex gap-2">
@@ -505,7 +504,7 @@ export function CreatorMarketplace() {
                   onClick={() => void useTemplate(preview.listing.id)}
                 >
                   <Copy className="size-4" />
-                  Duplicate
+                  {pt("duplicate")}
                 </Button>
                 <Button
                   className="bg-premium-gold text-black hover:bg-premium-gold/90"
@@ -515,7 +514,7 @@ export function CreatorMarketplace() {
                   {usingId === preview.listing.id ? (
                     <Loader2 className="size-4 animate-spin" />
                   ) : null}
-                  Use template
+                  {pt("useTemplate")}
                 </Button>
               </div>
             ) : null}
@@ -554,6 +553,10 @@ function ListingCard(props: {
   onUse: () => void;
 }) {
   const { listing: l, using, onPreview, onFavorite, onUse } = props;
+  const pt = useProductT("creatorMarketplace");
+  const { formatCurrency } = useFormatter();
+  const formatListingPrice = (cents: number) =>
+    cents <= 0 ? pt("free") : formatCurrency(cents);
   return (
     <DashboardPanel className="flex h-full flex-col overflow-hidden p-0">
       <button
@@ -576,7 +579,7 @@ function ListingCard(props: {
             {l.style}
           </span>
           <span className="rounded-full bg-premium-gold/90 px-2 py-0.5 text-[10px] font-semibold text-black">
-            {formatPrice(l.commerce.priceCents)}
+            {formatListingPrice(l.commerce.priceCents)}
           </span>
         </div>
       </button>
@@ -585,14 +588,14 @@ function ListingCard(props: {
           <div>
             <h4 className="text-[15px] font-bold text-white">{l.title}</h4>
             <p className="mt-0.5 text-[11px] text-white/40">
-              by {l.author.displayName}
+              {pt("byAuthor", { name: l.author.displayName })}
             </p>
           </div>
           <button
             type="button"
             onClick={onFavorite}
             className="rounded-md p-1.5 text-white/50 transition hover:bg-white/5 hover:text-premium-gold"
-            aria-label="Favorite"
+            aria-label={pt("favoriteAria")}
           >
             <Heart
               className={cn(
@@ -627,7 +630,7 @@ function ListingCard(props: {
             className="flex-1 border-white/15 text-white"
             onClick={onPreview}
           >
-            Live preview
+            {pt("livePreview")}
           </Button>
           <Button
             size="sm"
@@ -636,7 +639,7 @@ function ListingCard(props: {
             onClick={onUse}
           >
             {using ? <Loader2 className="size-3.5 animate-spin" /> : null}
-            Use template
+            {pt("useTemplate")}
           </Button>
         </div>
       </div>
@@ -651,6 +654,8 @@ function UploadTemplateDialog(props: {
   styles: string[];
   onUploaded: () => void;
 }) {
+  const pt = useProductT("creatorMarketplace");
+  const { t } = useTranslation();
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -663,7 +668,7 @@ function UploadTemplateDialog(props: {
   const [features, setFeatures] = useState("");
   const [priceCents, setPriceCents] = useState("0");
   const [version, setVersion] = useState("1.0.0");
-  const [changelog, setChangelog] = useState("Initial marketplace release");
+  const [changelog, setChangelog] = useState(pt("upload.initialChangelog"));
 
   const reset = () => {
     setTitle("");
@@ -674,7 +679,7 @@ function UploadTemplateDialog(props: {
     setFeatures("");
     setPriceCents("0");
     setVersion("1.0.0");
-    setChangelog("Initial marketplace release");
+    setChangelog(pt("upload.initialChangelog"));
     setError(null);
   };
 
@@ -708,12 +713,12 @@ function UploadTemplateDialog(props: {
       }
       if (!res.ok) {
         const data = (await res.json()) as { error?: string };
-        throw new Error(data.error || "Upload failed");
+        throw new Error(data.error || pt("upload.uploadFailed"));
       }
       reset();
       props.onUploaded();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed");
+      setError(err instanceof Error ? err.message : pt("upload.uploadFailed"));
     } finally {
       setSaving(false);
     }
@@ -729,10 +734,9 @@ function UploadTemplateDialog(props: {
     >
       <DialogContent className="max-h-[90vh] overflow-y-auto border-white/10 bg-[#0c0c0c] text-white sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>Upload template</DialogTitle>
+          <DialogTitle>{pt("upload.title")}</DialogTitle>
           <DialogDescription className="text-white/45">
-            Publish a listing with metadata and an initial version. Payments and
-            payouts will plug into this commerce layer later.
+            {pt("upload.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -740,19 +744,19 @@ function UploadTemplateDialog(props: {
           <Input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Template title"
+            placeholder={pt("upload.titlePlaceholder")}
             className="border-white/10 bg-white/5 text-white"
           />
           <Input
             value={tagline}
             onChange={(e) => setTagline(e.target.value)}
-            placeholder="Short tagline"
+            placeholder={pt("upload.taglinePlaceholder")}
             className="border-white/10 bg-white/5 text-white"
           />
           <Textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Describe the template, audience, and conversion goals…"
+            placeholder={pt("upload.descriptionPlaceholder")}
             className="min-h-[96px] border-white/10 bg-white/5 text-white"
           />
           <div className="grid gap-3 sm:grid-cols-2">
@@ -784,26 +788,26 @@ function UploadTemplateDialog(props: {
           <Input
             value={features}
             onChange={(e) => setFeatures(e.target.value)}
-            placeholder="Features (comma-separated)"
+            placeholder={pt("upload.featuresPlaceholder")}
             className="border-white/10 bg-white/5 text-white"
           />
           <div className="grid gap-3 sm:grid-cols-3">
             <Input
               value={priceCents}
               onChange={(e) => setPriceCents(e.target.value)}
-              placeholder="Price cents (0 = free)"
+              placeholder={pt("upload.pricePlaceholder")}
               className="border-white/10 bg-white/5 text-white"
             />
             <Input
               value={version}
               onChange={(e) => setVersion(e.target.value)}
-              placeholder="Version"
+              placeholder={pt("upload.versionPlaceholder")}
               className="border-white/10 bg-white/5 text-white"
             />
             <Input
               value={changelog}
               onChange={(e) => setChangelog(e.target.value)}
-              placeholder="Changelog"
+              placeholder={pt("upload.changelogPlaceholder")}
               className="border-white/10 bg-white/5 text-white"
             />
           </div>
@@ -818,7 +822,7 @@ function UploadTemplateDialog(props: {
             className="border-white/15 text-white"
             onClick={() => props.onOpenChange(false)}
           >
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button
             className="bg-premium-gold text-black hover:bg-premium-gold/90"
@@ -830,7 +834,7 @@ function UploadTemplateDialog(props: {
             ) : (
               <Plus className="size-4" />
             )}
-            Publish listing
+            {pt("upload.publishListing")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -846,6 +850,11 @@ function CreatorProfileDialog(props: {
   onRefresh: () => void;
   onPreview: (id: string) => void;
 }) {
+  const pt = useProductT("creatorMarketplace");
+  const { t } = useTranslation();
+  const { formatCurrency } = useFormatter();
+  const formatListingPrice = (cents: number) =>
+    cents <= 0 ? pt("free") : formatCurrency(cents);
   const [versionListingId, setVersionListingId] = useState<string | null>(null);
   const [version, setVersion] = useState("");
   const [changelog, setChangelog] = useState("");
@@ -867,14 +876,14 @@ function CreatorProfileDialog(props: {
       );
       if (!res.ok) {
         const data = (await res.json()) as { error?: string };
-        throw new Error(data.error || "Version failed");
+        throw new Error(data.error || pt("creator.versionFailed"));
       }
       setVersionListingId(null);
       setVersion("");
       setChangelog("");
       props.onRefresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Version failed");
+      setError(err instanceof Error ? err.message : pt("creator.versionFailed"));
     } finally {
       setSavingVersion(false);
     }
@@ -884,17 +893,16 @@ function CreatorProfileDialog(props: {
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto border-white/10 bg-[#0c0c0c] text-white sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Creator profile</DialogTitle>
+          <DialogTitle>{pt("creator.title")}</DialogTitle>
           <DialogDescription className="text-white/45">
-            Manage your public identity, listings, and versions. Revenue share
-            and Stripe Connect are scaffolded for launch.
+            {pt("creator.description")}
           </DialogDescription>
         </DialogHeader>
 
         {props.loading ? (
           <div className="flex items-center gap-2 py-10 text-white/40">
             <Loader2 className="size-4 animate-spin" />
-            Loading profile…
+            {pt("creator.loading")}
           </div>
         ) : props.data ? (
           <div className="space-y-5">
@@ -909,8 +917,12 @@ function CreatorProfileDialog(props: {
                 </h3>
                 <p className="text-[12px] text-white/45">
                   @{props.data.profile.handle} ·{" "}
-                  {props.data.profile.templateCount} templates · Payouts{" "}
-                  {props.data.profile.payoutReady ? "ready" : "pending"}
+                  {pt("creator.templatesCount", { count: props.data.profile.templateCount })} ·{" "}
+                  {pt("creator.payouts", {
+                    status: props.data.profile.payoutReady
+                      ? pt("creator.payoutsReady")
+                      : pt("creator.payoutsPending"),
+                  })}
                 </p>
                 <p className="mt-2 text-[13px] text-white/55">
                   {props.data.profile.bio}
@@ -920,11 +932,11 @@ function CreatorProfileDialog(props: {
 
             <div>
               <h4 className="mb-2 text-sm font-semibold text-white/80">
-                Your listings ({props.data.count})
+                {pt("creator.yourListings", { count: props.data.count })}
               </h4>
               {props.data.listings.length === 0 ? (
                 <p className="text-[12px] text-white/40">
-                  No uploads yet. Publish your first template from the marketplace.
+                  {pt("creator.noUploads")}
                 </p>
               ) : (
                 <div className="space-y-2">
@@ -940,7 +952,7 @@ function CreatorProfileDialog(props: {
                         <p className="text-[11px] text-white/40">
                           {l.category} · v
                           {l.versions.find((v) => v.isLatest)?.version || "1.0.0"}{" "}
-                          · {formatPrice(l.commerce.priceCents)}
+                          · {formatListingPrice(l.commerce.priceCents)}
                         </p>
                       </div>
                       <div className="flex gap-2">
@@ -950,7 +962,7 @@ function CreatorProfileDialog(props: {
                           className="border-white/15 text-white"
                           onClick={() => props.onPreview(l.id)}
                         >
-                          Preview
+                          {pt("creator.preview")}
                         </Button>
                         <Button
                           size="sm"
@@ -963,7 +975,7 @@ function CreatorProfileDialog(props: {
                             setError(null);
                           }}
                         >
-                          New version
+                          {pt("creator.newVersion")}
                         </Button>
                       </div>
                     </div>
@@ -975,18 +987,18 @@ function CreatorProfileDialog(props: {
             {versionListingId ? (
               <div className="space-y-2 rounded-lg border border-premium-gold/25 bg-premium-gold/5 p-3">
                 <p className="text-[12px] font-semibold text-premium-gold">
-                  Add version
+                  {pt("creator.addVersion")}
                 </p>
                 <Input
                   value={version}
                   onChange={(e) => setVersion(e.target.value)}
-                  placeholder="e.g. 1.1.0"
+                  placeholder={pt("creator.versionPlaceholder")}
                   className="border-white/10 bg-white/5 text-white"
                 />
                 <Textarea
                   value={changelog}
                   onChange={(e) => setChangelog(e.target.value)}
-                  placeholder="What changed in this version?"
+                  placeholder={pt("creator.changelogPlaceholder")}
                   className="min-h-[72px] border-white/10 bg-white/5 text-white"
                 />
                 {error ? (
@@ -999,7 +1011,7 @@ function CreatorProfileDialog(props: {
                     className="border-white/15 text-white"
                     onClick={() => setVersionListingId(null)}
                   >
-                    Cancel
+                    {t("common.cancel")}
                   </Button>
                   <Button
                     size="sm"
@@ -1012,7 +1024,7 @@ function CreatorProfileDialog(props: {
                     {savingVersion ? (
                       <Loader2 className="size-3.5 animate-spin" />
                     ) : null}
-                    Save version
+                    {pt("creator.saveVersion")}
                   </Button>
                 </div>
               </div>
@@ -1020,7 +1032,7 @@ function CreatorProfileDialog(props: {
           </div>
         ) : (
           <p className="py-8 text-center text-sm text-white/40">
-            Could not load creator profile.
+            {pt("creator.loadFailed")}
           </p>
         )}
       </DialogContent>

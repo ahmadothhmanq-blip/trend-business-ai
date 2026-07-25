@@ -1,11 +1,13 @@
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { LogoDesignerTool } from "@/components/dashboard/logo-designer/logo-designer-tool";
 import type { LogoGeneration } from "@/types/logo";
+import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
 
-export const metadata: Metadata = { title: "AI Logo Designer" };
+export async function generateMetadata() {
+  return dashboardPageMetadata("logoMaker");
+}
 
 export default async function LogoMakerPage() {
   const supabase = await createClient();

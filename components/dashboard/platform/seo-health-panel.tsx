@@ -20,6 +20,7 @@ import {
   DashboardPanel,
 } from "@/components/dashboard/ui/dashboard-card";
 import { dashboardInputClass, dashboardTextareaClass } from "@/components/dashboard/ui/dashboard-styles";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 import { cn } from "@/lib/utils";
 import type { SeoAnalyzeResult } from "@/lib/seo/analyzer";
 import type { SeoHealthReport } from "@/lib/seo/health";
@@ -37,6 +38,7 @@ const STATUS_COLOR = {
 } as const;
 
 export function SeoHealthPanel() {
+  const wt = useWorkspaceT("platform");
   const [report, setReport] = useState<SeoHealthReport | null>(null);
   const [analysis, setAnalysis] = useState<SeoAnalyzeResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -57,16 +59,16 @@ export function SeoHealthPanel() {
         setError(null);
         const res = await fetch("/api/seo/health");
         if (!res.ok) {
-          setError("Failed to load SEO health report.");
+          setError(wt("seoHealth.loadFailed"));
           return;
         }
         const data = await res.json();
         setReport(data.report as SeoHealthReport);
       } catch {
-        setError("Failed to load SEO health report.");
+        setError(wt("seoHealth.loadFailed"));
       }
     });
-  }, []);
+  }, [wt]);
 
   useEffect(() => {
     loadHealth();
@@ -95,12 +97,12 @@ export function SeoHealthPanel() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error ?? "Analyzer failed.");
+        setError(data.error ?? wt("seoHealth.analyzerFailed"));
         return;
       }
       setAnalysis(data.analysis as SeoAnalyzeResult);
     } catch {
-      setError("Analyzer request failed.");
+      setError(wt("seoHealth.analyzerRequestFailed"));
     } finally {
       setAnalyzing(false);
     }
@@ -118,52 +120,52 @@ export function SeoHealthPanel() {
         <DashboardPanel className="flex flex-col items-center justify-center p-5">
           <Gauge className="size-5 text-premium-gold-light" />
           <span className="mt-2 text-2xl font-black text-white">
-            {report?.score ?? (pending ? "…" : "—")}
+            {report?.score ?? (pending ? "…" : wt("common.emDash"))}
           </span>
           <span className="text-[10px] font-bold uppercase tracking-wider text-white/30">
-            Health score
+            {wt("seoHealth.healthScore")}
           </span>
         </DashboardPanel>
         <DashboardPanel className="flex flex-col items-center justify-center p-5">
           <Activity className="size-5 text-premium-gold-light" />
           <span className="mt-2 text-2xl font-black text-white">
-            {report?.counts.sitemapUrls ?? "—"}
+            {report?.counts.sitemapUrls ?? wt("common.emDash")}
           </span>
           <span className="text-[10px] font-bold uppercase tracking-wider text-white/30">
-            Sitemap URLs
+            {wt("seoHealth.sitemapUrls")}
           </span>
         </DashboardPanel>
         <DashboardPanel className="flex flex-col items-center justify-center p-5">
           <Search className="size-5 text-premium-gold-light" />
           <span className="mt-2 text-2xl font-black text-white">
-            {report?.counts.publicRoutes ?? "—"}
+            {report?.counts.publicRoutes ?? wt("common.emDash")}
           </span>
           <span className="text-[10px] font-bold uppercase tracking-wider text-white/30">
-            Public routes
+            {wt("seoHealth.publicRoutes")}
           </span>
         </DashboardPanel>
         <DashboardPanel className="flex flex-col items-center justify-center p-5">
           <Sparkles className="size-5 text-premium-gold-light" />
           <span className="mt-2 text-2xl font-black text-white">
-            {report?.counts.programmaticPublished ?? "—"}
+            {report?.counts.programmaticPublished ?? wt("common.emDash")}
           </span>
           <span className="text-[10px] font-bold uppercase tracking-wider text-white/30">
-            Programmatic pages
+            {wt("seoHealth.programmaticPages")}
           </span>
         </DashboardPanel>
       </div>
 
       <DashboardCard>
         <DashboardCardHeader>
-          <DashboardCardTitle>Sitewide SEO checks</DashboardCardTitle>
+          <DashboardCardTitle>{wt("seoHealth.sitewideChecks")}</DashboardCardTitle>
           <DashboardCardDescription>
-            Coverage across sitemaps, content registries, analytics and hreflang foundations.
+            {wt("seoHealth.sitewideDescription")}
           </DashboardCardDescription>
         </DashboardCardHeader>
         <DashboardCardContent>
           {!report ? (
             <div className="flex items-center gap-2 py-8 text-sm text-white/40">
-              <Loader2 className="size-4 animate-spin" /> Loading health report…
+              <Loader2 className="size-4 animate-spin" /> {wt("seoHealth.loadingReport")}
             </div>
           ) : (
             <ul className="space-y-3">
@@ -187,7 +189,7 @@ export function SeoHealthPanel() {
           {report?.recommendations?.length ? (
             <div className="mt-6 space-y-2">
               <p className="text-[11px] font-bold uppercase tracking-wider text-white/30">
-                Recommendations
+                {wt("seoHealth.recommendations")}
               </p>
               {report.recommendations.map((item) => (
                 <p key={item} className="text-xs text-white/55">
@@ -201,15 +203,15 @@ export function SeoHealthPanel() {
 
       <DashboardCard>
         <DashboardCardHeader>
-          <DashboardCardTitle>AI SEO Analyzer</DashboardCardTitle>
+          <DashboardCardTitle>{wt("seoHealth.analyzerTitle")}</DashboardCardTitle>
           <DashboardCardDescription>
-            Score titles, descriptions and page signals. Optionally enrich with AI recommendations.
+            {wt("seoHealth.analyzerDescription")}
           </DashboardCardDescription>
         </DashboardCardHeader>
         <DashboardCardContent className="space-y-4">
           <div className="grid gap-3 md:grid-cols-2">
             <label className="space-y-1.5 text-xs text-white/50">
-              Title
+              {wt("seoHealth.titleLabel")}
               <input
                 className={dashboardInputClass}
                 value={title}
@@ -217,7 +219,7 @@ export function SeoHealthPanel() {
               />
             </label>
             <label className="space-y-1.5 text-xs text-white/50">
-              Path
+              {wt("seoHealth.pathLabel")}
               <input
                 className={dashboardInputClass}
                 value={path}
@@ -226,7 +228,7 @@ export function SeoHealthPanel() {
             </label>
           </div>
           <label className="block space-y-1.5 text-xs text-white/50">
-            Meta description
+            {wt("seoHealth.metaDescriptionLabel")}
             <textarea
               className={cn(dashboardTextareaClass, "min-h-[72px]")}
               value={description}
@@ -234,12 +236,12 @@ export function SeoHealthPanel() {
             />
           </label>
           <label className="block space-y-1.5 text-xs text-white/50">
-            Content sample (optional)
+            {wt("seoHealth.contentSampleLabel")}
             <textarea
               className={cn(dashboardTextareaClass, "min-h-[96px]")}
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Paste page body text for thin-content and keyword checks…"
+              placeholder={wt("seoHealth.contentPlaceholder")}
             />
           </label>
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -250,7 +252,7 @@ export function SeoHealthPanel() {
                 onChange={(e) => setUseAi(e.target.checked)}
                 className="rounded border-white/20"
               />
-              Enrich with AI insights
+              {wt("seoHealth.enrichWithAi")}
             </label>
             <button
               type="button"
@@ -259,7 +261,7 @@ export function SeoHealthPanel() {
               className="inline-flex items-center gap-2 rounded-lg bg-premium-gold px-4 py-2 text-sm font-semibold text-luxury-black transition hover:brightness-110 disabled:opacity-60"
             >
               {analyzing ? <Loader2 className="size-4 animate-spin" /> : <Search className="size-4" />}
-              Analyze
+              {wt("common.analyze")}
             </button>
           </div>
 
@@ -268,13 +270,13 @@ export function SeoHealthPanel() {
               <div className="flex items-end gap-3">
                 <span className="text-3xl font-black text-white">{analysis.score}</span>
                 <span className="pb-1 text-sm text-white/50">
-                  Grade {analysis.grade} · {analysis.source}
+                  {wt("seoHealth.gradeSource", { grade: analysis.grade, source: analysis.source })}
                 </span>
               </div>
               {analysis.strengths.length > 0 && (
                 <div>
                   <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-400/80">
-                    Strengths
+                    {wt("seoHealth.strengths")}
                   </p>
                   <ul className="mt-2 space-y-1">
                     {analysis.strengths.map((item) => (
@@ -288,7 +290,7 @@ export function SeoHealthPanel() {
               {analysis.issues.length > 0 && (
                 <div>
                   <p className="text-[11px] font-bold uppercase tracking-wider text-amber-400/80">
-                    Issues
+                    {wt("seoHealth.issues")}
                   </p>
                   <ul className="mt-2 space-y-2">
                     {analysis.issues.map((issue) => (
@@ -303,13 +305,13 @@ export function SeoHealthPanel() {
               <div className="grid gap-3 md:grid-cols-2">
                 <div>
                   <p className="text-[11px] font-bold uppercase tracking-wider text-white/30">
-                    Suggested title
+                    {wt("seoHealth.suggestedTitle")}
                   </p>
                   <p className="mt-1 text-sm text-white/80">{analysis.suggestions.title}</p>
                 </div>
                 <div>
                   <p className="text-[11px] font-bold uppercase tracking-wider text-white/30">
-                    Suggested description
+                    {wt("seoHealth.suggestedDescription")}
                   </p>
                   <p className="mt-1 text-sm text-white/80">{analysis.suggestions.description}</p>
                 </div>
@@ -317,7 +319,7 @@ export function SeoHealthPanel() {
               {analysis.aiInsights && (
                 <div>
                   <p className="text-[11px] font-bold uppercase tracking-wider text-premium-gold-light">
-                    AI insights
+                    {wt("seoHealth.aiInsights")}
                   </p>
                   <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-white/70">
                     {analysis.aiInsights}

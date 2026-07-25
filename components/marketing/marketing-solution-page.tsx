@@ -28,42 +28,46 @@ import {
   getRelatedServices,
   getRelatedTemplates,
 } from "@/lib/seo/internal-links";
+import { useScopedT } from "@/lib/i18n/use-scoped-t";
 
 /** Category page — products for this suite only, each card links to its landing. */
 export function MarketingSolutionPage({ id }: { id: AiProductCategoryId }) {
+  const tCommon = useScopedT("marketing.common");
+  const tCat = useScopedT("marketing.categories");
   const reduce = useReducedMotion();
   const category = AI_PRODUCT_CATEGORIES.find((item) => item.id === id)!;
   const others = AI_PRODUCT_CATEGORIES.filter((item) => item.id !== id);
+  const categoryTitle = tCat(`${id}.title`);
 
   return (
     <SiteShell>
       <section className="landing-container pt-[108px] pb-14 lg:pb-16 lg:pt-[124px]">
         <SeoBreadcrumbs
           items={[
-            { name: "Home", href: "/" },
-            { name: "Products", href: "/features" },
-            { name: category.title },
+            { name: tCommon("home"), href: "/" },
+            { name: tCommon("products"), href: "/features" },
+            { name: categoryTitle },
           ]}
         />
         <div className="grid items-center gap-10 lg:grid-cols-[1fr_1.05fr] lg:gap-14">
           <div>
             <div className="flex flex-wrap items-center gap-3">
-              <SiteEyebrow>{category.eyebrow}</SiteEyebrow>
+              <SiteEyebrow>{tCat(`${id}.eyebrow`)}</SiteEyebrow>
               <span className="rounded-full border border-[rgba(212,175,55,0.28)] bg-[rgba(212,175,55,0.08)] px-3 py-1 text-[11px] font-semibold text-[#D4AF37]">
-                {category.productCount} products
+                {tCommon("productsCount", { count: category.productCount })}
               </span>
             </div>
-            <SiteH1 className="mt-5">{category.title}</SiteH1>
+            <SiteH1 className="mt-5">{categoryTitle}</SiteH1>
             <SiteBody className="mt-5 max-w-xl text-[17px] text-[#C7C7C7]">
-              {category.headline}
+              {tCat(`${id}.headline`)}
             </SiteBody>
-            <SiteBody className="mt-4 max-w-xl">{category.body}</SiteBody>
+            <SiteBody className="mt-4 max-w-xl">{tCat(`${id}.body`)}</SiteBody>
             <div className="mt-10 flex flex-col gap-3 sm:flex-row">
               <SiteButton href="/signup" size="lg">
-                Start Free <ArrowRight className="size-4" />
+                {tCommon("startFree")} <ArrowRight className="size-4" />
               </SiteButton>
               <SiteButton href={`#${id}-products`} variant="dark" size="lg">
-                Browse products
+                {tCommon("browseProducts")}
               </SiteButton>
             </div>
           </div>
@@ -83,9 +87,9 @@ export function MarketingSolutionPage({ id }: { id: AiProductCategoryId }) {
         <div className="landing-container py-16 lg:py-20">
           <SiteSectionHead
             id={`${id}-products-heading`}
-            label={`Inside ${category.title}`}
-            title={`${category.title} products`}
-            description={`Only the ${category.title} suite — each card opens a dedicated product landing page.`}
+            label={tCommon("insideCategory", { category: categoryTitle })}
+            title={tCommon("categoryProducts", { category: categoryTitle })}
+            description={tCommon("categoryProductsDescription", { category: categoryTitle })}
             align="left"
           />
           <div className="mt-12 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
@@ -110,7 +114,7 @@ export function MarketingSolutionPage({ id }: { id: AiProductCategoryId }) {
                       {product.description}
                     </p>
                     <span className="mt-auto inline-flex items-center gap-2 pt-6 text-sm font-semibold text-[#D4AF37]">
-                      Open product page
+                      {tCommon("openProductPage")}
                       <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
                     </span>
                   </div>
@@ -125,15 +129,15 @@ export function MarketingSolutionPage({ id }: { id: AiProductCategoryId }) {
         <div className="landing-container py-16 lg:py-20">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <SiteSectionHead
-              label="More AI Products"
-              title="Explore other categories"
+              label={tCommon("moreAiProducts")}
+              title={tCommon("exploreOtherCategories")}
               align="left"
             />
             <Link
               href="/#solutions"
               className="text-sm font-semibold text-[#D4AF37] hover:text-[#F4D56A]"
             >
-              View all AI Solutions
+              {tCommon("viewAllAiSolutions")}
             </Link>
           </div>
           <div className="mt-10 grid gap-5 sm:grid-cols-3">
@@ -146,13 +150,15 @@ export function MarketingSolutionPage({ id }: { id: AiProductCategoryId }) {
                 <SolutionIllustration id={item.id} className="rounded-none border-0" />
                 <div className="p-5">
                   <div className="flex items-center justify-between gap-3">
-                    <p className="text-lg font-semibold text-white">{item.title}</p>
+                    <p className="text-lg font-semibold text-white">
+                      {tCat(`${item.id}.title`)}
+                    </p>
                     <span className="text-[11px] font-semibold text-[#D4AF37]">
-                      {item.productCount} products
+                      {tCommon("productsCount", { count: item.productCount })}
                     </span>
                   </div>
                   <p className="mt-2 text-[13px] leading-relaxed text-[#B5B5B5]">
-                    {item.description}
+                    {tCat(`${item.id}.description`)}
                   </p>
                 </div>
               </Link>
@@ -165,20 +171,20 @@ export function MarketingSolutionPage({ id }: { id: AiProductCategoryId }) {
         <div className="landing-container py-16 lg:py-20">
           <RelatedLinksGroups
             groups={[
-              { title: "Related services", links: getRelatedServices(id) },
-              { title: "Related templates", links: getRelatedTemplates() },
-              { title: "Related articles", links: getRelatedBlogArticles() },
-              { title: "Business resources", links: getRelatedBusinessResources() },
+              { title: tCommon("relatedServices"), links: getRelatedServices(id) },
+              { title: tCommon("relatedTemplates"), links: getRelatedTemplates() },
+              { title: tCommon("relatedArticles"), links: getRelatedBlogArticles() },
+              { title: tCommon("businessResources"), links: getRelatedBusinessResources() },
             ]}
           />
         </div>
       </section>
 
       <SiteCtaBand
-        title={`Start building with ${category.title}`}
-        description={category.description}
+        title={tCommon("startBuildingCategory", { category: categoryTitle })}
+        description={tCat(`${id}.description`)}
         secondaryHref={`#${id}-products`}
-        secondaryLabel={`Browse ${category.title}`}
+        secondaryLabel={tCommon("browseCategory", { category: categoryTitle })}
       />
     </SiteShell>
   );

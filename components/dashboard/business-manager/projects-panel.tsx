@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { groupTasksByStatus, TASK_STATUSES } from "@/lib/business-manager/tasks";
 import type { BusinessProject, Task, Milestone } from "@/types/business-manager";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 
 type View = "kanban" | "list" | "timeline";
 
@@ -23,6 +24,7 @@ export function ProjectsPanel({
   initialTasks = [],
   initialMilestones = [],
 }: Props) {
+  const wt = useWorkspaceT("businessManager");
   const [projects, setProjects] = useState(initialProjects);
   const [tasks, setTasks] = useState(initialTasks);
   const [milestones, setMilestones] = useState(initialMilestones);
@@ -44,7 +46,7 @@ export function ProjectsPanel({
   const kanban = useMemo(() => groupTasksByStatus(projectTasks), [projectTasks]);
 
   const generateProject = async () => {
-    if (!brief.trim()) return toast.error("Enter a project brief.");
+    if (!brief.trim()) return toast.error(wt("toasts.briefRequired"));
     setGenerating(true);
     try {
       const res = await fetch("/api/business-manager/projects", {
@@ -53,13 +55,13 @@ export function ProjectsPanel({
         body: JSON.stringify({ name: brief.slice(0, 60), brief, generate: true, status: "active" }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Failed");
+      if (!res.ok) throw new Error(data.error ?? wt("toasts.failed"));
       setProjects([data.project, ...projects]);
       setSelectedId(data.project.id);
       setBrief("");
-      toast.success("Project created");
+      toast.success(wt("toasts.projectCreated"));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed");
+      toast.error(e instanceof Error ? e.message : wt("toasts.failed"));
     } finally {
       setGenerating(false);
     }
@@ -73,7 +75,7 @@ export function ProjectsPanel({
       body: JSON.stringify({ title: newTaskTitle, projectId: selected.id, status: "todo" }),
     });
     const data = await res.json();
-    if (!res.ok) return toast.error(data.error ?? "Failed");
+    if (!res.ok) return toast.error(data.error ?? wt("toasts.failed"));
     setTasks([data.task, ...tasks]);
     setNewTaskTitle("");
   };
@@ -85,7 +87,7 @@ export function ProjectsPanel({
       body: JSON.stringify({ status }),
     });
     const data = await res.json();
-    if (!res.ok) return toast.error(data.error ?? "Failed");
+    if (!res.ok) return toast.error(data.error ?? wt("toasts.failed"));
     setTasks(tasks.map((t) => (t.id === taskId ? data.task : t)));
   };
 
@@ -97,26 +99,26 @@ export function ProjectsPanel({
       body: JSON.stringify({ archive: true }),
     });
     const data = await res.json();
-    if (!res.ok) return toast.error(data.error ?? "Failed");
+    if (!res.ok) return toast.error(data.error ?? wt("toasts.failed"));
     setProjects(projects.map((p) => (p.id === selected.id ? data.project : p)));
-    toast.success("Project archived");
+    toast.success(wt("toasts.projectArchived"));
   };
 
   return (
     <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
       <div className="space-y-4">
         <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
-          <p className="mb-2 text-xs font-medium uppercase text-white/40">AI project planner</p>
+          <p className="mb-2 text-xs font-medium uppercase text-white/40">{wt("projects.aiPlanner")}</p>
           <Textarea
             value={brief}
             onChange={(e) => setBrief(e.target.value)}
-            placeholder="Describe goals, timeline, team, deliverables..."
+            placeholder={wt("projects.briefPlaceholder")}
             rows={3}
             className="border-white/10 bg-white/5 text-white"
           />
           <Button className="mt-2 w-full" onClick={() => void generateProject()} disabled={generating}>
             <Sparkles className="mr-2 size-4" />
-            {generating ? "Creating…" : "Create project"}
+            {generating ? wt("projects.creating") : wt("projects.createProject")}
           </Button>
         </div>
         <div className="space-y-2">
@@ -146,14 +148,14 @@ export function ProjectsPanel({
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h3 className="text-lg font-semibold text-white">{selected.name}</h3>
-              <p className="text-sm text-white/40">{selected.description || "No description"}</p>
+              <p className="text-sm text-white/40">{selected.description || wt("projects.noDescription")}</p>
             </div>
             <div className="flex gap-1">
               {(
                 [
-                  { key: "kanban" as const, icon: LayoutGrid, label: "Kanban" },
-                  { key: "list" as const, icon: List, label: "List" },
-                  { key: "timeline" as const, icon: GanttChart, label: "Timeline" },
+                  { key: "kanban" as const, icon: LayoutGrid, label: wt("projects.kanban") },
+                  { key: "list" as const, icon: List, label: wt("projects.list") },
+                  { key: "timeline" as const, icon: GanttChart, label: wt("projects.timeline") },
                 ] as const
               ).map(({ key, icon: Icon, label }) => (
                 <button
@@ -169,7 +171,7 @@ export function ProjectsPanel({
                 </button>
               ))}
               <Button variant="outline" size="sm" onClick={() => void archiveProject()}>
-                Archive
+                {wt("projects.archive")}
               </Button>
             </div>
           </div>
@@ -178,7 +180,7 @@ export function ProjectsPanel({
             <Input
               value={newTaskTitle}
               onChange={(e) => setNewTaskTitle(e.target.value)}
-              placeholder="New task title"
+              placeholder={wt("projects.newTaskPlaceholder")}
               className="border-white/10 bg-white/5 text-white"
             />
             <Button onClick={() => void addTask()}>
@@ -190,7 +192,7 @@ export function ProjectsPanel({
             <div className="grid gap-3 md:grid-cols-3 xl:grid-cols-5">
               {TASK_STATUSES.map((status) => (
                 <div key={status} className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
-                  <p className="mb-2 text-xs font-medium uppercase text-white/40">{status.replace("_", " ")}</p>
+                  <p className="mb-2 text-xs font-medium uppercase text-white/40">{wt(`taskStatuses.${status}`)}</p>
                   <div className="space-y-2">
                     {kanban[status].map((task) => (
                       <div key={task.id} className="rounded-lg border border-white/[0.06] bg-white/[0.03] p-2 text-sm">
@@ -202,7 +204,7 @@ export function ProjectsPanel({
                             className="mt-1 text-xs text-premium-gold-light"
                             onClick={() => void moveTask(task.id, status === "todo" ? "in_progress" : "done")}
                           >
-                            Advance →
+                            {wt("projects.advance")}
                           </button>
                         )}
                       </div>
@@ -223,14 +225,14 @@ export function ProjectsPanel({
                   <div>
                     <p className="text-white">{task.title}</p>
                     <p className="text-xs text-white/40">
-                      {task.assignee_name || "Unassigned"} · {task.priority}
+                      {task.assignee_name || wt("projects.unassigned")} · {task.priority}
                     </p>
                   </div>
-                  <span className="text-xs capitalize text-white/50">{task.status}</span>
+                  <span className="text-xs capitalize text-white/50">{wt(`taskStatuses.${task.status}`)}</span>
                 </div>
               ))}
               {projectTasks.length === 0 && (
-                <p className="p-4 text-sm text-white/30">No tasks yet.</p>
+                <p className="p-4 text-sm text-white/30">{wt("projects.noTasks")}</p>
               )}
             </div>
           )}
@@ -243,7 +245,7 @@ export function ProjectsPanel({
                   <div className="flex-1">
                     <p className="font-medium text-white">{m.title}</p>
                     <p className="text-xs text-white/40">
-                      {m.target_date ?? "No date"} · {m.status}
+                      {m.target_date ?? wt("projects.noDate")} · {m.status}
                     </p>
                   </div>
                 </div>
@@ -257,14 +259,14 @@ export function ProjectsPanel({
                   </div>
                 ))}
               {projectMilestones.length === 0 && projectTasks.length === 0 && (
-                <p className="text-sm text-white/30">Add tasks with due dates or milestones for timeline view.</p>
+                <p className="text-sm text-white/30">{wt("projects.timelineEmpty")}</p>
               )}
             </div>
           )}
         </div>
       ) : (
         <div className="flex items-center justify-center rounded-xl border border-dashed border-white/10 p-12 text-white/30">
-          Select or create a project
+          {wt("projects.selectOrCreate")}
         </div>
       )}
     </div>

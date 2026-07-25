@@ -4,6 +4,7 @@ import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
 import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter, ilikeContainsPattern } from "@/lib/api/search-filters";
 import { marketInputSchema } from "@/lib/validations/market-analysis";
+import { resolveRequestLanguage } from "@/lib/i18n/api";
 import type { MarketAnalysis } from "@/types/database";
 import { NextResponse } from "next/server";
 
@@ -72,10 +73,12 @@ export async function POST(request: Request) {
     );
   }
 
+  const aiLanguage = resolveRequestLanguage(request);
+
   let analysis;
   let source: string;
   try {
-    const result = await generateMarketAnalysis(parsed.data);
+    const result = await generateMarketAnalysis({ ...parsed.data, language: aiLanguage });
     analysis = result.analysis;
     source = result.source;
   } catch (error) {

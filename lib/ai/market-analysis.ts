@@ -7,6 +7,7 @@ export type MarketAnalysisInput = {
   industry: string;
   region: string;
   targetAudience: string;
+  language?: string;
 };
 
 export type GeneratedMarketAnalysis = {

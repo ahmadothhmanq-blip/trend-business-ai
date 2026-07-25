@@ -12,6 +12,7 @@ import { buildImageGeneratorPayload } from "@/lib/social-media/design-integratio
 import { TemplateSelector } from "@/components/dashboard/social-media/template-selector";
 import { PostPreviewPanel } from "@/components/dashboard/social-media/post-preview";
 import type { SocialPost, SocialPostPlatform, SocialAccountPublic } from "@/types/social-media";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 
 type Brand = { id: string; brand_name: string };
 
@@ -22,7 +23,10 @@ type Props = {
   onChange: (patch: Partial<SocialPost>) => void;
 };
 
+const POST_ACTIONS = ["rewrite", "improve_engagement", "shorten", "expand", "generate_variations"] as const;
+
 export function PostComposer({ post, brands, onSaved, onChange }: Props) {
+  const wt = useWorkspaceT("socialMedia");
   const [platform, setPlatform] = useState<SocialPostPlatform>(post?.platform ?? "instagram");
   const [topic, setTopic] = useState("");
   const [tone, setTone] = useState("Professional");
@@ -61,7 +65,7 @@ export function PostComposer({ post, brands, onSaved, onChange }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           platform,
-          topic: templateTopic || topic || post?.title || "Social post",
+          topic: templateTopic || topic || post?.title || wt("composer.defaultTopic"),
           tone,
           brandIdentityId: brandId || undefined,
           templateId,
@@ -69,11 +73,11 @@ export function PostComposer({ post, brands, onSaved, onChange }: Props) {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Generation failed");
+      if (!res.ok) throw new Error(data.error ?? wt("toasts.generationFailed"));
       onSaved(data.post);
-      toast.success("Post generated!");
+      toast.success(wt("toasts.postGenerated"));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed");
+      toast.error(e instanceof Error ? e.message : wt("toasts.failed"));
     } finally {
       setGenerating(false);
     }
@@ -82,7 +86,7 @@ export function PostComposer({ post, brands, onSaved, onChange }: Props) {
   const runAction = async (action: string) => {
     const text = post?.caption || post?.post_text;
     if (!text?.trim()) {
-      toast.error("Generate or write content first.");
+      toast.error(wt("toasts.contentRequired"));
       return;
     }
     setActionBusy(true);
@@ -93,7 +97,7 @@ export function PostComposer({ post, brands, onSaved, onChange }: Props) {
         body: JSON.stringify({ action, text, platform, postId: post?.id }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Action failed");
+      if (!res.ok) throw new Error(data.error ?? wt("toasts.actionFailed"));
       onChange({
         post_text: data.result.postText,
         caption: data.result.caption,
@@ -102,9 +106,9 @@ export function PostComposer({ post, brands, onSaved, onChange }: Props) {
         content_angle: data.result.contentAngle,
       });
       if (post?.id) onSaved({ ...post, ...data.result } as SocialPost);
-      toast.success("Updated!");
+      toast.success(wt("toasts.updated"));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Action failed");
+      toast.error(e instanceof Error ? e.message : wt("toasts.actionFailed"));
     } finally {
       setActionBusy(false);
     }
@@ -117,7 +121,7 @@ export function PostComposer({ post, brands, onSaved, onChange }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           platform,
-          title: post?.title || "Untitled Post",
+          title: post?.title || wt("composer.untitledPost"),
           postText: post?.post_text ?? "",
           caption: post?.caption ?? "",
           hashtags: post?.hashtags ?? [],
@@ -131,7 +135,7 @@ export function PostComposer({ post, brands, onSaved, onChange }: Props) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       onSaved(data.post);
-      toast.success("Draft saved");
+      toast.success(wt("toasts.draftSaved"));
       return;
     }
 
@@ -152,16 +156,16 @@ export function PostComposer({ post, brands, onSaved, onChange }: Props) {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error);
     onSaved(data.post);
-    toast.success("Draft saved");
+    toast.success(wt("toasts.draftSaved"));
   };
 
   const schedule = async () => {
     if (!post?.id || !scheduleAt) {
-      toast.error("Save post and pick schedule time.");
+      toast.error(wt("toasts.scheduleRequired"));
       return;
     }
     if (!accountId) {
-      toast.error("Connect an account first.");
+      toast.error(wt("toasts.connectAccount"));
       return;
     }
     const res = await fetch(`/api/social-media/posts/${post.id}/publish`, {
@@ -173,18 +177,18 @@ export function PostComposer({ post, brands, onSaved, onChange }: Props) {
       }),
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error ?? "Schedule failed");
+    if (!res.ok) throw new Error(data.error ?? wt("toasts.scheduleFailed"));
     setPublishStatus(data.job?.status ?? "queued");
-    toast.success("Scheduled for publishing!");
+    toast.success(wt("toasts.scheduled"));
   };
 
   const publishNow = async () => {
     if (!post?.id) {
-      toast.error("Save the post first.");
+      toast.error(wt("toasts.savePostFirst"));
       return;
     }
     if (!accountId) {
-      toast.error("Connect an account to publish.");
+      toast.error(wt("toasts.connectToPublish"));
       return;
     }
     setPublishing(true);
@@ -195,16 +199,16 @@ export function PostComposer({ post, brands, onSaved, onChange }: Props) {
         body: JSON.stringify({ accountId }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? data.result?.error ?? "Publish failed");
+      if (!res.ok) throw new Error(data.error ?? data.result?.error ?? wt("toasts.publishFailed"));
       setPublishStatus(data.job?.status ?? (data.result?.ok ? "published" : "failed"));
       if (data.result?.ok) {
         onSaved({ ...post, status: "published" } as SocialPost);
-        toast.success("Published!");
+        toast.success(wt("toasts.published"));
       } else {
-        toast.error(data.result?.error ?? "Publish failed");
+        toast.error(data.result?.error ?? wt("toasts.publishFailed"));
       }
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Publish failed");
+      toast.error(e instanceof Error ? e.message : wt("toasts.publishFailed"));
     } finally {
       setPublishing(false);
     }
@@ -212,10 +216,10 @@ export function PostComposer({ post, brands, onSaved, onChange }: Props) {
 
   const generateVisual = async () => {
     const payload = buildImageGeneratorPayload({
-      prompt: post?.caption || post?.post_text || topic || "Social media visual",
+      prompt: post?.caption || post?.post_text || topic || wt("composer.defaultTopic"),
       platform,
     });
-    toast.info("Opening Image Generator flow — use dashboard Image Generator with social dimensions.");
+    toast.info(wt("toasts.openImageGenerator"));
     void payload;
   };
 
@@ -224,7 +228,7 @@ export function PostComposer({ post, brands, onSaved, onChange }: Props) {
       <div className="space-y-4">
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
-            <label className="text-xs text-white/50">Platform</label>
+            <label className="text-xs text-white/50">{wt("composer.platform")}</label>
             <select
               value={platform}
               onChange={(e) => setPlatform(e.target.value as SocialPostPlatform)}
@@ -236,14 +240,14 @@ export function PostComposer({ post, brands, onSaved, onChange }: Props) {
             </select>
           </div>
           <div>
-            <label className="text-xs text-white/50">Tone</label>
+            <label className="text-xs text-white/50">{wt("composer.tone")}</label>
             <select
               value={tone}
               onChange={(e) => setTone(e.target.value)}
               className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
             >
               {SOCIAL_TONES.map((t) => (
-                <option key={t} value={t}>{t}</option>
+                <option key={t} value={t}>{wt(`tones.${t}`)}</option>
               ))}
             </select>
           </div>
@@ -251,13 +255,13 @@ export function PostComposer({ post, brands, onSaved, onChange }: Props) {
 
         {brands.length > 0 && (
           <div>
-            <label className="text-xs text-white/50">Brand (read-only)</label>
+            <label className="text-xs text-white/50">{wt("composer.brand")}</label>
             <select
               value={brandId}
               onChange={(e) => setBrandId(e.target.value)}
               className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
             >
-              <option value="">No brand</option>
+              <option value="">{wt("composer.noBrand")}</option>
               {brands.map((b) => (
                 <option key={b.id} value={b.id}>{b.brand_name}</option>
               ))}
@@ -267,7 +271,7 @@ export function PostComposer({ post, brands, onSaved, onChange }: Props) {
 
         {accounts.length > 0 && (
           <div>
-            <label className="text-xs text-white/50">Publish account</label>
+            <label className="text-xs text-white/50">{wt("composer.publishAccount")}</label>
             <select
               value={accountId}
               onChange={(e) => setAccountId(e.target.value)}
@@ -283,15 +287,15 @@ export function PostComposer({ post, brands, onSaved, onChange }: Props) {
         )}
 
         {publishStatus && (
-          <p className="text-xs text-premium-gold-light">Publishing status: {publishStatus}</p>
+          <p className="text-xs text-premium-gold-light">{wt("composer.publishingStatus", { status: publishStatus })}</p>
         )}
 
         <div>
-          <label className="text-xs text-white/50">Topic / brief</label>
+          <label className="text-xs text-white/50">{wt("composer.topicBrief")}</label>
           <Input
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
-            placeholder="What should this post be about?"
+            placeholder={wt("composer.topicPlaceholder")}
             className="mt-1 rounded-lg border-white/10 bg-white/5 text-white"
           />
         </div>
@@ -304,18 +308,18 @@ export function PostComposer({ post, brands, onSaved, onChange }: Props) {
         <div className="flex flex-wrap gap-2">
           <Button onClick={() => void generate()} disabled={generating} className="rounded-lg">
             <Sparkles className="mr-2 size-4" />
-            {generating ? "Generating…" : "AI Generate"}
+            {generating ? wt("composer.generating") : wt("composer.aiGenerate")}
           </Button>
           <Button variant="outline" className="rounded-lg border-white/10" onClick={() => void saveDraft()}>
-            Save Draft
+            {wt("composer.saveDraft")}
           </Button>
           <Button variant="outline" className="rounded-lg border-white/10" onClick={() => void generateVisual()}>
-            <ImageIcon className="mr-2 size-4" /> Visual
+            <ImageIcon className="mr-2 size-4" /> {wt("composer.visual")}
           </Button>
         </div>
 
         <div>
-          <label className="text-xs text-white/50">Title</label>
+          <label className="text-xs text-white/50">{wt("composer.title")}</label>
           <Input
             value={post?.title ?? ""}
             onChange={(e) => onChange({ title: e.target.value })}
@@ -323,7 +327,7 @@ export function PostComposer({ post, brands, onSaved, onChange }: Props) {
           />
         </div>
         <div>
-          <label className="text-xs text-white/50">Caption</label>
+          <label className="text-xs text-white/50">{wt("composer.caption")}</label>
           <Textarea
             value={post?.caption ?? ""}
             onChange={(e) => onChange({ caption: e.target.value, post_text: e.target.value })}
@@ -333,17 +337,17 @@ export function PostComposer({ post, brands, onSaved, onChange }: Props) {
         </div>
 
         <div className="flex flex-wrap gap-2">
-          {["rewrite", "improve_engagement", "shorten", "expand", "generate_variations"].map((a) => (
+          {POST_ACTIONS.map((a) => (
             <Button
               key={a}
               size="sm"
               variant="outline"
               disabled={actionBusy}
-              className="rounded-lg border-white/10 text-xs capitalize"
+              className="rounded-lg border-white/10 text-xs"
               onClick={() => void runAction(a)}
             >
               <Wand2 className="mr-1 size-3" />
-              {a.replace("_", " ")}
+              {wt(`actions.${a}`)}
             </Button>
           ))}
         </div>
@@ -351,7 +355,7 @@ export function PostComposer({ post, brands, onSaved, onChange }: Props) {
         <div className="flex flex-wrap gap-2">
           <Button onClick={() => void publishNow()} disabled={publishing || !post?.id} className="rounded-lg">
             <Send className="mr-2 size-4" />
-            {publishing ? "Publishing…" : "Publish"}
+            {publishing ? wt("composer.publishing") : wt("composer.publish")}
           </Button>
           <Input
             type="datetime-local"
@@ -361,7 +365,7 @@ export function PostComposer({ post, brands, onSaved, onChange }: Props) {
           />
           <Button variant="outline" className="rounded-lg border-white/10" onClick={() => void schedule()}>
             <Clock className="mr-2 size-4" />
-            Schedule
+            {wt("composer.schedule")}
           </Button>
         </div>
       </div>

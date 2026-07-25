@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { useScopedT } from "@/lib/i18n/use-scoped-t";
 import { cn } from "@/lib/utils";
 
 type SmartCtaProps = {
@@ -9,26 +10,15 @@ type SmartCtaProps = {
 };
 
 const VARIANTS = [
-  {
-    id: "a",
-    eyebrow: "Start free",
-    title: "Build your AI business workspace today",
-    href: "/signup",
-    cta: "Create free account",
-  },
-  {
-    id: "b",
-    eyebrow: "Launch faster",
-    title: "Generate website projects, brands and strategy with AI",
-    href: "/pricing",
-    cta: "See plans",
-  },
-] as const;
+  { id: "a" as const, href: "/signup", key: "variantA" },
+  { id: "b" as const, href: "/pricing", key: "variantB" },
+];
 
 /**
  * Smart CTA — sticky bar with sticky A/B assignment in localStorage + event tracking.
  */
 export function SmartCtaBar({ className }: SmartCtaProps) {
+  const t = useScopedT("marketing.growth.smartCta");
   const [variantId, setVariantId] = useState<(typeof VARIANTS)[number]["id"]>("a");
   const [visible, setVisible] = useState(false);
 
@@ -75,9 +65,11 @@ export function SmartCtaBar({ className }: SmartCtaProps) {
       <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-3 px-4 py-3 sm:flex-row sm:items-center sm:px-6">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#D4AF37]">
-            {variant.eyebrow}
+            {t(`${variant.key}.eyebrow`)}
           </p>
-          <p className="text-sm font-medium text-white sm:text-base">{variant.title}</p>
+          <p className="text-sm font-medium text-white sm:text-base">
+            {t(`${variant.key}.title`)}
+          </p>
         </div>
         <Link
           href={variant.href}
@@ -95,7 +87,7 @@ export function SmartCtaBar({ className }: SmartCtaProps) {
           }}
           className="inline-flex rounded-full bg-[linear-gradient(180deg,#FFD700,#D4AF37)] px-5 py-2.5 text-sm font-semibold text-[#111111] hover:brightness-110"
         >
-          {variant.cta}
+          {t(`${variant.key}.cta`)}
         </Link>
       </div>
     </div>

@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
@@ -7,8 +6,11 @@ import { getMarketingAnalytics } from "@/lib/marketing/analytics";
 import { getMergedCalendar } from "@/lib/marketing/calendar";
 import type { MarketingCampaign, CustomerPersona, MarketingCalendarEvent } from "@/types/marketing";
 import type { WorkspaceGeneration } from "@/types/database";
+import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
 
-export const metadata: Metadata = { title: "AI Marketing Intelligence Platform" };
+export async function generateMetadata() {
+  return dashboardPageMetadata("marketing");
+}
 
 export default async function MarketingPage() {
   const supabase = await createClient();

@@ -37,6 +37,8 @@ import {
 } from "@/components/dashboard/ui/dashboard-styles";
 import type { HistoryItem, HistoryItemType } from "@/types/database";
 import { getHistoryItemEndpoint } from "@/lib/workspace/history";
+import { useTranslation } from "@/lib/i18n/client";
+import { useFormatter } from "@/lib/i18n/use-formatter";
 import { cn } from "@/lib/utils";
 
 type HistoryListProps = {
@@ -46,55 +48,35 @@ type HistoryListProps = {
 type HistoryFilter = "all" | HistoryItemType;
 type HistorySort = "newest" | "oldest";
 
-const TYPE_META: Record<
-  HistoryItemType,
-  { label: string; icon: LucideIcon; endpoint: string }
-> = {
-  idea: {
-    label: "Business Idea",
-    icon: Lightbulb,
-    endpoint: "/api/ideas",
-  },
-  analysis: {
-    label: "Market Analysis",
-    icon: LineChart,
-    endpoint: "/api/market-analysis",
-  },
-  report: {
-    label: "AI Report",
-    icon: FileText,
-    endpoint: "/api/reports",
-  },
-  website: {
-    label: "Website Blueprint",
-    icon: Globe,
-    endpoint: "/api/website-builder",
-  },
-  workspace: {
-    label: "AI Workspace",
-    icon: Sparkles,
-    endpoint: "/api/workspaces/brand",
-  },
+const TYPE_ICONS: Record<HistoryItemType, LucideIcon> = {
+  idea: Lightbulb,
+  analysis: LineChart,
+  report: FileText,
+  website: Globe,
+  workspace: Sparkles,
 };
 
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
-}
+const TYPE_ENDPOINTS: Record<HistoryItemType, string> = {
+  idea: "/api/ideas",
+  analysis: "/api/market-analysis",
+  report: "/api/reports",
+  website: "/api/website-builder",
+  workspace: "/api/workspaces/brand",
+};
 
-function matchesSearch(item: HistoryItem, search: string) {
+function matchesSearch(item: HistoryItem, search: string, typeLabel: string) {
   const query = search.trim().toLowerCase();
   if (!query) return true;
 
-  return [item.title, item.description, item.detail, TYPE_META[item.type].label]
+  return [item.title, item.description, item.detail, typeLabel]
     .join(" ")
     .toLowerCase()
     .includes(query);
 }
 
 export function HistoryList({ initialItems }: HistoryListProps) {
+  const { t } = useTranslation();
+  const { formatDateTime } = useFormatter();
   const [items, setItems] = useState(initialItems);
   const [typeFilter, setTypeFilter] = useState<HistoryFilter>("all");
   const [sort, setSort] = useState<HistorySort>("newest");
@@ -103,16 +85,32 @@ export function HistoryList({ initialItems }: HistoryListProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
+  const typeMeta = useMemo(
+    () =>
+      (["idea", "analysis", "report", "website", "workspace"] as const).reduce(
+        (acc, type) => {
+          acc[type] = {
+            label: t(`dashboard.history.types.${type}`),
+            icon: TYPE_ICONS[type],
+            endpoint: TYPE_ENDPOINTS[type],
+          };
+          return acc;
+        },
+        {} as Record<HistoryItemType, { label: string; icon: LucideIcon; endpoint: string }>,
+      ),
+    [t],
+  );
+
   const filteredItems = useMemo(() => {
     return items
       .filter((item) => typeFilter === "all" || item.type === typeFilter)
-      .filter((item) => matchesSearch(item, search))
+      .filter((item) => matchesSearch(item, search, typeMeta[item.type].label))
       .sort((a, b) => {
         const delta =
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         return sort === "newest" ? delta : -delta;
       });
-  }, [items, search, sort, typeFilter]);
+  }, [items, search, sort, typeFilter, typeMeta]);
 
   const totalByType = useMemo(() => {
     return items.reduce<Record<HistoryFilter, number>>(
@@ -142,7 +140,7 @@ export function HistoryList({ initialItems }: HistoryListProps) {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to delete history item");
+        throw new Error(data.error || t("dashboard.history.deleteFailed"));
       }
 
       setItems((current) =>
@@ -151,13 +149,13 @@ export function HistoryList({ initialItems }: HistoryListProps) {
             !(item.id === deleteTarget.id && item.type === deleteTarget.type),
         ),
       );
-      toast.success(data.message || "History item deleted.");
+      toast.success(data.message || t("dashboard.history.deleted"));
       setDeleteTarget(null);
     } catch (error) {
       setDeleteError(
         error instanceof Error
           ? error.message
-          : "Unable to delete this history item.",
+          : t("dashboard.history.deleteFailed"),
       );
     } finally {
       setDeletingId(null);
@@ -177,32 +175,28 @@ export function HistoryList({ initialItems }: HistoryListProps) {
               <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-premium-gold/25 bg-premium-gold/10 px-3 py-1">
                 <History className="size-3.5 text-premium-gold-light" />
                 <span className="text-[11px] font-semibold tracking-wide text-premium-gold-light uppercase">
-                  Complete generation history
+                  {t("dashboard.history.badge")}
                 </span>
               </div>
               <h2 className="text-xl font-bold tracking-tight text-white sm:text-2xl">
-                All generated assets in one place
+                {t("dashboard.history.title")}
               </h2>
               <p className="mt-2 max-w-2xl text-[14px] leading-relaxed text-white/50 sm:text-[15px]">
-                Browse every business idea, market analysis, AI report, and
-                website blueprint saved to your workspace.
+                {t("dashboard.history.description")}
               </p>
             </div>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:min-w-[420px]">
-              {(["idea", "analysis", "report", "website", "workspace"] as const).map((type) => {
-                const meta = TYPE_META[type];
-                return (
-                  <div
-                    key={type}
-                    className="rounded-xl border border-white/[0.08] bg-black/20 px-3 py-2"
-                  >
-                    <p className="text-[11px] text-white/35">{meta.label}</p>
-                    <p className="mt-0.5 text-lg font-bold text-white">
-                      {totalByType[type]}
-                    </p>
-                  </div>
-                );
-              })}
+              {(["idea", "analysis", "report", "website", "workspace"] as const).map((type) => (
+                <div
+                  key={type}
+                  className="rounded-xl border border-white/[0.08] bg-black/20 px-3 py-2"
+                >
+                  <p className="text-[11px] text-white/35">{typeMeta[type].label}</p>
+                  <p className="mt-0.5 text-lg font-bold text-white">
+                    {totalByType[type]}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         </DashboardPanel>
@@ -217,31 +211,31 @@ export function HistoryList({ initialItems }: HistoryListProps) {
               <Input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search generated history..."
+                placeholder={t("dashboard.history.searchPlaceholder")}
                 className={`pl-9 ${dashboardInputClass}`}
-                aria-label="Search history"
+                aria-label={t("dashboard.history.searchAria")}
               />
             </div>
             <select
               value={typeFilter}
               onChange={(event) => setTypeFilter(event.target.value as HistoryFilter)}
               className={dashboardFilterSelectClass}
-              aria-label="Filter by type"
+              aria-label={t("dashboard.history.filterAria")}
             >
-              <option value="all">All types</option>
-              <option value="idea">Business Ideas</option>
-              <option value="analysis">Market Analysis</option>
-              <option value="report">AI Reports</option>
-              <option value="website">Website Blueprints</option>
+              <option value="all">{t("dashboard.history.allTypes")}</option>
+              <option value="idea">{t("dashboard.history.filters.idea")}</option>
+              <option value="analysis">{t("dashboard.history.filters.analysis")}</option>
+              <option value="report">{t("dashboard.history.filters.report")}</option>
+              <option value="website">{t("dashboard.history.filters.website")}</option>
             </select>
             <select
               value={sort}
               onChange={(event) => setSort(event.target.value as HistorySort)}
               className={dashboardFilterSelectClass}
-              aria-label="Sort history"
+              aria-label={t("dashboard.history.sortAria")}
             >
-              <option value="newest">Newest first</option>
-              <option value="oldest">Oldest first</option>
+              <option value="newest">{t("dashboard.history.newestFirst")}</option>
+              <option value="oldest">{t("dashboard.history.oldestFirst")}</option>
             </select>
           </div>
         </DashboardPanel>
@@ -251,7 +245,7 @@ export function HistoryList({ initialItems }: HistoryListProps) {
         {filteredItems.length > 0 ? (
           <div className="grid gap-4 xl:grid-cols-2">
             {filteredItems.map((item) => {
-              const meta = TYPE_META[item.type];
+              const meta = typeMeta[item.type];
               const Icon = meta.icon;
               const deleting = deletingId === item.id;
 
@@ -272,7 +266,7 @@ export function HistoryList({ initialItems }: HistoryListProps) {
                             {meta.label}
                           </span>
                           <span className="text-[11px] text-white/35">
-                            {formatDate(item.createdAt)}
+                            {formatDateTime(item.createdAt)}
                           </span>
                         </div>
                         <h3 className="truncate text-lg font-bold text-white">
@@ -297,7 +291,7 @@ export function HistoryList({ initialItems }: HistoryListProps) {
                           setDeleteError(null);
                         }}
                         disabled={Boolean(deletingId)}
-                        aria-label={`Delete ${item.title}`}
+                        aria-label={t("dashboard.history.deleteAria", { title: item.title })}
                       >
                         {deleting ? (
                           <Loader2 className="size-4 animate-spin" />
@@ -312,7 +306,7 @@ export function HistoryList({ initialItems }: HistoryListProps) {
                         className="text-white/45 hover:bg-premium-gold/10 hover:text-premium-gold-light"
                         asChild
                       >
-                        <Link href={item.href} aria-label={`Open ${item.title}`}>
+                        <Link href={item.href} aria-label={t("dashboard.history.openAria", { title: item.title })}>
                           <ArrowRight className="size-4" />
                         </Link>
                       </Button>
@@ -325,11 +319,11 @@ export function HistoryList({ initialItems }: HistoryListProps) {
         ) : (
           <DashboardEmptyState
             icon={isFiltering ? Search : History}
-            title={isFiltering ? "No matching history" : "No generated history yet"}
+            title={isFiltering ? t("dashboard.history.noMatching") : t("dashboard.history.emptyTitle")}
             description={
               isFiltering
-                ? "Adjust your search, type filter, or sort order to find generated assets."
-                : "Generate a business idea, market analysis, AI report, or website blueprint to build your history."
+                ? t("dashboard.history.noMatchingDescription")
+                : t("dashboard.history.emptyDescription")
             }
           />
         )}
@@ -349,13 +343,11 @@ export function HistoryList({ initialItems }: HistoryListProps) {
             <div className="mb-1 flex size-11 items-center justify-center rounded-xl bg-red-400/10 ring-1 ring-red-400/20">
               <AlertTriangle className="size-5 text-red-300" aria-hidden="true" />
             </div>
-            <DialogTitle>Delete history item?</DialogTitle>
+            <DialogTitle>{t("dashboard.history.deleteTitle")}</DialogTitle>
             <DialogDescription className="text-white/50">
-              This will permanently remove{" "}
-              <span className="font-medium text-white">
-                {deleteTarget?.title ?? "this generated item"}
-              </span>{" "}
-              from your dashboard.
+              {t("dashboard.history.deleteDescription", {
+                title: deleteTarget?.title ?? t("dashboard.history.deleteFallback"),
+              })}
             </DialogDescription>
           </DialogHeader>
           {deleteError && (
@@ -374,7 +366,7 @@ export function HistoryList({ initialItems }: HistoryListProps) {
               }}
               disabled={Boolean(deletingId)}
             >
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button
               type="button"
@@ -387,7 +379,7 @@ export function HistoryList({ initialItems }: HistoryListProps) {
               ) : (
                 <Trash2 className="size-4" />
               )}
-              Delete
+              {t("common.delete")}
             </Button>
           </DialogFooter>
         </DialogContent>

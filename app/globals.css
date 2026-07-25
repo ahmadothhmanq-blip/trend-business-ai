@@ -335,9 +335,43 @@
 /* Global RTL support (Arabic, Persian, Urdu) */
 html[dir="rtl"] body {
   direction: rtl;
+  text-align: start;
 }
 
 html[dir="rtl"] .dashboard-sidebar,
 html[dir="rtl"] .dashboard-header {
-  text-align: right;
+  text-align: start;
+}
+
+html[dir="rtl"] [data-sidebar] {
+  border-inline-end: 1px solid rgb(255 255 255 / 0.06);
+  border-inline-start: none;
+}
+
+html[dir="rtl"] .flex-row-reverse-aware {
+  flex-direction: row-reverse;
+}
+
+html[dir="rtl"] input,
+html[dir="rtl"] textarea,
+html[dir="rtl"] select {
+  text-align: start;
+}
+
+html[dir="rtl"] table th,
+html[dir="rtl"] table td {
+  text-align: start;
+}
+
+html[dir="rtl"] [class*="ml-"]:not([class*="ml-0"]) {
+  /* Prefer logical margin utilities in new code; this aids legacy layouts */
+}
+
+html[dir="rtl"] .lucide-chevron-right {
+  transform: scaleX(-1);
+}
+
+html[dir="rtl"] dialog,
+html[dir="rtl"] [role="dialog"] {
+  text-align: start;
 }

@@ -13,6 +13,7 @@ export type ContentActionInput = {
   tone?: string;
   style?: string;
   targetLanguage?: string;
+  outputLanguage?: string;
   instruction?: string;
   brandVoice?: BrandVoiceContext | null;
 };
@@ -43,6 +44,7 @@ function buildActionPrompt(input: ContentActionInput): { system: string; prompt:
   if (input.tone) extras.push(`Target tone: ${input.tone}`);
   if (input.style) extras.push(`Target style: ${input.style}`);
   if (input.targetLanguage) extras.push(`Target language: ${input.targetLanguage}`);
+  else if (input.outputLanguage) extras.push(`Respond entirely in ${input.outputLanguage}`);
   if (input.instruction) extras.push(`Additional instruction: ${input.instruction}`);
 
   const system = [

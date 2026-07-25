@@ -23,11 +23,7 @@ import { AdsPanel } from "@/components/dashboard/marketing/ads-panel";
 import type { MarketingCampaign, CustomerPersona, MarketingCalendarEvent } from "@/types/marketing";
 import type { WorkspaceGeneration } from "@/types/database";
 import type { MarketingDashboardSummary } from "@/components/dashboard/marketing/marketing-dashboard";
-
-const StrategyWorkspace = dynamic(
-  () => import("@/components/dashboard/marketing/strategy-workspace").then((m) => m.StrategyWorkspace),
-  { loading: () => <div className="text-sm text-white/40">Loading AI strategy…</div> },
-);
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 
 type Tab =
   | "dashboard"
@@ -47,6 +43,16 @@ type Props = {
   analyticsSummary?: MarketingDashboardSummary;
 };
 
+function StrategyLoading() {
+  const wt = useWorkspaceT("marketing");
+  return <div className="text-sm text-white/40">{wt("workspace.loadingStrategy")}</div>;
+}
+
+const StrategyWorkspace = dynamic(
+  () => import("@/components/dashboard/marketing/strategy-workspace").then((m) => m.StrategyWorkspace),
+  { loading: () => <StrategyLoading /> },
+);
+
 export function MarketingWorkspace({
   initialCampaigns = [],
   initialPersonas = [],
@@ -54,6 +60,7 @@ export function MarketingWorkspace({
   initialGenerations = [],
   analyticsSummary,
 }: Props) {
+  const wt = useWorkspaceT("marketing");
   const [tab, setTab] = useState<Tab>("campaigns");
   const [campaigns, setCampaigns] = useState(initialCampaigns);
   const [selectedCampaignId, setSelectedCampaignId] = useState<string | null>(initialCampaigns[0]?.id ?? null);
@@ -72,14 +79,14 @@ export function MarketingWorkspace({
   };
 
   const tabs = [
-    { key: "dashboard" as const, label: "Dashboard", icon: LayoutDashboard },
-    { key: "campaigns" as const, label: "Campaigns", icon: Megaphone },
-    { key: "personas" as const, label: "Personas", icon: Users },
-    { key: "calendar" as const, label: "Calendar", icon: CalendarDays },
-    { key: "analytics" as const, label: "Analytics", icon: BarChart3 },
-    { key: "email" as const, label: "Email", icon: Mail },
-    { key: "ads" as const, label: "Ads", icon: Target },
-    { key: "strategy" as const, label: "AI Strategy", icon: Sparkles },
+    { key: "dashboard" as const, label: wt("workspace.tabs.dashboard"), icon: LayoutDashboard },
+    { key: "campaigns" as const, label: wt("workspace.tabs.campaigns"), icon: Megaphone },
+    { key: "personas" as const, label: wt("workspace.tabs.personas"), icon: Users },
+    { key: "calendar" as const, label: wt("workspace.tabs.calendar"), icon: CalendarDays },
+    { key: "analytics" as const, label: wt("workspace.tabs.analytics"), icon: BarChart3 },
+    { key: "email" as const, label: wt("workspace.tabs.email"), icon: Mail },
+    { key: "ads" as const, label: wt("workspace.tabs.ads"), icon: Target },
+    { key: "strategy" as const, label: wt("workspace.tabs.strategy"), icon: Sparkles },
   ];
 
   return (

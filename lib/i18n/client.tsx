@@ -107,8 +107,8 @@ export function useI18n() {
 }
 
 export function useTranslation() {
-  const { t, locale } = useI18n();
-  return { t, locale };
+  const { t, locale, setLocale, isPending } = useI18n();
+  return { t, locale, setLocale, isPending };
 }
 
 export function useOptionalI18n() {

@@ -29,9 +29,16 @@ import {
   MARKETING_SLUG_TO_ONE_PROMPT,
   getOnePromptProduct,
 } from "@/lib/constants/one-prompt-products";
+import { useScopedT } from "@/lib/i18n/use-scoped-t";
+import { translateField } from "@/lib/i18n/translate-field";
+import { useTranslation } from "@/lib/i18n/client";
 
 /** Individual product landing — dedicated page per product slug. */
 export function MarketingProductPage({ slug }: { slug: MarketingProductSlug }) {
+  const { t } = useTranslation();
+  const tCommon = useScopedT("marketing.common");
+  const tCat = useScopedT("marketing.categories");
+  const productKey = `marketing.products.${slug}`;
   const reduce = useReducedMotion();
   const product = getMarketingProduct(slug)!;
   const category = AI_PRODUCT_CATEGORIES.find((c) => c.id === product.categoryId)!;
@@ -40,45 +47,54 @@ export function MarketingProductPage({ slug }: { slug: MarketingProductSlug }) {
   const onePromptId = MARKETING_SLUG_TO_ONE_PROMPT[slug];
   const onePrompt = onePromptId ? getOnePromptProduct(onePromptId) : null;
   const primaryHref = onePrompt?.dashboardHref ?? product.dashboardHref;
+  const categoryTitle = tCat(`${category.id}.title`);
+  const productTitle = translateField(t, product.title, `${productKey}.title`);
 
   return (
     <SiteShell>
       <section className="landing-container pt-[108px] pb-14 lg:pb-16 lg:pt-[124px]">
         <SeoBreadcrumbs
           items={[
-            { name: "Home", href: "/" },
-            { name: category.title, href: category.href },
-            { name: product.title },
+            { name: tCommon("home"), href: "/" },
+            { name: categoryTitle, href: category.href },
+            { name: productTitle },
           ]}
         />
         <div className="grid items-center gap-10 lg:grid-cols-[1fr_1.05fr] lg:gap-14">
           <div>
-            <SiteEyebrow>{product.eyebrow}</SiteEyebrow>
-            <SiteH1 className="mt-5">{product.title}</SiteH1>
-            <SiteBody className="mt-5 max-w-xl">{product.description}</SiteBody>
+            <SiteEyebrow>
+              {translateField(t, product.eyebrow, `${productKey}.eyebrow`)}
+            </SiteEyebrow>
+            <SiteH1 className="mt-5">{productTitle}</SiteH1>
+            <SiteBody className="mt-5 max-w-xl">
+              {translateField(t, product.description, `${productKey}.description`)}
+            </SiteBody>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <SiteButton href={primaryHref} size="lg">
-                Open {product.title} <ArrowRight className="size-4" />
+                {tCommon("openProduct", { title: productTitle })}{" "}
+                <ArrowRight className="size-4" />
               </SiteButton>
               <SiteButton href="/signup" variant="dark" size="lg">
-                Start Free
+                {tCommon("startFree")}
               </SiteButton>
             </div>
             <ul className="mt-8 space-y-3">
-              {product.highlights.map((item) => (
+              {product.highlights.map((item, index) => (
                 <li
                   key={item}
                   className="flex gap-3 text-[14px] leading-[1.65] text-[#C7C7C7]"
                 >
                   <Check className="mt-0.5 size-4 shrink-0 text-[#D4AF37]" />
-                  <span>{item}</span>
+                  <span>
+                    {translateField(t, item, `${productKey}.highlights.${index}`)}
+                  </span>
                 </li>
               ))}
             </ul>
           </div>
           <ProductIllustration
             src={product.image}
-            alt={product.imageAlt}
+            alt={translateField(t, product.imageAlt, `${productKey}.imageAlt`)}
             priority
             className="min-h-[260px] shadow-[0_40px_120px_rgba(0,0,0,0.45)] sm:min-h-[320px]"
           />
@@ -89,8 +105,8 @@ export function MarketingProductPage({ slug }: { slug: MarketingProductSlug }) {
         <div className="landing-container py-16 lg:py-20">
           <div className="grid gap-10 lg:grid-cols-2 lg:gap-14">
             <div>
-              <SiteLabel>Capabilities</SiteLabel>
-              <SiteH2 className="mt-4">What this product does</SiteH2>
+              <SiteLabel>{tCommon("capabilities")}</SiteLabel>
+              <SiteH2 className="mt-4">{tCommon("whatProductDoes")}</SiteH2>
               <ul className="mt-8 space-y-4">
                 {product.capabilities.map((item, index) => (
                   <motion.li
@@ -101,14 +117,14 @@ export function MarketingProductPage({ slug }: { slug: MarketingProductSlug }) {
                     transition={{ duration: 0.35, delay: index * 0.05 }}
                     className="rounded-2xl border border-[rgba(212,175,55,0.16)] bg-[#111111] px-5 py-4 text-[14px] leading-[1.7] text-[#C7C7C7]"
                   >
-                    {item}
+                    {translateField(t, item, `${productKey}.capabilities.${index}`)}
                   </motion.li>
                 ))}
               </ul>
             </div>
             <div>
-              <SiteLabel>Outcomes</SiteLabel>
-              <SiteH2 className="mt-4">What you walk away with</SiteH2>
+              <SiteLabel>{tCommon("outcomes")}</SiteLabel>
+              <SiteH2 className="mt-4">{tCommon("whatYouWalkAwayWith")}</SiteH2>
               <ul className="mt-8 space-y-4">
                 {product.outcomes.map((item, index) => (
                   <motion.li
@@ -120,7 +136,9 @@ export function MarketingProductPage({ slug }: { slug: MarketingProductSlug }) {
                     className="flex gap-3 rounded-2xl border border-[rgba(212,175,55,0.16)] bg-[#111111] px-5 py-4 text-[14px] leading-[1.7] text-[#C7C7C7]"
                   >
                     <Check className="mt-0.5 size-4 shrink-0 text-[#D4AF37]" />
-                    <span>{item}</span>
+                    <span>
+                      {translateField(t, item, `${productKey}.outcomes.${index}`)}
+                    </span>
                   </motion.li>
                 ))}
               </ul>
@@ -135,37 +153,38 @@ export function MarketingProductPage({ slug }: { slug: MarketingProductSlug }) {
         <section className="border-t border-[rgba(212,175,55,0.12)]">
           <div className="landing-container py-16 lg:py-20">
             <SiteSectionHead
-              label="How it works"
-              title="Brief → generate → save & export"
-              description="The same private workflow across every Trend Business AI product."
+              label={tCommon("howItWorks")}
+              title={tCommon("briefGenerateSave")}
+              description={tCommon("samePrivateWorkflow")}
             />
             <div className="mt-12 grid gap-5 sm:grid-cols-3">
-              {[
-                {
-                  step: "01",
-                  title: "Open the product",
-                  body: `Start from ${category.title} or jump straight into ${product.title} after signup.`,
-                },
-                {
-                  step: "02",
-                  title: "Describe your brief",
-                  body: "Share goals, audience and constraints. Clearer briefs produce stronger output.",
-                },
-                {
-                  step: "03",
-                  title: "Save and export",
-                  body: "Keep results in your authenticated dashboard and export when you are ready to execute.",
-                },
-              ].map((item) => (
+              {(["01", "02", "03"] as const).map((step, index) => (
                 <div
-                  key={item.step}
+                  key={step}
                   className="rounded-2xl border border-[rgba(212,175,55,0.16)] bg-[#111111] p-6"
                 >
                   <span className="inline-flex size-9 items-center justify-center rounded-full border border-[rgba(212,175,55,0.3)] bg-[rgba(212,175,55,0.1)] text-[12px] font-bold text-[#D4AF37]">
-                    {item.step}
+                    {step}
                   </span>
-                  <h3 className="mt-4 text-lg font-bold text-white">{item.title}</h3>
-                  <p className="mt-2 text-[14px] leading-[1.7] text-[#B5B5B5]">{item.body}</p>
+                  <h3 className="mt-4 text-lg font-bold text-white">
+                    {tCommon(
+                      index === 0
+                        ? "stepOpenProduct"
+                        : index === 1
+                          ? "stepDescribeBrief"
+                          : "stepSaveExport",
+                    )}
+                  </h3>
+                  <p className="mt-2 text-[14px] leading-[1.7] text-[#B5B5B5]">
+                    {index === 0
+                      ? tCommon("stepOpenProductBody", {
+                          category: categoryTitle,
+                          product: productTitle,
+                        })
+                      : tCommon(
+                          index === 1 ? "stepDescribeBriefBody" : "stepSaveExportBody",
+                        )}
+                  </p>
                 </div>
               ))}
             </div>
@@ -176,9 +195,9 @@ export function MarketingProductPage({ slug }: { slug: MarketingProductSlug }) {
       <section className="border-t border-[rgba(212,175,55,0.12)]">
         <div className="landing-container py-16 lg:py-20">
           <SiteSectionHead
-            label={`More in ${category.title}`}
-            title={`Other ${category.title} products`}
-            description="Stay in this category or explore the full suite."
+            label={tCommon("moreInCategory", { category: categoryTitle })}
+            title={tCommon("otherCategoryProducts", { category: categoryTitle })}
+            description={tCommon("stayInCategory")}
             align="left"
           />
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -194,7 +213,7 @@ export function MarketingProductPage({ slug }: { slug: MarketingProductSlug }) {
                   {item.description}
                 </p>
                 <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#D4AF37]">
-                  Open page
+                  {tCommon("openPage")}
                   <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
                 </span>
               </Link>
@@ -204,16 +223,16 @@ export function MarketingProductPage({ slug }: { slug: MarketingProductSlug }) {
               className="flex flex-col justify-center rounded-2xl border border-[rgba(212,175,55,0.16)] bg-[#111111] p-6 transition-all hover:border-[rgba(212,175,55,0.42)]"
             >
               <p className="text-[11px] font-semibold tracking-[0.18em] text-[#D4AF37] uppercase">
-                Category
+                {tCommon("category")}
               </p>
               <h3 className="mt-2 text-lg font-bold text-white">
-                All {category.title} products
+                {tCommon("allCategoryProducts", { category: categoryTitle })}
               </h3>
               <p className="mt-2 text-[14px] leading-[1.7] text-[#B5B5B5]">
-                {category.description}
+                {tCat(`${category.id}.description`)}
               </p>
               <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#D4AF37]">
-                Back to {category.title}
+                {tCommon("backToCategory", { category: categoryTitle })}
                 <ArrowRight className="size-3.5" />
               </span>
             </Link>
@@ -225,41 +244,43 @@ export function MarketingProductPage({ slug }: { slug: MarketingProductSlug }) {
         <div className="landing-container py-16 lg:py-20">
           <RelatedLinksGroups
             groups={[
-              { title: "Related tools", links: related.tools },
-              { title: "Related services", links: related.services },
-              { title: "Related templates", links: related.templates },
-              { title: "Related articles", links: related.articles },
-              { title: "Business resources", links: related.resources },
+              { title: tCommon("relatedTools"), links: related.tools },
+              { title: tCommon("relatedServices"), links: related.services },
+              { title: tCommon("relatedTemplates"), links: related.templates },
+              { title: tCommon("relatedArticles"), links: related.articles },
+              { title: tCommon("businessResources"), links: related.resources },
             ]}
           />
         </div>
       </section>
 
       <SiteCtaBand
-        title={`Start ${product.title} free`}
-        description="Enter one business idea — AI guides Idea through Ready Product in your private dashboard."
+        title={tCommon("startProductFree", { title: productTitle })}
+        description={tCommon("onePromptCtaDescription")}
         primaryHref={primaryHref}
-        primaryLabel={`Open ${product.title}`}
+        primaryLabel={tCommon("openProduct", { title: productTitle })}
         secondaryHref={category.href}
-        secondaryLabel={`Browse ${category.title}`}
+        secondaryLabel={tCommon("browseCategory", { category: categoryTitle })}
       />
     </SiteShell>
   );
 }
 
 export function MarketingProductPageFallback({ slug }: { slug: string }) {
+  const tCommon = useScopedT("marketing.common");
+
   return (
     <SiteShell>
       <SitePageHero
-        eyebrow="AI Product"
-        title="Product coming soon"
-        description={`The “${slug}” product page is being finalized. Explore our AI product categories while we finish this landing.`}
-        primary={{ label: "Browse Solutions", href: "/#solutions" }}
-        secondary={{ label: "Start Free", href: "/signup" }}
+        eyebrow={tCommon("aiProduct")}
+        title={tCommon("productComingSoon")}
+        description={tCommon("productComingSoonDescription", { slug })}
+        primary={{ label: tCommon("browseSolutions"), href: "/#solutions" }}
+        secondary={{ label: tCommon("startFree"), href: "/signup" }}
       />
       <div className="landing-container pb-20">
         <Link href="/#solutions" className="text-sm font-semibold text-[#D4AF37]">
-          ← Back to AI Solutions
+          {tCommon("backToSolutions")}
         </Link>
       </div>
     </SiteShell>

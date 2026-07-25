@@ -1,4 +1,5 @@
 import type { ImagePluginInput, ImageAnalysis, ImageConcept } from "@/plugins/image-generator/types";
+import { aiOutputLanguageDirective } from "@/lib/ai/prompts/shared";
 
 function getImageTypeContext(type: string): string {
   const ctx: Record<string, string> = {
@@ -44,7 +45,7 @@ Produce a JSON object with:
 - targetUse: where this image will be used
 - technicalRequirements: array of technical specs (resolution, format, etc.)
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(input.language)}`;
 }
 
 export function imagePlanPrompt(input: ImagePluginInput, analysis: ImageAnalysis): string {
@@ -73,7 +74,7 @@ Create a JSON object with:
 - outputFormats: recommended output formats (array of strings like "png", "svg", "jpg")
 - compositionApproach: overall composition strategy
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(input.language)}`;
 }
 
 export function imageConceptPrompt(
@@ -127,7 +128,7 @@ Return a JSON object with:
 - style: "${analysis.style}"
 - svgConcept: complete SVG markup as a string
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(input.language)}`;
 }
 
 export function imagePromptLibraryPrompt(
@@ -158,5 +159,5 @@ Each entry should have:
 - negativePrompt: what to exclude
 - style: the style tag
 
-Return ONLY valid JSON with a "prompts" array.`;
+Return ONLY valid JSON with a "prompts" array.${aiOutputLanguageDirective(input.language)}`;
 }

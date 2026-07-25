@@ -6,6 +6,7 @@ import { generateWebApp } from "@/lib/webapp-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
 import { resolveIteratedPrompt } from "@/lib/ai/iteration";
 import { getWebAppTypeLabel } from "@/lib/constants/webapp-builder";
+import { resolveRequestLanguage } from "@/lib/i18n/api";
 import type { WebAppGeneration, WebAppBlueprint } from "@/types/webapp";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -105,6 +106,7 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data;
+  const aiLanguage = resolveRequestLanguage(request, input.language);
   const appLabel = getWebAppTypeLabel(input.appType);
 
   let stage = "generateWebApp";
@@ -127,7 +129,7 @@ export async function POST(request: Request) {
     const project = await generateWebApp({
       prompt: iterated.prompt,
       appType: input.appType,
-      language: input.language,
+      language: aiLanguage,
       designStyle: input.designStyle,
       colorStyle: input.colorStyle,
       features: input.features,
@@ -151,7 +153,7 @@ export async function POST(request: Request) {
       app_name: savedProject.title || `${appLabel} App`,
       app_type: input.appType,
       description: savedProject.description || input.prompt,
-      language: input.language,
+      language: aiLanguage,
       design_style: input.designStyle,
       color_style: input.colorStyle,
       features: input.features,

@@ -1,4 +1,4 @@
-export type TranslationValue = string | TranslationMessages;
+export type TranslationValue = string | TranslationMessages | TranslationValue[];
 export type TranslationMessages = { [key: string]: TranslationValue };
 
 export function isTranslationMessages(
@@ -32,10 +32,20 @@ export function getNestedMessage(
   key: string,
 ): string | undefined {
   const parts = key.split(".");
-  let current: TranslationValue | undefined = messages;
+  let current: unknown = messages;
   for (const part of parts) {
-    if (!current || !isTranslationMessages(current)) return undefined;
-    current = current[part];
+    if (current === null || current === undefined) return undefined;
+    if (Array.isArray(current)) {
+      const index = Number(part);
+      if (!Number.isInteger(index)) return undefined;
+      current = current[index];
+      continue;
+    }
+    if (isTranslationMessages(current as TranslationValue)) {
+      current = (current as TranslationMessages)[part];
+      continue;
+    }
+    return undefined;
   }
   return typeof current === "string" ? current : undefined;
 }

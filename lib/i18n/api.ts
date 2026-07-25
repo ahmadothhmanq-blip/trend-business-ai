@@ -23,3 +23,14 @@ export function getRequestAiLanguage(
   const locale = getRequestLocale(request);
   return resolveAiLanguage({ locale, language: explicitLanguage });
 }
+
+/**
+ * Resolve AI output language for any generation API.
+ * Prefers explicit body language, then UI locale cookie/header.
+ */
+export function resolveRequestLanguage(
+  request: Request,
+  explicitLanguage?: string | null,
+): string {
+  return getRequestAiLanguage(request, explicitLanguage);
+}

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useScopedT } from "@/lib/i18n/use-scoped-t";
 import { cn } from "@/lib/utils";
 
 type LeadCaptureFormProps = {
@@ -18,6 +19,7 @@ export function LeadCaptureForm({
   compact = false,
   onSuccess,
 }: LeadCaptureFormProps) {
+  const t = useScopedT("marketing.growth.leadCapture");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [company, setCompany] = useState("");
@@ -51,8 +53,8 @@ export function LeadCaptureForm({
         }),
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Could not submit");
-      toast.success("Thanks — we will be in touch shortly.");
+      if (!res.ok) throw new Error(json.error ?? t("submitFailed"));
+      toast.success(t("successToast"));
       setName("");
       setEmail("");
       setCompany("");
@@ -68,7 +70,7 @@ export function LeadCaptureForm({
         }),
       });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Submission failed");
+      toast.error(err instanceof Error ? err.message : t("submitFailed"));
     } finally {
       setLoading(false);
     }
@@ -90,7 +92,7 @@ export function LeadCaptureForm({
       {!compact && (
         <input
           className={fieldClass}
-          placeholder="Your name"
+          placeholder={t("namePlaceholder")}
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
@@ -99,7 +101,7 @@ export function LeadCaptureForm({
         required
         type="email"
         className={fieldClass}
-        placeholder="Work email"
+        placeholder={t("emailPlaceholder")}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
@@ -107,13 +109,13 @@ export function LeadCaptureForm({
         <>
           <input
             className={fieldClass}
-            placeholder="Company (optional)"
+            placeholder={t("companyPlaceholder")}
             value={company}
             onChange={(e) => setCompany(e.target.value)}
           />
           <textarea
             className={cn(fieldClass, "min-h-[110px] resize-y")}
-            placeholder="How can we help?"
+            placeholder={t("messagePlaceholder")}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
           />
@@ -125,7 +127,7 @@ export function LeadCaptureForm({
         className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#FFD700,#D4AF37)] px-5 py-3 text-sm font-semibold text-[#111111] hover:brightness-110 disabled:opacity-60"
       >
         {loading ? <Loader2 className="size-4 animate-spin" /> : null}
-        {compact ? "Get early access" : "Send message"}
+        {compact ? t("getEarlyAccess") : t("sendMessage")}
       </button>
     </form>
   );

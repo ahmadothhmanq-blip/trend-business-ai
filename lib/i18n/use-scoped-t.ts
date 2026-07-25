@@ -15,7 +15,18 @@ export function useScopedT(scope: string) {
   );
 }
 
-export function useWorkspaceT(workspace: "crm" | "erp" | "bi" | "cyber") {
+export function useWorkspaceT(
+  workspace:
+    | "crm"
+    | "erp"
+    | "bi"
+    | "cyber"
+    | "platform"
+    | "marketing"
+    | "socialMedia"
+    | "businessManager"
+    | "profile",
+) {
   return useScopedT(`workspaces.${workspace}`);
 }
 
@@ -31,7 +42,12 @@ export function useProductT(
     | "businessSuite"
     | "aiAgents"
     | "landingPageBuilder"
-    | "marketAnalysis",
+    | "marketAnalysis"
+    | "ideas"
+    | "reports"
+    | "visualEditor"
+    | "creatorMarketplace"
+    | "templateMarketplace",
 ) {
   return useScopedT(`products.${product}`);
 }

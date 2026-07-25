@@ -1,10 +1,12 @@
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { AdminPanel } from "@/components/dashboard/platform/admin-panel";
 import { createClient } from "@/lib/supabase/server";
+import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
 
-export const metadata: Metadata = { title: "Admin Dashboard" };
+export async function generateMetadata() {
+  return dashboardPageMetadata("admin");
+}
 
 export default async function AdminPage() {
   const supabase = await createClient();

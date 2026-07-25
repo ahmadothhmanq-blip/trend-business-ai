@@ -6,6 +6,7 @@ import { generateBrandIdentity, modelToBlueprint } from "@/lib/brand-identity-ge
 import { getActiveProvider } from "@/lib/ai/provider-config";
 import { resolveIteratedPrompt } from "@/lib/ai/iteration";
 import { getBrandTypeLabel } from "@/lib/constants/brand-identity-builder";
+import { resolveRequestLanguage } from "@/lib/i18n/api";
 import { getBrandTemplate } from "@/lib/ai-core/brand-studio/templates";
 import type { BrandIdentityGeneration, BrandIdentityBlueprint } from "@/types/brand-identity";
 import { NextResponse } from "next/server";
@@ -84,6 +85,7 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data;
+  const aiLanguage = resolveRequestLanguage(request);
   const template = input.templateId ? getBrandTemplate(input.templateId) : undefined;
   const typeLabel = getBrandTypeLabel(input.brandType);
   let stage = "generateBrandIdentity";
@@ -112,6 +114,7 @@ export async function POST(request: Request) {
       brandPersonality: template?.personality || input.brandPersonality,
       deliverables: template?.deliverables?.length ? template.deliverables : input.deliverables,
       templateId: input.templateId,
+      language: aiLanguage,
     });
 
     const blueprint: BrandIdentityBlueprint = result.model

@@ -28,6 +28,7 @@ import {
   DashboardPanel,
 } from "@/components/dashboard/ui/dashboard-card";
 import { dashboardInputClass, dashboardTextareaClass } from "@/components/dashboard/ui/dashboard-styles";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 import { cn } from "@/lib/utils";
 import type {
   AeoAnalyzeResult,
@@ -48,19 +49,6 @@ type TabId =
   | "knowledge"
   | "competitors"
   | "recommendations";
-
-const TABS: Array<{ id: TabId; label: string; icon: typeof Radar }> = [
-  { id: "visibility", label: "Visibility", icon: Gauge },
-  { id: "aeo", label: "AEO", icon: Search },
-  { id: "geo", label: "GEO", icon: Brain },
-  { id: "schema", label: "Schema", icon: FileJson2 },
-  { id: "optimize", label: "Optimizer", icon: Wand2 },
-  { id: "analytics", label: "Analytics", icon: TrendingUp },
-  { id: "programmatic", label: "Programmatic", icon: Layers3 },
-  { id: "knowledge", label: "Knowledge", icon: BookOpen },
-  { id: "competitors", label: "Competitors", icon: Swords },
-  { id: "recommendations", label: "Recommendations", icon: Lightbulb },
-];
 
 const STATUS_ICON = {
   pass: CheckCircle2,
@@ -95,6 +83,7 @@ function ScoreTile({
 }
 
 export function AiSearchPanel() {
+  const wt = useWorkspaceT("platform");
   const [tab, setTab] = useState<TabId>("visibility");
   const [data, setData] = useState<AiSearchDashboardPayload | null>(null);
   const [loading, setLoading] = useState(true);
@@ -122,12 +111,25 @@ export function AiSearchPanel() {
     const res = await fetch("/api/ai-search/dashboard");
     const json = await res.json();
     if (!res.ok) {
-      setError(json.error ?? "Failed to load AI Search Center");
+      setError(json.error ?? wt("aiSearch.loadFailed"));
       setData(null);
       return;
     }
     setData(json.dashboard as AiSearchDashboardPayload);
-  }, []);
+  }, [wt]);
+
+  const tabs: Array<{ id: TabId; label: string; icon: typeof Radar }> = [
+    { id: "visibility", label: wt("aiSearch.tabs.visibility"), icon: Gauge },
+    { id: "aeo", label: wt("aiSearch.tabs.aeo"), icon: Search },
+    { id: "geo", label: wt("aiSearch.tabs.geo"), icon: Brain },
+    { id: "schema", label: wt("aiSearch.tabs.schema"), icon: FileJson2 },
+    { id: "optimize", label: wt("aiSearch.tabs.optimize"), icon: Wand2 },
+    { id: "analytics", label: wt("aiSearch.tabs.analytics"), icon: TrendingUp },
+    { id: "programmatic", label: wt("aiSearch.tabs.programmatic"), icon: Layers3 },
+    { id: "knowledge", label: wt("aiSearch.tabs.knowledge"), icon: BookOpen },
+    { id: "competitors", label: wt("aiSearch.tabs.competitors"), icon: Swords },
+    { id: "recommendations", label: wt("aiSearch.tabs.recommendations"), icon: Lightbulb },
+  ];
 
   useEffect(() => {
     void (async () => {
@@ -148,7 +150,7 @@ export function AiSearchPanel() {
           try {
             jsonLd = JSON.parse(schemaJson);
           } catch {
-            setError("Schema JSON is invalid.");
+            setError(wt("aiSearch.invalidSchemaJson"));
             return;
           }
         }
@@ -188,7 +190,7 @@ export function AiSearchPanel() {
       });
       const json = await res.json();
       if (!res.ok) {
-        setError(json.error ?? "Analyze failed");
+        setError(json.error ?? wt("aiSearch.analyzeFailed"));
         return;
       }
       if (mode === "aeo") setAeoResult(json.result as AeoAnalyzeResult);
@@ -196,7 +198,7 @@ export function AiSearchPanel() {
       if (mode === "schema") setSchemaResult(json.result as SchemaValidationResult);
       if (mode === "optimize") setOptimizeResult(json.result as ContentOptimizeResult);
     } catch {
-      setError("Analyze request failed");
+      setError(wt("aiSearch.analyzeRequestFailed"));
     } finally {
       setBusy(false);
     }
@@ -206,7 +208,7 @@ export function AiSearchPanel() {
     return (
       <div className="flex items-center gap-3 text-white/60">
         <Loader2 className="size-5 animate-spin text-premium-gold" />
-        Loading AI Search Center…
+        {wt("aiSearch.loading")}
       </div>
     );
   }
@@ -215,8 +217,8 @@ export function AiSearchPanel() {
     return (
       <DashboardCard>
         <DashboardCardHeader>
-          <DashboardCardTitle>AI Search Center unavailable</DashboardCardTitle>
-          <DashboardCardDescription>{error ?? "Unable to load dashboard."}</DashboardCardDescription>
+          <DashboardCardTitle>{wt("aiSearch.unavailable")}</DashboardCardTitle>
+          <DashboardCardDescription>{error ?? wt("aiSearch.unableToLoad")}</DashboardCardDescription>
         </DashboardCardHeader>
       </DashboardCard>
     );
@@ -234,7 +236,7 @@ export function AiSearchPanel() {
       ) : null}
 
       <div className="flex flex-wrap gap-2">
-        {TABS.map((item) => {
+        {tabs.map((item) => {
           const Icon = item.icon;
           const active = tab === item.id;
           return (
@@ -259,23 +261,23 @@ export function AiSearchPanel() {
       {tab === "visibility" && (
         <div className="space-y-6">
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <ScoreTile label="AI Visibility" value={visibility.scores.overall} hint={`Grade ${visibility.scores.grade}`} />
-            <ScoreTile label="SEO" value={visibility.scores.seo} />
-            <ScoreTile label="AEO" value={visibility.scores.aeo} />
-            <ScoreTile label="GEO" value={visibility.scores.geo} />
-            <ScoreTile label="Technical SEO" value={visibility.scores.technical} />
-            <ScoreTile label="Content Quality" value={visibility.scores.contentQuality} />
-            <ScoreTile label="Structured Data" value={visibility.scores.structuredData} />
-            <ScoreTile label="AI Search Readiness" value={readinessScore} hint={visibility.siteUrl} />
+            <ScoreTile label={wt("aiSearch.visibility.aiVisibility")} value={visibility.scores.overall} hint={wt("common.grade", { grade: visibility.scores.grade })} />
+            <ScoreTile label={wt("aiSearch.visibility.seo")} value={visibility.scores.seo} />
+            <ScoreTile label={wt("aiSearch.visibility.aeo")} value={visibility.scores.aeo} />
+            <ScoreTile label={wt("aiSearch.visibility.geo")} value={visibility.scores.geo} />
+            <ScoreTile label={wt("aiSearch.visibility.technicalSeo")} value={visibility.scores.technical} />
+            <ScoreTile label={wt("aiSearch.visibility.contentQuality")} value={visibility.scores.contentQuality} />
+            <ScoreTile label={wt("aiSearch.visibility.structuredData")} value={visibility.scores.structuredData} />
+            <ScoreTile label={wt("aiSearch.visibility.aiSearchReadiness")} value={readinessScore} hint={visibility.siteUrl} />
           </div>
 
           <DashboardCard>
             <DashboardCardHeader>
               <DashboardCardTitle className="flex items-center gap-2">
-                <Radar className="size-4 text-premium-gold" /> Engine coverage
+                <Radar className="size-4 text-premium-gold" /> {wt("aiSearch.visibility.engineCoverage")}
               </DashboardCardTitle>
               <DashboardCardDescription>
-                Readiness for Google, AI Mode, ChatGPT, Gemini, Claude, Perplexity and Copilot
+                {wt("aiSearch.visibility.engineCoverageDescription")}
               </DashboardCardDescription>
             </DashboardCardHeader>
             <DashboardCardContent className="grid gap-3 md:grid-cols-2">
@@ -302,7 +304,7 @@ export function AiSearchPanel() {
 
           <DashboardCard>
             <DashboardCardHeader>
-              <DashboardCardTitle>Visibility checks</DashboardCardTitle>
+              <DashboardCardTitle>{wt("aiSearch.visibility.visibilityChecks")}</DashboardCardTitle>
             </DashboardCardHeader>
             <DashboardCardContent className="space-y-2">
               {visibility.checks.slice(0, 18).map((check) => {
@@ -330,36 +332,36 @@ export function AiSearchPanel() {
           <DashboardCard>
             <DashboardCardHeader>
               <DashboardCardTitle>
-                {tab === "aeo" ? "AEO Analyzer" : tab === "geo" ? "GEO Analyzer" : "AI Content Optimizer"}
+                {tab === "aeo" ? wt("aiSearch.analyzer.aeoTitle") : tab === "geo" ? wt("aiSearch.analyzer.geoTitle") : wt("aiSearch.analyzer.optimizeTitle")}
               </DashboardCardTitle>
               <DashboardCardDescription>
                 {tab === "aeo"
-                  ? "Answer Engine Optimization for FAQs, direct answers and question coverage"
+                  ? wt("aiSearch.analyzer.aeoDescription")
                   : tab === "geo"
-                    ? "Generative Engine Optimization for entities, clusters and citation readiness"
-                    : "Generate SEO title, meta, OpenGraph, FAQ, schema, summary, CTA and internal links"}
+                    ? wt("aiSearch.analyzer.geoDescription")
+                    : wt("aiSearch.analyzer.optimizeDescription")}
               </DashboardCardDescription>
             </DashboardCardHeader>
             <DashboardCardContent className="space-y-3">
-              <input className={dashboardInputClass} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" />
-              <input className={dashboardInputClass} value={path} onChange={(e) => setPath(e.target.value)} placeholder="/path" />
+              <input className={dashboardInputClass} value={title} onChange={(e) => setTitle(e.target.value)} placeholder={wt("aiSearch.analyzer.titlePlaceholder")} />
+              <input className={dashboardInputClass} value={path} onChange={(e) => setPath(e.target.value)} placeholder={wt("aiSearch.analyzer.pathPlaceholder")} />
               <textarea
                 className={dashboardTextareaClass}
                 rows={2}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Meta description"
+                placeholder={wt("aiSearch.analyzer.metaDescriptionPlaceholder")}
               />
               <textarea
                 className={dashboardTextareaClass}
                 rows={6}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder="Page content"
+                placeholder={wt("aiSearch.analyzer.pageContentPlaceholder")}
               />
               <label className="flex items-center gap-2 text-sm text-white/60">
                 <input type="checkbox" checked={useAi} onChange={(e) => setUseAi(e.target.checked)} />
-                Enrich with AI insights (uses AI quota)
+                {wt("aiSearch.analyzer.enrichWithAi")}
               </label>
               <button
                 type="button"
@@ -368,14 +370,15 @@ export function AiSearchPanel() {
                 className="btn-gold inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-60"
               >
                 {busy ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
-                Run {tab === "optimize" ? "Optimizer" : tab.toUpperCase()}
+                {tab === "optimize" ? wt("aiSearch.analyzer.runOptimizer") : wt("aiSearch.analyzer.runMode", { mode: tab.toUpperCase() })}
               </button>
             </DashboardCardContent>
           </DashboardCard>
 
           {tab === "aeo" && aeoResult && (
             <ResultScoreCard
-              title="AEO result"
+              wt={wt}
+              title={wt("aiSearch.results.aeoResult")}
               score={aeoResult.score}
               grade={aeoResult.grade}
               strengths={aeoResult.strengths}
@@ -387,7 +390,8 @@ export function AiSearchPanel() {
           )}
           {tab === "geo" && geoResult && (
             <ResultScoreCard
-              title="GEO result"
+              wt={wt}
+              title={wt("aiSearch.results.geoResult")}
               score={geoResult.score}
               grade={geoResult.grade}
               strengths={geoResult.strengths}
@@ -396,7 +400,7 @@ export function AiSearchPanel() {
               aiInsights={geoResult.aiInsights}
               metrics={[
                 ...Object.entries(geoResult.metrics).map(([k, v]) => `${k}: ${String(v)}`),
-                `entities: ${geoResult.entitiesDetected.join(", ") || "none"}`,
+                `entities: ${geoResult.entitiesDetected.join(", ") || wt("aiSearch.results.noneDetected")}`,
                 `clusters: ${geoResult.topicClusters.join(", ")}`,
               ]}
             />
@@ -404,17 +408,17 @@ export function AiSearchPanel() {
           {tab === "optimize" && optimizeResult && (
             <DashboardCard>
               <DashboardCardHeader>
-                <DashboardCardTitle>Optimized outputs ({optimizeResult.source})</DashboardCardTitle>
+                <DashboardCardTitle>{wt("aiSearch.results.optimizedOutputs", { source: optimizeResult.source })}</DashboardCardTitle>
               </DashboardCardHeader>
               <DashboardCardContent className="space-y-4 text-sm">
-                <Field label="SEO Title" value={optimizeResult.title} />
-                <Field label="Meta Description" value={optimizeResult.metaDescription} />
-                <Field label="OpenGraph Title" value={optimizeResult.openGraph.title} />
-                <Field label="OpenGraph Description" value={optimizeResult.openGraph.description} />
-                <Field label="AI Summary" value={optimizeResult.aiSummary} />
-                <Field label="CTA" value={optimizeResult.callToAction} />
+                <Field label={wt("aiSearch.results.seoTitle")} value={optimizeResult.title} />
+                <Field label={wt("aiSearch.results.metaDescription")} value={optimizeResult.metaDescription} />
+                <Field label={wt("aiSearch.results.openGraphTitle")} value={optimizeResult.openGraph.title} />
+                <Field label={wt("aiSearch.results.openGraphDescription")} value={optimizeResult.openGraph.description} />
+                <Field label={wt("aiSearch.results.aiSummary")} value={optimizeResult.aiSummary} />
+                <Field label={wt("aiSearch.results.cta")} value={optimizeResult.callToAction} />
                 <div>
-                  <p className="mb-2 text-xs uppercase tracking-wide text-premium-gold-light/80">FAQ</p>
+                  <p className="mb-2 text-xs uppercase tracking-wide text-premium-gold-light/80">{wt("aiSearch.results.faq")}</p>
                   <ul className="space-y-2">
                     {optimizeResult.faq.map((f) => (
                       <li key={f.question} className="rounded-lg border border-white/10 bg-black/20 p-3">
@@ -425,7 +429,7 @@ export function AiSearchPanel() {
                   </ul>
                 </div>
                 <div>
-                  <p className="mb-2 text-xs uppercase tracking-wide text-premium-gold-light/80">Internal links</p>
+                  <p className="mb-2 text-xs uppercase tracking-wide text-premium-gold-light/80">{wt("aiSearch.results.internalLinks")}</p>
                   <ul className="space-y-1 text-white/70">
                     {optimizeResult.internalLinks.map((l) => (
                       <li key={l.href}>
@@ -447,9 +451,9 @@ export function AiSearchPanel() {
         <div className="space-y-6">
           <DashboardCard>
             <DashboardCardHeader>
-              <DashboardCardTitle>Schema Validator</DashboardCardTitle>
+              <DashboardCardTitle>{wt("aiSearch.schema.title")}</DashboardCardTitle>
               <DashboardCardDescription>
-                Validate Organization, Product, SoftwareApplication, FAQ, Article, Breadcrumb, WebSite, SearchAction, HowTo and Review
+                {wt("aiSearch.schema.description")}
               </DashboardCardDescription>
             </DashboardCardHeader>
             <DashboardCardContent className="space-y-3">
@@ -458,7 +462,7 @@ export function AiSearchPanel() {
                 rows={8}
                 value={schemaJson}
                 onChange={(e) => setSchemaJson(e.target.value)}
-                placeholder='Optional page JSON-LD… e.g. { "@type": "FAQPage", "mainEntity": [] }'
+                placeholder={wt("aiSearch.schema.jsonLdPlaceholder")}
               />
               <button
                 type="button"
@@ -467,7 +471,7 @@ export function AiSearchPanel() {
                 className="btn-gold inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-60"
               >
                 {busy ? <Loader2 className="size-4 animate-spin" /> : <FileJson2 className="size-4" />}
-                Validate schema
+                {wt("aiSearch.schema.validate")}
               </button>
             </DashboardCardContent>
           </DashboardCard>
@@ -475,13 +479,13 @@ export function AiSearchPanel() {
           {(schemaResult ?? null) && (
             <>
               <div className="grid gap-3 sm:grid-cols-3">
-                <ScoreTile label="Schema score" value={schemaResult!.score} hint={`Grade ${schemaResult!.grade}`} />
-                <ScoreTile label="Errors" value={schemaResult!.errors.length} />
-                <ScoreTile label="Warnings" value={schemaResult!.warnings.length} />
+                <ScoreTile label={wt("aiSearch.schema.schemaScore")} value={schemaResult!.score} hint={wt("common.grade", { grade: schemaResult!.grade })} />
+                <ScoreTile label={wt("aiSearch.schema.errors")} value={schemaResult!.errors.length} />
+                <ScoreTile label={wt("aiSearch.schema.warnings")} value={schemaResult!.warnings.length} />
               </div>
               <DashboardCard>
                 <DashboardCardHeader>
-                  <DashboardCardTitle>Platform coverage</DashboardCardTitle>
+                  <DashboardCardTitle>{wt("aiSearch.schema.platformCoverage")}</DashboardCardTitle>
                 </DashboardCardHeader>
                 <DashboardCardContent className="grid gap-2 md:grid-cols-2">
                   {schemaResult!.platformCoverage.map((item) => {
@@ -506,14 +510,14 @@ export function AiSearchPanel() {
       {tab === "analytics" && (
         <div className="space-y-6">
           <div className="grid gap-4 lg:grid-cols-2">
-            <ListCard title="Most searched topics" items={analytics.mostSearchedTopics.map((t) => `${t.topic} · signal ${t.signal}`)} />
-            <ListCard title="Top performing pages" items={analytics.topPerformingPages.map((p) => `${p.score} · ${p.path}`)} />
-            <ListCard title="AI-ready pages" items={analytics.aiReadyPages.map((p) => `${p.score} · ${p.title}`)} />
-            <ListCard title="Weak pages" items={analytics.weakPages.map((p) => `${p.score} · ${p.path}`)} />
-            <ListCard title="Content opportunities" items={analytics.contentOpportunities.map((o) => `[${o.priority}] ${o.title}`)} />
-            <ListCard title="Keyword opportunities" items={analytics.keywordOpportunities.map((k) => `${k.coverage} · ${k.keyword}`)} />
+            <ListCard title={wt("aiSearch.analytics.mostSearchedTopics")} items={analytics.mostSearchedTopics.map((t) => wt("aiSearch.analytics.topicSignal", { topic: t.topic, signal: t.signal }))} emptyLabel={wt("common.noItems")} />
+            <ListCard title={wt("aiSearch.analytics.topPerformingPages")} items={analytics.topPerformingPages.map((p) => wt("aiSearch.analytics.pageScore", { score: p.score, path: p.path }))} emptyLabel={wt("common.noItems")} />
+            <ListCard title={wt("aiSearch.analytics.aiReadyPages")} items={analytics.aiReadyPages.map((p) => wt("aiSearch.analytics.pageTitle", { score: p.score, title: p.title }))} emptyLabel={wt("common.noItems")} />
+            <ListCard title={wt("aiSearch.analytics.weakPages")} items={analytics.weakPages.map((p) => wt("aiSearch.analytics.pageScore", { score: p.score, path: p.path }))} emptyLabel={wt("common.noItems")} />
+            <ListCard title={wt("aiSearch.analytics.contentOpportunities")} items={analytics.contentOpportunities.map((o) => wt("aiSearch.analytics.opportunity", { priority: o.priority, title: o.title }))} emptyLabel={wt("common.noItems")} />
+            <ListCard title={wt("aiSearch.analytics.keywordOpportunities")} items={analytics.keywordOpportunities.map((k) => wt("aiSearch.analytics.keyword", { coverage: k.coverage, keyword: k.keyword }))} emptyLabel={wt("common.noItems")} />
           </div>
-          <ListCard title="Search trends" items={analytics.searchTrends.map((t) => `${t.direction.toUpperCase()} · ${t.label}: ${t.detail}`)} />
+          <ListCard title={wt("aiSearch.analytics.searchTrends")} items={analytics.searchTrends.map((t) => wt("aiSearch.analytics.trend", { direction: t.direction.toUpperCase(), label: t.label, detail: t.detail }))} emptyLabel={wt("common.noItems")} />
         </div>
       )}
 
@@ -521,43 +525,45 @@ export function AiSearchPanel() {
         <div className="space-y-6">
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {programmatic.clusters.map((c) => (
-              <ScoreTile key={c.id} label={c.label} value={c.published} hint={`${c.draft} draft`} />
+              <ScoreTile key={c.id} label={c.label} value={c.published} hint={wt("aiSearch.programmatic.draftHint", { draft: c.draft })} />
             ))}
           </div>
           {programmatic.duplicates.length > 0 && (
             <ListCard
-              title="Duplicate / conflict prevention"
-              items={programmatic.duplicates.map((d) => `${d.path} ↔ ${d.conflictWith}: ${d.reason}`)}
+              title={wt("aiSearch.programmatic.duplicatePrevention")}
+              items={programmatic.duplicates.map((d) => wt("aiSearch.programmatic.duplicateRow", { path: d.path, conflictWith: d.conflictWith, reason: d.reason }))}
+              emptyLabel={wt("common.noItems")}
             />
           )}
-          <ListCard title="Quality gates" items={programmatic.qualityGates.map((g) => `${g.status.toUpperCase()} · ${g.label}: ${g.detail}`)} />
-          <ListCard title="Recommendations" items={programmatic.recommendations} />
+          <ListCard title={wt("aiSearch.programmatic.qualityGates")} items={programmatic.qualityGates.map((g) => wt("aiSearch.programmatic.qualityGateRow", { status: g.status.toUpperCase(), label: g.label, detail: g.detail }))} emptyLabel={wt("common.noItems")} />
+          <ListCard title={wt("aiSearch.programmatic.recommendations")} items={programmatic.recommendations} emptyLabel={wt("common.noItems")} />
         </div>
       )}
 
       {tab === "knowledge" && (
         <div className="space-y-6">
-          <ListCard title="Knowledge hubs" items={knowledge.hubs.map((h) => `${h.title} · ${h.path}`)} />
+          <ListCard title={wt("aiSearch.knowledge.hubs")} items={knowledge.hubs.map((h) => wt("aiSearch.knowledge.hubRow", { title: h.title, path: h.path }))} emptyLabel={wt("common.noItems")} />
           <div className="grid gap-4 lg:grid-cols-2">
             {Object.entries(knowledge.byKind).map(([kind, bucket]) => (
               <ListCard
                 key={kind}
-                title={`${kind} (${bucket.published} published / ${bucket.draft} draft)`}
+                title={wt("aiSearch.knowledge.kindBucket", { kind, published: bucket.published, draft: bucket.draft })}
                 items={
                   bucket.entries.length
-                    ? bucket.entries.map((e) => `${e.status} · ${e.title}`)
-                    : ["No entries yet"]
+                    ? bucket.entries.map((e) => wt("aiSearch.knowledge.entryRow", { status: e.status, title: e.title }))
+                    : [wt("aiSearch.knowledge.noEntries")]
                 }
+                emptyLabel={wt("common.noItems")}
               />
             ))}
           </div>
-          <ListCard title="Gaps" items={knowledge.gaps.map((g) => `[${g.priority}] ${g.kind}: ${g.message}`)} />
+          <ListCard title={wt("aiSearch.knowledge.gaps")} items={knowledge.gaps.map((g) => wt("aiSearch.knowledge.gapRow", { priority: g.priority, kind: g.kind, message: g.message }))} emptyLabel={wt("common.noItems")} />
         </div>
       )}
 
       {tab === "competitors" && (
         <div className="space-y-6">
-          <ListCard title="Our coverage" items={competitors.ourCoverage} />
+          <ListCard title={wt("aiSearch.competitors.ourCoverage")} items={competitors.ourCoverage} emptyLabel={wt("common.noItems")} />
           <div className="grid gap-4 lg:grid-cols-2">
             {competitors.competitors.map((c) => (
               <DashboardCard key={c.name}>
@@ -566,14 +572,14 @@ export function AiSearchPanel() {
                   <DashboardCardDescription>{c.category}</DashboardCardDescription>
                 </DashboardCardHeader>
                 <DashboardCardContent className="space-y-3 text-sm text-white/65">
-                  <p><span className="text-premium-gold-light">Overlap:</span> {c.overlap.join(", ") || "None"}</p>
-                  <p><span className="text-premium-gold-light">Missing vs us:</span> {c.missingVsUs.slice(0, 5).join(", ")}</p>
-                  <p><span className="text-premium-gold-light">Opportunities:</span> {c.opportunities.join(" · ") || "—"}</p>
+                  <p><span className="text-premium-gold-light">{wt("aiSearch.competitors.overlap")}</span> {c.overlap.join(", ") || wt("common.none")}</p>
+                  <p><span className="text-premium-gold-light">{wt("aiSearch.competitors.missingVsUs")}</span> {c.missingVsUs.slice(0, 5).join(", ")}</p>
+                  <p><span className="text-premium-gold-light">{wt("aiSearch.competitors.opportunities")}</span> {c.opportunities.join(" · ") || wt("common.emDash")}</p>
                 </DashboardCardContent>
               </DashboardCard>
             ))}
           </div>
-          <ListCard title="Platform gaps" items={competitors.platformGaps} />
+          <ListCard title={wt("aiSearch.competitors.platformGaps")} items={competitors.platformGaps} emptyLabel={wt("common.noItems")} />
         </div>
       )}
 
@@ -582,10 +588,10 @@ export function AiSearchPanel() {
           <DashboardCardHeader>
             <DashboardCardTitle className="flex items-center gap-2">
               <Lightbulb className="size-4 text-premium-gold" />
-              AI Recommendations Engine
+              {wt("aiSearch.recommendationsEngine.title")}
             </DashboardCardTitle>
             <DashboardCardDescription>
-              Continuous suggestions from visibility, schema, programmatic, knowledge and competitor intelligence
+              {wt("aiSearch.recommendationsEngine.description")}
             </DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent className="space-y-2">
@@ -623,7 +629,7 @@ function Field({ label, value }: { label: string; value: string }) {
   );
 }
 
-function ListCard({ title, items }: { title: string; items: string[] }) {
+function ListCard({ title, items, emptyLabel }: { title: string; items: string[]; emptyLabel: string }) {
   return (
     <DashboardCard>
       <DashboardCardHeader>
@@ -631,7 +637,7 @@ function ListCard({ title, items }: { title: string; items: string[] }) {
       </DashboardCardHeader>
       <DashboardCardContent>
         <ul className="space-y-2 text-sm text-white/65">
-          {items.length === 0 ? <li className="text-white/35">No items</li> : null}
+          {items.length === 0 ? <li className="text-white/35">{emptyLabel}</li> : null}
           {items.map((item) => (
             <li key={item} className="rounded-lg border border-white/8 bg-black/20 px-3 py-2">
               {item}
@@ -644,6 +650,7 @@ function ListCard({ title, items }: { title: string; items: string[] }) {
 }
 
 function ResultScoreCard({
+  wt,
   title,
   score,
   grade,
@@ -653,6 +660,7 @@ function ResultScoreCard({
   aiInsights,
   metrics,
 }: {
+  wt: ReturnType<typeof useWorkspaceT>;
   title: string;
   score: number;
   grade: string;
@@ -666,14 +674,14 @@ function ResultScoreCard({
     <DashboardCard>
       <DashboardCardHeader>
         <DashboardCardTitle>
-          {title}: {score}/100 ({grade})
+          {wt("aiSearch.results.scoreGrade", { title, score, grade })}
         </DashboardCardTitle>
       </DashboardCardHeader>
       <DashboardCardContent className="space-y-4 text-sm">
-        <ListBlock label="Metrics" items={metrics} />
-        <ListBlock label="Strengths" items={strengths} />
+        <ListBlock label={wt("aiSearch.results.metrics")} items={metrics} />
+        <ListBlock label={wt("aiSearch.results.strengths")} items={strengths} />
         <div>
-          <p className="mb-2 text-xs uppercase tracking-wide text-premium-gold-light/80">Issues</p>
+          <p className="mb-2 text-xs uppercase tracking-wide text-premium-gold-light/80">{wt("aiSearch.results.issues")}</p>
           <ul className="space-y-2">
             {issues.map((issue) => (
               <li key={issue.id} className="rounded-lg border border-white/10 p-3">
@@ -685,8 +693,8 @@ function ResultScoreCard({
             ))}
           </ul>
         </div>
-        <ListBlock label="Recommendations" items={recommendations} />
-        {aiInsights ? <Field label="AI insights" value={aiInsights} /> : null}
+        <ListBlock label={wt("aiSearch.results.recommendations")} items={recommendations} />
+        {aiInsights ? <Field label={wt("aiSearch.results.aiInsights")} value={aiInsights} /> : null}
       </DashboardCardContent>
     </DashboardCard>
   );

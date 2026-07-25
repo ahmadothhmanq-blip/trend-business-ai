@@ -21,6 +21,7 @@ import {
 import { createSseStreamHelpers } from "@/lib/api/sse-stream";
 import { isRetryableError, isStreamDisconnectError, withRetry } from "@/lib/ai/retry";
 import { clampWebsitePrompt } from "@/lib/ai/timeouts";
+import { resolveRequestLanguage } from "@/lib/i18n/api";
 import { logger } from "@/lib/logger";
 import {
   isWebsiteIncrementalPreviewEnabled,
@@ -61,7 +62,9 @@ export async function POST(request: Request) {
       ? clampWebsitePrompt(parsed.data.continueInstruction, 6000)
       : parsed.data.continueInstruction,
   };
-  const projectKind = detectWebsiteProjectKind(input);
+  const aiLanguage = resolveRequestLanguage(request, input.language);
+  const localizedInput = { ...input, language: aiLanguage };
+  const projectKind = detectWebsiteProjectKind(localizedInput);
   const runId = `wb-${Date.now().toString(36)}`;
   logger.info("Website Builder stream start", WB_STREAM_LOG, {
     runId,
@@ -127,21 +130,21 @@ export async function POST(request: Request) {
           supabase: auth.supabase,
           userId: auth.user!.id,
           input: {
-            prompt: input.prompt,
-            language: input.language,
-            theme: input.theme,
-            features: input.features,
-            productId: input.productId,
-            projectId: input.projectId,
-            mode: input.mode,
-            parentGenerationId: input.parentGenerationId,
-            continueInstruction: input.continueInstruction,
+            prompt: localizedInput.prompt,
+            language: aiLanguage,
+            theme: localizedInput.theme,
+            features: localizedInput.features,
+            productId: localizedInput.productId,
+            projectId: localizedInput.projectId,
+            mode: localizedInput.mode,
+            parentGenerationId: localizedInput.parentGenerationId,
+            continueInstruction: localizedInput.continueInstruction,
             projectKind,
           },
         });
         if (session.ok) {
           sessionId = session.generation.id;
-          const generationProfile = resolveWebsiteGenerationProfile(input);
+          const generationProfile = resolveWebsiteGenerationProfile(localizedInput);
           send("session", {
             generationId: sessionId,
             incrementalPreview:
@@ -175,7 +178,7 @@ export async function POST(request: Request) {
         const project = await withRetry(
           () =>
             generateWebsite({
-              ...input,
+              ...localizedInput,
               projectKind,
               ...parentContext,
               userId: auth.user!.id,
@@ -246,15 +249,15 @@ export async function POST(request: Request) {
           projectKind: project.projectKind ?? projectKind,
           existingGenerationId: sessionId,
           input: {
-            prompt: input.prompt,
-            language: input.language,
-            theme: input.theme,
-            features: input.features,
-            productId: input.productId,
-            projectId: input.projectId,
-            mode: input.mode,
-            parentGenerationId: input.parentGenerationId,
-            continueInstruction: input.continueInstruction,
+            prompt: localizedInput.prompt,
+            language: aiLanguage,
+            theme: localizedInput.theme,
+            features: localizedInput.features,
+            productId: localizedInput.productId,
+            projectId: localizedInput.projectId,
+            mode: localizedInput.mode,
+            parentGenerationId: localizedInput.parentGenerationId,
+            continueInstruction: localizedInput.continueInstruction,
           },
         });
 

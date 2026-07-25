@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import type { AgentWorkflow } from "@/types/agents";
 
 export function WorkflowRunner() {
+  const pt = useProductT("aiAgents");
   const [workflows, setWorkflows] = useState<AgentWorkflow[]>([]);
   const [selectedId, setSelectedId] = useState("");
   const [loading, setLoading] = useState(false);
@@ -19,7 +21,7 @@ export function WorkflowRunner() {
   }, []);
 
   const run = async () => {
-    if (!selectedId) return toast.error("Select a workflow");
+    if (!selectedId) return toast.error(pt("panels.workflow.selectWorkflow"));
     setLoading(true);
     try {
       const res = await fetch("/api/ai-agents/workflows", {
@@ -28,11 +30,11 @@ export function WorkflowRunner() {
         body: JSON.stringify({ action: "run", workflowId: selectedId, input: { task: "Run workflow" } }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Failed");
+      if (!res.ok) throw new Error(data.error ?? pt("toasts.failed"));
       setResult(data.result);
-      toast.success("Workflow executed");
+      toast.success(pt("panels.workflow.executed"));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed");
+      toast.error(e instanceof Error ? e.message : pt("toasts.failed"));
     } finally {
       setLoading(false);
     }
@@ -43,7 +45,9 @@ export function WorkflowRunner() {
       <select value={selectedId} onChange={(e) => setSelectedId(e.target.value)} className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white">
         {workflows.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
       </select>
-      <Button onClick={() => void run()} disabled={loading || !selectedId}>{loading ? "Running…" : "Run Workflow"}</Button>
+      <Button onClick={() => void run()} disabled={loading || !selectedId}>
+        {loading ? pt("panels.workflow.running") : pt("panels.workflow.runWorkflow")}
+      </Button>
       {result ? <pre className="max-h-96 overflow-auto rounded-xl border border-white/5 p-4 text-xs text-white/60">{JSON.stringify(result, null, 2)}</pre> : null}
     </div>
   );

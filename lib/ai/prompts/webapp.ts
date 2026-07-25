@@ -2,6 +2,7 @@ import {
   COMPLEXITY_GUIDE,
   FILE_GENERATION_RULES,
   PRODUCTION_ARCHITECTURE_GUIDE,
+  aiOutputLanguageDirective,
 } from "@/lib/ai/prompts/shared";
 import { WEBAPP_TYPES } from "@/lib/constants/webapp-builder";
 
@@ -150,7 +151,7 @@ Determine complexity:
 
 List all required database tables, API endpoints, pages, features and technologies.
 
-Return only structured JSON.`;
+Return only structured JSON.${aiOutputLanguageDirective(input.language)}`;
 }
 
 export function webappBlueprintPrompt(
@@ -182,7 +183,7 @@ This is a full-stack web application, not a static website.
 Every page must have real functionality — forms that submit, tables that display data, charts that visualize metrics.
 No placeholder content. Use realistic business data aligned with the app type.
 
-Return only JSON.`;
+Return only JSON.${aiOutputLanguageDirective(input.language)}`;
 }
 
 export function webappPlanPrompt(
@@ -220,7 +221,7 @@ Web Application specific rules:
 - Reuse shared UI primitives — do not plan duplicate button/card/input implementations.
 - Do not plan unused files.
 - Do not include file contents.
-- Return only JSON.`;
+- Return only JSON.${aiOutputLanguageDirective(input.language)}`;
 }
 
 export function webappFilePrompt(args: {
@@ -273,5 +274,5 @@ Web Application specific rules:
 - Prisma schema includes all relationships, indexes, and timestamps.
 - Use realistic business copy — no lorem ipsum or "Your Company Here".
 - Navigation sidebar must list all app sections.
-- All pages must be responsive and use Tailwind CSS.`;
+- All pages must be responsive and use Tailwind CSS.${aiOutputLanguageDirective(args.input.language)}`;
 }

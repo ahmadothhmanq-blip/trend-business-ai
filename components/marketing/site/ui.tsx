@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
+import { useScopedT } from "@/lib/i18n/use-scoped-t";
 import { cn } from "@/lib/utils";
 import { SiteButton } from "@/components/marketing/site/button";
 
@@ -193,9 +194,9 @@ export function SiteCtaBand({
   title,
   description,
   primaryHref = "/signup",
-  primaryLabel = "Start Free",
+  primaryLabel,
   secondaryHref = "/#solutions",
-  secondaryLabel = "Browse AI Solutions",
+  secondaryLabel,
 }: {
   title: string;
   description: string;
@@ -204,21 +205,26 @@ export function SiteCtaBand({
   secondaryHref?: string;
   secondaryLabel?: string;
 }) {
+  const tCommon = useScopedT("marketing.common");
+  const tCta = useScopedT("marketing.cta");
+  const resolvedPrimary = primaryLabel ?? tCommon("startFree");
+  const resolvedSecondary = secondaryLabel ?? tCommon("browseAiSolutions");
+
   return (
     <section className="border-t border-[rgba(212,175,55,0.12)]">
       <div className="landing-container py-16 lg:py-24">
         <div className="relative overflow-hidden rounded-2xl border border-[rgba(212,175,55,0.28)] bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(212,175,55,0.22),transparent_55%),linear-gradient(160deg,#141414,#080808)] px-6 py-14 text-center shadow-[0_40px_120px_rgba(0,0,0,0.45),0_0_80px_rgba(212,175,55,0.08)] sm:px-10">
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#F4D56A]/80 to-transparent" />
           <div className="pointer-events-none absolute left-1/2 top-0 size-[320px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(255,215,0,0.15),transparent_70%)] blur-2xl" />
-          <SiteLabel>Get started</SiteLabel>
+          <SiteLabel>{tCta("getStartedLabel")}</SiteLabel>
           <SiteH2 className="mx-auto mt-4 max-w-3xl">{title}</SiteH2>
           <SiteBody className="mx-auto mt-4 max-w-xl">{description}</SiteBody>
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <SiteButton href={primaryHref} size="lg">
-              {primaryLabel} <ArrowRight className="size-4" />
+              {resolvedPrimary} <ArrowRight className="size-4" />
             </SiteButton>
             <SiteButton href={secondaryHref} variant="dark" size="lg">
-              {secondaryLabel}
+              {resolvedSecondary}
             </SiteButton>
           </div>
         </div>

@@ -1,8 +1,10 @@
-import type { Metadata } from "next";
+import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
 import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { TeamPanel } from "@/components/dashboard/platform/team-panel";
 
-export const metadata: Metadata = { title: "Team & Workspace" };
+export async function generateMetadata() {
+  return dashboardPageMetadata("team");
+}
 
 export default function TeamPage() {
   return (

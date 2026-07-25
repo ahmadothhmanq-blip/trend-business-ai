@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { DASHBOARD_QUICK_ACTIONS } from "@/lib/constants/dashboard-nav";
 import { useTranslation } from "@/lib/i18n/client";
+import { useFormatter } from "@/lib/i18n/use-formatter";
 import {
   PublishReadinessBadge,
   publishStatusFromQuality,
@@ -29,15 +30,6 @@ const ACTIVITY_ICONS: Record<DashboardActivityItem["type"], LucideIcon> = {
   website: FolderKanban,
   workspace: Sparkles,
 };
-
-function formatActivityDate(value: string) {
-  return new Intl.DateTimeFormat(undefined, {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(new Date(value));
-}
 
 type DashboardOverviewProps = {
   data: DashboardHomeData;
@@ -73,6 +65,7 @@ function QuickActionsGrid() {
 
 export function DashboardOverview({ data, userName }: DashboardOverviewProps) {
   const { t } = useTranslation();
+  const { formatDateTime } = useFormatter();
   const {
     stats,
     recentActivity,
@@ -102,7 +95,7 @@ export function DashboardOverview({ data, userName }: DashboardOverviewProps) {
     (item) => item.type === "website" || item.type === "workspace",
   );
   const latestGenerations = recentActivity.slice(0, 5);
-  const firstName = userName?.split(" ")[0] || "there";
+  const firstName = userName?.split(" ")[0] || t("dashboard.overview.defaultName");
 
   return (
     <div className="space-y-6 lg:space-y-8">
@@ -187,9 +180,9 @@ export function DashboardOverview({ data, userName }: DashboardOverviewProps) {
       <section>
         <div className="mb-4 flex items-end justify-between gap-4">
           <div>
-            <h3 className="text-lg font-bold text-white">Quick Actions</h3>
+            <h3 className="text-lg font-bold text-white">{t("dashboard.overview.quickActionsTitle")}</h3>
             <p className="mt-1 text-[13px] text-white/40">
-              Jump into the most-used AI products.
+              {t("dashboard.overview.quickActionsDescription")}
             </p>
           </div>
         </div>
@@ -201,18 +194,18 @@ export function DashboardOverview({ data, userName }: DashboardOverviewProps) {
         <DashboardPanel className="p-5 sm:p-6">
           <div className="mb-5 flex items-center justify-between gap-3">
             <div>
-              <h3 className="text-lg font-bold text-white">AI Runs</h3>
+              <h3 className="text-lg font-bold text-white">{t("dashboard.overview.aiRunsTitle")}</h3>
               <p className="mt-1 text-[13px] text-white/40">
-                Core Engine pipeline activity across products.
+                {t("dashboard.overview.aiRunsDescription")}
               </p>
             </div>
           </div>
           {recentAiRuns.length === 0 ? (
             <DashboardEmptyState
               icon={Sparkles}
-              title="No AI runs yet"
-              description="Start with one business idea — AI guides Idea through Ready Product."
-              action={{ label: "Website Builder", href: "/dashboard/website-builder" }}
+              title={t("dashboard.overview.emptyAiRuns.title")}
+              description={t("dashboard.overview.emptyAiRuns.description")}
+              action={{ label: t("dashboard.overview.emptyAiRuns.action"), href: "/dashboard/website-builder" }}
             />
           ) : (
             <ul className="space-y-3">
@@ -251,7 +244,12 @@ export function DashboardOverview({ data, userName }: DashboardOverviewProps) {
                             ? run.layersExecuted.slice(-4).join(" · ")
                             : run.status}
                           {" · "}
-                          {formatActivityDate(run.createdAt)}
+                          {formatDateTime(run.createdAt, {
+                            month: "short",
+                            day: "numeric",
+                            hour: "numeric",
+                            minute: "2-digit",
+                          })}
                         </p>
                       </div>
                     </Link>
@@ -265,18 +263,18 @@ export function DashboardOverview({ data, userName }: DashboardOverviewProps) {
         <DashboardPanel className="p-5 sm:p-6">
           <div className="mb-5 flex items-center justify-between gap-3">
             <div>
-              <h3 className="text-lg font-bold text-white">Generated products</h3>
+              <h3 className="text-lg font-bold text-white">{t("dashboard.overview.generatedProductsTitle")}</h3>
               <p className="mt-1 text-[13px] text-white/40">
-                Quality reports and publish readiness.
+                {t("dashboard.overview.generatedProductsDescription")}
               </p>
             </div>
           </div>
           {generatedProducts.length === 0 ? (
             <DashboardEmptyState
               icon={FolderKanban}
-              title="No products yet"
-              description="Completed Core runs with quality scores will appear here."
-              action={{ label: "Start creating", href: "/dashboard/website-builder" }}
+              title={t("dashboard.overview.emptyProducts.title")}
+              description={t("dashboard.overview.emptyProducts.description")}
+              action={{ label: t("dashboard.overview.emptyProducts.action"), href: "/dashboard/website-builder" }}
             />
           ) : (
             <ul className="space-y-3">
@@ -321,24 +319,24 @@ export function DashboardOverview({ data, userName }: DashboardOverviewProps) {
         <DashboardPanel className="p-5 sm:p-6">
           <div className="mb-5 flex items-center justify-between gap-3">
             <div>
-              <h3 className="text-lg font-bold text-white">Recent Projects</h3>
+              <h3 className="text-lg font-bold text-white">{t("dashboard.overview.recentProjectsTitle")}</h3>
               <p className="mt-1 text-[13px] text-white/40">
-                Latest website and workspace generations.
+                {t("dashboard.overview.recentProjectsDescription")}
               </p>
             </div>
             <Link
               href="/dashboard/projects"
               className="text-[13px] font-semibold text-premium-gold hover:text-premium-gold-light"
             >
-              View all
+              {t("dashboard.overview.viewAll")}
             </Link>
           </div>
           {recentProjects.length === 0 ? (
             <DashboardEmptyState
               icon={FolderKanban}
-              title="No projects yet"
-              description="Create your first website, brand or campaign project to see it here."
-              action={{ label: "Create project", href: "/dashboard/website-builder" }}
+              title={t("dashboard.overview.emptyProjects.title")}
+              description={t("dashboard.overview.emptyProjects.description")}
+              action={{ label: t("dashboard.overview.emptyProjects.action"), href: "/dashboard/website-builder" }}
             />
           ) : (
             <ul className="space-y-3">
@@ -358,7 +356,12 @@ export function DashboardOverview({ data, userName }: DashboardOverviewProps) {
                       </p>
                     </div>
                     <span className="shrink-0 text-[11px] text-white/30">
-                      {formatActivityDate(item.createdAt)}
+                      {formatDateTime(item.createdAt, {
+                        month: "short",
+                        day: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}
                     </span>
                   </Link>
                 </li>
@@ -369,17 +372,17 @@ export function DashboardOverview({ data, userName }: DashboardOverviewProps) {
 
         {/* Credits / Plan — live billing balance (Phase 10) */}
         <DashboardPanel className="p-5 sm:p-6">
-          <h3 className="text-lg font-bold text-white">Credits / Plan</h3>
+          <h3 className="text-lg font-bold text-white">{t("dashboard.overview.creditsPlanTitle")}</h3>
           <p className="mt-1 text-[13px] text-white/40">
-            {planLabel} plan
+            {t("dashboard.overview.planLabelSuffix", { plan: planLabel })}
             {billing?.billingConfigured
-              ? " · PayPal & card checkout ready"
-              : " · Paid checkout when PayPal is configured"}
+              ? t("dashboard.overview.billingReady")
+              : t("dashboard.overview.billingPending")}
           </p>
           <div className="mt-6">
             <div className="flex items-end justify-between">
               <p className="text-3xl font-bold text-premium-gold">{aiCreditsRemaining}</p>
-              <p className="text-[13px] text-white/40">credits left</p>
+              <p className="text-[13px] text-white/40">{t("dashboard.overview.creditsLeft")}</p>
             </div>
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/[0.08]">
               <div
@@ -388,9 +391,9 @@ export function DashboardOverview({ data, userName }: DashboardOverviewProps) {
               />
             </div>
             <p className="mt-3 text-[12px] text-white/35">
-              {aiCreditsUsed} lifetime used
+              {t("dashboard.overview.lifetimeUsed", { count: String(aiCreditsUsed) })}
               {billing?.lifetimePurchased
-                ? ` · ${billing.lifetimePurchased} purchased`
+                ? t("dashboard.overview.purchased", { count: String(billing.lifetimePurchased) })
                 : ""}
             </p>
           </div>
@@ -399,7 +402,7 @@ export function DashboardOverview({ data, userName }: DashboardOverviewProps) {
             variant="outline"
             className="mt-6 w-full rounded-xl border-premium-gold/25 bg-premium-gold/10 text-premium-gold-light hover:bg-premium-gold/15"
           >
-            <Link href="/dashboard/billing">Manage billing</Link>
+            <Link href="/dashboard/billing">{t("dashboard.overview.manageBilling")}</Link>
           </Button>
         </DashboardPanel>
       </div>
@@ -407,13 +410,13 @@ export function DashboardOverview({ data, userName }: DashboardOverviewProps) {
       <div className="grid gap-6 xl:grid-cols-2">
         {/* Activity timeline */}
         <DashboardPanel className="p-5 sm:p-6">
-          <h3 className="text-lg font-bold text-white">Activity timeline</h3>
-          <p className="mt-1 text-[13px] text-white/40">Recent workspace events</p>
+          <h3 className="text-lg font-bold text-white">{t("dashboard.overview.activityTimelineTitle")}</h3>
+          <p className="mt-1 text-[13px] text-white/40">{t("dashboard.overview.activityTimelineDescription")}</p>
           {recentActivity.length === 0 ? (
             <DashboardEmptyState
               icon={Clock3}
               className="mt-6 py-12"
-              description="Your generations and project updates will appear here."
+              description={t("dashboard.overview.emptyActivity.description")}
             />
           ) : (
             <ol className="relative mt-6 space-y-4 border-l border-white/[0.08] pl-5">
@@ -424,7 +427,12 @@ export function DashboardOverview({ data, userName }: DashboardOverviewProps) {
                     <p className="text-[14px] font-semibold text-white">{item.title}</p>
                     <p className="text-[12px] text-white/40">{item.description}</p>
                     <p className="mt-1 text-[11px] text-white/30">
-                      {formatActivityDate(item.createdAt)}
+                      {formatDateTime(item.createdAt, {
+                        month: "short",
+                        day: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}
                     </p>
                   </Link>
                 </li>
@@ -437,22 +445,22 @@ export function DashboardOverview({ data, userName }: DashboardOverviewProps) {
         <DashboardPanel className="p-5 sm:p-6">
           <div className="mb-5 flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-bold text-white">Latest AI generations</h3>
-              <p className="mt-1 text-[13px] text-white/40">Fresh outputs across products</p>
+              <h3 className="text-lg font-bold text-white">{t("dashboard.overview.latestGenerationsTitle")}</h3>
+              <p className="mt-1 text-[13px] text-white/40">{t("dashboard.overview.latestGenerationsDescription")}</p>
             </div>
             <Link
               href="/dashboard/history"
               className="text-[13px] font-semibold text-premium-gold hover:text-premium-gold-light"
             >
-              History
+              {t("dashboard.overview.historyLink")}
             </Link>
           </div>
           {latestGenerations.length === 0 ? (
             <DashboardEmptyState
               icon={Sparkles}
               className="py-12"
-              description="Generate a website, logo, campaign or report to populate this feed."
-              action={{ label: "Start generating", href: "/dashboard/website-builder" }}
+              description={t("dashboard.overview.emptyFeed.description")}
+              action={{ label: t("dashboard.overview.emptyFeed.action"), href: "/dashboard/website-builder" }}
             />
           ) : (
             <ul className="space-y-3">

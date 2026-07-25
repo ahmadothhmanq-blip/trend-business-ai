@@ -1,11 +1,13 @@
-import type { Metadata } from "next";
 import { Search } from "lucide-react";
 import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import { createClient } from "@/lib/supabase/server";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
+import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
 
-export const metadata: Metadata = { title: "Search" };
+export async function generateMetadata() {
+  return dashboardPageMetadata("search");
+}
 
 type SearchResult = {
   id: string;

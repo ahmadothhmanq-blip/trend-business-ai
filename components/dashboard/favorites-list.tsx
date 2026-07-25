@@ -27,6 +27,8 @@ import {
 } from "@/components/dashboard/ui/dashboard-styles";
 import type { HistoryItem, HistoryItemType } from "@/types/database";
 import { getHistoryItemEndpoint } from "@/lib/workspace/history";
+import { useTranslation } from "@/lib/i18n/client";
+import { useFormatter } from "@/lib/i18n/use-formatter";
 import { cn } from "@/lib/utils";
 
 type FavoritesListProps = {
@@ -36,71 +38,58 @@ type FavoritesListProps = {
 type FavoriteFilter = "all" | HistoryItemType;
 type FavoriteSort = "newest" | "oldest";
 
-const TYPE_META: Record<
-  HistoryItemType,
-  { label: string; icon: LucideIcon; endpoint: string }
-> = {
-  idea: {
-    label: "Business Idea",
-    icon: Lightbulb,
-    endpoint: "/api/ideas",
-  },
-  analysis: {
-    label: "Market Analysis",
-    icon: LineChart,
-    endpoint: "/api/market-analysis",
-  },
-  report: {
-    label: "AI Report",
-    icon: FileText,
-    endpoint: "/api/reports",
-  },
-  website: {
-    label: "Website Blueprint",
-    icon: Globe,
-    endpoint: "/api/website-builder",
-  },
-  workspace: {
-    label: "AI Workspace",
-    icon: Sparkles,
-    endpoint: "/api/workspaces/brand",
-  },
+const TYPE_ICONS: Record<HistoryItemType, LucideIcon> = {
+  idea: Lightbulb,
+  analysis: LineChart,
+  report: FileText,
+  website: Globe,
+  workspace: Sparkles,
 };
 
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
-}
-
-function matchesSearch(item: HistoryItem, search: string) {
+function matchesSearch(item: HistoryItem, search: string, typeLabel: string) {
   const query = search.trim().toLowerCase();
   if (!query) return true;
 
-  return [item.title, item.description, item.detail, TYPE_META[item.type].label]
+  return [item.title, item.description, item.detail, typeLabel]
     .join(" ")
     .toLowerCase()
     .includes(query);
 }
 
 export function FavoritesList({ initialItems }: FavoritesListProps) {
+  const { t } = useTranslation();
+  const { formatDateTime } = useFormatter();
   const [items, setItems] = useState(initialItems);
   const [typeFilter, setTypeFilter] = useState<FavoriteFilter>("all");
   const [sort, setSort] = useState<FavoriteSort>("newest");
   const [search, setSearch] = useState("");
   const [removingId, setRemovingId] = useState<string | null>(null);
 
+  const typeMeta = useMemo(
+    () =>
+      (["idea", "analysis", "report", "website", "workspace"] as const).reduce(
+        (acc, type) => {
+          acc[type] = {
+            label: t(`dashboard.favorites.types.${type}`),
+            icon: TYPE_ICONS[type],
+          };
+          return acc;
+        },
+        {} as Record<HistoryItemType, { label: string; icon: LucideIcon }>,
+      ),
+    [t],
+  );
+
   const filteredItems = useMemo(() => {
     return items
       .filter((item) => typeFilter === "all" || item.type === typeFilter)
-      .filter((item) => matchesSearch(item, search))
+      .filter((item) => matchesSearch(item, search, typeMeta[item.type].label))
       .sort((a, b) => {
         const delta =
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         return sort === "newest" ? delta : -delta;
       });
-  }, [items, search, sort, typeFilter]);
+  }, [items, search, sort, typeFilter, typeMeta]);
 
   const totalByType = useMemo(() => {
     return items.reduce<Record<FavoriteFilter, number>>(
@@ -127,7 +116,7 @@ export function FavoritesList({ initialItems }: FavoritesListProps) {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to remove favorite");
+        throw new Error(data.error || t("dashboard.favorites.removeFailed"));
       }
 
       setItems((current) =>
@@ -135,12 +124,12 @@ export function FavoritesList({ initialItems }: FavoritesListProps) {
           (favorite) => !(favorite.id === item.id && favorite.type === item.type),
         ),
       );
-      toast.success(data.message || "Removed from favorites.");
+      toast.success(data.message || t("dashboard.favorites.removed"));
     } catch (error) {
       toast.error(
         error instanceof Error
           ? error.message
-          : "Unable to remove this favorite.",
+          : t("dashboard.favorites.removeFailed"),
       );
     } finally {
       setRemovingId(null);
@@ -159,32 +148,28 @@ export function FavoritesList({ initialItems }: FavoritesListProps) {
             <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-premium-gold/25 bg-premium-gold/10 px-3 py-1">
               <Star className="size-3.5 fill-premium-gold text-premium-gold-light" />
               <span className="text-[11px] font-semibold tracking-wide text-premium-gold-light uppercase">
-                Favorite assets
+                {t("dashboard.favorites.badge")}
               </span>
             </div>
             <h2 className="text-xl font-bold tracking-tight text-white sm:text-2xl">
-              Your best generated work
+              {t("dashboard.favorites.title")}
             </h2>
             <p className="mt-2 max-w-2xl text-[14px] leading-relaxed text-white/50 sm:text-[15px]">
-              Keep high-value ideas, analyses, reports, and website blueprints
-              easy to find while you plan your next move.
+              {t("dashboard.favorites.description")}
             </p>
           </div>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:min-w-[420px]">
-            {(["idea", "analysis", "report", "website", "workspace"] as const).map((type) => {
-              const meta = TYPE_META[type];
-              return (
-                <div
-                  key={type}
-                  className="rounded-xl border border-white/[0.08] bg-black/20 px-3 py-2"
-                >
-                  <p className="text-[11px] text-white/35">{meta.label}</p>
-                  <p className="mt-0.5 text-lg font-bold text-white">
-                    {totalByType[type]}
-                  </p>
-                </div>
-              );
-            })}
+            {(["idea", "analysis", "report", "website", "workspace"] as const).map((type) => (
+              <div
+                key={type}
+                className="rounded-xl border border-white/[0.08] bg-black/20 px-3 py-2"
+              >
+                <p className="text-[11px] text-white/35">{typeMeta[type].label}</p>
+                <p className="mt-0.5 text-lg font-bold text-white">
+                  {totalByType[type]}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </DashboardPanel>
@@ -199,31 +184,31 @@ export function FavoritesList({ initialItems }: FavoritesListProps) {
             <Input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search favorites..."
+              placeholder={t("dashboard.favorites.searchPlaceholder")}
               className={`pl-9 ${dashboardInputClass}`}
-              aria-label="Search favorites"
+              aria-label={t("dashboard.favorites.searchAria")}
             />
           </div>
           <select
             value={typeFilter}
             onChange={(event) => setTypeFilter(event.target.value as FavoriteFilter)}
             className={dashboardFilterSelectClass}
-            aria-label="Filter favorites by type"
+            aria-label={t("dashboard.favorites.filterAria")}
           >
-            <option value="all">All types</option>
-            <option value="idea">Business Ideas</option>
-            <option value="analysis">Market Analysis</option>
-            <option value="report">AI Reports</option>
-            <option value="website">Website Blueprints</option>
+            <option value="all">{t("dashboard.favorites.allTypes")}</option>
+            <option value="idea">{t("dashboard.favorites.filterTypes.idea")}</option>
+            <option value="analysis">{t("dashboard.favorites.filterTypes.analysis")}</option>
+            <option value="report">{t("dashboard.favorites.filterTypes.report")}</option>
+            <option value="website">{t("dashboard.favorites.filterTypes.website")}</option>
           </select>
           <select
             value={sort}
             onChange={(event) => setSort(event.target.value as FavoriteSort)}
             className={dashboardFilterSelectClass}
-            aria-label="Sort favorites"
+            aria-label={t("dashboard.favorites.sortAria")}
           >
-            <option value="newest">Newest first</option>
-            <option value="oldest">Oldest first</option>
+            <option value="newest">{t("dashboard.favorites.newestFirst")}</option>
+            <option value="oldest">{t("dashboard.favorites.oldestFirst")}</option>
           </select>
         </div>
       </DashboardPanel>
@@ -233,7 +218,7 @@ export function FavoritesList({ initialItems }: FavoritesListProps) {
       {filteredItems.length > 0 ? (
         <div className="grid gap-4 xl:grid-cols-2">
           {filteredItems.map((item) => {
-            const meta = TYPE_META[item.type];
+            const meta = typeMeta[item.type];
             const Icon = meta.icon;
             const removing = removingId === item.id;
 
@@ -254,7 +239,7 @@ export function FavoritesList({ initialItems }: FavoritesListProps) {
                           {meta.label}
                         </span>
                         <span className="text-[11px] text-white/35">
-                          {formatDate(item.createdAt)}
+                          {formatDateTime(item.createdAt)}
                         </span>
                       </div>
                       <h3 className="truncate text-lg font-bold text-white">
@@ -276,7 +261,7 @@ export function FavoritesList({ initialItems }: FavoritesListProps) {
                       className="text-premium-gold hover:bg-premium-gold/10 hover:text-premium-gold-light"
                       onClick={() => removeFavorite(item)}
                       disabled={Boolean(removingId)}
-                      aria-label={`Remove ${item.title} from favorites`}
+                      aria-label={t("dashboard.favorites.removeAria", { title: item.title })}
                     >
                       {removing ? (
                         <Loader2 className="size-4 animate-spin" />
@@ -291,7 +276,7 @@ export function FavoritesList({ initialItems }: FavoritesListProps) {
                       className="text-white/45 hover:bg-premium-gold/10 hover:text-premium-gold-light"
                       asChild
                     >
-                      <Link href={item.href} aria-label={`Open ${item.title}`}>
+                      <Link href={item.href} aria-label={t("dashboard.favorites.openAria", { title: item.title })}>
                         <ArrowRight className="size-4" />
                       </Link>
                     </Button>
@@ -304,11 +289,11 @@ export function FavoritesList({ initialItems }: FavoritesListProps) {
       ) : (
         <DashboardEmptyState
           icon={isFiltering ? Search : Star}
-          title={isFiltering ? "No matching favorites" : "No favorites yet"}
+          title={isFiltering ? t("dashboard.favorites.noMatching") : t("dashboard.favorites.emptyTitle")}
           description={
             isFiltering
-              ? "Adjust your search, type filter, or sort order to find saved favorites."
-              : "Mark your best ideas, analyses, reports, and website blueprints as favorites to collect them here."
+              ? t("dashboard.favorites.noMatchingDescription")
+              : t("dashboard.favorites.emptyDescription")
           }
         />
       )}

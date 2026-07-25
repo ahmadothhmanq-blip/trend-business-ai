@@ -6,6 +6,7 @@ import { generateVideo } from "@/lib/video-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
 import { resolveIteratedPrompt } from "@/lib/ai/iteration";
 import { getVideoTypeLabel } from "@/lib/constants/video-studio";
+import { resolveRequestLanguage } from "@/lib/i18n/api";
 import type { VideoGeneration, VideoBlueprint } from "@/types/video";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -87,6 +88,7 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data;
+  const aiLanguage = resolveRequestLanguage(request, input.language);
   const typeLabel = getVideoTypeLabel(input.videoType);
   let stage = "generateVideo";
 
@@ -115,6 +117,7 @@ export async function POST(request: Request) {
       cameraMove: input.cameraMove,
       options: input.options,
       sceneCount: input.sceneCount,
+      language: aiLanguage,
     });
 
     const blueprint: VideoBlueprint = {
@@ -134,6 +137,7 @@ export async function POST(request: Request) {
       exportPreset: "1080p",
       files: result.files,
       prompt: input.prompt,
+      language: aiLanguage,
       generatedAt: new Date().toISOString(),
       progressEvents: [...result.progressEvents, "Saving...", "Done."],
       productionModel: result.productionModel,

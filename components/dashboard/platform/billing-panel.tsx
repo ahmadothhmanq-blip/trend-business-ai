@@ -12,6 +12,8 @@ import {
   DashboardCardDescription,
   DashboardPanel,
 } from "@/components/dashboard/ui/dashboard-card";
+import { useFormatter } from "@/lib/i18n/use-formatter";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 import { cn } from "@/lib/utils";
 import type { SubscriptionPlan } from "@/types/platform";
 import type {
@@ -21,28 +23,13 @@ import type {
   CreditPack,
 } from "@/types/billing";
 
-function formatMoney(cents: number, currency = "USD") {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
-  }).format(cents / 100);
-}
-
-function formatDate(value: string | null | undefined) {
-  if (!value) return "—";
-  return new Date(value).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
 function redirectToCheckout(approvalUrl: string) {
-  // Navigate via assign so React Compiler immutability lint allows the redirect.
   window.location.assign(approvalUrl);
 }
 
 export function BillingPanel() {
+  const wt = useWorkspaceT("platform");
+  const { formatCurrency, formatDate } = useFormatter();
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
   const [provider, setProvider] = useState<BillingProviderId>("paypal");
@@ -91,9 +78,9 @@ export function BillingPanel() {
           const data = await res.json();
           if (!cancelled) {
             if (!res.ok) {
-              toast.error(data.error ?? "Could not complete payment.");
+              toast.error(data.error ?? wt("toasts.couldNotCompletePayment"));
             } else {
-              toast.success(data.alreadyCompleted ? "Payment already recorded." : "Payment completed.");
+              toast.success(data.alreadyCompleted ? wt("toasts.paymentAlreadyRecorded") : wt("toasts.paymentCompleted"));
               if (data.status) setStatus(data.status);
               else await refreshBilling();
             }
@@ -104,7 +91,7 @@ export function BillingPanel() {
           }
         }
       } catch {
-        if (!cancelled) toast.error("Could not load billing.");
+        if (!cancelled) toast.error(wt("toasts.couldNotLoadBilling"));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -113,7 +100,7 @@ export function BillingPanel() {
     return () => {
       cancelled = true;
     };
-  }, [refreshBilling]);
+  }, [refreshBilling, wt]);
 
   async function startSubscriptionCheckout(planId: string) {
     setActionKey(`plan:${planId}`);
@@ -125,16 +112,16 @@ export function BillingPanel() {
       });
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.error ?? "Checkout failed.");
+        toast.error(data.error ?? wt("toasts.checkoutFailed"));
         return;
       }
       if (data.approvalUrl) {
         redirectToCheckout(data.approvalUrl);
         return;
       }
-      toast.error("No payment approval URL returned.");
+      toast.error(wt("toasts.noApprovalUrl"));
     } catch {
-      toast.error("Checkout failed.");
+      toast.error(wt("toasts.checkoutFailed"));
     } finally {
       setActionKey(null);
     }
@@ -150,16 +137,16 @@ export function BillingPanel() {
       });
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.error ?? "Credits checkout failed.");
+        toast.error(data.error ?? wt("toasts.creditsCheckoutFailed"));
         return;
       }
       if (data.approvalUrl) {
         redirectToCheckout(data.approvalUrl);
         return;
       }
-      toast.error("No payment approval URL returned.");
+      toast.error(wt("toasts.noApprovalUrl"));
     } catch {
-      toast.error("Credits checkout failed.");
+      toast.error(wt("toasts.creditsCheckoutFailed"));
     } finally {
       setActionKey(null);
     }
@@ -175,13 +162,13 @@ export function BillingPanel() {
       });
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.error ?? "Could not cancel subscription.");
+        toast.error(data.error ?? wt("toasts.couldNotCancelSubscription"));
         return;
       }
-      toast.success("Subscription will end at the current period.");
+      toast.success(wt("toasts.subscriptionCancelScheduled"));
       await refreshBilling();
     } catch {
-      toast.error("Could not cancel subscription.");
+      toast.error(wt("toasts.couldNotCancelSubscription"));
     } finally {
       setActionKey(null);
     }
@@ -199,17 +186,19 @@ export function BillingPanel() {
           <CreditCard className="size-5 text-premium-gold-light" />
           <div>
             <p className="text-sm font-bold text-white">
-              Current Plan:{" "}
+              {wt("billing.currentPlan")}{" "}
               <span className="text-premium-gold-light capitalize">
                 {loading ? "…" : currentPlan}
               </span>
             </p>
             <p className="text-xs text-white/40">
               {subscription
-                ? `${subscription.billing_interval} · renews ${formatDate(subscription.current_period_end)}${
-                    subscription.cancel_at_period_end ? " · canceling" : ""
-                  }`
-                : "Upgrade to unlock more features and higher limits"}
+                ? wt("billing.subscriptionSummary", {
+                    interval: subscription.billing_interval,
+                    renews: `${wt("common.renews")} ${formatDate(subscription.current_period_end)}`,
+                    canceling: subscription.cancel_at_period_end ? ` · ${wt("common.canceling")}` : "",
+                  })
+                : wt("billing.upgradePrompt")}
             </p>
           </div>
         </div>
@@ -224,8 +213,8 @@ export function BillingPanel() {
                   billing === b ? "bg-premium-gold/15 text-premium-gold-light" : "text-white/40 hover:text-white/60",
                 )}
               >
-                {b === "monthly" ? "Monthly" : "Yearly"}
-                {b === "yearly" && <span className="ml-1 text-green-400">-17%</span>}
+                {b === "monthly" ? wt("common.monthly") : wt("common.yearly")}
+                {b === "yearly" && <span className="ml-1 text-green-400">{wt("common.yearlyDiscount")}</span>}
               </button>
             ))}
           </div>
@@ -240,7 +229,7 @@ export function BillingPanel() {
                     provider === p ? "bg-premium-gold/15 text-premium-gold-light" : "text-white/40 hover:text-white/60",
                   )}
                 >
-                  {p === "card" ? "Card" : "PayPal"}
+                  {p === "card" ? wt("common.card") : wt("common.paypal")}
                 </button>
               ))}
             </div>
@@ -250,8 +239,10 @@ export function BillingPanel() {
 
       {!status?.billingConfigured && !loading && (
         <DashboardPanel className="border-amber-500/20 bg-amber-500/5 p-4 text-xs text-amber-100/80">
-          Payment providers are not configured yet. Set <code className="text-amber-50">PAYPAL_CLIENT_ID</code> and{" "}
-          <code className="text-amber-50">PAYPAL_CLIENT_SECRET</code> to enable checkout.
+          {wt("billing.providersNotConfigured", {
+            paypalClientId: wt("billing.paypalClientId"),
+            paypalClientSecret: wt("billing.paypalClientSecret"),
+          })}
         </DashboardPanel>
       )}
 
@@ -268,14 +259,14 @@ export function BillingPanel() {
             >
               {plan.id === "pro" && (
                 <div className="mb-3 flex items-center gap-1 self-start rounded-full bg-premium-gold/15 px-2 py-0.5 text-[10px] font-bold text-premium-gold-light">
-                  <Crown className="size-3" /> Most Popular
+                  <Crown className="size-3" /> {wt("billing.mostPopular")}
                 </div>
               )}
               <h3 className="text-lg font-black text-white">{plan.name}</h3>
               <p className="mt-1 text-xs text-white/40">{plan.description}</p>
               <div className="mt-4">
                 <span className="text-3xl font-black text-white">${price}</span>
-                <span className="text-xs text-white/30">/mo</span>
+                <span className="text-xs text-white/30">{wt("common.perMonth")}</span>
               </div>
               <ul className="mt-4 flex-1 space-y-2">
                 {plan.features.map((f, i) => (
@@ -296,9 +287,9 @@ export function BillingPanel() {
                 {busy ? (
                   <Loader2 className="size-4 animate-spin" />
                 ) : isCurrent ? (
-                  "Current Plan"
+                  wt("billing.currentPlanButton")
                 ) : (
-                  `Upgrade to ${plan.name}`
+                  wt("billing.upgradeTo", { plan: plan.name })
                 )}
               </Button>
             </DashboardPanel>
@@ -310,16 +301,18 @@ export function BillingPanel() {
         <DashboardCard>
           <DashboardCardHeader>
             <DashboardCardTitle className="flex items-center gap-2">
-              <Wallet className="size-4 text-premium-gold-light" /> Credits
+              <Wallet className="size-4 text-premium-gold-light" /> {wt("billing.credits")}
             </DashboardCardTitle>
             <DashboardCardDescription>
-              Balance: <span className="text-white">{status?.credits.balance ?? 0}</span> · Used:{" "}
-              {status?.credits.lifetime_used ?? 0}
+              {wt("billing.balanceUsed", {
+                balance: status?.credits.balance ?? 0,
+                used: status?.credits.lifetime_used ?? 0,
+              })}
             </DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent className="space-y-3">
             {packs.length === 0 && (
-              <p className="text-xs text-white/40">Credit packs will appear after billing migration is applied.</p>
+              <p className="text-xs text-white/40">{wt("billing.creditPacksPending")}</p>
             )}
             {packs.map((pack) => {
               const busy = actionKey === `pack:${pack.id}`;
@@ -330,7 +323,7 @@ export function BillingPanel() {
                 >
                   <div>
                     <p className="text-sm font-semibold text-white">{pack.name}</p>
-                    <p className="text-xs text-white/40">{formatMoney(pack.price_cents, pack.currency)}</p>
+                    <p className="text-xs text-white/40">{formatCurrency(pack.price_cents, pack.currency)}</p>
                   </div>
                   <Button
                     size="sm"
@@ -338,7 +331,7 @@ export function BillingPanel() {
                     disabled={busy || !status?.billingConfigured}
                     onClick={() => startCreditsCheckout(pack)}
                   >
-                    {busy ? <Loader2 className="size-3.5 animate-spin" /> : "Buy"}
+                    {busy ? <Loader2 className="size-3.5 animate-spin" /> : wt("common.buy")}
                   </Button>
                 </div>
               );
@@ -350,7 +343,7 @@ export function BillingPanel() {
                 disabled={actionKey === "cancel"}
                 onClick={cancelSubscription}
               >
-                {actionKey === "cancel" ? <Loader2 className="size-4 animate-spin" /> : "Cancel subscription at period end"}
+                {actionKey === "cancel" ? <Loader2 className="size-4 animate-spin" /> : wt("billing.cancelSubscription")}
               </Button>
             )}
           </DashboardCardContent>
@@ -359,13 +352,13 @@ export function BillingPanel() {
         <DashboardCard>
           <DashboardCardHeader>
             <DashboardCardTitle className="flex items-center gap-2">
-              <FileText className="size-4 text-premium-gold-light" /> Billing history
+              <FileText className="size-4 text-premium-gold-light" /> {wt("billing.billingHistory")}
             </DashboardCardTitle>
-            <DashboardCardDescription>Paid invoices and receipts</DashboardCardDescription>
+            <DashboardCardDescription>{wt("billing.billingHistoryDescription")}</DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent className="space-y-2">
             {invoices.length === 0 && (
-              <p className="text-xs text-white/40">No invoices yet. Completed payments appear here.</p>
+              <p className="text-xs text-white/40">{wt("billing.noInvoices")}</p>
             )}
             {invoices.map((invoice) => (
               <div
@@ -380,7 +373,7 @@ export function BillingPanel() {
                   </p>
                 </div>
                 <p className="shrink-0 text-sm font-semibold text-premium-gold-light">
-                  {formatMoney(invoice.amount_cents, invoice.currency)}
+                  {formatCurrency(invoice.amount_cents, invoice.currency)}
                 </p>
               </div>
             ))}

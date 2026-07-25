@@ -1,13 +1,11 @@
-import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { CreatorMarketplace } from "@/components/dashboard/creator-marketplace/creator-marketplace";
+import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
 
-export const metadata: Metadata = {
-  title: "Template Marketplace",
-  description:
-    "Browse, favorite, and use creator website templates — upload, version, and share with the Trend Business AI marketplace.",
-};
+export async function generateMetadata() {
+  return dashboardPageMetadata("templates");
+}
 
 export default async function TemplatesPage() {
   const supabase = await createClient();

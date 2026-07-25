@@ -1,3 +1,10 @@
+/** Instruction appended to AI generation prompts for localized text output. */
+export function aiOutputLanguageDirective(language?: string): string {
+  const normalized = language?.trim();
+  if (!normalized) return "";
+  return `\nRespond entirely in ${normalized}.`;
+}
+
 export const COMPLEXITY_GUIDE = `
 Estimate project size and file count from the blueprint.
 HARD LIMIT: never plan more than 18 files total (configs + app code).

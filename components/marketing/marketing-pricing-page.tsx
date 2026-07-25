@@ -5,26 +5,31 @@ import { SiteStats } from "@/components/marketing/site/stats";
 import { SitePricing } from "@/components/marketing/site/pricing";
 import { SiteTrust } from "@/components/marketing/site/trust";
 import { SiteCtaBand, SitePageHero } from "@/components/marketing/site/ui";
+import { useScopedT } from "@/lib/i18n/use-scoped-t";
 
 export function MarketingPricingPage({ children }: { children?: React.ReactNode }) {
+  const tPricing = useScopedT("marketing.pricing");
+  const tCta = useScopedT("marketing.cta");
+  const tCommon = useScopedT("marketing.common");
+
   return (
     <SiteShell>
       <SitePageHero
-        eyebrow="Pricing"
-        title="Simple pricing for a premium AI platform."
-        description="Start free during beta. Scale into higher limits and team workflows when you are ready."
-        primary={{ label: "Start Free", href: "/signup" }}
-        secondary={{ label: "Contact Sales", href: "/contact" }}
+        eyebrow={tPricing("label")}
+        title={tPricing("title")}
+        description={tPricing("description")}
+        primary={{ label: tCommon("startFree"), href: "/signup" }}
+        secondary={{ label: tCommon("contactSales"), href: "/contact" }}
       />
       <SiteStats />
       <SitePricing standalone />
       <SiteTrust />
       {children}
       <SiteCtaBand
-        title="Start building today"
-        description="Create your free account and open every AI product category from one private dashboard."
+        title={tCta("startBuildingToday")}
+        description={tCta("startBuildingTodayDescription")}
         secondaryHref="/contact"
-        secondaryLabel="Talk to Sales"
+        secondaryLabel={tCommon("talkToSales")}
       />
     </SiteShell>
   );

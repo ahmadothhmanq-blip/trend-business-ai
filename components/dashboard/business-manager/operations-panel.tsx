@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 import type { Workflow, Approval } from "@/types/business-manager";
 
 type Props = {
@@ -13,37 +14,38 @@ type Props = {
 };
 
 export function OperationsPanel({ initialWorkflows = [], initialApprovals = [] }: Props) {
+  const wt = useWorkspaceT("businessManager");
   const [workflows, setWorkflows] = useState(initialWorkflows);
   const [approvals, setApprovals] = useState(initialApprovals);
   const [workflowName, setWorkflowName] = useState("");
   const [approvalTitle, setApprovalTitle] = useState("");
 
   const createWorkflow = async () => {
-    if (!workflowName.trim()) return toast.error("Workflow name required");
+    if (!workflowName.trim()) return toast.error(wt("operations.nameRequired"));
     const res = await fetch("/api/business-manager/workflows", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: workflowName, useTemplate: true, status: "active" }),
     });
     const data = await res.json();
-    if (!res.ok) return toast.error(data.error ?? "Failed");
+    if (!res.ok) return toast.error(data.error ?? wt("toasts.failed"));
     setWorkflows([data.workflow, ...workflows]);
     setWorkflowName("");
-    toast.success("Workflow created");
+    toast.success(wt("operations.workflowCreated"));
   };
 
   const requestApproval = async () => {
-    if (!approvalTitle.trim()) return toast.error("Title required");
+    if (!approvalTitle.trim()) return toast.error(wt("operations.titleRequired"));
     const res = await fetch("/api/business-manager/approvals", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title: approvalTitle, requesterName: "You" }),
     });
     const data = await res.json();
-    if (!res.ok) return toast.error(data.error ?? "Failed");
+    if (!res.ok) return toast.error(data.error ?? wt("toasts.failed"));
     setApprovals([data.approval, ...approvals]);
     setApprovalTitle("");
-    toast.success("Approval requested");
+    toast.success(wt("operations.approvalRequested"));
   };
 
   const reviewApproval = async (id: string, status: "approved" | "rejected") => {
@@ -53,7 +55,7 @@ export function OperationsPanel({ initialWorkflows = [], initialApprovals = [] }
       body: JSON.stringify({ id, status }),
     });
     const data = await res.json();
-    if (!res.ok) return toast.error(data.error ?? "Failed");
+    if (!res.ok) return toast.error(data.error ?? wt("toasts.failed"));
     setApprovals(approvals.map((a) => (a.id === id ? data.approval : a)));
   };
 
@@ -61,9 +63,9 @@ export function OperationsPanel({ initialWorkflows = [], initialApprovals = [] }
     <div className="grid gap-6 lg:grid-cols-2">
       <div className="space-y-4">
         <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
-          <p className="mb-3 text-xs font-medium uppercase text-white/40">Workflow builder</p>
+          <p className="mb-3 text-xs font-medium uppercase text-white/40">{wt("operations.workflowBuilder")}</p>
           <div className="flex gap-2">
-            <Input value={workflowName} onChange={(e) => setWorkflowName(e.target.value)} placeholder="Workflow name" className="border-white/10 bg-white/5 text-white" />
+            <Input value={workflowName} onChange={(e) => setWorkflowName(e.target.value)} placeholder={wt("operations.workflowNamePlaceholder")} className="border-white/10 bg-white/5 text-white" />
             <Button onClick={() => void createWorkflow()}><Plus className="size-4" /></Button>
           </div>
         </div>
@@ -82,10 +84,10 @@ export function OperationsPanel({ initialWorkflows = [], initialApprovals = [] }
 
       <div className="space-y-4">
         <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
-          <p className="mb-3 text-xs font-medium uppercase text-white/40">Approvals</p>
+          <p className="mb-3 text-xs font-medium uppercase text-white/40">{wt("operations.approvals")}</p>
           <div className="flex gap-2">
-            <Input value={approvalTitle} onChange={(e) => setApprovalTitle(e.target.value)} placeholder="Approval request" className="border-white/10 bg-white/5 text-white" />
-            <Button onClick={() => void requestApproval()}>Request</Button>
+            <Input value={approvalTitle} onChange={(e) => setApprovalTitle(e.target.value)} placeholder={wt("operations.approvalPlaceholder")} className="border-white/10 bg-white/5 text-white" />
+            <Button onClick={() => void requestApproval()}>{wt("operations.request")}</Button>
           </div>
         </div>
         {approvals.map((a) => (
@@ -96,8 +98,8 @@ export function OperationsPanel({ initialWorkflows = [], initialApprovals = [] }
             </div>
             {a.status === "pending" && (
               <div className="mt-2 flex gap-2">
-                <Button size="sm" onClick={() => void reviewApproval(a.id, "approved")}>Approve</Button>
-                <Button size="sm" variant="outline" onClick={() => void reviewApproval(a.id, "rejected")}>Reject</Button>
+                <Button size="sm" onClick={() => void reviewApproval(a.id, "approved")}>{wt("operations.approve")}</Button>
+                <Button size="sm" variant="outline" onClick={() => void reviewApproval(a.id, "rejected")}>{wt("operations.reject")}</Button>
               </div>
             )}
           </div>

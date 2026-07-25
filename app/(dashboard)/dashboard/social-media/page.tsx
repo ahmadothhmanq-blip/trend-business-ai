@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
@@ -7,8 +6,11 @@ import { getAnalyticsSummary } from "@/lib/social-media/analytics";
 import { listUserBrands } from "@/lib/social-media/brand-integration";
 import type { SocialPost } from "@/types/social-media";
 import type { WorkspaceGeneration } from "@/types/database";
+import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
 
-export const metadata: Metadata = { title: "AI Social Media Manager" };
+export async function generateMetadata() {
+  return dashboardPageMetadata("socialMedia");
+}
 
 export default async function SocialMediaPage() {
   const supabase = await createClient();

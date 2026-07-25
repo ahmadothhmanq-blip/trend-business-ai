@@ -8,6 +8,7 @@ import { fetchBrandVoiceContext, brandVoiceToPromptContext } from "@/lib/content
 import { runContentAction } from "@/lib/content-studio/actions";
 import { createSseStreamHelpers } from "@/lib/api/sse-stream";
 import { getContentToolLabel, getContentTypeLabel } from "@/lib/constants/content-studio";
+import { resolveRequestLanguage } from "@/lib/i18n/api";
 import type { ContentBlueprint } from "@/types/content";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -61,6 +62,10 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data;
+  const aiLanguage = resolveRequestLanguage(
+    request,
+    input.type === "generate" ? input.language : input.targetLanguage,
+  );
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -86,7 +91,11 @@ export async function POST(request: Request) {
               text: input.text,
               tone: input.tone,
               style: input.style,
-              targetLanguage: input.targetLanguage,
+              targetLanguage:
+                input.action === "translate"
+                  ? input.targetLanguage ?? aiLanguage
+                  : input.targetLanguage,
+              outputLanguage: input.action === "translate" ? undefined : aiLanguage,
               instruction: input.instruction,
               brandVoice,
             },
@@ -137,7 +146,7 @@ export async function POST(request: Request) {
           contentType: input.contentType,
           tone: input.tone,
           audience: input.audience,
-          language: input.language,
+          language: aiLanguage,
           brandVoice: brandVoiceText,
           writingStyle: input.writingStyle,
           creativityLevel: input.creativityLevel,
@@ -171,7 +180,7 @@ export async function POST(request: Request) {
           prompt: input.prompt,
           tone: input.tone,
           audience: input.audience,
-          language: input.language,
+          language: aiLanguage,
           writingStyle: input.writingStyle,
           creativityLevel: input.creativityLevel,
           generatedAt: new Date().toISOString(),
@@ -189,7 +198,7 @@ export async function POST(request: Request) {
           prompt: input.prompt,
           tone: input.tone,
           audience: input.audience,
-          language: input.language,
+          language: aiLanguage,
           brand_voice: brandVoiceText,
           writing_style: input.writingStyle,
           creativity_level: input.creativityLevel,

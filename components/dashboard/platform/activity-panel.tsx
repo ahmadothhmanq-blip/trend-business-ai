@@ -3,9 +3,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { Activity, Clock } from "lucide-react";
 import { DashboardCard, DashboardCardContent, DashboardCardHeader, DashboardCardTitle, DashboardCardDescription, DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
+import { useFormatter } from "@/lib/i18n/use-formatter";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 import type { ActivityLogEntry } from "@/types/platform";
 
 export function ActivityPanel() {
+  const wt = useWorkspaceT("platform");
+  const { formatDateTime } = useFormatter();
   const [entries, setEntries] = useState<ActivityLogEntry[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -30,14 +34,14 @@ export function ActivityPanel() {
         <div className="flex items-center gap-2">
           <Activity className="size-5 text-premium-gold-light" />
           <div>
-            <DashboardCardTitle>Activity Log</DashboardCardTitle>
-            <DashboardCardDescription>{total} total events</DashboardCardDescription>
+            <DashboardCardTitle>{wt("activity.title")}</DashboardCardTitle>
+            <DashboardCardDescription>{wt("activity.totalEvents", { count: total })}</DashboardCardDescription>
           </div>
         </div>
       </DashboardCardHeader>
       <DashboardCardContent>
         {entries.length === 0 ? (
-          <DashboardPanel className="py-10 text-center"><Clock className="mx-auto size-8 text-white/10" /><p className="mt-3 text-xs text-white/30">No activity recorded yet</p></DashboardPanel>
+          <DashboardPanel className="py-10 text-center"><Clock className="mx-auto size-8 text-white/10" /><p className="mt-3 text-xs text-white/30">{wt("activity.empty")}</p></DashboardPanel>
         ) : (
           <div className="space-y-2">
             {entries.map((e) => (
@@ -46,7 +50,7 @@ export function ActivityPanel() {
                 <div className="min-w-0 flex-1">
                   <p className="text-xs font-semibold text-white/80">{e.action}</p>
                   {e.resource_type && <p className="text-[10px] text-white/40">{e.resource_type}{e.resource_id ? ` #${e.resource_id.slice(0, 8)}` : ""}</p>}
-                  <p className="mt-0.5 text-[10px] text-white/20">{new Date(e.created_at).toLocaleString()}</p>
+                  <p className="mt-0.5 text-[10px] text-white/20">{formatDateTime(e.created_at)}</p>
                 </div>
               </DashboardPanel>
             ))}
@@ -54,9 +58,9 @@ export function ActivityPanel() {
         )}
         {totalPages > 1 && (
           <div className="mt-4 flex items-center justify-center gap-2">
-            <button disabled={page === 1} onClick={() => setPage((p) => p - 1)} className="rounded-lg border border-white/10 px-3 py-1.5 text-xs text-white/50 disabled:opacity-30">Previous</button>
+            <button disabled={page === 1} onClick={() => setPage((p) => p - 1)} className="rounded-lg border border-white/10 px-3 py-1.5 text-xs text-white/50 disabled:opacity-30">{wt("common.previous")}</button>
             <span className="text-xs text-white/30">{page} / {totalPages}</span>
-            <button disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)} className="rounded-lg border border-white/10 px-3 py-1.5 text-xs text-white/50 disabled:opacity-30">Next</button>
+            <button disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)} className="rounded-lg border border-white/10 px-3 py-1.5 text-xs text-white/50 disabled:opacity-30">{wt("common.next")}</button>
           </div>
         )}
       </DashboardCardContent>

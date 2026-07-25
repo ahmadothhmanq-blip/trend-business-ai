@@ -2,12 +2,18 @@
 
 import { Check, Sparkles } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
-import { REF_PRICING } from "@/lib/constants/marketing-content";
 import { SiteButton } from "@/components/marketing/site/button";
 import { SiteSectionHead } from "@/components/marketing/site/ui";
+import { useScopedT } from "@/lib/i18n/use-scoped-t";
 import { cn } from "@/lib/utils";
 
+const PLANS = [
+  { id: "freeBeta", href: "/signup", featured: true },
+  { id: "pro", href: "/signup", featured: false },
+] as const;
+
 export function SitePricing({ standalone = false }: { standalone?: boolean }) {
+  const t = useScopedT("marketing.pricing");
   const reduce = useReducedMotion();
 
   return (
@@ -23,15 +29,15 @@ export function SitePricing({ standalone = false }: { standalone?: boolean }) {
         {!standalone && (
           <SiteSectionHead
             id="pricing-title"
-            label="Pricing"
-            title="Simple pricing for a premium AI platform."
-            description="Start free during beta. Scale into higher limits and team workflows when you are ready."
+            label={t("label")}
+            title={t("title")}
+            description={t("description")}
           />
         )}
         <div className={cn("mx-auto grid max-w-4xl gap-5 md:grid-cols-2", !standalone && "mt-12")}>
-          {REF_PRICING.map((plan, index) => (
+          {PLANS.map((plan, index) => (
             <motion.article
-              key={plan.name}
+              key={plan.id}
               initial={reduce ? undefined : { opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -49,22 +55,25 @@ export function SitePricing({ standalone = false }: { standalone?: boolean }) {
                   <div className="pointer-events-none absolute -right-10 -top-10 size-40 rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.18),transparent_70%)]" />
                   <div className="absolute right-5 top-5 inline-flex items-center gap-1.5 rounded-full border border-[rgba(212,175,55,0.28)] bg-[rgba(212,175,55,0.12)] px-3 py-1 text-[11px] font-semibold text-[#D4AF37] shadow-[0_0_16px_rgba(212,175,55,0.15)]">
                     <Sparkles className="size-3" />
-                    Recommended
+                    {t("recommended")}
                   </div>
                 </>
               )}
-              <h3 className="text-xl font-bold text-white">{plan.name}</h3>
+              <h3 className="text-xl font-bold text-white">{t(`plans.${plan.id}.name`)}</h3>
               <p className="mt-3 text-[clamp(2rem,5vw,3rem)] font-bold tracking-[-0.04em] text-[#D4AF37] drop-shadow-[0_0_20px_rgba(212,175,55,0.25)]">
-                {plan.price}
+                {t(`plans.${plan.id}.price`)}
               </p>
               <p className="mt-3 min-h-[48px] text-[14px] leading-[1.7] text-[#B5B5B5]">
-                {plan.description}
+                {t(`plans.${plan.id}.description`)}
               </p>
               <ul className="mt-7 space-y-3">
-                {plan.features.map((f) => (
-                  <li key={f} className="flex gap-3 text-[14px] text-[#C7C7C7]">
+                {Array.from({ length: 5 }, (_, featureIndex) => (
+                  <li
+                    key={featureIndex}
+                    className="flex gap-3 text-[14px] text-[#C7C7C7]"
+                  >
                     <Check className="mt-0.5 size-4 shrink-0 text-[#D4AF37]" />
-                    <span>{f}</span>
+                    <span>{t(`plans.${plan.id}.features.${featureIndex}`)}</span>
                   </li>
                 ))}
               </ul>
@@ -73,7 +82,7 @@ export function SitePricing({ standalone = false }: { standalone?: boolean }) {
                 variant={plan.featured ? "gold" : "dark"}
                 className="mt-8 w-full"
               >
-                {plan.cta}
+                {t(`plans.${plan.id}.cta`)}
               </SiteButton>
             </motion.article>
           ))}

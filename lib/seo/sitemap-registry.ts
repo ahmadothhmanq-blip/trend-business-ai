@@ -3,6 +3,7 @@ import {
   AI_PRODUCT_CATEGORIES,
   MARKETING_PRODUCTS,
 } from "@/lib/constants/marketing-content";
+import { expandSitemapLocales } from "@/lib/seo/i18n";
 import { getKnowledgeEntries } from "@/lib/seo/knowledge";
 import { getPublishedProgrammaticPages } from "@/lib/seo/programmatic";
 import {
@@ -195,7 +196,7 @@ export function buildFullSitemap(): MetadataRoute.Sitemap {
     merged.push(entry);
   }
 
-  return merged;
+  return expandSitemapLocales(merged);
 }
 
 export const SPECIALIZED_SITEMAPS = [

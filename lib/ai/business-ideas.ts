@@ -8,6 +8,7 @@ export type IdeaInput = {
   skills: string;
   budget: string;
   industry?: string;
+  language?: string;
 };
 
 export type GeneratedIdea = {

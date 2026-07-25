@@ -10,6 +10,7 @@ import {
   SitePageHero,
 } from "@/components/marketing/site/ui";
 import type { PublicSaasPageConfig } from "@/lib/constants/saas-pages";
+import { useScopedT } from "@/lib/i18n/use-scoped-t";
 
 function resolveHref(label?: string) {
   if (!label) return "/signup";
@@ -31,6 +32,8 @@ export function PublicSaasPage({
   page: PublicSaasPageConfig;
   children?: React.ReactNode;
 }) {
+  const tCta = useScopedT("marketing.cta");
+
   return (
     <SiteShell>
       <SitePageHero
@@ -73,8 +76,8 @@ export function PublicSaasPage({
       </section>
       {children}
       <SiteCtaBand
-        title="Ready to build with Trend Business AI?"
-        description="Create your free account and explore Create, Design, Content, and Business from one premium AI workspace."
+        title={tCta("readyToBuild")}
+        description={tCta("readyToBuildShort")}
       />
     </SiteShell>
   );

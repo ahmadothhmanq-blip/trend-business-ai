@@ -1,8 +1,10 @@
-import type { Metadata } from "next";
+import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
 import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { BillingPanel } from "@/components/dashboard/platform/billing-panel";
 
-export const metadata: Metadata = { title: "Billing & Plans" };
+export async function generateMetadata() {
+  return dashboardPageMetadata("billing");
+}
 
 export default function BillingPage() {
   return (

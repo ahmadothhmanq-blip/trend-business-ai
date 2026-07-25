@@ -1,11 +1,13 @@
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { ImageGeneratorTool } from "@/components/dashboard/image-generator/image-generator-tool";
 import type { ImageGeneration } from "@/types/image-generation";
+import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
 
-export const metadata: Metadata = { title: "AI Design Studio" };
+export async function generateMetadata() {
+  return dashboardPageMetadata("imageGenerator");
+}
 
 export default async function ImageGeneratorPage() {
   const supabase = await createClient();

@@ -1,10 +1,12 @@
-import type { Metadata } from "next";
 import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardHeader } from "@/components/dashboard/header";
 import { AppManagementDashboard } from "@/components/dashboard/webapp-builder/app-management-dashboard";
+import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
 
-export const metadata: Metadata = { title: "Manage App · App Builder" };
+export async function generateMetadata() {
+  return dashboardPageMetadata("appBuilderManage");
+}
 
 type PageProps = { params: Promise<{ id: string }> };
 

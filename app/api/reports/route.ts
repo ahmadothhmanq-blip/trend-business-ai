@@ -4,6 +4,7 @@ import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
 import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import { reportInputSchema } from "@/lib/validations/reports";
+import { resolveRequestLanguage } from "@/lib/i18n/api";
 import type { AIReport } from "@/types/database";
 import { NextResponse } from "next/server";
 
@@ -70,10 +71,12 @@ export async function POST(request: Request) {
     );
   }
 
+  const aiLanguage = resolveRequestLanguage(request);
+
   let report;
   let source: string;
   try {
-    const result = await generateReport(parsed.data);
+    const result = await generateReport({ ...parsed.data, language: aiLanguage });
     report = result.report;
     source = result.source;
   } catch (error) {

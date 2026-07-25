@@ -1,11 +1,13 @@
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { VideoStudioTool } from "@/components/dashboard/video-studio/video-studio-tool";
 import type { VideoGeneration } from "@/types/video";
+import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
 
-export const metadata: Metadata = { title: "AI Video Production Platform" };
+export async function generateMetadata() {
+  return dashboardPageMetadata("videoStudio");
+}
 
 export default async function VideoStudioPage() {
   const supabase = await createClient();

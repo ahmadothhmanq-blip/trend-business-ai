@@ -1,11 +1,13 @@
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { CyberWorkspace } from "@/components/dashboard/cybersecurity/cyber-workspace";
 import { getCyberAnalytics } from "@/lib/cyber/analytics";
+import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
 
-export const metadata: Metadata = { title: "Cybersecurity Platform" };
+export async function generateMetadata() {
+  return dashboardPageMetadata("cybersecurity");
+}
 
 export default async function CybersecurityPage() {
   const supabase = await createClient();

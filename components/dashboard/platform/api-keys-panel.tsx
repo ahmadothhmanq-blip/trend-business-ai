@@ -7,12 +7,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DashboardCard, DashboardCardContent, DashboardCardHeader, DashboardCardTitle, DashboardCardDescription, DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import { dashboardInputClass, dashboardSelectClass } from "@/components/dashboard/ui/dashboard-styles";
+import { useFormatter } from "@/lib/i18n/use-formatter";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 import { cn } from "@/lib/utils";
 import { API_KEY_SCOPES } from "@/lib/constants/platform";
 import { CheckboxToggle } from "@/components/dashboard/builder-shared";
 import type { ApiKey } from "@/types/platform";
 
 export function ApiKeysPanel() {
+  const wt = useWorkspaceT("platform");
+  const { formatDate } = useFormatter();
   const [keys, setKeys] = useState<Partial<ApiKey>[]>([]);
   const [showCreate, setShowCreate] = useState(false);
   const [name, setName] = useState("");
@@ -32,14 +36,14 @@ export function ApiKeysPanel() {
   useEffect(() => { fetchKeys(); }, [fetchKeys]);
 
   const handleCreate = async () => {
-    if (!name.trim()) { toast.error("Name is required"); return; }
+    if (!name.trim()) { toast.error(wt("apiKeys.nameRequired")); return; }
     const res = await fetch("/api/platform/api-keys", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, scopes, expiresInDays: parseInt(expiresInDays) || 90 }),
     });
     const d = await res.json();
-    if (!res.ok) { toast.error(d.error ?? "Failed"); return; }
+    if (!res.ok) { toast.error(d.error ?? wt("toasts.failed")); return; }
     setNewFullKey(d.fullKey);
     toast.success(d.message);
     setShowCreate(false);
@@ -49,7 +53,7 @@ export function ApiKeysPanel() {
 
   const handleDelete = async (id: string) => {
     await fetch(`/api/platform/api-keys/${id}`, { method: "DELETE" });
-    toast.success("Key revoked");
+    toast.success(wt("toasts.keyRevoked"));
     fetchKeys();
   };
 
@@ -64,63 +68,63 @@ export function ApiKeysPanel() {
     <div className="space-y-6">
       {newFullKey && (
         <DashboardPanel gold className="space-y-2 p-4">
-          <p className="text-xs font-bold text-premium-gold-light">Your new API key (copy it now):</p>
+          <p className="text-xs font-bold text-premium-gold-light">{wt("apiKeys.newKeyBanner")}</p>
           <div className="flex items-center gap-2">
             <code className="flex-1 overflow-x-auto rounded-lg bg-black/40 px-3 py-2 font-mono text-xs text-white/80">{newFullKey}</code>
-            <Button variant="ghost" size="icon-xs" className="text-premium-gold-light" onClick={() => { navigator.clipboard.writeText(newFullKey); toast.success("Copied"); }}>
+            <Button variant="ghost" size="icon-xs" className="text-premium-gold-light" onClick={() => { navigator.clipboard.writeText(newFullKey); toast.success(wt("common.copied")); }}>
               <Copy className="size-4" />
             </Button>
           </div>
-          <Button variant="ghost" size="sm" className="text-xs text-white/40" onClick={() => setNewFullKey(null)}>Dismiss</Button>
+          <Button variant="ghost" size="sm" className="text-xs text-white/40" onClick={() => setNewFullKey(null)}>{wt("common.dismiss")}</Button>
         </DashboardPanel>
       )}
 
       <DashboardCard>
         <DashboardCardHeader>
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2"><Key className="size-5 text-premium-gold-light" /><DashboardCardTitle>API Keys</DashboardCardTitle></div>
+            <div className="flex items-center gap-2"><Key className="size-5 text-premium-gold-light" /><DashboardCardTitle>{wt("apiKeys.title")}</DashboardCardTitle></div>
             <Button onClick={() => setShowCreate(!showCreate)} size="sm" className="btn-gold gap-1.5 rounded-lg text-xs font-bold text-luxury-black">
-              <Plus className="size-3" /> Create Key
+              <Plus className="size-3" /> {wt("apiKeys.createKey")}
             </Button>
           </div>
-          <DashboardCardDescription>Manage API keys for programmatic access</DashboardCardDescription>
+          <DashboardCardDescription>{wt("apiKeys.description")}</DashboardCardDescription>
         </DashboardCardHeader>
         <DashboardCardContent>
           {showCreate && (
             <DashboardPanel className="mb-4 space-y-3 p-4">
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-white/60">Key Name *</label>
-                  <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="My API Key" className={dashboardInputClass} />
+                  <label className="mb-1 block text-xs font-medium text-white/60">{wt("apiKeys.keyName")}</label>
+                  <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={wt("apiKeys.keyNamePlaceholder")} className={dashboardInputClass} />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-white/60">Expires in</label>
+                  <label className="mb-1 block text-xs font-medium text-white/60">{wt("apiKeys.expiresIn")}</label>
                   <select value={expiresInDays} onChange={(e) => setExpiresInDays(e.target.value)} className={dashboardSelectClass}>
-                    <option value="30">30 days</option>
-                    <option value="90">90 days</option>
-                    <option value="180">180 days</option>
-                    <option value="365">1 year</option>
-                    <option value="0">Never</option>
+                    <option value="30">{wt("apiKeys.expires30")}</option>
+                    <option value="90">{wt("apiKeys.expires90")}</option>
+                    <option value="180">{wt("apiKeys.expires180")}</option>
+                    <option value="365">{wt("apiKeys.expires365")}</option>
+                    <option value="0">{wt("apiKeys.expiresNever")}</option>
                   </select>
                 </div>
               </div>
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-white/60">Scopes</label>
+                <label className="mb-1.5 block text-xs font-medium text-white/60">{wt("apiKeys.scopes")}</label>
                 <div className="flex flex-wrap gap-2">
                   {API_KEY_SCOPES.map((s) => (
-                    <CheckboxToggle key={s.id} label={s.label} checked={scopes.includes(s.id)} onChange={(c) => setScopes((p) => c ? [...p, s.id] : p.filter((x) => x !== s.id))} />
+                    <CheckboxToggle key={s.id} label={wt(`apiKeyScopes.${s.id}`)} checked={scopes.includes(s.id)} onChange={(c) => setScopes((p) => c ? [...p, s.id] : p.filter((x) => x !== s.id))} />
                   ))}
                 </div>
               </div>
               <div className="flex gap-2 pt-1">
-                <Button variant="outline" size="sm" className="rounded-lg border-white/10 text-white/50" onClick={() => setShowCreate(false)}>Cancel</Button>
-                <Button size="sm" className="btn-gold rounded-lg font-bold text-luxury-black" onClick={handleCreate}>Create Key</Button>
+                <Button variant="outline" size="sm" className="rounded-lg border-white/10 text-white/50" onClick={() => setShowCreate(false)}>{wt("common.cancel")}</Button>
+                <Button size="sm" className="btn-gold rounded-lg font-bold text-luxury-black" onClick={handleCreate}>{wt("apiKeys.createKey")}</Button>
               </div>
             </DashboardPanel>
           )}
 
           {keys.length === 0 ? (
-            <DashboardPanel className="py-10 text-center"><Key className="mx-auto size-8 text-white/10" /><p className="mt-3 text-xs text-white/30">No API keys created</p></DashboardPanel>
+            <DashboardPanel className="py-10 text-center"><Key className="mx-auto size-8 text-white/10" /><p className="mt-3 text-xs text-white/30">{wt("apiKeys.noKeys")}</p></DashboardPanel>
           ) : (
             <div className="space-y-2">
               {keys.map((k) => (
@@ -128,10 +132,10 @@ export function ApiKeysPanel() {
                   <Key className={cn("size-4", k.is_active ? "text-green-400" : "text-white/20")} />
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-xs font-semibold text-white/80">{k.name}</p>
-                    <p className="text-[10px] text-white/30">{k.key_prefix}... &middot; {(k.scopes ?? []).join(", ")} &middot; Created {new Date(k.created_at!).toLocaleDateString()}</p>
+                    <p className="text-[10px] text-white/30">{wt("apiKeys.keyMeta", { prefix: k.key_prefix ?? "", scopes: (k.scopes ?? []).join(", "), created: formatDate(k.created_at) })}</p>
                   </div>
                   <div className="flex gap-1">
-                    <Button variant="ghost" size="icon-xs" className="text-white/30 hover:text-white" onClick={() => handleToggle(k.id!)} title={k.is_active ? "Deactivate" : "Activate"}>
+                    <Button variant="ghost" size="icon-xs" className="text-white/30 hover:text-white" onClick={() => handleToggle(k.id!)} title={k.is_active ? wt("common.deactivate") : wt("common.activate")}>
                       <Power className="size-3" />
                     </Button>
                     <Button variant="ghost" size="icon-xs" className="text-white/30 hover:text-red-400" onClick={() => handleDelete(k.id!)}>

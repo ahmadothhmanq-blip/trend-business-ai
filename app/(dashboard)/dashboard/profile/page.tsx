@@ -1,10 +1,12 @@
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { ProfileForm } from "@/components/dashboard/profile-form";
+import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
 
-export const metadata: Metadata = { title: "User Profile" };
+export async function generateMetadata() {
+  return dashboardPageMetadata("profile");
+}
 
 export default async function ProfilePage() {
   const supabase = await createClient();

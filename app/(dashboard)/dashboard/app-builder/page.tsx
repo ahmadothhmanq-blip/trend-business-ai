@@ -1,11 +1,13 @@
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { WebAppBuilderTool } from "@/components/dashboard/webapp-builder/webapp-builder-tool";
 import type { WebAppGeneration } from "@/types/webapp";
+import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
 
-export const metadata: Metadata = { title: "AI App Design Platform" };
+export async function generateMetadata() {
+  return dashboardPageMetadata("appBuilder");
+}
 
 export default async function AppBuilderPage() {
   const supabase = await createClient();

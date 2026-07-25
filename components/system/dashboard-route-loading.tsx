@@ -1,10 +1,15 @@
+"use client";
+
 import { Loader2 } from "lucide-react";
 import {
   DashboardCardSkeleton,
   DashboardSkeleton,
 } from "@/components/dashboard/ui/dashboard-skeleton";
+import { useTranslation } from "@/lib/i18n/client";
 
 export function DashboardRouteLoading() {
+  const { t } = useTranslation();
+
   return (
     <div aria-busy="true" aria-live="polite" role="status">
       <header className="dashboard-header border-b border-white/[0.08] px-4 py-5 sm:px-6 lg:px-8">
@@ -38,7 +43,7 @@ export function DashboardRouteLoading() {
 
         <div className="sr-only flex items-center gap-2 pt-8">
           <Loader2 className="size-4 animate-spin text-premium-gold" aria-hidden="true" />
-          Loading dashboard
+          {t("dashboard.loading.dashboard")}
         </div>
       </main>
     </div>

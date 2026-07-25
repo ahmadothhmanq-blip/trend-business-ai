@@ -1,4 +1,5 @@
 import type { BrandIdentityPluginInput, BrandAnalysis, BrandPlanResult } from "@/plugins/brand-identity/types";
+import { aiOutputLanguageDirective } from "@/lib/ai/prompts/shared";
 
 function getBrandTypeContext(type: string): string {
   const ctx: Record<string, string> = {
@@ -43,7 +44,7 @@ Produce a JSON object with:
 - coreValues: array of 4-6 core brand values
 - emotionalAppeal: the emotional response the brand should evoke
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(input.language)}`;
 }
 
 export function brandPlanPrompt(input: BrandIdentityPluginInput, analysis: BrandAnalysis): string {
@@ -84,10 +85,14 @@ Create a JSON object with:
 - deliverables: array of deliverable IDs to generate
 - brandArchetype: the brand archetype (e.g. "The Creator", "The Explorer", "The Hero")
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(input.language)}`;
 }
 
-export function brandStrategyPrompt(analysis: BrandAnalysis, plan: BrandPlanResult): string {
+export function brandStrategyPrompt(
+  analysis: BrandAnalysis,
+  plan: BrandPlanResult,
+  language?: string,
+): string {
   return `Write a professional brand strategy document for "${analysis.brandName}".
 
 Brand: ${analysis.brandName}
@@ -108,10 +113,14 @@ Cover:
 5. Value Proposition — what makes us unique
 6. Go-to-Market Messaging — key messages for different channels
 
-Write 400-600 words in professional markdown. No JSON wrapper — return plain text.`;
+Write 400-600 words in professional markdown. No JSON wrapper — return plain text.${aiOutputLanguageDirective(language)}`;
 }
 
-export function brandStoryPrompt(analysis: BrandAnalysis, plan: BrandPlanResult): string {
+export function brandStoryPrompt(
+  analysis: BrandAnalysis,
+  plan: BrandPlanResult,
+  language?: string,
+): string {
   return `Write a compelling brand story for "${analysis.brandName}".
 
 Brand: ${analysis.brandName}
@@ -128,10 +137,14 @@ Write the brand story that:
 - Connects emotionally with the audience
 - Ends with the aspirational future
 
-Write 200-400 words. Compelling, authentic, and memorable. Return plain text — no JSON wrapper.`;
+Write 200-400 words. Compelling, authentic, and memorable. Return plain text — no JSON wrapper.${aiOutputLanguageDirective(language)}`;
 }
 
-export function logoGuidelinesPrompt(analysis: BrandAnalysis, plan: BrandPlanResult): string {
+export function logoGuidelinesPrompt(
+  analysis: BrandAnalysis,
+  plan: BrandPlanResult,
+  language?: string,
+): string {
   const colors = plan.colorPalette.map((c) => `${c.name}: ${c.hex} (${c.role})`).join(", ");
   return `Write professional logo usage guidelines for the "${analysis.brandName}" brand.
 
@@ -148,13 +161,14 @@ Cover:
 5. Don'ts — distortion, recoloring, rotation, effects to avoid
 6. File Formats — when to use SVG, PNG, PDF
 
-Write 200-350 words in markdown. Return plain text — no JSON wrapper.`;
+Write 200-350 words in markdown. Return plain text — no JSON wrapper.${aiOutputLanguageDirective(language)}`;
 }
 
 export function brandAssetPrompt(
   assetType: string,
   analysis: BrandAnalysis,
   plan: BrandPlanResult,
+  language?: string,
 ): string {
   const colors = plan.colorPalette.map((c) => `${c.name}: ${c.hex}`).join(", ");
   const base = `Brand: ${analysis.brandName}\nColors: ${colors}\nFonts: ${plan.typography.primary} / ${plan.typography.secondary}\nTone: ${plan.voiceTone.tone}\nTagline: ${plan.voiceTone.tagline}`;
@@ -209,5 +223,5 @@ Return a JSON object with:
 Return ONLY valid JSON.`,
   };
 
-  return prompts[assetType] || `Create a "${assetType}" brand asset for "${analysis.brandName}".\n${base}\n\nReturn JSON with: name, category, description, content (the asset content as text/markup), format ("markdown" or "svg" or "html").\nReturn ONLY valid JSON.`;
+  return (prompts[assetType] || `Create a "${assetType}" brand asset for "${analysis.brandName}".\n${base}\n\nReturn JSON with: name, category, description, content (the asset content as text/markup), format ("markdown" or "svg" or "html").\nReturn ONLY valid JSON.`) + aiOutputLanguageDirective(language);
 }

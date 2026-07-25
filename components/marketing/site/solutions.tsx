@@ -6,9 +6,13 @@ import { motion, useReducedMotion } from "framer-motion";
 import { AI_PRODUCT_CATEGORIES } from "@/lib/constants/marketing-content";
 import { SolutionIllustration } from "@/components/marketing/solution-illustration";
 import { SiteSectionHead } from "@/components/marketing/site/ui";
+import { useScopedT } from "@/lib/i18n/use-scoped-t";
 
 /** AI Solutions — four large illustrated category cards. */
 export function SiteSolutions() {
+  const t = useScopedT("marketing.solutions");
+  const tCat = useScopedT("marketing.categories");
+  const tCommon = useScopedT("marketing.common");
   const reduce = useReducedMotion();
 
   return (
@@ -20,9 +24,9 @@ export function SiteSolutions() {
       <div className="landing-container py-20 lg:py-28">
         <SiteSectionHead
           id="solutions-title"
-          label="AI Solutions"
-          title="Four AI suites. One luxury company."
-          description="Create, Design, Content and Business — premium product categories built for founders who want speed without sacrificing polish."
+          label={t("label")}
+          title={t("title")}
+          description={t("description")}
         />
         <div className="mt-14 grid gap-6 lg:grid-cols-2 lg:gap-7">
           {AI_PRODUCT_CATEGORIES.map((category, index) => (
@@ -44,20 +48,20 @@ export function SiteSolutions() {
                 <div className="mt-7 flex flex-1 flex-col px-1">
                   <div className="flex items-start justify-between gap-4">
                     <h3 className="text-[clamp(1.5rem,2.5vw,1.875rem)] font-bold tracking-[-0.03em] text-white">
-                      {category.title}
+                      {tCat(`${category.id}.title`)}
                     </h3>
                     <span className="shrink-0 rounded-full border border-[rgba(212,175,55,0.28)] bg-[rgba(212,175,55,0.08)] px-3 py-1 text-[11px] font-semibold text-[#D4AF37]">
-                      {category.productCount} products
+                      {tCommon("productsCount", { count: category.productCount })}
                     </span>
                   </div>
                   <p className="mt-3 max-w-md text-[15px] leading-[1.75] text-[#B5B5B5]">
-                    {category.description}
+                    {tCat(`${category.id}.description`)}
                   </p>
                   <Link
                     href={category.href}
                     className="mt-auto inline-flex w-fit items-center gap-2 rounded-full border border-[rgba(212,175,55,0.28)] bg-[rgba(212,175,55,0.08)] px-5 py-2.5 text-sm font-semibold text-[#D4AF37] shadow-[0_0_20px_rgba(212,175,55,0.08)] transition-all hover:border-[rgba(212,175,55,0.5)] hover:bg-[rgba(212,175,55,0.14)]"
                   >
-                    Explore
+                    {tCommon("explore")}
                     <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </div>

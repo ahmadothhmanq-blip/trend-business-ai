@@ -7,6 +7,7 @@ import { brandIdentityEngine } from "@/lib/ai-core/brand-studio/engine";
 import { modelToBlueprint } from "@/lib/ai-core/brand-studio/model";
 import { getBrandTemplate } from "@/lib/ai-core/brand-studio/templates";
 import { getBrandTypeLabel } from "@/lib/constants/brand-identity-builder";
+import { resolveRequestLanguage } from "@/lib/i18n/api";
 import type { BrandIdentityGeneration } from "@/types/brand-identity";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -49,6 +50,7 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data;
+  const aiLanguage = resolveRequestLanguage(request);
   const template = input.templateId ? getBrandTemplate(input.templateId) : undefined;
   const deliverables = template?.deliverables.length
     ? template.deliverables
@@ -91,6 +93,7 @@ export async function POST(request: Request) {
             targetAudience: input.targetAudience,
             brandPersonality: template?.personality || input.brandPersonality,
             deliverables,
+            language: aiLanguage,
           },
           {
             templateId: input.templateId,

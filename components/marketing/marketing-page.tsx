@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { SiteShell } from "@/components/marketing/site/shell";
 import { SiteHero } from "@/components/marketing/site/hero";
 import { SiteCtaBand } from "@/components/marketing/site/ui";
+import { useScopedT } from "@/lib/i18n/use-scoped-t";
 
 const SiteSolutions = dynamic(
   () => import("@/components/marketing/site/solutions").then((m) => m.SiteSolutions),
@@ -40,6 +41,9 @@ const SiteFaq = dynamic(
 );
 
 export function MarketingPage() {
+  const tCta = useScopedT("marketing.cta");
+  const tCommon = useScopedT("marketing.common");
+
   return (
     <SiteShell>
       <SiteHero />
@@ -52,10 +56,10 @@ export function MarketingPage() {
       <SiteTestimonials />
       <SiteFaq />
       <SiteCtaBand
-        title="Ready to build with Trend Business AI?"
-        description="Create your free account and explore Create, Design, Content, and Business products from one premium AI workspace."
+        title={tCta("readyToBuild")}
+        description={tCta("readyToBuildDescription")}
         secondaryHref="/#solutions"
-        secondaryLabel="Browse AI Solutions"
+        secondaryLabel={tCommon("browseAiSolutions")}
       />
     </SiteShell>
   );

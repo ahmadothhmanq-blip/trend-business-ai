@@ -125,7 +125,7 @@ async function generateLogo(
       ctx.progress.emit(`Creating ${varName}...`);
       try {
         const result = await ctx.provider.generateJson<LogoVariation>({
-          prompt: logoVariationPrompt(analysis.brandName, primarySvg, varName, plan.colorPalette),
+          prompt: logoVariationPrompt(analysis.brandName, primarySvg, varName, plan.colorPalette, input.language),
           schema: logoVariationSchema,
         });
         variations.push({
@@ -150,7 +150,7 @@ async function generateLogo(
     };
     const guidelinesText = ctx.provider.generateText
       ? await ctx.provider.generateText({
-          prompt: logoGuidelinesPrompt(analysis.brandName, analysis, plan.colorPalette, typographyInfo, variations),
+          prompt: logoGuidelinesPrompt(analysis.brandName, analysis, plan.colorPalette, typographyInfo, variations, input.language),
         })
       : "";
     guidelines = guidelinesText || "";

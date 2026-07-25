@@ -1,8 +1,10 @@
-import type { Metadata } from "next";
+import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
 import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { AiSearchPanel } from "@/components/dashboard/platform/ai-search-panel";
 
-export const metadata: Metadata = { title: "AI Search Center" };
+export async function generateMetadata() {
+  return dashboardPageMetadata("aiSearch");
+}
 
 export default function AiSearchDashboardPage() {
   return (

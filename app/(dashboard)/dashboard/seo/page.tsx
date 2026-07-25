@@ -1,8 +1,10 @@
-import type { Metadata } from "next";
+import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
 import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { SeoHealthPanel } from "@/components/dashboard/platform/seo-health-panel";
 
-export const metadata: Metadata = { title: "SEO Health" };
+export async function generateMetadata() {
+  return dashboardPageMetadata("seo");
+}
 
 export default function SeoDashboardPage() {
   return (

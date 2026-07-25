@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
@@ -7,8 +6,11 @@ import { getBiAnalytics, type BiAnalyticsSummary } from "@/lib/bi/analytics";
 import { ensureDefaultMetrics } from "@/lib/bi/metrics";
 import { ensureDefaultDashboard } from "@/lib/bi/dashboards";
 import type { BiDashboard, BiDataSource, BiMetric, BiReport, BiScheduledReport, BiWidget } from "@/types/bi";
+import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
 
-export const metadata: Metadata = { title: "Business Intelligence Platform" };
+export async function generateMetadata() {
+  return dashboardPageMetadata("bi");
+}
 
 export default async function BiPage() {
   const supabase = await createClient();

@@ -4,6 +4,7 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import { CalendarDays, LayoutDashboard, Link2, PenSquare, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 import { PostComposer } from "@/components/dashboard/social-media/post-composer";
 import { ContentLibrary } from "@/components/dashboard/social-media/content-library";
 import { SocialDashboard } from "@/components/dashboard/social-media/social-dashboard";
@@ -12,10 +13,15 @@ import { ConnectedAccountsPanel } from "@/components/dashboard/social-media/conn
 import type { SocialPost } from "@/types/social-media";
 import type { WorkspaceGeneration } from "@/types/database";
 
+function StrategyWorkspaceLoading() {
+  const wt = useWorkspaceT("socialMedia");
+  return <div className="text-sm text-white/40">{wt("workspace.loadingStrategy")}</div>;
+}
+
 const WorkspaceStrategy = dynamic(
   () =>
     import("@/components/dashboard/social-media/strategy-workspace").then((m) => m.StrategyWorkspace),
-  { loading: () => <div className="text-sm text-white/40">Loading AI strategy…</div> },
+  { loading: () => <StrategyWorkspaceLoading /> },
 );
 
 type Brand = { id: string; brand_name: string };
@@ -35,6 +41,7 @@ export function SocialMediaWorkspace({
   brands = [],
   analyticsSummary,
 }: Props) {
+  const wt = useWorkspaceT("socialMedia");
   const [tab, setTab] = useState<Tab>("compose");
   const [posts, setPosts] = useState<SocialPost[]>(initialPosts);
   const [activePost, setActivePost] = useState<Partial<SocialPost> | null>(null);
@@ -50,18 +57,18 @@ export function SocialMediaWorkspace({
     recordCount: 0,
   };
 
+  const tabs = [
+    { key: "dashboard" as const, label: wt("workspace.tabs.dashboard"), icon: LayoutDashboard },
+    { key: "compose" as const, label: wt("workspace.tabs.compose"), icon: PenSquare },
+    { key: "calendar" as const, label: wt("workspace.tabs.calendar"), icon: CalendarDays },
+    { key: "accounts" as const, label: wt("workspace.tabs.accounts"), icon: Link2 },
+    { key: "strategy" as const, label: wt("workspace.tabs.strategy"), icon: Sparkles },
+  ] as const;
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-1 rounded-xl border border-white/[0.06] bg-white/[0.02] p-1">
-        {(
-          [
-            { key: "dashboard" as const, label: "Dashboard", icon: LayoutDashboard },
-            { key: "compose" as const, label: "Composer", icon: PenSquare },
-            { key: "calendar" as const, label: "Calendar", icon: CalendarDays },
-            { key: "accounts" as const, label: "Accounts", icon: Link2 },
-            { key: "strategy" as const, label: "AI Strategy", icon: Sparkles },
-          ] as const
-        ).map(({ key, label, icon: Icon }) => (
+        {tabs.map(({ key, label, icon: Icon }) => (
           <button
             key={key}
             onClick={() => setTab(key)}
@@ -81,7 +88,7 @@ export function SocialMediaWorkspace({
       {tab === "compose" && (
         <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
           <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
-            <p className="mb-3 text-xs font-medium uppercase tracking-wide text-white/40">Content Library</p>
+            <p className="mb-3 text-xs font-medium uppercase tracking-wide text-white/40">{wt("workspace.contentLibrary")}</p>
             <ContentLibrary
               selectedId={activePost?.id}
               onSelect={(p) => {
@@ -131,7 +138,7 @@ export function SocialMediaWorkspace({
                   calendarView === v ? "bg-premium-gold/15 text-premium-gold-light" : "text-white/40",
                 )}
               >
-                {v}
+                {wt(`workspace.views.${v}`)}
               </button>
             ))}
           </div>

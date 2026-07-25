@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useTranslation } from "@/lib/i18n/client";
 
 type RouteErrorProps = {
   error: Error & { digest?: string };
@@ -26,9 +27,14 @@ export function RouteError({
   error,
   reset,
   variant = "default",
-  title = "Something went wrong",
-  description = "An unexpected error occurred. Please try again or return to a safe page.",
+  title,
+  description,
 }: RouteErrorProps) {
+  const { t } = useTranslation();
+  const resolvedTitle = title ?? t("dashboard.errors.genericTitle");
+  const resolvedDescription =
+    description ?? t("dashboard.errors.genericDescription");
+
   useEffect(() => {
     console.error("[RouteError]", error);
   }, [error]);
@@ -52,8 +58,8 @@ export function RouteError({
         <div className="mx-auto mb-2 flex justify-center">
           <BrandLogo size="md" />
         </div>
-        <CardTitle className="text-xl">{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
+        <CardTitle className="text-xl">{resolvedTitle}</CardTitle>
+        <CardDescription>{resolvedDescription}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-3 text-center">
         {process.env.NODE_ENV === "development" && (
@@ -70,7 +76,7 @@ export function RouteError({
           className="w-full btn-gold text-luxury-black sm:w-auto"
         >
           <RotateCcw className="size-4" aria-hidden="true" />
-          Try again
+          {t("dashboard.errors.tryAgain")}
         </Button>
         <Button
           type="button"
@@ -79,7 +85,9 @@ export function RouteError({
           asChild
         >
           <Link href={isDashboard ? "/dashboard" : "/"}>
-            {isDashboard ? "Back to dashboard" : "Back to home"}
+            {isDashboard
+              ? t("dashboard.errors.backToDashboard")
+              : t("dashboard.errors.backToHome")}
           </Link>
         </Button>
       </CardFooter>
@@ -92,10 +100,10 @@ export function RouteError({
         <header className="dashboard-header border-b border-white/[0.08] px-4 py-5 sm:px-6 lg:px-8">
           <div className="pl-12 lg:pl-0">
             <h1 className="text-xl font-bold tracking-[-0.02em] text-white sm:text-2xl">
-              Error
+              {t("dashboard.errors.headerTitle")}
             </h1>
             <p className="mt-1 text-[14px] text-white/45">
-              We couldn&apos;t load this page
+              {t("dashboard.errors.headerDescription")}
             </p>
           </div>
         </header>

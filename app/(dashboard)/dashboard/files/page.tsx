@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { FileStack } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
@@ -6,8 +5,11 @@ import { loadUserHistoryItems } from "@/lib/db/history-items";
 import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import { DashboardEmptyState } from "@/components/dashboard/ui/dashboard-empty-state";
+import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
 
-export const metadata: Metadata = { title: "Files" };
+export async function generateMetadata() {
+  return dashboardPageMetadata("files");
+}
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat(undefined, {

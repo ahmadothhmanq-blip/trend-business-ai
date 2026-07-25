@@ -2,15 +2,25 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { REF_STATS } from "@/lib/constants/marketing-content";
+import { useScopedT } from "@/lib/i18n/use-scoped-t";
 import { cn } from "@/lib/utils";
+
+const STAT_KEYS = [
+  "projectsCompleted",
+  "countriesServed",
+  "successRate",
+  "aiSupport",
+] as const;
 
 /** Reference statistics row — large gold metrics, white labels, thin dividers. */
 export function SiteStats() {
+  const t = useScopedT("marketing.stats");
+  const tCommon = useScopedT("marketing.common");
   const reduce = useReducedMotion();
 
   return (
     <section
-      aria-label="Platform statistics"
+      aria-label={tCommon("platformStatistics")}
       className="relative z-10 border-y border-[rgba(212,175,55,0.14)] bg-[#0A0A0A]"
     >
       <div className="landing-container py-10 sm:py-12 lg:py-[52px]">
@@ -23,7 +33,7 @@ export function SiteStats() {
         >
           {REF_STATS.map((s, i) => (
             <div
-              key={s.label}
+              key={STAT_KEYS[i]}
               className={cn(
                 "px-3 py-4 text-center sm:px-5 sm:py-2",
                 i % 2 === 1 && "border-l border-[rgba(212,175,55,0.14)]",
@@ -35,7 +45,7 @@ export function SiteStats() {
                 {s.value}
               </dt>
               <dd className="mt-2.5 text-[12px] font-medium text-white sm:mt-3 sm:text-[13px]">
-                {s.label}
+                {t(STAT_KEYS[i])}
               </dd>
             </div>
           ))}

@@ -14,6 +14,7 @@ export type LogoPluginInput = {
   typography: string;
   personality: string;
   options: string[];
+  language?: string;
 };
 
 export type LogoAnalysis = {

@@ -29,6 +29,7 @@ import { apiMutation, usePaginatedResource } from "@/lib/hooks/use-paginated-res
 import { downloadMarkdownReport, downloadPdfReport } from "@/lib/export/report-export";
 import type { AIReport } from "@/types/database";
 import { cn } from "@/lib/utils";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 
 type ReportsGeneratorProps = {
   initialReports?: AIReport[];
@@ -39,6 +40,7 @@ export function ReportsGenerator({
   initialReports = [],
   initialTotal = 0,
 }: ReportsGeneratorProps) {
+  const pt = useProductT("reports");
   const {
     items: reports,
     page,
@@ -80,7 +82,7 @@ export function ReportsGenerator({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
         },
-        "Report generated and saved.",
+        pt("toasts.generated"),
       );
       refresh();
     } catch {
@@ -126,26 +128,26 @@ export function ReportsGenerator({
         <DashboardCardHeader>
           <DashboardCardTitle className="flex items-center gap-3">
             <DashboardIconBox icon={FileText} className="size-9" />
-            Report Settings
+            {pt("settings.title")}
           </DashboardCardTitle>
           <DashboardCardDescription>
-            Configure your AI-generated business report
+            {pt("settings.description")}
           </DashboardCardDescription>
         </DashboardCardHeader>
         <DashboardCardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="topic">Report topic</Label>
+              <Label htmlFor="topic">{pt("settings.topic")}</Label>
               <Input
                 id="topic"
                 name="topic"
-                placeholder="e.g. Q1 Growth Strategy, Product Launch..."
+                placeholder={pt("settings.topicPlaceholder")}
                 className={dashboardInputClass}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="reportType">Report type</Label>
+              <Label htmlFor="reportType">{pt("settings.reportType")}</Label>
               <select
                 id="reportType"
                 name="reportType"
@@ -153,16 +155,16 @@ export function ReportsGenerator({
                 required
               >
                 {REPORT_TYPES.map((type) => (
-                  <option key={type} value={type}>{type}</option>
+                  <option key={type} value={type}>{pt(`types.${type}`)}</option>
                 ))}
               </select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="timeframe">Timeframe</Label>
+              <Label htmlFor="timeframe">{pt("settings.timeframe")}</Label>
               <Input
                 id="timeframe"
                 name="timeframe"
-                placeholder="e.g. Q1 2026, Annual, 6-month..."
+                placeholder={pt("settings.timeframePlaceholder")}
                 className={dashboardInputClass}
                 required
               />
@@ -175,12 +177,12 @@ export function ReportsGenerator({
               {generating ? (
                 <>
                   <Loader2 className="size-4 animate-spin" />
-                  Generating...
+                  {pt("settings.generating")}
                 </>
               ) : (
                 <>
                   <FileText className="size-4" />
-                  Generate Report
+                  {pt("settings.generate")}
                 </>
               )}
             </Button>
@@ -192,14 +194,14 @@ export function ReportsGenerator({
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-lg font-bold text-white sm:text-xl">
             {reports.length > 0
-              ? `${total} Report${total === 1 ? "" : "s"} Saved`
-              : "Generated reports will appear here"}
+              ? pt(total === 1 ? "list.reportSaved" : "list.reportsSaved", { count: total })
+              : pt("list.emptyHeading")}
           </h2>
           <ListFilters
             search={search}
             favoriteFilter={favoriteFilter}
             extraFilter={extraFilter}
-            extraLabel="Report types"
+            extraLabel={pt("list.reportTypesFilter")}
             extraOptions={[...REPORT_TYPES]}
             onApply={applyFilters}
           />
@@ -217,10 +219,10 @@ export function ReportsGenerator({
                     <div>
                       <div className="mb-2 flex items-center gap-2">
                         <Badge className="mb-0 border-white/10 bg-white/[0.06] text-white/75">
-                          {report.report_type}
+                          {pt(`types.${report.report_type}`)}
                         </Badge>
                         {report.is_favorite && (
-                          <Badge className={dashboardBadgeGold}>Favorite</Badge>
+                          <Badge className={dashboardBadgeGold}>{pt("list.favorite")}</Badge>
                         )}
                       </div>
                       <DashboardCardTitle>{report.title}</DashboardCardTitle>
@@ -232,7 +234,7 @@ export function ReportsGenerator({
                         className={dashboardIconButtonClass}
                         onClick={() => toggleFavorite(report)}
                         disabled={actionLoading === report.id}
-                        aria-label="Toggle favorite"
+                        aria-label={pt("aria.toggleFavorite")}
                       >
                         {actionLoading === report.id ? (
                           <Loader2 className="size-4 animate-spin" />
@@ -264,7 +266,7 @@ export function ReportsGenerator({
                         onClick={() => deleteReport(report.id)}
                         disabled={actionLoading === report.id}
                         className={cn(dashboardIconButtonClass, "text-destructive hover:text-destructive")}
-                        aria-label="Delete report"
+                        aria-label={pt("aria.delete")}
                       >
                         {actionLoading === report.id ? (
                           <Loader2 className="size-4 animate-spin" />
@@ -275,7 +277,7 @@ export function ReportsGenerator({
                     </div>
                   </div>
                   <DashboardCardDescription className="text-[15px] text-white/60">
-                    AI-generated business report
+                    {pt("list.generatedDescription")}
                   </DashboardCardDescription>
                 </DashboardCardHeader>
                 <DashboardCardContent>
@@ -287,7 +289,7 @@ export function ReportsGenerator({
 
               <DashboardCard className="glass-panel glass-panel-premium">
                 <DashboardCardHeader>
-                  <DashboardCardTitle className="text-base">Key Insights</DashboardCardTitle>
+                  <DashboardCardTitle className="text-base">{pt("list.keyInsights")}</DashboardCardTitle>
                 </DashboardCardHeader>
                 <DashboardCardContent>
                   <ul className="space-y-3">
@@ -308,8 +310,8 @@ export function ReportsGenerator({
         {showEmptyState && (
           <DashboardEmptyState
             icon={FileText}
-            title="No reports yet"
-            description="Configure your report settings and generate comprehensive AI business intelligence reports."
+            title={pt("empty.title")}
+            description={pt("empty.description")}
           />
         )}
 

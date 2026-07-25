@@ -2,10 +2,13 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { ShieldCheck } from "lucide-react";
-import { REF_TRUST } from "@/lib/constants/marketing-content";
 import { SiteBody, SiteH2, SiteLabel } from "@/components/marketing/site/ui";
+import { useScopedT } from "@/lib/i18n/use-scoped-t";
+
+const TRUST_COUNT = 4;
 
 export function SiteTrust() {
+  const t = useScopedT("marketing.trust");
   const reduce = useReducedMotion();
 
   return (
@@ -23,27 +26,23 @@ export function SiteTrust() {
               <div className="mb-5 flex size-12 items-center justify-center rounded-2xl border border-[rgba(212,175,55,0.28)] bg-[rgba(212,175,55,0.1)] text-[#D4AF37] shadow-[0_0_28px_rgba(212,175,55,0.18)]">
                 <ShieldCheck className="size-6" />
               </div>
-              <SiteLabel>Trust & privacy</SiteLabel>
+              <SiteLabel>{t("label")}</SiteLabel>
               <SiteH2 id="trust-title" className="mt-4">
-                Private by design. Built for real business work.
+                {t("title")}
               </SiteH2>
-              <SiteBody className="mt-4 max-w-xl">
-                Trend Business AI keeps your workspace authenticated, scoped to
-                your account, and ready for export whenever you need to move
-                faster.
-              </SiteBody>
+              <SiteBody className="mt-4 max-w-xl">{t("description")}</SiteBody>
             </div>
             <div className="grid gap-3">
-              {REF_TRUST.map((item, i) => (
+              {Array.from({ length: TRUST_COUNT }, (_, i) => (
                 <motion.div
-                  key={item}
+                  key={i}
                   initial={reduce ? undefined : { opacity: 0, y: 10 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: i * 0.06 }}
                   className="rounded-xl border border-[rgba(212,175,55,0.16)] bg-black/45 px-4 py-4 text-[14px] leading-[1.7] text-white/85 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
                 >
-                  {item}
+                  {t(`items.${i}`)}
                 </motion.div>
               ))}
             </div>

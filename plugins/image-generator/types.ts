@@ -8,6 +8,7 @@ export type ImagePluginInput = {
   options: string[];
   batchCount: number;
   brandColors: string[];
+  language?: string;
 };
 
 export type ImageAnalysis = {

@@ -8,6 +8,7 @@ export type VideoPluginInput = {
   cameraMove: string;
   options: string[];
   sceneCount: number;
+  language?: string;
 };
 
 export type VideoAnalysis = {

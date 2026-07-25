@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useFormatter } from "@/lib/i18n/use-formatter";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 import type { SocialCampaign, SocialPost } from "@/types/social-media";
 
 type ScheduleRow = {
@@ -20,6 +22,8 @@ type Props = {
 };
 
 export function SocialCalendar({ view, onSelectPost, campaignId }: Props) {
+  const wt = useWorkspaceT("socialMedia");
+  const { formatDate } = useFormatter();
   const [cursor, setCursor] = useState(new Date());
   const [schedules, setSchedules] = useState<ScheduleRow[]>([]);
   const [posts, setPosts] = useState<SocialPost[]>([]);
@@ -48,7 +52,6 @@ export function SocialCalendar({ view, onSelectPost, campaignId }: Props) {
   const days = useMemo(() => {
     const year = cursor.getFullYear();
     const month = cursor.getMonth();
-    const first = new Date(year, month, 1);
     const last = new Date(year, month + 1, 0);
     const result: Date[] = [];
     for (let d = 1; d <= last.getDate(); d++) {
@@ -69,6 +72,9 @@ export function SocialCalendar({ view, onSelectPost, campaignId }: Props) {
     return { scheduled, drafts };
   };
 
+  const monthLabel = formatDate(cursor, { month: "long", year: "numeric" });
+  const weekdayKeys = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -76,7 +82,7 @@ export function SocialCalendar({ view, onSelectPost, campaignId }: Props) {
           <ChevronLeft className="size-4" />
         </Button>
         <h3 className="text-sm font-medium text-white">
-          {cursor.toLocaleString("default", { month: "long", year: "numeric" })} · {view} view
+          {wt("calendar.viewLabel", { month: monthLabel, view: wt(`workspace.views.${view}`) })}
         </h3>
         <Button variant="ghost" size="sm" onClick={() => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1))}>
           <ChevronRight className="size-4" />
@@ -94,8 +100,8 @@ export function SocialCalendar({ view, onSelectPost, campaignId }: Props) {
       )}
 
       <div className="grid grid-cols-7 gap-1">
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-          <div key={d} className="py-1 text-center text-[10px] font-medium uppercase text-white/30">{d}</div>
+        {weekdayKeys.map((d) => (
+          <div key={d} className="py-1 text-center text-[10px] font-medium uppercase text-white/30">{wt(`calendar.weekdays.${d}`)}</div>
         ))}
         {Array.from({ length: days[0]?.getDay() ?? 0 }).map((_, i) => (
           <div key={`pad-${i}`} />
@@ -119,7 +125,7 @@ export function SocialCalendar({ view, onSelectPost, campaignId }: Props) {
                   className="mt-1 block w-full truncate rounded bg-blue-500/15 px-1 py-0.5 text-left text-[10px] text-blue-300"
                   onClick={() => onSelectPost?.(s.id)}
                 >
-                  {s.social_posts?.title ?? "Scheduled"}
+                  {s.social_posts?.title ?? wt("calendar.scheduled")}
                 </button>
               ))}
               {drafts.slice(0, 2).map((p) => (

@@ -23,6 +23,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import type {
   MarketplaceCategory,
   MarketplaceRecommendResult,
@@ -51,6 +52,7 @@ const VIEWPORT_WIDTH: Record<Viewport, string> = {
 };
 
 export function TemplateMarketplace() {
+  const pt = useProductT("templateMarketplace");
   const [catalog, setCatalog] = useState<CatalogResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState<MarketplaceCategory | "all">("all");
@@ -77,7 +79,7 @@ export function TemplateMarketplace() {
       if (style !== "all") params.set("style", style);
       if (query.trim()) params.set("q", query.trim());
       const res = await fetch(`/api/website-builder/marketplace?${params}`);
-      if (!res.ok) throw new Error("Failed to load marketplace");
+      if (!res.ok) throw new Error(pt("errors.loadFailed"));
       const data = (await res.json()) as CatalogResponse;
       setCatalog(data);
     } catch {
@@ -102,7 +104,7 @@ export function TemplateMarketplace() {
       const res = await fetch(
         `/api/website-builder/marketplace?id=${encodeURIComponent(id)}`,
       );
-      if (!res.ok) throw new Error("Preview failed");
+      if (!res.ok) throw new Error(pt("errors.previewFailed"));
       const data = (await res.json()) as PreviewResponse;
       setPreview(data);
     } catch {
@@ -126,7 +128,7 @@ export function TemplateMarketplace() {
           limit: 6,
         }),
       });
-      if (!res.ok) throw new Error("Recommend failed");
+      if (!res.ok) throw new Error(pt("errors.recommendFailed"));
       const data = (await res.json()) as MarketplaceRecommendResult;
       setRecommendations(data);
     } catch {
@@ -155,21 +157,18 @@ export function TemplateMarketplace() {
           <div>
             <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-premium-gold/25 bg-premium-gold/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-premium-gold">
               <Sparkles className="size-3" />
-              Template Marketplace
+              {pt("badge")}
             </div>
             <h2 className="text-xl font-bold text-white sm:text-2xl">
-              Premium website templates
+              {pt("title")}
             </h2>
             <p className="mt-1 max-w-2xl text-[13px] leading-relaxed text-white/45">
-              Browse industry packs with luxury, modern, corporate, creative,
-              minimal, premium SaaS, and technology variations. Preview on any
-              device, then generate with Design Intelligence, Brand Identity,
-              Assets, Editor, and Final Quality.
+              {pt("description")}
             </p>
           </div>
           <Link href="/dashboard/website-builder">
             <Button variant="outline" className="border-white/15 text-white">
-              Open Website Builder
+              {pt("openWebsiteBuilder")}
             </Button>
           </Link>
         </div>
@@ -178,7 +177,7 @@ export function TemplateMarketplace() {
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search restaurants, SaaS, finance…"
+            placeholder={pt("searchPlaceholder")}
             className="border-white/10 bg-white/5 text-white placeholder:text-white/30"
           />
           <select
@@ -188,7 +187,7 @@ export function TemplateMarketplace() {
             }
             className="h-10 rounded-md border border-white/10 bg-[#121212] px-3 text-sm text-white"
           >
-            <option value="all">All categories</option>
+            <option value="all">{pt("allCategories")}</option>
             {categories.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.label}
@@ -202,7 +201,7 @@ export function TemplateMarketplace() {
             }
             className="h-10 rounded-md border border-white/10 bg-[#121212] px-3 text-sm text-white"
           >
-            <option value="all">All styles</option>
+            <option value="all">{pt("allStyles")}</option>
             {styles.map((s) => (
               <option key={s} value={s}>
                 {s}
@@ -214,29 +213,28 @@ export function TemplateMarketplace() {
 
       <DashboardPanel className="p-5 sm:p-6">
         <h3 className="text-sm font-semibold text-white">
-          AI template recommendations
+          {pt("aiRecommendations")}
         </h3>
         <p className="mt-1 text-[12px] text-white/40">
-          Analyze industry, business goal, and audience — then pick the best
-          starting template before generation.
+          {pt("aiRecommendationsDescription")}
         </p>
         <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           <Input
             value={recIndustry}
             onChange={(e) => setRecIndustry(e.target.value)}
-            placeholder="Industry (e.g. restaurant)"
+            placeholder={pt("industryPlaceholder")}
             className="border-white/10 bg-white/5 text-white placeholder:text-white/30"
           />
           <Input
             value={recGoal}
             onChange={(e) => setRecGoal(e.target.value)}
-            placeholder="Business goal (leads, bookings…)"
+            placeholder={pt("goalPlaceholder")}
             className="border-white/10 bg-white/5 text-white placeholder:text-white/30"
           />
           <Input
             value={recAudience}
             onChange={(e) => setRecAudience(e.target.value)}
-            placeholder="Audience"
+            placeholder={pt("audiencePlaceholder")}
             className="border-white/10 bg-white/5 text-white placeholder:text-white/30"
           />
           <Button
@@ -249,13 +247,13 @@ export function TemplateMarketplace() {
             ) : (
               <Sparkles className="size-4" />
             )}
-            Recommend
+            {pt("recommend")}
           </Button>
         </div>
         <Textarea
           value={recPrompt}
           onChange={(e) => setRecPrompt(e.target.value)}
-          placeholder="Optional business brief for smarter matching…"
+          placeholder={pt("briefPlaceholder")}
           className="mt-3 min-h-[72px] border-white/10 bg-white/5 text-white placeholder:text-white/30"
         />
         {recommendations ? (
@@ -268,7 +266,7 @@ export function TemplateMarketplace() {
                 <TemplateCard
                   key={r.template.id}
                   template={r.template}
-                  badge={`${r.score}% · ${r.reason}`}
+                  badge={pt("badgeScore", { score: r.score, reason: r.reason })}
                   onPreview={() => void openPreview(r.template.id)}
                   useHref={useHref(r.template)}
                 />
@@ -280,7 +278,7 @@ export function TemplateMarketplace() {
 
       {featured.length > 0 ? (
         <section>
-          <h3 className="mb-3 text-sm font-semibold text-white/80">Popular</h3>
+          <h3 className="mb-3 text-sm font-semibold text-white/80">{pt("popular")}</h3>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {featured.map((t) => (
               <TemplateCard
@@ -297,17 +295,17 @@ export function TemplateMarketplace() {
       <section>
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-sm font-semibold text-white/80">
-            Library {catalog ? `(${catalog.count})` : ""}
+            {pt("library")} {catalog ? `(${catalog.count})` : ""}
           </h3>
         </div>
         {loading ? (
           <div className="flex items-center gap-2 py-16 text-white/40">
             <Loader2 className="size-4 animate-spin" />
-            Loading marketplace…
+            {pt("loading")}
           </div>
         ) : templates.length === 0 ? (
           <DashboardPanel className="p-8 text-center text-sm text-white/40">
-            No templates match these filters.
+            {pt("noResults")}
           </DashboardPanel>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -327,11 +325,10 @@ export function TemplateMarketplace() {
         <DialogContent className="max-h-[92vh] max-w-5xl overflow-hidden border-white/10 bg-[#0c0c0c] text-white sm:max-w-5xl">
           <DialogHeader>
             <DialogTitle>
-              {preview?.template.name || "Template preview"}
+              {preview?.template.name || pt("previewTitle")}
             </DialogTitle>
             <DialogDescription className="text-white/45">
-              {preview?.template.description ||
-                "Live structural preview before you generate."}
+              {preview?.template.description || pt("previewDescription")}
             </DialogDescription>
           </DialogHeader>
 
@@ -355,7 +352,7 @@ export function TemplateMarketplace() {
                 onClick={() => setViewport(key)}
               >
                 <Icon className="size-3.5" />
-                {key}
+                {pt(`viewports.${key}`)}
               </Button>
             ))}
           </div>
@@ -367,14 +364,14 @@ export function TemplateMarketplace() {
               </div>
             ) : preview?.previewHtml ? (
               <iframe
-                title="Template preview"
+                title={pt("previewIframe")}
                 srcDoc={preview.previewHtml}
                 className="h-[520px] rounded-lg border border-white/10 bg-white transition-all"
                 style={{ width: VIEWPORT_WIDTH[viewport], maxWidth: "100%" }}
               />
             ) : (
               <div className="flex h-[320px] items-center justify-center text-sm text-white/40">
-                Preview unavailable
+                {pt("previewUnavailable")}
               </div>
             )}
           </div>
@@ -382,17 +379,17 @@ export function TemplateMarketplace() {
           {preview?.template ? (
             <div className="grid gap-3 text-[12px] text-white/55 sm:grid-cols-3">
               <div>
-                <p className="font-semibold text-white/80">Intelligence</p>
-                <p>Industry: {preview.template.industry}</p>
-                <p>Style: {preview.template.style}</p>
-                <p>Layout: {preview.template.layoutType}</p>
+                <p className="font-semibold text-white/80">{pt("intelligence")}</p>
+                <p>{pt("industry")}: {preview.template.industry}</p>
+                <p>{pt("style")}: {preview.template.style}</p>
+                <p>{pt("layout")}: {preview.template.layoutType}</p>
               </div>
               <div>
-                <p className="font-semibold text-white/80">Audience</p>
+                <p className="font-semibold text-white/80">{pt("audience")}</p>
                 <p>{preview.template.recommendedAudience}</p>
               </div>
               <div>
-                <p className="font-semibold text-white/80">Features</p>
+                <p className="font-semibold text-white/80">{pt("features")}</p>
                 <p>{preview.template.features.join(" · ")}</p>
               </div>
             </div>
@@ -401,12 +398,12 @@ export function TemplateMarketplace() {
           <DialogFooter className="gap-2 sm:justify-between">
             <div className="flex items-center gap-2 text-[11px] text-white/35">
               <LayoutTemplate className="size-3.5" />
-              Connects Design · Brand · Assets · Editor · Quality
+              {pt("pipelineHint")}
             </div>
             {preview?.template ? (
               <Link href={useHref(preview.template)}>
                 <Button className="bg-premium-gold text-black hover:bg-premium-gold/90">
-                  Use this template
+                  {pt("useThisTemplate")}
                 </Button>
               </Link>
             ) : null}
@@ -423,6 +420,7 @@ function TemplateCard(props: {
   useHref: string;
   badge?: string;
 }) {
+  const pt = useProductT("templateMarketplace");
   const { template: t, onPreview, useHref, badge } = props;
   return (
     <DashboardPanel className="flex h-full flex-col overflow-hidden p-0">
@@ -442,7 +440,7 @@ function TemplateCard(props: {
           </span>
           {t.popular ? (
             <span className="rounded-full bg-premium-gold/90 px-2 py-0.5 text-[10px] font-semibold text-black">
-              Popular
+              {pt("popular")}
             </span>
           ) : null}
         </div>
@@ -456,9 +454,9 @@ function TemplateCard(props: {
           <p className="mt-2 text-[11px] text-premium-gold/85">{badge}</p>
         ) : null}
         <ul className="mt-3 space-y-1 text-[11px] text-white/40">
-          <li>Layout · {t.layoutType}</li>
-          <li>Audience · {t.recommendedAudience}</li>
-          <li className="line-clamp-1">Features · {t.features.slice(0, 3).join(", ")}</li>
+          <li>{pt("layoutLabel", { type: t.layoutType })}</li>
+          <li>{pt("audienceLabel", { audience: t.recommendedAudience })}</li>
+          <li className="line-clamp-1">{pt("featuresLabel", { features: t.features.slice(0, 3).join(", ") })}</li>
         </ul>
         <div className="mt-4 flex gap-2">
           <Button
@@ -467,14 +465,14 @@ function TemplateCard(props: {
             className="flex-1 border-white/15 text-white"
             onClick={onPreview}
           >
-            Preview
+            {pt("preview")}
           </Button>
           <Link href={useHref} className="flex-1">
             <Button
               size="sm"
               className="w-full bg-premium-gold text-black hover:bg-premium-gold/90"
             >
-              Use
+              {pt("use")}
             </Button>
           </Link>
         </div>

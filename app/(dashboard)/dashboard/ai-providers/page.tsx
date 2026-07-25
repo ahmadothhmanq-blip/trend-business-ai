@@ -1,10 +1,12 @@
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { AIProvidersSettings } from "@/components/dashboard/ai-providers-settings";
+import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
 
-export const metadata: Metadata = { title: "AI Providers" };
+export async function generateMetadata() {
+  return dashboardPageMetadata("aiProviders");
+}
 
 export default async function AIProvidersPage() {
   const supabase = await createClient();

@@ -26,6 +26,7 @@ import {
 import { DashboardIconBox } from "@/components/dashboard/ui/icon-box";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 
 type ProfileFormProps = {
   email: string;
@@ -46,6 +47,7 @@ export function ProfileForm({
   theme = "dark",
   emailNotifications = true,
 }: ProfileFormProps) {
+  const wt = useWorkspaceT("profile");
   const { setTheme } = useTheme();
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -60,7 +62,7 @@ export function ProfileForm({
       const newPassword = formData.get("newPassword");
       const confirmPassword = formData.get("confirmPassword");
       if (newPassword !== confirmPassword) {
-        return { error: "Passwords do not match" };
+        return { error: wt("errors.passwordsDoNotMatch") };
       }
       formData.set("password", String(newPassword));
       return updatePassword(formData);
@@ -74,7 +76,7 @@ export function ProfileForm({
       if (result.success) {
         const selectedTheme = formData.get("theme") as string;
         if (selectedTheme) setTheme(selectedTheme);
-        toast.success(result.message ?? "Preferences saved");
+        toast.success(result.message ?? wt("toasts.preferencesSaved"));
       }
       return result;
     },
@@ -92,7 +94,7 @@ export function ProfileForm({
     if (result.error) {
       toast.error(result.error);
     } else {
-      toast.success(result.message ?? "Avatar updated");
+      toast.success(result.message ?? wt("toasts.avatarUpdated"));
     }
   }
 
@@ -115,7 +117,7 @@ export function ProfileForm({
           </Avatar>
           <div className="flex-1">
             <DashboardCardTitle className="text-xl">
-              {fullName || "Your Profile"}
+              {fullName || wt("title")}
             </DashboardCardTitle>
             <DashboardCardDescription>{email}</DashboardCardDescription>
           </div>
@@ -135,7 +137,7 @@ export function ProfileForm({
               onClick={() => fileRef.current?.click()}
             >
               <Upload className="size-4" />
-              Upload
+              {wt("upload")}
             </Button>
           </div>
         </DashboardCardHeader>
@@ -145,10 +147,10 @@ export function ProfileForm({
         <DashboardCardHeader>
           <DashboardCardTitle className="flex items-center gap-3">
             <DashboardIconBox icon={User} className="size-9" />
-            Account Settings
+            {wt("accountSettings.title")}
           </DashboardCardTitle>
           <DashboardCardDescription>
-            Update your personal information
+            {wt("accountSettings.description")}
           </DashboardCardDescription>
         </DashboardCardHeader>
         <form action={profileAction}>
@@ -166,48 +168,48 @@ export function ProfileForm({
                 role="status"
                 className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-600 dark:text-emerald-400"
               >
-                {profileState.message ?? "Profile updated successfully."}
+                {profileState.message ?? wt("success.profileUpdated")}
               </div>
             )}
             <div className="space-y-2">
               <Label htmlFor="email" className="text-white/70">
-                Email
+                {wt("forms.email")}
               </Label>
               <Input id="email" value={email} disabled className={`${dashboardInputClass} opacity-70`} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="fullName" className="text-white/70">
-                Full name
+                {wt("forms.fullName")}
               </Label>
               <Input
                 id="fullName"
                 name="fullName"
                 defaultValue={fullName}
-                placeholder="Jane Doe"
+                placeholder={wt("forms.fullNamePlaceholder")}
                 className={dashboardInputClass}
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="company" className="text-white/70">
-                Company
+                {wt("forms.company")}
               </Label>
               <Input
                 id="company"
                 name="company"
                 defaultValue={company}
-                placeholder="Acme Inc."
+                placeholder={wt("forms.companyPlaceholder")}
                 className={dashboardInputClass}
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="role" className="text-white/70">
-                Role
+                {wt("forms.role")}
               </Label>
               <Input
                 id="role"
                 name="role"
                 defaultValue={role}
-                placeholder="Founder, CEO, Analyst..."
+                placeholder={wt("forms.rolePlaceholder")}
                 className={dashboardInputClass}
               />
             </div>
@@ -218,10 +220,10 @@ export function ProfileForm({
             >
               {profilePending ? (
                 <>
-                  <Loader2 className="size-4 animate-spin" /> Saving...
+                  <Loader2 className="size-4 animate-spin" /> {wt("saving")}
                 </>
               ) : (
-                "Save Changes"
+                wt("saveChanges")
               )}
             </Button>
           </DashboardCardContent>
@@ -232,10 +234,10 @@ export function ProfileForm({
         <DashboardCardHeader>
           <DashboardCardTitle className="flex items-center gap-3">
             <DashboardIconBox icon={LockKeyhole} className="size-9" />
-            Change Password
+            {wt("password.title")}
           </DashboardCardTitle>
           <DashboardCardDescription>
-            Update your account password
+            {wt("password.description")}
           </DashboardCardDescription>
         </DashboardCardHeader>
         <form action={passwordAction}>
@@ -258,7 +260,7 @@ export function ProfileForm({
             )}
             <div className="space-y-2">
               <Label htmlFor="newPassword" className="text-white/70">
-                New password
+                {wt("password.newPassword")}
               </Label>
               <Input
                 id="newPassword"
@@ -271,7 +273,7 @@ export function ProfileForm({
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirmPassword" className="text-white/70">
-                Confirm password
+                {wt("password.confirmPassword")}
               </Label>
               <Input
                 id="confirmPassword"
@@ -287,7 +289,7 @@ export function ProfileForm({
               className="btn-gold h-11 rounded-xl px-6 font-bold text-luxury-black"
               disabled={passwordPending}
             >
-              {passwordPending ? "Updating..." : "Update Password"}
+              {passwordPending ? wt("password.updating") : wt("password.update")}
             </Button>
           </DashboardCardContent>
         </form>
@@ -297,10 +299,10 @@ export function ProfileForm({
         <DashboardCardHeader>
           <DashboardCardTitle className="flex items-center gap-3">
             <DashboardIconBox icon={Settings2} className="size-9" />
-            Preferences
+            {wt("preferences.title")}
           </DashboardCardTitle>
           <DashboardCardDescription>
-            Theme and notification settings
+            {wt("preferences.description")}
           </DashboardCardDescription>
         </DashboardCardHeader>
         <form action={prefsAction}>
@@ -315,7 +317,7 @@ export function ProfileForm({
             )}
             <div className="space-y-2">
               <Label htmlFor="theme" className="text-white/70">
-                Theme
+                {wt("preferences.theme")}
               </Label>
               <select
                 id="theme"
@@ -323,9 +325,9 @@ export function ProfileForm({
                 defaultValue={theme}
                 className={dashboardSelectClass}
               >
-                <option value="dark">Dark</option>
-                <option value="light">Light</option>
-                <option value="system">System</option>
+                <option value="dark">{wt("themes.dark")}</option>
+                <option value="light">{wt("themes.light")}</option>
+                <option value="system">{wt("themes.system")}</option>
               </select>
             </div>
             <div className="flex items-center gap-2 rounded-xl border border-white/[0.08] bg-black/20 px-3 py-2.5">
@@ -337,7 +339,7 @@ export function ProfileForm({
                 className="size-4 rounded border-white/30 accent-premium-gold"
               />
               <Label htmlFor="emailNotifications" className="text-white/80">
-                Email notifications
+                {wt("preferences.emailNotifications")}
               </Label>
             </div>
             <Button
@@ -345,7 +347,7 @@ export function ProfileForm({
               className="btn-gold h-11 rounded-xl px-6 font-bold text-luxury-black"
               disabled={prefsPending}
             >
-              {prefsPending ? "Saving..." : "Save Preferences"}
+              {prefsPending ? wt("preferences.saving") : wt("preferences.save")}
             </Button>
           </DashboardCardContent>
         </form>

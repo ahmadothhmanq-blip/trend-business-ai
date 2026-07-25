@@ -1,11 +1,13 @@
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { LocalizedDashboardHeader } from "@/components/dashboard/localized-header";
 import { BusinessSuiteTool } from "@/components/dashboard/business-suite/business-suite-tool";
 import type { BusinessGeneration } from "@/types/business";
+import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
 
-export const metadata: Metadata = { title: "Business Intelligence" };
+export async function generateMetadata() {
+  return dashboardPageMetadata("businessIntelligence");
+}
 
 export default async function BusinessIntelligencePage() {
   const supabase = await createClient();

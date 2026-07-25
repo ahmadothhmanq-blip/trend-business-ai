@@ -7,6 +7,7 @@ import { fetchSocialBrandContext } from "@/lib/social-media/brand-integration";
 import { applyTemplateVariables, getSocialTemplate } from "@/lib/social-media/templates";
 import { SOCIAL_TONES } from "@/lib/social-media/prompts";
 import { POST_PLATFORMS } from "@/lib/social-media/platforms";
+import { resolveRequestLanguage } from "@/lib/i18n/api";
 import type { SocialPost, SocialTone } from "@/types/social-media";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -40,6 +41,7 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data;
+  const aiLanguage = resolveRequestLanguage(request, input.language);
   let templateStructure: string | undefined;
   if (input.templateId) {
     const tpl = getSocialTemplate(input.templateId);
@@ -62,7 +64,7 @@ export async function POST(request: Request) {
       platform: input.platform as SocialPost["platform"],
       topic: input.topic,
       tone: input.tone as SocialTone,
-      language: input.language,
+      language: aiLanguage,
       audience: input.audience,
       brandContext,
       templateStructure,
@@ -77,7 +79,7 @@ export async function POST(request: Request) {
       ...generatedPostToRow(generated, {
         platform: input.platform as SocialPost["platform"],
         tone: input.tone,
-        language: input.language,
+        language: aiLanguage,
         campaignId: input.campaignId,
         templateId: input.templateId,
         brandIdentityId: input.brandIdentityId,

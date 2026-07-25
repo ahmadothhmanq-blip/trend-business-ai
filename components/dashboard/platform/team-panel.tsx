@@ -13,8 +13,10 @@ import {
   DashboardPanel,
 } from "@/components/dashboard/ui/dashboard-card";
 import { dashboardInputClass, dashboardSelectClass } from "@/components/dashboard/ui/dashboard-styles";
+import { useFormatter } from "@/lib/i18n/use-formatter";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 import { cn } from "@/lib/utils";
-import { ORG_ROLES, getRoleLabel } from "@/lib/constants/platform";
+import { ORG_ROLES } from "@/lib/constants/platform";
 import type { OrgMember, TeamInvitation } from "@/types/platform";
 
 type OrgSummary = {
@@ -25,6 +27,8 @@ type OrgSummary = {
 };
 
 export function TeamPanel() {
+  const wt = useWorkspaceT("platform");
+  const { formatDate } = useFormatter();
   const [organization, setOrganization] = useState<OrgSummary | null>(null);
   const [organizationId, setOrganizationId] = useState<string | null>(null);
   const [members, setMembers] = useState<OrgMember[]>([]);
@@ -41,7 +45,7 @@ export function TeamPanel() {
       const res = await fetch("/api/platform/team");
       const d = await res.json();
       if (!res.ok) {
-        toast.error(d.error ?? "Failed to load team");
+        toast.error(d.error ?? wt("toasts.failedToLoadTeam"));
         return;
       }
       setOrganizationId(d.organizationId ?? null);
@@ -49,11 +53,11 @@ export function TeamPanel() {
       setMembers(d.members ?? []);
       setInvitations(d.invitations ?? []);
     } catch {
-      toast.error("Failed to load team");
+      toast.error(wt("toasts.failedToLoadTeam"));
     } finally {
       setBootstrapping(false);
     }
-  }, []);
+  }, [wt]);
 
   useEffect(() => {
     fetchTeam();
@@ -61,7 +65,7 @@ export function TeamPanel() {
 
   const handleCreateWorkspace = async () => {
     if (!workspaceName.trim()) {
-      toast.error("Enter a workspace name");
+      toast.error(wt("toasts.workspaceNameRequired"));
       return;
     }
     setCreating(true);
@@ -73,14 +77,14 @@ export function TeamPanel() {
       });
       const d = await res.json();
       if (!res.ok) {
-        toast.error(d.error ?? "Failed to create workspace");
+        toast.error(d.error ?? wt("toasts.failedToCreateWorkspace"));
         return;
       }
-      toast.success(d.created ? "Workspace created" : "Workspace ready");
+      toast.success(d.created ? wt("toasts.workspaceCreated") : wt("toasts.workspaceReady"));
       setWorkspaceName("");
       await fetchTeam();
     } catch {
-      toast.error("Request failed");
+      toast.error(wt("toasts.requestFailed"));
     } finally {
       setCreating(false);
     }
@@ -88,11 +92,11 @@ export function TeamPanel() {
 
   const handleInvite = async () => {
     if (!email.trim()) {
-      toast.error("Enter an email address");
+      toast.error(wt("toasts.emailRequired"));
       return;
     }
     if (!organizationId) {
-      toast.error("Create a workspace first");
+      toast.error(wt("toasts.createWorkspaceFirst"));
       return;
     }
     setLoading(true);
@@ -104,14 +108,14 @@ export function TeamPanel() {
       });
       const d = await res.json();
       if (!res.ok) {
-        toast.error(d.error ?? "Invite failed");
+        toast.error(d.error ?? wt("toasts.inviteFailed"));
         return;
       }
-      toast.success(d.message ?? "Invitation created");
+      toast.success(d.message ?? wt("toasts.invitationCreated"));
       setEmail("");
       fetchTeam();
     } catch {
-      toast.error("Request failed");
+      toast.error(wt("toasts.requestFailed"));
     } finally {
       setLoading(false);
     }
@@ -120,7 +124,7 @@ export function TeamPanel() {
   if (bootstrapping) {
     return (
       <DashboardPanel className="py-12 text-center">
-        <p className="text-xs text-white/40">Loading workspace…</p>
+        <p className="text-xs text-white/40">{wt("team.loadingWorkspace")}</p>
       </DashboardPanel>
     );
   }
@@ -131,18 +135,18 @@ export function TeamPanel() {
         <DashboardCardHeader>
           <div className="flex items-center gap-2">
             <Building2 className="size-5 text-premium-gold-light" />
-            <DashboardCardTitle>Create your workspace</DashboardCardTitle>
+            <DashboardCardTitle>{wt("team.createWorkspace")}</DashboardCardTitle>
           </div>
         </DashboardCardHeader>
         <DashboardCardContent className="space-y-4">
           <p className="text-xs text-white/50">
-            Set up a personal workspace to invite teammates and manage roles.
+            {wt("team.createWorkspaceDescription")}
           </p>
           <div className="flex gap-3">
             <Input
               value={workspaceName}
               onChange={(e) => setWorkspaceName(e.target.value)}
-              placeholder="Acme Studio"
+              placeholder={wt("team.workspaceNamePlaceholder")}
               className={cn(dashboardInputClass, "flex-1")}
             />
             <Button
@@ -150,7 +154,7 @@ export function TeamPanel() {
               disabled={creating}
               className="btn-gold rounded-xl font-bold text-luxury-black"
             >
-              Create
+              {wt("common.create")}
             </Button>
           </div>
         </DashboardCardContent>
@@ -176,7 +180,7 @@ export function TeamPanel() {
         <DashboardCardHeader>
           <div className="flex items-center gap-2">
             <UserPlus className="size-5 text-premium-gold-light" />
-            <DashboardCardTitle>Invite Team Member</DashboardCardTitle>
+            <DashboardCardTitle>{wt("team.inviteTeamMember")}</DashboardCardTitle>
           </div>
         </DashboardCardHeader>
         <DashboardCardContent>
@@ -184,7 +188,7 @@ export function TeamPanel() {
             <Input
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="colleague@company.com"
+              placeholder={wt("team.emailPlaceholder")}
               className={cn(dashboardInputClass, "flex-1")}
             />
             <select
@@ -194,7 +198,7 @@ export function TeamPanel() {
             >
               {ORG_ROLES.filter((r) => r.id !== "owner").map((r) => (
                 <option key={r.id} value={r.id}>
-                  {r.label}
+                  {wt(`roles.${r.id}`)}
                 </option>
               ))}
             </select>
@@ -203,11 +207,11 @@ export function TeamPanel() {
               disabled={loading}
               className="btn-gold rounded-xl font-bold text-luxury-black"
             >
-              <Mail className="mr-1.5 size-4" /> Invite
+              <Mail className="mr-1.5 size-4" /> {wt("team.invite")}
             </Button>
           </div>
           <p className="mt-3 text-[10px] text-white/35">
-            Invitations are stored in your workspace. Email delivery can be connected later.
+            {wt("team.inviteFootnote")}
           </p>
         </DashboardCardContent>
       </DashboardCard>
@@ -216,14 +220,14 @@ export function TeamPanel() {
         <DashboardCardHeader>
           <div className="flex items-center gap-2">
             <Users className="size-5 text-premium-gold-light" />
-            <DashboardCardTitle>Team Members ({members.length})</DashboardCardTitle>
+            <DashboardCardTitle>{wt("team.teamMembers", { count: members.length })}</DashboardCardTitle>
           </div>
         </DashboardCardHeader>
         <DashboardCardContent>
           {members.length === 0 ? (
             <DashboardPanel className="py-10 text-center">
               <Users className="mx-auto size-8 text-white/10" />
-              <p className="mt-3 text-xs text-white/30">No team members yet</p>
+              <p className="mt-3 text-xs text-white/30">{wt("team.noTeamMembers")}</p>
             </DashboardPanel>
           ) : (
             <div className="space-y-2">
@@ -239,7 +243,7 @@ export function TeamPanel() {
                     <p className="text-[10px] text-white/30">{m.profile?.email ?? ""}</p>
                   </div>
                   <span className="rounded-md bg-white/5 px-2 py-0.5 text-[10px] font-medium text-white/50">
-                    {getRoleLabel(m.role)}
+                    {wt(`roles.${m.role}`)}
                   </span>
                 </DashboardPanel>
               ))}
@@ -251,7 +255,7 @@ export function TeamPanel() {
       {invitations.length > 0 && (
         <DashboardCard>
           <DashboardCardHeader>
-            <DashboardCardTitle>Pending Invitations ({invitations.length})</DashboardCardTitle>
+            <DashboardCardTitle>{wt("team.pendingInvitations", { count: invitations.length })}</DashboardCardTitle>
           </DashboardCardHeader>
           <DashboardCardContent>
             <div className="space-y-2">
@@ -261,12 +265,14 @@ export function TeamPanel() {
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-xs font-semibold text-white/70">{inv.email}</p>
                     <p className="text-[10px] text-white/30">
-                      Invited as {getRoleLabel(inv.role as "admin" | "member" | "viewer")} · Expires{" "}
-                      {new Date(inv.expires_at).toLocaleDateString()}
+                      {wt("team.invitedAs", {
+                        role: wt(`roles.${inv.role}`),
+                        expires: formatDate(inv.expires_at),
+                      })}
                     </p>
                   </div>
                   <span className="rounded-md bg-yellow-500/15 px-2 py-0.5 text-[10px] font-medium text-yellow-400">
-                    Pending
+                    {wt("common.pending")}
                   </span>
                 </DashboardPanel>
               ))}

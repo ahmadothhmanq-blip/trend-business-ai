@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import type { AgentExecution } from "@/types/agents";
 
 export function ExecutionMonitor({ initialExecutions = [] }: { initialExecutions?: AgentExecution[] }) {
+  const pt = useProductT("aiAgents");
   const [executions, setExecutions] = useState(initialExecutions);
   const [selected, setSelected] = useState<AgentExecution | null>(null);
 
@@ -20,7 +22,7 @@ export function ExecutionMonitor({ initialExecutions = [] }: { initialExecutions
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
-        <p className="mb-3 text-xs uppercase text-white/40">Recent Runs</p>
+        <p className="mb-3 text-xs uppercase text-white/40">{pt("panels.execution.recentRuns")}</p>
         <ul className="space-y-2">
           {executions.map((e) => (
             <li key={e.id}>
@@ -32,11 +34,11 @@ export function ExecutionMonitor({ initialExecutions = [] }: { initialExecutions
         </ul>
       </div>
       <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
-        <p className="mb-3 text-xs uppercase text-white/40">Execution Detail</p>
+        <p className="mb-3 text-xs uppercase text-white/40">{pt("panels.execution.executionDetail")}</p>
         {selected ? (
           <pre className="max-h-96 overflow-auto text-xs text-white/60">{JSON.stringify(selected, null, 2)}</pre>
         ) : (
-          <p className="text-sm text-white/30">Select an execution.</p>
+          <p className="text-sm text-white/30">{pt("panels.execution.selectExecution")}</p>
         )}
       </div>
     </div>

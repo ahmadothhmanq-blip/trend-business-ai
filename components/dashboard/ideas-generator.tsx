@@ -42,6 +42,7 @@ import { PaginationControls } from "@/components/dashboard/pagination-controls";
 import { apiMutation, usePaginatedResource } from "@/lib/hooks/use-paginated-resource";
 import type { BusinessIdea } from "@/types/database";
 import { cn } from "@/lib/utils";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 
 type IdeasGeneratorProps = {
   initialIdeas?: BusinessIdea[];
@@ -52,6 +53,7 @@ export function IdeasGenerator({
   initialIdeas = [],
   initialTotal = 0,
 }: IdeasGeneratorProps) {
+  const pt = useProductT("ideas");
   const {
     items: ideas,
     page,
@@ -95,7 +97,7 @@ export function IdeasGenerator({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
         },
-        "Ideas generated successfully.",
+        pt("toasts.generated"),
       );
       refresh();
     } catch {
@@ -106,10 +108,16 @@ export function IdeasGenerator({
   }
 
   async function copyIdea(idea: BusinessIdea) {
-    const text = `${idea.title}\n\n${idea.description}\n\nIndustry: ${idea.industry}\nTarget: ${idea.target_market}\nRevenue: ${idea.revenue_model}`;
+    const text = pt("copy.template", {
+      title: idea.title,
+      description: idea.description,
+      industry: idea.industry,
+      target: idea.target_market,
+      revenue: idea.revenue_model,
+    });
     await navigator.clipboard.writeText(text);
     setCopied(idea.id);
-    toast.success("Copied to clipboard");
+    toast.success(pt("toasts.copied"));
     setTimeout(() => setCopied(null), 2000);
   }
 
@@ -162,7 +170,7 @@ export function IdeasGenerator({
             revenue_model: formData.get("revenue_model"),
           }),
         },
-        "Idea updated.",
+        pt("toasts.updated"),
       );
       setEditing(null);
       refresh();
@@ -182,50 +190,50 @@ export function IdeasGenerator({
           <DashboardCardHeader>
             <DashboardCardTitle className="flex items-center gap-3">
               <DashboardIconBox icon={Sparkles} className="size-9" />
-              Your Profile
+              {pt("profileCard.title")}
             </DashboardCardTitle>
             <DashboardCardDescription>
-              Tell us about yourself to get personalized business ideas
+              {pt("profileCard.description")}
             </DashboardCardDescription>
           </DashboardCardHeader>
           <DashboardCardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="interests">Interests & passions</Label>
+                <Label htmlFor="interests">{pt("profileCard.interests")}</Label>
                 <Textarea
                   id="interests"
                   name="interests"
-                  placeholder="e.g. sustainability, tech, fitness, education..."
+                  placeholder={pt("profileCard.interestsPlaceholder")}
                   className={dashboardInputClass}
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="skills">Skills & experience</Label>
+                <Label htmlFor="skills">{pt("profileCard.skills")}</Label>
                 <Input
                   id="skills"
                   name="skills"
-                  placeholder="e.g. marketing, coding, sales..."
+                  placeholder={pt("profileCard.skillsPlaceholder")}
                   className={dashboardInputClass}
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="budget">Starting budget</Label>
+                <Label htmlFor="budget">{pt("profileCard.budget")}</Label>
                 <Input
                   id="budget"
                   name="budget"
-                  placeholder="e.g. $5,000, $50,000..."
+                  placeholder={pt("profileCard.budgetPlaceholder")}
                   className={dashboardInputClass}
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="industry">Preferred industry (optional)</Label>
+                <Label htmlFor="industry">{pt("profileCard.industry")}</Label>
                 <Input
                   id="industry"
                   name="industry"
-                  placeholder="e.g. SaaS, E-commerce..."
+                  placeholder={pt("profileCard.industryPlaceholder")}
                   className={dashboardInputClass}
                 />
               </div>
@@ -237,12 +245,12 @@ export function IdeasGenerator({
                 {generating ? (
                   <>
                     <Loader2 className="size-4 animate-spin" />
-                    Generating...
+                    {pt("profileCard.generating")}
                   </>
                 ) : (
                   <>
                     <Sparkles className="size-4" />
-                    Generate Ideas
+                    {pt("profileCard.generate")}
                   </>
                 )}
               </Button>
@@ -254,8 +262,8 @@ export function IdeasGenerator({
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="text-lg font-bold text-white sm:text-xl">
               {ideas.length > 0
-                ? `${total} Idea${total === 1 ? "" : "s"} Saved`
-                : "Generated ideas will appear here"}
+                ? pt(total === 1 ? "list.ideaSaved" : "list.ideasSaved", { count: total })
+                : pt("list.emptyHeading")}
             </h2>
             <ListFilters
               search={search}
@@ -278,10 +286,10 @@ export function IdeasGenerator({
                     <div>
                       <div className="mb-2 flex flex-wrap items-center gap-2">
                         <Badge variant="secondary" className="border-white/10 bg-white/[0.06] text-white/60">
-                          Idea #{index + 1}
+                          {pt("list.ideaNumber", { number: index + 1 })}
                         </Badge>
                         {idea.is_favorite && (
-                          <Badge className={dashboardBadgeGold}>Favorite</Badge>
+                          <Badge className={dashboardBadgeGold}>{pt("list.favorite")}</Badge>
                         )}
                       </div>
                       <DashboardCardTitle>{idea.title}</DashboardCardTitle>
@@ -292,7 +300,7 @@ export function IdeasGenerator({
                         size="icon-sm"
                         className={dashboardIconButtonClass}
                         onClick={() => setEditing(idea)}
-                        aria-label="Edit idea"
+                        aria-label={pt("aria.edit")}
                       >
                         <Pencil className="size-4" />
                       </Button>
@@ -304,8 +312,8 @@ export function IdeasGenerator({
                         disabled={actionLoading === idea.id}
                         aria-label={
                           idea.is_favorite
-                            ? "Remove from favorites"
-                            : "Add to favorites"
+                            ? pt("aria.removeFavorite")
+                            : pt("aria.addFavorite")
                         }
                       >
                         {actionLoading === idea.id ? (
@@ -325,7 +333,7 @@ export function IdeasGenerator({
                         size="icon-sm"
                         className={dashboardIconButtonClass}
                         onClick={() => copyIdea(idea)}
-                        aria-label="Copy idea"
+                        aria-label={pt("aria.copy")}
                       >
                         {copied === idea.id ? (
                           <Check className="size-4 text-emerald-500" />
@@ -338,7 +346,7 @@ export function IdeasGenerator({
                         size="icon-sm"
                         onClick={() => deleteIdea(idea.id)}
                         disabled={actionLoading === idea.id}
-                        aria-label="Delete idea"
+                        aria-label={pt("aria.delete")}
                         className="text-destructive hover:text-destructive"
                       >
                         {actionLoading === idea.id ? (
@@ -355,15 +363,15 @@ export function IdeasGenerator({
                 </DashboardCardHeader>
                 <DashboardCardContent className="grid gap-4 rounded-xl border border-white/[0.06] bg-black/20 p-4 sm:grid-cols-3">
                   <div>
-                    <p className="text-[11px] font-semibold tracking-wide text-white/35 uppercase">Industry</p>
+                    <p className="text-[11px] font-semibold tracking-wide text-white/35 uppercase">{pt("list.industry")}</p>
                     <p className="mt-1 text-sm font-medium text-white/80">{idea.industry}</p>
                   </div>
                   <div>
-                    <p className="text-[11px] font-semibold tracking-wide text-white/35 uppercase">Target Market</p>
+                    <p className="text-[11px] font-semibold tracking-wide text-white/35 uppercase">{pt("list.targetMarket")}</p>
                     <p className="mt-1 text-sm font-medium text-white/80">{idea.target_market}</p>
                   </div>
                   <div>
-                    <p className="text-[11px] font-semibold tracking-wide text-white/35 uppercase">Revenue Model</p>
+                    <p className="text-[11px] font-semibold tracking-wide text-white/35 uppercase">{pt("list.revenueModel")}</p>
                     <p className="mt-1 text-sm font-medium text-white/80">{idea.revenue_model}</p>
                   </div>
                 </DashboardCardContent>
@@ -373,8 +381,8 @@ export function IdeasGenerator({
           {showEmptyState && (
             <DashboardEmptyState
               icon={Sparkles}
-              title="No ideas yet"
-              description="Fill in your profile and click Generate to discover business ideas powered by AI."
+              title={pt("empty.title")}
+              description={pt("empty.description")}
             />
           )}
 
@@ -390,32 +398,32 @@ export function IdeasGenerator({
       <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Idea</DialogTitle>
+            <DialogTitle>{pt("edit.title")}</DialogTitle>
           </DialogHeader>
           {editing && (
             <form onSubmit={saveEdit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="edit-title">Title</Label>
+                <Label htmlFor="edit-title">{pt("edit.titleLabel")}</Label>
                 <Input id="edit-title" name="title" defaultValue={editing.title} required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="edit-description">Description</Label>
+                <Label htmlFor="edit-description">{pt("edit.description")}</Label>
                 <Textarea id="edit-description" name="description" defaultValue={editing.description} required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="edit-industry">Industry</Label>
+                <Label htmlFor="edit-industry">{pt("edit.industry")}</Label>
                 <Input id="edit-industry" name="industry" defaultValue={editing.industry} required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="edit-target">Target Market</Label>
+                <Label htmlFor="edit-target">{pt("edit.targetMarket")}</Label>
                 <Input id="edit-target" name="target_market" defaultValue={editing.target_market} required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="edit-revenue">Revenue Model</Label>
+                <Label htmlFor="edit-revenue">{pt("edit.revenueModel")}</Label>
                 <Input id="edit-revenue" name="revenue_model" defaultValue={editing.revenue_model} required />
               </div>
               <Button type="submit" className="btn-gold rounded-xl font-bold text-luxury-black" disabled={actionLoading === editing.id}>
-                {actionLoading === editing.id ? "Saving..." : "Save Changes"}
+                {actionLoading === editing.id ? pt("edit.saving") : pt("edit.save")}
               </Button>
             </form>
           )}
