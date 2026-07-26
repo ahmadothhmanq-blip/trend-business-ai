@@ -1,4 +1,5 @@
 import { requireUser, parseUuidParam } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import type { AgentExecution } from "@/types/agents";
 import { NextResponse } from "next/server";
@@ -22,7 +23,7 @@ export async function GET(_request: Request, context: RouteContext) {
 
   if (error) {
     if (error.code === "PGRST116") {
-      return NextResponse.json({ error: "Execution not found." }, { status: 404 });
+      return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Execution not found.");
     }
     return databaseErrorResponse("executions.get", error);
   }

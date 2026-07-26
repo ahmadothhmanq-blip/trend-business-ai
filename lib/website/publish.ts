@@ -1,25 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { slugify } from "@/lib/website/build-static-preview";
 import { resolveProductionPublishHtml } from "@/lib/website/public-site";
-import type { WebsiteGeneration } from "@/types/database";
+import { listCmsEntries } from "@/lib/ai-core/website-management/cms/store";
+import type { WebsiteGeneration, WebsitePublication } from "@/types/database";
 
-export type WebsitePublication = {
-  id: string;
-  user_id: string;
-  generation_id: string;
-  project_id: string | null;
-  slug: string;
-  status: "prepared" | "published" | "unpublished";
-  public_path: string;
-  planned_public_url: string | null;
-  title: string;
-  created_at: string;
-  updated_at: string;
-  published_at: string | null;
-  seo_json?: unknown;
-  robots_txt?: string | null;
-  sitemap_xml?: string | null;
-};
+export type { WebsitePublication };
 
 export type PublishAction = "prepare" | "publish" | "unpublish";
 
@@ -60,16 +45,25 @@ function isMissingColumnError(error: { code?: string; message?: string } | null)
   );
 }
 
-function allocationFor(generation: WebsiteGeneration) {
+async function allocationFor(
+  generation: WebsiteGeneration,
+  supabase?: SupabaseClient,
+) {
   const title = generation.project_name || "website";
   const baseSlug = slugify(title);
   const slug = `${baseSlug}-${generation.id.slice(0, 8)}`;
   const { publicPath, plannedPublicUrl } = buildPlannedPublicUrl(slug);
-  // Prefer absolute public URL when NEXT_PUBLIC_SITE_URL is set; else path-based.
   const absoluteUrl = plannedPublicUrl.startsWith("http")
     ? plannedPublicUrl
     : plannedPublicUrl;
-  const produced = resolveProductionPublishHtml(generation, absoluteUrl);
+  const cms = supabase
+    ? await listCmsEntries(generation.id, supabase)
+    : [];
+  const produced = resolveProductionPublishHtml(
+    generation,
+    absoluteUrl,
+    cms,
+  );
   return {
     title,
     slug,
@@ -100,7 +94,7 @@ async function upsertPublication(args: {
     robotsTxt,
     sitemapXml,
     seoJson,
-  } = allocationFor(args.generation);
+  } = await allocationFor(args.generation, args.supabase);
   const now = new Date().toISOString();
 
   const baseRow = {

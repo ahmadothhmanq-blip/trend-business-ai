@@ -1,4 +1,5 @@
 import { requireUser } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { getAiCoreRun } from "@/lib/ai-core/runs/service";
 import { NextResponse } from "next/server";
 
@@ -13,23 +14,22 @@ export async function GET(_request: Request, context: RouteContext) {
 
   const { id } = await context.params;
   if (!id) {
-    return NextResponse.json({ error: "Run id is required." }, { status: 400 });
+    return apiValidationError("Run id is required.");
   }
 
   const result = await getAiCoreRun(auth.supabase, auth.user!.id, id);
   if (result.missingTable) {
-    return NextResponse.json(
-      {
-        error: "AI Core runs table not found. Apply migration 033_ai_runs.sql.",
-      },
-      { status: 503 },
+    return apiErrorResponse(
+      API_ERROR_CODES.MIGRATION_REQUIRED,
+      503,
+      "AI Core runs table not found. Apply migration 033_ai_runs.sql.",
     );
   }
   if (result.error) {
-    return NextResponse.json({ error: result.error }, { status: 500 });
+    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, result.error);
   }
   if (!result.run) {
-    return NextResponse.json({ error: "Run not found." }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Run not found.");
   }
 
   return NextResponse.json({ run: result.run });

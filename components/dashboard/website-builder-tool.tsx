@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { readSseStream } from "@/lib/api/sse-client";
 import { isWebsiteIncrementalPreviewEnabled } from "@/lib/website/generation-flags";
 import { tryRecoverCompletedWebsiteGeneration } from "@/lib/website/stream-recovery";
+import { MAX_RECENT_PROJECTS } from "@/lib/website/constants";
 import { useTranslation } from "@/lib/i18n/client";
 import { translateOption } from "@/lib/i18n/product-options";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
@@ -13,6 +14,8 @@ import { CoreProgressStepper } from "@/components/dashboard/one-prompt";
 import { useCoreProgress } from "@/components/dashboard/one-prompt/use-core-progress";
 import { getOnePromptProduct } from "@/lib/constants/one-prompt-products";
 import { useIdeaQueryParam } from "@/lib/hooks/use-idea-query-param";
+import { useGenerationQueryParam } from "@/lib/hooks/use-generation-query-param";
+import { useWebsitePublish } from "@/lib/hooks/use-website-publish";
 import {
   dashboardColorThemeToDesignSystem,
   dashboardDesignStyleToPreset,
@@ -34,6 +37,7 @@ import {
   MonitorSmartphone,
   Palette,
   RefreshCw,
+  Rocket,
   Search,
   Settings,
   Smartphone,
@@ -228,7 +232,6 @@ const TEMPLATES = [
 ] as const;
 
 const PAGES = ["Home", "About", "Services", "Pricing", "Dashboard", "Admin", "Contact"];
-const LIVE_PREVIEW_ENABLED = false;
 
 type GenerateProjectResponse =
   | {
@@ -480,6 +483,10 @@ export function WebsiteBuilderTool({
   const [fileSearch, setFileSearch] = useState("");
   const [renameOpen, setRenameOpen] = useState(false);
   const [renameValue, setRenameValue] = useState("");
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<WorkspaceProject | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [visualEditorDirty, setVisualEditorDirty] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const [projects, setProjects] = useState<WorkspaceProject[]>(
     initialGenerations.map(toProject),
@@ -494,6 +501,93 @@ export function WebsiteBuilderTool({
     active: isGenerating,
     complete: !isGenerating && !!activeProject,
   });
+
+  const openGenerationFromQuery = useCallback(
+    async (generationId: string) => {
+      if (visualEditorDirty && outputTab === "canvas") {
+        if (!window.confirm(wb("dialogs.unsavedEditorWarning"))) return;
+        setVisualEditorDirty(false);
+      }
+      try {
+        const response = await fetch(`/api/website-builder/${generationId}`);
+        if (!response.ok) {
+          toast.error(wb("errors.noProject"));
+          return;
+        }
+        const data = (await response.json()) as { generation?: WebsiteGeneration };
+        if (!data.generation) {
+          toast.error(wb("errors.noProject"));
+          return;
+        }
+        const project = toProject(data.generation);
+        setProjects((items) => {
+          const filtered = items.filter((item) => item.id !== project.id);
+          return [project, ...filtered].slice(0, MAX_RECENT_PROJECTS);
+        });
+        setActiveProject(project);
+        setSelectedFilePath(project.generatedProject?.files[0]?.path ?? "");
+        setFileSearch("");
+        setEditMode(false);
+        setOutputTab("preview");
+        if (typeof window !== "undefined") {
+          const url = new URL(window.location.href);
+          url.searchParams.delete("generation");
+          window.history.replaceState(
+            {},
+            "",
+            `${url.pathname}${url.search}${url.hash}`,
+          );
+        }
+      } catch {
+        toast.error(wb("errors.api"));
+      }
+    },
+    [visualEditorDirty, outputTab, wb],
+  );
+
+  useGenerationQueryParam(openGenerationFromQuery, () => {
+    toast.error(wb("errors.noProject"));
+  });
+
+  useEffect(() => {
+    if (!visualEditorDirty || outputTab !== "canvas") return;
+    const onBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [visualEditorDirty, outputTab]);
+
+  function handleOutputTabChange(tab: OutputTab) {
+    if (visualEditorDirty && outputTab === "canvas" && tab !== "canvas") {
+      if (!window.confirm(wb("dialogs.unsavedEditorWarning"))) return;
+      setVisualEditorDirty(false);
+    }
+    setOutputTab(tab);
+  }
+
+  function requestDelete(target: WorkspaceProject | string) {
+    const project =
+      typeof target === "string"
+        ? projects.find((item) => item.id === target)
+        : target;
+    if (!project || isDeleting) return;
+    setDeleteTarget(project);
+    setDeleteOpen(true);
+  }
+
+  async function confirmDeleteProject() {
+    if (!deleteTarget || isDeleting) return;
+    setIsDeleting(true);
+    try {
+      await deleteProject(deleteTarget.id);
+      setDeleteOpen(false);
+      setDeleteTarget(null);
+    } finally {
+      setIsDeleting(false);
+    }
+  }
 
   useEffect(() => {
     if (!isGenerating) {
@@ -579,7 +673,19 @@ export function WebsiteBuilderTool({
   const activeFile =
     activeFiles.find((file) => file.path === selectedFilePath) ?? activeFiles[0] ?? null;
 
-  async function selectProject(project: WorkspaceProject) {
+  async function selectProject(
+    project: WorkspaceProject,
+    options?: { skipDirtyCheck?: boolean },
+  ): Promise<boolean> {
+    if (
+      !options?.skipDirtyCheck &&
+      visualEditorDirty &&
+      outputTab === "canvas" &&
+      activeProject?.id !== project.id
+    ) {
+      if (!window.confirm(wb("dialogs.unsavedEditorWarning"))) return false;
+      setVisualEditorDirty(false);
+    }
     const needsHydration = !project.generatedProject?.files?.length;
     if (needsHydration) {
       try {
@@ -594,7 +700,7 @@ export function WebsiteBuilderTool({
             setActiveProject(hydrated);
             setSelectedFilePath(hydrated.generatedProject?.files[0]?.path ?? "");
             setFileSearch("");
-            return;
+            return true;
           }
         }
       } catch {
@@ -604,6 +710,7 @@ export function WebsiteBuilderTool({
     setActiveProject(project);
     setSelectedFilePath(project.generatedProject?.files[0]?.path ?? "");
     setFileSearch("");
+    return true;
   }
 
   function updateProject(projectId: string, patch: Partial<WorkspaceProject>) {
@@ -615,55 +722,6 @@ export function WebsiteBuilderTool({
     );
   }
 
-  async function buildGeneratedProject(project: WorkspaceProject) {
-    if (!project.generatedProject) return;
-
-    updateProject(project.id, { build: { status: "building" } });
-
-    try {
-      const response = await fetch("/api/website-builder/preview", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: project.title,
-          files: project.generatedProject.files,
-        }),
-      });
-      const data = (await response.json()) as
-        | {
-            ok: true;
-            previewId: string;
-            previewUrl: string;
-            buildOutput?: string;
-          }
-        | {
-            ok: false;
-            error?: string;
-          };
-
-      if (!response.ok || !data.ok) {
-        throw new Error("error" in data ? data.error : wb("errors.build"));
-      }
-
-      updateProject(project.id, {
-        build: {
-          status: "success",
-          previewUrl: `${data.previewUrl}?v=${Date.now()}`,
-          buildOutput: data.buildOutput,
-        },
-      });
-    } catch (error) {
-      updateProject(project.id, {
-        build: {
-          status: "error",
-          error:
-            error instanceof Error
-              ? error.message
-              : wb("errors.build"),
-        },
-      });
-    }
-  }
 
   function toggleFeature(feature: string) {
     setFeatures((items) =>
@@ -899,7 +957,7 @@ export function WebsiteBuilderTool({
       );
       setOutputTab("preview");
       setEditMode(false);
-      setProjects((items) => [nextProject, ...items.filter((p) => p.id !== nextProject.id)].slice(0, 24));
+      setProjects((items) => [nextProject, ...items.filter((p) => p.id !== nextProject.id)].slice(0, MAX_RECENT_PROJECTS));
       setStreamStatus(wb("stream.websiteSaved"));
       toast.success(wb("toasts.createdAndSaved"));
     };
@@ -952,8 +1010,13 @@ export function WebsiteBuilderTool({
         const sseResult = await readSseStream<{
           project?: GeneratedWebsiteProject;
           generation?: WebsiteGeneration;
-          message?: string;
           generationId?: string;
+          summary?: {
+            title?: string;
+            fileCount?: number;
+            projectKind?: string;
+          };
+          message?: string;
           fileCount?: number;
         }>(streamResponse, {
           onProgress: (message, _progress, meta) => {
@@ -991,17 +1054,31 @@ export function WebsiteBuilderTool({
             });
             setActiveProject(stub);
             setProjects((items) =>
-              [stub, ...items.filter((p) => p.id !== session.generationId)].slice(0, 24),
+              [stub, ...items.filter((p) => p.id !== session.generationId)].slice(0, MAX_RECENT_PROJECTS),
             );
             setOutputTab("preview");
             setPreviewRevision((n) => n + 1);
           },
-          onComplete: (payload) => {
-            if (!payload.project || !payload.generation?.id) {
+          onComplete: async (payload) => {
+            if (payload.project && payload.generation?.id) {
+              applySavedGeneration(payload.project, payload.generation);
+              setPreviewRevision((n) => n + 1);
+              return;
+            }
+
+            const generationId =
+              payload.generationId ?? payload.generation?.id ?? sessionGenerationId;
+            if (!generationId) {
               throw new Error(wb("errors.noSavedGeneration"));
             }
-            applySavedGeneration(payload.project, payload.generation);
-            setPreviewRevision((n) => n + 1);
+
+            const recovered = await tryApplyRecoveredGeneration(
+              generationId,
+              payload.message ?? null,
+            );
+            if (!recovered) {
+              throw new Error(wb("errors.noSavedGeneration"));
+            }
           },
           onError: (message) => {
             setApiError(message);
@@ -1035,7 +1112,7 @@ export function WebsiteBuilderTool({
                     setProjects((items) =>
                       [partial, ...items.filter((p) => p.id !== partial.id)].slice(
                         0,
-                        24,
+                        MAX_RECENT_PROJECTS,
                       ),
                     );
                   }
@@ -1411,7 +1488,7 @@ export function WebsiteBuilderTool({
       }
 
       const copyProject = toProject(data.generation);
-      setProjects((items) => [copyProject, ...items].slice(0, 8));
+      setProjects((items) => [copyProject, ...items].slice(0, MAX_RECENT_PROJECTS));
       selectProject(copyProject);
       toast.success(wb("toasts.projectDuplicated"));
     } catch (error) {
@@ -1441,11 +1518,14 @@ export function WebsiteBuilderTool({
     const nextProjects = projects.filter((project) => project.id !== id);
     setProjects(nextProjects);
     if (activeProject?.id === id) {
-      if (nextProjects[0]) {
-        selectProject(nextProjects[0]);
+      const shouldAutoSelect =
+        nextProjects[0] && !(visualEditorDirty && outputTab === "canvas");
+      if (shouldAutoSelect) {
+        await selectProject(nextProjects[0], { skipDirtyCheck: true });
       } else {
         setActiveProject(null);
         setSelectedFilePath("");
+        if (visualEditorDirty) setVisualEditorDirty(false);
       }
     }
     toast.success(wb("toasts.projectDeleted"));
@@ -1570,23 +1650,34 @@ export function WebsiteBuilderTool({
     }
   }
 
-  function refreshPreview() {
-    if (!activeProject) return;
-    // Prefer in-platform static live preview (D-017). npm compile builder stays off.
-    if (!LIVE_PREVIEW_ENABLED) {
-      setPreviewRevision((n) => n + 1);
-      return;
-    }
-    void buildGeneratedProject(activeProject);
-  }
-
-  function openPreviewInNewTab() {
-    const previewUrl =
-      activeProject?.build?.previewUrl ||
-      (activeProject?.id ? livePreviewSrc(activeProject.id) : "");
-
-    if (previewUrl) {
-      window.open(previewUrl, "_blank", "noopener,noreferrer");
+  async function importProject(file: File) {
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      form.append("title", file.name.replace(/\.zip$/i, ""));
+      const res = await fetch("/api/website-builder/import", {
+        method: "POST",
+        body: form,
+      });
+      const json = (await res.json()) as {
+        generation?: WebsiteGeneration;
+        error?: string;
+        warnings?: string[];
+      };
+      if (!res.ok || !json.generation) {
+        throw new Error(json.error || "Import failed");
+      }
+      const imported = toProject(json.generation);
+      setProjects((items) =>
+        [imported, ...items].slice(0, MAX_RECENT_PROJECTS),
+      );
+      setActiveProject(imported);
+      toast.success("Project imported successfully");
+      if (json.warnings?.length) {
+        toast.message(json.warnings[0]);
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Import failed");
     }
   }
 
@@ -2094,31 +2185,17 @@ export function WebsiteBuilderTool({
           </div>
         </div>
 
-        {LIVE_PREVIEW_ENABLED ? (
-          <RightPreview
-            activeProject={activeProject}
-            currentPages={currentPages}
-            projectType={projectType}
-            designStyle={designStyle}
-            colorTheme={colorTheme}
-            language={language}
-            isGenerating={isGenerating}
-            streamStatus={streamStatus}
-            elapsedSeconds={elapsedSeconds}
-            onRefreshPreview={refreshPreview}
-            onOpenPreview={openPreviewInNewTab}
-          />
-        ) : (
-          <PreviewAndExportPanel
-            activeProject={activeProject}
-            previewRevision={previewRevision}
-            onDownload={downloadProject}
-            onImprove={() => {
-              if (!activeProject?.id) return;
-              void createInterfaceProject({ optimize: true });
-            }}
-          />
-        )}
+        <PreviewAndExportPanel
+          activeProject={activeProject}
+          previewRevision={previewRevision}
+          onDownload={downloadProject}
+          onImport={importProject}
+          onImprove={() => {
+            if (!activeProject?.id) return;
+            void createInterfaceProject({ optimize: true });
+          }}
+          onGoToDeploy={() => handleOutputTabChange("deploy")}
+        />
       </div>
 
       <DesignEnginePanels
@@ -2149,8 +2226,7 @@ export function WebsiteBuilderTool({
       <OutputWorkspace
         activeProject={activeProject}
         outputTab={outputTab}
-        onOutputTabChange={setOutputTab}
-        previewEnabled={LIVE_PREVIEW_ENABLED}
+        onOutputTabChange={handleOutputTabChange}
         previewRevision={previewRevision}
         files={activeFiles}
         selectedFile={activeFile}
@@ -2159,10 +2235,10 @@ export function WebsiteBuilderTool({
         fileSearch={fileSearch}
         onFileSearch={setFileSearch}
         projects={projects}
-        onSelectProject={(project) => {
+        onSelectProject={async (project) => {
           setEditMode(false);
-          selectProject(project);
-          setOutputTab("preview");
+          const selected = await selectProject(project);
+          if (selected) setOutputTab("preview");
         }}
         onDownload={downloadProject}
         onCopy={copyActiveFile}
@@ -2171,9 +2247,10 @@ export function WebsiteBuilderTool({
           setRenameOpen(true);
         }}
         onDelete={() => {
-          if (activeProject) void deleteProject(activeProject.id);
+          if (activeProject) requestDelete(activeProject);
         }}
         visualEditorDisabled={isGenerating}
+        onVisualEditorDirtyChange={setVisualEditorDirty}
         onVisualEditorSaved={({ project: savedProject, generation }) => {
           const nextProject = toProject({
             ...generation,
@@ -2188,6 +2265,7 @@ export function WebsiteBuilderTool({
             ),
           );
           setPreviewRevision((n) => n + 1);
+          setVisualEditorDirty(false);
           setSelectedFilePath(
             savedProject.files.find((f) => f.path.includes("preview/"))?.path ||
               savedProject.files[0]?.path ||
@@ -2222,8 +2300,6 @@ export function WebsiteBuilderTool({
         onFavorite={() => {
           if (activeProject) void toggleFavorite(activeProject.id);
         }}
-        onRefreshPreview={refreshPreview}
-        onOpenPreview={openPreviewInNewTab}
       />
 
       <Dialog open={renameOpen} onOpenChange={setRenameOpen}>
@@ -2261,6 +2337,41 @@ export function WebsiteBuilderTool({
         </DialogContent>
       </Dialog>
 
+      <Dialog open={deleteOpen} onOpenChange={(open) => !isDeleting && setDeleteOpen(open)}>
+        <DialogContent className="border-white/10 bg-[#141414]/95 text-white">
+          <DialogHeader>
+            <DialogTitle>{wb("dialogs.deleteTitle")}</DialogTitle>
+            <DialogDescription className="text-white/45">
+              {deleteTarget
+                ? `${wb("dialogs.deleteDescription")} (${deleteTarget.title})`
+                : wb("dialogs.deleteDescription")}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="border-white/10 bg-white/[0.03]">
+            <Button
+              type="button"
+              variant="outline"
+              className="btn-ghost-gold"
+              onClick={() => setDeleteOpen(false)}
+              disabled={isDeleting}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button
+              type="button"
+              className="bg-red-500 text-white hover:bg-red-600"
+              onClick={() => void confirmDeleteProject()}
+              disabled={isDeleting || !deleteTarget}
+            >
+              {isDeleting ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : null}
+              {wb("dialogs.confirm")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <BottomWorkspace
         projects={projects}
         catalogTemplates={catalogTemplates}
@@ -2268,10 +2379,10 @@ export function WebsiteBuilderTool({
         isGenerating={isGenerating}
         onOpenTemplateDetails={setRailDetailsTpl}
         activeProject={activeProject}
-        onSelect={selectProject}
+        onSelect={(project) => void selectProject(project)}
         onFavorite={toggleFavorite}
         onDuplicate={duplicateProject}
-        onDelete={deleteProject}
+        onDelete={requestDelete}
         onDownload={downloadProject}
       />
 
@@ -2741,140 +2852,24 @@ function PreviewAndExportPanel({
   activeProject,
   previewRevision = 0,
   onDownload,
+  onImport,
   onImprove,
+  onGoToDeploy,
 }: {
   activeProject: WorkspaceProject | null;
   previewRevision?: number;
   onDownload: (project?: WorkspaceProject | null) => void;
+  onImport?: (file: File) => void;
   onImprove: () => void;
+  onGoToDeploy: () => void;
 }) {
   const wb = useProductT("websiteBuilder");
   const generated = activeProject?.generatedProject;
   const fileCount = generated?.files.length ?? 0;
   const [viewport, setViewport] = useState<PreviewViewport>("desktop");
   const [liveOpen, setLiveOpen] = useState(false);
-  const [publishBusy, setPublishBusy] = useState(false);
-  const [publicUrl, setPublicUrl] = useState<string | null>(null);
-  const [publishStatus, setPublishStatus] = useState<
-    "none" | "prepared" | "published" | "unpublished"
-  >("none");
-  const [publishQuality, setPublishQuality] = useState<{
-    seoScore?: number | null;
-    performanceScore?: number | null;
-    mobileScore?: number | null;
-    conversionReady?: boolean | null;
-    blockers: string[];
-    warnings: string[];
-    opportunities: string[];
-  } | null>(null);
-
-  useEffect(() => {
-    if (!activeProject?.id) {
-      setPublicUrl(null);
-      setPublishStatus("none");
-      setPublishQuality(null);
-      return;
-    }
-    let cancelled = false;
-    void (async () => {
-      try {
-        const res = await fetch(`/api/website-builder/${activeProject.id}/publish`);
-        if (!res.ok || cancelled) return;
-        const data = await res.json();
-        if (cancelled) return;
-        const status = data.publication?.status as
-          | "prepared"
-          | "published"
-          | "unpublished"
-          | undefined;
-        setPublishStatus(status ?? "none");
-        setPublicUrl(
-          status === "published"
-            ? data.publicUrl ??
-                data.publication?.planned_public_url ??
-                data.publication?.public_path ??
-                null
-            : data.publication?.planned_public_url ??
-                data.publication?.public_path ??
-                null,
-        );
-      } catch {
-        /* ignore */
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [activeProject?.id]);
-
-  async function runPublishAction(
-    action: "prepare" | "publish" | "unpublish",
-    force = false,
-  ) {
-    if (!activeProject?.id) return;
-    setPublishBusy(true);
-    try {
-      const res = await fetch(`/api/website-builder/${activeProject.id}/publish`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action, force }),
-      });
-      const data = await res.json();
-      const qr = data.qualityRecommendations as
-        | {
-            seoScore?: number | null;
-            performanceScore?: number | null;
-            mobileScore?: number | null;
-            conversionReady?: boolean | null;
-            publishReady?: boolean | null;
-            blockers?: string[];
-            warnings?: string[];
-            opportunities?: string[];
-          }
-        | undefined;
-      if (qr) {
-        setPublishQuality({
-          seoScore: qr.seoScore ?? null,
-          performanceScore: qr.performanceScore ?? null,
-          mobileScore: qr.mobileScore ?? null,
-          conversionReady: qr.conversionReady ?? null,
-          blockers: qr.blockers ?? data.blockers ?? [],
-          warnings: qr.warnings ?? [],
-          opportunities: qr.opportunities ?? [],
-        });
-      }
-      if (!res.ok) {
-        if (res.status === 422) {
-          toast.error(
-            data.blockers?.[0] ??
-              wb("errors.publishBlocked"),
-          );
-        } else {
-          toast.error(data.error ?? wb("errors.couldNotAction", { action }));
-        }
-        return;
-      }
-      const status = (data.publication?.status ?? action) as
-        | "prepared"
-        | "published"
-        | "unpublished";
-      setPublishStatus(status);
-      const url =
-        data.publicUrl ??
-        data.publication?.planned_public_url ??
-        data.publication?.public_path ??
-        null;
-      setPublicUrl(url);
-      toast.success(data.message ?? wb("publish.publishedSuccess"));
-      if (action === "publish" && url) {
-        window.open(url.startsWith("http") ? url : url, "_blank", "noopener,noreferrer");
-      }
-    } catch {
-      toast.error(wb("errors.couldNotAction", { action }));
-    } finally {
-      setPublishBusy(false);
-    }
-  }
+  const importRef = useRef<HTMLInputElement>(null);
+  const publish = useWebsitePublish(activeProject?.id ?? null);
 
   return (
     <aside className="space-y-6 xl:sticky xl:top-28 xl:self-start">
@@ -2955,6 +2950,29 @@ function PreviewAndExportPanel({
             <Download className="size-4" />
             {wb("labels.downloadZip")}
           </Button>
+          {onImport ? (
+            <>
+              <input
+                ref={importRef}
+                type="file"
+                accept=".zip,application/zip"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) onImport(file);
+                  e.target.value = "";
+                }}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                className="btn-ghost-gold h-10 rounded-xl"
+                onClick={() => importRef.current?.click()}
+              >
+                Import ZIP
+              </Button>
+            </>
+          ) : null}
         </div>
         <p className="mt-3 text-[11px] leading-relaxed text-white/40">
           {wb("previewExport.sandboxHint")}
@@ -2970,87 +2988,32 @@ function PreviewAndExportPanel({
         <div className="mt-5 space-y-3">
           <InfoTile label={wb("labels.website")} value={activeProject?.title ?? wb("labels.notCreatedYet")} />
           <InfoTile label={wb("labels.files")} value={String(fileCount)} />
-          <InfoTile label={wb("labels.status")} value={publishStatus === "none" ? wb("publish.notPublished") : publishStatus} />
+          <InfoTile
+            label={wb("labels.status")}
+            value={
+              publish.status === "none"
+                ? wb("publish.notPublished")
+                : publish.status
+            }
+          />
           <InfoTile
             label={wb("labels.publicUrl")}
-            value={publicUrl ?? wb("publish.notPublished")}
+            value={publish.publicUrl ?? wb("publish.notPublished")}
           />
-          {publishQuality ? (
-            <div className="rounded-xl border border-white/10 bg-black/25 p-3">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-white/45">
-                {wb("qualityScores.prePublish")}
-              </p>
-              <div className="mt-2 grid grid-cols-3 gap-2 text-center">
-                <div>
-                  <p className="text-[10px] text-white/40">{wb("qualityScores.seo")}</p>
-                  <p className="text-sm font-semibold text-premium-gold-light">
-                    {publishQuality.seoScore ?? "—"}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[10px] text-white/40">{wb("qualityScores.perf")}</p>
-                  <p className="text-sm font-semibold text-premium-gold-light">
-                    {publishQuality.performanceScore ?? "—"}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[10px] text-white/40">{wb("qualityScores.mobile")}</p>
-                  <p className="text-sm font-semibold text-premium-gold-light">
-                    {publishQuality.mobileScore ?? "—"}
-                  </p>
-                </div>
-              </div>
-              {publishQuality.blockers[0] ? (
-                <p className="mt-2 text-[11px] text-amber-200/80">
-                  {publishQuality.blockers[0]}
-                </p>
-              ) : publishQuality.warnings[0] ? (
-                <p className="mt-2 text-[11px] text-white/50">
-                  {publishQuality.warnings[0]}
-                </p>
-              ) : (
-                <p className="mt-2 text-[11px] text-emerald-200/70">
-                  {wb("qualityScores.readyForPublishing")}
-                </p>
-              )}
-            </div>
+          {publish.quality?.blockers[0] ? (
+            <p className="text-[11px] text-amber-200/80">{publish.quality.blockers[0]}</p>
           ) : null}
           <div className="flex flex-col gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              className="btn-ghost-gold h-10 w-full rounded-xl"
-              onClick={() => void runPublishAction("prepare")}
-              disabled={!activeProject?.id || publishBusy}
-            >
-              {wb("qualityScores.reviewPrepare")}
-            </Button>
-            <Button
-              type="button"
-              className="btn-gold h-10 w-full rounded-xl font-bold text-luxury-black"
-              onClick={() => void runPublishAction("publish")}
-              disabled={!activeProject?.id || publishBusy}
-            >
-              {publishBusy ? (
-                <>
-                  <Loader2 className="size-4 animate-spin" />
-                  {wb("qualityScores.publishing")}
-                </>
-              ) : (
-                <>
-                  <ExternalLink className="size-4" />
-                  {publishStatus === "published" ? wb("publish.updateRepublish") : wb("publish.publishPublicUrl")}
-                </>
-              )}
-            </Button>
-            {publishStatus === "published" && publicUrl ? (
+            {publish.status === "published" && publish.publicUrl ? (
               <Button
                 type="button"
                 variant="outline"
                 className="btn-ghost-gold h-10 w-full rounded-xl"
                 onClick={() =>
                   window.open(
-                    publicUrl.startsWith("http") ? publicUrl : publicUrl,
+                    publish.publicUrl!.startsWith("http")
+                      ? publish.publicUrl!
+                      : publish.publicUrl!,
                     "_blank",
                     "noopener,noreferrer",
                   )
@@ -3060,18 +3023,19 @@ function PreviewAndExportPanel({
                 {wb("previewExport.openPublicUrl")}
               </Button>
             ) : null}
-            {publishStatus === "published" ? (
-              <Button
-                type="button"
-                variant="outline"
-                className="h-10 w-full rounded-xl border-white/10 text-white/60"
-                onClick={() => void runPublishAction("unpublish")}
-                disabled={publishBusy}
-              >
-                {wb("publish.unpublishAction")}
-              </Button>
-            ) : null}
+            <Button
+              type="button"
+              className="btn-gold h-10 w-full rounded-xl font-bold text-luxury-black"
+              onClick={onGoToDeploy}
+              disabled={!activeProject?.id}
+            >
+              <Rocket className="size-4" />
+              {wb("workspace.deploy")}
+            </Button>
           </div>
+          <p className="text-[11px] leading-relaxed text-white/40">
+            {wb("panels.deploymentDescription")}
+          </p>
         </div>
       </DashboardPanel>
 
@@ -3128,232 +3092,6 @@ function formatElapsed(totalSeconds: number) {
   return `${minutes}m ${seconds.toString().padStart(2, "0")}s`;
 }
 
-function RightPreview({
-  activeProject,
-  currentPages,
-  projectType,
-  designStyle,
-  colorTheme,
-  language,
-  isGenerating,
-  streamStatus,
-  elapsedSeconds,
-  onRefreshPreview,
-  onOpenPreview,
-}: {
-  activeProject: WorkspaceProject | null;
-  currentPages: string[];
-  projectType: string;
-  designStyle: string;
-  colorTheme: string;
-  language: string;
-  isGenerating: boolean;
-  streamStatus: string | null;
-  elapsedSeconds: number;
-  onRefreshPreview: () => void;
-  onOpenPreview: () => void;
-}) {
-  const wb = useProductT("websiteBuilder");
-  const generatedProject = activeProject?.generatedProject;
-  const build = activeProject?.build ?? { status: "idle" as const };
-  const previewPages = generatedProject?.pages?.length ? generatedProject.pages : currentPages;
-  const previewUrl = build.status === "success" ? build.previewUrl : undefined;
-  const isBuilding = build.status === "building";
-
-  return (
-    <aside className="space-y-6 xl:sticky xl:top-28 xl:self-start">
-      <DashboardPanel gold className="overflow-hidden">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <SectionHeader
-            icon={MonitorSmartphone}
-            title={wb("preview.title")}
-            description={wb("preview.description")}
-          />
-          <div className="flex flex-wrap gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              className="btn-ghost-gold rounded-xl"
-              onClick={onRefreshPreview}
-              disabled={!generatedProject || isBuilding}
-            >
-              {isBuilding ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
-                <RefreshCw className="size-4" />
-              )}
-              Refresh
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="btn-ghost-gold rounded-xl"
-              onClick={onOpenPreview}
-              disabled={!previewUrl}
-            >
-              <ExternalLink className="size-4" />
-              {wb("previewExport.open")}
-            </Button>
-          </div>
-        </div>
-        <div className="mt-5 overflow-hidden rounded-[1.6rem] border border-white/[0.08] bg-[#070707] shadow-[0_24px_80px_rgb(0_0_0/0.32)]">
-          <div className="flex items-center gap-2 border-b border-white/[0.08] bg-white/[0.035] px-4 py-3">
-            <span className="size-2.5 rounded-full bg-red-400/70" />
-            <span className="size-2.5 rounded-full bg-yellow-300/70" />
-            <span className="size-2.5 rounded-full bg-green-400/70" />
-            <span className="ml-auto text-[11px] text-white/30">preview.trendai.app</span>
-          </div>
-          <div className="p-4">
-            {previewUrl ? (
-              <iframe
-                title={`${activeProject?.title ?? wb("previewExport.generatedProject")} ${wb("previewExport.livePreviewSuffix")}`}
-                src={previewUrl}
-                className="h-[520px] w-full rounded-2xl border border-premium-gold/15 bg-white"
-                sandbox="allow-scripts allow-forms allow-popups"
-              />
-            ) : isBuilding ? (
-              <div className="flex h-[420px] flex-col items-center justify-center rounded-2xl border border-premium-gold/15 bg-black/30 text-center">
-                <Loader2 className="size-8 animate-spin text-premium-gold" />
-                <p className="mt-4 font-bold text-white">{wb("panels.buildingProject")}</p>
-                <p className="mt-2 max-w-sm text-sm text-white/40">
-                  {wb("previewExport.buildingDescription")}
-                </p>
-              </div>
-            ) : (
-              <div className="rounded-2xl border border-premium-gold/15 bg-[radial-gradient(circle_at_80%_0%,rgb(212_175_55/0.18),transparent_38%),linear-gradient(145deg,rgb(255_255_255/0.06),rgb(255_255_255/0.02))] p-5">
-                <p className="text-[11px] font-semibold tracking-[0.16em] text-premium-gold-light uppercase">
-                  {activeProject?.type ?? projectType}
-                </p>
-                <h3 className="mt-3 text-2xl font-bold tracking-[-0.04em] text-white">
-                  {activeProject?.title ?? wb("previewExport.premiumConcept")}
-                </h3>
-                <p className="mt-3 line-clamp-3 text-[13px] leading-relaxed text-white/45">
-                  {activeProject?.description ??
-                    wb("previewExport.conceptDescription")}
-                </p>
-                <div className="mt-5 grid grid-cols-2 gap-3">
-                  <div className="rounded-xl bg-black/30 p-3">
-                    <p className="text-[11px] text-white/35">{wb("labels.style")}</p>
-                    <p className="mt-1 font-semibold text-white">{activeProject?.style ?? designStyle}</p>
-                  </div>
-                  <div className="rounded-xl bg-black/30 p-3">
-                    <p className="text-[11px] text-white/35">{wb("labels.theme")}</p>
-                    <p className="mt-1 font-semibold text-white">{activeProject?.theme ?? colorTheme}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-        {build.status === "error" && (
-          <div className="mt-4 rounded-2xl border border-red-400/20 bg-red-400/10 p-4">
-            <div className="flex items-center gap-2 text-red-200">
-              <AlertTriangle className="size-4" />
-              <p className="font-semibold">{wb("panels.compileFailed")}</p>
-            </div>
-            <pre className="mt-3 max-h-56 overflow-auto whitespace-pre-wrap text-[12px] leading-relaxed text-red-100/85">
-              {build.error}
-            </pre>
-          </div>
-        )}
-      </DashboardPanel>
-
-      <DashboardPanel>
-        <SectionHeader icon={FileStack} title={wb("sections.websiteStructure")} description={wb("sectionDescriptions.websiteStructure")} />
-        <div className="mt-5 space-y-3">
-          {previewPages.map((page, index) => (
-            <div
-              key={page}
-              className="flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.025] p-3"
-            >
-              <span className="flex size-8 items-center justify-center rounded-xl bg-premium-gold/10 text-[12px] font-bold text-premium-gold-light">
-                {index + 1}
-              </span>
-              <span className="font-medium text-white/70">{page}</span>
-            </div>
-          ))}
-        </div>
-      </DashboardPanel>
-
-      {generatedProject && (
-        <DashboardPanel>
-          <SectionHeader
-            icon={Sparkles}
-            title={wb("sections.generatedResult")}
-            description={wb("sectionDescriptions.generatedResult")}
-          />
-          <div className="mt-5 space-y-4">
-            <ResultList title={wb("resultLists.sections")} items={generatedProject.sections} />
-            <ResultList title={wb("resultLists.colorPalette")} items={generatedProject.colorPalette} />
-            <ResultList title={wb("resultLists.typography")} items={generatedProject.typography} />
-            <ResultList title={wb("resultLists.components")} items={generatedProject.components} />
-            <ResultList title={wb("resultLists.content")} items={generatedProject.content} />
-            <ResultList title={wb("resultLists.seo")} items={generatedProject.seo} />
-            <ResultList title={wb("resultLists.roadmap")} items={generatedProject.roadmap} />
-          </div>
-        </DashboardPanel>
-      )}
-
-      <DashboardPanel>
-        <SectionHeader
-          icon={Clock3}
-          title={wb("sections.generationStatus")}
-          description={wb("sectionDescriptions.generationStatus")}
-        />
-        <div className="mt-5">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-white/45">
-              {isGenerating
-                ? streamStatus ?? wb("stream.generating")
-                : activeProject
-                  ? "Ready"
-                  : "Idle"}
-            </span>
-            <span className="font-bold text-premium-gold-light">
-              {isGenerating ? formatElapsed(elapsedSeconds) : activeProject ? "Done" : "—"}
-            </span>
-          </div>
-          <div className="mt-3 h-3 overflow-hidden rounded-full bg-white/[0.07]">
-            {isGenerating ? (
-              <div className="h-full w-2/5 animate-pulse rounded-full bg-gradient-to-r from-premium-gold to-premium-gold-light" />
-            ) : (
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-premium-gold to-premium-gold-light transition-all duration-700"
-                style={{ width: activeProject ? "100%" : "20%" }}
-              />
-            )}
-          </div>
-          <div className="mt-5 grid grid-cols-2 gap-3">
-            <InfoTile label={wb("labels.typicalTime")} value={wb("labels.typicalTimeValue")} />
-            <InfoTile label={wb("labels.language")} value={language} />
-          </div>
-        </div>
-      </DashboardPanel>
-    </aside>
-  );
-}
-
-function ResultList({ title, items }: { title: string; items: string[] }) {
-  return (
-    <div className="rounded-2xl border border-white/[0.08] bg-black/20 p-4">
-      <p className="text-[12px] font-semibold tracking-wide text-premium-gold-light uppercase">
-        {title}
-      </p>
-      <ul className="mt-3 space-y-2">
-        {items.map((item, index) => (
-          <li
-            key={`${item}-${index}`}
-            className="flex gap-2 text-[13px] leading-relaxed text-white/55"
-          >
-            <span className="mt-2 size-1.5 shrink-0 rounded-full bg-premium-gold/70" />
-            <span>{item}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
 function InfoTile({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-2xl border border-white/[0.08] bg-black/20 p-3">
@@ -3367,7 +3105,6 @@ function OutputWorkspace({
   activeProject,
   outputTab,
   onOutputTabChange,
-  previewEnabled,
   previewRevision = 0,
   files,
   selectedFile,
@@ -3382,9 +3119,8 @@ function OutputWorkspace({
   onRename,
   onDelete,
   onFavorite,
-  onRefreshPreview,
-  onOpenPreview,
   visualEditorDisabled,
+  onVisualEditorDirtyChange,
   onVisualEditorSaved,
   onSeoApplied,
   onIntelligenceApply,
@@ -3392,7 +3128,6 @@ function OutputWorkspace({
   activeProject: WorkspaceProject | null;
   outputTab: OutputTab;
   onOutputTabChange: (tab: OutputTab) => void;
-  previewEnabled: boolean;
   previewRevision?: number;
   files: GeneratedProjectFile[];
   selectedFile: GeneratedProjectFile | null;
@@ -3407,9 +3142,8 @@ function OutputWorkspace({
   onRename: () => void;
   onDelete: () => void;
   onFavorite: () => void;
-  onRefreshPreview: () => void;
-  onOpenPreview: () => void;
   visualEditorDisabled?: boolean;
+  onVisualEditorDirtyChange?: (dirty: boolean) => void;
   onVisualEditorSaved: (payload: {
     project: GeneratedWebsiteProject;
     generation: WebsiteGeneration;
@@ -3543,6 +3277,7 @@ function OutputWorkspace({
               files={files}
               project={activeProject.generatedProject}
               disabled={visualEditorDisabled}
+              onDirtyChange={onVisualEditorDirtyChange}
               onSaved={onVisualEditorSaved}
             />
           ) : (
@@ -3595,21 +3330,13 @@ function OutputWorkspace({
         />
         <div className="min-w-0 border-x border-white/[0.08] bg-[#050505]">
           {outputTab === "preview" ? (
-            previewEnabled ? (
-              <GeneratedPreviewWorkspace
-                activeProject={activeProject}
-                onRefreshPreview={onRefreshPreview}
-                onOpenPreview={onOpenPreview}
-              />
-            ) : (
-              <WebsiteLiveFrame
-                projectId={activeProject?.id}
-                title={wb("preview.title")}
-                viewport="desktop"
-                revision={previewRevision}
-                className="h-full min-h-[720px]"
-              />
-            )
+            <WebsiteLiveFrame
+              projectId={activeProject?.id}
+              title={wb("preview.title")}
+              viewport="desktop"
+              revision={previewRevision}
+              className="h-full min-h-[720px]"
+            />
           ) : (
             <CodeEditorWorkspace
               files={files}
@@ -3967,103 +3694,6 @@ function ProjectRightSidebar({
         </div>
       </div>
     </aside>
-  );
-}
-
-function GeneratedPreviewWorkspace({
-  activeProject,
-  onRefreshPreview,
-  onOpenPreview,
-}: {
-  activeProject: WorkspaceProject | null;
-  onRefreshPreview: () => void;
-  onOpenPreview: () => void;
-}) {
-  const wb = useProductT("websiteBuilder");
-  const build = activeProject?.build ?? { status: "idle" as const };
-  const previewUrl = build.status === "success" ? build.previewUrl : undefined;
-  const isBuilding = build.status === "building";
-
-  return (
-    <div className="overflow-hidden rounded-3xl border border-white/[0.08] bg-[#070707]">
-      <div className="flex flex-col gap-3 border-b border-white/[0.08] bg-white/[0.035] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="font-semibold text-white">
-            {activeProject?.title ?? wb("previewExport.noProjectYet")}
-          </p>
-          <p className="text-[12px] text-white/35">
-            {previewUrl
-              ? wb("previewExport.compiledLoaded")
-              : wb("previewExport.generateToPreview")}
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            className="btn-ghost-gold rounded-xl"
-            onClick={onRefreshPreview}
-            disabled={!activeProject?.generatedProject || isBuilding}
-          >
-            {isBuilding ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <RefreshCw className="size-4" />
-            )}
-            {wb("previewExport.refreshPreview")}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            className="btn-ghost-gold rounded-xl"
-            onClick={onOpenPreview}
-            disabled={!previewUrl}
-          >
-            <ExternalLink className="size-4" />
-            {wb("previewExport.openInNewTab")}
-          </Button>
-        </div>
-      </div>
-
-      <div className="p-4">
-        {previewUrl ? (
-          <iframe
-            title={`${activeProject?.title ?? wb("previewExport.generatedProject")} ${wb("previewExport.fullPreviewSuffix")}`}
-            src={previewUrl}
-            className="h-[760px] w-full rounded-2xl border border-premium-gold/15 bg-white"
-            sandbox="allow-scripts allow-forms allow-popups"
-          />
-        ) : isBuilding ? (
-          <div className="flex h-[520px] flex-col items-center justify-center rounded-2xl border border-premium-gold/15 bg-black/30 text-center">
-            <Loader2 className="size-9 animate-spin text-premium-gold" />
-            <p className="mt-4 font-bold text-white">{wb("panels.buildingNextApp")}</p>
-            <p className="mt-2 max-w-sm text-sm text-white/40">
-              {wb("previewExport.buildingFilesDescription")}
-            </p>
-          </div>
-        ) : (
-          <div className="flex h-[420px] flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.1] text-center">
-            <MonitorSmartphone className="size-10 text-premium-gold" />
-            <p className="mt-4 font-bold text-white">{wb("preview.emptyTitle")}</p>
-            <p className="mt-2 max-w-sm text-sm text-white/40">
-              {wb("previewExport.generateToRender")}
-            </p>
-          </div>
-        )}
-
-        {build.status === "error" && (
-          <div className="mt-4 rounded-2xl border border-red-400/20 bg-red-400/10 p-4">
-            <div className="flex items-center gap-2 text-red-200">
-              <AlertTriangle className="size-4" />
-              <p className="font-semibold">{wb("panels.buildFailed")}</p>
-            </div>
-            <pre className="mt-3 max-h-72 overflow-auto whitespace-pre-wrap text-[12px] leading-relaxed text-red-100/85">
-              {build.error}
-            </pre>
-          </div>
-        )}
-      </div>
-    </div>
   );
 }
 

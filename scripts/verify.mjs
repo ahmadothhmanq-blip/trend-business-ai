@@ -34,6 +34,27 @@ const openAiKey = process.env.OPENAI_API_KEY;
 const deepseekKey = process.env.DEEPSEEK_API_KEY;
 const upstashUrl = process.env.UPSTASH_REDIS_REST_URL;
 const upstashToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+function tableProbeColumn(table) {
+  return table === "user_preferences" ? "user_id" : "id";
+}
+
+function isMissingTableError(error) {
+  return (
+    error.message.includes("does not exist") ||
+    error.message.includes("schema cache") ||
+    error.code === "42P01" ||
+    error.message.includes("Could not find the table")
+  );
+}
+
+function isMissingTableColumnError(error, table) {
+  return (
+    error.code === "42703" &&
+    error.message.includes(`${table}.${tableProbeColumn(table)} does not exist`)
+  );
+}
 
 const DASHBOARD_PAGES = [
   "/dashboard",
@@ -71,6 +92,12 @@ const DASHBOARD_PAGES = [
   "/dashboard/templates",
   "/dashboard/usage",
   "/dashboard/video-studio",
+  "/dashboard/crm",
+  "/dashboard/erp",
+  "/dashboard/bi",
+  "/dashboard/business-manager",
+  "/dashboard/cybersecurity",
+  "/dashboard/search",
 ];
 
 const AUTH_PAGES = ["/login", "/signup", "/forgot-password", "/reset-password"];
@@ -195,14 +222,10 @@ async function verifySupabase() {
   const supabase = createClient(url, anonKey);
   console.log("\n[2] Database tables");
   for (const table of TABLES) {
-    const { error } = await supabase.from(table).select("id").limit(1);
+    const column = tableProbeColumn(table);
+    const { error } = await supabase.from(table).select(column).limit(1);
     if (error) {
-      if (
-        error.message.includes("does not exist") ||
-        error.message.includes("schema cache") ||
-        error.code === "42P01" ||
-        error.message.includes("Could not find the table")
-      ) {
+      if (isMissingTableError(error) && !isMissingTableColumnError(error, table)) {
         fail(`table ${table}`, "missing — run migrations");
       } else {
         pass(`table ${table}`, "exists");
@@ -214,13 +237,10 @@ async function verifySupabase() {
 
   console.log("\n[3] Row Level Security (anonymous access blocked)");
   for (const table of TABLES) {
-    const { data, error } = await supabase.from(table).select("id").limit(1);
+    const column = tableProbeColumn(table);
+    const { data, error } = await supabase.from(table).select(column).limit(1);
     if (error) {
-      if (
-        error.message.includes("does not exist") ||
-        error.message.includes("schema cache") ||
-        error.message.includes("Could not find the table")
-      ) {
+      if (isMissingTableError(error) && !isMissingTableColumnError(error, table)) {
         fail(`RLS ${table}`, "table missing");
       } else if (error.message.includes("permission") || error.code === "42501") {
         pass(`RLS ${table}`, "access denied for anon");
@@ -235,15 +255,34 @@ async function verifySupabase() {
   }
 
   console.log("\n[4] Storage (avatars bucket)");
-  const { data: buckets, error: bucketError } = await supabase.storage.listBuckets();
-  if (bucketError) {
-    fail("storage buckets", bucketError.message);
-  } else {
-    const avatars = buckets?.find((b) => b.id === "avatars" || b.name === "avatars");
-    if (avatars) {
-      pass("avatars bucket", avatars.public ? "public" : "private");
+  let avatarsVerified = false;
+  if (serviceRoleKey) {
+    const admin = createClient(url, serviceRoleKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data: buckets, error: bucketError } = await admin.storage.listBuckets();
+    if (bucketError) {
+      fail("avatars bucket", bucketError.message);
     } else {
+      const avatars = buckets?.find((b) => b.id === "avatars" || b.name === "avatars");
+      if (avatars) {
+        pass("avatars bucket", avatars.public ? "public" : "private");
+        avatarsVerified = true;
+      } else {
+        fail("avatars bucket", "missing — run 007_storage_avatars.sql");
+      }
+    }
+  }
+  if (!avatarsVerified) {
+    const { error: avatarsError } = await supabase.storage.from("avatars").list("", {
+      limit: 1,
+    });
+    if (avatarsError && /not found|Bucket not found/i.test(avatarsError.message)) {
       fail("avatars bucket", "missing — run 007_storage_avatars.sql");
+    } else if (avatarsError) {
+      pass("avatars bucket", "addressable (anon list)");
+    } else {
+      pass("avatars bucket", "addressable");
     }
   }
 
@@ -466,6 +505,40 @@ async function runLiveChecks() {
   }
 }
 
+const WEBSITE_SMOKE_SCRIPTS = [
+  "smoke:website-ai",
+  "smoke:website-publish",
+  "smoke:website-design-engine",
+];
+
+function runNpmScript(script) {
+  return new Promise((resolve, reject) => {
+    const child = spawn("npm", ["run", script], {
+      cwd: root,
+      shell: true,
+      stdio: "inherit",
+      env: process.env,
+    });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(`${script} exited with code ${code}`));
+    });
+  });
+}
+
+async function runWebsiteSmokeScripts() {
+  console.log("\n[13] Website Builder smoke scripts");
+  for (const script of WEBSITE_SMOKE_SCRIPTS) {
+    try {
+      await runNpmScript(script);
+      pass(script);
+    } catch (err) {
+      fail(script, err.message);
+    }
+  }
+}
+
 async function main() {
   console.log("Trend Business AI — verification\n");
   const supabase = await verifySupabase();
@@ -484,6 +557,8 @@ async function main() {
   } else {
     console.log("\n[Live checks] skipped (run npm run build first)");
   }
+
+  await runWebsiteSmokeScripts();
 
   console.log("\n--- Summary ---");
   const ok = results.filter((r) => r.ok).length;

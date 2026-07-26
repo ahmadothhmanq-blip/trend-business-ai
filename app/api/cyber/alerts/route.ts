@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { enforceMutationRateLimit } from "@/lib/api/rate-limit";
 import { listAlerts, createAlert, updateAlertStatus, ingestEvent, listEvents } from "@/lib/cyber/monitoring";
@@ -47,7 +48,7 @@ export async function POST(request: Request) {
   }
 
   const parsed = alertSchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: "Invalid" }, { status: 400 });
+  if (!parsed.success) return apiValidationError("Invalid");
   const { data, error } = await createAlert(auth.supabase, { user_id: auth.user!.id, title: parsed.data.title, severity: parsed.data.severity });
   if (error) return databaseErrorResponse("cyber.alerts.create", error);
   await logCyberAudit(auth.supabase, { user_id: auth.user!.id, action: "create", entity_type: "alert", entity_id: data?.id });

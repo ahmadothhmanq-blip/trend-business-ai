@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
 
 export function AdsPanel() {
+  const wt = useWorkspaceT("marketing");
   const [drafts, setDrafts] = useState<Array<{ id: string; name: string; platform: string; status: string }>>([]);
 
   useEffect(() => {
@@ -13,9 +15,9 @@ export function AdsPanel() {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-white/40">Google Ads & Meta Ads draft campaigns — no live publishing yet.</p>
+      <p className="text-sm text-white/40">{wt("adsPanel.description")}</p>
       {drafts.length === 0 ? (
-        <p className="text-sm text-white/30">No ad drafts yet. Create from a campaign.</p>
+        <p className="text-sm text-white/30">{wt("adsPanel.empty")}</p>
       ) : (
         drafts.map((d) => (
           <div key={d.id} className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2">

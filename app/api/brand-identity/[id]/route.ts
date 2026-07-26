@@ -1,4 +1,5 @@
 import { syncFavorite } from "@/lib/db/favorites";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { requireUser, parseJsonBody, parseUuidParam } from "@/lib/api/helpers";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { blueprintToModel, mergeModel, modelToBlueprint } from "@/lib/ai-core/brand-studio/model";
@@ -43,7 +44,7 @@ export async function GET(_request: Request, context: RouteContext) {
   if (auth.response) return auth.response;
 
   const { data, error } = await auth.supabase.from("brand_identity_generations").select("*").eq("id", id).eq("user_id", auth.user!.id).single();
-  if (error || !data) return NextResponse.json({ error: "Brand identity not found" }, { status: 404 });
+  if (error || !data) return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Brand identity not found");
   return NextResponse.json({ generation: data as BrandIdentityGeneration });
 }
 
@@ -60,7 +61,7 @@ export async function PATCH(request: Request, context: RouteContext) {
   if (body instanceof NextResponse) return body;
 
   const parsed = updateSchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid update" }, { status: 400 });
+  if (!parsed.success) return apiValidationError(parsed.error.issues[0]?.message);
 
   const { is_favorite, brand_name, colors, typography, voiceTone } = parsed.data;
 
@@ -72,7 +73,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     .single();
 
   if (existingError || !existing) {
-    return NextResponse.json({ error: "Brand identity not found" }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Brand identity not found");
   }
 
   let blueprintUpdate: Record<string, unknown> | undefined;
@@ -121,7 +122,7 @@ export async function PATCH(request: Request, context: RouteContext) {
       updated_at: new Date().toISOString(),
     })
     .eq("id", id).eq("user_id", auth.user!.id).select("*").single();
-  if (error || !data) return NextResponse.json({ error: "Brand identity not found" }, { status: 404 });
+  if (error || !data) return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Brand identity not found");
 
   if (typeof is_favorite === "boolean") {
     const sync = await syncFavorite(auth.supabase, auth.user!.id, "brand_identity_generation", id, is_favorite);
@@ -141,7 +142,7 @@ export async function POST(_request: Request, context: RouteContext) {
   if (auth.response) return auth.response;
 
   const { data: source, error: sourceError } = await auth.supabase.from("brand_identity_generations").select("*").eq("id", id).eq("user_id", auth.user!.id).single();
-  if (sourceError || !source) return NextResponse.json({ error: "Brand identity not found" }, { status: 404 });
+  if (sourceError || !source) return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Brand identity not found");
 
   const { data, error } = await auth.supabase
     .from("brand_identity_generations")
@@ -163,6 +164,6 @@ export async function DELETE(_request: Request, context: RouteContext) {
 
   await syncFavorite(auth.supabase, auth.user!.id, "brand_identity_generation", id, false);
   const { data, error } = await auth.supabase.from("brand_identity_generations").delete().eq("id", id).eq("user_id", auth.user!.id).select("id").single();
-  if (error || !data) return NextResponse.json({ error: "Brand identity not found" }, { status: 404 });
+  if (error || !data) return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Brand identity not found");
   return NextResponse.json({ message: "Brand identity deleted." });
 }

@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
 import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { WEBSITE_LIST_COLUMNS } from "@/lib/api/list-selects";
@@ -101,10 +102,7 @@ export async function POST(request: Request) {
 
   const parsed = websiteGenerateRequestSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid input" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const input = parsed.data;
@@ -154,7 +152,7 @@ export async function POST(request: Request) {
     });
 
     if (!saved.ok) {
-      return NextResponse.json({ error: saved.error }, { status: 500 });
+      return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, saved.error);
     }
 
     return NextResponse.json({

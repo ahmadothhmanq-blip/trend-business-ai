@@ -16,6 +16,14 @@ import {
 
 const cmsByGeneration = new Map<string, CmsEntry[]>();
 
+function isProductionEnv(): boolean {
+  return process.env.NODE_ENV === "production";
+}
+
+function productionDbUnavailable(feature: string): never {
+  throw new Error(`${feature} database unavailable in production`);
+}
+
 export async function listCmsEntries(
   generationId: string,
   client?: SupabaseClient | null,
@@ -28,6 +36,11 @@ export async function listCmsEntries(
       .eq("generation_id", generationId)
       .limit(1);
     if (!isCmsTableMissing(error)) return rows;
+    if (isProductionEnv()) {
+      productionDbUnavailable("CMS");
+    }
+  } else if (isProductionEnv()) {
+    productionDbUnavailable("CMS");
   }
   return cmsByGeneration.get(generationId) || [];
 }
@@ -52,6 +65,10 @@ export async function upsertCmsEntry(
     body: entry.body,
     mediaUrl: entry.mediaUrl,
     pagePath: entry.pagePath,
+    slug: entry.slug,
+    categories: entry.categories,
+    tags: entry.tags,
+    seoJson: entry.seoJson,
     scheduledAt: entry.scheduledAt ?? null,
     published: entry.published ?? true,
     updatedAt: now,
@@ -66,6 +83,20 @@ export async function upsertCmsEntry(
       previousVersion: previous,
     });
     if (persisted) return persisted;
+
+    const { error } = await options.client
+      .from("website_cms_entries")
+      .select("id")
+      .eq("generation_id", generationId)
+      .limit(1);
+    if (!isCmsTableMissing(error)) {
+      throw new Error("Failed to persist CMS entry");
+    }
+    if (isProductionEnv()) {
+      productionDbUnavailable("CMS");
+    }
+  } else if (isProductionEnv()) {
+    productionDbUnavailable("CMS");
   }
 
   if (existingIdx >= 0) {
@@ -91,6 +122,11 @@ export async function deleteCmsEntry(
       .eq("generation_id", generationId)
       .limit(1);
     if (!isCmsTableMissing(error)) return ok;
+    if (isProductionEnv()) {
+      productionDbUnavailable("CMS");
+    }
+  } else if (isProductionEnv()) {
+    productionDbUnavailable("CMS");
   }
   const list = await listCmsEntries(generationId);
   const next = list.filter((e) => e.id !== id);

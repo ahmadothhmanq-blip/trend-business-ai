@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { createDocumentVersion, restoreDocumentVersion } from "@/lib/content-studio/versions";
 import type { ContentVersion } from "@/types/content";
@@ -27,7 +28,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const documentId = searchParams.get("documentId");
   if (!documentId) {
-    return NextResponse.json({ error: "documentId is required" }, { status: 400 });
+    return apiValidationError("documentId is required");
   }
 
   const { page, limit, from, to } = paginationParams(searchParams);
@@ -73,7 +74,7 @@ export async function POST(request: Request) {
       restoreParsed.data.versionId,
     );
     if (!result.ok) {
-      return NextResponse.json({ error: result.error }, { status: result.status });
+      return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, result.status, result.error);
     }
     return NextResponse.json({
       document: result.document,
@@ -84,7 +85,7 @@ export async function POST(request: Request) {
 
   const parsed = createSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid input" }, { status: 400 });
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const input = parsed.data;
@@ -97,7 +98,7 @@ export async function POST(request: Request) {
     .single();
 
   if (!doc) {
-    return NextResponse.json({ error: "Document not found" }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Document not found");
   }
 
   const { data, error } = await createDocumentVersion(auth.supabase, {

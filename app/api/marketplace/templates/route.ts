@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { z } from "zod";
 import { requireUser } from "@/lib/api/helpers";
 import {
@@ -51,7 +52,7 @@ export async function GET(request: Request) {
   if (id) {
     const detail = getCreatorMarketplaceListingDetail(id, userId);
     if (!detail) {
-      return NextResponse.json({ error: "Template not found." }, { status: 404 });
+      return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Template not found.");
     }
     return NextResponse.json(detail);
   }
@@ -147,15 +148,12 @@ export async function POST(request: Request) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    return apiErrorResponse(API_ERROR_CODES.INVALID_JSON, 400);
   }
 
   const parsed = uploadSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid upload" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const meta = auth.user!.user_metadata ?? {};

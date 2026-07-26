@@ -1,6 +1,5 @@
 import { cookies, headers } from "next/headers";
 import {
-  DEFAULT_LOCALE,
   LOCALE_COOKIE,
   LOCALE_HEADER,
   normalizeLocale,
@@ -8,7 +7,6 @@ import {
 } from "@/lib/i18n/config";
 import { loadMessages } from "@/lib/i18n/load-messages";
 import { createTranslator, type TranslateFn } from "@/lib/i18n/translate";
-import en from "@/locales/en.json";
 import type { TranslationMessages } from "@/lib/i18n/messages";
 
 export async function getServerLocale(): Promise<SupportedLocale> {
@@ -35,9 +33,8 @@ export async function getServerTranslator(
 ): Promise<{ locale: SupportedLocale; t: TranslateFn }> {
   const resolved = locale ?? (await getServerLocale());
   const messages = loadMessages(resolved);
-  const fallback = en as TranslationMessages;
   return {
     locale: resolved,
-    t: createTranslator(messages, fallback),
+    t: createTranslator(messages),
   };
 }

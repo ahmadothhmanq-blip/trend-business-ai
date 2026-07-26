@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import {
   COMPONENT_INDUSTRY_PACKS,
   COMPONENT_MARKETPLACE_CATEGORIES,
@@ -25,7 +26,7 @@ export async function GET(request: Request) {
   if (id) {
     const component = getMarketplaceComponent(id);
     if (!component) {
-      return NextResponse.json({ error: "Component not found." }, { status: 404 });
+      return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Component not found.");
     }
     return NextResponse.json({
       component,

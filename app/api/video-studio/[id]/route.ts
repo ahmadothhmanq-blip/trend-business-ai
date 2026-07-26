@@ -1,4 +1,5 @@
 import { syncFavorite } from "@/lib/db/favorites";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { requireUser, parseJsonBody, parseUuidParam } from "@/lib/api/helpers";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import type { VideoGeneration } from "@/types/video";
@@ -23,7 +24,7 @@ export async function GET(_request: Request, context: RouteContext) {
   if (auth.response) return auth.response;
 
   const { data, error } = await auth.supabase.from("video_generations").select("*").eq("id", id).eq("user_id", auth.user!.id).single();
-  if (error || !data) return NextResponse.json({ error: "Video not found" }, { status: 404 });
+  if (error || !data) return apiErrorResponse(API_ERROR_CODES.VIDEO_NOT_FOUND, 404);
   return NextResponse.json({ generation: data as VideoGeneration });
 }
 
@@ -40,7 +41,7 @@ export async function PATCH(request: Request, context: RouteContext) {
   if (body instanceof NextResponse) return body;
 
   const parsed = updateSchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid update" }, { status: 400 });
+  if (!parsed.success) return apiValidationError(parsed.error.issues[0]?.message);
 
   const { is_favorite, video_name } = parsed.data;
 
@@ -49,7 +50,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     .update({ ...(typeof is_favorite === "boolean" ? { is_favorite } : {}), ...(video_name ? { video_name } : {}), updated_at: new Date().toISOString() })
     .eq("id", id).eq("user_id", auth.user!.id).select("*").single();
 
-  if (error || !data) return NextResponse.json({ error: "Video not found" }, { status: 404 });
+  if (error || !data) return apiErrorResponse(API_ERROR_CODES.VIDEO_NOT_FOUND, 404);
 
   if (typeof is_favorite === "boolean") {
     const sync = await syncFavorite(auth.supabase, auth.user!.id, "video_generation", id, is_favorite);
@@ -69,7 +70,7 @@ export async function POST(_request: Request, context: RouteContext) {
   if (auth.response) return auth.response;
 
   const { data: source, error: srcErr } = await auth.supabase.from("video_generations").select("*").eq("id", id).eq("user_id", auth.user!.id).single();
-  if (srcErr || !source) return NextResponse.json({ error: "Video not found" }, { status: 404 });
+  if (srcErr || !source) return apiErrorResponse(API_ERROR_CODES.VIDEO_NOT_FOUND, 404);
 
   const { data, error } = await auth.supabase
     .from("video_generations")
@@ -96,6 +97,6 @@ export async function DELETE(_request: Request, context: RouteContext) {
     generationId: id,
   });
   const { data, error } = await auth.supabase.from("video_generations").delete().eq("id", id).eq("user_id", auth.user!.id).select("id").single();
-  if (error || !data) return NextResponse.json({ error: "Video not found" }, { status: 404 });
+  if (error || !data) return apiErrorResponse(API_ERROR_CODES.VIDEO_NOT_FOUND, 404);
   return NextResponse.json({ message: "Video deleted." });
 }

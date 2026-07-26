@@ -660,7 +660,7 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
       const designPlan = assertDesignPlanApproved(rawPlan);
 
       const designIntel = designPlan.intelligence;
-      let plannedStrategy = applyDesignPlanToStrategy(
+      const plannedStrategy = applyDesignPlanToStrategy(
         strategy as CoreProductStrategy,
         designPlan,
       );

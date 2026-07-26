@@ -14,6 +14,11 @@ export const API_ERROR_CODES = {
   TEMPLATE_NOT_FOUND: "TEMPLATE_NOT_FOUND",
   CHECKOUT_FAILED: "CHECKOUT_FAILED",
   PAYMENT_INCOMPLETE: "PAYMENT_INCOMPLETE",
+  INVALID_JSON: "INVALID_JSON",
+  INVALID_PARAM: "INVALID_PARAM",
+  PROVIDER_UNAVAILABLE: "PROVIDER_UNAVAILABLE",
+  UNKNOWN_PROVIDER: "UNKNOWN_PROVIDER",
+  LOAD_FAILED: "LOAD_FAILED",
 } as const;
 
 export type ApiErrorCode = (typeof API_ERROR_CODES)[keyof typeof API_ERROR_CODES];
@@ -37,6 +42,11 @@ const DEFAULT_MESSAGES: Record<ApiErrorCode, string> = {
   TEMPLATE_NOT_FOUND: "Template not found",
   CHECKOUT_FAILED: "Checkout failed",
   PAYMENT_INCOMPLETE: "Payment could not be completed",
+  INVALID_JSON: "Invalid JSON body",
+  INVALID_PARAM: "Invalid parameter",
+  PROVIDER_UNAVAILABLE: "Provider is not available",
+  UNKNOWN_PROVIDER: "Unknown provider",
+  LOAD_FAILED: "Failed to load data",
 };
 
 export function apiErrorResponse(
@@ -44,12 +54,14 @@ export function apiErrorResponse(
   status: number,
   message?: string,
   details?: string,
-): NextResponse<ApiErrorBody> {
+  extra?: Record<string, unknown>,
+): NextResponse<ApiErrorBody & Record<string, unknown>> {
   return NextResponse.json(
     {
       error: message || DEFAULT_MESSAGES[code],
       code,
       ...(details ? { details } : {}),
+      ...extra,
     },
     { status },
   );

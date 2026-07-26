@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { getAllCrmIntegrations, importFromGrowthEngine } from "@/lib/crm/integrations";
 import { NextResponse } from "next/server";
 
@@ -20,5 +21,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ result });
   }
 
-  return NextResponse.json({ error: "Unknown action" }, { status: 400 });
+  return apiValidationError("Unknown action");
 }

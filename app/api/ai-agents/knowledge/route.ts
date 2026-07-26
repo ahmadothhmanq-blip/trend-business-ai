@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { enforceMutationRateLimit } from "@/lib/api/rate-limit";
 import { listKnowledgeBases, createKnowledgeBase, listDocuments, addDocument } from "@/lib/agents/knowledge";
@@ -51,7 +52,7 @@ export async function POST(request: Request) {
   }
 
   const parsed = kbSchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: "Invalid" }, { status: 400 });
+  if (!parsed.success) return apiValidationError("Invalid");
   const { data, error } = await createKnowledgeBase(auth.supabase, {
     user_id: auth.user!.id,
     name: parsed.data.name,

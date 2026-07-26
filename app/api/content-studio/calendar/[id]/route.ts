@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody, parseUuidParam } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import type { CalendarEntry } from "@/types/content";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -31,7 +32,7 @@ export async function PATCH(request: Request, context: RouteContext) {
   if (body instanceof NextResponse) return body;
 
   const parsed = updateSchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid update" }, { status: 400 });
+  if (!parsed.success) return apiValidationError(parsed.error.issues[0]?.message);
 
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
   for (const [key, value] of Object.entries(parsed.data)) {
@@ -44,7 +45,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     .eq("id", idParsed.id).eq("user_id", auth.user!.id)
     .select("*").single();
 
-  if (error || !data) return NextResponse.json({ error: "Calendar entry not found" }, { status: 404 });
+  if (error || !data) return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Calendar entry not found");
   return NextResponse.json({ entry: data as CalendarEntry, message: "Updated." });
 }
 
@@ -62,6 +63,6 @@ export async function DELETE(_request: Request, context: RouteContext) {
     .eq("id", idParsed.id).eq("user_id", auth.user!.id)
     .select("id").single();
 
-  if (error || !data) return NextResponse.json({ error: "Calendar entry not found" }, { status: 404 });
+  if (error || !data) return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Calendar entry not found");
   return NextResponse.json({ message: "Calendar entry deleted." });
 }

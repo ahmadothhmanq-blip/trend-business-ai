@@ -14,11 +14,9 @@ import {
   LOCALE_COOKIE,
   type SupportedLocale,
 } from "@/lib/i18n/config";
-import { loadMessages } from "@/lib/i18n/load-messages";
 import { createTranslator, type TranslateFn } from "@/lib/i18n/translate";
 import { switchLocaleInPath } from "@/lib/i18n/paths";
 import type { TranslationMessages } from "@/lib/i18n/messages";
-import en from "@/locales/en.json";
 
 const LOCALE_STORAGE_KEY = "tba_locale";
 
@@ -57,7 +55,7 @@ export function I18nProvider({
   const [isPending, startTransition] = useTransition();
 
   const t = useMemo(
-    () => createTranslator(messages, en as TranslationMessages),
+    () => createTranslator(messages),
     [messages],
   );
 

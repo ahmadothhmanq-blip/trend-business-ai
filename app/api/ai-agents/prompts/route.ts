@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import type { PromptLibraryEntry } from "@/types/agents";
 import { NextResponse } from "next/server";
@@ -47,7 +48,7 @@ export async function POST(request: Request) {
   if (body instanceof NextResponse) return body;
 
   const parsed = createSchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0]?.message }, { status: 400 });
+  if (!parsed.success) return apiValidationError(parsed.error.issues[0]?.message);
 
   const { data, error } = await auth.supabase.from("prompt_library").insert({
     user_id: auth.user!.id,
@@ -60,7 +61,7 @@ export async function POST(request: Request) {
   }).select("*").single();
 
   if (error) {
-    if (error.code === "42P01") return NextResponse.json({ error: "Prompt library table not ready. Apply migration 022." }, { status: 503 });
+    if (error.code === "42P01") return apiErrorResponse(API_ERROR_CODES.MIGRATION_REQUIRED, 503, "Prompt library table not ready. Apply migration 022.");
     return databaseErrorResponse("prompts.create", error);
   }
   return NextResponse.json({ prompt: data as PromptLibraryEntry, message: "Prompt saved." });

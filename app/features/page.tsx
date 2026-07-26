@@ -5,28 +5,34 @@ import { RelatedLinksSection } from "@/components/seo/related-links";
 import { PUBLIC_SAAS_PAGES } from "@/lib/constants/saas-pages";
 import { SeoService } from "@/lib/seo/engine";
 import { collectionPageJsonLd, webPageJsonLd } from "@/lib/seo/json-ld";
+import { getServerTranslator } from "@/lib/i18n/server";
 
-export const metadata: Metadata = SeoService.createMetadata({
-  title: "Features",
-  description: PUBLIC_SAAS_PAGES.features.description,
-  path: "/features",
-  type: "collection",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerTranslator();
+  return SeoService.createMetadata({
+    title: t("marketing.publicPages.features.metaTitle"),
+    description: PUBLIC_SAAS_PAGES.features.description,
+    path: "/features",
+    type: "collection",
+  });
+}
 
-export default function FeaturesPage() {
+export default async function FeaturesPage() {
+  const { t } = await getServerTranslator();
+
   return (
     <>
       <JsonLdScript
         id="features-jsonld"
         data={[
           webPageJsonLd({
-            name: "Features",
+            name: t("marketing.publicPages.features.metaTitle"),
             description: PUBLIC_SAAS_PAGES.features.description,
             path: "/features",
             type: "CollectionPage",
           }),
           collectionPageJsonLd({
-            name: "Trend Business AI Features",
+            name: t("marketing.publicPages.features.jsonLdCollectionName"),
             description: PUBLIC_SAAS_PAGES.features.description,
             path: "/features",
             items: PUBLIC_SAAS_PAGES.features.sections.map((section) => ({
@@ -40,7 +46,7 @@ export default function FeaturesPage() {
       <PublicSaasPage page={PUBLIC_SAAS_PAGES.features}>
         <div className="landing-container border-t border-[rgba(212,175,55,0.12)] py-16">
           <RelatedLinksSection
-            title="Explore products"
+            title={t("marketing.publicPages.features.exploreProducts")}
             links={[
               ...SeoService.links.services("create"),
               ...SeoService.links.resources(2),

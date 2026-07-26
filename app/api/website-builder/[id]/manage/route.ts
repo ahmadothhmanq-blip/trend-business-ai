@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { requireUser, parseUuidParam, parseJsonBody } from "@/lib/api/helpers";
 import { serverErrorResponse } from "@/lib/api/errors";
+import { enforceWebsiteUserMutationRateLimit } from "@/lib/website/public-endpoints";
 import { extractWebsiteFilesFromBlueprint } from "@/plugins/website/iteration";
 import { persistWebsiteGeneration } from "@/lib/website/save-generation";
 import type { GeneratedWebsiteProject } from "@/plugins/website/types";
 import type { WebsiteGeneration } from "@/types/database";
 import {
-  resolveSiteStructure,
+  resolveSiteStructureForProject,
   parseCatalogFromFiles,
   writeCatalogToFiles,
   upsertCatalogItem,
@@ -17,8 +19,20 @@ import {
   applyBrandManagement,
   runWebsiteAssistant,
   runPrePublishQualityControl,
+  addPage,
+  removePage,
+  duplicatePage,
+  reorderPages,
+  setHomepage,
+  updatePageMeta,
+  applyStructureToProjectFiles,
+  updateNavLinks,
+  updateFooterLinks,
+  injectCmsIntoFiles,
+  listMediaAssets,
 } from "@/lib/ai-core/website-management";
 import { listWebsiteLeads } from "@/lib/ai-core/website-design-platform";
+import { resolveBrandLogoUrl } from "@/lib/ai-core/website-management/brand/resolve-logo";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -64,6 +78,7 @@ export async function GET(_request: Request, { params }: Params) {
   const { id: rawId } = await params;
   const parsedId = parseUuidParam(rawId, "generation id");
   if (parsedId instanceof NextResponse) return parsedId;
+  const generationId = parsedId.id;
 
   const { data, error } = await auth.supabase
     .from("website_generations")
@@ -73,10 +88,10 @@ export async function GET(_request: Request, { params }: Params) {
     .maybeSingle();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, error.message);
   }
   if (!data) {
-    return NextResponse.json({ error: "Website not found." }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Website not found.");
   }
 
   const generation = data as WebsiteGeneration;
@@ -85,7 +100,8 @@ export async function GET(_request: Request, { params }: Params) {
     project.businessProfile?.industry ||
     project.designSystem?.industryPattern ||
     "business";
-  const structure = resolveSiteStructure(
+  const structure = resolveSiteStructureForProject(
+    project.files || [],
     industryId,
     project.description || generation.business_description,
   );
@@ -96,6 +112,7 @@ export async function GET(_request: Request, { params }: Params) {
   });
   const cms = await listCmsEntries(parsedId.id, auth.supabase);
   const leads = await listWebsiteLeads(parsedId.id, auth.supabase);
+  const media = await listMediaAssets(parsedId.id, { client: auth.supabase });
 
   return NextResponse.json({
     generation,
@@ -103,6 +120,7 @@ export async function GET(_request: Request, { params }: Params) {
     structure,
     catalog,
     cms,
+    media,
     leads,
     quality,
     brand: {
@@ -112,6 +130,7 @@ export async function GET(_request: Request, { params }: Params) {
       accent: project.designSystem?.colors?.accent,
       displayFont: project.designSystem?.typography?.headingFont,
       bodyFont: project.designSystem?.typography?.bodyFont,
+      logoUrl: resolveBrandLogoUrl(project),
     },
   });
 }
@@ -151,6 +170,16 @@ const manageSchema = z.discriminatedUnion("action", [
       body: z.string().optional(),
       mediaUrl: z.string().optional(),
       pagePath: z.string().optional(),
+      slug: z.string().optional(),
+      categories: z.array(z.string()).optional(),
+      tags: z.array(z.string()).optional(),
+      seoJson: z
+        .object({
+          title: z.string().optional(),
+          description: z.string().optional(),
+          keywords: z.array(z.string()).optional(),
+        })
+        .optional(),
       scheduledAt: z.string().nullable().optional(),
       published: z.boolean().optional(),
     }),
@@ -179,6 +208,58 @@ const manageSchema = z.discriminatedUnion("action", [
   z.object({
     action: z.literal("quality"),
   }),
+  z.object({
+    action: z.literal("pages.create"),
+    label: z.string().min(1),
+    route: z.string().optional(),
+    purpose: z.string().optional(),
+  }),
+  z.object({
+    action: z.literal("pages.update"),
+    route: z.string().min(1),
+    label: z.string().optional(),
+    purpose: z.string().optional(),
+  }),
+  z.object({
+    action: z.literal("pages.delete"),
+    route: z.string().min(1),
+  }),
+  z.object({
+    action: z.literal("pages.duplicate"),
+    route: z.string().min(1),
+  }),
+  z.object({
+    action: z.literal("pages.reorder"),
+    routes: z.array(z.string()).min(1),
+  }),
+  z.object({
+    action: z.literal("pages.setHome"),
+    route: z.string().min(1),
+  }),
+  z.object({
+    action: z.literal("nav.update"),
+    links: z.array(
+      z.object({
+        href: z.string(),
+        label: z.string(),
+        children: z
+          .array(z.object({ href: z.string(), label: z.string() }))
+          .optional(),
+      }),
+    ),
+  }),
+  z.object({
+    action: z.literal("footer.update"),
+    links: z.array(
+      z.object({
+        href: z.string(),
+        label: z.string(),
+        children: z
+          .array(z.object({ href: z.string(), label: z.string() }))
+          .optional(),
+      }),
+    ),
+  }),
 ]);
 
 /**
@@ -188,19 +269,20 @@ export async function POST(request: Request, { params }: Params) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
+  const rateLimited = await enforceWebsiteUserMutationRateLimit(auth.user!.id);
+  if (rateLimited) return rateLimited;
+
   const { id: rawId } = await params;
   const parsedId = parseUuidParam(rawId, "generation id");
   if (parsedId instanceof NextResponse) return parsedId;
+  const generationId = parsedId.id;
 
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
 
   const parsed = manageSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid request" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   try {
@@ -213,7 +295,7 @@ export async function POST(request: Request, { params }: Params) {
 
     if (error) throw error;
     if (!data) {
-      return NextResponse.json({ error: "Website not found." }, { status: 404 });
+      return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Website not found.");
     }
 
     const generation = data as WebsiteGeneration;
@@ -222,10 +304,39 @@ export async function POST(request: Request, { params }: Params) {
       project.businessProfile?.industry ||
       project.designSystem?.industryPattern ||
       "business";
-    const structure = resolveSiteStructure(industryId, project.description);
+    let structure = resolveSiteStructureForProject(
+      project.files || [],
+      industryId,
+      project.description,
+    );
     const action = parsed.data;
     const notes: string[] = [];
     let assistantResult: ReturnType<typeof runWebsiteAssistant> | null = null;
+    const brandName =
+      generation.project_name || project.title || "Brand";
+
+    async function syncCmsToProject() {
+      const cms = await listCmsEntries(generationId, auth.supabase);
+      const files = injectCmsIntoFiles(
+        project.files || [],
+        cms,
+        brandName,
+      );
+      project = { ...project, files };
+      notes.push("CMS synced to project files");
+      return cms;
+    }
+
+    function syncStructureToProject() {
+      project = {
+        ...project,
+        files: applyStructureToProjectFiles({
+          files: project.files || [],
+          structure,
+          brandName,
+        }),
+      };
+    }
 
     if (action.action === "quality") {
       const quality = runPrePublishQualityControl({
@@ -236,22 +347,78 @@ export async function POST(request: Request, { params }: Params) {
     }
 
     if (action.action === "cms.upsert") {
-      const entry = await upsertCmsEntry(parsedId.id, action.entry, {
+      const entry = await upsertCmsEntry(generationId, action.entry, {
         userId: auth.user!.id,
         client: auth.supabase,
       });
+      await syncCmsToProject();
+      const saved = await persistWebsiteGeneration({
+        supabase: auth.supabase,
+        userId: auth.user!.id,
+        project,
+        projectKind: project.projectKind || "website",
+        existingGenerationId: generation.id,
+        input: {
+          prompt:
+            generation.business_description ||
+            project.description ||
+            "Website management update",
+          language: generation.language || "English",
+          theme: `${generation.design_style || ""} ${generation.color_style || ""}`.trim() ||
+            "premium",
+          features: generation.features || [],
+          productId: "website-builder",
+          projectId: generation.project_id || undefined,
+          mode: "continue",
+          parentGenerationId: generation.id,
+          continueInstruction: `[website-management] CMS updated: ${entry.title}`,
+        },
+      });
+      if (!saved.ok) {
+        return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, saved.error);
+      }
       return NextResponse.json({
         ok: true,
         entry,
-        cms: await listCmsEntries(parsedId.id, auth.supabase),
+        cms: await listCmsEntries(generationId, auth.supabase),
+        project: saved.project,
+        generation: saved.generation,
       });
     }
 
     if (action.action === "cms.delete") {
-      await deleteCmsEntry(parsedId.id, action.id, auth.supabase);
+      await deleteCmsEntry(generationId, action.id, auth.supabase);
+      await syncCmsToProject();
+      const saved = await persistWebsiteGeneration({
+        supabase: auth.supabase,
+        userId: auth.user!.id,
+        project,
+        projectKind: project.projectKind || "website",
+        existingGenerationId: generation.id,
+        input: {
+          prompt:
+            generation.business_description ||
+            project.description ||
+            "Website management update",
+          language: generation.language || "English",
+          theme: `${generation.design_style || ""} ${generation.color_style || ""}`.trim() ||
+            "premium",
+          features: generation.features || [],
+          productId: "website-builder",
+          projectId: generation.project_id || undefined,
+          mode: "continue",
+          parentGenerationId: generation.id,
+          continueInstruction: "[website-management] CMS entry deleted",
+        },
+      });
+      if (!saved.ok) {
+        return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, saved.error);
+      }
       return NextResponse.json({
         ok: true,
-        cms: await listCmsEntries(parsedId.id, auth.supabase),
+        cms: await listCmsEntries(generationId, auth.supabase),
+        project: saved.project,
+        generation: saved.generation,
       });
     }
 
@@ -299,6 +466,57 @@ export async function POST(request: Request, { params }: Params) {
       notes.push(...assistantResult.notes);
     }
 
+    if (action.action === "pages.create") {
+      structure = addPage(structure, action);
+      syncStructureToProject();
+      notes.push(`Page created: ${action.label}`);
+    }
+
+    if (action.action === "pages.update") {
+      structure = updatePageMeta(structure, action.route, {
+        label: action.label,
+        purpose: action.purpose,
+      });
+      syncStructureToProject();
+      notes.push(`Page updated: ${action.route}`);
+    }
+
+    if (action.action === "pages.delete") {
+      structure = removePage(structure, action.route);
+      syncStructureToProject();
+      notes.push(`Page deleted: ${action.route}`);
+    }
+
+    if (action.action === "pages.duplicate") {
+      structure = duplicatePage(structure, action.route);
+      syncStructureToProject();
+      notes.push(`Page duplicated: ${action.route}`);
+    }
+
+    if (action.action === "pages.reorder") {
+      structure = reorderPages(structure, action.routes);
+      syncStructureToProject();
+      notes.push("Pages reordered");
+    }
+
+    if (action.action === "pages.setHome") {
+      structure = setHomepage(structure, action.route);
+      syncStructureToProject();
+      notes.push(`Homepage set: ${action.route}`);
+    }
+
+    if (action.action === "nav.update") {
+      structure = updateNavLinks(structure, action.links);
+      syncStructureToProject();
+      notes.push("Navigation updated");
+    }
+
+    if (action.action === "footer.update") {
+      structure = updateFooterLinks(structure, action.links);
+      syncStructureToProject();
+      notes.push("Footer links updated");
+    }
+
     const saved = await persistWebsiteGeneration({
       supabase: auth.supabase,
       userId: auth.user!.id,
@@ -323,19 +541,24 @@ export async function POST(request: Request, { params }: Params) {
     });
 
     if (!saved.ok) {
-      return NextResponse.json({ error: saved.error }, { status: 500 });
+      return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, saved.error);
     }
 
     const quality = runPrePublishQualityControl({
       files: saved.project.files || [],
-      structure,
+      structure: resolveSiteStructureForProject(
+        saved.project.files || [],
+        industryId,
+        project.description,
+      ),
     });
 
     return NextResponse.json({
       ok: true,
       notes,
+      structure,
       catalog: parseCatalogFromFiles(saved.project.files || []),
-      cms: await listCmsEntries(parsedId.id, auth.supabase),
+      cms: await listCmsEntries(generationId, auth.supabase),
       quality,
       assistant: assistantResult,
       editCommand: assistantResult?.editCommand,

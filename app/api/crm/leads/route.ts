@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { enforceMutationRateLimit } from "@/lib/api/rate-limit";
 import { listLeads, createLead, updateLead, convertLead } from "@/lib/crm/leads";
@@ -45,13 +46,13 @@ export async function POST(request: Request) {
       convertBody.leadId,
       { createDeal: convertBody.createDeal },
     );
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, error.message);
     return NextResponse.json({ contact, deal });
   }
 
   const parsed = createSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid" }, { status: 400 });
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const { data, error } = await createLead(auth.supabase, {
@@ -74,7 +75,7 @@ export async function PATCH(request: Request) {
   if (auth.response) return auth.response;
   const body = await parseJsonBody<{ id?: string; status?: string; assigneeName?: string }>(request);
   if (body instanceof NextResponse) return body;
-  if (!body.id) return NextResponse.json({ error: "id required" }, { status: 400 });
+  if (!body.id) return apiValidationError("id required");
   const patch: Record<string, unknown> = {};
   if (body.status) patch.status = body.status;
   if (body.assigneeName) patch.assignee_name = body.assigneeName;

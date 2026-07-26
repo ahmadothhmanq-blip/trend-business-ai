@@ -2,7 +2,12 @@
  * Phase 1 — Industry site structure (pages, nav, footer, sitemap).
  */
 
-import type { SiteStructurePlan, ManagedPageDef } from "@/lib/ai-core/website-management/types";
+import type { GeneratedProjectFile } from "@/lib/ai/types";
+import type {
+  NavLink,
+  SiteStructurePlan,
+  ManagedPageDef,
+} from "@/lib/ai-core/website-management/types";
 
 function pages(
   ...defs: Array<[string, string, string, string, string[]]>
@@ -269,4 +274,154 @@ export function resolveSiteStructure(
 
 export function listSiteStructureIndustries(): string[] {
   return Object.keys(STRUCTURES);
+}
+
+function parseJsonConst<T>(content: string, exportName: string): T | null {
+  const match = content.match(
+    new RegExp(`export const ${exportName}\\s*=\\s*([\\s\\S]*?)\\s*as const`),
+  );
+  if (!match?.[1]) return null;
+  try {
+    return JSON.parse(match[1]) as T;
+  } catch {
+    return null;
+  }
+}
+
+function parseSitemapPaths(content: string): string[] {
+  const match = content.match(
+    /export const SITE_SITEMAP_PATHS\s*=\s*\[([\s\S]*?)\]\s*as const/,
+  );
+  if (!match?.[1]) return [];
+  const paths: string[] = [];
+  for (const line of match[1].split("\n")) {
+    const m = line.match(/"([^"]+)"/);
+    if (m?.[1]) paths.push(m[1]);
+  }
+  return paths;
+}
+
+function industryFromCatalogFile(files: GeneratedProjectFile[]): string | null {
+  const file = files.find((f) => f.path === "lib/site-catalog.ts");
+  if (!file) return null;
+  const match = file.content.match(/Industry:\s*([a-z-]+)/i);
+  return match?.[1] || null;
+}
+
+function routeFromPagePath(path: string): string {
+  if (path === "app/page.tsx") return "/";
+  const m = path.match(/^app\/(.+)\/page\.tsx$/);
+  if (!m?.[1]) return "/";
+  return `/${m[1].replace(/\[slug\]/g, "")}`.replace(/\/+/g, "/");
+}
+
+function labelFromRoute(route: string): string {
+  if (route === "/") return "Home";
+  const slug = route.replace(/^\//, "").split("/")[0] || "Page";
+  return slug
+    .split("-")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
+/**
+ * Parse persisted structure from blueprint files (lib/site-sitemap.ts + page files).
+ */
+export function parseStructureFromFiles(
+  files: GeneratedProjectFile[],
+): SiteStructurePlan | null {
+  const sitemapFile = files.find((f) => f.path === "lib/site-sitemap.ts");
+  if (!sitemapFile) return null;
+
+  const navLinks = parseJsonConst<NavLink[]>(
+    sitemapFile.content,
+    "SITE_NAV_LINKS",
+  );
+  const footerLinks = parseJsonConst<NavLink[]>(
+    sitemapFile.content,
+    "SITE_FOOTER_LINKS",
+  );
+  const sitemapPaths = parseSitemapPaths(sitemapFile.content);
+
+  if (!navLinks?.length && !sitemapPaths.length) return null;
+
+  const pageFiles = files.filter(
+    (f) => f.path === "app/page.tsx" || /^app\/.+\/page\.tsx$/.test(f.path),
+  );
+  const pages: ManagedPageDef[] = pageFiles.map((file) => {
+    const route = routeFromPagePath(file.path);
+    const existing = sitemapPaths.includes(route);
+    return {
+      route,
+      path: file.path,
+      label: labelFromRoute(route),
+      purpose: existing ? `${labelFromRoute(route)} page` : "Custom page",
+      sections: [],
+    };
+  });
+
+  const industryId =
+    industryFromCatalogFile(files) ||
+    resolveSiteStructure(null, null).industryId;
+
+  const base = STRUCTURES[industryId] || STRUCTURES.business!;
+  const orderedPaths = sitemapPaths.length
+    ? sitemapPaths
+    : pages.map((p) => p.route);
+
+  const orderedPages = orderedPaths
+    .map((route) => pages.find((p) => p.route === route))
+    .filter((p): p is ManagedPageDef => Boolean(p));
+
+  for (const page of pages) {
+    if (!orderedPages.some((p) => p.route === page.route)) {
+      orderedPages.push(page);
+    }
+  }
+
+  return {
+    industryId,
+    businessType: base.businessType,
+    pages: orderedPages.length ? orderedPages : base.pages,
+    navLinks: navLinks?.length ? navLinks : base.navLinks,
+    footerLinks: footerLinks?.length ? footerLinks : base.footerLinks,
+    sitemapPaths: sitemapPaths.length
+      ? sitemapPaths
+      : orderedPages.map((p) => p.route),
+  };
+}
+
+/** Write structure nav/footer/sitemap constants into blueprint files. */
+export function writeStructureToFiles(
+  files: GeneratedProjectFile[],
+  structure: SiteStructurePlan,
+): GeneratedProjectFile[] {
+  const urls = structure.sitemapPaths
+    .map((p) => `  ${JSON.stringify(p)},`)
+    .join("\n");
+  const sitemapFile: GeneratedProjectFile = {
+    path: "lib/site-sitemap.ts",
+    language: "typescript",
+    content: `/** Auto-generated site sitemap paths */
+export const SITE_SITEMAP_PATHS = [
+${urls}
+] as const;
+
+export const SITE_NAV_LINKS = ${JSON.stringify(structure.navLinks, null, 2)} as const;
+
+export const SITE_FOOTER_LINKS = ${JSON.stringify(structure.footerLinks, null, 2)} as const;
+`,
+  };
+  return [...files.filter((f) => f.path !== sitemapFile.path), sitemapFile];
+}
+
+/** Prefer saved blueprint structure; fall back to industry templates. */
+export function resolveSiteStructureForProject(
+  files: GeneratedProjectFile[],
+  industryId?: string | null,
+  promptHint?: string | null,
+): SiteStructurePlan {
+  const parsed = parseStructureFromFiles(files);
+  if (parsed) return parsed;
+  return resolveSiteStructure(industryId, promptHint);
 }

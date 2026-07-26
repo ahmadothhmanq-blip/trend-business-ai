@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody, parseUuidParam } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import {
   applyBrandKit,
@@ -69,7 +70,7 @@ export async function POST(request: Request, context: RouteContext) {
   if (body instanceof NextResponse) return body;
   const parsed = postSchema.safeParse(body ?? {});
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+    return apiValidationError("Invalid input");
   }
 
   const { data: gen, error: genError } = await auth.supabase
@@ -80,7 +81,7 @@ export async function POST(request: Request, context: RouteContext) {
     .single();
 
   if (genError || !gen?.blueprint) {
-    return NextResponse.json({ error: "Brand identity not found" }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Brand identity not found");
   }
 
   const generation = gen as BrandIdentityGeneration;
@@ -98,7 +99,7 @@ export async function POST(request: Request, context: RouteContext) {
   });
 
   if (kitError || !kit) {
-    return NextResponse.json({ error: kitError ?? "Failed to save kit" }, { status: 503 });
+    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 503, kitError ?? "Failed to save kit");
   }
 
   const { assets, error: assetError } = await saveBrandAssets({

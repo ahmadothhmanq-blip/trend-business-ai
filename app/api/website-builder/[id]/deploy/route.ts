@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { z } from "zod";
 import { requireUser, parseUuidParam } from "@/lib/api/helpers";
+import { enforceWebsiteUserMutationRateLimit } from "@/lib/website/public-endpoints";
 import type { WebsiteGeneration } from "@/types/database";
 import {
   getPublicationForGeneration,
@@ -9,6 +11,11 @@ import {
 import { buildDeploymentDashboard } from "@/lib/ai-core/deployment";
 import { recordDeploymentEvent } from "@/lib/ai-core/deployment";
 import { normalizeSubdomainHandle } from "@/lib/ai-core/domains";
+import {
+  buildPublishQualityPayload,
+  prepareSuccessMessage,
+  publishSuccessMessage,
+} from "@/lib/website/publish-quality";
 
 export const dynamic = "force-dynamic";
 
@@ -47,10 +54,10 @@ export async function GET(_request: Request, { params }: Params) {
     .maybeSingle();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, error.message);
   }
   if (!generation) {
-    return NextResponse.json({ error: "Website not found." }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Website not found.");
   }
 
   const publication = await getPublicationForGeneration({
@@ -82,15 +89,19 @@ const actionSchema = z.object({
     "archive",
     "republish",
   ]),
+  force: z.boolean().optional(),
 });
 
 /**
  * POST — Publish / prepare / unpublish / archive via Publishing Engine.
- * Delegates to existing lib/website/publish (quality gates remain on /publish).
+ * Enforces the same quality gates as /publish (including force override).
  */
 export async function POST(request: Request, { params }: Params) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
+
+  const rateLimited = await enforceWebsiteUserMutationRateLimit(auth.user!.id);
+  if (rateLimited) return rateLimited;
 
   const { id: rawId } = await params;
   const parsedId = parseUuidParam(rawId, "generation id");
@@ -100,15 +111,12 @@ export async function POST(request: Request, { params }: Params) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    return apiErrorResponse(API_ERROR_CODES.INVALID_JSON, 400);
   }
 
   const parsed = actionSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid action" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const { data: existing, error } = await auth.supabase
@@ -119,14 +127,15 @@ export async function POST(request: Request, { params }: Params) {
     .maybeSingle();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, error.message);
   }
   if (!existing) {
-    return NextResponse.json({ error: "Website not found." }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Website not found.");
   }
 
   const generation = existing as WebsiteGeneration;
   const handle = userHandleFromAuth(auth.user!);
+  const force = parsed.data.force === true;
 
   const result = await runPublishingAction({
     supabase: auth.supabase,
@@ -134,13 +143,23 @@ export async function POST(request: Request, { params }: Params) {
     generation,
     action: parsed.data.action,
     userHandle: handle,
+    force,
   });
 
   if (!result.ok) {
-    return NextResponse.json(
-      { error: result.error },
-      { status: result.status },
-    );
+    if (result.gateBlock) {
+      return apiErrorResponse(
+        API_ERROR_CODES.INVALID_INPUT,
+        422,
+        result.error,
+        undefined,
+        {
+          qualityRecommendations: result.qualityRecommendations,
+          blockers: result.blockers,
+        },
+      );
+    }
+    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, result.status, result.error);
   }
 
   const kindByAction = {
@@ -173,11 +192,26 @@ export async function POST(request: Request, { params }: Params) {
     client: auth.supabase,
   });
 
+  const { gates } = result;
+  const qualityRecommendations = buildPublishQualityPayload(gates);
+  const publishAction =
+    parsed.data.action === "publish" || parsed.data.action === "republish";
+
   return NextResponse.json({
     success: true,
     publication: result.publication,
     dashboard,
-    publicUrl:
-      "publicUrl" in result ? result.publicUrl : result.publication.planned_public_url,
+    publicUrl: result.publicUrl ?? result.publication.planned_public_url,
+    managementQuality: gates.managementQuality,
+    conversionChecklist: gates.conversionChecklist,
+    seoPerformanceChecklist: gates.seoChecklist,
+    finalQualityChecklist: gates.finalChecklist,
+    qualityRecommendations,
+    message:
+      parsed.data.action === "prepare"
+        ? prepareSuccessMessage(gates)
+        : publishAction
+          ? publishSuccessMessage(gates, force)
+          : `Deployment action: ${parsed.data.action}`,
   });
 }

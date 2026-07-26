@@ -1,4 +1,5 @@
 import { syncFavorite } from "@/lib/db/favorites";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { requireUser, parseJsonBody, parseUuidParam } from "@/lib/api/helpers";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import type { WebAppGeneration } from "@/types/webapp";
@@ -29,7 +30,7 @@ export async function GET(_request: Request, context: RouteContext) {
     .single();
 
   if (error || !data) {
-    return NextResponse.json({ error: "Web app not found" }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Web app not found");
   }
 
   return NextResponse.json({ generation: data as WebAppGeneration });
@@ -49,10 +50,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   const parsed = updateSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid update" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const { is_favorite, app_name } = parsed.data;
@@ -70,7 +68,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     .single();
 
   if (error || !data) {
-    return NextResponse.json({ error: "Web app not found" }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Web app not found");
   }
 
   if (typeof is_favorite === "boolean") {
@@ -109,7 +107,7 @@ export async function POST(_request: Request, context: RouteContext) {
     .single();
 
   if (sourceError || !source) {
-    return NextResponse.json({ error: "Web app not found" }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Web app not found");
   }
 
   const { data, error } = await auth.supabase
@@ -162,7 +160,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
     .single();
 
   if (error || !data) {
-    return NextResponse.json({ error: "Web app not found" }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Web app not found");
   }
 
   return NextResponse.json({ message: "Web app deleted." });

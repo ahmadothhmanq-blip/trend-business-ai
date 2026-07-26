@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+/** i18n:api-internal — probe/fallback route, not user-facing API errors */
+
 /**
  * Safe fallback — auth signup is implemented via `/signup` (server actions),
  * not a dedicated JSON API. Keep this route for probes and mistaken clients.

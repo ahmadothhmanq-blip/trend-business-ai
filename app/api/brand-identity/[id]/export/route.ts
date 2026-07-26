@@ -1,4 +1,5 @@
 import { requireUser, parseUuidParam } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import {
   blueprintToModel,
   buildExportManifest,
@@ -32,7 +33,7 @@ export async function GET(request: Request, context: RouteContext) {
     .single();
 
   if (error || !gen?.blueprint) {
-    return NextResponse.json({ error: "Brand identity not found" }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Brand identity not found");
   }
 
   const generation = gen as BrandIdentityGeneration;

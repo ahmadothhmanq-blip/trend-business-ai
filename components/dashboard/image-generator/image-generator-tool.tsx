@@ -40,6 +40,10 @@ import {
   SvgPreview,
   type ProjectHistoryItem,
 } from "@/components/dashboard/builder-shared";
+import {
+  BrandKitPanel,
+  type BrandKitOption,
+} from "@/components/dashboard/website-builder/brand-kit-panel";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n/client";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
@@ -316,6 +320,7 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
   const [batchCount, setBatchCount] = useState(2);
   const [quality, setQuality] = useState<"standard" | "hd">("standard");
   const [useBrand, setUseBrand] = useState(false);
+  const [selectedBrandKitId, setSelectedBrandKitId] = useState<string | null>(null);
   const [brandIdentity, setBrandIdentity] = useState({
     brandName: "", primary: "#D4AF37", secondary: "#1A1A2E", accent: "#C9A227",
     headingFont: "Inter", bodyFont: "Roboto", voiceTone: "Professional", tagline: "",
@@ -367,6 +372,22 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
     setSelectedType(id);
     const def = getImageType(id);
     if (def) setOptions([...def.defaultOptions]);
+  };
+
+  const applyBrandKit = (kit: BrandKitOption | null) => {
+    if (!kit) {
+      setSelectedBrandKitId(null);
+      return;
+    }
+    setSelectedBrandKitId(kit.id);
+    setUseBrand(true);
+    setBrandIdentity((b) => ({
+      ...b,
+      brandName: kit.name,
+      primary: kit.primary || b.primary,
+      secondary: kit.secondary || b.secondary,
+      accent: kit.accent || b.accent,
+    }));
   };
 
   const handleGenerate = async (
@@ -613,12 +634,15 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
               </div>
 
               {useBrand && (
-                <DashboardPanel className="grid gap-3 p-4 sm:grid-cols-2">
+                <div className="space-y-3">
+                  <BrandKitPanel selectedId={selectedBrandKitId} onSelect={applyBrandKit} />
+                  <DashboardPanel className="grid gap-3 p-4 sm:grid-cols-2">
                   <Input value={brandIdentity.brandName} onChange={(e) => setBrandIdentity((b) => ({ ...b, brandName: e.target.value }))} placeholder={p("placeholders.brandName")} className={dashboardInputClass} />
                   <Input value={brandIdentity.primary} onChange={(e) => setBrandIdentity((b) => ({ ...b, primary: e.target.value }))} placeholder={p("placeholders.primaryColor")} className={dashboardInputClass} />
                   <Input value={brandIdentity.secondary} onChange={(e) => setBrandIdentity((b) => ({ ...b, secondary: e.target.value }))} placeholder={p("placeholders.secondaryColor")} className={dashboardInputClass} />
                   <Input value={brandIdentity.accent} onChange={(e) => setBrandIdentity((b) => ({ ...b, accent: e.target.value }))} placeholder={p("placeholders.accentColor")} className={dashboardInputClass} />
                 </DashboardPanel>
+                </div>
               )}
 
               {/* Batch count */}

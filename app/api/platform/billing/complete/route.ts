@@ -1,4 +1,5 @@
 import { parseJsonBody, requireUser } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { serverErrorResponse } from "@/lib/api/errors";
 import { createBillingManager } from "@/lib/billing";
 import { requireBillingWriteClient } from "@/lib/billing/write-client";
@@ -25,7 +26,7 @@ export async function POST(request: Request) {
 
   const parsed = completeSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "sessionId is required." }, { status: 400 });
+    return apiValidationError("sessionId is required.");
   }
 
   try {
@@ -35,7 +36,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ...result, status });
   } catch (error) {
     if (error instanceof Error) {
-      return NextResponse.json({ error: error.message }, { status: 400 });
+      return apiValidationError(error.message);
     }
     return serverErrorResponse("billing.complete", error);
   }

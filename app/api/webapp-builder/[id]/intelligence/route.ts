@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { requireUser, parseUuidParam } from "@/lib/api/helpers";
 import { serverErrorResponse } from "@/lib/api/errors";
 import type { WebAppGeneration } from "@/types/webapp";
@@ -29,10 +30,10 @@ export async function GET(_request: Request, { params }: Params) {
       .maybeSingle();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, error.message);
     }
     if (!data) {
-      return NextResponse.json({ error: "App not found." }, { status: 404 });
+      return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "App not found.");
     }
 
     const generation = data as WebAppGeneration;

@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { enforceMutationRateLimit } from "@/lib/api/rate-limit";
 import { runOsintQuery, listOsintResults } from "@/lib/cyber/osint";
@@ -23,7 +24,7 @@ export async function POST(request: Request) {
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
   const parsed = schema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: "Invalid" }, { status: 400 });
+  if (!parsed.success) return apiValidationError("Invalid");
   const { data, error } = await runOsintQuery(auth.supabase, auth.user!.id, parsed.data.query, parsed.data.resultType);
   if (error) return databaseErrorResponse("cyber.osint.run", error);
   return NextResponse.json({ result: data });

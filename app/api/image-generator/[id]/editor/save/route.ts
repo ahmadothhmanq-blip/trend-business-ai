@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody, parseUuidParam } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { serverErrorResponse } from "@/lib/api/errors";
 import { saveCanvasDocument } from "@/lib/ai-core/image-design-platform/canvas-repository";
 import type { CanvasDocumentModel } from "@/lib/ai-core/image-design-platform/editor/types";
@@ -26,7 +27,7 @@ export async function POST(request: Request, context: RouteContext) {
 
   const parsed = saveSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid save payload" }, { status: 400 });
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const { data: gen, error: genErr } = await auth.supabase
@@ -37,7 +38,7 @@ export async function POST(request: Request, context: RouteContext) {
     .single();
 
   if (genErr || !gen) {
-    return NextResponse.json({ error: "Design not found" }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Design not found");
   }
 
   try {
@@ -51,7 +52,7 @@ export async function POST(request: Request, context: RouteContext) {
     });
 
     if (saved.error) {
-      return NextResponse.json({ error: saved.error }, { status: 503 });
+      return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 503, saved.error);
     }
 
     return NextResponse.json({

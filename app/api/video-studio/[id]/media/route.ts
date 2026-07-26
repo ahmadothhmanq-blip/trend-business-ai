@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { requireUser, parseUuidParam, parseJsonBody } from "@/lib/api/helpers";
 import { serverErrorResponse } from "@/lib/api/errors";
 import {
@@ -35,7 +36,7 @@ export async function GET(request: Request, { params }: Params) {
         mediaId,
       });
       if (!preview.record) {
-        return NextResponse.json({ error: "Media not found." }, { status: 404 });
+        return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Media not found.");
       }
       return NextResponse.json({
         previewUrl: preview.url,
@@ -100,19 +101,13 @@ export async function POST(request: Request, { params }: Params) {
 
   const parsed = uploadSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid upload" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   try {
     const bytes = new Uint8Array(Buffer.from(parsed.data.base64, "base64"));
     if (bytes.byteLength > 8_000_000) {
-      return NextResponse.json(
-        { error: "File too large (max 8MB via this endpoint)." },
-        { status: 400 },
-      );
+      return apiValidationError("File too large (max 8MB via this endpoint).");
     }
 
     const uploaded = await uploadVideoStudioMedia({
@@ -161,7 +156,7 @@ export async function DELETE(request: Request, { params }: Params) {
 
   const parsed = deleteSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "mediaId required" }, { status: 400 });
+    return apiValidationError("mediaId required");
   }
 
   try {
@@ -173,7 +168,7 @@ export async function DELETE(request: Request, { params }: Params) {
     });
     const owned = list.find((m) => m.id === parsed.data.mediaId);
     if (!owned) {
-      return NextResponse.json({ error: "Media not found for this video." }, { status: 404 });
+      return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Media not found for this video.");
     }
 
     const result = await deleteVideoStudioMedia({
@@ -182,7 +177,7 @@ export async function DELETE(request: Request, { params }: Params) {
       mediaId: parsed.data.mediaId,
     });
     if (!result.ok) {
-      return NextResponse.json({ error: result.error || "Delete failed" }, { status: 500 });
+      return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, result.error || "Delete failed");
     }
     return NextResponse.json({ message: "Media deleted.", mediaId: parsed.data.mediaId });
   } catch (error) {

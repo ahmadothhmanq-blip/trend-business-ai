@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { preferencesSchema } from "@/lib/validations/auth";
 import { NextResponse } from "next/server";
@@ -60,7 +61,7 @@ export async function PUT(request: Request) {
 
   const parsed = preferencesSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid preferences" }, { status: 400 });
+    return apiValidationError("Invalid preferences");
   }
 
   const { error } = await auth.supabase.from("user_preferences").upsert({

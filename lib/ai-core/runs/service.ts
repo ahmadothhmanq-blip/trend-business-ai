@@ -343,7 +343,7 @@ export async function executeAiCoreRun(params: {
 
   const mode = (body.mode ?? "generate") as CoreRunMode;
   let priorArtifacts: Partial<CoreLayerArtifacts> | undefined;
-  let parentRunId = body.parentRunId ?? null;
+  const parentRunId = body.parentRunId ?? null;
 
   if (parentRunId) {
     const parent = await getAiCoreRun(supabase, userId, parentRunId);

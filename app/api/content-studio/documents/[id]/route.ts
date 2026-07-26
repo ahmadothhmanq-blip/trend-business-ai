@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody, parseUuidParam } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { documentCounts } from "@/lib/content-studio/documents";
 import { createDocumentVersion } from "@/lib/content-studio/versions";
@@ -38,7 +39,7 @@ export async function GET(_request: Request, context: RouteContext) {
     .single();
 
   if (error || !data) {
-    return NextResponse.json({ error: "Document not found" }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Document not found");
   }
 
   return NextResponse.json({ document: data as ContentDocument });
@@ -57,7 +58,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   const parsed = updateSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid input" }, { status: 400 });
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const input = parsed.data;

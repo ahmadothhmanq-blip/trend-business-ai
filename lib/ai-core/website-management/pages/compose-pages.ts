@@ -3,7 +3,13 @@
  */
 
 import type { GeneratedProjectFile } from "@/lib/ai/types";
-import type { SiteStructurePlan } from "@/lib/ai-core/website-management/types";
+import type {
+  ManagedPageDef,
+  NavLink,
+  SiteStructurePlan,
+} from "@/lib/ai-core/website-management/types";
+import { wireNavAndFooterToRoutes } from "@/lib/ai-core/website-management/pages/wire-nav";
+import { writeStructureToFiles } from "@/lib/ai-core/website-management/pages/site-structure";
 
 function pageShell(params: {
   brand: string;
@@ -269,4 +275,172 @@ export const SITE_FOOTER_LINKS = ${JSON.stringify(params.structure.footerLinks, 
   });
 
   return files;
+}
+
+function slugifyRoute(label: string): string {
+  return label
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 48) || "page";
+}
+
+export function routeToPagePath(route: string): string {
+  if (route === "/") return "app/page.tsx";
+  const clean = route.replace(/^\//, "").replace(/\/$/, "");
+  return `app/${clean}/page.tsx`;
+}
+
+export function addPage(
+  structure: SiteStructurePlan,
+  params: { label: string; route?: string; purpose?: string },
+): SiteStructurePlan {
+  const baseRoute = params.route || `/${slugifyRoute(params.label)}`;
+  const route = baseRoute.startsWith("/") ? baseRoute : `/${baseRoute}`;
+  const path = routeToPagePath(route);
+  if (structure.pages.some((p) => p.route === route)) return structure;
+
+  const page: ManagedPageDef = {
+    route,
+    path,
+    label: params.label,
+    purpose: params.purpose || `${params.label} page`,
+    sections: [],
+  };
+
+  return {
+    ...structure,
+    pages: [...structure.pages, page],
+    sitemapPaths: structure.sitemapPaths.includes(route)
+      ? structure.sitemapPaths
+      : [...structure.sitemapPaths, route],
+  };
+}
+
+export function removePage(
+  structure: SiteStructurePlan,
+  route: string,
+): SiteStructurePlan {
+  if (route === "/") return structure;
+  return {
+    ...structure,
+    pages: structure.pages.filter((p) => p.route !== route),
+    sitemapPaths: structure.sitemapPaths.filter((p) => p !== route),
+    navLinks: structure.navLinks.filter((l) => l.href !== route),
+    footerLinks: structure.footerLinks.filter((l) => l.href !== route),
+  };
+}
+
+export function duplicatePage(
+  structure: SiteStructurePlan,
+  route: string,
+): SiteStructurePlan {
+  const source = structure.pages.find((p) => p.route === route);
+  if (!source) return structure;
+  const copyLabel = `${source.label} Copy`;
+  let candidate = `/${slugifyRoute(copyLabel)}`;
+  let i = 2;
+  while (structure.pages.some((p) => p.route === candidate)) {
+    candidate = `/${slugifyRoute(copyLabel)}-${i}`;
+    i += 1;
+  }
+  return addPage(structure, {
+    label: copyLabel,
+    route: candidate,
+    purpose: source.purpose,
+  });
+}
+
+export function reorderPages(
+  structure: SiteStructurePlan,
+  routes: string[],
+): SiteStructurePlan {
+  const byRoute = new Map(structure.pages.map((p) => [p.route, p]));
+  const pages = routes
+    .map((r) => byRoute.get(r))
+    .filter((p): p is ManagedPageDef => Boolean(p));
+  for (const page of structure.pages) {
+    if (!pages.some((p) => p.route === page.route)) pages.push(page);
+  }
+  return {
+    ...structure,
+    pages,
+    sitemapPaths: routes.length ? routes : structure.sitemapPaths,
+  };
+}
+
+export function setHomepage(
+  structure: SiteStructurePlan,
+  route: string,
+): SiteStructurePlan {
+  const target = structure.pages.find((p) => p.route === route);
+  const currentHome = structure.pages.find((p) => p.route === "/");
+  if (!target || route === "/") return structure;
+
+  const pages = structure.pages.map((p) => {
+    if (p.route === "/") {
+      return { ...target, route: "/", path: "app/page.tsx" };
+    }
+    if (p.route === route && currentHome) {
+      return {
+        ...currentHome,
+        route,
+        path: routeToPagePath(route),
+      };
+    }
+    return p;
+  });
+
+  const sitemapPaths = structure.sitemapPaths.map((p) =>
+    p === route ? "/" : p === "/" ? route : p,
+  );
+
+  return { ...structure, pages, sitemapPaths };
+}
+
+export function updatePageMeta(
+  structure: SiteStructurePlan,
+  route: string,
+  patch: Partial<Pick<ManagedPageDef, "label" | "purpose">>,
+): SiteStructurePlan {
+  return {
+    ...structure,
+    pages: structure.pages.map((p) =>
+      p.route === route ? { ...p, ...patch } : p,
+    ),
+  };
+}
+
+/**
+ * Apply structure changes to blueprint files: pages, sitemap, nav wiring.
+ */
+export function applyStructureToProjectFiles(params: {
+  files: GeneratedProjectFile[];
+  structure: SiteStructurePlan;
+  brandName: string;
+}): GeneratedProjectFile[] {
+  const validPaths = new Set(params.structure.pages.map((p) => p.path));
+  let files = params.files.filter((f) => {
+    if (f.path === "app/page.tsx") return validPaths.has("app/page.tsx");
+    if (/^app\/.+\/page\.tsx$/.test(f.path)) return validPaths.has(f.path);
+    return true;
+  });
+
+  const secondary = composeManagedSecondaryPages({
+    structure: params.structure,
+    brandName: params.brandName,
+  });
+  for (const file of secondary) {
+    if (
+      files.some((f) => f.path === file.path) &&
+      (file.path.startsWith("app/models") ||
+        file.path.startsWith("app/inventory"))
+    ) {
+      continue;
+    }
+    files = [...files.filter((f) => f.path !== file.path), file];
+  }
+
+  files = writeStructureToFiles(files, params.structure);
+  return wireNavAndFooterToRoutes(files, params.structure);
 }

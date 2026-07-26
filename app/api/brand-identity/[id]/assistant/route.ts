@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody, parseUuidParam } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import {
@@ -32,7 +33,7 @@ export async function POST(request: Request, context: RouteContext) {
   if (body instanceof NextResponse) return body;
   const parsed = bodySchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Message required" }, { status: 400 });
+    return apiValidationError("Message required");
   }
 
   const { data: gen, error } = await auth.supabase
@@ -43,7 +44,7 @@ export async function POST(request: Request, context: RouteContext) {
     .single();
 
   if (error || !gen?.blueprint) {
-    return NextResponse.json({ error: "Brand identity not found" }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Brand identity not found");
   }
 
   const generation = gen as BrandIdentityGeneration;

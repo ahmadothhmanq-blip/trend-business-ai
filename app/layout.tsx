@@ -1,13 +1,10 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
-import { ThemeProvider } from "@/components/theme/theme-provider";
-import { AppToaster } from "@/components/providers/app-toaster";
-import { AnalyticsNoscript, AnalyticsScripts } from "@/components/seo/analytics-scripts";
+import { AppProviders } from "@/components/providers/app-providers";
 import { CoreWebVitalsHints } from "@/components/seo/core-web-vitals-hints";
 import { rootMetadata } from "@/lib/seo/metadata";
 import { THEME_COOKIE, resolveServerThemeClass } from "@/lib/theme/theme";
-import { I18nProvider } from "@/lib/i18n/client";
 import { getLocaleDefinition } from "@/lib/i18n/config";
 import { getServerLocale, getServerMessages, getServerTranslator } from "@/lib/i18n/server";
 import "./globals.css";
@@ -55,20 +52,15 @@ export default async function RootLayout({
         <CoreWebVitalsHints />
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <AnalyticsNoscript />
-        <ThemeProvider defaultTheme="dark" enableSystem disableTransitionOnChange>
-          <I18nProvider locale={locale} messages={messages}>
-            <a
-              href="#main-content"
-              className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-premium-gold focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-luxury-black"
-            >
-              {t("common.skipToContent")}
-            </a>
-            <div id="main-content">{children}</div>
-            <AppToaster />
-          </I18nProvider>
-        </ThemeProvider>
-        <AnalyticsScripts />
+        <AppProviders locale={locale} messages={messages}>
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-premium-gold focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-luxury-black"
+          >
+            {t("common.skipToContent")}
+          </a>
+          <div id="main-content">{children}</div>
+        </AppProviders>
       </body>
     </html>
   );

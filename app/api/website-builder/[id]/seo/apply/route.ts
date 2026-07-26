@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { z } from "zod";
 import { requireUser, parseUuidParam } from "@/lib/api/helpers";
 import { extractWebsiteFilesFromBlueprint } from "@/plugins/website/iteration";
@@ -47,15 +48,12 @@ export async function POST(request: Request, { params }: Params) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    return apiErrorResponse(API_ERROR_CODES.INVALID_JSON, 400);
   }
 
   const parsed = applySchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid apply request" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const { data: existing, error } = await auth.supabase
@@ -66,20 +64,17 @@ export async function POST(request: Request, { params }: Params) {
     .maybeSingle();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, error.message);
   }
   if (!existing) {
-    return NextResponse.json({ error: "Website not found." }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Website not found.");
   }
 
   const generation = existing as WebsiteGeneration;
   const project = generation.blueprint as unknown as GeneratedWebsiteProject;
   const files = extractWebsiteFilesFromBlueprint(generation.blueprint);
   if (!files.length) {
-    return NextResponse.json(
-      { error: "Generation has no editable files." },
-      { status: 400 },
-    );
+    return apiValidationError("Generation has no editable files.");
   }
 
   const profile = (project.businessProfile ||
@@ -114,7 +109,7 @@ export async function POST(request: Request, { params }: Params) {
 
   const fix = getSeoFix(agent.optimizer, parsed.data.fixId);
   if (!fix) {
-    return NextResponse.json({ error: "SEO fix not found." }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "SEO fix not found.");
   }
 
   let nextFiles = files;
@@ -151,7 +146,7 @@ export async function POST(request: Request, { params }: Params) {
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : "Apply fix failed";
-    return NextResponse.json({ error: message }, { status: 400 });
+    return apiValidationError(message);
   }
 
   const nextProject: GeneratedWebsiteProject = {
@@ -184,7 +179,7 @@ export async function POST(request: Request, { params }: Params) {
   });
 
   if (!saved.ok) {
-    return NextResponse.json({ error: saved.error }, { status: 500 });
+    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, saved.error);
   }
 
   // Re-run agent on saved files for refreshed dashboard

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
 import { serverErrorResponse } from "@/lib/api/errors";
 import {
@@ -33,10 +34,7 @@ export async function POST(request: Request) {
 
   const parsed = schema.safeParse(body ?? {});
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid worker request" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   try {
@@ -99,7 +97,7 @@ export async function GET() {
           message: "Apply migration 044_video_studio_media.sql for render jobs.",
         });
       }
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, error.message);
     }
 
     return NextResponse.json({ jobs: data ?? [] });

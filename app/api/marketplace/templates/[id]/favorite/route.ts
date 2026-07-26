@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { requireUser } from "@/lib/api/helpers";
 import { favoriteCreatorTemplate } from "@/lib/marketplace/templates";
 
@@ -18,6 +19,6 @@ export async function POST(_request: Request, { params }: Params) {
     const result = favoriteCreatorTemplate(auth.user!.id, id);
     return NextResponse.json(result);
   } catch {
-    return NextResponse.json({ error: "Template not found." }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Template not found.");
   }
 }

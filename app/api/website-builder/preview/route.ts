@@ -1,4 +1,5 @@
 import { exec } from "node:child_process";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { randomUUID } from "node:crypto";
 import { access, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -177,12 +178,10 @@ export async function POST(request: Request) {
   if (auth.response) return auth.response;
 
   if (!isPreviewBuilderEnabled()) {
-    return NextResponse.json(
-      {
-        error:
-          "Preview builder is disabled. Download the project ZIP and run or deploy it yourself. Production builds cannot enable WEBSITE_PREVIEW_BUILDER_ENABLED until a sandboxed preview is approved.",
-      },
-      { status: 503 },
+    return apiErrorResponse(
+      API_ERROR_CODES.MIGRATION_REQUIRED,
+      503,
+      "Preview builder is disabled. Download the project ZIP and run or deploy it yourself. Production builds cannot enable WEBSITE_PREVIEW_BUILDER_ENABLED until a sandboxed preview is approved.",
     );
   }
 
@@ -191,10 +190,7 @@ export async function POST(request: Request) {
 
   const parsed = previewBuildSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid generated project." },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const previewId = randomUUID();
@@ -224,13 +220,12 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     logApiError("website-builder.preview.build", error);
-    return NextResponse.json(
-      {
-        ok: false,
-        previewId,
-        error: "Generated project failed to compile.",
-      },
-      { status: 500 },
+    return apiErrorResponse(
+      API_ERROR_CODES.SERVER_ERROR,
+      500,
+      "Generated project failed to compile.",
+      undefined,
+      { ok: false, previewId },
     );
   }
 }

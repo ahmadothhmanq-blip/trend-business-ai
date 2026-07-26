@@ -3,7 +3,6 @@
  */
 
 import {
-  ensureDemoExperiment,
   getExperiment,
   listExperiments,
   recordVariantMetric,
@@ -14,6 +13,7 @@ import type {
   ExperimentResults,
   WebsiteExperiment,
 } from "@/lib/ai-core/ab-testing/types";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 function rate(conversions: number, impressions: number): number {
   if (impressions <= 0) return 0;
@@ -103,11 +103,12 @@ export function computeWinnerConfidence(
   return { winnerVariantId, confidence, liftPercent, ready };
 }
 
-export function evaluateExperimentResults(
+export async function evaluateExperimentResults(
   experimentId: string,
   autoDeclare = true,
-): ExperimentResults | null {
-  let experiment = getExperiment(experimentId);
+  client?: SupabaseClient | null,
+): Promise<ExperimentResults | null> {
+  let experiment = await getExperiment(experimentId, client);
   if (!experiment) return null;
 
   const decision = computeWinnerConfidence(experiment);
@@ -122,13 +123,14 @@ export function evaluateExperimentResults(
     const winner = experiment.variants.find(
       (v) => v.id === decision.winnerVariantId,
     );
-    experiment = setWinner(
+    experiment = await setWinner(
       experimentId,
       decision.winnerVariantId,
       `Auto-declared winner ${winner?.key || ""} at ${(decision.confidence * 100).toFixed(1)}% confidence` +
         (decision.liftPercent != null
           ? ` (lift ${decision.liftPercent > 0 ? "+" : ""}${decision.liftPercent}%).`
           : "."),
+      client,
     );
     autoDeclared = true;
   }
@@ -159,29 +161,36 @@ export function evaluateExperimentResults(
   };
 }
 
-export function getRunningAssignment(
+export async function getRunningAssignment(
   generationId: string,
   visitorId: string,
-): ExperimentAssignment | null {
-  ensureDemoExperiment(generationId);
-  const running = listExperiments(generationId).find(
+  client?: SupabaseClient | null,
+): Promise<ExperimentAssignment | null> {
+  const running = (await listExperiments(generationId, client)).find(
     (e) => e.status === "running",
   );
   if (!running) return null;
   const assignment = assignVariant(running, visitorId);
   if (assignment) {
-    recordVariantMetric({
-      experimentId: assignment.experimentId,
-      variantId: assignment.variantId,
-      kind: "impression",
-    });
+    await recordVariantMetric(
+      {
+        experimentId: assignment.experimentId,
+        variantId: assignment.variantId,
+        kind: "impression",
+      },
+      client,
+    );
   }
   return assignment;
 }
 
-export function listExperimentResults(generationId: string): ExperimentResults[] {
-  ensureDemoExperiment(generationId);
-  return listExperiments(generationId)
-    .map((e) => evaluateExperimentResults(e.id, true))
-    .filter((r): r is ExperimentResults => Boolean(r));
+export async function listExperimentResults(
+  generationId: string,
+  client?: SupabaseClient | null,
+): Promise<ExperimentResults[]> {
+  const experiments = await listExperiments(generationId, client);
+  const results = await Promise.all(
+    experiments.map((e) => evaluateExperimentResults(e.id, true, client)),
+  );
+  return results.filter((r): r is ExperimentResults => Boolean(r));
 }

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { buildPlannedPublicUrl, isWebsitePublishEnabled } from "@/lib/website/publish";
+import { resolvePublishedAbsoluteUrl } from "@/lib/website/published-site-url";
 import { buildPublicSitemapXml } from "@/lib/website/public-site";
 import type { CoreSeoPackage } from "@/lib/ai-core/seo/types";
 import { NextResponse } from "next/server";
@@ -40,10 +41,7 @@ export async function GET(_request: Request, context: RouteContext) {
     data.planned_public_url ||
     buildPlannedPublicUrl(slug).plannedPublicUrl ||
     `/w/${slug}`;
-  const absolute =
-    publicUrl.startsWith("http")
-      ? publicUrl
-      : `https://example.com${publicUrl}`;
+  const absolute = resolvePublishedAbsoluteUrl(publicUrl);
 
   const body =
     (typeof data.sitemap_xml === "string" && data.sitemap_xml.trim()) ||

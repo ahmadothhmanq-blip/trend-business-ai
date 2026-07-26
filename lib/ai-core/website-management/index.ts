@@ -4,6 +4,7 @@
 
 export type {
   ManagedPageDef,
+  NavLink,
   SiteStructurePlan,
   LinkValidationIssue,
   LinkValidationReport,
@@ -17,14 +18,29 @@ export type {
 
 export {
   resolveSiteStructure,
+  resolveSiteStructureForProject,
+  parseStructureFromFiles,
+  writeStructureToFiles,
   listSiteStructureIndustries,
 } from "@/lib/ai-core/website-management/pages/site-structure";
 
 export { composeManagedSecondaryPages } from "@/lib/ai-core/website-management/pages/compose-pages";
+export {
+  addPage,
+  removePage,
+  duplicatePage,
+  reorderPages,
+  setHomepage,
+  updatePageMeta,
+  applyStructureToProjectFiles,
+  routeToPagePath,
+} from "@/lib/ai-core/website-management/pages/compose-pages";
 
 export {
   wireNavAndFooterToRoutes,
   structureNavToContentLinks,
+  updateNavLinks,
+  updateFooterLinks,
 } from "@/lib/ai-core/website-management/pages/wire-nav";
 
 export { validateWebsiteLinks } from "@/lib/ai-core/website-management/links/validate";
@@ -44,6 +60,15 @@ export {
   deleteCmsEntry,
   listDueScheduledEntries,
 } from "@/lib/ai-core/website-management/cms/store";
+
+export { injectCmsIntoFiles } from "@/lib/ai-core/website-management/cms/inject-files";
+
+export {
+  listMediaAssets,
+  upsertMediaAsset,
+  deleteMediaAsset,
+  patchMediaAsset,
+} from "@/lib/ai-core/website-management/media/store";
 
 export { applyBrandManagement } from "@/lib/ai-core/website-management/brand/apply";
 

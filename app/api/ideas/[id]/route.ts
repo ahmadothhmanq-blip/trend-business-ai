@@ -1,4 +1,5 @@
 import { syncFavorite } from "@/lib/db/favorites";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { requireUser, parseJsonBody, parseUuidParam } from "@/lib/api/helpers";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { favoriteSchema } from "@/lib/validations/common";
@@ -22,10 +23,7 @@ export async function PUT(request: Request, context: RouteContext) {
 
   const parsed = ideaUpdateSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid input" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const { data, error } = await auth.supabase
@@ -41,7 +39,7 @@ export async function PUT(request: Request, context: RouteContext) {
   }
 
   if (!data) {
-    return NextResponse.json({ error: "Idea not found" }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Idea not found");
   }
 
   return NextResponse.json({
@@ -64,7 +62,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   const parsed = favoriteSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "is_favorite boolean is required" }, { status: 400 });
+    return apiValidationError("is_favorite boolean is required");
   }
 
   const { is_favorite } = parsed.data;
@@ -82,7 +80,7 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
 
   if (!data) {
-    return NextResponse.json({ error: "Idea not found" }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Idea not found");
   }
 
   const favoriteSync = await syncFavorite(
@@ -120,7 +118,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
     .single();
 
   if (error || !data) {
-    return NextResponse.json({ error: "Idea not found" }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Idea not found");
   }
 
   const favoriteSync = await syncFavorite(auth.supabase, auth.user!.id, "business_idea", id, false);

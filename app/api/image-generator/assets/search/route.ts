@@ -1,4 +1,5 @@
 import { requireUser, paginationParams } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse } from "@/lib/i18n/api-errors";
 import { searchDesignAssets, listAssetFolders } from "@/lib/ai-core/image-design-platform/asset-library";
 import { NextResponse } from "next/server";
 
@@ -18,7 +19,10 @@ export async function GET(request: Request) {
 
   if (listFolders) {
     const folders = await listAssetFolders({ supabase: auth.supabase, userId: auth.user!.id });
-    return NextResponse.json({ folders: folders.folders, error: folders.error });
+    if (folders.error) {
+      return apiErrorResponse(API_ERROR_CODES.LOAD_FAILED, 500, folders.error);
+    }
+    return NextResponse.json({ folders: folders.folders });
   }
 
   const result = await searchDesignAssets({
@@ -37,12 +41,14 @@ export async function GET(request: Request) {
   });
 
   const total = result.total;
+  if (result.error) {
+    return apiErrorResponse(API_ERROR_CODES.LOAD_FAILED, 500, result.error);
+  }
   return NextResponse.json({
     assets: result.assets,
     page,
     limit,
     total,
     totalPages: Math.ceil(total / limit) || 1,
-    error: result.error,
   });
 }

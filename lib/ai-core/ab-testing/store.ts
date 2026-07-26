@@ -1,54 +1,89 @@
 /**
- * In-process A/B experiment store for Website Builder.
+ * Persistent A/B experiment store for Website Builder (Supabase).
  */
 
+import type { SupabaseClient } from "@supabase/supabase-js";
+import {
+  deleteExperimentDb,
+  getExperimentDb,
+  insertExperimentDb,
+  listExperimentsDb,
+  updateExperimentDb,
+} from "@/lib/ai-core/ab-testing/repository";
 import type {
   CreateExperimentInput,
   ExperimentStatus,
   ExperimentVariant,
   WebsiteExperiment,
 } from "@/lib/ai-core/ab-testing/types";
+import { createAdminClient } from "@/lib/supabase/admin";
 
-type StoreState = {
-  experiments: WebsiteExperiment[];
-};
-
-const globalStore = globalThis as typeof globalThis & {
-  __tbaWebsiteExperiments?: StoreState;
-};
-
-function getState(): StoreState {
-  if (!globalStore.__tbaWebsiteExperiments) {
-    globalStore.__tbaWebsiteExperiments = { experiments: [] };
-  }
-  return globalStore.__tbaWebsiteExperiments;
+function resolveClient(client?: SupabaseClient | null): SupabaseClient | null {
+  return client ?? createAdminClient();
 }
 
 function nowIso() {
   return new Date().toISOString();
 }
 
-function id(prefix: string) {
+function variantId(prefix: string) {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
-export function listExperiments(generationId: string): WebsiteExperiment[] {
-  return getState()
-    .experiments.filter((e) => e.generationId === generationId)
-    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+function requireUserId(userId?: string | null): string {
+  if (!userId) {
+    throw new Error("userId is required to persist experiments");
+  }
+  return userId;
 }
 
-export function getExperiment(experimentId: string): WebsiteExperiment | null {
-  return getState().experiments.find((e) => e.id === experimentId) ?? null;
+async function persistExperiment(
+  client: SupabaseClient | null,
+  experiment: WebsiteExperiment,
+  mode: "insert" | "update",
+): Promise<WebsiteExperiment> {
+  if (!client) {
+    throw new Error("Database unavailable — cannot persist experiment");
+  }
+
+  const saved =
+    mode === "insert"
+      ? await insertExperimentDb(client, experiment)
+      : await updateExperimentDb(client, experiment);
+
+  if (!saved) {
+    throw new Error("Failed to persist experiment");
+  }
+  return saved;
 }
 
-export function createExperiment(
+export async function listExperiments(
+  generationId: string,
+  client?: SupabaseClient | null,
+): Promise<WebsiteExperiment[]> {
+  const db = resolveClient(client);
+  if (!db) return [];
+  return listExperimentsDb(db, generationId);
+}
+
+export async function getExperiment(
+  experimentId: string,
+  client?: SupabaseClient | null,
+): Promise<WebsiteExperiment | null> {
+  const db = resolveClient(client);
+  if (!db) return null;
+  return getExperimentDb(db, experimentId);
+}
+
+export async function createExperiment(
   input: CreateExperimentInput,
-): WebsiteExperiment {
+  client?: SupabaseClient | null,
+): Promise<WebsiteExperiment> {
+  const userId = requireUserId(input.userId);
   const weightA = input.variantA?.weight ?? 50;
   const weightB = input.variantB.weight ?? 50;
   const variantA: ExperimentVariant = {
-    id: id("var-a"),
+    id: variantId("var-a"),
     key: "A",
     name: input.variantA?.name || "Control (A)",
     weight: weightA,
@@ -58,7 +93,7 @@ export function createExperiment(
     clicks: 0,
   };
   const variantB: ExperimentVariant = {
-    id: id("var-b"),
+    id: variantId("var-b"),
     key: "B",
     name: input.variantB.name || "Challenger (B)",
     weight: weightB,
@@ -77,10 +112,11 @@ export function createExperiment(
     ];
 
   const started = Boolean(input.start);
+  const timestamp = nowIso();
   const experiment: WebsiteExperiment = {
-    id: id("exp"),
+    id: crypto.randomUUID(),
     generationId: input.generationId,
-    userId: input.userId ?? null,
+    userId,
     name: input.name.trim(),
     hypothesis: input.hypothesis?.trim() || "",
     status: started ? "running" : "draft",
@@ -91,21 +127,22 @@ export function createExperiment(
     winnerVariantId: null,
     winnerDeclaredAt: null,
     winnerReason: null,
-    startedAt: started ? nowIso() : null,
+    startedAt: started ? timestamp : null,
     endedAt: null,
-    createdAt: nowIso(),
-    updatedAt: nowIso(),
+    createdAt: timestamp,
+    updatedAt: timestamp,
   };
 
-  getState().experiments.unshift(experiment);
-  return experiment;
+  return persistExperiment(resolveClient(client), experiment, "insert");
 }
 
-export function updateExperimentStatus(
+export async function updateExperimentStatus(
   experimentId: string,
   status: ExperimentStatus,
-): WebsiteExperiment {
-  const experiment = getExperiment(experimentId);
+  client?: SupabaseClient | null,
+): Promise<WebsiteExperiment> {
+  const db = resolveClient(client);
+  const experiment = await getExperiment(experimentId, db);
   if (!experiment) throw new Error("Experiment not found");
 
   experiment.status = status;
@@ -116,18 +153,22 @@ export function updateExperimentStatus(
   if (status === "completed" || status === "archived") {
     experiment.endedAt = nowIso();
   }
-  return experiment;
+  return persistExperiment(db, experiment, "update");
 }
 
-export function duplicateSectionForVariant(params: {
-  experimentId: string;
-  variantKey: "A" | "B";
-  sectionLabel: string;
-  changeType: ExperimentVariant["changes"][number]["type"];
-  controlValue?: string;
-  variantValue: string;
-}): WebsiteExperiment {
-  const experiment = getExperiment(params.experimentId);
+export async function duplicateSectionForVariant(
+  params: {
+    experimentId: string;
+    variantKey: "A" | "B";
+    sectionLabel: string;
+    changeType: ExperimentVariant["changes"][number]["type"];
+    controlValue?: string;
+    variantValue: string;
+  },
+  client?: SupabaseClient | null,
+): Promise<WebsiteExperiment> {
+  const db = resolveClient(client);
+  const experiment = await getExperiment(params.experimentId, db);
   if (!experiment) throw new Error("Experiment not found");
 
   const variant = experiment.variants.find((v) => v.key === params.variantKey);
@@ -144,15 +185,19 @@ export function duplicateSectionForVariant(params: {
     experiment.changeTypes.push(params.changeType);
   }
   experiment.updatedAt = nowIso();
-  return experiment;
+  return persistExperiment(db, experiment, "update");
 }
 
-export function recordVariantMetric(params: {
-  experimentId: string;
-  variantId: string;
-  kind: "impression" | "conversion" | "click";
-}): WebsiteExperiment | null {
-  const experiment = getExperiment(params.experimentId);
+export async function recordVariantMetric(
+  params: {
+    experimentId: string;
+    variantId: string;
+    kind: "impression" | "conversion" | "click";
+  },
+  client?: SupabaseClient | null,
+): Promise<WebsiteExperiment | null> {
+  const db = resolveClient(client);
+  const experiment = await getExperiment(params.experimentId, db);
   if (!experiment || experiment.status !== "running") return experiment;
 
   const variant = experiment.variants.find((v) => v.id === params.variantId);
@@ -162,15 +207,17 @@ export function recordVariantMetric(params: {
   if (params.kind === "conversion") variant.conversions += 1;
   if (params.kind === "click") variant.clicks += 1;
   experiment.updatedAt = nowIso();
-  return experiment;
+  return persistExperiment(db, experiment, "update");
 }
 
-export function setWinner(
+export async function setWinner(
   experimentId: string,
   winnerVariantId: string,
   reason: string,
-): WebsiteExperiment {
-  const experiment = getExperiment(experimentId);
+  client?: SupabaseClient | null,
+): Promise<WebsiteExperiment> {
+  const db = resolveClient(client);
+  const experiment = await getExperiment(experimentId, db);
   if (!experiment) throw new Error("Experiment not found");
   if (!experiment.variants.some((v) => v.id === winnerVariantId)) {
     throw new Error("Winner variant not found");
@@ -181,61 +228,79 @@ export function setWinner(
   experiment.status = "completed";
   experiment.endedAt = nowIso();
   experiment.updatedAt = nowIso();
-  return experiment;
+  return persistExperiment(db, experiment, "update");
 }
 
-/** Seed a demo running experiment when generation has none. */
-export function ensureDemoExperiment(generationId: string): WebsiteExperiment {
-  const existing = listExperiments(generationId);
+export async function deleteExperiment(
+  experimentId: string,
+  client?: SupabaseClient | null,
+): Promise<boolean> {
+  const db = resolveClient(client);
+  if (!db) return false;
+  return deleteExperimentDb(db, experimentId);
+}
+
+/** Seed a demo running experiment when generation has none (non-production only). */
+export async function ensureDemoExperiment(
+  generationId: string,
+  userId: string,
+  client?: SupabaseClient | null,
+): Promise<WebsiteExperiment | null> {
+  if (process.env.NODE_ENV === "production") return null;
+  const db = resolveClient(client);
+  const existing = await listExperiments(generationId, db);
   if (existing.length) return existing[0]!;
 
-  const experiment = createExperiment({
-    generationId,
-    name: "Hero CTA copy test",
-    hypothesis:
-      "A clearer primary CTA increases contact conversions vs the control headline.",
-    changeTypes: ["headline", "button"],
-    variantA: {
-      name: "Control (A)",
-      weight: 50,
-      changes: [
-        {
-          type: "headline",
-          target: "hero",
-          controlValue: "Original headline",
-          variantValue: "Original headline",
-        },
-        {
-          type: "button",
-          target: "hero-cta",
-          controlValue: "Get started",
-          variantValue: "Get started",
-        },
-      ],
+  const experiment = await createExperiment(
+    {
+      generationId,
+      userId,
+      name: "Hero CTA copy test",
+      hypothesis:
+        "A clearer primary CTA increases contact conversions vs the control headline.",
+      changeTypes: ["headline", "button"],
+      variantA: {
+        name: "Control (A)",
+        weight: 50,
+        changes: [
+          {
+            type: "headline",
+            target: "hero",
+            controlValue: "Original headline",
+            variantValue: "Original headline",
+          },
+          {
+            type: "button",
+            target: "hero-cta",
+            controlValue: "Get started",
+            variantValue: "Get started",
+          },
+        ],
+      },
+      variantB: {
+        name: "Challenger (B)",
+        weight: 50,
+        changes: [
+          {
+            type: "headline",
+            target: "hero",
+            controlValue: "Original headline",
+            variantValue: "Grow faster with a conversion-ready site",
+          },
+          {
+            type: "button",
+            target: "hero-cta",
+            controlValue: "Get started",
+            variantValue: "Book a free consult",
+          },
+        ],
+      },
+      start: true,
+      minSampleSize: 40,
     },
-    variantB: {
-      name: "Challenger (B)",
-      weight: 50,
-      changes: [
-        {
-          type: "headline",
-          target: "hero",
-          controlValue: "Original headline",
-          variantValue: "Grow faster with a conversion-ready site",
-        },
-        {
-          type: "button",
-          target: "hero-cta",
-          controlValue: "Get started",
-          variantValue: "Book a free consult",
-        },
-      ],
-    },
-    start: true,
-    minSampleSize: 40,
-  });
+    db,
+  );
 
-  // Seed uneven metrics so winner logic can demonstrate
   const a = experiment.variants[0]!;
   const b = experiment.variants[1]!;
   a.impressions = 120;
@@ -245,5 +310,5 @@ export function ensureDemoExperiment(generationId: string): WebsiteExperiment {
   b.conversions = 16;
   b.clicks = 48;
   experiment.updatedAt = nowIso();
-  return experiment;
+  return persistExperiment(db, experiment, "update");
 }

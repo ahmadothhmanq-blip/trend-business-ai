@@ -1,4 +1,5 @@
 import { parseJsonBody, requireUser } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { createBillingManager } from "@/lib/billing";
 import { requireBillingWriteClient } from "@/lib/billing/write-client";
@@ -25,7 +26,7 @@ export async function POST(request: Request) {
 
   const parsed = cancelSchema.safeParse(body ?? {});
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid cancel payload." }, { status: 400 });
+    return apiValidationError("Invalid cancel payload.");
   }
 
   try {
@@ -34,7 +35,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ subscription });
   } catch (error) {
     if (error instanceof Error) {
-      return NextResponse.json({ error: error.message }, { status: 400 });
+      return apiValidationError(error.message);
     }
     return databaseErrorResponse("billing.cancel", error);
   }

@@ -1,4 +1,5 @@
 import { requireUser, parseUuidParam } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { buildProjectZip } from "@/lib/ai/zipper";
 import type { GeneratedProjectFile } from "@/lib/ai/types";
 import { prepareWebsiteProjectForExport } from "@/lib/website/prepare-export";
@@ -46,34 +47,33 @@ export async function GET(_request: Request, context: RouteContext) {
     .single();
 
   if (error || !data) {
-    return NextResponse.json({ error: "Generation not found" }, { status: 404 });
+    return apiErrorResponse(API_ERROR_CODES.GENERATION_NOT_FOUND, 404);
   }
 
   const generation = data as WebsiteGeneration;
   const rawFiles = extractFiles(generation);
 
   if (rawFiles.length === 0) {
-    return NextResponse.json(
-      {
-        error:
-          "This project has no downloadable source files yet. Open it in Website Builder and regenerate if needed.",
-      },
-      { status: 409 },
+    return apiErrorResponse(
+      API_ERROR_CODES.INVALID_INPUT,
+      409,
+      "This project has no downloadable source files yet. Open it in Website Builder and regenerate if needed.",
     );
   }
 
   const prepared = prepareWebsiteProjectForExport(rawFiles);
 
   if (!prepared.ready) {
-    return NextResponse.json(
+    return apiErrorResponse(
+      API_ERROR_CODES.INVALID_INPUT,
+      422,
+      "This project has export blockers. Fix validation issues in Website Builder, then try again.",
+      undefined,
       {
-        error:
-          "This project has export blockers. Fix validation issues in Website Builder, then try again.",
         issues: prepared.blockingIssues.slice(0, 20),
         warnings: prepared.warnings.slice(0, 12),
         fixesApplied: prepared.fixesApplied.slice(0, 12),
       },
-      { status: 422 },
     );
   }
 

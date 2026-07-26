@@ -1,4 +1,5 @@
 import { requireUser, parseUuidParam } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { blueprintToModel, buildExportManifest, assetToBuffer, buildProjectExport, buildPdfFromCanvas } from "@/lib/ai-core/image-design-platform";
 import { loadCanvasDocument } from "@/lib/ai-core/image-design-platform/canvas-repository";
 import type { ImageGeneration } from "@/types/image-generation";
@@ -26,7 +27,7 @@ export async function GET(request: Request, context: RouteContext) {
     .single();
 
   if (error || !gen?.blueprint) {
-    return NextResponse.json({ error: "Image not found" }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Image not found");
   }
 
   const generation = gen as ImageGeneration;

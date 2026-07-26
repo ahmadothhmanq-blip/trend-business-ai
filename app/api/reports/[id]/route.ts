@@ -1,4 +1,5 @@
 import { syncFavorite } from "@/lib/db/favorites";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { requireUser, parseJsonBody, parseUuidParam } from "@/lib/api/helpers";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { favoriteSchema } from "@/lib/validations/common";
@@ -21,7 +22,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   const parsed = favoriteSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "is_favorite boolean is required" }, { status: 400 });
+    return apiValidationError("is_favorite boolean is required");
   }
 
   const { is_favorite } = parsed.data;
@@ -39,7 +40,7 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
 
   if (!data) {
-    return NextResponse.json({ error: "Report not found" }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Report not found");
   }
 
   const favoriteSync = await syncFavorite(auth.supabase, auth.user!.id, "report", id, is_favorite);
@@ -73,7 +74,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
     .single();
 
   if (error || !data) {
-    return NextResponse.json({ error: "Report not found" }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Report not found");
   }
 
   const favoriteSync = await syncFavorite(auth.supabase, auth.user!.id, "report", id, false);

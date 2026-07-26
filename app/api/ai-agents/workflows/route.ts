@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { enforceMutationRateLimit } from "@/lib/api/rate-limit";
 import { runWorkflow } from "@/lib/agents/workflows";
@@ -67,12 +68,12 @@ export async function POST(request: Request) {
       await logAgentAudit(auth.supabase, { user_id: auth.user!.id, action: "run", entity_type: "workflow", entity_id: runBody.workflowId });
       return NextResponse.json({ result });
     } catch (e) {
-      return NextResponse.json({ error: e instanceof Error ? e.message : "Failed" }, { status: 500 });
+      return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, e instanceof Error ? e.message : undefined);
     }
   }
 
   const parsed = createSchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0]?.message }, { status: 400 });
+  if (!parsed.success) return apiValidationError(parsed.error.issues[0]?.message);
 
   const { data, error } = await auth.supabase.from("agent_workflows").insert({
     user_id: auth.user!.id,
@@ -84,7 +85,7 @@ export async function POST(request: Request) {
   }).select("*").single();
 
   if (error) {
-    if (error.code === "42P01") return NextResponse.json({ error: "Workflows table not ready. Apply migration 022." }, { status: 503 });
+    if (error.code === "42P01") return apiErrorResponse(API_ERROR_CODES.MIGRATION_REQUIRED, 503, "Workflows table not ready. Apply migration 022.");
     return databaseErrorResponse("workflows.create", error);
   }
   await logAgentAudit(auth.supabase, { user_id: auth.user!.id, action: "create", entity_type: "workflow", entity_id: data?.id });

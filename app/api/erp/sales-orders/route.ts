@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { enforceMutationRateLimit } from "@/lib/api/rate-limit";
 import {
@@ -43,17 +44,17 @@ export async function POST(request: Request) {
   const actionBody = body as { action?: string; dealId?: string; companyId?: string; orderId?: string };
   if (actionBody.action === "convert-deal" && actionBody.dealId && actionBody.companyId) {
     const result = await convertDealToSalesOrder(auth.supabase, auth.user!.id, actionBody.companyId, actionBody.dealId);
-    if (result.error) return NextResponse.json({ error: result.error.message }, { status: 500 });
+    if (result.error) return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, result.error.message);
     return NextResponse.json({ order: result.data });
   }
   if (actionBody.action === "create-invoice" && actionBody.orderId) {
     const result = await createInvoiceFromSalesOrder(auth.supabase, auth.user!.id, actionBody.orderId);
-    if (result.error) return NextResponse.json({ error: result.error.message }, { status: 500 });
+    if (result.error) return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, result.error.message);
     return NextResponse.json({ invoice: result.data });
   }
 
   const parsed = createSchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: "Invalid" }, { status: 400 });
+  if (!parsed.success) return apiValidationError("Invalid");
   const { data, error } = await createSalesOrder(auth.supabase, {
     user_id: auth.user!.id,
     company_id: parsed.data.companyId,

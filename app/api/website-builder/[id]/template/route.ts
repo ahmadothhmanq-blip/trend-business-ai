@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody, parseUuidParam } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { serverErrorResponse } from "@/lib/api/errors";
 import { updateWebsiteGenerationInPlace } from "@/lib/website/save-generation";
 import { applyTemplateVisualSwitch } from "@/lib/ai-core/template-intelligence";
@@ -35,10 +36,7 @@ export async function POST(request: Request, context: RouteContext) {
 
   const parsed = bodySchema.safeParse(body ?? {});
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid input" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   try {
@@ -51,7 +49,7 @@ export async function POST(request: Request, context: RouteContext) {
 
     if (error) throw error;
     if (!row) {
-      return NextResponse.json({ error: "Generation not found." }, { status: 404 });
+      return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Generation not found.");
     }
 
     const generation = row as WebsiteGeneration;
@@ -93,7 +91,7 @@ export async function POST(request: Request, context: RouteContext) {
     });
 
     if (!saved.ok) {
-      return NextResponse.json({ error: saved.error }, { status: 500 });
+      return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, saved.error);
     }
 
     return NextResponse.json({

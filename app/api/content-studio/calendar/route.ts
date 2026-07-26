@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import type { CalendarEntry } from "@/types/content";
 import { NextResponse } from "next/server";
@@ -64,7 +65,7 @@ export async function POST(request: Request) {
 
   const parsed = createSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid input" }, { status: 400 });
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const { data, error } = await auth.supabase
@@ -75,7 +76,7 @@ export async function POST(request: Request) {
 
   if (error) {
     if (error.code === "42P01") {
-      return NextResponse.json({ error: "Content Calendar table not found. Please apply migration 019." }, { status: 503 });
+      return apiErrorResponse(API_ERROR_CODES.MIGRATION_REQUIRED, 503, "Content Calendar table not found. Please apply migration 019.");
     }
     return databaseErrorResponse("content-calendar.insert", error);
   }

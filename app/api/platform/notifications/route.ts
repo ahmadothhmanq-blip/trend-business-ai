@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import type { Notification } from "@/types/platform";
 import { NextResponse } from "next/server";
@@ -82,5 +83,5 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ message: "Notifications marked as read." });
   }
 
-  return NextResponse.json({ error: "Invalid action" }, { status: 400 });
+  return apiValidationError("Invalid action");
 }

@@ -5,9 +5,12 @@ import Link from "next/link";
 import { toast } from "sonner";
 import {
   ArrowLeft,
+  FileText,
   ImageIcon,
+  LayoutGrid,
   Loader2,
   MessageSquare,
+  Navigation,
   Package,
   Palette,
   ShieldCheck,
@@ -16,15 +19,27 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import { cn } from "@/lib/utils";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
-import type { CatalogItem, CmsEntry } from "@/lib/ai-core/website-management";
+import type { CatalogItem, CmsEntry, NavLink } from "@/lib/ai-core/website-management";
+import { MediaLibraryPanel } from "@/components/dashboard/website-builder/media-library-panel";
 
 type Tab =
   | "overview"
+  | "pages"
+  | "navigation"
   | "catalog"
   | "cms"
+  | "media"
   | "brand"
   | "leads"
   | "assistant"
@@ -43,8 +58,9 @@ export function WebsiteManagementDashboard({
     project?: { title?: string; description?: string };
     structure?: {
       businessType?: string;
-      pages?: Array<{ route: string; label: string }>;
-      navLinks?: Array<{ href: string; label: string }>;
+      pages?: Array<{ route: string; label: string; path?: string }>;
+      navLinks?: NavLink[];
+      footerLinks?: NavLink[];
     };
     catalog?: CatalogItem[];
     cms?: CmsEntry[];
@@ -62,6 +78,7 @@ export function WebsiteManagementDashboard({
       accent?: string;
       displayFont?: string;
       bodyFont?: string;
+      logoUrl?: string | null;
     };
   } | null>(null);
   const [brandForm, setBrandForm] = useState({
@@ -77,6 +94,13 @@ export function WebsiteManagementDashboard({
   const [assistantLog, setAssistantLog] = useState<string[]>([]);
   const [cmsTitle, setCmsTitle] = useState("");
   const [cmsBody, setCmsBody] = useState("");
+  const [cmsSlug, setCmsSlug] = useState("");
+  const [cmsCategories, setCmsCategories] = useState("");
+  const [cmsTags, setCmsTags] = useState("");
+  const [newPageLabel, setNewPageLabel] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<
+    { kind: "catalog"; id: string; title: string } | { kind: "cms"; id: string; title: string } | null
+  >(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -92,7 +116,7 @@ export function WebsiteManagementDashboard({
         accent: json.brand?.accent || "",
         displayFont: json.brand?.displayFont || "",
         bodyFont: json.brand?.bodyFont || "",
-        logoUrl: "",
+        logoUrl: json.brand?.logoUrl || "",
       });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : wb("management.errors.loadFailed"));
@@ -117,6 +141,7 @@ export function WebsiteManagementDashboard({
       if (!res.ok) throw new Error(json.error || wb("management.errors.actionFailed"));
       if (json.catalog) setData((d) => (d ? { ...d, catalog: json.catalog } : d));
       if (json.cms) setData((d) => (d ? { ...d, cms: json.cms } : d));
+      if (json.structure) setData((d) => (d ? { ...d, structure: json.structure } : d));
       if (json.quality) setData((d) => (d ? { ...d, quality: json.quality } : d));
       if (json.assistant) {
         setAssistantLog((log) => [
@@ -125,15 +150,25 @@ export function WebsiteManagementDashboard({
           ...log,
         ].slice(0, 20));
         if (json.editCommand) {
-          await fetch(`/api/website-builder/${generationId}/edit`, {
+          const editRes = await fetch(`/api/website-builder/${generationId}/edit`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ command: json.editCommand, applyAi: true }),
           });
+          if (!editRes.ok) {
+            const editJson = (await editRes.json()) as { error?: string };
+            throw new Error(editJson.error || wb("management.errors.actionFailed"));
+          }
         }
       }
       toast.success(json.notes?.[0] || wb("management.saved"));
-      if (payload.action === "brand.apply" || payload.action === "catalog.upsert") {
+      if (
+        payload.action === "brand.apply" ||
+        payload.action === "catalog.upsert" ||
+        String(payload.action).startsWith("pages.") ||
+        payload.action === "nav.update" ||
+        payload.action === "footer.update"
+      ) {
         await load();
       }
       return json;
@@ -145,10 +180,23 @@ export function WebsiteManagementDashboard({
     }
   }
 
+  async function confirmDelete() {
+    if (!deleteTarget) return;
+    const payload =
+      deleteTarget.kind === "catalog"
+        ? { action: "catalog.delete", id: deleteTarget.id }
+        : { action: "cms.delete", id: deleteTarget.id };
+    const result = await postAction(payload);
+    if (result) setDeleteTarget(null);
+  }
+
   const tabs = [
     { id: "overview" as const, labelKey: "management.tabs.overview", icon: ShieldCheck },
+    { id: "pages" as const, label: "Pages", icon: FileText },
+    { id: "navigation" as const, label: "Navigation", icon: Navigation },
     { id: "catalog" as const, labelKey: "management.tabs.catalog", icon: Package },
-    { id: "cms" as const, labelKey: "management.tabs.cms", icon: ImageIcon },
+    { id: "cms" as const, labelKey: "management.tabs.cms", icon: LayoutGrid },
+    { id: "media" as const, label: "Media", icon: ImageIcon },
     { id: "brand" as const, labelKey: "management.tabs.brand", icon: Palette },
     { id: "leads" as const, labelKey: "management.tabs.leads", icon: MessageSquare },
     { id: "assistant" as const, labelKey: "management.tabs.assistant", icon: Sparkles },
@@ -212,7 +260,11 @@ export function WebsiteManagementDashboard({
             )}
           >
             <tabItem.icon className="size-3.5" />
-            {wb(tabItem.labelKey)}
+            {"labelKey" in tabItem && tabItem.labelKey
+              ? wb(tabItem.labelKey)
+              : "label" in tabItem
+                ? tabItem.label
+                : ""}
           </button>
         ))}
       </div>
@@ -258,6 +310,210 @@ export function WebsiteManagementDashboard({
                 <p className="mt-1 text-[12px] text-white/45">{data.quality.summary}</p>
               </div>
             ) : null}
+          </DashboardPanel>
+        </div>
+      ) : null}
+
+      {tab === "pages" ? (
+        <DashboardPanel className="space-y-4">
+          <div className="flex flex-wrap items-end gap-2">
+            <div className="min-w-[200px] flex-1">
+              <label className="text-[11px] text-white/40">New page label</label>
+              <Input
+                value={newPageLabel}
+                onChange={(e) => setNewPageLabel(e.target.value)}
+                placeholder="About Us"
+                className="mt-1 border-white/10 bg-black/30 text-white"
+              />
+            </div>
+            <Button
+              disabled={saving || !newPageLabel.trim()}
+              className="bg-premium-gold text-black"
+              onClick={() => {
+                void postAction({
+                  action: "pages.create",
+                  label: newPageLabel,
+                }).then(() => setNewPageLabel(""));
+              }}
+            >
+              Add page
+            </Button>
+          </div>
+          <div className="space-y-2">
+            {(data?.structure?.pages || []).map((page, index) => (
+              <div
+                key={page.route}
+                className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-white/[0.08] px-3 py-2"
+              >
+                <div>
+                  <p className="text-sm text-white">{page.label}</p>
+                  <p className="font-mono text-[11px] text-white/40">{page.route}</p>
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-white/15 text-white"
+                    disabled={saving || index === 0}
+                    onClick={() => {
+                      const routes = (data?.structure?.pages || []).map((p) => p.route);
+                      const next = [...routes];
+                      [next[index - 1], next[index]] = [next[index], next[index - 1]];
+                      void postAction({ action: "pages.reorder", routes: next });
+                    }}
+                  >
+                    ↑
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-white/15 text-white"
+                    disabled={saving || index === (data?.structure?.pages?.length || 0) - 1}
+                    onClick={() => {
+                      const routes = (data?.structure?.pages || []).map((p) => p.route);
+                      const next = [...routes];
+                      [next[index], next[index + 1]] = [next[index + 1], next[index]];
+                      void postAction({ action: "pages.reorder", routes: next });
+                    }}
+                  >
+                    ↓
+                  </Button>
+                  {page.route !== "/" ? (
+                    <>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-white/15 text-white"
+                        disabled={saving}
+                        onClick={() =>
+                          void postAction({
+                            action: "pages.setHome",
+                            route: page.route,
+                          })
+                        }
+                      >
+                        Set home
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-white/15 text-white"
+                        disabled={saving}
+                        onClick={() =>
+                          void postAction({
+                            action: "pages.duplicate",
+                            route: page.route,
+                          })
+                        }
+                      >
+                        Duplicate
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-red-400/30 text-red-200"
+                        disabled={saving}
+                        onClick={() =>
+                          void postAction({
+                            action: "pages.delete",
+                            route: page.route,
+                          })
+                        }
+                      >
+                        Delete
+                      </Button>
+                    </>
+                  ) : null}
+                </div>
+              </div>
+            ))}
+          </div>
+        </DashboardPanel>
+      ) : null}
+
+      {tab === "navigation" ? (
+        <div className="grid gap-4 lg:grid-cols-2">
+          <DashboardPanel className="space-y-3">
+            <p className="text-[12px] font-semibold uppercase tracking-wide text-white/40">
+              Header navigation
+            </p>
+            {(data?.structure?.navLinks || []).map((link, index) => (
+              <div key={`nav-${index}`} className="flex gap-2">
+                <Input
+                  defaultValue={link.label}
+                  className="border-white/10 bg-black/30 text-white"
+                  onBlur={(e) => {
+                    const links = [...(data?.structure?.navLinks || [])];
+                    links[index] = { ...links[index], label: e.target.value };
+                    void postAction({ action: "nav.update", links });
+                  }}
+                />
+                <Input
+                  defaultValue={link.href}
+                  className="border-white/10 bg-black/30 text-white"
+                  onBlur={(e) => {
+                    const links = [...(data?.structure?.navLinks || [])];
+                    links[index] = { ...links[index], href: e.target.value };
+                    void postAction({ action: "nav.update", links });
+                  }}
+                />
+              </div>
+            ))}
+            <Button
+              size="sm"
+              variant="outline"
+              className="border-white/15 text-white"
+              onClick={() => {
+                const links = [
+                  ...(data?.structure?.navLinks || []),
+                  { href: "/", label: "New link" },
+                ];
+                void postAction({ action: "nav.update", links });
+              }}
+            >
+              Add nav link
+            </Button>
+          </DashboardPanel>
+          <DashboardPanel className="space-y-3">
+            <p className="text-[12px] font-semibold uppercase tracking-wide text-white/40">
+              Footer links
+            </p>
+            {(data?.structure?.footerLinks || []).map((link, index) => (
+              <div key={`footer-${index}`} className="flex gap-2">
+                <Input
+                  defaultValue={link.label}
+                  className="border-white/10 bg-black/30 text-white"
+                  onBlur={(e) => {
+                    const links = [...(data?.structure?.footerLinks || [])];
+                    links[index] = { ...links[index], label: e.target.value };
+                    void postAction({ action: "footer.update", links });
+                  }}
+                />
+                <Input
+                  defaultValue={link.href}
+                  className="border-white/10 bg-black/30 text-white"
+                  onBlur={(e) => {
+                    const links = [...(data?.structure?.footerLinks || [])];
+                    links[index] = { ...links[index], href: e.target.value };
+                    void postAction({ action: "footer.update", links });
+                  }}
+                />
+              </div>
+            ))}
+            <Button
+              size="sm"
+              variant="outline"
+              className="border-white/15 text-white"
+              onClick={() => {
+                const links = [
+                  ...(data?.structure?.footerLinks || []),
+                  { href: "/", label: "New link" },
+                ];
+                void postAction({ action: "footer.update", links });
+              }}
+            >
+              Add footer link
+            </Button>
           </DashboardPanel>
         </div>
       ) : null}
@@ -322,7 +578,11 @@ export function WebsiteManagementDashboard({
                     className="border-red-400/30 text-red-200"
                     disabled={saving}
                     onClick={() =>
-                      void postAction({ action: "catalog.delete", id: item.id })
+                      setDeleteTarget({
+                        kind: "catalog",
+                        id: item.id,
+                        title: item.title,
+                      })
                     }
                   >
                     {wb("management.delete")}
@@ -351,6 +611,26 @@ export function WebsiteManagementDashboard({
             placeholder={wb("management.bodyPlaceholder")}
             className="min-h-[100px] border-white/10 bg-black/30 text-white"
           />
+          <div className="grid gap-2 sm:grid-cols-3">
+            <Input
+              value={cmsSlug}
+              onChange={(e) => setCmsSlug(e.target.value)}
+              placeholder="post-slug"
+              className="border-white/10 bg-black/30 text-white"
+            />
+            <Input
+              value={cmsCategories}
+              onChange={(e) => setCmsCategories(e.target.value)}
+              placeholder="Categories (comma-separated)"
+              className="border-white/10 bg-black/30 text-white"
+            />
+            <Input
+              value={cmsTags}
+              onChange={(e) => setCmsTags(e.target.value)}
+              placeholder="Tags (comma-separated)"
+              className="border-white/10 bg-black/30 text-white"
+            />
+          </div>
           <Button
             disabled={saving || !cmsTitle.trim()}
             className="bg-premium-gold text-black"
@@ -361,11 +641,24 @@ export function WebsiteManagementDashboard({
                   kind: "post",
                   title: cmsTitle,
                   body: cmsBody,
+                  slug: cmsSlug || undefined,
+                  categories: cmsCategories
+                    .split(",")
+                    .map((s) => s.trim())
+                    .filter(Boolean),
+                  tags: cmsTags
+                    .split(",")
+                    .map((s) => s.trim())
+                    .filter(Boolean),
                   published: true,
                 },
               }).then(() => {
                 setCmsTitle("");
                 setCmsBody("");
+                setCmsSlug("");
+                setCmsCategories("");
+                setCmsTags("");
+                void load();
               });
             }}
           >
@@ -389,7 +682,11 @@ export function WebsiteManagementDashboard({
                   variant="outline"
                   className="border-white/15 text-white"
                   onClick={() =>
-                    void postAction({ action: "cms.delete", id: entry.id })
+                    setDeleteTarget({
+                      kind: "cms",
+                      id: entry.id,
+                      title: entry.title,
+                    })
                   }
                 >
                   {wb("management.delete")}
@@ -400,11 +697,36 @@ export function WebsiteManagementDashboard({
         </DashboardPanel>
       ) : null}
 
+      {tab === "media" ? (
+        <DashboardPanel>
+          <p className="mb-4 text-[12px] font-semibold uppercase tracking-wide text-white/40">
+            Media library
+          </p>
+          <MediaLibraryPanel generationId={generationId} />
+        </DashboardPanel>
+      ) : null}
+
       {tab === "brand" ? (
         <DashboardPanel className="space-y-3">
           <p className="text-[12px] font-semibold uppercase tracking-wide text-white/40">
             {wb("management.brandManagement")}
           </p>
+          {brandForm.logoUrl ? (
+            <div className="rounded-xl border border-white/[0.08] bg-black/25 p-3">
+              <p className="mb-2 text-[11px] text-white/40">{wb("management.logoUrl")}</p>
+              <div className="flex items-center gap-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={brandForm.logoUrl}
+                  alt={brandForm.businessName || wb("management.brand.businessName")}
+                  className="h-16 w-16 rounded-lg border border-white/10 bg-white/5 object-contain p-1"
+                />
+                <p className="min-w-0 flex-1 truncate text-[12px] text-white/55">
+                  {brandForm.logoUrl}
+                </p>
+              </div>
+            </div>
+          ) : null}
           {(
             [
               ["businessName", wb("management.brand.businessName")],
@@ -544,6 +866,42 @@ export function WebsiteManagementDashboard({
           )}
         </DashboardPanel>
       ) : null}
+
+      <Dialog
+        open={Boolean(deleteTarget)}
+        onOpenChange={(open) => !open && !saving && setDeleteTarget(null)}
+      >
+        <DialogContent className="border-white/10 bg-[#141414]/95 text-white">
+          <DialogHeader>
+            <DialogTitle>{wb("dialogs.deleteTitle")}</DialogTitle>
+            <DialogDescription className="text-white/45">
+              {deleteTarget
+                ? `${wb("dialogs.deleteDescription")} (${deleteTarget.title})`
+                : wb("dialogs.deleteDescription")}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="border-white/10 bg-white/[0.03]">
+            <Button
+              type="button"
+              variant="outline"
+              className="border-white/15 text-white"
+              disabled={saving}
+              onClick={() => setDeleteTarget(null)}
+            >
+              {wb("dialogs.cancel")}
+            </Button>
+            <Button
+              type="button"
+              className="bg-red-500 text-white hover:bg-red-600"
+              disabled={saving}
+              onClick={() => void confirmDelete()}
+            >
+              {saving ? <Loader2 className="size-4 animate-spin" /> : null}
+              {wb("dialogs.confirm")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

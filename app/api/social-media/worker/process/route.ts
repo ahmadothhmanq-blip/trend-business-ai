@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { serverErrorResponse } from "@/lib/api/errors";
 import { processScheduledJobs } from "@/lib/social-media/publishing";
@@ -17,18 +18,12 @@ function authorizeWorker(request: Request): boolean {
 
 async function runWorker(request: Request) {
   if (!authorizeWorker(request)) {
-    return NextResponse.json(
-      { error: "Unauthorized. Set SOCIAL_PUBLISH_CRON_SECRET and pass Bearer token." },
-      { status: 401 },
-    );
+    return apiErrorResponse(API_ERROR_CODES.UNAUTHORIZED, 401, "Unauthorized. Set SOCIAL_PUBLISH_CRON_SECRET and pass Bearer token.");
   }
 
   const admin = createAdminClient();
   if (!admin) {
-    return NextResponse.json(
-      { error: "SUPABASE_SERVICE_ROLE_KEY required for publish worker." },
-      { status: 503 },
-    );
+    return apiErrorResponse(API_ERROR_CODES.MIGRATION_REQUIRED, 503, "SUPABASE_SERVICE_ROLE_KEY required for publish worker.");
   }
 
   try {

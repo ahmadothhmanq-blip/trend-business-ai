@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { z } from "zod";
 import { requireUser } from "@/lib/api/helpers";
 import { versionCreatorTemplate } from "@/lib/marketplace/templates";
@@ -26,15 +27,12 @@ export async function POST(request: Request, { params }: Params) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    return apiErrorResponse(API_ERROR_CODES.INVALID_JSON, 400);
   }
 
   const parsed = versionSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid version payload" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   try {
@@ -47,6 +45,7 @@ export async function POST(request: Request, { params }: Params) {
   } catch (err) {
     const message = err instanceof Error ? err.message : "Version failed";
     const status = message.includes("Not allowed") ? 403 : 404;
-    return NextResponse.json({ error: message }, { status });
+    const code = status === 403 ? API_ERROR_CODES.FORBIDDEN : API_ERROR_CODES.NOT_FOUND;
+    return apiErrorResponse(code, status, message);
   }
 }

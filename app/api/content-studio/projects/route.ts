@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import type { ContentProject } from "@/types/content";
@@ -68,7 +69,7 @@ export async function POST(request: Request) {
 
   const parsed = createSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid input" }, { status: 400 });
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const input = parsed.data;
@@ -88,7 +89,7 @@ export async function POST(request: Request) {
 
   if (error) {
     if (error.code === "42P01" || /relation/i.test(error.message ?? "")) {
-      return NextResponse.json({ error: "Apply migration 061." }, { status: 503 });
+      return apiErrorResponse(API_ERROR_CODES.MIGRATION_REQUIRED, 503, "Apply migration 061.");
     }
     return databaseErrorResponse("content-studio.projects.insert", error);
   }
@@ -102,14 +103,14 @@ export async function PATCH(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
-  if (!id) return NextResponse.json({ error: "id is required" }, { status: 400 });
+  if (!id) return apiValidationError("id is required");
 
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
 
   const parsed = updateSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid input" }, { status: 400 });
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const input = parsed.data;
@@ -130,7 +131,7 @@ export async function PATCH(request: Request) {
     .single();
 
   if (error || !data) {
-    return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Project not found");
   }
 
   return NextResponse.json({ project: data as ContentProject });
@@ -142,7 +143,7 @@ export async function DELETE(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
-  if (!id) return NextResponse.json({ error: "id is required" }, { status: 400 });
+  if (!id) return apiValidationError("id is required");
 
   const { error } = await auth.supabase
     .from("content_projects")

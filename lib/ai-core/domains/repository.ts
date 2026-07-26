@@ -107,18 +107,71 @@ export async function getDomainByIdDb(
   return rowToDomain(data as DomainRow);
 }
 
+type PublicDomainRow = {
+  id: string;
+  generation_id: string;
+  hostname: string;
+  kind: string;
+  status: string;
+  ssl_status: string;
+  created_at: string;
+  updated_at: string;
+};
+
+function publicRowToDomain(row: PublicDomainRow): WebsiteDomain {
+  return {
+    id: row.id,
+    userId: "",
+    generationId: row.generation_id,
+    publicationId: null,
+    slug: null,
+    hostname: row.hostname,
+    kind: row.kind as WebsiteDomain["kind"],
+    status: row.status as WebsiteDomain["status"],
+    verificationToken: "",
+    verifiedAt: null,
+    sslStatus: row.ssl_status as WebsiteDomain["sslStatus"],
+    dnsInstructions: [],
+    lastCheckedAt: null,
+    lastCheckMessage: null,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
 export async function findDomainByHostnameDb(
   client: SupabaseClient,
   hostname: string,
   activeOnly = false,
 ): Promise<WebsiteDomain | null> {
-  let query = client.from("website_domains").select("*").eq("hostname", hostname.toLowerCase());
+  const normalized = hostname.toLowerCase();
+
   if (activeOnly) {
-    query = query.eq("status", "active");
-  } else {
-    query = query.neq("status", "removed");
+    const { data, error } = await client
+      .from("website_active_domains_public")
+      .select("id, generation_id, hostname, kind, status, ssl_status, created_at, updated_at")
+      .eq("hostname", normalized)
+      .maybeSingle();
+    if (!error && data) return publicRowToDomain(data as PublicDomainRow);
+
+    if (error && !isDomainsTableMissing(error)) {
+      const { data: fallback, error: fallbackError } = await client
+        .from("website_domains")
+        .select("id, generation_id, hostname, kind, status, ssl_status, created_at, updated_at")
+        .eq("hostname", normalized)
+        .eq("status", "active")
+        .maybeSingle();
+      if (!fallbackError && fallback) return publicRowToDomain(fallback as PublicDomainRow);
+    }
+    return null;
   }
-  const { data, error } = await query.maybeSingle();
+
+  const { data, error } = await client
+    .from("website_domains")
+    .select("*")
+    .eq("hostname", normalized)
+    .neq("status", "removed")
+    .maybeSingle();
   if (error || !data) return null;
   return rowToDomain(data as DomainRow);
 }

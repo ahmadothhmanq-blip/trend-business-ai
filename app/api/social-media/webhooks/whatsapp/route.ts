@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { enforceWebhookRateLimit } from "@/lib/api/rate-limit";
 import { logWebhookEvent, parseMetaWebhookPayload, verifyMetaWebhook } from "@/lib/social-media/webhooks";
@@ -10,7 +11,7 @@ async function handleWhatsAppWebhook(request: Request) {
   if (rateLimited) return rateLimited;
 
   const admin = createAdminClient();
-  if (!admin) return NextResponse.json({ error: "Service unavailable." }, { status: 503 });
+  if (!admin) return apiErrorResponse(API_ERROR_CODES.MIGRATION_REQUIRED, 503, "Service unavailable.");
 
   const url = new URL(request.url);
   if (request.method === "GET") {
@@ -21,7 +22,7 @@ async function handleWhatsAppWebhook(request: Request) {
       process.env.SOCIAL_META_WEBHOOK_VERIFY_TOKEN ?? "",
     );
     if (challenge) return new NextResponse(challenge, { status: 200 });
-    return NextResponse.json({ error: "Verification failed." }, { status: 403 });
+    return apiErrorResponse(API_ERROR_CODES.FORBIDDEN, 403, "Verification failed.");
   }
 
   const payload = (await request.json()) as Record<string, unknown>;

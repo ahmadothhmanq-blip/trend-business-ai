@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireUser } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse } from "@/lib/i18n/api-errors";
 import { loadGrowthDashboard } from "@/lib/growth/engine";
 
 export async function GET() {
@@ -13,12 +14,10 @@ export async function GET() {
   );
 
   if (!payload) {
-    return NextResponse.json(
-      {
-        error: "Growth engine tables are missing. Apply migration 029_growth_engine.sql.",
-        code: "MIGRATION_REQUIRED",
-      },
-      { status: 503 },
+    return apiErrorResponse(
+      API_ERROR_CODES.MIGRATION_REQUIRED,
+      503,
+      "Growth engine tables are missing. Apply migration 029_growth_engine.sql.",
     );
   }
 

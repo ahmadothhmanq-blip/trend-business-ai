@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { enforceMutationRateLimit } from "@/lib/api/rate-limit";
 import { listTriggers, createTrigger, fireTrigger } from "@/lib/agents/triggers";
@@ -43,12 +44,12 @@ export async function POST(request: Request) {
       await logAgentAudit(auth.supabase, { user_id: auth.user!.id, action: "fire", entity_type: "trigger", entity_id: fire.data.triggerId });
       return NextResponse.json({ result });
     } catch (e) {
-      return NextResponse.json({ error: e instanceof Error ? e.message : "Failed" }, { status: 500 });
+      return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, e instanceof Error ? e.message : undefined);
     }
   }
 
   const parsed = createSchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: "Invalid" }, { status: 400 });
+  if (!parsed.success) return apiValidationError("Invalid");
   const { data, error } = await createTrigger(auth.supabase, {
     user_id: auth.user!.id,
     name: parsed.data.name,

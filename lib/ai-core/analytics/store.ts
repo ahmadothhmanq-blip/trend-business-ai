@@ -73,6 +73,14 @@ function inferDevice(uaHint?: string | null): AnalyticsDeviceType {
   return "desktop";
 }
 
+function isProductionEnv(): boolean {
+  return process.env.NODE_ENV === "production";
+}
+
+function productionDbUnavailable(feature: string): never {
+  throw new Error(`${feature} database unavailable in production`);
+}
+
 function seedMemoryAnalytics(generationId: string): void {
   const state = getState();
   if (state.seededGenerations.has(generationId)) return;
@@ -156,6 +164,19 @@ export async function trackAnalyticsEvent(
   if (dbClient) {
     const persisted = await insertAnalyticsEventDb(dbClient, event);
     if (persisted) return persisted;
+
+    const { error } = await dbClient
+      .from("website_analytics_events")
+      .select("id")
+      .limit(1);
+    if (!isAnalyticsTableMissing(error)) {
+      throw new Error("Failed to persist analytics event");
+    }
+    if (isProductionEnv()) {
+      productionDbUnavailable("Analytics");
+    }
+  } else if (isProductionEnv()) {
+    productionDbUnavailable("Analytics");
   }
 
   const state = getState();
@@ -180,9 +201,14 @@ export async function listAnalyticsEvents(
       .eq("generation_id", generationId)
       .limit(1);
     if (!isAnalyticsTableMissing(error)) return rows;
+    if (isProductionEnv()) {
+      productionDbUnavailable("Analytics");
+    }
+  } else if (isProductionEnv()) {
+    productionDbUnavailable("Analytics");
   }
 
-  if (process.env.NODE_ENV !== "production") {
+  if (!isProductionEnv()) {
     seedMemoryAnalytics(generationId);
   }
   const since = sinceIso ? Date.parse(sinceIso) : 0;

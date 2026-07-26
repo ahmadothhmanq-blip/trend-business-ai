@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { enforceMutationRateLimit } from "@/lib/api/rate-limit";
 import { listPurchaseOrders, createPurchaseOrder, receivePurchaseOrder } from "@/lib/erp/procurement";
@@ -45,12 +46,12 @@ export async function POST(request: Request) {
       warehouseId: receiveBody.warehouseId,
       quantity: receiveBody.quantity,
     });
-    if (result.error) return NextResponse.json({ error: result.error.message }, { status: 500 });
+    if (result.error) return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, result.error.message);
     return NextResponse.json({ success: true });
   }
 
   const parsed = createSchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: "Invalid" }, { status: 400 });
+  if (!parsed.success) return apiValidationError("Invalid");
   const { data, error } = await createPurchaseOrder(auth.supabase, {
     user_id: auth.user!.id,
     company_id: parsed.data.companyId,

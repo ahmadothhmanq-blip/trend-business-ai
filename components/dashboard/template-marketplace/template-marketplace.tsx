@@ -138,7 +138,7 @@ export function TemplateMarketplace() {
     }
   };
 
-  const useHref = (tpl: MarketplaceTemplate) =>
+  const buildTemplateUseHref = (tpl: MarketplaceTemplate) =>
     `/dashboard/website-builder?templateId=${encodeURIComponent(tpl.premiumTemplateId)}&marketplaceTemplateId=${encodeURIComponent(tpl.id)}&templateStyle=${encodeURIComponent(tpl.style)}&designPreset=${encodeURIComponent(tpl.designPreset)}`;
 
   const templates = catalog?.templates ?? [];
@@ -268,7 +268,7 @@ export function TemplateMarketplace() {
                   template={r.template}
                   badge={pt("badgeScore", { score: r.score, reason: r.reason })}
                   onPreview={() => void openPreview(r.template.id)}
-                  useHref={useHref(r.template)}
+                  buildTemplateUseHref={buildTemplateUseHref(r.template)}
                 />
               ))}
             </div>
@@ -285,7 +285,7 @@ export function TemplateMarketplace() {
                 key={t.id}
                 template={t}
                 onPreview={() => void openPreview(t.id)}
-                useHref={useHref(t)}
+                buildTemplateUseHref={buildTemplateUseHref(t)}
               />
             ))}
           </div>
@@ -314,7 +314,7 @@ export function TemplateMarketplace() {
                 key={t.id}
                 template={t}
                 onPreview={() => void openPreview(t.id)}
-                useHref={useHref(t)}
+                buildTemplateUseHref={buildTemplateUseHref(t)}
               />
             ))}
           </div>
@@ -401,7 +401,7 @@ export function TemplateMarketplace() {
               {pt("pipelineHint")}
             </div>
             {preview?.template ? (
-              <Link href={useHref(preview.template)}>
+              <Link href={buildTemplateUseHref(preview.template)}>
                 <Button className="bg-premium-gold text-black hover:bg-premium-gold/90">
                   {pt("useThisTemplate")}
                 </Button>
@@ -417,11 +417,11 @@ export function TemplateMarketplace() {
 function TemplateCard(props: {
   template: MarketplaceTemplate;
   onPreview: () => void;
-  useHref: string;
+  buildTemplateUseHref: string;
   badge?: string;
 }) {
   const pt = useProductT("templateMarketplace");
-  const { template: t, onPreview, useHref, badge } = props;
+  const { template: t, onPreview, buildTemplateUseHref, badge } = props;
   return (
     <DashboardPanel className="flex h-full flex-col overflow-hidden p-0">
       <div
@@ -467,7 +467,7 @@ function TemplateCard(props: {
           >
             {pt("preview")}
           </Button>
-          <Link href={useHref} className="flex-1">
+          <Link href={buildTemplateUseHref} className="flex-1">
             <Button
               size="sm"
               className="w-full bg-premium-gold text-black hover:bg-premium-gold/90"

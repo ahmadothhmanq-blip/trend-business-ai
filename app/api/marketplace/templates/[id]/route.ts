@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { requireUser } from "@/lib/api/helpers";
 import {
   buildUseTemplateHref,
@@ -17,7 +18,7 @@ export async function GET(_request: Request, { params }: Params) {
   const auth = await requireUser();
   const detail = getCreatorMarketplaceListingDetail(id, auth.user?.id ?? null);
   if (!detail) {
-    return NextResponse.json({ error: "Template not found." }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Template not found.");
   }
   return NextResponse.json({
     ...detail,

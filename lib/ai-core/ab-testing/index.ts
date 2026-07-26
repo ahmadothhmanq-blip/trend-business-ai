@@ -17,6 +17,7 @@ export {
   duplicateSectionForVariant,
   recordVariantMetric,
   setWinner,
+  deleteExperiment,
   ensureDemoExperiment,
 } from "@/lib/ai-core/ab-testing/store";
 

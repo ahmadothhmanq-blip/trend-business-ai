@@ -417,3 +417,59 @@ html[dir="rtl"] .text-left {
 html[dir="rtl"] .text-right {
   text-align: end;
 }
+
+html[dir="rtl"] [data-dashboard-sidebar],
+html[dir="rtl"] [data-dashboard-nav] nav,
+html[dir="rtl"] [data-dashboard-header] {
+  direction: rtl;
+}
+
+html[dir="rtl"] [role="table"],
+html[dir="rtl"] table thead,
+html[dir="rtl"] table tbody {
+  direction: rtl;
+}
+
+html[dir="rtl"] [data-editor-toolbar],
+html[dir="rtl"] [data-visual-editor],
+html[dir="rtl"] [data-design-editor] {
+  direction: rtl;
+  text-align: start;
+}
+
+html[dir="rtl"] [data-chart] .recharts-cartesian-axis-tick text {
+  direction: ltr;
+}
+
+html[dir="rtl"] [data-breadcrumb],
+html[dir="rtl"] nav[aria-label="Breadcrumb"] {
+  direction: rtl;
+}
+
+html[dir="rtl"] [data-tabs],
+html[dir="rtl"] [role="tablist"] {
+  direction: rtl;
+}
+
+html[dir="rtl"] [data-dropdown],
+html[dir="rtl"] [data-popover],
+html[dir="rtl"] [role="menu"] {
+  direction: rtl;
+  text-align: start;
+}
+
+html[dir="rtl"] .dashboard-content,
+html[dir="rtl"] [data-dashboard-main] {
+  direction: rtl;
+}
+
+html[dir="rtl"] [data-stat-card],
+html[dir="rtl"] [data-metric-card] {
+  text-align: start;
+}
+
+html[dir="rtl"] .space-x-2 > :not([hidden]) ~ :not([hidden]),
+html[dir="rtl"] .space-x-3 > :not([hidden]) ~ :not([hidden]),
+html[dir="rtl"] .space-x-4 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}

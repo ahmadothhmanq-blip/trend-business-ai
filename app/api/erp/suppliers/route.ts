@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { enforceMutationRateLimit } from "@/lib/api/rate-limit";
 import { listSuppliers, createSupplier } from "@/lib/erp/suppliers";
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
   const parsed = createSchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: "Invalid" }, { status: 400 });
+  if (!parsed.success) return apiValidationError("Invalid");
   const { data, error } = await createSupplier(auth.supabase, {
     user_id: auth.user!.id,
     company_id: parsed.data.companyId,

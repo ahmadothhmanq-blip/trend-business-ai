@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { enforceMutationRateLimit } from "@/lib/api/rate-limit";
 import type { ApiKey } from "@/types/platform";
@@ -49,7 +50,7 @@ export async function POST(request: Request) {
   if (body instanceof NextResponse) return body;
 
   const parsed = createSchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0]?.message }, { status: 400 });
+  if (!parsed.success) return apiValidationError(parsed.error.issues[0]?.message);
 
   const { fullKey, prefix, hash } = generateApiKey();
   const expiresAt = parsed.data.expiresInDays
@@ -66,7 +67,7 @@ export async function POST(request: Request) {
   }).select("id, name, key_prefix, scopes, expires_at, is_active, created_at").single();
 
   if (error) {
-    if (error.code === "42P01") return NextResponse.json({ error: "API Keys table not ready. Apply migration 021." }, { status: 503 });
+    if (error.code === "42P01") return apiErrorResponse(API_ERROR_CODES.MIGRATION_REQUIRED, 503, "API Keys table not ready. Apply migration 021.");
     return databaseErrorResponse("api-keys.create", error);
   }
 

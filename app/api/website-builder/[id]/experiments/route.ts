@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { z } from "zod";
 import { requireUser, parseUuidParam } from "@/lib/api/helpers";
 import {
@@ -27,10 +28,10 @@ async function assertOwnedGeneration(
     .eq("id", generationId)
     .eq("user_id", userId)
     .maybeSingle();
-  if (error) return { error: NextResponse.json({ error: error.message }, { status: 500 }) };
+  if (error) return { error: apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, error.message) };
   if (!data) {
     return {
-      error: NextResponse.json({ error: "Website not found." }, { status: 404 }),
+      error: apiErrorResponse(API_ERROR_CODES.NOT_FOUND, 404, "Website not found."),
     };
   }
   return { error: null };
@@ -54,9 +55,9 @@ export async function GET(_request: Request, { params }: Params) {
   );
   if (owned.error) return owned.error;
 
-  ensureDemoExperiment(parsedId.id);
-  const experiments = listExperiments(parsedId.id);
-  const results = listExperimentResults(parsedId.id);
+  await ensureDemoExperiment(parsedId.id, auth.user!.id, auth.supabase);
+  const experiments = await listExperiments(parsedId.id, auth.supabase);
+  const results = await listExperimentResults(parsedId.id, auth.supabase);
 
   return NextResponse.json({
     experiments,
@@ -146,7 +147,7 @@ export async function POST(request: Request, { params }: Params) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    return apiErrorResponse(API_ERROR_CODES.INVALID_JSON, 400);
   }
 
   const action =
@@ -158,40 +159,42 @@ export async function POST(request: Request, { params }: Params) {
     if (action === "status") {
       const parsed = statusSchema.safeParse(body);
       if (!parsed.success) {
-        return NextResponse.json(
-          { error: parsed.error.issues[0]?.message ?? "Invalid status" },
-          { status: 400 },
-        );
+        return apiValidationError(parsed.error.issues[0]?.message);
       }
-      const experiment = updateExperimentStatus(
+      const experiment = await updateExperimentStatus(
         parsed.data.experimentId,
         parsed.data.status,
+        auth.supabase,
       );
       if (experiment.generationId !== parsedId.id) {
-        return NextResponse.json({ error: "Experiment not found." }, { status: 404 });
+        return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Experiment not found.");
       }
-      const results = evaluateExperimentResults(experiment.id, true);
+      const results = await evaluateExperimentResults(
+        experiment.id,
+        true,
+        auth.supabase,
+      );
       return NextResponse.json({ experiment, results });
     }
 
     if (action === "duplicate-section") {
       const parsed = duplicateSchema.safeParse(body);
       if (!parsed.success) {
-        return NextResponse.json(
-          { error: parsed.error.issues[0]?.message ?? "Invalid duplicate" },
-          { status: 400 },
-        );
+        return apiValidationError(parsed.error.issues[0]?.message);
       }
-      const experiment = duplicateSectionForVariant({
-        experimentId: parsed.data.experimentId,
-        variantKey: parsed.data.variantKey,
-        sectionLabel: parsed.data.sectionLabel,
-        changeType: parsed.data.changeType as ExperimentChangeType,
-        controlValue: parsed.data.controlValue,
-        variantValue: parsed.data.variantValue,
-      });
+      const experiment = await duplicateSectionForVariant(
+        {
+          experimentId: parsed.data.experimentId,
+          variantKey: parsed.data.variantKey,
+          sectionLabel: parsed.data.sectionLabel,
+          changeType: parsed.data.changeType as ExperimentChangeType,
+          controlValue: parsed.data.controlValue,
+          variantValue: parsed.data.variantValue,
+        },
+        auth.supabase,
+      );
       if (experiment.generationId !== parsedId.id) {
-        return NextResponse.json({ error: "Experiment not found." }, { status: 404 });
+        return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Experiment not found.");
       }
       return NextResponse.json({ experiment });
     }
@@ -199,42 +202,47 @@ export async function POST(request: Request, { params }: Params) {
     if (action === "evaluate") {
       const parsed = evaluateSchema.safeParse(body);
       if (!parsed.success) {
-        return NextResponse.json(
-          { error: parsed.error.issues[0]?.message ?? "Invalid evaluate" },
-          { status: 400 },
-        );
+        return apiValidationError(parsed.error.issues[0]?.message);
       }
-      const results = evaluateExperimentResults(parsed.data.experimentId, true);
+      const results = await evaluateExperimentResults(
+        parsed.data.experimentId,
+        true,
+        auth.supabase,
+      );
       if (!results || results.experiment.generationId !== parsedId.id) {
-        return NextResponse.json({ error: "Experiment not found." }, { status: 404 });
+        return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Experiment not found.");
       }
       return NextResponse.json({ results });
     }
 
     const parsed = createSchema.safeParse({ ...(body as object), action: undefined });
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: parsed.error.issues[0]?.message ?? "Invalid experiment" },
-        { status: 400 },
-      );
+      return apiValidationError(parsed.error.issues[0]?.message);
     }
 
-    const experiment = createExperiment({
-      generationId: parsedId.id,
-      userId: auth.user!.id,
-      name: parsed.data.name,
-      hypothesis: parsed.data.hypothesis,
-      changeTypes: parsed.data.changeTypes as ExperimentChangeType[] | undefined,
-      variantA: parsed.data.variantA,
-      variantB: parsed.data.variantB,
-      minSampleSize: parsed.data.minSampleSize,
-      start: parsed.data.start ?? true,
-    });
+    const experiment = await createExperiment(
+      {
+        generationId: parsedId.id,
+        userId: auth.user!.id,
+        name: parsed.data.name,
+        hypothesis: parsed.data.hypothesis,
+        changeTypes: parsed.data.changeTypes as ExperimentChangeType[] | undefined,
+        variantA: parsed.data.variantA,
+        variantB: parsed.data.variantB,
+        minSampleSize: parsed.data.minSampleSize,
+        start: parsed.data.start ?? true,
+      },
+      auth.supabase,
+    );
 
-    const results = evaluateExperimentResults(experiment.id, false);
+    const results = await evaluateExperimentResults(
+      experiment.id,
+      false,
+      auth.supabase,
+    );
     return NextResponse.json({ experiment, results }, { status: 201 });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Experiment action failed";
-    return NextResponse.json({ error: message }, { status: 400 });
+    return apiValidationError(message);
   }
 }

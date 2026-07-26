@@ -1,6 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import {
+  API_ERROR_CODES,
+  apiErrorResponse,
+  apiValidationError,
+} from "@/lib/i18n/api-errors";
 
 const uuidSchema = z.string().uuid();
 
@@ -12,7 +17,11 @@ export async function requireUser() {
   } = await supabase.auth.getUser();
 
   if (error || !user) {
-    return { supabase, user: null, response: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
+    return {
+      supabase,
+      user: null,
+      response: apiErrorResponse(API_ERROR_CODES.UNAUTHORIZED, 401),
+    };
   }
 
   return { supabase, user, response: null };
@@ -22,14 +31,13 @@ export async function parseJsonBody<T>(request: Request): Promise<T | NextRespon
   try {
     return (await request.json()) as T;
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    return apiErrorResponse(API_ERROR_CODES.INVALID_JSON, 400);
   }
 }
 
 export function safeRedirectPath(path: string | null | undefined, fallback = "/dashboard"): string {
   if (!path) return fallback;
 
-  // Decode once to catch encoded bypasses, then reject absolute/protocol-relative URLs.
   let decoded = path;
   try {
     decoded = decodeURIComponent(path);
@@ -50,7 +58,6 @@ export function safeRedirectPath(path: string | null | undefined, fallback = "/d
     return fallback;
   }
 
-  // Allow only relative app paths with safe characters.
   if (!/^\/[A-Za-z0-9._~/?#&=+\-[\]%]*$/.test(decoded)) {
     return fallback;
   }
@@ -64,7 +71,7 @@ export function parseUuidParam(
 ): { id: string } | NextResponse {
   const parsed = uuidSchema.safeParse(id);
   if (!parsed.success) {
-    return NextResponse.json({ error: `Invalid ${label}.` }, { status: 400 });
+    return apiErrorResponse(API_ERROR_CODES.INVALID_PARAM, 400, undefined, label);
   }
   return { id: parsed.data };
 }
@@ -76,3 +83,5 @@ export function paginationParams(searchParams: URLSearchParams) {
   const to = from + limit - 1;
   return { page, limit, from, to };
 }
+
+export { apiValidationError, apiErrorResponse, API_ERROR_CODES };

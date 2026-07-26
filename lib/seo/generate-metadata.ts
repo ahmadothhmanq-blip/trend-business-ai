@@ -9,6 +9,11 @@ import type { PageMetadataOptions } from "@/lib/seo/metadata";
 import { getPublishedBlogPosts } from "@/lib/seo/content/blog";
 import { getPublishedProgrammaticPages } from "@/lib/seo/programmatic";
 import { MARKETING_PRODUCTS } from "@/lib/constants/marketing-content";
+import { getServerLocale } from "@/lib/i18n/server";
+import {
+  getLocalizedBlogPost,
+  getLocalizedProgrammaticPage,
+} from "@/lib/seo/localized-content";
 
 export async function generateSeoMetadata(
   options: PageMetadataOptions,
@@ -32,24 +37,30 @@ export async function generateProductSeoMetadata(slug: string): Promise<Metadata
 export async function generateBlogPostSeoMetadata(slug: string): Promise<Metadata | null> {
   const post = getPublishedBlogPosts().find((item) => item.slug === slug);
   if (!post) return null;
+  const locale = await getServerLocale();
+  const localized = getLocalizedBlogPost(locale, post);
   return SeoService.createMetadata({
-    title: post.title,
-    description: post.description,
+    title: localized.title,
+    description: localized.description,
     path: post.path,
     type: "article",
     image: post.image,
     publishedTime: post.publishedAt,
     modifiedTime: post.updatedAt,
+    locale,
   });
 }
 
 export async function generateProgrammaticSeoMetadata(id: string): Promise<Metadata | null> {
   const page = getPublishedProgrammaticPages().find((item) => item.id === id);
   if (!page) return null;
+  const locale = await getServerLocale();
+  const localized = getLocalizedProgrammaticPage(locale, page);
   return SeoService.createMetadata({
-    title: page.title,
-    description: page.description,
+    title: localized.title,
+    description: localized.description,
     path: page.path,
     type: "website",
+    locale,
   });
 }

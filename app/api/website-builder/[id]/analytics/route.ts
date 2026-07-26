@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { requireUser, parseUuidParam } from "@/lib/api/helpers";
 import { buildWebsiteAnalyticsSummary } from "@/lib/ai-core/analytics";
 import { runConversionOptimizer } from "@/lib/ai-core/conversion-optimizer";
@@ -33,10 +34,10 @@ export async function GET(request: Request, { params }: Params) {
     .maybeSingle();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, error.message);
   }
   if (!generation) {
-    return NextResponse.json({ error: "Website not found." }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Website not found.");
   }
 
   const blueprint = (generation.blueprint ?? {}) as {

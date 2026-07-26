@@ -12,6 +12,13 @@ import {
   unpublishWebsitePublication,
   type WebsitePublication,
 } from "@/lib/website/publish";
+import type { PublishGateResult } from "@/lib/website/publish-gates";
+import {
+  buildPublishGateBlockPayload,
+  evaluateGenerationPublishGates,
+  PUBLISH_GATE_BLOCK_MESSAGE,
+  shouldBlockPublish,
+} from "@/lib/website/publish-quality";
 import type {
   PublicationBackendStatus,
   PublishingLifecycleStatus,
@@ -82,13 +89,47 @@ export async function getPublicationForGeneration(args: {
   return data as WebsitePublication;
 }
 
-export async function runPublishingAction(args: {
+type PublishingActionBase = {
   supabase: SupabaseClient;
   userId: string;
   generation: WebsiteGeneration;
   action: "prepare" | "publish" | "unpublish" | "archive" | "republish";
   userHandle?: string | null;
-}) {
+  force?: boolean;
+};
+
+export type PublishingActionGateBlock = {
+  ok: false;
+  status: 422;
+  error: string;
+  gateBlock: true;
+  gates: PublishGateResult;
+  qualityRecommendations: ReturnType<typeof buildPublishGateBlockPayload>["qualityRecommendations"];
+  blockers: string[];
+};
+
+export type PublishingActionFailure = {
+  ok: false;
+  status: number;
+  error: string;
+  gateBlock?: false;
+};
+
+export type PublishingActionSuccess = {
+  ok: true;
+  publication: WebsitePublication;
+  gates: PublishGateResult;
+  htmlBytes?: number;
+  publishEnabled?: boolean;
+  publicUrl?: string;
+  summary: PublishingSummary;
+};
+
+export async function runPublishingAction(
+  args: PublishingActionBase,
+): Promise<
+  PublishingActionSuccess | PublishingActionGateBlock | PublishingActionFailure
+> {
   const action =
     args.action === "archive"
       ? "unpublish"
@@ -96,18 +137,24 @@ export async function runPublishingAction(args: {
         ? "publish"
         : args.action;
 
+  const gates = evaluateGenerationPublishGates(args.generation);
+  const force = args.force === true;
+
   if (action === "prepare") {
     const result = await prepareWebsitePublication({
       supabase: args.supabase,
       userId: args.userId,
       generation: args.generation,
     });
-    if (!result.ok) return result;
+    if (!result.ok) {
+      return { ok: false, status: result.status, error: result.error };
+    }
     return {
-      ok: true as const,
+      ok: true,
       publication: result.publication,
       htmlBytes: result.htmlBytes,
       publishEnabled: result.publishEnabled,
+      gates,
       summary: buildPublishingSummary({
         generationId: args.generation.id,
         publication: result.publication,
@@ -117,18 +164,34 @@ export async function runPublishingAction(args: {
   }
 
   if (action === "publish") {
+    if (shouldBlockPublish(gates, force)) {
+      const blockPayload = buildPublishGateBlockPayload(gates);
+      return {
+        ok: false,
+        status: 422,
+        error: PUBLISH_GATE_BLOCK_MESSAGE,
+        gateBlock: true,
+        gates,
+        qualityRecommendations: blockPayload.qualityRecommendations,
+        blockers: blockPayload.blockers,
+      };
+    }
+
     const result = await publishWebsitePublication({
       supabase: args.supabase,
       userId: args.userId,
       generation: args.generation,
     });
-    if (!result.ok) return result;
+    if (!result.ok) {
+      return { ok: false, status: result.status, error: result.error };
+    }
     return {
-      ok: true as const,
+      ok: true,
       publication: result.publication,
       htmlBytes: result.htmlBytes,
       publishEnabled: result.publishEnabled,
       publicUrl: result.publicUrl,
+      gates,
       summary: buildPublishingSummary({
         generationId: args.generation.id,
         publication: result.publication,
@@ -142,10 +205,13 @@ export async function runPublishingAction(args: {
     userId: args.userId,
     generationId: args.generation.id,
   });
-  if (!result.ok) return result;
+  if (!result.ok) {
+    return { ok: false, status: result.status, error: result.error };
+  }
   return {
-    ok: true as const,
+    ok: true,
     publication: result.publication,
+    gates,
     summary: buildPublishingSummary({
       generationId: args.generation.id,
       publication: result.publication,

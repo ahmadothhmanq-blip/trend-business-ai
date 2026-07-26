@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { enforceMutationRateLimit } from "@/lib/api/rate-limit";
 import { ensurePersonalOrganization } from "@/lib/platform/organizations";
@@ -45,7 +46,7 @@ export async function POST(request: Request) {
 
   const parsed = createSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0]?.message }, { status: 400 });
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const result = await ensurePersonalOrganization(
@@ -55,9 +56,12 @@ export async function POST(request: Request) {
   );
 
   if (result.error || !result.organization) {
-    return NextResponse.json(
-      { error: result.error ?? "Failed to create organization" },
-      { status: result.error?.includes("not ready") ? 503 : 500 },
+    const status = result.error?.includes("not ready") ? 503 : 500;
+    const code = status === 503 ? API_ERROR_CODES.MIGRATION_REQUIRED : API_ERROR_CODES.SERVER_ERROR;
+    return apiErrorResponse(
+      code,
+      status,
+      result.error ?? "Failed to create organization",
     );
   }
 

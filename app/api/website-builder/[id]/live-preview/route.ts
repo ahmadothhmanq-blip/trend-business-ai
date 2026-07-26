@@ -1,4 +1,5 @@
 import { requireUser, parseUuidParam } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import {
   livePreviewResponseHeaders,
   resolveLivePreviewHtml,
@@ -29,7 +30,7 @@ export async function GET(_request: Request, context: RouteContext) {
     .maybeSingle();
 
   if (error || !data) {
-    return NextResponse.json({ error: "Website not found." }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Website not found.");
   }
 
   const html = resolveLivePreviewHtml(data as WebsiteGeneration);

@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import {
   isPlaceholderProvider,
@@ -90,10 +91,7 @@ export async function PUT(request: Request) {
 
   const parsed = settingsSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid settings" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   // Preserve stored API keys when the client sends a masked placeholder.
@@ -113,10 +111,7 @@ export async function PUT(request: Request) {
   }
 
   if (!isUserFacingProvider(parsed.data.default_provider)) {
-    return NextResponse.json(
-      { error: "Default provider is not available" },
-      { status: 400 },
-    );
+    return apiValidationError("Default provider is not available");
   }
 
   const facingProviders = parsed.data.providers.filter((p) =>
@@ -175,10 +170,7 @@ export async function PUT(request: Request) {
       error.code === "42P01" ||
       (typeof error.message === "string" && error.message.includes("relation"))
     ) {
-      return NextResponse.json(
-        { error: "AI Provider Settings table not found. Please apply migration 012." },
-        { status: 503 },
-      );
+      return apiErrorResponse(API_ERROR_CODES.MIGRATION_REQUIRED, 503, "AI Provider Settings table not found. Please apply migration 012.");
     }
     return databaseErrorResponse("ai-settings.update", error);
   }

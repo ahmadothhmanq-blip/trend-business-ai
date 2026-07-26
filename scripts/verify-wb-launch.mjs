@@ -141,7 +141,11 @@ if (billingOptional === "true" && productionMode) {
 }
 
 if (!upstashUrl || !upstashToken) {
-  warn("UPSTASH_REDIS_*", "missing — production rate limits are per-instance only (P1)");
+  if (productionMode) {
+    fail("UPSTASH_REDIS_*", "required in production for distributed rate limits");
+  } else {
+    warn("UPSTASH_REDIS_*", "missing — production rate limits are per-instance only (P1)");
+  }
 } else {
   pass("UPSTASH_REDIS_*", "set");
 }
@@ -178,6 +182,11 @@ console.log("\n--- Supabase / database ---");
 const requiredTables = [
   "website_generations",
   "website_publications",
+  "website_experiments",
+  "website_analytics_events",
+  "website_domains",
+  "website_leads",
+  "website_cms_entries",
   "credit_balances",
   "projects",
 ];
@@ -204,6 +213,19 @@ if (dbUrl) {
     );
     if (rpc.rowCount) pass("RPC consume_credits", "exists");
     else fail("RPC consume_credits", "missing — credits/generation will fail closed in production");
+
+    const { rows: viewRows } = await client.query(
+      `select to_regclass('public.website_active_domains_public') as reg`,
+    );
+    if (viewRows[0]?.reg) {
+      pass("view website_active_domains_public", "exists (migration 072)");
+    } else {
+      fail(
+        "view website_active_domains_public",
+        "missing — apply supabase/migrations/072_website_enterprise_hardening.sql",
+      );
+    }
+
     await client.end();
   } catch (e) {
     fail("SUPABASE_DB_URL probe", e.message);

@@ -7,16 +7,22 @@ import { PUBLIC_SAAS_PAGES } from "@/lib/constants/saas-pages";
 import { SeoService } from "@/lib/seo/engine";
 import { getPublishedBlogPosts } from "@/lib/seo/content/blog";
 import { collectionPageJsonLd, webPageJsonLd } from "@/lib/seo/json-ld";
+import { getServerTranslator } from "@/lib/i18n/server";
+import { getLocalizedBlogPost } from "@/lib/seo/localized-content";
 
-export const metadata: Metadata = SeoService.createMetadata({
-  title: "Blog",
-  description: PUBLIC_SAAS_PAGES.blog.description,
-  path: "/blog",
-  type: "collection",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerTranslator();
+  return SeoService.createMetadata({
+    title: t("marketing.publicPages.blog.metaTitle"),
+    description: PUBLIC_SAAS_PAGES.blog.description,
+    path: "/blog",
+    type: "collection",
+  });
+}
 
-export default function BlogPage() {
-  const posts = getPublishedBlogPosts();
+export default async function BlogPage() {
+  const { t, locale } = await getServerTranslator();
+  const posts = getPublishedBlogPosts().map((post) => getLocalizedBlogPost(locale, post));
 
   return (
     <>
@@ -24,13 +30,13 @@ export default function BlogPage() {
         id="blog-jsonld"
         data={[
           webPageJsonLd({
-            name: "Blog",
+            name: t("marketing.publicPages.blog.metaTitle"),
             description: PUBLIC_SAAS_PAGES.blog.description,
             path: "/blog",
             type: "CollectionPage",
           }),
           collectionPageJsonLd({
-            name: "Trend Business AI Blog",
+            name: t("marketing.publicPages.blog.jsonLdName"),
             description: PUBLIC_SAAS_PAGES.blog.description,
             path: "/blog",
             items: posts.map((post) => ({
@@ -42,7 +48,7 @@ export default function BlogPage() {
         ]}
       />
       <PublicSaasPage page={PUBLIC_SAAS_PAGES.blog}>
-        <div className="landing-container border-t border-[rgba(212,175,55,0.12)] py-16 space-y-10">
+        <div className="landing-container space-y-10 border-t border-[rgba(212,175,55,0.12)] py-16">
           {posts.length > 0 ? (
             <div className="grid gap-4">
               {posts.map((post) => (
@@ -58,7 +64,7 @@ export default function BlogPage() {
             </div>
           ) : null}
           <RelatedLinksSection
-            title="Explore while you read"
+            title={t("marketing.publicPages.blog.exploreWhileReading")}
             links={[
               ...SeoService.links.tools("website-builder", 2),
               ...SeoService.links.resources(2),

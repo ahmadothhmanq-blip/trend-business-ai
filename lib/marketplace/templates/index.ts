@@ -24,7 +24,7 @@ export {
   getCreatorMarketplaceListingDetail,
   buildTemplateHandoff,
   buildUseTemplateHref,
-  useCreatorTemplate,
+  applyCreatorTemplate,
   favoriteCreatorTemplate,
   publishCreatorTemplate,
   versionCreatorTemplate,

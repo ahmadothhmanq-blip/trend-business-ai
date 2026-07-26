@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { requireUser, parseUuidParam, parseJsonBody } from "@/lib/api/helpers";
 import { serverErrorResponse } from "@/lib/api/errors";
 import type { WebAppGeneration, WebAppBlueprint } from "@/types/webapp";
@@ -106,7 +107,7 @@ export async function GET(_request: Request, { params }: Params) {
       parsedId.id,
     );
     if (!generation) {
-      return NextResponse.json({ error: "App not found." }, { status: 404 });
+      return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "App not found.");
     }
 
     const model = extractAppModelFromBlueprint(generation.blueprint, {
@@ -305,10 +306,7 @@ export async function POST(request: Request, { params }: Params) {
 
   const parsed = manageSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid action" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   try {
@@ -318,7 +316,7 @@ export async function POST(request: Request, { params }: Params) {
       parsedId.id,
     );
     if (!generation) {
-      return NextResponse.json({ error: "App not found." }, { status: 404 });
+      return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "App not found.");
     }
 
     let model = extractAppModelFromBlueprint(generation.blueprint, {
@@ -415,7 +413,7 @@ export async function POST(request: Request, { params }: Params) {
       case "restore_version": {
         const restored = restoreAppVersion(history, action.versionId);
         if (!restored) {
-          return NextResponse.json({ error: "Version not found." }, { status: 404 });
+          return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Version not found.");
         }
         model = restored.model;
         history = restored.history;
@@ -511,7 +509,7 @@ export async function POST(request: Request, { params }: Params) {
       case "run_workflow": {
         const workflow = model.workflows.find((w) => w.id === action.workflowId);
         if (!workflow) {
-          return NextResponse.json({ error: "Workflow not found." }, { status: 404 });
+          return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Workflow not found.");
         }
         const execution = await executeWorkflow({ workflow, model, trigger: "manual" });
         persist = false;

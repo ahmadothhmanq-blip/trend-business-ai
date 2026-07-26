@@ -42,7 +42,7 @@ export async function runWorkflow(
     metadata: { input },
   }).select("id").single();
 
-  let variables: Record<string, unknown> = { ...input, ...(wf.variables ?? {}) };
+  const variables: Record<string, unknown> = { ...input, ...(wf.variables ?? {}) };
   let failed = false;
   let lastError: string | undefined;
 

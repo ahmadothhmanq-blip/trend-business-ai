@@ -33,7 +33,7 @@ export function ConnectedAccountsPanel() {
   }, [load]);
 
   const connect = (platform: string) => {
-    window.location.href = `/api/social-media/accounts/connect/${platform}`;
+    window.location.assign(`/api/social-media/accounts/connect/${platform}`);
   };
 
   const disconnect = async (id: string) => {

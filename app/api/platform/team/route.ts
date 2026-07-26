@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { enforceMutationRateLimit } from "@/lib/api/rate-limit";
 import {
@@ -24,7 +25,7 @@ async function resolveOrganizationId(
         .eq("user_id", auth.user!.id)
         .maybeSingle();
       if (!data) {
-        return NextResponse.json({ error: "Organization not found." }, { status: 404 });
+        return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Organization not found.");
       }
     }
     return { organizationId: requestedOrgId };
@@ -42,9 +43,12 @@ async function resolveOrganizationId(
   );
 
   if (ensured.error || !ensured.organization) {
-    return NextResponse.json(
-      { error: ensured.error ?? "Unable to resolve organization" },
-      { status: ensured.error?.includes("not ready") ? 503 : 500 },
+    const status = ensured.error?.includes("not ready") ? 503 : 500;
+    const code = status === 503 ? API_ERROR_CODES.MIGRATION_REQUIRED : API_ERROR_CODES.SERVER_ERROR;
+    return apiErrorResponse(
+      code,
+      status,
+      ensured.error ?? "Unable to resolve organization",
     );
   }
 
@@ -109,7 +113,7 @@ export async function POST(request: Request) {
 
   const parsed = inviteSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0]?.message }, { status: 400 });
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const resolved = await resolveOrganizationId(auth, parsed.data.organizationId ?? null);
@@ -119,11 +123,11 @@ export async function POST(request: Request) {
 
   const admin = await requireOrgAdmin(auth.supabase, auth.user!.id, organizationId);
   if (!admin.ok) {
-    return NextResponse.json({ error: admin.error }, { status: 403 });
+    return apiErrorResponse(API_ERROR_CODES.FORBIDDEN, 403, admin.error);
   }
 
   if (parsed.data.email.toLowerCase() === auth.user!.email?.toLowerCase()) {
-    return NextResponse.json({ error: "You cannot invite yourself." }, { status: 400 });
+    return apiValidationError("You cannot invite yourself.");
   }
 
   const { data: existingInvite } = await auth.supabase
@@ -135,7 +139,7 @@ export async function POST(request: Request) {
     .maybeSingle();
 
   if (existingInvite) {
-    return NextResponse.json({ error: "An invitation is already pending for this email." }, { status: 409 });
+    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 409, "An invitation is already pending for this email.");
   }
 
   const { data, error } = await auth.supabase
@@ -151,7 +155,7 @@ export async function POST(request: Request) {
 
   if (error) {
     if (error.code === "42P01") {
-      return NextResponse.json({ error: "Team tables not ready. Apply migration 021." }, { status: 503 });
+      return apiErrorResponse(API_ERROR_CODES.MIGRATION_REQUIRED, 503, "Team tables not ready. Apply migration 021.");
     }
     return databaseErrorResponse("team.invite", error);
   }

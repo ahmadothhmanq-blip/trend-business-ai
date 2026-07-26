@@ -4,24 +4,29 @@ import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { RelatedLinksSection } from "@/components/seo/related-links";
 import { SeoService } from "@/lib/seo/engine";
 import { softwareApplicationJsonLd, webPageJsonLd } from "@/lib/seo/json-ld";
+import { getServerTranslator } from "@/lib/i18n/server";
 
-export const metadata: Metadata = SeoService.createMetadata({
-  title: "Pricing",
-  description:
-    "Simple pricing for Trend Business AI. Start free during beta and scale into higher limits when you are ready.",
-  path: "/pricing",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerTranslator();
+  return SeoService.createMetadata({
+    title: t("marketing.publicPages.pricing.metaTitle"),
+    description: t("marketing.publicPages.pricing.metaDescription"),
+    path: "/pricing",
+  });
+}
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const { t } = await getServerTranslator();
+  const description = t("marketing.publicPages.pricing.metaDescription");
+
   return (
     <>
       <JsonLdScript
         id="pricing-jsonld"
         data={[
           webPageJsonLd({
-            name: "Pricing",
-            description:
-              "Simple pricing for Trend Business AI. Start free during beta and scale into higher limits when you are ready.",
+            name: t("marketing.publicPages.pricing.jsonLdName"),
+            description,
             path: "/pricing",
           }),
           softwareApplicationJsonLd({
@@ -34,7 +39,7 @@ export default function PricingPage() {
       <MarketingPricingPage>
         <div className="landing-container border-t border-[rgba(212,175,55,0.12)] py-16">
           <RelatedLinksSection
-            title="Before you upgrade"
+            title={t("marketing.publicPages.pricing.beforeUpgrade")}
             links={[
               ...SeoService.links.tools("website-builder", 2),
               ...SeoService.links.resources(2),

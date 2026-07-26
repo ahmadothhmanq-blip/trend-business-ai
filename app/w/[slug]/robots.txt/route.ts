@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { buildPlannedPublicUrl, isWebsitePublishEnabled } from "@/lib/website/publish";
+import { resolvePublishedAbsoluteUrl } from "@/lib/website/published-site-url";
 import { buildPublicRobotsTxt } from "@/lib/website/public-site";
 import { NextResponse } from "next/server";
 
@@ -41,11 +42,7 @@ export async function GET(_request: Request, context: RouteContext) {
     `/w/${slug}`;
   const body =
     (typeof data.robots_txt === "string" && data.robots_txt.trim()) ||
-    buildPublicRobotsTxt(
-      publicUrl.startsWith("http")
-        ? publicUrl
-        : `https://example.com${publicUrl}`,
-    );
+    buildPublicRobotsTxt(resolvePublishedAbsoluteUrl(publicUrl));
 
   return new NextResponse(body, {
     status: 200,

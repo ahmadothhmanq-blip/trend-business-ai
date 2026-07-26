@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
@@ -37,7 +38,7 @@ export async function POST(request: Request) {
 
   const parsed = generateSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid input" }, { status: 400 });
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const input = parsed.data;
@@ -89,7 +90,7 @@ export async function POST(request: Request) {
     const { data, error } = await auth.supabase.from("social_posts").insert(row).select("*").single();
     if (error) {
       if (/relation/i.test(error.message ?? "")) {
-        return NextResponse.json({ error: "Apply migration 062." }, { status: 503 });
+        return apiErrorResponse(API_ERROR_CODES.MIGRATION_REQUIRED, 503, "Apply migration 062.");
       }
       return databaseErrorResponse("social-media.generate", error);
     }
@@ -97,6 +98,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ post: data as SocialPost, generated, provider: generated.provider });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Generation failed";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, message);
   }
 }

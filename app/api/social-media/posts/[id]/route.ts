@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody, parseUuidParam } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import type { SocialPost } from "@/types/social-media";
 import { NextResponse } from "next/server";
@@ -37,7 +38,7 @@ export async function GET(_request: Request, context: RouteContext) {
     .eq("user_id", auth.user!.id)
     .single();
 
-  if (error || !data) return NextResponse.json({ error: "Post not found" }, { status: 404 });
+  if (error || !data) return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Post not found");
   return NextResponse.json({ post: data as SocialPost });
 }
 
@@ -54,7 +55,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   const parsed = updateSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid input" }, { status: 400 });
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const input = parsed.data;
@@ -100,7 +101,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
     .eq("user_id", auth.user!.id)
     .single();
 
-  if (!existing) return NextResponse.json({ error: "Post not found" }, { status: 404 });
+  if (!existing) return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Post not found");
 
   const { error } = await auth.supabase
     .from("social_posts")
@@ -128,7 +129,7 @@ export async function POST(request: Request, context: RouteContext) {
     .eq("user_id", auth.user!.id)
     .single();
 
-  if (!source) return NextResponse.json({ error: "Post not found" }, { status: 404 });
+  if (!source) return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Post not found");
 
   const { id: _id, created_at: _c, updated_at: _u, ...rest } = source as SocialPost & { id: string };
   const { data, error } = await auth.supabase

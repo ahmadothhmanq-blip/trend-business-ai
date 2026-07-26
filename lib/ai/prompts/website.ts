@@ -38,7 +38,7 @@ export function websiteBlueprintPrompt(
   input: WebsiteAnalyzeInput,
   analysis: unknown,
 ) {
-  return `Create a focused MVP blueprint for a Next.js 16 App Router project (shippable under 22 files).
+  return `Create a focused MVP blueprint for a Next.js 16 App Router project (target ~22 AI-authored files; hard cap 48 including scaffold).
 
 Original prompt: ${input.prompt}
 Analysis: ${JSON.stringify(analysis)}
@@ -65,8 +65,8 @@ ${COMPLEXITY_GUIDE}
 ${PRODUCTION_ARCHITECTURE_GUIDE}
 
 HARD RULES:
-- estimatedFileCount MUST be <= 22 (including configs already provided by scaffold).
-- Plan at most 10 AI-authored app files beyond static scaffold configs (package.json, tsconfig, next/tailwind/postcss, globals.css, lib/utils.ts).
+- estimatedFileCount MUST be <= 48 (MAX_WEBSITE_FILES scaffold ceiling).
+- AI TARGET: plan ~22 files total for a lean shippable MVP (~10 AI-authored app files beyond static scaffold configs).
 - Prefer a shippable MVP over a large incomplete tree. Do NOT plan full production module trees.
 - Align pages with the Strategy sitemap and Design System tokens.
 

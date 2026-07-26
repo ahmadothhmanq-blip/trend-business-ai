@@ -1,4 +1,5 @@
 import { parseJsonBody, requireUser } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { createBillingManager, isBillingConfigured } from "@/lib/billing";
 import { requireBillingWriteClient } from "@/lib/billing/write-client";
@@ -21,12 +22,10 @@ export async function POST(request: Request) {
   if (limited) return limited;
 
   if (!isBillingConfigured()) {
-    return NextResponse.json(
-      {
-        error:
-          "Billing is not configured. Set PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET (and optionally PAYPAL_MODE=live).",
-      },
-      { status: 503 },
+    return apiErrorResponse(
+      API_ERROR_CODES.MIGRATION_REQUIRED,
+      503,
+      "Billing is not configured. Set PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET (and optionally PAYPAL_MODE=live).",
     );
   }
 
@@ -38,7 +37,12 @@ export async function POST(request: Request) {
 
   const parsed = checkoutSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid checkout payload.", details: parsed.error.flatten() }, { status: 400 });
+    return apiErrorResponse(
+      API_ERROR_CODES.INVALID_INPUT,
+      400,
+      "Invalid checkout payload.",
+      JSON.stringify(parsed.error.flatten()),
+    );
   }
 
   try {
@@ -60,13 +64,10 @@ export async function POST(request: Request) {
   } catch (error) {
     const code = (error as { code?: string })?.code;
     if (code === "42P01") {
-      return NextResponse.json(
-        { error: "Billing tables are not migrated. Apply migration 025_billing_system.sql." },
-        { status: 503 },
-      );
+      return apiErrorResponse(API_ERROR_CODES.MIGRATION_REQUIRED, 503, "Billing tables are not migrated. Apply migration 025_billing_system.sql.");
     }
     if (error instanceof Error) {
-      return NextResponse.json({ error: error.message }, { status: 400 });
+      return apiValidationError(error.message);
     }
     return databaseErrorResponse("billing.checkout", error);
   }

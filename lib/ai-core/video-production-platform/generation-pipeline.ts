@@ -526,7 +526,7 @@ export async function resumeRenderJob(params: {
   const assets = [...params.model.assets];
   const rounds = params.pollRounds ?? MAX_INLINE_POLLS;
   let clips = [...params.job.clips];
-  let audioAsset = params.job.audioAsset;
+  const audioAsset = params.job.audioAsset;
 
   for (let round = 0; round < rounds; round++) {
     let anyProcessing = false;

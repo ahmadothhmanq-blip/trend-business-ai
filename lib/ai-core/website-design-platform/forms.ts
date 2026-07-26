@@ -14,6 +14,9 @@ import {
   updateWebsiteLeadStatusDb,
 } from "@/lib/ai-core/website-design-platform/leads-repository";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { assertSafeOutboundUrl } from "@/lib/website/url-safety";
+
+const isProduction = process.env.NODE_ENV === "production";
 
 export type StoredWebsiteLead = FormLeadPayload & {
   id: string;
@@ -53,6 +56,11 @@ export async function storeWebsiteLead(
     if (persisted) return persisted;
     const { error } = await dbClient.from("website_leads").select("id").limit(1);
     if (!isLeadsTableMissing(error)) return row;
+    if (isProduction) {
+      throw new Error("Lead storage unavailable. Apply website leads migration.");
+    }
+  } else if (isProduction) {
+    throw new Error("Lead storage unavailable.");
   }
 
   return memoryStore(row);
@@ -106,25 +114,30 @@ export async function notifyLeadIntegrations(
   const cfg = lead.integration;
 
   if (cfg?.webhookUrl) {
-    try {
-      const res = await fetch(cfg.webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "website_form_lead",
-          lead,
-        }),
-      });
-      webhooked = res.ok;
-      notes.push(
-        webhooked
-          ? `Webhook delivered (${res.status})`
-          : `Webhook failed (${res.status})`,
-      );
-    } catch (error) {
-      notes.push(
-        `Webhook error: ${error instanceof Error ? error.message : "unknown"}`,
-      );
+    const safeUrl = assertSafeOutboundUrl(cfg.webhookUrl);
+    if (!safeUrl) {
+      notes.push("Webhook blocked: URL must be HTTPS and publicly routable.");
+    } else {
+      try {
+        const res = await fetch(safeUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "website_form_lead",
+            lead,
+          }),
+        });
+        webhooked = res.ok;
+        notes.push(
+          webhooked
+            ? `Webhook delivered (${res.status})`
+            : `Webhook failed (${res.status})`,
+        );
+      } catch (error) {
+        notes.push(
+          `Webhook error: ${error instanceof Error ? error.message : "unknown"}`,
+        );
+      }
     }
   }
 

@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { generateWebsite } from "@/lib/website-generator";
 import { providerManager } from "@/lib/ai/provider-manager";
@@ -32,8 +33,8 @@ import type { GeneratedProjectFile } from "@/plugins/website/types";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
-/** Long Website Builder generations (multiple DeepSeek + image calls). */
-export const maxDuration = 900;
+/** Long Website Builder generations (multiple DeepSeek + image calls). Vercel Pro max is 300s. */
+export const maxDuration = 300;
 
 const WB_STREAM_LOG = "wb-stream";
 
@@ -49,10 +50,7 @@ export async function POST(request: Request) {
 
   const parsed = websiteGenerateRequestSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid input" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const input = {
@@ -154,6 +152,14 @@ export async function POST(request: Request) {
             generationProfile,
             message: "Generation session started — progress is saved as we go.",
           });
+        } else {
+          send("error", {
+            message:
+              session.error ||
+              "Could not start a saved generation session. Apply database migrations and retry.",
+          });
+          controller.close();
+          return;
         }
 
         const okConnect = send("progress", {
@@ -289,9 +295,12 @@ export async function POST(request: Request) {
         });
 
         const completeDelivered = send("complete", {
-          project: saved.project,
-          generation: saved.generation,
           generationId: saved.generation.id,
+          summary: {
+            title: saved.project.title,
+            fileCount: saved.project.files?.length ?? 0,
+            projectKind: saved.project.projectKind ?? projectKind,
+          },
           message: "Website saved to your workspace.",
         });
 

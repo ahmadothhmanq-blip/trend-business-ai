@@ -1,4 +1,9 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
+import {
+  getRequestClientIp,
+  enforceWebsitePublicRateLimit,
+} from "@/lib/website/public-endpoints";
 import {
   TEMPLATE_INTELLIGENCE_CATEGORIES,
   listTemplateIntelligence,
@@ -22,7 +27,7 @@ export async function GET(request: Request) {
   if (id) {
     const template = getTemplateIntelligence(id);
     if (!template) {
-      return NextResponse.json({ error: "Template not found." }, { status: 404 });
+      return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Template not found.");
     }
     return NextResponse.json({
       template,
@@ -60,6 +65,13 @@ const selectSchema = z.object({
  * POST — recommend / auto-select a Template Intelligence template.
  */
 export async function POST(request: Request) {
+  const ip = getRequestClientIp(request);
+  const rateLimited = await enforceWebsitePublicRateLimit(
+    "template-intelligence",
+    ip,
+  );
+  if (rateLimited) return rateLimited;
+
   let body: unknown = {};
   try {
     body = await request.json();
@@ -68,10 +80,7 @@ export async function POST(request: Request) {
   }
   const parsed = selectSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid input" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const result = selectTemplateIntelligence({

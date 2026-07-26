@@ -54,7 +54,7 @@ const COMMAND_PATTERNS: Array<{
     pattern: /create\s+orders?\s+dashboard/i,
     label: "Create orders dashboard",
     apply: (model) => {
-      let next = addScreen(model, {
+      const next = addScreen(model, {
         name: "Orders Dashboard",
         path: "/orders",
         purpose: "Track and manage orders",

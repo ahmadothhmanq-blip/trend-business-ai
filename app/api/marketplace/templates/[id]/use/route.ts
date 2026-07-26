@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { useCreatorTemplate } from "@/lib/marketplace/templates";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
+import { applyCreatorTemplate } from "@/lib/marketplace/templates";
 
 export const dynamic = "force-dynamic";
 
@@ -10,9 +11,9 @@ type Params = { params: Promise<{ id: string }> };
  */
 export async function POST(_request: Request, { params }: Params) {
   const { id } = await params;
-  const result = useCreatorTemplate(id);
+  const result = applyCreatorTemplate(id);
   if (!result) {
-    return NextResponse.json({ error: "Template not found." }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Template not found.");
   }
   return NextResponse.json({
     listing: result.listing,

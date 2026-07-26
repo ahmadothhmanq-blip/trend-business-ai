@@ -162,6 +162,18 @@ export default async function WebsiteBuilderSettingsPage() {
                     <span>•</span>
                     <span>{formatGenerationDate(project.created_at)}</span>
                   </div>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Button asChild variant="outline" className="btn-ghost-gold h-9 rounded-xl text-xs">
+                      <Link href={`/dashboard/website-builder?generation=${project.id}`}>
+                        {wb("openEditor")}
+                      </Link>
+                    </Button>
+                    <Button asChild variant="outline" className="btn-ghost-gold h-9 rounded-xl text-xs">
+                      <Link href={`/dashboard/website-builder/${project.id}`}>
+                        {wb("openManagement")}
+                      </Link>
+                    </Button>
+                  </div>
                 </article>
               ))}
             </div>

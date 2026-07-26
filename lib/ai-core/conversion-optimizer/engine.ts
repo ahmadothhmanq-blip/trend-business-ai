@@ -40,7 +40,10 @@ export async function runConversionOptimizer(
     14,
     params.client,
   );
-  const experiments = listExperimentResults(params.generationId);
+  const experiments = await listExperimentResults(
+    params.generationId,
+    params.client,
+  );
   const insights: ConversionInsight[] = [];
 
   const betterCtaSuggestions: string[] = [];

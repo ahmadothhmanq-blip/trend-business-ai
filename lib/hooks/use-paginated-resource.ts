@@ -2,6 +2,9 @@
 
 import { useCallback, useState, useTransition } from "react";
 import { toast } from "sonner";
+import { useTranslation } from "@/lib/i18n/client";
+import { translateApiError } from "@/lib/i18n/translate-api-error";
+import type { ApiErrorBody } from "@/lib/i18n/api-errors";
 
 type PaginatedResult<T> = {
   data: T[];
@@ -29,6 +32,7 @@ export function usePaginatedResource<T>({
   limit = 10,
   queryParams,
 }: UsePaginatedResourceOptions) {
+  const { t } = useTranslation();
   const [items, setItems] = useState<T[]>(initialData as T[]);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(initialTotal);
@@ -63,7 +67,7 @@ export function usePaginatedResource<T>({
         const json = await res.json();
 
         if (!res.ok) {
-          throw new Error(json.error || "Failed to load data");
+          throw new Error(translateApiError(t, json as Partial<ApiErrorBody>, "errors.api.LOAD_FAILED"));
         }
 
         const result = json as Record<string, unknown> & PaginatedResult<T>;
@@ -72,12 +76,12 @@ export function usePaginatedResource<T>({
         setTotal(result.total);
         setTotalPages(result.totalPages);
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Failed to load data");
+        toast.error(err instanceof Error ? err.message : t("errors.api.LOAD_FAILED"));
       } finally {
         setLoading(false);
       }
     },
-    [endpoint, dataKey, page, search, favoriteFilter, extraFilter, limit, queryParams],
+    [endpoint, dataKey, page, search, favoriteFilter, extraFilter, limit, queryParams, t],
   );
 
   const refresh = useCallback(() => {
@@ -126,13 +130,17 @@ export async function apiMutation(
   url: string,
   options: RequestInit,
   successMessage?: string,
+  translateError?: (payload: Partial<ApiErrorBody>) => string,
 ) {
   const res = await fetch(url, options);
   const data = await res.json();
 
   if (!res.ok) {
-    toast.error(data.error || "Request failed");
-    throw new Error(data.error || "Request failed");
+    const message = translateError
+      ? translateError(data as Partial<ApiErrorBody>)
+      : (data as Partial<ApiErrorBody>).error || "Request failed";
+    toast.error(message);
+    throw new Error(message);
   }
 
   if (successMessage || data.message) {

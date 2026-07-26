@@ -1,4 +1,5 @@
 import { readFile } from "node:fs/promises";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import path from "node:path";
 import { requireUser } from "@/lib/api/helpers";
 import { verifyPreviewOwner } from "@/lib/api/preview-ownership";
@@ -67,7 +68,7 @@ export async function GET(
 
     const isOwner = await verifyPreviewOwner(previewId, auth.user!.id);
     if (!isOwner) {
-      return NextResponse.json({ error: "Asset not found." }, { status: 404 });
+      return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Asset not found.");
     }
 
     const assetPath = sanitizeAssetPath(assetPathParts);
@@ -81,6 +82,6 @@ export async function GET(
       },
     });
   } catch {
-    return NextResponse.json({ error: "Asset not found." }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Asset not found.");
   }
 }

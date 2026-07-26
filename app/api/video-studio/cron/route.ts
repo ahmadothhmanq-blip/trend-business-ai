@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { serverErrorResponse } from "@/lib/api/errors";
 import { processVideoStudioBackgroundQueue } from "@/lib/ai-core/video-production-platform";
@@ -23,19 +24,15 @@ function authorizeCron(request: Request): boolean {
  */
 async function runWorker(request: Request) {
   if (!authorizeCron(request)) {
-    return NextResponse.json(
-      { error: "Unauthorized. Set VIDEO_STUDIO_CRON_SECRET and pass Bearer token." },
-      { status: 401 },
-    );
+    return apiErrorResponse(API_ERROR_CODES.UNAUTHORIZED, 401, "Unauthorized. Set VIDEO_STUDIO_CRON_SECRET and pass Bearer token.");
   }
 
   const admin = createAdminClient();
   if (!admin) {
-    return NextResponse.json(
-      {
-        error: "SUPABASE_SERVICE_ROLE_KEY required for background render worker.",
-      },
-      { status: 503 },
+    return apiErrorResponse(
+      API_ERROR_CODES.MIGRATION_REQUIRED,
+      503,
+      "SUPABASE_SERVICE_ROLE_KEY required for background render worker.",
     );
   }
 

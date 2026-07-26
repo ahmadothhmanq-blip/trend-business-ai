@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody, parseUuidParam } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { serverErrorResponse } from "@/lib/api/errors";
 import {
   listEditorHistory,
@@ -27,7 +28,7 @@ export async function GET(request: Request, context: RouteContext) {
 
   const canvasId = new URL(request.url).searchParams.get("canvasId");
   if (!canvasId) {
-    return NextResponse.json({ error: "canvasId required" }, { status: 400 });
+    return apiValidationError("canvasId required");
   }
 
   const result = await listEditorHistory({
@@ -36,7 +37,11 @@ export async function GET(request: Request, context: RouteContext) {
     canvasId,
   });
 
-  return NextResponse.json({ entries: result.entries, error: result.error });
+  if (result.error) {
+    return apiErrorResponse(API_ERROR_CODES.LOAD_FAILED, 500, result.error);
+  }
+
+  return NextResponse.json({ entries: result.entries });
 }
 
 export async function POST(request: Request, context: RouteContext) {
@@ -52,7 +57,7 @@ export async function POST(request: Request, context: RouteContext) {
 
   const parsed = historySchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid history payload" }, { status: 400 });
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   try {
@@ -66,7 +71,7 @@ export async function POST(request: Request, context: RouteContext) {
     });
 
     if (result.error) {
-      return NextResponse.json({ error: result.error }, { status: 503 });
+      return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 503, result.error);
     }
 
     return NextResponse.json({ message: "History saved." });

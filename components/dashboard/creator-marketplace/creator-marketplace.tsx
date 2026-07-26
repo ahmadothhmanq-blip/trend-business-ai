@@ -161,7 +161,7 @@ export function CreatorMarketplace() {
     }
   };
 
-  const useTemplate = async (listingId: string) => {
+  const applyListingTemplate = async (listingId: string) => {
     setUsingId(listingId);
     try {
       const res = await fetch(
@@ -350,7 +350,7 @@ export function CreatorMarketplace() {
                 using={usingId === l.id}
                 onPreview={() => void openPreview(l.id)}
                 onFavorite={() => void toggleFavorite(l)}
-                onUse={() => void useTemplate(l.id)}
+                onUse={() => void applyListingTemplate(l.id)}
               />
             ))}
           </div>
@@ -381,7 +381,7 @@ export function CreatorMarketplace() {
                 using={usingId === l.id}
                 onPreview={() => void openPreview(l.id)}
                 onFavorite={() => void toggleFavorite(l)}
-                onUse={() => void useTemplate(l.id)}
+                onUse={() => void applyListingTemplate(l.id)}
               />
             ))}
           </div>
@@ -501,7 +501,7 @@ export function CreatorMarketplace() {
                   variant="outline"
                   className="border-white/15 text-white"
                   disabled={usingId === preview.listing.id}
-                  onClick={() => void useTemplate(preview.listing.id)}
+                  onClick={() => void applyListingTemplate(preview.listing.id)}
                 >
                   <Copy className="size-4" />
                   {pt("duplicate")}
@@ -509,7 +509,7 @@ export function CreatorMarketplace() {
                 <Button
                   className="bg-premium-gold text-black hover:bg-premium-gold/90"
                   disabled={usingId === preview.listing.id}
-                  onClick={() => void useTemplate(preview.listing.id)}
+                  onClick={() => void applyListingTemplate(preview.listing.id)}
                 >
                   {usingId === preview.listing.id ? (
                     <Loader2 className="size-4 animate-spin" />

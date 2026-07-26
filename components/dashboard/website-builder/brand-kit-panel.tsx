@@ -12,7 +12,23 @@ export type BrandKitOption = {
   primary?: string;
   secondary?: string;
   accent?: string;
+  logoUrl?: string | null;
 };
+
+function resolveLogoUrl(blueprint?: {
+  logoVariants?: Array<{ pngDataUrl?: string; svg?: string; format?: string }>;
+  logos?: Array<{ imageUrl?: string; pngDataUrl?: string }>;
+} | null): string | null {
+  const variant = blueprint?.logoVariants?.[0];
+  if (variant?.pngDataUrl) return variant.pngDataUrl;
+  if (variant?.svg && variant.format === "svg") {
+    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(variant.svg)}`;
+  }
+  const concept = blueprint?.logos?.[0];
+  if (concept?.pngDataUrl) return concept.pngDataUrl;
+  if (concept?.imageUrl) return concept.imageUrl;
+  return null;
+}
 
 export function BrandKitPanel(props: {
   selectedId?: string | null;
@@ -22,9 +38,11 @@ export function BrandKitPanel(props: {
   const wb = useProductT("websiteBuilder");
   const [kits, setKits] = useState<BrandKitOption[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const res = await fetch("/api/brand-identity");
       if (!res.ok) throw new Error(wb("panels.failedLoadBrandKits"));
@@ -34,6 +52,8 @@ export function BrandKitPanel(props: {
           brand_name?: string;
           blueprint?: {
             colorPalette?: Array<{ hex?: string; value?: string; name?: string } | string>;
+            logoVariants?: Array<{ pngDataUrl?: string; svg?: string; format?: string }>;
+            logos?: Array<{ imageUrl?: string; pngDataUrl?: string }>;
           } | null;
         }>;
       };
@@ -47,15 +67,19 @@ export function BrandKitPanel(props: {
           primary: palette[0],
           secondary: palette[1],
           accent: palette[2],
+          logoUrl: resolveLogoUrl(g.blueprint),
         } satisfies BrandKitOption;
       });
       setKits(rows);
-    } catch {
+    } catch (err) {
       setKits([]);
+      setError(
+        err instanceof Error ? err.message : wb("panels.failedLoadBrandKits"),
+      );
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [wb]);
 
   useEffect(() => {
     void load();
@@ -90,6 +114,18 @@ export function BrandKitPanel(props: {
           <Loader2 className="size-3.5 animate-spin" />
           Loading brand kits…
         </div>
+      ) : error ? (
+        <div className="space-y-2">
+          <p className="text-[12px] text-red-300/90">{error}</p>
+          <Button
+            size="sm"
+            variant="outline"
+            className="border-white/15 text-white"
+            onClick={() => void load()}
+          >
+            Retry
+          </Button>
+        </div>
       ) : kits.length === 0 ? (
         <p className="text-[12px] text-white/40">
           No brand kits yet. Create one in Brand Identity, then attach it here.
@@ -109,8 +145,17 @@ export function BrandKitPanel(props: {
                   : "border-white/[0.08] bg-white/[0.03] hover:border-premium-gold/25",
               )}
             >
-              <div className="flex size-9 items-center justify-center rounded-lg bg-white/5">
-                <Palette className="size-4 text-premium-gold" />
+              <div className="flex size-9 items-center justify-center overflow-hidden rounded-lg bg-white/5">
+                {kit.logoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={kit.logoUrl}
+                    alt=""
+                    className="size-full object-contain p-0.5"
+                  />
+                ) : (
+                  <Palette className="size-4 text-premium-gold" />
+                )}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[13px] font-medium text-white">

@@ -2,10 +2,14 @@
 
 import { useEffect, useState } from "react";
 import type { MarketingCalendarEvent } from "@/types/marketing";
+import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
+import { useFormatter } from "@/lib/i18n/use-formatter";
 
 type Props = { initialEvents?: MarketingCalendarEvent[] };
 
 export function MarketingCalendar({ initialEvents = [] }: Props) {
+  const wt = useWorkspaceT("marketing");
+  const { formatDate } = useFormatter();
   const [events, setEvents] = useState<MarketingCalendarEvent[]>(initialEvents);
 
   useEffect(() => {
@@ -21,7 +25,7 @@ export function MarketingCalendar({ initialEvents = [] }: Props) {
   }, []);
 
   const grouped = events.reduce<Record<string, MarketingCalendarEvent[]>>((acc, e) => {
-    const day = new Date(e.scheduled_at).toLocaleDateString();
+    const day = formatDate(e.scheduled_at);
     if (!acc[day]) acc[day] = [];
     acc[day].push(e);
     return acc;
@@ -29,11 +33,9 @@ export function MarketingCalendar({ initialEvents = [] }: Props) {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-white/40">
-        Includes marketing events plus read-only Content Studio & Social Media schedules.
-      </p>
+      <p className="text-sm text-white/40">{wt("calendarPanel.description")}</p>
       {Object.keys(grouped).length === 0 ? (
-        <p className="text-sm text-white/30">No calendar events yet.</p>
+        <p className="text-sm text-white/30">{wt("calendarPanel.empty")}</p>
       ) : (
         Object.entries(grouped).map(([day, dayEvents]) => (
           <div key={day} className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">

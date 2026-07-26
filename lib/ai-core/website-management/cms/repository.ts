@@ -4,6 +4,7 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { CmsEntry } from "@/lib/ai-core/website-management/types";
+import { cmsKindFromDb, cmsKindToDb } from "@/lib/website/cms-kinds";
 
 type CmsRow = {
   id: string;
@@ -14,6 +15,10 @@ type CmsRow = {
   body: string | null;
   media_url: string | null;
   page_path: string | null;
+  slug: string | null;
+  categories: string[] | null;
+  tags: string[] | null;
+  seo_json: Record<string, unknown> | null;
   scheduled_at: string | null;
   published: boolean;
   version: number;
@@ -34,11 +39,15 @@ export function isCmsTableMissing(error: { message?: string; code?: string } | n
 function rowToEntry(row: CmsRow): CmsEntry {
   return {
     id: row.id,
-    kind: row.kind as CmsEntry["kind"],
+    kind: cmsKindFromDb(row.kind),
     title: row.title,
     body: row.body ?? undefined,
     mediaUrl: row.media_url ?? undefined,
     pagePath: row.page_path ?? undefined,
+    slug: row.slug ?? undefined,
+    categories: row.categories ?? undefined,
+    tags: row.tags ?? undefined,
+    seoJson: (row.seo_json as CmsEntry["seoJson"]) ?? undefined,
     scheduledAt: row.scheduled_at,
     published: row.published,
     createdAt: row.created_at,
@@ -95,11 +104,15 @@ export async function upsertCmsEntryDb(
     id: params.entry.id,
     generation_id: params.generationId,
     user_id: params.userId,
-    kind: params.entry.kind,
+    kind: cmsKindToDb(params.entry.kind),
     title: params.entry.title,
     body: params.entry.body ?? null,
     media_url: params.entry.mediaUrl ?? null,
     page_path: params.entry.pagePath ?? null,
+    slug: params.entry.slug ?? null,
+    categories: params.entry.categories ?? [],
+    tags: params.entry.tags ?? [],
+    seo_json: params.entry.seoJson ?? {},
     scheduled_at: params.entry.scheduledAt ?? null,
     published: params.entry.published ?? true,
     version: nextVersion,

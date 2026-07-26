@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { requireUser, parseUuidParam, parseJsonBody } from "@/lib/api/helpers";
 import { serverErrorResponse } from "@/lib/api/errors";
 import type { WebAppGeneration, WebAppBlueprint } from "@/types/webapp";
@@ -48,7 +49,7 @@ export async function GET(_request: Request, { params }: Params) {
       .maybeSingle();
 
     if (error || !data) {
-      return NextResponse.json({ error: "App not found." }, { status: 404 });
+      return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "App not found.");
     }
 
     const blueprint = (data.blueprint || {}) as WebAppBlueprint & {
@@ -93,10 +94,7 @@ export async function POST(request: Request, { params }: Params) {
 
   const parsed = deploySchema.safeParse(body ?? {});
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid deploy request" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   try {
@@ -108,7 +106,7 @@ export async function POST(request: Request, { params }: Params) {
       .maybeSingle();
 
     if (error || !data) {
-      return NextResponse.json({ error: "App not found." }, { status: 404 });
+      return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "App not found.");
     }
 
     const generation = data as WebAppGeneration;
@@ -228,7 +226,7 @@ export async function PATCH(request: Request, { params }: Params) {
       .eq("user_id", auth.user!.id)
       .maybeSingle();
 
-    if (!data) return NextResponse.json({ error: "App not found." }, { status: 404 });
+    if (!data) return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "App not found.");
 
     const blueprint = (data.blueprint || {}) as WebAppBlueprint & {
       deployment?: ReturnType<typeof extractDeploymentState>;
@@ -243,7 +241,7 @@ export async function PATCH(request: Request, { params }: Params) {
           : state.preview;
 
     if (!target) {
-      return NextResponse.json({ error: "No deployment to update." }, { status: 404 });
+      return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "No deployment to update.");
     }
 
     const updated = updateDeploymentEnv(target, env);

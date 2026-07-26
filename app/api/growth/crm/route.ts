@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
 import { enforceMutationRateLimit } from "@/lib/api/rate-limit";
 import { contactUpsertSchema, dealUpsertSchema } from "@/lib/growth/schemas";
@@ -15,10 +16,7 @@ export async function POST(request: Request) {
 
   const parsed = contactUpsertSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid contact" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const { data, error } = await auth.supabase
@@ -41,10 +39,10 @@ export async function POST(request: Request) {
     .single();
 
   if (error?.code === "42P01") {
-    return NextResponse.json({ error: "Migration 029 required." }, { status: 503 });
+    return apiErrorResponse(API_ERROR_CODES.MIGRATION_REQUIRED, 503, "Migration 029 required.");
   }
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, error.message);
   }
 
   return NextResponse.json({ contact: data });
@@ -59,10 +57,7 @@ export async function PATCH(request: Request) {
 
   const parsed = dealUpsertSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid deal" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const payload = {
@@ -85,7 +80,7 @@ export async function PATCH(request: Request) {
       .eq("user_id", auth.user!.id)
       .select("*")
       .single();
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, error.message);
     return NextResponse.json({ deal: data });
   }
 
@@ -96,8 +91,8 @@ export async function PATCH(request: Request) {
     .single();
 
   if (error?.code === "42P01") {
-    return NextResponse.json({ error: "Migration 029 required." }, { status: 503 });
+    return apiErrorResponse(API_ERROR_CODES.MIGRATION_REQUIRED, 503, "Migration 029 required.");
   }
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, error.message);
   return NextResponse.json({ deal: data });
 }

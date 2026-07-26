@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { requireUser, parseUuidParam, parseJsonBody } from "@/lib/api/helpers";
 import { serverErrorResponse } from "@/lib/api/errors";
 import type { VideoGeneration, VideoBlueprint } from "@/types/video";
@@ -105,7 +106,7 @@ export async function GET(_request: Request, { params }: Params) {
       parsedId.id,
     );
     if (!generation) {
-      return NextResponse.json({ error: "Video not found." }, { status: 404 });
+      return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Video not found.");
     }
 
     const model = extractProductionModel(generation.blueprint, {
@@ -280,10 +281,7 @@ export async function POST(request: Request, { params }: Params) {
 
   const parsed = manageSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid action" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   try {
@@ -293,7 +291,7 @@ export async function POST(request: Request, { params }: Params) {
       parsedId.id,
     );
     if (!generation) {
-      return NextResponse.json({ error: "Video not found." }, { status: 404 });
+      return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Video not found.");
     }
 
     let model = extractProductionModel(generation.blueprint, {
@@ -559,10 +557,7 @@ export async function POST(request: Request, { params }: Params) {
       case "resume_render": {
         const current = getLatestJob(model);
         if (!current) {
-          return NextResponse.json(
-            { error: "No render job to resume." },
-            { status: 400 },
-          );
+          return apiValidationError("No render job to resume.");
         }
         const resumed = await resumeRenderJob({
           model,
@@ -600,7 +595,7 @@ export async function POST(request: Request, { params }: Params) {
       case "restore_version": {
         const restored = restoreVideoVersion(history, action.versionId);
         if (!restored) {
-          return NextResponse.json({ error: "Version not found." }, { status: 404 });
+          return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Version not found.");
         }
         model = restored.model;
         history = restored.history;
@@ -672,7 +667,7 @@ export async function POST(request: Request, { params }: Params) {
     });
   } catch (error) {
     if (error instanceof ProviderNotConfiguredError) {
-      return NextResponse.json({ error: error.message }, { status: 400 });
+      return apiValidationError(error.message);
     }
     return serverErrorResponse(
       "video-studio.manage.post",

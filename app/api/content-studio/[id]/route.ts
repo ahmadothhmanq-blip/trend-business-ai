@@ -1,4 +1,5 @@
 import { syncFavorite } from "@/lib/db/favorites";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { requireUser, parseJsonBody, parseUuidParam } from "@/lib/api/helpers";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import type { ContentGeneration } from "@/types/content";
@@ -21,7 +22,7 @@ export async function GET(_request: Request, context: RouteContext) {
   if (auth.response) return auth.response;
 
   const { data, error } = await auth.supabase.from("content_generations").select("*").eq("id", idParsed.id).eq("user_id", auth.user!.id).single();
-  if (error || !data) return NextResponse.json({ error: "Content not found" }, { status: 404 });
+  if (error || !data) return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Content not found");
   return NextResponse.json({ generation: data as ContentGeneration });
 }
 
@@ -37,7 +38,7 @@ export async function PATCH(request: Request, context: RouteContext) {
   if (body instanceof NextResponse) return body;
 
   const parsed = updateSchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid update" }, { status: 400 });
+  if (!parsed.success) return apiValidationError(parsed.error.issues[0]?.message);
 
   const { is_favorite, title } = parsed.data;
 
@@ -46,7 +47,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     .update({ ...(typeof is_favorite === "boolean" ? { is_favorite } : {}), ...(title ? { title } : {}), updated_at: new Date().toISOString() })
     .eq("id", idParsed.id).eq("user_id", auth.user!.id).select("*").single();
 
-  if (error || !data) return NextResponse.json({ error: "Content not found" }, { status: 404 });
+  if (error || !data) return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Content not found");
 
   if (typeof is_favorite === "boolean") {
     const sync = await syncFavorite(auth.supabase, auth.user!.id, "content_generation", idParsed.id, is_favorite);
@@ -66,6 +67,6 @@ export async function DELETE(_request: Request, context: RouteContext) {
 
   await syncFavorite(auth.supabase, auth.user!.id, "content_generation", idParsed.id, false);
   const { data, error } = await auth.supabase.from("content_generations").delete().eq("id", idParsed.id).eq("user_id", auth.user!.id).select("id").single();
-  if (error || !data) return NextResponse.json({ error: "Content not found" }, { status: 404 });
+  if (error || !data) return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Content not found");
   return NextResponse.json({ message: "Content deleted." });
 }

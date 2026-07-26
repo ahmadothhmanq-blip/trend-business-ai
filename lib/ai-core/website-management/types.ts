@@ -3,6 +3,14 @@
  * Website Builder only.
  */
 
+import type { CmsAppKind } from "@/lib/website/cms-kinds";
+
+export type NavLink = {
+  href: string;
+  label: string;
+  children?: NavLink[];
+};
+
 export type ManagedPageDef = {
   path: string;
   route: string;
@@ -15,9 +23,15 @@ export type SiteStructurePlan = {
   industryId: string;
   businessType: string;
   pages: ManagedPageDef[];
-  navLinks: Array<{ href: string; label: string }>;
-  footerLinks: Array<{ href: string; label: string }>;
+  navLinks: NavLink[];
+  footerLinks: NavLink[];
   sitemapPaths: string[];
+};
+
+export type CmsSeoJson = {
+  title?: string;
+  description?: string;
+  keywords?: string[];
 };
 
 export type LinkValidationIssue = {
@@ -62,15 +76,32 @@ export type CatalogItem = {
 
 export type CmsEntry = {
   id: string;
-  kind: "page-block" | "post" | "announcement" | "media";
+  kind: CmsAppKind;
   title: string;
   body?: string;
   mediaUrl?: string;
   pagePath?: string;
+  slug?: string;
+  categories?: string[];
+  tags?: string[];
+  seoJson?: CmsSeoJson;
   scheduledAt?: string | null;
   published: boolean;
   updatedAt: string;
   createdAt: string;
+};
+
+export type WebsiteMediaAsset = {
+  id: string;
+  generationId: string;
+  folder: string;
+  filename: string;
+  url: string;
+  mime: string;
+  size: number;
+  alt?: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type BrandManagementState = {

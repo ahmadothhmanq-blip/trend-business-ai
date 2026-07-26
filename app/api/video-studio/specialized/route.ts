@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { z } from "zod";
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
 import { enforceAiUsage } from "@/lib/api/rate-limit";
@@ -65,10 +66,7 @@ export async function POST(request: Request) {
 
   const parsed = schema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid input" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   try {
@@ -172,10 +170,7 @@ export async function POST(request: Request) {
       .single();
 
     if (error || !data) {
-      return NextResponse.json(
-        { error: error?.message || "Failed to save generation" },
-        { status: 500 },
-      );
+      return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, error?.message || "Failed to save generation");
     }
 
     let generation = data as VideoGeneration;

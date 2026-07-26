@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { enforceMutationRateLimit } from "@/lib/api/rate-limit";
 import { listInvoices, createInvoice, updateInvoice } from "@/lib/erp/invoices";
@@ -36,7 +37,7 @@ export async function POST(request: Request) {
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
   const parsed = createSchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: "Invalid" }, { status: 400 });
+  if (!parsed.success) return apiValidationError("Invalid");
 
   const { data, error } = await createInvoice(auth.supabase, {
     user_id: auth.user!.id,
@@ -57,7 +58,7 @@ export async function PATCH(request: Request) {
   if (auth.response) return auth.response;
   const body = await parseJsonBody<{ id?: string; status?: string }>(request);
   if (body instanceof NextResponse) return body;
-  if (!body.id) return NextResponse.json({ error: "id required" }, { status: 400 });
+  if (!body.id) return apiValidationError("id required");
   const patch: Record<string, unknown> = {};
   if (body.status) patch.status = body.status;
   if (body.status === "paid") patch.paid_at = new Date().toISOString();

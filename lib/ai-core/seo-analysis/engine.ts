@@ -173,7 +173,7 @@ export function runSeoAnalysis(params: RunSeoAnalysisParams): SeoAnalysisReport 
   const primaryHits = primary
     ? countMatches(lower, new RegExp(primary.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"))
     : 0;
-  let keywordScore = primaryHits >= 2 ? 80 : 50;
+  const keywordScore = primaryHits >= 2 ? 80 : 50;
   if (primaryHits < 2) {
     issues.push(
       issue({
@@ -214,7 +214,7 @@ export function runSeoAnalysis(params: RunSeoAnalysisParams): SeoAnalysisReport 
   // Internal links
   const hrefCount = countMatches(content, /href\s*=\s*["'][^"']+["']/gi);
   const internalLinkNotes: string[] = [];
-  let linkScore = hrefCount >= 6 ? 80 : hrefCount >= 3 ? 60 : 40;
+  const linkScore = hrefCount >= 6 ? 80 : hrefCount >= 3 ? 60 : 40;
   if (hrefCount < 4) {
     internalLinkNotes.push("Few internal links detected between pages/sections.");
     issues.push(
@@ -235,7 +235,7 @@ export function runSeoAnalysis(params: RunSeoAnalysisParams): SeoAnalysisReport 
   const imgTags = countMatches(content, /<img\b/gi) + countMatches(content, /next\/image|Image\s+from/gi);
   const altCount = countMatches(content, /alt\s*=\s*["'][^"']+["']/gi);
   const imageAltNotes: string[] = [];
-  let imageScore = imgTags === 0 ? 70 : clamp((altCount / Math.max(1, imgTags)) * 100);
+  const imageScore = imgTags === 0 ? 70 : clamp((altCount / Math.max(1, imgTags)) * 100);
   if (imgTags > 0 && altCount < imgTags) {
     imageAltNotes.push(`${altCount}/${imgTags} images appear to have alt text.`);
     issues.push(
@@ -254,7 +254,7 @@ export function runSeoAnalysis(params: RunSeoAnalysisParams): SeoAnalysisReport 
 
   // Page speed (from performance report + heuristics)
   const pageSpeedNotes: string[] = [];
-  let speedScore = perf.scores.performance;
+  const speedScore = perf.scores.performance;
   if (perf.scores.performance < 70) {
     pageSpeedNotes.push("Performance score suggests CWV / asset optimization work.");
     issues.push(

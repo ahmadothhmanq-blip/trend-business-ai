@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { getActiveProvider } from "@/lib/ai/provider-config";
 import { resolveIteratedPrompt } from "@/lib/ai/iteration";
@@ -62,10 +63,7 @@ export async function POST(request: Request) {
 
   const parsed = requestSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid input" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const input = parsed.data;

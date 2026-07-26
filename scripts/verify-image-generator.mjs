@@ -66,7 +66,7 @@ else fail("export missing ZIP");
 
 console.log("\n[4] Dashboard wiring");
 const tool = readFileSync(join(root, "components/dashboard/image-generator/image-generator-tool.tsx"), "utf8");
-for (const marker of ["rasterAssets", "/templates", "Use my brand identity", "/export?format=zip"]) {
+for (const marker of ["rasterAssets", "/templates", "steps.useBrandIdentity", "/export?format=zip"]) {
   if (tool.includes(marker)) ok(`dashboard: ${marker}`);
   else fail(`dashboard missing ${marker}`);
 }

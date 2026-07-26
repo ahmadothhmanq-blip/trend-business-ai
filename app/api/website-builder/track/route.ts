@@ -8,10 +8,16 @@ import {
   getExperiment,
   recordVariantMetric,
 } from "@/lib/ai-core/ab-testing";
+import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  enforceWebsitePublicRateLimit,
+  getRequestClientIp,
+  isPublishedWebsiteGeneration,
+} from "@/lib/website/public-endpoints";
 
 export const dynamic = "force-dynamic";
 
-/** Always succeed from the client's perspective. */
+/** Always succeed from the client's perspective for benign skips. */
 function trackingOk(extra?: Record<string, unknown>) {
   return NextResponse.json({ success: true, ...extra });
 }
@@ -55,60 +61,93 @@ const trackSchema = z.object({
  * Does not alter generation or publishing flows.
  */
 export async function POST(request: Request) {
+  const ip = getRequestClientIp(request);
+  const rateLimited = await enforceWebsitePublicRateLimit("track", ip);
+  if (rateLimited) return rateLimited;
+
   let body: unknown;
   try {
     body = await request.json();
   } catch {
-    return trackingOk({ skipped: true });
+    return trackingOk({ skipped: true, reason: "invalid_json" });
   }
 
   const parsed = trackSchema.safeParse(body);
   if (!parsed.success) {
-    return trackingOk({ skipped: true });
+    return trackingOk({ skipped: true, reason: "invalid_payload" });
   }
 
   const data = parsed.data;
-  const event = await trackAnalyticsEvent({
-    generationId: data.generationId,
-    eventName: data.eventName as AnalyticsEventName,
-    sessionId: data.sessionId,
-    visitorId: data.visitorId,
-    pagePath: data.pagePath,
-    referrer: data.referrer,
-    source: data.source,
-    device: data.device,
-    experimentId: data.experimentId,
-    variantId: data.variantId,
-    target: data.target,
-    valueCents: data.valueCents,
-    metadata: data.metadata,
-  });
+  const admin = createAdminClient();
+  if (!admin) {
+    return trackingOk({ skipped: true, reason: "storage_unavailable" });
+  }
 
-  if (data.experimentId && data.variantId && getExperiment(data.experimentId)) {
-    if (data.eventName === "page_view" || data.eventName === "session_start") {
-      recordVariantMetric({
-        experimentId: data.experimentId,
-        variantId: data.variantId,
-        kind: "impression",
-      });
-    } else if (
-      data.eventName === "button_click" ||
-      data.eventName === "cta_click"
+  const published = await isPublishedWebsiteGeneration(admin, data.generationId);
+  if (!published) {
+    return trackingOk({ skipped: true, reason: "not_published" });
+  }
+
+  const event = await trackAnalyticsEvent(
+    {
+      generationId: data.generationId,
+      eventName: data.eventName as AnalyticsEventName,
+      sessionId: data.sessionId,
+      visitorId: data.visitorId,
+      pagePath: data.pagePath,
+      referrer: data.referrer,
+      source: data.source,
+      device: data.device,
+      experimentId: data.experimentId,
+      variantId: data.variantId,
+      target: data.target,
+      valueCents: data.valueCents,
+      metadata: data.metadata,
+    },
+    admin,
+  );
+
+  if (data.experimentId && data.variantId) {
+    const experiment = await getExperiment(data.experimentId, admin);
+    if (
+      experiment &&
+      experiment.generationId === data.generationId &&
+      experiment.status === "running"
     ) {
-      recordVariantMetric({
-        experimentId: data.experimentId,
-        variantId: data.variantId,
-        kind: "click",
-      });
-    } else if (
-      data.eventName === "conversion" ||
-      data.eventName === "form_submit"
-    ) {
-      recordVariantMetric({
-        experimentId: data.experimentId,
-        variantId: data.variantId,
-        kind: "conversion",
-      });
+      if (data.eventName === "page_view" || data.eventName === "session_start") {
+        await recordVariantMetric(
+          {
+            experimentId: data.experimentId,
+            variantId: data.variantId,
+            kind: "impression",
+          },
+          admin,
+        );
+      } else if (
+        data.eventName === "button_click" ||
+        data.eventName === "cta_click"
+      ) {
+        await recordVariantMetric(
+          {
+            experimentId: data.experimentId,
+            variantId: data.variantId,
+            kind: "click",
+          },
+          admin,
+        );
+      } else if (
+        data.eventName === "conversion" ||
+        data.eventName === "form_submit"
+      ) {
+        await recordVariantMetric(
+          {
+            experimentId: data.experimentId,
+            variantId: data.variantId,
+            kind: "conversion",
+          },
+          admin,
+        );
+      }
     }
   }
 

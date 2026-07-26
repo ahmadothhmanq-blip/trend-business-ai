@@ -1,12 +1,13 @@
 import { requireUser, parseUuidParam } from "@/lib/api/helpers";
-import { evaluatePublishGates } from "@/lib/website/publish-gates";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
+import { enforceWebsiteUserMutationRateLimit } from "@/lib/website/public-endpoints";
 import {
-  isWebsitePublishEnabled,
-  prepareWebsitePublication,
-  publishWebsitePublication,
-  unpublishWebsitePublication,
-  type PublishAction,
-} from "@/lib/website/publish";
+  buildPublishQualityPayload,
+  prepareSuccessMessage,
+  publishSuccessMessage,
+} from "@/lib/website/publish-quality";
+import { isWebsitePublishEnabled } from "@/lib/website/publish";
+import { runPublishingAction } from "@/lib/ai-core/publishing";
 import type { WebsiteGeneration } from "@/types/database";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -43,30 +44,6 @@ async function readPublishBody(request: Request) {
   }
 }
 
-function qualityPayload(gates: ReturnType<typeof evaluatePublishGates>) {
-  return {
-    conversionReady: gates.conversionChecklist?.conversionReady ?? null,
-    score: gates.scores.overall,
-    goal: gates.conversionChecklist?.goal ?? null,
-    publishReady: gates.publishReady,
-    scores: gates.scores,
-    blockers: gates.blockers,
-    warnings: gates.warnings,
-    opportunities: gates.opportunities,
-    improvementActions: gates.finalChecklist?.topActions ?? [],
-    designScore: gates.scores.design,
-    uxScore: gates.scores.ux,
-    seoScore: gates.scores.seo,
-    conversionScore: gates.scores.conversion,
-    performanceScore: gates.scores.performance,
-    mobileScore: gates.seoChecklist?.mobileScore ?? null,
-    overallTechnicalScore: gates.seoChecklist?.overallScore ?? null,
-    suggestedTitle: gates.seoChecklist?.suggestedTitle ?? null,
-    suggestedDescription: gates.seoChecklist?.suggestedDescription ?? null,
-    primaryKeyword: gates.seoChecklist?.primaryKeyword ?? null,
-  };
-}
-
 /**
  * Publish actions for a website generation:
  * - prepare → status prepared (draft snapshot)
@@ -82,31 +59,55 @@ export async function POST(request: Request, context: RouteContext) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
+  const rateLimited = await enforceWebsiteUserMutationRateLimit(auth.user!.id);
+  if (rateLimited) return rateLimited;
+
   const rawBody = await readPublishBody(request);
   if (rawBody === null) {
-    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    return apiErrorResponse(API_ERROR_CODES.INVALID_JSON, 400);
   }
 
   const parsed = bodySchema.safeParse(rawBody);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid publish request" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
-  const action = parsed.data.action as PublishAction;
+  const action = parsed.data.action;
   const force = parsed.data.force === true;
 
-  if (action === "unpublish") {
-    const result = await unpublishWebsitePublication({
-      supabase: auth.supabase,
-      userId: auth.user!.id,
-      generationId: id,
-    });
-    if (!result.ok) {
-      return NextResponse.json({ error: result.error }, { status: result.status });
+  const generation = await loadOwnedGeneration(auth, id);
+  if (!generation) {
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Website not found.");
+  }
+
+  const result = await runPublishingAction({
+    supabase: auth.supabase,
+    userId: auth.user!.id,
+    generation,
+    action,
+    force,
+  });
+
+  if (!result.ok) {
+    if (result.gateBlock) {
+      return apiErrorResponse(
+        API_ERROR_CODES.INVALID_INPUT,
+        422,
+        result.error,
+        undefined,
+        {
+          qualityRecommendations: result.qualityRecommendations,
+          blockers: result.blockers,
+        },
+      );
     }
+    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, result.status, result.error);
+  }
+
+  const { gates } = result;
+  const qualityRecommendations = buildPublishQualityPayload(gates);
+
+  if (action === "unpublish") {
     return NextResponse.json({
       publication: result.publication,
       publishEnabled: isWebsitePublishEnabled(),
@@ -114,75 +115,33 @@ export async function POST(request: Request, context: RouteContext) {
     });
   }
 
-  const generation = await loadOwnedGeneration(auth, id);
-  if (!generation) {
-    return NextResponse.json({ error: "Website not found." }, { status: 404 });
-  }
-
-  const gates = evaluatePublishGates(generation);
-
   if (action === "prepare") {
-    const prepared = await prepareWebsitePublication({
-      supabase: auth.supabase,
-      userId: auth.user!.id,
-      generation,
-    });
-    if (!prepared.ok) {
-      return NextResponse.json({ error: prepared.error }, { status: prepared.status });
-    }
     return NextResponse.json({
-      publication: prepared.publication,
-      publishEnabled: prepared.publishEnabled,
-      htmlBytes: prepared.htmlBytes,
-      publicPath: prepared.publication.public_path,
-      plannedPublicUrl: prepared.publication.planned_public_url,
+      publication: result.publication,
+      publishEnabled: result.publishEnabled,
+      htmlBytes: result.htmlBytes,
+      publicPath: result.publication.public_path,
+      plannedPublicUrl: result.publication.planned_public_url,
       managementQuality: gates.managementQuality,
       conversionChecklist: gates.conversionChecklist,
       seoPerformanceChecklist: gates.seoChecklist,
       finalQualityChecklist: gates.finalChecklist,
-      qualityRecommendations: qualityPayload(gates),
-      message: gates.publishReady
-        ? "Publication prepared. Quality gates passed — click Publish when ready."
-        : "Publication prepared. Resolve blockers before publishing.",
+      qualityRecommendations,
+      message: prepareSuccessMessage(gates),
     });
   }
 
-  if (!force && !gates.publishReady) {
-    return NextResponse.json(
-      {
-        error: "Publishing blocked until critical quality issues are resolved.",
-        qualityRecommendations: qualityPayload(gates),
-        blockers: gates.blockers,
-      },
-      { status: 422 },
-    );
-  }
-
-  const published = await publishWebsitePublication({
-    supabase: auth.supabase,
-    userId: auth.user!.id,
-    generation,
-  });
-
-  if (!published.ok) {
-    return NextResponse.json({ error: published.error }, { status: published.status });
-  }
-
   return NextResponse.json({
-    publication: published.publication,
-    publishEnabled: published.publishEnabled,
-    htmlBytes: published.htmlBytes,
-    publicUrl: published.publicUrl,
-    publicPath: published.publication.public_path,
+    publication: result.publication,
+    publishEnabled: result.publishEnabled,
+    htmlBytes: result.htmlBytes,
+    publicUrl: result.publicUrl,
+    publicPath: result.publication.public_path,
     conversionChecklist: gates.conversionChecklist,
     seoPerformanceChecklist: gates.seoChecklist,
     finalQualityChecklist: gates.finalChecklist,
-    qualityRecommendations: qualityPayload(gates),
-    message: gates.publishReady
-      ? "Website published. Public URL is live and search-engine ready."
-      : force
-        ? "Website published with force override. Review remaining recommendations."
-        : "Website published.",
+    qualityRecommendations,
+    message: publishSuccessMessage(gates, force),
   });
 }
 
@@ -209,7 +168,7 @@ export async function GET(_request: Request, context: RouteContext) {
         publishEnabled: isWebsitePublishEnabled(),
       });
     }
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, error.message);
   }
 
   return NextResponse.json({

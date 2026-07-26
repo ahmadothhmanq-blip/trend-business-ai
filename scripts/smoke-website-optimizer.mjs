@@ -74,7 +74,7 @@ const ui = readFileSync(
   "utf8",
 );
 assert.match(ui, /optimize:\s*true/);
-assert.match(ui, /Website Quality Score/);
+assert.match(ui, /qualityScores/);
 
 console.log("smoke-website-optimizer: OK", {
   tables: ["website_audits", "optimization_reports", "improvement_history"],

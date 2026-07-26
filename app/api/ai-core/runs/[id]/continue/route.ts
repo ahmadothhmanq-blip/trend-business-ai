@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { continueAiCoreRun } from "@/lib/ai-core/runs/service";
 import { aiCoreRunContinueSchema } from "@/lib/ai-core/validations";
@@ -22,7 +23,7 @@ export async function POST(request: Request, context: RouteContext) {
 
   const { id } = await context.params;
   if (!id) {
-    return NextResponse.json({ error: "Run id is required." }, { status: 400 });
+    return apiValidationError("Run id is required.");
   }
 
   const body = await parseJsonBody<unknown>(request);
@@ -30,10 +31,7 @@ export async function POST(request: Request, context: RouteContext) {
 
   const parsed = aiCoreRunContinueSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid input" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const result = await continueAiCoreRun({
@@ -45,7 +43,7 @@ export async function POST(request: Request, context: RouteContext) {
   });
 
   if (!result.ok) {
-    return NextResponse.json({ error: result.error }, { status: result.status });
+    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, result.status, result.error);
   }
 
   return NextResponse.json({

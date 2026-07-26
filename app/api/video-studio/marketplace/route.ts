@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import {
   searchVideoTemplates,
   templateCatalogStats,
@@ -22,7 +23,7 @@ export async function GET(request: Request) {
   if (templateId) {
     const template = getVideoTemplate(templateId);
     if (!template) {
-      return NextResponse.json({ error: "Template not found." }, { status: 404 });
+      return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Template not found.");
     }
     return NextResponse.json({ template });
   }

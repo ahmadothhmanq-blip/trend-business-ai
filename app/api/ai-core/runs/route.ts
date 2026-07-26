@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { executeAiCoreRun } from "@/lib/ai-core/runs/service";
 import { resolveAiCoreProduct } from "@/lib/ai-core/products";
@@ -36,10 +37,7 @@ export async function GET(request: Request) {
 
   const { data, error } = await query;
   if (error) {
-    return NextResponse.json(
-      { error: error.message || "Failed to load AI runs" },
-      { status: 500 },
-    );
+    return apiErrorResponse(API_ERROR_CODES.LOAD_FAILED, 500, error.message || "Failed to load AI runs");
   }
 
   return NextResponse.json({ runs: data ?? [] });
@@ -65,10 +63,7 @@ export async function POST(request: Request) {
 
   const parsed = aiCoreRunCreateSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid input" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const result = await executeAiCoreRun({
@@ -78,7 +73,7 @@ export async function POST(request: Request) {
   });
 
   if (!result.ok) {
-    return NextResponse.json({ error: result.error }, { status: result.status });
+    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, result.status, result.error);
   }
 
   return NextResponse.json({

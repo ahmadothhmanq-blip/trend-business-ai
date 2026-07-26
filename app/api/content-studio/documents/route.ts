@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import { documentCounts } from "@/lib/content-studio/documents";
@@ -76,7 +77,7 @@ export async function POST(request: Request) {
 
   const parsed = createSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid input" }, { status: 400 });
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const input = parsed.data;
@@ -102,7 +103,7 @@ export async function POST(request: Request) {
 
   if (error) {
     if (error.code === "42P01" || /relation/i.test(error.message ?? "")) {
-      return NextResponse.json({ error: "Apply migration 061 for Content Studio platform tables." }, { status: 503 });
+      return apiErrorResponse(API_ERROR_CODES.MIGRATION_REQUIRED, 503, "Apply migration 061 for Content Studio platform tables.");
     }
     return databaseErrorResponse("content-studio.documents.insert", error);
   }

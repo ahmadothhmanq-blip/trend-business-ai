@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { queuePostSchedule } from "@/lib/social-media/publishing";
 import type { SocialSchedule } from "@/types/social-media";
@@ -49,7 +50,7 @@ export async function POST(request: Request) {
 
   const parsed = createSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid input" }, { status: 400 });
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const { data: post } = await auth.supabase
@@ -59,7 +60,7 @@ export async function POST(request: Request) {
     .eq("user_id", auth.user!.id)
     .single();
 
-  if (!post) return NextResponse.json({ error: "Post not found" }, { status: 404 });
+  if (!post) return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Post not found");
 
   const { data, error } = await queuePostSchedule(auth.supabase, {
     userId: auth.user!.id,

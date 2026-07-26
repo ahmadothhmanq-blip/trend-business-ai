@@ -1,4 +1,5 @@
 import { requireUser } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
 import { enforceMutationRateLimit } from "@/lib/api/rate-limit";
 import type { GenerationAttachmentMeta } from "@/types/database";
@@ -71,14 +72,11 @@ export async function POST(request: Request) {
     const file = form.get("file");
 
     if (!(file instanceof File)) {
-      return NextResponse.json({ error: "Missing file upload." }, { status: 400 });
+      return apiValidationError("Missing file upload.");
     }
 
     if (file.size <= 0 || file.size > MAX_BYTES) {
-      return NextResponse.json(
-        { error: "File exceeds the 12MB upload limit." },
-        { status: 400 },
-      );
+      return apiValidationError("File exceeds the 12MB upload limit.");
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
@@ -91,17 +89,11 @@ export async function POST(request: Request) {
       mimeType = sniffed;
     }
     if (!sniffed && !declared.startsWith("text/") && declared !== "application/json" && declared !== "application/msword") {
-      return NextResponse.json(
-        { error: "Unable to verify file type." },
-        { status: 400 },
-      );
+      return apiValidationError("Unable to verify file type.");
     }
 
     if (!ALLOWED_FILE.has(mimeType)) {
-      return NextResponse.json(
-        { error: "Unsupported file type. Upload images, PDF, Markdown, or DOCX." },
-        { status: 400 },
-      );
+      return apiValidationError("Unsupported file type. Upload images, PDF, Markdown, or DOCX.");
     }
 
     const isImage = ALLOWED_IMAGE.has(mimeType);

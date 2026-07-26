@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
 import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
@@ -80,10 +81,7 @@ export async function POST(request: Request) {
 
   const parsed = lpRequestSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid input" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const input = parsed.data;
@@ -103,7 +101,7 @@ export async function POST(request: Request) {
       titleField: "page_name",
     });
     if (!iterated.ok) {
-      return NextResponse.json({ error: iterated.error }, { status: iterated.status });
+      return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, iterated.status, iterated.error);
     }
 
     const project = await generateLandingPage({
@@ -152,10 +150,7 @@ export async function POST(request: Request) {
 
     if (error) {
       if (error.code === "42P01" || (typeof error.message === "string" && error.message.includes("relation"))) {
-        return NextResponse.json(
-          { error: "Landing Page Builder table not found. Please apply migration 014." },
-          { status: 503 },
-        );
+        return apiErrorResponse(API_ERROR_CODES.MIGRATION_REQUIRED, 503, "Landing Page Builder table not found. Please apply migration 014.");
       }
       logError(stage, error);
       return databaseErrorResponse("landing-page-builder.insert", error);

@@ -1,4 +1,5 @@
 import { requireUser } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -6,7 +7,7 @@ export async function GET() {
   if (auth.response) return auth.response;
 
   const isAdmin = auth.user!.app_metadata?.role === "admin";
-  if (!isAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+  if (!isAdmin) return apiErrorResponse(API_ERROR_CODES.FORBIDDEN, 403, "Unauthorized");
 
   const tables = [
     "profiles",

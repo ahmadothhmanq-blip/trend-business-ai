@@ -3,7 +3,10 @@
  */
 
 import type { GeneratedProjectFile } from "@/lib/ai/types";
-import type { SiteStructurePlan } from "@/lib/ai-core/website-management/types";
+import type {
+  NavLink,
+  SiteStructurePlan,
+} from "@/lib/ai-core/website-management/types";
 
 function linksLiteral(
   links: Array<{ href: string; label: string }>,
@@ -104,7 +107,21 @@ export function wireNavAndFooterToRoutes(
 export function structureNavToContentLinks(
   structure: SiteStructurePlan,
 ): Array<{ href: string; label: string }> {
-  return structure.navLinks.map((l) => ({ ...l }));
+  return structure.navLinks.map((l) => ({ href: l.href, label: l.label }));
+}
+
+export function updateNavLinks(
+  structure: SiteStructurePlan,
+  links: NavLink[],
+): SiteStructurePlan {
+  return { ...structure, navLinks: links };
+}
+
+export function updateFooterLinks(
+  structure: SiteStructurePlan,
+  links: NavLink[],
+): SiteStructurePlan {
+  return { ...structure, footerLinks: links };
 }
 
 export { linksLiteral };

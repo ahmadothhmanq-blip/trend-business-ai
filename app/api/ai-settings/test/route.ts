@@ -1,11 +1,16 @@
-import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { requireUser, parseJsonBody, apiValidationError } from "@/lib/api/helpers";
+/** i18n:api-internal — provider probe prompts are not user-facing UI */
 import { isUserFacingProvider } from "@/lib/ai/provider-config";
+import {
+  API_ERROR_CODES,
+  apiErrorResponse,
+} from "@/lib/i18n/api-errors";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
 const testSchema = z.object({
   provider: z.string().min(1),
-  apiKey: z.string().min(1, "API key is required"),
+  apiKey: z.string().min(1),
   model: z.string().min(1),
 });
 
@@ -15,6 +20,7 @@ type TestResult = {
   model: string;
   latencyMs: number;
   error?: string;
+  code?: string;
 };
 
 async function testDeepSeek(apiKey: string, model: string): Promise<TestResult> {
@@ -31,7 +37,14 @@ async function testDeepSeek(apiKey: string, model: string): Promise<TestResult> 
   const latencyMs = Date.now() - start;
   if (!res.ok) {
     const body = await res.text();
-    return { success: false, provider: "deepseek", model, latencyMs, error: `HTTP ${res.status}: ${body.slice(0, 200)}` };
+    return {
+      success: false,
+      provider: "deepseek",
+      model,
+      latencyMs,
+      code: API_ERROR_CODES.SERVER_ERROR,
+      error: `HTTP ${res.status}: ${body.slice(0, 200)}`,
+    };
   }
   return { success: true, provider: "deepseek", model, latencyMs };
 }
@@ -50,7 +63,14 @@ async function testOpenAI(apiKey: string, model: string): Promise<TestResult> {
   const latencyMs = Date.now() - start;
   if (!res.ok) {
     const body = await res.text();
-    return { success: false, provider: "openai", model, latencyMs, error: `HTTP ${res.status}: ${body.slice(0, 200)}` };
+    return {
+      success: false,
+      provider: "openai",
+      model,
+      latencyMs,
+      code: API_ERROR_CODES.SERVER_ERROR,
+      error: `HTTP ${res.status}: ${body.slice(0, 200)}`,
+    };
   }
   return { success: true, provider: "openai", model, latencyMs };
 }
@@ -73,7 +93,14 @@ async function testAnthropic(apiKey: string, model: string): Promise<TestResult>
   const latencyMs = Date.now() - start;
   if (!res.ok) {
     const body = await res.text();
-    return { success: false, provider: "claude", model, latencyMs, error: `HTTP ${res.status}: ${body.slice(0, 200)}` };
+    return {
+      success: false,
+      provider: "claude",
+      model,
+      latencyMs,
+      code: API_ERROR_CODES.SERVER_ERROR,
+      error: `HTTP ${res.status}: ${body.slice(0, 200)}`,
+    };
   }
   return { success: true, provider: "claude", model, latencyMs };
 }
@@ -92,7 +119,14 @@ async function testGemini(apiKey: string, model: string): Promise<TestResult> {
   const latencyMs = Date.now() - start;
   if (!res.ok) {
     const body = await res.text();
-    return { success: false, provider: "gemini", model, latencyMs, error: `HTTP ${res.status}: ${body.slice(0, 200)}` };
+    return {
+      success: false,
+      provider: "gemini",
+      model,
+      latencyMs,
+      code: API_ERROR_CODES.SERVER_ERROR,
+      error: `HTTP ${res.status}: ${body.slice(0, 200)}`,
+    };
   }
   return { success: true, provider: "gemini", model, latencyMs };
 }
@@ -111,7 +145,14 @@ async function testGrok(apiKey: string, model: string): Promise<TestResult> {
   const latencyMs = Date.now() - start;
   if (!res.ok) {
     const body = await res.text();
-    return { success: false, provider: "grok", model, latencyMs, error: `HTTP ${res.status}: ${body.slice(0, 200)}` };
+    return {
+      success: false,
+      provider: "grok",
+      model,
+      latencyMs,
+      code: API_ERROR_CODES.SERVER_ERROR,
+      error: `HTTP ${res.status}: ${body.slice(0, 200)}`,
+    };
   }
   return { success: true, provider: "grok", model, latencyMs };
 }
@@ -122,7 +163,7 @@ async function testLlama(_apiKey: string, model: string): Promise<TestResult> {
     provider: "llama",
     model,
     latencyMs: 0,
-    error: "Llama provider requires a custom endpoint. Configure your Llama API host first.",
+    code: API_ERROR_CODES.PROVIDER_UNAVAILABLE,
   };
 }
 
@@ -144,28 +185,19 @@ export async function POST(request: Request) {
 
   const parsed = testSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid request" },
-      { status: 400 },
-    );
+    return apiValidationError();
   }
 
   const { provider, apiKey, model } = parsed.data;
 
   if (!isUserFacingProvider(provider)) {
-    return NextResponse.json(
-      { error: `Provider is not available: ${provider}` },
-      { status: 400 },
-    );
+    return apiErrorResponse(API_ERROR_CODES.PROVIDER_UNAVAILABLE, 400, undefined, provider);
   }
 
   const tester = testers[provider];
 
   if (!tester) {
-    return NextResponse.json(
-      { error: `Unknown provider: ${provider}` },
-      { status: 400 },
-    );
+    return apiErrorResponse(API_ERROR_CODES.UNKNOWN_PROVIDER, 400, undefined, provider);
   }
 
   try {
@@ -174,7 +206,14 @@ export async function POST(request: Request) {
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     return NextResponse.json({
-      result: { success: false, provider, model, latencyMs: 0, error: message },
+      result: {
+        success: false,
+        provider,
+        model,
+        latencyMs: 0,
+        code: API_ERROR_CODES.SERVER_ERROR,
+        error: message,
+      },
     });
   }
 }

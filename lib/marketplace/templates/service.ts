@@ -110,7 +110,7 @@ export function buildUseTemplateHref(listing: CreatorTemplateListing): string {
   return `/dashboard/website-builder?${params.toString()}`;
 }
 
-export function useCreatorTemplate(listingId: string) {
+export function applyCreatorTemplate(listingId: string) {
   const listing = getCreatorListing(listingId);
   if (!listing) return null;
   recordTemplateUse(listingId);

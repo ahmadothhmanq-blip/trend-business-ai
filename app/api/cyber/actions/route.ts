@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { runCyberAssistant } from "@/lib/cyber/engine";
@@ -28,11 +29,11 @@ export async function POST(request: Request) {
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
   const parsed = schema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: "Invalid" }, { status: 400 });
+  if (!parsed.success) return apiValidationError("Invalid");
   try {
     const result = await runCyberAssistant(parsed.data.action as CyberAssistantAction, { text: parsed.data.text, context: parsed.data.context });
     return NextResponse.json({ result });
   } catch (e) {
-    return NextResponse.json({ error: e instanceof Error ? e.message : "Failed" }, { status: 500 });
+    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, e instanceof Error ? e.message : undefined);
   }
 }

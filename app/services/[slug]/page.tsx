@@ -5,6 +5,8 @@ import {
   getPublishedProgrammaticPages,
   getProgrammaticPageBySlug,
 } from "@/lib/seo/programmatic";
+import { getServerTranslator } from "@/lib/i18n/server";
+import { getLocalizedProgrammaticPage } from "@/lib/seo/localized-content";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -18,10 +20,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const page = getProgrammaticPageBySlug("services", slug);
   if (!page || page.status !== "published") return {};
+  const { locale } = await getServerTranslator();
+  const localized = getLocalizedProgrammaticPage(locale, page);
   return SeoService.createMetadata({
-    title: page.title,
-    description: page.description,
+    title: localized.title,
+    description: localized.description,
     path: page.path,
+    locale,
   });
 }
 

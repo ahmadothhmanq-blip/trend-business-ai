@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { createGrowthWriteClient } from "@/lib/growth/client";
 import { newsletterSchema } from "@/lib/growth/schemas";
 import { enforceMutationRateLimitAsync } from "@/lib/api/rate-limit";
@@ -33,10 +34,7 @@ export async function POST(request: Request) {
 
   const parsed = newsletterSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid email" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   if (parsed.data.honeypot) {
@@ -69,14 +67,11 @@ export async function POST(request: Request) {
     });
 
     if (inserted.error?.code === "42P01") {
-      return NextResponse.json(
-        { error: "Growth engine migration not applied. Run migration 029." },
-        { status: 503 },
-      );
+      return apiErrorResponse(API_ERROR_CODES.MIGRATION_REQUIRED, 503, "Growth engine migration not applied. Run migration 029.");
     }
 
     if (inserted.error && inserted.error.code !== "23505") {
-      return NextResponse.json({ error: inserted.error.message }, { status: 500 });
+      return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, inserted.error.message);
     }
   }
 

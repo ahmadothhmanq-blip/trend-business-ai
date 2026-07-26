@@ -4,12 +4,14 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type DragEvent,
 } from "react";
 import {
   Copy,
   GripVertical,
+  ImageIcon,
   Loader2,
   Monitor,
   Redo2,
@@ -18,6 +20,8 @@ import {
   Tablet,
   Trash2,
   Undo2,
+  Upload,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -55,6 +59,13 @@ import {
   decodeComponentDrag,
   DRAG_MIME,
 } from "@/components/dashboard/visual-editor/component-library-panel";
+import { MediaLibraryPanel } from "@/components/dashboard/website-builder/media-library-panel";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 function kindFromSectionKind(kind: string): VisualNodeKind {
   if (kind === "hero") return "hero";
@@ -79,6 +90,7 @@ type VisualWebsiteEditorProps = {
   files: GeneratedProjectFile[];
   project?: GeneratedWebsiteProject | null;
   disabled?: boolean;
+  onDirtyChange?: (dirty: boolean) => void;
   onSaved: (payload: {
     project: GeneratedWebsiteProject;
     generation: WebsiteGeneration;
@@ -90,6 +102,7 @@ export function VisualWebsiteEditor({
   files,
   project,
   disabled,
+  onDirtyChange,
   onSaved,
 }: VisualWebsiteEditorProps) {
   const pt = useProductT("visualEditor");
@@ -109,6 +122,83 @@ export function VisualWebsiteEditor({
   );
   const [saving, setSaving] = useState(false);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [mediaOpen, setMediaOpen] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [cropAspect, setCropAspect] = useState<"free" | "1:1" | "16:9">("free");
+  const imageInputRef = useRef<HTMLInputElement>(null);
+
+  async function optimizeAndUpload(file: File) {
+    if (!selected) return;
+    setUploadingImage(true);
+    try {
+      const optimized = await new Promise<Blob>((resolve, reject) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+          const maxW = 1920;
+          const scale = Math.min(1, maxW / img.width);
+          let sw = img.width;
+          let sh = img.height;
+          let sx = 0;
+          let sy = 0;
+          if (cropAspect === "1:1") {
+            const side = Math.min(img.width, img.height);
+            sw = side;
+            sh = side;
+            sx = (img.width - side) / 2;
+            sy = (img.height - side) / 2;
+          } else if (cropAspect === "16:9") {
+            const target = img.width / (16 / 9);
+            if (target <= img.height) {
+              sh = target;
+              sy = (img.height - target) / 2;
+            } else {
+              sw = img.height * (16 / 9);
+              sx = (img.width - sw) / 2;
+            }
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.round(sw * scale);
+          canvas.height = Math.round(sh * scale);
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            reject(new Error("Canvas unavailable"));
+            return;
+          }
+          ctx.drawImage(img, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+          URL.revokeObjectURL(url);
+          canvas.toBlob(
+            (blob) => (blob ? resolve(blob) : reject(new Error("Optimize failed"))),
+            "image/webp",
+            0.85,
+          );
+        };
+        img.onerror = () => reject(new Error("Invalid image"));
+        img.src = url;
+      });
+
+      const form = new FormData();
+      form.append("file", optimized, file.name.replace(/\.\w+$/, ".webp"));
+      form.append("folder", "editor");
+      const res = await fetch(`/api/website-builder/${generationId}/media`, {
+        method: "POST",
+        body: form,
+      });
+      const json = (await res.json()) as { asset?: { url?: string }; error?: string };
+      if (!res.ok || !json.asset?.url) {
+        throw new Error(json.error || "Upload failed");
+      }
+      commit(
+        updateNodeImage(doc, selected.id, json.asset.url),
+        pt("history.replaceImage"),
+      );
+      toast.success(pt("toasts.saved"));
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : pt("toasts.saveFailed"));
+    } finally {
+      setUploadingImage(false);
+    }
+  }
 
   // Rebuild when generation / files change
   useEffect(() => {
@@ -120,6 +210,20 @@ export function VisualWebsiteEditor({
   const doc = history.present;
   const selected =
     doc.nodes.find((n) => n.id === doc.selectedNodeId) || doc.nodes[0] || null;
+
+  useEffect(() => {
+    onDirtyChange?.(doc.dirty);
+  }, [doc.dirty, onDirtyChange]);
+
+  useEffect(() => {
+    if (!doc.dirty) return;
+    const onBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [doc.dirty]);
 
   const commit = useCallback((next: VisualDocument, label: string) => {
     setHistory((h) => pushVisualHistory(h, next, label));
@@ -441,6 +545,72 @@ export function VisualWebsiteEditor({
                     className="border-white/10 bg-white/5 text-white"
                     placeholder={pt("imagePlaceholder")}
                   />
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <select
+                      value={cropAspect}
+                      onChange={(e) =>
+                        setCropAspect(e.target.value as "free" | "1:1" | "16:9")
+                      }
+                      className="h-8 rounded-md border border-white/10 bg-[#121212] px-2 text-[11px] text-white"
+                      disabled={disabled || selected.locked}
+                    >
+                      <option value="free">Crop: Free</option>
+                      <option value="1:1">Crop: 1:1</option>
+                      <option value="16:9">Crop: 16:9</option>
+                    </select>
+                    <input
+                      ref={imageInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) void optimizeAndUpload(file);
+                        e.target.value = "";
+                      }}
+                    />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-white/15 text-white"
+                      disabled={disabled || selected.locked || uploadingImage}
+                      onClick={() => imageInputRef.current?.click()}
+                    >
+                      {uploadingImage ? (
+                        <Loader2 className="size-3.5 animate-spin" />
+                      ) : (
+                        <Upload className="size-3.5" />
+                      )}
+                      Upload
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-white/15 text-white"
+                      disabled={disabled || selected.locked}
+                      onClick={() => setMediaOpen(true)}
+                    >
+                      <ImageIcon className="size-3.5" />
+                      Library
+                    </Button>
+                    {selected.imageUrl ? (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-white/15 text-white"
+                        disabled={disabled || selected.locked}
+                        onClick={() =>
+                          commit(
+                            updateNodeImage(doc, selected.id, ""),
+                            pt("history.replaceImage"),
+                          )
+                        }
+                      >
+                        <X className="size-3.5" />
+                        Remove
+                      </Button>
+                    ) : null}
+                  </div>
                 </div>
                 <div className="flex gap-2">
                   <Button
@@ -571,6 +741,26 @@ export function VisualWebsiteEditor({
           </div>
         </aside>
       </div>
+
+      <Dialog open={mediaOpen} onOpenChange={setMediaOpen}>
+        <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto border-white/10 bg-[#0a0a0a] text-white">
+          <DialogHeader>
+            <DialogTitle>Media library</DialogTitle>
+          </DialogHeader>
+          <MediaLibraryPanel
+            generationId={generationId}
+            compact
+            onSelect={(asset) => {
+              if (!selected) return;
+              commit(
+                updateNodeImage(doc, selected.id, asset.url),
+                pt("history.replaceImage"),
+              );
+              setMediaOpen(false);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -650,12 +840,21 @@ function CanvasBlock(props: {
           {node.text || node.label}
         </div>
       )}
-      <div
-        className="mt-3 h-16 rounded-lg opacity-80"
-        style={{
-          background: `linear-gradient(135deg, ${tokens.primary}, ${tokens.secondary} 55%, ${tokens.accent})`,
-        }}
-      />
+      {node.imageUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={node.imageUrl}
+          alt={node.label}
+          className="mt-3 h-32 w-full rounded-lg object-cover"
+        />
+      ) : (
+        <div
+          className="mt-3 h-16 rounded-lg opacity-80"
+          style={{
+            background: `linear-gradient(135deg, ${tokens.primary}, ${tokens.secondary} 55%, ${tokens.accent})`,
+          }}
+        />
+      )}
       <p className="mt-3 max-w-prose text-[12px] opacity-55">
         {pt("canvasHint")}
       </p>

@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { profileSchema } from "@/lib/validations/auth";
 import { NextResponse } from "next/server";
@@ -51,10 +52,7 @@ export async function PUT(request: Request) {
 
   const parsed = profileSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid profile data" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const { fullName = "", company = "", role = "" } = parsed.data;
@@ -64,7 +62,7 @@ export async function PUT(request: Request) {
   });
 
   if (authError) {
-    return NextResponse.json({ error: authError.message }, { status: 400 });
+    return apiValidationError(authError.message);
   }
 
   const { error: profileError } = await auth.supabase.from("profiles").upsert({
@@ -88,12 +86,10 @@ export async function POST(request: Request) {
 
   const contentType = request.headers.get("content-type") ?? "";
   if (!contentType.includes("multipart/form-data")) {
-    return NextResponse.json(
-      {
-        error:
-          "Avatar upload requires multipart/form-data. Use PUT /api/profile with JSON to update profile fields.",
-      },
-      { status: 415 },
+    return apiErrorResponse(
+      API_ERROR_CODES.INVALID_INPUT,
+      415,
+      "Avatar upload requires multipart/form-data. Use PUT /api/profile with JSON to update profile fields.",
     );
   }
 
@@ -101,16 +97,16 @@ export async function POST(request: Request) {
   const file = formData.get("avatar") as File | null;
 
   if (!file || file.size === 0) {
-    return NextResponse.json({ error: "No file provided" }, { status: 400 });
+    return apiValidationError("No file provided");
   }
 
   const ext = AVATAR_TYPES[file.type as keyof typeof AVATAR_TYPES];
   if (!ext) {
-    return NextResponse.json({ error: "File must be a JPG, PNG or WebP image" }, { status: 400 });
+    return apiValidationError("File must be a JPG, PNG or WebP image");
   }
 
   if (file.size > MAX_AVATAR_BYTES) {
-    return NextResponse.json({ error: "Image must be under 2MB" }, { status: 400 });
+    return apiValidationError("Image must be under 2MB");
   }
 
   const path = `${auth.user!.id}/avatar.${ext}`;

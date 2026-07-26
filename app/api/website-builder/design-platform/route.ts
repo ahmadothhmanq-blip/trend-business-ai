@@ -1,4 +1,9 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
+import {
+  getRequestClientIp,
+  enforceWebsitePublicRateLimit,
+} from "@/lib/website/public-endpoints";
 import {
   runAutoDesignDecision,
   DESIGN_PLATFORM_TAXONOMY,
@@ -24,7 +29,7 @@ export async function GET(request: Request) {
   if (templateId) {
     const template = getTemplateIntelligence(templateId);
     if (!template) {
-      return NextResponse.json({ error: "Template not found." }, { status: 404 });
+      return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Template not found.");
     }
     return NextResponse.json({
       template,
@@ -61,6 +66,10 @@ const autoSchema = z.object({
  * POST — Run AI Auto Design Decision Engine (Phase 1).
  */
 export async function POST(request: Request) {
+  const ip = getRequestClientIp(request);
+  const rateLimited = await enforceWebsitePublicRateLimit("design-platform", ip);
+  if (rateLimited) return rateLimited;
+
   let body: unknown = {};
   try {
     body = await request.json();
@@ -69,10 +78,7 @@ export async function POST(request: Request) {
   }
   const parsed = autoSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid input" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const decision = runAutoDesignDecision(parsed.data);

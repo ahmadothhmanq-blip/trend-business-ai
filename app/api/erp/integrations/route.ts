@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { enforceMutationRateLimit } from "@/lib/api/rate-limit";
 import { getAllErpIntegrations } from "@/lib/erp/integrations";
 import { convertDealToSalesOrder } from "@/lib/erp/sales-orders";
@@ -22,9 +23,9 @@ export async function POST(request: Request) {
 
   if (body.action === "convert-crm-deal" && body.dealId && body.companyId) {
     const result = await convertDealToSalesOrder(auth.supabase, auth.user!.id, body.companyId, body.dealId);
-    if (result.error) return NextResponse.json({ error: result.error.message }, { status: 500 });
+    if (result.error) return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, result.error.message);
     return NextResponse.json({ order: result.data });
   }
 
-  return NextResponse.json({ error: "Unknown action" }, { status: 400 });
+  return apiValidationError("Unknown action");
 }

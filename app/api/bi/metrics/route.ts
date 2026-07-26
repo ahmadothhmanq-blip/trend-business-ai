@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { enforceMutationRateLimit } from "@/lib/api/rate-limit";
 import { ensureDefaultMetrics } from "@/lib/bi/metrics";
@@ -26,5 +27,5 @@ export async function POST(request: Request) {
     await ensureDefaultMetrics(auth.supabase, auth.user!.id);
     return NextResponse.json({ ok: true });
   }
-  return NextResponse.json({ error: "Unknown action" }, { status: 400 });
+  return apiValidationError("Unknown action");
 }

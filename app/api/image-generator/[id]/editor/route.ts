@@ -1,4 +1,5 @@
 import { requireUser, parseUuidParam } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { serverErrorResponse } from "@/lib/api/errors";
 import { loadCanvasDocument } from "@/lib/ai-core/image-design-platform/canvas-repository";
 import { listCanvasTemplatesV2 } from "@/lib/ai-core/image-design-platform/templates-v2";
@@ -26,7 +27,7 @@ export async function GET(_request: Request, context: RouteContext) {
       .single();
 
     if (error || !gen) {
-      return NextResponse.json({ error: "Design not found" }, { status: 404 });
+      return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Design not found");
     }
 
     const generation = gen as ImageGeneration;

@@ -1,4 +1,5 @@
 import { requireUser } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { enforceMutationRateLimitAsync } from "@/lib/api/rate-limit";
 import {
   CONNECTABLE_PLATFORMS,
@@ -23,17 +24,18 @@ export async function GET(_request: Request, context: RouteContext) {
 
   const { platform } = await context.params;
   if (!CONNECTABLE_PLATFORMS.includes(platform as (typeof CONNECTABLE_PLATFORMS)[number])) {
-    return NextResponse.json({ error: "Unsupported platform." }, { status: 400 });
+    return apiValidationError("Unsupported platform.");
   }
 
   const provider = getOAuthProvider(platform);
-  if (!provider) return NextResponse.json({ error: "Unknown platform." }, { status: 400 });
+  if (!provider) return apiValidationError("Unknown platform.");
 
   const { clientId } = getOAuthCredentials(provider);
   if (!clientId) {
-    return NextResponse.json(
-      { error: `${provider.label} OAuth is not configured. Set ${provider.clientIdEnv}.` },
-      { status: 503 },
+    return apiErrorResponse(
+      API_ERROR_CODES.MIGRATION_REQUIRED,
+      503,
+      `${provider.label} OAuth is not configured. Set ${provider.clientIdEnv}.`,
     );
   }
 

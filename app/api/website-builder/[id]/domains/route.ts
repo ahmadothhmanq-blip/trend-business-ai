@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { z } from "zod";
 import { requireUser, parseUuidParam } from "@/lib/api/helpers";
 import { getPublicationForGeneration } from "@/lib/ai-core/publishing";
@@ -27,12 +28,12 @@ async function assertOwnedGeneration(
     .maybeSingle();
   if (error) {
     return {
-      error: NextResponse.json({ error: error.message }, { status: 500 }),
+      error: apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, error.message),
     };
   }
   if (!data) {
     return {
-      error: NextResponse.json({ error: "Website not found." }, { status: 404 }),
+      error: apiErrorResponse(API_ERROR_CODES.NOT_FOUND, 404, "Website not found."),
     };
   }
   return { error: null };
@@ -86,20 +87,17 @@ export async function POST(request: Request, { params }: Params) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    return apiErrorResponse(API_ERROR_CODES.INVALID_JSON, 400);
   }
 
   const parsed = addSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid domain" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const validated = validateCustomHostname(parsed.data.hostname);
   if (!validated.ok) {
-    return NextResponse.json({ error: validated.error }, { status: 400 });
+    return apiValidationError(validated.error);
   }
 
   const publication = await getPublicationForGeneration({
@@ -135,7 +133,8 @@ export async function POST(request: Request, { params }: Params) {
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to add domain";
     const status = message.includes("already") ? 409 : 400;
-    return NextResponse.json({ error: message }, { status });
+    const code = API_ERROR_CODES.INVALID_INPUT;
+    return apiErrorResponse(code, status, message);
   }
 }
 
@@ -165,12 +164,12 @@ export async function DELETE(request: Request, { params }: Params) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    return apiErrorResponse(API_ERROR_CODES.INVALID_JSON, 400);
   }
 
   const parsed = deleteSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "domainId required" }, { status: 400 });
+    return apiValidationError("domainId required");
   }
 
   try {
@@ -182,7 +181,7 @@ export async function DELETE(request: Request, { params }: Params) {
       auth.supabase,
     );
     if (domain.generationId !== parsedId.id) {
-      return NextResponse.json({ error: "Domain not found." }, { status: 404 });
+      return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Domain not found.");
     }
     await recordDeploymentEvent(
       {
@@ -196,6 +195,6 @@ export async function DELETE(request: Request, { params }: Params) {
     return NextResponse.json({ domain });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Remove failed";
-    return NextResponse.json({ error: message }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, message);
   }
 }

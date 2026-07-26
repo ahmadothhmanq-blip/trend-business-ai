@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody, parseUuidParam } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { serverErrorResponse } from "@/lib/api/errors";
 import { enforceMutationRateLimitAsync } from "@/lib/api/rate-limit";
 import { publishPost } from "@/lib/social-media/publishing";
@@ -28,7 +29,7 @@ export async function POST(request: Request, context: RouteContext) {
 
   const parsed = publishSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid input" }, { status: 400 });
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   try {
@@ -41,11 +42,7 @@ export async function POST(request: Request, context: RouteContext) {
 
     return NextResponse.json({
       job: output.job,
-      result: {
-        ok: output.result.ok,
-        platformPostId: output.result.platformPostId,
-        error: output.result.error,
-      },
+      result: { ...output.result },
     });
   } catch (error) {
     return serverErrorResponse("social-media.posts.publish", error, "Publishing failed.");

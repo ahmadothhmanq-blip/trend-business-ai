@@ -10,11 +10,15 @@
     "type-check": "tsc --noEmit",
     "verify": "node scripts/verify.mjs",
     "verify:wb-launch": "node scripts/verify-wb-launch.mjs",
+    "verify:website-experiments": "node scripts/verify-website-experiments.mjs",
+    "verify:website-publish-gates": "node scripts/verify-website-publish-gates.mjs",
     "verify:launch": "node scripts/verify-production-launch.mjs",
     "verify:staging": "node scripts/verify-staging.mjs",
     "verify:golive": "node scripts/verify-production-golive.mjs",
     "perf:budget": "node scripts/check-dashboard-budgets.mjs",
     "smoke:website-ai": "node scripts/smoke-website-ai.mjs",
+    "smoke:website-publish": "node scripts/smoke-website-publish.mjs",
+    "smoke:website-design-engine": "node scripts/smoke-website-design-engine.mjs",
     "smoke:ai-core": "node scripts/smoke-ai-core.mjs",
     "smoke:ai-providers": "node scripts/smoke-ai-providers.mjs",
     "smoke:smart-templates": "node scripts/smoke-smart-templates.mjs",
@@ -42,8 +46,9 @@
     "verify:brand-studio": "node scripts/verify-brand-studio.mjs",
     "verify:image-generator": "node scripts/verify-image-generator.mjs",
     "verify:image-editor": "node scripts/verify-image-generator-editor.mjs",
-    "verify:i18n": "node scripts/audit-i18n.mjs",
-    "sync:locales": "node scripts/sync-locale-keys.mjs"
+    "verify:i18n": "node scripts/audit-i18n.mjs && node scripts/verify-locale-depth.mjs",
+    "sync:locales": "node scripts/seed-seo-content-keys.mjs && node scripts/sync-locale-keys.mjs",
+    "translate:locales": "node scripts/translate-locales-deepseek.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.0",

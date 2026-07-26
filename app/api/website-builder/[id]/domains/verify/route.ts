@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { z } from "zod";
 import { requireUser, parseUuidParam } from "@/lib/api/helpers";
 import { getPublicationForGeneration } from "@/lib/ai-core/publishing";
@@ -33,15 +34,12 @@ export async function POST(request: Request, { params }: Params) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    return apiErrorResponse(API_ERROR_CODES.INVALID_JSON, 400);
   }
 
   const parsed = verifySchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid verify request" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const existing = await getDomainById(parsed.data.domainId, auth.supabase);
@@ -50,7 +48,7 @@ export async function POST(request: Request, { params }: Params) {
     existing.userId !== auth.user!.id ||
     existing.generationId !== parsedId.id
   ) {
-    return NextResponse.json({ error: "Domain not found." }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Domain not found.");
   }
 
   const publication = await getPublicationForGeneration({
@@ -99,6 +97,6 @@ export async function POST(request: Request, { params }: Params) {
     return NextResponse.json({ domain });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Verification failed";
-    return NextResponse.json({ error: message }, { status: 400 });
+    return apiValidationError(message);
   }
 }

@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody, parseUuidParam } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { serverErrorResponse } from "@/lib/api/errors";
 import { generateWebsite } from "@/lib/website-generator";
@@ -76,10 +77,7 @@ export async function POST(request: Request, context: RouteContext) {
 
   const parsed = editBodySchema.safeParse(body ?? {});
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid input" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const { data: existing, error } = await auth.supabase
@@ -90,7 +88,7 @@ export async function POST(request: Request, context: RouteContext) {
     .single();
 
   if (error || !existing) {
-    return NextResponse.json({ error: "Generation not found" }, { status: 404 });
+    return apiErrorResponse(API_ERROR_CODES.GENERATION_NOT_FOUND, 404);
   }
 
   const generation = existing as WebsiteGeneration;
@@ -98,10 +96,7 @@ export async function POST(request: Request, context: RouteContext) {
   const files = extractWebsiteFilesFromBlueprint(generation.blueprint);
 
   if (!files.length) {
-    return NextResponse.json(
-      { error: "Generation has no editable files." },
-      { status: 400 },
-    );
+    return apiValidationError("Generation has no editable files.");
   }
 
   let command = parsed.data.command?.trim() || "";
@@ -120,10 +115,7 @@ export async function POST(request: Request, context: RouteContext) {
   }
 
   if (!command && !actions.length) {
-    return NextResponse.json(
-      { error: "Provide a command, suggestionId, or actions." },
-      { status: 400 },
-    );
+    return apiValidationError("Provide a command, suggestionId, or actions.");
   }
 
   try {
@@ -197,7 +189,7 @@ export async function POST(request: Request, context: RouteContext) {
       });
 
       if (!saved.ok) {
-        return NextResponse.json({ error: saved.error }, { status: 500 });
+        return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, saved.error);
       }
       savedProject = saved.project;
       savedGeneration = saved.generation;
@@ -237,7 +229,7 @@ export async function POST(request: Request, context: RouteContext) {
       });
 
       if (!saved.ok) {
-        return NextResponse.json({ error: saved.error }, { status: 500 });
+        return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, saved.error);
       }
       savedProject = saved.project;
       savedGeneration = saved.generation;

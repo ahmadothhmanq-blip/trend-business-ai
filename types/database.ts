@@ -166,6 +166,25 @@ export type WebsiteGeneration = {
   attachments?: GenerationAttachmentMeta[];
 };
 
+/** Published / prepared website snapshot (public.website_publications). */
+export type WebsitePublication = {
+  id: string;
+  user_id: string;
+  generation_id: string;
+  project_id: string | null;
+  slug: string;
+  status: "prepared" | "published" | "unpublished";
+  public_path: string;
+  planned_public_url: string | null;
+  title: string;
+  created_at: string;
+  updated_at: string;
+  published_at: string | null;
+  seo_json?: unknown;
+  robots_txt?: string | null;
+  sitemap_xml?: string | null;
+};
+
 /** Persisted Website Optimizer audit row (public.website_audits). */
 export type WebsiteAudit = {
   id: string;

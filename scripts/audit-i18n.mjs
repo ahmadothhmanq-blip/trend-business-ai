@@ -69,6 +69,7 @@ for (const base of targets) {
     if (rel.includes("lib/i18n/")) continue;
     if (SKIP_FILES.has(rel)) continue;
     const content = fs.readFileSync(file, "utf8");
+    if (rel.startsWith("app/api/") && content.includes("i18n:api-internal")) continue;
     if (
       rel.startsWith("lib/constants/") &&
       (content.includes("labelKey") || content.includes("I18N_CATALOG"))

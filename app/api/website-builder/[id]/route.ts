@@ -1,4 +1,5 @@
 import { syncFavorite } from "@/lib/db/favorites";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { requireUser, parseJsonBody, parseUuidParam } from "@/lib/api/helpers";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { z } from "zod";
@@ -30,7 +31,7 @@ export async function GET(_request: Request, context: RouteContext) {
     .single();
 
   if (error || !data) {
-    return NextResponse.json({ error: "Generation not found" }, { status: 404 });
+    return apiErrorResponse(API_ERROR_CODES.GENERATION_NOT_FOUND, 404);
   }
 
   return NextResponse.json({ generation: data as WebsiteGeneration });
@@ -50,7 +51,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   const parsed = updateWebsiteGenerationSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid update" }, { status: 400 });
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const existing = await auth.supabase
@@ -61,7 +62,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     .single();
 
   if (existing.error || !existing.data) {
-    return NextResponse.json({ error: "Generation not found" }, { status: 404 });
+    return apiErrorResponse(API_ERROR_CODES.GENERATION_NOT_FOUND, 404);
   }
 
   const { is_favorite, projectName, settings } = parsed.data;
@@ -91,7 +92,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     .single();
 
   if (error || !data) {
-    return NextResponse.json({ error: "Generation not found" }, { status: 404 });
+    return apiErrorResponse(API_ERROR_CODES.GENERATION_NOT_FOUND, 404);
   }
 
   if (typeof is_favorite === "boolean") {
@@ -130,7 +131,7 @@ export async function POST(_request: Request, context: RouteContext) {
     .single();
 
   if (sourceError || !source) {
-    return NextResponse.json({ error: "Generation not found" }, { status: 404 });
+    return apiErrorResponse(API_ERROR_CODES.GENERATION_NOT_FOUND, 404);
   }
 
   const { data, error } = await auth.supabase
@@ -185,7 +186,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
     .single();
 
   if (error || !data) {
-    return NextResponse.json({ error: "Generation not found" }, { status: 404 });
+    return apiErrorResponse(API_ERROR_CODES.GENERATION_NOT_FOUND, 404);
   }
 
   return NextResponse.json({ message: "Website blueprint deleted." });

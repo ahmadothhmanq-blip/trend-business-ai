@@ -1,4 +1,5 @@
 import { requireUser, parseUuidParam } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
 import { enforceMutationRateLimitAsync } from "@/lib/api/rate-limit";
 import { NextResponse } from "next/server";
@@ -23,7 +24,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
     .eq("user_id", auth.user!.id)
     .single();
 
-  if (!existing) return NextResponse.json({ error: "Account not found." }, { status: 404 });
+  if (!existing) return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Account not found.");
 
   const { error } = await auth.supabase
     .from("social_accounts")

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { requireUser, parseUuidParam } from "@/lib/api/helpers";
 import { extractWebsiteFilesFromBlueprint } from "@/plugins/website/iteration";
 import type { GeneratedWebsiteProject } from "@/plugins/website/types";
@@ -34,10 +35,10 @@ export async function GET(_request: Request, { params }: Params) {
     .maybeSingle();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, error.message);
   }
   if (!existing) {
-    return NextResponse.json({ error: "Website not found." }, { status: 404 });
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Website not found.");
   }
 
   const generation = existing as WebsiteGeneration;
@@ -45,10 +46,7 @@ export async function GET(_request: Request, { params }: Params) {
   const files = extractWebsiteFilesFromBlueprint(generation.blueprint);
 
   if (!files.length) {
-    return NextResponse.json(
-      { error: "Generation has no files to analyze." },
-      { status: 400 },
-    );
+    return apiValidationError("Generation has no files to analyze.");
   }
 
   const profile = (project.businessProfile ||

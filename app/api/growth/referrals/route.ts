@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
 import { enforceMutationRateLimit } from "@/lib/api/rate-limit";
 import { referralInviteSchema } from "@/lib/growth/schemas";
@@ -16,18 +17,12 @@ export async function POST(request: Request) {
 
   const parsed = referralInviteSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid invite" },
-      { status: 400 },
-    );
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const referral = await ensureReferralProfile(auth.supabase, auth.user!.id);
   if (!referral) {
-    return NextResponse.json(
-      { error: "Growth engine migration required." },
-      { status: 503 },
-    );
+    return apiErrorResponse(API_ERROR_CODES.MIGRATION_REQUIRED, 503, "Growth engine migration required.");
   }
 
   const email = parsed.data.email.toLowerCase();
@@ -43,7 +38,7 @@ export async function POST(request: Request) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, error.message);
   }
 
   await auth.supabase

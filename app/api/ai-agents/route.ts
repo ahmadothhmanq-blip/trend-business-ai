@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
 import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { enforceMutationRateLimit } from "@/lib/api/rate-limit";
@@ -70,7 +71,7 @@ export async function POST(request: Request) {
     const rateLimited = enforceMutationRateLimit(auth.user!.id);
     if (rateLimited) return rateLimited;
     const parsed = createAgentSchema.safeParse(body);
-    if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0]?.message }, { status: 400 });
+    if (!parsed.success) return apiValidationError(parsed.error.issues[0]?.message);
 
     const slug = parsed.data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 60);
     const { data, error } = await auth.supabase.from("agents").insert({
@@ -89,7 +90,7 @@ export async function POST(request: Request) {
     }).select("*").single();
 
     if (error) {
-      if (error.code === "42P01") return NextResponse.json({ error: "Agents table not ready. Apply migration 022." }, { status: 503 });
+      if (error.code === "42P01") return apiErrorResponse(API_ERROR_CODES.MIGRATION_REQUIRED, 503, "Agents table not ready. Apply migration 022.");
       return databaseErrorResponse("agents.create", error);
     }
     await logAgentAudit(auth.supabase, { user_id: auth.user!.id, action: "create", entity_type: "agent", entity_id: data?.id });
@@ -97,7 +98,7 @@ export async function POST(request: Request) {
   }
 
   const parsed = runAgentSchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0]?.message }, { status: 400 });
+  if (!parsed.success) return apiValidationError(parsed.error.issues[0]?.message);
 
   const rateLimited = await enforceAiUsage(auth.supabase, auth.user!.id, "ai-agents");
   if (rateLimited) return rateLimited;

@@ -1,6 +1,8 @@
 import Script from "next/script";
 import { getAnalyticsConfig } from "@/lib/seo/analytics";
 
+export { AnalyticsNoscript } from "@/components/seo/analytics-noscript";
+
 /**
  * Loads GA4 / GTM only when measurement IDs are configured.
  * Safe no-op in local/dev without env vars.
@@ -35,22 +37,5 @@ export function AnalyticsScripts() {
         </>
       ) : null}
     </>
-  );
-}
-
-export function AnalyticsNoscript() {
-  const { gtmId } = getAnalyticsConfig();
-  if (!gtmId) return null;
-
-  return (
-    <noscript>
-      <iframe
-        src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
-        height="0"
-        width="0"
-        style={{ display: "none", visibility: "hidden" }}
-        title="Google Tag Manager"
-      />
-    </noscript>
   );
 }

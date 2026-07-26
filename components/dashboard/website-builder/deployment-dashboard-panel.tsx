@@ -13,11 +13,20 @@ import {
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import { cn } from "@/lib/utils";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
 import type { DeploymentDashboard } from "@/lib/ai-core/deployment";
 import type { WebsiteDomain } from "@/lib/ai-core/domains";
+import { useWebsitePublish } from "@/lib/hooks/use-website-publish";
 
 export function DeploymentDashboardPanel(props: {
   generationId: string | null;
@@ -25,9 +34,11 @@ export function DeploymentDashboardPanel(props: {
   const wb = useProductT("websiteBuilder");
   const [dashboard, setDashboard] = useState<DeploymentDashboard | null>(null);
   const [loading, setLoading] = useState(false);
-  const [busy, setBusy] = useState<string | null>(null);
   const [hostname, setHostname] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [domainToRemove, setDomainToRemove] = useState<WebsiteDomain | null>(null);
+  const [domainBusy, setDomainBusy] = useState<string | null>(null);
+  const publish = useWebsitePublish(props.generationId);
 
   const load = useCallback(async () => {
     if (!props.generationId) {
@@ -60,40 +71,29 @@ export function DeploymentDashboardPanel(props: {
 
   const runAction = async (
     action: "prepare" | "publish" | "unpublish" | "archive" | "republish",
+    force = false,
   ) => {
     if (!props.generationId) return;
-    setBusy(action);
-    try {
-      const res = await fetch(
-        `/api/website-builder/${props.generationId}/deploy`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action }),
-        },
+    const data = await publish.runAction(action, { force });
+    if (!data.ok) {
+      toast.error(
+        data.blockers?.[0] ?? data.error ?? wb("management.errors.actionFailed"),
       );
-      const data = (await res.json()) as {
-        error?: string;
-        dashboard?: DeploymentDashboard;
-        publicUrl?: string;
-      };
-      if (!res.ok) throw new Error(data.error || wb("management.errors.actionFailed"));
-      if (data.dashboard) setDashboard(data.dashboard);
-      toast.success(
-        action === "publish" || action === "republish"
-          ? wb("panels.publishedToast", { url: data.publicUrl ? `: ${data.publicUrl}` : "" })
-          : wb("panels.deploymentAction", { action }),
-      );
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : wb("management.errors.actionFailed"));
-    } finally {
-      setBusy(null);
+      return;
     }
+    if (data.dashboard) setDashboard(data.dashboard);
+    toast.success(
+      action === "publish" || action === "republish"
+        ? wb("panels.publishedToast", {
+            url: data.publicUrl ? `: ${data.publicUrl}` : "",
+          })
+        : wb("panels.deploymentAction", { action }),
+    );
   };
 
   const addDomain = async () => {
     if (!props.generationId || !hostname.trim()) return;
-    setBusy("add-domain");
+    setDomainBusy("add-domain");
     try {
       const res = await fetch(
         `/api/website-builder/${props.generationId}/domains`,
@@ -111,13 +111,13 @@ export function DeploymentDashboardPanel(props: {
     } catch (err) {
       toast.error(err instanceof Error ? err.message : wb("panels.failedAddDomain"));
     } finally {
-      setBusy(null);
+      setDomainBusy(null);
     }
   };
 
   const verifyDomain = async (domainId: string, simulate = false) => {
     if (!props.generationId) return;
-    setBusy(`verify-${domainId}`);
+    setDomainBusy(`verify-${domainId}`);
     try {
       const res = await fetch(
         `/api/website-builder/${props.generationId}/domains/verify`,
@@ -137,13 +137,14 @@ export function DeploymentDashboardPanel(props: {
     } catch (err) {
       toast.error(err instanceof Error ? err.message : wb("panels.verificationFailed"));
     } finally {
-      setBusy(null);
+      setDomainBusy(null);
     }
   };
 
-  const removeDomain = async (domainId: string) => {
-    if (!props.generationId) return;
-    setBusy(`remove-${domainId}`);
+  const confirmRemoveDomain = async () => {
+    if (!props.generationId || !domainToRemove) return;
+    const domainId = domainToRemove.id;
+    setDomainBusy(`remove-${domainId}`);
     try {
       const res = await fetch(
         `/api/website-builder/${props.generationId}/domains`,
@@ -158,13 +159,16 @@ export function DeploymentDashboardPanel(props: {
         throw new Error(data.error || wb("panels.removeFailed"));
       }
       toast.success(wb("panels.domainRemoved"));
+      setDomainToRemove(null);
       await load();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : wb("panels.removeFailed"));
     } finally {
-      setBusy(null);
+      setDomainBusy(null);
     }
   };
+
+  const actionBusy = publish.isBusy || Boolean(domainBusy);
 
   if (!props.generationId) {
     return (
@@ -215,22 +219,22 @@ export function DeploymentDashboardPanel(props: {
           <Button
             variant="outline"
             className="border-white/15 text-white"
-            disabled={Boolean(busy)}
+            disabled={actionBusy}
             onClick={() => void runAction("prepare")}
           >
-            {busy === "prepare" ? (
+            {publish.busy === "prepare" ? (
               <Loader2 className="size-4 animate-spin" />
             ) : null}
             {wb("panels.prepare")}
           </Button>
           <Button
             className="bg-premium-gold text-black hover:bg-premium-gold/90"
-            disabled={Boolean(busy)}
+            disabled={actionBusy}
             onClick={() =>
               void runAction(isPublished ? "republish" : "publish")
             }
           >
-            {busy === "publish" || busy === "republish" ? (
+            {publish.busy === "publish" || publish.busy === "republish" ? (
               <Loader2 className="size-4 animate-spin" />
             ) : (
               <Rocket className="size-4" />
@@ -308,7 +312,7 @@ export function DeploymentDashboardPanel(props: {
               size="sm"
               variant="outline"
               className="border-white/15 text-white"
-              disabled={Boolean(busy)}
+              disabled={actionBusy}
               onClick={() => void runAction("unpublish")}
             >
               {wb("panels.unpublish")}
@@ -317,7 +321,7 @@ export function DeploymentDashboardPanel(props: {
               size="sm"
               variant="outline"
               className="border-white/15 text-white"
-              disabled={Boolean(busy)}
+              disabled={actionBusy}
               onClick={() => void runAction("archive")}
             >
               {wb("panels.archive")}
@@ -343,10 +347,10 @@ export function DeploymentDashboardPanel(props: {
           />
           <Button
             className="bg-premium-gold text-black"
-            disabled={Boolean(busy) || !hostname.trim()}
+            disabled={actionBusy || !hostname.trim()}
             onClick={() => void addDomain()}
           >
-            {busy === "add-domain" ? (
+            {domainBusy === "add-domain" ? (
               <Loader2 className="size-4 animate-spin" />
             ) : null}
             {wb("panels.connectDomain")}
@@ -363,15 +367,53 @@ export function DeploymentDashboardPanel(props: {
               <DomainCard
                 key={domain.id}
                 domain={domain}
-                busy={busy}
+                busy={domainBusy}
                 wb={wb}
                 onVerify={(simulate) => void verifyDomain(domain.id, simulate)}
-                onRemove={() => void removeDomain(domain.id)}
+                onRemove={() => setDomainToRemove(domain)}
               />
             ))
           )}
         </div>
       </DashboardPanel>
+
+      <Dialog
+        open={Boolean(domainToRemove)}
+        onOpenChange={(open) => !open && !domainBusy && setDomainToRemove(null)}
+      >
+        <DialogContent className="border-white/10 bg-[#141414]/95 text-white">
+          <DialogHeader>
+            <DialogTitle>{wb("dialogs.deleteTitle")}</DialogTitle>
+            <DialogDescription className="text-white/45">
+              {domainToRemove
+                ? `${wb("dialogs.deleteDescription")} (${domainToRemove.hostname})`
+                : wb("dialogs.deleteDescription")}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="border-white/10 bg-white/[0.03]">
+            <Button
+              type="button"
+              variant="outline"
+              className="border-white/15 text-white"
+              disabled={Boolean(domainBusy)}
+              onClick={() => setDomainToRemove(null)}
+            >
+              {wb("dialogs.cancel")}
+            </Button>
+            <Button
+              type="button"
+              className="bg-red-500 text-white hover:bg-red-600"
+              disabled={Boolean(domainBusy)}
+              onClick={() => void confirmRemoveDomain()}
+            >
+              {domainBusy?.startsWith("remove-") ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : null}
+              {wb("dialogs.confirm")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <DashboardPanel className="p-4 sm:p-5">
         <h4 className="text-sm font-semibold text-white">{wb("panels.deploymentHistory")}</h4>

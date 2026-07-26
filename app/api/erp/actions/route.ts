@@ -1,4 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { runErpAssistant } from "@/lib/erp";
 import type { ErpAssistantAction } from "@/types/erp";
@@ -28,7 +29,7 @@ export async function POST(request: Request) {
   if (body instanceof NextResponse) return body;
   const parsed = schema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid" }, { status: 400 });
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   try {
@@ -38,6 +39,6 @@ export async function POST(request: Request) {
     });
     return NextResponse.json({ result });
   } catch (e) {
-    return NextResponse.json({ error: e instanceof Error ? e.message : "Action failed" }, { status: 500 });
+    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, e instanceof Error ? e.message : undefined);
   }
 }

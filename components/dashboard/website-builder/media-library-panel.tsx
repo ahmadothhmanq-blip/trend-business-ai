@@ -1,0 +1,183 @@
+"use client";
+
+import { useCallback, useEffect, useRef, useState } from "react";
+import { FolderOpen, Loader2, Search, Trash2, Upload } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import type { WebsiteMediaAsset } from "@/lib/ai-core/website-management/types";
+
+type MediaLibraryPanelProps = {
+  generationId: string;
+  onSelect?: (asset: WebsiteMediaAsset) => void;
+  compact?: boolean;
+  className?: string;
+};
+
+export function MediaLibraryPanel({
+  generationId,
+  onSelect,
+  compact,
+  className,
+}: MediaLibraryPanelProps) {
+  const [assets, setAssets] = useState<WebsiteMediaAsset[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const [query, setQuery] = useState("");
+  const [folder, setFolder] = useState("uploads");
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (folder) params.set("folder", folder);
+      if (query) params.set("q", query);
+      const res = await fetch(
+        `/api/website-builder/${generationId}/media?${params}`,
+      );
+      const json = await res.json();
+      if (res.ok) setAssets(json.assets || []);
+    } finally {
+      setLoading(false);
+    }
+  }, [generationId, folder, query]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  async function uploadFile(file: File) {
+    setUploading(true);
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      form.append("folder", folder);
+      const res = await fetch(`/api/website-builder/${generationId}/media`, {
+        method: "POST",
+        body: form,
+      });
+      if (res.ok) await load();
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function removeAsset(id: string) {
+    await fetch(
+      `/api/website-builder/${generationId}/media?assetId=${encodeURIComponent(id)}`,
+      { method: "DELETE" },
+    );
+    await load();
+  }
+
+  return (
+    <div className={cn("space-y-3", className)}>
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="relative min-w-[140px] flex-1">
+          <Search className="absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-white/30" />
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search media..."
+            className="h-8 border-white/10 bg-white/5 pl-8 text-white"
+          />
+        </div>
+        <Input
+          value={folder}
+          onChange={(e) => setFolder(e.target.value)}
+          placeholder="Folder"
+          className="h-8 w-28 border-white/10 bg-white/5 text-white"
+        />
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) void uploadFile(file);
+            e.target.value = "";
+          }}
+        />
+        <Button
+          size="sm"
+          variant="outline"
+          className="border-white/15 text-white"
+          disabled={uploading}
+          onClick={() => fileRef.current?.click()}
+        >
+          {uploading ? (
+            <Loader2 className="size-3.5 animate-spin" />
+          ) : (
+            <Upload className="size-3.5" />
+          )}
+          Upload
+        </Button>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center gap-2 py-8 text-sm text-white/40">
+          <Loader2 className="size-4 animate-spin" />
+          Loading media...
+        </div>
+      ) : assets.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-white/10 py-10 text-center text-sm text-white/40">
+          <FolderOpen className="mx-auto mb-2 size-6 opacity-40" />
+          No media yet. Upload images to use in your site.
+        </div>
+      ) : (
+        <div
+          className={cn(
+            "grid gap-2",
+            compact ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-3",
+          )}
+        >
+          {assets.map((asset) => (
+            <div
+              key={asset.id}
+              className="group relative overflow-hidden rounded-xl border border-white/[0.08] bg-black/30"
+            >
+              {asset.mime.startsWith("image/") ? (
+                <img
+                  src={asset.url}
+                  alt={asset.alt || asset.filename}
+                  className="aspect-video w-full object-cover"
+                />
+              ) : (
+                <div className="flex aspect-video items-center justify-center text-xs text-white/40">
+                  {asset.mime}
+                </div>
+              )}
+              <div className="p-2">
+                <p className="truncate text-[11px] text-white/70">
+                  {asset.filename}
+                </p>
+                <p className="text-[10px] text-white/30">{asset.folder}</p>
+              </div>
+              <div className="absolute inset-x-0 bottom-0 flex gap-1 bg-gradient-to-t from-black/80 to-transparent p-2 opacity-0 transition group-hover:opacity-100">
+                {onSelect ? (
+                  <Button
+                    size="sm"
+                    className="h-7 flex-1 bg-premium-gold text-[10px] text-black"
+                    onClick={() => onSelect(asset)}
+                  >
+                    Use
+                  </Button>
+                ) : null}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 border-red-500/30 px-2 text-red-300"
+                  onClick={() => void removeAsset(asset.id)}
+                >
+                  <Trash2 className="size-3" />
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
