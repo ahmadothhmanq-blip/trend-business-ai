@@ -33,8 +33,14 @@ import type { AppIntelligenceReport, AppQualityReport } from "@/lib/ai-core/app-
 import type { AppPreviewPayload, VisualEditorState } from "@/lib/ai-core/app-design-platform/types";
 import { PREVIEW_DEVICE_FRAMES } from "@/lib/ai-core/app-design-platform/preview";
 import { brandTokensToCssVars } from "@/lib/ai-core/app-design-platform/brand";
+import { AppCopilotCommandPanel } from "@/components/dashboard/webapp-builder/app-copilot-command-panel";
+import type { AppCopilotUndoSnapshot } from "@/components/dashboard/webapp-builder/hooks/use-app-copilot-command";
+import type { GeneratedProjectFile } from "@/lib/ai/types";
+import type { WebAppGeneration } from "@/types/webapp";
+import { readBlueprintRevisionFromGeneration } from "@/lib/webapp/platform/revision";
 
 type ManagePayload = {
+  generation: WebAppGeneration;
   model: StructuredAppModel;
   history: AppVersionHistory;
   intelligence: AppIntelligenceReport;
@@ -72,7 +78,6 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
   const [tab, setTab] = useState<Tab>("overview");
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<ManagePayload | null>(null);
-  const [assistantMsg, setAssistantMsg] = useState("");
   const [appName, setAppName] = useState("");
   const [primary, setPrimary] = useState("");
   const [newItemTitle, setNewItemTitle] = useState("");
@@ -82,6 +87,8 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [propTitle, setPropTitle] = useState("");
   const [deployStatus, setDeployStatus] = useState<string | null>(null);
+  const [revision, setRevision] = useState(0);
+  const [files, setFiles] = useState<GeneratedProjectFile[]>([]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -95,6 +102,8 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
       setData(json);
       setAppName(json.model.settings.appName);
       setPrimary(json.model.brand.tokens.primary);
+      setRevision(readBlueprintRevisionFromGeneration(json.generation));
+      setFiles(json.generation?.blueprint?.files ?? []);
     } catch {
       toast.error(p("errors.loadManagementFailed"));
     } finally {
@@ -801,34 +810,37 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
         </DashboardCard>
       )}
 
-      {tab === "assistant" && (
-        <DashboardCard>
-          <DashboardCardHeader>
-            <DashboardCardTitle>{p("management.aiAssistant")}</DashboardCardTitle>
-            <DashboardCardDescription>
-              {p("management.aiAssistantDescription")}
-            </DashboardCardDescription>
-          </DashboardCardHeader>
-          <DashboardCardContent className="space-y-3">
-            <Textarea
-              value={assistantMsg}
-              onChange={(e) => setAssistantMsg(e.target.value)}
-              placeholder={p("management.assistantPlaceholder")}
-              className={cn(dashboardInputClass, "min-h-[100px]")}
-            />
-            <Button
-              className="btn-gold rounded-xl font-bold text-luxury-black"
-              disabled={busy || !assistantMsg.trim()}
-              onClick={() => {
-                void postAction({ action: "assistant", message: assistantMsg }).then(() =>
-                  setAssistantMsg(""),
-                );
-              }}
-            >
-              <Sparkles className="mr-2 size-4" /> {p("management.applyWithAi")}
-            </Button>
-          </DashboardCardContent>
-        </DashboardCard>
+      {tab === "assistant" && data && (
+        <AppCopilotCommandPanel
+          generationId={generationId}
+          expectedRevision={revision}
+          disabled={busy}
+          getUndoSnapshot={() => {
+            if (!data) return null;
+            return {
+              model: data.model,
+              files,
+              generation: data.generation,
+              revision,
+            } satisfies AppCopilotUndoSnapshot;
+          }}
+          onApplied={({ model, files: nextFiles, generation, revision: nextRevision }) => {
+            setData((current) =>
+              current
+                ? {
+                    ...current,
+                    model,
+                    generation,
+                  }
+                : current,
+            );
+            setFiles(nextFiles);
+            setRevision(nextRevision);
+            setAppName(model.settings.appName);
+            setPrimary(model.brand.tokens.primary);
+            void load();
+          }}
+        />
       )}
 
       {tab === "intelligence" && (

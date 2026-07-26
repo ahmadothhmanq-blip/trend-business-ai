@@ -32,6 +32,11 @@ import type {
 } from "@/lib/ai-core/design-renderer";
 import { isIndustryId } from "@/lib/ai-core/templates/industries";
 import type { IndustryId, TemplateSelection } from "@/lib/ai-core/templates/types";
+import { getWebsiteIndustryIntelligence } from "@/lib/ai-core/industry-intelligence/profiles";
+import {
+  buildWebsiteGenerationKey,
+  resolveWebsiteOutputLanguage,
+} from "@/lib/ai-core/website-builder/prompt-industry";
 import {
   buildSeoPackageFromStrategy,
   checkSeoReadiness,
@@ -76,6 +81,10 @@ import type {
   WebsiteStrategy,
 } from "@/plugins/website/types";
 import {
+  applyLocaleToWebsiteFiles,
+  resolveLocaleFromLanguage,
+} from "@/lib/ai-core/website-design-platform/i18n";
+import {
   applyWebsiteStyleIntent,
   resolveWebsiteStyleIntent,
 } from "@/lib/website/style-resolution";
@@ -85,6 +94,10 @@ import {
   isUltraFastWebsiteGenerationEnabled,
   resolveWebsiteGenerationProfile,
 } from "@/lib/website/generation-flags";
+import {
+  buildGenerationRepairInstruction,
+  validateWebsiteGeneration,
+} from "@/lib/ai-core/website-builder/generation-validation";
 export const WEBSITE_BUILDER_PRODUCT_ID = "website-builder";
 
 const INPUT_META_KEY = "websiteGenerationInput";
@@ -104,6 +117,18 @@ type PremiumTemplatePlan = {
   recommendedComponents?: DesignRendererComponentId[];
   sections: PremiumTemplateSectionPlan[];
 };
+
+function resolveBusinessIndustryLabel(
+  template: TemplateSelection | null | undefined,
+  analysisIndustry: string,
+): string {
+  const intel = template?.industryIntelligence;
+  if (intel?.label?.trim()) return intel.label.trim();
+  if (template?.industryId && isIndustryId(String(template.industryId))) {
+    return getWebsiteIndustryIntelligence(template.industryId).label;
+  }
+  return analysisIndustry;
+}
 
 function extractPremiumTemplatePlan(
   template?: TemplateSelection | null,
@@ -332,14 +357,16 @@ function applyDesignRenderer(
 export function websiteInputToBrief(
   input: WebsiteGenerationInput,
 ): CoreBrief {
+  const language = resolveWebsiteOutputLanguage(input.prompt, input.language);
+  const locale = resolveLocaleFromLanguage(language);
   return {
     prompt: input.prompt,
     productId: WEBSITE_BUILDER_PRODUCT_ID,
-    language: input.language,
+    language,
     theme: input.theme,
     features: input.features,
     metadata: {
-      [INPUT_META_KEY]: input,
+      [INPUT_META_KEY]: { ...input, language, locale: language },
       ...(input.templateId
         ? {
             templateId: input.templateId,
@@ -366,7 +393,8 @@ export function websiteInputToBrief(
       ...(input.brandIdentityId
         ? { brandIdentityId: input.brandIdentityId }
         : {}),
-      ...(input.locale ? { locale: input.locale } : {}),
+      ...(input.locale ? { locale: input.locale } : { locale: language }),
+      ...(locale.rtl ? { dir: locale.dir, rtl: true, htmlLang: locale.htmlLang } : {}),
       ...(input.formEmailTo ? { formEmailTo: input.formEmailTo } : {}),
       ...(input.formWebhookUrl
         ? { formWebhookUrl: input.formWebhookUrl }
@@ -470,7 +498,10 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
           isSaas: analysis.isSaas || template.industryId === "saas",
           businessProfile: {
             ...analysis.businessProfile,
-            industry: template.label || analysis.businessProfile.industry,
+            industry: resolveBusinessIndustryLabel(
+              template,
+              analysis.businessProfile.industry,
+            ),
             requiredSections,
             tone:
               intel?.contentStyle ||
@@ -512,7 +543,10 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
               : intel.recommendedPages,
           businessProfile: {
             ...analysis.businessProfile,
-            industry: template?.label || analysis.businessProfile.industry,
+            industry: resolveBusinessIndustryLabel(
+              template,
+              analysis.businessProfile.industry,
+            ),
             requiredSections: Array.from(
               new Set([
                 ...intel.requiredSections,
@@ -883,8 +917,12 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
       const { runAiImageEngine } = await import(
         "@/lib/ai-core/image-engine"
       );
-      const generationKey =
-        input.parentGenerationId ?? `draft-${Date.now()}`;
+      const generationKey = buildWebsiteGenerationKey({
+        userId: input.userId,
+        parentGenerationId: input.parentGenerationId,
+        mode: input.mode,
+        prompt: input.prompt,
+      });
       const designPlan =
         artifacts.designPlan ||
         (brief.metadata?.designPlan as
@@ -1617,6 +1655,10 @@ registerProductEngineAdapter(websiteBuilderAdapterDefinition);
 export function priorArtifactsFromWebsiteInput(
   input: WebsiteGenerationInput,
 ): Partial<CoreLayerArtifacts> | undefined {
+  const reuseModes = new Set(["continue", "regenerate", "retry"]);
+  if (!input.mode || !reuseModes.has(input.mode)) {
+    return undefined;
+  }
   if (
     !input.previousBusinessProfile &&
     !input.previousStrategy &&

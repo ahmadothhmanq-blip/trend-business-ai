@@ -9,6 +9,7 @@ import {
 } from "@/lib/ai-core/industry-intelligence/profiles";
 import type { IndustryDetectionResult } from "@/lib/ai-core/industry-intelligence/types";
 import type { IndustryId } from "@/lib/ai-core/templates/types";
+import { detectIndustryFromPrompt } from "@/lib/ai-core/website-builder/prompt-industry";
 
 function isKnownIndustryId(value: string): value is IndustryId {
   return value in WEBSITE_INDUSTRY_INTELLIGENCE;
@@ -95,6 +96,24 @@ function aliasToIndustryId(raw: string): IndustryId | null {
   }
   if (normalized.includes("restaurant") || normalized.includes("dining")) {
     return "restaurant";
+  }
+  if (
+    normalized.includes("furniture") ||
+    normalized.includes("sofa") ||
+    normalized.includes("bedroom") ||
+    normalized.includes("أثاث") ||
+    normalized.includes("مفروشات")
+  ) {
+    return "furniture";
+  }
+  if (
+    normalized.includes("technology") ||
+    normalized.includes("computer") ||
+    normalized.includes("hardware") ||
+    normalized.includes("تكنولوجيا") ||
+    normalized.includes("حاسوب")
+  ) {
+    return "technology";
   }
   if (normalized.includes("saas") || normalized.includes("software")) {
     return "saas";
@@ -198,6 +217,16 @@ export async function detectWebsiteIndustry(
   const explicit = explicitIndustry(brief);
   if (explicit) {
     return toResult(explicit, 1, "Explicit industry override.", "explicit");
+  }
+
+  const keywordMatch = detectIndustryFromPrompt(brief.prompt);
+  if (keywordMatch && keywordMatch.confidence >= 0.9) {
+    return toResult(
+      keywordMatch.industryId,
+      keywordMatch.confidence,
+      keywordMatch.reason,
+      "keyword",
+    );
   }
 
   const catalog = PRIMARY_WEBSITE_INDUSTRIES.map((id) => {

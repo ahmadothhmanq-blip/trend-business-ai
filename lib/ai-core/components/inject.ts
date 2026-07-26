@@ -47,6 +47,7 @@ export function injectProfessionalComponents(params: {
   heroEyebrow?: string;
   content?: ProductionContentPack | null;
   composePage?: boolean;
+  language?: string | null;
 }): GeneratedProjectFile[] {
   const paths = new Set<string>([
     SECTION_SHELL_PATH,
@@ -101,6 +102,7 @@ export function injectProfessionalComponents(params: {
         title: params.pageTitle,
         description: params.pageDescription,
         content: params.content,
+        language: params.language,
       }),
       language: "tsx",
     });

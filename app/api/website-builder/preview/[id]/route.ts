@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
+import { API_ERROR_CODES, apiNotFoundError } from "@/lib/i18n/api-errors";
 import path from "node:path";
 import { requireUser } from "@/lib/api/helpers";
 import { verifyPreviewOwner } from "@/lib/api/preview-ownership";

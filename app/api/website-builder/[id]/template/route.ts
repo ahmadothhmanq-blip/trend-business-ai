@@ -2,7 +2,7 @@ import { requireUser, parseJsonBody, parseUuidParam } from "@/lib/api/helpers";
 import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { serverErrorResponse } from "@/lib/api/errors";
 import { updateWebsiteGenerationInPlace } from "@/lib/website/save-generation";
-import { applyTemplateVisualSwitch } from "@/lib/ai-core/template-intelligence";
+import { applyTemplateIntelligenceRetheme } from "@/lib/ai-core/template-intelligence";
 import { extractWebsiteFilesFromBlueprint } from "@/plugins/website/iteration";
 import type { GeneratedWebsiteProject } from "@/plugins/website/types";
 import type { WebsiteGeneration } from "@/types/database";
@@ -77,9 +77,10 @@ export async function POST(request: Request, context: RouteContext) {
       settings: blueprint.settings,
     };
 
-    const switched = applyTemplateVisualSwitch({
+    const switched = applyTemplateIntelligenceRetheme({
       project,
       templateId: parsed.data.templateIntelligenceId,
+      language: generation.language,
     });
 
     const saved = await updateWebsiteGenerationInPlace({

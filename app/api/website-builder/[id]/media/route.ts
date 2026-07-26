@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
-import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
-import { requireUser, parseUuidParam } from "@/lib/api/helpers";
+import { z } from "zod";
+import { API_ERROR_CODES, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
+import { requireUser, parseUuidParam, parseJsonBody } from "@/lib/api/helpers";
 import { serverErrorResponse } from "@/lib/api/errors";
 import { enforceWebsiteUserMutationRateLimit } from "@/lib/website/public-endpoints";
+import { assertBuilderAccess } from "@/lib/website/builder/access";
 import { uploadWebsiteAsset } from "@/lib/website/assets-storage";
 import {
   listMediaAssets,
@@ -19,6 +21,25 @@ const MAX_BYTES = 12 * 1024 * 1024;
 
 type Params = { params: Promise<{ id: string }> };
 
+const patchMediaSchema = z.object({
+  assetId: z.string().uuid(),
+  folder: z.string().max(80).optional(),
+  filename: z.string().max(200).optional(),
+  alt: z.string().max(200).optional(),
+});
+
+async function assertMediaAccess(
+  supabase: NonNullable<Awaited<ReturnType<typeof requireUser>>["supabase"]>,
+  userId: string,
+  generationId: string,
+) {
+  const access = await assertBuilderAccess(supabase, userId, generationId, "manage");
+  if (!access) {
+    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Website not found.");
+  }
+  return null;
+}
+
 export async function GET(request: Request, { params }: Params) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
@@ -27,19 +48,8 @@ export async function GET(request: Request, { params }: Params) {
   const parsedId = parseUuidParam(rawId, "generation id");
   if (parsedId instanceof NextResponse) return parsedId;
 
-  const { data, error } = await auth.supabase
-    .from("website_generations")
-    .select("id")
-    .eq("id", parsedId.id)
-    .eq("user_id", auth.user!.id)
-    .maybeSingle();
-
-  if (error) {
-    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, error.message);
-  }
-  if (!data) {
-    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Website not found.");
-  }
+  const denied = await assertMediaAccess(auth.supabase!, auth.user!.id, parsedId.id);
+  if (denied) return denied;
 
   const url = new URL(request.url);
   const folder = url.searchParams.get("folder") || undefined;
@@ -65,19 +75,8 @@ export async function POST(request: Request, { params }: Params) {
   const parsedId = parseUuidParam(rawId, "generation id");
   if (parsedId instanceof NextResponse) return parsedId;
 
-  const { data, error } = await auth.supabase
-    .from("website_generations")
-    .select("id")
-    .eq("id", parsedId.id)
-    .eq("user_id", auth.user!.id)
-    .maybeSingle();
-
-  if (error) {
-    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, error.message);
-  }
-  if (!data) {
-    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Website not found.");
-  }
+  const denied = await assertMediaAccess(auth.supabase!, auth.user!.id, parsedId.id);
+  if (denied) return denied;
 
   try {
     const form = await request.formData();
@@ -131,28 +130,31 @@ export async function PATCH(request: Request, { params }: Params) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
+  const rateLimited = await enforceWebsiteUserMutationRateLimit(auth.user!.id);
+  if (rateLimited) return rateLimited;
+
   const { id: rawId } = await params;
   const parsedId = parseUuidParam(rawId, "generation id");
   if (parsedId instanceof NextResponse) return parsedId;
 
-  const body = (await request.json()) as {
-    assetId?: string;
-    folder?: string;
-    filename?: string;
-    alt?: string;
-  };
+  const denied = await assertMediaAccess(auth.supabase!, auth.user!.id, parsedId.id);
+  if (denied) return denied;
 
-  if (!body.assetId) {
-    return apiValidationError("assetId is required");
+  const body = await parseJsonBody<unknown>(request);
+  if (body instanceof NextResponse) return body;
+
+  const parsed = patchMediaSchema.safeParse(body);
+  if (!parsed.success) {
+    return apiValidationError(parsed.error.issues[0]?.message);
   }
 
   const asset = await patchMediaAsset(
     parsedId.id,
-    body.assetId,
+    parsed.data.assetId,
     {
-      folder: body.folder,
-      filename: body.filename,
-      alt: body.alt,
+      folder: parsed.data.folder,
+      filename: parsed.data.filename,
+      alt: parsed.data.alt,
     },
     auth.supabase,
   );
@@ -168,9 +170,15 @@ export async function DELETE(request: Request, { params }: Params) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
+  const rateLimited = await enforceWebsiteUserMutationRateLimit(auth.user!.id);
+  if (rateLimited) return rateLimited;
+
   const { id: rawId } = await params;
   const parsedId = parseUuidParam(rawId, "generation id");
   if (parsedId instanceof NextResponse) return parsedId;
+
+  const denied = await assertMediaAccess(auth.supabase!, auth.user!.id, parsedId.id);
+  if (denied) return denied;
 
   const url = new URL(request.url);
   const assetId = url.searchParams.get("assetId");

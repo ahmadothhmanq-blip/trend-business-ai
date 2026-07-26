@@ -9,6 +9,7 @@ import type {
 } from "@/plugins/website/types";
 import type { GenerationContext } from "@/lib/ai/types";
 import type { ProjectCapabilityFlags } from "@/lib/ai/validator";
+import { detectIndustryFromPrompt } from "@/lib/ai-core/website-builder/prompt-industry";
 
 function normalizeDatabaseProvider(
   value: string,
@@ -20,9 +21,10 @@ function normalizeDatabaseProvider(
 }
 
 function fallbackProfile(input: WebsiteGenerationInput): BusinessProfile {
+  const detected = detectIndustryFromPrompt(input.prompt);
   return {
     projectName: input.projectType.slice(0, 60) || "New Website",
-    industry: "General",
+    industry: detected?.label || "General",
     targetAudience: "Target customers described in the brief",
     businessGoals: ["Generate leads", "Build trust", "Convert visitors"],
     offer: input.prompt.slice(0, 200),

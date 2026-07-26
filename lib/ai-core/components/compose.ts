@@ -1,6 +1,10 @@
 import { DESIGN_RENDERER_COMPONENTS } from "@/lib/ai-core/design-renderer/components";
 import type { DesignRendererComponentId } from "@/lib/ai-core/design-renderer/types";
 import type { ProductionContentPack } from "@/lib/ai-core/content/production-content";
+import {
+  getComposeUiFallbacks,
+  resolveContentLanguage,
+} from "@/lib/ai-core/content/content-language";
 
 function isComponentId(id: string): id is DesignRendererComponentId {
   return id in DESIGN_RENDERER_COMPONENTS;
@@ -122,9 +126,12 @@ export function composeHomePage(params: {
   secondaryCta?: string;
   heroEyebrow?: string;
   content?: ProductionContentPack | null;
+  language?: string | null;
 }): string {
   const ids = params.componentIds.filter(isComponentId);
   const content = params.content;
+  const ui = getComposeUiFallbacks(params.language);
+  const contentLang = resolveContentLanguage(params.language);
 
   const headerId: DesignRendererComponentId =
     ids.find((id) => HEADER_IDS.has(id)) ?? "SiteHeader";
@@ -150,26 +157,26 @@ export function composeHomePage(params: {
     return `import { ${spec.exportName} } from "${importPath}";`;
   });
 
-  const brand = params.brandName || "Brand";
-  const title = params.title || `${brand} — Professional website`;
+  const brand = params.brandName || (contentLang === "ar" ? "العلامة" : "Brand");
+  const title = params.title || `${brand} — ${ui.pageTitleSuffix}`;
   const description =
     params.description ||
     content?.brandTagline ||
-    `${brand} website built with Trend Business AI Professional Components Library.`;
+    `${brand} ${ui.pageDescriptionSuffix}`;
   const heroTitle = params.heroHeadline || content?.heroHeadline || title;
   const heroSubtitle =
     params.heroSubheadline || content?.heroSubheadline || description;
   const primaryCta =
-    params.primaryCta || content?.primaryCta || "Get started";
+    params.primaryCta || content?.primaryCta || ui.primaryCta;
   const secondaryCta =
-    params.secondaryCta || content?.secondaryCta || "Learn more";
+    params.secondaryCta || content?.secondaryCta || ui.secondaryCta;
   const heroEyebrow =
-    params.heroEyebrow || content?.heroEyebrow || "Premium experience";
+    params.heroEyebrow || content?.heroEyebrow || ui.heroEyebrow;
   const navLinks = content?.navLinks || [
-    { href: "#services", label: "Services" },
-    { href: "#features", label: "Features" },
-    { href: "#pricing", label: "Pricing" },
-    { href: "#contact", label: "Contact" },
+    { href: "#services", label: ui.navServices },
+    { href: "#features", label: ui.navFeatures },
+    { href: "#pricing", label: ui.navPricing },
+    { href: "#contact", label: ui.navContact },
   ];
 
   const renderSection = (id: DesignRendererComponentId): string => {

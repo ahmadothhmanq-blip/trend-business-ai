@@ -2,25 +2,7 @@ import { NextResponse } from "next/server";
 import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { z } from "zod";
 import { requireUser, parseUuidParam } from "@/lib/api/helpers";
-import { extractWebsiteFilesFromBlueprint } from "@/plugins/website/iteration";
-import { persistWebsiteGeneration } from "@/lib/website/save-generation";
-import type { GeneratedWebsiteProject } from "@/plugins/website/types";
-import type { WebsiteGeneration } from "@/types/database";
-import { runSeoAgent } from "@/lib/ai-core/seo-agent";
-import {
-  applySeoPackageFix,
-  getSeoFix,
-} from "@/lib/ai-core/seo-optimizer";
-import {
-  runWebsiteEditor,
-  type WebsiteEditAction,
-} from "@/lib/ai-core/website-editor";
-import { buildWebsiteAnalyticsSummary } from "@/lib/ai-core/analytics";
-import { runConversionOptimizer } from "@/lib/ai-core/conversion-optimizer";
-import type {
-  CoreBusinessProfile,
-  CoreProductStrategy,
-} from "@/lib/ai-core/layers/types";
+import { executeWebsiteSeoApply } from "@/lib/website/platform/services/seo-service";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -31,6 +13,8 @@ const applySchema = z.object({
   fixId: z.string().trim().min(1).max(120),
   /** When true, also run editor actions for dual-mode fixes. */
   applyEditor: z.boolean().optional(),
+  expectedRevision: z.number().int().min(0).optional(),
+  idempotencyKey: z.string().trim().max(128).optional(),
 });
 
 /**
@@ -56,152 +40,45 @@ export async function POST(request: Request, { params }: Params) {
     return apiValidationError(parsed.error.issues[0]?.message);
   }
 
-  const { data: existing, error } = await auth.supabase
-    .from("website_generations")
-    .select("*")
-    .eq("id", parsedId.id)
-    .eq("user_id", auth.user!.id)
-    .maybeSingle();
-
-  if (error) {
-    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, error.message);
-  }
-  if (!existing) {
-    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Website not found.");
-  }
-
-  const generation = existing as WebsiteGeneration;
-  const project = generation.blueprint as unknown as GeneratedWebsiteProject;
-  const files = extractWebsiteFilesFromBlueprint(generation.blueprint);
-  if (!files.length) {
-    return apiValidationError("Generation has no editable files.");
-  }
-
-  const profile = (project.businessProfile ||
-    null) as CoreBusinessProfile | null;
-  const strategy = (project.strategy || null) as CoreProductStrategy | null;
-
-  const analytics = await buildWebsiteAnalyticsSummary(
-    parsedId.id,
-    14,
-    auth.supabase,
-  );
-  const conversionOptimizer = await runConversionOptimizer({
-    generationId: parsedId.id,
-    conversionReport: project.conversionReport ?? null,
-    industry: profile?.industry || null,
-    projectName: generation.project_name || profile?.projectName || null,
-    client: auth.supabase,
-  });
-
-  const agent = runSeoAgent({
-    generationId: parsedId.id,
-    files,
-    strategy: strategy || undefined,
-    profile: profile || undefined,
-    industryId: profile?.industry || null,
-    seoPackage: project.seoPackage || null,
-    performanceReport: project.performanceReport || null,
-    assetManifest: (project.assetManifest as never) || null,
-    analytics,
-    conversionOptimizer,
-  });
-
-  const fix = getSeoFix(agent.optimizer, parsed.data.fixId);
-  if (!fix) {
-    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "SEO fix not found.");
-  }
-
-  let nextFiles = files;
-  let seoPackage = project.seoPackage;
-  const notes: string[] = [];
-
   try {
-    if (fix.injectSeoPackage || fix.applyMode === "seo-package" || fix.applyMode === "both") {
-      const applied = applySeoPackageFix({
-        files: nextFiles,
-        optimizer: agent.optimizer,
-        fixId: fix.id,
-      });
-      nextFiles = applied.files;
-      seoPackage = applied.seoPackage;
-      notes.push(...applied.notes);
+    const result = await executeWebsiteSeoApply({
+      supabase: auth.supabase,
+      userId: auth.user!.id,
+      generationId: parsedId.id,
+      request: {
+        fixId: parsed.data.fixId,
+        applyEditor: parsed.data.applyEditor,
+      },
+      commit: {
+        expectedRevision: parsed.data.expectedRevision,
+        idempotencyKey: parsed.data.idempotencyKey,
+      },
+    });
+
+    if (!result.ok) {
+      if (result.code === "NOT_FOUND") {
+        return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, result.error);
+      }
+      if (result.code === "VALIDATION") {
+        return apiValidationError(result.error);
+      }
+      if (result.code === "CONFLICT") {
+        return apiErrorResponse(API_ERROR_CODES.CONFLICT, 409, result.error);
+      }
+      return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, result.error);
     }
 
-    const shouldEditor =
-      parsed.data.applyEditor !== false &&
-      (fix.applyMode === "editor" || fix.applyMode === "both") &&
-      (fix.command || fix.actions?.length);
-
-    if (shouldEditor) {
-      const editResult = runWebsiteEditor({
-        files: nextFiles,
-        project: { ...project, files: nextFiles },
-        command: fix.command || fix.title,
-        actions: (fix.actions || []) as WebsiteEditAction[],
-      });
-      nextFiles = editResult.files;
-      notes.push(editResult.summary);
-      notes.push(...editResult.appliedNotes.slice(0, 4));
-    }
+    return NextResponse.json({
+      success: true,
+      fix: result.fix,
+      notes: result.notes,
+      report: result.report,
+      project: result.project,
+      generation: result.generation,
+      message: `Applied: ${result.fix.title}`,
+    });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Apply fix failed";
     return apiValidationError(message);
   }
-
-  const nextProject: GeneratedWebsiteProject = {
-    ...project,
-    files: nextFiles,
-    seoPackage: seoPackage || agent.optimizer.assets.seoPackage,
-    seoPerformanceReport: agent.analysis.performanceReport,
-    progressEvents: [
-      ...(project.progressEvents ?? []),
-      `[seo-agent] Applied fix ${fix.id}: ${fix.title}`,
-    ],
-  };
-
-  const saved = await persistWebsiteGeneration({
-    supabase: auth.supabase,
-    userId: auth.user!.id,
-    project: nextProject,
-    projectKind: nextProject.projectKind ?? "website",
-    input: {
-      prompt: generation.business_description || `SEO fix: ${fix.title}`,
-      language: "en",
-      theme: "modern",
-      features: [],
-      productId: "website-builder",
-      projectId: generation.project_id ?? undefined,
-      mode: "continue",
-      parentGenerationId: parsedId.id,
-      continueInstruction: fix.command || fix.title,
-    },
-  });
-
-  if (!saved.ok) {
-    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, saved.error);
-  }
-
-  // Re-run agent on saved files for refreshed dashboard
-  const refreshed = runSeoAgent({
-    generationId: parsedId.id,
-    files: extractWebsiteFilesFromBlueprint(saved.generation.blueprint),
-    strategy: strategy || undefined,
-    profile: profile || undefined,
-    industryId: profile?.industry || null,
-    seoPackage: saved.project.seoPackage || null,
-    performanceReport: saved.project.performanceReport || null,
-    analytics,
-    conversionOptimizer,
-  });
-
-  return NextResponse.json({
-    success: true,
-    fix,
-    notes,
-    report: refreshed,
-    project: saved.project,
-    generation: saved.generation,
-    message: `Applied: ${fix.title}`,
-  });
 }

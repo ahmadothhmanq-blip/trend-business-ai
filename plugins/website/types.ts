@@ -214,6 +214,8 @@ export type GeneratedWebsiteProject = {
   editorSuggestions?: import("@/lib/ai-core/website-editor").WebsiteEditorSuggestionsReport;
   /** Final Website Quality Intelligence — unified pre-publish scores + actions */
   finalQualityReport?: import("@/lib/ai-core/final-quality").FinalWebsiteQualityReport;
+  /** Phase 0 platform revision metadata (also mirrored on website_generations.blueprint_revision). */
+  platformRevision?: import("@/lib/website/platform/types").BlueprintPlatformRevision;
 };
 
 export type { GeneratedProjectFile };

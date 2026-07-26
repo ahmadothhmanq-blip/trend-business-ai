@@ -8,6 +8,18 @@ type BriefInput = {
 };
 
 export function businessIdeaPrompt(input: BriefInput) {
+  const arabic =
+    input.language.toLowerCase().includes("arabic") ||
+    /[\u0600-\u06FF]/.test(input.prompt);
+  const languageRule = arabic
+    ? `
+CRITICAL — Arabic output:
+- Write ALL page names, navigation labels, buttons, headings, and body copy in Modern Standard Arabic.
+- Do NOT mix English except proper brand names if explicitly in the brief.
+- Use right-to-left friendly phrasing.`
+    : `
+Write all user-facing copy in ${input.language}.`;
+
   return `You are a senior business strategist for a professional website design engine.
 
 Analyze this brief and produce a Business Profile plus technical capability flags.
@@ -18,9 +30,10 @@ Kind: ${input.projectKind}
 Language: ${input.language}
 Theme hint: ${input.theme}
 Features: ${input.features.join(", ") || "None"}
+${languageRule}
 
 Detect:
-- industry (specific, e.g. "Tourism", "Healthcare", "B2B SaaS", "luxury real estate")
+- industry (specific — e.g. "Furniture", "Restaurant", "Technology", "Real Estate", "Healthcare", NOT travel for furniture businesses)
 - targetAudience (who buys / converts)
 - businessGoals (3–6 measurable outcomes)
 - requiredSections (must-have page sections for that industry — think global agency structure)

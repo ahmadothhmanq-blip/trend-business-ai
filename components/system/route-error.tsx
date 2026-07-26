@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { AlertTriangle, RotateCcw } from "lucide-react";
-import { BrandLogo } from "@/components/ui/brand-logo";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -56,7 +55,9 @@ export function RouteError({
           <AlertTriangle className="size-6 text-destructive" aria-hidden="true" />
         </div>
         <div className="mx-auto mb-2 flex justify-center">
-          <BrandLogo size="md" />
+          <div className="flex size-10 items-center justify-center rounded-xl border border-premium-gold/25 bg-premium-gold/10 text-premium-gold">
+            <span className="text-xs font-bold tracking-[0.18em]">TBA</span>
+          </div>
         </div>
         <CardTitle className="text-xl">{resolvedTitle}</CardTitle>
         <CardDescription>{resolvedDescription}</CardDescription>

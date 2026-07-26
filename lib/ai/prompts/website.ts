@@ -105,6 +105,13 @@ export function websiteFilePrompt(args: {
     ? `\nPrevious attempt failed validation:\n${args.validationReason}\nFix all issues and regenerate this file correctly.`
     : "";
 
+  const arabic =
+    args.input.language.toLowerCase().includes("arabic") ||
+    /[\u0600-\u06FF]/.test(args.input.prompt);
+  const languageDirective = arabic
+    ? `\nLANGUAGE (mandatory): Write ALL visible text in Modern Standard Arabic — navigation, buttons, headings, forms, labels, and body copy. Do not use English except untranslated brand names. Layout must support RTL (dir=rtl).`
+    : `\nLANGUAGE: Write all user-facing copy in ${args.input.language}.`;
+
   const layerNote = [
     args.strategy ? `Strategy: ${JSON.stringify(args.strategy)}` : "",
     args.designSystem
@@ -131,6 +138,7 @@ Dynamic project plan: ${JSON.stringify(args.dynamicPlan)}
 Project tree: ${JSON.stringify(args.projectTree)}
 Existing generated files: ${JSON.stringify(args.existingFiles)}
 ${layerNote}
+${languageDirective}
 ${validationNote}
 
 Architecture rules:

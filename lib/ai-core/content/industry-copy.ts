@@ -3,6 +3,8 @@
  * Improves headlines, CTAs, and service blurbs without rewriting invent.
  */
 
+import { AR_PACKS } from "@/lib/ai-core/content/arabic-industry-copy";
+import { resolveContentLanguage } from "@/lib/ai-core/content/content-language";
 import { WEBSITE_INDUSTRY_INTELLIGENCE } from "@/lib/ai-core/industry-intelligence/profiles";
 import { sanitizeCtaForIndustry } from "@/lib/ai-core/template-intelligence/industry-palettes";
 import type {
@@ -250,23 +252,38 @@ export function buildIndustryCopyPack(params: {
   industryId?: string | null;
   profile?: CoreBusinessProfile | null;
   strategy?: CoreProductStrategy | null;
+  language?: string | null;
 }): IndustryCopyPack {
   const industryId = resolveCopyIndustryId(params.industryId, params.profile);
-  const base = PACKS[String(industryId)] ?? PACKS.business;
+  const lang = resolveContentLanguage(params.language);
+  const packSource = lang === "ar" ? AR_PACKS : PACKS;
+  const base = packSource[String(industryId)] ?? packSource.business;
   const brand = params.profile?.projectName?.trim();
   const offer = params.profile?.offer?.trim();
   const geography = params.profile?.geography?.trim();
   const positioning = params.strategy?.positioning?.trim();
   const strategyCta = params.strategy?.ctas?.[0]?.trim();
 
-  const heroHeadline = brand
-    ? `${brand} — ${base.heroHeadline.charAt(0).toLowerCase()}${base.heroHeadline.slice(1)}`
-    : base.heroHeadline;
+  const heroHeadline =
+    brand && lang === "ar"
+      ? `${brand} — ${base.heroHeadline}`
+      : brand
+        ? `${brand} — ${base.heroHeadline.charAt(0).toLowerCase()}${base.heroHeadline.slice(1)}`
+        : base.heroHeadline;
+
+  const geographySuffix =
+    lang === "ar"
+      ? geography
+        ? ` · نخدم ${geography}`
+        : ""
+      : geography
+        ? ` · Serving ${geography}`
+        : "";
 
   const heroSubheadline =
     positioning ||
     (offer
-      ? `${offer}${geography ? ` · Serving ${geography}` : ""}. ${base.heroSubheadline}`
+      ? `${offer}${geographySuffix}. ${base.heroSubheadline}`
       : base.heroSubheadline);
 
   return {

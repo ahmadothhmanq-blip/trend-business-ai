@@ -48,6 +48,7 @@ export type WebAppGeneration = {
   project_id: string | null;
   product_id: string | null;
   is_favorite: boolean;
+  blueprint_revision?: number;
   created_at: string;
   updated_at: string;
 };

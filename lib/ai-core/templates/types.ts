@@ -3,6 +3,8 @@ export type IndustryId =
   | "restaurant"
   | "ecommerce"
   | "saas"
+  | "technology"
+  | "furniture"
   | "real-estate"
   | "automotive"
   | "agency"

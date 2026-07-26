@@ -32,6 +32,7 @@ import { cn } from "@/lib/utils";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
 import type { CatalogItem, CmsEntry, NavLink } from "@/lib/ai-core/website-management";
 import { MediaLibraryPanel } from "@/components/dashboard/website-builder/media-library-panel";
+import { useCopilotCommand } from "@/components/dashboard/website-builder/hooks/use-copilot-command";
 
 type Tab =
   | "overview"
@@ -123,11 +124,39 @@ export function WebsiteManagementDashboard({
     } finally {
       setLoading(false);
     }
-  }, [generationId]);
+  }, [generationId, wb]);
+
+  const copilot = useCopilotCommand({
+    generationId,
+    applyAi: true,
+    onApplied: () => {
+      void load();
+    },
+  });
 
   useEffect(() => {
     void load();
   }, [load]);
+
+  async function runCopilotAssistant(message: string) {
+    setSaving(true);
+    try {
+      const result = await copilot.submit(message, { forceStream: true });
+      if (!result) {
+        throw new Error(wb("management.errors.actionFailed"));
+      }
+      setAssistantLog((log) =>
+        [result.summary || "Copilot response", ...log].slice(0, 20),
+      );
+      toast.success(result.summary || wb("management.saved"));
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : wb("management.errors.actionFailed"),
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
 
   async function postAction(payload: Record<string, unknown>) {
     setSaving(true);
@@ -150,14 +179,9 @@ export function WebsiteManagementDashboard({
           ...log,
         ].slice(0, 20));
         if (json.editCommand) {
-          const editRes = await fetch(`/api/website-builder/${generationId}/edit`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ command: json.editCommand, applyAi: true }),
-          });
-          if (!editRes.ok) {
-            const editJson = (await editRes.json()) as { error?: string };
-            throw new Error(editJson.error || wb("management.errors.actionFailed"));
+          const result = await copilot.submit(json.editCommand, { forceStream: true });
+          if (!result) {
+            throw new Error(wb("management.errors.actionFailed"));
           }
         }
       }
@@ -190,17 +214,21 @@ export function WebsiteManagementDashboard({
     if (result) setDeleteTarget(null);
   }
 
-  const tabs = [
-    { id: "overview" as const, labelKey: "management.tabs.overview", icon: ShieldCheck },
-    { id: "pages" as const, label: "Pages", icon: FileText },
-    { id: "navigation" as const, label: "Navigation", icon: Navigation },
-    { id: "catalog" as const, labelKey: "management.tabs.catalog", icon: Package },
-    { id: "cms" as const, labelKey: "management.tabs.cms", icon: LayoutGrid },
-    { id: "media" as const, label: "Media", icon: ImageIcon },
-    { id: "brand" as const, labelKey: "management.tabs.brand", icon: Palette },
-    { id: "leads" as const, labelKey: "management.tabs.leads", icon: MessageSquare },
-    { id: "assistant" as const, labelKey: "management.tabs.assistant", icon: Sparkles },
-    { id: "quality" as const, labelKey: "management.tabs.quality", icon: ShieldCheck },
+  const tabs: Array<{
+    id: Tab;
+    labelKey: string;
+    icon: typeof ShieldCheck;
+  }> = [
+    { id: "overview", labelKey: "management.tabs.overview", icon: ShieldCheck },
+    { id: "pages", labelKey: "management.pages", icon: FileText },
+    { id: "navigation", labelKey: "management.navigation", icon: Navigation },
+    { id: "catalog", labelKey: "management.tabs.catalog", icon: Package },
+    { id: "cms", labelKey: "management.tabs.cms", icon: LayoutGrid },
+    { id: "media", labelKey: "builder.media.title", icon: ImageIcon },
+    { id: "brand", labelKey: "management.tabs.brand", icon: Palette },
+    { id: "leads", labelKey: "management.tabs.leads", icon: MessageSquare },
+    { id: "assistant", labelKey: "management.tabs.assistant", icon: Sparkles },
+    { id: "quality", labelKey: "management.tabs.quality", icon: ShieldCheck },
   ];
 
   if (loading) {
@@ -260,11 +288,7 @@ export function WebsiteManagementDashboard({
             )}
           >
             <tabItem.icon className="size-3.5" />
-            {"labelKey" in tabItem && tabItem.labelKey
-              ? wb(tabItem.labelKey)
-              : "label" in tabItem
-                ? tabItem.label
-                : ""}
+            {"labelKey" in tabItem ? wb(tabItem.labelKey) : ""}
           </button>
         ))}
       </div>
@@ -818,7 +842,7 @@ export function WebsiteManagementDashboard({
             onClick={() => {
               const msg = assistantMsg;
               setAssistantMsg("");
-              void postAction({ action: "assistant", message: msg });
+              void runCopilotAssistant(msg);
             }}
           >
             <Sparkles className="size-4" />

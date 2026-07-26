@@ -8,18 +8,14 @@ import { isWebsiteIncrementalPreviewEnabled } from "@/lib/website/generation-fla
 import { tryRecoverCompletedWebsiteGeneration } from "@/lib/website/stream-recovery";
 import { MAX_RECENT_PROJECTS } from "@/lib/website/constants";
 import { useTranslation } from "@/lib/i18n/client";
-import { translateOption } from "@/lib/i18n/product-options";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
+import { inferWebsiteOnboardingDefaults } from "@/lib/ai-core/website-builder/onboarding-inference";
 import { CoreProgressStepper } from "@/components/dashboard/one-prompt";
 import { useCoreProgress } from "@/components/dashboard/one-prompt/use-core-progress";
 import { getOnePromptProduct } from "@/lib/constants/one-prompt-products";
 import { useIdeaQueryParam } from "@/lib/hooks/use-idea-query-param";
 import { useGenerationQueryParam } from "@/lib/hooks/use-generation-query-param";
 import { useWebsitePublish } from "@/lib/hooks/use-website-publish";
-import {
-  dashboardColorThemeToDesignSystem,
-  dashboardDesignStyleToPreset,
-} from "@/lib/website/style-resolution";
 import {
   AlertTriangle,
   ArrowDownToLine,
@@ -134,40 +130,6 @@ type PreviewBuildState = {
   error?: string;
 };
 
-const PROJECT_TYPES = [
-  "Business Website",
-  "Web Application",
-  "E-commerce",
-  "Landing Page",
-  "Portfolio",
-  "Restaurant",
-  "Clinic",
-  "Real Estate",
-  "Education",
-  "AI SaaS",
-  "CRM",
-  "ERP",
-  "Mobile App",
-] as const;
-
-const PROJECT_TYPE_KEYS: Record<(typeof PROJECT_TYPES)[number], string> = {
-  "Business Website": "businessWebsite",
-  "Web Application": "webApplication",
-  "E-commerce": "eCommerce",
-  "Landing Page": "landingPage",
-  Portfolio: "portfolio",
-  Restaurant: "restaurant",
-  Clinic: "clinic",
-  "Real Estate": "realEstate",
-  Education: "education",
-  "AI SaaS": "aiSaas",
-  CRM: "crm",
-  ERP: "erp",
-  "Mobile App": "mobileApp",
-};
-
-const DESIGN_STYLES = ["Luxury", "Minimal", "Corporate", "Startup", "Modern", "Glass", "Dark", "Light"] as const;
-const COLOR_THEMES = ["Gold", "Blue", "Purple", "Green", "Custom"] as const;
 const LANGUAGES = [
   "English",
   "Arabic",
@@ -190,14 +152,6 @@ const FEATURES = [
   "CRM",
   "Admin Panel",
 ] as const;
-
-const COLOR_THEME_KEYS: Record<(typeof COLOR_THEMES)[number], string> = {
-  Gold: "gold",
-  Blue: "blue",
-  Purple: "purple",
-  Green: "green",
-  Custom: "custom",
-};
 
 const LANGUAGE_KEYS: Record<(typeof LANGUAGES)[number], string> = {
   English: "english",
@@ -341,31 +295,7 @@ function toProject(generation: WebsiteGeneration): WorkspaceProject {
   };
 }
 
-function resolveInitialProjectType(
-  product?: ProductDefinition,
-): (typeof PROJECT_TYPES)[number] {
-  const candidate = product?.defaultProjectType;
-  if (candidate && (PROJECT_TYPES as readonly string[]).includes(candidate)) {
-    return candidate as (typeof PROJECT_TYPES)[number];
-  }
-  return "Web Application";
-}
-
-function mapMarketplaceStyleToDesignStyle(
-  style: string,
-): (typeof DESIGN_STYLES)[number] | null {
-  const key = style.toLowerCase().replace(/_/g, "-");
-  if (key === "luxury") return "Luxury";
-  if (key === "minimal") return "Minimal";
-  if (key === "corporate") return "Corporate";
-  if (key === "modern" || key === "creative") return "Modern";
-  if (key === "premium-saas" || key === "technology") return "Startup";
-  return null;
-}
-
-function mapIndustryToProjectType(
-  industry: string,
-): (typeof PROJECT_TYPES)[number] | null {
+function mapIndustryToProjectType(industry: string): string | null {
   const key = industry.toLowerCase().replace(/_/g, "-");
   if (key === "restaurant") return "Restaurant";
   if (key === "healthcare" || key === "clinic") return "Clinic";
@@ -436,11 +366,6 @@ export function WebsiteBuilderTool({
   const [railDetailsTpl, setRailDetailsTpl] = useState<MarketplaceTemplate | null>(
     null,
   );
-  const [projectType, setProjectType] = useState<(typeof PROJECT_TYPES)[number]>(
-    () => resolveInitialProjectType(product),
-  );
-  const [designStyle, setDesignStyle] = useState<(typeof DESIGN_STYLES)[number]>("Luxury");
-  const [colorTheme, setColorTheme] = useState<(typeof COLOR_THEMES)[number]>("Gold");
   const [language, setLanguage] = useState<(typeof LANGUAGES)[number]>("English");
   const [features, setFeatures] = useState<string[]>(["Dashboard", "Booking", "Admin Panel"]);
 
@@ -454,11 +379,7 @@ export function WebsiteBuilderTool({
     const preset = params.get("designPreset")?.trim();
     if (tid) setSelectedTemplateId(tid);
     if (mid) setMarketplaceTemplateId(mid);
-    if (style) {
-      setTemplateStyle(style);
-      const mapped = mapMarketplaceStyleToDesignStyle(style);
-      if (mapped) setDesignStyle(mapped);
-    }
+    if (style) setTemplateStyle(style);
     if (preset) setDesignPreset(preset);
     if (tid || mid) {
       setStreamStatus(
@@ -468,7 +389,7 @@ export function WebsiteBuilderTool({
       );
     }
   }, []);
-  const [advancedOpen, setAdvancedOpen] = useState(true);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isApplyingTemplate, setIsApplyingTemplate] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
@@ -494,6 +415,15 @@ export function WebsiteBuilderTool({
   const [activeProject, setActiveProject] = useState<WorkspaceProject | null>(
     initialGenerations[0] ? toProject(initialGenerations[0]) : null,
   );
+
+  const inferredFromBrief = useMemo(
+    () =>
+      inferWebsiteOnboardingDefaults(
+        projectBrief || activeProject?.description || "",
+      ),
+    [projectBrief, activeProject?.description],
+  );
+
   const streamAbortRef = useRef<AbortController | null>(null);
   const activeStreamSessionRef = useRef<string | null>(null);
   const progressStep = useCoreProgress({
@@ -808,9 +738,19 @@ export function WebsiteBuilderTool({
       : templateStyle
         ? ` ${templateStyle}`
         : "";
+    const inferred = inferWebsiteOnboardingDefaults(brief);
     const resolvedProjectType =
       (tpl?.industry ? mapIndustryToProjectType(tpl.industry) : null) ||
-      projectType;
+      inferred.projectType;
+    const resolvedLanguage =
+      mode === "continue" && activeProject?.language
+        ? activeProject.language
+        : language;
+    const inferredTheme = resolvedStyle
+      ? `${inferred.colorTheme} ${resolvedStyle}`
+      : templateStyle
+        ? `${inferred.colorTheme} ${templateStyle}`
+        : inferred.theme;
 
     setIsGenerating(true);
     setApiError(null);
@@ -840,9 +780,9 @@ export function WebsiteBuilderTool({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             prompt: brief,
-            language,
-            brandStyle: designStyle,
-            industry: templateIndustry || undefined,
+            language: resolvedLanguage,
+            brandStyle: inferred.designStyle,
+            industry: templateIndustry || inferred.industryId || undefined,
           }),
         });
         if (autoRes.ok) {
@@ -891,18 +831,16 @@ export function WebsiteBuilderTool({
             : autoHint || wb("stream.connecting"),
     );
 
-    const pickerDesignSystem = dashboardColorThemeToDesignSystem(colorTheme, designStyle);
-    const pickerPreset = dashboardDesignStyleToPreset(designStyle);
     const mergedDesignSystem = {
-      ...pickerDesignSystem,
+      ...inferred.designSystem,
       ...(resolvedDesignSystem ?? {}),
     };
 
     const requestBody = {
       prompt: mode === "continue" ? activeProject?.description || brief : brief,
       projectType: resolvedProjectType,
-      language,
-      theme: `${colorTheme} ${designStyle}${resolvedThemeStyle}`,
+      language: resolvedLanguage,
+      theme: `${inferredTheme}${resolvedThemeStyle}`,
       features: [
         ...features,
         ...(product?.id ? [`product:${product.id}`] : []),
@@ -918,15 +856,15 @@ export function WebsiteBuilderTool({
       projectId: tpl ? undefined : activeProject?.projectId ?? undefined,
       templateId: autoTemplateId || undefined,
       marketplaceTemplateId: resolvedMarketplaceId || undefined,
-      templateStyle: resolvedStyle || designStyle || undefined,
-      designPreset: autoPreset || pickerPreset || undefined,
-      industryId: resolvedIndustry || undefined,
+      templateStyle: resolvedStyle || inferred.designStyle || undefined,
+      designPreset: autoPreset || inferred.designPreset || undefined,
+      industryId: resolvedIndustry || inferred.industryId || undefined,
       components: autoComponents.length ? autoComponents : undefined,
       designSystem: mergedDesignSystem,
       templateIntelligenceId: autoTiId || undefined,
       templateIntelligenceCategory: autoTiCategory || undefined,
       brandIdentityId: brandIdentityId || undefined,
-      locale: language || undefined,
+      locale: resolvedLanguage || undefined,
       mode: tpl ? "generate" : mode,
       parentGenerationId:
         tpl || mode === "generate" ? undefined : activeProject?.id,
@@ -1046,9 +984,9 @@ export function WebsiteBuilderTool({
                   ? requestBody.prompt
                   : brief,
               type: resolvedProjectType,
-              style: designStyle,
-              theme: colorTheme,
-              language,
+              style: inferred.designStyle,
+              theme: inferred.colorTheme,
+              language: resolvedLanguage,
               features,
               mode: requestBody.mode as GenerationMode | undefined,
             });
@@ -1222,11 +1160,7 @@ export function WebsiteBuilderTool({
     setTemplateIntelligenceId(choice.templateIntelligenceId);
     setTemplateIntelligenceCategory(choice.category);
     if (choice.designPreset) setDesignPreset(choice.designPreset);
-    if (choice.designStyle) {
-      const mapped = mapMarketplaceStyleToDesignStyle(choice.designStyle);
-      if (mapped) setDesignStyle(mapped);
-      else setTemplateStyle(choice.designStyle);
-    }
+    if (choice.designStyle) setTemplateStyle(choice.designStyle);
     if (choice.premiumTemplateId) {
       setSelectedTemplateId(choice.premiumTemplateId);
     }
@@ -1366,11 +1300,7 @@ export function WebsiteBuilderTool({
     setProjectBrief(buildBriefFromTemplate(payload));
     setEditMode(false);
     setRailDetailsTpl(null);
-    const mappedStyle = mapMarketplaceStyleToDesignStyle(payload.style);
-    if (mappedStyle) setDesignStyle(mappedStyle);
-    const mappedType = mapIndustryToProjectType(payload.industry);
-    if (mappedType) setProjectType(mappedType);
-    setOutputTab("preview");
+        setOutputTab("preview");
 
     if (activeProject?.id) {
       const templateIntelligenceId = resolveTemplateIntelligenceForMarketplace({
@@ -1869,10 +1799,13 @@ export function WebsiteBuilderTool({
                   disabled={isGenerating || isApplyingTemplate}
                   activeGenerationId={activeProject?.id || null}
                   selectionContext={{
-                    businessType: projectType,
-                    industry: templateIndustry || projectType,
-                    brandStyle: designStyle,
-                    designStyle,
+                    businessType: inferredFromBrief.projectType,
+                    industry:
+                      templateIndustry ||
+                      inferredFromBrief.industryId ||
+                      inferredFromBrief.projectType,
+                    brandStyle: inferredFromBrief.designStyle,
+                    designStyle: inferredFromBrief.designStyle,
                     prompt: projectBrief,
                   }}
                   onSelect={handleTemplateIntelligenceSelect}
@@ -1896,10 +1829,13 @@ export function WebsiteBuilderTool({
                   disabled={isGenerating || isApplyingTemplate}
                   activeGenerationId={activeProject.id}
                   selectionContext={{
-                    businessType: projectType,
-                    industry: templateIndustry || projectType,
-                    brandStyle: designStyle,
-                    designStyle,
+                    businessType: inferredFromBrief.projectType,
+                    industry:
+                      templateIndustry ||
+                      inferredFromBrief.industryId ||
+                      inferredFromBrief.projectType,
+                    brandStyle: inferredFromBrief.designStyle,
+                    designStyle: inferredFromBrief.designStyle,
                     prompt: projectBrief || activeProject.description,
                   }}
                   onSelect={handleTemplateIntelligenceSelect}
@@ -1948,6 +1884,25 @@ export function WebsiteBuilderTool({
             )}
           </DashboardPanel>
 
+          <DashboardPanel data-onboarding="website-language">
+            <SectionHeader
+              icon={FileStack}
+              title={wb("sections.outputLanguage")}
+              description={wb("sectionDescriptions.language")}
+            />
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {LANGUAGES.map((item) => (
+                <ChoiceCard
+                  key={item}
+                  label={wb(`languages.${LANGUAGE_KEYS[item]}`)}
+                  active={language === item}
+                  onClick={() => setLanguage(item)}
+                  compact
+                />
+              ))}
+            </div>
+          </DashboardPanel>
+
           <Button
             type="button"
             onClick={() => setAdvancedOpen((open) => !open)}
@@ -1959,75 +1914,9 @@ export function WebsiteBuilderTool({
           </Button>
 
           {advancedOpen ? (
-            <>
-          <DashboardPanel>
-            <SectionHeader
-              icon={Globe2}
-              title={wb("sections.projectType")}
-              description={wb("sectionDescriptions.projectType")}
-            />
-            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {PROJECT_TYPES.map((type) => (
-                <ChoiceCard
-                  key={type}
-                  label={wb(`projectTypes.${PROJECT_TYPE_KEYS[type]}`)}
-                  active={projectType === type}
-                  onClick={() => setProjectType(type)}
-                />
-              ))}
-            </div>
-          </DashboardPanel>
-
-          <div className="grid gap-6 lg:grid-cols-2">
-            <DashboardPanel>
-              <SectionHeader icon={Palette} title={wb("sections.designStyle")} description={wb("sectionDescriptions.designStyle")} />
-              <div className="mt-5 grid grid-cols-2 gap-3">
-                {DESIGN_STYLES.map((style) => (
-                  <ChoiceCard
-                    key={style}
-                    label={translateOption(t, "designStyles", style)}
-                    active={designStyle === style}
-                    onClick={() => setDesignStyle(style)}
-                    compact
-                  />
-                ))}
-              </div>
-            </DashboardPanel>
-
-            <DashboardPanel>
-              <SectionHeader icon={Sparkles} title={wb("sections.colorTheme")} description={wb("sectionDescriptions.colorTheme")} />
-              <div className="mt-5 grid gap-3">
-                {COLOR_THEMES.map((theme) => (
-                  <ThemeButton
-                    key={theme}
-                    label={wb(`colorThemes.${COLOR_THEME_KEYS[theme]}`)}
-                    active={colorTheme === theme}
-                    onClick={() => setColorTheme(theme)}
-                  />
-                ))}
-              </div>
-            </DashboardPanel>
-          </div>
-
-          <div className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-            <DashboardPanel>
-              <SectionHeader icon={FileStack} title={wb("sections.outputLanguage")} description={wb("sectionDescriptions.language")} />
-              <div className="mt-5 space-y-3">
-                {LANGUAGES.map((item) => (
-                  <ChoiceCard
-                    key={item}
-                    label={wb(`languages.${LANGUAGE_KEYS[item]}`)}
-                    active={language === item}
-                    onClick={() => setLanguage(item)}
-                    compact
-                  />
-                ))}
-              </div>
-            </DashboardPanel>
-
-            <DashboardPanel>
+            <DashboardPanel data-onboarding="website-features">
               <SectionHeader icon={LayoutDashboard} title={wb("sections.features")} description={wb("sectionDescriptions.features")} />
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {FEATURES.map((feature) => {
                   const checked = features.includes(feature);
                   return (
@@ -2052,8 +1941,6 @@ export function WebsiteBuilderTool({
                 })}
               </div>
             </DashboardPanel>
-          </div>
-            </>
           ) : null}
 
           {(isGenerating || streamStatus) && (
@@ -2447,40 +2334,6 @@ function ChoiceCard({
           {wb("choiceCard.description")}
         </span>
       )}
-    </button>
-  );
-}
-
-function ThemeButton({
-  label,
-  active,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  const swatch: Record<string, string> = {
-    Gold: "from-[#D4AF37] to-[#F4D56A]",
-    Blue: "from-blue-500 to-cyan-300",
-    Purple: "from-purple-500 to-fuchsia-300",
-    Green: "from-emerald-500 to-lime-300",
-    Custom: "from-white/60 to-premium-gold",
-  };
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "flex items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-all duration-300",
-        active
-          ? "border-premium-gold/45 bg-premium-gold/12 text-premium-gold-light"
-          : "border-white/[0.08] bg-white/[0.025] text-white/55 hover:border-premium-gold/25 hover:text-white/80",
-      )}
-    >
-      <span className={cn("size-8 rounded-xl bg-gradient-to-br shadow-lg", swatch[label])} />
-      <span className="font-semibold">{label}</span>
     </button>
   );
 }

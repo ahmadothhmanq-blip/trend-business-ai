@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { resolveWebsiteOnboardingInput } from "@/lib/ai-core/website-builder/onboarding-inference";
 import {
   WEBSITE_COLOR_STYLES,
   WEBSITE_DESIGN_STYLES,
@@ -24,9 +25,9 @@ export const websiteGenerateRequestSchema = z
         MAX_WEBSITE_PROMPT_CHARS + 2000,
         `Keep the project brief under ${MAX_WEBSITE_PROMPT_CHARS} characters.`,
       ),
-    projectType: z.string().trim().min(1, "Select a project type."),
+    projectType: z.string().trim().min(1).optional(),
     language: z.string().trim().min(1, "Select a language."),
-    theme: z.string().trim().min(1, "Select a theme."),
+    theme: z.string().trim().min(1).optional(),
     features: z.array(z.string().trim()).default([]),
     productId: z.string().trim().optional(),
     /** Optional Smart / Premium Template Engine override (auto-selected when omitted). */
@@ -78,21 +79,36 @@ export const websiteGenerateRequestSchema = z
     generationProfile: z.enum(["fast", "professional", "ultra"]).optional(),
     projectId: z.string().uuid().optional(),
   })
-  .transform((value) => ({
-    ...value,
-    prompt: clampWebsitePrompt(value.prompt),
-    continueInstruction: value.continueInstruction
-      ? clampWebsitePrompt(
-          value.continueInstruction,
-          MAX_CONTINUE_INSTRUCTION_CHARS,
-        )
-      : value.continueInstruction,
-  }));
+  .transform((value) => {
+    const clamped = {
+      ...value,
+      prompt: clampWebsitePrompt(value.prompt),
+      continueInstruction: value.continueInstruction
+        ? clampWebsitePrompt(
+            value.continueInstruction,
+            MAX_CONTINUE_INSTRUCTION_CHARS,
+          )
+        : value.continueInstruction,
+    };
+    const resolved = resolveWebsiteOnboardingInput(clamped);
+    return {
+      ...clamped,
+      projectType: resolved.projectType,
+      language: resolved.language,
+      theme: resolved.theme,
+      designPreset: clamped.designPreset || resolved.designPreset,
+      designSystem: clamped.designSystem
+        ? { ...resolved.designSystem, ...clamped.designSystem }
+        : resolved.designSystem,
+      industryId: clamped.industryId || resolved.industryId,
+      locale: clamped.locale || resolved.language,
+    };
+  });
 
 export type WebsiteGenerateRequest = z.infer<typeof websiteGenerateRequestSchema>;
 
 export function detectWebsiteProjectKind(input: WebsiteGenerateRequest) {
-  const signal = [input.prompt, input.projectType, ...input.features]
+  const signal = [input.prompt, input.projectType ?? "", ...input.features]
     .join(" ")
     .toLowerCase();
   const appSignals = [

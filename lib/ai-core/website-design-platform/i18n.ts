@@ -125,17 +125,23 @@ export function applyLocaleToWebsiteFiles(
       if (!content.includes("/* Design Platform RTL */")) {
         content += `
 
-/* Design Platform RTL */
+/* Design Platform RTL + Arabic typography */
 html[dir="rtl"] {
   direction: rtl;
   text-align: right;
 }
 html[dir="rtl"] body {
-  font-family: ${locale.fontHint || "system-ui"}, var(--font-body, system-ui);
+  font-family: ${locale.fontHint || "Tajawal, Noto Naskh Arabic, system-ui"}, var(--font-body, system-ui);
 }
 html[dir="rtl"] .site-nav,
-html[dir="rtl"] header nav {
+html[dir="rtl"] header nav,
+html[dir="rtl"] nav {
   flex-direction: row-reverse;
+}
+html[dir="rtl"] button,
+html[dir="rtl"] input,
+html[dir="rtl"] textarea {
+  text-align: right;
 }
 `;
       }

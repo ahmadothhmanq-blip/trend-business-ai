@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { FolderOpen, Loader2, Search, Trash2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -139,9 +140,12 @@ export function MediaLibraryPanel({
               className="group relative overflow-hidden rounded-xl border border-white/[0.08] bg-black/30"
             >
               {asset.mime.startsWith("image/") ? (
-                <img
+                <Image
                   src={asset.url}
                   alt={asset.alt || asset.filename}
+                  width={640}
+                  height={360}
+                  unoptimized
                   className="aspect-video w-full object-cover"
                 />
               ) : (

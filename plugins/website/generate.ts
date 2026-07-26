@@ -28,6 +28,11 @@ import {
   shouldSkipLlmForComposedHomePage,
 } from "@/lib/website/generation-flags";
 import { injectAiImagesIntoProject } from "@/lib/ai-core/image-engine";
+import {
+  buildGenerationRepairInstruction,
+  validateWebsiteGeneration,
+} from "@/lib/ai-core/website-builder/generation-validation";
+import { buildWebsiteGenerationKey } from "@/lib/ai-core/website-builder/prompt-industry";
 import { designSystemCssVariables } from "@/plugins/website/layers/design-engine";
 import {
   buildQualityImproveInstruction,
@@ -300,7 +305,12 @@ export async function generateWebsite(
           designSystem: plan.designSystem,
           ctx,
           userId: input.userId,
-          generationKey: input.parentGenerationId ?? `draft-${Date.now()}`,
+          generationKey: buildWebsiteGenerationKey({
+            userId: input.userId,
+            parentGenerationId: input.parentGenerationId,
+            mode: input.mode,
+            prompt: input.prompt,
+          }),
         });
   const assetSummary = assetManifestForPrompt(assetManifest);
 
@@ -464,8 +474,13 @@ export async function generateWebsite(
     industryId: analysis.businessProfile?.industry,
     profile: analysis.businessProfile,
     strategy: plan.strategy,
+    language: input.language,
   });
-  const productionContent = buildProductionContentPack(copyPack, brandName);
+  const productionContent = buildProductionContentPack(
+    copyPack,
+    brandName,
+    input.language,
+  );
   const componentIds = plan.designSystem.componentPalette?.map(String);
 
   // Professional Components Library: scaffolds + composed home page.
@@ -492,6 +507,7 @@ export async function generateWebsite(
     heroEyebrow: productionContent.heroEyebrow,
     content: productionContent,
     composePage: true,
+    language: input.language,
   });
 
   // Production content polish — realistic copy, brand, typography (pipeline unchanged).
@@ -547,6 +563,46 @@ export async function generateWebsite(
     });
     validatedFiles = qualityResult.files;
     qualityReport = qualityResult.qualityReport;
+  }
+
+  const validation = validateWebsiteGeneration({
+    prompt: input.prompt,
+    language: input.language,
+    industry: analysis.businessProfile?.industry,
+    industryId:
+      typeof input.industryId === "string" ? input.industryId : undefined,
+    files: validatedFiles,
+    assetManifest,
+    expectedPages: analysis.pages,
+  });
+
+  if (!validation.passed) {
+    const repairInstruction = buildGenerationRepairInstruction(validation);
+    if (repairInstruction) {
+      ctx.progress.emit(
+        "[validation] Regenerating sections that failed industry/language checks…",
+      );
+      try {
+        validatedFiles = await applyQualityImprovePass(
+          input,
+          analysis,
+          plan,
+          validatedFiles,
+          ctx,
+          assetManifestForPrompt(assetManifest),
+          repairInstruction,
+        );
+        validatedFiles = injectAiImagesIntoProject({
+          files: validatedFiles,
+          assetManifest: coreManifest,
+          industry: industryHint,
+        });
+      } catch (error) {
+        logger.warn("validation repair pass failed", "website-generate", {
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
   }
 
   // Final image pass — quality improve must never leave empty placeholders.

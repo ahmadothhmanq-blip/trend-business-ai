@@ -164,6 +164,8 @@ export type WebsiteGeneration = {
   error_message?: string | null;
   prompt_versions?: PromptVersion[];
   attachments?: GenerationAttachmentMeta[];
+  /** Phase 0 — monotonic blueprint revision for optimistic concurrency. */
+  blueprint_revision?: number;
 };
 
 /** Published / prepared website snapshot (public.website_publications). */

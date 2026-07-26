@@ -174,6 +174,50 @@ const RULES: Record<IndustryId, IndustryConversionRule> = {
       "Objection handling",
     ],
   },
+  technology: {
+    industryId: "technology",
+    label: "Technology",
+    defaultGoal: "leads",
+    requiredElements: [
+      "solution",
+      "product",
+      "support",
+      "case-study",
+      "trust",
+      "contact",
+    ],
+    sectionOrder: [
+      "Hero",
+      "Solutions",
+      "Products",
+      "Case Studies",
+      "Trust",
+      "Contact",
+      "CTA",
+    ],
+    heroGuidance:
+      "Modern technology hero with computers, office, or server imagery and Request demo CTA.",
+    ctaGuidance:
+      "Primary CTA: Request demo / Contact sales. Secondary: View solutions.",
+    trustElements: [
+      "Enterprise clients",
+      "Certifications",
+      "Support SLAs",
+      "Case study metrics",
+    ],
+    journeySteps: [
+      "Understand capability",
+      "Explore solutions",
+      "See proof",
+      "Contact sales",
+    ],
+    contentStructure: [
+      "Technology outcomes",
+      "Product highlights",
+      "Trust signals",
+      "Support path",
+    ],
+  },
   ecommerce: {
     industryId: "ecommerce",
     label: "E-commerce",
@@ -216,6 +260,51 @@ const RULES: Record<IndustryId, IndustryConversionRule> = {
       "Offers",
       "Social proof",
       "Purchase CTA",
+    ],
+  },
+  furniture: {
+    industryId: "furniture",
+    label: "Furniture",
+    defaultGoal: "sales",
+    requiredElements: [
+      "collection",
+      "showroom",
+      "product",
+      "gallery",
+      "testimonial",
+      "contact",
+    ],
+    sectionOrder: [
+      "Hero",
+      "Collections",
+      "Living Room",
+      "Bedroom",
+      "Showroom",
+      "Testimonials",
+      "Contact",
+    ],
+    heroGuidance:
+      "Showroom hero with sofas, living rooms, or bedroom sets — never travel imagery.",
+    ctaGuidance:
+      "Primary CTA: Browse collections / Visit showroom. Repeat after room inspiration.",
+    trustElements: [
+      "Craftsmanship",
+      "Material quality",
+      "Customer reviews",
+      "Showroom locations",
+    ],
+    journeySteps: [
+      "Inspire",
+      "Browse collections",
+      "See room sets",
+      "Visit showroom",
+      "Contact",
+    ],
+    contentStructure: [
+      "Room inspiration",
+      "Product highlights",
+      "Craft story",
+      "Showroom CTA",
     ],
   },
   automotive: {

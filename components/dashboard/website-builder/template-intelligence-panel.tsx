@@ -89,7 +89,7 @@ export function TemplateIntelligencePanel(props: {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [wb]);
 
   useEffect(() => {
     void load();

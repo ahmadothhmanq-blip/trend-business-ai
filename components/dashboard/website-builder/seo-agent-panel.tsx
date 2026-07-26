@@ -57,7 +57,7 @@ export function SeoAgentPanel(props: {
     } finally {
       setLoading(false);
     }
-  }, [props.generationId]);
+  }, [props.generationId, wb]);
 
   useEffect(() => {
     void load();

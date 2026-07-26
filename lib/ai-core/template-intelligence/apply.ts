@@ -16,6 +16,10 @@ import {
   buildTemplateVisualCss,
   resolveTemplateVisualPreset,
 } from "@/lib/ai-core/template-intelligence/visual-preset";
+import {
+  resolveLocaleFromLanguage,
+  applyLocaleToWebsiteFiles,
+} from "@/lib/ai-core/website-design-platform/i18n";
 import type { CoreBrief } from "@/lib/ai-core/layers/types";
 import type { GeneratedProjectFile } from "@/lib/ai/types";
 import type { GeneratedWebsiteProject } from "@/plugins/website/types";
@@ -323,6 +327,7 @@ export type RethemeResult = {
 export function applyTemplateIntelligenceRetheme(params: {
   project: GeneratedWebsiteProject;
   templateId: string;
+  language?: string | null;
 }): RethemeResult {
   const template = getTemplateIntelligence(params.templateId);
   if (!template) {
@@ -330,6 +335,7 @@ export function applyTemplateIntelligenceRetheme(params: {
   }
 
   const notes: string[] = [];
+  const locale = resolveLocaleFromLanguage(params.language);
   const originalFiles = params.project.files || [];
   const preserved = originalFiles.filter((f) => shouldPreserveFile(f.path));
   notes.push(`Preserved ${preserved.length} content/data/image files`);
@@ -344,6 +350,7 @@ export function applyTemplateIntelligenceRetheme(params: {
     industryId: businessIndustry,
     profile: profile || null,
     strategy: strategy || null,
+    language: params.language,
   });
   copyPack.primaryCta = sanitizeCtaForIndustry(
     copyPack.primaryCta,
@@ -356,6 +363,7 @@ export function applyTemplateIntelligenceRetheme(params: {
   const production = buildProductionContentPack(
     copyPack,
     profile?.projectName || params.project.title,
+    params.language,
   );
   const preservedContent = extractPreservedHeroContent(
     params.project,
@@ -378,11 +386,16 @@ export function applyTemplateIntelligenceRetheme(params: {
     heroEyebrow: preservedContent.heroEyebrow,
     content: preservedContent.content,
     composePage: true,
+    language: params.language,
   });
   notes.push(
     `Applied layout components: ${template.components.slice(0, 6).join(", ")}…`,
   );
-  notes.push("Preserved existing headlines, CTAs, and section copy");
+  notes.push(
+    locale.rtl
+      ? "Localized section copy and navigation in Arabic"
+      : "Refreshed section copy for selected template",
+  );
 
   // Restore preserved assets if inject stubbed site-images
   for (const file of preserved) {
@@ -395,6 +408,12 @@ export function applyTemplateIntelligenceRetheme(params: {
   }
 
   files = applyTokensToGlobals(files, template);
+  files = applyLocaleToWebsiteFiles(files, locale);
+  if (locale.rtl) {
+    notes.push("Applied Arabic/RTL locale to layout and styles");
+  } else {
+    notes.push(`Applied ${locale.language} locale to layout`);
+  }
   const visualPreset = resolveTemplateVisualPreset(template);
   notes.push(`Applied theme tokens (${template.category} · ${template.designPreset})`);
   notes.push(

@@ -187,6 +187,8 @@ const requiredTables = [
   "website_domains",
   "website_leads",
   "website_cms_entries",
+  "website_cms_versions",
+  "website_media_assets",
   "credit_balances",
   "projects",
 ];

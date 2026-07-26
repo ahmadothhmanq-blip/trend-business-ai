@@ -95,6 +95,22 @@ const STOCK: Record<string, StockPack> = {
     gallery: [u("photo-1557804506-669a67965ba0"), u("photo-1507679799987-c73779587ccf")],
     testimonial: [u("photo-1472099645785-5658abf4ff4e", 800), u("photo-1438761681033-6461ffad8d80", 800)],
   },
+  furniture: {
+    hero: [u("photo-1555041469-a586c61ea9bc"), u("photo-1616486338812-3dadae4b4ace")],
+    section: [u("photo-1618221195710-dd6b41faaea6"), u("photo-1615529328331-f8917597711f")],
+    product: [u("photo-1586023492125-27b2c045efd7"), u("photo-1631049307904-41a163c20979")],
+    service: [u("photo-1616486338812-3dadae4b4ace"), u("photo-1615873968403-b1128c629a9e")],
+    background: [u("photo-1616486338812-3dadae4b4ace")],
+    gallery: [u("photo-1618221195710-dd6b41faaea6"), u("photo-1615873968403-b1128c629a9e")],
+  },
+  technology: {
+    hero: [u("photo-1498050108023-c5249f4df085"), u("photo-1518770660439-4636190af475")],
+    section: [u("photo-1551434678-e076c223a692"), u("photo-1517245386807-bb43f82c33c4")],
+    product: [u("photo-1587825140708-dfaf3ae4be57"), u("photo-1550751827-4bd374c3f58b")],
+    service: [u("photo-1522071820081-009f0129c71c"), u("photo-1451187580459-43490279c0fa")],
+    background: [u("photo-1451187580459-43490279c0fa")],
+    gallery: [u("photo-1519389950473-47ba0277781c"), u("photo-1504384308090-c894fdcc538d")],
+  },
   business: {
     hero: [u("photo-1497366811353-6870744d04b2"), u("photo-1486406146926-c627a92ad1ab")],
     section: [u("photo-1454165804606-c3d57bc86b40"), u("photo-1521737711867-e3b97375f902")],
@@ -133,6 +149,16 @@ function resolveIndustry(industry?: string | null): string {
   if (raw.includes("agency") || raw.includes("studio")) return "agency";
   if (raw.includes("financ") || raw.includes("bank") || raw.includes("invest")) {
     return "finance";
+  }
+  if (raw.includes("furniture") || raw.includes("sofa") || raw.includes("bedroom")) {
+    return "furniture";
+  }
+  if (
+    raw.includes("technology") ||
+    raw.includes("computer") ||
+    (raw.includes("tech") && !raw.includes("restaurant"))
+  ) {
+    return "technology";
   }
   return "business";
 }

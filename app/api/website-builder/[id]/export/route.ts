@@ -1,5 +1,5 @@
 import { requireUser, parseUuidParam } from "@/lib/api/helpers";
-import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
+import { API_ERROR_CODES, apiErrorResponse } from "@/lib/i18n/api-errors";
 import { buildProjectZip } from "@/lib/ai/zipper";
 import type { GeneratedProjectFile } from "@/lib/ai/types";
 import { prepareWebsiteProjectForExport } from "@/lib/website/prepare-export";

@@ -3,36 +3,19 @@ import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError
 import { requireUser, parseUuidParam, parseJsonBody } from "@/lib/api/helpers";
 import { serverErrorResponse } from "@/lib/api/errors";
 import { enforceWebsiteUserMutationRateLimit } from "@/lib/website/public-endpoints";
-import { extractWebsiteFilesFromBlueprint } from "@/plugins/website/iteration";
-import { persistWebsiteGeneration } from "@/lib/website/save-generation";
 import type { GeneratedWebsiteProject } from "@/plugins/website/types";
 import type { WebsiteGeneration } from "@/types/database";
 import {
   resolveSiteStructureForProject,
   parseCatalogFromFiles,
-  writeCatalogToFiles,
-  upsertCatalogItem,
-  deleteCatalogItem,
-  listCmsEntries,
-  upsertCmsEntry,
-  deleteCmsEntry,
-  applyBrandManagement,
-  runWebsiteAssistant,
   runPrePublishQualityControl,
-  addPage,
-  removePage,
-  duplicatePage,
-  reorderPages,
-  setHomepage,
-  updatePageMeta,
-  applyStructureToProjectFiles,
-  updateNavLinks,
-  updateFooterLinks,
-  injectCmsIntoFiles,
+  listCmsEntries,
   listMediaAssets,
 } from "@/lib/ai-core/website-management";
 import { listWebsiteLeads } from "@/lib/ai-core/website-design-platform";
 import { resolveBrandLogoUrl } from "@/lib/ai-core/website-management/brand/resolve-logo";
+import { executeWebsiteStructureMutation } from "@/lib/website/platform/services/structure-service";
+import { toWebsiteProject, loadWebsiteGenerationForUser } from "@/lib/website/platform/load-generation";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -41,31 +24,7 @@ export const runtime = "nodejs";
 type Params = { params: Promise<{ id: string }> };
 
 function toProject(generation: WebsiteGeneration): GeneratedWebsiteProject {
-  const blueprint = (generation.blueprint ||
-    {}) as unknown as GeneratedWebsiteProject;
-  const files = extractWebsiteFilesFromBlueprint(generation.blueprint);
-  return {
-    ...blueprint,
-    projectKind: blueprint.projectKind || "website",
-    title: blueprint.title || generation.project_name || "Website",
-    description:
-      blueprint.description || generation.business_description || "",
-    pages: blueprint.pages || [],
-    sections: blueprint.sections || [],
-    colorPalette: blueprint.colorPalette || [],
-    typography: blueprint.typography || [],
-    components: blueprint.components || [],
-    content: blueprint.content || [],
-    seo: blueprint.seo || [],
-    roadmap: blueprint.roadmap || [],
-    files: files.length ? files : blueprint.files || [],
-    businessProfile: blueprint.businessProfile,
-    strategy: blueprint.strategy,
-    designSystem: blueprint.designSystem,
-    assetManifest: blueprint.assetManifest,
-    seoPackage: blueprint.seoPackage,
-    qualityReport: blueprint.qualityReport,
-  };
+  return toWebsiteProject(generation);
 }
 
 /**
@@ -78,23 +37,17 @@ export async function GET(_request: Request, { params }: Params) {
   const { id: rawId } = await params;
   const parsedId = parseUuidParam(rawId, "generation id");
   if (parsedId instanceof NextResponse) return parsedId;
-  const generationId = parsedId.id;
 
-  const { data, error } = await auth.supabase
-    .from("website_generations")
-    .select("*")
-    .eq("id", parsedId.id)
-    .eq("user_id", auth.user!.id)
-    .maybeSingle();
+  const generation = await loadWebsiteGenerationForUser(
+    auth.supabase!,
+    auth.user!.id,
+    parsedId.id,
+  );
 
-  if (error) {
-    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, error.message);
-  }
-  if (!data) {
+  if (!generation) {
     return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Website not found.");
   }
 
-  const generation = data as WebsiteGeneration;
   const project = toProject(generation);
   const industryId =
     project.businessProfile?.industry ||
@@ -135,7 +88,7 @@ export async function GET(_request: Request, { params }: Params) {
   });
 }
 
-const manageSchema = z.discriminatedUnion("action", [
+const manageActionSchema = z.discriminatedUnion("action", [
   z.object({
     action: z.literal("catalog.upsert"),
     item: z.object({
@@ -262,6 +215,13 @@ const manageSchema = z.discriminatedUnion("action", [
   }),
 ]);
 
+const manageBodySchema = manageActionSchema.and(
+  z.object({
+    expectedRevision: z.number().int().min(0).optional(),
+    idempotencyKey: z.string().trim().max(128).optional(),
+  }),
+);
+
 /**
  * POST — Management mutations (catalog, CMS, brand, assistant, quality).
  */
@@ -280,290 +240,60 @@ export async function POST(request: Request, { params }: Params) {
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
 
-  const parsed = manageSchema.safeParse(body);
+  const parsed = manageBodySchema.safeParse(body);
   if (!parsed.success) {
     return apiValidationError(parsed.error.issues[0]?.message);
   }
 
+  const { expectedRevision, idempotencyKey, ...action } = parsed.data;
+
   try {
-    const { data, error } = await auth.supabase
-      .from("website_generations")
-      .select("*")
-      .eq("id", parsedId.id)
-      .eq("user_id", auth.user!.id)
-      .maybeSingle();
-
-    if (error) throw error;
-    if (!data) {
-      return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Website not found.");
-    }
-
-    const generation = data as WebsiteGeneration;
-    let project = toProject(generation);
-    const industryId =
-      project.businessProfile?.industry ||
-      project.designSystem?.industryPattern ||
-      "business";
-    let structure = resolveSiteStructureForProject(
-      project.files || [],
-      industryId,
-      project.description,
-    );
-    const action = parsed.data;
-    const notes: string[] = [];
-    let assistantResult: ReturnType<typeof runWebsiteAssistant> | null = null;
-    const brandName =
-      generation.project_name || project.title || "Brand";
-
-    async function syncCmsToProject() {
-      const cms = await listCmsEntries(generationId, auth.supabase);
-      const files = injectCmsIntoFiles(
-        project.files || [],
-        cms,
-        brandName,
-      );
-      project = { ...project, files };
-      notes.push("CMS synced to project files");
-      return cms;
-    }
-
-    function syncStructureToProject() {
-      project = {
-        ...project,
-        files: applyStructureToProjectFiles({
-          files: project.files || [],
-          structure,
-          brandName,
-        }),
-      };
-    }
-
-    if (action.action === "quality") {
-      const quality = runPrePublishQualityControl({
-        files: project.files || [],
-        structure,
-      });
-      return NextResponse.json({ ok: true, quality });
-    }
-
-    if (action.action === "cms.upsert") {
-      const entry = await upsertCmsEntry(generationId, action.entry, {
-        userId: auth.user!.id,
-        client: auth.supabase,
-      });
-      await syncCmsToProject();
-      const saved = await persistWebsiteGeneration({
-        supabase: auth.supabase,
-        userId: auth.user!.id,
-        project,
-        projectKind: project.projectKind || "website",
-        existingGenerationId: generation.id,
-        input: {
-          prompt:
-            generation.business_description ||
-            project.description ||
-            "Website management update",
-          language: generation.language || "English",
-          theme: `${generation.design_style || ""} ${generation.color_style || ""}`.trim() ||
-            "premium",
-          features: generation.features || [],
-          productId: "website-builder",
-          projectId: generation.project_id || undefined,
-          mode: "continue",
-          parentGenerationId: generation.id,
-          continueInstruction: `[website-management] CMS updated: ${entry.title}`,
-        },
-      });
-      if (!saved.ok) {
-        return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, saved.error);
-      }
-      return NextResponse.json({
-        ok: true,
-        entry,
-        cms: await listCmsEntries(generationId, auth.supabase),
-        project: saved.project,
-        generation: saved.generation,
-      });
-    }
-
-    if (action.action === "cms.delete") {
-      await deleteCmsEntry(generationId, action.id, auth.supabase);
-      await syncCmsToProject();
-      const saved = await persistWebsiteGeneration({
-        supabase: auth.supabase,
-        userId: auth.user!.id,
-        project,
-        projectKind: project.projectKind || "website",
-        existingGenerationId: generation.id,
-        input: {
-          prompt:
-            generation.business_description ||
-            project.description ||
-            "Website management update",
-          language: generation.language || "English",
-          theme: `${generation.design_style || ""} ${generation.color_style || ""}`.trim() ||
-            "premium",
-          features: generation.features || [],
-          productId: "website-builder",
-          projectId: generation.project_id || undefined,
-          mode: "continue",
-          parentGenerationId: generation.id,
-          continueInstruction: "[website-management] CMS entry deleted",
-        },
-      });
-      if (!saved.ok) {
-        return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, saved.error);
-      }
-      return NextResponse.json({
-        ok: true,
-        cms: await listCmsEntries(generationId, auth.supabase),
-        project: saved.project,
-        generation: saved.generation,
-      });
-    }
-
-    let catalog = parseCatalogFromFiles(project.files || []);
-
-    if (action.action === "catalog.upsert") {
-      catalog = upsertCatalogItem(catalog, action.item);
-      project = {
-        ...project,
-        files: writeCatalogToFiles(project.files || [], catalog, industryId),
-      };
-      notes.push(`Catalog item saved: ${action.item.title}`);
-    }
-
-    if (action.action === "catalog.delete") {
-      catalog = deleteCatalogItem(catalog, action.id);
-      project = {
-        ...project,
-        files: writeCatalogToFiles(project.files || [], catalog, industryId),
-      };
-      notes.push("Catalog item deleted");
-    }
-
-    if (action.action === "brand.apply") {
-      const result = applyBrandManagement({
-        project,
-        brand: action.brand,
-      });
-      project = result.project;
-      notes.push(...result.notes);
-    }
-
-    if (action.action === "assistant") {
-      assistantResult = runWebsiteAssistant({
-        message: action.message,
-        catalog,
-      });
-      if (assistantResult.catalog) {
-        catalog = assistantResult.catalog;
-        project = {
-          ...project,
-          files: writeCatalogToFiles(project.files || [], catalog, industryId),
-        };
-      }
-      notes.push(...assistantResult.notes);
-    }
-
-    if (action.action === "pages.create") {
-      structure = addPage(structure, action);
-      syncStructureToProject();
-      notes.push(`Page created: ${action.label}`);
-    }
-
-    if (action.action === "pages.update") {
-      structure = updatePageMeta(structure, action.route, {
-        label: action.label,
-        purpose: action.purpose,
-      });
-      syncStructureToProject();
-      notes.push(`Page updated: ${action.route}`);
-    }
-
-    if (action.action === "pages.delete") {
-      structure = removePage(structure, action.route);
-      syncStructureToProject();
-      notes.push(`Page deleted: ${action.route}`);
-    }
-
-    if (action.action === "pages.duplicate") {
-      structure = duplicatePage(structure, action.route);
-      syncStructureToProject();
-      notes.push(`Page duplicated: ${action.route}`);
-    }
-
-    if (action.action === "pages.reorder") {
-      structure = reorderPages(structure, action.routes);
-      syncStructureToProject();
-      notes.push("Pages reordered");
-    }
-
-    if (action.action === "pages.setHome") {
-      structure = setHomepage(structure, action.route);
-      syncStructureToProject();
-      notes.push(`Homepage set: ${action.route}`);
-    }
-
-    if (action.action === "nav.update") {
-      structure = updateNavLinks(structure, action.links);
-      syncStructureToProject();
-      notes.push("Navigation updated");
-    }
-
-    if (action.action === "footer.update") {
-      structure = updateFooterLinks(structure, action.links);
-      syncStructureToProject();
-      notes.push("Footer links updated");
-    }
-
-    const saved = await persistWebsiteGeneration({
+    const result = await executeWebsiteStructureMutation({
       supabase: auth.supabase,
       userId: auth.user!.id,
-      project,
-      projectKind: project.projectKind || "website",
-      existingGenerationId: generation.id,
-      input: {
-        prompt:
-          generation.business_description ||
-          project.description ||
-          "Website management update",
-        language: generation.language || "English",
-        theme: `${generation.design_style || ""} ${generation.color_style || ""}`.trim() ||
-          "premium",
-        features: generation.features || [],
-        productId: "website-builder",
-        projectId: generation.project_id || undefined,
-        mode: "continue",
-        parentGenerationId: generation.id,
-        continueInstruction: `[website-management] ${notes.join(" · ") || action.action}`,
-      },
+      generationId,
+      action,
+      commit: { expectedRevision, idempotencyKey },
     });
 
-    if (!saved.ok) {
-      return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, saved.error);
+    if (!result.ok) {
+      if (result.code === "NOT_FOUND") {
+        return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, result.error);
+      }
+      if (result.code === "VALIDATION") {
+        return apiValidationError(result.error);
+      }
+      if (result.code === "CONFLICT") {
+        return apiErrorResponse(API_ERROR_CODES.CONFLICT, 409, result.error);
+      }
+      return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, result.error);
     }
 
-    const quality = runPrePublishQualityControl({
-      files: saved.project.files || [],
-      structure: resolveSiteStructureForProject(
-        saved.project.files || [],
-        industryId,
-        project.description,
-      ),
-    });
+    if (result.kind === "quality") {
+      return NextResponse.json({ ok: true, quality: result.quality });
+    }
+
+    if (result.kind === "cms") {
+      return NextResponse.json({
+        ok: true,
+        entry: result.entry,
+        cms: result.cms,
+        project: result.project,
+        generation: result.generation,
+      });
+    }
 
     return NextResponse.json({
       ok: true,
-      notes,
-      structure,
-      catalog: parseCatalogFromFiles(saved.project.files || []),
-      cms: await listCmsEntries(generationId, auth.supabase),
-      quality,
-      assistant: assistantResult,
-      editCommand: assistantResult?.editCommand,
-      project: saved.project,
-      generation: saved.generation,
+      notes: result.notes,
+      structure: result.structure,
+      catalog: result.catalog,
+      cms: result.cms,
+      quality: result.quality,
+      assistant: result.assistant,
+      editCommand: result.editCommand,
+      project: result.project,
+      generation: result.generation,
     });
   } catch (error) {
     return serverErrorResponse("website-builder.manage", error);

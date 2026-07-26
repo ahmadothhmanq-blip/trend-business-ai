@@ -231,11 +231,21 @@ export function normalizeVerticalIndustryId(
   if (
     raw === "saas" ||
     raw === "software" ||
-    raw === "technology" ||
-    raw === "tech" ||
-    raw === "ai"
+    raw === "subscription"
   ) {
     return "saas";
+  }
+  if (
+    raw === "technology" ||
+    raw === "tech" ||
+    raw === "computer" ||
+    raw === "it" ||
+    raw === "hardware"
+  ) {
+    return "technology";
+  }
+  if (raw === "furniture" || raw === "furnishing" || raw === "home-furnish") {
+    return "furniture";
   }
   if (
     raw === "automotive" ||
@@ -260,6 +270,9 @@ export function normalizeVerticalIndustryId(
 
 export function inferVerticalFromText(text: string): IndustryId | "business" {
   const haystack = text.toLowerCase();
+  if (/furniture|sofa|bedroom|living room|أثاث|مفروشات/.test(haystack)) {
+    return "furniture";
+  }
   if (
     AUTOMOTIVE_SIGNALS.some((s) => haystack.includes(s)) &&
     !SOFTWARE_SIGNALS.some((s) => haystack.includes(s))
@@ -269,6 +282,9 @@ export function inferVerticalFromText(text: string): IndustryId | "business" {
   if (RESTAURANT_SIGNALS.some((s) => haystack.includes(s))) return "restaurant";
   if (/real estate|realtor|property listing|home buyer/.test(haystack)) {
     return "real-estate";
+  }
+  if (/computer company|computers?|it services|hardware|servers/.test(haystack)) {
+    return "technology";
   }
   if (SOFTWARE_SIGNALS.some((s) => haystack.includes(s))) return "saas";
   return "business";

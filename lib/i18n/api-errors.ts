@@ -19,6 +19,7 @@ export const API_ERROR_CODES = {
   PROVIDER_UNAVAILABLE: "PROVIDER_UNAVAILABLE",
   UNKNOWN_PROVIDER: "UNKNOWN_PROVIDER",
   LOAD_FAILED: "LOAD_FAILED",
+  CONFLICT: "CONFLICT",
 } as const;
 
 export type ApiErrorCode = (typeof API_ERROR_CODES)[keyof typeof API_ERROR_CODES];
@@ -47,6 +48,7 @@ const DEFAULT_MESSAGES: Record<ApiErrorCode, string> = {
   PROVIDER_UNAVAILABLE: "Provider is not available",
   UNKNOWN_PROVIDER: "Unknown provider",
   LOAD_FAILED: "Failed to load data",
+  CONFLICT: "Resource was modified concurrently",
 };
 
 export function apiErrorResponse(

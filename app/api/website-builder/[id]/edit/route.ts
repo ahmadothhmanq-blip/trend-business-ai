@@ -1,25 +1,9 @@
 import { requireUser, parseJsonBody, parseUuidParam } from "@/lib/api/helpers";
-import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
+import { API_ERROR_CODES, apiErrorResponse, apiValidationError } from "@/lib/i18n/api-errors";
 import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { serverErrorResponse } from "@/lib/api/errors";
-import { generateWebsite } from "@/lib/website-generator";
-import { providerManager } from "@/lib/ai/provider-manager";
-import type { AIProviderName } from "@/lib/ai/types";
-import {
-  asSupabaseMaybeSingleClient,
-  asSupabaseSingleClient,
-} from "@/lib/api/supabase-query";
-import {
-  extractWebsiteFilesFromBlueprint,
-  loadWebsiteParentContext,
-} from "@/plugins/website/iteration";
-import { persistWebsiteGeneration } from "@/lib/website/save-generation";
-import {
-  runWebsiteEditor,
-  type WebsiteEditAction,
-} from "@/lib/ai-core/website-editor";
-import type { GeneratedWebsiteProject } from "@/plugins/website/types";
-import type { WebsiteGeneration } from "@/types/database";
+import { executeWebsiteEdit } from "@/lib/website/platform/services/edit-service";
+import type { WebsiteEditAction } from "@/lib/ai-core/website-editor";
 import { z } from "zod";
 import { NextResponse } from "next/server";
 
@@ -50,6 +34,10 @@ const editBodySchema = z.object({
     .optional(),
   /** When true (default), run AI continue for remaining rewrite/conversion intents. */
   applyAi: z.boolean().optional(),
+  /** Phase 0 — optional optimistic concurrency (blueprint revision). */
+  expectedRevision: z.number().int().min(0).optional(),
+  /** Phase 0 — optional idempotent replay key. */
+  idempotencyKey: z.string().trim().max(128).optional(),
 });
 
 /**
@@ -80,172 +68,40 @@ export async function POST(request: Request, context: RouteContext) {
     return apiValidationError(parsed.error.issues[0]?.message);
   }
 
-  const { data: existing, error } = await auth.supabase
-    .from("website_generations")
-    .select("*")
-    .eq("id", id)
-    .eq("user_id", auth.user!.id)
-    .single();
-
-  if (error || !existing) {
-    return apiErrorResponse(API_ERROR_CODES.GENERATION_NOT_FOUND, 404);
-  }
-
-  const generation = existing as WebsiteGeneration;
-  const project = generation.blueprint as unknown as GeneratedWebsiteProject;
-  const files = extractWebsiteFilesFromBlueprint(generation.blueprint);
-
-  if (!files.length) {
-    return apiValidationError("Generation has no editable files.");
-  }
-
-  let command = parsed.data.command?.trim() || "";
-  let actions = (parsed.data.actions || []) as WebsiteEditAction[];
-
-  if (parsed.data.suggestionId && project.editorSuggestions?.suggestions) {
-    const suggestion = project.editorSuggestions.suggestions.find(
-      (s) => s.id === parsed.data.suggestionId,
-    );
-    if (suggestion) {
-      command = command || suggestion.command;
-      if (suggestion.actions?.length) {
-        actions = [...actions, ...suggestion.actions];
-      }
-    }
-  }
-
-  if (!command && !actions.length) {
-    return apiValidationError("Provide a command, suggestionId, or actions.");
-  }
-
   try {
-    const editResult = runWebsiteEditor({
-      files,
-      project,
-      command,
-      actions,
+    const result = await executeWebsiteEdit({
+      supabase: auth.supabase,
+      userId: auth.user!.id,
+      generationId: id,
+      request: {
+        command: parsed.data.command,
+        suggestionId: parsed.data.suggestionId,
+        actions: (parsed.data.actions || []) as WebsiteEditAction[],
+        applyAi: parsed.data.applyAi,
+      },
+      commit: {
+        expectedRevision: parsed.data.expectedRevision,
+        idempotencyKey: parsed.data.idempotencyKey,
+      },
     });
 
-    const applyAi = parsed.data.applyAi !== false;
-    const settings = await providerManager.loadUserSettings(
-      asSupabaseSingleClient(auth.supabase),
-      auth.user!.id,
-    );
-    const parentContext = await loadWebsiteParentContext(
-      asSupabaseMaybeSingleClient(auth.supabase),
-      auth.user!.id,
-      id,
-    );
-
-    let savedProject: GeneratedWebsiteProject;
-    let savedGeneration: WebsiteGeneration;
-
-    if (applyAi && editResult.continueInstruction) {
-      const generated = await generateWebsite({
-        prompt:
-          generation.business_description ||
-          project.description ||
-          project.prompt ||
-          "Edit this website with AI.",
-        projectType: generation.website_type || "Business website",
-        projectKind: "website",
-        language: "en",
-        theme: "modern",
-        features: [],
-        mode: "continue",
-        parentGenerationId: id,
-        continueInstruction: editResult.continueInstruction,
-        optimizeWithAi: true,
-        previousFiles: editResult.files,
-        ...parentContext,
-        userId: auth.user!.id,
-        preferredProvider: settings?.default_provider as AIProviderName | undefined,
-        autoFallback: settings?.auto_fallback ?? true,
-      });
-
-      const saved = await persistWebsiteGeneration({
-        supabase: auth.supabase,
-        userId: auth.user!.id,
-        project: {
-          ...generated,
-          editorSuggestions: {
-            suggestions: editResult.suggestions,
-            summary: editResult.summary,
-            generatedAt: new Date().toISOString(),
-          },
-        },
-        projectKind: generated.projectKind ?? "website",
-        input: {
-          prompt: generation.business_description || command,
-          language: "en",
-          theme: "modern",
-          features: [],
-          productId: "website-builder",
-          projectId: generation.project_id ?? undefined,
-          mode: "continue",
-          parentGenerationId: id,
-          continueInstruction: editResult.continueInstruction,
-        },
-      });
-
-      if (!saved.ok) {
-        return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, saved.error);
+    if (!result.ok) {
+      if (result.code === "NOT_FOUND") {
+        return apiErrorResponse(API_ERROR_CODES.GENERATION_NOT_FOUND, 404);
       }
-      savedProject = saved.project;
-      savedGeneration = saved.generation;
-    } else {
-      const nextProject: GeneratedWebsiteProject = {
-        ...project,
-        files: editResult.files,
-        sections: editResult.understanding.homeComponentOrder,
-        components: editResult.understanding.homeComponentOrder,
-        editorSuggestions: {
-          suggestions: editResult.suggestions,
-          summary: editResult.summary,
-          generatedAt: new Date().toISOString(),
-        },
-        progressEvents: [
-          ...(project.progressEvents ?? []),
-          `[website-editor] ${editResult.summary}`,
-        ],
-      };
-
-      const saved = await persistWebsiteGeneration({
-        supabase: auth.supabase,
-        userId: auth.user!.id,
-        project: nextProject,
-        projectKind: nextProject.projectKind ?? "website",
-        input: {
-          prompt: generation.business_description || command,
-          language: "en",
-          theme: "modern",
-          features: [],
-          productId: "website-builder",
-          projectId: generation.project_id ?? undefined,
-          mode: "continue",
-          parentGenerationId: id,
-          continueInstruction: command || editResult.summary,
-        },
-      });
-
-      if (!saved.ok) {
-        return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, saved.error);
+      if (result.code === "VALIDATION") {
+        return apiValidationError(result.error);
       }
-      savedProject = saved.project;
-      savedGeneration = saved.generation;
+      if (result.code === "CONFLICT") {
+        return apiErrorResponse(API_ERROR_CODES.CONFLICT, 409, result.error);
+      }
+      return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, result.error);
     }
 
     return NextResponse.json({
-      project: savedProject,
-      generation: savedGeneration,
-      editResult: {
-        summary: editResult.summary,
-        actionsApplied: editResult.actionsApplied,
-        appliedNotes: editResult.appliedNotes,
-        understanding: editResult.understanding,
-        suggestions: editResult.suggestions,
-        continueInstruction: editResult.continueInstruction ?? null,
-      },
+      project: result.project,
+      generation: result.generation,
+      editResult: result.editResult,
       message: "Website edited with Website Editor Intelligence.",
     });
   } catch (err) {

@@ -30,25 +30,30 @@ export type AutoDesignInput = {
 function inferIndustryId(prompt: string, hint?: string | null): string {
   if (hint?.trim()) return hint.trim().toLowerCase();
   const p = prompt.toLowerCase();
-  if (/car|vehicle|dealership|automotive|showroom|garage/.test(p))
+  if (/furniture|sofa|bedroom|living room|showroom|أثاث|مفروشات|كنب/.test(p))
+    return "furniture";
+  if (/car|vehicle|dealership|automotive|showroom|garage/.test(p) && !/furniture|sofa/.test(p))
     return "automotive";
-  if (/real estate|realtor|property|listing|home buyer/.test(p))
+  if (/real estate|realtor|property|listing|home buyer|عقار/.test(p))
     return "real-estate";
-  if (/restaurant|dining|bistro|cafe|menu|chef/.test(p)) return "restaurant";
+  if (/restaurant|dining|bistro|cafe|menu|chef|مطعم/.test(p)) return "restaurant";
+  if (/computer company|computers?|it services|hardware|servers|تكنولوجيا|حاسوب|حواسيب/.test(p))
+    return "technology";
   if (/hotel|resort|hospitality stay/.test(p)) return "tourism";
-  if (/travel|tour|destination|tourism/.test(p)) return "tourism";
+  if (/travel|tour|destination|tourism|سفر|سياحة/.test(p) && !/furniture|أثاث|sofa/.test(p))
+    return "tourism";
   if (/saas|subscription software|b2b platform/.test(p)) return "saas";
   if (/ecommerce|online store|shopify|product shop/.test(p))
     return "ecommerce";
   if (/agency|creative studio|portfolio|design firm/.test(p)) return "agency";
-  if (/clinic|dental|medical|healthcare/.test(p)) return "clinic";
+  if (/clinic|dental|medical|healthcare|عيادة/.test(p)) return "clinic";
   if (/school|university|education|course/.test(p)) return "education";
   if (
     /ai company|artificial intelligence|machine learning|software|tech company/.test(
       p,
     )
   )
-    return "saas";
+    return "technology";
   return "business";
 }
 

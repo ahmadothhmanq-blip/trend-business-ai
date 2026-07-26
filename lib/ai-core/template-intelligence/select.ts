@@ -102,6 +102,12 @@ function scoreTemplate(
   if (tpl.industry === "automotive" && hasSoftware && !hasAutomotive) {
     score -= 50;
   }
+  if (tpl.industry === "tourism" && /furniture|sofa|bedroom|أثاث|مفروشات/.test(text)) {
+    score -= 80;
+  }
+  if (tpl.industry === "ecommerce" && /furniture|sofa|bedroom|أثاث/.test(text)) {
+    score += 25;
+  }
   if (
     (tpl.category === "Technology" || tpl.category === "SaaS") &&
     hasSoftware &&
@@ -167,8 +173,20 @@ export function selectTemplateIntelligence(
   const alternatives = ranked.slice(1, 4).map((r) => r.tpl);
 
   if (best.score <= 0) {
+    const industryFallbackId =
+      resolvedIndustry === "furniture"
+        ? "ti-ecommerce-atelier"
+        : resolvedIndustry === "technology" || resolvedIndustry === "saas"
+          ? "ti-technology-dark"
+          : resolvedIndustry === "restaurant"
+            ? "ti-restaurant-dining"
+            : resolvedIndustry === "real-estate"
+              ? "ti-real-estate-listings"
+              : "ti-modern-clean";
     const fallback =
-      getTemplateIntelligence("ti-modern-clean") || TEMPLATE_INTELLIGENCE_CATALOG[0]!;
+      getTemplateIntelligence(industryFallbackId) ||
+      getTemplateIntelligence("ti-modern-clean") ||
+      TEMPLATE_INTELLIGENCE_CATALOG[0]!;
     return {
       template: fallback,
       confidence: 0.4,

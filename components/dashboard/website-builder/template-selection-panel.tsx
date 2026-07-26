@@ -270,7 +270,7 @@ export function TemplateSelectionPanel(props: {
     } finally {
       setLoading(false);
     }
-  }, [onCatalogLoaded]);
+  }, [onCatalogLoaded, wb]);
 
   useEffect(() => {
     void load();

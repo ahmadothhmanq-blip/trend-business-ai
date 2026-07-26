@@ -74,7 +74,7 @@ export function ExperimentsPanel(props: { generationId: string | null }) {
     } finally {
       setLoading(false);
     }
-  }, [props.generationId]);
+  }, [props.generationId, wb]);
 
   useEffect(() => {
     void load();

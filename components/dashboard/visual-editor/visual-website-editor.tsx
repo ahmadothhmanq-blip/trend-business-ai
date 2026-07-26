@@ -1,8 +1,10 @@
 "use client";
 
 import {
+  forwardRef,
   useCallback,
   useEffect,
+  useImperativeHandle,
   useMemo,
   useRef,
   useState,
@@ -66,6 +68,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  createBuilderAutosaveScheduler,
+} from "@/lib/website/builder/autosave";
+import type { BuilderAutosaveState } from "@/lib/website/builder/types";
 
 function kindFromSectionKind(kind: string): VisualNodeKind {
   if (kind === "hero") return "hero";
@@ -90,21 +96,60 @@ type VisualWebsiteEditorProps = {
   files: GeneratedProjectFile[];
   project?: GeneratedWebsiteProject | null;
   disabled?: boolean;
+  chrome?: "full" | "workspace";
+  autosaveEnabled?: boolean;
+  onAutosaveStateChange?: (state: BuilderAutosaveState) => void;
   onDirtyChange?: (dirty: boolean) => void;
+  onSelectionChange?: (selection: {
+    nodeId: string;
+    nodeLabel: string;
+    sectionKind?: string;
+    componentExportName?: string;
+  } | null) => void;
   onSaved: (payload: {
     project: GeneratedWebsiteProject;
     generation: WebsiteGeneration;
   }) => void;
+  onTokensChange?: (tokens: VisualDocument["tokens"]) => void;
 };
 
-export function VisualWebsiteEditor({
-  generationId,
-  files,
-  project,
-  disabled,
-  onDirtyChange,
-  onSaved,
-}: VisualWebsiteEditorProps) {
+export type VisualWebsiteEditorHandle = {
+  save: (options?: { silent?: boolean }) => Promise<boolean>;
+  selectNode: (nodeId: string) => void;
+  moveSection: (fromIndex: number, toIndex: number) => void;
+  insertBlock: (block: {
+    exportName: string;
+    path: string;
+    sectionKind: string;
+    name: string;
+  }) => void;
+  getTokens: () => VisualDesignTokens;
+  updateTokens: (patch: Partial<VisualDesignTokens>) => void;
+  getViewport: () => VisualViewport;
+  setViewport: (viewport: VisualViewport) => void;
+};
+
+type VisualDesignTokens = VisualDocument["tokens"];
+
+export const VisualWebsiteEditor = forwardRef<
+  VisualWebsiteEditorHandle,
+  VisualWebsiteEditorProps
+>(function VisualWebsiteEditor(
+  {
+    generationId,
+    files,
+    project,
+    disabled,
+    chrome = "full",
+    autosaveEnabled = false,
+    onAutosaveStateChange,
+    onDirtyChange,
+    onSelectionChange,
+    onSaved,
+    onTokensChange,
+  },
+  ref,
+) {
   const pt = useProductT("visualEditor");
   const initial = useMemo(
     () =>
@@ -126,6 +171,8 @@ export function VisualWebsiteEditor({
   const [uploadingImage, setUploadingImage] = useState(false);
   const [cropAspect, setCropAspect] = useState<"free" | "1:1" | "16:9">("free");
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const autosaveSchedulerRef = useRef(createBuilderAutosaveScheduler());
+  const isWorkspace = chrome === "workspace";
 
   async function optimizeAndUpload(file: File) {
     if (!selected) return;
@@ -212,8 +259,32 @@ export function VisualWebsiteEditor({
     doc.nodes.find((n) => n.id === doc.selectedNodeId) || doc.nodes[0] || null;
 
   useEffect(() => {
+    onTokensChange?.(doc.tokens);
+  }, [doc.tokens, onTokensChange]);
+
+  useEffect(() => {
     onDirtyChange?.(doc.dirty);
   }, [doc.dirty, onDirtyChange]);
+
+  useEffect(() => {
+    if (!onSelectionChange) return;
+    if (!selected) {
+      onSelectionChange(null);
+      return;
+    }
+    onSelectionChange({
+      nodeId: selected.id,
+      nodeLabel: selected.label || selected.exportName || selected.kind,
+      sectionKind: selected.kind,
+      componentExportName: selected.exportName,
+    });
+  }, [
+    selected?.id,
+    selected?.label,
+    selected?.exportName,
+    selected?.kind,
+    onSelectionChange,
+  ]);
 
   useEffect(() => {
     if (!doc.dirty) return;
@@ -276,17 +347,18 @@ export function VisualWebsiteEditor({
     toast.message(pt("toasts.componentAdded", { name: payload.name }));
   };
 
-  const save = async () => {
+  const save = async (options?: { silent?: boolean }) => {
     if (!doc.dirty) {
-      toast.message(pt("toasts.noChanges"));
-      return;
+      if (!options?.silent) toast.message(pt("toasts.noChanges"));
+      return true;
     }
     const actions = documentToSaveActions(baseline, doc);
     if (!actions.length) {
-      toast.message(pt("toasts.nothingToPersist"));
-      return;
+      if (!options?.silent) toast.message(pt("toasts.nothingToPersist"));
+      return true;
     }
     setSaving(true);
+    onAutosaveStateChange?.("saving");
     try {
       const response = await fetch(
         `/api/website-builder/${generationId}/edit`,
@@ -313,15 +385,95 @@ export function VisualWebsiteEditor({
       setBaseline(nextDoc);
       setHistory(createVisualHistory(nextDoc));
       onSaved({ project: data.project, generation: data.generation });
-      toast.success(data.editResult?.summary || pt("toasts.saved"));
+      if (!options?.silent) {
+        toast.success(data.editResult?.summary || pt("toasts.saved"));
+      }
+      onAutosaveStateChange?.("saved");
+      return true;
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : pt("toasts.saveFailed"),
-      );
+      onAutosaveStateChange?.("error");
+      if (!options?.silent) {
+        toast.error(
+          error instanceof Error ? error.message : pt("toasts.saveFailed"),
+        );
+      }
+      return false;
     } finally {
       setSaving(false);
     }
   };
+
+  const saveRef = useRef(save);
+  useEffect(() => {
+    saveRef.current = save;
+  });
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      save: (options) => saveRef.current(options),
+      selectNode: (nodeId: string) => {
+        setHistory((h) => ({
+          ...h,
+          present: selectNode(h.present, nodeId),
+        }));
+      },
+      moveSection: (fromIndex: number, toIndex: number) => {
+        setHistory((h) => ({
+          ...h,
+          present: moveNode(h.present, fromIndex, toIndex),
+        }));
+      },
+      insertBlock: (block) => {
+        setHistory((h) => {
+          const present = h.present;
+          return {
+            ...h,
+            present: insertMarketplaceComponent(present, {
+              exportName: block.exportName,
+              path: block.path,
+              kind: kindFromSectionKind(block.sectionKind),
+              label: block.name,
+              text: block.name,
+            }),
+          };
+        });
+      },
+      getTokens: () => doc.tokens,
+      updateTokens: (patch) => {
+        setHistory((h) => ({
+          ...h,
+          present: updateTokens(h.present, patch),
+        }));
+      },
+      getViewport: () => doc.viewport,
+      setViewport: (viewport) => {
+        setHistory((h) => ({
+          ...h,
+          present: setViewport(h.present, viewport),
+        }));
+      },
+    }),
+    [doc.tokens, doc.viewport],
+  );
+
+  useEffect(() => {
+    if (!autosaveEnabled || !doc.dirty || saving || disabled) {
+      return;
+    }
+    onAutosaveStateChange?.("pending");
+    const scheduler = autosaveSchedulerRef.current;
+    scheduler.schedule(() => {
+      void saveRef.current({ silent: true });
+    });
+    return () => scheduler.cancel();
+  }, [
+    autosaveEnabled,
+    doc.dirty,
+    disabled,
+    onAutosaveStateChange,
+    saving,
+  ]);
 
   return (
     <div className="flex h-full min-h-[720px] flex-col bg-[#050505]">
@@ -394,16 +546,24 @@ export function VisualWebsiteEditor({
         </Button>
       </div>
 
-      <div className="grid min-h-0 flex-1 lg:grid-cols-[240px_200px_minmax(0,1fr)_260px]">
-        {/* Component marketplace */}
+      <div
+        className={cn(
+          "grid min-h-0 flex-1",
+          isWorkspace
+            ? "lg:grid-cols-[minmax(0,1fr)_260px]"
+            : "lg:grid-cols-[240px_200px_minmax(0,1fr)_260px]",
+        )}
+      >
+        {!isWorkspace ? (
         <aside className="border-r border-white/[0.08] bg-black/40 p-3">
           <ComponentLibraryPanel
             compact
             onInsert={(c) => insertFromLibrary(c)}
           />
         </aside>
+        ) : null}
 
-        {/* Layers */}
+        {!isWorkspace ? (
         <aside className="border-r border-white/[0.08] bg-black/30 p-3">
           <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/35">
             {pt("layers")}
@@ -444,6 +604,7 @@ export function VisualWebsiteEditor({
             ))}
           </ul>
         </aside>
+        ) : null}
 
         {/* Canvas */}
         <div
@@ -763,7 +924,7 @@ export function VisualWebsiteEditor({
       </Dialog>
     </div>
   );
-}
+});
 
 function CanvasBlock(props: {
   node: VisualNode;

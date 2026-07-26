@@ -1,5 +1,5 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
-import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
+import { apiValidationError } from "@/lib/i18n/api-errors";
 import { enforceAiUsage } from "@/lib/api/rate-limit";
 import { generateWebsite } from "@/lib/website-generator";
 import { providerManager } from "@/lib/ai/provider-manager";

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError } from "@/lib/i18n/api-errors";
 import { requireUser, parseUuidParam } from "@/lib/api/helpers";
 import { extractWebsiteFilesFromBlueprint } from "@/plugins/website/iteration";
 import type { GeneratedWebsiteProject } from "@/plugins/website/types";

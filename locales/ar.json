@@ -2043,6 +2043,7 @@
         "renameDescriptionWorkspace": "حدّث اسم المشروع المحفوظ في سجل مساحة العمل.",
         "deleteTitle": "حذف المشروع؟",
         "deleteDescription": "لا يمكن التراجع عن هذا الإجراء.",
+        "unsavedEditorWarning": "لديك تغييرات غير محفوظة في المحرر المرئي. المغادرة دون حفظ؟",
         "confirm": "تأكيد",
         "cancel": "إلغاء"
       },
@@ -2306,6 +2307,189 @@
         "pipelineHint": "خط أنابيب الذكاء الاصطناعي: فكرة ← استراتيجية ← تصميم ← أصول ← إنشاء ← جودة ← جاهز",
         "viewGeneratedInside": "اعرض موقعك المُنشأ داخل المنصة."
       },
+      "builder": {
+        "toolRail": {
+          "structure": "الهيكل",
+          "design": "التصميم",
+          "blocks": "الكتل",
+          "ai": "الذكاء الاصطناعي",
+          "professional": "احترافي",
+          "business": "الأعمال",
+          "publish": "النشر",
+          "enterprise": "المؤسسات"
+        },
+        "workspace": {
+          "title": "منشئ المواقع",
+          "autosavePending": "تغييرات غير محفوظة…",
+          "autosaveSaving": "جارٍ الحفظ التلقائي…",
+          "autosaveSaved": "تم حفظ جميع التغييرات",
+          "autosaveError": "فشل الحفظ التلقائي",
+          "versions": "الإصدارات",
+          "openManagementHint": "افتح إدارة الموقع لتحرير هذه الصفحة.",
+          "restored": "تمت استعادة {label}",
+          "backupSaved": "تم حفظ النسخة الاحتياطية على الخادم.",
+          "backupFailed": "تعذر حفظ النسخة الاحتياطية على الخادم."
+        },
+        "pages": {
+          "title": "الصفحات",
+          "manage": "إدارة",
+          "editInManagement": "تحرير في إدارة الموقع"
+        },
+        "sections": {
+          "title": "الأقسام"
+        },
+        "blocks": {
+          "searchPlaceholder": "البحث في الكتل…",
+          "insert": "إدراج كتلة",
+          "categories": {
+            "all": "الكل",
+            "hero": "البطل",
+            "section": "الأقسام",
+            "cta": "دعوة إجراء",
+            "proof": "إثبات",
+            "media": "الوسائط",
+            "layout": "التخطيط"
+          }
+        },
+        "design": {
+          "themePresets": "سمات جاهزة",
+          "responsive": "متجاوب",
+          "colors": "الألوان",
+          "primary": "أساسي",
+          "secondary": "ثانوي",
+          "accent": "تمييز",
+          "background": "الخلفية",
+          "foreground": "النص",
+          "typography": "الخطوط",
+          "headingFont": "خط العناوين",
+          "bodyFont": "خط النص",
+          "spacing": "التباعد",
+          "compact": "مضغوط",
+          "balanced": "متوازن",
+          "airy": "واسع"
+        },
+        "ai": {
+          "title": "إجراءات الموقع بالذكاء الاصطناعي",
+          "subtitle": "موحّد مع مساعد الموقع — بث، ذاكرة، سياق التحديد، ومراجعة.",
+          "fullModernize": { "label": "تحديث التصميم", "description": "تحديث الأسلوب البصري العام" },
+          "pageAbout": { "label": "إضافة صفحة من نحن", "description": "إنشاء صفحة من نحن جديدة" },
+          "sectionTestimonials": { "label": "إضافة شهادات", "description": "إدراج قسم إثبات اجتماعي" },
+          "sectionHero": { "label": "إعادة توليد البطل", "description": "إعادة كتابة قسم البطل لتحسين التحويل" },
+          "contentHome": { "label": "إعادة كتابة الصفحة الرئيسية", "description": "تحسين رسائل الصفحة الرئيسية" },
+          "imagesFresh": { "label": "تحديث الصور", "description": "استبدال الصور بصور جديدة" },
+          "seoImprove": { "label": "تحسين SEO", "description": "تطبيق توصيات تحسين محركات البحث" }
+        },
+        "copilot": {
+          "title": "مساعد الموقع",
+          "subtitle": "أوامر بلغة طبيعية لتعديلات سريعة على الموقع",
+          "selectionFocus": "التحديد: {label}",
+          "runCommand": "تنفيذ الأمر",
+          "conversation": "المحادثة",
+          "you": "أنت",
+          "assistant": "المساعد",
+          "placeholder": "صف التغيير المطلوب…",
+          "undo": "تراجع",
+          "history": "السجل",
+          "noHistory": "لا توجد أوامر بعد.",
+          "costFree": "مجاني",
+          "costAi": "رصيد واحد",
+          "quickEdits": "تعديلات سريعة",
+          "conversationView": "المحادثة",
+          "placeholderLong": "صف التغيير المطلوب على موقعك…",
+          "undoTitle": "التراجع عن آخر تغيير للمساعد"
+        },
+        "professional": {
+          "title": "الميزات الاحترافية",
+          "openManagement": "فتح في الإدارة",
+          "runCopilot": "تشغيل عبر المساعد"
+        },
+        "business": {
+          "title": "مركز الأعمال",
+          "openTab": "فتح {tab}",
+          "manage": "إدارة",
+          "copilot": "المساعد"
+        },
+        "publishing": {
+          "title": "النشر والأداء",
+          "required": "مطلوب",
+          "accessibility": "إمكانية الوصول ({count})",
+          "noA11yIssues": "لم يُكتشف مشاكل أساسية في إمكانية الوصول.",
+          "openDeploy": "فتح لوحة النشر",
+          "backup": "حفظ نسخة احتياطية على الخادم",
+          "backingUp": "جارٍ حفظ النسخة الاحتياطية…"
+        },
+        "enterprise": {
+          "title": "المؤسسات",
+          "teamMembers": "أعضاء الفريق",
+          "inviteCollaborator": "دعوة متعاون",
+          "emailPlaceholder": "collaborator@email.com",
+          "noMembers": "لا يوجد متعاونون بعد.",
+          "pending": "قيد الانتظار",
+          "emailStatus": "البريد {status}",
+          "resend": "إعادة الإرسال",
+          "remove": "إزالة",
+          "accept": "قبول",
+          "pendingInvites": "دعوات قيد الانتظار",
+          "inviteSent": "تم إرسال الدعوة.",
+          "inviteFailed": "تعذر إرسال الدعوة.",
+          "inviteRemoved": "تمت إزالة المتعاون.",
+          "removeFailed": "فشلت الإزالة.",
+          "resendSent": "تم إرسال بريد الدعوة.",
+          "resendSkipped": "تم حفظ الدعوة (مزود البريد غير مُعد).",
+          "resendFailed": "فشلت إعادة الإرسال.",
+          "loadFailed": "فشل تحميل الفريق.",
+          "capabilities": {
+            "teams": { "label": "وصول الفريق", "description": "دعوة متعاونين لمشروع موقع" },
+            "roles": { "label": "الأدوار والصلاحيات", "description": "مستويات المالك والمحرر والمشاهد" },
+            "marketplace": { "label": "سوق القوالب", "description": "تصفح وتطبيق قوالب مميزة" },
+            "plugins": { "label": "بنية الإضافات", "description": "خط أنابيب إضافات الموقع (إنشاء، تخطيط، تحقق)" },
+            "api": { "label": "واجهة API عامة", "description": "منصة التصميم والسوق وواجهات المنشئ" },
+            "white-label": { "label": "علامة بيضاء", "description": "علامة تجارية مخصصة عبر إعدادات المؤسسة (أساس)" }
+          }
+        },
+        "media": {
+          "title": "مكتبة الوسائط",
+          "searchPlaceholder": "البحث في الوسائط…",
+          "upload": "رفع",
+          "uploading": "جارٍ الرفع…",
+          "empty": "لم يُرفع وسائط بعد.",
+          "delete": "حذف",
+          "loadFailed": "فشل تحميل الوسائط."
+        },
+        "themes": {
+          "luxuryGold": { "label": "ذهبي فاخر", "description": "داكن فاخر بلمسات ذهبية" },
+          "modernMinimal": { "label": "حديث بسيط", "description": "جمالية SaaS فاتحة ونظيفة" },
+          "boldStartup": { "label": "شركة ناشئة جريئة", "description": "تباين عالٍ يركز على التحويل" }
+        },
+        "publishingItems": {
+          "quality": { "label": "بوابات الجودة", "description": "اجتياز مراقبة الجودة قبل النشر" },
+          "seo": { "label": "بيانات SEO", "description": "العناوين والأوصاف وخريطة الموقع جاهزة" },
+          "ssl": { "label": "SSL", "description": "HTTPS مفعّل على رابط النشر" },
+          "cdn": { "label": "توصيل CDN", "description": "الأصول الثابتة عبر مسار CDN للمنصة" },
+          "backup": { "label": "لقطة احتياطية", "description": "لقطة مخطط مخزّنة على الخادم" },
+          "performance": { "label": "الأداء", "description": "مؤشرات Core Web Vitals ضمن الأهداف" },
+          "accessibility": { "label": "إمكانية الوصول", "description": "فحوصات أساسية على العلامات المُنشأة" }
+        },
+        "features": {
+          "templates": { "label": "القوالب", "description": "تطبيق قوالب وتخطيطات صناعية" },
+          "blog": { "label": "المدونة ونظام المحتوى", "description": "إدارة المنشورات والفئات والمحتوى" },
+          "forms": { "label": "النماذج والعملاء المحتملون", "description": "التقاط العملاء المحتملين والرسائل" },
+          "booking": { "label": "الحجز", "description": "إضافة تدفقات حجز المواعيد" },
+          "portfolio": { "label": "معرض الأعمال", "description": "عرض المشاريع ودراسات الحالة" },
+          "pricing": { "label": "جداول الأسعار", "description": "عرض الخطط والباقات" },
+          "testimonials": { "label": "الشهادات", "description": "إثبات اجتماعي ومراجعات" },
+          "faq": { "label": "الأسئلة الشائعة", "description": "الإجابة على أسئلة العملاء الشائعة" },
+          "navigation": { "label": "التنقل", "description": "تحرير روابط الرأس والتذييل" },
+          "contact": { "label": "اتصل بنا", "description": "نماذج الاتصال وتفاصيل العمل" },
+          "analytics": { "label": "التحليلات", "description": "الزيارات والتفاعل ومقاييس التحويل" },
+          "experiments": { "label": "تجارب A/B", "description": "اختبار العناوين ودعوات الإجراء والتخطيطات" },
+          "leads": { "label": "جمع العملاء المحتملين", "description": "إرسال النماذج وتصدير CRM" },
+          "ecommerce": { "label": "كتالوج التجارة الإلكترونية", "description": "المنتجات والخدمات وإدارة الكتالوج" },
+          "membership": { "label": "أساس العضوية", "description": "محتوى مقيّد ومناطق الأعضاء (أساس)" },
+          "marketing": { "label": "أدوات التسويق", "description": "تتبع التحويل وربط الحملات" },
+          "crm": { "label": "تكامل CRM", "description": "Webhook وتوجيه العملاء المحتملين" }
+        }
+      },
       "management": {
         "backToBuilder": "العودة إلى منشئ المواقع",
         "tabs": {
@@ -2397,6 +2581,8 @@
         "favorites": "المفضلة",
         "generationHistory": "سجل التوليد",
         "generationHistoryDescription": "إعادة فتح المشاريع السابقة من مساحة العمل الرئيسية للمعاينة، التحسين بالذكاء الاصطناعي، النشر، تصدير ZIP، إعادة التسمية، الحذف، والمفضلة.",
+        "openEditor": "فتح المحرر",
+        "openManagement": "فتح الإدارة",
         "filesCount": "{count} ملفات",
         "noProjectsTitle": "لا توجد مشاريع مُنشأة بعد",
         "noProjectsDescription": "أنشئ مشروعًا لملء إعدادات مساحة العمل والسجل."

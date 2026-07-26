@@ -118,8 +118,8 @@ export async function ensureWebsiteWorkspaceProject(
   return created;
 }
 
-export async function persistWebsiteGeneration(args: {
-  supabase: SupabaseClient;
+export type PersistWebsiteGenerationArgs = {
+  supabase: import("@supabase/supabase-js").SupabaseClient;
   userId: string;
   project: GeneratedWebsiteProject & {
     provider?: string;
@@ -138,9 +138,15 @@ export async function persistWebsiteGeneration(args: {
     continueInstruction?: string;
   };
   projectKind: "website" | "web_application";
-  /** When set, update the running session row instead of inserting a new one. */
   existingGenerationId?: string | null;
-}): Promise<
+  commit?: {
+    revisionBefore: number;
+    revisionAfter: number;
+    expectedRevision?: number;
+  };
+};
+
+export async function persistWebsiteGeneration(args: PersistWebsiteGenerationArgs): Promise<
   | { ok: true; generation: WebsiteGeneration; project: GeneratedWebsiteProject }
   | { ok: false; error: string }
 > {
@@ -154,6 +160,7 @@ export async function persistWebsiteGeneration(args: {
     industryId: args.project.businessProfile?.industry,
     profile: args.project.businessProfile as never,
     strategy: args.project.strategy as never,
+    language: args.input.language,
   });
   const primaryCta =
     args.project.strategy?.ctas?.[0] ||
@@ -343,38 +350,89 @@ export async function persistWebsiteGeneration(args: {
   };
 
   if (existingId) {
-    const updated = await args.supabase
+    const revisionAfter = args.commit?.revisionAfter;
+    const revisionPatch =
+      typeof revisionAfter === "number"
+        ? { blueprint_revision: revisionAfter }
+        : {};
+
+    let updateQuery = args.supabase
       .from("website_generations")
       .update({
         ...phase5Row,
+        ...revisionPatch,
         status: "completed",
         error_message: null,
         updated_at: new Date().toISOString(),
       })
       .eq("id", existingId)
-      .eq("user_id", args.userId)
-      .select("*")
-      .single();
+      .eq("user_id", args.userId);
+
+    if (args.commit?.expectedRevision !== undefined) {
+      updateQuery = updateQuery.eq(
+        "blueprint_revision",
+        args.commit.expectedRevision,
+      );
+    }
+
+    const updated = await updateQuery.select("*").single();
     result = {
       data: (updated.data as WebsiteGeneration | null) ?? null,
       error: updated.error,
     };
 
+    if (
+      args.commit?.expectedRevision !== undefined &&
+      (updated.error || !updated.data)
+    ) {
+      const code = updated.error?.code;
+      const msg = updated.error?.message?.toLowerCase() ?? "";
+      if (!updated.data || code === "PGRST116" || msg.includes("0 rows")) {
+        return {
+          ok: false,
+          error:
+            "Blueprint revision conflict — generation was modified concurrently.",
+        };
+      }
+    }
+
     if (result.error && isMissingColumnError(result.error.message ?? "")) {
-      const coreUpdate = await args.supabase
+      let coreUpdateQuery = args.supabase
         .from("website_generations")
         .update({
           ...coreRow,
           updated_at: new Date().toISOString(),
         })
         .eq("id", existingId)
-        .eq("user_id", args.userId)
-        .select("*")
-        .single();
+        .eq("user_id", args.userId);
+
+      if (args.commit?.expectedRevision !== undefined) {
+        coreUpdateQuery = coreUpdateQuery.eq(
+          "blueprint_revision",
+          args.commit.expectedRevision,
+        );
+      }
+
+      const coreUpdate = await coreUpdateQuery.select("*").single();
       result = {
         data: (coreUpdate.data as WebsiteGeneration | null) ?? null,
         error: coreUpdate.error,
       };
+
+      if (
+        args.commit?.expectedRevision !== undefined &&
+        (coreUpdate.error || !coreUpdate.data)
+      ) {
+        const code = coreUpdate.error?.code;
+        const msg = coreUpdate.error?.message?.toLowerCase() ?? "";
+        if (!coreUpdate.data || code === "PGRST116" || msg.includes("0 rows")) {
+          return {
+            ok: false,
+            error:
+              "Blueprint revision conflict — generation was modified concurrently.",
+          };
+        }
+      }
     }
   } else {
     const inserted = await args.supabase

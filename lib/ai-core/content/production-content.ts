@@ -3,6 +3,11 @@
  * Used after professional component inject to replace generic scaffold copy.
  */
 
+import { getArabicExtras } from "@/lib/ai-core/content/arabic-production-extras";
+import {
+  getComposeUiFallbacks,
+  resolveContentLanguage,
+} from "@/lib/ai-core/content/content-language";
 import type { IndustryCopyPack } from "@/lib/ai-core/content/industry-copy";
 
 export type ContentCard = {
@@ -76,7 +81,7 @@ export type ProductionContentPack = IndustryCopyPack & {
   showcaseBullets: string[];
 };
 
-type IndustryExtras = {
+export type IndustryExtras = {
   heroEyebrow: string;
   brandTagline: string;
   serviceTitles: [string, string, string];
@@ -1285,7 +1290,13 @@ const EXTRAS: Record<string, IndustryExtras> = {
   },
 };
 
-function getExtras(industryId: string): IndustryExtras {
+function getExtras(
+  industryId: string,
+  language?: string | null,
+): IndustryExtras {
+  if (resolveContentLanguage(language) === "ar") {
+    return getArabicExtras(industryId);
+  }
   return EXTRAS[industryId] ?? EXTRAS.business;
 }
 
@@ -1295,10 +1306,13 @@ function getExtras(industryId: string): IndustryExtras {
 export function buildProductionContentPack(
   pack: IndustryCopyPack,
   brandName?: string | null,
+  language?: string | null,
 ): ProductionContentPack {
-  const extras = getExtras(String(pack.industryId));
-  const brand = brandName?.trim() || "Brand";
-  const ctas = [pack.primaryCta, "Learn more", pack.secondaryCta];
+  const lang = resolveContentLanguage(language);
+  const ui = getComposeUiFallbacks(lang);
+  const extras = getExtras(String(pack.industryId), lang);
+  const brand = brandName?.trim() || (lang === "ar" ? "العلامة" : "Brand");
+  const ctas = [pack.primaryCta, ui.learnMore, pack.secondaryCta];
 
   const services: ContentCard[] = extras.serviceTitles.map((title, i) => ({
     title,
@@ -1317,7 +1331,9 @@ export function buildProductionContentPack(
           ...t,
           quote: t.quote.includes(brand)
             ? t.quote
-            : t.quote.replace(/\.$/, ` — working with ${brand}.`),
+            : lang === "ar"
+              ? `${t.quote.replace(/\.$/, "")} — بالتعاون مع ${brand}.`
+              : t.quote.replace(/\.$/, ` — working with ${brand}.`),
         }
       : t,
   );

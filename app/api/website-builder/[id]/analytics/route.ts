@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
+import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError } from "@/lib/i18n/api-errors";
 import { requireUser, parseUuidParam } from "@/lib/api/helpers";
 import { buildWebsiteAnalyticsSummary } from "@/lib/ai-core/analytics";
 import { runConversionOptimizer } from "@/lib/ai-core/conversion-optimizer";
