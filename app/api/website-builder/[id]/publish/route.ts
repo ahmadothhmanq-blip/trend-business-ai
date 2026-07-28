@@ -9,6 +9,7 @@ import {
 import { isWebsitePublishEnabled } from "@/lib/website/publish";
 import { runPublishingAction } from "@/lib/ai-core/publishing";
 import type { WebsiteGeneration } from "@/types/database";
+import { requireWebsiteGenerationAccess } from "@/lib/website/builder/route-access";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -19,19 +20,22 @@ const bodySchema = z.object({
   force: z.boolean().optional(),
 });
 
-async function loadOwnedGeneration(
+async function loadAccessibleGeneration(
   auth: Awaited<ReturnType<typeof requireUser>>,
   id: string,
-) {
-  const { data, error } = await auth.supabase
-    .from("website_generations")
-    .select("*")
-    .eq("id", id)
-    .eq("user_id", auth.user!.id)
-    .maybeSingle();
-
-  if (error || !data) return null;
-  return data as WebsiteGeneration;
+  action: "view" | "publish",
+): Promise<WebsiteGeneration | NextResponse> {
+  if (!auth.user) {
+    return apiErrorResponse(API_ERROR_CODES.UNAUTHORIZED, 401);
+  }
+  const result = await requireWebsiteGenerationAccess(
+    auth.supabase,
+    auth.user.id,
+    id,
+    action,
+  );
+  if (result instanceof NextResponse) return result;
+  return result.generation;
 }
 
 async function readPublishBody(request: Request) {
@@ -75,10 +79,9 @@ export async function POST(request: Request, context: RouteContext) {
   const action = parsed.data.action;
   const force = parsed.data.force === true;
 
-  const generation = await loadOwnedGeneration(auth, id);
-  if (!generation) {
-    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Website not found.");
-  }
+  const generationResult = await loadAccessibleGeneration(auth, id, "publish");
+  if (generationResult instanceof NextResponse) return generationResult;
+  const generation = generationResult;
 
   const result = await runPublishingAction({
     supabase: auth.supabase,
@@ -154,11 +157,19 @@ export async function GET(_request: Request, context: RouteContext) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
+  const accessResult = await requireWebsiteGenerationAccess(
+    auth.supabase,
+    auth.user!.id,
+    id,
+    "view",
+  );
+  if (accessResult instanceof NextResponse) return accessResult;
+
   const { data, error } = await auth.supabase
     .from("website_publications")
     .select("*")
     .eq("generation_id", id)
-    .eq("user_id", auth.user!.id)
+    .eq("user_id", accessResult.generation.user_id)
     .maybeSingle();
 
   if (error) {

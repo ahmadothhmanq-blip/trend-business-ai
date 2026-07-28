@@ -10,32 +10,24 @@ import {
   validateCustomHostname,
 } from "@/lib/ai-core/domains";
 import { recordDeploymentEvent } from "@/lib/ai-core/deployment";
+import { requireWebsiteGenerationAccess } from "@/lib/website/builder/route-access";
 
 export const dynamic = "force-dynamic";
 
 type Params = { params: Promise<{ id: string }> };
 
-async function assertOwnedGeneration(
+async function assertGenerationAccess(
   supabase: Awaited<ReturnType<typeof requireUser>>["supabase"],
   userId: string,
   generationId: string,
 ) {
-  const { data, error } = await supabase
-    .from("website_generations")
-    .select("id")
-    .eq("id", generationId)
-    .eq("user_id", userId)
-    .maybeSingle();
-  if (error) {
-    return {
-      error: apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, error.message),
-    };
-  }
-  if (!data) {
-    return {
-      error: apiErrorResponse(API_ERROR_CODES.NOT_FOUND, 404, "Website not found."),
-    };
-  }
+  const result = await requireWebsiteGenerationAccess(
+    supabase,
+    userId,
+    generationId,
+    "manage",
+  );
+  if (result instanceof NextResponse) return { error: result };
   return { error: null };
 }
 
@@ -50,7 +42,7 @@ export async function GET(_request: Request, { params }: Params) {
   const parsedId = parseUuidParam(rawId, "generation id");
   if (parsedId instanceof NextResponse) return parsedId;
 
-  const owned = await assertOwnedGeneration(
+  const owned = await assertGenerationAccess(
     auth.supabase,
     auth.user!.id,
     parsedId.id,
@@ -76,7 +68,7 @@ export async function POST(request: Request, { params }: Params) {
   const parsedId = parseUuidParam(rawId, "generation id");
   if (parsedId instanceof NextResponse) return parsedId;
 
-  const owned = await assertOwnedGeneration(
+  const owned = await assertGenerationAccess(
     auth.supabase,
     auth.user!.id,
     parsedId.id,
@@ -153,7 +145,7 @@ export async function DELETE(request: Request, { params }: Params) {
   const parsedId = parseUuidParam(rawId, "generation id");
   if (parsedId instanceof NextResponse) return parsedId;
 
-  const owned = await assertOwnedGeneration(
+  const owned = await assertGenerationAccess(
     auth.supabase,
     auth.user!.id,
     parsedId.id,

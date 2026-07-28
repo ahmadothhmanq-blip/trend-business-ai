@@ -2818,7 +2818,12 @@
         "qa": "QA",
         "improveStrategyHint": "Refine positioning, sitemap, and conversion CTAs for higher conversions.",
         "improveDesignHint": "Refresh the color system, typography, and layout rules for a more premium look.",
-        "improveAssetsHint": "Regenerate hero and section visuals to better match the brand and audience."
+        "improveAssetsHint": "Regenerate hero and section visuals to better match the brand and audience.",
+        "improvingStrategy": "Analyzing strategy…",
+        "improvingDesign": "Improving design…",
+        "improvingAssets": "Generating better assets…",
+        "layerImproveComplete": "Optimization completed successfully.",
+        "generateBeforeLayerImprove": "Generate the website first, then use Improve strategy, design, or assets."
       },
       "previewExport": {
         "openLivePreview": "Open live preview",

@@ -12,6 +12,9 @@ import {
   resolveVerticalPaletteId,
   sanitizeCtaForIndustry,
 } from "@/lib/ai-core/template-intelligence/industry-palettes";
+import {
+  resolveTemplateDNA,
+} from "@/lib/ai-core/template-intelligence/template-dna";
 import type { TemplateIntelligenceDefinition } from "@/lib/ai-core/template-intelligence/types";
 import {
   buildTemplateVisualCss,
@@ -270,16 +273,16 @@ export function applyTemplateIntelligenceToBrief(
     (typeof meta.industry === "string" && meta.industry) ||
     undefined;
   const haystack = [brief.prompt, brief.theme, industryId].filter(Boolean).join(" ");
-  const resolvedComponents = resolveComponentsForIndustryAndTemplate(
-    template,
-    industryId,
-    haystack,
-  );
+  const templateDna = resolveTemplateDNA(template);
+  const resolvedComponents = templateDna.components.length
+    ? [...templateDna.components]
+    : resolveComponentsForIndustryAndTemplate(template, industryId, haystack);
   const paletteId = resolveVerticalPaletteId(industryId, haystack);
 
   meta.templateIntelligenceId = template.id;
   meta.templateIntelligenceCategory = template.category;
   meta.templateVisualPalette = paletteId;
+  meta.templateDna = templateDna;
   if (industryId) meta.industryId = industryId;
   meta.designPreset = template.designPreset;
   meta.brandStyle = template.designStyle;
@@ -301,6 +304,9 @@ export function applyTemplateIntelligenceToBrief(
   meta.preferredComponents = resolvedComponents;
   meta.templateAnimations = template.animations;
   meta.layoutStyle = template.layoutStructure;
+  meta.templateSectionOrder = templateDna.sectionOrder;
+  meta.templateHeroProfile = templateDna.heroProfile;
+  meta.templateNavigationProfile = templateDna.navigationProfile;
 
   const themeBits = [
     template.colors.primary,

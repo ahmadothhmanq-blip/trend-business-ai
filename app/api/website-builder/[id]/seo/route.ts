@@ -11,6 +11,7 @@ import type {
   CoreBusinessProfile,
   CoreProductStrategy,
 } from "@/lib/ai-core/layers/types";
+import { requireWebsiteGenerationAccess } from "@/lib/website/builder/route-access";
 
 export const dynamic = "force-dynamic";
 
@@ -27,21 +28,15 @@ export async function GET(_request: Request, { params }: Params) {
   const parsedId = parseUuidParam(rawId, "generation id");
   if (parsedId instanceof NextResponse) return parsedId;
 
-  const { data: existing, error } = await auth.supabase
-    .from("website_generations")
-    .select("*")
-    .eq("id", parsedId.id)
-    .eq("user_id", auth.user!.id)
-    .maybeSingle();
+  const accessResult = await requireWebsiteGenerationAccess(
+    auth.supabase,
+    auth.user!.id,
+    parsedId.id,
+    "view",
+  );
+  if (accessResult instanceof NextResponse) return accessResult;
 
-  if (error) {
-    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, error.message);
-  }
-  if (!existing) {
-    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Website not found.");
-  }
-
-  const generation = existing as WebsiteGeneration;
+  const generation = accessResult.generation as WebsiteGeneration;
   const project = generation.blueprint as unknown as GeneratedWebsiteProject;
   const files = extractWebsiteFilesFromBlueprint(generation.blueprint);
 

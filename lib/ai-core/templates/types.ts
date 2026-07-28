@@ -10,6 +10,9 @@ export type IndustryId =
   | "agency"
   | "clinic"
   | "education"
+  | "law"
+  | "blog"
+  | "landing-page"
   | "business";
 
 export type LayoutStyle =
@@ -23,7 +26,10 @@ export type LayoutStyle =
   | "studio-portfolio"
   | "corporate-trust"
   | "travel-premium"
-  | "campus-education";
+  | "campus-education"
+  | "legal-trust"
+  | "editorial-blog"
+  | "conversion-landing";
 
 /** Matches Core / Website design presets (kept local to avoid circular imports). */
 export type TemplateDesignPreset =

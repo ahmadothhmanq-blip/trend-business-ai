@@ -33,10 +33,12 @@ export function buildWebsiteLanguageDirective(params: {
 CRITICAL — Arabic website output (non-negotiable):
 - Generate ALL copy natively in Modern Standard Arabic from the start. Do NOT write English and translate afterward.
 - Navigation, buttons, headings, hero labels, section titles, card titles, CTAs, footer links, form labels, metadata titles/descriptions, and SEO keywords must ALL be Arabic.
-- Do NOT output English UI text unless it is an intentional brand name provided in the brief.
+- Do NOT output English headings, buttons, navigation, placeholder text, metadata, or comments.
+- Do NOT output mixed-language UI unless the brief explicitly requests Bilingual.
 - Use natural, native Arabic phrasing — not literal word-for-word translation.
 - Layout MUST support RTL: set html lang="ar" dir="rtl", mirror navigation order, and right-align form fields.
-- Strategy page names, section names, and CTAs must also be Arabic.`;
+- Strategy page names, section names, and CTAs must also be Arabic.
+- Upstream Strategy/Blueprint JSON may contain English planning labels — treat as STRUCTURE ONLY; never copy English into user-facing output.`;
   }
 
   if (language.toLowerCase() === "bilingual") {

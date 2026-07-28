@@ -11,6 +11,9 @@ import type { GeneratedWebsiteProject } from "@/plugins/website/types";
 import type { WebsiteGeneration } from "@/types/database";
 import { submitWebsiteCopilotCommand } from "@/lib/website/builder/copilot-client";
 import type { CopilotCommandApiSuccess } from "@/lib/website/builder/copilot-client";
+import { useBuilderLocale } from "@/lib/website/builder/use-builder-locale";
+import { useTranslation } from "@/lib/i18n/client";
+import { formatWebsiteBuilderApiError } from "@/lib/website/builder/client-api-error";
 import {
   createCopilotSessionId,
   persistCopilotSessionId,
@@ -89,6 +92,9 @@ export function useCopilotCommand(
     onBeforeMutation,
     onStreamProgress,
   } = options;
+
+  const { wb } = useBuilderLocale();
+  const { t } = useTranslation();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -183,8 +189,12 @@ export function useCopilotCommand(
 
         return body;
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : "Copilot command failed.";
+        const rawMessage = err instanceof Error ? err.message : undefined;
+        const message = formatWebsiteBuilderApiError({
+          message: rawMessage,
+          t,
+          wb,
+        });
         setError(message);
         setHistory((items) =>
           [
@@ -217,6 +227,8 @@ export function useCopilotCommand(
       onStreamProgress,
       pushUndoSnapshot,
       sessionId,
+      t,
+      wb,
     ],
   );
 
@@ -247,7 +259,14 @@ export function useCopilotCommand(
       };
 
       if (!res.ok || !body.ok) {
-        throw new Error(body.error || "Copilot undo failed.");
+        throw new Error(
+          formatWebsiteBuilderApiError({
+            status: res.status,
+            message: body.error,
+            t,
+            wb,
+          }),
+        );
       }
 
       setUndoStack(rest);
@@ -263,13 +282,16 @@ export function useCopilotCommand(
 
       return body;
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Copilot undo failed.";
+      const message =
+        err instanceof Error
+          ? err.message
+          : formatWebsiteBuilderApiError({ t, wb });
       setError(message);
       return null;
     } finally {
       setLoading(false);
     }
-  }, [generationId, expectedRevision, onApplied, undoStack]);
+  }, [generationId, expectedRevision, onApplied, undoStack, t, wb]);
 
   const previewCostHint = useCallback((command: string) => {
     const match = routeCommand(command);

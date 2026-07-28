@@ -10,10 +10,21 @@ import {
   imageStyleFragment,
   resolveImageEngineStyle,
 } from "@/lib/ai-core/image-engine/styles";
+import {
+  aspectForSection,
+  buildSectionPromptSeed,
+  designToneFragment,
+  imageQualityGuardrails,
+  inferSectionKey,
+  resolveIndustryVisualBrief,
+  type SectionKey,
+} from "@/lib/ai-core/image-engine/section-strategies";
 import type {
   ImageIntelligenceContext,
   ImagePurpose,
+  StructuredImageRequirement,
 } from "@/lib/ai-core/image-engine/types";
+import type { MasterWebsitePlan } from "@/lib/ai-core/master-planner/types";
 
 /**
  * Build image intelligence context from Industry Intelligence,
@@ -26,7 +37,10 @@ export function buildImageIntelligence(params: {
   templateSelection?: TemplateSelection;
   preferredStyle?: string | null;
   brandIdentity?: BrandIdentityBrief | null;
+  structuredRequirements?: StructuredImageRequirement[];
+  masterPlan?: MasterWebsitePlan | null;
 }): ImageIntelligenceContext {
+  const master = params.masterPlan;
   const intel = params.templateSelection?.industryIntelligence;
   const premium = params.designSystem.premium;
   const premiumTpl = params.templateSelection?.designConfiguration
@@ -34,7 +48,9 @@ export function buildImageIntelligence(params: {
     | {
         brandStyle?: string;
         designStyle?: string;
-        imageRequirements?: Array<{ brief?: string } | string>;
+        imageRequirements?: Array<
+          { role?: string; brief?: string } | string
+        >;
       }
     | undefined;
   const audience =
@@ -42,13 +58,25 @@ export function buildImageIntelligence(params: {
     params.strategy.contentStrategy?.brandVoice ||
     "discerning customers";
 
-  const premiumImageReqs = Array.isArray(premiumTpl?.imageRequirements)
+  const premiumStructured: StructuredImageRequirement[] = Array.isArray(
+    premiumTpl?.imageRequirements,
+  )
     ? premiumTpl.imageRequirements
-        .map((row) =>
-          typeof row === "string" ? row : typeof row?.brief === "string" ? row.brief : "",
-        )
-        .filter(Boolean)
+        .map((row) => {
+          if (typeof row === "string") {
+            return { role: "section" as const, brief: row };
+          }
+          const role = normalizeRole(row.role);
+          return {
+            role,
+            brief: typeof row.brief === "string" ? row.brief : "",
+            sectionKey: roleToSectionKey(role),
+          };
+        })
+        .filter((r) => r.brief)
     : [];
+
+  const premiumImageReqs = premiumStructured.map((r) => r.brief);
 
   const brand = params.brandIdentity;
   const imageStyle = resolveImageEngineStyle({
@@ -64,17 +92,32 @@ export function buildImageIntelligence(params: {
     industryDesignStyle: premiumTpl?.designStyle || intel?.designStyle,
   });
 
+  const structuredRequirements =
+    params.structuredRequirements?.length
+      ? params.structuredRequirements
+      : premiumStructured.length > 0
+        ? premiumStructured
+        : undefined;
+
+  const lockedImageKeywords =
+    master?.locked.images && master.imageKeywords.length
+      ? master.imageKeywords
+      : null;
+
   return {
     businessType:
+      master?.businessType ||
       params.profile?.industry ||
       intel?.label ||
       "business",
     industry:
+      (master?.industry && String(master.industry)) ||
       params.profile?.industry ||
       intel?.industryPattern ||
       params.designSystem.industryPattern ||
       "general",
     brandStyle:
+      master?.style ||
       brand?.strategy.brandStyle ||
       premiumTpl?.brandStyle ||
       premium?.label ||
@@ -82,7 +125,10 @@ export function buildImageIntelligence(params: {
       intel?.designStyle ||
       "premium",
     designStyle:
-      premiumTpl?.designStyle || intel?.designStyle || params.designSystem.style,
+      master?.imageStyle ||
+      premiumTpl?.designStyle ||
+      intel?.designStyle ||
+      params.designSystem.style,
     designPreset:
       String(params.designSystem.stylePreset || "") ||
       params.templateSelection?.designPreset ||
@@ -93,9 +139,11 @@ export function buildImageIntelligence(params: {
       brand?.brandName || params.profile?.projectName || "Brand",
     imageStyle,
     imageRequirements:
-      premiumImageReqs.length > 0
+      lockedImageKeywords ??
+      (premiumImageReqs.length > 0
         ? premiumImageReqs
-        : (intel?.imageRequirements ?? []),
+        : (intel?.imageRequirements ?? [])),
+    structuredRequirements,
     brandImageDirection: brand?.imageDirection,
     templateLabel: params.templateSelection?.label,
     premiumStyleId: brand?.premiumStyleId || premium?.styleId,
@@ -107,25 +155,162 @@ export function buildImageIntelligence(params: {
   };
 }
 
+function normalizeRole(
+  role?: string,
+): StructuredImageRequirement["role"] {
+  const r = (role || "section").toLowerCase();
+  if (
+    r === "hero" ||
+    r === "product" ||
+    r === "service" ||
+    r === "section" ||
+    r === "background" ||
+    r === "gallery" ||
+    r === "testimonial"
+  ) {
+    return r;
+  }
+  return "section";
+}
+
+function roleToSectionKey(
+  role: StructuredImageRequirement["role"],
+): SectionKey | undefined {
+  switch (role) {
+    case "hero":
+      return "hero";
+    case "product":
+      return "features";
+    case "service":
+      return "services";
+    case "gallery":
+      return "gallery";
+    case "testimonial":
+      return "testimonials";
+    case "background":
+      return "cta";
+    default:
+      return undefined;
+  }
+}
+
+/** Resolve role-matched shot brief from structured or string requirements. */
+export function resolveShotBriefForRole(
+  ctx: ImageIntelligenceContext,
+  role: ImagePurpose,
+  sectionKey?: SectionKey,
+  varietyIndex = 0,
+  usedBriefs?: Set<string>,
+): string | undefined {
+  const structured = ctx.structuredRequirements;
+  if (structured?.length) {
+    const match = structured.find(
+      (r) =>
+        r.role === role ||
+        (sectionKey && r.sectionKey === sectionKey),
+    );
+    if (match?.brief && !usedBriefs?.has(match.brief)) {
+      return match.brief;
+    }
+  }
+
+  const indexMatch = ctx.imageRequirements[varietyIndex];
+  if (indexMatch && !usedBriefs?.has(indexMatch)) {
+    return indexMatch;
+  }
+
+  if (sectionKey) {
+    return resolveIndustryVisualBrief(
+      ctx.industry,
+      sectionKey,
+      varietyIndex,
+      usedBriefs,
+    );
+  }
+
+  return resolveIndustryVisualBrief(
+    ctx.industry,
+    roleToSectionKey(role) || inferSectionKey(role),
+    varietyIndex,
+    usedBriefs,
+  );
+}
+
+/** Compose SEO-friendly alt text for accessibility. */
+export function buildAccessibleAltText(params: {
+  ctx: ImageIntelligenceContext;
+  purpose: ImagePurpose;
+  sectionName?: string;
+  sectionKey?: SectionKey;
+  shotBrief?: string;
+}): { alt: string; caption?: string; seoDescription: string } {
+  const sectionKey =
+    params.sectionKey ||
+    inferSectionKey(params.sectionName || params.purpose);
+  const sectionLabel = params.sectionName || sectionKey;
+  const subject =
+    params.shotBrief?.split(",")[0]?.trim() ||
+    `${params.ctx.industry} ${params.purpose}`;
+
+  const alt = `${params.ctx.projectName} — ${subject} for ${sectionLabel}`.slice(
+    0,
+    125,
+  );
+  const seoDescription = [
+    `Professional ${params.ctx.industry} photography for ${params.ctx.projectName}.`,
+    `${sectionLabel}: ${subject}.`,
+    `Premium ${params.ctx.brandStyle} visual for ${params.ctx.targetAudience}.`,
+  ].join(" ");
+
+  const caption =
+    params.purpose === "testimonial" || sectionKey === "team"
+      ? `${params.ctx.projectName} team and client photography`
+      : undefined;
+
+  return { alt, caption, seoDescription };
+}
+
 /** Compose a full generation prompt for a purpose + optional shot brief. */
 export function composeImagePrompt(params: {
   purpose: ImagePurpose;
   ctx: ImageIntelligenceContext;
   sectionName?: string;
+  sectionKey?: SectionKey;
   shotBrief?: string;
   contentNotes?: string;
   artDirectionFragment?: string;
+  varietyIndex?: number;
 }): string {
+  const sectionKey =
+    params.sectionKey ||
+    inferSectionKey(params.sectionName || params.purpose);
   const styleFrag = imageStyleFragment(params.ctx.imageStyle);
-  const purposeLine = purposePromptSeed(params.purpose, params);
+  const toneFrag = designToneFragment(
+    params.ctx.designStyle,
+    params.ctx.designPreset,
+    params.ctx.brandStyle,
+  );
+  const shotBrief =
+    params.shotBrief ||
+    resolveIndustryVisualBrief(
+      params.ctx.industry,
+      sectionKey,
+      params.varietyIndex ?? 0,
+    );
+
+  const sectionSeed = buildSectionPromptSeed(
+    sectionKey,
+    params.ctx.projectName,
+    params.ctx.industry,
+    shotBrief,
+  );
+
   return [
-    purposeLine,
+    sectionSeed,
     `Business type: ${params.ctx.businessType}.`,
-    `Industry: ${params.ctx.industry}.`,
     `Offer: ${params.ctx.offer}.`,
-    `Brand style: ${params.ctx.brandStyle}.`,
-    `Design system: ${params.ctx.designStyle} / ${params.ctx.designPreset}.`,
-    `Target audience: ${params.ctx.targetAudience}.`,
+    `Brand personality: ${params.ctx.brandStyle}.`,
+    `Design tone: ${toneFrag}.`,
     `Visual style: ${styleFrag}.`,
     params.ctx.brandImageDirection
       ? `Brand image direction: ${params.ctx.brandImageDirection}.`
@@ -133,55 +318,28 @@ export function composeImagePrompt(params: {
     params.artDirectionFragment
       ? `Art direction: ${params.artDirectionFragment}.`
       : "",
-    params.shotBrief ? `Shot brief: ${params.shotBrief}.` : "",
     params.contentNotes
-      ? `Section direction: ${params.contentNotes}.`
+      ? `Section narrative: ${params.contentNotes}.`
       : "",
     params.ctx.templateLabel
-      ? `Smart template: ${params.ctx.templateLabel}.`
+      ? `Template: ${params.ctx.templateLabel}.`
       : "",
-    `Color mood near ${params.ctx.colors.primary} and ${params.ctx.colors.secondary}.`,
-    "Award-winning commercial photography, ultra sharp, premium agency quality.",
-    "No text overlays, no logos, no watermarks, no UI mockups, no empty placeholders, no generic stock smiles.",
+    `Color palette mood: ${params.ctx.colors.primary}, ${params.ctx.colors.secondary}${params.ctx.colors.accent ? `, ${params.ctx.colors.accent}` : ""}.`,
+    `Target audience: ${params.ctx.targetAudience}.`,
+    imageQualityGuardrails(),
   ]
     .filter(Boolean)
     .join(" ")
     .trim();
 }
 
-function purposePromptSeed(
-  purpose: ImagePurpose,
-  params: {
-    ctx: ImageIntelligenceContext;
-    sectionName?: string;
-  },
-): string {
-  const { ctx, sectionName } = params;
-  switch (purpose) {
-    case "hero":
-      return `Photorealistic website hero image for ${ctx.projectName} (${ctx.industry}): ${ctx.offer}. Wide cinematic composition.`;
-    case "product":
-      return `Photorealistic product visual for ${ctx.offer} in ${ctx.industry}, premium product staging.`;
-    case "service":
-      return `Photorealistic service imagery for ${ctx.offer} in ${ctx.industry}, people or craft in authentic context.`;
-    case "background":
-      return `Atmospheric background photography for ${ctx.industry} brand website, subtle depth, suitable as section backdrop.`;
-    case "gallery":
-      return `Gallery photograph for ${ctx.projectName} showcasing ${ctx.offer} / ${ctx.industry}, editorial composition.`;
-    case "brand":
-      return `Brand mood photograph for ${ctx.projectName}, ${ctx.brandStyle}, premium brand visual.`;
-    case "section":
-      return `Supporting photorealistic image for website section "${sectionName || "Features"}" in ${ctx.industry}.`;
-    case "testimonial":
-      return `Authentic portrait photography for testimonials of ${ctx.projectName}, trustworthy client or guest in natural light.`;
-    default:
-      return `Photorealistic website image for ${ctx.projectName}.`;
-  }
-}
-
 export function defaultAspectForPurpose(
   purpose: ImagePurpose,
+  sectionKey?: SectionKey,
 ): import("@/lib/ai-core/assets/settings").ImageAspectRatio {
+  if (sectionKey) {
+    return aspectForSection(sectionKey);
+  }
   switch (purpose) {
     case "hero":
     case "background":

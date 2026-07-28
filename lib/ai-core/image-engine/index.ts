@@ -4,7 +4,18 @@ export type {
   ImageEnginePlanItem,
   ImageIntelligenceContext,
   AdvancedAssetsExtras,
+  StructuredImageRequirement,
+  DesignPlanImageContext,
 } from "@/lib/ai-core/image-engine/types";
+
+export type {
+  SectionKey,
+  SectionImageStrategy,
+} from "@/lib/ai-core/image-engine/section-strategies";
+
+export type {
+  ImagePromptScore,
+} from "@/lib/ai-core/image-engine/prompt-scoring";
 
 export type {
   ImageArtDirection,
@@ -31,7 +42,31 @@ export {
   buildImageIntelligence,
   composeImagePrompt,
   defaultAspectForPurpose,
+  resolveShotBriefForRole,
+  buildAccessibleAltText,
 } from "@/lib/ai-core/image-engine/intelligence";
+
+export {
+  inferSectionKey,
+  getSectionStrategy,
+  resolveIndustryVisualBrief,
+  imageQualityGuardrails,
+  designToneFragment,
+  SUPPORTED_IMAGE_INDUSTRIES,
+  SUPPORTED_SECTION_KEYS,
+} from "@/lib/ai-core/image-engine/section-strategies";
+
+export {
+  scoreImagePrompt,
+  improvePromptForScore,
+  PROMPT_QUALITY_THRESHOLD,
+} from "@/lib/ai-core/image-engine/prompt-scoring";
+
+export {
+  getCachedPrompt,
+  setCachedPrompt,
+  clearPromptCache,
+} from "@/lib/ai-core/image-engine/prompt-cache";
 
 export {
   buildImageArtDirection,

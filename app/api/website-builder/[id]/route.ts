@@ -5,6 +5,7 @@ import { databaseErrorResponse } from "@/lib/api/errors";
 import { z } from "zod";
 import type { WebsiteGeneration } from "@/types/database";
 import { NextResponse } from "next/server";
+import { requireWebsiteGenerationAccess } from "@/lib/website/builder/route-access";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -23,18 +24,17 @@ export async function GET(_request: Request, context: RouteContext) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  const { data, error } = await auth.supabase
-    .from("website_generations")
-    .select("*")
-    .eq("id", id)
-    .eq("user_id", auth.user!.id)
-    .single();
+  const accessResult = await requireWebsiteGenerationAccess(
+    auth.supabase,
+    auth.user!.id,
+    id,
+    "view",
+  );
+  if (accessResult instanceof NextResponse) return accessResult;
 
-  if (error || !data) {
-    return apiErrorResponse(API_ERROR_CODES.GENERATION_NOT_FOUND, 404);
-  }
-
-  return NextResponse.json({ generation: data as WebsiteGeneration });
+  return NextResponse.json({
+    generation: accessResult.generation as WebsiteGeneration,
+  });
 }
 
 export async function PATCH(request: Request, context: RouteContext) {
@@ -46,6 +46,14 @@ export async function PATCH(request: Request, context: RouteContext) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
+  const accessResult = await requireWebsiteGenerationAccess(
+    auth.supabase,
+    auth.user!.id,
+    id,
+    "edit",
+  );
+  if (accessResult instanceof NextResponse) return accessResult;
+
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
 
@@ -54,31 +62,21 @@ export async function PATCH(request: Request, context: RouteContext) {
     return apiValidationError(parsed.error.issues[0]?.message);
   }
 
-  const existing = await auth.supabase
-    .from("website_generations")
-    .select("*")
-    .eq("id", id)
-    .eq("user_id", auth.user!.id)
-    .single();
-
-  if (existing.error || !existing.data) {
-    return apiErrorResponse(API_ERROR_CODES.GENERATION_NOT_FOUND, 404);
-  }
-
+  const current = accessResult.generation as WebsiteGeneration;
   const { is_favorite, projectName, settings } = parsed.data;
-  const current = existing.data as WebsiteGeneration;
   const nextBlueprint =
     settings && current.blueprint
       ? {
           ...(current.blueprint as unknown as Record<string, unknown>),
           settings: {
-            ...((current.blueprint as unknown as { settings?: Record<string, string> }).settings ?? {}),
+            ...((current.blueprint as unknown as { settings?: Record<string, string> })
+              .settings ?? {}),
             ...settings,
           },
         }
       : current.blueprint;
 
-  const { data, error } = await auth.supabase
+  const updateQuery = auth.supabase
     .from("website_generations")
     .update({
       ...(typeof is_favorite === "boolean" ? { is_favorite } : {}),
@@ -86,10 +84,12 @@ export async function PATCH(request: Request, context: RouteContext) {
       ...(settings ? { blueprint: nextBlueprint } : {}),
       updated_at: new Date().toISOString(),
     })
-    .eq("id", id)
-    .eq("user_id", auth.user!.id)
-    .select("*")
-    .single();
+    .eq("id", id);
+
+  const { data, error } =
+    accessResult.access === "owner"
+      ? await updateQuery.eq("user_id", auth.user!.id).select("*").single()
+      : await updateQuery.select("*").single();
 
   if (error || !data) {
     return apiErrorResponse(API_ERROR_CODES.GENERATION_NOT_FOUND, 404);
@@ -123,16 +123,15 @@ export async function POST(_request: Request, context: RouteContext) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  const { data: source, error: sourceError } = await auth.supabase
-    .from("website_generations")
-    .select("*")
-    .eq("id", id)
-    .eq("user_id", auth.user!.id)
-    .single();
+  const accessResult = await requireWebsiteGenerationAccess(
+    auth.supabase,
+    auth.user!.id,
+    id,
+    "owner",
+  );
+  if (accessResult instanceof NextResponse) return accessResult;
 
-  if (sourceError || !source) {
-    return apiErrorResponse(API_ERROR_CODES.GENERATION_NOT_FOUND, 404);
-  }
+  const source = accessResult.generation as WebsiteGeneration;
 
   const { data, error } = await auth.supabase
     .from("website_generations")
@@ -172,7 +171,21 @@ export async function DELETE(_request: Request, context: RouteContext) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  const favoriteSync = await syncFavorite(auth.supabase, auth.user!.id, "website_generation", id, false);
+  const accessResult = await requireWebsiteGenerationAccess(
+    auth.supabase,
+    auth.user!.id,
+    id,
+    "owner",
+  );
+  if (accessResult instanceof NextResponse) return accessResult;
+
+  const favoriteSync = await syncFavorite(
+    auth.supabase,
+    auth.user!.id,
+    "website_generation",
+    id,
+    false,
+  );
   if (favoriteSync.error) {
     return databaseErrorResponse("website-builder.syncFavorite", favoriteSync.error);
   }

@@ -8,6 +8,7 @@ import type {
   CoreBusinessProfile,
   CoreProductStrategy,
 } from "@/lib/ai-core/layers/types";
+import type { TemplateDNAProfile } from "@/lib/ai-core/template-intelligence/template-dna";
 
 /** Typed layout variations the engine can select. */
 export type LayoutVariationId =
@@ -465,6 +466,7 @@ export function selectWebsiteLayout(params: {
   audience?: string | null;
   brandPosition?: string | null;
   businessGoals?: string[] | null;
+  templateDna?: TemplateDNAProfile | null;
 }): LayoutSelectionResult {
   const industryKey = resolveLayoutIndustryKey(
     params.industryId,
@@ -505,7 +507,7 @@ export function selectWebsiteLayout(params: {
     params.preferredStyle,
   );
 
-  return {
+  const base: LayoutSelectionResult = {
     industryKey,
     layoutVariationId: variation,
     layoutStyle: profile.layoutStyle,
@@ -521,6 +523,31 @@ export function selectWebsiteLayout(params: {
     reason: `Layout Selection Engine chose ${variation} + ${premiumStyleId} for ${industryKey} (audience/brand/goal aware)`,
     allowedHeroVariants: profile.heroPool,
     allowedSectionLayouts: profile.sectionPool,
+  };
+
+  const dna = params.templateDna;
+  if (!dna) return base;
+
+  const dnaVariation =
+    dna.layoutProfile in VARIATION_DEFAULTS
+      ? (dna.layoutProfile as LayoutVariationId)
+      : variation;
+  const dnaDefaults = VARIATION_DEFAULTS[dnaVariation];
+
+  return {
+    ...base,
+    layoutVariationId: dnaVariation,
+    layoutStyle: String(dna.layoutProfile),
+    heroTreatment: dna.heroProfile,
+    sectionLayout: dna.gridSystem,
+    cardStyle: dna.cardProfile,
+    navigationStyle: dna.navigationProfile,
+    animationStyle: dna.animationProfile,
+    sectionStructure: dna.sectionOrder,
+    compositionMode: dnaDefaults.compositionMode,
+    reason: `Template DNA "${dna.id}" drives layout, sections, and components (not industry-only defaults)`,
+    allowedHeroVariants: [dna.heroProfile, ...profile.heroPool],
+    allowedSectionLayouts: [dna.gridSystem, ...profile.sectionPool],
   };
 }
 

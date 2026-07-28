@@ -581,4 +581,26 @@ export function GalleryExperience({
   );
 }
 `,
+
+  IntegrationsLogoCloud: `import { SectionShell } from "@/components/ui/section-shell";
+
+const partners = ["NVIDIA", "AWS", "Stripe", "Vercel", "OpenAI", "Snowflake", "Datadog", "HubSpot"];
+
+export function IntegrationsLogoCloud() {
+  return (
+    <SectionShell id="integrations" eyebrow="Integrations" title="Connects to your stack" subtitle="Glass panels and logo rhythm — technology trust without card clutter.">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
+        {partners.map((name) => (
+          <div
+            key={name}
+            className="ti-card flex min-h-[4.5rem] items-center justify-center rounded-[var(--ti-card-radius,1rem)] border border-[var(--color-foreground)]/10 bg-[var(--color-surface)]/60 px-3 py-4 text-center text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-[var(--color-foreground)]/45 backdrop-blur-md"
+          >
+            {name}
+          </div>
+        ))}
+      </div>
+    </SectionShell>
+  );
+}
+`,
 };

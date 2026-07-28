@@ -38,6 +38,7 @@ export function injectProfessionalComponents(params: {
   files: GeneratedProjectFile[];
   componentPaths?: string[];
   componentIds?: string[];
+  homeComponentOrder?: string[];
   brandName?: string;
   pageTitle?: string;
   pageDescription?: string;
@@ -49,6 +50,8 @@ export function injectProfessionalComponents(params: {
   content?: ProductionContentPack | null;
   composePage?: boolean;
   language?: string | null;
+  templateIntelligenceId?: string | null;
+  templateVisualCss?: string | null;
 }): GeneratedProjectFile[] {
   const paths = new Set<string>([
     SECTION_SHELL_PATH,
@@ -95,11 +98,12 @@ export function injectProfessionalComponents(params: {
     });
   }
 
-  if (params.composePage !== false && params.componentIds?.length) {
+  if (params.composePage !== false && (params.componentIds?.length || params.homeComponentOrder?.length)) {
     byPath.set("app/page.tsx", {
       path: "app/page.tsx",
       content: composeHomePage({
-        componentIds: params.componentIds,
+        componentIds: params.componentIds ?? params.homeComponentOrder ?? [],
+        homeComponentOrder: params.homeComponentOrder,
         heroHeadline: params.heroHeadline,
         heroSubheadline: params.heroSubheadline,
         primaryCta: params.primaryCta,
@@ -110,9 +114,22 @@ export function injectProfessionalComponents(params: {
         description: params.pageDescription,
         content: params.content,
         language: params.language,
+        templateId: params.templateIntelligenceId,
       }),
       language: "tsx",
     });
+  }
+
+  if (params.templateVisualCss?.trim()) {
+    const globals = byPath.get("app/globals.css");
+    const base = globals?.content ?? "";
+    if (!base.includes("Template Visual Preset")) {
+      byPath.set("app/globals.css", {
+        path: "app/globals.css",
+        content: `${base}\n${params.templateVisualCss.trim()}\n`,
+        language: "css",
+      });
+    }
   }
 
   return Array.from(byPath.values());

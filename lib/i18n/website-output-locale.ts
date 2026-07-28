@@ -63,6 +63,13 @@ const LANGUAGE_MAP: Record<string, SiteLocaleConfig> = {
     rtl: false,
     htmlLang: "it",
   },
+  portuguese: {
+    language: "Portuguese",
+    localeCode: "pt",
+    dir: "ltr",
+    rtl: false,
+    htmlLang: "pt",
+  },
   persian: {
     language: "Persian",
     localeCode: "fa",
@@ -90,6 +97,9 @@ export function resolveLocaleFromLanguage(
   if (key.includes("urdu")) return { ...LANGUAGE_MAP.urdu! };
   if (key.includes("italian") || key === "it" || key.startsWith("it-")) {
     return { ...LANGUAGE_MAP.italian! };
+  }
+  if (key.includes("portug") || key === "pt" || key.startsWith("pt-")) {
+    return { ...LANGUAGE_MAP.portuguese! };
   }
   if (key.includes("rtl")) return { ...LANGUAGE_MAP.arabic! };
   return { ...LANGUAGE_MAP.english! };

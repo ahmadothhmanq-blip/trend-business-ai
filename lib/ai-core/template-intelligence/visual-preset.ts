@@ -1,5 +1,9 @@
 import { getBrandPreset } from "@/lib/ai-core/brand-identity/presets";
 import { buildSectionSpecsFromComponents } from "@/lib/ai-core/template-intelligence/section-specs";
+import {
+  applyTemplateDnaToVisualPreset,
+  resolveTemplateDNA,
+} from "@/lib/ai-core/template-intelligence/template-dna";
 import type {
   TemplateCardVariant,
   TemplateFooterVariant,
@@ -204,7 +208,7 @@ export function resolveTemplateVisualPreset(
   const derivedSections = defaultSections(template);
 
   if (template.visualPreset) {
-    return {
+    const merged: TemplateVisualPreset = {
       ...template.visualPreset,
       layout: {
         ...derivedLayout,
@@ -215,10 +219,11 @@ export function resolveTemplateVisualPreset(
           ? template.visualPreset.sections
           : derivedSections,
     };
+    return applyTemplateDnaToVisualPreset(merged, resolveTemplateDNA(template));
   }
 
   const brand = getBrandPreset(template.brandPresetId);
-  return {
+  const base: TemplateVisualPreset = {
     spacing: {
       sectionY: brand.spacing.sectionY,
       sectionYMobile: brand.spacing.sectionYMobile,
@@ -231,6 +236,8 @@ export function resolveTemplateVisualPreset(
     layout: derivedLayout,
     sections: derivedSections,
   };
+
+  return applyTemplateDnaToVisualPreset(base, resolveTemplateDNA(template));
 }
 
 /** CSS custom properties + rules for template visual preset. */

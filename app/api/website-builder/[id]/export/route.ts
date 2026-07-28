@@ -4,6 +4,7 @@ import { buildProjectZip } from "@/lib/ai/zipper";
 import type { GeneratedProjectFile } from "@/lib/ai/types";
 import { prepareWebsiteProjectForExport } from "@/lib/website/prepare-export";
 import type { WebsiteGeneration } from "@/types/database";
+import { requireWebsiteGenerationAccess } from "@/lib/website/builder/route-access";
 import { NextResponse } from "next/server";
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -39,18 +40,14 @@ export async function GET(_request: Request, context: RouteContext) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  const { data, error } = await auth.supabase
-    .from("website_generations")
-    .select("*")
-    .eq("id", id)
-    .eq("user_id", auth.user!.id)
-    .single();
-
-  if (error || !data) {
-    return apiErrorResponse(API_ERROR_CODES.GENERATION_NOT_FOUND, 404);
-  }
-
-  const generation = data as WebsiteGeneration;
+  const accessResult = await requireWebsiteGenerationAccess(
+    auth.supabase,
+    auth.user!.id,
+    id,
+    "edit",
+  );
+  if (accessResult instanceof NextResponse) return accessResult;
+  const generation = accessResult.generation;
   const rawFiles = extractFiles(generation);
 
   if (rawFiles.length === 0) {

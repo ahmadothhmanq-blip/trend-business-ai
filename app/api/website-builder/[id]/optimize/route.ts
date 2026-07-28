@@ -12,6 +12,7 @@ import {
 import { loadWebsiteParentContext } from "@/plugins/website/iteration";
 import { persistWebsiteGeneration } from "@/lib/website/save-generation";
 import type { WebsiteGeneration } from "@/types/database";
+import { requireWebsiteGenerationAccess } from "@/lib/website/builder/route-access";
 import { z } from "zod";
 import { NextResponse } from "next/server";
 
@@ -53,18 +54,15 @@ export async function POST(request: Request, context: RouteContext) {
     return apiValidationError(parsed.error.issues[0]?.message);
   }
 
-  const { data: existing, error } = await auth.supabase
-    .from("website_generations")
-    .select("*")
-    .eq("id", id)
-    .eq("user_id", auth.user!.id)
-    .single();
+  const accessResult = await requireWebsiteGenerationAccess(
+    auth.supabase,
+    auth.user!.id,
+    id,
+    "edit",
+  );
+  if (accessResult instanceof NextResponse) return accessResult;
 
-  if (error || !existing) {
-    return apiErrorResponse(API_ERROR_CODES.GENERATION_NOT_FOUND, 404);
-  }
-
-  const generation = existing as WebsiteGeneration;
+  const generation = accessResult.generation as WebsiteGeneration;
   const blueprint = generation.blueprint as unknown as {
     prompt?: string;
     description?: string;
@@ -86,6 +84,7 @@ export async function POST(request: Request, context: RouteContext) {
   );
 
   const websiteLanguage = generation.language || "English";
+  const preservedFeatures = generation.features ?? [];
 
   try {
     const project = await generateWebsite({
@@ -98,7 +97,7 @@ export async function POST(request: Request, context: RouteContext) {
       projectKind: "website",
       language: websiteLanguage,
       theme: "modern",
-      features: [],
+      features: preservedFeatures,
       mode: "continue",
       parentGenerationId: id,
       continueInstruction: instruction,
@@ -118,7 +117,7 @@ export async function POST(request: Request, context: RouteContext) {
         prompt: generation.business_description || instruction,
         language: websiteLanguage,
         theme: "modern",
-        features: [],
+        features: preservedFeatures,
         productId: "website-builder",
         projectId: generation.project_id ?? undefined,
         mode: "continue",

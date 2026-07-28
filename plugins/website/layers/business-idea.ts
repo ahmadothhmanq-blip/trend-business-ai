@@ -11,6 +11,10 @@ import type { GenerationContext } from "@/lib/ai/types";
 import type { ProjectCapabilityFlags } from "@/lib/ai/validator";
 import { detectIndustryFromPrompt } from "@/lib/ai-core/website-builder/prompt-industry";
 import {
+  applyFeaturesToAnalysis,
+  resolveWebsiteFeatures,
+} from "@/lib/website/builder/feature-registry";
+import {
   getStrategyFallbackLabels,
   usesLlmLocalizedWebsiteCopy,
 } from "@/lib/ai-core/content/content-language";
@@ -71,11 +75,16 @@ export async function analyzeBusinessIdea(
   };
 
   try {
+    const resolvedFeatures = resolveWebsiteFeatures(input.features);
+    const featurePlanning = resolvedFeatures.aiPlanningBlock
+      ? `\n\n${resolvedFeatures.aiPlanningBlock}`
+      : "";
+
     const analysis = await websiteGenerateJson<WebsiteProjectAnalysis>({
       stage: "business-idea",
       input: iterationInput,
       provider: ctx.provider,
-      prompt: businessIdeaPrompt(iterationInput),
+      prompt: `${businessIdeaPrompt(iterationInput)}${featurePlanning}`,
       schema: businessIdeaAnalysisSchema,
       maxAttempts: 3,
       validate: validateBusinessIdeaAnalysis,
@@ -86,39 +95,45 @@ export async function analyzeBusinessIdea(
       input.previousBusinessProfile ??
       fallbackProfile(input);
 
-    return {
-      ...analysis,
-      databaseProvider: normalizeDatabaseProvider(
-        String(analysis.databaseProvider ?? "none"),
-      ),
-      businessProfile: {
-        ...profile,
-        projectName: profile.projectName || analysis.projectName,
-        requiredSections:
-          Array.isArray(profile.requiredSections) &&
-          profile.requiredSections.length
-            ? profile.requiredSections
-            : fallbackProfile(input).requiredSections,
+    return applyFeaturesToAnalysis(
+      {
+        ...analysis,
+        databaseProvider: normalizeDatabaseProvider(
+          String(analysis.databaseProvider ?? "none"),
+        ),
+        businessProfile: {
+          ...profile,
+          projectName: profile.projectName || analysis.projectName,
+          requiredSections:
+            Array.isArray(profile.requiredSections) &&
+            profile.requiredSections.length
+              ? profile.requiredSections
+              : fallbackProfile(input).requiredSections,
+        },
       },
-    };
+      resolveWebsiteFeatures(input.features),
+    );
   } catch (error) {
     console.error("business idea analysis failed; using fallback", error);
     const profile = input.previousBusinessProfile ?? fallbackProfile(input);
     const labels = getStrategyFallbackLabels(input.language);
-    return {
-      projectName: profile.projectName,
-      projectType: input.projectType,
-      pages: labels.pages,
-      features: input.features,
-      designSystem: [input.theme],
-      technologies: ["Next.js", "Tailwind CSS"],
-      requiresAuth: false,
-      requiresDatabase: false,
-      requiresDashboard: false,
-      isEcommerce: false,
-      isSaas: false,
-      databaseProvider: "none",
-      businessProfile: profile,
-    };
+    return applyFeaturesToAnalysis(
+      {
+        projectName: profile.projectName,
+        projectType: input.projectType,
+        pages: labels.pages,
+        features: input.features,
+        designSystem: [input.theme],
+        technologies: ["Next.js", "Tailwind CSS"],
+        requiresAuth: false,
+        requiresDatabase: false,
+        requiresDashboard: false,
+        isEcommerce: false,
+        isSaas: false,
+        databaseProvider: "none",
+        businessProfile: profile,
+      },
+      resolveWebsiteFeatures(input.features),
+    );
   }
 }

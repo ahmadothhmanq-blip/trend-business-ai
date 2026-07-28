@@ -35,6 +35,7 @@ import {
 } from "@/lib/website/public-endpoints";
 
 import { loadOwnerLeadIntegration } from "@/lib/website/lead-integrations";
+import { requireWebsiteGenerationAccess } from "@/lib/website/builder/route-access";
 
 
 
@@ -126,33 +127,13 @@ export async function GET(request: Request, { params }: Params) {
 
 
 
-  const { data, error } = await auth.supabase
-
-    .from("website_generations")
-
-    .select("id")
-
-    .eq("id", parsedId.id)
-
-    .eq("user_id", auth.user!.id)
-
-    .maybeSingle();
-
-
-
-  if (error) {
-
-    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, error.message);
-
-  }
-
-  if (!data) {
-
-    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Website not found.");
-
-  }
-
-
+  const access = await requireWebsiteGenerationAccess(
+    auth.supabase,
+    auth.user!.id,
+    parsedId.id,
+    "view",
+  );
+  if (access instanceof NextResponse) return access;
 
   const leads = await listWebsiteLeads(parsedId.id, auth.supabase);
 
@@ -364,25 +345,13 @@ export async function PATCH(request: Request, { params }: Params) {
 
 
 
-  const { data: owned } = await auth.supabase
-
-    .from("website_generations")
-
-    .select("id")
-
-    .eq("id", parsedId.id)
-
-    .eq("user_id", auth.user!.id)
-
-    .maybeSingle();
-
-  if (!owned) {
-
-    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Website not found.");
-
-  }
-
-
+  const access = await requireWebsiteGenerationAccess(
+    auth.supabase,
+    auth.user!.id,
+    parsedId.id,
+    "manage",
+  );
+  if (access instanceof NextResponse) return access;
 
   const body = await parseJsonBody<unknown>(request);
 

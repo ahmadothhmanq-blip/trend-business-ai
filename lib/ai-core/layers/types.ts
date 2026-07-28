@@ -140,6 +140,8 @@ export type CoreDesignSystem = {
   layoutStyle: string;
   uiPatterns: string[];
   componentPalette: string[];
+  /** Ordered home page components when Template DNA drives layout. */
+  homeComponentOrder?: string[];
   spacingScale: string[];
   borderRadius: string;
   shadowStyle: string;

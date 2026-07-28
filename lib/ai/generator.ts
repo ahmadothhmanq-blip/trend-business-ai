@@ -12,6 +12,11 @@ export type GenerateJsonOptions<T> = {
   maxAttempts?: number;
   validate: (result: T) => { valid: boolean; reason?: string };
   audit?: LlmAuditContext;
+  /** Optional hook to reinforce constraints on validation retry. */
+  transformRetryPrompt?: (
+    basePrompt: string,
+    validationReason: string,
+  ) => string;
 };
 
 export type GenerateFileOptions<T> = GenerateJsonOptions<T>;
@@ -25,7 +30,9 @@ export async function generateJsonWithValidation<T>(
 
   for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
     const prompt = validationReason
-      ? `${options.prompt}\n\nPrevious attempt failed validation: ${validationReason}`
+      ? options.transformRetryPrompt
+        ? options.transformRetryPrompt(options.prompt, validationReason)
+        : `${options.prompt}\n\nPrevious attempt failed validation: ${validationReason}`
       : options.prompt;
 
     const audit: LlmAuditContext | undefined = options.audit

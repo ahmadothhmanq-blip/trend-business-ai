@@ -6,10 +6,11 @@ import {
 } from "@/lib/ai-core/template-intelligence/catalog";
 import {
   inferVerticalFromText,
+  isAutomotiveContext,
+  isTourismContext,
   normalizeVerticalIndustryId,
   scoreIndustryTemplateAlignment,
   SOFTWARE_SIGNALS,
-  AUTOMOTIVE_SIGNALS,
 } from "@/lib/ai-core/template-intelligence/industry-palettes";
 import type {
   TemplateIntelligenceCategory,
@@ -98,9 +99,10 @@ function scoreTemplate(
   score += scoreIndustryTemplateAlignment(tpl, resolvedIndustry, text);
 
   const hasSoftware = SOFTWARE_SIGNALS.some((s) => text.includes(s));
-  const hasAutomotive = AUTOMOTIVE_SIGNALS.some((s) => text.includes(s));
-  if (tpl.industry === "automotive" && hasSoftware && !hasAutomotive) {
-    score -= 50;
+  const hasAutomotive = isAutomotiveContext(text);
+  const hasTourism = isTourismContext(text);
+  if (tpl.industry === "automotive" && (hasTourism || (hasSoftware && !hasAutomotive))) {
+    score -= 80;
   }
   if (tpl.industry === "tourism" && /furniture|sofa|bedroom|أثاث|مفروشات/.test(text)) {
     score -= 80;
@@ -174,7 +176,9 @@ export function selectTemplateIntelligence(
 
   if (best.score <= 0) {
     const industryFallbackId =
-      resolvedIndustry === "furniture"
+      resolvedIndustry === "tourism"
+        ? "ti-travel-horizon"
+        : resolvedIndustry === "furniture"
         ? "ti-ecommerce-atelier"
         : resolvedIndustry === "technology" || resolvedIndustry === "saas"
           ? "ti-technology-dark"
@@ -182,7 +186,17 @@ export function selectTemplateIntelligence(
             ? "ti-restaurant-dining"
             : resolvedIndustry === "real-estate"
               ? "ti-real-estate-listings"
-              : "ti-modern-clean";
+              : resolvedIndustry === "clinic"
+                ? "ti-medical-care"
+                : resolvedIndustry === "law"
+                  ? "ti-law-firm"
+                  : resolvedIndustry === "education"
+                    ? "ti-education-campus"
+                    : resolvedIndustry === "blog"
+                      ? "ti-blog-editorial"
+                      : resolvedIndustry === "landing-page"
+                        ? "ti-landing-conversion"
+                        : "ti-modern-clean";
     const fallback =
       getTemplateIntelligence(industryFallbackId) ||
       getTemplateIntelligence("ti-modern-clean") ||

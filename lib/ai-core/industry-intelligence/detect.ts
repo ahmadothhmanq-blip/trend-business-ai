@@ -48,7 +48,12 @@ function aliasToIndustryId(raw: string): IndustryId | null {
   if (
     normalized.includes("tourism") ||
     normalized.includes("travel") ||
-    normalized.includes("tour")
+    normalized.includes("tour") ||
+    normalized.includes("destination") ||
+    normalized.includes("vacation") ||
+    normalized.includes("resort") ||
+    normalized.includes("itinerary") ||
+    normalized.includes("cruise")
   ) {
     return "tourism";
   }
@@ -85,12 +90,18 @@ function aliasToIndustryId(raw: string): IndustryId | null {
     return "ecommerce";
   }
   if (
-    normalized.includes("automotive") ||
-    normalized.includes("dealership") ||
-    normalized.includes("vehicle") ||
-    normalized.includes("showroom") ||
-    /\bcar\b/.test(normalized) ||
-    normalized === "ev"
+    (normalized.includes("automotive") ||
+      normalized.includes("dealership") ||
+      normalized.includes("vehicle") ||
+      (normalized.includes("showroom") &&
+        !normalized.includes("travel") &&
+        !normalized.includes("tourism") &&
+        !normalized.includes("destination")) ||
+      /\bcar\b/.test(normalized) ||
+      normalized === "ev") &&
+    !normalized.includes("travel") &&
+    !normalized.includes("tourism") &&
+    !normalized.includes("destination")
   ) {
     return "automotive";
   }
@@ -121,11 +132,42 @@ function aliasToIndustryId(raw: string): IndustryId | null {
   if (normalized.includes("agency") || normalized.includes("studio")) {
     return "agency";
   }
+  if (
+    normalized.includes("law") ||
+    normalized.includes("legal") ||
+    normalized.includes("attorney") ||
+    normalized.includes("lawyer")
+  ) {
+    return "law";
+  }
+  if (
+    normalized.includes("blog") ||
+    normalized.includes("article") ||
+    normalized.includes("magazine") ||
+    normalized.includes("editorial")
+  ) {
+    return "blog";
+  }
+  if (
+    normalized.includes("landing") ||
+    normalized.includes("launch") ||
+    normalized.includes("lead-gen") ||
+    normalized.includes("leadgen")
+  ) {
+    return "landing-page";
+  }
   return null;
 }
 
 function explicitIndustry(brief: CoreBrief): IndustryId | null {
   const meta = brief.metadata ?? {};
+  const masterRaw = meta.masterWebsitePlan;
+  if (masterRaw && typeof masterRaw === "object" && "industry" in masterRaw) {
+    const mapped = aliasToIndustryId(
+      String((masterRaw as { industry: string }).industry),
+    );
+    if (mapped) return mapped;
+  }
   const candidates = [
     meta.industryId,
     meta.industry,
@@ -214,6 +256,25 @@ type AnalysisPayload = {
 export async function detectWebsiteIndustry(
   brief: CoreBrief,
 ): Promise<IndustryDetectionResult> {
+  const masterRaw = brief.metadata?.masterWebsitePlan;
+  if (masterRaw && typeof masterRaw === "object") {
+    const plan = masterRaw as {
+      industry?: string;
+      locked?: { industry?: boolean };
+    };
+    if (plan.locked?.industry && plan.industry) {
+      const mapped = aliasToIndustryId(String(plan.industry));
+      if (mapped) {
+        return toResult(
+          mapped,
+          1,
+          "Master AI Planner locked industry.",
+          "explicit",
+        );
+      }
+    }
+  }
+
   const explicit = explicitIndustry(brief);
   if (explicit) {
     return toResult(explicit, 1, "Explicit industry override.", "explicit");

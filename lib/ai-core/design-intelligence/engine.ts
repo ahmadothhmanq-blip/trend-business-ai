@@ -4,6 +4,7 @@ import type {
   CoreBusinessProfile,
   CoreProductStrategy,
 } from "@/lib/ai-core/layers/types";
+import type { TemplateDNAProfile } from "@/lib/ai-core/template-intelligence/template-dna";
 
 export type RunDesignIntelligenceParams = {
   profile?: CoreBusinessProfile | null;
@@ -12,6 +13,7 @@ export type RunDesignIntelligenceParams = {
   theme?: string | null;
   designStyle?: string | null;
   preferredStyle?: string | null;
+  templateDna?: TemplateDNAProfile | null;
   onProgress?: (message: string) => void;
 };
 

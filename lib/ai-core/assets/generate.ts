@@ -65,19 +65,23 @@ export async function generateCoreAssets(
 
     params.onProgress?.(`Asset: ${planned.name} (${planned.kind})`);
 
+    const itemSettings = planned.aspectRatio
+      ? { ...settings, aspectRatio: planned.aspectRatio }
+      : settings;
+
     const enrichedPrompt = planned.realistic
       ? `Photorealistic, high detail. ${planned.prompt}. Brand colors roughly ${params.colors.primary} and ${params.colors.secondary}.`
       : `${planned.prompt}. Brand colors roughly ${params.colors.primary} and ${params.colors.secondary}.`;
 
     // Retry once on provider failure before falling back to premium stock.
     let generated = await generateRealisticImage(enrichedPrompt, {
-      settings,
+      settings: itemSettings,
       negativePrompt: params.negativePrompt,
     });
     if (!generated) {
       params.onProgress?.(`Retrying image: ${planned.name}`);
       generated = await generateRealisticImage(enrichedPrompt, {
-        settings,
+        settings: itemSettings,
         negativePrompt: params.negativePrompt,
       });
     }

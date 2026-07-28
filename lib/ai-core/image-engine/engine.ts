@@ -5,6 +5,15 @@ import type { BrandIdentityBrief } from "@/lib/ai-core/brand-identity/types";
 import { buildArtDirectionMap } from "@/lib/ai-core/image-engine/art-direction";
 import { buildImageIntelligence } from "@/lib/ai-core/image-engine/intelligence";
 import { planWebsiteImages } from "@/lib/ai-core/image-engine/plan";
+import {
+  getCachedPrompt,
+  setCachedPrompt,
+} from "@/lib/ai-core/image-engine/prompt-cache";
+import {
+  improvePromptForScore,
+  PROMPT_QUALITY_THRESHOLD,
+  scoreImagePrompt,
+} from "@/lib/ai-core/image-engine/prompt-scoring";
 import { preferAiImages } from "@/lib/ai-core/image-engine/prefer";
 import { ensureRequiredPhotoAssets } from "@/lib/ai-core/image-engine/inject";
 import {
@@ -12,6 +21,12 @@ import {
   validateAssetManifest,
 } from "@/lib/ai-core/image-engine/validate";
 import { prepareVideoAssets } from "@/lib/ai-core/image-engine/video";
+import type {
+  DesignPlanImageContext,
+  ImageEnginePlanItem,
+  StructuredImageRequirement,
+} from "@/lib/ai-core/image-engine/types";
+import type { MasterWebsitePlan } from "@/lib/ai-core/master-planner/types";
 import type {
   CoreAssetManifest,
   CoreBusinessProfile,
@@ -31,7 +46,7 @@ type PromptEnrichment = {
 };
 
 /**
- * Advanced AI Assets Engine — art direction → plan → generate → validate → video prep.
+ * Advanced AI Assets Engine — art direction → plan → score → generate → validate → video prep.
  * No empty placeholders for photographic roles.
  */
 export async function runAiImageEngine(params: {
@@ -42,8 +57,12 @@ export async function runAiImageEngine(params: {
   brandIdentity?: BrandIdentityBrief | null;
   /** Override from approved Design Planning Phase. */
   preferredStyle?: string | null;
-  /** Shot briefs from VisualDesignPlan.imageRequirements. */
+  /** Shot briefs from VisualDesignPlan.imageRequirements (legacy string form). */
   designPlanImageRequirements?: string[];
+  /** Structured requirements from design plan / premium templates. */
+  structuredImageRequirements?: StructuredImageRequirement[];
+  /** Design plan section structure for layout-aware planning. */
+  designPlanContext?: DesignPlanImageContext;
   maxImages?: number;
   userId?: string;
   generationKey?: string;
@@ -56,6 +75,7 @@ export async function runAiImageEngine(params: {
     contentType: string;
   }) => Promise<{ publicUrl: string; storagePath: string } | null>;
   onProgress?: (message: string) => void;
+  masterPlan?: MasterWebsitePlan | null;
 }): Promise<CoreAssetManifest> {
   const maxImages = params.maxImages ?? 14;
   const intel = buildImageIntelligence({
@@ -65,6 +85,8 @@ export async function runAiImageEngine(params: {
     templateSelection: params.templateSelection,
     preferredStyle: params.preferredStyle,
     brandIdentity: params.brandIdentity,
+    structuredRequirements: params.structuredImageRequirements,
+    masterPlan: params.masterPlan,
   });
   if (params.designPlanImageRequirements?.length) {
     intel.imageRequirements = params.designPlanImageRequirements;
@@ -88,7 +110,7 @@ export async function runAiImageEngine(params: {
     `AI Assets Engine: art direction for ${intel.industry} · ${intel.brandStyle}…`,
   );
   params.onProgress?.(
-    `AI Assets Engine: planning ${intel.imageStyle} imagery (hero, product, service, gallery, testimonials)…`,
+    `AI Assets Engine: planning ${intel.imageStyle} imagery with section-specific strategies…`,
   );
 
   let planned = planWebsiteImages({
@@ -101,12 +123,16 @@ export async function runAiImageEngine(params: {
       params.brandIdentity?.imageDirection ||
       intel.imageStyle,
     brandIdentity: params.brandIdentity,
+    structuredRequirements: params.structuredImageRequirements,
+    designPlanContext: params.designPlanContext,
     maxItems: maxImages,
+    masterPlan: params.masterPlan,
   });
 
+  planned = scoreAndImprovePlannedPrompts(planned, intel, params.onProgress);
   planned = await refinePromptsWithDeepSeek(planned, intel, params.onProgress);
 
-  const settings = getDefaultImageSettings({
+  const defaultSettings = getDefaultImageSettings({
     style: intel.imageStyle,
     aspectRatio: "16:9",
   });
@@ -119,7 +145,12 @@ export async function runAiImageEngine(params: {
     prompt: item.prompt,
     alt: item.alt,
     realistic: item.realistic,
-    metadata: item.metadata,
+    aspectRatio: item.aspectRatio,
+    metadata: {
+      ...item.metadata,
+      seoDescription: item.seoDescription,
+      caption: item.caption,
+    },
   }));
 
   params.onProgress?.(
@@ -159,7 +190,7 @@ export async function runAiImageEngine(params: {
     websiteGenerationId: params.websiteGenerationId,
     aiRunId: params.aiRunId,
     maxImages,
-    imageSettings: settings,
+    imageSettings: defaultSettings,
     negativePrompt:
       "text, watermark, logo, UI mockup, blurry, low quality, distorted anatomy, placeholder, cartoon, clipart, generic stock smile, empty background, blank image",
     persist: params.persist,
@@ -178,7 +209,7 @@ export async function runAiImageEngine(params: {
         metadata: {
           purpose,
           section: plan?.metadata.section,
-          style: plan?.metadata.style ?? settings.style,
+          style: plan?.metadata.style ?? defaultSettings.style,
           prompt: plan?.prompt ?? item.prompt,
           artDirection: plan?.metadata.artDirection || artMap[purpose]?.summary,
           provider:
@@ -193,7 +224,6 @@ export async function runAiImageEngine(params: {
   };
 
   const preferred = preferAiImages(withMeta);
-  // Never leave required photo roles empty — premium stock fills gaps (never SVG).
   const complete = ensureRequiredPhotoAssets(
     preferred,
     params.templateSelection?.industryId ||
@@ -205,6 +235,12 @@ export async function runAiImageEngine(params: {
   const qualityReport = validateAssetManifest(complete, {
     industry: intel.industry,
     brandStyle: intel.brandStyle,
+    plannedPrompts: planned.map((p) => ({
+      id: p.id,
+      prompt: p.prompt,
+      purpose: p.metadata.purpose,
+      section: p.metadata.section,
+    })),
   });
   assertPublishableAssets(complete);
 
@@ -225,8 +261,50 @@ export async function runAiImageEngine(params: {
   };
 }
 
+/** Score planned prompts and auto-improve any below threshold before LLM refinement. */
+function scoreAndImprovePlannedPrompts(
+  planned: ImageEnginePlanItem[],
+  intel: ReturnType<typeof buildImageIntelligence>,
+  onProgress?: (message: string) => void,
+): ImageEnginePlanItem[] {
+  let improved = 0;
+  const result = planned.map((item) => {
+    const score = scoreImagePrompt({
+      prompt: item.prompt,
+      purpose: item.metadata.purpose,
+      ctx: intel,
+      sectionName: item.metadata.section,
+      shotBrief: item.metadata.artDirection,
+    });
+
+    if (score.passed) return item;
+
+    const betterPrompt = improvePromptForScore({
+      prompt: item.prompt,
+      purpose: item.metadata.purpose,
+      ctx: intel,
+      sectionName: item.metadata.section,
+      score,
+    });
+    improved += 1;
+    return {
+      ...item,
+      prompt: betterPrompt,
+      metadata: { ...item.metadata, prompt: betterPrompt },
+    };
+  });
+
+  if (improved > 0) {
+    onProgress?.(
+      `AI Assets Engine: improved ${improved} prompt(s) below quality threshold (${PROMPT_QUALITY_THRESHOLD}/100)…`,
+    );
+  }
+
+  return result;
+}
+
 async function refinePromptsWithDeepSeek(
-  planned: ReturnType<typeof planWebsiteImages>,
+  planned: ImageEnginePlanItem[],
   intel: ReturnType<typeof buildImageIntelligence>,
   onProgress?: (message: string) => void,
 ) {
@@ -237,11 +315,41 @@ async function refinePromptsWithDeepSeek(
     "AI Assets Engine: refining prompts from brand + industry intelligence…",
   );
 
+  const needsRefinement = planned.filter((item) => {
+    const cached = getCachedPrompt([
+      intel.industry,
+      item.metadata.purpose,
+      item.sectionKey || "",
+      item.metadata.section || "",
+      intel.imageStyle,
+    ]);
+    return !cached;
+  });
+
+  if (!needsRefinement.length) {
+    return planned.map((item) => {
+      const cached = getCachedPrompt([
+        intel.industry,
+        item.metadata.purpose,
+        item.sectionKey || "",
+        item.metadata.section || "",
+        intel.imageStyle,
+      ]);
+      if (!cached) return item;
+      return {
+        ...item,
+        prompt: cached.prompt,
+        alt: cached.alt || item.alt,
+        metadata: { ...item.metadata, prompt: cached.prompt },
+      };
+    });
+  }
+
   try {
     const enrichment = await providerManager.generateJson<PromptEnrichment>(
       {
         system:
-          "You write concise photorealistic commercial image prompts for premium agency websites. No text overlays, logos, or watermarks. Return JSON only.",
+          "You write concise photorealistic commercial image prompts for premium agency websites. Each section must have a DISTINCT subject — never reuse hero wording for other sections. No text overlays, logos, or watermarks. Return JSON only.",
         prompt: `Business: ${intel.projectName}
 Industry: ${intel.industry}
 Business type: ${intel.businessType}
@@ -254,12 +362,13 @@ Image style: ${intel.imageStyle}
 Industry image requirements: ${intel.imageRequirements.join("; ") || "n/a"}
 Template: ${intel.templateLabel || "n/a"}
 
-Planned assets:
+Planned assets (each must stay unique):
 ${JSON.stringify(
-  planned.map((i) => ({
+  needsRefinement.map((i) => ({
     id: i.id,
     purpose: i.metadata.purpose,
     section: i.metadata.section,
+    sectionKey: i.sectionKey,
     role: i.role,
     name: i.name,
     prompt: i.prompt,
@@ -272,7 +381,7 @@ ${JSON.stringify(
 Return JSON:
 {
   "items": [
-    { "id": "<same id>", "prompt": "<improved prompt>", "alt": "<alt>" }
+    { "id": "<same id>", "prompt": "<improved unique prompt>", "alt": "<accessible alt text>" }
   ]
 }`,
         temperature: 0.4,
@@ -292,15 +401,41 @@ Return JSON:
 
     return planned.map((item) => {
       const row = byId.get(item.id);
-      if (!row?.prompt) return item;
+      if (!row?.prompt) {
+        const cached = getCachedPrompt([
+          intel.industry,
+          item.metadata.purpose,
+          item.sectionKey || "",
+          item.metadata.section || "",
+          intel.imageStyle,
+        ]);
+        if (cached) {
+          return {
+            ...item,
+            prompt: cached.prompt,
+            alt: cached.alt || item.alt,
+            metadata: { ...item.metadata, prompt: cached.prompt },
+          };
+        }
+        return item;
+      }
       const prompt = String(row.prompt);
+      const alt =
+        typeof row.alt === "string" && row.alt.trim() ? row.alt : item.alt;
+      setCachedPrompt(
+        [
+          intel.industry,
+          item.metadata.purpose,
+          item.sectionKey || "",
+          item.metadata.section || "",
+          intel.imageStyle,
+        ],
+        { prompt, alt },
+      );
       return {
         ...item,
         prompt,
-        alt:
-          typeof row.alt === "string" && row.alt.trim()
-            ? row.alt
-            : item.alt,
+        alt,
         metadata: {
           ...item.metadata,
           prompt,

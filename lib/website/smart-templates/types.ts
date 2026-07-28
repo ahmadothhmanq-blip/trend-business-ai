@@ -13,6 +13,9 @@ export type SmartTemplateId =
   | "agency"
   | "clinic"
   | "education-campus"
+  | "law-firm"
+  | "blog-editorial"
+  | "landing-conversion"
   | "ecommerce-store";
 
 export type SmartTemplateColorPalette = {

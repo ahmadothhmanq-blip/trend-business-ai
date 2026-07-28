@@ -158,7 +158,10 @@ export function BuilderWorkspace({
       pushBuilderVersionSnapshot({
         generationId,
         project: payload.project,
-        label: autosaveState === "saving" ? "Autosave" : "Manual save",
+        label:
+          autosaveState === "saving"
+            ? wb("builder.workspace.autosaveSaving")
+            : wb("builder.publishing.backup"),
       });
       setVersions(listBuilderVersionSnapshots(generationId));
       setStructureKey((k) => k + 1);
@@ -189,10 +192,10 @@ export function BuilderWorkspace({
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ label: "Manual backup" }),
+          body: JSON.stringify({ label: wb("builder.publishing.backup") }),
         },
       );
-      if (!res.ok) throw new Error("Backup failed");
+      if (!res.ok) throw new Error(wb("builder.workspace.backupFailed"));
       toast.success(wb("builder.workspace.backupSaved"));
     } catch {
       toast.error(wb("builder.workspace.backupFailed"));

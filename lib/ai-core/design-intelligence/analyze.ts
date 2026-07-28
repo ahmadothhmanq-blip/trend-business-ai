@@ -12,6 +12,10 @@ import type { DesignIntelligenceBrief } from "@/lib/ai-core/design-intelligence/
 import { selectWebsiteLayout } from "@/lib/ai-core/design-intelligence/layout-selection";
 import type { PremiumStyleId } from "@/lib/ai-core/design-system/premium/types";
 import type { DesignPresetId } from "@/lib/ai-core/design-system/types";
+import {
+  applyTemplateDnaToIntelligence,
+  type TemplateDNAProfile,
+} from "@/lib/ai-core/template-intelligence/template-dna";
 
 function engineForStyle(style: PremiumStyleId): DesignPresetId {
   if (style === "technology" || style === "futuristic" || style === "saas") {
@@ -77,6 +81,7 @@ export function analyzeDesignIntelligence(params: {
   theme?: string | null;
   designStyle?: string | null;
   preferredStyle?: string | null;
+  templateDna?: TemplateDNAProfile | null;
 }): DesignIntelligenceBrief {
   const audience =
     params.profile?.targetAudience?.trim() ||
@@ -97,6 +102,7 @@ export function analyzeDesignIntelligence(params: {
     audience,
     brandPosition,
     businessGoals,
+    templateDna: params.templateDna,
   });
 
   const signalStyle = preferStyleFromSignals({
@@ -157,7 +163,7 @@ export function analyzeDesignIntelligence(params: {
         ? "Product-marketing density — breathable but information-rich"
         : "Airy section rhythm on desktop; tightened but breathable on mobile";
 
-  return {
+  const base: DesignIntelligenceBrief = {
     premiumStyleId,
     enginePreset,
     industryKey: layout.industryKey,
@@ -185,4 +191,9 @@ export function analyzeDesignIntelligence(params: {
       ? `${layout.reason}; brand/audience signals refined style to ${premiumStyleId}`
       : layout.reason,
   };
+
+  if (params.templateDna) {
+    return applyTemplateDnaToIntelligence(base, params.templateDna);
+  }
+  return base;
 }

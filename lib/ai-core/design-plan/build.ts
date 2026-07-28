@@ -23,6 +23,8 @@ import type {
   CoreBusinessProfile,
   CoreProductStrategy,
 } from "@/lib/ai-core/layers/types";
+import type { TemplateDNAProfile } from "@/lib/ai-core/template-intelligence/template-dna";
+import type { DesignRendererComponentId } from "@/lib/ai-core/design-renderer/types";
 
 function slugKey(label: string, index: number): string {
   const base = label
@@ -93,6 +95,41 @@ function assetRoleForKind(
   return undefined;
 }
 
+const NAV_COMPONENTS = new Set<DesignRendererComponentId>([
+  "SiteHeader",
+  "SiteHeaderTransparent",
+  "NavModern",
+]);
+const FOOTER_COMPONENTS = new Set<DesignRendererComponentId>(["SiteFooter"]);
+
+function bodyComponentsFromDna(
+  dna: TemplateDNAProfile,
+): DesignRendererComponentId[] {
+  return dna.components.filter(
+    (c) => !NAV_COMPONENTS.has(c) && !FOOTER_COMPONENTS.has(c),
+  );
+}
+
+/** Map Template DNA section order → explicit component ids (true templates, not themes). */
+function buildSectionsFromTemplateDna(
+  dna: TemplateDNAProfile,
+): DesignPlanSection[] {
+  const body = bodyComponentsFromDna(dna);
+  return dna.sectionOrder.map((label, index) => {
+    const kindHint = kindHintFromLabel(label);
+    const componentId = body[index] ?? body[body.length - 1];
+    return {
+      key: slugKey(label, index),
+      label,
+      purpose: `Deliver ${label.toLowerCase()} · ${dna.componentProfile}`,
+      priority: index,
+      kindHint,
+      componentId,
+      assetRole: assetRoleForKind(kindHint),
+    };
+  });
+}
+
 function buildSections(
   intelligence: DesignIntelligenceBrief,
   strategy?: CoreProductStrategy | null,
@@ -161,15 +198,30 @@ function buildImageRequirements(
     >,
   );
 
-  for (const role of roles) {
-    if (role === "hero") continue;
+  for (const section of sections) {
+    const role = section.assetRole;
+    if (!role || role === "hero") continue;
+    const sectionKey = section.key.toLowerCase();
     reqs.push({
       role,
-      purpose: `${role} imagery supporting section narrative`,
+      purpose: `${role} imagery for "${section.label}" — ${section.purpose}`,
       style: imageStyle,
       required: role === "product" || role === "gallery" || role === "section",
-      notes: `Match brand mood; industry-true; role=${role}`,
+      notes: `Section-specific shot for ${sectionKey}; match section narrative; never reuse hero prompt`,
     });
+  }
+
+  for (const role of roles) {
+    if (role === "hero") continue;
+    if (!reqs.some((r) => r.role === role)) {
+      reqs.push({
+        role,
+        purpose: `${role} imagery supporting section narrative`,
+        style: imageStyle,
+        required: role === "product" || role === "gallery" || role === "section",
+        notes: `Match brand mood; industry-true; role=${role}`,
+      });
+    }
   }
 
   for (const role of ["product", "service", "gallery", "section"] as const) {
@@ -213,6 +265,8 @@ export type BuildVisualDesignPlanInput = {
   prompt?: string | null;
   /** Brand Identity Intelligence — seeds colors, type, image, component style. */
   brandIdentity?: BrandIdentityBrief | null;
+  /** Template DNA — locks section order and component mapping. */
+  templateDna?: TemplateDNAProfile | null;
 };
 
 /**
@@ -238,19 +292,23 @@ export function buildVisualDesignPlan(
   ]);
 
   const uniquenessSeed = `u${seed.toString(16)}`;
-  // Uniqueness stays inside Layout Selection Engine pools — industry identity wins.
-  const heroTreatment = pickUniqueHeroTreatment(
-    seed,
-    intelligence.allowedHeroVariants?.length
-      ? intelligence.allowedHeroVariants
-      : [intelligence.heroTreatment],
-  );
-  const sectionLayout = pickUniqueSectionLayout(
-    seed,
-    intelligence.allowedSectionLayouts?.length
-      ? intelligence.allowedSectionLayouts
-      : [intelligence.sectionLayout || intelligence.layoutStyle],
-  );
+  const dna = input.templateDna;
+  const heroTreatment = dna
+    ? dna.heroProfile
+    : pickUniqueHeroTreatment(
+        seed,
+        intelligence.allowedHeroVariants?.length
+          ? intelligence.allowedHeroVariants
+          : [intelligence.heroTreatment],
+      );
+  const sectionLayout = dna
+    ? dna.gridSystem
+    : pickUniqueSectionLayout(
+        seed,
+        intelligence.allowedSectionLayouts?.length
+          ? intelligence.allowedSectionLayouts
+          : [intelligence.sectionLayout || intelligence.layoutStyle],
+      );
 
   const preset = getDesignPreset(intelligence.enginePreset);
   const brand = input.brandIdentity;
@@ -272,7 +330,9 @@ export function buildVisualDesignPlan(
     seedAccent: brandSeeds?.seedAccent || preset.colors.accent,
   });
 
-  const sections = buildSections(intelligence, input.strategy, seed);
+  const sections = dna
+    ? buildSectionsFromTemplateDna(dna)
+    : buildSections(intelligence, input.strategy, seed);
   const imageRequirements = buildImageRequirements(
     sections,
     brandSeeds?.imageStyle || intelligence.imageStyle,

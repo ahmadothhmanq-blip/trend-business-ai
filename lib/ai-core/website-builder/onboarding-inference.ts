@@ -26,6 +26,9 @@ export type InferredOnboardingDefaults = {
 const INDUSTRY_TO_PROJECT_TYPE: Record<string, string> = {
   restaurant: "Restaurant",
   clinic: "Clinic",
+  law: "Law Firm",
+  blog: "Blog",
+  "landing-page": "Landing Page",
   "real-estate": "Real Estate",
   education: "Education",
   saas: "AI SaaS",

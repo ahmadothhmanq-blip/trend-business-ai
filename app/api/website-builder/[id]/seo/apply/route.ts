@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { z } from "zod";
 import { requireUser, parseUuidParam } from "@/lib/api/helpers";
+import { requireWebsiteGenerationAccess } from "@/lib/website/builder/route-access";
 import { executeWebsiteSeoApply } from "@/lib/website/platform/services/seo-service";
 
 export const dynamic = "force-dynamic";
@@ -39,6 +40,14 @@ export async function POST(request: Request, { params }: Params) {
   if (!parsed.success) {
     return apiValidationError(parsed.error.issues[0]?.message);
   }
+
+  const access = await requireWebsiteGenerationAccess(
+    auth.supabase,
+    auth.user!.id,
+    parsedId.id,
+    "edit",
+  );
+  if (access instanceof NextResponse) return access;
 
   try {
     const result = await executeWebsiteSeoApply({

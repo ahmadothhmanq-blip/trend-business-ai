@@ -55,9 +55,21 @@ export {
   PALETTE_TECHNOLOGY,
   PALETTE_SAAS,
   PALETTE_AUTOMOTIVE,
+  PALETTE_TOURISM,
   PALETTE_RESTAURANT,
   PALETTE_REAL_ESTATE,
+  isTourismContext,
+  isAutomotiveContext,
+  TOURISM_SIGNALS,
 } from "@/lib/ai-core/template-intelligence/industry-palettes";
+
+export type { TemplateDNAProfile } from "@/lib/ai-core/template-intelligence/template-dna";
+
+export {
+  resolveTemplateDNA,
+  applyTemplateDnaToIntelligence,
+  applyTemplateDnaToVisualPreset,
+} from "@/lib/ai-core/template-intelligence/template-dna";
 
 export { buildSectionSpecsFromComponents } from "@/lib/ai-core/template-intelligence/section-specs";
 

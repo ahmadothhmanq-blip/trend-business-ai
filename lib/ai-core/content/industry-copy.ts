@@ -169,6 +169,60 @@ const PACKS: Record<string, Omit<IndustryCopyPack, "industryId">> = {
       "Start your application with a guided admissions checklist.",
     ],
   },
+  law: {
+    heroHeadline: "Legal counsel you can trust",
+    heroSubheadline:
+      "Experienced attorneys across practice areas — clear guidance, discreet representation, and responsive consultation.",
+    primaryCta: "Book consultation",
+    secondaryCta: "Practice areas",
+    serviceDescriptions: [
+      "Corporate, family, and immigration matters handled with precision.",
+      "Case strategy explained in plain language before you commit.",
+      "Consultations scheduled around your timeline and confidentiality needs.",
+    ],
+    trustLine: "Professional legal representation with discretion and accountability.",
+    contentBlocks: [
+      "Review practice areas and representative case outcomes.",
+      "Meet the attorneys leading your matter.",
+      "Request a confidential consultation online.",
+    ],
+  },
+  blog: {
+    heroHeadline: "Stories, insights, and ideas worth your time",
+    heroSubheadline:
+      "Editorial-quality articles across the topics you care about — written for clarity, depth, and practical value.",
+    primaryCta: "Read latest",
+    secondaryCta: "Subscribe",
+    serviceDescriptions: [
+      "Featured articles curated for relevance and quality.",
+      "Browse by category, author, or trending topics.",
+      "Newsletter digests delivered on your schedule.",
+    ],
+    trustLine: "Independent editorial voice with consistent publishing quality.",
+    contentBlocks: [
+      "Explore featured and popular posts from our writers.",
+      "Subscribe for new articles and exclusive commentary.",
+      "Meet the authors behind the publication.",
+    ],
+  },
+  "landing-page": {
+    heroHeadline: "Launch faster. Convert better.",
+    heroSubheadline:
+      "A focused landing experience that communicates value, builds trust, and drives signups — without distracting navigation.",
+    primaryCta: "Get started",
+    secondaryCta: "Book a demo",
+    serviceDescriptions: [
+      "Benefit-led hero with a single primary conversion goal.",
+      "Social proof, metrics, and pricing that reduce hesitation.",
+      "FAQ and objection handling directly on the page.",
+    ],
+    trustLine: "Built for campaigns, product launches, and lead generation.",
+    contentBlocks: [
+      "See benefits and features mapped to outcomes.",
+      "Compare plans or offers with transparent pricing.",
+      "Start a trial or join the waitlist in one click.",
+    ],
+  },
   agency: {
     heroHeadline: "Creative work that grows brands",
     heroSubheadline:
@@ -239,6 +293,15 @@ export function resolveCopyIndustryId(
   }
   if (raw.includes("clinic") || raw.includes("health") || raw.includes("medical")) {
     return "clinic";
+  }
+  if (raw.includes("law") || raw.includes("legal") || raw.includes("attorney")) {
+    return "law";
+  }
+  if (raw.includes("blog") || raw.includes("article") || raw.includes("magazine")) {
+    return "blog";
+  }
+  if (raw.includes("landing") || raw.includes("launch") || raw.includes("campaign")) {
+    return "landing-page";
   }
   if (raw.includes("school") || raw.includes("education")) return "education";
   if (raw.includes("agency") || raw.includes("studio")) return "agency";

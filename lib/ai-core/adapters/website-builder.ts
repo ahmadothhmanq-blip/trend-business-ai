@@ -15,6 +15,7 @@ import type {
   CoreProductStrategy,
   CoreQualityReport,
 } from "@/lib/ai-core/layers/types";
+import { inferSectionKey } from "@/lib/ai-core/image-engine/section-strategies";
 import { registerProductEngineAdapter } from "@/lib/ai-core/registry";
 import { getTemplateSelectionFromBrief } from "@/lib/ai-core/templates/apply";
 import {
@@ -33,6 +34,10 @@ import type {
 import { isIndustryId } from "@/lib/ai-core/templates/industries";
 import type { IndustryId, TemplateSelection } from "@/lib/ai-core/templates/types";
 import { getWebsiteIndustryIntelligence } from "@/lib/ai-core/industry-intelligence/profiles";
+import {
+  getMasterWebsitePlan,
+  resolveIndustryFromMasterPlan,
+} from "@/lib/ai-core/master-planner";
 import {
   buildWebsiteGenerationKey,
   resolveWebsiteOutputLanguage,
@@ -62,6 +67,13 @@ import {
   runDesignPlanningPhaseWithBrand,
 } from "@/lib/ai-core/design-plan/engine";
 import type { VisualDesignPlan } from "@/lib/ai-core/design-plan/types";
+import {
+  getTemplateIntelligence,
+} from "@/lib/ai-core/template-intelligence/catalog";
+import {
+  resolveTemplateDNA,
+  type TemplateDNAProfile,
+} from "@/lib/ai-core/template-intelligence/template-dna";
 import { analyzeBusinessIdea } from "@/plugins/website/layers/business-idea";
 import { buildDesignSystem } from "@/plugins/website/layers/design-engine";
 import { buildWebsiteStrategy } from "@/plugins/website/layers/strategy";
@@ -95,6 +107,7 @@ import {
   isUltraFastWebsiteGenerationEnabled,
   resolveWebsiteGenerationProfile,
 } from "@/lib/website/generation-flags";
+import { normalizeWebsiteFeatureList } from "@/lib/website/builder/feature-registry";
 import {
   buildGenerationRepairInstruction,
   validateWebsiteGeneration,
@@ -186,18 +199,27 @@ function extractPremiumTemplatePlan(
 function componentIdFromPlanKind(
   kindHint: string,
   heroTreatment?: string,
+  industryId?: string,
 ): DesignRendererComponentId {
   const k = kindHint.toLowerCase();
   const hero = (heroTreatment || "").toLowerCase();
+  const industry = (industryId || "").toLowerCase();
+  const tourism =
+    industry === "tourism" ||
+    /travel|tour\b|destination|vacation|resort/.test(hero);
   if (k === "hero") {
     if (/interactive/.test(hero)) return "HeroInteractive";
     if (/cinematic-hero|cinematic/.test(hero)) return "HeroCinematic";
-    if (/full-image|full.?image/.test(hero)) return "HeroFullImage";
-    if (/vehicle|showroom|luxury-vehicle|product-showcase-hero/.test(hero)) {
-      return /vehicle|showroom|luxury-vehicle/.test(hero)
-        ? "HeroLuxuryShowcase"
-        : "HeroProduct";
+    if (/full-image|full.?image|destination|travel|tour/.test(hero)) {
+      return "HeroFullImage";
     }
+    if (
+      /vehicle|luxury-vehicle/.test(hero) ||
+      (/showroom/.test(hero) && !tourism && industry === "automotive")
+    ) {
+      return "HeroLuxuryShowcase";
+    }
+    if (/product-showcase-hero/.test(hero) && !tourism) return "HeroProduct";
     if (/appetite|image-led|image.?focus/.test(hero)) return "HeroImage";
     if (/split-hero|editorial-split|trust-split|property|split/.test(hero)) {
       return "HeroSplit";
@@ -249,13 +271,16 @@ function applyDesignRenderer(
 
   const template = getTemplateSelectionFromBrief(brief);
   const intel = template?.industryIntelligence;
-  const industryRaw =
+  const masterPlan = getMasterWebsitePlan(brief);
+  const industryRaw = resolveIndustryFromMasterPlan(
+    brief,
     template?.industryId ||
-    (typeof brief.metadata?.industryId === "string"
-      ? brief.metadata.industryId
-      : "") ||
-    artifacts.businessProfile?.industry ||
-    "";
+      (typeof brief.metadata?.industryId === "string"
+        ? brief.metadata.industryId
+        : "") ||
+      artifacts.businessProfile?.industry ||
+      "",
+  );
   const industryId: IndustryId | string = isIndustryId(String(industryRaw))
     ? String(industryRaw)
     : String(industryRaw);
@@ -266,6 +291,14 @@ function applyDesignRenderer(
     artifacts.designPlan ||
     (brief.metadata?.designPlan as VisualDesignPlan | undefined);
   const planSections = designPlan?.sectionStructure?.map((s) => s.label);
+  const templateDna =
+    (brief.metadata?.templateDna as TemplateDNAProfile | undefined) ??
+    (() => {
+      const tiId = brief.metadata?.templateIntelligenceId;
+      if (typeof tiId !== "string") return null;
+      const ti = getTemplateIntelligence(tiId);
+      return ti ? resolveTemplateDNA(ti) : null;
+    })();
   const rendered = renderWebsiteDesign({
     industryId,
     industryLabel:
@@ -275,13 +308,16 @@ function applyDesignRenderer(
     strategy: artifacts.strategy,
     designSystem: artifacts.designSystem,
     websiteSections:
-      planSections?.length
-        ? planSections
-        : premiumPlan?.sections.map((s) => s.label) ??
-          intel?.requiredSections ??
-          template?.sections ??
-          artifacts.strategy.contentStructure,
+      masterPlan?.locked.sections && masterPlan.sections.length
+        ? masterPlan.sections.map((s) => s.label)
+        : planSections?.length
+          ? planSections
+          : premiumPlan?.sections.map((s) => s.label) ??
+            intel?.requiredSections ??
+            template?.sections ??
+            artifacts.strategy.contentStructure,
     designStyle:
+      masterPlan?.style ||
       designPlan?.visualIdentity ||
       premiumPlan?.designStyle ||
       intel?.designStyle ||
@@ -314,10 +350,13 @@ function applyDesignRenderer(
     premiumHomeSections:
       designPlan?.sectionStructure?.map((s) => ({
         name: s.label,
-        componentId: componentIdFromPlanKind(
-          s.kindHint,
-          designPlan.websiteStyle.heroTreatment,
-        ),
+        componentId:
+          s.componentId ??
+          componentIdFromPlanKind(
+            s.kindHint,
+            designPlan.websiteStyle.heroTreatment,
+            designPlan.industryId,
+          ),
         goal: s.purpose,
         contentNotes: `Design plan · ${s.kindHint} · ${designPlan.visualIdentity}`,
         assetRole:
@@ -330,7 +369,10 @@ function applyDesignRenderer(
         contentNotes: `Premium template · ${s.label}`,
         assetRole: s.assetRole,
       })),
-    premiumRecommendedComponents: premiumPlan?.recommendedComponents,
+    premiumComponentOrder: templateDna?.components,
+    premiumRecommendedComponents: templateDna?.components.length
+      ? templateDna.components
+      : premiumPlan?.recommendedComponents,
   });
 
   artifacts.strategy = rendered.strategy;
@@ -366,7 +408,7 @@ export function websiteInputToBrief(
     productId: WEBSITE_BUILDER_PRODUCT_ID,
     language,
     theme: input.theme,
-    features: input.features,
+    features: normalizeWebsiteFeatureList(input.features),
     metadata: {
       [INPUT_META_KEY]: { ...input, language, locale: language },
       ...(input.templateId
@@ -698,6 +740,14 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
       };
 
       // Design Planning Phase — Brand Identity → Design Intelligence → approved plan.
+      const templateDna =
+        (brief.metadata?.templateDna as TemplateDNAProfile | undefined) ??
+        (() => {
+          const tiId = brief.metadata?.templateIntelligenceId;
+          if (typeof tiId !== "string") return null;
+          const ti = getTemplateIntelligence(tiId);
+          return ti ? resolveTemplateDNA(ti) : null;
+        })();
       const { plan: rawPlan, brandIdentity } = runDesignPlanningPhaseWithBrand({
         profile,
         strategy: strategy as CoreProductStrategy,
@@ -713,6 +763,7 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
           template?.designPreset ||
           input.theme,
         prompt: brief.prompt || input.prompt,
+        templateDna: templateDna ?? null,
         onProgress: (message) => ctx.progress.emit(message),
       });
       const designPlan = assertDesignPlanApproved(rawPlan);
@@ -972,10 +1023,28 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
         profile: analysis.businessProfile,
         templateSelection: template,
         brandIdentity,
+        masterPlan: getMasterWebsitePlan(brief),
         preferredStyle: planImageStyle,
         designPlanImageRequirements: designPlan?.imageRequirements?.map(
           (r) => `${r.role}: ${r.purpose}. ${r.style}. ${r.notes}`,
         ),
+        structuredImageRequirements: designPlan?.imageRequirements?.map(
+          (r) => ({
+            role: r.role,
+            brief: `${r.purpose}. ${r.notes}`,
+            style: r.style,
+            notes: r.notes,
+            required: r.required,
+            sectionKey: inferSectionKey(r.role),
+          }),
+        ),
+        designPlanContext: designPlan
+          ? {
+              sections: designPlan.sectionStructure,
+              heroTreatment: designPlan.websiteStyle.heroTreatment,
+              layoutStyle: designPlan.websiteStyle.layoutStyle,
+            }
+          : undefined,
         maxImages:
           assetProfile === "ultra" ? 6 : assetProfile === "fast" ? 10 : 14,
         userId: input.userId,

@@ -118,6 +118,8 @@ function jsxProp(name: string, value: unknown): string {
  */
 export function composeHomePage(params: {
   componentIds: string[];
+  /** Exact home page order (header → sections → footer) from Template DNA. */
+  homeComponentOrder?: string[];
   brandName?: string;
   title?: string;
   description?: string;
@@ -128,8 +130,14 @@ export function composeHomePage(params: {
   heroEyebrow?: string;
   content?: ProductionContentPack | null;
   language?: string | null;
+  /** Template Intelligence id for body class + layout hooks. */
+  templateId?: string | null;
 }): string {
-  const ids = params.componentIds.filter(isComponentId);
+  const sourceIds =
+    params.homeComponentOrder?.length
+      ? params.homeComponentOrder
+      : params.componentIds;
+  const ids = sourceIds.filter(isComponentId);
   const content = params.content;
   const ui = getComposeUiFallbacks(params.language);
   const contentLang = resolveContentLanguage(params.language);
@@ -145,11 +153,11 @@ export function composeHomePage(params: {
       !HEADER_IDS.has(id),
   );
 
-  const ordered: DesignRendererComponentId[] = [
-    headerId,
-    ...sectionIds,
-    footerId,
-  ];
+  const ordered: DesignRendererComponentId[] = params.homeComponentOrder?.length
+    ? ids.filter(
+        (id) => isComponentId(id) && (id === headerId || id === footerId || sectionIds.includes(id)),
+      )
+    : [headerId, ...sectionIds, footerId];
 
   const imports = ordered.map((id) => {
     const spec = DESIGN_RENDERER_COMPONENTS[id];
@@ -285,7 +293,16 @@ ${jsxProp("eyebrow", ui.navContact)}${jsxProp("title", content.contactTitle)}${j
     return `      <${name} />`;
   };
 
-  const sectionJsx = sectionIds.map(renderSection).join("\n");
+  const sectionJsx = (params.homeComponentOrder?.length ? ordered : sectionIds)
+    .filter((id) => id !== headerId && id !== footerId)
+    .map(renderSection)
+    .join("\n");
+
+  const templateClass = params.templateId
+    ? ` ti-template ti-${params.templateId.replace(/^ti-/, "")}`
+    : "";
+  const mainClass =
+    `min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] antialiased${templateClass}`;
 
   const headerProps =
     `${jsxProp("brandName", brand)}` +
@@ -308,7 +325,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] antialiased">
+    <main className=${JSON.stringify(mainClass)}>
       <${DESIGN_RENDERER_COMPONENTS[headerId].exportName}
 ${headerProps}      />
 ${sectionJsx}

@@ -33,7 +33,7 @@ export function EnterprisePanel({ generationId, disabled }: EnterprisePanelProps
     try {
       const res = await fetch(`/api/website-builder/${generationId}/builder/members`);
       if (!res.ok) {
-        throw new Error("Could not load team members.");
+        throw new Error(wb("builder.enterprise.loadFailed"));
       }
       const data = (await res.json()) as { members?: BuilderGenerationMember[] };
       setMembers(data.members ?? []);
@@ -74,7 +74,7 @@ export function EnterprisePanel({ generationId, disabled }: EnterprisePanelProps
       });
       const data = (await res.json()) as { error?: string; member?: BuilderGenerationMember };
       if (!res.ok) {
-        throw new Error(data.error || "Invite failed.");
+        throw new Error(data.error || wb("builder.enterprise.inviteFailed"));
       }
       setEmail("");
       toast.success(wb("builder.enterprise.inviteSent"));
@@ -97,11 +97,11 @@ export function EnterprisePanel({ generationId, disabled }: EnterprisePanelProps
         body: JSON.stringify({ token }),
       });
       const data = (await res.json()) as { error?: string };
-      if (!res.ok) throw new Error(data.error || "Could not accept invitation.");
-      toast.success("You joined the website team.");
+      if (!res.ok) throw new Error(data.error || wb("builder.enterprise.loadFailed"));
+      toast.success(wb("builder.enterprise.inviteSent"));
       await Promise.all([loadMembers(), loadPendingInvites()]);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Accept failed.");
+      toast.error(err instanceof Error ? err.message : wb("builder.enterprise.loadFailed"));
     } finally {
       setActionLoading(false);
     }
@@ -114,11 +114,11 @@ export function EnterprisePanel({ generationId, disabled }: EnterprisePanelProps
         `/api/website-builder/${generationId}/builder/members/${memberId}`,
         { method: "DELETE" },
       );
-      if (!res.ok) throw new Error("Could not remove member.");
-      toast.success("Collaborator removed.");
+      if (!res.ok) throw new Error(wb("builder.enterprise.removeFailed"));
+      toast.success(wb("builder.enterprise.inviteRemoved"));
       await loadMembers();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Remove failed.");
+      toast.error(err instanceof Error ? err.message : wb("builder.enterprise.removeFailed"));
     } finally {
       setActionLoading(false);
     }
@@ -225,7 +225,7 @@ export function EnterprisePanel({ generationId, disabled }: EnterprisePanelProps
                 className="flex items-center justify-between gap-2 text-[10px] text-white/70"
               >
                 <span className="min-w-0 truncate">
-                  {member.email || member.userId || "Pending invite"}
+                  {member.email || member.userId || wb("builder.enterprise.pending")}
                 </span>
                 <span className="shrink-0 text-white/40">
                   {member.role}
@@ -271,7 +271,7 @@ export function EnterprisePanel({ generationId, disabled }: EnterprisePanelProps
           onChange={(e) => setRole(e.target.value as BuilderMemberRole)}
           disabled={disabled || actionLoading}
           className="mb-2 h-9 w-full rounded-md border border-white/10 bg-[#121212] px-2 text-xs text-white"
-          aria-label="Collaborator role"
+          aria-label={wb("builder.enterprise.inviteCollaborator")}
         >
           {Object.keys(BUILDER_ROLE_PERMISSIONS)
             .filter((r) => r !== "owner")

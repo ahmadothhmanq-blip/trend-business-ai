@@ -27,8 +27,18 @@ export function mapIndustryToVertical(
   const p = prompt.toLowerCase();
 
   if (
-    i.includes("auto") ||
-    /car|vehicle|dealership|showroom/.test(p)
+    i.includes("tourism") ||
+    i === "travel" ||
+    /travel|tour\b|destination|vacation|itinerary|cruise|resort|hotel/.test(p)
+  ) {
+    return { family: "Hospitality", vertical: "Travel" };
+  }
+  if (
+    (i.includes("auto") ||
+      /\b(car|vehicle|dealership|garage)\b/.test(p) ||
+      (/\bshowroom\b/.test(p) &&
+        !/travel|tourism|tour\b|destination|vacation|resort|hotel/.test(p))) &&
+    !/travel|tourism|tour\b|destination|vacation|resort|hotel/.test(p)
   ) {
     return { family: "Luxury", vertical: "Automotive" };
   }
@@ -64,9 +74,6 @@ export function mapIndustryToVertical(
   }
   if (/hotel|resort|boutique stay/.test(p)) {
     return { family: "Hospitality", vertical: "Hotel" };
-  }
-  if (i.includes("tourism") || /travel|tour|destination/.test(p)) {
-    return { family: "Hospitality", vertical: "Travel" };
   }
   if (i.includes("ecom") || /ecommerce|online store|shopify/.test(p)) {
     return { family: "Commerce", vertical: "Ecommerce" };

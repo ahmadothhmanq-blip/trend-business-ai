@@ -1,10 +1,10 @@
 import { requireUser, parseUuidParam } from "@/lib/api/helpers";
-import { API_ERROR_CODES, apiNotFoundError } from "@/lib/i18n/api-errors";
+import { apiNotFoundError } from "@/lib/i18n/api-errors";
 import {
   livePreviewResponseHeaders,
   resolveLivePreviewHtml,
 } from "@/lib/website/live-preview";
-import type { WebsiteGeneration } from "@/types/database";
+import { requireWebsiteGenerationAccess } from "@/lib/website/builder/route-access";
 import { NextResponse } from "next/server";
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -22,18 +22,15 @@ export async function GET(_request: Request, context: RouteContext) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  const { data, error } = await auth.supabase
-    .from("website_generations")
-    .select("*")
-    .eq("id", id)
-    .eq("user_id", auth.user!.id)
-    .maybeSingle();
+  const accessResult = await requireWebsiteGenerationAccess(
+    auth.supabase,
+    auth.user!.id,
+    id,
+    "view",
+  );
+  if (accessResult instanceof NextResponse) return accessResult;
 
-  if (error || !data) {
-    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Website not found.");
-  }
-
-  const html = resolveLivePreviewHtml(data as WebsiteGeneration);
+  const html = resolveLivePreviewHtml(accessResult.generation);
   return new NextResponse(html, {
     status: 200,
     headers: livePreviewResponseHeaders(),

@@ -106,27 +106,40 @@ export class LayerRunner {
     // Other products → Industry Template Engine (Phase 6)
     emit(progress, onProgress, "template", "Selecting template...");
     if (adapter.productId === "website-builder") {
-      const {
-        detectWebsiteIndustry,
-        applyIndustryIntelligenceToBrief,
-      } = await import("@/lib/ai-core/industry-intelligence");
-      onProgress?.(
-        "[industry] Detecting industry with DeepSeek for agency-grade structure...",
+      const { runMasterWebsitePlanner } = await import(
+        "@/lib/ai-core/master-planner"
       );
-      const detection = await detectWebsiteIndustry(brief);
-      const withIndustry = applyIndustryIntelligenceToBrief(brief, detection);
-      brief = withIndustry.brief;
-      onProgress?.(
-        `[industry] ${detection.profile.label} · ${detection.profile.designStyle} · pages=${detection.profile.recommendedPages.length} · ${detection.source}`,
+      const { applyIndustryIntelligenceToBrief } = await import(
+        "@/lib/ai-core/industry-intelligence"
       );
 
       onProgress?.(
-        "[template] Selecting premium template with AI (industry · goal · style)...",
+        "[master-planner] Building authoritative Website Plan (single source of truth)…",
+      );
+      const master = await runMasterWebsitePlanner({ brief, onProgress });
+      brief = master.brief;
+      const plan = master.plan;
+
+      onProgress?.(
+        `[master-planner] Locked · ${plan.industryLabel} · ${plan.style} · ${plan.template} · hero=${plan.hero.slice(0, 40)}…`,
+      );
+      onProgress?.(
+        `[master-planner] Sections: ${plan.sections.map((s) => s.label).join(" · ")}`,
+      );
+
+      const withIndustry = applyIndustryIntelligenceToBrief(
+        brief,
+        master.industryDetection,
+      );
+      brief = withIndustry.brief;
+
+      onProgress?.(
+        "[template] Selecting premium template from master plan…",
       );
       const { selectPremiumTemplate, applyPremiumTemplateToBrief } =
         await import("@/lib/ai-core/premium-templates");
       const premium = await selectPremiumTemplate(brief, {
-        preferredIndustryId: detection.industryId,
+        preferredIndustryId: plan.industry,
       });
       const enriched = applyPremiumTemplateToBrief(brief, premium);
       brief = enriched.brief;
@@ -137,52 +150,28 @@ export class LayerRunner {
         `[template] ${premium.template.name} (${premium.template.id}) · goal=${premium.websiteGoal} · ${premium.brandStyle} · ${premium.designPreset} · ${premium.source}`,
       );
 
-      // Template Intelligence — visual style / category layer (auto or explicit)
       onProgress?.(
-        "[template-intelligence] Selecting visual template (industry · audience · brand style)...",
+        "[template-intelligence] Applying locked template from master plan…",
       );
       const {
-        selectTemplateIntelligence,
-        selectionInputFromBrief,
+        getTemplateIntelligence,
         applyTemplateIntelligenceToBrief,
       } = await import("@/lib/ai-core/template-intelligence");
-      const { runAutoDesignDecision } = await import(
-        "@/lib/ai-core/website-design-platform"
-      );
-      const autoDesign = runAutoDesignDecision({
-        prompt: brief.prompt,
-        language: brief.language,
-        brandStyle:
-          typeof brief.metadata?.brandStyle === "string"
-            ? brief.metadata.brandStyle
-            : null,
-        industry: detection.industryId,
-        explicitTemplateId:
-          typeof brief.metadata?.templateIntelligenceId === "string"
-            ? brief.metadata.templateIntelligenceId
-            : null,
-      });
-      brief.metadata = {
-        ...(brief.metadata || {}),
-        autoDesignDecision: autoDesign,
-        designPlatformFamily: autoDesign.family,
-        designPlatformVertical: autoDesign.vertical,
-        requiredSections: autoDesign.requiredSections,
-        localeDir: autoDesign.locale.dir,
-      };
-      const tiSelection = selectTemplateIntelligence({
-        ...selectionInputFromBrief(brief),
-        explicitTemplateId:
-          autoDesign.templateIntelligenceId ||
-          selectionInputFromBrief(brief).explicitTemplateId,
-      });
-      brief = applyTemplateIntelligenceToBrief(brief, tiSelection.template);
+      const tiTemplate = getTemplateIntelligence(plan.template);
+      if (tiTemplate) {
+        brief = applyTemplateIntelligenceToBrief(brief, tiTemplate);
+      }
       artifacts.brief = brief;
+      const autoDesign = brief.metadata?.autoDesignDecision as
+        | { vertical?: string; family?: string; confidence?: number }
+        | undefined;
+      if (autoDesign) {
+        onProgress?.(
+          `[auto-design] ${autoDesign.vertical} · ${autoDesign.family} · ${plan.template} · confidence=${(autoDesign.confidence ?? 1).toFixed(2)}`,
+        );
+      }
       onProgress?.(
-        `[auto-design] ${autoDesign.vertical} · ${autoDesign.family} · ${autoDesign.templateIntelligenceId} · confidence=${autoDesign.confidence.toFixed(2)}`,
-      );
-      onProgress?.(
-        `[template-intelligence] ${tiSelection.template.name} · ${tiSelection.template.category} · ${tiSelection.source} · confidence=${tiSelection.confidence.toFixed(2)}`,
+        `[template-intelligence] ${tiTemplate?.name ?? plan.template} · ${plan.templateCategory ?? "n/a"} · master-plan · locked`,
       );
     } else {
       const enriched = enrichBriefWithIndustryTemplate(brief);

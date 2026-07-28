@@ -2,13 +2,20 @@ import type { DesignRendererComponentId } from "@/lib/ai-core/design-renderer/ty
 import { usesLlmLocalizedWebsiteCopy } from "@/lib/i18n/website-output-locale";
 import type { IndustryId } from "@/lib/ai-core/templates/types";
 import type { TemplateIntelligenceDefinition } from "@/lib/ai-core/template-intelligence/types";
+import { resolveTemplateDNA } from "@/lib/ai-core/template-intelligence/template-dna";
 
 export type VerticalPaletteId =
   | "technology"
   | "saas"
   | "automotive"
+  | "tourism"
   | "restaurant"
   | "real-estate"
+  | "medical"
+  | "law"
+  | "education"
+  | "blog"
+  | "landing"
   | "generic";
 
 function comps(
@@ -59,6 +66,20 @@ export const PALETTE_AUTOMOTIVE = comps(
   "SiteFooter",
 );
 
+/** Tourism / travel — destinations, packages, booking, experiences. */
+export const PALETTE_TOURISM = comps(
+  "SiteHeaderTransparent",
+  "HeroFullBleed",
+  "DestinationsGallery",
+  "TourPackagesGrid",
+  "BookingSection",
+  "TestimonialsCarousel",
+  "TravelCtaBand",
+  "FaqAccordion",
+  "ContactCta",
+  "SiteFooter",
+);
+
 /** Restaurant — menu, gallery, chef story, reservations. */
 export const PALETTE_RESTAURANT = comps(
   "SiteHeaderTransparent",
@@ -82,6 +103,80 @@ export const PALETTE_REAL_ESTATE = comps(
   "TeamSection",
   "TestimonialsModern",
   "ContactSection",
+  "SiteFooter",
+);
+
+/** Medical — care services, doctors, appointments, emergency. */
+export const PALETTE_MEDICAL = comps(
+  "SiteHeader",
+  "HeroSplit",
+  "CareServices",
+  "ServicesModern",
+  "DoctorProfiles",
+  "BookingForm",
+  "FaqAccordion",
+  "MapsSection",
+  "TestimonialsModern",
+  "ContactCta",
+  "SiteFooter",
+);
+
+/** Law — practice areas, attorneys, cases, consultation. */
+export const PALETTE_LAW = comps(
+  "SiteHeaderTransparent",
+  "HeroLuxury",
+  "ServicesModern",
+  "TeamSection",
+  "CaseStudies",
+  "TestimonialsSlider",
+  "BookingForm",
+  "FaqAccordion",
+  "MapsSection",
+  "CtaSplit",
+  "SiteFooter",
+);
+
+/** Education — programs, courses, faculty, admissions. */
+export const PALETTE_EDUCATION = comps(
+  "SiteHeader",
+  "HeroSplit",
+  "ProgramsGrid",
+  "ProductShowcase",
+  "TeamSection",
+  "FeaturesModern",
+  "GalleryGrid",
+  "TestimonialsCarousel",
+  "AdmissionsCta",
+  "BlogSection",
+  "ContactSection",
+  "SiteFooter",
+);
+
+/** Blog — editorial articles, categories, newsletter. */
+export const PALETTE_BLOG = comps(
+  "NavModern",
+  "HeroSplit",
+  "BlogSection",
+  "FeatureHighlights",
+  "ProductShowcase",
+  "TeamSection",
+  "CtaSplit",
+  "ContactSection",
+  "SiteFooter",
+);
+
+/** Landing page — conversion hero, benefits, pricing, sticky CTA. */
+export const PALETTE_LANDING = comps(
+  "NavModern",
+  "HeroProduct",
+  "FeatureHighlights",
+  "FeaturesModern",
+  "BrandTrust",
+  "TestimonialsModern",
+  "PricingModern",
+  "FaqAccordion",
+  "CtaBand",
+  "ContactCta",
   "SiteFooter",
 );
 
@@ -120,18 +215,61 @@ export const SOFTWARE_SIGNALS = [
   "data platform",
 ];
 
+export const TOURISM_SIGNALS = [
+  "tourism",
+  "travel",
+  "destination",
+  "vacation",
+  "itinerary",
+  "resort",
+  "hotel",
+  "cruise",
+  "safari",
+  "airline",
+  "adventure",
+  "tour package",
+  "honeymoon",
+  "backpack",
+];
+
 export const AUTOMOTIVE_SIGNALS = [
   "automotive",
   "dealership",
   "vehicle",
   "car ",
   " ev ",
-  "showroom",
   "test drive",
   "garage",
   "motors",
+  "showroom",
   "inventory",
 ];
+
+/** True when prompt/industry text describes travel & tourism (blocks automotive bleed). */
+export function isTourismContext(text: string): boolean {
+  const hay = text.toLowerCase();
+  if (TOURISM_SIGNALS.some((s) => hay.includes(s))) return true;
+  return (
+    /\btravel\b/.test(hay) ||
+    /\btour(s)?\b/.test(hay) ||
+    /\btrip(s)?\b/.test(hay) ||
+    /\bholiday(s)?\b/.test(hay)
+  );
+}
+
+/** Automotive only when signals are present and tourism context is absent. */
+export function isAutomotiveContext(text: string): boolean {
+  const hay = text.toLowerCase();
+  if (isTourismContext(hay)) return false;
+  if (SOFTWARE_SIGNALS.some((s) => hay.includes(s))) return false;
+  if (hay.includes("showroom") && !/\b(vehicle|car|dealer|auto|motor|ev|garage)\b/.test(hay)) {
+    return false;
+  }
+  if (hay.includes("inventory") && /\b(tour|travel|package|destination|hotel)\b/.test(hay)) {
+    return false;
+  }
+  return AUTOMOTIVE_SIGNALS.some((s) => hay.includes(s));
+}
 
 export const RESTAURANT_SIGNALS = [
   "restaurant",
@@ -156,6 +294,11 @@ const DEFAULT_PRIMARY_CTA: Record<string, string> = {
   saas: "Book a demo",
   technology: "Book a demo",
   "real-estate": "Browse listings",
+  medical: "Book appointment",
+  law: "Book consultation",
+  education: "Apply now",
+  blog: "Subscribe",
+  landing: "Get started",
   business: "Get started",
 };
 
@@ -193,6 +336,16 @@ const SECTION_LABELS: Record<
     TestimonialsSlider: "Testimonials",
     BookingCta: "Contact",
   },
+  tourism: {
+    HeroFullBleed: "Hero",
+    DestinationsGallery: "Destinations",
+    TourPackagesGrid: "Tour Packages",
+    BookingSection: "Booking",
+    TestimonialsCarousel: "Testimonials",
+    TravelCtaBand: "Book Your Trip",
+    FaqAccordion: "FAQ",
+    ContactCta: "Contact",
+  },
   restaurant: {
     HeroCinematic: "Hero",
     MenuHighlights: "Menu",
@@ -211,6 +364,48 @@ const SECTION_LABELS: Record<
     ContactSection: "Inquiry",
     TestimonialsModern: "Testimonials",
   },
+  medical: {
+    HeroSplit: "Hero",
+    CareServices: "Services",
+    DoctorProfiles: "Doctors",
+    BookingForm: "Appointments",
+    MapsSection: "Location",
+    FaqAccordion: "FAQ",
+    ContactCta: "Contact",
+  },
+  law: {
+    HeroLuxury: "Hero",
+    ServicesModern: "Practice Areas",
+    TeamSection: "Attorneys",
+    CaseStudies: "Cases",
+    BookingForm: "Consultation",
+    MapsSection: "Office",
+    CtaSplit: "Legal CTA",
+  },
+  education: {
+    HeroSplit: "Hero",
+    ProgramsGrid: "Programs",
+    ProductShowcase: "Courses",
+    TeamSection: "Teachers",
+    AdmissionsCta: "Admissions",
+    BlogSection: "News",
+    ContactSection: "Contact",
+  },
+  blog: {
+    HeroSplit: "Hero",
+    BlogSection: "Articles",
+    FeatureHighlights: "Categories",
+    TeamSection: "Author",
+    CtaSplit: "Newsletter",
+  },
+  landing: {
+    HeroProduct: "Hero",
+    FeatureHighlights: "Benefits",
+    FeaturesModern: "Features",
+    PricingModern: "Pricing",
+    CtaBand: "Get Started",
+    ContactCta: "Contact",
+  },
   generic: {},
 };
 
@@ -218,8 +413,14 @@ const PALETTES: Record<VerticalPaletteId, DesignRendererComponentId[]> = {
   technology: PALETTE_TECHNOLOGY,
   saas: PALETTE_SAAS,
   automotive: PALETTE_AUTOMOTIVE,
+  tourism: PALETTE_TOURISM,
   restaurant: PALETTE_RESTAURANT,
   "real-estate": PALETTE_REAL_ESTATE,
+  medical: PALETTE_MEDICAL,
+  law: PALETTE_LAW,
+  education: PALETTE_EDUCATION,
+  blog: PALETTE_BLOG,
+  landing: PALETTE_LANDING,
   generic: PALETTE_TECHNOLOGY,
 };
 
@@ -260,11 +461,41 @@ export function normalizeVerticalIndustryId(
     return "restaurant";
   }
   if (
+    raw === "tourism" ||
+    raw === "travel" ||
+    raw === "tour" ||
+    raw === "hospitality" ||
+    raw === "vacation"
+  ) {
+    return "tourism";
+  }
+  if (
     raw === "real-estate" ||
     raw === "realestate" ||
     raw === "property"
   ) {
     return "real-estate";
+  }
+  if (
+    raw === "clinic" ||
+    raw === "medical" ||
+    raw === "healthcare" ||
+    raw === "hospital" ||
+    raw === "dental"
+  ) {
+    return "clinic";
+  }
+  if (raw === "law" || raw === "legal" || raw === "attorney") {
+    return "law";
+  }
+  if (raw === "education" || raw === "school" || raw === "university") {
+    return "education";
+  }
+  if (raw === "blog" || raw === "editorial" || raw === "magazine") {
+    return "blog";
+  }
+  if (raw === "landing-page" || raw === "landing" || raw === "landingpage") {
+    return "landing-page";
   }
   return raw as IndustryId;
 }
@@ -274,12 +505,8 @@ export function inferVerticalFromText(text: string): IndustryId | "business" {
   if (/furniture|sofa|bedroom|living room|أثاث|مفروشات/.test(haystack)) {
     return "furniture";
   }
-  if (
-    AUTOMOTIVE_SIGNALS.some((s) => haystack.includes(s)) &&
-    !SOFTWARE_SIGNALS.some((s) => haystack.includes(s))
-  ) {
-    return "automotive";
-  }
+  if (isTourismContext(haystack)) return "tourism";
+  if (isAutomotiveContext(haystack)) return "automotive";
   if (RESTAURANT_SIGNALS.some((s) => haystack.includes(s))) return "restaurant";
   if (/real estate|realtor|property listing|home buyer/.test(haystack)) {
     return "real-estate";
@@ -299,8 +526,14 @@ export function resolveVerticalPaletteId(
   const text = haystack?.toLowerCase() || "";
 
   if (normalized === "automotive") return "automotive";
+  if (normalized === "tourism") return "tourism";
   if (normalized === "restaurant") return "restaurant";
   if (normalized === "real-estate") return "real-estate";
+  if (normalized === "clinic") return "medical";
+  if (normalized === "law") return "law";
+  if (normalized === "education") return "education";
+  if (normalized === "blog") return "blog";
+  if (normalized === "landing-page") return "landing";
 
   if (normalized === "saas" || SOFTWARE_SIGNALS.some((s) => text.includes(s))) {
     if (
@@ -312,6 +545,7 @@ export function resolveVerticalPaletteId(
   }
 
   const inferred = inferVerticalFromText(text);
+  if (inferred === "tourism") return "tourism";
   if (inferred === "automotive") return "automotive";
   if (inferred === "restaurant") return "restaurant";
   if (inferred === "real-estate") return "real-estate";
@@ -352,7 +586,7 @@ function pickHeroForPalette(
 ): DesignRendererComponentId {
   const paletteHero = PALETTES[paletteId].find((c) => isHeroComponent(c));
   const templateHero = template.components.find((c) => isHeroComponent(c));
-  if (paletteId === "automotive" || paletteId === "restaurant") {
+  if (paletteId === "automotive" || paletteId === "restaurant" || paletteId === "tourism") {
     return paletteHero || (templateHero as DesignRendererComponentId) || "HeroSplit";
   }
   return (
@@ -386,6 +620,11 @@ export function resolveComponentsForIndustryAndTemplate(
   industryId?: string | null,
   haystack?: string,
 ): DesignRendererComponentId[] {
+  const templateDna = resolveTemplateDNA(template);
+  if (templateDna.components.length) {
+    return [...templateDna.components];
+  }
+
   const paletteId = resolveVerticalPaletteId(
     industryId || template.industry,
     haystack,
@@ -481,8 +720,14 @@ export function scoreIndustryTemplateAlignment(
     technology: "saas",
     saas: "saas",
     automotive: "automotive",
+    tourism: "tourism",
     restaurant: "restaurant",
     "real-estate": "real-estate",
+    medical: "clinic",
+    law: "law",
+    education: "education",
+    blog: "blog",
+    landing: "landing-page",
     generic: "business",
   };
   if (templateIndustry === verticalToIndustry[paletteId]) score += 25;

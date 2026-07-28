@@ -3,6 +3,8 @@ import type { ImageStylePreset } from "@/lib/ai-core/assets/settings";
 import type { ImageArtDirection } from "@/lib/ai-core/image-engine/art-direction";
 import type { AssetQualityReport } from "@/lib/ai-core/image-engine/validate";
 import type { VideoAssetPackage } from "@/lib/ai-core/image-engine/video";
+import type { SectionKey } from "@/lib/ai-core/image-engine/section-strategies";
+import type { DesignPlanImageRequirement } from "@/lib/ai-core/design-plan/types";
 
 /** Why the image exists on the generated website. */
 export type ImagePurpose =
@@ -32,9 +34,22 @@ export type ImageEnginePlanItem = {
   name: string;
   prompt: string;
   alt: string;
+  caption?: string;
+  seoDescription?: string;
   realistic?: boolean;
   aspectRatio?: import("@/lib/ai-core/assets/settings").ImageAspectRatio;
+  sectionKey?: SectionKey;
   metadata: ImageAssetMetadata;
+};
+
+export type StructuredImageRequirement = {
+  role: ImagePurpose | "testimonial";
+  sectionKey?: SectionKey;
+  sectionLabel?: string;
+  brief: string;
+  style?: string;
+  notes?: string;
+  required?: boolean;
 };
 
 export type ImageIntelligenceContext = {
@@ -48,11 +63,24 @@ export type ImageIntelligenceContext = {
   projectName: string;
   imageStyle: ImageStylePreset;
   imageRequirements: string[];
+  /** Role-matched briefs from premium templates / design plan. */
+  structuredRequirements?: StructuredImageRequirement[];
   /** Brand Identity image direction (when available). */
   brandImageDirection?: string;
   templateLabel?: string;
   premiumStyleId?: string;
   colors: { primary: string; secondary: string; accent?: string };
+};
+
+export type DesignPlanImageContext = {
+  sections?: Array<{
+    key: string;
+    label: string;
+    purpose?: string;
+    assetRole?: DesignPlanImageRequirement["role"];
+  }>;
+  heroTreatment?: string;
+  layoutStyle?: string;
 };
 
 /** Extended manifest extras produced by Advanced AI Assets Engine. */

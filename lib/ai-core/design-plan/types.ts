@@ -2,6 +2,7 @@ import type { BrandIdentityBrief } from "@/lib/ai-core/brand-identity/types";
 import type { DesignPresetId } from "@/lib/ai-core/design-system/types";
 import type { PremiumStyleId } from "@/lib/ai-core/design-system/premium/types";
 import type { DesignIntelligenceBrief } from "@/lib/ai-core/design-intelligence/types";
+import type { DesignRendererComponentId } from "@/lib/ai-core/design-renderer/types";
 
 export type DesignPlanSection = {
   key: string;
@@ -10,6 +11,8 @@ export type DesignPlanSection = {
   priority: number;
   /** Preferred component kind hint for renderer/compose. */
   kindHint: string;
+  /** Explicit component from Template DNA (overrides kind-hint mapping). */
+  componentId?: DesignRendererComponentId;
   assetRole?:
     | "hero"
     | "product"

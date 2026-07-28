@@ -26,5 +26,11 @@ export {
 export { websiteGenerateJson } from "@/lib/ai-core/website-builder/llm-calls";
 export {
   countArabicCharacters,
+  extractUserFacingCopyFromSource,
+  isCopyBearingWebsiteFile,
+  isUserFacingWebsiteFile,
+  normalizeWebsiteCopyText,
   validateWebsiteLlmOutputLanguage,
 } from "@/lib/ai-core/website-builder/llm-language";
+
+export { summarizeStrategyForFilePrompt } from "@/lib/ai-core/website-builder/strategy-prompt-context";

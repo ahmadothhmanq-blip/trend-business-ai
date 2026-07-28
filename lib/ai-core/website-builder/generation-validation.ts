@@ -10,6 +10,11 @@ import {
   isArabicPrompt,
   type PromptIndustryMatch,
 } from "@/lib/ai-core/website-builder/prompt-industry";
+import { resolveContentLanguage } from "@/lib/ai-core/content/content-language";
+import {
+  countArabicCharacters,
+  extractUserFacingCopyFromSource,
+} from "@/lib/ai-core/website-builder/llm-language";
 import { resolveLocaleFromLanguage } from "@/lib/i18n/website-output-locale";
 
 export type GenerationValidationIssue = {
@@ -33,7 +38,11 @@ const INDUSTRY_IMAGE_HINTS: Record<string, RegExp[]> = {
   ],
   saas: [/computer|laptop|office|tech|software|dashboard|data/i],
   "real-estate": [/home|house|property|interior|architecture|عقار/i],
-  clinic: [/medical|health|clinic|doctor|patient|عيادة|صحة/i],
+  clinic: [/medical|health|clinic|doctor|patient|hospital|dental|عيادة|صحة/i],
+  law: [/law|legal|attorney|courtroom|lawyer|litigation/i],
+  education: [/education|school|university|campus|student|teacher/i],
+  blog: [/blog|article|editorial|magazine|writing|publishing/i],
+  "landing-page": [/landing|startup|product|marketing|saas|launch/i],
   automotive: [/car|vehicle|automotive|showroom|سيار/i],
   tourism: [/travel|destination|landscape|hotel|tour|سفر/i],
 };
@@ -101,6 +110,7 @@ export function validateWebsiteGeneration(params: {
   const expected = detectIndustryFromPrompt(params.prompt);
   const blob = fileBlob(params.files);
   const locale = resolveLocaleFromLanguage(params.language);
+  const arabicOutput = resolveContentLanguage(params.language) === "ar";
   const arabicPrompt = isArabicPrompt(params.prompt);
 
   if (expected) {
@@ -130,8 +140,9 @@ export function validateWebsiteGeneration(params: {
     }
   }
 
-  if (arabicPrompt || locale.rtl) {
-    const arabicChars = (blob.match(/[\u0600-\u06FF]/g) || []).length;
+  if (arabicOutput || arabicPrompt || locale.rtl) {
+    const userCopy = extractUserFacingCopyFromSource(blob);
+    const arabicChars = countArabicCharacters(userCopy || blob);
     if (arabicChars < 40) {
       issues.push({
         id: "language-arabic",

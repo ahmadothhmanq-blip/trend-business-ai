@@ -17,6 +17,23 @@ import type {
 } from "@/plugins/website/types";
 import type { GenerationContext } from "@/lib/ai/types";
 import { getStrategyFallbackLabels } from "@/lib/ai-core/content/content-language";
+import { usesLlmLocalizedWebsiteCopy } from "@/lib/ai-core/content/content-language";
+import {
+  applyFeaturesToStrategy,
+  resolveWebsiteFeatures,
+} from "@/lib/website/builder/feature-registry";
+
+function localizedGoal(
+  pagePurpose: string,
+  pageName: string,
+  language?: string | null,
+): string {
+  if (usesLlmLocalizedWebsiteCopy(language)) {
+    const labels = getStrategyFallbackLabels(language);
+    return `${labels.pagePurposeSuffix} ${pageName} · ${pagePurpose}`;
+  }
+  return `Support ${pagePurpose}`;
+}
 
 function fallbackStrategy(
   input: WebsiteGenerationInput,
@@ -56,7 +73,7 @@ function fallbackStrategy(
         id: `${p.name.toLowerCase().replace(/\s+/g, "-")}-${idx}`,
         page: p.name,
         name: section,
-        goal: `Support ${p.purpose}`,
+        goal: localizedGoal(p.purpose, p.name, input.language),
         contentNotes: analysis.businessProfile.offer,
       })),
     ),
@@ -115,6 +132,7 @@ function normalizeStrategyPages(
   raw: unknown,
   fallback: StrategyPage[],
   labels = getStrategyFallbackLabels(),
+  language?: string | null,
 ): StrategyPage[] {
   if (!Array.isArray(raw) || raw.length === 0) return fallback;
   const pages: StrategyPage[] = [];
@@ -137,7 +155,9 @@ function normalizeStrategyPages(
       purpose:
         typeof row.purpose === "string" && row.purpose.trim()
           ? row.purpose.trim()
-          : `${name} page`,
+          : usesLlmLocalizedWebsiteCopy(language)
+            ? `${name} ${labels.pagePurposeSuffix}`
+            : `${name} page`,
       keySections: keySections.length ? keySections : labels.sections.slice(0, 3),
       primaryCta:
         typeof row.primaryCta === "string" && row.primaryCta.trim()
@@ -152,6 +172,7 @@ function normalizeSectionPlan(
   raw: unknown,
   fallback: StrategySection[],
   pages: StrategyPage[],
+  language?: string | null,
 ): StrategySection[] {
   if (Array.isArray(raw) && raw.length > 0) {
     const plan: StrategySection[] = [];
@@ -177,7 +198,7 @@ function normalizeSectionPlan(
         goal:
           typeof row.goal === "string" && row.goal.trim()
             ? row.goal.trim()
-            : `Support ${page}`,
+            : localizedGoal(page, page, language),
         contentNotes:
           typeof row.contentNotes === "string" ? row.contentNotes : "",
       });
@@ -192,7 +213,7 @@ function normalizeSectionPlan(
           id: `${p.name.toLowerCase().replace(/\s+/g, "-")}-${idx}`,
           page: p.name,
           name: section,
-          goal: `Support ${p.purpose}`,
+          goal: localizedGoal(p.purpose, p.name, language),
           contentNotes: "",
         })),
       );
@@ -229,11 +250,12 @@ export function coerceWebsiteStrategy(
     fallback.contentStrategy,
   );
 
-  const pages = normalizeStrategyPages(raw.pages, fallback.pages, labels);
+  const pages = normalizeStrategyPages(raw.pages, fallback.pages, labels, input?.language);
   const sectionPlan = normalizeSectionPlan(
     raw.sectionPlan,
     fallback.sectionPlan,
     pages,
+    input?.language,
   );
 
   const contentStructureFromStrategy = normalizeWebsiteStringList(
@@ -302,7 +324,10 @@ export async function buildWebsiteStrategy(
     !instruction.includes("[strategy]") &&
     !instruction.includes("[idea]")
   ) {
-    return coerceWebsiteStrategy(input.previousStrategy, analysis, input);
+    return applyFeaturesToStrategy(
+      coerceWebsiteStrategy(input.previousStrategy, analysis, input),
+      resolveWebsiteFeatures(input.features),
+    );
   }
 
   const iterationInput = {
@@ -310,19 +335,30 @@ export async function buildWebsiteStrategy(
     prompt: buildWebsiteIterationPrompt(input),
   };
 
+  const resolvedFeatures = resolveWebsiteFeatures(input.features);
+  const featurePlanning = resolvedFeatures.aiPlanningBlock
+    ? `\n\n${resolvedFeatures.aiPlanningBlock}`
+    : "";
+
   try {
     const raw = await websiteGenerateJson<WebsiteStrategy>({
       stage: "strategy",
       input: iterationInput,
       provider: ctx.provider,
-      prompt: websiteStrategyPrompt(iterationInput, analysis),
+      prompt: `${websiteStrategyPrompt(iterationInput, analysis)}${featurePlanning}`,
       schema: websiteStrategySchema,
       maxAttempts: 3,
       validate: validateWebsiteStrategy,
     });
-    return coerceWebsiteStrategy(raw, analysis, input);
+    return applyFeaturesToStrategy(
+      coerceWebsiteStrategy(raw, analysis, input),
+      resolvedFeatures,
+    );
   } catch (error) {
     console.error("strategy layer failed; using fallback", error);
-    return fallbackStrategy(input, analysis);
+    return applyFeaturesToStrategy(
+      fallbackStrategy(input, analysis),
+      resolvedFeatures,
+    );
   }
 }

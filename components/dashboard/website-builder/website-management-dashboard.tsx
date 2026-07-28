@@ -30,6 +30,7 @@ import {
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import { cn } from "@/lib/utils";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
+import { useTranslation } from "@/lib/i18n/client";
 import type { CatalogItem, CmsEntry, NavLink } from "@/lib/ai-core/website-management";
 import { MediaLibraryPanel } from "@/components/dashboard/website-builder/media-library-panel";
 import { useCopilotCommand } from "@/components/dashboard/website-builder/hooks/use-copilot-command";
@@ -52,6 +53,7 @@ export function WebsiteManagementDashboard({
   generationId: string;
 }) {
   const wb = useProductT("websiteBuilder");
+  const { t } = useTranslation();
   const [tab, setTab] = useState<Tab>("overview");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -146,7 +148,7 @@ export function WebsiteManagementDashboard({
         throw new Error(wb("management.errors.actionFailed"));
       }
       setAssistantLog((log) =>
-        [result.summary || "Copilot response", ...log].slice(0, 20),
+        [result.summary || wb("builder.copilot.assistant"), ...log].slice(0, 20),
       );
       toast.success(result.summary || wb("management.saved"));
     } catch (error) {
@@ -342,11 +344,11 @@ export function WebsiteManagementDashboard({
         <DashboardPanel className="space-y-4">
           <div className="flex flex-wrap items-end gap-2">
             <div className="min-w-[200px] flex-1">
-              <label className="text-[11px] text-white/40">New page label</label>
+              <label className="text-[11px] text-white/40">{wb("builder.pages.title")}</label>
               <Input
                 value={newPageLabel}
                 onChange={(e) => setNewPageLabel(e.target.value)}
-                placeholder="About Us"
+                placeholder={wb("pages.about")}
                 className="mt-1 border-white/10 bg-black/30 text-white"
               />
             </div>
@@ -360,7 +362,7 @@ export function WebsiteManagementDashboard({
                 }).then(() => setNewPageLabel(""));
               }}
             >
-              Add page
+              {wb("management.addItem")}
             </Button>
           </div>
           <div className="space-y-2">
@@ -416,7 +418,7 @@ export function WebsiteManagementDashboard({
                           })
                         }
                       >
-                        Set home
+                        {wb("pages.home")}
                       </Button>
                       <Button
                         size="sm"
@@ -430,7 +432,7 @@ export function WebsiteManagementDashboard({
                           })
                         }
                       >
-                        Duplicate
+                        {t("common.duplicate")}
                       </Button>
                       <Button
                         size="sm"
@@ -459,7 +461,7 @@ export function WebsiteManagementDashboard({
         <div className="grid gap-4 lg:grid-cols-2">
           <DashboardPanel className="space-y-3">
             <p className="text-[12px] font-semibold uppercase tracking-wide text-white/40">
-              Header navigation
+              {wb("management.navigation")}
             </p>
             {(data?.structure?.navLinks || []).map((link, index) => (
               <div key={`nav-${index}`} className="flex gap-2">
@@ -490,17 +492,17 @@ export function WebsiteManagementDashboard({
               onClick={() => {
                 const links = [
                   ...(data?.structure?.navLinks || []),
-                  { href: "/", label: "New link" },
+                  { href: "/", label: wb("management.navigation") },
                 ];
                 void postAction({ action: "nav.update", links });
               }}
             >
-              Add nav link
+              {wb("management.addItem")}
             </Button>
           </DashboardPanel>
           <DashboardPanel className="space-y-3">
             <p className="text-[12px] font-semibold uppercase tracking-wide text-white/40">
-              Footer links
+              {wb("builder.blocks.categories.layout")}
             </p>
             {(data?.structure?.footerLinks || []).map((link, index) => (
               <div key={`footer-${index}`} className="flex gap-2">
@@ -531,12 +533,12 @@ export function WebsiteManagementDashboard({
               onClick={() => {
                 const links = [
                   ...(data?.structure?.footerLinks || []),
-                  { href: "/", label: "New link" },
+                  { href: "/", label: wb("management.navigation") },
                 ];
                 void postAction({ action: "footer.update", links });
               }}
             >
-              Add footer link
+              {wb("management.addItem")}
             </Button>
           </DashboardPanel>
         </div>
@@ -639,19 +641,19 @@ export function WebsiteManagementDashboard({
             <Input
               value={cmsSlug}
               onChange={(e) => setCmsSlug(e.target.value)}
-              placeholder="post-slug"
+              placeholder={wb("management.cms.titlePlaceholder")}
               className="border-white/10 bg-black/30 text-white"
             />
             <Input
               value={cmsCategories}
               onChange={(e) => setCmsCategories(e.target.value)}
-              placeholder="Categories (comma-separated)"
+              placeholder={wb("management.bodyPlaceholder")}
               className="border-white/10 bg-black/30 text-white"
             />
             <Input
               value={cmsTags}
               onChange={(e) => setCmsTags(e.target.value)}
-              placeholder="Tags (comma-separated)"
+              placeholder={wb("management.scheduled")}
               className="border-white/10 bg-black/30 text-white"
             />
           </div>

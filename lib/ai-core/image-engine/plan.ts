@@ -7,19 +7,29 @@ import type {
 import type { TemplateSelection } from "@/lib/ai-core/templates/types";
 import { buildImageArtDirection } from "@/lib/ai-core/image-engine/art-direction";
 import {
+  buildAccessibleAltText,
   buildImageIntelligence,
   composeImagePrompt,
   defaultAspectForPurpose,
+  resolveShotBriefForRole,
   styleFromContext,
 } from "@/lib/ai-core/image-engine/intelligence";
+import {
+  getSectionStrategy,
+  inferSectionKey,
+  type SectionKey,
+} from "@/lib/ai-core/image-engine/section-strategies";
 import type {
+  DesignPlanImageContext,
   ImageEnginePlanItem,
   ImagePurpose,
+  StructuredImageRequirement,
 } from "@/lib/ai-core/image-engine/types";
+import type { MasterWebsitePlan } from "@/lib/ai-core/master-planner/types";
 
 /**
- * Plan professional AI images for every major website surface:
- * hero, product, service, background, gallery, section, testimonial.
+ * Plan professional AI images for every major website surface with
+ * section-specific strategies — never reuse hero prompts for all sections.
  */
 export function planWebsiteImages(params: {
   strategy: CoreProductStrategy;
@@ -28,17 +38,25 @@ export function planWebsiteImages(params: {
   templateSelection?: TemplateSelection;
   preferredStyle?: string | null;
   brandIdentity?: BrandIdentityBrief | null;
+  structuredRequirements?: StructuredImageRequirement[];
+  designPlanContext?: DesignPlanImageContext;
   maxItems?: number;
+  masterPlan?: MasterWebsitePlan | null;
 }): ImageEnginePlanItem[] {
   const maxItems = params.maxItems ?? 14;
-  const ctx = buildImageIntelligence(params);
+  const ctx = buildImageIntelligence({
+    ...params,
+    structuredRequirements: params.structuredRequirements,
+    masterPlan: params.masterPlan,
+  });
   const style = styleFromContext(ctx);
-  const reqs = ctx.imageRequirements;
   const sections = Array.isArray(params.strategy.sectionPlan)
     ? params.strategy.sectionPlan
     : [];
-
+  const designSections = params.designPlanContext?.sections ?? [];
+  const usedBriefs = new Set<string>();
   const planned: ImageEnginePlanItem[] = [];
+  let varietyIndex = 0;
 
   const push = (
     purpose: ImagePurpose,
@@ -48,37 +66,62 @@ export function planWebsiteImages(params: {
       role: ImageEnginePlanItem["role"];
       kind?: ImageEnginePlanItem["kind"];
       sectionName?: string;
+      sectionKey?: SectionKey;
       shotBrief?: string;
       contentNotes?: string;
-      alt?: string;
     },
   ) => {
+    const sectionKey =
+      opts.sectionKey ||
+      inferSectionKey(opts.sectionName || purpose);
+    const shotBrief =
+      opts.shotBrief ||
+      resolveShotBriefForRole(ctx, purpose, sectionKey, varietyIndex, usedBriefs);
+    if (shotBrief) {
+      usedBriefs.add(shotBrief);
+      varietyIndex += 1;
+    }
+
     const art = buildImageArtDirection({
       purpose,
       ctx,
       brandIdentity: params.brandIdentity,
-      sectionName: opts.sectionName,
+      sectionName: opts.sectionName || sectionKey,
     });
     const prompt = composeImagePrompt({
       purpose,
       ctx,
       sectionName: opts.sectionName,
-      shotBrief: opts.shotBrief,
+      sectionKey,
+      shotBrief,
       contentNotes: opts.contentNotes,
       artDirectionFragment: art.promptFragment,
+      varietyIndex,
     });
+    const accessibility = buildAccessibleAltText({
+      ctx,
+      purpose,
+      sectionName: opts.sectionName,
+      sectionKey,
+      shotBrief,
+    });
+    const strategy = getSectionStrategy(sectionKey);
+
     planned.push({
       id: opts.id,
       kind: opts.kind ?? purposeToKind(purpose),
       role: opts.role,
       name: opts.name,
       prompt,
-      alt: opts.alt ?? opts.name,
+      alt: accessibility.alt,
+      caption: accessibility.caption,
+      seoDescription: accessibility.seoDescription,
       realistic: true,
-      aspectRatio: defaultAspectForPurpose(purpose),
+      aspectRatio: defaultAspectForPurpose(purpose, sectionKey),
+      sectionKey,
       metadata: {
         purpose,
-        section: opts.sectionName,
+        section: opts.sectionName || sectionKey,
         style,
         prompt,
         artDirection: art.summary,
@@ -86,98 +129,201 @@ export function planWebsiteImages(params: {
     });
   };
 
+  // Hero — always first, wide cinematic.
+  const heroSection = designSections.find((s) =>
+    /hero/i.test(s.key || s.label),
+  );
   push("hero", {
     id: "hero",
     name: "Hero image",
     role: "hero",
-    shotBrief: reqs[0],
-    contentNotes: sections[0]?.contentNotes,
-    alt: `${ctx.projectName} hero`,
+    sectionKey: "hero",
+    sectionName: heroSection?.label || sections[0]?.name,
+    shotBrief: resolveShotBriefForRole(ctx, "hero", "hero", 0, usedBriefs),
+    contentNotes: sections[0]?.contentNotes || heroSection?.purpose,
   });
 
+  // Core photographic roles with distinct section strategies.
   push("product", {
     id: "product",
     name: "Product visual",
     role: "product",
-    shotBrief: reqs[1] || reqs[0],
-    alt: `${ctx.projectName} product`,
+    sectionKey: "features",
+    shotBrief: resolveShotBriefForRole(ctx, "product", "features", varietyIndex, usedBriefs),
   });
 
   push("service", {
     id: "service",
     name: "Service visual",
     role: "service",
-    shotBrief: reqs[2] || reqs[1] || reqs[0],
-    alt: `${ctx.projectName} services`,
+    sectionKey: "services",
+    shotBrief: resolveShotBriefForRole(ctx, "service", "services", varietyIndex, usedBriefs),
   });
 
   push("background", {
     id: "background",
     name: "Background atmosphere",
     role: "background",
-    shotBrief: reqs.find((r) => /background|atmosphere|mood/i.test(r)),
-    alt: "Background",
+    sectionKey: "cta",
+    shotBrief: resolveShotBriefForRole(ctx, "background", "cta", varietyIndex, usedBriefs),
   });
 
-  // Section images from Design Renderer / strategy plan (skip hero-like first).
-  const sectionCandidates = sections
-    .filter((s) => !/hero/i.test(s.name))
-    .slice(0, 3);
+  // Section images from design plan / strategy — each gets unique section key.
+  const sectionSources =
+    designSections.length > 0
+      ? designSections
+          .filter((s) => !/hero/i.test(s.key || s.label))
+          .map((s) => ({
+            name: s.label,
+            key: s.key,
+            contentNotes: s.purpose,
+            assetRole: s.assetRole,
+          }))
+      : sections
+          .filter((s) => !/hero/i.test(s.name))
+          .map((s) => ({
+            name: s.name,
+            key: s.name,
+            contentNotes: s.contentNotes,
+            assetRole: undefined as string | undefined,
+          }));
+
+  const sectionKeysSeen = new Set<SectionKey>();
+  const sectionCandidates = sectionSources.slice(0, 5);
+
   if (sectionCandidates.length) {
     sectionCandidates.forEach((section, index) => {
-      push("section", {
-        id: `section-${index + 1}`,
+      const sectionKey = inferSectionKey(section.key || section.name);
+      sectionKeysSeen.add(sectionKey);
+      const purpose = sectionKeyToPurpose(sectionKey, section.assetRole);
+      push(purpose, {
+        id: `section-${sectionKey}-${index + 1}`,
         name: `${section.name} visual`,
-        role: "section",
+        role: purposeToRole(purpose),
         sectionName: section.name,
-        shotBrief: reqs[index + 1] || reqs[0],
+        sectionKey,
         contentNotes: section.contentNotes,
-        alt: section.name,
+        shotBrief: resolveShotBriefForRole(
+          ctx,
+          purpose,
+          sectionKey,
+          varietyIndex,
+          usedBriefs,
+        ),
       });
     });
   } else {
-    for (let i = 0; i < 3; i += 1) {
+    const fallbackSections: SectionKey[] = ["about", "features", "contact"];
+    fallbackSections.forEach((sectionKey, index) => {
       push("section", {
-        id: `section-${i + 1}`,
-        name: `Section visual ${i + 1}`,
+        id: `section-${sectionKey}-${index + 1}`,
+        name: `${sectionKey} visual`,
         role: "section",
-        shotBrief: reqs[i + 1] || reqs[0],
-        alt: `${ctx.projectName} section ${i + 1}`,
+        sectionKey,
+        shotBrief: resolveShotBriefForRole(
+          ctx,
+          "section",
+          sectionKey,
+          varietyIndex,
+          usedBriefs,
+        ),
       });
-    }
+    });
   }
 
-  // Gallery slots — agency-grade inventory.
-  const galleryBriefs = reqs.filter((r) =>
-    /gallery|collage|destination|lifestyle|package|tour|vehicle|inventory|car/i.test(
-      r,
-    ),
-  );
-  const galleryCount = Math.min(3, Math.max(galleryBriefs.length || 3, 3));
+  // Gallery — diverse industry shots, never duplicate briefs.
+  const galleryCount = 3;
   for (let i = 0; i < galleryCount; i += 1) {
+    const galleryKey: SectionKey = i % 2 === 0 ? "gallery" : "portfolio";
     push("gallery", {
       id: `gallery-${i + 1}`,
       name: `Gallery image ${i + 1}`,
       role: "gallery",
       kind: "realistic",
-      shotBrief: galleryBriefs[i] || reqs[i] || reqs[0],
-      alt: `${ctx.projectName} gallery ${i + 1}`,
+      sectionKey: galleryKey,
+      shotBrief: resolveShotBriefForRole(
+        ctx,
+        "gallery",
+        galleryKey,
+        varietyIndex + i,
+        usedBriefs,
+      ),
     });
   }
 
-  // Testimonial portraits — required for trust sections.
+  // Testimonial portraits — distinct from team section.
   for (let i = 0; i < 2; i += 1) {
     push("testimonial", {
       id: `testimonial-${i + 1}`,
       name: `Testimonial portrait ${i + 1}`,
       role: "testimonial",
       kind: "realistic",
-      shotBrief: reqs.find((r) => /testimonial|trust|portrait|people/i.test(r)),
-      alt: `${ctx.projectName} client portrait ${i + 1}`,
+      sectionKey: "testimonials",
+      shotBrief: resolveShotBriefForRole(
+        ctx,
+        "testimonial",
+        "testimonials",
+        varietyIndex + i,
+        usedBriefs,
+      ),
     });
   }
 
-  return planned.slice(0, maxItems);
+  // Optional footer background if room in budget.
+  if (planned.length < maxItems) {
+    push("background", {
+      id: "footer-background",
+      name: "Footer atmosphere",
+      role: "background",
+      sectionKey: "footer",
+      shotBrief: resolveShotBriefForRole(
+        ctx,
+        "background",
+        "footer",
+        varietyIndex,
+        usedBriefs,
+      ),
+    });
+  }
+
+  return dedupeSimilarPrompts(planned).slice(0, maxItems);
+}
+
+function sectionKeyToPurpose(
+  sectionKey: SectionKey,
+  assetRole?: string,
+): ImagePurpose {
+  if (assetRole) {
+    const r = assetRole.toLowerCase();
+    if (r === "hero") return "hero";
+    if (r === "product") return "product";
+    if (r === "service") return "service";
+    if (r === "gallery") return "gallery";
+    if (r === "testimonial") return "testimonial";
+    if (r === "background") return "background";
+  }
+  switch (sectionKey) {
+    case "services":
+      return "service";
+    case "gallery":
+    case "portfolio":
+      return "gallery";
+    case "testimonials":
+      return "testimonial";
+    case "pricing":
+    case "faq":
+    case "cta":
+    case "footer":
+      return "background";
+    default:
+      return "section";
+  }
+}
+
+function purposeToRole(
+  purpose: ImagePurpose,
+): ImageEnginePlanItem["role"] {
+  return purpose as ImageEnginePlanItem["role"];
 }
 
 function purposeToKind(
@@ -202,4 +348,29 @@ function purposeToKind(
     default:
       return "realistic";
   }
+}
+
+/** Remove near-duplicate prompts to increase visual variety. */
+function dedupeSimilarPrompts(
+  items: ImageEnginePlanItem[],
+): ImageEnginePlanItem[] {
+  const seen = new Set<string>();
+  return items.map((item) => {
+    const fingerprint = item.prompt
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, " ")
+      .split(" ")
+      .filter((w) => w.length > 5)
+      .slice(0, 12)
+      .join(" ");
+    if (seen.has(fingerprint)) {
+      const varied = {
+        ...item,
+        prompt: `${item.prompt} Unique angle variant ${item.id}, distinct composition.`,
+      };
+      return varied;
+    }
+    seen.add(fingerprint);
+    return item;
+  });
 }

@@ -32,21 +32,26 @@ type CopilotCommandPanelProps = {
   control?: CopilotCommandControl;
 };
 
-const PHASE1_CHIPS = [
-  "Change the primary color to #2563eb",
-  "Make the design more modern",
-  "Add a testimonials section",
-  "Regenerate only the hero section",
-  "Rewrite the homepage copy",
+const PHASE1_CHIP_KEYS = [
+  "builder.ai.fullModernize",
+  "builder.ai.sectionTestimonials",
+  "builder.ai.sectionHero",
+  "builder.ai.contentHome",
 ] as const;
 
-const PHASE2_CHIPS = [
-  "Add an About page",
-  "Replace all images with fresh photos",
-  "Improve SEO for this site",
-  "Add a new service to the catalog",
-  "Add a blog post to CMS",
+const PHASE2_CHIP_KEYS = [
+  "builder.ai.pageAbout",
+  "builder.ai.imagesFresh",
+  "builder.ai.seoImprove",
+  "management.catalog.newItem",
+  "builder.features.blog",
 ] as const;
+
+function copilotChipLabel(key: string, wb: (translationKey: string) => string) {
+  if (key.startsWith("management.")) return wb(key);
+  if (key.startsWith("builder.features.")) return wb(`${key}.label`);
+  return wb(`${key}.label`);
+}
 
 type CopilotCommandPanelViewProps = CopilotCommandPanelProps & {
   control: CopilotCommandControl;
@@ -138,7 +143,7 @@ export function CopilotCommandPanelView({
               )}
             >
               <MessageSquare className="size-3" />
-              {chatView ? "Command view" : "Chat view"}
+              {chatView ? wb("builder.copilot.runCommand") : wb("builder.copilot.conversationView")}
             </button>
           </div>
 
@@ -146,7 +151,7 @@ export function CopilotCommandPanelView({
             <div className="max-h-56 space-y-2 overflow-y-auto rounded-2xl border border-white/8 bg-black/20 p-3">
               {thread.length === 0 ? (
                 <p className="text-xs text-white/45">
-                  Start a conversation — your session history appears here.
+                  {wb("builder.copilot.subtitle")}
                 </p>
               ) : (
                 thread.map((turn) => (
@@ -160,7 +165,7 @@ export function CopilotCommandPanelView({
                     )}
                   >
                     <p className="mb-0.5 text-[10px] font-medium uppercase tracking-wide text-white/35">
-                      {turn.role === "user" ? "You" : "Copilot"}
+                      {turn.role === "user" ? wb("builder.copilot.you") : wb("builder.copilot.assistant")}
                     </p>
                     <p>{turn.content}</p>
                   </div>
@@ -171,42 +176,48 @@ export function CopilotCommandPanelView({
             <>
               <div className="space-y-2">
                 <div className="flex flex-wrap gap-2">
-                  {PHASE1_CHIPS.map((chip) => (
+                  {PHASE1_CHIP_KEYS.map((chipKey) => {
+                    const chipLabel = copilotChipLabel(chipKey, wb);
+                    return (
                     <button
-                      key={chip}
+                      key={chipKey}
                       type="button"
                       disabled={disabled || loading || !generationId}
-                      onClick={() => setCommand(chip)}
+                      onClick={() => setCommand(chipLabel)}
                       className={cn(
                         "rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-white/70 transition hover:border-premium-gold/30 hover:text-white",
                         (disabled || loading || !generationId) && "opacity-50",
                       )}
                     >
-                      {chip}
+                      {chipLabel}
                     </button>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
               <div className="space-y-2">
                 <p className="text-[10px] font-medium uppercase tracking-wide text-white/35">
-                  Site management
+                  {wb("management.title")}
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {PHASE2_CHIPS.map((chip) => (
+                  {PHASE2_CHIP_KEYS.map((chipKey) => {
+                    const chipLabel = copilotChipLabel(chipKey, wb);
+                    return (
                     <button
-                      key={chip}
+                      key={chipKey}
                       type="button"
                       disabled={disabled || loading || !generationId}
-                      onClick={() => setCommand(chip)}
+                      onClick={() => setCommand(chipLabel)}
                       className={cn(
                         "rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-white/70 transition hover:border-premium-gold/30 hover:text-white",
                         (disabled || loading || !generationId) && "opacity-50",
                       )}
                     >
-                      {chip}
+                      {chipLabel}
                     </button>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </>
@@ -265,7 +276,7 @@ export function CopilotCommandPanelView({
               {loading ? (
                 <>
                   <Loader2 className="size-4 animate-spin" />
-                  {streamMessage || "Running command…"}
+                  {streamMessage || wb("statuses.generating")}
                 </>
               ) : (
                 <>
@@ -289,7 +300,7 @@ export function CopilotCommandPanelView({
           {history.length > 0 && !chatView && (
             <div className="space-y-2">
               <p className="text-xs font-medium uppercase tracking-wide text-white/40">
-                Recent commands
+                {wb("builder.copilot.history")}
               </p>
               <ul className="max-h-48 space-y-2 overflow-y-auto pr-1">
                 {history.map((entry) => (

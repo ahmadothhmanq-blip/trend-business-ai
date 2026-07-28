@@ -46,6 +46,12 @@ import {
   shouldUseDeterministicBlueprint,
 } from "@/lib/website/generation-flags";
 import {
+  applyFeaturesToCapabilityFlags,
+  applyFeaturesToStrategy,
+  mergeFeatureFilePlans,
+  resolveWebsiteFeatures,
+} from "@/lib/website/builder/feature-registry";
+import {
   buildEssentialWebsiteFilePlan,
   filterFilePlansForFastGeneration,
 } from "@/lib/website/fast-generation";
@@ -54,8 +60,9 @@ import type { DesignSystem } from "@/plugins/website/layers/types";
 
 export function getCapabilityFlags(
   analysis: WebsiteProjectAnalysis,
+  features?: string[],
 ): ProjectCapabilityFlags {
-  return {
+  const base: ProjectCapabilityFlags = {
     requiresAuth: analysis.requiresAuth,
     requiresDatabase: analysis.requiresDatabase,
     requiresDashboard: analysis.requiresDashboard,
@@ -63,11 +70,17 @@ export function getCapabilityFlags(
     isSaas: analysis.isSaas,
     databaseProvider: analysis.databaseProvider,
   };
+  if (!features?.length) return base;
+  return applyFeaturesToCapabilityFlags(
+    base,
+    resolveWebsiteFeatures(features),
+  );
 }
 
 function normalizePlannedFiles(
   plan: WebsiteDynamicPlan,
   flags: ProjectCapabilityFlags,
+  features?: string[],
 ): PlannedFile[] {
   const merged = mergeProductionRequirements(plan.files, flags).map((file) => {
     const path = sanitizeProjectPath(file.path);
@@ -79,8 +92,12 @@ function normalizePlannedFiles(
     };
   });
 
+  const withFeatures = features?.length
+    ? mergeFeatureFilePlans(merged, resolveWebsiteFeatures(features))
+    : merged;
+
   const byPath = new Map<string, PlannedFile>();
-  for (const file of merged) {
+  for (const file of withFeatures) {
     byPath.set(file.path, file);
   }
 
@@ -229,8 +246,10 @@ export async function planWebsite(
     prompt: buildWebsiteIterationPrompt(input),
   };
 
-  const strategy =
+  const resolvedFeatures = resolveWebsiteFeatures(input.features);
+  let strategy =
     options?.strategy ?? (await buildWebsiteStrategy(input, analysis, ctx));
+  strategy = applyFeaturesToStrategy(strategy, resolvedFeatures);
   const designSystem =
     options?.designSystem ??
     (await buildDesignSystem(input, analysis, strategy, ctx));
@@ -267,6 +286,7 @@ export async function planWebsite(
 
 Strategy: ${JSON.stringify(strategy)}
 DesignSystem: ${JSON.stringify(designSystem)}
+${resolvedFeatures.aiPlanningBlock}
 
 Align blueprint pages/sections/colors/typography with Strategy and DesignSystem.
 Prefer DesignSystem.componentPalette as real React components under components/sections/ and components/layout/.
@@ -308,9 +328,14 @@ Section order must follow Strategy.sectionPlan (Design Renderer output).`,
 
   ctx.progress.emit("Planning files...");
 
-  const flags = getCapabilityFlags(analysis);
+  const flags = getCapabilityFlags(analysis, input.features);
   const componentPaths = options?.designRenderComponentPaths;
-  const componentIds = designSystem.componentPalette;
+  const componentIds = Array.from(
+    new Set([
+      ...(designSystem.componentPalette ?? []),
+      ...resolvedFeatures.componentIds,
+    ]),
+  );
 
   let dynamicPlan: WebsiteDynamicPlan;
   if (isUltraFastWebsiteGeneration(input)) {
@@ -345,6 +370,7 @@ Section order must follow Strategy.sectionPlan (Design Renderer output).`,
 
 Strategy sitemap: ${JSON.stringify(strategy.sitemap)}
 Design pattern: ${designSystem.industryPattern}
+${resolvedFeatures.aiPlanningBlock}
 Prefer pages matching strategy paths. Inject design tokens via app/globals.css.
 Must include Design Renderer components as separate files when listed in DesignSystem.componentPalette:
 ${JSON.stringify(componentPaths ?? designSystem.componentPalette ?? [])}`,
@@ -364,6 +390,7 @@ ${JSON.stringify(componentPaths ?? designSystem.componentPalette ?? [])}`,
         ),
       },
       flags,
+      input.features,
     ),
     isUltraFastWebsiteGeneration(input)
       ? componentPaths?.slice(0, 8)

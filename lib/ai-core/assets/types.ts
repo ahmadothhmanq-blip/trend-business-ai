@@ -24,6 +24,8 @@ export type CoreAssetPlanItem = {
   alt: string;
   /** Prefer photorealistic generation when provider available */
   realistic?: boolean;
+  /** Per-item aspect ratio for layout-aware generation */
+  aspectRatio?: import("@/lib/ai-core/assets/settings").ImageAspectRatio;
   metadata?: {
     purpose?:
       | "hero"
@@ -39,6 +41,8 @@ export type CoreAssetPlanItem = {
     prompt?: string;
     provider?: string;
     artDirection?: string;
+    caption?: string;
+    seoDescription?: string;
   };
 };
 

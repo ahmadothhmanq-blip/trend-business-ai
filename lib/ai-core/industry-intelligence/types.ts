@@ -27,17 +27,7 @@ export type WebsiteIndustryIntelligence = {
   /** Preferred Smart Template Engine id when available. */
   preferredSmartTemplateId?: string;
   /** Preferred Premium Templates System id when available. */
-  preferredPremiumTemplateId?:
-    | "luxury-business"
-    | "saas"
-    | "real-estate"
-    | "automotive"
-    | "tourism"
-    | "restaurant"
-    | "healthcare"
-    | "ecommerce"
-    | "agency"
-    | "education";
+  preferredPremiumTemplateId?: import("@/lib/ai-core/premium-templates/types").PremiumTemplateId;
 };
 
 export type IndustryDetectionSource =

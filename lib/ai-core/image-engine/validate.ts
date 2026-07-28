@@ -1,9 +1,15 @@
 /**
- * Asset Quality Check — detect missing images, bad matching, low visual quality.
+ * Asset Quality Check — detect missing images, bad matching, low visual quality,
+ * and evaluate planned prompt quality before generation.
  */
 
 import { isPremiumStockUrl } from "@/lib/ai-core/image-engine/stock";
 import type { CoreAssetManifest } from "@/lib/ai-core/layers/types";
+import {
+  PROMPT_QUALITY_THRESHOLD,
+  scoreImagePrompt,
+} from "@/lib/ai-core/image-engine/prompt-scoring";
+import type { ImagePurpose } from "@/lib/ai-core/image-engine/types";
 
 export type AssetQualityIssue = {
   id: string;
@@ -23,6 +29,8 @@ export type AssetQualityReport = {
   photoCount: number;
   aiGeneratedCount: number;
   stockFallbackCount: number;
+  /** Average planned prompt quality score (pre-generation). */
+  promptQualityScore?: number;
   summary: string;
 };
 
@@ -59,7 +67,16 @@ function isLowQualityHint(item: CoreAssetManifest["items"][number]): boolean {
  */
 export function validateAssetManifest(
   manifest: CoreAssetManifest,
-  opts?: { industry?: string | null; brandStyle?: string | null },
+  opts?: {
+    industry?: string | null;
+    brandStyle?: string | null;
+    plannedPrompts?: Array<{
+      id: string;
+      prompt: string;
+      purpose: ImagePurpose;
+      section?: string;
+    }>;
+  },
 ): AssetQualityReport {
   const issues: AssetQualityIssue[] = [];
   const photos = manifest.items.filter((i) => i.role !== "icon");
@@ -129,6 +146,44 @@ export function validateAssetManifest(
     });
   }
 
+  let promptQualityScore: number | undefined;
+  if (opts?.plannedPrompts?.length) {
+    const ctx = {
+      businessType: opts.industry || "business",
+      industry: opts.industry || "business",
+      brandStyle: opts.brandStyle || "premium",
+      designStyle: opts.brandStyle || "modern",
+      designPreset: "modern",
+      targetAudience: "customers",
+      offer: "services",
+      projectName: "Website",
+      imageStyle: "modern" as const,
+      imageRequirements: [] as string[],
+      colors: { primary: "#000", secondary: "#fff" },
+    };
+    const scores = opts.plannedPrompts.map((p) =>
+      scoreImagePrompt({
+        prompt: p.prompt,
+        purpose: p.purpose,
+        ctx,
+        sectionName: p.section,
+      }),
+    );
+    promptQualityScore = Math.round(
+      scores.reduce((sum, s) => sum + s.score, 0) / scores.length,
+    );
+    const weak = scores.filter((s) => !s.passed);
+    if (weak.length > 0) {
+      issues.push({
+        id: "prompt-quality-low",
+        severity: "minor",
+        category: "quality",
+        title: `${weak.length} planned prompt(s) below quality threshold`,
+        detail: `Average prompt score ${promptQualityScore}/100 (threshold ${PROMPT_QUALITY_THRESHOLD}).`,
+      });
+    }
+  }
+
   const aiGeneratedCount = withUrl.filter(
     (i) =>
       i.status === "generated" &&
@@ -158,8 +213,9 @@ export function validateAssetManifest(
     photoCount: withUrl.length,
     aiGeneratedCount,
     stockFallbackCount,
+    promptQualityScore,
     summary: passed
-      ? `Asset quality ${score}/100 — ${withUrl.length} photos (${aiGeneratedCount} AI, ${stockFallbackCount} stock)`
+      ? `Asset quality ${score}/100 — ${withUrl.length} photos (${aiGeneratedCount} AI, ${stockFallbackCount} stock)${promptQualityScore != null ? ` · prompts ${promptQualityScore}/100` : ""}`
       : `Asset quality ${score}/100 — ${issues.length} issue(s); missing: ${missingRoles.join(", ") || "none"}`,
   };
 }

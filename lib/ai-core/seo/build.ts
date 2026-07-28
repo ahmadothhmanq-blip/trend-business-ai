@@ -114,8 +114,17 @@ function industrySchemaType(industryId?: string | null, industryLabel?: string):
   if (raw.includes("clinic") || raw.includes("health") || raw.includes("medical")) {
     return "MedicalBusiness";
   }
+  if (raw.includes("law") || raw.includes("legal") || raw.includes("attorney")) {
+    return "LegalService";
+  }
   if (raw.includes("education") || raw.includes("school") || raw.includes("university")) {
     return "EducationalOrganization";
+  }
+  if (raw.includes("blog") || raw.includes("article") || raw.includes("news")) {
+    return "Blog";
+  }
+  if (raw.includes("landing") || raw.includes("product launch")) {
+    return "WebPage";
   }
   if (raw.includes("agency") || raw.includes("studio")) {
     return "ProfessionalService";

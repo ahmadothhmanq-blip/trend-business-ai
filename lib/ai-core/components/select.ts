@@ -138,14 +138,23 @@ function scoreCandidate(
   if (ctx.industryId === "automotive" && candidate.id === "HeroLuxuryShowcase") {
     score += 30;
   }
+  if (ctx.industryId !== "automotive" && candidate.id === "HeroLuxuryShowcase") {
+    score -= 60;
+  }
+  if (ctx.industryId === "tourism" && candidate.id === "HeroFullBleed") {
+    score += 32;
+  }
+  if (ctx.industryId === "tourism" && candidate.id === "HeroCinematic") {
+    score += 28;
+  }
+  if (ctx.industryId === "tourism" && candidate.id === "DestinationsGallery") {
+    score += 20;
+  }
   if (ctx.industryId === "real-estate" && candidate.id === "HeroProperty") {
     score += 30;
   }
   if (ctx.industryId === "saas" && candidate.id === "HeroProduct") {
     score += 28;
-  }
-  if (ctx.industryId === "tourism" && candidate.id === "DestinationsGallery") {
-    score += 20;
   }
 
   // Prefer "modern" library variants for conversion/ecommerce goals.
@@ -201,10 +210,19 @@ function resolveHomeKinds(
   if (["agency", "saas", "technology", "business"].includes(ctx.industryId)) {
     industryExtras.push("case-studies");
   }
-  if (["clinic", "restaurant", "tourism", "education"].includes(ctx.industryId)) {
+  if (["clinic", "law"].includes(ctx.industryId)) {
     industryExtras.push("booking");
   }
-  if (["restaurant", "clinic", "automotive", "education"].includes(ctx.industryId)) {
+  if (["blog", "landing-page", "saas", "technology"].includes(ctx.industryId)) {
+    industryExtras.push("pricing");
+  }
+  if (ctx.industryId === "blog") {
+    industryExtras.push("blog");
+  }
+  if (ctx.industryId === "landing-page") {
+    industryExtras.push("brand-trust");
+  }
+  if (["restaurant", "clinic", "automotive", "education", "law"].includes(ctx.industryId)) {
     industryExtras.push("maps");
   }
 

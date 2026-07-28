@@ -12,6 +12,7 @@ import type {
   LayoutStyle,
   TemplateDesignPreset,
 } from "@/lib/ai-core/templates/types";
+import type { TemplateDNAProfile } from "@/lib/ai-core/template-intelligence/template-dna";
 
 export const TEMPLATE_INTELLIGENCE_CATEGORIES = [
   "Luxury",
@@ -164,6 +165,8 @@ export type TemplateIntelligenceDefinition = {
   audienceHints: string[];
   brandStyleHints: string[];
   visualPreset?: TemplateVisualPreset;
+  /** Resolved at runtime via resolveTemplateDNA — not stored in catalog JSON. */
+  templateDna?: TemplateDNAProfile;
 };
 
 export type TemplateIntelligenceSelectionInput = {

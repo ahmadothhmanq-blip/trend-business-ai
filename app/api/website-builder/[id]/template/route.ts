@@ -6,6 +6,7 @@ import { applyTemplateIntelligenceRetheme } from "@/lib/ai-core/template-intelli
 import { extractWebsiteFilesFromBlueprint } from "@/plugins/website/iteration";
 import type { GeneratedWebsiteProject } from "@/plugins/website/types";
 import type { WebsiteGeneration } from "@/types/database";
+import { requireWebsiteGenerationAccess } from "@/lib/website/builder/route-access";
 import { z } from "zod";
 import { NextResponse } from "next/server";
 
@@ -40,19 +41,15 @@ export async function POST(request: Request, context: RouteContext) {
   }
 
   try {
-    const { data: row, error } = await auth.supabase
-      .from("website_generations")
-      .select("*")
-      .eq("id", id)
-      .eq("user_id", auth.user!.id)
-      .maybeSingle();
+    const accessResult = await requireWebsiteGenerationAccess(
+      auth.supabase,
+      auth.user!.id,
+      id,
+      "edit",
+    );
+    if (accessResult instanceof NextResponse) return accessResult;
 
-    if (error) throw error;
-    if (!row) {
-      return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Generation not found.");
-    }
-
-    const generation = row as WebsiteGeneration;
+    const generation = accessResult.generation as WebsiteGeneration;
     const files = extractWebsiteFilesFromBlueprint(generation.blueprint);
     const blueprint = (generation.blueprint || {}) as unknown as GeneratedWebsiteProject;
     const project: GeneratedWebsiteProject = {

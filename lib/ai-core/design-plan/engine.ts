@@ -8,6 +8,7 @@ import type {
   CoreBusinessProfile,
   CoreProductStrategy,
 } from "@/lib/ai-core/layers/types";
+import type { TemplateDNAProfile } from "@/lib/ai-core/template-intelligence/template-dna";
 
 export type RunDesignPlanningPhaseParams = {
   profile?: CoreBusinessProfile | null;
@@ -17,6 +18,7 @@ export type RunDesignPlanningPhaseParams = {
   designStyle?: string | null;
   preferredStyle?: string | null;
   prompt?: string | null;
+  templateDna?: TemplateDNAProfile | null;
   onProgress?: (message: string) => void;
 };
 
@@ -64,6 +66,7 @@ export function runDesignPlanningPhaseWithBrand(
       params.preferredStyle ||
       brandIdentity.premiumStyleId ||
       brandIdentity.presetId,
+    templateDna: params.templateDna,
     onProgress: params.onProgress,
   });
 
@@ -93,6 +96,7 @@ export function runDesignPlanningPhaseWithBrand(
     industryId: params.industryId,
     prompt: params.prompt,
     brandIdentity,
+    templateDna: params.templateDna,
   });
 
   plan = applyBrandIdentityToDesignPlan(plan, brandIdentity);

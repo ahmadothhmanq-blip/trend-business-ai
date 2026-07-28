@@ -90,10 +90,12 @@ ${languageRule}
 Analysis: ${JSON.stringify(analysis)}
 
 Deliver:
-1. Sitemap (3–6 pages)
-2. Page strategy (purpose, key sections, primary CTA per page)
-3. Content strategy (brand voice, messaging pillars, proof points, objection handlers, SEO topics)
-4. Conversion funnel + CTAs
+1. Sitemap (3–6 pages) — page names in ${input.language}
+2. Page strategy (purpose, key sections, primary CTA per page) — all string values in ${input.language}
+3. Content strategy (brand voice, messaging pillars, proof points, objection handlers, SEO topics) — in ${input.language}
+4. Conversion funnel + CTAs — in ${input.language}
+
+When Language is Arabic: every JSON string value MUST be Modern Standard Arabic (navigation, CTAs, section names, page names). No English planning labels.
 
 Honor businessProfile.requiredSections when planning sectionPlan.
 Build a complete professional sitemap from analysis.pages (industry-specific pages such as Destinations/Tours for tourism, Inventory for automotive, Programs for education).
@@ -149,7 +151,7 @@ Map theme hints:
 - Blue/Purple/Green color themes → use those hues as primary/accent, not gold
 
 Also set:
-- industryPattern (tourism, clinic, saas, restaurant, real_estate, portfolio, ecommerce, agency, generic)
+- industryPattern (tourism, clinic, medical, law, education, blog, landing_page, saas, restaurant, real_estate, portfolio, ecommerce, agency, generic)
 - layoutStyle (e.g. "full-bleed hero + asymmetric grids")
 - uiPatterns (hero style, card style, nav style, footer style cues)
 - colors as real hex with strong harmony

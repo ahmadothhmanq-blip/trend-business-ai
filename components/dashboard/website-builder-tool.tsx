@@ -10,6 +10,13 @@ import { MAX_RECENT_PROJECTS } from "@/lib/website/constants";
 import { useTranslation } from "@/lib/i18n/client";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
 import { inferWebsiteOnboardingDefaults } from "@/lib/ai-core/website-builder/onboarding-inference";
+import {
+  BUILDER_PANEL_FEATURES,
+  BUILDER_PANEL_FEATURE_I18N,
+  DEFAULT_BUILDER_PANEL_FEATURES,
+  hydrateBuilderPanelFeatures,
+  type BuilderPanelFeatureLabel,
+} from "@/lib/website/builder/feature-registry";
 import { CoreProgressStepper } from "@/components/dashboard/one-prompt";
 import { useCoreProgress } from "@/components/dashboard/one-prompt/use-core-progress";
 import { getOnePromptProduct } from "@/lib/constants/one-prompt-products";
@@ -67,7 +74,6 @@ import type {
   WebsiteGeneration,
 } from "@/types/database";
 import { cn } from "@/lib/utils";
-import { VisualWebsiteEditor } from "@/components/dashboard/visual-editor/visual-website-editor";
 import { AnalyticsIntelligencePanel } from "@/components/dashboard/website-builder/analytics-intelligence-panel";
 import { ExperimentsPanel } from "@/components/dashboard/website-builder/experiments-panel";
 import { SeoAgentPanel } from "@/components/dashboard/website-builder/seo-agent-panel";
@@ -84,18 +90,11 @@ import {
 } from "@/components/dashboard/website-builder/template-intelligence-panel";
 import { WebsiteIntelligencePanel } from "@/components/dashboard/website-builder/website-intelligence-panel";
 import { BrandKitPanel } from "@/components/dashboard/website-builder/brand-kit-panel";
+import { WebsiteBuilderCanvasWorkspace } from "@/components/dashboard/website-builder/tool/website-builder-canvas-workspace";
+import type { OutputTab } from "@/components/dashboard/website-builder/tool/types";
+import { readWebsiteBuilderApiError, formatWebsiteBuilderApiError } from "@/lib/website/builder/client-api-error";
 import type { MarketplaceTemplate } from "@/lib/ai-core/template-marketplace";
 import { resolveTemplateIntelligenceForMarketplace } from "@/lib/ai-core/template-intelligence/resolve-marketplace";
-
-type OutputTab =
-  | "preview"
-  | "code"
-  | "canvas"
-  | "analytics"
-  | "experiments"
-  | "seo"
-  | "deploy"
-  | "intelligence";
 
 type WebsiteBuilderToolProps = {
   /** Serializable product id only — never pass ProductDefinition (contains LucideIcon). */
@@ -141,19 +140,6 @@ const LANGUAGES = [
   "Portuguese",
   "Italian",
 ] as const;
-const FEATURES = [
-  "Authentication",
-  "Dashboard",
-  "CMS",
-  "Blog",
-  "Payments",
-  "Booking",
-  "Chat",
-  "Notifications",
-  "Analytics",
-  "CRM",
-  "Admin Panel",
-] as const;
 
 const LANGUAGE_KEYS: Record<(typeof LANGUAGES)[number], string> = {
   English: "english",
@@ -164,20 +150,6 @@ const LANGUAGE_KEYS: Record<(typeof LANGUAGES)[number], string> = {
   German: "german",
   Portuguese: "portuguese",
   Italian: "italian",
-};
-
-const FEATURE_KEYS: Record<(typeof FEATURES)[number], string> = {
-  Authentication: "authentication",
-  Dashboard: "dashboard",
-  CMS: "cms",
-  Blog: "blog",
-  Payments: "payments",
-  Booking: "booking",
-  Chat: "chat",
-  Notifications: "notifications",
-  Analytics: "analytics",
-  CRM: "crm",
-  "Admin Panel": "adminPanel",
 };
 
 const TEMPLATES = [
@@ -283,7 +255,7 @@ function toProject(generation: WebsiteGeneration): WorkspaceProject {
     style: generation.design_style,
     theme: generation.color_style,
     language: generation.language,
-    features: generation.features,
+    features: generation.features ?? [],
     createdAt: formatGenerationDate(generation.created_at),
     favorite: Boolean(generation.is_favorite),
     description: generation.business_description,
@@ -378,7 +350,9 @@ export function WebsiteBuilderTool({
     null,
   );
   const [language, setLanguage] = useState<(typeof LANGUAGES)[number]>("English");
-  const [features, setFeatures] = useState<string[]>(["Dashboard", "Booking", "Admin Panel"]);
+  const [features, setFeatures] = useState<BuilderPanelFeatureLabel[]>([
+    ...DEFAULT_BUILDER_PANEL_FEATURES,
+  ]);
 
   // Template Marketplace handoff: ?templateId=&marketplaceTemplateId=&templateStyle=
   useEffect(() => {
@@ -645,6 +619,9 @@ export function WebsiteBuilderTool({
             ) {
               setLanguage(hydrated.language as (typeof LANGUAGES)[number]);
             }
+            if (hydrated.features?.length) {
+              setFeatures(hydrateBuilderPanelFeatures(hydrated.features));
+            }
             setSelectedFilePath(hydrated.generatedProject?.files[0]?.path ?? "");
             setFileSearch("");
             return true;
@@ -661,6 +638,9 @@ export function WebsiteBuilderTool({
     ) {
       setLanguage(project.language as (typeof LANGUAGES)[number]);
     }
+    if (project.features?.length) {
+      setFeatures(hydrateBuilderPanelFeatures(project.features));
+    }
     setSelectedFilePath(project.generatedProject?.files[0]?.path ?? "");
     setFileSearch("");
     return true;
@@ -676,7 +656,7 @@ export function WebsiteBuilderTool({
   }
 
 
-  function toggleFeature(feature: string) {
+  function toggleFeature(feature: BuilderPanelFeatureLabel) {
     setFeatures((items) =>
       items.includes(feature)
         ? items.filter((item) => item !== feature)
@@ -701,15 +681,20 @@ export function WebsiteBuilderTool({
     optimize?: boolean;
     /** Start a new project from a marketplace template selection. */
     fromTemplate?: TemplateUsePayload;
+    /** Layer-specific improve instruction (strategy / design / assets). */
+    continueInstruction?: string;
+    layerImprove?: "strategy" | "design" | "assets";
   }) {
     const tpl = options?.fromTemplate;
     const mode = options?.resume
       ? "continue"
-      : options?.continue || options?.optimize
+      : options?.continue || options?.optimize || options?.layerImprove
         ? "continue"
         : options?.regenerate
           ? "regenerate"
           : "generate";
+
+    const layerInstruction = options?.continueInstruction?.trim();
 
     if (mode === "continue") {
       if (!activeProject?.id) {
@@ -717,8 +702,16 @@ export function WebsiteBuilderTool({
         return;
       }
       if (
+        options?.layerImprove &&
+        !activeProject.generatedProject?.files?.length
+      ) {
+        toast.error(wb("designEngine.generateBeforeLayerImprove"));
+        return;
+      }
+      if (
         !options?.optimize &&
         !options?.resume &&
+        !layerInstruction &&
         !projectBrief.trim()
       ) {
         toast.error(wb("toasts.describeChanges"));
@@ -848,13 +841,19 @@ export function WebsiteBuilderTool({
     }
 
     setStreamStatus(
-      options?.optimize
-        ? wb("stream.runningOptimizer")
-        : options?.resume
-          ? wb("stream.resuming")
-          : tpl
-            ? `Creating website from template: ${tpl.name}…`
-            : autoHint || wb("stream.connecting"),
+      options?.layerImprove === "strategy"
+        ? wb("designEngine.improvingStrategy")
+        : options?.layerImprove === "design"
+          ? wb("designEngine.improvingDesign")
+          : options?.layerImprove === "assets"
+            ? wb("designEngine.improvingAssets")
+            : options?.optimize
+              ? wb("stream.runningOptimizer")
+              : options?.resume
+                ? wb("stream.resuming")
+                : tpl
+                  ? `Creating website from template: ${tpl.name}…`
+                  : autoHint || wb("stream.connecting"),
     );
 
     const mergedDesignSystem = {
@@ -899,7 +898,8 @@ export function WebsiteBuilderTool({
           ? undefined
           : options?.resume
             ? resumeInstruction
-            : projectBrief.trim() ||
+            : layerInstruction ||
+              projectBrief.trim() ||
               (options?.optimize ? optimizeInstruction : undefined),
       optimizeWithAi: Boolean(options?.optimize),
     };
@@ -923,7 +923,11 @@ export function WebsiteBuilderTool({
       setEditMode(false);
       setProjects((items) => [nextProject, ...items.filter((p) => p.id !== nextProject.id)].slice(0, MAX_RECENT_PROJECTS));
       setStreamStatus(wb("stream.websiteSaved"));
-      toast.success(wb("toasts.createdAndSaved"));
+      toast.success(
+        options?.layerImprove
+          ? wb("designEngine.layerImproveComplete")
+          : wb("toasts.createdAndSaved"),
+      );
     };
 
     const recoveryMessages = {
@@ -1118,7 +1122,9 @@ export function WebsiteBuilderTool({
         const data = (await response.json()) as GenerateProjectResponse;
 
         if (!response.ok) {
-          throw new Error("error" in data ? data.error : wb("errors.generic"));
+          throw new Error(
+            await readWebsiteBuilderApiError(response, t, wb),
+          );
         }
 
         if (!("project" in data) || !data.project || !data.generation?.id) {
@@ -1128,13 +1134,7 @@ export function WebsiteBuilderTool({
         applySavedGeneration(data.project, data.generation);
         setPreviewRevision((n) => n + 1);
       } else {
-        let detail = `Unable to generate website (${streamResponse.status}).`;
-        try {
-          const errBody = (await streamResponse.json()) as { error?: string };
-          if (errBody.error) detail = errBody.error;
-        } catch {
-          // keep status-based message
-        }
+        const detail = await readWebsiteBuilderApiError(streamResponse, t, wb);
         throw new Error(detail);
       }
     } catch (error) {
@@ -1375,7 +1375,15 @@ export function WebsiteBuilderTool({
         message?: string;
       };
       if (!response.ok || !data.project || !data.generation) {
-        throw new Error(data.error ?? wb("errors.generic"));
+        throw new Error(
+          formatWebsiteBuilderApiError({
+            status: response.status,
+            code: (data as { code?: string }).code,
+            message: data.error,
+            t,
+            wb,
+          }),
+        );
       }
       const nextProject = toProject({
         ...data.generation,
@@ -1943,7 +1951,7 @@ export function WebsiteBuilderTool({
             <DashboardPanel data-onboarding="website-features">
               <SectionHeader icon={LayoutDashboard} title={wb("sections.features")} description={wb("sectionDescriptions.features")} />
               <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {FEATURES.map((feature) => {
+                {BUILDER_PANEL_FEATURES.map((feature) => {
                   const checked = features.includes(feature);
                   return (
                     <label
@@ -1961,7 +1969,7 @@ export function WebsiteBuilderTool({
                         onChange={() => toggleFeature(feature)}
                         className="size-4 rounded border-white/20 accent-[#d4af37]"
                       />
-                      {wb(`features.${FEATURE_KEYS[feature]}`)}
+                      {wb(`features.${BUILDER_PANEL_FEATURE_I18N[feature]}`)}
                     </label>
                   );
                 })}
@@ -2119,9 +2127,21 @@ export function WebsiteBuilderTool({
             toast.error(wb("toasts.createOrSelectFirst"));
             return;
           }
-          setEditMode(true);
-          setProjectBrief(`${prefix} ${hint}`.trim());
-          toast.message(wb("toasts.editInstructionHint"));
+          if (!activeProject.generatedProject?.files?.length) {
+            toast.error(wb("designEngine.generateBeforeLayerImprove"));
+            return;
+          }
+          const layer =
+            prefix === "[strategy]"
+              ? "strategy"
+              : prefix === "[design]"
+                ? "design"
+                : "assets";
+          void createInterfaceProject({
+            continue: true,
+            continueInstruction: `${prefix} ${hint}`.trim(),
+            layerImprove: layer,
+          });
         }}
         onApplyEditorSuggestion={(command, suggestionId) => {
           if (!activeProject?.id) {
@@ -2202,6 +2222,16 @@ export function WebsiteBuilderTool({
           toast.success(wb("toasts.seoFixApplied"));
         }}
         onIntelligenceApply={(command) => {
+          if (!activeProject?.id) return;
+          setEditMode(true);
+          setProjectBrief(command);
+          void applyWebsiteEditorEdit({
+            generationId: activeProject.id,
+            command,
+          });
+        }}
+        generationStreamMessage={streamStatus}
+        onCanvasAiCommand={(command) => {
           if (!activeProject?.id) return;
           setEditMode(true);
           setProjectBrief(command);
@@ -2743,6 +2773,7 @@ function PreviewAndExportPanel({
   onGoToDeploy: () => void;
 }) {
   const wb = useProductT("websiteBuilder");
+  const { t } = useTranslation();
   const generated = activeProject?.generatedProject;
   const fileCount = generated?.files.length ?? 0;
   const [viewport, setViewport] = useState<PreviewViewport>("desktop");
@@ -2848,7 +2879,7 @@ function PreviewAndExportPanel({
                 className="btn-ghost-gold h-10 rounded-xl"
                 onClick={() => importRef.current?.click()}
               >
-                Import ZIP
+                {t("common.import")}
               </Button>
             </>
           ) : null}
@@ -3003,6 +3034,8 @@ function OutputWorkspace({
   onVisualEditorSaved,
   onSeoApplied,
   onIntelligenceApply,
+  generationStreamMessage,
+  onCanvasAiCommand,
 }: {
   activeProject: WorkspaceProject | null;
   outputTab: OutputTab;
@@ -3032,6 +3065,8 @@ function OutputWorkspace({
     generation: WebsiteGeneration;
   }) => void;
   onIntelligenceApply?: (command: string) => void;
+  generationStreamMessage?: string | null;
+  onCanvasAiCommand?: (command: string, useStream?: boolean) => void;
 }) {
   const wb = useProductT("websiteBuilder");
   const filteredFiles = files.filter((file) =>
@@ -3151,12 +3186,17 @@ function OutputWorkspace({
       {outputTab === "canvas" ? (
         <div className="min-h-[760px]">
           {activeProject?.id && files.length ? (
-            <VisualWebsiteEditor
+            <WebsiteBuilderCanvasWorkspace
               generationId={activeProject.id}
               files={files}
-              project={activeProject.generatedProject}
+              project={activeProject.generatedProject!}
               disabled={visualEditorDisabled}
+              promptHint={activeProject.description}
+              aiLoading={visualEditorDisabled}
+              aiStreamMessage={generationStreamMessage}
+              onAiCommand={onCanvasAiCommand}
               onDirtyChange={onVisualEditorDirtyChange}
+              onOpenWorkspaceTab={onOutputTabChange}
               onSaved={onVisualEditorSaved}
             />
           ) : (

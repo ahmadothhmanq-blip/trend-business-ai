@@ -136,15 +136,25 @@ for (const key of Object.keys(STOCK)) {
 function resolveIndustry(industry?: string | null): string {
   const raw = (industry || "business").toLowerCase().replace(/[_\s]+/g, "-");
   if (raw in STOCK) return raw;
-  if (raw.includes("tour") || raw.includes("travel")) return "tourism";
-  if (raw.includes("restaurant") || raw.includes("food")) return "restaurant";
-  if (raw.includes("real") || raw.includes("estate")) return "real-estate";
+  if (raw.includes("tour") || raw.includes("travel") || raw.includes("tourism")) {
+    return "tourism";
+  }
+  if (raw.includes("restaurant") || raw.includes("food") || raw.includes("dining")) {
+    return "restaurant";
+  }
+  if (raw.includes("real") || raw.includes("estate") || raw.includes("property")) {
+    return "real-estate";
+  }
+  if (raw.includes("clinic") || raw.includes("health") || raw.includes("medical")) {
+    return "clinic";
+  }
   if (raw.includes("saas") || raw.includes("software") || raw.includes("tech")) {
     return "saas";
   }
   if (raw.includes("ecom") || raw.includes("shop")) return "ecommerce";
-  if (raw.includes("auto") || raw.includes("car")) return "automotive";
-  if (raw.includes("clinic") || raw.includes("health")) return "clinic";
+  if (/\b(automotive|dealership|vehicle)\b/.test(raw) || /\bcar\b/.test(raw)) {
+    return "automotive";
+  }
   if (raw.includes("school") || raw.includes("education")) return "education";
   if (raw.includes("agency") || raw.includes("studio")) return "agency";
   if (raw.includes("financ") || raw.includes("bank") || raw.includes("invest")) {

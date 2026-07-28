@@ -93,6 +93,7 @@ export type DesignSystem = {
   layoutStyle: string;
   uiPatterns: string[];
   componentPalette: string[];
+  homeComponentOrder?: string[];
   spacingScale: string[];
   borderRadius: string;
   shadowStyle: string;

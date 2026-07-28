@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import type { WebsiteMediaAsset } from "@/lib/ai-core/website-management/types";
+import { useBuilderLocale } from "@/lib/website/builder/use-builder-locale";
+import { useTranslation } from "@/lib/i18n/client";
 
 type MediaLibraryPanelProps = {
   generationId: string;
@@ -21,6 +23,8 @@ export function MediaLibraryPanel({
   compact,
   className,
 }: MediaLibraryPanelProps) {
+  const { wb } = useBuilderLocale();
+  const { t } = useTranslation();
   const [assets, setAssets] = useState<WebsiteMediaAsset[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -80,14 +84,14 @@ export function MediaLibraryPanel({
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search media..."
+            placeholder={wb("builder.media.searchPlaceholder")}
             className="h-8 border-white/10 bg-white/5 pl-8 text-white"
           />
         </div>
         <Input
           value={folder}
           onChange={(e) => setFolder(e.target.value)}
-          placeholder="Folder"
+          placeholder={wb("builder.media.title")}
           className="h-8 w-28 border-white/10 bg-white/5 text-white"
         />
         <input
@@ -113,19 +117,19 @@ export function MediaLibraryPanel({
           ) : (
             <Upload className="size-3.5" />
           )}
-          Upload
+          {uploading ? wb("builder.media.uploading") : wb("builder.media.upload")}
         </Button>
       </div>
 
       {loading ? (
         <div className="flex items-center gap-2 py-8 text-sm text-white/40">
           <Loader2 className="size-4 animate-spin" />
-          Loading media...
+          {t("common.loading")}
         </div>
       ) : assets.length === 0 ? (
         <div className="rounded-xl border border-dashed border-white/10 py-10 text-center text-sm text-white/40">
           <FolderOpen className="mx-auto mb-2 size-6 opacity-40" />
-          No media yet. Upload images to use in your site.
+          {wb("builder.media.empty")}
         </div>
       ) : (
         <div
@@ -166,7 +170,7 @@ export function MediaLibraryPanel({
                     className="h-7 flex-1 bg-premium-gold text-[10px] text-black"
                     onClick={() => onSelect(asset)}
                   >
-                    Use
+                    {wb("builder.blocks.insert")}
                   </Button>
                 ) : null}
                 <Button

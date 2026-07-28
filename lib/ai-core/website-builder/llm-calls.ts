@@ -1,10 +1,14 @@
 import type { AIProvider } from "@/lib/ai/types";
 import { generateJsonWithValidation } from "@/lib/ai/generator";
 import {
+  buildWebsiteLanguageDirective,
+} from "@/lib/ai-core/website-builder/language-directive";
+import {
   languageMismatchRepairHint,
   validateWebsiteLlmOutputLanguage,
   type WebsiteLlmStage,
 } from "@/lib/ai-core/website-builder/llm-language";
+import { resolveContentLanguage } from "@/lib/ai-core/content/content-language";
 
 export type WebsiteLlmCallInput = {
   language: string;
@@ -59,6 +63,17 @@ export async function websiteGenerateJson<T>(options: {
       }
 
       return { valid: true };
+    },
+    transformRetryPrompt: (basePrompt, validationReason) => {
+      const languageBlock = buildWebsiteLanguageDirective({
+        language: websiteLanguage,
+        prompt: options.input.prompt,
+      });
+      const arabicReinforce =
+        resolveContentLanguage(websiteLanguage) === "ar"
+          ? "\nRETRY: Previous output was not fully Arabic. Regenerate with Modern Standard Arabic for EVERY visible string."
+          : "";
+      return `${basePrompt}\n\nPrevious attempt failed validation: ${validationReason}\n${languageBlock}${arabicReinforce}`;
     },
   });
 }

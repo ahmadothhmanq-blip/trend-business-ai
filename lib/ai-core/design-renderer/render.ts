@@ -29,7 +29,7 @@ function resolveIndustryId(input: DesignRendererInput): IndustryId {
 
   const label = String(input.industryLabel || "").toLowerCase();
   if (label.includes("tour") || label.includes("travel")) return "tourism";
-  if (label.includes("auto") || label.includes("car")) return "automotive";
+  if (label.includes("auto") && !label.includes("automatic")) return "automotive";
   if (label.includes("real") || label.includes("property")) return "real-estate";
   if (label.includes("saas") || label.includes("software")) return "saas";
   if (label.includes("restaurant") || label.includes("dining")) return "restaurant";
@@ -183,6 +183,29 @@ function buildSections(
   return out;
 }
 
+function uniqueOrdered(ids: DesignRendererComponentId[]): DesignRendererComponentId[] {
+  const seen = new Set<DesignRendererComponentId>();
+  const out: DesignRendererComponentId[] = [];
+  for (const id of ids) {
+    if (seen.has(id)) continue;
+    seen.add(id);
+    out.push(id);
+  }
+  return out;
+}
+
+const NAV_IDS = new Set<DesignRendererComponentId>([
+  "SiteHeader",
+  "SiteHeaderTransparent",
+  "NavModern",
+]);
+
+function resolveNavComponent(
+  order: DesignRendererComponentId[],
+): DesignRendererComponentId {
+  return order.find((id) => NAV_IDS.has(id)) ?? "SiteHeader";
+}
+
 function applyToStrategy(
   strategy: CoreProductStrategy,
   sections: DesignRendererSection[],
@@ -275,9 +298,12 @@ function applyToDesignSystem(
         ...(designSystem.uiPatterns ?? []),
       ]),
     ).slice(0, 16),
-    componentPalette: Array.from(
-      new Set([...palette, ...(designSystem.componentPalette ?? [])]),
-    ).slice(0, 24),
+    componentPalette: plan.homeComponentOrder?.length
+      ? plan.homeComponentOrder.map(String)
+      : Array.from(
+          new Set([...palette, ...(designSystem.componentPalette ?? [])]),
+        ).slice(0, 24),
+    homeComponentOrder: plan.homeComponentOrder?.map(String),
   };
 }
 
@@ -366,30 +392,62 @@ export function renderWebsiteDesign(
   const nonHome = presetSections.filter((s) => s.page !== homeName);
   const sections = [...intelligentHome, ...nonHome];
 
-  const componentPalette = Array.from(
-    new Set([
+  const dnaDriven = Boolean(
+    premiumHome && (input.premiumComponentOrder?.length || input.premiumHomeSections?.length),
+  );
+
+  let componentPalette: DesignRendererComponentId[];
+  let homeComponentOrder: DesignRendererComponentId[] | undefined;
+
+  if (dnaDriven && input.premiumComponentOrder?.length) {
+    homeComponentOrder = uniqueOrdered(input.premiumComponentOrder);
+    componentPalette = uniqueOrdered([
+      ...homeComponentOrder,
+      ...nonHome.map((s) => s.componentId),
+    ]);
+  } else if (dnaDriven && premiumHome) {
+    const nav = resolveNavComponent(
+      intelligentHome.map((s) => s.componentId),
+    );
+    homeComponentOrder = uniqueOrdered([
+      nav,
+      ...intelligentHome.map((s) => s.componentId),
+      "SiteFooter",
+    ]);
+    componentPalette = uniqueOrdered([
+      ...homeComponentOrder,
+      ...nonHome.map((s) => s.componentId),
+    ]);
+  } else {
+    componentPalette = uniqueOrdered([
       ...(input.premiumRecommendedComponents ?? []),
       ...selection.componentPalette,
       ...sections.map((s) => s.componentId),
-    ]),
-  ) as DesignRendererComponentId[];
-
-  // Always include a nav + footer shell for generation.
-  const hasNav = componentPalette.some((id) =>
-    ["SiteHeader", "SiteHeaderTransparent", "NavModern"].includes(id),
-  );
-  if (!hasNav) {
-    componentPalette.unshift("SiteHeader");
+    ]);
+    const hasNav = componentPalette.some((id) => NAV_IDS.has(id));
+    if (!hasNav) componentPalette.unshift("SiteHeader");
+    if (!componentPalette.includes("SiteFooter")) {
+      componentPalette.push("SiteFooter");
+    }
   }
-  if (!componentPalette.includes("SiteFooter")) {
-    componentPalette.push("SiteFooter");
+
+  if (dnaDriven) {
+    const hasNav = componentPalette.some((id) => NAV_IDS.has(id));
+    if (!hasNav) {
+      componentPalette.unshift("SiteHeader");
+      homeComponentOrder?.unshift("SiteHeader");
+    }
+    if (!componentPalette.includes("SiteFooter")) {
+      componentPalette.push("SiteFooter");
+      homeComponentOrder?.push("SiteFooter");
+    }
   }
 
   const componentPaths = Array.from(
     new Set([
       "components/ui/section-shell.tsx",
       "components/ui/motion.tsx",
-      ...selection.componentPaths,
+      ...(dnaDriven ? [] : selection.componentPaths),
       ...sections.map((s) => s.componentPath),
     ]),
   );
@@ -398,26 +456,51 @@ export function renderWebsiteDesign(
     industryId,
     industryLabel: preset.label,
     layoutStyle: preset.layoutStyle,
-    visualStyle: {
-      ...preset.visualStyle,
-      heroTreatment: `${selection.navVariant} nav · ${selection.heroVariant} hero · goal=${selection.websiteGoal}`,
-      uiPatterns: Array.from(
-        new Set([
-          `${selection.navVariant}-nav`,
-          `${selection.heroVariant}-hero`,
-          `goal-${selection.websiteGoal}`,
-          "professional-components-library",
-          ...preset.visualStyle.uiPatterns,
-        ]),
-      ),
-    },
+    visualStyle: dnaDriven
+      ? {
+          ...preset.visualStyle,
+          heroTreatment:
+            input.premiumHeroStyle ||
+            input.designSystem.premium?.layout?.heroStyle ||
+            preset.visualStyle.heroTreatment,
+          cardTreatment:
+            input.designSystem.premium?.layout?.cardStyle ||
+            preset.visualStyle.cardTreatment,
+          uiPatterns: Array.from(
+            new Set([
+              input.premiumHeroStyle || "dna-hero",
+              input.premiumSectionLayout || "dna-sections",
+              "template-dna-driven",
+              ...preset.visualStyle.uiPatterns,
+            ]),
+          ),
+        }
+      : {
+          ...preset.visualStyle,
+          heroTreatment: `${selection.navVariant} nav · ${selection.heroVariant} hero · goal=${selection.websiteGoal}`,
+          uiPatterns: Array.from(
+            new Set([
+              `${selection.navVariant}-nav`,
+              `${selection.heroVariant}-hero`,
+              `goal-${selection.websiteGoal}`,
+              "professional-components-library",
+              ...preset.visualStyle.uiPatterns,
+            ]),
+          ),
+        },
     sections,
     componentPalette,
+    homeComponentOrder,
     componentPaths,
-    layoutRules: Array.from(
-      new Set([...selection.layoutRules, ...preset.layoutRules]),
-    ),
-    source: "professional-library",
+    layoutRules: dnaDriven
+      ? [
+          "Template DNA drives home section order and component selection",
+          "Do not substitute industry-default components on the home page",
+        ]
+      : Array.from(
+          new Set([...selection.layoutRules, ...preset.layoutRules]),
+        ),
+    source: dnaDriven ? "merged" : "professional-library",
   };
 
   const strategy = applyToStrategy(

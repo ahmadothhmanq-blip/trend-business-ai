@@ -492,6 +492,19 @@ export async function generateWebsite(
   const brandName =
     analysis.businessProfile?.projectName || analysis.projectName;
   const componentIds = plan.designSystem.componentPalette?.map(String);
+  const homeComponentOrder = plan.designSystem.homeComponentOrder?.map(String);
+
+  let templateVisualCss: string | null = null;
+  if (input.templateIntelligenceId) {
+    const { getTemplateIntelligence } = await import(
+      "@/lib/ai-core/template-intelligence/catalog"
+    );
+    const { buildTemplateVisualCss } = await import(
+      "@/lib/ai-core/template-intelligence/visual-preset"
+    );
+    const ti = getTemplateIntelligence(input.templateIntelligenceId);
+    if (ti) templateVisualCss = buildTemplateVisualCss(ti);
+  }
 
   let filesWithComponents: GeneratedProjectFile[];
   let productionContent: Awaited<
@@ -528,6 +541,7 @@ export async function generateWebsite(
             p.startsWith("components/ui/"),
         ),
       componentIds,
+      homeComponentOrder,
       brandName,
       pageTitle:
         plan.blueprint.title || productionContent.heroHeadline || analysis.projectName,
@@ -541,6 +555,8 @@ export async function generateWebsite(
       content: productionContent,
       composePage: true,
       language: input.language,
+      templateIntelligenceId: input.templateIntelligenceId,
+      templateVisualCss,
     });
 
     filesWithComponents = polishGeneratedProject({

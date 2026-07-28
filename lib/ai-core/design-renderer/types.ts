@@ -121,6 +121,8 @@ export type DesignRenderPlan = {
   sections: DesignRendererSection[];
   /** Deduped concrete component ids for DesignSystem.componentPalette. */
   componentPalette: DesignRendererComponentId[];
+  /** Ordered home-page component ids (header → sections → footer) when DNA-driven. */
+  homeComponentOrder?: DesignRendererComponentId[];
   /** Component paths the file planner should prefer. */
   componentPaths: string[];
   layoutRules: string[];
@@ -164,6 +166,8 @@ export type DesignRendererInput = {
     | "gallery"
     | "testimonial";
   }>;
+  /** Explicit Template DNA component order (nav → sections → footer). */
+  premiumComponentOrder?: DesignRendererComponentId[];
   premiumRecommendedComponents?: DesignRendererComponentId[];
 };
 

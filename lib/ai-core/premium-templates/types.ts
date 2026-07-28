@@ -17,7 +17,10 @@ export type PremiumTemplateId =
   | "healthcare"
   | "ecommerce"
   | "agency"
-  | "education";
+  | "education"
+  | "law"
+  | "blog"
+  | "landing-page";
 
 export type PremiumTemplatePage = {
   name: string;

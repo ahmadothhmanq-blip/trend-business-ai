@@ -3,7 +3,12 @@ import {
   FILE_GENERATION_RULES,
   PRODUCTION_ARCHITECTURE_GUIDE,
 } from "@/lib/ai/prompts/shared";
-import { buildWebsiteLanguageDirective } from "@/lib/ai-core/website-builder/language-directive";
+import {
+  buildWebsiteLanguageDirective,
+  requiresArabicWebsiteCopy,
+} from "@/lib/ai-core/website-builder/language-directive";
+import { summarizeStrategyForFilePrompt } from "@/lib/ai-core/website-builder/strategy-prompt-context";
+import { isCopyBearingWebsiteFile } from "@/lib/ai-core/website-builder/llm-language";
 
 type WebsiteAnalyzeInput = {
   prompt: string;
@@ -131,8 +136,21 @@ export function websiteFilePrompt(args: {
     prompt: args.input.prompt,
   });
 
+  const copyBearing = isCopyBearingWebsiteFile(args.filePlan.path);
+  const arabic = requiresArabicWebsiteCopy(
+    args.input.language,
+    args.input.prompt,
+  );
+  const fileRoleNote = copyBearing
+    ? arabic
+      ? `\nThis file (${args.filePlan.path}) MUST contain Modern Standard Arabic for every visible string, metadata title/description, and navigation label.`
+      : `\nThis file (${args.filePlan.path}) MUST contain all user-facing copy in ${args.input.language}.`
+    : `\nThis file (${args.filePlan.path}) is a structural/UI primitive — keep code identifiers in English, but any default visible labels must still be in ${args.input.language}.`;
+
   const layerNote = [
-    args.strategy ? `Strategy: ${JSON.stringify(args.strategy)}` : "",
+    args.strategy
+      ? summarizeStrategyForFilePrompt(args.strategy, args.input.language)
+      : "",
     args.designSystem
       ? `DesignSystem (use CSS variables --color-primary etc.): ${JSON.stringify(args.designSystem)}`
       : "",
@@ -158,6 +176,7 @@ Project tree: ${JSON.stringify(args.projectTree)}
 Existing generated files: ${JSON.stringify(args.existingFiles)}
 ${layerNote}
 ${languageDirective}
+${fileRoleNote}
 ${validationNote}
 
 IMPORTANT: Upstream Strategy / Analysis JSON may contain English planning labels — IGNORE them for visible copy. Every user-facing string in this file MUST be in ${args.input.language} only.

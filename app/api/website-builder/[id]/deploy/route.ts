@@ -16,6 +16,7 @@ import {
   prepareSuccessMessage,
   publishSuccessMessage,
 } from "@/lib/website/publish-quality";
+import { requireWebsiteGenerationAccess } from "@/lib/website/builder/route-access";
 
 export const dynamic = "force-dynamic";
 
@@ -46,19 +47,15 @@ export async function GET(_request: Request, { params }: Params) {
   const parsedId = parseUuidParam(rawId, "generation id");
   if (parsedId instanceof NextResponse) return parsedId;
 
-  const { data: generation, error } = await auth.supabase
-    .from("website_generations")
-    .select("id, project_name, user_id")
-    .eq("id", parsedId.id)
-    .eq("user_id", auth.user!.id)
-    .maybeSingle();
+  const accessResult = await requireWebsiteGenerationAccess(
+    auth.supabase,
+    auth.user!.id,
+    parsedId.id,
+    "view",
+  );
+  if (accessResult instanceof NextResponse) return accessResult;
 
-  if (error) {
-    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, error.message);
-  }
-  if (!generation) {
-    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Website not found.");
-  }
+  const generation = accessResult.generation;
 
   const publication = await getPublicationForGeneration({
     supabase: auth.supabase,
@@ -119,21 +116,20 @@ export async function POST(request: Request, { params }: Params) {
     return apiValidationError(parsed.error.issues[0]?.message);
   }
 
-  const { data: existing, error } = await auth.supabase
-    .from("website_generations")
-    .select("*")
-    .eq("id", parsedId.id)
-    .eq("user_id", auth.user!.id)
-    .maybeSingle();
+  const deployAction = parsed.data.action;
+  const accessAction =
+    deployAction === "publish" || deployAction === "republish"
+      ? "publish"
+      : "manage";
+  const accessResult = await requireWebsiteGenerationAccess(
+    auth.supabase,
+    auth.user!.id,
+    parsedId.id,
+    accessAction,
+  );
+  if (accessResult instanceof NextResponse) return accessResult;
 
-  if (error) {
-    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, error.message);
-  }
-  if (!existing) {
-    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Website not found.");
-  }
-
-  const generation = existing as WebsiteGeneration;
+  const generation = accessResult.generation as WebsiteGeneration;
   const handle = userHandleFromAuth(auth.user!);
   const force = parsed.data.force === true;
 

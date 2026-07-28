@@ -8,7 +8,8 @@ import type { GeneratedProjectFile } from "@/lib/ai/types";
 import { buildWebsiteLanguageDirective } from "@/lib/ai-core/website-builder/language-directive";
 import {
   countArabicCharacters,
-  isUserFacingWebsiteFile,
+  extractUserFacingCopyFromSource,
+  isCopyBearingWebsiteFile,
   languageMismatchRepairHint,
 } from "@/lib/ai-core/website-builder/llm-language";
 import { resolveContentLanguage } from "@/lib/ai-core/content/content-language";
@@ -138,8 +139,10 @@ Return the complete improved file source.`,
         const needsArabic = resolveContentLanguage(websiteLanguage) === "ar";
         if (
           needsArabic &&
-          isUserFacingWebsiteFile(target.path) &&
-          countArabicCharacters(content) < 16
+          isCopyBearingWebsiteFile(target.path) &&
+          countArabicCharacters(
+            extractUserFacingCopyFromSource(content) || content,
+          ) < 12
         ) {
           validationReason = languageMismatchRepairHint(
             websiteLanguage,

@@ -110,6 +110,21 @@ export {
 } from "@/lib/ai-core/industry-intelligence";
 
 export {
+  MASTER_WEBSITE_PLAN_KEY,
+  runMasterWebsitePlanner,
+  getMasterWebsitePlan,
+  isMasterPlanLocked,
+  applyMasterWebsitePlanToBrief,
+  resolveIndustryFromMasterPlan,
+  lockedIndustryId,
+  assertMasterPlanIndustry,
+  type MasterWebsitePlan,
+  type MasterWebsitePlanSection,
+  type RunMasterWebsitePlannerParams,
+  type MasterWebsitePlannerResult,
+} from "@/lib/ai-core/master-planner";
+
+export {
   selectPremiumTemplate,
   applyPremiumTemplateToBrief,
   configurePremiumTemplate,

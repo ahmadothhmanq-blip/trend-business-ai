@@ -29,7 +29,8 @@ const BY_ID: Record<string, string> = {
     ADVANCED_SCAFFOLDS.FeaturesModern,
     "FeatureHighlights",
   ),
-  FeaturesBento: renameExport(ADVANCED_SCAFFOLDS.FeaturesModern, "FeaturesBento"),
+  FeaturesBento: SECTION_SCAFFOLDS.FeaturesBento,
+  IntegrationsLogoCloud: PREMIUM_SCAFFOLDS.IntegrationsLogoCloud,
   ServicesGrid: renameExport(ADVANCED_SCAFFOLDS.ServicesModern, "ServicesGrid"),
   TestimonialsCarousel: renameExport(
     AUTOMOTIVE_SCAFFOLDS.TestimonialsSlider,
@@ -51,7 +52,7 @@ const BY_ID: Record<string, string> = {
 
 /** Alias industry-specific components onto professional scaffolds when needed. */
 const ALIASES: Partial<Record<DesignRendererComponentId, string>> = {
-  HeroLuxuryShowcase: HERO_SCAFFOLDS.HeroLuxury,
+  HeroLuxuryShowcase: HERO_SCAFFOLDS.HeroLuxuryShowcase,
   HeroProperty: HERO_SCAFFOLDS.HeroSplit,
   DestinationsGallery: PREMIUM_SCAFFOLDS.GalleryExperience,
   TourPackagesGrid: PREMIUM_SCAFFOLDS.ProductInteractive,
@@ -66,17 +67,10 @@ const ALIASES: Partial<Record<DesignRendererComponentId, string>> = {
   PropertyListings: PREMIUM_SCAFFOLDS.ProductInteractive,
   ProcessSteps: PREMIUM_SCAFFOLDS.TimelineSection,
   SocialProof: PREMIUM_SCAFFOLDS.BrandTrust,
-  IntegrationsLogoCloud: PREMIUM_SCAFFOLDS.BrandTrust,
   TravelCtaBand: ADVANCED_SCAFFOLDS.CtaSplit || SECTION_SCAFFOLDS.CtaBand,
   BookingCta: SECTION_SCAFFOLDS.CtaBand,
   AdmissionsCta: ADVANCED_SCAFFOLDS.CtaSplit,
   LocationSections: AUTOMOTIVE_SCAFFOLDS.BranchesMap,
-  FeatureHighlights: PREMIUM_SCAFFOLDS.FeatureStorytelling,
-  FeaturesBento: PREMIUM_SCAFFOLDS.FeatureStorytelling,
-  ServicesGrid: ADVANCED_SCAFFOLDS.ServicesModern,
-  PricingTable: ADVANCED_SCAFFOLDS.PricingModern,
-  GalleryGrid: PREMIUM_SCAFFOLDS.GalleryExperience,
-  CtaBand: ADVANCED_SCAFFOLDS.CtaSplit,
 };
 
 export function getProfessionalScaffoldById(id: string): string | null {

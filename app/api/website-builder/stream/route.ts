@@ -29,6 +29,7 @@ import {
   isUltraFastWebsiteGenerationEnabled,
   resolveWebsiteGenerationProfile,
 } from "@/lib/website/generation-flags";
+import { normalizeWebsiteFeatureList } from "@/lib/website/builder/feature-registry";
 import type { GeneratedProjectFile } from "@/plugins/website/types";
 import { NextResponse } from "next/server";
 
@@ -56,6 +57,7 @@ export async function POST(request: Request) {
   const input = {
     ...parsed.data,
     prompt: clampWebsitePrompt(parsed.data.prompt),
+    features: normalizeWebsiteFeatureList(parsed.data.features),
     continueInstruction: parsed.data.continueInstruction
       ? clampWebsitePrompt(parsed.data.continueInstruction, 6000)
       : parsed.data.continueInstruction,

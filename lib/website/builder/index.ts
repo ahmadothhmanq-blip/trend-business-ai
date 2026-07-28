@@ -65,6 +65,27 @@ export { PROFESSIONAL_FEATURES, type ProfessionalFeature } from "@/lib/website/b
 export { BUSINESS_FEATURES, type BusinessFeature } from "@/lib/website/builder/business";
 
 export {
+  WEBSITE_FEATURE_REGISTRY,
+  resolveWebsiteFeatures,
+  normalizeWebsiteFeatureId,
+  normalizeWebsiteFeatureList,
+  listBuilderDefaultFeatures,
+  listAllWebsiteBuilderFeatures,
+  BUILDER_PANEL_FEATURES,
+  BUILDER_PANEL_FEATURE_I18N,
+  DEFAULT_BUILDER_PANEL_FEATURES,
+  hydrateBuilderPanelFeatures,
+  type BuilderPanelFeatureLabel,
+  applyFeaturesToAnalysis,
+  applyFeaturesToStrategy,
+  applyFeaturesToCapabilityFlags,
+  mergeFeatureFilePlans,
+  type WebsiteFeatureDefinition,
+  type WebsiteFeatureCategory,
+  type ResolvedWebsiteFeatures,
+} from "@/lib/website/builder/feature-registry";
+
+export {
   PUBLISHING_CHECKLIST,
   runBuilderAccessibilityHeuristics,
   type PublishingChecklistItem,
@@ -87,3 +108,8 @@ export {
   type BuilderMemberStatus,
   type BuilderGenerationMemberRecord,
 } from "@/lib/website/builder/collaboration";
+
+export {
+  formatWebsiteBuilderApiError,
+  readWebsiteBuilderApiError,
+} from "@/lib/website/builder/client-api-error";

@@ -60,6 +60,56 @@ export function HeroLuxury({
 }
 `,
 
+  HeroLuxuryShowcase: `"use client";
+
+${img}
+
+type HeroLuxuryShowcaseProps = {
+  title?: string;
+  subtitle?: string;
+  eyebrow?: string;
+  primaryCta?: string;
+  secondaryCta?: string;
+  imageUrl?: string | null;
+};
+
+/** Fullscreen vehicle stage — museum spacing, edge-to-edge photography. */
+export function HeroLuxuryShowcase({
+  title = "The flagship, uninterrupted",
+  subtitle = "A full-screen stage for the vehicle — no cards, no clutter, only presence.",
+  eyebrow = "Showroom premiere",
+  primaryCta = "Configure yours",
+  secondaryCta = "Book concierge",
+  imageUrl,
+}: HeroLuxuryShowcaseProps) {
+  const src = resolveSiteImage(imageUrl || HERO_IMAGE || PRODUCT_IMAGE || GALLERY_IMAGES[0], 0);
+  return (
+    <section className="relative min-h-[100svh] overflow-hidden bg-black text-white">
+      <div className="absolute inset-0">
+        {src ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={src} alt={title} className="h-full w-full object-cover scale-[1.02]" />
+        ) : (
+          <div className="h-full w-full bg-gradient-hero" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+      </div>
+      <div className="relative mx-auto flex min-h-[100svh] max-w-[var(--ti-container-max,var(--container-max,80rem))] flex-col justify-end px-6 pb-[var(--ti-section-y,6rem)] pt-32">
+        <p className="mb-6 text-[0.7rem] font-medium uppercase tracking-[0.32em] text-white/60">{eyebrow}</p>
+        <h1 className="max-w-4xl font-[family-name:var(--font-display,var(--font-heading,inherit))] text-[clamp(2.75rem,7vw,5.5rem)] font-light leading-[0.95] tracking-[-0.04em]">
+          {title}
+        </h1>
+        <p className="mt-8 max-w-lg text-base leading-relaxed text-white/75 sm:text-lg">{subtitle}</p>
+        <div className="mt-12 flex flex-wrap gap-4">
+          <a href="#contact" className="ti-btn-primary border-white bg-white text-black">{primaryCta}</a>
+          <a href="#gallery" className="inline-flex items-center border-b border-white/50 pb-1 text-sm tracking-wide text-white/90">{secondaryCta}</a>
+        </div>
+      </div>
+    </section>
+  );
+}
+`,
+
   HeroVideo: `"use client";
 
 ${img}

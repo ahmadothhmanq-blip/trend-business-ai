@@ -4,6 +4,7 @@ import { requireUser, parseUuidParam } from "@/lib/api/helpers";
 import { buildWebsiteAnalyticsSummary } from "@/lib/ai-core/analytics";
 import { runConversionOptimizer } from "@/lib/ai-core/conversion-optimizer";
 import type { ConversionOptimizationReport } from "@/lib/ai-core/conversion";
+import { requireWebsiteGenerationAccess } from "@/lib/website/builder/route-access";
 
 export const dynamic = "force-dynamic";
 
@@ -26,19 +27,15 @@ export async function GET(request: Request, { params }: Params) {
     Math.max(7, Number(searchParams.get("days") ?? 14) || 14),
   );
 
-  const { data: generation, error } = await auth.supabase
-    .from("website_generations")
-    .select("id, project_name, blueprint")
-    .eq("id", parsedId.id)
-    .eq("user_id", auth.user!.id)
-    .maybeSingle();
+  const accessResult = await requireWebsiteGenerationAccess(
+    auth.supabase,
+    auth.user!.id,
+    parsedId.id,
+    "view",
+  );
+  if (accessResult instanceof NextResponse) return accessResult;
 
-  if (error) {
-    return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, error.message);
-  }
-  if (!generation) {
-    return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Website not found.");
-  }
+  const generation = accessResult.generation;
 
   const blueprint = (generation.blueprint ?? {}) as {
     conversionReport?: ConversionOptimizationReport | null;
