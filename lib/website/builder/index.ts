@@ -87,22 +87,3 @@ export {
   type BuilderMemberStatus,
   type BuilderGenerationMemberRecord,
 } from "@/lib/website/builder/collaboration";
-
-export {
-  assertBuilderAccess,
-  resolveBuilderAccess,
-  type BuilderAccessLevel,
-} from "@/lib/website/builder/access";
-
-export {
-  submitWebsiteCopilotCommand,
-  shouldUseCopilotStream,
-} from "@/lib/website/builder/copilot-client";
-
-export {
-  deliverBuilderInvitationEmail,
-  sendBuilderInvitationEmail,
-  buildBuilderInvitationUrl,
-  renderBuilderInvitationEmail,
-  type BuilderEmailDeliveryStatus,
-} from "@/lib/website/builder/invitation-email";

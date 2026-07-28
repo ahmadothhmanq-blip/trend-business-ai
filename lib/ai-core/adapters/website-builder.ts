@@ -37,6 +37,7 @@ import {
   buildWebsiteGenerationKey,
   resolveWebsiteOutputLanguage,
 } from "@/lib/ai-core/website-builder/prompt-industry";
+import { usesLlmLocalizedWebsiteCopy } from "@/lib/ai-core/content/content-language";
 import {
   buildSeoPackageFromStrategy,
   checkSeoReadiness,
@@ -302,6 +303,7 @@ function applyDesignRenderer(
     businessGoals: artifacts.businessProfile?.businessGoals,
     positioning: artifacts.strategy.positioning,
     brandName: artifacts.businessProfile?.projectName,
+    language: brief.language,
     stylePreset: artifacts.designSystem.stylePreset,
     premiumHeroStyle:
       designPlan?.websiteStyle.heroTreatment ||
@@ -460,55 +462,72 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
       const template = getTemplateSelectionFromBrief(brief);
       const intel = template?.industryIntelligence;
       analysis = await analyzeBusinessIdea(input, ctx);
+      const localizedCopy = usesLlmLocalizedWebsiteCopy(input.language);
       if (template) {
-        const premiumPages = (
-          brief.metadata?.premiumPageStructure as
-            | Array<{ name: string }>
-            | undefined
-        )?.map((p) => p.name);
-        const recommendedPages =
-          premiumPages?.length
-            ? premiumPages
-            : intel?.recommendedPages?.length
-              ? intel.recommendedPages
-              : template.suggestedPages;
-        const requiredSections = Array.from(
-          new Set([
-            ...(intel?.requiredSections ?? []),
-            ...analysis.businessProfile.requiredSections,
-            ...template.sections,
-          ]),
-        );
-        // Prefer Premium Template / industry sitemap when AI returns a thin page list.
-        const pages =
-          analysis.pages.length >= recommendedPages.length
-            ? analysis.pages
-            : recommendedPages;
-        analysis = {
-          ...analysis,
-          pages,
-          features: Array.from(
+        if (localizedCopy) {
+          analysis = {
+            ...analysis,
+            isEcommerce:
+              analysis.isEcommerce || template.industryId === "ecommerce",
+            isSaas: analysis.isSaas || template.industryId === "saas",
+            businessProfile: {
+              ...analysis.businessProfile,
+              industry: resolveBusinessIndustryLabel(
+                template,
+                analysis.businessProfile.industry,
+              ),
+            },
+          };
+        } else {
+          const premiumPages = (
+            brief.metadata?.premiumPageStructure as
+              | Array<{ name: string }>
+              | undefined
+          )?.map((p) => p.name);
+          const recommendedPages =
+            premiumPages?.length
+              ? premiumPages
+              : intel?.recommendedPages?.length
+                ? intel.recommendedPages
+                : template.suggestedPages;
+          const requiredSections = Array.from(
             new Set([
-              ...analysis.features,
-              ...template.requiredFeatures,
+              ...(intel?.requiredSections ?? []),
+              ...analysis.businessProfile.requiredSections,
+              ...template.sections,
             ]),
-          ),
-          isEcommerce:
-            analysis.isEcommerce || template.industryId === "ecommerce",
-          isSaas: analysis.isSaas || template.industryId === "saas",
-          businessProfile: {
-            ...analysis.businessProfile,
-            industry: resolveBusinessIndustryLabel(
-              template,
-              analysis.businessProfile.industry,
+          );
+          // Prefer Premium Template / industry sitemap when AI returns a thin page list.
+          const pages =
+            analysis.pages.length >= recommendedPages.length
+              ? analysis.pages
+              : recommendedPages;
+          analysis = {
+            ...analysis,
+            pages,
+            features: Array.from(
+              new Set([
+                ...analysis.features,
+                ...template.requiredFeatures,
+              ]),
             ),
-            requiredSections,
-            tone:
-              intel?.contentStyle ||
-              analysis.businessProfile.tone ||
-              template.contentTone,
-          },
-        };
+            isEcommerce:
+              analysis.isEcommerce || template.industryId === "ecommerce",
+            isSaas: analysis.isSaas || template.industryId === "saas",
+            businessProfile: {
+              ...analysis.businessProfile,
+              industry: resolveBusinessIndustryLabel(
+                template,
+                analysis.businessProfile.industry,
+              ),
+              requiredSections,
+              tone:
+                intel?.contentStyle ||
+                analysis.businessProfile.tone ||
+                template.contentTone,
+            },
+          };
+        }
       }
       return analysis.businessProfile as CoreBusinessProfile;
     },
@@ -558,8 +577,11 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
         };
       }
       const strategy = await buildWebsiteStrategy(input, analysis, ctx);
+      const localizedCopy = usesLlmLocalizedWebsiteCopy(input.language);
       if (intel?.ctaTypes?.length && (!strategy.ctas || strategy.ctas.length < 2)) {
-        strategy.ctas = intel.ctaTypes.slice(0, 4);
+        if (!localizedCopy) {
+          strategy.ctas = intel.ctaTypes.slice(0, 4);
+        }
       }
 
       // Premium Templates System — apply full page structure + content strategy.
@@ -584,7 +606,7 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
           }
         | undefined;
 
-      if (premiumConfigured?.pageStructure?.length) {
+      if (!localizedCopy && premiumConfigured?.pageStructure?.length) {
         const byName = new Map(
           (strategy.pages ?? []).map((p) => [p.name.toLowerCase(), p]),
         );
@@ -604,7 +626,7 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
         strategy.sitemap = strategy.pages.map((p) => p.path);
       }
 
-      if (premiumConfigured?.contentStrategy) {
+      if (!localizedCopy && premiumConfigured?.contentStrategy) {
         const cs = premiumConfigured.contentStrategy;
         strategy.contentStrategy = {
           ...strategy.contentStrategy,
@@ -628,11 +650,12 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
         }
       }
 
-      if (premiumConfigured?.conversionPath?.length) {
+      if (!localizedCopy && premiumConfigured?.conversionPath?.length) {
         strategy.conversionFunnel = premiumConfigured.conversionPath;
       }
 
       if (
+        !localizedCopy &&
         premiumConfigured?.sections?.length &&
         (!strategy.contentStructure ||
           strategy.contentStructure.length < premiumConfigured.sections.length)
@@ -653,6 +676,7 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
           (typeof brief.metadata?.industryId === "string"
             ? brief.metadata.industryId
             : profile?.industry || analysis?.businessProfile?.industry),
+        input.language,
       );
 
       return enriched as CoreProductStrategy;
@@ -1356,6 +1380,7 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
             seoPackage: artifacts.seoPackage,
             performanceReport: artifacts.performanceReport,
             applyFixes,
+            websiteLanguage: input.language,
             seedImproveThemes: [
               ...(conversionReport?.improveThemes ?? []),
               ...(seoPerformanceReport?.improveThemes ?? []),

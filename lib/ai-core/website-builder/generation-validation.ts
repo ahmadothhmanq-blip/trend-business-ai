@@ -10,7 +10,7 @@ import {
   isArabicPrompt,
   type PromptIndustryMatch,
 } from "@/lib/ai-core/website-builder/prompt-industry";
-import { resolveLocaleFromLanguage } from "@/lib/ai-core/website-design-platform/i18n";
+import { resolveLocaleFromLanguage } from "@/lib/i18n/website-output-locale";
 
 export type GenerationValidationIssue = {
   id: string;

@@ -6,7 +6,10 @@ import type { WebsiteGeneration } from "@/types/database";
 
 const WebsiteBuilderTool = dynamic(
   () =>
-    import("@/components/dashboard/website-builder-tool").then((m) => m.WebsiteBuilderTool),
+    import(
+      /* webpackChunkName: "website-builder-tool" */
+      "@/components/dashboard/website-builder-tool"
+    ).then((m) => m.WebsiteBuilderTool),
   {
     ssr: false,
     loading: () => (

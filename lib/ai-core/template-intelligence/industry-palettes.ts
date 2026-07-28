@@ -1,4 +1,5 @@
 import type { DesignRendererComponentId } from "@/lib/ai-core/design-renderer/types";
+import { usesLlmLocalizedWebsiteCopy } from "@/lib/i18n/website-output-locale";
 import type { IndustryId } from "@/lib/ai-core/templates/types";
 import type { TemplateIntelligenceDefinition } from "@/lib/ai-core/template-intelligence/types";
 
@@ -330,7 +331,9 @@ export function getIndustryComponentPalette(
 export function getSectionLabelForIndustry(
   componentId: string,
   paletteId?: VerticalPaletteId,
+  language?: string | null,
 ): string | undefined {
+  if (usesLlmLocalizedWebsiteCopy(language)) return undefined;
   if (!paletteId) return undefined;
   return SECTION_LABELS[paletteId]?.[componentId as DesignRendererComponentId];
 }

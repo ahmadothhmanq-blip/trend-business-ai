@@ -17,6 +17,10 @@ import type {
   WebsiteGoal,
 } from "@/lib/ai-core/components/types";
 import type { DesignRendererComponentId } from "@/lib/ai-core/design-renderer/types";
+import {
+  getSectionKindLabel,
+  usesLlmLocalizedWebsiteCopy,
+} from "@/lib/ai-core/content/content-language";
 
 type HomeSectionKind = Exclude<SectionKind, "header" | "footer">;
 
@@ -217,7 +221,11 @@ function resolveHomeKinds(
 function sectionTitle(
   kind: SectionKind,
   pick: ProfessionalComponentDefinition,
+  language?: string | null,
 ): string {
+  if (usesLlmLocalizedWebsiteCopy(language)) {
+    return getSectionKindLabel(kind, language);
+  }
   switch (kind) {
     case "hero":
       return "Hero";
@@ -331,7 +339,7 @@ export function selectProfessionalComponents(
       heroVariant = pick.variant as HeroVariant;
     }
     homeSections.push({
-      name: sectionTitle(kind, pick),
+      name: sectionTitle(kind, pick, ctx.language),
       kind,
       componentId: pick.id,
       goal: pick.defaultGoal,
@@ -353,7 +361,7 @@ export function selectProfessionalComponents(
     const hero = pickBest("hero", ctx, websiteGoal)!;
     heroVariant = (hero.variant as HeroVariant) || "image";
     homeSections.unshift({
-      name: "Hero",
+      name: sectionTitle("hero", hero, ctx.language),
       kind: "hero",
       componentId: hero.id,
       goal: hero.defaultGoal,

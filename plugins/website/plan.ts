@@ -1,5 +1,5 @@
 import type { ProjectCapabilityFlags } from "@/lib/ai/validator";
-import { generateJsonWithValidation } from "@/lib/ai/generator";
+import { websiteGenerateJson } from "@/lib/ai-core/website-builder/llm-calls";
 import {
   inferCategoryFromPath,
   normalizeCategory,
@@ -259,7 +259,9 @@ export async function planWebsite(
     );
   } else {
     try {
-      const rawBlueprint = await generateJsonWithValidation<WebsiteProjectBlueprint>({
+      const rawBlueprint = await websiteGenerateJson<WebsiteProjectBlueprint>({
+        stage: "blueprint",
+        input: iterationInput,
         provider: ctx.provider,
         prompt: `${websiteBlueprintPrompt(iterationInput, analysis)}
 
@@ -335,7 +337,9 @@ Section order must follow Strategy.sectionPlan (Design Renderer output).`,
       files: essentialFiles,
     };
   } else {
-    dynamicPlan = await generateJsonWithValidation<WebsiteDynamicPlan>({
+    dynamicPlan = await websiteGenerateJson<WebsiteDynamicPlan>({
+      stage: "dynamic-plan",
+      input: iterationInput,
       provider: ctx.provider,
       prompt: `${websitePlanPrompt(iterationInput, analysis, blueprint)}
 

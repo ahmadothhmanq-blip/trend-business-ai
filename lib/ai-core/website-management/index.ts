@@ -86,6 +86,7 @@ import {
 } from "@/lib/ai-core/website-management/catalog/engine";
 import { validateWebsiteLinks } from "@/lib/ai-core/website-management/links/validate";
 import { injectProfessionalComponents } from "@/lib/ai-core/components/inject";
+import { usesLlmLocalizedWebsiteCopy } from "@/lib/ai-core/content/content-language";
 
 const INDUSTRY_PAGE_COMPONENTS: Record<string, string[]> = {
   restaurant: [
@@ -171,6 +172,7 @@ export function applyWebsiteManagementToProject(params: {
   industryId?: string | null;
   brandName?: string;
   promptHint?: string | null;
+  language?: string | null;
 }) {
   const structure = resolveSiteStructure(
     params.industryId,
@@ -178,6 +180,11 @@ export function applyWebsiteManagementToProject(params: {
   );
   const brand = params.brandName || "Brand";
   let files = [...params.files];
+
+  if (usesLlmLocalizedWebsiteCopy(params.language)) {
+    const linkReport = validateWebsiteLinks({ files, structure });
+    return { files, structure, catalog: [], linkReport };
+  }
 
   const componentIds =
     INDUSTRY_PAGE_COMPONENTS[structure.industryId] ||

@@ -56,7 +56,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import type { GeneratedProjectFile, GeneratedWebsiteProject } from "@/lib/website-generator";
+import type { GeneratedProjectFile } from "@/lib/ai/types";
+import type { GeneratedWebsiteProject } from "@/plugins/website/types";
 import { getProductDefinition } from "@/lib/products/registry";
 import type { ProductDefinition, ProductId } from "@/lib/products/types";
 import type {
@@ -138,6 +139,7 @@ const LANGUAGES = [
   "French",
   "German",
   "Portuguese",
+  "Italian",
 ] as const;
 const FEATURES = [
   "Authentication",
@@ -161,6 +163,7 @@ const LANGUAGE_KEYS: Record<(typeof LANGUAGES)[number], string> = {
   French: "french",
   German: "german",
   Portuguese: "portuguese",
+  Italian: "italian",
 };
 
 const FEATURE_KEYS: Record<(typeof FEATURES)[number], string> = {
@@ -309,7 +312,14 @@ function mapIndustryToProjectType(industry: string): string | null {
   return null;
 }
 
-function buildBriefFromTemplate(payload: TemplateUsePayload): string {
+function buildBriefFromTemplate(
+  payload: TemplateUsePayload,
+  websiteLanguage: string,
+): string {
+  const structureOnly =
+    websiteLanguage !== "English"
+      ? `\n\nSTRUCTURE ONLY (do not copy English labels into the website): Template metadata below describes layout, sections, and design — NOT the output language. Every visible string in the generated site MUST be in ${websiteLanguage}.`
+      : "";
   return [
     `Build a ${payload.name} website.`,
     payload.tagline,
@@ -321,6 +331,7 @@ function buildBriefFromTemplate(payload: TemplateUsePayload): string {
     payload.components.length
       ? `Preferred sections: ${payload.components.join(", ")}.`
       : "",
+    structureOnly,
   ]
     .filter(Boolean)
     .join(" ");
@@ -628,6 +639,12 @@ export function WebsiteBuilderTool({
               items.map((item) => (item.id === hydrated.id ? hydrated : item)),
             );
             setActiveProject(hydrated);
+            if (
+              hydrated.language &&
+              (LANGUAGES as readonly string[]).includes(hydrated.language)
+            ) {
+              setLanguage(hydrated.language as (typeof LANGUAGES)[number]);
+            }
             setSelectedFilePath(hydrated.generatedProject?.files[0]?.path ?? "");
             setFileSearch("");
             return true;
@@ -638,6 +655,12 @@ export function WebsiteBuilderTool({
       }
     }
     setActiveProject(project);
+    if (
+      project.language &&
+      (LANGUAGES as readonly string[]).includes(project.language)
+    ) {
+      setLanguage(project.language as (typeof LANGUAGES)[number]);
+    }
     setSelectedFilePath(project.generatedProject?.files[0]?.path ?? "");
     setFileSearch("");
     return true;
@@ -709,7 +732,14 @@ export function WebsiteBuilderTool({
     const resumeInstruction =
       "[resume] Finish the incomplete website generation. Reuse already generated files, complete missing files, and finalize the project without starting over.";
 
-    const templateBrief = tpl ? buildBriefFromTemplate(tpl) : null;
+    const resolvedLanguage =
+      mode === "continue" && activeProject?.language
+        ? activeProject.language
+        : language;
+
+    const templateBrief = tpl
+      ? buildBriefFromTemplate(tpl, resolvedLanguage)
+      : null;
     const brief =
       templateBrief ||
       projectBrief.trim() ||
@@ -742,10 +772,6 @@ export function WebsiteBuilderTool({
     const resolvedProjectType =
       (tpl?.industry ? mapIndustryToProjectType(tpl.industry) : null) ||
       inferred.projectType;
-    const resolvedLanguage =
-      mode === "continue" && activeProject?.language
-        ? activeProject.language
-        : language;
     const inferredTheme = resolvedStyle
       ? `${inferred.colorTheme} ${resolvedStyle}`
       : templateStyle
@@ -1297,7 +1323,7 @@ export function WebsiteBuilderTool({
     setTemplateIndustry(payload.industry);
     setTemplateComponents(payload.components);
     setTemplateDesignSystem(payload.designSystem);
-    setProjectBrief(buildBriefFromTemplate(payload));
+    setProjectBrief(buildBriefFromTemplate(payload, language));
     setEditMode(false);
     setRailDetailsTpl(null);
         setOutputTab("preview");

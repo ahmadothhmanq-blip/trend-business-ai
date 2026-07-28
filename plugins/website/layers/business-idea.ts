@@ -1,4 +1,4 @@
-import { generateJsonWithValidation } from "@/lib/ai/generator";
+import { websiteGenerateJson } from "@/lib/ai-core/website-builder/llm-calls";
 import { businessIdeaPrompt } from "@/lib/ai/prompts/website-layers";
 import { buildWebsiteIterationPrompt } from "@/plugins/website/iteration";
 import { businessIdeaAnalysisSchema } from "@/plugins/website/layers/schemas";
@@ -10,6 +10,10 @@ import type {
 import type { GenerationContext } from "@/lib/ai/types";
 import type { ProjectCapabilityFlags } from "@/lib/ai/validator";
 import { detectIndustryFromPrompt } from "@/lib/ai-core/website-builder/prompt-industry";
+import {
+  getStrategyFallbackLabels,
+  usesLlmLocalizedWebsiteCopy,
+} from "@/lib/ai-core/content/content-language";
 
 function normalizeDatabaseProvider(
   value: string,
@@ -22,25 +26,24 @@ function normalizeDatabaseProvider(
 
 function fallbackProfile(input: WebsiteGenerationInput): BusinessProfile {
   const detected = detectIndustryFromPrompt(input.prompt);
+  const labels = getStrategyFallbackLabels(input.language);
+  const localized = usesLlmLocalizedWebsiteCopy(input.language);
   return {
     projectName: input.projectType.slice(0, 60) || "New Website",
     industry: detected?.label || "General",
-    targetAudience: "Target customers described in the brief",
-    businessGoals: ["Generate leads", "Build trust", "Convert visitors"],
+    targetAudience: localized
+      ? input.prompt.slice(0, 120)
+      : "Target customers described in the brief",
+    businessGoals: localized
+      ? [input.prompt.slice(0, 80)]
+      : ["Generate leads", "Build trust", "Convert visitors"],
     offer: input.prompt.slice(0, 200),
     tone: input.theme || "Professional",
     geography: "Global",
     competitors: [],
-    kpis: ["Conversion rate", "Engagement"],
+    kpis: localized ? [] : ["Conversion rate", "Engagement"],
     summary: input.prompt.slice(0, 280),
-    requiredSections: [
-      "Hero",
-      "Value proposition",
-      "Social proof",
-      "Features",
-      "CTA",
-      "Contact",
-    ],
+    requiredSections: labels.sections,
   };
 }
 
@@ -68,7 +71,9 @@ export async function analyzeBusinessIdea(
   };
 
   try {
-    const analysis = await generateJsonWithValidation<WebsiteProjectAnalysis>({
+    const analysis = await websiteGenerateJson<WebsiteProjectAnalysis>({
+      stage: "business-idea",
+      input: iterationInput,
       provider: ctx.provider,
       prompt: businessIdeaPrompt(iterationInput),
       schema: businessIdeaAnalysisSchema,
@@ -99,10 +104,11 @@ export async function analyzeBusinessIdea(
   } catch (error) {
     console.error("business idea analysis failed; using fallback", error);
     const profile = input.previousBusinessProfile ?? fallbackProfile(input);
+    const labels = getStrategyFallbackLabels(input.language);
     return {
       projectName: profile.projectName,
       projectType: input.projectType,
-      pages: ["Home", "About", "Contact"],
+      pages: labels.pages,
       features: input.features,
       designSystem: [input.theme],
       technologies: ["Next.js", "Tailwind CSS"],

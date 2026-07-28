@@ -1,3 +1,5 @@
+import { buildWebsiteLanguageDirective } from "@/lib/ai-core/website-builder/language-directive";
+
 type BriefInput = {
   prompt: string;
   projectType: string;
@@ -8,17 +10,10 @@ type BriefInput = {
 };
 
 export function businessIdeaPrompt(input: BriefInput) {
-  const arabic =
-    input.language.toLowerCase().includes("arabic") ||
-    /[\u0600-\u06FF]/.test(input.prompt);
-  const languageRule = arabic
-    ? `
-CRITICAL — Arabic output:
-- Write ALL page names, navigation labels, buttons, headings, and body copy in Modern Standard Arabic.
-- Do NOT mix English except proper brand names if explicitly in the brief.
-- Use right-to-left friendly phrasing.`
-    : `
-Write all user-facing copy in ${input.language}.`;
+  const languageRule = buildWebsiteLanguageDirective({
+    language: input.language,
+    prompt: input.prompt,
+  });
 
   return `You are a senior business strategist for a professional website design engine.
 
@@ -81,11 +76,17 @@ export function websiteStrategyPrompt(
   input: BriefInput,
   analysis: unknown,
 ) {
+  const languageRule = buildWebsiteLanguageDirective({
+    language: input.language,
+    prompt: input.prompt,
+  });
+
   return `You are a conversion-focused web strategist. Build a complete Website Strategy.
 
 Brief: ${input.prompt}
 Theme: ${input.theme}
 Language: ${input.language}
+${languageRule}
 Analysis: ${JSON.stringify(analysis)}
 
 Deliver:
@@ -123,10 +124,17 @@ export function designEnginePrompt(
   analysis: unknown,
   strategy: unknown,
 ) {
+  const languageRule = buildWebsiteLanguageDirective({
+    language: input.language,
+    prompt: input.prompt,
+  });
+
   return `You are an AI Design Engine for world-class premium websites.
 
 Brief: ${input.prompt}
 Theme hint: ${input.theme}
+Language: ${input.language}
+${languageRule}
 Analysis: ${JSON.stringify(analysis)}
 Strategy: ${JSON.stringify(strategy)}
 
@@ -183,9 +191,13 @@ export function assetPlanPrompt(
   strategy: unknown,
   design: unknown,
   business: unknown,
+  language?: string,
 ) {
+  const languageRule = language
+    ? buildWebsiteLanguageDirective({ language })
+    : "";
   return `Plan visual assets for this website (hero, section, product/background, brand mark).
-
+${languageRule}
 Business: ${JSON.stringify(business)}
 Strategy: ${JSON.stringify(strategy)}
 Design: ${JSON.stringify(design)}

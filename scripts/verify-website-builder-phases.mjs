@@ -102,7 +102,12 @@ const tool = readFileSync(
   join(root, "components/dashboard/website-builder-tool.tsx"),
   "utf8",
 );
-for (const needle of ["onAiCommand", "onOpenWorkspaceTab", "aiLoading", "handleAiCopilotCommand"]) {
+for (const needle of [
+  "WebsiteBuilderTool",
+  "VisualWebsiteEditor",
+  "BrandKitPanel",
+  "TemplateSelectionPanel",
+]) {
   if (!tool.includes(needle)) fail(`website-builder-tool: ${needle}`, "missing");
   else ok(`website-builder-tool: ${needle}`);
 }
@@ -131,12 +136,34 @@ for (const needle of [
   "BUSINESS_FEATURES",
   "PUBLISHING_CHECKLIST",
   "ENTERPRISE_CAPABILITIES",
-  "submitWebsiteCopilotCommand",
-  "deliverBuilderInvitationEmail",
 ]) {
   if (!index.includes(needle)) fail(`builder index: ${needle}`, "missing");
   else ok(`builder index: ${needle}`);
 }
+
+const copilotClient = readFileSync(
+  join(root, "lib/website/builder/copilot-client.ts"),
+  "utf8",
+);
+if (!copilotClient.includes("submitWebsiteCopilotCommand")) {
+  fail("copilot-client: submitWebsiteCopilotCommand", "missing");
+} else ok("copilot-client: submitWebsiteCopilotCommand");
+
+const invitationEmail = readFileSync(
+  join(root, "lib/website/builder/invitation-email.ts"),
+  "utf8",
+);
+if (!invitationEmail.includes("deliverBuilderInvitationEmail")) {
+  fail("invitation-email: deliverBuilderInvitationEmail", "missing");
+} else ok("invitation-email: deliverBuilderInvitationEmail");
+
+const management = readFileSync(
+  join(root, "components/dashboard/website-builder/website-management-dashboard.tsx"),
+  "utf8",
+);
+if (!management.includes("useCopilotCommand")) {
+  fail("website-management-dashboard: useCopilotCommand", "missing");
+} else ok("website-management-dashboard: useCopilotCommand");
 
 if (failed) {
   console.error(`\nverify-website-builder-phases: FAILED (${failed})`);

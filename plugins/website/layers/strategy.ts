@@ -1,4 +1,4 @@
-import { generateJsonWithValidation } from "@/lib/ai/generator";
+import { websiteGenerateJson } from "@/lib/ai-core/website-builder/llm-calls";
 import { websiteStrategyPrompt } from "@/lib/ai/prompts/website-layers";
 import {
   buildWebsiteIterationPrompt,
@@ -16,25 +16,27 @@ import type {
   WebsiteProjectAnalysis,
 } from "@/plugins/website/types";
 import type { GenerationContext } from "@/lib/ai/types";
+import { getStrategyFallbackLabels } from "@/lib/ai-core/content/content-language";
 
 function fallbackStrategy(
   input: WebsiteGenerationInput,
   analysis: WebsiteProjectAnalysis,
 ): WebsiteStrategy {
-  const pages = (analysis.pages.length ? analysis.pages : ["Home", "About", "Contact"]).map(
+  const labels = getStrategyFallbackLabels(input.language);
+  const pages = (analysis.pages.length ? analysis.pages : labels.pages).map(
     (name, i) => ({
       name,
       path: i === 0 ? "/" : `/${name.toLowerCase().replace(/\s+/g, "-")}`,
-      purpose: `${name} page for ${analysis.businessProfile.industry}`,
-      keySections: ["Hero", "Value", "CTA"],
-      primaryCta: "Get started",
+      purpose: `${name} ${labels.pagePurposeSuffix} · ${analysis.businessProfile.industry}`,
+      keySections: labels.sections.slice(0, 3),
+      primaryCta: labels.ctas[0],
     }),
   );
 
   const required = Array.isArray(analysis.businessProfile.requiredSections) &&
     analysis.businessProfile.requiredSections.length
       ? analysis.businessProfile.requiredSections
-      : ["Hero", "Benefits", "Social proof", "CTA"];
+      : labels.sections;
 
   const homeSections = required.slice(0, 5);
   const normalizedPages = pages.map((p, i) =>
@@ -58,19 +60,19 @@ function fallbackStrategy(
         contentNotes: analysis.businessProfile.offer,
       })),
     ),
-    conversionFunnel: ["Awareness", "Interest", "Conversion"],
+    conversionFunnel: labels.conversionFunnel,
     contentStructure: required,
     contentStrategy: {
       brandVoice: analysis.businessProfile.tone || "Professional",
       messagingPillars: goals.slice(0, 4),
-      proofPoints: ["Customer outcomes", "Trusted expertise"],
-      objectionHandlers: ["Clear pricing path", "Fast contact"],
+      proofPoints: labels.proofPoints,
+      objectionHandlers: labels.objectionHandlers,
       seoTopics: [analysis.businessProfile.industry, analysis.projectName].filter(
         Boolean,
       ),
       sections: [],
     },
-    ctas: ["Get started", "Contact us"],
+    ctas: [...labels.ctas],
     seoFocus: [analysis.businessProfile.industry, analysis.projectName].filter(
       Boolean,
     ),
@@ -112,6 +114,7 @@ function normalizeContentStrategy(
 function normalizeStrategyPages(
   raw: unknown,
   fallback: StrategyPage[],
+  labels = getStrategyFallbackLabels(),
 ): StrategyPage[] {
   if (!Array.isArray(raw) || raw.length === 0) return fallback;
   const pages: StrategyPage[] = [];
@@ -135,11 +138,11 @@ function normalizeStrategyPages(
         typeof row.purpose === "string" && row.purpose.trim()
           ? row.purpose.trim()
           : `${name} page`,
-      keySections: keySections.length ? keySections : ["Hero", "Value", "CTA"],
+      keySections: keySections.length ? keySections : labels.sections.slice(0, 3),
       primaryCta:
         typeof row.primaryCta === "string" && row.primaryCta.trim()
           ? row.primaryCta.trim()
-          : "Get started",
+          : labels.ctas[0],
     });
   }
   return pages.length ? pages : fallback;
@@ -202,13 +205,15 @@ function normalizeSectionPlan(
 export function coerceWebsiteStrategy(
   strategy: WebsiteStrategy,
   analysis: WebsiteProjectAnalysis,
+  input?: WebsiteGenerationInput,
 ): WebsiteStrategy {
+  const labels = getStrategyFallbackLabels(input?.language);
   const fallback = fallbackStrategy(
     {
       prompt: analysis.businessProfile.summary,
       projectType: analysis.projectType,
       projectKind: "website",
-      language: "English",
+      language: input?.language || "English",
       theme: analysis.businessProfile.tone,
       features: analysis.features,
     },
@@ -224,7 +229,7 @@ export function coerceWebsiteStrategy(
     fallback.contentStrategy,
   );
 
-  const pages = normalizeStrategyPages(raw.pages, fallback.pages);
+  const pages = normalizeStrategyPages(raw.pages, fallback.pages, labels);
   const sectionPlan = normalizeSectionPlan(
     raw.sectionPlan,
     fallback.sectionPlan,
@@ -297,7 +302,7 @@ export async function buildWebsiteStrategy(
     !instruction.includes("[strategy]") &&
     !instruction.includes("[idea]")
   ) {
-    return coerceWebsiteStrategy(input.previousStrategy, analysis);
+    return coerceWebsiteStrategy(input.previousStrategy, analysis, input);
   }
 
   const iterationInput = {
@@ -306,14 +311,16 @@ export async function buildWebsiteStrategy(
   };
 
   try {
-    const raw = await generateJsonWithValidation<WebsiteStrategy>({
+    const raw = await websiteGenerateJson<WebsiteStrategy>({
+      stage: "strategy",
+      input: iterationInput,
       provider: ctx.provider,
       prompt: websiteStrategyPrompt(iterationInput, analysis),
       schema: websiteStrategySchema,
       maxAttempts: 3,
       validate: validateWebsiteStrategy,
     });
-    return coerceWebsiteStrategy(raw, analysis);
+    return coerceWebsiteStrategy(raw, analysis, input);
   } catch (error) {
     console.error("strategy layer failed; using fallback", error);
     return fallbackStrategy(input, analysis);

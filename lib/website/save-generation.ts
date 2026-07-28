@@ -3,6 +3,8 @@ import { getActiveProvider } from "@/lib/ai/provider-config";
 import { emptyTokenUsage } from "@/lib/ai/usage";
 import { appendPromptVersion } from "@/lib/workspace/persist";
 import { ensureStaticPreviewFile } from "@/lib/website/build-static-preview";
+import { usesLlmLocalizedWebsiteCopy } from "@/lib/ai-core/content/content-language";
+import { productionContentForPreview } from "@/lib/ai-core/content/production-content";
 import { logger } from "@/lib/logger";
 import type {
   PromptVersion,
@@ -156,20 +158,33 @@ export async function persistWebsiteGeneration(args: PersistWebsiteGenerationArg
   const { buildIndustryCopyPack, industryContentForPreview } = await import(
     "@/lib/ai-core/content/industry-copy"
   );
+  const { buildProductionContentPack } = await import(
+    "@/lib/ai-core/content/production-content"
+  );
   const copyPack = buildIndustryCopyPack({
     industryId: args.project.businessProfile?.industry,
     profile: args.project.businessProfile as never,
     strategy: args.project.strategy as never,
     language: args.input.language,
   });
+  const productionContent = buildProductionContentPack(
+    copyPack,
+    args.project.businessProfile?.projectName || args.project.title,
+    args.input.language,
+  );
   const primaryCta =
     args.project.strategy?.ctas?.[0] ||
     args.project.strategy?.pages?.[0]?.primaryCta ||
+    productionContent.primaryCta ||
     copyPack.primaryCta;
+  const localizedCopy = usesLlmLocalizedWebsiteCopy(args.input.language);
   const previewContent =
-    args.project.content?.length && args.project.content.join("").length > 80
+    args.project.content?.length &&
+    args.project.content.join("").length > 20
       ? args.project.content
-      : industryContentForPreview(copyPack);
+      : localizedCopy
+        ? productionContentForPreview(productionContent).filter(Boolean)
+        : industryContentForPreview(copyPack);
 
   const files = ensureStaticPreviewFile({
     title: args.project.title || copyPack.heroHeadline,

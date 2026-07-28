@@ -4,6 +4,7 @@ import type { ProductionContentPack } from "@/lib/ai-core/content/production-con
 import {
   getComposeUiFallbacks,
   resolveContentLanguage,
+  usesLlmLocalizedWebsiteCopy,
 } from "@/lib/ai-core/content/content-language";
 
 function isComponentId(id: string): id is DesignRendererComponentId {
@@ -132,6 +133,7 @@ export function composeHomePage(params: {
   const content = params.content;
   const ui = getComposeUiFallbacks(params.language);
   const contentLang = resolveContentLanguage(params.language);
+  const localized = usesLlmLocalizedWebsiteCopy(params.language);
 
   const headerId: DesignRendererComponentId =
     ids.find((id) => HEADER_IDS.has(id)) ?? "SiteHeader";
@@ -241,23 +243,24 @@ ${jsxProp("eyebrow", content.servicesEyebrow)}${jsxProp("title", content.service
     }
 
     if (VEHICLE_DETAIL_IDS.has(id)) {
+      if (localized) return "";
       return `      <${name}
 ${jsxProp("eyebrow", "Model detail")}      />`;
     }
 
     if (VEHICLE_COMPARE_IDS.has(id) && content) {
       return `      <${name}
-${jsxProp("eyebrow", "Compare")}${jsxProp("title", "Find the right model")}${jsxProp("subtitle", content.featuresSubtitle)}      />`;
+${jsxProp("eyebrow", localized ? content.featuresEyebrow : "Compare")}${jsxProp("title", localized ? content.featuresTitle : "Find the right model")}${jsxProp("subtitle", content.featuresSubtitle)}      />`;
     }
 
     if (BRANCH_IDS.has(id) && content) {
       return `      <${name}
-${jsxProp("eyebrow", "Locations")}${jsxProp("title", content.galleryTitle)}${jsxProp("subtitle", content.gallerySubtitle)}      />`;
+${jsxProp("eyebrow", localized ? content.galleryEyebrow : "Locations")}${jsxProp("title", content.galleryTitle)}${jsxProp("subtitle", content.gallerySubtitle)}      />`;
     }
 
     if (APPOINTMENT_IDS.has(id) && content) {
       return `      <${name}
-${jsxProp("eyebrow", "Test drive")}${jsxProp("title", content.ctaTitle)}${jsxProp("subtitle", content.ctaBody)}      />`;
+${jsxProp("eyebrow", localized ? content.ctaEyebrow : "Test drive")}${jsxProp("title", content.ctaTitle)}${jsxProp("subtitle", content.ctaBody)}      />`;
     }
 
     if (FAQ_IDS.has(id) && content) {
@@ -272,7 +275,11 @@ ${jsxProp("eyebrow", content.ctaEyebrow)}${jsxProp("title", content.ctaTitle)}${
 
     if (CONTACT_IDS.has(id) && content) {
       return `      <${name}
-${jsxProp("eyebrow", "Contact")}${jsxProp("title", content.contactTitle)}${jsxProp("subtitle", content.contactSubtitle)}${jsxProp("ctaLabel", primaryCta)}      />`;
+${jsxProp("eyebrow", ui.navContact)}${jsxProp("title", content.contactTitle)}${jsxProp("subtitle", content.contactSubtitle)}${jsxProp("ctaLabel", primaryCta)}      />`;
+    }
+
+    if (localized) {
+      return "";
     }
 
     return `      <${name} />`;

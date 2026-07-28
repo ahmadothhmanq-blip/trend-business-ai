@@ -4,6 +4,7 @@
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { getGeneratingWebsiteLabel } from "@/lib/ai-core/content/content-language";
 import { getActiveProvider } from "@/lib/ai/provider-config";
 import { emptyTokenUsage } from "@/lib/ai/usage";
 import { logger } from "@/lib/logger";
@@ -35,10 +36,14 @@ export type WebsiteGenerationSessionInput = {
   projectKind: "website" | "web_application";
 };
 
-function baseBlueprint(partial?: Partial<GeneratedWebsiteProject>) {
+function baseBlueprint(
+  partial?: Partial<GeneratedWebsiteProject>,
+  language?: string | null,
+) {
+  const generatingLabel = getGeneratingWebsiteLabel(language);
   return {
     projectKind: partial?.projectKind ?? "website",
-    title: partial?.title ?? "Generating website…",
+    title: partial?.title ?? generatingLabel,
     description: partial?.description ?? "",
     pages: partial?.pages ?? [],
     sections: partial?.sections ?? [],
@@ -60,9 +65,10 @@ export async function beginWebsiteGenerationSession(args: {
   userId: string;
   input: WebsiteGenerationSessionInput;
 }): Promise<{ ok: true; generation: WebsiteGeneration } | { ok: false; error: string }> {
+  const generatingLabel = getGeneratingWebsiteLabel(args.input.language);
   const workspaceProject = await ensureWebsiteWorkspaceProject(args.supabase, {
     userId: args.userId,
-    name: "Generating website…",
+    name: generatingLabel,
     productId: args.input.productId ?? "website-builder",
     projectId: args.input.projectId,
   });
@@ -80,7 +86,7 @@ export async function beginWebsiteGenerationSession(args: {
 
   const row = {
     user_id: args.userId,
-    project_name: "Generating website…",
+    project_name: generatingLabel,
     website_type:
       args.input.projectKind === "web_application" ? "Web Application" : "Website",
     business_description: args.input.prompt.slice(0, 2000) || "Website generation in progress",
@@ -90,10 +96,13 @@ export async function beginWebsiteGenerationSession(args: {
     design_style: args.input.theme || "modern",
     page_count: "1",
     features: Array.isArray(args.input.features) ? args.input.features : [],
-    blueprint: baseBlueprint({
-      prompt: args.input.prompt,
-      progressEvents: ["Connecting to AI website engine..."],
-    }),
+    blueprint: baseBlueprint(
+      {
+        prompt: args.input.prompt,
+        progressEvents: ["Connecting to AI website engine..."],
+      },
+      args.input.language,
+    ),
     product_id: args.input.productId ?? "website-builder",
     project_id: workspaceProject?.id ?? null,
     status: "running" as const,
@@ -145,7 +154,7 @@ export async function checkpointWebsiteGeneration(args: {
 
   const { data: existing } = await args.supabase
     .from("website_generations")
-    .select("id, blueprint, status")
+    .select("id, blueprint, status, language")
     .eq("id", args.generationId)
     .eq("user_id", args.userId)
     .maybeSingle();
@@ -164,23 +173,31 @@ export async function checkpointWebsiteGeneration(args: {
     ? [...prevEvents, args.message].slice(-80)
     : prevEvents;
 
-  const nextBlueprint = baseBlueprint({
-    ...(prevBlueprint as Partial<GeneratedWebsiteProject>),
-    ...args.partialProject,
-    files: args.files ?? (prevBlueprint.files as GeneratedProjectFile[] | undefined) ?? [],
-    progressEvents: nextEvents,
-    title:
-      args.partialProject?.title ||
-      (typeof prevBlueprint.title === "string" ? prevBlueprint.title : "Generating website…"),
-  });
+  const sessionLanguage =
+    typeof existing.language === "string" ? existing.language : null;
+  const generatingLabel = getGeneratingWebsiteLabel(sessionLanguage);
+
+  const nextBlueprint = baseBlueprint(
+    {
+      ...(prevBlueprint as Partial<GeneratedWebsiteProject>),
+      ...args.partialProject,
+      files: args.files ?? (prevBlueprint.files as GeneratedProjectFile[] | undefined) ?? [],
+      progressEvents: nextEvents,
+      title:
+        args.partialProject?.title ||
+        (typeof prevBlueprint.title === "string"
+          ? prevBlueprint.title
+          : generatingLabel),
+    },
+    sessionLanguage,
+  );
 
   const { error } = await args.supabase
     .from("website_generations")
     .update({
       blueprint: nextBlueprint,
       status: "running",
-      project_name:
-        nextBlueprint.title || "Generating website…",
+      project_name: nextBlueprint.title || generatingLabel,
       business_description:
         nextBlueprint.description ||
         (typeof prevBlueprint.description === "string"

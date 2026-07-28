@@ -1,4 +1,4 @@
-import { generateJsonWithValidation } from "@/lib/ai/generator";
+import { websiteGenerateJson } from "@/lib/ai-core/website-builder/llm-calls";
 import {
   premiumDesignCssVariables,
   premiumUtilityCss,
@@ -420,7 +420,9 @@ export async function buildDesignSystem(
   };
 
   try {
-    const raw = await generateJsonWithValidation<DesignSystem>({
+    const raw = await websiteGenerateJson<DesignSystem>({
+      stage: "design-system",
+      input: iterationInput,
       provider: ctx.provider,
       prompt: `${designEnginePrompt(iterationInput, analysis, strategy)}\n\n${formatStyleIntentForPrompt(styleIntent)}`,
       schema: designSystemSchema,

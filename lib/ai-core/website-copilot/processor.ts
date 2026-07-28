@@ -557,7 +557,7 @@ export async function runCopilotCommand(params: {
   const l1 = validatePostCommandL1({
     project: editResult.project,
     prompt: generation.business_description ?? undefined,
-    language: "en",
+    language: generation.language ?? undefined,
   });
 
   const success = await applyWebsitePhase5(params.supabase, {

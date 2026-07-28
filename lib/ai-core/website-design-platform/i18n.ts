@@ -2,96 +2,14 @@
  * Phase 9 — Multi-language + RTL support for Website Builder.
  */
 
-export type SiteLocaleConfig = {
-  language: string;
-  localeCode: string;
-  dir: "ltr" | "rtl";
-  rtl: boolean;
-  htmlLang: string;
-  fontHint?: string;
-};
-
-const LANGUAGE_MAP: Record<string, SiteLocaleConfig> = {
-  english: {
-    language: "English",
-    localeCode: "en",
-    dir: "ltr",
-    rtl: false,
-    htmlLang: "en",
-  },
-  arabic: {
-    language: "Arabic",
-    localeCode: "ar",
-    dir: "rtl",
-    rtl: true,
-    htmlLang: "ar",
-    fontHint: "Noto Naskh Arabic, Tajawal, system-ui",
-  },
-  bilingual: {
-    language: "Bilingual",
-    localeCode: "en",
-    dir: "ltr",
-    rtl: false,
-    htmlLang: "en",
-  },
-  spanish: {
-    language: "Spanish",
-    localeCode: "es",
-    dir: "ltr",
-    rtl: false,
-    htmlLang: "es",
-  },
-  french: {
-    language: "French",
-    localeCode: "fr",
-    dir: "ltr",
-    rtl: false,
-    htmlLang: "fr",
-  },
-  german: {
-    language: "German",
-    localeCode: "de",
-    dir: "ltr",
-    rtl: false,
-    htmlLang: "de",
-  },
-  portuguese: {
-    language: "Portuguese",
-    localeCode: "pt",
-    dir: "ltr",
-    rtl: false,
-    htmlLang: "pt",
-  },
-  persian: {
-    language: "Persian",
-    localeCode: "fa",
-    dir: "rtl",
-    rtl: true,
-    htmlLang: "fa",
-  },
-  urdu: {
-    language: "Urdu",
-    localeCode: "ur",
-    dir: "rtl",
-    rtl: true,
-    htmlLang: "ur",
-  },
-};
-
-export function resolveLocaleFromLanguage(
-  language?: string | null,
-): SiteLocaleConfig {
-  const key = (language || "English").toLowerCase().trim();
-  if (LANGUAGE_MAP[key]) return { ...LANGUAGE_MAP[key]! };
-  if (key.includes("arab")) return { ...LANGUAGE_MAP.arabic! };
-  if (key.includes("persian") || key.includes("farsi"))
-    return { ...LANGUAGE_MAP.persian! };
-  if (key.includes("urdu")) return { ...LANGUAGE_MAP.urdu! };
-  if (key.includes("rtl")) return { ...LANGUAGE_MAP.arabic! };
-  return { ...LANGUAGE_MAP.english! };
-}
-
 import type { GeneratedProjectFile } from "@/lib/ai/types";
+import {
+  resolveLocaleFromLanguage,
+  type SiteLocaleConfig,
+} from "@/lib/i18n/website-output-locale";
+
+export type { SiteLocaleConfig } from "@/lib/i18n/website-output-locale";
+export { resolveLocaleFromLanguage } from "@/lib/i18n/website-output-locale";
 
 /**
  * Inject dir/lang attributes and RTL CSS tokens into generated site files.

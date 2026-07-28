@@ -5,6 +5,13 @@
 import { getDefaultTextProvider } from "@/lib/ai/provider-config";
 import { providerManager } from "@/lib/ai/provider-manager";
 import type { GeneratedProjectFile } from "@/lib/ai/types";
+import { buildWebsiteLanguageDirective } from "@/lib/ai-core/website-builder/language-directive";
+import {
+  countArabicCharacters,
+  isUserFacingWebsiteFile,
+  languageMismatchRepairHint,
+} from "@/lib/ai-core/website-builder/llm-language";
+import { resolveContentLanguage } from "@/lib/ai-core/content/content-language";
 import type { WebsiteAuditResult } from "@/lib/ai-core/optimizer/types";
 
 export type ApplyOptimizerFixesResult = {
@@ -34,6 +41,7 @@ export async function applyOptimizerFixes(params: {
   audit: WebsiteAuditResult;
   improveThemes: string[];
   userInstruction?: string;
+  websiteLanguage?: string;
   onProgress?: (message: string) => void;
 }): Promise<ApplyOptimizerFixesResult> {
   const resolved = providerManager.resolve(getDefaultTextProvider());
@@ -54,8 +62,14 @@ export async function applyOptimizerFixes(params: {
     };
   }
 
+  const websiteLanguage = params.websiteLanguage ?? "English";
+  const languageBlock = buildWebsiteLanguageDirective({
+    language: websiteLanguage,
+  });
+
   const instruction = [
     params.userInstruction?.trim(),
+    languageBlock,
     "Optimize this website file for conversion and quality:",
     "- Improve headlines with clearer value propositions",
     "- Improve CTA button labels and placement",
@@ -82,15 +96,21 @@ export async function applyOptimizerFixes(params: {
   for (const target of targets) {
     params.onProgress?.(`Optimizing ${target.path}…`);
     try {
-      const improved = await providerManager.generateText(
-        {
-          system:
-            "You improve Next.js/React/TSX website source files. Return ONLY the full updated file contents. No markdown fences. Preserve imports and structure unless a change is required for the optimization.",
-          prompt: `File path: ${target.path}
-Language: ${target.language}
+      let validationReason = "";
+      let content = target.content;
+      const maxAttempts = 3;
+
+      for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+        const improved = await providerManager.generateText(
+          {
+            system:
+              "You improve Next.js/React/TSX website source files. Return ONLY the full updated file contents. No markdown fences. Preserve imports and structure unless a change is required for the optimization.",
+            prompt: `File path: ${target.path}
+Website output language: ${websiteLanguage}
 
 Optimization instruction:
 ${instruction}
+${validationReason ? `\nPrevious attempt failed:\n${validationReason}` : ""}
 
 Current file:
 \`\`\`
@@ -98,15 +118,37 @@ ${target.content.slice(0, 14000)}
 \`\`\`
 
 Return the complete improved file source.`,
-          temperature: 0.35,
-        },
-        resolved,
-      );
+            temperature: 0.35,
+            audit: {
+              stage: "optimizer-rewrite",
+              websiteLanguage,
+              filePath: target.path,
+              languageDirectiveIncluded: instruction.includes("CRITICAL"),
+              attempt: attempt + 1,
+            },
+          },
+          resolved,
+        );
 
-      const content = String(improved ?? "")
-        .replace(/^```(?:tsx|ts|jsx|js|css)?\s*/i, "")
-        .replace(/\s*```$/i, "")
-        .trim();
+        content = String(improved ?? "")
+          .replace(/^```(?:tsx|ts|jsx|js|css)?\s*/i, "")
+          .replace(/\s*```$/i, "")
+          .trim();
+
+        const needsArabic = resolveContentLanguage(websiteLanguage) === "ar";
+        if (
+          needsArabic &&
+          isUserFacingWebsiteFile(target.path) &&
+          countArabicCharacters(content) < 16
+        ) {
+          validationReason = languageMismatchRepairHint(
+            websiteLanguage,
+            `Optimizer rewrite for ${target.path} is not in Arabic.`,
+          );
+          continue;
+        }
+        break;
+      }
 
       if (content.length > 80 && content !== target.content.trim()) {
         const idx = nextFiles.findIndex((f) => f.path === target.path);

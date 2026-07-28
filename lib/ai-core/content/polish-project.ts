@@ -6,6 +6,7 @@
 import type { GeneratedProjectFile } from "@/lib/ai/types";
 import { composeHomePage } from "@/lib/ai-core/components/compose";
 import type { ProductionContentPack } from "@/lib/ai-core/content/production-content";
+import { usesLlmLocalizedWebsiteCopy } from "@/lib/ai-core/content/content-language";
 import { applyWebsiteManagementToProject } from "@/lib/ai-core/website-management";
 
 const PREMIUM_CSS_SNIPPET = `
@@ -162,11 +163,16 @@ export function polishGeneratedProject(params: {
   pageTitle?: string;
   pageDescription?: string;
   content: ProductionContentPack;
+  language?: string | null;
 }): GeneratedProjectFile[] {
   const byPath = new Map(params.files.map((f) => [f.path, { ...f }]));
   const brand = params.brandName?.trim() || "Brand";
   const content = params.content;
   const ids = params.componentIds ?? [];
+
+  if (usesLlmLocalizedWebsiteCopy(params.language)) {
+    return applyCssPolishOnly(byPath);
+  }
 
   if (ids.length) {
     byPath.set("app/page.tsx", {
@@ -183,6 +189,7 @@ export function polishGeneratedProject(params: {
         secondaryCta: content.secondaryCta,
         heroEyebrow: content.heroEyebrow,
         content,
+        language: params.language,
       }),
     });
   }
@@ -237,10 +244,24 @@ export function polishGeneratedProject(params: {
     industryId: content.industryId,
     brandName: brand,
     promptHint: params.pageDescription || content.heroSubheadline,
+    language: params.language,
   });
   for (const file of managed.files) {
     byPath.set(file.path, file);
   }
 
+  return Array.from(byPath.values());
+}
+
+function applyCssPolishOnly(
+  byPath: Map<string, GeneratedProjectFile>,
+): GeneratedProjectFile[] {
+  const globals = byPath.get("app/globals.css");
+  if (globals?.content && !globals.content.includes("Production polish")) {
+    byPath.set("app/globals.css", {
+      ...globals,
+      content: `${globals.content.trimEnd()}\n${PREMIUM_CSS_SNIPPET}\n`,
+    });
+  }
   return Array.from(byPath.values());
 }

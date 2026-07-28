@@ -312,6 +312,7 @@ export function renderWebsiteDesign(
       input.premiumSectionLayout ||
       input.designSystem.premium?.layout?.sectionLayout,
     brandName: input.brandName,
+    language: input.language,
   });
 
   // Intelligence-selected home sections, then preset/page sections for other pages.

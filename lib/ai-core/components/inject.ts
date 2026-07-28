@@ -1,6 +1,7 @@
 import type { GeneratedProjectFile } from "@/lib/ai/types";
 import { composeHomePage } from "@/lib/ai-core/components/compose";
 import type { ProductionContentPack } from "@/lib/ai-core/content/production-content";
+import { usesLlmLocalizedWebsiteCopy } from "@/lib/ai-core/content/content-language";
 import {
   getProfessionalScaffoldByPath,
   listProfessionalScaffoldPaths,
@@ -57,6 +58,7 @@ export function injectProfessionalComponents(params: {
   ]);
 
   const byPath = new Map(params.files.map((f) => [f.path, f]));
+  const localizedCopy = usesLlmLocalizedWebsiteCopy(params.language);
 
   byPath.set(SECTION_SHELL_PATH, {
     path: SECTION_SHELL_PATH,
@@ -76,6 +78,11 @@ export function injectProfessionalComponents(params: {
       content: SITE_IMAGES_STUB,
       language: "typescript",
     });
+  }
+
+  // Non-English: keep LLM-authored copy — never inject English scaffolds or compose home.
+  if (localizedCopy) {
+    return Array.from(byPath.values());
   }
 
   for (const path of paths) {

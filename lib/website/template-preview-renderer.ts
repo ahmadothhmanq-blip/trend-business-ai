@@ -6,6 +6,7 @@ import type {
   TemplateVisualPreset,
 } from "@/lib/ai-core/template-intelligence/types";
 import { resolveTemplateVisualPreset } from "@/lib/ai-core/template-intelligence/visual-preset";
+import { usesLlmLocalizedWebsiteCopy, getPreviewBlockLabels } from "@/lib/ai-core/content/content-language";
 
 export type TemplatePreviewContent = {
   title: string;
@@ -16,6 +17,7 @@ export type TemplatePreviewContent = {
   heroImageUrl?: string | null;
   pages?: string[];
   defaultSlug: string;
+  language?: string | null;
 };
 
 export type TemplatePreviewTheme = {
@@ -54,10 +56,19 @@ function pickContent(
   content: string[],
   slot: number | undefined,
   fallback: string,
+  localized = false,
 ): string {
   if (slot !== undefined && content[slot]?.trim()) return content[slot]!.trim();
   if (content[slot ?? 0]?.trim()) return content[slot ?? 0]!.trim();
-  return fallback;
+  return localized ? "" : fallback;
+}
+
+function isLocalizedPreview(ctx: TemplatePreviewContent): boolean {
+  return usesLlmLocalizedWebsiteCopy(ctx.language);
+}
+
+function previewLabels(ctx: TemplatePreviewContent) {
+  return getPreviewBlockLabels(ctx.language);
 }
 
 function ctaHtml(
@@ -138,10 +149,11 @@ function renderHero(
   }
 
   if (variant === "red-premium") {
+    const labels = previewLabels(ctx);
     return `<section class="ti-hero ti-hero--red-premium" data-component="${escapeHtml(spec.componentId)}">
   ${media}
   <div class="ti-hero-overlay">
-    <p class="eyebrow">Premium</p>
+    ${labels.premium ? `<p class="eyebrow">${escapeHtml(labels.premium)}</p>` : ""}
     <h1>${escapeHtml(ctx.title)}</h1>
     <p class="lead">${escapeHtml(ctx.description)}</p>
     <div class="ti-hero-actions">${ctaHtml(ctx.primaryCta, "#cta", theme)}${secondary}</div>
@@ -176,18 +188,30 @@ function renderFeaturesGrid(
   theme: TemplatePreviewTheme,
   items: string[],
 ): string {
+  const localized = isLocalizedPreview(ctx);
   const layout = theme.preset.layout.sectionLayout;
+  const sectionTitle =
+    pickContent(ctx.content, spec.contentSlot, spec.label, localized) ||
+    spec.label ||
+    ctx.title;
   const cards = items
-    .map(
-      (body, i) => `<article class="ti-card ti-card--${theme.preset.layout.cardVariant}">
-  <p class="eyebrow">Feature ${i + 1}</p>
-  <h3>${escapeHtml(spec.label)} ${i + 1}</h3>
-  <p class="copy">${escapeHtml(body)}</p>
-</article>`,
-    )
+    .map((body, i) => {
+      const cardTitle =
+        pickContent(ctx.content, (spec.contentSlot ?? 0) + i + 1, "", localized) ||
+        (localized ? "" : `${spec.label} ${i + 1}`);
+      if (localized && !body.trim() && !cardTitle.trim()) return "";
+      return `<article class="ti-card ti-card--${theme.preset.layout.cardVariant}">
+  ${cardTitle ? `<h3>${escapeHtml(cardTitle)}</h3>` : ""}
+  ${body ? `<p class="copy">${escapeHtml(body)}</p>` : ""}
+</article>`;
+    })
+    .filter(Boolean)
     .join("\n");
+  if (localized && !sectionTitle.trim() && !cards.trim()) return "";
+  const labels = previewLabels(ctx);
+  const eyebrow = localized ? "" : labels.features;
   return `<section class="ti-block ti-block--features ti-layout-${layout}" id="features" data-component="${escapeHtml(spec.componentId)}">
-  <header class="ti-block-head"><p class="eyebrow">Features</p><h2>${escapeHtml(spec.label)}</h2></header>
+  <header class="ti-block-head">${eyebrow ? `<p class="eyebrow">${escapeHtml(eyebrow)}</p>` : ""}${sectionTitle ? `<h2>${escapeHtml(sectionTitle)}</h2>` : ""}</header>
   <div class="ti-features-grid">${cards}</div>
 </section>`;
 }
@@ -198,12 +222,26 @@ function renderServices(
   theme: TemplatePreviewTheme,
   body: string,
 ): string {
+  const localized = isLocalizedPreview(ctx);
+  const labels = previewLabels(ctx);
+  const sectionTitle = pickContent(ctx.content, spec.contentSlot, spec.label, localized) || spec.label;
+  const card1Body = body;
+  const card2Body = pickContent(ctx.content, (spec.contentSlot ?? 0) + 1, body, localized);
+  const card3Body = pickContent(
+    ctx.content,
+    (spec.contentSlot ?? 0) + 2,
+    localized ? "" : "Tailored support for your goals.",
+    localized,
+  );
+  if (localized && !sectionTitle.trim() && !card1Body.trim() && !card2Body.trim() && !card3Body.trim()) {
+    return "";
+  }
   return `<section class="ti-block ti-block--services" id="services" data-component="${escapeHtml(spec.componentId)}">
-  <header class="ti-block-head"><p class="eyebrow">Services</p><h2>${escapeHtml(spec.label)}</h2></header>
+  <header class="ti-block-head">${labels.services ? `<p class="eyebrow">${escapeHtml(labels.services)}</p>` : ""}${sectionTitle ? `<h2>${escapeHtml(sectionTitle)}</h2>` : ""}</header>
   <div class="ti-services-row">
-    <article class="ti-card ti-card--${theme.preset.layout.cardVariant}"><h3>Core offering</h3><p class="copy">${escapeHtml(body)}</p></article>
-    <article class="ti-card ti-card--${theme.preset.layout.cardVariant}"><h3>Premium tier</h3><p class="copy">${escapeHtml(pickContent(ctx.content, (spec.contentSlot ?? 0) + 1, body))}</p></article>
-    <article class="ti-card ti-card--${theme.preset.layout.cardVariant}"><h3>Consultation</h3><p class="copy">${escapeHtml(pickContent(ctx.content, (spec.contentSlot ?? 0) + 2, "Tailored support for your goals."))}</p></article>
+    <article class="ti-card ti-card--${theme.preset.layout.cardVariant}">${labels.coreOffering ? `<h3>${escapeHtml(labels.coreOffering)}</h3>` : ""}${card1Body ? `<p class="copy">${escapeHtml(card1Body)}</p>` : ""}</article>
+    <article class="ti-card ti-card--${theme.preset.layout.cardVariant}">${labels.premiumTier ? `<h3>${escapeHtml(labels.premiumTier)}</h3>` : ""}${card2Body ? `<p class="copy">${escapeHtml(card2Body)}</p>` : ""}</article>
+    <article class="ti-card ti-card--${theme.preset.layout.cardVariant}">${labels.consultation ? `<h3>${escapeHtml(labels.consultation)}</h3>` : ""}${card3Body ? `<p class="copy">${escapeHtml(card3Body)}</p>` : ""}</article>
   </div>
 </section>`;
 }
@@ -213,14 +251,27 @@ function renderGallery(
   ctx: TemplatePreviewContent,
   theme: TemplatePreviewTheme,
 ): string {
+  const localized = isLocalizedPreview(ctx);
+  const labels = previewLabels(ctx);
   const asymmetric = theme.preset.layout.sectionLayout === "asymmetric";
-  const cells = [0, 1, 2, 3].map(
-    (i) =>
-      `<figure class="ti-gallery-cell ${i === 0 && asymmetric ? "ti-gallery-cell--hero" : ""}"><span>${escapeHtml(pickContent(ctx.content, (spec.contentSlot ?? 0) + i, `Gallery item ${i + 1}`))}</span></figure>`,
-  );
+  const sectionTitle = pickContent(ctx.content, spec.contentSlot, spec.label, localized) || spec.label;
+  const cells = [0, 1, 2, 3]
+    .map((i) => {
+      const label = pickContent(
+        ctx.content,
+        (spec.contentSlot ?? 0) + i,
+        localized ? "" : `Gallery item ${i + 1}`,
+        localized,
+      );
+      if (localized && !label.trim()) return "";
+      return `<figure class="ti-gallery-cell ${i === 0 && asymmetric ? "ti-gallery-cell--hero" : ""}"><span>${escapeHtml(label)}</span></figure>`;
+    })
+    .filter(Boolean)
+    .join("");
+  if (localized && !sectionTitle.trim() && !cells.trim()) return "";
   return `<section class="ti-block ti-block--gallery ti-layout-${theme.preset.layout.sectionLayout}" id="gallery" data-component="${escapeHtml(spec.componentId)}">
-  <header class="ti-block-head"><p class="eyebrow">Gallery</p><h2>${escapeHtml(spec.label)}</h2></header>
-  <div class="ti-gallery-grid">${cells.join("")}</div>
+  <header class="ti-block-head">${labels.gallery ? `<p class="eyebrow">${escapeHtml(labels.gallery)}</p>` : ""}${sectionTitle ? `<h2>${escapeHtml(sectionTitle)}</h2>` : ""}</header>
+  <div class="ti-gallery-grid">${cells}</div>
 </section>`;
 }
 
@@ -230,17 +281,31 @@ function renderTestimonials(
   theme: TemplatePreviewTheme,
   body: string,
 ): string {
+  const localized = isLocalizedPreview(ctx);
+  const labels = previewLabels(ctx);
+  const sectionTitle = pickContent(ctx.content, spec.contentSlot, spec.label, localized) || spec.label;
   const quotes = [
     body,
-    pickContent(ctx.content, (spec.contentSlot ?? 0) + 1, "Outstanding quality and attention to detail."),
-    pickContent(ctx.content, (spec.contentSlot ?? 0) + 2, "A seamless experience from start to finish."),
-  ];
+    pickContent(
+      ctx.content,
+      (spec.contentSlot ?? 0) + 1,
+      localized ? "" : "Outstanding quality and attention to detail.",
+      localized,
+    ),
+    pickContent(
+      ctx.content,
+      (spec.contentSlot ?? 0) + 2,
+      localized ? "" : "A seamless experience from start to finish.",
+      localized,
+    ),
+  ].filter((q) => q.trim());
+  if (localized && !sectionTitle.trim() && !quotes.length) return "";
   return `<section class="ti-block ti-block--testimonials" data-component="${escapeHtml(spec.componentId)}">
-  <header class="ti-block-head"><p class="eyebrow">Proof</p><h2>${escapeHtml(spec.label)}</h2></header>
+  <header class="ti-block-head">${labels.proof ? `<p class="eyebrow">${escapeHtml(labels.proof)}</p>` : ""}${sectionTitle ? `<h2>${escapeHtml(sectionTitle)}</h2>` : ""}</header>
   <div class="ti-testimonial-track">${quotes
     .map(
       (q) =>
-        `<blockquote class="ti-card ti-card--${theme.preset.layout.cardVariant}"><p>"${escapeHtml(q)}"</p><footer>Verified client</footer></blockquote>`,
+        `<blockquote class="ti-card ti-card--${theme.preset.layout.cardVariant}"><p>"${escapeHtml(q)}"</p>${labels.verifiedClient ? `<footer>${escapeHtml(labels.verifiedClient)}</footer>` : ""}</blockquote>`,
     )
     .join("")}</div>
 </section>`;
@@ -251,12 +316,22 @@ function renderPricing(
   ctx: TemplatePreviewContent,
   theme: TemplatePreviewTheme,
 ): string {
+  const localized = isLocalizedPreview(ctx);
+  const labels = previewLabels(ctx);
+  const sectionTitle = pickContent(ctx.content, spec.contentSlot, spec.label, localized) || spec.label;
+  const proCopy = pickContent(
+    ctx.content,
+    spec.contentSlot,
+    localized ? "" : "Most popular plan",
+    localized,
+  );
+  if (localized && !sectionTitle.trim() && !proCopy.trim()) return "";
   return `<section class="ti-block ti-block--pricing" id="pricing" data-component="${escapeHtml(spec.componentId)}">
-  <header class="ti-block-head"><p class="eyebrow">Pricing</p><h2>${escapeHtml(spec.label)}</h2></header>
+  <header class="ti-block-head">${labels.pricing ? `<p class="eyebrow">${escapeHtml(labels.pricing)}</p>` : ""}${sectionTitle ? `<h2>${escapeHtml(sectionTitle)}</h2>` : ""}</header>
   <div class="ti-pricing-grid">
-    <article class="ti-card ti-card--${theme.preset.layout.cardVariant}"><h3>Starter</h3><p class="price">$29</p><p class="copy">Essentials to get started</p></article>
-    <article class="ti-card ti-card--${theme.preset.layout.cardVariant} ti-card--featured"><h3>Pro</h3><p class="price">$79</p><p class="copy">${escapeHtml(pickContent(ctx.content, spec.contentSlot, "Most popular plan"))}</p></article>
-    <article class="ti-card ti-card--${theme.preset.layout.cardVariant}"><h3>Enterprise</h3><p class="price">Custom</p><p class="copy">Dedicated support</p></article>
+    <article class="ti-card ti-card--${theme.preset.layout.cardVariant}">${labels.starter ? `<h3>${escapeHtml(labels.starter)}</h3>` : ""}<p class="price">$29</p>${!localized ? `<p class="copy">Essentials to get started</p>` : ""}</article>
+    <article class="ti-card ti-card--${theme.preset.layout.cardVariant} ti-card--featured">${labels.pro ? `<h3>${escapeHtml(labels.pro)}</h3>` : ""}<p class="price">$79</p>${proCopy ? `<p class="copy">${escapeHtml(proCopy)}</p>` : ""}</article>
+    <article class="ti-card ti-card--${theme.preset.layout.cardVariant}">${labels.enterprise ? `<h3>${escapeHtml(labels.enterprise)}</h3>` : ""}<p class="price">${localized ? escapeHtml(labels.custom) : "Custom"}</p>${!localized ? `<p class="copy">Dedicated support</p>` : ""}</article>
   </div>
 </section>`;
 }
@@ -267,13 +342,23 @@ function renderFaq(
   theme: TemplatePreviewTheme,
   body: string,
 ): string {
-  const items = [
-    { q: "How do I get started?", a: body },
-    { q: "What is included?", a: pickContent(ctx.content, (spec.contentSlot ?? 0) + 1, ctx.description) },
-    { q: "Can I customize?", a: pickContent(ctx.content, (spec.contentSlot ?? 0) + 2, "Yes — structure and design adapt to your brand.") },
-  ];
+  const localized = isLocalizedPreview(ctx);
+  const labels = previewLabels(ctx);
+  const sectionTitle = pickContent(ctx.content, spec.contentSlot, spec.label, localized) || spec.label;
+  const items = localized
+    ? [
+        { q: pickContent(ctx.content, (spec.contentSlot ?? 0) + 3, "", true), a: body },
+        { q: pickContent(ctx.content, (spec.contentSlot ?? 0) + 4, "", true), a: pickContent(ctx.content, (spec.contentSlot ?? 0) + 1, ctx.description, true) },
+        { q: pickContent(ctx.content, (spec.contentSlot ?? 0) + 5, "", true), a: pickContent(ctx.content, (spec.contentSlot ?? 0) + 2, "", true) },
+      ].filter((item) => item.q.trim() || item.a.trim())
+    : [
+        { q: "How do I get started?", a: body },
+        { q: "What is included?", a: pickContent(ctx.content, (spec.contentSlot ?? 0) + 1, ctx.description) },
+        { q: "Can I customize?", a: pickContent(ctx.content, (spec.contentSlot ?? 0) + 2, "Yes — structure and design adapt to your brand.") },
+      ];
+  if (localized && !sectionTitle.trim() && !items.length) return "";
   return `<section class="ti-block ti-block--faq" id="faq" data-component="${escapeHtml(spec.componentId)}">
-  <header class="ti-block-head"><p class="eyebrow">FAQ</p><h2>${escapeHtml(spec.label)}</h2></header>
+  <header class="ti-block-head">${labels.faq ? `<p class="eyebrow">${escapeHtml(labels.faq)}</p>` : ""}${sectionTitle ? `<h2>${escapeHtml(sectionTitle)}</h2>` : ""}</header>
   <div class="ti-faq-list">${items
     .map(
       (item) =>
@@ -303,13 +388,29 @@ function renderCaseStudies(
   ctx: TemplatePreviewContent,
   theme: TemplatePreviewTheme,
 ): string {
-  const cases = [0, 1].map((i) => {
-    const body = pickContent(ctx.content, (spec.contentSlot ?? 0) + i, `Case study ${i + 1}`);
-    return `<article class="ti-case ti-card ti-card--${theme.preset.layout.cardVariant}"><h3>Project ${i + 1}</h3><p class="copy">${escapeHtml(body)}</p></article>`;
-  });
+  const localized = isLocalizedPreview(ctx);
+  const labels = previewLabels(ctx);
+  const sectionTitle = pickContent(ctx.content, spec.contentSlot, spec.label, localized) || spec.label;
+  const cases = [0, 1]
+    .map((i) => {
+      const body = pickContent(
+        ctx.content,
+        (spec.contentSlot ?? 0) + i,
+        localized ? "" : `Case study ${i + 1}`,
+        localized,
+      );
+      if (localized && !body.trim()) return "";
+      const title = localized
+        ? pickContent(ctx.content, (spec.contentSlot ?? 0) + i + 2, "", true)
+        : `Project ${i + 1}`;
+      return `<article class="ti-case ti-card ti-card--${theme.preset.layout.cardVariant}">${title ? `<h3>${escapeHtml(title)}</h3>` : ""}${body ? `<p class="copy">${escapeHtml(body)}</p>` : ""}</article>`;
+    })
+    .filter(Boolean)
+    .join("");
+  if (localized && !sectionTitle.trim() && !cases.trim()) return "";
   return `<section class="ti-block ti-block--cases ti-layout-asymmetric" data-component="${escapeHtml(spec.componentId)}">
-  <header class="ti-block-head"><p class="eyebrow">Work</p><h2>${escapeHtml(spec.label)}</h2></header>
-  <div class="ti-cases-grid">${cases.join("")}</div>
+  <header class="ti-block-head">${labels.work ? `<p class="eyebrow">${escapeHtml(labels.work)}</p>` : ""}${sectionTitle ? `<h2>${escapeHtml(sectionTitle)}</h2>` : ""}</header>
+  <div class="ti-cases-grid">${cases}</div>
 </section>`;
 }
 
@@ -319,10 +420,14 @@ function renderStory(
   theme: TemplatePreviewTheme,
   body: string,
 ): string {
+  const localized = isLocalizedPreview(ctx);
+  const labels = previewLabels(ctx);
+  const sectionTitle = pickContent(ctx.content, spec.contentSlot, spec.label, localized) || spec.label;
+  if (localized && !sectionTitle.trim() && !body.trim()) return "";
   return `<section class="ti-block ti-block--editorial" id="story" data-component="${escapeHtml(spec.componentId)}">
   <div class="ti-editorial-split">
-    <div><p class="eyebrow">Story</p><h2>${escapeHtml(spec.label)}</h2></div>
-    <p class="copy ti-editorial-body">${escapeHtml(body)}</p>
+    <div>${labels.story ? `<p class="eyebrow">${escapeHtml(labels.story)}</p>` : ""}${sectionTitle ? `<h2>${escapeHtml(sectionTitle)}</h2>` : ""}</div>
+    ${body ? `<p class="copy ti-editorial-body">${escapeHtml(body)}</p>` : ""}
   </div>
 </section>`;
 }
@@ -333,12 +438,16 @@ function renderContact(
   theme: TemplatePreviewTheme,
   body: string,
 ): string {
+  const localized = isLocalizedPreview(ctx);
+  const labels = previewLabels(ctx);
+  const sectionTitle = pickContent(ctx.content, spec.contentSlot, spec.label, localized) || spec.label;
+  if (localized && !sectionTitle.trim() && !body.trim()) return "";
   return `<section class="ti-block ti-block--contact" id="contact" data-component="${escapeHtml(spec.componentId)}">
-  <header class="ti-block-head"><p class="eyebrow">Contact</p><h2>${escapeHtml(spec.label)}</h2></header>
-  <p class="copy">${escapeHtml(body)}</p>
+  <header class="ti-block-head">${labels.contact ? `<p class="eyebrow">${escapeHtml(labels.contact)}</p>` : ""}${sectionTitle ? `<h2>${escapeHtml(sectionTitle)}</h2>` : ""}</header>
+  ${body ? `<p class="copy">${escapeHtml(body)}</p>` : ""}
   <div class="ti-contact-form">
-    <div class="ti-field">Name</div><div class="ti-field">Email</div><div class="ti-field ti-field--wide">Message</div>
-    ${ctaHtml(ctx.primaryCta, "#", theme)}
+    ${labels.name ? `<div class="ti-field">${escapeHtml(labels.name)}</div>` : ""}${labels.email ? `<div class="ti-field">${escapeHtml(labels.email)}</div>` : ""}${labels.message ? `<div class="ti-field ti-field--wide">${escapeHtml(labels.message)}</div>` : ""}
+    ${ctx.primaryCta ? ctaHtml(ctx.primaryCta, "#", theme) : ""}
   </div>
 </section>`;
 }
@@ -349,9 +458,13 @@ function renderGenericSection(
   theme: TemplatePreviewTheme,
   body: string,
 ): string {
+  const localized = isLocalizedPreview(ctx);
+  const labels = previewLabels(ctx);
+  const sectionTitle = pickContent(ctx.content, spec.contentSlot, spec.label, localized) || spec.label;
+  if (localized && !sectionTitle.trim() && !body.trim()) return "";
   return `<section class="ti-block" data-component="${escapeHtml(spec.componentId)}">
-  <header class="ti-block-head"><p class="eyebrow">Section</p><h2>${escapeHtml(spec.label)}</h2></header>
-  <p class="copy">${escapeHtml(body)}</p>
+  <header class="ti-block-head">${!localized && labels.section ? `<p class="eyebrow">${escapeHtml(labels.section)}</p>` : ""}${sectionTitle ? `<h2>${escapeHtml(sectionTitle)}</h2>` : ""}</header>
+  ${body ? `<p class="copy">${escapeHtml(body)}</p>` : ""}
 </section>`;
 }
 
@@ -360,17 +473,19 @@ function renderSectionComponent(
   ctx: TemplatePreviewContent,
   theme: TemplatePreviewTheme,
 ): string {
+  const localized = isLocalizedPreview(ctx);
   const id = spec.componentId;
   const body = pickContent(
     ctx.content,
     spec.contentSlot,
-    `${spec.label} — ${ctx.description}`,
+    localized ? "" : `${spec.label} — ${ctx.description}`,
+    localized,
   );
   const featureBodies = [
     body,
-    pickContent(ctx.content, (spec.contentSlot ?? 0) + 1, body),
-    pickContent(ctx.content, (spec.contentSlot ?? 0) + 2, body),
-    pickContent(ctx.content, (spec.contentSlot ?? 0) + 3, body),
+    pickContent(ctx.content, (spec.contentSlot ?? 0) + 1, body, localized),
+    pickContent(ctx.content, (spec.contentSlot ?? 0) + 2, body, localized),
+    pickContent(ctx.content, (spec.contentSlot ?? 0) + 3, body, localized),
   ];
 
   if (/Feature/i.test(id)) return renderFeaturesGrid(spec, ctx, theme, featureBodies);
@@ -394,6 +509,8 @@ function renderFooter(
   ctx: TemplatePreviewContent,
   theme: TemplatePreviewTheme,
 ): string {
+  const labels = previewLabels(ctx);
+  const localized = isLocalizedPreview(ctx);
   const variant = theme.preset.layout.footerVariant;
   const note = theme.templateName
     ? `${theme.templateName} · ${escapeHtml(ctx.title)}`
@@ -406,11 +523,11 @@ function renderFooter(
   }
   if (variant === "premium-red") {
     return `<footer class="ti-site-footer ti-footer-red" data-component="${escapeHtml(spec.componentId)}">
-  <div class="ti-footer-cols"><span>${note}</span><span>Privacy</span><span>Terms</span></div>
+  <div class="ti-footer-cols"><span>${note}</span>${labels.privacy ? `<span>${escapeHtml(labels.privacy)}</span>` : ""}${labels.terms ? `<span>${escapeHtml(labels.terms)}</span>` : ""}</div>
 </footer>`;
   }
   return `<footer class="ti-site-footer ti-footer-multi" data-component="${escapeHtml(spec.componentId)}">
-  <div class="ti-footer-cols"><div><strong>${escapeHtml(ctx.title)}</strong><p>${escapeHtml(ctx.description)}</p></div><div>Pages</div><div>Legal</div></div>
+  <div class="ti-footer-cols"><div><strong>${escapeHtml(ctx.title)}</strong>${ctx.description ? `<p>${escapeHtml(ctx.description)}</p>` : ""}</div>${!localized && labels.pages ? `<div>${escapeHtml(labels.pages)}</div>` : ""}${!localized && labels.legal ? `<div>${escapeHtml(labels.legal)}</div>` : ""}</div>
 </footer>`;
 }
 
@@ -443,25 +560,39 @@ export function renderTemplateDrivenPageBody(params: {
 export function resolvePreviewSections(input: {
   templateIntelligenceId?: string | null;
   components?: string[];
+  language?: string | null;
+  content?: string[];
+  industryId?: string | null;
 }): TemplateSectionSpec[] {
+  const specOptions = {
+    language: input.language,
+    industryId: input.industryId,
+    contentLabels: input.content,
+  };
   const template = input.templateIntelligenceId
     ? getTemplateIntelligence(input.templateIntelligenceId)
     : null;
   if (template) {
     const preset = resolveTemplateVisualPreset(template);
     if (preset.sections.length) return preset.sections;
-    return buildSectionSpecsFromComponents(template.components.map(String));
+    return buildSectionSpecsFromComponents(
+      template.components.map(String),
+      specOptions,
+    );
   }
   const comps = (input.components ?? []).filter(Boolean);
-  if (comps.length) return buildSectionSpecsFromComponents(comps);
-  return buildSectionSpecsFromComponents([
-    "SiteHeader",
-    "HeroSplit",
-    "FeaturesModern",
-    "ServicesModern",
-    "CtaSplit",
-    "SiteFooter",
-  ]);
+  if (comps.length) return buildSectionSpecsFromComponents(comps, specOptions);
+  return buildSectionSpecsFromComponents(
+    [
+      "SiteHeader",
+      "HeroSplit",
+      "FeaturesModern",
+      "ServicesModern",
+      "CtaSplit",
+      "SiteFooter",
+    ],
+    specOptions,
+  );
 }
 
 export function heroVariantFromComponent(

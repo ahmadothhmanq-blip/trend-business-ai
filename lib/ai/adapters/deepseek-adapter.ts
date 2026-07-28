@@ -13,6 +13,7 @@ import {
   withRetry,
 } from "@/lib/ai/retry";
 import { getDeepSeekTimeoutMs } from "@/lib/ai/timeouts";
+import { logLlmRawResponse, logLlmRequest } from "@/lib/ai/llm-audit";
 import { logger } from "@/lib/logger";
 import { withTiming } from "@/lib/perf/timing";
 
@@ -90,6 +91,12 @@ export class DeepSeekAdapter implements AIProvider {
             ? `\n\nRespond with JSON matching this schema:\n${JSON.stringify(request.schema, null, 2)}`
             : "";
 
+          const systemContent = `${request.system ?? "Return only valid JSON matching the requested structure."}${schemaHint}`;
+
+          if (request.audit) {
+            logLlmRequest(request.audit, request.prompt, systemContent);
+          }
+
           logger.info("DeepSeek request start", DS_LOG, {
             reqId,
             mode: "generateJson",
@@ -107,7 +114,7 @@ export class DeepSeekAdapter implements AIProvider {
               messages: [
                 {
                   role: "system",
-                  content: `${request.system ?? "Return only valid JSON matching the requested structure."}${schemaHint}`,
+                  content: systemContent,
                 },
                 { role: "user", content: request.prompt },
               ],
@@ -139,6 +146,13 @@ export class DeepSeekAdapter implements AIProvider {
             throw new Error("DeepSeek returned an empty response.");
           }
 
+          if (request.audit) {
+            logLlmRawResponse(
+              { ...request.audit, attempt: request.audit.attempt ?? 1 },
+              content,
+            );
+          }
+
           return parseJsonResponse<T>(content);
         },
         { delaysMs: DEEPSEEK_RETRY_DELAYS_MS },
@@ -153,6 +167,10 @@ export class DeepSeekAdapter implements AIProvider {
     return withTiming("deepseek.generateText", () =>
       withRetry(
         async () => {
+          if (request.audit) {
+            logLlmRequest(request.audit, request.prompt, request.system);
+          }
+
           logger.info("DeepSeek request start", DS_LOG, {
             reqId,
             mode: "generateText",
@@ -197,6 +215,13 @@ export class DeepSeekAdapter implements AIProvider {
           });
           if (!content) {
             throw new Error("DeepSeek returned an empty response.");
+          }
+
+          if (request.audit) {
+            logLlmRawResponse(
+              { ...request.audit, attempt: request.audit.attempt ?? 1 },
+              content,
+            );
           }
 
           return content;

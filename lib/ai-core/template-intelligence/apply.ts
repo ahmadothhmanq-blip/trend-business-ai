@@ -1,6 +1,7 @@
 import { getBrandPreset } from "@/lib/ai-core/brand-identity/presets";
 import { injectProfessionalComponents } from "@/lib/ai-core/components/inject";
 import { buildIndustryCopyPack } from "@/lib/ai-core/content/industry-copy";
+import { usesLlmLocalizedWebsiteCopy } from "@/lib/ai-core/content/content-language";
 import {
   buildProductionContentPack,
   type ProductionContentPack,
@@ -332,6 +333,26 @@ export function applyTemplateIntelligenceRetheme(params: {
   const template = getTemplateIntelligence(params.templateId);
   if (!template) {
     throw new Error(`Unknown template intelligence id: ${params.templateId}`);
+  }
+
+  // Non-English: visual-only switch — preserve LLM-authored copy and pages.
+  if (usesLlmLocalizedWebsiteCopy(params.language)) {
+    const visual = applyTemplateVisualSwitch({
+      project: params.project,
+      templateId: params.templateId,
+    });
+    const locale = resolveLocaleFromLanguage(params.language);
+    return {
+      ...visual,
+      project: {
+        ...visual.project,
+        files: applyLocaleToWebsiteFiles(visual.project.files || [], locale),
+      },
+      notes: [
+        ...visual.notes,
+        `Preserved ${params.language} copy — template changed layout and design only`,
+      ],
+    };
   }
 
   const notes: string[] = [];

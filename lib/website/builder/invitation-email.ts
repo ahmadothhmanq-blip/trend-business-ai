@@ -2,6 +2,8 @@
  * Website Builder — transactional invitation emails (SendGrid via marketing adapters).
  */
 
+import "server-only";
+
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { SendGridAdapter } from "@/lib/marketing/integrations/email-adapters";
 import type { BuilderMemberRole } from "@/lib/website/builder/enterprise";

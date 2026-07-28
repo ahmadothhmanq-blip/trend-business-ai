@@ -197,7 +197,7 @@ export async function executeWebsiteSeoApply(params: {
     projectKind: nextProject.projectKind ?? "website",
     input: {
       prompt: generation.business_description || `SEO fix: ${fix.title}`,
-      language: "en",
+      language: generation.language || "English",
       theme: "modern",
       features: [],
       productId: "website-builder",

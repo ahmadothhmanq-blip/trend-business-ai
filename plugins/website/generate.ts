@@ -1,4 +1,4 @@
-import { generateWithValidation } from "@/lib/ai/generator";
+import { generateJsonWithValidation } from "@/lib/ai/generator";
 import { truncateForContext, type PlannedFile } from "@/lib/ai/planner";
 import { sortFilesByDependency } from "@/lib/ai/planner";
 import { websiteFilePrompt } from "@/lib/ai/prompts/website";
@@ -28,10 +28,15 @@ import {
   shouldSkipLlmForComposedHomePage,
 } from "@/lib/website/generation-flags";
 import { injectAiImagesIntoProject } from "@/lib/ai-core/image-engine";
-import {
-  buildGenerationRepairInstruction,
+import { buildGenerationRepairInstruction,
   validateWebsiteGeneration,
 } from "@/lib/ai-core/website-builder/generation-validation";
+import { usesLlmLocalizedWebsiteCopy } from "@/lib/ai-core/content/content-language";
+import {
+  buildWebsiteLanguageDirective,
+} from "@/lib/ai-core/website-builder/language-directive";
+import { websiteGenerateJson } from "@/lib/ai-core/website-builder/llm-calls";
+import { productionContentForPreview } from "@/lib/ai-core/content/production-content";
 import { buildWebsiteGenerationKey } from "@/lib/ai-core/website-builder/prompt-industry";
 import { designSystemCssVariables } from "@/plugins/website/layers/design-engine";
 import {
@@ -63,9 +68,12 @@ async function generateFileWithValidation(
   extraValidationReason = "",
   assetSummary = "",
 ) {
-  return generateWithValidation({
+  return websiteGenerateJson<GeneratedProjectFile>({
+    stage: "file-generation",
+    input,
     provider: ctx.provider,
     maxAttempts: FILE_GENERATION_RETRIES,
+    filePath: filePlan.path,
     prompt: websiteFilePrompt({
       input,
       analysis,
@@ -224,6 +232,12 @@ export async function applyQualityImprovePass(
   assetSummary: string,
   improveInstruction: string,
 ) {
+  const languageBlock = buildWebsiteLanguageDirective({
+    language: input.language,
+    prompt: input.prompt,
+  });
+  const fullInstruction = `${improveInstruction}\n${languageBlock}`;
+
   const planByPath = new Map(plan.filePlans.map((entry) => [entry.path, entry]));
   const targets = plan.filePlans.filter(
     (f) =>
@@ -241,14 +255,14 @@ export async function applyQualityImprovePass(
     const existingWithoutTarget = current.filter((f) => f.path !== filePlan.path);
     try {
       const improved = await generateFileWithValidation(
-        { ...input, continueInstruction: improveInstruction, mode: "continue" },
+        { ...input, continueInstruction: fullInstruction, mode: "continue" },
         analysis,
         plan,
         plan.filePlans,
         existingWithoutTarget,
         filePlan,
         ctx,
-        improveInstruction,
+        fullInstruction,
         assetSummary,
       );
       current = [
@@ -362,6 +376,7 @@ export async function generateWebsite(
   const componentPaletteForCompose = plan.designSystem.componentPalette?.map(
     String,
   );
+  const localizedCopy = usesLlmLocalizedWebsiteCopy(input.language);
 
   let index = 0;
   for (const filePlan of aiFilePlans) {
@@ -384,6 +399,7 @@ export async function generateWebsite(
     }
 
     if (
+      !localizedCopy &&
       shouldSkipLlmForComposedHomePage({
         filePath: filePlan.path,
         componentPalette: componentPaletteForCompose,
@@ -406,7 +422,12 @@ export async function generateWebsite(
     }
 
     const scaffold = getProfessionalScaffoldByPath(filePlan.path);
-    if (scaffold && hasProfessionalScaffold(filePlan.path)) {
+    const preferLlmCopy = localizedCopy;
+    if (
+      scaffold &&
+      hasProfessionalScaffold(filePlan.path) &&
+      !preferLlmCopy
+    ) {
       ctx.progress.emit(
         `Using Professional Components Library ${index}/${aiFilePlans.length}: ${filePlan.path}`,
       );
@@ -470,57 +491,70 @@ export async function generateWebsite(
   );
   const brandName =
     analysis.businessProfile?.projectName || analysis.projectName;
-  const copyPack = buildIndustryCopyPack({
-    industryId: analysis.businessProfile?.industry,
-    profile: analysis.businessProfile,
-    strategy: plan.strategy,
-    language: input.language,
-  });
-  const productionContent = buildProductionContentPack(
-    copyPack,
-    brandName,
-    input.language,
-  );
   const componentIds = plan.designSystem.componentPalette?.map(String);
 
-  // Professional Components Library: scaffolds + composed home page.
-  let filesWithComponents = injectProfessionalComponents({
-    files: filesWithImages,
-    componentPaths: plan.filePlans
-      .map((f) => f.path)
-      .filter(
-        (p) =>
-          p.startsWith("components/sections/") ||
-          p.startsWith("components/layout/") ||
-          p.startsWith("components/ui/"),
-      ),
-    componentIds,
-    brandName,
-    pageTitle:
-      plan.blueprint.title || productionContent.heroHeadline || analysis.projectName,
-    pageDescription:
-      plan.blueprint.description || productionContent.heroSubheadline,
-    heroHeadline: productionContent.heroHeadline,
-    heroSubheadline: productionContent.heroSubheadline,
-    primaryCta: productionContent.primaryCta,
-    secondaryCta: productionContent.secondaryCta,
-    heroEyebrow: productionContent.heroEyebrow,
-    content: productionContent,
-    composePage: true,
-    language: input.language,
-  });
+  let filesWithComponents: GeneratedProjectFile[];
+  let productionContent: Awaited<
+    ReturnType<typeof buildProductionContentPack>
+  > | null = null;
 
-  // Production content polish — realistic copy, brand, typography (pipeline unchanged).
-  filesWithComponents = polishGeneratedProject({
-    files: filesWithComponents,
-    componentIds,
-    brandName,
-    pageTitle:
-      plan.blueprint.title || productionContent.heroHeadline || analysis.projectName,
-    pageDescription:
-      plan.blueprint.description || productionContent.heroSubheadline,
-    content: productionContent,
-  });
+  if (localizedCopy) {
+    filesWithComponents = injectProfessionalComponents({
+      files: filesWithImages,
+      composePage: false,
+      language: input.language,
+    });
+  } else {
+    const copyPack = buildIndustryCopyPack({
+      industryId: analysis.businessProfile?.industry,
+      profile: analysis.businessProfile,
+      strategy: plan.strategy,
+      language: input.language,
+    });
+    productionContent = buildProductionContentPack(
+      copyPack,
+      brandName,
+      input.language,
+    );
+
+    filesWithComponents = injectProfessionalComponents({
+      files: filesWithImages,
+      componentPaths: plan.filePlans
+        .map((f) => f.path)
+        .filter(
+          (p) =>
+            p.startsWith("components/sections/") ||
+            p.startsWith("components/layout/") ||
+            p.startsWith("components/ui/"),
+        ),
+      componentIds,
+      brandName,
+      pageTitle:
+        plan.blueprint.title || productionContent.heroHeadline || analysis.projectName,
+      pageDescription:
+        plan.blueprint.description || productionContent.heroSubheadline,
+      heroHeadline: productionContent.heroHeadline,
+      heroSubheadline: productionContent.heroSubheadline,
+      primaryCta: productionContent.primaryCta,
+      secondaryCta: productionContent.secondaryCta,
+      heroEyebrow: productionContent.heroEyebrow,
+      content: productionContent,
+      composePage: true,
+      language: input.language,
+    });
+
+    filesWithComponents = polishGeneratedProject({
+      files: filesWithComponents,
+      componentIds,
+      brandName,
+      pageTitle:
+        plan.blueprint.title || productionContent.heroHeadline || analysis.projectName,
+      pageDescription:
+        plan.blueprint.description || productionContent.heroSubheadline,
+      content: productionContent,
+      language: input.language,
+    });
+  }
 
   ctx.progress.emit("Validating project...");
 
@@ -597,6 +631,41 @@ export async function generateWebsite(
           assetManifest: coreManifest,
           industry: industryHint,
         });
+        if (!localizedCopy && productionContent) {
+          validatedFiles = injectProfessionalComponents({
+            files: validatedFiles,
+            componentPaths: plan.filePlans
+              .map((f) => f.path)
+              .filter(
+                (p) =>
+                  p.startsWith("components/sections/") ||
+                  p.startsWith("components/layout/") ||
+                  p.startsWith("components/ui/"),
+              ),
+            componentIds,
+            brandName,
+            pageTitle:
+              plan.blueprint.title ||
+              productionContent.heroHeadline ||
+              analysis.projectName,
+            pageDescription:
+              plan.blueprint.description || productionContent.heroSubheadline,
+            heroHeadline: productionContent.heroHeadline,
+            heroSubheadline: productionContent.heroSubheadline,
+            primaryCta: productionContent.primaryCta,
+            secondaryCta: productionContent.secondaryCta,
+            heroEyebrow: productionContent.heroEyebrow,
+            content: productionContent,
+            composePage: true,
+            language: input.language,
+          });
+        } else if (localizedCopy) {
+          validatedFiles = injectProfessionalComponents({
+            files: validatedFiles,
+            composePage: false,
+            language: input.language,
+          });
+        }
       } catch (error) {
         logger.warn("validation repair pass failed", "website-generate", {
           error: error instanceof Error ? error.message : String(error),
@@ -612,6 +681,13 @@ export async function generateWebsite(
     industry: industryHint,
   });
 
+  const localizedContent =
+    localizedCopy
+      ? plan.blueprint.content
+      : productionContent
+        ? productionContentForPreview(productionContent)
+        : plan.blueprint.content;
+
   return {
     projectKind: input.projectKind,
     title: plan.blueprint.title || analysis.projectName,
@@ -621,7 +697,7 @@ export async function generateWebsite(
     colorPalette: plan.blueprint.colorPalette,
     typography: plan.blueprint.typography,
     components: plan.blueprint.components,
-    content: plan.blueprint.content,
+    content: localizedContent,
     seo: plan.blueprint.seo,
     roadmap: plan.blueprint.roadmap,
     files: validatedFiles,
@@ -674,6 +750,7 @@ export async function runWebsiteQualityLayer(params: {
     assetManifest,
     pages: plan.blueprint.pages,
     requiredSections: analysis.businessProfile.requiredSections,
+    language: input.language,
   });
 
   if (
@@ -681,7 +758,10 @@ export async function runWebsiteQualityLayer(params: {
     (!qualityReport.passed || qualityReport.weakSections.length > 0)
   ) {
     ctx.progress.emit("Improving weak sections...");
-    const improveInstruction = buildQualityImproveInstruction(qualityReport);
+    const improveInstruction = buildQualityImproveInstruction(
+      qualityReport,
+      input.language,
+    );
     try {
       validatedFiles = await applyQualityImprovePass(
         input,
@@ -700,6 +780,7 @@ export async function runWebsiteQualityLayer(params: {
           assetManifest,
           pages: plan.blueprint.pages,
           requiredSections: analysis.businessProfile.requiredSections,
+          language: input.language,
         }),
         improveApplied: true,
         improveNotes: [improveInstruction],

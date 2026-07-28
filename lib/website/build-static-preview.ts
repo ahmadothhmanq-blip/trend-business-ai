@@ -4,6 +4,7 @@ import {
   resolveLocaleFromLanguage,
   type SiteLocaleConfig,
 } from "@/lib/ai-core/website-design-platform/i18n";
+import { getComposeUiFallbacks, getDefaultPreviewPageNames, getGeneratingWebsiteLabel } from "@/lib/ai-core/content/content-language";
 import {
   renderTemplateDrivenPageBody,
   resolvePreviewSections,
@@ -28,6 +29,7 @@ export type StaticPreviewInput = {
   templateIntelligenceId?: string | null;
   /** Website language — drives RTL preview when Arabic (etc.). */
   language?: string | null;
+  industryId?: string | null;
 };
 
 function escapeHtml(value: string): string {
@@ -461,22 +463,27 @@ function sanitizePreviewHtml(html: string): string {
 export function buildStaticPreviewHtml(input: StaticPreviewInput): string {
   const theme = resolvePreviewTheme(input);
   const locale = resolveLocaleFromLanguage(input.language);
-  const title = input.title?.trim() || "Website Preview";
+  const ui = getComposeUiFallbacks(input.language);
+  const title = input.title?.trim() || (locale.rtl ? "معاينة الموقع" : "Website Preview");
   const description =
-    input.description?.trim() || "AI-generated website product preview.";
+    input.description?.trim() ||
+    (locale.rtl
+      ? "معاينة منتج الموقع المُنشأ بالذكاء الاصطناعي."
+      : "AI-generated website product preview.");
   const content = (input.content ?? []).map((c) => c.trim()).filter(Boolean);
+  const defaultPageNames = getDefaultPreviewPageNames(input.language);
   const pageNames = (input.pages ?? [])
     .map((p) => p.trim())
     .filter(Boolean)
     .slice(0, 8);
-  const pages = (pageNames.length ? pageNames : ["Home", "About", "Services", "Contact"]).map(
+  const pages = (pageNames.length ? pageNames : defaultPageNames).map(
     (name, index) => ({
       name,
       slug: slugify(name) || `page-${index + 1}`,
     }),
   );
   const defaultSlug = pages[0]?.slug || "home";
-  const ctaLabel = input.primaryCta?.trim() || "Continue";
+  const ctaLabel = input.primaryCta?.trim() || ui.primaryCta;
 
   const navItems = pages
     .map(
@@ -488,6 +495,9 @@ export function buildStaticPreviewHtml(input: StaticPreviewInput): string {
   const sectionSpecs = resolvePreviewSections({
     templateIntelligenceId: input.templateIntelligenceId,
     components: input.components,
+    language: input.language,
+    content,
+    industryId: input.industryId,
   });
 
   const homeBody = renderTemplateDrivenPageBody({
@@ -497,21 +507,21 @@ export function buildStaticPreviewHtml(input: StaticPreviewInput): string {
       description,
       content,
       primaryCta: ctaLabel,
-      secondaryCta: "Learn more",
+      secondaryCta: ui.secondaryCta,
       heroImageUrl: input.heroImageUrl,
       pages: pageNames,
       defaultSlug,
+      language: input.language,
     },
     theme,
     navHtml: navItems,
   });
 
   const secondaryPages = pages.slice(1).map((page, pageIndex) => {
-    const body = pickContent(
-      content,
-      pageIndex + 1,
-      `${page.name} page for ${title}.`,
-    );
+    const fallbackBody = locale.rtl
+      ? `محتوى صفحة ${page.name} لموقع ${title}.`
+      : `${page.name} — ${title}.`;
+    const body = pickContent(content, pageIndex + 1, fallbackBody);
     return `<section class="page" id="${escapeHtml(page.slug)}">
   <div class="ti-block">
     <p class="eyebrow">${escapeHtml(page.name)}</p>

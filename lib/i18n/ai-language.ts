@@ -1,9 +1,9 @@
 import {
-  DEFAULT_LOCALE,
   getLocaleDefinition,
   normalizeLocale,
   type SupportedLocale,
 } from "@/lib/i18n/config";
+import { resolveLocaleFromLanguage } from "@/lib/i18n/website-output-locale";
 
 /** Map UI locale to human language name for AI generation prompts. */
 export function resolveAiLanguageFromLocale(
@@ -20,11 +20,15 @@ export function resolveAiLanguage(input?: {
 }): string {
   if (input?.language?.trim()) {
     const lang = input.language.trim();
-    const asLocale = normalizeLocale(lang);
-    if (asLocale !== DEFAULT_LOCALE || lang.toLowerCase().startsWith("en")) {
-      return getLocaleDefinition(asLocale).aiLanguage;
+    if (lang.toLowerCase() === "bilingual") return "Bilingual";
+    const fromName = resolveLocaleFromLanguage(lang);
+    if (fromName.language !== "English" || /^en/i.test(lang)) {
+      return fromName.language;
     }
     return lang;
+  }
+  if (input?.locale?.trim()) {
+    return resolveLocaleFromLanguage(input.locale).language;
   }
   return resolveAiLanguageFromLocale(input?.locale);
 }

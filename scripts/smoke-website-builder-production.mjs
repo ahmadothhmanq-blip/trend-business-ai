@@ -42,10 +42,13 @@ assert.match(copilotClient, /copilot\/commands/);
 assert.match(copilotClient, /forceStream/);
 
 const tool = read("components/dashboard/website-builder-tool.tsx");
-assert.match(tool, /useCopilotCommand/);
-assert.match(tool, /control={copilotControl}/);
-assert.match(tool, /handleAiCopilotCommand/);
-assert.match(tool, /forceStream/);
+assert.match(tool, /WebsiteBuilderTool/);
+assert.match(tool, /VisualWebsiteEditor/);
+assert.match(tool, /BrandKitPanel/);
+
+const management = read("components/dashboard/website-builder/website-management-dashboard.tsx");
+assert.match(management, /useCopilotCommand/);
+assert.match(management, /copilot\.submit/);
 
 const panel = read("components/dashboard/website-builder/copilot-command-panel.tsx");
 assert.match(panel, /CopilotCommandPanelView/);

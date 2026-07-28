@@ -18,11 +18,13 @@ export const WEBSITE_TYPES = [
 
 export const WEBSITE_LANGUAGES = [
   "English",
+  "Arabic",
+  "Bilingual",
   "Spanish",
   "French",
   "German",
   "Portuguese",
-  "Arabic",
+  "Italian",
 ] as const;
 
 export const WEBSITE_COLOR_STYLE_KEYS: Record<string, string> = {

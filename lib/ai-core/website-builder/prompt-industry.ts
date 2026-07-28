@@ -228,6 +228,9 @@ export function detectLanguageFromPrompt(prompt: string): string {
   if (/\b(português|portuguese|em português)\b/i.test(lower)) {
     return "Portuguese";
   }
+  if (/\b(italiano|italian|in italiano|sito web in italiano)\b/i.test(lower)) {
+    return "Italian";
+  }
   return "English";
 }
 

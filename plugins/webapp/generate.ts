@@ -39,7 +39,7 @@ async function generateFileWithValidation(
   ctx: GenerationContext,
   extraValidationReason = "",
 ) {
-  return generateWithValidation({
+  return generateWithValidation<GeneratedProjectFile>({
     provider: ctx.provider,
     maxAttempts: FILE_GENERATION_RETRIES,
     prompt: webappFilePrompt({

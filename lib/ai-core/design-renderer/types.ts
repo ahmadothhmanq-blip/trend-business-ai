@@ -147,6 +147,8 @@ export type DesignRendererInput = {
   businessGoals?: string[];
   positioning?: string;
   brandName?: string;
+  /** Website output language for localized section naming. */
+  language?: string | null;
   /** Premium Templates System home plan (authoritative when present). */
   premiumHomeSections?: Array<{
     name: string;

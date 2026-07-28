@@ -178,9 +178,11 @@ export async function executeWebsiteEdit(
     params.generationId,
   );
 
+  const websiteLanguage = generation.language || "English";
+
   const baseInput = {
     prompt: generation.business_description || command,
-    language: "en",
+    language: websiteLanguage,
     theme: "modern",
     features: [] as string[],
     productId: "website-builder",
@@ -198,7 +200,7 @@ export async function executeWebsiteEdit(
         "Edit this website with AI.",
       projectType: generation.website_type || "Business website",
       projectKind: "website",
-      language: "en",
+      language: websiteLanguage,
       theme: "modern",
       features: [],
       mode: "continue",

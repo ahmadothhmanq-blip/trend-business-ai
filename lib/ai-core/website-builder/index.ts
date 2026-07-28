@@ -16,3 +16,15 @@ export {
   buildGenerationRepairInstruction,
   validateWebsiteGeneration,
 } from "@/lib/ai-core/website-builder/generation-validation";
+
+export {
+  buildWebsiteLanguageDirective,
+  isRtlWebsiteLanguage,
+  requiresArabicWebsiteCopy,
+} from "@/lib/ai-core/website-builder/language-directive";
+
+export { websiteGenerateJson } from "@/lib/ai-core/website-builder/llm-calls";
+export {
+  countArabicCharacters,
+  validateWebsiteLlmOutputLanguage,
+} from "@/lib/ai-core/website-builder/llm-language";

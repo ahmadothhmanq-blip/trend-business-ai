@@ -20,12 +20,15 @@ export type JsonGenerationRequest = {
   schema?: object;
   temperature?: number;
   system?: string;
+  /** Website Builder audit — enables full prompt/response logging (wb-llm). */
+  audit?: import("@/lib/ai/llm-audit").LlmAuditContext;
 };
 
 export type TextGenerationRequest = {
   prompt: string;
   temperature?: number;
   system?: string;
+  audit?: import("@/lib/ai/llm-audit").LlmAuditContext;
 };
 
 export type StreamTextRequest = TextGenerationRequest & {

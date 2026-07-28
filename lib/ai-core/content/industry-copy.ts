@@ -4,7 +4,7 @@
  */
 
 import { AR_PACKS } from "@/lib/ai-core/content/arabic-industry-copy";
-import { resolveContentLanguage } from "@/lib/ai-core/content/content-language";
+import { resolveContentLanguage, usesLlmLocalizedWebsiteCopy, getStrategyFallbackLabels } from "@/lib/ai-core/content/content-language";
 import { WEBSITE_INDUSTRY_INTELLIGENCE } from "@/lib/ai-core/industry-intelligence/profiles";
 import { sanitizeCtaForIndustry } from "@/lib/ai-core/template-intelligence/industry-palettes";
 import type {
@@ -255,6 +255,18 @@ export function buildIndustryCopyPack(params: {
   language?: string | null;
 }): IndustryCopyPack {
   const industryId = resolveCopyIndustryId(params.industryId, params.profile);
+  if (usesLlmLocalizedWebsiteCopy(params.language)) {
+    return {
+      industryId,
+      heroHeadline: "",
+      heroSubheadline: "",
+      primaryCta: "",
+      secondaryCta: "",
+      serviceDescriptions: [],
+      trustLine: "",
+      contentBlocks: [],
+    };
+  }
   const lang = resolveContentLanguage(params.language);
   const packSource = lang === "ar" ? AR_PACKS : PACKS;
   const base = packSource[String(industryId)] ?? packSource.business;
@@ -310,8 +322,18 @@ export function enrichStrategyWithIndustryCopy(
   strategy: CoreProductStrategy,
   profile?: CoreBusinessProfile | null,
   industryId?: string | null,
+  language?: string | null,
 ): CoreProductStrategy {
-  const pack = buildIndustryCopyPack({ industryId, profile, strategy });
+  if (usesLlmLocalizedWebsiteCopy(language)) {
+    const labels = getStrategyFallbackLabels(language);
+    const next = { ...strategy };
+    if (!next.contentStructure?.length) {
+      next.contentStructure = labels.sections;
+    }
+    return next;
+  }
+
+  const pack = buildIndustryCopyPack({ industryId, profile, strategy, language });
   const next = { ...strategy };
 
   if (!next.ctas?.length) {

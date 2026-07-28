@@ -88,6 +88,8 @@ export type ComponentSelectionContext = {
   premiumHeroStyle?: string;
   premiumSectionLayout?: string;
   brandName?: string;
+  /** Website output language — non-English uses localized section names only. */
+  language?: string | null;
 };
 
 export type SelectedHomeSection = {

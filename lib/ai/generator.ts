@@ -1,4 +1,9 @@
-import type { AIProvider, GeneratedProjectFile } from "@/lib/ai/types";
+import type { AIProvider } from "@/lib/ai/types";
+import {
+  logLlmParsedResult,
+  logLlmRequest,
+  type LlmAuditContext,
+} from "@/lib/ai/llm-audit";
 
 export type GenerateJsonOptions<T> = {
   provider: AIProvider;
@@ -6,6 +11,7 @@ export type GenerateJsonOptions<T> = {
   schema: object;
   maxAttempts?: number;
   validate: (result: T) => { valid: boolean; reason?: string };
+  audit?: LlmAuditContext;
 };
 
 export type GenerateFileOptions<T> = GenerateJsonOptions<T>;
@@ -22,10 +28,23 @@ export async function generateJsonWithValidation<T>(
       ? `${options.prompt}\n\nPrevious attempt failed validation: ${validationReason}`
       : options.prompt;
 
+    const audit: LlmAuditContext | undefined = options.audit
+      ? { ...options.audit, attempt: attempt + 1 }
+      : undefined;
+
+    if (audit) {
+      logLlmRequest(audit, prompt);
+    }
+
     const result = await options.provider.generateJson<T>({
       prompt,
       schema: options.schema,
+      audit,
     });
+
+    if (audit) {
+      logLlmParsedResult(audit, result);
+    }
 
     const validation = options.validate(result);
     if (validation.valid) {
@@ -38,7 +57,7 @@ export async function generateJsonWithValidation<T>(
   throw new Error(`Generation failed after ${maxAttempts} attempts: ${validationReason}`);
 }
 
-export async function generateWithValidation<T extends GeneratedProjectFile>(
+export async function generateWithValidation<T>(
   options: GenerateFileOptions<T>,
 ): Promise<T> {
   return generateJsonWithValidation(options);

@@ -129,7 +129,12 @@ export async function generateWebsiteAssets(params: {
   try {
     const plan = await generateJsonWithValidation<{ items: PlannedAsset[] }>({
       provider: ctx.provider,
-      prompt: assetPlanPrompt(strategy, designSystem, businessProfile),
+      prompt: assetPlanPrompt(
+        strategy,
+        designSystem,
+        businessProfile,
+        input.language,
+      ),
       schema: assetPlanSchema,
       maxAttempts: 2,
       validate: (v) =>

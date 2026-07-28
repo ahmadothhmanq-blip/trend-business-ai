@@ -7,6 +7,7 @@ import { getArabicExtras } from "@/lib/ai-core/content/arabic-production-extras"
 import {
   getComposeUiFallbacks,
   resolveContentLanguage,
+  usesLlmLocalizedWebsiteCopy,
 } from "@/lib/ai-core/content/content-language";
 import type { IndustryCopyPack } from "@/lib/ai-core/content/industry-copy";
 
@@ -1308,8 +1309,51 @@ export function buildProductionContentPack(
   brandName?: string | null,
   language?: string | null,
 ): ProductionContentPack {
+  if (usesLlmLocalizedWebsiteCopy(language)) {
+    const brand = brandName?.trim() || "";
+    return {
+      ...pack,
+      heroEyebrow: "",
+      brandTagline: "",
+      servicesEyebrow: "",
+      servicesTitle: "",
+      servicesSubtitle: "",
+      services: [],
+      featuresEyebrow: "",
+      featuresTitle: "",
+      featuresSubtitle: "",
+      features: [],
+      testimonialsEyebrow: "",
+      testimonialsTitle: "",
+      testimonialsSubtitle: "",
+      testimonials: [],
+      faqEyebrow: "",
+      faqTitle: "",
+      faqSubtitle: "",
+      faqs: [],
+      pricingEyebrow: "",
+      pricingTitle: "",
+      pricingSubtitle: "",
+      pricing: [],
+      galleryEyebrow: "",
+      galleryTitle: "",
+      gallerySubtitle: "",
+      galleryItems: [],
+      ctaEyebrow: "",
+      ctaTitle: "",
+      ctaBody: "",
+      contactTitle: "",
+      contactSubtitle: "",
+      navLinks: [],
+      showcaseBullets: [],
+      heroHeadline: pack.heroHeadline || brand,
+      heroSubheadline: pack.heroSubheadline,
+      primaryCta: pack.primaryCta,
+      secondaryCta: pack.secondaryCta,
+    };
+  }
   const lang = resolveContentLanguage(language);
-  const ui = getComposeUiFallbacks(lang);
+  const ui = getComposeUiFallbacks(language);
   const extras = getExtras(String(pack.industryId), lang);
   const brand = brandName?.trim() || (lang === "ar" ? "العلامة" : "Brand");
   const ctas = [pack.primaryCta, ui.learnMore, pack.secondaryCta];
@@ -1376,4 +1420,22 @@ export function buildProductionContentPack(
     navLinks: extras.navLinks,
     showcaseBullets: extras.showcaseBullets,
   };
+}
+
+/** Localized content strings for blueprint preview / static HTML. */
+export function productionContentForPreview(
+  pack: ProductionContentPack,
+): string[] {
+  return [
+    pack.heroHeadline,
+    pack.heroSubheadline,
+    pack.brandTagline,
+    ...pack.services.map((s) => `${s.title}: ${s.body}`),
+    ...pack.features.map((f) => `${f.title}: ${f.body}`),
+    pack.ctaTitle,
+    pack.ctaBody,
+    pack.contactTitle,
+    pack.contactSubtitle,
+    pack.trustLine,
+  ].filter((line) => line?.trim());
 }

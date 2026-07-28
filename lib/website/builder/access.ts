@@ -2,6 +2,8 @@
  * Website Builder — generation access checks (owner + collaborators).
  */
 
+import "server-only";
+
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   builderRoleCan,

@@ -44,7 +44,7 @@ export async function restoreCopilotSnapshot(params: {
     projectKind: params.project.projectKind ?? "website",
     input: {
       prompt: generation.business_description || "Copilot undo",
-      language: "en",
+      language: generation.language || "English",
       theme: "modern",
       features: [],
       productId: "website-builder",

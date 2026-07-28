@@ -3,6 +3,7 @@
  */
 
 import { buildKeywordPlan } from "@/lib/ai-core/seo-performance/keywords";
+import { resolveLocaleFromLanguage } from "@/lib/i18n/website-output-locale";
 import type {
   CoreBusinessProfile,
   CoreProductStrategy,
@@ -54,7 +55,14 @@ function localeFromLanguage(language?: string): string {
   if (lang.startsWith("fr")) return "fr_FR";
   if (lang.startsWith("de")) return "de_DE";
   if (lang.startsWith("es")) return "es_ES";
+  if (lang.startsWith("pt")) return "pt_BR";
+  if (lang.startsWith("it")) return "it_IT";
   return "en_US";
+}
+
+function htmlLangFromLanguage(language?: string): string {
+  const { htmlLang } = resolveLocaleFromLanguage(language);
+  return htmlLang;
 }
 
 function buildSitemap(strategy: CoreProductStrategy): CoreSitemapEntry[] {
@@ -122,8 +130,10 @@ function buildStructuredData(params: {
   siteUrl?: string;
   industryId?: string | null;
   keywords: string[];
+  language?: string;
 }): CoreStructuredDataItem[] {
-  const { strategy, profile, metadata, siteUrl, industryId, keywords } = params;
+  const { strategy, profile, metadata, siteUrl, industryId, keywords, language } =
+    params;
   const name =
     profile?.projectName || metadata.title.split("|")[0]?.trim() || "Business";
   const description = metadata.description;
@@ -150,7 +160,7 @@ function buildStructuredData(params: {
       name,
       description,
       url,
-      inLanguage: "en",
+      inLanguage: htmlLangFromLanguage(language),
       potentialAction: {
         "@type": "SearchAction",
         target: `${url}/search?q={search_term_string}`,
@@ -257,6 +267,7 @@ export function buildSeoPackageFromStrategy(
     siteUrl,
     industryId: industryId || keywordPlan.source,
     keywords,
+    language,
   });
 
   return {

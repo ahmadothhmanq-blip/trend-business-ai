@@ -85,6 +85,8 @@ export async function POST(request: Request, context: RouteContext) {
     id,
   );
 
+  const websiteLanguage = generation.language || "English";
+
   try {
     const project = await generateWebsite({
       prompt:
@@ -94,7 +96,7 @@ export async function POST(request: Request, context: RouteContext) {
         "Optimize this website for quality and conversions.",
       projectType: generation.website_type || "Business website",
       projectKind: "website",
-      language: "en",
+      language: websiteLanguage,
       theme: "modern",
       features: [],
       mode: "continue",
@@ -114,7 +116,7 @@ export async function POST(request: Request, context: RouteContext) {
       projectKind: project.projectKind ?? "website",
       input: {
         prompt: generation.business_description || instruction,
-        language: "en",
+        language: websiteLanguage,
         theme: "modern",
         features: [],
         productId: "website-builder",

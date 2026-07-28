@@ -48,6 +48,7 @@ export type RunWebsiteOptimizerParams = {
   parentGenerationId?: string;
   aiRunId?: string;
   persist?: boolean;
+  websiteLanguage?: string;
   onProgress?: (message: string) => void;
 };
 
@@ -148,6 +149,7 @@ export async function runWebsiteOptimizer(
       audit,
       improveThemes,
       userInstruction: params.userInstruction,
+      websiteLanguage: params.websiteLanguage,
       onProgress: params.onProgress,
     });
     files = applied.files;

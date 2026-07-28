@@ -17,6 +17,9 @@ function allContent(files: GeneratedProjectFile[]) {
   return files.map((f) => f.content).join("\n");
 }
 
+import { buildWebsiteLanguageDirective } from "@/lib/ai-core/website-builder/language-directive";
+import { resolveContentLanguage, usesLlmLocalizedWebsiteCopy } from "@/lib/ai-core/content/content-language";
+
 export function runWebsiteQualityCheck(params: {
   files: GeneratedProjectFile[];
   strategy?: WebsiteStrategy;
@@ -24,8 +27,9 @@ export function runWebsiteQualityCheck(params: {
   assetManifest?: AssetManifest;
   pages: string[];
   requiredSections?: string[];
+  language?: string;
 }): QualityReport {
-  const { files, strategy, designSystem, assetManifest, pages, requiredSections } =
+  const { files, strategy, designSystem, assetManifest, pages, requiredSections, language } =
     params;
   const content = allContent(files);
   const layout = fileContent(files, "layout.tsx") + fileContent(files, "globals.css");
@@ -89,7 +93,14 @@ export function runWebsiteQualityCheck(params: {
     weakSections.push("Home page content is thin");
     contentIssues.push("Home page content is thin");
   }
-  if (!/\b(cta|button|get started|contact|book|buy|sign up)\b/i.test(content)) {
+  const contentLang = resolveContentLanguage(language);
+  const ctaPattern =
+    contentLang === "ar"
+      ? /(cta|button|ابدأ|تواصل|احجز|اشتر|سجّل|اتصل)/i
+      : usesLlmLocalizedWebsiteCopy(language)
+        ? /(cta|button|btn|href=)/i
+        : /\b(cta|button|get started|contact|book|buy|sign up)\b/i;
+  if (!ctaPattern.test(content)) {
     weakSections.push("Primary CTA may be missing");
     contentIssues.push("Primary CTA language not detected");
   }
@@ -171,12 +182,19 @@ export function runWebsiteQualityCheck(params: {
   };
 }
 
-export function buildQualityImproveInstruction(report: QualityReport): string {
+export function buildQualityImproveInstruction(
+  report: QualityReport,
+  language?: string,
+): string {
+  const languageBlock = language
+    ? buildWebsiteLanguageDirective({ language })
+    : "";
   const lines = [
     "[quality] Improve the generated website to fix these quality issues:",
     ...report.issues.slice(0, 12).map((i) => `- ${i}`),
     ...report.weakSections.slice(0, 6).map((w) => `- Strengthen: ${w}`),
     "Keep existing architecture. Prefer editing app/page.tsx, layout, and shared components.",
-  ];
+    languageBlock,
+  ].filter(Boolean);
   return lines.join("\n");
 }

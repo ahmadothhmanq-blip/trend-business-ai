@@ -3,6 +3,7 @@ import {
   FILE_GENERATION_RULES,
   PRODUCTION_ARCHITECTURE_GUIDE,
 } from "@/lib/ai/prompts/shared";
+import { buildWebsiteLanguageDirective } from "@/lib/ai-core/website-builder/language-directive";
 
 type WebsiteAnalyzeInput = {
   prompt: string;
@@ -14,6 +15,11 @@ type WebsiteAnalyzeInput = {
 };
 
 export function websiteAnalyzePrompt(input: WebsiteAnalyzeInput) {
+  const languageRule = buildWebsiteLanguageDirective({
+    language: input.language,
+    prompt: input.prompt,
+  });
+
   return `Analyze this project request for a production Next.js application.
 
 Prompt: ${input.prompt}
@@ -22,6 +28,7 @@ Detected kind: ${input.projectKind}
 Language: ${input.language}
 Theme: ${input.theme}
 Requested features: ${input.features.join(", ") || "None"}
+${languageRule}
 
 Detect capability flags:
 - requiresAuth: login/register/session needed
@@ -38,9 +45,16 @@ export function websiteBlueprintPrompt(
   input: WebsiteAnalyzeInput,
   analysis: unknown,
 ) {
+  const languageRule = buildWebsiteLanguageDirective({
+    language: input.language,
+    prompt: input.prompt,
+  });
+
   return `Create a focused MVP blueprint for a Next.js 16 App Router project (target ~22 AI-authored files; hard cap 48 including scaffold).
 
 Original prompt: ${input.prompt}
+Language: ${input.language}
+${languageRule}
 Analysis: ${JSON.stringify(analysis)}
 
 ${PRODUCTION_ARCHITECTURE_GUIDE}
@@ -55,9 +69,16 @@ export function websitePlanPrompt(
   analysis: unknown,
   blueprint: unknown,
 ) {
+  const languageRule = buildWebsiteLanguageDirective({
+    language: input.language,
+    prompt: input.prompt,
+  });
+
   return `Build a dynamic MVP file plan for a Next.js 16 App Router project.
 
 Original prompt: ${input.prompt}
+Language: ${input.language}
+${languageRule}
 Analysis: ${JSON.stringify(analysis)}
 Blueprint: ${JSON.stringify(blueprint)}
 
@@ -105,12 +126,10 @@ export function websiteFilePrompt(args: {
     ? `\nPrevious attempt failed validation:\n${args.validationReason}\nFix all issues and regenerate this file correctly.`
     : "";
 
-  const arabic =
-    args.input.language.toLowerCase().includes("arabic") ||
-    /[\u0600-\u06FF]/.test(args.input.prompt);
-  const languageDirective = arabic
-    ? `\nLANGUAGE (mandatory): Write ALL visible text in Modern Standard Arabic — navigation, buttons, headings, forms, labels, and body copy. Do not use English except untranslated brand names. Layout must support RTL (dir=rtl).`
-    : `\nLANGUAGE: Write all user-facing copy in ${args.input.language}.`;
+  const languageDirective = buildWebsiteLanguageDirective({
+    language: args.input.language,
+    prompt: args.input.prompt,
+  });
 
   const layerNote = [
     args.strategy ? `Strategy: ${JSON.stringify(args.strategy)}` : "",
@@ -140,6 +159,10 @@ Existing generated files: ${JSON.stringify(args.existingFiles)}
 ${layerNote}
 ${languageDirective}
 ${validationNote}
+
+IMPORTANT: Upstream Strategy / Analysis JSON may contain English planning labels — IGNORE them for visible copy. Every user-facing string in this file MUST be in ${args.input.language} only.
+- NEVER use English default parameter values in React components (e.g. eyebrow = "Features", title = "Get started"). All user-facing props MUST be passed from the page or defined in ${args.input.language}.
+- When rendering library section components, pass every visible string as an explicit prop — do not rely on component-internal English fallbacks.
 
 Architecture rules:
 - Clean App Router pages/components; shared UI primitives under components/
