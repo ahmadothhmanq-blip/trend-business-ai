@@ -1,0 +1,155 @@
+{
+  "specVersion": "2.0.0",
+  "id": "medical-care-plus",
+  "version": "2.0.0",
+  "name": "Medical Care Plus",
+  "description": "Premium healthcare with clinical calm, physician profiles, appointment flows, and patient trust architecture.",
+  "metadata": {
+    "category": "medical",
+    "industry": "Medical",
+    "tags": [
+      "medical",
+      "healthcare",
+      "clinic",
+      "hospital"
+    ],
+    "author": {
+      "name": "Trend Business AI",
+      "organization": "Premium Template Studio"
+    },
+    "license": "MIT",
+    "keywords": [
+      "medical",
+      "healthcare",
+      "clinic",
+      "hospital"
+    ],
+    "templateIntelligenceId": "ti-medical-care",
+    "premium": true,
+    "tier": "agency"
+  },
+  "media": {
+    "thumbnail": "assets/thumbnail.png",
+    "preview": "assets/preview.png"
+  },
+  "compatibility": {
+    "engineVersion": ">=1.0.0",
+    "specVersion": "2.0.0",
+    "features": [
+      "regions",
+      "placement-rules",
+      "responsive",
+      "premium-canvas"
+    ]
+  },
+  "update": {
+    "channel": "stable",
+    "releasedAt": "2026-07-30T17:52:37.779Z"
+  },
+  "responsive": {
+    "breakpoints": [
+      {
+        "name": "sm",
+        "minWidth": 640
+      },
+      {
+        "name": "md",
+        "minWidth": 768
+      },
+      {
+        "name": "lg",
+        "minWidth": 1024
+      },
+      {
+        "name": "xl",
+        "minWidth": 1280
+      },
+      {
+        "name": "2xl",
+        "minWidth": 1536
+      }
+    ],
+    "containerMaxWidth": "78rem",
+    "fluidTypography": true
+  },
+  "canvas": {
+    "file": "canvas.json"
+  },
+  "placementRules": {
+    "file": "placement-rules.json"
+  },
+  "layouts": [
+    {
+      "id": "default",
+      "file": "layouts/default.json",
+      "kind": "single-column",
+      "label": "Default",
+      "description": "Premium single-column layout for Medical."
+    }
+  ],
+  "regions": [
+    {
+      "id": "header",
+      "file": "regions/header.json",
+      "role": "header",
+      "label": "Header Region",
+      "description": "Premium header region for Medical Care Plus."
+    },
+    {
+      "id": "main",
+      "file": "regions/main.json",
+      "role": "main",
+      "label": "Main Region",
+      "description": "Premium main region for Medical Care Plus."
+    },
+    {
+      "id": "utility",
+      "file": "regions/utility.json",
+      "role": "utility",
+      "label": "Utility Region",
+      "description": "Premium utility region for Medical Care Plus."
+    },
+    {
+      "id": "footer",
+      "file": "regions/footer.json",
+      "role": "footer",
+      "label": "Footer Region",
+      "description": "Premium footer region for Medical Care Plus."
+    }
+  ],
+  "pages": [
+    {
+      "id": "home",
+      "title": "Home",
+      "path": "/",
+      "layoutId": "default",
+      "file": "pages/home.json",
+      "description": "Home — premium Medical page blueprint."
+    },
+    {
+      "id": "services",
+      "title": "Services",
+      "path": "/services",
+      "layoutId": "default",
+      "file": "pages/services.json",
+      "description": "Services — premium Medical page blueprint."
+    },
+    {
+      "id": "doctors",
+      "title": "Doctors",
+      "path": "/doctors",
+      "layoutId": "default",
+      "file": "pages/doctors.json",
+      "description": "Doctors — premium Medical page blueprint."
+    },
+    {
+      "id": "appointments",
+      "title": "Appointments",
+      "path": "/appointments",
+      "layoutId": "default",
+      "file": "pages/appointments.json",
+      "description": "Appointments — premium Medical page blueprint."
+    }
+  ],
+  "entry": "package.entry.json"
+}

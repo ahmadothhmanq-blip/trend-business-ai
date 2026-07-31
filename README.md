@@ -64,13 +64,18 @@ npm run db:verify
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open the app at the URL in `NEXT_PUBLIC_SITE_URL`, or by default `http://localhost:3003` (`PORT` / `DEV_PORT` override the port).
+
+**One dev server per project** — Next.js uses a project lock (`.next/dev/lock`). `npm run dev` reuses a healthy server instead of failing with a lock error. QA scripts call `npm run dev:ensure` internally. Use `npm run dev:status` / `npm run dev:stop` to inspect or stop the server.
 
 ## Useful scripts
 
 | Script | Description |
 |--------|-------------|
-| `npm run dev` | Development server |
+| `npm run dev` | Development server (single-instance manager) |
+| `npm run dev:ensure` | Reuse or start dev server for QA harnesses |
+| `npm run dev:stop` | Stop the running dev server |
+| `npm run dev:status` | Print dev lock + health state |
 | `npm run build` | Production build |
 | `npm run type-check` | `tsc --noEmit` |
 | `npm run db:apply` | Apply SQL migrations |

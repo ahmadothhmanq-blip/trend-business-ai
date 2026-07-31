@@ -1,0 +1,29 @@
+{
+  "id": "overlay",
+  "role": "overlay",
+  "label": "Overlay Region",
+  "layout": {
+    "width": "full",
+    "alignment": "stretch",
+    "maxWidth": "100%",
+    "padding": "0"
+  },
+  "placement": {
+    "allowedComponentTypes": [
+      "banner",
+      "gallery",
+      "hero",
+      "video",
+      "custom"
+    ],
+    "ordering": "vertical",
+    "allowNesting": true,
+    "maxComponents": 6,
+    "minComponents": 0,
+    "allowCustomComponents": true
+  },
+  "responsive": {
+    "collapseBelow": "md",
+    "stackOrder": "normal"
+  }
+}

@@ -28,6 +28,7 @@ import {
   shouldSkipLlmForComposedHomePage,
 } from "@/lib/website/generation-flags";
 import { injectAiImagesIntoProject } from "@/lib/ai-core/image-engine";
+import { getThemePageArchitecture } from "@/lib/website/builder/theme-architecture";
 import { buildGenerationRepairInstruction,
   validateWebsiteGeneration,
 } from "@/lib/ai-core/website-builder/generation-validation";
@@ -480,11 +481,11 @@ export async function generateWebsite(
   });
 
   // Industry copy → hero/CTA props on composed home page.
-  const { buildIndustryCopyPack } = await import(
-    "@/lib/ai-core/content/industry-copy"
+  const { resolveProductionContentWithIntelligence } = await import(
+    "@/lib/ai-core/content-intelligence/resolve"
   );
-  const { buildProductionContentPack } = await import(
-    "@/lib/ai-core/content/production-content"
+  const { repairAccessibility } = await import(
+    "@/lib/ai-core/accessibility/validate"
   );
   const { polishGeneratedProject } = await import(
     "@/lib/ai-core/content/polish-project"
@@ -493,6 +494,23 @@ export async function generateWebsite(
     analysis.businessProfile?.projectName || analysis.projectName;
   const componentIds = plan.designSystem.componentPalette?.map(String);
   const homeComponentOrder = plan.designSystem.homeComponentOrder?.map(String);
+  const themeArch = input.templateIntelligenceId
+    ? getThemePageArchitecture(input.templateIntelligenceId)
+    : input.websiteThemeId
+      ? getThemePageArchitecture(input.websiteThemeId)
+      : null;
+  const excellenceShell =
+    (plan.designSystem.sectionShellVariant as
+      | import("@/lib/ai-core/components/scaffolds").SectionShellVariant
+      | undefined) ?? null;
+  const sectionShellVariant =
+    themeArch?.sectionShellVariant ?? excellenceShell ?? null;
+  const injectComponentIds = themeArch?.components.length
+    ? themeArch.components.map(String)
+    : componentIds;
+  const injectHomeOrder = themeArch?.components.length
+    ? themeArch.components.map(String)
+    : homeComponentOrder;
 
   let templateVisualCss: string | null = null;
   if (input.templateIntelligenceId) {
@@ -508,8 +526,11 @@ export async function generateWebsite(
 
   let filesWithComponents: GeneratedProjectFile[];
   let productionContent: Awaited<
-    ReturnType<typeof buildProductionContentPack>
-  > | null = null;
+    ReturnType<typeof resolveProductionContentWithIntelligence>
+  >["pack"] | null = null;
+  let contentIntelligenceTrace: Awaited<
+    ReturnType<typeof resolveProductionContentWithIntelligence>
+  >["trace"] | null = null;
 
   if (localizedCopy) {
     filesWithComponents = injectProfessionalComponents({
@@ -518,17 +539,17 @@ export async function generateWebsite(
       language: input.language,
     });
   } else {
-    const copyPack = buildIndustryCopyPack({
-      industryId: analysis.businessProfile?.industry,
+    const contentResolution = resolveProductionContentWithIntelligence({
+      agencyContract: input.agencyContract ?? null,
+      brandName,
+      language: input.language,
       profile: analysis.businessProfile,
       strategy: plan.strategy,
-      language: input.language,
+      masterPlan: input.masterWebsitePlan ?? null,
+      businessProfile: input.agencyContract?.businessIntelligence.profile ?? null,
     });
-    productionContent = buildProductionContentPack(
-      copyPack,
-      brandName,
-      input.language,
-    );
+    productionContent = contentResolution.pack;
+    contentIntelligenceTrace = contentResolution.trace;
 
     filesWithComponents = injectProfessionalComponents({
       files: filesWithImages,
@@ -540,8 +561,8 @@ export async function generateWebsite(
             p.startsWith("components/layout/") ||
             p.startsWith("components/ui/"),
         ),
-      componentIds,
-      homeComponentOrder,
+      componentIds: injectComponentIds,
+      homeComponentOrder: injectHomeOrder,
       brandName,
       pageTitle:
         plan.blueprint.title || productionContent.heroHeadline || analysis.projectName,
@@ -557,6 +578,10 @@ export async function generateWebsite(
       language: input.language,
       templateIntelligenceId: input.templateIntelligenceId,
       templateVisualCss,
+      sectionShellVariant,
+      websiteThemeId: themeArch?.themeId ?? null,
+      pageTopology: themeArch?.pageTopology ?? null,
+      floatingCta: themeArch?.floatingCta ?? false,
     });
 
     filesWithComponents = polishGeneratedProject({
@@ -569,6 +594,8 @@ export async function generateWebsite(
         plan.blueprint.description || productionContent.heroSubheadline,
       content: productionContent,
       language: input.language,
+      eliteColors: input.agencyContract?.brandKit.colorPalette,
+      spacingDensity: plan.designSystem.uiStyle?.density,
     });
   }
 
@@ -591,6 +618,30 @@ export async function generateWebsite(
     assetManifest: coreManifest,
     industry: industryHint,
   });
+
+  validatedFiles = repairAccessibility(validatedFiles);
+
+  if (input.agencyContract?.brandKit.logos) {
+    const { brandLogoReactComponent } = await import(
+      "@/lib/ai-core/agency-brand-kit/logo-svg"
+    );
+    const logoPath = "components/brand-logo.tsx";
+    if (!validatedFiles.some((f) => f.path === logoPath)) {
+      validatedFiles.push({
+        path: logoPath,
+        content: brandLogoReactComponent(
+          input.agencyContract.brandKit,
+          {
+            logoLight: input.agencyContract.brandKit.logos.light,
+            logoDark: input.agencyContract.brandKit.logos.dark,
+            monogram: input.agencyContract.brandKit.logos.monogram,
+            favicon: input.agencyContract.brandKit.logos.favicon,
+          },
+        ),
+        language: "typescript",
+      });
+    }
+  }
 
   let qualityReport: QualityReport | undefined;
   if (options?.skipQuality) {
@@ -658,7 +709,8 @@ export async function generateWebsite(
                   p.startsWith("components/layout/") ||
                   p.startsWith("components/ui/"),
               ),
-            componentIds,
+            componentIds: injectComponentIds,
+            homeComponentOrder: injectHomeOrder,
             brandName,
             pageTitle:
               plan.blueprint.title ||
@@ -674,6 +726,11 @@ export async function generateWebsite(
             content: productionContent,
             composePage: true,
             language: input.language,
+            templateIntelligenceId: input.templateIntelligenceId,
+            sectionShellVariant,
+            websiteThemeId: themeArch?.themeId ?? null,
+            pageTopology: themeArch?.pageTopology ?? null,
+            floatingCta: themeArch?.floatingCta ?? false,
           });
         } else if (localizedCopy) {
           validatedFiles = injectProfessionalComponents({
@@ -722,6 +779,7 @@ export async function generateWebsite(
     designSystem: plan.designSystem,
     assetManifest,
     qualityReport,
+    agencyContract: input.agencyContract,
     settings: {
       framework: "Next.js App Router",
       styling: "Tailwind CSS",
@@ -738,6 +796,9 @@ export async function generateWebsite(
       generationProfile: String(generationProfile),
       ...(input.templateIntelligenceId
         ? { templateIntelligenceId: input.templateIntelligenceId }
+        : {}),
+      ...(contentIntelligenceTrace
+        ? { contentIntelligenceTrace }
         : {}),
     },
   };

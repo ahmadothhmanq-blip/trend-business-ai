@@ -1,4 +1,5 @@
 import type { SocialPlatform } from "@/types/social-media";
+import { getLocalDevOrigin } from "@/lib/dev-origin";
 
 export type OAuthProviderConfig = {
   platform: SocialPlatform;
@@ -86,7 +87,7 @@ export function getAppBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL;
   if (process.env.VERCEL_URL?.startsWith("http")) return process.env.VERCEL_URL;
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  return "http://localhost:3000";
+  return getLocalDevOrigin();
 }
 
 export function getRedirectUri(platform: string): string {

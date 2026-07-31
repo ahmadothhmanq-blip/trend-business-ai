@@ -1,0 +1,13 @@
+{
+  "id": "rooms",
+  "title": "Rooms",
+  "path": "/rooms",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "overlay",
+    "main",
+    "utility",
+    "footer"
+  ]
+}

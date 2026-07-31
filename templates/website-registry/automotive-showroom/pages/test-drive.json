@@ -1,0 +1,12 @@
+{
+  "id": "test-drive",
+  "title": "Test Drive",
+  "path": "/test-drive",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "footer",
+    "overlay"
+  ]
+}

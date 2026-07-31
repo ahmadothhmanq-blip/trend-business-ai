@@ -1,0 +1,13 @@
+{
+  "id": "claims",
+  "title": "Claims",
+  "path": "/claims",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "utility",
+    "sidebar",
+    "footer"
+  ]
+}

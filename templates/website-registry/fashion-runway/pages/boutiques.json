@@ -1,0 +1,12 @@
+{
+  "id": "boutiques",
+  "title": "Boutiques",
+  "path": "/boutiques",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "overlay",
+    "footer",
+    "main"
+  ]
+}

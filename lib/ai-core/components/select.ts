@@ -157,6 +157,62 @@ function scoreCandidate(
     score += 28;
   }
 
+  const compositionMode = ctx.compositionMode ?? "balanced";
+  const candidateId = candidate.id;
+  if (compositionMode === "editorial") {
+    if (
+      /Storytelling|Editorial|GalleryExperience|CaseStudies|Timeline|Luxury/.test(
+        candidateId,
+      )
+    ) {
+      score += 18;
+    }
+    if (/Grid|Bento|PricingTable/.test(candidateId) && kind !== "pricing") {
+      score -= 8;
+    }
+  }
+  if (compositionMode === "story") {
+    if (
+      /Storytelling|Timeline|Video|Cinematic|GalleryExperience/.test(candidateId)
+    ) {
+      score += 20;
+    }
+  }
+  if (compositionMode === "product") {
+    if (
+      /Product|Showcase|Services|Pricing|Interactive|Bento/.test(candidateId)
+    ) {
+      score += 18;
+    }
+  }
+  if (compositionMode === "trust") {
+    if (
+      /Trust|Testimonial|SocialProof|LogoCloud|CaseStudies|Team/.test(candidateId)
+    ) {
+      score += 20;
+    }
+  }
+
+  if (ctx.componentStyling) {
+    const stylingBlob = normalizeBlob(
+      ctx.componentStyling.cards,
+      ctx.componentStyling.buttons,
+      ctx.componentStyling.navigation,
+    );
+    for (const style of candidate.designStyles) {
+      if (style !== "*" && stylingBlob.includes(style.toLowerCase())) {
+        score += 10;
+      }
+    }
+    if (
+      kind === "hero" &&
+      /editorial|luxury|cinematic/.test(stylingBlob) &&
+      /Luxury|Cinematic|Editorial|Storytelling/.test(candidateId)
+    ) {
+      score += 12;
+    }
+  }
+
   // Prefer "modern" library variants for conversion/ecommerce goals.
   if (
     (websiteGoal === "conversion" || websiteGoal === "ecommerce") &&

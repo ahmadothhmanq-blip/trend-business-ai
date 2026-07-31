@@ -1,0 +1,162 @@
+{
+  "specVersion": "2.0.0",
+  "id": "beauty-glow",
+  "version": "2.0.0",
+  "name": "Beauty Glow",
+  "description": "Luminous beauty and spa brand with ritual storytelling, treatment menus, and booking-first luxury flows.",
+  "metadata": {
+    "category": "beauty",
+    "industry": "Beauty",
+    "tags": [
+      "beauty",
+      "spa",
+      "skincare",
+      "salon"
+    ],
+    "author": {
+      "name": "Trend Business AI",
+      "organization": "Premium Template Studio"
+    },
+    "license": "MIT",
+    "keywords": [
+      "beauty",
+      "spa",
+      "skincare",
+      "salon"
+    ],
+    "templateIntelligenceId": "ti-beauty-glow",
+    "premium": true,
+    "tier": "agency"
+  },
+  "media": {
+    "thumbnail": "assets/thumbnail.png",
+    "preview": "assets/preview.png"
+  },
+  "compatibility": {
+    "engineVersion": ">=1.0.0",
+    "specVersion": "2.0.0",
+    "features": [
+      "regions",
+      "placement-rules",
+      "responsive",
+      "premium-canvas"
+    ]
+  },
+  "update": {
+    "channel": "stable",
+    "releasedAt": "2026-07-30T17:52:39.678Z"
+  },
+  "responsive": {
+    "breakpoints": [
+      {
+        "name": "sm",
+        "minWidth": 640
+      },
+      {
+        "name": "md",
+        "minWidth": 768
+      },
+      {
+        "name": "lg",
+        "minWidth": 1024
+      },
+      {
+        "name": "xl",
+        "minWidth": 1280
+      },
+      {
+        "name": "2xl",
+        "minWidth": 1536
+      }
+    ],
+    "containerMaxWidth": "100%",
+    "fluidTypography": true
+  },
+  "canvas": {
+    "file": "canvas.json"
+  },
+  "placementRules": {
+    "file": "placement-rules.json"
+  },
+  "layouts": [
+    {
+      "id": "default",
+      "file": "layouts/default.json",
+      "kind": "full-bleed",
+      "label": "Default",
+      "description": "Premium full-bleed layout for Beauty."
+    }
+  ],
+  "regions": [
+    {
+      "id": "header",
+      "file": "regions/header.json",
+      "role": "header",
+      "label": "Header Region",
+      "description": "Premium header region for Beauty Glow."
+    },
+    {
+      "id": "utility",
+      "file": "regions/utility.json",
+      "role": "utility",
+      "label": "Utility Region",
+      "description": "Premium utility region for Beauty Glow."
+    },
+    {
+      "id": "overlay",
+      "file": "regions/overlay.json",
+      "role": "overlay",
+      "label": "Overlay Region",
+      "description": "Premium overlay region for Beauty Glow."
+    },
+    {
+      "id": "main",
+      "file": "regions/main.json",
+      "role": "main",
+      "label": "Main Region",
+      "description": "Premium main region for Beauty Glow."
+    },
+    {
+      "id": "footer",
+      "file": "regions/footer.json",
+      "role": "footer",
+      "label": "Footer Region",
+      "description": "Premium footer region for Beauty Glow."
+    }
+  ],
+  "pages": [
+    {
+      "id": "home",
+      "title": "Home",
+      "path": "/",
+      "layoutId": "default",
+      "file": "pages/home.json",
+      "description": "Home — premium Beauty page blueprint."
+    },
+    {
+      "id": "rituals",
+      "title": "Rituals",
+      "path": "/rituals",
+      "layoutId": "default",
+      "file": "pages/rituals.json",
+      "description": "Rituals — premium Beauty page blueprint."
+    },
+    {
+      "id": "products",
+      "title": "Products",
+      "path": "/products",
+      "layoutId": "default",
+      "file": "pages/products.json",
+      "description": "Products — premium Beauty page blueprint."
+    },
+    {
+      "id": "book",
+      "title": "Book",
+      "path": "/book",
+      "layoutId": "default",
+      "file": "pages/book.json",
+      "description": "Book — premium Beauty page blueprint."
+    }
+  ],
+  "entry": "package.entry.json"
+}

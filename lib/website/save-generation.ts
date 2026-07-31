@@ -2,7 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { getActiveProvider } from "@/lib/ai/provider-config";
 import { emptyTokenUsage } from "@/lib/ai/usage";
 import { appendPromptVersion } from "@/lib/workspace/persist";
-import { ensureStaticPreviewFile } from "@/lib/website/build-static-preview";
+import { ensureStaticPreviewFile } from "@/lib/website/build-static-preview.server";
 import { usesLlmLocalizedWebsiteCopy } from "@/lib/ai-core/content/content-language";
 import { productionContentForPreview } from "@/lib/ai-core/content/production-content";
 import { logger } from "@/lib/logger";
@@ -155,28 +155,47 @@ export async function persistWebsiteGeneration(args: PersistWebsiteGenerationArg
   const heroAsset = args.project.assetManifest?.items?.find(
     (item) => item.role === "hero" && item.url,
   );
-  const { buildIndustryCopyPack, industryContentForPreview } = await import(
+  const { resolveProductionContentWithIntelligence } = await import(
+    "@/lib/ai-core/content-intelligence/resolve"
+  );
+  const contentResolution = args.project.agencyContract
+    ? resolveProductionContentWithIntelligence({
+        agencyContract: args.project.agencyContract,
+        brandName:
+          args.project.businessProfile?.projectName || args.project.title,
+        language: args.input.language,
+        profile: args.project.businessProfile as never,
+        strategy: args.project.strategy as never,
+        businessProfile: args.project.agencyContract.businessIntelligence.profile,
+      })
+    : null;
+  const copyPack = contentResolution
+    ? null
+    : (
+        await import("@/lib/ai-core/content/industry-copy")
+      ).buildIndustryCopyPack({
+        industryId: args.project.businessProfile?.industry,
+        profile: args.project.businessProfile as never,
+        strategy: args.project.strategy as never,
+        language: args.input.language,
+      });
+  const { buildProductionContentPack, productionContentForPreview } =
+    await import("@/lib/ai-core/content/production-content");
+  const { industryContentForPreview } = await import(
     "@/lib/ai-core/content/industry-copy"
   );
-  const { buildProductionContentPack } = await import(
-    "@/lib/ai-core/content/production-content"
-  );
-  const copyPack = buildIndustryCopyPack({
-    industryId: args.project.businessProfile?.industry,
-    profile: args.project.businessProfile as never,
-    strategy: args.project.strategy as never,
-    language: args.input.language,
-  });
-  const productionContent = buildProductionContentPack(
-    copyPack,
-    args.project.businessProfile?.projectName || args.project.title,
-    args.input.language,
-  );
+  const productionContent =
+    contentResolution?.pack ??
+    buildProductionContentPack(
+      copyPack!,
+      args.project.businessProfile?.projectName || args.project.title,
+      args.input.language,
+    );
   const primaryCta =
     args.project.strategy?.ctas?.[0] ||
     args.project.strategy?.pages?.[0]?.primaryCta ||
     productionContent.primaryCta ||
-    copyPack.primaryCta;
+    copyPack?.primaryCta;
   const localizedCopy = usesLlmLocalizedWebsiteCopy(args.input.language);
   const previewContent =
     args.project.content?.length &&
@@ -184,12 +203,14 @@ export async function persistWebsiteGeneration(args: PersistWebsiteGenerationArg
       ? args.project.content
       : localizedCopy
         ? productionContentForPreview(productionContent).filter(Boolean)
-        : industryContentForPreview(copyPack);
+        : copyPack
+          ? industryContentForPreview(copyPack)
+          : productionContentForPreview(productionContent).filter(Boolean);
 
   const files = ensureStaticPreviewFile({
-    title: args.project.title || copyPack.heroHeadline,
+    title: args.project.title || productionContent.heroHeadline,
     description:
-      args.project.description || copyPack.heroSubheadline,
+      args.project.description || productionContent.heroSubheadline,
     pages: args.project.pages,
     sections: args.project.sections,
     colorPalette:
@@ -218,6 +239,9 @@ export async function persistWebsiteGeneration(args: PersistWebsiteGenerationArg
     templateIntelligenceId:
       (args.project.settings as { templateIntelligenceId?: string } | undefined)
         ?.templateIntelligenceId ?? undefined,
+    websiteThemeId:
+      (args.project.settings as { websiteThemeId?: string } | undefined)
+        ?.websiteThemeId ?? undefined,
     language: args.input.language,
     files: args.project.files,
   });
@@ -587,6 +611,9 @@ export async function updateWebsiteGenerationInPlace(args: {
     templateIntelligenceId:
       (args.project.settings as { templateIntelligenceId?: string } | undefined)
         ?.templateIntelligenceId ?? undefined,
+    websiteThemeId:
+      (args.project.settings as { websiteThemeId?: string } | undefined)
+        ?.websiteThemeId ?? undefined,
     language: args.language,
     files: args.project.files,
   });

@@ -71,20 +71,36 @@ export function scoreImagePrompt(params: {
 }): ImagePromptScore {
   const issues: string[] = [];
   const prompt = params.prompt.toLowerCase();
-  const industry = (params.ctx.industry || params.ctx.businessType || "").toLowerCase();
+  const industry = (params.ctx.businessProfile?.industry || params.ctx.industry || params.ctx.businessType || "").toLowerCase();
   const sectionKey: SectionKey = inferSectionKey(
     params.sectionName || params.purpose,
   );
+
+  const forbidden = params.ctx.businessProfile?.forbiddenSubjects ?? [];
+  const forbiddenHits = forbidden.filter((subject) => {
+    const s = subject.trim().toLowerCase();
+    return s.length > 2 && prompt.includes(s);
+  });
+  if (forbiddenHits.length) {
+    issues.push(`Contains forbidden subjects: ${forbiddenHits.join(", ")}`);
+  }
 
   if (NEGATIVE_TOKENS.some((t) => prompt.includes(t))) {
     issues.push("Contains placeholder or low-quality signals");
   }
 
-  const industryTokens = industry
-    .split(/[^a-z0-9]+/)
-    .filter((t) => t.length > 3);
+  const industryTokens = [
+    ...industry.split(/[^a-z0-9]+/).filter((t) => t.length > 3),
+    ...(params.ctx.businessProfile?.photographyStyle ?? [])
+      .join(" ")
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter((t) => t.length > 3),
+  ];
   const industryRelevance =
-    industryTokens.length === 0
+    forbiddenHits.length > 0
+      ? 15
+      : industryTokens.length === 0
       ? 70
       : clamp(
           (industryTokens.some((t) => prompt.includes(t)) ? 85 : 35) +
@@ -206,8 +222,18 @@ export function improvePromptForScore(params: {
   const sectionKey = inferSectionKey(params.sectionName || params.purpose);
 
   if (params.score.dimensions.industryRelevance < 55) {
+    const industryLabel =
+      params.ctx.businessProfile?.industry || params.ctx.industry;
+    const photoStyle = params.ctx.businessProfile?.photographyStyle?.[0];
     additions.push(
-      `Industry-specific ${params.ctx.industry} context for ${params.ctx.offer}.`,
+      photoStyle
+        ? `Required photography: ${photoStyle}.`
+        : `Industry-specific ${industryLabel} context for ${params.ctx.offer}.`,
+    );
+  }
+  if (params.ctx.businessProfile?.forbiddenSubjects.length) {
+    additions.push(
+      `NEVER show: ${params.ctx.businessProfile.forbiddenSubjects.slice(0, 6).join(", ")}.`,
     );
   }
   if (params.score.dimensions.sectionRelevance < 55) {

@@ -38,7 +38,7 @@
 
 | Item | Status | Evidence / notes |
 |------|--------|------------------|
-| `NEXT_PUBLIC_SITE_URL` | **BLOCKED** (for public) | Local **DONE** as `http://localhost:3000`. Not a production HTTPS origin. Public customers cannot use localhost redirects. |
+| `NEXT_PUBLIC_SITE_URL` | **BLOCKED** (for public) | Local **DONE** as configured origin (default `http://localhost:3003`). Not a production HTTPS origin. Public customers cannot use localhost redirects. |
 | `NEXT_PUBLIC_SUPABASE_URL` | **DONE** | Set to `*.supabase.co` in `.env.local` |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | **BLOCKED** | Present but **len=46** — atypical for classic Supabase anon JWTs. Must confirm full key in Dashboard before launch. |
 | `SUPABASE_SERVICE_ROLE_KEY` | **BLOCKED** | **MISSING** in `.env.local`. Required for production billing/admin credit paths. |

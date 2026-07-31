@@ -1,0 +1,12 @@
+{
+  "id": "process",
+  "title": "Process",
+  "path": "/process",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "sidebar",
+    "footer"
+  ]
+}

@@ -46,7 +46,7 @@ export type LayoutSelectionResult = {
   compositionMode: "editorial" | "story" | "product" | "trust" | "balanced";
 };
 
-const VARIATION_DEFAULTS: Record<
+export const VARIATION_DEFAULTS: Record<
   LayoutVariationId,
   {
     heroTreatment: string;

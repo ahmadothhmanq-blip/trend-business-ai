@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { buildPlannedPublicUrl, isWebsitePublishEnabled } from "@/lib/website/publish";
+import { buildPlannedPublicUrl, isWebsitePublishEnabled } from "@/lib/website/publish-config";
 import { resolvePublishedAbsoluteUrl } from "@/lib/website/published-site-url";
 import { buildPublicRobotsTxt } from "@/lib/website/public-site";
 import { NextResponse } from "next/server";

@@ -1,0 +1,13 @@
+{
+  "id": "tracking",
+  "title": "Tracking",
+  "path": "/tracking",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "sidebar",
+    "utility",
+    "main",
+    "footer"
+  ]
+}

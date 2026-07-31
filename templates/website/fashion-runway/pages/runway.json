@@ -1,0 +1,12 @@
+{
+  "id": "runway",
+  "title": "Runway",
+  "path": "/runway",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "overlay",
+    "footer",
+    "main"
+  ]
+}

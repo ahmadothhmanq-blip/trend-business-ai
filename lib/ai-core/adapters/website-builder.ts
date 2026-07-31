@@ -34,23 +34,53 @@ import type {
 import { isIndustryId } from "@/lib/ai-core/templates/industries";
 import type { IndustryId, TemplateSelection } from "@/lib/ai-core/templates/types";
 import { getWebsiteIndustryIntelligence } from "@/lib/ai-core/industry-intelligence/profiles";
+import { getBusinessIntelligenceFromBrief } from "@/lib/ai-core/business-intelligence";
+import { getAgencyContractFromBrief } from "@/lib/ai-core/agency-orchestrator";
+import { runAgencyQualityGate } from "@/lib/ai-core/agency-quality";
 import {
   getMasterWebsitePlan,
   resolveIndustryFromMasterPlan,
 } from "@/lib/ai-core/master-planner";
+import { getWebsiteGenerationPlanFromBrief } from "@/lib/ai-core/architecture-validation/orchestrate";
+import {
+  DESIGN_INTELLIGENCE_SPEC_KEY,
+  DESIGN_INTELLIGENCE_TRACE_KEY,
+} from "@/lib/ai-core/design-intelligence/die-types";
+import { getDesignSystemSpecFromBrief } from "@/lib/ai-core/design-intelligence/die-engine";
+import {
+  IMAGE_INTELLIGENCE_SPEC_KEY,
+  IMAGE_INTELLIGENCE_TRACE_KEY,
+} from "@/lib/ai-core/image-intelligence/iie-types";
+import { getImageSystemSpecFromBrief } from "@/lib/ai-core/image-intelligence/iie-engine";
+import {
+  runSeoAeoIntelligenceEngine,
+} from "@/lib/ai-core/seo-aeo-intelligence/saie-engine";
+import {
+  SEO_AEO_INTELLIGENCE_SPEC_KEY,
+  SEO_AEO_INTELLIGENCE_TRACE_KEY,
+} from "@/lib/ai-core/seo-aeo-intelligence/saie-types";
 import {
   buildWebsiteGenerationKey,
   resolveWebsiteOutputLanguage,
 } from "@/lib/ai-core/website-builder/prompt-industry";
 import { usesLlmLocalizedWebsiteCopy } from "@/lib/ai-core/content/content-language";
 import {
-  buildSeoPackageFromStrategy,
   checkSeoReadiness,
   injectSeoArtifacts,
   withSeoReadiness,
 } from "@/lib/ai-core/seo";
 import { runPerformanceChecks } from "@/lib/ai-core/performance";
-import { buildAutoQualityReport } from "@/lib/ai-core/quality";
+import {
+  runQualityAssuranceEngine,
+} from "@/lib/ai-core/quality-assurance/qashe-engine";
+import {
+  QUALITY_ASSURANCE_TRACE_KEY,
+  QUALITY_SPECIFICATION_KEY,
+} from "@/lib/ai-core/quality-assurance/qashe-types";
+import {
+  getWorkflowStateFromBrief,
+  superviseAgentSync,
+} from "@/lib/ai-core/multi-agent-orchestration";
 import {
   runWebsiteOptimizer,
   shouldApplyOptimizerFixes,
@@ -299,6 +329,12 @@ function applyDesignRenderer(
       const ti = getTemplateIntelligence(tiId);
       return ti ? resolveTemplateDNA(ti) : null;
     })();
+  const designSystemSpec =
+    getDesignSystemSpecFromBrief(brief) ??
+    (brief.metadata?.[DESIGN_INTELLIGENCE_SPEC_KEY] as
+      | import("@/lib/ai-core/design-intelligence/die-types").DesignSystemSpec
+      | undefined) ??
+    null;
   const rendered = renderWebsiteDesign({
     industryId,
     industryLabel:
@@ -373,6 +409,15 @@ function applyDesignRenderer(
     premiumRecommendedComponents: templateDna?.components.length
       ? templateDna.components
       : premiumPlan?.recommendedComponents,
+    designSystemSpec,
+    compositionMode:
+      designSystemSpec?.layoutComposition.compositionMode as
+        | "editorial"
+        | "story"
+        | "product"
+        | "trust"
+        | "balanced"
+        | undefined,
   });
 
   artifacts.strategy = rendered.strategy;
@@ -431,6 +476,10 @@ export function websiteInputToBrief(
       ...(input.templateIntelligenceId
         ? { templateIntelligenceId: input.templateIntelligenceId }
         : {}),
+      ...(input.websiteStructureTemplateId
+        ? { websiteStructureTemplateId: input.websiteStructureTemplateId }
+        : {}),
+      ...(input.websiteThemeId ? { websiteThemeId: input.websiteThemeId } : {}),
       ...(input.templateIntelligenceCategory
         ? { templateIntelligenceCategory: input.templateIntelligenceCategory }
         : {}),
@@ -503,7 +552,32 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
       const input = getWebsiteInput(brief);
       const template = getTemplateSelectionFromBrief(brief);
       const intel = template?.industryIntelligence;
-      analysis = await analyzeBusinessIdea(input, ctx);
+      analysis = await analyzeBusinessIdea(
+        input,
+        ctx,
+        getBusinessIntelligenceFromBrief(brief)?.profile ?? null,
+      );
+
+      const agencyContract = getAgencyContractFromBrief(brief);
+      if (agencyContract) {
+        analysis = {
+          ...analysis,
+          projectName: agencyContract.brandKit.companyName,
+          businessProfile: {
+            ...analysis.businessProfile,
+            projectName: agencyContract.brandKit.companyName,
+            industry: agencyContract.businessIntelligence.profile.industry,
+            targetAudience:
+              agencyContract.businessIntelligence.profile.audience.join(", "),
+            tone: agencyContract.businessIntelligence.profile.tone,
+            offer: agencyContract.content.hero.subheadline,
+            summary: agencyContract.content.about.story,
+            requiredSections:
+              agencyContract.businessIntelligence.profile.recommendedSections,
+          },
+        };
+      }
+
       const localizedCopy = usesLlmLocalizedWebsiteCopy(input.language);
       if (template) {
         if (localizedCopy) {
@@ -748,7 +822,8 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
           const ti = getTemplateIntelligence(tiId);
           return ti ? resolveTemplateDNA(ti) : null;
         })();
-      const { plan: rawPlan, brandIdentity } = runDesignPlanningPhaseWithBrand({
+      const { plan: rawPlan, brandIdentity, designIntelligence } =
+        runDesignPlanningPhaseWithBrand({
         profile,
         strategy: strategy as CoreProductStrategy,
         industryId: template?.industryId || profile.industry,
@@ -764,6 +839,10 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
           input.theme,
         prompt: brief.prompt || input.prompt,
         templateDna: templateDna ?? null,
+        masterPlan: getMasterWebsitePlan(brief),
+        websiteGenerationPlan: getWebsiteGenerationPlanFromBrief(brief),
+        businessProfile: getBusinessIntelligenceFromBrief(brief)?.profile ?? null,
+        brief,
         onProgress: (message) => ctx.progress.emit(message),
       });
       const designPlan = assertDesignPlanApproved(rawPlan);
@@ -784,6 +863,9 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
         brandIdentity,
         designPlan,
         designIntelligence: designIntel,
+        [DESIGN_INTELLIGENCE_TRACE_KEY]: designIntelligence.trace,
+        [DESIGN_INTELLIGENCE_SPEC_KEY]: designIntelligence.spec,
+        designIntelligenceValidation: designIntelligence.validation,
       };
 
       const designInput = template
@@ -1017,6 +1099,7 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
       );
 
       const assetProfile = resolveWebsiteGenerationProfile(input);
+      const businessIntel = getBusinessIntelligenceFromBrief(brief);
       const manifest = await runAiImageEngine({
         strategy: artifacts.strategy!,
         designSystem: artifacts.designSystem!,
@@ -1024,6 +1107,15 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
         templateSelection: template,
         brandIdentity,
         masterPlan: getMasterWebsitePlan(brief),
+        websiteGenerationPlan: getWebsiteGenerationPlanFromBrief(brief),
+        designSystemSpec:
+          getDesignSystemSpecFromBrief(brief) ??
+          (brief.metadata?.[DESIGN_INTELLIGENCE_SPEC_KEY] as
+            | import("@/lib/ai-core/design-intelligence/die-types").DesignSystemSpec
+            | undefined) ??
+          null,
+        businessProfile: businessIntel?.profile ?? null,
+        brief,
         preferredStyle: planImageStyle,
         designPlanImageRequirements: designPlan?.imageRequirements?.map(
           (r) => `${r.role}: ${r.purpose}. ${r.style}. ${r.notes}`,
@@ -1071,12 +1163,24 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
             : undefined,
       });
 
+      brief.metadata = {
+        ...(brief.metadata ?? {}),
+        ...(manifest.qualityReport
+          ? { assetQualityReport: manifest.qualityReport }
+          : {}),
+        ...(manifest.videoPackage
+          ? { videoAssetPackage: manifest.videoPackage }
+          : {}),
+        ...(manifest.imageIntelligence
+          ? {
+              [IMAGE_INTELLIGENCE_TRACE_KEY]: manifest.imageIntelligence.trace,
+              [IMAGE_INTELLIGENCE_SPEC_KEY]: manifest.imageIntelligence.spec,
+              imageIntelligenceValidation:
+                manifest.imageIntelligence.validation,
+            }
+          : {}),
+      };
       if (manifest.qualityReport) {
-        brief.metadata = {
-          ...(brief.metadata ?? {}),
-          assetQualityReport: manifest.qualityReport,
-          videoAssetPackage: manifest.videoPackage,
-        };
         ctx.progress.emit(`[assets-quality] ${manifest.qualityReport.summary}`);
       }
 
@@ -1145,7 +1249,16 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
         ctx.progress.emit("[fast] Fast generation profile — minimal files, no improve pass");
       }
 
-      project = await generateWebsiteFiles(input, analysis, plan, ctx, {
+      project = await generateWebsiteFiles(
+        {
+          ...input,
+          agencyContract: getAgencyContractFromBrief(brief) ?? undefined,
+          masterWebsitePlan: getMasterWebsitePlan(brief) ?? undefined,
+        },
+        analysis,
+        plan,
+        ctx,
+        {
         assetManifest: artifacts.assetManifest as AssetManifest,
         skipAssetGeneration: true,
         skipQuality: true,
@@ -1157,6 +1270,7 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
 
     async runQuality(brief, artifacts, generation, ctx) {
       const input = getWebsiteInput(brief);
+      const template = getTemplateSelectionFromBrief(brief);
       if (!analysis || !plan) {
         throw new Error(
           "Website Builder adapter: quality requires analysis and plan.",
@@ -1181,8 +1295,9 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
         skipImprove: isMinimalWebsiteGeneration(input),
       });
 
-      // Phase 8: Auto Quality Engine — sections + design consistency on top of plugin check.
-      const autoReport = buildAutoQualityReport({
+      // Phase 8: Quality Assurance & Self-Healing Engine (QASHE) — EDS-007 authoritative gate.
+      const qasheParams = {
+        brief,
         baseReport: qualityResult.qualityReport as CoreQualityReport,
         files: qualityResult.files,
         strategy: artifacts.strategy,
@@ -1191,16 +1306,92 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
         profile: artifacts.businessProfile ?? analysis.businessProfile,
         improveApplied: qualityResult.qualityReport.improveApplied,
         improveNotes: qualityResult.qualityReport.improveNotes,
-      });
+        seoPackage:
+          artifacts.seoPackage ??
+          (generation as { seoPackage?: import("@/lib/ai-core/seo/types").CoreSeoPackage })
+            .seoPackage,
+        performanceReport:
+          artifacts.performanceReport ??
+          (generation as { performanceReport?: import("@/lib/ai-core/performance/types").CorePerformanceReport })
+            .performanceReport,
+        masterPlan: getMasterWebsitePlan(brief),
+        websiteGenerationPlan: getWebsiteGenerationPlanFromBrief(brief),
+        businessProfile: getBusinessIntelligenceFromBrief(brief)?.profile ?? null,
+        industryId:
+          template?.industryId ||
+          (typeof brief.metadata?.industryId === "string"
+            ? brief.metadata.industryId
+            : undefined) ||
+          artifacts.businessProfile?.industry,
+      };
+
+      const qasheResult = getWorkflowStateFromBrief(brief)
+        ? superviseAgentSync({
+            agentId: "QASHE",
+            brief,
+            relaxedDependencies: true,
+            executor: () => runQualityAssuranceEngine(qasheParams),
+            updateBrief: (result, currentBrief) => ({
+              ...currentBrief,
+              metadata: {
+                ...(currentBrief.metadata ?? {}),
+                [QUALITY_ASSURANCE_TRACE_KEY]: result.trace,
+                [QUALITY_SPECIFICATION_KEY]: result.spec,
+                qualityAssuranceValidation: result.validation,
+              },
+            }),
+            shareArtifacts: (result) => ({
+              qualitySpecification: result.spec,
+            }),
+          }).result
+        : runQualityAssuranceEngine(qasheParams);
+
+      let autoReport = qasheResult.spec.qualityReport;
+      const qualityFiles =
+        qasheResult.files && qasheResult.files.length > 0
+          ? qualityResult.files.map((file) => {
+              const healed = qasheResult.files!.find((f) => f.path === file.path);
+              return healed ? { ...file, content: healed.content } : file;
+            })
+          : qualityResult.files;
+
+      const agencyContract = getAgencyContractFromBrief(brief);
+      if (agencyContract) {
+        const agencyQuality = runAgencyQualityGate({
+          files: qualityFiles,
+          contract: agencyContract,
+          imagePrompts: assetManifest?.items?.map((item) => ({
+            id: item.id,
+            prompt: item.prompt || item.metadata?.prompt || "",
+            alt: item.alt,
+          })),
+        });
+        ctx.progress.emit(agencyQuality.summary);
+        if (!agencyQuality.passed) {
+          autoReport.issues = [
+            ...(autoReport.issues ?? []),
+            ...agencyQuality.blockers,
+            ...agencyQuality.warnings,
+          ];
+        }
+      }
+
+      brief.metadata = {
+        ...(brief.metadata ?? {}),
+        [QUALITY_ASSURANCE_TRACE_KEY]: qasheResult.trace,
+        [QUALITY_SPECIFICATION_KEY]: qasheResult.spec,
+        qualityAssuranceValidation: qasheResult.validation,
+      };
 
       project = {
         ...generation,
-        files: qualityResult.files,
+        files: qualityFiles,
         qualityReport: autoReport as QualityReport,
         businessProfile: analysis.businessProfile,
         strategy: plan.strategy,
         designSystem: plan.designSystem,
         assetManifest,
+        agencyContract: agencyContract ?? generation.agencyContract,
       };
 
       return autoReport;
@@ -1237,7 +1428,7 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
             a.url &&
             !a.url.startsWith("data:image/svg"),
         )?.url ?? null;
-      const pkg = buildSeoPackageFromStrategy({
+      const saieParams = {
         strategy: artifacts.strategy,
         profile: artifacts.businessProfile ?? analysis?.businessProfile,
         language: input.language || brief.language,
@@ -1256,7 +1447,39 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
         premiumKeywords:
           premiumConfigured?.configured?.keywords ?? premiumCfg?.keywords,
         heroImageUrl,
-      });
+        agencyContract: getAgencyContractFromBrief(brief) ?? undefined,
+        masterPlan: getMasterWebsitePlan(brief),
+        websiteGenerationPlan: getWebsiteGenerationPlanFromBrief(brief),
+        imageSystemSpec:
+          getImageSystemSpecFromBrief(brief) ??
+          (brief.metadata?.[IMAGE_INTELLIGENCE_SPEC_KEY] as
+            | import("@/lib/ai-core/image-intelligence/iie-types").ImageSystemSpec
+            | undefined) ??
+          null,
+        businessProfile: getBusinessIntelligenceFromBrief(brief)?.profile ?? null,
+      };
+
+      const saieResult = getWorkflowStateFromBrief(brief)
+        ? superviseAgentSync({
+            agentId: "SAIE",
+            brief,
+            relaxedDependencies: true,
+            executor: () => runSeoAeoIntelligenceEngine(saieParams),
+            updateBrief: (result, currentBrief) => ({
+              ...currentBrief,
+              metadata: {
+                ...(currentBrief.metadata ?? {}),
+                [SEO_AEO_INTELLIGENCE_TRACE_KEY]: result.trace,
+                [SEO_AEO_INTELLIGENCE_SPEC_KEY]: result.spec,
+                seoAeoIntelligenceValidation: result.validation,
+              },
+            }),
+            shareArtifacts: (result) => ({
+              seoAeoSpecification: result.spec,
+            }),
+          }).result
+        : runSeoAeoIntelligenceEngine(saieParams);
+      const pkg = saieResult.spec.seoPackage;
       const files = project?.files ?? generation.files;
       const readiness = checkSeoReadiness({
         files,
@@ -1271,6 +1494,13 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
         files: nextFiles,
         seo: seoPackage.keywords,
         seoPackage,
+      };
+
+      brief.metadata = {
+        ...(brief.metadata ?? {}),
+        [SEO_AEO_INTELLIGENCE_TRACE_KEY]: saieResult.trace,
+        [SEO_AEO_INTELLIGENCE_SPEC_KEY]: saieResult.spec,
+        seoAeoIntelligenceValidation: saieResult.validation,
       };
 
       return seoPackage;
@@ -1304,6 +1534,10 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
 
       let base: GeneratedWebsiteProject = {
         ...(project ?? generation),
+        agencyContract:
+          getAgencyContractFromBrief(brief) ??
+          project?.agencyContract ??
+          generation.agencyContract,
         businessProfile:
           (artifacts.businessProfile as GeneratedWebsiteProject["businessProfile"]) ??
           project?.businessProfile ??

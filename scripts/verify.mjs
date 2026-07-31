@@ -7,23 +7,13 @@ import { readFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
+import {
+  loadEnvLocal,
+  resolveLocalDevBaseUrl,
+} from "./lib/dev-base-url.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
-
-function loadEnvLocal() {
-  const path = join(root, ".env.local");
-  if (!existsSync(path)) return;
-  for (const line of readFileSync(path, "utf8").split("\n")) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("#")) continue;
-    const eq = trimmed.indexOf("=");
-    if (eq === -1) continue;
-    const key = trimmed.slice(0, eq).trim();
-    const value = trimmed.slice(eq + 1).trim();
-    if (!process.env[key]) process.env[key] = value;
-  }
-}
 
 loadEnvLocal();
 
@@ -190,7 +180,10 @@ async function verifySupabase() {
     if (process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production") {
       fail("NEXT_PUBLIC_SITE_URL", "required in production for canonicals/sitemaps/auth redirects");
     } else {
-      pass("NEXT_PUBLIC_SITE_URL", "missing — using localhost fallback (set before production launch)");
+      pass(
+        "NEXT_PUBLIC_SITE_URL",
+        `missing — using ${resolveLocalDevBaseUrl()} fallback (set before production launch)`,
+      );
     }
   } else if (!/^https?:\/\/[^/]+/.test(siteUrl)) {
     fail("NEXT_PUBLIC_SITE_URL", "must be an absolute URL");

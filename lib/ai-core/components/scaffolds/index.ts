@@ -9,9 +9,13 @@ import {
   MOTION_SOURCE,
   SECTION_SHELL_PATH,
   SECTION_SHELL_SOURCE,
+  resolveSectionShellSource,
+  type SectionShellVariant,
 } from "@/lib/ai-core/components/scaffolds/shared";
+import { getThemeScaffoldById } from "@/lib/ai-core/components/scaffolds/themes";
 import { DESIGN_RENDERER_COMPONENTS } from "@/lib/ai-core/design-renderer/components";
 import type { DesignRendererComponentId } from "@/lib/ai-core/design-renderer/types";
+import { isThemeScopedComponent } from "@/lib/website/builder/theme-component-registry";
 
 function renameExport(source: string, exportName: string): string {
   return source.replace(/export function \w+/, `export function ${exportName}`);
@@ -74,6 +78,9 @@ const ALIASES: Partial<Record<DesignRendererComponentId, string>> = {
 };
 
 export function getProfessionalScaffoldById(id: string): string | null {
+  if (isThemeScopedComponent(id)) {
+    return getThemeScaffoldById(id);
+  }
   if (BY_ID[id]) return BY_ID[id]!;
   const aliased = ALIASES[id as DesignRendererComponentId];
   if (aliased) {
@@ -102,4 +109,5 @@ export function listProfessionalScaffoldPaths(componentIds: string[]): string[] 
   return Array.from(paths);
 }
 
-export { SECTION_SHELL_PATH, SECTION_SHELL_SOURCE, MOTION_PATH, MOTION_SOURCE };
+export { SECTION_SHELL_PATH, SECTION_SHELL_SOURCE, MOTION_PATH, MOTION_SOURCE, resolveSectionShellSource };
+export type { SectionShellVariant };

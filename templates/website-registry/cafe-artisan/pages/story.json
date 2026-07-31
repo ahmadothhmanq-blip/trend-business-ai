@@ -1,0 +1,13 @@
+{
+  "id": "story",
+  "title": "Our Story",
+  "path": "/story",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "utility",
+    "main",
+    "overlay",
+    "footer"
+  ]
+}

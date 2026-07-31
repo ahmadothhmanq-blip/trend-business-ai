@@ -8,6 +8,8 @@ import { composeHomePage } from "@/lib/ai-core/components/compose";
 import type { ProductionContentPack } from "@/lib/ai-core/content/production-content";
 import { usesLlmLocalizedWebsiteCopy } from "@/lib/ai-core/content/content-language";
 import { applyWebsiteManagementToProject } from "@/lib/ai-core/website-management";
+import { buildEliteVisualSystemCss } from "@/lib/website/theme-preview/elite-visual-system";
+import { buildExcellenceSpacingCss } from "@/lib/ai-core/website-builder/excellence";
 
 const PREMIUM_CSS_SNIPPET = `
 /* Production polish — SaaS / Webflow spacing & type */
@@ -164,6 +166,14 @@ export function polishGeneratedProject(params: {
   pageDescription?: string;
   content: ProductionContentPack;
   language?: string | null;
+  eliteColors?: {
+    primary: string;
+    accent: string;
+    foreground: string;
+    background: string;
+    surface: string;
+  };
+  spacingDensity?: "airy" | "balanced" | "compact";
 }): GeneratedProjectFile[] {
   const byPath = new Map(params.files.map((f) => [f.path, { ...f }]));
   const brand = params.brandName?.trim() || "Brand";
@@ -203,15 +213,35 @@ export function polishGeneratedProject(params: {
   }
 
   const globals = byPath.get("app/globals.css");
+  const eliteCss = params.eliteColors
+    ? buildEliteVisualSystemCss(params.eliteColors)
+    : "";
+  const excellenceCss = buildExcellenceSpacingCss(
+    params.spacingDensity ?? "balanced",
+  );
   if (globals?.content && !globals.content.includes("Production polish")) {
     byPath.set("app/globals.css", {
       ...globals,
-      content: `${globals.content.trimEnd()}\n${PREMIUM_CSS_SNIPPET}\n`,
+      content: `${globals.content.trimEnd()}\n${PREMIUM_CSS_SNIPPET}\n${excellenceCss}\n${eliteCss}\n`,
     });
   } else if (globals?.content && !globals.content.includes("--space-section-gap")) {
     byPath.set("app/globals.css", {
       ...globals,
-      content: `${globals.content.trimEnd()}\n${PREMIUM_CSS_SNIPPET}\n`,
+      content: `${globals.content.trimEnd()}\n${PREMIUM_CSS_SNIPPET}\n${excellenceCss}\n${eliteCss}\n`,
+    });
+  } else if (
+    globals?.content &&
+    !globals.content.includes("Excellence Program") &&
+    params.spacingDensity
+  ) {
+    byPath.set("app/globals.css", {
+      ...globals,
+      content: `${globals.content.trimEnd()}\n${excellenceCss}\n`,
+    });
+  } else if (globals?.content && eliteCss && !globals.content.includes("Phase 5 Elite")) {
+    byPath.set("app/globals.css", {
+      ...globals,
+      content: `${globals.content.trimEnd()}\n${eliteCss}\n`,
     });
   }
 

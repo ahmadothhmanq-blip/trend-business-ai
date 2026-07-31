@@ -4,6 +4,7 @@
 
 import { brandIdentityPlanSeeds } from "@/lib/ai-core/brand-identity/apply";
 import type { BrandIdentityBrief } from "@/lib/ai-core/brand-identity/types";
+import type { DesignSystemSpec } from "@/lib/ai-core/design-intelligence/die-types";
 import type { DesignIntelligenceBrief } from "@/lib/ai-core/design-intelligence/types";
 import { getDesignPreset } from "@/lib/ai-core/design-system/presets";
 import { buildPremiumDesignSystem } from "@/lib/ai-core/design-system/premium";
@@ -100,7 +101,11 @@ const NAV_COMPONENTS = new Set<DesignRendererComponentId>([
   "SiteHeaderTransparent",
   "NavModern",
 ]);
-const FOOTER_COMPONENTS = new Set<DesignRendererComponentId>(["SiteFooter"]);
+const FOOTER_COMPONENTS = new Set<DesignRendererComponentId>([
+  "SiteFooter",
+  "SiteFooterMinimal",
+  "SiteFooterEditorial",
+]);
 
 function bodyComponentsFromDna(
   dna: TemplateDNAProfile,
@@ -267,6 +272,8 @@ export type BuildVisualDesignPlanInput = {
   brandIdentity?: BrandIdentityBrief | null;
   /** Template DNA — locks section order and component mapping. */
   templateDna?: TemplateDNAProfile | null;
+  /** DIE-locked DesignSystemSpec — seeds colors, type, spacing when present. */
+  designSpec?: DesignSystemSpec | null;
 };
 
 /**
@@ -369,6 +376,29 @@ export function buildVisualDesignPlan(
 
   const summary = `Approved design plan for ${brandName}: ${brand?.presetId || "brand"} · ${intelligence.layoutVariationId} · ${intelligence.premiumStyleId} · ${heroTreatment} · ${sections.length} sections · ${imageRequirements.filter((i) => i.required).length} required images.`;
 
+  const spec = input.designSpec;
+  const colorSystem = spec
+    ? { ...spec.colorSystem }
+    : {
+        primary: premium.colors.primary,
+        secondary: premium.colors.secondary,
+        accent: premium.colors.accent,
+        neutral: premium.colors.neutral,
+        surface: premium.colors.surface,
+        background: premium.colors.background,
+        foreground: premium.colors.foreground,
+        direction: intelligence.colorDirection,
+      };
+  const typographySystem = spec
+    ? { ...spec.typographySystem }
+    : {
+        displayFont: premium.typography.displayFont,
+        headingFont: premium.typography.headingFont,
+        bodyFont: premium.typography.bodyFont,
+        direction: intelligence.typographyDirection,
+        scaleNotes: premium.typography.notes,
+      };
+
   return {
     id: `design-plan-${uniquenessSeed}`,
     status: "approved",
@@ -390,26 +420,11 @@ export function buildVisualDesignPlan(
       navigationStyle: intelligence.navigationStyle,
       animationStyle: intelligence.animationDirection,
       componentStyle: intelligence.componentStyle,
-      density: premium.layout.density,
+      density: spec?.spacing.density ?? premium.layout.density,
     },
-    colorSystem: {
-      primary: premium.colors.primary,
-      secondary: premium.colors.secondary,
-      accent: premium.colors.accent,
-      neutral: premium.colors.neutral,
-      surface: premium.colors.surface,
-      background: premium.colors.background,
-      foreground: premium.colors.foreground,
-      direction: intelligence.colorDirection,
-    },
-    typographySystem: {
-      displayFont: premium.typography.displayFont,
-      headingFont: premium.typography.headingFont,
-      bodyFont: premium.typography.bodyFont,
-      direction: intelligence.typographyDirection,
-      scaleNotes: premium.typography.notes,
-    },
-    spacingNotes: intelligence.spacingDirection,
+    colorSystem,
+    typographySystem,
+    spacingNotes: spec?.spacing.notes ?? intelligence.spacingDirection,
     sectionStructure: sections,
     imageRequirements,
     artDirection,

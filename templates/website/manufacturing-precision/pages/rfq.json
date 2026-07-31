@@ -1,0 +1,12 @@
+{
+  "id": "rfq",
+  "title": "Request Quote",
+  "path": "/rfq",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "sidebar",
+    "footer"
+  ]
+}

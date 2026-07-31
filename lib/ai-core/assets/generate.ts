@@ -91,6 +91,7 @@ export async function generateCoreAssets(
         industry,
         role: planned.role,
         seed: planned.id + planned.name,
+        semanticQuery: planned.prompt || planned.metadata?.prompt,
       });
       items.push({
         id: planned.id,

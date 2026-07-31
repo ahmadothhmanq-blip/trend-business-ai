@@ -1,4 +1,16 @@
-const base = process.env.QA_BASE || "http://localhost:3000";
+import {
+  loadEnvLocal,
+  resolveHarnessBaseUrl,
+} from "./lib/dev-base-url.mjs";
+import {
+  ensureDevServer,
+  registerHarnessDevServerCleanup,
+} from "./lib/dev-server.mjs";
+
+loadEnvLocal();
+registerHarnessDevServerCleanup();
+
+const base = resolveHarnessBaseUrl();
 
 async function hit(m, p, body, extra = {}) {
   const opts = {
@@ -157,6 +169,9 @@ const PLATFORM_APIS = [
 async function main() {
   console.log("=== Phase 20 Functional QA ===");
   console.log("Base:", base);
+
+  const dev = await ensureDevServer();
+  console.log(`[dev] ${dev.action} → ${dev.baseUrl}`);
 
   // Auth pages
   for (const p of AUTH_PAGES) {

@@ -1,0 +1,13 @@
+{
+  "id": "attorneys",
+  "title": "Attorneys",
+  "path": "/attorneys",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "overlay",
+    "utility",
+    "footer"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "projects",
+  "title": "Projects",
+  "path": "/projects",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "overlay",
+    "main",
+    "footer"
+  ]
+}

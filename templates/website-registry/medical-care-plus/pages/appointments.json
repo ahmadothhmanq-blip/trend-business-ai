@@ -1,0 +1,12 @@
+{
+  "id": "appointments",
+  "title": "Appointments",
+  "path": "/appointments",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "utility",
+    "footer"
+  ]
+}

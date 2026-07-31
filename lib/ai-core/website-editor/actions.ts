@@ -16,6 +16,10 @@ import type {
   WebsiteEditAction,
   WebsiteUnderstanding,
 } from "@/lib/ai-core/website-editor/types";
+import {
+  resolveTextPropNameForComponent,
+  updateComponentJsxStringProp,
+} from "@/lib/ai-core/visual-editor/hydrate-node-text";
 
 function isComponentId(id: string): id is DesignRendererComponentId {
   return id in DESIGN_RENDERER_COMPONENTS;
@@ -372,6 +376,27 @@ export function applyWebsiteEditActions(params: {
             `$1${text.replace(/['"`]/g, "")}$3`,
           );
         } else {
+          const home = findHome(files);
+          const propName = resolveTextPropNameForComponent(target);
+          const nextPage =
+            home &&
+            updateComponentJsxStringProp(
+              home.content,
+              target,
+              propName,
+              text,
+            );
+          if (nextPage && home) {
+            files = upsertFile(
+              files,
+              home.path,
+              nextPage,
+              home.language || "tsx",
+            );
+            applied.push(action);
+            notes.push(`Updated ${propName} prop for ${target} in page.tsx`);
+            break;
+          }
           pendingAiActions.push({
             type: "rewrite-content",
             target,
@@ -381,6 +406,24 @@ export function applyWebsiteEditActions(params: {
           break;
         }
         files = upsertFile(files, file.path, content, file.language || "tsx");
+        const home = findHome(files);
+        if (home) {
+          const propName = resolveTextPropNameForComponent(target);
+          const nextPage = updateComponentJsxStringProp(
+            home.content,
+            target,
+            propName,
+            text,
+          );
+          if (nextPage) {
+            files = upsertFile(
+              files,
+              home.path,
+              nextPage,
+              home.language || "tsx",
+            );
+          }
+        }
         applied.push(action);
         notes.push(`Updated text in ${target}`);
         break;

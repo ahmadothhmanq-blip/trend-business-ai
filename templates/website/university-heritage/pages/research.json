@@ -1,0 +1,13 @@
+{
+  "id": "research",
+  "title": "Research",
+  "path": "/research",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "sidebar",
+    "utility",
+    "footer"
+  ]
+}

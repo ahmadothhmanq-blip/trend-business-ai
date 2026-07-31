@@ -1,0 +1,12 @@
+{
+  "id": "collections",
+  "title": "Collections",
+  "path": "/collections",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "overlay",
+    "footer",
+    "main"
+  ]
+}

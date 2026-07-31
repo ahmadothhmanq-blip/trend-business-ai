@@ -9,7 +9,13 @@ export type DesignRendererComponentId =
   | "SiteHeader"
   | "SiteHeaderTransparent"
   | "NavModern"
+  | "NavSidebar"
+  | "NavHamburger"
+  | "NavCentered"
   | "SiteFooter"
+  | "SiteFooterMinimal"
+  | "SiteFooterEditorial"
+  | "FloatingCta"
   | "HeroFullBleed"
   | "HeroCinematic"
   | "HeroFullImage"
@@ -76,7 +82,68 @@ export type DesignRendererComponentId =
   | "TimelineSection"
   | "ComparisonSection"
   | "VideoSection"
-  | "GalleryExperience";
+  | "GalleryExperience"
+  | "ThemeLuxuryNav"
+  | "ThemeLuxuryHero"
+  | "ThemeLuxuryStory"
+  | "ThemeLuxuryGallery"
+  | "ThemeLuxuryTestimonials"
+  | "ThemeLuxuryCta"
+  | "ThemeLuxuryFooter"
+  | "ThemeModernNav"
+  | "ThemeModernHero"
+  | "ThemeModernFeatures"
+  | "ThemeModernServices"
+  | "ThemeModernPricing"
+  | "ThemeModernFaq"
+  | "ThemeModernFooter"
+  | "ThemeMinimalNav"
+  | "ThemeMinimalHero"
+  | "ThemeMinimalHighlights"
+  | "ThemeMinimalServices"
+  | "ThemeMinimalTestimonials"
+  | "ThemeMinimalContact"
+  | "ThemeMinimalFooter"
+  | "ThemeCorporateNav"
+  | "ThemeCorporateHero"
+  | "ThemeCorporateProcess"
+  | "ThemeCorporateServices"
+  | "ThemeCorporateTrust"
+  | "ThemeCorporateTestimonials"
+  | "ThemeCorporateContact"
+  | "ThemeCorporateFooter"
+  | "ThemeCreativeNav"
+  | "ThemeCreativeHero"
+  | "ThemeCreativeGallery"
+  | "ThemeCreativeCases"
+  | "ThemeCreativeStory"
+  | "ThemeCreativeCta"
+  | "ThemeCreativeFooter"
+  | "ThemeTechNav"
+  | "ThemeTechHero"
+  | "ThemeTechBento"
+  | "ThemeTechCases"
+  | "ThemeTechIntegrations"
+  | "ThemeTechTrust"
+  | "ThemeTechCta"
+  | "ThemeTechFooter"
+  | "ThemeTechFloatingCta"
+  | "ThemeEditorialNav"
+  | "ThemeEditorialHero"
+  | "ThemeEditorialMagazine"
+  | "ThemeEditorialStory"
+  | "ThemeEditorialTimeline"
+  | "ThemeEditorialGallery"
+  | "ThemeEditorialFooter"
+  | "ThemeBoldNav"
+  | "ThemeBoldHero"
+  | "ThemeBoldPortfolio"
+  | "ThemeBoldFeatures"
+  | "ThemeBoldPricing"
+  | "ThemeBoldIntegrations"
+  | "ThemeBoldFaq"
+  | "ThemeBoldFooter"
+  | "ThemeBoldFloatingCta";
 
 export type DesignRendererSection = {
   id: string;
@@ -127,6 +194,9 @@ export type DesignRenderPlan = {
   componentPaths: string[];
   layoutRules: string[];
   source: "preset" | "merged" | "professional-library";
+  /** Section shell variant for inject/polish (from DesignSystemSpec). */
+  sectionShellVariant?: import("@/lib/ai-core/components/scaffolds").SectionShellVariant;
+  compositionMode?: "editorial" | "story" | "product" | "trust" | "balanced";
 };
 
 export type DesignRendererInput = {
@@ -169,6 +239,10 @@ export type DesignRendererInput = {
   /** Explicit Template DNA component order (nav → sections → footer). */
   premiumComponentOrder?: DesignRendererComponentId[];
   premiumRecommendedComponents?: DesignRendererComponentId[];
+  /** Layout composition mode from Design Intelligence (EDS-004). */
+  compositionMode?: "editorial" | "story" | "product" | "trust" | "balanced";
+  /** Authoritative design system spec for component/shell styling. */
+  designSystemSpec?: import("@/lib/ai-core/design-intelligence/die-types").DesignSystemSpec | null;
 };
 
 export type DesignRendererResult = {

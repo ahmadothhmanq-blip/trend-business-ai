@@ -1,0 +1,13 @@
+{
+  "id": "reservations",
+  "title": "Reservations",
+  "path": "/reservations",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "overlay",
+    "utility",
+    "footer"
+  ]
+}

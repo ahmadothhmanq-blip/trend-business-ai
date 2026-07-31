@@ -1,0 +1,13 @@
+{
+  "id": "spa",
+  "title": "Spa",
+  "path": "/spa",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "overlay",
+    "main",
+    "utility",
+    "footer"
+  ]
+}

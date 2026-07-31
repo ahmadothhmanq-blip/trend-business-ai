@@ -1,0 +1,29 @@
+{
+  "id": "sidebar",
+  "role": "sidebar",
+  "label": "Sidebar Region",
+  "layout": {
+    "width": "narrow",
+    "alignment": "center",
+    "maxWidth": "100%",
+    "padding": "1.25rem"
+  },
+  "placement": {
+    "allowedComponentTypes": [
+      "navigation",
+      "services",
+      "cta",
+      "custom",
+      "team"
+    ],
+    "ordering": "vertical",
+    "allowNesting": false,
+    "maxComponents": 10,
+    "minComponents": 0,
+    "allowCustomComponents": true
+  },
+  "responsive": {
+    "collapseBelow": "lg",
+    "stackOrder": "normal"
+  }
+}

@@ -106,25 +106,43 @@ export class LayerRunner {
     // Other products → Industry Template Engine (Phase 6)
     emit(progress, onProgress, "template", "Selecting template...");
     if (adapter.productId === "website-builder") {
-      const { runMasterWebsitePlanner } = await import(
-        "@/lib/ai-core/master-planner"
-      );
       const { applyIndustryIntelligenceToBrief } = await import(
         "@/lib/ai-core/industry-intelligence"
       );
 
       onProgress?.(
-        "[master-planner] Building authoritative Website Plan (single source of truth)…",
+        "[maoe] Initializing Multi-Agent Orchestration Engine…",
       );
-      const master = await runMasterWebsitePlanner({ brief, onProgress });
-      brief = master.brief;
+      const {
+        runMultiAgentOrchestrationEngine,
+        superviseAgentExecution,
+      } = await import("@/lib/ai-core/multi-agent-orchestration");
+      const maoeInit = runMultiAgentOrchestrationEngine({ brief, onProgress });
+      brief = maoeInit.brief;
+
+      onProgress?.(
+        "[pre] Building authoritative Website Plan via Planning & Reasoning Engine…",
+      );
+      const { runPlanningReasoningEngine } = await import(
+        "@/lib/ai-core/planning-reasoning-engine"
+      );
+      const preSupervised = await superviseAgentExecution({
+        agentId: "PRE",
+        brief,
+        onProgress,
+        executor: () => runPlanningReasoningEngine({ brief, onProgress }),
+        updateBrief: (result) => result.brief,
+        shareArtifacts: (result) => ({ masterWebsitePlan: result.plan }),
+      });
+      brief = preSupervised.brief;
+      const master = preSupervised.result;
       const plan = master.plan;
 
       onProgress?.(
-        `[master-planner] Locked · ${plan.industryLabel} · ${plan.style} · ${plan.template} · hero=${plan.hero.slice(0, 40)}…`,
+        `[pre] Locked · ${plan.industryLabel} · ${plan.style} · ${plan.template} · hero=${plan.hero.slice(0, 40)}…`,
       );
       onProgress?.(
-        `[master-planner] Sections: ${plan.sections.map((s) => s.label).join(" · ")}`,
+        `[pre] Sections: ${plan.sections.map((s) => s.label).join(" · ")}`,
       );
 
       const withIndustry = applyIndustryIntelligenceToBrief(
@@ -134,13 +152,20 @@ export class LayerRunner {
       brief = withIndustry.brief;
 
       onProgress?.(
-        "[template] Selecting premium template from master plan…",
+        "[template] Applying locked premium template from unified route…",
       );
-      const { selectPremiumTemplate, applyPremiumTemplateToBrief } =
+      const {
+        configurePremiumFromUnifiedRoute,
+        getUnifiedTemplateRouteFromBrief,
+      } = await import("@/lib/ai-core/template-router");
+      const { applyPremiumTemplateToBrief, selectPremiumTemplate } =
         await import("@/lib/ai-core/premium-templates");
-      const premium = await selectPremiumTemplate(brief, {
-        preferredIndustryId: plan.industry,
-      });
+      const unifiedRoute = getUnifiedTemplateRouteFromBrief(brief);
+      const premium = unifiedRoute
+        ? configurePremiumFromUnifiedRoute(brief, unifiedRoute)
+        : await selectPremiumTemplate(brief, {
+            preferredIndustryId: plan.industry,
+          });
       const enriched = applyPremiumTemplateToBrief(brief, premium);
       brief = enriched.brief;
       artifacts.brief = brief;
@@ -151,7 +176,7 @@ export class LayerRunner {
       );
 
       onProgress?.(
-        "[template-intelligence] Applying locked template from master plan…",
+        "[template-intelligence] Applying locked layout template from master plan…",
       );
       const {
         getTemplateIntelligence,
@@ -329,6 +354,7 @@ export class LayerRunner {
         designSystem: artifacts.designSystem,
         assetManifest: artifacts.assetManifest,
         profile: artifacts.businessProfile,
+        brief,
       });
     }
 
@@ -341,6 +367,14 @@ export class LayerRunner {
     }
 
     emit(progress, onProgress, "done", `${adapter.label} Core run complete`);
+
+    if (adapter.productId === "website-builder") {
+      const { completeMaoeWorkflow } = await import(
+        "@/lib/ai-core/multi-agent-orchestration"
+      );
+      brief = completeMaoeWorkflow(brief, onProgress);
+      artifacts.brief = brief;
+    }
 
     return {
       artifacts,

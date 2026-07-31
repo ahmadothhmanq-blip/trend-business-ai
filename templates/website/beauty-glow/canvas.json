@@ -1,0 +1,61 @@
+{
+  "id": "canvas",
+  "grid": {
+    "columns": 12,
+    "gutter": "2rem",
+    "margin": "0",
+    "maxWidth": "100%"
+  },
+  "spacing": {
+    "unit": "rem",
+    "scale": [
+      "0.5",
+      "1",
+      "2",
+      "3",
+      "5",
+      "8",
+      "12",
+      "16"
+    ]
+  },
+  "visualIdentity": {
+    "colors": {
+      "primary": "#4A044E",
+      "secondary": "#A21CAF",
+      "accent": "#F0ABFC",
+      "background": "#FDF4FF",
+      "foreground": "#3B0764",
+      "muted": "rgba(59,7,100,0.58)",
+      "surface": "#FFFFFF"
+    },
+    "typography": {
+      "display": "Cormorant Garamond, ui-serif, Georgia, serif",
+      "body": "Outfit, ui-sans-serif, system-ui, sans-serif",
+      "scale": {
+        "sm": "0.9375rem",
+        "base": "1.0625rem",
+        "lg": "1.75rem",
+        "xl": "3.75rem"
+      }
+    },
+    "radius": {
+      "sm": "16px",
+      "md": "24px",
+      "lg": "40px"
+    },
+    "shadows": {
+      "surface": "0 16px 60px rgba(74,4,78,0.12)"
+    },
+    "borders": {
+      "default": "rgba(0,0,0,0.08)"
+    },
+    "animation": "glow-parallax"
+  },
+  "designSystem": {
+    "tier": "premium",
+    "industry": "Beauty",
+    "layoutKind": "full-bleed",
+    "templateIntelligenceId": "ti-beauty-glow"
+  }
+}

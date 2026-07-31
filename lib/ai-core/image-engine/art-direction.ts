@@ -104,9 +104,10 @@ export function buildImageArtDirection(params: {
 }): ImageArtDirection {
   const purposeDir = PURPOSE_DIRECTION[params.purpose] || PURPOSE_DIRECTION.section;
   const photographyStyle =
+    params.ctx.businessProfile?.photographyStyle[0] ||
     params.brandIdentity?.imageDirection ||
     params.ctx.imageRequirements[0] ||
-    `${params.ctx.imageStyle} commercial photography for ${params.ctx.industry}`;
+    `${params.ctx.imageStyle} commercial photography for ${params.ctx.businessProfile?.industry || params.ctx.industry}`;
   const lighting = lightingForStyle(params.ctx.brandStyle, String(params.ctx.imageStyle));
   const mood = moodForContext(params.ctx, params.brandIdentity);
   const colors = `Palette harmony near ${params.ctx.colors.primary} / ${params.ctx.colors.secondary}${

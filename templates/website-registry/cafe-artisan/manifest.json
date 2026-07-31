@@ -1,0 +1,162 @@
+{
+  "specVersion": "2.0.0",
+  "id": "cafe-artisan",
+  "version": "2.0.0",
+  "name": "Cafe Artisan",
+  "description": "Neighborhood craft coffee with morning-light warmth, roast storytelling, and community reservation flows.",
+  "metadata": {
+    "category": "cafe",
+    "industry": "Cafe",
+    "tags": [
+      "cafe",
+      "coffee",
+      "artisan",
+      "brunch"
+    ],
+    "author": {
+      "name": "Trend Business AI",
+      "organization": "Premium Template Studio"
+    },
+    "license": "MIT",
+    "keywords": [
+      "cafe",
+      "coffee",
+      "artisan",
+      "brunch"
+    ],
+    "templateIntelligenceId": "ti-cafe-artisan",
+    "premium": true,
+    "tier": "agency"
+  },
+  "media": {
+    "thumbnail": "assets/thumbnail.png",
+    "preview": "assets/preview.png"
+  },
+  "compatibility": {
+    "engineVersion": ">=1.0.0",
+    "specVersion": "2.0.0",
+    "features": [
+      "regions",
+      "placement-rules",
+      "responsive",
+      "premium-canvas"
+    ]
+  },
+  "update": {
+    "channel": "stable",
+    "releasedAt": "2026-07-30T17:52:37.600Z"
+  },
+  "responsive": {
+    "breakpoints": [
+      {
+        "name": "sm",
+        "minWidth": 640
+      },
+      {
+        "name": "md",
+        "minWidth": 768
+      },
+      {
+        "name": "lg",
+        "minWidth": 1024
+      },
+      {
+        "name": "xl",
+        "minWidth": 1280
+      },
+      {
+        "name": "2xl",
+        "minWidth": 1536
+      }
+    ],
+    "containerMaxWidth": "100%",
+    "fluidTypography": true
+  },
+  "canvas": {
+    "file": "canvas.json"
+  },
+  "placementRules": {
+    "file": "placement-rules.json"
+  },
+  "layouts": [
+    {
+      "id": "default",
+      "file": "layouts/default.json",
+      "kind": "full-bleed",
+      "label": "Default",
+      "description": "Premium full-bleed layout for Cafe."
+    }
+  ],
+  "regions": [
+    {
+      "id": "header",
+      "file": "regions/header.json",
+      "role": "header",
+      "label": "Header Region",
+      "description": "Premium header region for Cafe Artisan."
+    },
+    {
+      "id": "utility",
+      "file": "regions/utility.json",
+      "role": "utility",
+      "label": "Utility Region",
+      "description": "Premium utility region for Cafe Artisan."
+    },
+    {
+      "id": "main",
+      "file": "regions/main.json",
+      "role": "main",
+      "label": "Main Region",
+      "description": "Premium main region for Cafe Artisan."
+    },
+    {
+      "id": "overlay",
+      "file": "regions/overlay.json",
+      "role": "overlay",
+      "label": "Overlay Region",
+      "description": "Premium overlay region for Cafe Artisan."
+    },
+    {
+      "id": "footer",
+      "file": "regions/footer.json",
+      "role": "footer",
+      "label": "Footer Region",
+      "description": "Premium footer region for Cafe Artisan."
+    }
+  ],
+  "pages": [
+    {
+      "id": "home",
+      "title": "Home",
+      "path": "/",
+      "layoutId": "default",
+      "file": "pages/home.json",
+      "description": "Home — premium Cafe page blueprint."
+    },
+    {
+      "id": "menu",
+      "title": "Menu",
+      "path": "/menu",
+      "layoutId": "default",
+      "file": "pages/menu.json",
+      "description": "Menu — premium Cafe page blueprint."
+    },
+    {
+      "id": "story",
+      "title": "Our Story",
+      "path": "/story",
+      "layoutId": "default",
+      "file": "pages/story.json",
+      "description": "Our Story — premium Cafe page blueprint."
+    },
+    {
+      "id": "visit",
+      "title": "Visit",
+      "path": "/visit",
+      "layoutId": "default",
+      "file": "pages/visit.json",
+      "description": "Visit — premium Cafe page blueprint."
+    }
+  ],
+  "entry": "package.entry.json"
+}

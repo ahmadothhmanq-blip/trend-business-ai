@@ -1,0 +1,12 @@
+{
+  "id": "features",
+  "title": "Features",
+  "path": "/features",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "utility",
+    "main",
+    "footer"
+  ]
+}

@@ -180,6 +180,176 @@ export const PALETTE_LANDING = comps(
   "SiteFooter",
 );
 
+/** Cafe — morning ritual, menu, community, reservations. */
+export const PALETTE_CAFE = comps(
+  "NavModern",
+  "HeroSplit",
+  "FeatureStorytelling",
+  "MenuHighlights",
+  "GalleryGrid",
+  "TestimonialsCarousel",
+  "ReservationSection",
+  "MapsSection",
+  "ContactCta",
+  "SiteFooter",
+);
+
+/** Architecture — monograph projects, process, inquiry. */
+export const PALETTE_ARCHITECTURE = comps(
+  "SiteHeaderTransparent",
+  "HeroCinematic",
+  "CaseStudies",
+  "GalleryExperience",
+  "FeatureStorytelling",
+  "ProcessSteps",
+  "TeamSection",
+  "CtaSplit",
+  "ContactSection",
+  "SiteFooterEditorial",
+);
+
+/** Construction — capabilities, safety, projects, bids. */
+export const PALETTE_CONSTRUCTION = comps(
+  "SiteHeader",
+  "HeroSplit",
+  "ServicesModern",
+  "TimelineSection",
+  "CaseStudies",
+  "BrandTrust",
+  "ProcessSteps",
+  "TestimonialsModern",
+  "ContactSection",
+  "SiteFooter",
+);
+
+/** Dental — treatments, doctors, booking, trust. */
+export const PALETTE_DENTAL = comps(
+  "SiteHeader",
+  "HeroFullBleed",
+  "CareServices",
+  "DoctorProfiles",
+  "ServicesGrid",
+  "TestimonialsModern",
+  "BookingForm",
+  "FaqAccordion",
+  "MapsSection",
+  "ContactCta",
+  "SiteFooter",
+);
+
+/** Pharmacy — wellness lanes, pharmacist trust, services. */
+export const PALETTE_PHARMACY = comps(
+  "SiteHeader",
+  "HeroSplit",
+  "CareServices",
+  "ServicesModern",
+  "FeatureHighlights",
+  "BrandTrust",
+  "BookingForm",
+  "FaqAccordion",
+  "MapsSection",
+  "ContactCta",
+  "SiteFooter",
+);
+
+/** Insurance — plans, advisors, claims, quotes. */
+export const PALETTE_INSURANCE = comps(
+  "SiteHeader",
+  "HeroSplit",
+  "ServicesModern",
+  "PricingModern",
+  "TeamSection",
+  "BrandTrust",
+  "FaqAccordion",
+  "TestimonialsModern",
+  "ContactSection",
+  "SiteFooter",
+);
+
+/** University — schools, research, campus life, admissions. */
+export const PALETTE_UNIVERSITY = comps(
+  "SiteHeaderTransparent",
+  "HeroCinematic",
+  "ProgramsGrid",
+  "FeatureStorytelling",
+  "GalleryExperience",
+  "TeamSection",
+  "BlogSection",
+  "AdmissionsCta",
+  "ContactSection",
+  "SiteFooter",
+);
+
+/** Beauty — rituals, treatments, products, booking. */
+export const PALETTE_BEAUTY = comps(
+  "SiteHeaderTransparent",
+  "HeroLuxury",
+  "FeatureStorytelling",
+  "GalleryExperience",
+  "ServicesModern",
+  "ProductShowcase",
+  "TestimonialsSlider",
+  "BookingForm",
+  "CtaSplit",
+  "SiteFooterEditorial",
+);
+
+/** Fitness — programs, trainers, schedules, membership. */
+export const PALETTE_FITNESS = comps(
+  "NavModern",
+  "HeroInteractive",
+  "FeaturesBento",
+  "ServicesModern",
+  "TeamSection",
+  "PricingModern",
+  "TestimonialsModern",
+  "CtaBand",
+  "BookingForm",
+  "SiteFooter",
+);
+
+/** Logistics — fleet, routes, tracking, quotes. */
+export const PALETTE_LOGISTICS = comps(
+  "SiteHeader",
+  "HeroSplit",
+  "ServicesModern",
+  "TimelineSection",
+  "BrandTrust",
+  "IntegrationsLogoCloud",
+  "CaseStudies",
+  "ContactSection",
+  "MapsSection",
+  "SiteFooter",
+);
+
+/** Manufacturing — capabilities, quality, certifications, RFQ. */
+export const PALETTE_MANUFACTURING = comps(
+  "SiteHeader",
+  "HeroProduct",
+  "FeaturesModern",
+  "ProcessSteps",
+  "BrandTrust",
+  "CaseStudies",
+  "IntegrationsLogoCloud",
+  "TestimonialsModern",
+  "ContactSection",
+  "SiteFooter",
+);
+
+/** Nonprofit — mission, impact, volunteer, donate. */
+export const PALETTE_NONPROFIT = comps(
+  "SiteHeader",
+  "HeroFullBleed",
+  "FeatureStorytelling",
+  "TimelineSection",
+  "TeamSection",
+  "TestimonialsCarousel",
+  "GalleryGrid",
+  "CtaBand",
+  "ContactCta",
+  "SiteFooter",
+);
+
 export const AUTOMOTIVE_ONLY_COMPONENTS: DesignRendererComponentId[] = [
   "HeroLuxuryShowcase",
   "VehicleShowcase",

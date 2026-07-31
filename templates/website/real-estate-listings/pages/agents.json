@@ -1,0 +1,13 @@
+{
+  "id": "agents",
+  "title": "Agents",
+  "path": "/agents",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "sidebar",
+    "main",
+    "utility",
+    "footer"
+  ]
+}

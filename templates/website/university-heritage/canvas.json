@@ -1,0 +1,61 @@
+{
+  "id": "canvas",
+  "grid": {
+    "columns": 12,
+    "gutter": "2rem",
+    "margin": "1.5rem",
+    "maxWidth": "90rem"
+  },
+  "spacing": {
+    "unit": "rem",
+    "scale": [
+      "0.5",
+      "1",
+      "1.5",
+      "2.5",
+      "4",
+      "6",
+      "8",
+      "12"
+    ]
+  },
+  "visualIdentity": {
+    "colors": {
+      "primary": "#7F1D1D",
+      "secondary": "#B45309",
+      "accent": "#D97706",
+      "background": "#FFFBEB",
+      "foreground": "#1C1917",
+      "muted": "rgba(28,25,23,0.58)",
+      "surface": "#FFFFFF"
+    },
+    "typography": {
+      "display": "Libre Baskerville, ui-serif, Georgia, serif",
+      "body": "Source Sans 3, ui-sans-serif, system-ui, sans-serif",
+      "scale": {
+        "sm": "0.9375rem",
+        "base": "1.0625rem",
+        "lg": "1.75rem",
+        "xl": "3.25rem"
+      }
+    },
+    "radius": {
+      "sm": "2px",
+      "md": "4px",
+      "lg": "6px"
+    },
+    "shadows": {
+      "surface": "0 4px 24px rgba(127,29,29,0.1)"
+    },
+    "borders": {
+      "default": "rgba(0,0,0,0.08)"
+    },
+    "animation": "heritage-cinematic"
+  },
+  "designSystem": {
+    "tier": "premium",
+    "industry": "University",
+    "layoutKind": "sidebar-right",
+    "templateIntelligenceId": "ti-university-heritage"
+  }
+}

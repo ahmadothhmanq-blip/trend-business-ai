@@ -1,0 +1,22 @@
+{
+  "id": "default",
+  "kind": "single-column",
+  "label": "Default Layout",
+  "regionOrder": [
+    "header",
+    "utility",
+    "main",
+    "footer"
+  ],
+  "rules": {
+    "gap": "0",
+    "regionGap": "1rem",
+    "minHeight": "auto"
+  },
+  "grid": {
+    "templateAreas": "\"header\" \"utility\" \"main\" \"footer\"",
+    "columns": "1fr",
+    "rows": "repeat(4, auto)",
+    "gap": "0"
+  }
+}

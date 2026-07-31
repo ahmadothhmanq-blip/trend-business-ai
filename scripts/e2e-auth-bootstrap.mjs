@@ -7,19 +7,12 @@ import { createClient } from "@supabase/supabase-js";
 import { readFileSync, appendFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import pg from "pg";
+import {
+  loadEnvLocal,
+  resolveLocalDevBaseUrl,
+} from "./lib/dev-base-url.mjs";
 
 const envPath = resolve(process.cwd(), ".env.local");
-
-function loadEnvLocal() {
-  const raw = readFileSync(envPath, "utf8");
-  for (const line of raw.split(/\r?\n/)) {
-    const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
-    if (!m) continue;
-    if (!process.env[m[1]]) {
-      process.env[m[1]] = m[2].replace(/^"|"$/g, "").replace(/^'|'$/g, "");
-    }
-  }
-}
 
 function upsertEnvLocal(key, value) {
   const raw = readFileSync(envPath, "utf8");
@@ -41,8 +34,9 @@ const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const dbUrl = process.env.SUPABASE_DB_URL;
 
 if (!process.env.NEXT_PUBLIC_SITE_URL) {
-  upsertEnvLocal("NEXT_PUBLIC_SITE_URL", "http://localhost:3000");
-  console.log("SET NEXT_PUBLIC_SITE_URL=http://localhost:3000");
+  const localOrigin = resolveLocalDevBaseUrl();
+  upsertEnvLocal("NEXT_PUBLIC_SITE_URL", localOrigin);
+  console.log(`SET NEXT_PUBLIC_SITE_URL=${localOrigin}`);
 } else {
   console.log("OK NEXT_PUBLIC_SITE_URL=", process.env.NEXT_PUBLIC_SITE_URL);
 }

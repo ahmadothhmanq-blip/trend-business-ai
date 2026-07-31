@@ -1,0 +1,12 @@
+{
+  "id": "treatments",
+  "title": "Treatments",
+  "path": "/treatments",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "overlay",
+    "footer"
+  ]
+}

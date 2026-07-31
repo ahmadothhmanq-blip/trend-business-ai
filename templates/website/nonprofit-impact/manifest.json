@@ -1,0 +1,155 @@
+{
+  "specVersion": "2.0.0",
+  "id": "nonprofit-impact",
+  "version": "2.0.0",
+  "name": "Nonprofit Impact",
+  "description": "Humanitarian nonprofit with mission storytelling, impact metrics, volunteer paths, and donation architecture.",
+  "metadata": {
+    "category": "nonprofit",
+    "industry": "Non-profit",
+    "tags": [
+      "nonprofit",
+      "charity",
+      "impact",
+      "donate"
+    ],
+    "author": {
+      "name": "Trend Business AI",
+      "organization": "Premium Template Studio"
+    },
+    "license": "MIT",
+    "keywords": [
+      "nonprofit",
+      "charity",
+      "foundation",
+      "volunteer"
+    ],
+    "templateIntelligenceId": "ti-nonprofit-impact",
+    "premium": true,
+    "tier": "agency"
+  },
+  "media": {
+    "thumbnail": "assets/thumbnail.png",
+    "preview": "assets/preview.png"
+  },
+  "compatibility": {
+    "engineVersion": ">=1.0.0",
+    "specVersion": "2.0.0",
+    "features": [
+      "regions",
+      "placement-rules",
+      "responsive",
+      "premium-canvas"
+    ]
+  },
+  "update": {
+    "channel": "stable",
+    "releasedAt": "2026-07-30T17:52:40.176Z"
+  },
+  "responsive": {
+    "breakpoints": [
+      {
+        "name": "sm",
+        "minWidth": 640
+      },
+      {
+        "name": "md",
+        "minWidth": 768
+      },
+      {
+        "name": "lg",
+        "minWidth": 1024
+      },
+      {
+        "name": "xl",
+        "minWidth": 1280
+      },
+      {
+        "name": "2xl",
+        "minWidth": 1536
+      }
+    ],
+    "containerMaxWidth": "76rem",
+    "fluidTypography": true
+  },
+  "canvas": {
+    "file": "canvas.json"
+  },
+  "placementRules": {
+    "file": "placement-rules.json"
+  },
+  "layouts": [
+    {
+      "id": "default",
+      "file": "layouts/default.json",
+      "kind": "single-column",
+      "label": "Default",
+      "description": "Premium single-column layout for Non-profit."
+    }
+  ],
+  "regions": [
+    {
+      "id": "header",
+      "file": "regions/header.json",
+      "role": "header",
+      "label": "Header Region",
+      "description": "Premium header region for Nonprofit Impact."
+    },
+    {
+      "id": "footer",
+      "file": "regions/footer.json",
+      "role": "footer",
+      "label": "Footer Region",
+      "description": "Premium footer region for Nonprofit Impact."
+    },
+    {
+      "id": "utility",
+      "file": "regions/utility.json",
+      "role": "utility",
+      "label": "Utility Region",
+      "description": "Premium utility region for Nonprofit Impact."
+    },
+    {
+      "id": "main",
+      "file": "regions/main.json",
+      "role": "main",
+      "label": "Main Region",
+      "description": "Premium main region for Nonprofit Impact."
+    }
+  ],
+  "pages": [
+    {
+      "id": "home",
+      "title": "Home",
+      "path": "/",
+      "layoutId": "default",
+      "file": "pages/home.json",
+      "description": "Home — premium Non-profit page blueprint."
+    },
+    {
+      "id": "mission",
+      "title": "Mission",
+      "path": "/mission",
+      "layoutId": "default",
+      "file": "pages/mission.json",
+      "description": "Mission — premium Non-profit page blueprint."
+    },
+    {
+      "id": "impact",
+      "title": "Impact",
+      "path": "/impact",
+      "layoutId": "default",
+      "file": "pages/impact.json",
+      "description": "Impact — premium Non-profit page blueprint."
+    },
+    {
+      "id": "donate",
+      "title": "Donate",
+      "path": "/donate",
+      "layoutId": "default",
+      "file": "pages/donate.json",
+      "description": "Donate — premium Non-profit page blueprint."
+    }
+  ],
+  "entry": "package.entry.json"
+}

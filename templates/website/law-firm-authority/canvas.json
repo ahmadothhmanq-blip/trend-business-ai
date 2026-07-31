@@ -1,0 +1,61 @@
+{
+  "id": "canvas",
+  "grid": {
+    "columns": 12,
+    "gutter": "2rem",
+    "margin": "0",
+    "maxWidth": "100%"
+  },
+  "spacing": {
+    "unit": "rem",
+    "scale": [
+      "0.5",
+      "1",
+      "2",
+      "3",
+      "4",
+      "6",
+      "8",
+      "12"
+    ]
+  },
+  "visualIdentity": {
+    "colors": {
+      "primary": "#0F172A",
+      "secondary": "#334155",
+      "accent": "#C9A962",
+      "background": "#020617",
+      "foreground": "#F8FAFC",
+      "muted": "rgba(248,250,252,0.62)",
+      "surface": "#0F172A"
+    },
+    "typography": {
+      "display": "Cormorant Garamond, ui-serif, Georgia, serif",
+      "body": "Source Sans 3, ui-sans-serif, system-ui, sans-serif",
+      "scale": {
+        "sm": "0.9375rem",
+        "base": "1.0625rem",
+        "lg": "1.75rem",
+        "xl": "3.5rem"
+      }
+    },
+    "radius": {
+      "sm": "0",
+      "md": "2px",
+      "lg": "4px"
+    },
+    "shadows": {
+      "surface": "0 24px 80px rgba(0,0,0,0.4)"
+    },
+    "borders": {
+      "default": "rgba(0,0,0,0.08)"
+    },
+    "animation": "authority-cinematic"
+  },
+  "designSystem": {
+    "tier": "premium",
+    "industry": "Law Firm",
+    "layoutKind": "full-bleed",
+    "templateIntelligenceId": "ti-law-firm"
+  }
+}

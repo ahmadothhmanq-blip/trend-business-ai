@@ -1,9 +1,4 @@
 import { requireUser, parseUuidParam } from "@/lib/api/helpers";
-import { apiNotFoundError } from "@/lib/i18n/api-errors";
-import {
-  livePreviewResponseHeaders,
-  resolveLivePreviewHtml,
-} from "@/lib/website/live-preview";
 import { requireWebsiteGenerationAccess } from "@/lib/website/builder/route-access";
 import { NextResponse } from "next/server";
 
@@ -30,6 +25,9 @@ export async function GET(_request: Request, context: RouteContext) {
   );
   if (accessResult instanceof NextResponse) return accessResult;
 
+  const { livePreviewResponseHeaders, resolveLivePreviewHtml } = await import(
+    "@/lib/website/live-preview.server"
+  );
   const html = resolveLivePreviewHtml(accessResult.generation);
   return new NextResponse(html, {
     status: 200,

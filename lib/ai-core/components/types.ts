@@ -87,6 +87,15 @@ export type ComponentSelectionContext = {
   ctaTypes?: string[];
   premiumHeroStyle?: string;
   premiumSectionLayout?: string;
+  /** Composition mode from layout selection — biases component scoring. */
+  compositionMode?: "editorial" | "story" | "product" | "trust" | "balanced";
+  /** Component styling tokens from DesignSystemSpec. */
+  componentStyling?: {
+    cards?: string;
+    buttons?: string;
+    forms?: string;
+    navigation?: string;
+  };
   brandName?: string;
   /** Website output language — non-English uses localized section names only. */
   language?: string | null;

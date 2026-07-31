@@ -13,6 +13,9 @@ import { promisify } from "node:util";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createClient } from "@supabase/supabase-js";
+import {
+  resolveLocalDevBaseUrl,
+} from "./lib/dev-base-url.mjs";
 
 const accessAsync = promisify(access);
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -478,7 +481,7 @@ async function checkProductionHttp() {
   ).replace(/\/+$/, "");
   const localFallback = (
     process.env.GOLIVE_LOCAL_BASE_URL ||
-    "http://127.0.0.1:3000"
+    resolveLocalDevBaseUrl("127.0.0.1")
   ).replace(/\/+$/, "");
 
   if (!remote) {

@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   BUILDER_SPACING_MAP,
-  BUILDER_THEME_PRESETS,
   spacingPresetFromSectionY,
   type BuilderSpacingPreset,
 } from "@/lib/website/builder";
@@ -20,7 +19,6 @@ type DesignSystemPanelProps = {
   disabled?: boolean;
   onTokensChange: (patch: Partial<VisualDesignTokens>) => void;
   onViewportChange: (viewport: VisualViewport) => void;
-  onApplyTheme: (presetId: string) => void;
 };
 
 function normalizeHex(value: string): string {
@@ -33,47 +31,18 @@ function normalizeHex(value: string): string {
   return `#${hex.slice(0, 6)}`;
 }
 
-function themeI18nKey(presetId: string): string {
-  return presetId.replace(/-([a-z])/g, (_, char: string) => char.toUpperCase());
-}
-
 export function DesignSystemPanel({
   tokens,
   viewport,
   disabled,
   onTokensChange,
   onViewportChange,
-  onApplyTheme,
 }: DesignSystemPanelProps) {
   const { wb } = useBuilderLocale();
   const spacing = spacingPresetFromSectionY(tokens.sectionY);
 
   return (
     <div className="flex h-full flex-col gap-4 overflow-y-auto p-3">
-      <div>
-        <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/35">
-          {wb("builder.design.themePresets")}
-        </p>
-        <div className="space-y-2">
-          {BUILDER_THEME_PRESETS.map((preset) => (
-            <button
-              key={preset.id}
-              type="button"
-              disabled={disabled}
-              onClick={() => onApplyTheme(preset.id)}
-              className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-start transition hover:border-premium-gold/30"
-            >
-              <p className="text-xs font-medium text-white">
-                {wb(`builder.themes.${themeI18nKey(preset.id)}.label`)}
-              </p>
-              <p className="text-[10px] text-white/45">
-                {wb(`builder.themes.${themeI18nKey(preset.id)}.description`)}
-              </p>
-            </button>
-          ))}
-        </div>
-      </div>
-
       <div>
         <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/35">
           {wb("builder.design.responsive")}

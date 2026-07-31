@@ -76,6 +76,125 @@ export function SiteFooter({
 }
 `,
 
+  SiteFooterMinimal: `type SiteFooterMinimalProps = {
+  brandName?: string;
+  tagline?: string;
+  links?: Array<{ href: string; label: string }>;
+};
+
+export function SiteFooterMinimal({
+  brandName = "Brand",
+  tagline = "Designed with intention.",
+  links = [],
+}: SiteFooterMinimalProps) {
+  return (
+    <footer className="border-t border-[var(--color-foreground)]/8 py-8 sm:py-10">
+      <div className="mx-auto flex max-w-[var(--container-max,72rem)] flex-col items-center justify-between gap-4 px-5 text-center sm:flex-row sm:px-6 sm:text-left">
+        <div>
+          <p className="text-sm font-semibold">{brandName}</p>
+          <p className="mt-1 text-xs text-[var(--color-foreground)]/50">{tagline}</p>
+        </div>
+        <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-[var(--color-foreground)]/45">
+          {(links.length ? links : [{ href: "#", label: "Privacy" }, { href: "#", label: "Terms" }]).map((l) => (
+            <a key={l.href} href={l.href}>{l.label}</a>
+          ))}
+        </div>
+      </div>
+    </footer>
+  );
+}
+`,
+
+  SiteFooterEditorial: `type SiteFooterEditorialProps = {
+  brandName?: string;
+  tagline?: string;
+  links?: Array<{ href: string; label: string }>;
+};
+
+export function SiteFooterEditorial({
+  brandName = "Brand",
+  tagline = "Stories worth telling.",
+  links = [
+    { href: "#services", label: "Services" },
+    { href: "#gallery", label: "Gallery" },
+    { href: "#contact", label: "Contact" },
+  ],
+}: SiteFooterEditorialProps) {
+  return (
+    <footer className="bg-[var(--color-foreground)] text-[var(--color-background)]">
+      <div className="mx-auto max-w-[var(--container-max,80rem)] px-5 py-16 sm:px-8 sm:py-20">
+        <div className="grid gap-12 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--color-background)]/50">
+              Newsletter
+            </p>
+            <h2 className="mt-4 font-[family-name:var(--font-display,var(--font-heading,inherit))] text-[clamp(2rem,5vw,3.5rem)] font-semibold leading-[1.02] tracking-[-0.03em]">
+              Stay in the {brandName} world
+            </h2>
+            <p className="mt-4 max-w-md text-sm leading-relaxed text-[var(--color-background)]/65">
+              {tagline}
+            </p>
+          </div>
+          <div className="flex flex-col gap-6">
+            <div className="flex border-b border-[var(--color-background)]/25">
+              <input
+                type="email"
+                placeholder="Email address"
+                className="flex-1 bg-transparent py-3 text-sm outline-none placeholder:text-[var(--color-background)]/40"
+              />
+              <button type="button" className="px-4 text-xs font-semibold uppercase tracking-[0.16em]">
+                Join
+              </button>
+            </div>
+            <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-[var(--color-background)]/70">
+              {links.map((l) => (
+                <li key={l.href}><a href={l.href}>{l.label}</a></li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        <p className="mt-14 text-xs text-[var(--color-background)]/40">
+          © {new Date().getFullYear()} {brandName}. All rights reserved.
+        </p>
+      </div>
+    </footer>
+  );
+}
+`,
+
+  FloatingCta: `"use client";
+
+type FloatingCtaProps = {
+  primaryCta?: string;
+  secondaryCta?: string;
+};
+
+export function FloatingCta({
+  primaryCta = "Book a demo",
+  secondaryCta,
+}: FloatingCtaProps) {
+  return (
+    <div className="pointer-events-none fixed bottom-5 right-5 z-[55] flex flex-col items-end gap-2 sm:bottom-8 sm:right-8">
+      {secondaryCta ? (
+        <a
+          href="#contact"
+          className="pointer-events-auto hidden rounded-full border border-[var(--color-foreground)]/15 bg-[var(--color-background)]/90 px-4 py-2 text-xs font-medium backdrop-blur-xl sm:inline-flex"
+        >
+          {secondaryCta}
+        </a>
+      ) : null}
+      <a
+        href="#contact"
+        className="pointer-events-auto inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-5 py-3.5 text-sm font-semibold text-[var(--color-on-primary,white)] shadow-2xl shadow-[var(--color-primary)]/30 transition hover:scale-[1.02]"
+      >
+        {primaryCta}
+        <span aria-hidden>→</span>
+      </a>
+    </div>
+  );
+}
+`,
+
   ServicesGrid: `import { SectionShell } from "@/components/ui/section-shell";
 ${img}
 

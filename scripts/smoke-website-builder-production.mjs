@@ -42,8 +42,9 @@ assert.match(copilotClient, /copilot\/commands/);
 assert.match(copilotClient, /forceStream/);
 
 const tool = read("components/dashboard/website-builder-tool.tsx");
+const workspace = read("components/dashboard/website-builder/builder-workspace.tsx");
 assert.match(tool, /WebsiteBuilderTool/);
-assert.match(tool, /VisualWebsiteEditor/);
+assert.match(workspace, /VisualWebsiteEditor/);
 assert.match(tool, /BrandKitPanel/);
 
 const management = read("components/dashboard/website-builder/website-management-dashboard.tsx");

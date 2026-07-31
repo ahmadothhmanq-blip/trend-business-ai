@@ -1,0 +1,23 @@
+{
+  "id": "default",
+  "kind": "full-bleed",
+  "label": "Default Layout",
+  "regionOrder": [
+    "header",
+    "overlay",
+    "main",
+    "utility",
+    "footer"
+  ],
+  "rules": {
+    "gap": "0",
+    "regionGap": "0",
+    "minHeight": "100vh"
+  },
+  "grid": {
+    "templateAreas": "\"header\" \"overlay\" \"main\" \"utility\" \"footer\"",
+    "columns": "1fr",
+    "rows": "auto auto 1fr auto auto",
+    "gap": "0"
+  }
+}

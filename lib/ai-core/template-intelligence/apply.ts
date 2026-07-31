@@ -1,16 +1,15 @@
 import { getBrandPreset } from "@/lib/ai-core/brand-identity/presets";
 import { injectProfessionalComponents } from "@/lib/ai-core/components/inject";
-import { buildIndustryCopyPack } from "@/lib/ai-core/content/industry-copy";
-import { usesLlmLocalizedWebsiteCopy } from "@/lib/ai-core/content/content-language";
+import type { ProductionContentPack } from "@/lib/ai-core/content/production-content";
 import {
-  buildProductionContentPack,
-  type ProductionContentPack,
-} from "@/lib/ai-core/content/production-content";
+  applyBusinessIdentityToProject,
+  extractBusinessIdentity,
+  patchDesignSystemVisualOnly,
+} from "@/lib/ai-core/template-intelligence/business-identity";
 import { getTemplateIntelligence } from "@/lib/ai-core/template-intelligence/catalog";
 import {
   resolveComponentsForIndustryAndTemplate,
   resolveVerticalPaletteId,
-  sanitizeCtaForIndustry,
 } from "@/lib/ai-core/template-intelligence/industry-palettes";
 import {
   resolveTemplateDNA,
@@ -24,6 +23,7 @@ import {
   resolveLocaleFromLanguage,
   applyLocaleToWebsiteFiles,
 } from "@/lib/ai-core/website-design-platform/i18n";
+import { resolveThemePageArchitecture } from "@/lib/website/builder/theme-architecture";
 import type { CoreBrief } from "@/lib/ai-core/layers/types";
 import type { GeneratedProjectFile } from "@/lib/ai/types";
 import type { GeneratedWebsiteProject } from "@/plugins/website/types";
@@ -180,7 +180,7 @@ function shouldPreserveFile(path: string): boolean {
   if (PRESERVE_PATH_PREFIXES.some((p) => path.startsWith(p) || path.includes(p))) {
     return true;
   }
-  // Keep secondary content pages (models/inventory/blog) — layout re-skin keeps data routes
+  // Keep secondary content pages (models/inventory/blog) — business routes unchanged
   if (
     path.startsWith("app/") &&
     path !== "app/page.tsx" &&
@@ -328,8 +328,8 @@ export type RethemeResult = {
 };
 
 /**
- * Switch visual template after generation — preserves content, images, pages, data.
- * Changes layout scaffolds, theme tokens, components, and visual style only.
+ * Switch website design template — full visual rebuild, 100% business identity preserved.
+ * Replaces header, hero layout, navigation, sections, cards, footer, typography, colors, etc.
  */
 export function applyTemplateIntelligenceRetheme(params: {
   project: GeneratedWebsiteProject;
@@ -341,96 +341,76 @@ export function applyTemplateIntelligenceRetheme(params: {
     throw new Error(`Unknown template intelligence id: ${params.templateId}`);
   }
 
-  // Non-English: visual-only switch — preserve LLM-authored copy and pages.
-  if (usesLlmLocalizedWebsiteCopy(params.language)) {
-    const visual = applyTemplateVisualSwitch({
-      project: params.project,
-      templateId: params.templateId,
-    });
-    const locale = resolveLocaleFromLanguage(params.language);
-    return {
-      ...visual,
-      project: {
-        ...visual.project,
-        files: applyLocaleToWebsiteFiles(visual.project.files || [], locale),
-      },
-      notes: [
-        ...visual.notes,
-        `Preserved ${params.language} copy — template changed layout and design only`,
-      ],
-    };
-  }
-
   const notes: string[] = [];
   const locale = resolveLocaleFromLanguage(params.language);
+  const identity = extractBusinessIdentity(params.project, params.language);
+  notes.push("Business identity locked (content, SEO, images, pages, strategy)");
+
   const originalFiles = params.project.files || [];
   const preserved = originalFiles.filter((f) => shouldPreserveFile(f.path));
-  notes.push(`Preserved ${preserved.length} content/data/image files`);
+  notes.push(`Preserved ${preserved.length} business asset and route files`);
 
-  const profile = params.project.businessProfile;
-  const strategy = params.project.strategy;
+  const profile = identity.businessProfile;
   const businessIndustry =
     profile?.industry ||
     params.project.designSystem?.industryPattern ||
     undefined;
-  const copyPack = buildIndustryCopyPack({
-    industryId: businessIndustry,
-    profile: profile || null,
-    strategy: strategy || null,
-    language: params.language,
-  });
-  copyPack.primaryCta = sanitizeCtaForIndustry(
-    copyPack.primaryCta,
-    copyPack.industryId,
-  );
-  copyPack.secondaryCta = sanitizeCtaForIndustry(
-    copyPack.secondaryCta,
-    copyPack.industryId,
-  );
-  const production = buildProductionContentPack(
-    copyPack,
-    profile?.projectName || params.project.title,
-    params.language,
-  );
-  const preservedContent = extractPreservedHeroContent(
-    params.project,
-    production,
-  );
 
-  const brandName = profile?.projectName || params.project.title || "Brand";
+  const templateDna = resolveTemplateDNA(template);
+  const themeArch = resolveThemePageArchitecture(template.id);
+  const architectureComponents = themeArch?.components.length
+    ? [...themeArch.components]
+    : null;
+  const resolvedComponents = architectureComponents?.length
+    ? architectureComponents
+    : templateDna.components.length
+      ? [...templateDna.components]
+      : resolveComponentsForIndustryAndTemplate(
+          template,
+          businessIndustry,
+          params.project.description || params.project.title,
+        );
+  const homeOrder = architectureComponents?.length
+    ? architectureComponents
+    : templateDna.components.length
+      ? [...templateDna.components]
+      : resolvedComponents;
 
-  // Start from preserved files, then inject new visual components + home composition.
+  const productionContent = identity.productionContent;
+  const brandName = profile?.projectName || identity.title || "Brand";
+
   let files = injectProfessionalComponents({
     files: preserved,
-    componentIds: template.components.map(String),
+    componentIds: resolvedComponents.map(String),
+    homeComponentOrder: homeOrder.map(String),
     brandName,
-    pageTitle: params.project.title,
-    pageDescription: params.project.description,
-    heroHeadline: preservedContent.heroHeadline,
-    heroSubheadline: preservedContent.heroSubheadline,
-    primaryCta: preservedContent.primaryCta,
-    secondaryCta: preservedContent.secondaryCta,
-    heroEyebrow: preservedContent.heroEyebrow,
-    content: preservedContent.content,
+    pageTitle: identity.title,
+    pageDescription: identity.description,
+    heroHeadline: productionContent.heroHeadline,
+    heroSubheadline: productionContent.heroSubheadline,
+    primaryCta: productionContent.primaryCta,
+    secondaryCta: productionContent.secondaryCta,
+    heroEyebrow: productionContent.heroEyebrow,
+    content: productionContent,
     composePage: true,
     language: params.language,
+    templateIntelligenceId: template.id,
+    templateVisualCss: buildTemplateVisualCss(template),
+    sectionShellVariant: themeArch?.sectionShellVariant ?? null,
+    websiteThemeId: themeArch?.themeId ?? null,
+    pageTopology: themeArch?.pageTopology ?? null,
+    floatingCta: themeArch?.floatingCta ?? false,
+    forceDesignRebuild: true,
   });
   notes.push(
-    `Applied layout components: ${template.components.slice(0, 6).join(", ")}…`,
-  );
-  notes.push(
-    locale.rtl
-      ? "Localized section copy and navigation in Arabic"
-      : "Refreshed section copy for selected template",
+    themeArch
+      ? `Rebuilt theme architecture: ${themeArch.pageTopology} · ${resolvedComponents.slice(0, 5).join(", ")}…`
+      : `Rebuilt website design: ${resolvedComponents.slice(0, 6).join(", ")}…`,
   );
 
-  // Restore preserved assets if inject stubbed site-images
   for (const file of preserved) {
     if (file.path.includes("site-images") || file.path.includes("site-videos")) {
-      files = [
-        ...files.filter((f) => f.path !== file.path),
-        file,
-      ];
+      files = [...files.filter((f) => f.path !== file.path), file];
     }
   }
 
@@ -438,44 +418,55 @@ export function applyTemplateIntelligenceRetheme(params: {
   files = applyLocaleToWebsiteFiles(files, locale);
   if (locale.rtl) {
     notes.push("Applied Arabic/RTL locale to layout and styles");
-  } else {
-    notes.push(`Applied ${locale.language} locale to layout`);
   }
+
   const visualPreset = resolveTemplateVisualPreset(template);
-  notes.push(`Applied theme tokens (${template.category} · ${template.designPreset})`);
   notes.push(
-    `Visual preset: ${visualPreset.chrome.headerVariant} header · ${visualPreset.layout.sectionLayout} sections · ${visualPreset.buttons.primary} buttons`,
+    themeArch
+      ? `Architecture: ${themeArch.pageTopology} · ${themeArch.sectionShellVariant} sections · ${themeArch.animationLanguage}`
+      : `Design: ${template.name} · ${visualPreset.chrome.headerVariant} header · ${visualPreset.layout.sectionLayout} sections`,
   );
 
-  const designSystem = patchDesignSystem(params.project.designSystem, template);
+  const designSystem = patchDesignSystemVisualOnly(
+    params.project.designSystem,
+    template,
+  );
 
-  const project: GeneratedWebsiteProject = {
-    ...params.project,
-    files,
-    designSystem,
-    colorPalette: [
-      template.colors.primary,
-      template.colors.secondary,
-      template.colors.accent,
-      template.colors.background,
-    ],
-    typography: [
-      template.typography.display,
-      template.typography.heading,
-      template.typography.body,
-    ],
-    components: template.components.map(String),
-    sections: template.components.map(String),
-    settings: {
-      ...params.project.settings,
-      templateIntelligenceId: template.id,
-      templateIntelligenceCategory: template.category,
-      templateVisualPreset: visualPreset,
-    } as GeneratedWebsiteProject["settings"],
+  const designSettings = {
+    templateIntelligenceId: template.id,
+    templateIntelligenceCategory: template.category,
+    templateVisualPreset: visualPreset,
   };
 
+  const project = applyBusinessIdentityToProject(
+    {
+      ...params.project,
+      files,
+      designSystem,
+      colorPalette: [
+        template.colors.primary,
+        template.colors.secondary,
+        template.colors.accent,
+        template.colors.background,
+        template.colors.foreground,
+        template.colors.surface,
+      ],
+      typography: [
+        template.typography.display,
+        template.typography.heading,
+        template.typography.body,
+      ],
+      components: resolvedComponents.map(String),
+      sections: templateDna.sectionOrder.length
+        ? [...templateDna.sectionOrder]
+        : resolvedComponents.map(String),
+    },
+    identity,
+    designSettings,
+  );
+
   notes.push(
-    `Template switched to ${template.name} — content, images, and pages preserved`,
+    `Template redesign complete — same business, new professional design (${template.name})`,
   );
 
   return { project, template, notes };

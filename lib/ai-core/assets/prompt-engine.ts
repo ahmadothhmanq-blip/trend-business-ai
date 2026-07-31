@@ -13,8 +13,11 @@ import {
 import type { CoreAssetPlanItem } from "@/lib/ai-core/assets/types";
 import {
   buildImageIntelligence,
-  planWebsiteImages,
 } from "@/lib/ai-core/image-engine";
+import {
+  imageSpecificationsToPlanItems,
+  runImageIntelligenceEngine,
+} from "@/lib/ai-core/image-intelligence";
 
 type PromptEnrichment = {
   items: Array<{
@@ -56,14 +59,19 @@ export async function buildImagePrompts(params: {
     style: intel.imageStyle,
   });
 
-  let items: CoreAssetPlanItem[] = planWebsiteImages({
+  const iieResult = runImageIntelligenceEngine({
     strategy: params.strategy,
     designSystem: params.designSystem,
     profile: params.profile,
     templateSelection: params.templateSelection,
     preferredStyle: settings.style,
-    maxItems: params.maxItems ?? 8,
-  }).map((item) => ({
+    maxImages: params.maxItems ?? 8,
+    onProgress: params.onProgress,
+  });
+
+  let items: CoreAssetPlanItem[] = imageSpecificationsToPlanItems(
+    iieResult.spec.specifications,
+  ).map((item) => ({
     id: item.id,
     kind: item.kind,
     role: item.role,

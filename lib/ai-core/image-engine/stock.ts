@@ -38,7 +38,7 @@ const STOCK: Record<string, StockPack> = {
     gallery: [u("photo-1600585154526-990dced4db0d"), u("photo-1600047509807-ba8f99d2cd00")],
   },
   saas: {
-    hero: [u("photo-1551434678-e076c223a6922"), u("photo-1460925895917-afdab827c52f")],
+    hero: [u("photo-1551434678-e076c223a692"), u("photo-1460925895917-afdab827c52f")],
     section: [u("photo-1553877522-43269d4ea984"), u("photo-1517245386807-bb43f82c33c4")],
     product: [u("photo-1551288049-bebda4e38f71")],
     service: [u("photo-1522071820081-009f0129c71c")],
@@ -78,7 +78,7 @@ const STOCK: Record<string, StockPack> = {
     gallery: [u("photo-1522202176988-66273c2fd55f"), u("photo-1516321318423-f06f85e504b3")],
   },
   agency: {
-    hero: [u("photo-1542744173-8e7e53415bb5"), u("photo-1552664730-d307ca884978")],
+    hero: [u("photo-1497366811353-6870744d04b2"), u("photo-1486406146926-c627a92ad1ab")],
     section: [u("photo-1600880292203-757bb62b4baf"), u("photo-1556761175-5973dc0f32e7")],
     product: [u("photo-1561070791-2526d30994b5")],
     service: [u("photo-1553877522-43269d4ea984")],
@@ -133,7 +133,14 @@ for (const key of Object.keys(STOCK)) {
   }
 }
 
-function resolveIndustry(industry?: string | null): string {
+function resolveIndustry(
+  industry?: string | null,
+  routingIndustryId?: string | null,
+): string {
+  const preferred = (routingIndustryId || industry || "business")
+    .toLowerCase()
+    .replace(/[_\s]+/g, "-");
+  if (preferred in STOCK) return preferred;
   const raw = (industry || "business").toLowerCase().replace(/[_\s]+/g, "-");
   if (raw in STOCK) return raw;
   if (raw.includes("tour") || raw.includes("travel") || raw.includes("tourism")) {
@@ -151,7 +158,11 @@ function resolveIndustry(industry?: string | null): string {
   if (raw.includes("saas") || raw.includes("software") || raw.includes("tech")) {
     return "saas";
   }
-  if (raw.includes("ecom") || raw.includes("shop")) return "ecommerce";
+  if (raw.includes("ecom")) return "ecommerce";
+  if (raw.includes("shop") || raw.includes("store")) {
+    if (raw.includes("furniture") || raw.includes("furnish")) return "furniture";
+    return "ecommerce";
+  }
   if (/\b(automotive|dealership|vehicle)\b/.test(raw) || /\bcar\b/.test(raw)) {
     return "automotive";
   }
@@ -178,10 +189,15 @@ function resolveIndustry(industry?: string | null): string {
  */
 export function resolvePremiumStockUrl(params: {
   industry?: string | null;
+  routingIndustryId?: string | null;
   role: string;
   seed?: string;
+  /** Semantic query from ImageSpecification — selects most relevant stock variant. */
+  semanticQuery?: string | null;
 }): string {
-  const pack = STOCK[resolveIndustry(params.industry)] ?? STOCK.business;
+  const pack =
+    STOCK[resolveIndustry(params.industry, params.routingIndustryId)] ??
+    STOCK.business;
   const roleKey = params.role in pack ? params.role : "hero";
   const list =
     pack[roleKey] ||
@@ -189,8 +205,34 @@ export function resolvePremiumStockUrl(params: {
     STOCK.business.hero || [
       u("photo-1497366811353-6870744d04b2"),
     ];
+
+  const query = (params.semanticQuery || "").toLowerCase();
+  if (query.length > 8) {
+    const tokens = query
+      .replace(/[^a-z0-9\s]/g, " ")
+      .split(/\s+/)
+      .filter((w) => w.length > 4)
+      .slice(0, 8);
+    if (tokens.length > 0) {
+      let bestIdx = 0;
+      let bestScore = -1;
+      for (let i = 0; i < list.length; i += 1) {
+        const urlHay = list[i]!.toLowerCase();
+        const score = tokens.reduce(
+          (sum, t) => sum + (urlHay.includes(t) ? 1 : 0),
+          0,
+        );
+        if (score > bestScore) {
+          bestScore = score;
+          bestIdx = i;
+        }
+      }
+      if (bestScore > 0) return list[bestIdx]!;
+    }
+  }
+
   let hash = 0;
-  const seed = params.seed || params.role;
+  const seed = params.seed || params.semanticQuery || params.role;
   for (let i = 0; i < seed.length; i += 1) {
     hash = (hash + seed.charCodeAt(i) * (i + 1)) % 997;
   }
@@ -199,4 +241,33 @@ export function resolvePremiumStockUrl(params: {
 
 export function isPremiumStockUrl(url: string | null | undefined): boolean {
   return Boolean(url?.includes("images.unsplash.com"));
+}
+
+/** Unsplash photos removed from CDN — remap legacy project URLs at read/inject time. */
+const REMOVED_UNSPLASH_PHOTOS: Record<string, string> = {
+  "photo-1542744173-8e7e53415bb5": "photo-1497366811353-6870744d04b2",
+  "photo-1551434678-e076c223a6922": "photo-1551434678-e076c223a692",
+  "photo-1552664730-d307ca884978": "photo-1486406146926-c627a92ad1ab",
+};
+
+function extractUnsplashPhotoId(url: string): string | null {
+  const match = url.match(/images\.unsplash\.com\/(photo-[^/?]+)/i);
+  return match?.[1] ?? null;
+}
+
+/**
+ * Normalize premium stock URLs — fix known typos and replace removed Unsplash photos.
+ * Used when parsing site-images for preview and when hydrating legacy blueprints.
+ */
+export function normalizePremiumStockUrl(url: string): string {
+  const trimmed = url.trim();
+  if (!trimmed) return trimmed;
+
+  const photoId = extractUnsplashPhotoId(trimmed);
+  if (!photoId) return trimmed;
+
+  const replacement = REMOVED_UNSPLASH_PHOTOS[photoId];
+  if (!replacement) return trimmed;
+
+  return trimmed.replace(photoId, replacement);
 }

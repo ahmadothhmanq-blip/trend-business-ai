@@ -1,0 +1,13 @@
+{
+  "id": "products",
+  "title": "Products",
+  "path": "/products",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "utility",
+    "overlay",
+    "main",
+    "footer"
+  ]
+}

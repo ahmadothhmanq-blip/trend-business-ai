@@ -6,9 +6,15 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  loadEnvLocal,
+  resolveLocalDevBaseUrl,
+} from "./lib/dev-base-url.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
+
+loadEnvLocal();
 
 function read(rel) {
   return readFileSync(join(root, rel), "utf8");
@@ -22,7 +28,7 @@ function slugify(value) {
 }
 
 process.env.NEXT_PUBLIC_SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  process.env.NEXT_PUBLIC_SITE_URL || resolveLocalDevBaseUrl();
 
 function isWebsitePublishEnabled() {
   return process.env.WEBSITE_PUBLISH_ENABLED !== "false";

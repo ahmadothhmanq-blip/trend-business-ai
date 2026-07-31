@@ -1,7 +1,8 @@
 import { requireUser, parseJsonBody, parseUuidParam } from "@/lib/api/helpers";
-import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
+import { API_ERROR_CODES, apiErrorResponse, apiValidationError } from "@/lib/i18n/api-errors";
 import { serverErrorResponse } from "@/lib/api/errors";
 import { updateWebsiteGenerationInPlace } from "@/lib/website/save-generation";
+import { applyStructureTemplateToProject } from "@/lib/website/builder/apply-structure-template";
 import { applyTemplateIntelligenceRetheme } from "@/lib/ai-core/template-intelligence";
 import { extractWebsiteFilesFromBlueprint } from "@/plugins/website/iteration";
 import type { GeneratedWebsiteProject } from "@/plugins/website/types";
@@ -15,13 +16,46 @@ export const dynamic = "force-dynamic";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
-const bodySchema = z.object({
-  templateIntelligenceId: z.string().trim().min(1),
-});
+const bodySchema = z.union([
+  z.object({
+    templatePackageId: z.string().trim().min(1),
+  }),
+  z.object({
+    templateIntelligenceId: z.string().trim().min(1),
+  }),
+]);
+
+function buildProjectFromGeneration(
+  generation: WebsiteGeneration,
+): GeneratedWebsiteProject {
+  const files = extractWebsiteFilesFromBlueprint(generation.blueprint);
+  const blueprint = (generation.blueprint || {}) as unknown as GeneratedWebsiteProject;
+  return {
+    ...blueprint,
+    projectKind: blueprint.projectKind || "website",
+    title: blueprint.title || generation.project_name || "Website",
+    description:
+      blueprint.description || generation.business_description || "",
+    pages: blueprint.pages || [],
+    sections: blueprint.sections || [],
+    colorPalette: blueprint.colorPalette || [],
+    typography: blueprint.typography || [],
+    components: blueprint.components || [],
+    content: blueprint.content || [],
+    seo: blueprint.seo || [],
+    roadmap: blueprint.roadmap || [],
+    files: files.length ? files : blueprint.files || [],
+    businessProfile: blueprint.businessProfile,
+    strategy: blueprint.strategy,
+    designSystem: blueprint.designSystem,
+    assetManifest: blueprint.assetManifest,
+    settings: blueprint.settings,
+  };
+}
 
 /**
  * POST /api/website-builder/[id]/template
- * Switch Template Intelligence on the active project — no AI, no new generation row.
+ * Switch structure template or Template Intelligence on the active project — no AI, no new generation row.
  */
 export async function POST(request: Request, context: RouteContext) {
   const { id: rawId } = await context.params;
@@ -50,35 +84,20 @@ export async function POST(request: Request, context: RouteContext) {
     if (accessResult instanceof NextResponse) return accessResult;
 
     const generation = accessResult.generation as WebsiteGeneration;
-    const files = extractWebsiteFilesFromBlueprint(generation.blueprint);
-    const blueprint = (generation.blueprint || {}) as unknown as GeneratedWebsiteProject;
-    const project: GeneratedWebsiteProject = {
-      ...blueprint,
-      projectKind: blueprint.projectKind || "website",
-      title: blueprint.title || generation.project_name || "Website",
-      description:
-        blueprint.description || generation.business_description || "",
-      pages: blueprint.pages || [],
-      sections: blueprint.sections || [],
-      colorPalette: blueprint.colorPalette || [],
-      typography: blueprint.typography || [],
-      components: blueprint.components || [],
-      content: blueprint.content || [],
-      seo: blueprint.seo || [],
-      roadmap: blueprint.roadmap || [],
-      files: files.length ? files : blueprint.files || [],
-      businessProfile: blueprint.businessProfile,
-      strategy: blueprint.strategy,
-      designSystem: blueprint.designSystem,
-      assetManifest: blueprint.assetManifest,
-      settings: blueprint.settings,
-    };
+    const project = buildProjectFromGeneration(generation);
 
-    const switched = applyTemplateIntelligenceRetheme({
-      project,
-      templateId: parsed.data.templateIntelligenceId,
-      language: generation.language,
-    });
+    const switched =
+      "templatePackageId" in parsed.data
+        ? applyStructureTemplateToProject({
+            project,
+            templatePackageId: parsed.data.templatePackageId,
+            language: generation.language,
+          })
+        : applyTemplateIntelligenceRetheme({
+            project,
+            templateId: parsed.data.templateIntelligenceId,
+            language: generation.language,
+          });
 
     const saved = await updateWebsiteGenerationInPlace({
       supabase: auth.supabase,
@@ -92,9 +111,16 @@ export async function POST(request: Request, context: RouteContext) {
       return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, saved.error);
     }
 
+    const structureTemplateId =
+      "templatePackageId" in parsed.data
+        ? parsed.data.templatePackageId
+        : ((saved.project.settings as Record<string, unknown> | undefined)
+            ?.websiteStructureTemplateId as string | undefined);
+
     return NextResponse.json({
       ok: true,
       notes: switched.notes,
+      structureTemplateId: structureTemplateId ?? null,
       template: {
         id: switched.template.id,
         name: switched.template.name,

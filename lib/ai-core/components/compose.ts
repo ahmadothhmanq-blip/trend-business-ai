@@ -6,6 +6,16 @@ import {
   resolveContentLanguage,
   usesLlmLocalizedWebsiteCopy,
 } from "@/lib/ai-core/content/content-language";
+import type { ThemePageTopology } from "@/lib/website/builder/theme-architecture";
+import {
+  getThemeComponentRole,
+  isThemeFloatingCtaComponent,
+  isThemeFooterComponent,
+  isThemeHeroComponent,
+  isThemeNavComponent,
+  isThemeScopedComponent,
+} from "@/lib/website/builder/theme-component-registry";
+import type { WebsiteThemePresetId } from "@/lib/website/builder/theme-catalog";
 
 function isComponentId(id: string): id is DesignRendererComponentId {
   return id in DESIGN_RENDERER_COMPONENTS;
@@ -28,8 +38,31 @@ const HERO_IDS = new Set<string>([
 const HEADER_IDS = new Set([
   "SiteHeaderTransparent",
   "NavModern",
+  "NavSidebar",
+  "NavHamburger",
+  "NavCentered",
   "SiteHeader",
 ]);
+
+const FOOTER_IDS = new Set([
+  "SiteFooter",
+  "SiteFooterMinimal",
+  "SiteFooterEditorial",
+]);
+
+const CHROME_IDS_LEGACY = new Set([...HEADER_IDS, ...FOOTER_IDS, "FloatingCta"]);
+
+function isChromeComponent(id: string): boolean {
+  if (isThemeScopedComponent(id)) {
+    const role = getThemeComponentRole(id);
+    return (
+      role === "nav" ||
+      role === "footer" ||
+      role === "floating-cta"
+    );
+  }
+  return CHROME_IDS_LEGACY.has(id);
+}
 
 const SERVICES_IDS = new Set([
   "ServicesGrid",
@@ -104,6 +137,10 @@ const CTA_IDS = new Set([
 
 const CONTACT_IDS = new Set(["ContactSection", "ContactCta"]);
 
+const BLOG_IDS = new Set(["BlogSection"]);
+
+const TIMELINE_IDS = new Set(["TimelineSection", "ProcessSteps"]);
+
 function jsxProp(name: string, value: unknown): string {
   if (value === undefined || value === null) return "";
   if (typeof value === "string") {
@@ -132,6 +169,12 @@ export function composeHomePage(params: {
   language?: string | null;
   /** Template Intelligence id for body class + layout hooks. */
   templateId?: string | null;
+  /** Curated theme id for exclusive component library resolution. */
+  websiteThemeId?: WebsiteThemePresetId | string | null;
+  /** Theme page topology — drives distinct page trees per theme. */
+  pageTopology?: ThemePageTopology | null;
+  /** Inject persistent floating CTA (technology / bold themes). */
+  floatingCta?: boolean;
 }): string {
   const sourceIds =
     params.homeComponentOrder?.length
@@ -144,22 +187,41 @@ export function composeHomePage(params: {
   const localized = usesLlmLocalizedWebsiteCopy(params.language);
 
   const headerId: DesignRendererComponentId =
-    ids.find((id) => HEADER_IDS.has(id)) ?? "SiteHeader";
-  const footerId: DesignRendererComponentId = "SiteFooter";
-  const sectionIds = ids.filter(
-    (id) =>
-      id !== headerId &&
-      id !== footerId &&
-      !HEADER_IDS.has(id),
-  );
+    ids.find((id) => isThemeNavComponent(id) || HEADER_IDS.has(id)) ??
+    "SiteHeader";
+  const footerId: DesignRendererComponentId =
+    ids.find((id) => isThemeFooterComponent(id) || FOOTER_IDS.has(id)) ??
+    "SiteFooter";
+  const floatingCta =
+    params.floatingCta ??
+    ids.some((id) => isThemeFloatingCtaComponent(id) || id === "FloatingCta");
+  const pageTopology = params.pageTopology ?? "classic-stack";
+
+  const sectionIds = ids.filter((id) => !isChromeComponent(id));
+
+  const floatingId: DesignRendererComponentId =
+    ids.find((id) => isThemeFloatingCtaComponent(id)) ?? "FloatingCta";
 
   const ordered: DesignRendererComponentId[] = params.homeComponentOrder?.length
     ? ids.filter(
-        (id) => isComponentId(id) && (id === headerId || id === footerId || sectionIds.includes(id)),
+        (id) =>
+          isComponentId(id) &&
+          (id === headerId ||
+            id === footerId ||
+            id === floatingId ||
+            sectionIds.includes(id)),
       )
-    : [headerId, ...sectionIds, footerId];
+    : [
+        headerId,
+        ...sectionIds,
+        footerId,
+        ...(floatingCta ? [floatingId] : []),
+      ];
 
-  const imports = ordered.map((id) => {
+  const importIds = new Set(ordered);
+  if (floatingCta) importIds.add(floatingId);
+
+  const imports = Array.from(importIds).map((id) => {
     const spec = DESIGN_RENDERER_COMPONENTS[id];
     const importPath = spec.path
       .replace(/^components\//, "@/components/")
@@ -191,8 +253,86 @@ export function composeHomePage(params: {
 
   const renderSection = (id: DesignRendererComponentId): string => {
     const name = DESIGN_RENDERER_COMPONENTS[id].exportName;
+    const themeRole = getThemeComponentRole(id);
 
-    if (HERO_IDS.has(id)) {
+    if (themeRole === "nav") {
+      return `      <${name}
+${jsxProp("brandName", brand)}${jsxProp("ctaLabel", primaryCta)}${jsxProp("links", navLinks)}      />`;
+    }
+
+    if (themeRole === "hero") {
+      let props = "";
+      props += jsxProp("title", heroTitle);
+      props += jsxProp("subtitle", heroSubtitle);
+      props += jsxProp("eyebrow", heroEyebrow);
+      props += jsxProp("primaryCta", primaryCta);
+      props += jsxProp("secondaryCta", secondaryCta);
+      props += "        imageUrl={HERO_IMAGE}\n";
+      return `      <${name}\n${props}      />`;
+    }
+
+    if (themeRole === "footer") {
+      return `      <${name}
+${jsxProp("brandName", brand)}${jsxProp("tagline", content?.brandTagline || description)}${jsxProp("links", navLinks)}      />`;
+    }
+
+    if (themeRole === "floating-cta") {
+      return `      <${name}
+${jsxProp("primaryCta", primaryCta)}${jsxProp("secondaryCta", secondaryCta)}      />`;
+    }
+
+    if (themeRole && content) {
+      if (
+        themeRole === "features" ||
+        themeRole === "story" ||
+        themeRole === "blog"
+      ) {
+        return `      <${name}
+${jsxProp("eyebrow", content.featuresEyebrow)}${jsxProp("title", content.featuresTitle)}${jsxProp("subtitle", content.featuresSubtitle)}${jsxProp("items", content.features)}${jsxProp("features", content.features)}      />`;
+      }
+      if (themeRole === "services" || themeRole === "process") {
+        return `      <${name}
+${jsxProp("eyebrow", content.servicesEyebrow)}${jsxProp("title", content.servicesTitle)}${jsxProp("subtitle", content.servicesSubtitle)}${jsxProp("items", content.services)}      />`;
+      }
+      if (themeRole === "testimonials" || themeRole === "trust") {
+        return `      <${name}
+${jsxProp("eyebrow", content.testimonialsEyebrow)}${jsxProp("title", content.testimonialsTitle)}${jsxProp("subtitle", content.testimonialsSubtitle)}${jsxProp("items", content.testimonials)}${jsxProp("quotes", content.testimonials)}      />`;
+      }
+      if (themeRole === "pricing") {
+        return `      <${name}
+${jsxProp("eyebrow", content.pricingEyebrow)}${jsxProp("title", content.pricingTitle)}${jsxProp("subtitle", content.pricingSubtitle)}${jsxProp("plans", content.pricing)}      />`;
+      }
+      if (themeRole === "faq") {
+        return `      <${name}
+${jsxProp("eyebrow", content.faqEyebrow)}${jsxProp("title", content.faqTitle)}${jsxProp("subtitle", content.faqSubtitle)}${jsxProp("items", content.faqs)}${jsxProp("faqs", content.faqs)}      />`;
+      }
+      if (
+        themeRole === "gallery" ||
+        themeRole === "portfolio" ||
+        themeRole === "cases"
+      ) {
+        return `      <${name}
+${jsxProp("eyebrow", content.galleryEyebrow)}${jsxProp("title", content.galleryTitle)}${jsxProp("subtitle", content.gallerySubtitle)}${jsxProp("items", content.galleryItems)}      />`;
+      }
+      if (themeRole === "integrations") {
+        return `      <${name}
+${jsxProp("eyebrow", content.featuresEyebrow)}${jsxProp("title", content.featuresTitle)}${jsxProp("subtitle", content.featuresSubtitle)}      />`;
+      }
+      if (themeRole === "timeline") {
+        return `      <${name}
+${jsxProp("eyebrow", content.servicesEyebrow)}${jsxProp("title", content.servicesTitle)}${jsxProp("subtitle", content.servicesSubtitle)}      />`;
+      }
+      if (themeRole === "cta") {
+        return `      <${name}
+${jsxProp("eyebrow", content.ctaEyebrow)}${jsxProp("title", content.ctaTitle)}${jsxProp("subtitle", content.ctaBody)}${jsxProp("primaryCta", primaryCta)}${jsxProp("secondaryCta", secondaryCta)}      />`;
+      }
+      if (themeRole === "contact") {
+        return `      <${name}
+${jsxProp("eyebrow", ui.navContact)}${jsxProp("title", content.contactTitle)}${jsxProp("subtitle", content.contactSubtitle)}${jsxProp("ctaLabel", primaryCta)}      />`;
+      }
+    }
+
+    if (HERO_IDS.has(id) || isThemeHeroComponent(id)) {
       const withSecondary = [
         "HeroLuxury",
         "HeroLuxuryShowcase",
@@ -286,6 +426,21 @@ ${jsxProp("eyebrow", content.ctaEyebrow)}${jsxProp("title", content.ctaTitle)}${
 ${jsxProp("eyebrow", ui.navContact)}${jsxProp("title", content.contactTitle)}${jsxProp("subtitle", content.contactSubtitle)}${jsxProp("ctaLabel", primaryCta)}      />`;
     }
 
+    if (BLOG_IDS.has(id) && content) {
+      return `      <${name}
+${jsxProp("eyebrow", content.featuresEyebrow)}${jsxProp("title", content.featuresTitle)}${jsxProp("subtitle", content.featuresSubtitle)}${jsxProp("items", content.features)}      />`;
+    }
+
+    if (TIMELINE_IDS.has(id) && content) {
+      return `      <${name}
+${jsxProp("eyebrow", content.servicesEyebrow)}${jsxProp("title", content.servicesTitle)}${jsxProp("subtitle", content.servicesSubtitle)}      />`;
+    }
+
+    if (id === "FloatingCta") {
+      return `      <${name}
+${jsxProp("primaryCta", primaryCta)}${jsxProp("secondaryCta", secondaryCta)}      />`;
+    }
+
     if (localized) {
       return "";
     }
@@ -293,16 +448,31 @@ ${jsxProp("eyebrow", ui.navContact)}${jsxProp("title", content.contactTitle)}${j
     return `      <${name} />`;
   };
 
-  const sectionJsx = (params.homeComponentOrder?.length ? ordered : sectionIds)
-    .filter((id) => id !== headerId && id !== footerId)
+  const bodySections = (params.homeComponentOrder?.length ? ordered : sectionIds)
+    .filter((id) => !isChromeComponent(id))
     .map(renderSection)
+    .filter(Boolean)
     .join("\n");
+
+  const heroSection = sectionIds.find(
+    (id) => HERO_IDS.has(id) || isThemeHeroComponent(id),
+  );
+  const afterHeroSections = sectionIds
+    .filter((id) => id !== heroSection)
+    .map(renderSection)
+    .filter(Boolean)
+    .join("\n");
+  const heroJsx = heroSection ? renderSection(heroSection) : "";
 
   const templateClass = params.templateId
     ? ` ti-template ti-${params.templateId.replace(/^ti-/, "")}`
     : "";
-  const mainClass =
-    `min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] antialiased${templateClass}`;
+  const themeClass = params.websiteThemeId
+    ? ` ti-theme-${params.websiteThemeId}`
+    : "";
+  const topologyClass = ` ti-topology-${pageTopology.replace(/-/g, "_")}`;
+  const rootClass =
+    `min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] antialiased${templateClass}${themeClass}${topologyClass}`;
 
   const headerProps =
     `${jsxProp("brandName", brand)}` +
@@ -313,6 +483,59 @@ ${jsxProp("eyebrow", ui.navContact)}${jsxProp("title", content.contactTitle)}${j
     `${jsxProp("brandName", brand)}` +
     `${jsxProp("tagline", content?.brandTagline || description)}` +
     `${jsxProp("links", navLinks)}`;
+
+  const headerJsx = `      <${DESIGN_RENDERER_COMPONENTS[headerId].exportName}
+${headerProps}      />`;
+  const footerJsx = `      <${DESIGN_RENDERER_COMPONENTS[footerId].exportName}
+${footerProps}      />`;
+  const floatingImportId = ids.find((id) => isThemeFloatingCtaComponent(id));
+  const floatingComponentName = floatingImportId
+    ? DESIGN_RENDERER_COMPONENTS[floatingImportId].exportName
+    : DESIGN_RENDERER_COMPONENTS.FloatingCta.exportName;
+  const floatingJsx = floatingCta
+    ? `      <${floatingComponentName}
+${jsxProp("primaryCta", primaryCta)}${jsxProp("secondaryCta", secondaryCta)}      />`
+    : "";
+
+  let pageBody = "";
+
+  if (pageTopology === "sidebar-rail") {
+    pageBody = `    <div className=${JSON.stringify(`${rootClass} lg:pl-[min(18rem,88vw)]`)}>
+${headerJsx}
+      <main className="relative">
+${heroJsx}
+${afterHeroSections}
+${footerJsx}
+      </main>
+${floatingJsx}
+    </div>`;
+  } else if (pageTopology === "fullscreen-editorial") {
+    pageBody = `    <main className=${JSON.stringify(rootClass)}>
+${headerJsx}
+${heroJsx}
+      <div className="relative z-10 bg-[var(--color-background)]">
+${afterHeroSections}
+${footerJsx}
+      </div>
+${floatingJsx}
+    </main>`;
+  } else if (pageTopology === "card-first-masonry") {
+    pageBody = `    <main className=${JSON.stringify(`${rootClass} ti-card-first`)}>
+${headerJsx}
+      <div className="divide-y divide-[var(--color-foreground)]/6">
+${bodySections}
+      </div>
+${footerJsx}
+${floatingJsx}
+    </main>`;
+  } else {
+    pageBody = `    <main className=${JSON.stringify(rootClass)}>
+${headerJsx}
+${bodySections}
+${footerJsx}
+${floatingJsx}
+    </main>`;
+  }
 
   return `import type { Metadata } from "next";
 import { HERO_IMAGE } from "@/lib/site-images";
@@ -325,13 +548,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <main className=${JSON.stringify(mainClass)}>
-      <${DESIGN_RENDERER_COMPONENTS[headerId].exportName}
-${headerProps}      />
-${sectionJsx}
-      <${DESIGN_RENDERER_COMPONENTS[footerId].exportName}
-${footerProps}      />
-    </main>
+${pageBody}
   );
 }
 `;

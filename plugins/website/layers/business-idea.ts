@@ -9,7 +9,7 @@ import type {
 } from "@/plugins/website/types";
 import type { GenerationContext } from "@/lib/ai/types";
 import type { ProjectCapabilityFlags } from "@/lib/ai/validator";
-import { detectIndustryFromPrompt } from "@/lib/ai-core/website-builder/prompt-industry";
+import type { BusinessIntelligenceProfile } from "@/lib/ai-core/business-intelligence/types";
 import {
   applyFeaturesToAnalysis,
   resolveWebsiteFeatures,
@@ -29,12 +29,11 @@ function normalizeDatabaseProvider(
 }
 
 function fallbackProfile(input: WebsiteGenerationInput): BusinessProfile {
-  const detected = detectIndustryFromPrompt(input.prompt);
   const labels = getStrategyFallbackLabels(input.language);
   const localized = usesLlmLocalizedWebsiteCopy(input.language);
   return {
     projectName: input.projectType.slice(0, 60) || "New Website",
-    industry: detected?.label || "General",
+    industry: "General",
     targetAudience: localized
       ? input.prompt.slice(0, 120)
       : "Target customers described in the brief",
@@ -66,6 +65,7 @@ export function validateBusinessIdeaAnalysis(
 export async function analyzeBusinessIdea(
   input: WebsiteGenerationInput,
   ctx: GenerationContext,
+  lockedBusinessProfile?: BusinessIntelligenceProfile | null,
 ): Promise<WebsiteProjectAnalysis> {
   ctx.progress.emit("Analyzing business idea...");
 
@@ -95,6 +95,13 @@ export async function analyzeBusinessIdea(
       input.previousBusinessProfile ??
       fallbackProfile(input);
 
+    const businessIntel = lockedBusinessProfile
+      ? { profile: lockedBusinessProfile }
+      : null;
+
+    const lockedIndustry = businessIntel?.profile.industry;
+    const lockedSections = businessIntel?.profile.recommendedSections;
+
     return applyFeaturesToAnalysis(
       {
         ...analysis,
@@ -104,11 +111,14 @@ export async function analyzeBusinessIdea(
         businessProfile: {
           ...profile,
           projectName: profile.projectName || analysis.projectName,
+          industry: lockedIndustry || profile.industry,
           requiredSections:
-            Array.isArray(profile.requiredSections) &&
-            profile.requiredSections.length
-              ? profile.requiredSections
-              : fallbackProfile(input).requiredSections,
+            lockedSections && lockedSections.length >= 3
+              ? lockedSections
+              : Array.isArray(profile.requiredSections) &&
+                  profile.requiredSections.length
+                ? profile.requiredSections
+                : fallbackProfile(input).requiredSections,
         },
       },
       resolveWebsiteFeatures(input.features),

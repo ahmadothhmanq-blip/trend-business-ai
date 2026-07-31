@@ -30,17 +30,36 @@ export function applyMasterWebsitePlanToBrief(
     industryDetection?: IndustryDetectionResult;
     autoDesign?: AutoDesignDecision;
     templateDna?: unknown;
+    structureTemplateId?: string;
+    /** Layout authority — structure / page topology. */
+    layoutTemplateIntelligenceId?: string;
+    /** @deprecated Use layoutTemplateIntelligenceId */
+    designTemplateIntelligenceId?: string;
+    visualThemePresetId?: string;
+    visualThemeTemplateIntelligenceId?: string;
+    premiumTemplateId?: string;
   },
 ): CoreBrief {
+  const layoutTiId =
+    extras?.layoutTemplateIntelligenceId ||
+    extras?.designTemplateIntelligenceId ||
+    plan.template;
+  const visualThemePreset =
+    extras?.visualThemePresetId || plan.theme;
   const meta: Record<string, unknown> = {
     ...(brief.metadata ?? {}),
     [MASTER_WEBSITE_PLAN_KEY]: plan,
     industryId: plan.industry,
     industry: plan.industryLabel,
     industryDesignStyle: plan.style,
-    templateIntelligenceId: plan.template,
+    templateIntelligenceId: layoutTiId,
+    websiteStructureTemplateId: extras?.structureTemplateId,
+    websiteThemeId: visualThemePreset,
+    visualThemeTemplateIntelligenceId:
+      extras?.visualThemeTemplateIntelligenceId,
+    premiumTemplateId: extras?.premiumTemplateId,
     templateIntelligenceCategory: plan.templateCategory,
-    designPreset: extras?.autoDesign?.designPreset,
+    designPreset: plan.ctaStyle,
     brandStyle: plan.style,
     designStyle: plan.style,
     preferredStyle: plan.style,
@@ -52,10 +71,15 @@ export function applyMasterWebsitePlanToBrief(
     imageKeywords: plan.imageKeywords,
     imageStyle: plan.imageStyle,
     masterPlanLocked: true,
+    masterPlanReasoningChain: plan.sources.reasoningChain,
   };
 
   if (extras?.industryDetection) {
     meta.industryIntelligence = extras.industryDetection;
+  }
+  const businessIntel = brief.metadata?.businessIntelligence;
+  if (businessIntel && typeof businessIntel === "object") {
+    meta.businessIntelligence = businessIntel;
   }
   if (extras?.autoDesign) {
     meta.autoDesignDecision = extras.autoDesign;
@@ -72,7 +96,9 @@ export function applyMasterWebsitePlanToBrief(
     const row = { ...(nested as Record<string, unknown>) };
     row.templateIndustry = plan.industry;
     row.industryIntelligenceId = plan.industry;
-    row.templateIntelligenceId = plan.template;
+    row.templateIntelligenceId = layoutTiId;
+    row.websiteStructureTemplateId = extras?.structureTemplateId;
+    row.websiteThemeId = visualThemePreset;
     row.industryDesignStyle = plan.style;
     meta[WEBSITE_INPUT_KEY] = row;
   }

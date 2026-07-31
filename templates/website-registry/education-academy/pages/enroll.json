@@ -1,0 +1,12 @@
+{
+  "id": "enroll",
+  "title": "Enroll",
+  "path": "/enroll",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "footer",
+    "utility"
+  ]
+}

@@ -25,6 +25,7 @@ import type {
   StructuredImageRequirement,
 } from "@/lib/ai-core/image-engine/types";
 import type { MasterWebsitePlan } from "@/lib/ai-core/master-planner/types";
+import type { BusinessIntelligenceProfile } from "@/lib/ai-core/business-intelligence/types";
 
 /**
  * Build image intelligence context from Industry Intelligence,
@@ -39,8 +40,10 @@ export function buildImageIntelligence(params: {
   brandIdentity?: BrandIdentityBrief | null;
   structuredRequirements?: StructuredImageRequirement[];
   masterPlan?: MasterWebsitePlan | null;
+  businessProfile?: BusinessIntelligenceProfile | null;
 }): ImageIntelligenceContext {
   const master = params.masterPlan;
+  const businessProfile = params.businessProfile ?? null;
   const intel = params.templateSelection?.industryIntelligence;
   const premium = params.designSystem.premium;
   const premiumTpl = params.templateSelection?.designConfiguration
@@ -106,11 +109,13 @@ export function buildImageIntelligence(params: {
 
   return {
     businessType:
+      businessProfile?.industry ||
       master?.businessType ||
       params.profile?.industry ||
       intel?.label ||
       "business",
     industry:
+      businessProfile?.routingIndustryId ||
       (master?.industry && String(master.industry)) ||
       params.profile?.industry ||
       intel?.industryPattern ||
@@ -140,9 +145,11 @@ export function buildImageIntelligence(params: {
     imageStyle,
     imageRequirements:
       lockedImageKeywords ??
-      (premiumImageReqs.length > 0
-        ? premiumImageReqs
-        : (intel?.imageRequirements ?? [])),
+      (businessProfile?.photographyStyle.length
+        ? businessProfile.photographyStyle
+        : premiumImageReqs.length > 0
+          ? premiumImageReqs
+          : (intel?.imageRequirements ?? [])),
     structuredRequirements,
     brandImageDirection: brand?.imageDirection,
     templateLabel: params.templateSelection?.label,
@@ -152,6 +159,7 @@ export function buildImageIntelligence(params: {
       secondary: brand?.colors.secondary || params.designSystem.colors.secondary,
       accent: brand?.colors.accent || params.designSystem.colors.accent,
     },
+    businessProfile,
   };
 }
 
@@ -194,16 +202,34 @@ function roleToSectionKey(
   }
 }
 
-/** Resolve role-matched shot brief from structured or string requirements. */
+/** Resolve role-matched shot brief from structured requirements — never pick template images by existence alone. */
 export function resolveShotBriefForRole(
   ctx: ImageIntelligenceContext,
   role: ImagePurpose,
   sectionKey?: SectionKey,
   varietyIndex = 0,
   usedBriefs?: Set<string>,
+  sectionLabel?: string,
+  contentNotes?: string,
 ): string | undefined {
+  if (contentNotes?.trim() && !usedBriefs?.has(contentNotes)) {
+    return contentNotes;
+  }
+
   const structured = ctx.structuredRequirements;
   if (structured?.length) {
+    const labelHay = (sectionLabel || "").toLowerCase();
+    const bySection = structured.find((r) => {
+      if (sectionKey && r.sectionKey === sectionKey) return true;
+      if (labelHay && r.brief.toLowerCase().includes(labelHay.slice(0, 12))) {
+        return true;
+      }
+      return labelHay.length > 0 && labelHay.includes((r.role || "").toLowerCase());
+    });
+    if (bySection?.brief && !usedBriefs?.has(bySection.brief)) {
+      return bySection.brief;
+    }
+
     const match = structured.find(
       (r) =>
         r.role === role ||
@@ -212,6 +238,17 @@ export function resolveShotBriefForRole(
     if (match?.brief && !usedBriefs?.has(match.brief)) {
       return match.brief;
     }
+  }
+
+  // Do not fall back to generic template image requirement pools when structured briefs exist.
+  if (structured?.length) {
+    return resolveIndustryVisualBrief(
+      ctx.industry,
+      sectionKey || roleToSectionKey(role) || inferSectionKey(role),
+      varietyIndex,
+      usedBriefs,
+      ctx.businessProfile ?? undefined,
+    );
   }
 
   const indexMatch = ctx.imageRequirements[varietyIndex];
@@ -225,6 +262,7 @@ export function resolveShotBriefForRole(
       sectionKey,
       varietyIndex,
       usedBriefs,
+      ctx.businessProfile ?? undefined,
     );
   }
 
@@ -233,6 +271,7 @@ export function resolveShotBriefForRole(
     roleToSectionKey(role) || inferSectionKey(role),
     varietyIndex,
     usedBriefs,
+    ctx.businessProfile ?? undefined,
   );
 }
 
@@ -296,7 +335,14 @@ export function composeImagePrompt(params: {
       params.ctx.industry,
       sectionKey,
       params.varietyIndex ?? 0,
+      undefined,
+      params.ctx.businessProfile ?? undefined,
     );
+
+  const forbiddenFragment =
+    params.ctx.businessProfile?.forbiddenSubjects.length
+      ? `Never show: ${params.ctx.businessProfile.forbiddenSubjects.slice(0, 8).join(", ")}.`
+      : "";
 
   const sectionSeed = buildSectionPromptSeed(
     sectionKey,
@@ -324,6 +370,7 @@ export function composeImagePrompt(params: {
     params.ctx.templateLabel
       ? `Template: ${params.ctx.templateLabel}.`
       : "",
+    forbiddenFragment,
     `Color palette mood: ${params.ctx.colors.primary}, ${params.ctx.colors.secondary}${params.ctx.colors.accent ? `, ${params.ctx.colors.accent}` : ""}.`,
     `Target audience: ${params.ctx.targetAudience}.`,
     imageQualityGuardrails(),

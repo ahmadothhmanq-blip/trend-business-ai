@@ -1,0 +1,13 @@
+{
+  "id": "packages",
+  "title": "Packages",
+  "path": "/packages",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "utility",
+    "overlay",
+    "footer"
+  ]
+}

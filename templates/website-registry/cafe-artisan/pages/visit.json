@@ -1,0 +1,13 @@
+{
+  "id": "visit",
+  "title": "Visit",
+  "path": "/visit",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "utility",
+    "main",
+    "overlay",
+    "footer"
+  ]
+}

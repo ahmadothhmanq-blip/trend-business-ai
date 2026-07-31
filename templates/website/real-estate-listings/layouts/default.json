@@ -1,0 +1,23 @@
+{
+  "id": "default",
+  "kind": "sidebar-left",
+  "label": "Default Layout",
+  "regionOrder": [
+    "header",
+    "sidebar",
+    "main",
+    "utility",
+    "footer"
+  ],
+  "rules": {
+    "gap": "0",
+    "regionGap": "1.25rem",
+    "minHeight": "auto"
+  },
+  "grid": {
+    "templateAreas": "\"header header header\" \"sidebar main utility\" \"footer footer footer\"",
+    "columns": "22rem 1fr",
+    "rows": "auto 1fr auto",
+    "gap": "0"
+  }
+}

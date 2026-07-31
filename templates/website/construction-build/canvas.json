@@ -1,0 +1,61 @@
+{
+  "id": "canvas",
+  "grid": {
+    "columns": 12,
+    "gutter": "1rem",
+    "margin": "1.25rem",
+    "maxWidth": "84rem"
+  },
+  "spacing": {
+    "unit": "rem",
+    "scale": [
+      "0.25",
+      "0.5",
+      "0.75",
+      "1",
+      "1.5",
+      "2.5",
+      "4",
+      "6"
+    ]
+  },
+  "visualIdentity": {
+    "colors": {
+      "primary": "#1A2332",
+      "secondary": "#4A5568",
+      "accent": "#F59E0B",
+      "background": "#F1F5F9",
+      "foreground": "#0F172A",
+      "muted": "rgba(15,23,42,0.58)",
+      "surface": "#FFFFFF"
+    },
+    "typography": {
+      "display": "Barlow Condensed, ui-sans-serif, system-ui, sans-serif",
+      "body": "Source Sans 3, ui-sans-serif, system-ui, sans-serif",
+      "scale": {
+        "sm": "0.875rem",
+        "base": "1rem",
+        "lg": "1.5rem",
+        "xl": "2.75rem"
+      }
+    },
+    "radius": {
+      "sm": "2px",
+      "md": "4px",
+      "lg": "6px"
+    },
+    "shadows": {
+      "surface": "0 2px 8px rgba(26,35,50,0.12)"
+    },
+    "borders": {
+      "default": "rgba(0,0,0,0.08)"
+    },
+    "animation": "industrial-snap"
+  },
+  "designSystem": {
+    "tier": "premium",
+    "industry": "Construction",
+    "layoutKind": "sidebar-left",
+    "templateIntelligenceId": "ti-construction-industrial"
+  }
+}

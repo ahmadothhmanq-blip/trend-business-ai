@@ -1,0 +1,12 @@
+{
+  "id": "capabilities",
+  "title": "Capabilities",
+  "path": "/capabilities",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "sidebar",
+    "footer"
+  ]
+}

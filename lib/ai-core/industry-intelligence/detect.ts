@@ -2,6 +2,12 @@ import { getDefaultTextProvider } from "@/lib/ai/provider-config";
 import { providerManager } from "@/lib/ai/provider-manager";
 import type { CoreBrief } from "@/lib/ai-core/layers/types";
 import {
+  detectionFromBusinessIntelligence,
+  getBusinessIntelligenceFromBrief,
+  runBusinessIntelligenceAnalysis,
+  applyBusinessIntelligenceToBrief,
+} from "@/lib/ai-core/business-intelligence";
+import {
   getWebsiteIndustryIntelligence,
   listWebsiteIndustryIntelligence,
   PRIMARY_WEBSITE_INDUSTRIES,
@@ -251,7 +257,7 @@ type AnalysisPayload = {
 };
 
 /**
- * Detect website industry from the user prompt (DeepSeek) with keyword fallback.
+ * Detect website industry from AI Business Intelligence (primary) or legacy analysis.
  */
 export async function detectWebsiteIndustry(
   brief: CoreBrief,
@@ -275,12 +281,25 @@ export async function detectWebsiteIndustry(
     }
   }
 
+  const existingBi = getBusinessIntelligenceFromBrief(brief);
+  if (existingBi) {
+    return detectionFromBusinessIntelligence(existingBi);
+  }
+
   const explicit = explicitIndustry(brief);
   if (explicit) {
     return toResult(explicit, 1, "Explicit industry override.", "explicit");
   }
 
-  const keywordMatch = detectIndustryFromPrompt(brief.prompt);
+  // Primary path: AI Business Intelligence before any keyword or asset logic.
+  const businessIntel = await runBusinessIntelligenceAnalysis({ brief });
+  const enriched = applyBusinessIntelligenceToBrief(brief, businessIntel);
+  if (businessIntel.source !== "fallback") {
+    return detectionFromBusinessIntelligence(businessIntel);
+  }
+
+  // Legacy fallback only when BI analysis is unavailable.
+  const keywordMatch = detectIndustryFromPrompt(enriched.prompt);
   if (keywordMatch && keywordMatch.confidence >= 0.9) {
     return toResult(
       keywordMatch.industryId,

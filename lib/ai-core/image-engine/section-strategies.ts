@@ -450,6 +450,15 @@ const FALLBACK_INDUSTRY: IndustryId = "business";
 
 function normalizeIndustryId(raw: string): IndustryId {
   const v = raw.toLowerCase().trim().replace(/\s+/g, "-");
+  if (v in INDUSTRY_VISUALS) return v as IndustryId;
+  if (
+    v.includes("furniture") ||
+    v.includes("furnish") ||
+    v.includes("sofa") ||
+    v.includes("bedroom")
+  ) {
+    return "furniture";
+  }
   const aliases: Record<string, IndustryId> = {
     medical: "clinic",
     healthcare: "clinic",
@@ -473,7 +482,6 @@ function normalizeIndustryId(raw: string): IndustryId {
     hotel: "tourism",
     gym: "business",
   };
-  if (v in INDUSTRY_VISUALS) return v as IndustryId;
   if (aliases[v]) return aliases[v];
   return FALLBACK_INDUSTRY;
 }
@@ -484,7 +492,22 @@ export function resolveIndustryVisualBrief(
   sectionKey: SectionKey,
   varietyIndex = 0,
   usedBriefs?: Set<string>,
+  businessProfile?: {
+    industry: string;
+    photographyStyle: string[];
+    forbiddenSubjects: string[];
+  },
 ): string {
+  if (businessProfile?.photographyStyle.length) {
+    const pool = businessProfile.photographyStyle;
+    const start = varietyIndex % pool.length;
+    for (let i = 0; i < pool.length; i += 1) {
+      const brief = `${pool[(start + i) % pool.length]} — ${sectionKey} section for ${businessProfile.industry}`;
+      if (!usedBriefs?.has(brief)) return brief;
+    }
+    return `${pool[start]} — ${sectionKey} for ${businessProfile.industry}`;
+  }
+
   const id = normalizeIndustryId(industry);
   const pool =
     INDUSTRY_VISUALS[id]?.[sectionKey] ||

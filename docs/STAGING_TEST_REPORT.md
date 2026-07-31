@@ -32,7 +32,7 @@ Validate staging (or local staging-equivalent env) before public launch:
 
 | Check | Level | Message |
 |-------|-------|---------|
-| site_url | ok | `http://localhost:3000` |
+| site_url | ok | `http://localhost:3003` (or configured `NEXT_PUBLIC_SITE_URL`) |
 | supabase_public | ok | configured |
 | service_role | warn | missing |
 | ai_provider | ok | DeepSeek key present |

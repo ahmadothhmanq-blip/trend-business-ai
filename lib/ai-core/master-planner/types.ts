@@ -43,6 +43,9 @@ export type MasterWebsitePlan = {
 
   template: string;
   templateCategory?: string;
+  /** Visual theme (colors, typography, tokens) — separate from structure template. */
+  theme: string;
+  themeLabel?: string;
   layout: string;
   hero: string;
   navigation: string;
@@ -65,6 +68,7 @@ export type MasterWebsitePlan = {
   locked: {
     industry: boolean;
     template: boolean;
+    theme: boolean;
     layout: boolean;
     sections: boolean;
     images: boolean;
@@ -75,6 +79,10 @@ export type MasterWebsitePlan = {
   sources: {
     industry: string;
     template: string;
+    theme: string;
     design: string;
+    route: string;
+    reasoningChain: string[];
+    validation: string;
   };
 };

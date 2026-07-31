@@ -47,6 +47,10 @@ export type WebsiteGenerationInput = {
   designPreset?: string;
   /** Template Intelligence System visual template id. */
   templateIntelligenceId?: string;
+  /** Structure template id (layout / sections). */
+  websiteStructureTemplateId?: string;
+  /** Visual theme id (colors / typography only). */
+  websiteThemeId?: string;
   /** Template Intelligence category. */
   templateIntelligenceCategory?: string;
   /** Brand Identity generation id for brand kit lock. */
@@ -92,6 +96,10 @@ export type WebsiteGenerationInput = {
   previousAssetManifest?: AssetManifest;
   /** Authenticated user id for asset storage uploads */
   userId?: string;
+  /** Agency generation contract from orchestrator pipeline */
+  agencyContract?: import("@/lib/ai-core/agency-orchestrator").AgencyGenerationContract;
+  /** Locked master website plan from PRE — drives content intelligence (EDS-003). */
+  masterWebsitePlan?: import("@/lib/ai-core/master-planner").MasterWebsitePlan;
 };
 
 export type WebsiteGenerationProgressEvent =
@@ -214,6 +222,8 @@ export type GeneratedWebsiteProject = {
   editorSuggestions?: import("@/lib/ai-core/website-editor").WebsiteEditorSuggestionsReport;
   /** Final Website Quality Intelligence — unified pre-publish scores + actions */
   finalQualityReport?: import("@/lib/ai-core/final-quality").FinalWebsiteQualityReport;
+  /** Agency Generation Contract — unified BI + design DNA + brand + content */
+  agencyContract?: import("@/lib/ai-core/agency-orchestrator").AgencyGenerationContract;
   /** Phase 0 platform revision metadata (also mirrored on website_generations.blueprint_revision). */
   platformRevision?: import("@/lib/website/platform/types").BlueprintPlatformRevision;
 };

@@ -102,14 +102,14 @@ const tool = readFileSync(
   join(root, "components/dashboard/website-builder-tool.tsx"),
   "utf8",
 );
-for (const needle of [
-  "WebsiteBuilderTool",
-  "VisualWebsiteEditor",
-  "BrandKitPanel",
-  "TemplateSelectionPanel",
+for (const [label, source, needle] of [
+  ["website-builder-tool", tool, "WebsiteBuilderTool"],
+  ["website-builder-tool", tool, "BrandKitPanel"],
+  ["website-builder-tool", tool, "WebsiteStructureTemplatesPanel"],
+  ["builder-workspace", workspace, "VisualWebsiteEditor"],
 ]) {
-  if (!tool.includes(needle)) fail(`website-builder-tool: ${needle}`, "missing");
-  else ok(`website-builder-tool: ${needle}`);
+  if (!source.includes(needle)) fail(`${label}: ${needle}`, "missing");
+  else ok(`${label}: ${needle}`);
 }
 
 const editor = readFileSync(

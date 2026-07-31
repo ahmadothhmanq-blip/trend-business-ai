@@ -1,0 +1,12 @@
+{
+  "id": "campaigns",
+  "title": "Campaigns",
+  "path": "/campaigns",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "sidebar",
+    "footer"
+  ]
+}

@@ -1,14 +1,30 @@
 import { applyBrandIdentityToDesignPlan } from "@/lib/ai-core/brand-identity/apply";
 import { runBrandIdentityIntelligence } from "@/lib/ai-core/brand-identity/engine";
 import type { BrandIdentityBrief } from "@/lib/ai-core/brand-identity/types";
-import { runDesignIntelligence } from "@/lib/ai-core/design-intelligence/engine";
+import {
+  runDesignIntelligenceEngine,
+  type RunDesignIntelligenceEngineParams,
+} from "@/lib/ai-core/design-intelligence/die-engine";
+import {
+  DESIGN_INTELLIGENCE_SPEC_KEY,
+  DESIGN_INTELLIGENCE_TRACE_KEY,
+  type DesignIntelligenceEngineResult,
+} from "@/lib/ai-core/design-intelligence/die-types";
+import {
+  getWorkflowStateFromBrief,
+  superviseAgentSync,
+} from "@/lib/ai-core/multi-agent-orchestration";
 import { buildVisualDesignPlan } from "@/lib/ai-core/design-plan/build";
 import type { VisualDesignPlan } from "@/lib/ai-core/design-plan/types";
 import type {
+  CoreBrief,
   CoreBusinessProfile,
   CoreProductStrategy,
 } from "@/lib/ai-core/layers/types";
 import type { TemplateDNAProfile } from "@/lib/ai-core/template-intelligence/template-dna";
+import type { MasterWebsitePlan } from "@/lib/ai-core/master-planner/types";
+import type { WebsiteGenerationPlan } from "@/lib/ai-core/architecture-validation/types";
+import type { BusinessIntelligenceProfile } from "@/lib/ai-core/business-intelligence/types";
 
 export type RunDesignPlanningPhaseParams = {
   profile?: CoreBusinessProfile | null;
@@ -19,12 +35,17 @@ export type RunDesignPlanningPhaseParams = {
   preferredStyle?: string | null;
   prompt?: string | null;
   templateDna?: TemplateDNAProfile | null;
+  masterPlan?: MasterWebsitePlan | null;
+  websiteGenerationPlan?: WebsiteGenerationPlan | null;
+  businessProfile?: BusinessIntelligenceProfile | null;
+  brief?: CoreBrief | null;
   onProgress?: (message: string) => void;
 };
 
 export type DesignPlanningPhaseResult = {
   plan: VisualDesignPlan;
   brandIdentity: BrandIdentityBrief;
+  designIntelligence: DesignIntelligenceEngineResult;
 };
 
 /**
@@ -56,7 +77,7 @@ export function runDesignPlanningPhaseWithBrand(
     onProgress: params.onProgress,
   });
 
-  const intelligence = runDesignIntelligence({
+  const dieParams = {
     profile: params.profile,
     strategy: params.strategy,
     industryId: params.industryId,
@@ -67,25 +88,62 @@ export function runDesignPlanningPhaseWithBrand(
       brandIdentity.premiumStyleId ||
       brandIdentity.presetId,
     templateDna: params.templateDna,
+    masterPlan: params.masterPlan,
+    websiteGenerationPlan: params.websiteGenerationPlan,
+    businessProfile: params.businessProfile,
+    prompt: params.prompt,
     onProgress: params.onProgress,
-  });
+  };
 
-  // Brand identity owns the design system family when signals agree.
+  let dieResult: DesignIntelligenceEngineResult;
+  if (params.brief && getWorkflowStateFromBrief(params.brief)) {
+    const supervised = superviseAgentSync({
+      agentId: "DIE",
+      brief: params.brief,
+      relaxedDependencies: true,
+      onProgress: params.onProgress,
+      executor: () => runDesignIntelligenceEngine(dieParams),
+      updateBrief: (result, currentBrief) => ({
+        ...currentBrief,
+        metadata: {
+          ...(currentBrief.metadata ?? {}),
+          [DESIGN_INTELLIGENCE_TRACE_KEY]: result.trace,
+          [DESIGN_INTELLIGENCE_SPEC_KEY]: result.spec,
+          designIntelligenceValidation: result.validation,
+        },
+      }),
+      shareArtifacts: (result) => ({
+        designSystemSpec: result.spec,
+      }),
+    });
+    dieResult = supervised.result;
+  } else {
+    dieResult = runDesignIntelligenceEngine(dieParams);
+  }
+
   const mergedIntelligence = {
-    ...intelligence,
-    premiumStyleId: brandIdentity.premiumStyleId || intelligence.premiumStyleId,
-    enginePreset: brandIdentity.enginePreset || intelligence.enginePreset,
-    imageStyle: brandIdentity.imageDirection || intelligence.imageStyle,
+    ...dieResult.intelligence,
+    premiumStyleId:
+      brandIdentity.premiumStyleId || dieResult.intelligence.premiumStyleId,
+    enginePreset:
+      brandIdentity.enginePreset || dieResult.intelligence.enginePreset,
+    imageStyle:
+      brandIdentity.imageDirection || dieResult.intelligence.imageStyle,
     animationDirection:
-      brandIdentity.animationDirection || intelligence.animationDirection,
-    componentStyle: brandIdentity.componentStyle || intelligence.componentStyle,
-    colorDirection: brandIdentity.colors.direction || intelligence.colorDirection,
+      brandIdentity.animationDirection ||
+      dieResult.intelligence.animationDirection,
+    componentStyle:
+      brandIdentity.componentStyle || dieResult.intelligence.componentStyle,
+    colorDirection:
+      brandIdentity.colors.direction || dieResult.intelligence.colorDirection,
     typographyDirection:
-      brandIdentity.typography.direction || intelligence.typographyDirection,
-    spacingDirection: brandIdentity.spacing.notes || intelligence.spacingDirection,
+      brandIdentity.typography.direction ||
+      dieResult.intelligence.typographyDirection,
+    spacingDirection:
+      brandIdentity.spacing.notes || dieResult.intelligence.spacingDirection,
     artDirectionNotes: [
       ...brandIdentity.artDirectionNotes,
-      ...intelligence.artDirectionNotes,
+      ...dieResult.intelligence.artDirectionNotes,
     ].slice(0, 16),
   };
 
@@ -97,6 +155,7 @@ export function runDesignPlanningPhaseWithBrand(
     prompt: params.prompt,
     brandIdentity,
     templateDna: params.templateDna,
+    designSpec: dieResult.spec,
   });
 
   plan = applyBrandIdentityToDesignPlan(plan, brandIdentity);
@@ -111,7 +170,7 @@ export function runDesignPlanningPhaseWithBrand(
   );
   params.onProgress?.(plan.summary);
 
-  return { plan, brandIdentity };
+  return { plan, brandIdentity, designIntelligence: dieResult };
 }
 
 export function assertDesignPlanApproved(

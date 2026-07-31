@@ -1,0 +1,13 @@
+{
+  "id": "admissions",
+  "title": "Admissions",
+  "path": "/admissions",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "sidebar",
+    "utility",
+    "footer"
+  ]
+}

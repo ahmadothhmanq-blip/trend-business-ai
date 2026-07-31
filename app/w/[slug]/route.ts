@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { isWebsitePublishEnabled } from "@/lib/website/publish";
+import { isWebsitePublishEnabled } from "@/lib/website/publish-config";
 import {
   publicSiteResponseHeaders,
   sanitizePublicHtml,

@@ -79,21 +79,27 @@ import { ExperimentsPanel } from "@/components/dashboard/website-builder/experim
 import { SeoAgentPanel } from "@/components/dashboard/website-builder/seo-agent-panel";
 import { DeploymentDashboardPanel } from "@/components/dashboard/website-builder/deployment-dashboard-panel";
 import {
-  TemplateDetailsDialog,
-  TemplateSelectionPanel,
-  TemplateSelectionRail,
   type TemplateUsePayload,
 } from "@/components/dashboard/website-builder/template-selection-panel";
 import {
-  TemplateIntelligencePanel,
-  type TemplateIntelligenceChoice,
-} from "@/components/dashboard/website-builder/template-intelligence-panel";
+  ThemeSelectionPanel,
+  type WebsiteThemeChoice,
+} from "@/components/dashboard/website-builder/theme-selection-panel";
+import {
+  isLegacyMarketplaceStructureTemplate,
+  type WebsiteStructureTemplateChoice,
+} from "@/lib/website/builder/template-catalog";
+import { getWebsiteStructureTemplate } from "@/lib/website/builder/structure-templates";
+import {
+  WebsiteStructureTemplatesPanel,
+  WebsiteStructureTemplatesRail,
+} from "@/components/dashboard/website-builder/website-structure-templates-panel";
 import { WebsiteIntelligencePanel } from "@/components/dashboard/website-builder/website-intelligence-panel";
 import { BrandKitPanel } from "@/components/dashboard/website-builder/brand-kit-panel";
 import { WebsiteBuilderCanvasWorkspace } from "@/components/dashboard/website-builder/tool/website-builder-canvas-workspace";
 import type { OutputTab } from "@/components/dashboard/website-builder/tool/types";
 import { readWebsiteBuilderApiError, formatWebsiteBuilderApiError } from "@/lib/website/builder/client-api-error";
-import type { MarketplaceTemplate } from "@/lib/ai-core/template-marketplace";
+import { useBuilderTemplateRuntime } from "@/lib/website/builder/use-template-runtime";
 import { resolveTemplateIntelligenceForMarketplace } from "@/lib/ai-core/template-intelligence/resolve-marketplace";
 
 type WebsiteBuilderToolProps = {
@@ -243,6 +249,33 @@ function stubRunningProject(params: {
   };
 }
 
+const ACTIVE_GENERATION_STORAGE_KEY = "wb-active-generation-id";
+
+function restoreTemplateStateFromSettings(
+  settings: Record<string, unknown> | undefined,
+  handlers: {
+    setWebsiteStructureTemplateId: (id: string) => void;
+    setSelectedTemplateId: (id: string) => void;
+    setTemplateIntelligenceId: (id: string) => void;
+  },
+) {
+  const structureId =
+    typeof settings?.websiteStructureTemplateId === "string"
+      ? settings.websiteStructureTemplateId
+      : typeof settings?.templatePackageId === "string"
+        ? settings.templatePackageId
+        : null;
+  const tiId =
+    typeof settings?.templateIntelligenceId === "string"
+      ? settings.templateIntelligenceId
+      : null;
+  if (structureId) {
+    handlers.setWebsiteStructureTemplateId(structureId);
+    handlers.setSelectedTemplateId(structureId);
+  }
+  if (tiId) handlers.setTemplateIntelligenceId(tiId);
+}
+
 function toProject(generation: WebsiteGeneration): WorkspaceProject {
   const generatedProject = isGeneratedWebsiteProject(generation.blueprint)
     ? generation.blueprint
@@ -341,20 +374,30 @@ export function WebsiteBuilderTool({
   >(null);
   const [templateIntelligenceCategory, setTemplateIntelligenceCategory] =
     useState<string | null>(null);
+  const [websiteStructureTemplateId, setWebsiteStructureTemplateId] = useState<
+    string | null
+  >(null);
+  const builderTemplatePackageId = websiteStructureTemplateId ?? selectedTemplateId;
+  const {
+    model: templateRuntimeModel,
+    error: templateRuntimeError,
+    loading: templateRuntimeLoading,
+  } = useBuilderTemplateRuntime(builderTemplatePackageId);
+  const templateRuntimeModelRef = useRef(templateRuntimeModel);
+  templateRuntimeModelRef.current = templateRuntimeModel;
+  void templateRuntimeError;
+  void templateRuntimeLoading;
+  const [websiteThemeId, setWebsiteThemeId] = useState<string | null>(null);
   const [brandIdentityId, setBrandIdentityId] = useState<string | null>(null);
   const [autoDesignHint, setAutoDesignHint] = useState<string | null>(null);
-  const [catalogTemplates, setCatalogTemplates] = useState<MarketplaceTemplate[]>(
-    [],
-  );
-  const [railDetailsTpl, setRailDetailsTpl] = useState<MarketplaceTemplate | null>(
-    null,
-  );
   const [language, setLanguage] = useState<(typeof LANGUAGES)[number]>("English");
   const [features, setFeatures] = useState<BuilderPanelFeatureLabel[]>([
     ...DEFAULT_BUILDER_PANEL_FEATURES,
   ]);
 
-  // Template Marketplace handoff: ?templateId=&marketplaceTemplateId=&templateStyle=
+  // Template Marketplace handoff: ?templateId=&applyTemplate=1&generation=
+  const pendingStructureTemplateApplyRef = useRef<string | null>(null);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
@@ -362,11 +405,19 @@ export function WebsiteBuilderTool({
     const mid = params.get("marketplaceTemplateId")?.trim();
     const style = params.get("templateStyle")?.trim();
     const preset = params.get("designPreset")?.trim();
-    if (tid) setSelectedTemplateId(tid);
+    const applyTemplate = params.get("applyTemplate") === "1";
+
+    if (tid) {
+      setSelectedTemplateId(tid);
+      setWebsiteStructureTemplateId(tid);
+    }
     if (mid) setMarketplaceTemplateId(mid);
     if (style) setTemplateStyle(style);
     if (preset) setDesignPreset(preset);
-    if (tid || mid) {
+
+    if (applyTemplate && tid) {
+      pendingStructureTemplateApplyRef.current = tid;
+    } else if (tid || mid) {
       setStreamStatus(
         mid
           ? `Marketplace template selected: ${mid}`
@@ -444,6 +495,14 @@ export function WebsiteBuilderTool({
         setFileSearch("");
         setEditMode(false);
         setOutputTab("preview");
+        restoreTemplateStateFromSettings(
+          project.generatedProject?.settings as Record<string, unknown> | undefined,
+          {
+            setWebsiteStructureTemplateId,
+            setSelectedTemplateId,
+            setTemplateIntelligenceId,
+          },
+        );
         if (typeof window !== "undefined") {
           const url = new URL(window.location.href);
           url.searchParams.delete("generation");
@@ -624,6 +683,16 @@ export function WebsiteBuilderTool({
             }
             setSelectedFilePath(hydrated.generatedProject?.files[0]?.path ?? "");
             setFileSearch("");
+            restoreTemplateStateFromSettings(
+              hydrated.generatedProject?.settings as
+                | Record<string, unknown>
+                | undefined,
+              {
+                setWebsiteStructureTemplateId,
+                setSelectedTemplateId,
+                setTemplateIntelligenceId,
+              },
+            );
             return true;
           }
         }
@@ -643,6 +712,14 @@ export function WebsiteBuilderTool({
     }
     setSelectedFilePath(project.generatedProject?.files[0]?.path ?? "");
     setFileSearch("");
+    restoreTemplateStateFromSettings(
+      project.generatedProject?.settings as Record<string, unknown> | undefined,
+      {
+        setWebsiteStructureTemplateId,
+        setSelectedTemplateId,
+        setTemplateIntelligenceId,
+      },
+    );
     return true;
   }
 
@@ -876,6 +953,9 @@ export function WebsiteBuilderTool({
         ...(autoComponents.length
           ? autoComponents.map((c) => `component:${c}`)
           : []),
+        ...(templateRuntimeModelRef.current
+          ? [`wb-template-package:${templateRuntimeModelRef.current.template.id}`]
+          : []),
       ],
       productId: product?.id ?? "website-builder",
       projectId: tpl ? undefined : activeProject?.projectId ?? undefined,
@@ -888,6 +968,11 @@ export function WebsiteBuilderTool({
       designSystem: mergedDesignSystem,
       templateIntelligenceId: autoTiId || undefined,
       templateIntelligenceCategory: autoTiCategory || undefined,
+      websiteStructureTemplateId:
+        (templateRuntimeModelRef.current?.template.id ??
+          websiteStructureTemplateId) ||
+        undefined,
+      websiteThemeId: websiteThemeId || undefined,
       brandIdentityId: brandIdentityId || undefined,
       locale: resolvedLanguage || undefined,
       mode: tpl ? "generate" : mode,
@@ -1163,10 +1248,6 @@ export function WebsiteBuilderTool({
     }
   }
 
-  const handleCatalogLoaded = useCallback((templates: MarketplaceTemplate[]) => {
-    setCatalogTemplates(templates);
-  }, []);
-
   function clearTemplateSelection() {
     setSelectedTemplateId(null);
     setMarketplaceTemplateId(null);
@@ -1177,27 +1258,132 @@ export function WebsiteBuilderTool({
     setTemplateDesignSystem(null);
     setTemplateIntelligenceId(null);
     setTemplateIntelligenceCategory(null);
+    setWebsiteStructureTemplateId(null);
+    setWebsiteThemeId(null);
     setBrandIdentityId(null);
     setAutoDesignHint(null);
     setStreamStatus(null);
   }
 
-  function syncTemplateIntelligenceChoice(choice: TemplateIntelligenceChoice) {
-    setTemplateIntelligenceId(choice.templateIntelligenceId);
-    setTemplateIntelligenceCategory(choice.category);
+  function syncThemeChoice(choice: WebsiteThemeChoice) {
+    setWebsiteThemeId(choice.id);
     if (choice.designPreset) setDesignPreset(choice.designPreset);
-    if (choice.designStyle) setTemplateStyle(choice.designStyle);
-    if (choice.premiumTemplateId) {
-      setSelectedTemplateId(choice.premiumTemplateId);
-    }
+    setTemplateDesignSystem({
+      primary: choice.colors.primary,
+      secondary: choice.colors.secondary,
+      accent: choice.colors.accent,
+      background: choice.colors.background,
+      foreground: choice.colors.foreground,
+      displayFont: choice.typography.display,
+      bodyFont: choice.typography.body,
+    });
+  }
+
+  function handleStructureTemplateSelect(
+    choice: WebsiteStructureTemplateChoice,
+  ) {
+    setWebsiteStructureTemplateId(choice.templatePackageId);
+    setTemplateIntelligenceId(choice.templateIntelligenceId);
+    setTemplateIndustry(choice.industry);
+    setMarketplaceTemplateId(choice.marketplaceTemplateId);
+    setSelectedTemplateId(choice.premiumTemplateId);
     if (choice.components.length) {
       setTemplateComponents(choice.components);
     }
+    if (!activeProject?.id) {
+      toast.success(wb("templates.structureApplied", { name: choice.label }));
+      return;
+    }
+    if (
+      isLegacyMarketplaceStructureTemplate(choice) &&
+      choice.templateIntelligenceId
+    ) {
+      void applyTemplateIntelligenceToActiveProject(
+        choice.templateIntelligenceId,
+      ).then((ok) => {
+        if (ok) {
+          toast.success(
+            wb("templates.structureRedesigned", { name: choice.label }),
+          );
+        }
+      });
+      return;
+    }
+    void applyStructureTemplateToActiveProject(choice).then((ok) => {
+      if (ok) {
+        toast.success(
+          wb("templates.structureRedesigned", { name: choice.label }),
+        );
+      }
+    });
   }
 
-  function handleTemplateIntelligenceSelect(choice: TemplateIntelligenceChoice) {
-    syncTemplateIntelligenceChoice(choice);
-    toast.success(wb("templates.intelligenceApplied", { name: choice.name }));
+  function handleThemeSelect(choice: WebsiteThemeChoice) {
+    syncThemeChoice(choice);
+    if (activeProject?.id) {
+      return;
+    }
+    toast.success(wb("templates.themeApplied", { name: choice.name }));
+  }
+
+  async function applyStructureTemplateToActiveProject(
+    choice: Pick<WebsiteStructureTemplateChoice, "templatePackageId" | "label">,
+  ): Promise<boolean> {
+    if (!activeProject?.id) return false;
+    setIsApplyingTemplate(true);
+    setApiError(null);
+    setStreamStatus(wb("stream.applyingEdit"));
+    try {
+      const res = await fetch(
+        `/api/website-builder/${activeProject.id}/template`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            templatePackageId: choice.templatePackageId,
+          }),
+        },
+      );
+      const data = (await res.json()) as {
+        error?: string;
+        generation?: unknown;
+        project?: unknown;
+        structureTemplateId?: string | null;
+        template?: {
+          id: string;
+          name: string;
+          category: string;
+          designPreset: string;
+          designStyle: string;
+          premiumTemplateId?: string;
+          components: string[];
+        };
+      };
+      if (!res.ok) {
+        throw new Error(data.error || wb("panels.failedApplyTemplate"));
+      }
+      if (data.structureTemplateId) {
+        setWebsiteStructureTemplateId(data.structureTemplateId);
+        setSelectedTemplateId(data.structureTemplateId);
+      }
+      if (data.generation && data.project) {
+        handleTemplateIntelligenceApplied({
+          generation: data.generation,
+          project: data.project,
+          template: data.template,
+        });
+      }
+      return true;
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : wb("errors.generic");
+      setApiError(message);
+      toast.error(message);
+      return false;
+    } finally {
+      setIsApplyingTemplate(false);
+      window.setTimeout(() => setStreamStatus(null), 800);
+    }
   }
 
   async function applyTemplateIntelligenceToActiveProject(
@@ -1253,49 +1439,15 @@ export function WebsiteBuilderTool({
     }
   }
 
-  function handleTemplateIntelligenceApplied(payload: {
+  function handleThemeApplied(payload: {
     generation: unknown;
     project: unknown;
-    template?: {
-      id: string;
-      name: string;
-      category: string;
-      designPreset: string;
-      designStyle: string;
-      premiumTemplateId?: string;
-      components: string[];
-      colors?: TemplateIntelligenceChoice["colors"];
-      typography?: TemplateIntelligenceChoice["typography"];
-    };
+    theme: WebsiteThemeChoice;
   }) {
+    syncThemeChoice(payload.theme);
     const generation = payload.generation as WebsiteGeneration;
     const project = payload.project as GeneratedWebsiteProject;
     if (!generation?.id || !project) return;
-
-    if (payload.template) {
-      syncTemplateIntelligenceChoice({
-        templateIntelligenceId: payload.template.id,
-        category: payload.template.category as TemplateIntelligenceChoice["category"],
-        designPreset: payload.template.designPreset,
-        designStyle: payload.template.designStyle,
-        premiumTemplateId: payload.template.premiumTemplateId,
-        components: payload.template.components.map(String),
-        colors: payload.template.colors ?? {
-          primary: project.designSystem?.colors.primary ?? "#111",
-          secondary: project.designSystem?.colors.secondary ?? "#333",
-          accent: project.designSystem?.colors.accent ?? "#2563EB",
-          background: project.designSystem?.colors.background ?? "#fff",
-          foreground: project.designSystem?.colors.foreground ?? "#111",
-          surface: project.designSystem?.colors.surface ?? "#f5f5f5",
-        },
-        typography: payload.template.typography ?? {
-          display: project.typography?.[0] ?? "Inter",
-          heading: project.typography?.[0] ?? "Inter",
-          body: project.typography?.[1] ?? "Inter",
-        },
-        name: payload.template.name,
-      });
-    }
 
     const nextProject = toProject({
       ...generation,
@@ -1312,8 +1464,113 @@ export function WebsiteBuilderTool({
     setProjects((items) =>
       items.map((p) => (p.id === nextProject.id ? nextProject : p)),
     );
+    toast.success(
+      wb("templates.themeRedesigned", { name: payload.theme.name }),
+    );
+  }
+
+  function handleTemplateIntelligenceApplied(payload: {
+    generation: unknown;
+    project: unknown;
+    template?: {
+      id: string;
+      name: string;
+      category: string;
+      designPreset: string;
+      designStyle: string;
+      premiumTemplateId?: string;
+      components: string[];
+      colors?: WebsiteThemeChoice["colors"];
+      typography?: WebsiteThemeChoice["typography"];
+    };
+  }) {
+    const generation = payload.generation as WebsiteGeneration;
+    const project = payload.project as GeneratedWebsiteProject;
+    if (!generation?.id || !project) return;
+
+    if (payload.template) {
+      syncThemeChoice({
+        id: payload.template.id as WebsiteThemeChoice["id"],
+        label: payload.template.name,
+        description: "",
+        templateIntelligenceId: payload.template.id,
+        designPreset: payload.template.designPreset as WebsiteThemeChoice["designPreset"],
+        layoutType: "",
+        heroType: "",
+        navigationType: "",
+        footerType: "",
+        animationProfile: "",
+        cardStyle: "",
+        sectionPreview: [],
+        pageTopology: "classic-stack",
+        name: payload.template.name,
+        colors: payload.template.colors ?? {
+          primary: project.designSystem?.colors.primary ?? "#111",
+          secondary: project.designSystem?.colors.secondary ?? "#333",
+          accent: project.designSystem?.colors.accent ?? "#2563EB",
+          background: project.designSystem?.colors.background ?? "#fff",
+          foreground: project.designSystem?.colors.foreground ?? "#111",
+          surface: project.designSystem?.colors.surface ?? "#f5f5f5",
+        },
+        typography: payload.template.typography ?? {
+          display: project.typography?.[0] ?? "Inter",
+          heading: project.typography?.[0] ?? "Inter",
+          body: project.typography?.[1] ?? "Inter",
+        },
+      });
+    }
+
+    const nextProject = toProject({
+      ...generation,
+      blueprint: project as unknown as WebsiteGeneration["blueprint"],
+    });
+    setActiveProject(nextProject);
+    setSelectedFilePath(
+      project.files.find((f) => f.path.includes("preview/"))?.path ||
+        project.files[0]?.path ||
+        "",
+    );
+    setOutputTab("preview");
+    setPreviewRevision((n) => n + 1);
+    setVisualEditorDirty(false);
+    setProjects((items) =>
+      items.map((p) => (p.id === nextProject.id ? nextProject : p)),
+    );
+    restoreTemplateStateFromSettings(
+      project.settings as Record<string, unknown> | undefined,
+      {
+        setWebsiteStructureTemplateId,
+        setSelectedTemplateId,
+        setTemplateIntelligenceId,
+      },
+    );
     toast.success(wb("toasts.templateApplied"));
   }
+
+  useEffect(() => {
+    if (!activeProject?.id || typeof window === "undefined") return;
+    sessionStorage.setItem(ACTIVE_GENERATION_STORAGE_KEY, activeProject.id);
+  }, [activeProject?.id]);
+
+  useEffect(() => {
+    const pendingId = pendingStructureTemplateApplyRef.current;
+    if (!pendingId || !activeProject?.id || isApplyingTemplate) return;
+    pendingStructureTemplateApplyRef.current = null;
+
+    const url = new URL(window.location.href);
+    url.searchParams.delete("applyTemplate");
+    window.history.replaceState(
+      {},
+      "",
+      `${url.pathname}${url.search}${url.hash}`,
+    );
+
+    const template = getWebsiteStructureTemplate(pendingId);
+    void applyStructureTemplateToActiveProject({
+      templatePackageId: pendingId,
+      label: template?.label ?? pendingId,
+    });
+  }, [activeProject?.id, isApplyingTemplate]);
 
   async function handleUseTemplate(payload: TemplateUsePayload) {
     setSelectedTemplateId(payload.templateId);
@@ -1325,8 +1582,7 @@ export function WebsiteBuilderTool({
     setTemplateDesignSystem(payload.designSystem);
     setProjectBrief(buildBriefFromTemplate(payload, language));
     setEditMode(false);
-    setRailDetailsTpl(null);
-        setOutputTab("preview");
+    setOutputTab("preview");
 
     if (activeProject?.id) {
       const templateIntelligenceId = resolveTemplateIntelligenceForMarketplace({
@@ -1723,36 +1979,7 @@ export function WebsiteBuilderTool({
                 <p className="text-[12px] text-white/55">{autoDesignHint}</p>
               </div>
             ) : null}
-            {!editMode && (marketplaceTemplateId || selectedTemplateId) ? (
-              <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-premium-gold/25 bg-premium-gold/10 px-4 py-3 text-sm text-premium-gold-light">
-                <div>
-                  <p className="font-semibold text-white">
-                    {wb("hints.marketplaceTemplateReady")}
-                  </p>
-                  <p className="text-[12px] text-white/55">
-                    {marketplaceTemplateId || selectedTemplateId}
-                    {templateStyle ? ` · ${templateStyle}` : ""}
-                    {templateIndustry ? ` · ${templateIndustry}` : ""}
-                    {" · "}{wb("hints.seedsPipeline")}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <Link href="/dashboard/templates">
-                    <Button size="sm" variant="outline" className="border-white/15 text-white">
-                      {wb("labels.browseAll")}
-                    </Button>
-                  </Link>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-white/15 text-white"
-                    onClick={clearTemplateSelection}
-                  >
-                    {wb("labels.clear")}
-                  </Button>
-                </div>
-              </div>
-            ) : !editMode && templateIntelligenceId ? (
+            {!editMode && templateIntelligenceId ? (
               <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-premium-gold/25 bg-premium-gold/10 px-4 py-3 text-sm text-premium-gold-light">
                 <div>
                   <p className="font-semibold text-white">
@@ -1777,15 +2004,6 @@ export function WebsiteBuilderTool({
                 >
                   {wb("labels.clear")}
                 </Button>
-              </div>
-            ) : !editMode ? (
-              <div className="mt-4">
-                <Link
-                  href="/dashboard/templates"
-                  className="text-[12px] font-medium text-premium-gold hover:underline"
-                >
-                  {wb("hints.browseMarketplace")}
-                </Link>
               </div>
             ) : null}
             <Textarea
@@ -1828,59 +2046,35 @@ export function WebsiteBuilderTool({
                 />
               </div>
               <div>
-                <TemplateIntelligencePanel
-                  selectedId={templateIntelligenceId}
+                <WebsiteStructureTemplatesPanel
+                  selectedId={websiteStructureTemplateId}
                   disabled={isGenerating || isApplyingTemplate}
-                  activeGenerationId={activeProject?.id || null}
-                  selectionContext={{
-                    businessType: inferredFromBrief.projectType,
-                    industry:
-                      templateIndustry ||
-                      inferredFromBrief.industryId ||
-                      inferredFromBrief.projectType,
-                    brandStyle: inferredFromBrief.designStyle,
-                    designStyle: inferredFromBrief.designStyle,
-                    prompt: projectBrief,
-                  }}
-                  onSelect={handleTemplateIntelligenceSelect}
-                  onApplied={handleTemplateIntelligenceApplied}
+                  onSelect={handleStructureTemplateSelect}
                 />
               </div>
               <div>
-                <TemplateSelectionPanel
-                  selectedMarketplaceId={marketplaceTemplateId}
+                <ThemeSelectionPanel
+                  selectedId={websiteThemeId}
                   disabled={isGenerating || isApplyingTemplate}
                   activeGenerationId={activeProject?.id || null}
-                  onUseTemplate={handleUseTemplate}
-                  onCatalogLoaded={handleCatalogLoaded}
+                  onSelect={handleThemeSelect}
+                  onApplied={handleThemeApplied}
                 />
               </div>
             </div>
             ) : activeProject?.id ? (
               <div className="mt-5 space-y-6">
-                <TemplateIntelligencePanel
-                  selectedId={templateIntelligenceId}
+                <WebsiteStructureTemplatesPanel
+                  selectedId={websiteStructureTemplateId}
+                  disabled={isGenerating || isApplyingTemplate}
+                  onSelect={handleStructureTemplateSelect}
+                />
+                <ThemeSelectionPanel
+                  selectedId={websiteThemeId}
                   disabled={isGenerating || isApplyingTemplate}
                   activeGenerationId={activeProject.id}
-                  selectionContext={{
-                    businessType: inferredFromBrief.projectType,
-                    industry:
-                      templateIndustry ||
-                      inferredFromBrief.industryId ||
-                      inferredFromBrief.projectType,
-                    brandStyle: inferredFromBrief.designStyle,
-                    designStyle: inferredFromBrief.designStyle,
-                    prompt: projectBrief || activeProject.description,
-                  }}
-                  onSelect={handleTemplateIntelligenceSelect}
-                  onApplied={handleTemplateIntelligenceApplied}
-                />
-                <TemplateSelectionPanel
-                  selectedMarketplaceId={marketplaceTemplateId}
-                  disabled={isGenerating || isApplyingTemplate}
-                  activeGenerationId={activeProject?.id || null}
-                  onUseTemplate={handleUseTemplate}
-                  onCatalogLoaded={handleCatalogLoaded}
+                  onSelect={handleThemeSelect}
+                  onApplied={handleThemeApplied}
                 />
               </div>
             ) : null}
@@ -2317,10 +2511,9 @@ export function WebsiteBuilderTool({
 
       <BottomWorkspace
         projects={projects}
-        catalogTemplates={catalogTemplates}
-        selectedMarketplaceId={marketplaceTemplateId}
+        websiteStructureTemplateId={websiteStructureTemplateId}
         isGenerating={isGenerating}
-        onOpenTemplateDetails={setRailDetailsTpl}
+        onStructureSelect={handleStructureTemplateSelect}
         activeProject={activeProject}
         onSelect={(project) => void selectProject(project)}
         onFavorite={toggleFavorite}
@@ -2329,13 +2522,6 @@ export function WebsiteBuilderTool({
         onDownload={downloadProject}
       />
 
-      <TemplateDetailsDialog
-        template={railDetailsTpl}
-        disabled={isGenerating}
-        activeGenerationId={activeProject?.id || null}
-        onClose={() => setRailDetailsTpl(null)}
-        onUseTemplate={handleUseTemplate}
-      />
     </div>
   );
 }
@@ -2435,9 +2621,9 @@ function WebsiteLiveFrame({
         key={src}
         title={title}
         src={src}
-        // Static HTML preview (no scripts). allow-same-origin keeps auth cookies
-        // working for /api/website-builder/:id/live-preview.
-        sandbox="allow-same-origin"
+        // Theme previews ship Tailwind via CDN in the HTML document; scripts are
+        // required for layout utilities (flex/gap) used by theme scaffolds.
+        sandbox="allow-same-origin allow-scripts"
         referrerPolicy="same-origin"
         className="h-full min-h-[420px] w-full bg-black"
       />
@@ -3618,10 +3804,9 @@ function ProjectRightSidebar({
 
 function BottomWorkspace({
   projects,
-  catalogTemplates,
-  selectedMarketplaceId,
+  websiteStructureTemplateId,
   isGenerating,
-  onOpenTemplateDetails,
+  onStructureSelect,
   activeProject,
   onSelect,
   onFavorite,
@@ -3630,10 +3815,9 @@ function BottomWorkspace({
   onDownload,
 }: {
   projects: WorkspaceProject[];
-  catalogTemplates: MarketplaceTemplate[];
-  selectedMarketplaceId?: string | null;
+  websiteStructureTemplateId?: string | null;
   isGenerating?: boolean;
-  onOpenTemplateDetails: (tpl: MarketplaceTemplate) => void;
+  onStructureSelect: (choice: WebsiteStructureTemplateChoice) => void;
   activeProject: WorkspaceProject | null;
   onSelect: (project: WorkspaceProject) => void;
   onFavorite: (id: string) => void;
@@ -3722,11 +3906,10 @@ function BottomWorkspace({
             title={wb("labels.templates")}
             description={wb("sectionDescriptions.templates")}
           />
-          <TemplateSelectionRail
-            templates={catalogTemplates}
-            selectedMarketplaceId={selectedMarketplaceId}
+          <WebsiteStructureTemplatesRail
+            selectedId={websiteStructureTemplateId}
             disabled={isGenerating}
-            onOpenDetails={onOpenTemplateDetails}
+            onSelect={onStructureSelect}
           />
         </DashboardPanel>
 

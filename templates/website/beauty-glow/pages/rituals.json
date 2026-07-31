@@ -1,0 +1,13 @@
+{
+  "id": "rituals",
+  "title": "Rituals",
+  "path": "/rituals",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "utility",
+    "overlay",
+    "main",
+    "footer"
+  ]
+}

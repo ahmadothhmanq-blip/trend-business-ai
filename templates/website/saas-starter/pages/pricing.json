@@ -1,0 +1,12 @@
+{
+  "id": "pricing",
+  "title": "Pricing",
+  "path": "/pricing",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "utility",
+    "main",
+    "footer"
+  ]
+}

@@ -73,7 +73,7 @@ console.log("  ✓ generation validation wired in pipeline");
 const layersPrompt = read("lib/ai/prompts/website-layers.ts");
 assert.match(layersPrompt, /Modern Standard Arabic/);
 const filePrompt = read("lib/ai/prompts/website.ts");
-assert.match(filePrompt, /LANGUAGE \(mandatory\)/);
+assert.match(filePrompt, /buildWebsiteLanguageDirective/);
 const i18n = read("lib/ai-core/website-design-platform/i18n.ts");
 assert.match(i18n, /Arabic typography/);
 console.log("  ✓ Arabic / RTL prompt + CSS support");

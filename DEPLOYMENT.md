@@ -77,8 +77,8 @@ Or paste `supabase/APPLY_PHASE20.sql` into the SQL Editor. Fixes org RLS recursi
 - **Redirect URLs** (add all):
   - `https://your-domain.vercel.app/auth/callback`
   - `https://your-domain.vercel.app/reset-password`
-  - `http://localhost:3000/auth/callback`
-  - `http://localhost:3000/reset-password`
+  - `http://localhost:{PORT}/auth/callback` (default `PORT=3003`)
+  - `http://localhost:{PORT}/reset-password`
 - Enable **Email** provider
 - Configure email templates for confirm / reset password if using custom SMTP
 

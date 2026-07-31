@@ -1,26 +1,18 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { slugify } from "@/lib/website/build-static-preview";
-import { resolveProductionPublishHtml } from "@/lib/website/public-site";
 import { listCmsEntries } from "@/lib/ai-core/website-management/cms/store";
+import { slugify } from "@/lib/website/preview-shared";
+import { resolveProductionPublishHtml } from "@/lib/website/public-site.server";
+import {
+  buildPlannedPublicUrl,
+  isWebsitePublishEnabled,
+} from "@/lib/website/publish-config";
 import type { WebsiteGeneration, WebsitePublication } from "@/types/database";
 
 export type { WebsitePublication };
 
 export type PublishAction = "prepare" | "publish" | "unpublish";
 
-/** Public hosting ON unless explicitly disabled with WEBSITE_PUBLISH_ENABLED=false. */
-export function isWebsitePublishEnabled() {
-  return process.env.WEBSITE_PUBLISH_ENABLED !== "false";
-}
-
-export function buildPlannedPublicUrl(slug: string) {
-  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "").replace(/\/$/, "");
-  const path = `/w/${slug}`;
-  return {
-    publicPath: path,
-    plannedPublicUrl: siteUrl ? `${siteUrl}${path}` : path,
-  };
-}
+export { buildPlannedPublicUrl, isWebsitePublishEnabled };
 
 function isMissingTableError(error: { code?: string; message?: string } | null) {
   if (!error) return false;

@@ -40,6 +40,14 @@ export {
 } from "@/lib/ai-core/template-intelligence/apply";
 
 export {
+  extractBusinessIdentity,
+  applyBusinessIdentityToProject,
+  buildProductionContentFromProject,
+  patchDesignSystemVisualOnly,
+  type BusinessIdentitySnapshot,
+} from "@/lib/ai-core/template-intelligence/business-identity";
+
+export {
   resolveTemplateVisualPreset,
   buildTemplateVisualCss,
 } from "@/lib/ai-core/template-intelligence/visual-preset";

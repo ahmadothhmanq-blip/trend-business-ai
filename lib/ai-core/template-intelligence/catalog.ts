@@ -118,6 +118,8 @@ import {
   PALETTE_SAAS,
   PALETTE_TECHNOLOGY,
 } from "@/lib/ai-core/template-intelligence/industry-palettes";
+import { PREMIUM_INDUSTRY_TEMPLATE_INTELLIGENCE } from "@/lib/ai-core/template-intelligence/premium-industry-extensions";
+import { enhancePremiumTemplateVisuals } from "@/lib/ai-core/template-intelligence/premium-ti-visual-tokens";
 
 const CORE_TECH = PALETTE_TECHNOLOGY;
 const CORE_SAAS = PALETTE_SAAS;
@@ -1308,6 +1310,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
     audienceHints: ["prospects", "buyers", "early adopters"],
     brandStyleHints: ["startup", "saas", "product launch"],
   },
+  ...PREMIUM_INDUSTRY_TEMPLATE_INTELLIGENCE,
 ];
 
 export function listTemplateIntelligence(filters?: {
@@ -1350,7 +1353,9 @@ export function listTemplateIntelligence(filters?: {
 export function getTemplateIntelligence(
   id: string,
 ): TemplateIntelligenceDefinition | null {
-  return TEMPLATE_INTELLIGENCE_CATALOG.find((t) => t.id === id) || null;
+  const template =
+    TEMPLATE_INTELLIGENCE_CATALOG.find((t) => t.id === id) || null;
+  return template ? enhancePremiumTemplateVisuals(template) : null;
 }
 
 export function isTemplateIntelligenceId(value: unknown): value is string {

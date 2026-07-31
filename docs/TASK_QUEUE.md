@@ -151,7 +151,7 @@
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | **SET** but **len=46** (classic Supabase anon JWTs are usually 100+ chars) | **WARN** — confirm full anon key in Supabase Dashboard → Settings → API |
 | `DEEPSEEK_API_KEY` | **SET** | OK for default AI |
 | `SUPABASE_DB_URL` | **SET** (used by H01 / `db:apply`) | OK for ops |
-| `NEXT_PUBLIC_SITE_URL` | **MISSING** | **Gap** — local falls back to `http://localhost:3000` via `getOptionalSiteUrl`; **required for Vercel production** (`lib/env.ts`) |
+| `NEXT_PUBLIC_SITE_URL` | **MISSING** | **Gap** — local falls back to `http://localhost:3003` (or `PORT` / `DEV_PORT`) via `getOptionalSiteUrl`; **required for Vercel production** (`lib/env.ts`) |
 | `SUPABASE_SERVICE_ROLE_KEY` | **MISSING** | **Prod / billing gap** — needed for admin client + PayPal webhook fulfillment |
 | `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | **MISSING** | **Prod recommended** — without them, production rate limits are per-instance memory only |
 | `WEBSITE_PREVIEW_BUILDER_ENABLED` | unset | OK / H08-aligned (treated as off) |

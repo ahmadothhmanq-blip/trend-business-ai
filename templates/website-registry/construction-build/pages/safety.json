@@ -1,0 +1,13 @@
+{
+  "id": "safety",
+  "title": "Safety",
+  "path": "/safety",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "utility",
+    "sidebar",
+    "main",
+    "footer"
+  ]
+}

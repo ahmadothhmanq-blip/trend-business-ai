@@ -1,3 +1,5 @@
+import { getLocalDevOrigin } from "@/lib/dev-origin";
+
 type RequiredEnvName =
   | "NEXT_PUBLIC_SUPABASE_URL"
   | "NEXT_PUBLIC_SUPABASE_ANON_KEY"
@@ -35,7 +37,7 @@ export function getRequiredSiteUrl() {
   return getRequiredEnv("NEXT_PUBLIC_SITE_URL");
 }
 
-export function getOptionalSiteUrl(fallback = "http://localhost:3000") {
+export function getOptionalSiteUrl(fallback?: string) {
   const configuredUrl = trimEnv(process.env.NEXT_PUBLIC_SITE_URL);
   if (configuredUrl) return configuredUrl;
 
@@ -49,7 +51,7 @@ export function getOptionalSiteUrl(fallback = "http://localhost:3000") {
     throw new Error("Missing required environment variable: NEXT_PUBLIC_SITE_URL");
   }
 
-  return fallback;
+  return fallback ?? getLocalDevOrigin();
 }
 
 /** True when distributed rate limiting (Upstash) is configured. */

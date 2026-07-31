@@ -6,7 +6,7 @@ import {
   prepareSuccessMessage,
   publishSuccessMessage,
 } from "@/lib/website/publish-quality";
-import { isWebsitePublishEnabled } from "@/lib/website/publish";
+import { isWebsitePublishEnabled } from "@/lib/website/publish-config";
 import { runPublishingAction } from "@/lib/ai-core/publishing";
 import type { WebsiteGeneration } from "@/types/database";
 import { requireWebsiteGenerationAccess } from "@/lib/website/builder/route-access";

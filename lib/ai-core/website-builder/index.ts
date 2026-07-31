@@ -34,3 +34,12 @@ export {
 } from "@/lib/ai-core/website-builder/llm-language";
 
 export { summarizeStrategyForFilePrompt } from "@/lib/ai-core/website-builder/strategy-prompt-context";
+
+export {
+  resolveSectionShellVariantFromSpec,
+  resolveInnerPageSections,
+  resolveDefaultInnerPageSections,
+  buildExcellenceSpacingCss,
+  type CompositionMode,
+  type InnerPageSectionContext,
+} from "@/lib/ai-core/website-builder/excellence";

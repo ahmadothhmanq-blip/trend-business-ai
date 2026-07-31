@@ -30,6 +30,9 @@ export type TemplateIntelligenceChoice = {
   name: string;
 };
 
+/** Visual theme choice — colors, typography, tokens only. */
+export type ThemeSelectionChoice = TemplateIntelligenceChoice;
+
 type CatalogResponse = {
   templates: TemplateIntelligenceDefinition[];
   categories: TemplateIntelligenceCategory[];
@@ -143,7 +146,7 @@ export function TemplateIntelligencePanel(props: {
     setApplyingId(tpl.id);
     try {
       const res = await fetch(
-        `/api/website-builder/${props.activeGenerationId}/template`,
+        `/api/website-builder/${props.activeGenerationId}/theme`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -156,7 +159,7 @@ export function TemplateIntelligencePanel(props: {
         project?: unknown;
         template?: TemplateIntelligenceDefinition;
       };
-      if (!res.ok) throw new Error(data.error || wb("panels.failedApplyTemplate"));
+      if (!res.ok) throw new Error(data.error || wb("panels.failedApplyTheme"));
       if (data.generation && data.project && data.template) {
         props.onApplied?.({
           generation: data.generation,
@@ -165,10 +168,10 @@ export function TemplateIntelligencePanel(props: {
         });
       }
       setDetails(null);
-      setAutoHint(wb("panels.appliedPreserved", { name: tpl.name }));
+      setAutoHint(wb("panels.appliedThemePreserved", { name: tpl.name }));
     } catch (error) {
       setAutoHint(
-        error instanceof Error ? error.message : wb("panels.failedApplyTemplate"),
+        error instanceof Error ? error.message : wb("panels.failedApplyTheme"),
       );
     } finally {
       setApplying(false);
@@ -228,10 +231,10 @@ export function TemplateIntelligencePanel(props: {
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <p className="text-[12px] font-semibold tracking-wide text-white/45 uppercase">
-              {wb("panels.templateIntelligenceTitle")}
+              {wb("panels.themesTitle")}
             </p>
             <p className="text-[11px] text-white/35">
-              {wb("panels.templateIntelligenceSubtitle")}
+              {wb("panels.themesSubtitle")}
             </p>
           </div>
           <Button
@@ -320,7 +323,8 @@ export function TemplateIntelligencePanel(props: {
                     ) : null}
                   </div>
                   <p className="mt-0.5 text-[11px] text-white/40">
-                    {tpl.category} · {tpl.designPreset}
+                    {tpl.typography.display} / {tpl.typography.body} ·{" "}
+                    {tpl.designPreset}
                   </p>
                 </div>
               </button>
@@ -413,7 +417,9 @@ export function TemplateIntelligencePanel(props: {
                 ) : (
                   <Sparkles className="size-4" />
                 )}
-                {wb("panels.useTemplate")}
+                {props.activeGenerationId
+                  ? wb("panels.applyTheme")
+                  : wb("panels.useTheme")}
               </Button>
             ) : null}
           </DialogFooter>
@@ -422,3 +428,6 @@ export function TemplateIntelligencePanel(props: {
     </>
   );
 }
+
+/** @deprecated Use ThemeSelectionPanel from theme-selection-panel.tsx */
+export const ThemeSelectionPanel = TemplateIntelligencePanel;

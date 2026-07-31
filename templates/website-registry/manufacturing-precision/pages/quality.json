@@ -1,0 +1,12 @@
+{
+  "id": "quality",
+  "title": "Quality",
+  "path": "/quality",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "sidebar",
+    "footer"
+  ]
+}

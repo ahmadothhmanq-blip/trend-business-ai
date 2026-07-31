@@ -1,0 +1,12 @@
+{
+  "id": "platform",
+  "title": "Platform",
+  "path": "/platform",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "overlay",
+    "footer"
+  ]
+}

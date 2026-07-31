@@ -1,26 +1,24 @@
 /**
  * Authenticated Website Builder journey:
  * Login → create → generate → preview → improve → publish → public URL
+ *
+ * Base URL: QA_BASE → NEXT_PUBLIC_SITE_URL → http://localhost:{PORT|DEV_PORT|3003}
  */
 import { createClient } from "@supabase/supabase-js";
 import { createServerClient } from "@supabase/ssr";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
-
-function loadEnvLocal() {
-  const raw = readFileSync(resolve(process.cwd(), ".env.local"), "utf8");
-  for (const line of raw.split(/\r?\n/)) {
-    const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
-    if (!m) continue;
-    if (!process.env[m[1]]) {
-      process.env[m[1]] = m[2].replace(/^"|"$/g, "").replace(/^'|'$/g, "");
-    }
-  }
-}
+import {
+  loadEnvLocal,
+  resolveHarnessBaseUrl,
+} from "./lib/dev-base-url.mjs";
+import {
+  ensureDevServer,
+  registerHarnessDevServerCleanup,
+} from "./lib/dev-server.mjs";
 
 loadEnvLocal();
+registerHarnessDevServerCleanup();
 
-const base = process.env.QA_BASE || "http://localhost:3000";
+const base = resolveHarnessBaseUrl();
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const email = process.env.E2E_TEST_EMAIL;
@@ -79,6 +77,7 @@ async function api(cookie, method, path, body, opts = {}) {
 function parseSseComplete(text) {
   let complete = null;
   let lastError = null;
+  let generationId = null;
   for (const block of text.split("\n\n")) {
     const lines = block.split("\n");
     let event = "message";
@@ -91,12 +90,27 @@ function parseSseComplete(text) {
     try {
       const parsed = JSON.parse(data);
       if (event === "complete") complete = parsed;
+      if (event === "session" && parsed.generationId) {
+        generationId = parsed.generationId;
+      }
       if (event === "error") lastError = parsed.error || data;
+      if (parsed.generationId) generationId = parsed.generationId;
     } catch {
       /* ignore */
     }
   }
-  return { complete, lastError };
+  return { complete, lastError, generationId };
+}
+
+async function fetchGeneration(cookie, generationId) {
+  const res = await api(cookie, "GET", `/api/website-builder/${generationId}`);
+  if (res.status !== 200) return null;
+  try {
+    const json = JSON.parse(res.text);
+    return json.generation ?? json;
+  } catch {
+    return null;
+  }
 }
 
 async function generate(cookie, body) {
@@ -104,9 +118,22 @@ async function generate(cookie, body) {
     accept: "text/event-stream",
   });
   if (stream.status === 200) {
-    const { complete, lastError } = parseSseComplete(stream.text);
-    if (complete?.generation?.id) {
-      return { ok: true, complete, ms: stream.ms, via: "stream" };
+    const { complete, lastError, generationId: sessionId } = parseSseComplete(stream.text);
+    const generationId =
+      complete?.generation?.id ??
+      complete?.generationId ??
+      sessionId;
+    if (generationId) {
+      const generation = await fetchGeneration(cookie, generationId);
+      return {
+        ok: true,
+        complete: {
+          generation: generation ?? { id: generationId },
+          project: generation?.blueprint,
+        },
+        ms: stream.ms,
+        via: "stream",
+      };
     }
     return { ok: false, error: lastError || "no complete event", ms: stream.ms };
   }
@@ -131,6 +158,9 @@ async function main() {
   console.log("=== Website Builder Customer Journey ===");
   console.log(`base=${base}`);
   console.log(`SITE_URL=${process.env.NEXT_PUBLIC_SITE_URL || "MISSING"}`);
+
+  const dev = await ensureDevServer();
+  console.log(`[dev] ${dev.action} → ${dev.baseUrl}`);
 
   if (!url || !anon || !email || !password) {
     fail(

@@ -15,6 +15,8 @@ import {
 } from "@/lib/ai-core/final-quality";
 import { runDesignCritic } from "@/lib/ai-core/design-critic";
 import { resolveSiteStructure, runPrePublishQualityControl } from "@/lib/ai-core/website-management";
+import type { AgencyGenerationContract } from "@/lib/ai-core/agency-orchestrator/types";
+import { runAgencyQualityGate } from "@/lib/ai-core/agency-quality";
 
 export type PublishGateResult = {
   publishReady: boolean;
@@ -39,6 +41,17 @@ function loadProject(generation: WebsiteGeneration): GeneratedWebsiteProject | n
   const raw = generation.blueprint;
   if (!raw || typeof raw !== "object") return null;
   return raw as unknown as GeneratedWebsiteProject;
+}
+
+function loadAgencyContract(
+  generation: WebsiteGeneration,
+): AgencyGenerationContract | null {
+  const blueprint = generation.blueprint;
+  if (!blueprint || typeof blueprint !== "object") return null;
+  const raw = (blueprint as Record<string, unknown>).agencyContract;
+  if (!raw || typeof raw !== "object") return null;
+  const contract = raw as AgencyGenerationContract;
+  return contract.brandKit?.companyName ? contract : null;
 }
 
 export function evaluatePublishGates(
@@ -118,6 +131,23 @@ export function evaluatePublishGates(
     files: project.files,
     structure,
   });
+
+  const agencyContract = loadAgencyContract(generation);
+  if (agencyContract) {
+    const agencyQuality = runAgencyQualityGate({
+      files: project.files,
+      contract: agencyContract,
+    });
+    if (!agencyQuality.passed) {
+      blockers.push(...agencyQuality.blockers);
+    }
+    warnings.push(...agencyQuality.warnings);
+    if (agencyQuality.score < agencyContract.qualityThresholds.minOverallScore) {
+      blockers.push(
+        `Agency quality score ${agencyQuality.score} below threshold ${agencyContract.qualityThresholds.minOverallScore}`,
+      );
+    }
+  }
 
   blockers.push(...(finalChecklist?.blockers ?? []));
   blockers.push(...(conversionChecklist?.blockers ?? []));

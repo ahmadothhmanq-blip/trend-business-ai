@@ -1,0 +1,61 @@
+{
+  "id": "canvas",
+  "grid": {
+    "columns": 12,
+    "gutter": "1.25rem",
+    "margin": "0",
+    "maxWidth": "100%"
+  },
+  "spacing": {
+    "unit": "rem",
+    "scale": [
+      "0.25",
+      "0.5",
+      "1",
+      "1.5",
+      "2",
+      "3",
+      "5",
+      "7"
+    ]
+  },
+  "visualIdentity": {
+    "colors": {
+      "primary": "#3F2E26",
+      "secondary": "#8B6F5C",
+      "accent": "#C4A574",
+      "background": "#FBF7F2",
+      "foreground": "#2C211B",
+      "muted": "rgba(44,33,27,0.58)",
+      "surface": "#FFFFFF"
+    },
+    "typography": {
+      "display": "Fraunces, ui-serif, Georgia, serif",
+      "body": "DM Sans, ui-sans-serif, system-ui, sans-serif",
+      "scale": {
+        "sm": "0.875rem",
+        "base": "1rem",
+        "lg": "1.375rem",
+        "xl": "2.5rem"
+      }
+    },
+    "radius": {
+      "sm": "12px",
+      "md": "20px",
+      "lg": "32px"
+    },
+    "shadows": {
+      "surface": "0 4px 20px rgba(63,46,38,0.08)"
+    },
+    "borders": {
+      "default": "rgba(0,0,0,0.08)"
+    },
+    "animation": "warm-reveal"
+  },
+  "designSystem": {
+    "tier": "premium",
+    "industry": "Cafe",
+    "layoutKind": "full-bleed",
+    "templateIntelligenceId": "ti-cafe-artisan"
+  }
+}

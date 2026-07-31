@@ -5,6 +5,11 @@
 import type { GeneratedProjectFile } from "@/lib/ai/types";
 import { understandWebsite } from "@/lib/ai-core/website-editor/understand";
 import type { GeneratedWebsiteProject } from "@/plugins/website/types";
+import {
+  findHomePageSource,
+  isTemplateToken,
+  resolveVisualNodeText,
+} from "@/lib/ai-core/visual-editor/hydrate-node-text";
 import type {
   VisualDesignTokens,
   VisualDocument,
@@ -66,18 +71,30 @@ export function buildVisualDocument(params: {
     params.files.map((f) => [f.path.replace(/\\/g, "/"), f]),
   );
 
+  const pageSource = findHomePageSource(params.files);
+
   const nodes: VisualNode[] = understanding.homeComponentOrder.map((name, index) => {
     const section = byName.get(name);
     const path = section?.path || `components/sections/${name}.tsx`;
     const file = fileByPath.get(path.replace(/\\/g, "/"));
     const kind = kindFromHint(section?.kindHint || name);
+    const rawExtract = file ? extractHeading(file.content) : undefined;
+    const hydratedText =
+      resolveVisualNodeText({
+        exportName: name,
+        kind,
+        componentSource: file?.content,
+        pageSource,
+        project: params.project,
+      }) ||
+      (rawExtract && !isTemplateToken(rawExtract) ? rawExtract : undefined);
     return {
       id: `node-${index}-${name}`,
       exportName: name,
       path,
       kind,
       label: name.replace(/([a-z])([A-Z])/g, "$1 $2"),
-      text: file ? extractHeading(file.content) : undefined,
+      text: hydratedText,
       locked: kind === "header" || kind === "footer",
     };
   });

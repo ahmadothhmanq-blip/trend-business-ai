@@ -1,0 +1,12 @@
+{
+  "id": "faculty",
+  "title": "Faculty",
+  "path": "/faculty",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "footer",
+    "utility"
+  ]
+}

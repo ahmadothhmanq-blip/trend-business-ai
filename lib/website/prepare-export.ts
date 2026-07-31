@@ -5,6 +5,7 @@ import {
   type ProjectCapabilityFlags,
 } from "@/lib/ai/validator";
 import { syncPackageJsonDependencies } from "@/lib/ai/website-scaffold";
+import { remediateSiteImagesInFiles } from "@/lib/website/site-images-parser";
 
 const EXPORT_FLAGS: ProjectCapabilityFlags = {
   requiresAuth: false,
@@ -195,6 +196,15 @@ export function prepareWebsiteProjectForExport(
   let current = [...files];
 
   current = fixNodeBuiltinImports(current, fixesApplied);
+  const beforeRemediation = current;
+  current = remediateSiteImagesInFiles(current);
+  if (
+    beforeRemediation.some((f) =>
+      f.path.replaceAll("\\", "/").includes("lib/site-images"),
+    )
+  ) {
+    fixesApplied.push("Remediated premium stock URLs in lib/site-images.ts");
+  }
   current = injectMissingScaffolds(current, fixesApplied);
   current = stripUnresolvedImports(current, fixesApplied);
   current = syncPackageJsonDependencies(current);

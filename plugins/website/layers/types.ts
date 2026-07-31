@@ -99,6 +99,15 @@ export type DesignSystem = {
   shadowStyle: string;
   /** Premium Design System Engine package when applied. */
   premium?: import("@/lib/ai-core/design-system/premium/types").PremiumDesignSystem;
+  sectionShellVariant?: string;
+  compositionMode?: "editorial" | "story" | "product" | "trust" | "balanced";
+  uiStyle?: {
+    density: "airy" | "balanced" | "compact";
+    corners?: "sharp" | "soft" | "pill";
+    elevation?: "flat" | "soft" | "elevated";
+    contrast?: "subtle" | "medium" | "high";
+    notes?: string;
+  };
 };
 
 export type AssetRole =

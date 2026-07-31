@@ -1,4 +1,4 @@
-import { buildStaticPreviewHtml } from "../lib/website/build-static-preview.ts";
+import { buildStaticPreviewHtml } from "../lib/website/build-static-preview.server.ts";
 
 const html = buildStaticPreviewHtml({
   title: "Acme",
@@ -11,7 +11,7 @@ const ok =
   html.includes('id="pricing"') &&
   html.includes('id="home"') &&
   !html.includes("<script") &&
-  html.includes("Live product preview");
+  html.includes("Live Preview");
 
 if (!ok) {
   console.error("FAIL live preview smoke");

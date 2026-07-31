@@ -14,7 +14,7 @@ function read(rel) {
 }
 
 const types = read("lib/ai-core/master-planner/types.ts");
-const engine = read("lib/ai-core/master-planner/engine.ts");
+const pre = read("lib/ai-core/planning-reasoning-engine/orchestrator.ts");
 const apply = read("lib/ai-core/master-planner/apply.ts");
 const runner = read("lib/ai-core/layers/runner.ts");
 const detect = read("lib/ai-core/industry-intelligence/detect.ts");
@@ -31,6 +31,11 @@ assert.ok(
 assert.ok(
   types.includes("locked:") && types.includes("industry: boolean"),
   "plan must define locked industry flag",
+);
+
+assert.ok(
+  types.includes("reasoningChain"),
+  "plan must include explainable routing chain (EDS-001)",
 );
 
 for (const field of [
@@ -57,20 +62,56 @@ for (const field of [
 }
 
 assert.ok(
+  read("lib/ai-core/architecture-validation/validate.ts").includes(
+    "validateWebsiteGenerationPlan",
+  ),
+  "architecture validation engine must exist",
+);
+assert.ok(
+  types.includes("validation:"),
+  "master plan must record validation status in sources",
+);
+const engine = read("lib/ai-core/master-planner/engine.ts");
+assert.ok(
   engine.includes("runMasterWebsitePlanner"),
-  "engine must export runMasterWebsitePlanner",
+  "master planner facade must export runMasterWebsitePlanner",
 );
 assert.ok(
-  engine.includes("detectWebsiteIndustry"),
-  "master planner must call industry detection once",
+  read("lib/ai-core/planning-reasoning-engine/orchestrator.ts").includes(
+    "runPlanningReasoningEngine",
+  ),
+  "PRE orchestrator must exist (EDS-002)",
 );
 assert.ok(
-  engine.includes("runAutoDesignDecision"),
-  "master planner must orchestrate auto-design",
+  read("lib/ai-core/planning-reasoning-engine/types.ts").includes(
+    "DecisionTraceEntry",
+  ),
+  "PRE must define structured DecisionTraceEntry (EDS-002)",
 );
 assert.ok(
-  engine.includes("applyMasterWebsitePlanToBrief"),
-  "master planner must apply plan to brief",
+  runner.includes("runPlanningReasoningEngine"),
+  "runner must invoke PRE for website-builder (EDS-002)",
+);
+assert.ok(
+  pre.includes("runBusinessIntelligenceAnalysis") ||
+    pre.includes("getBusinessIntelligenceFromBrief"),
+  "PRE must run business intelligence before routing",
+);
+assert.ok(
+  pre.includes("validateAndRouteWebsiteGeneration"),
+  "PRE must use unified router + architecture validation (EDS-001)",
+);
+assert.ok(
+  pre.includes("runAgencyOrchestrator"),
+  "PRE must run agency orchestrator before plan lock",
+);
+assert.ok(
+  pre.includes("runAutoDesignDecision"),
+  "PRE must orchestrate auto-design",
+);
+assert.ok(
+  pre.includes("applyMasterWebsitePlanToBrief"),
+  "PRE must apply plan to brief",
 );
 
 assert.ok(
@@ -81,10 +122,19 @@ assert.ok(
   apply.includes("resolveIndustryFromMasterPlan"),
   "apply module must expose resolveIndustryFromMasterPlan",
 );
+assert.ok(
+  apply.includes("layoutTemplateIntelligenceId"),
+  "apply must separate layout TI from visual theme",
+);
+assert.ok(
+  apply.includes("masterPlanReasoningChain"),
+  "apply must persist reasoning chain on brief",
+);
 
 assert.ok(
-  runner.includes("runMasterWebsitePlanner"),
-  "runner must invoke master planner for website-builder",
+  runner.includes("runPlanningReasoningEngine") ||
+    runner.includes("runMasterWebsitePlanner"),
+  "runner must invoke PRE or master planner for website-builder",
 );
 assert.ok(
   !runner.includes("detectWebsiteIndustry(brief)") ||
@@ -92,8 +142,8 @@ assert.ok(
   "runner must not call detectWebsiteIndustry directly before master planner",
 );
 assert.ok(
-  runner.includes("Applying locked template from master plan"),
-  "runner must apply locked template from master plan",
+  runner.includes("Applying locked layout template from master plan"),
+  "runner must apply locked layout template from master plan",
 );
 
 assert.ok(

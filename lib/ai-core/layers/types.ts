@@ -152,6 +152,10 @@ export type CoreDesignSystem = {
   animationStyle?: CoreDesignAnimationStyle;
   /** Premium Design System Engine package (world-class tokens + layout IQ). */
   premium?: import("@/lib/ai-core/design-system/premium/types").PremiumDesignSystem;
+  /** Section shell variant from Design Intelligence (excellence program). */
+  sectionShellVariant?: string;
+  /** Layout composition mode — editorial, story, product, trust, balanced. */
+  compositionMode?: "editorial" | "story" | "product" | "trust" | "balanced";
 };
 
 export type CoreAssetRole =
@@ -194,6 +198,9 @@ export type CoreAssetItem = {
     prompt?: string;
     provider?: string;
     artDirection?: string;
+    visualConcept?: string;
+    sectionPurpose?: string;
+    pagePurpose?: string;
   };
 };
 

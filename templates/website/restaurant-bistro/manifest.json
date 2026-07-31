@@ -1,0 +1,162 @@
+{
+  "specVersion": "2.0.0",
+  "id": "restaurant-bistro",
+  "version": "2.0.0",
+  "name": "Restaurant Fine Dining",
+  "description": "Michelin-caliber dining experience with cinematic food hero, tasting menu flow, and reservation-first hospitality.",
+  "metadata": {
+    "category": "restaurant",
+    "industry": "Restaurant",
+    "tags": [
+      "restaurant",
+      "fine-dining",
+      "chef",
+      "reservations"
+    ],
+    "author": {
+      "name": "Trend Business AI",
+      "organization": "Premium Template Studio"
+    },
+    "license": "MIT",
+    "keywords": [
+      "restaurant",
+      "fine dining",
+      "chef",
+      "tasting menu"
+    ],
+    "templateIntelligenceId": "ti-restaurant-dining",
+    "premium": true,
+    "tier": "agency"
+  },
+  "media": {
+    "thumbnail": "assets/thumbnail.png",
+    "preview": "assets/preview.png"
+  },
+  "compatibility": {
+    "engineVersion": ">=1.0.0",
+    "specVersion": "2.0.0",
+    "features": [
+      "regions",
+      "placement-rules",
+      "responsive",
+      "premium-canvas"
+    ]
+  },
+  "update": {
+    "channel": "stable",
+    "releasedAt": "2026-07-30T17:52:37.566Z"
+  },
+  "responsive": {
+    "breakpoints": [
+      {
+        "name": "sm",
+        "minWidth": 640
+      },
+      {
+        "name": "md",
+        "minWidth": 768
+      },
+      {
+        "name": "lg",
+        "minWidth": 1024
+      },
+      {
+        "name": "xl",
+        "minWidth": 1280
+      },
+      {
+        "name": "2xl",
+        "minWidth": 1536
+      }
+    ],
+    "containerMaxWidth": "100%",
+    "fluidTypography": true
+  },
+  "canvas": {
+    "file": "canvas.json"
+  },
+  "placementRules": {
+    "file": "placement-rules.json"
+  },
+  "layouts": [
+    {
+      "id": "default",
+      "file": "layouts/default.json",
+      "kind": "full-bleed",
+      "label": "Default",
+      "description": "Premium full-bleed layout for Restaurant."
+    }
+  ],
+  "regions": [
+    {
+      "id": "header",
+      "file": "regions/header.json",
+      "role": "header",
+      "label": "Header Region",
+      "description": "Premium header region for Restaurant Fine Dining."
+    },
+    {
+      "id": "main",
+      "file": "regions/main.json",
+      "role": "main",
+      "label": "Main Region",
+      "description": "Premium main region for Restaurant Fine Dining."
+    },
+    {
+      "id": "overlay",
+      "file": "regions/overlay.json",
+      "role": "overlay",
+      "label": "Overlay Region",
+      "description": "Premium overlay region for Restaurant Fine Dining."
+    },
+    {
+      "id": "utility",
+      "file": "regions/utility.json",
+      "role": "utility",
+      "label": "Utility Region",
+      "description": "Premium utility region for Restaurant Fine Dining."
+    },
+    {
+      "id": "footer",
+      "file": "regions/footer.json",
+      "role": "footer",
+      "label": "Footer Region",
+      "description": "Premium footer region for Restaurant Fine Dining."
+    }
+  ],
+  "pages": [
+    {
+      "id": "home",
+      "title": "Home",
+      "path": "/",
+      "layoutId": "default",
+      "file": "pages/home.json",
+      "description": "Home — premium Restaurant page blueprint."
+    },
+    {
+      "id": "menu",
+      "title": "Menu",
+      "path": "/menu",
+      "layoutId": "default",
+      "file": "pages/menu.json",
+      "description": "Menu — premium Restaurant page blueprint."
+    },
+    {
+      "id": "chef",
+      "title": "Chef",
+      "path": "/chef",
+      "layoutId": "default",
+      "file": "pages/chef.json",
+      "description": "Chef — premium Restaurant page blueprint."
+    },
+    {
+      "id": "reservations",
+      "title": "Reservations",
+      "path": "/reservations",
+      "layoutId": "default",
+      "file": "pages/reservations.json",
+      "description": "Reservations — premium Restaurant page blueprint."
+    }
+  ],
+  "entry": "package.entry.json"
+}

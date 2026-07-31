@@ -1,0 +1,155 @@
+{
+  "specVersion": "2.0.0",
+  "id": "saas-starter",
+  "version": "2.0.0",
+  "name": "SaaS Velocity",
+  "description": "Product-led growth architecture with bento features, pricing bands, and conversion-optimized component rhythm.",
+  "metadata": {
+    "category": "saas",
+    "industry": "SaaS",
+    "tags": [
+      "saas",
+      "product-led",
+      "growth",
+      "pricing"
+    ],
+    "author": {
+      "name": "Trend Business AI",
+      "organization": "Premium Template Studio"
+    },
+    "license": "MIT",
+    "keywords": [
+      "saas",
+      "product",
+      "growth",
+      "pricing"
+    ],
+    "templateIntelligenceId": "ti-saas-growth",
+    "premium": true,
+    "tier": "agency"
+  },
+  "media": {
+    "thumbnail": "assets/thumbnail.png",
+    "preview": "assets/preview.png"
+  },
+  "compatibility": {
+    "engineVersion": ">=1.0.0",
+    "specVersion": "2.0.0",
+    "features": [
+      "regions",
+      "placement-rules",
+      "responsive",
+      "premium-canvas"
+    ]
+  },
+  "update": {
+    "channel": "stable",
+    "releasedAt": "2026-07-30T17:52:37.458Z"
+  },
+  "responsive": {
+    "breakpoints": [
+      {
+        "name": "sm",
+        "minWidth": 640
+      },
+      {
+        "name": "md",
+        "minWidth": 768
+      },
+      {
+        "name": "lg",
+        "minWidth": 1024
+      },
+      {
+        "name": "xl",
+        "minWidth": 1280
+      },
+      {
+        "name": "2xl",
+        "minWidth": 1536
+      }
+    ],
+    "containerMaxWidth": "80rem",
+    "fluidTypography": true
+  },
+  "canvas": {
+    "file": "canvas.json"
+  },
+  "placementRules": {
+    "file": "placement-rules.json"
+  },
+  "layouts": [
+    {
+      "id": "default",
+      "file": "layouts/default.json",
+      "kind": "single-column",
+      "label": "Default",
+      "description": "Premium single-column layout for SaaS."
+    }
+  ],
+  "regions": [
+    {
+      "id": "header",
+      "file": "regions/header.json",
+      "role": "header",
+      "label": "Header Region",
+      "description": "Premium header region for SaaS Velocity."
+    },
+    {
+      "id": "utility",
+      "file": "regions/utility.json",
+      "role": "utility",
+      "label": "Utility Region",
+      "description": "Premium utility region for SaaS Velocity."
+    },
+    {
+      "id": "main",
+      "file": "regions/main.json",
+      "role": "main",
+      "label": "Main Region",
+      "description": "Premium main region for SaaS Velocity."
+    },
+    {
+      "id": "footer",
+      "file": "regions/footer.json",
+      "role": "footer",
+      "label": "Footer Region",
+      "description": "Premium footer region for SaaS Velocity."
+    }
+  ],
+  "pages": [
+    {
+      "id": "home",
+      "title": "Home",
+      "path": "/",
+      "layoutId": "default",
+      "file": "pages/home.json",
+      "description": "Home — premium SaaS page blueprint."
+    },
+    {
+      "id": "features",
+      "title": "Features",
+      "path": "/features",
+      "layoutId": "default",
+      "file": "pages/features.json",
+      "description": "Features — premium SaaS page blueprint."
+    },
+    {
+      "id": "pricing",
+      "title": "Pricing",
+      "path": "/pricing",
+      "layoutId": "default",
+      "file": "pages/pricing.json",
+      "description": "Pricing — premium SaaS page blueprint."
+    },
+    {
+      "id": "docs",
+      "title": "Docs",
+      "path": "/docs",
+      "layoutId": "default",
+      "file": "pages/docs.json",
+      "description": "Docs — premium SaaS page blueprint."
+    }
+  ],
+  "entry": "package.entry.json"
+}

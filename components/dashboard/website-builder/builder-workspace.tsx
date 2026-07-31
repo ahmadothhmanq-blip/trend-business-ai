@@ -34,7 +34,6 @@ import type { WebsiteGeneration } from "@/types/database";
 import type { VisualDesignTokens, VisualViewport } from "@/lib/ai-core/visual-editor/types";
 import {
   listBuilderVersionSnapshots,
-  mergeThemePreset,
   pushBuilderVersionSnapshot,
   resolveBuilderDesignTokens,
   resolveBuilderWorkspaceStructure,
@@ -214,14 +213,6 @@ export function BuilderWorkspace({
     setViewport(v);
   }, []);
 
-  const handleApplyTheme = useCallback((presetId: string) => {
-    setTokens((prev) => {
-      const next = mergeThemePreset(prev, presetId);
-      editorRef.current?.updateTokens(next);
-      return next;
-    });
-  }, []);
-
   const handleInsertBlock = useCallback((block: BuilderBlockView) => {
     editorRef.current?.insertBlock({
       exportName: block.exportName,
@@ -241,7 +232,6 @@ export function BuilderWorkspace({
           disabled={disabled}
           onTokensChange={handleTokensChange}
           onViewportChange={handleViewportChange}
-          onApplyTheme={handleApplyTheme}
         />
       );
     }

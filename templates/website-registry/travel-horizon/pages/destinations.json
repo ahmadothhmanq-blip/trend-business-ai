@@ -1,0 +1,13 @@
+{
+  "id": "destinations",
+  "title": "Destinations",
+  "path": "/destinations",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "utility",
+    "overlay",
+    "footer"
+  ]
+}

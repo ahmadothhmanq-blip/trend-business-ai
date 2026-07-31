@@ -2,7 +2,7 @@
 
 **Project:** Trend Business AI  
 **Test type:** End-to-end functional / acceptance (read-only; no code changes)  
-**Environment:** `http://localhost:3000` (`npm run dev`)  
+**Environment:** configured local dev origin (`npm run dev`, default `http://localhost:3003`)  
 **Date:** 2026-07-17  
 **Tester:** Automated harness + route/API inspection  
 **Constraint:** No authenticated user session available (Supabase email confirmation + no confirmed QA credentials). Authenticated generate/save/billing flows are therefore **partial** unless proven otherwise.

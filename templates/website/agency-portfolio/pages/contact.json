@@ -1,0 +1,12 @@
+{
+  "id": "contact",
+  "title": "Contact",
+  "path": "/contact",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "sidebar",
+    "main",
+    "footer"
+  ]
+}

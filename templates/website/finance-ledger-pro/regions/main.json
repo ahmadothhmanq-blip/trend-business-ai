@@ -1,0 +1,39 @@
+{
+  "id": "main",
+  "role": "main",
+  "label": "Main Region",
+  "layout": {
+    "width": "contained",
+    "alignment": "center",
+    "maxWidth": "80rem",
+    "padding": "1.75rem"
+  },
+  "placement": {
+    "allowedComponentTypes": [
+      "hero",
+      "banner",
+      "features",
+      "gallery",
+      "pricing",
+      "faq",
+      "team",
+      "blog",
+      "contact",
+      "video",
+      "timeline",
+      "cta",
+      "testimonials",
+      "services",
+      "custom"
+    ],
+    "ordering": "vertical",
+    "allowNesting": false,
+    "maxComponents": 28,
+    "minComponents": 0,
+    "allowCustomComponents": true
+  },
+  "responsive": {
+    "collapseBelow": "md",
+    "stackOrder": "normal"
+  }
+}

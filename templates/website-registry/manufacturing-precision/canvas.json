@@ -1,0 +1,61 @@
+{
+  "id": "canvas",
+  "grid": {
+    "columns": 12,
+    "gutter": "1.25rem",
+    "margin": "1.5rem",
+    "maxWidth": "84rem"
+  },
+  "spacing": {
+    "unit": "rem",
+    "scale": [
+      "0.25",
+      "0.5",
+      "1",
+      "1.5",
+      "2",
+      "3",
+      "5",
+      "7"
+    ]
+  },
+  "visualIdentity": {
+    "colors": {
+      "primary": "#334155",
+      "secondary": "#475569",
+      "accent": "#0EA5E9",
+      "background": "#F8FAFC",
+      "foreground": "#0F172A",
+      "muted": "rgba(15,23,42,0.58)",
+      "surface": "#FFFFFF"
+    },
+    "typography": {
+      "display": "IBM Plex Sans, ui-sans-serif, system-ui, sans-serif",
+      "body": "IBM Plex Sans, ui-sans-serif, system-ui, sans-serif",
+      "scale": {
+        "sm": "0.875rem",
+        "base": "1rem",
+        "lg": "1.375rem",
+        "xl": "2.25rem"
+      }
+    },
+    "radius": {
+      "sm": "2px",
+      "md": "4px",
+      "lg": "6px"
+    },
+    "shadows": {
+      "surface": "0 2px 8px rgba(30,41,59,0.08)"
+    },
+    "borders": {
+      "default": "rgba(0,0,0,0.08)"
+    },
+    "animation": "precision-crisp"
+  },
+  "designSystem": {
+    "tier": "premium",
+    "industry": "Manufacturing",
+    "layoutKind": "sidebar-right",
+    "templateIntelligenceId": "ti-manufacturing-precision"
+  }
+}

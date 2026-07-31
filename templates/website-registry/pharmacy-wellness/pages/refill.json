@@ -1,0 +1,12 @@
+{
+  "id": "refill",
+  "title": "Refill",
+  "path": "/refill",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "sidebar",
+    "footer"
+  ]
+}

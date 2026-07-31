@@ -1,0 +1,11 @@
+{
+  "id": "about",
+  "title": "About",
+  "path": "/about",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "footer"
+  ]
+}

@@ -42,6 +42,10 @@ export const websiteGenerateRequestSchema = z
     templateIntelligenceId: z.string().trim().min(1).optional(),
     /** Template Intelligence category override. */
     templateIntelligenceCategory: z.string().trim().min(1).optional(),
+    /** Installed template package id (Website Builder structure templates). */
+    websiteStructureTemplateId: z.string().trim().min(1).optional(),
+    /** Visual theme catalog id (colors / typography). */
+    websiteThemeId: z.string().trim().min(1).optional(),
     /** Industry id from template selection (e.g. saas, restaurant). */
     industryId: z.string().trim().min(1).optional(),
     /** Preferred component / section keys from the template. */

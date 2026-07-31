@@ -1,0 +1,12 @@
+{
+  "id": "join",
+  "title": "Join",
+  "path": "/join",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "footer",
+    "main",
+    "utility"
+  ]
+}

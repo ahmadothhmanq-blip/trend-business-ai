@@ -10,12 +10,14 @@ import type { BuilderMemberRole } from "@/lib/website/builder/enterprise";
 
 export type BuilderEmailDeliveryStatus = "pending" | "sent" | "failed" | "skipped";
 
+import { getLocalDevOrigin } from "@/lib/dev-origin";
+
 export function resolveBuilderAppOrigin(): string {
   const configured = process.env.NEXT_PUBLIC_APP_URL?.trim();
   if (configured) return configured.replace(/\/$/, "");
   const vercel = process.env.VERCEL_URL?.trim();
   if (vercel) return `https://${vercel}`;
-  return "http://localhost:3000";
+  return getLocalDevOrigin();
 }
 
 export function buildBuilderInvitationUrl(token: string): string {

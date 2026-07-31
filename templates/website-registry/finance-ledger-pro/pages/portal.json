@@ -1,0 +1,13 @@
+{
+  "id": "portal",
+  "title": "Client Portal",
+  "path": "/portal",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "sidebar",
+    "utility",
+    "main",
+    "footer"
+  ]
+}

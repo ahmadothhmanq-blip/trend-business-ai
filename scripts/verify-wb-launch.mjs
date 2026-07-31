@@ -11,6 +11,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import pg from "pg";
+import { resolveLocalDevBaseUrl } from "./lib/dev-base-url.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
@@ -96,7 +97,7 @@ else {
 
 if (!siteUrl) {
   if (productionMode) fail("NEXT_PUBLIC_SITE_URL", "required for production (auth redirects + public URLs)");
-  else warn("NEXT_PUBLIC_SITE_URL", "missing — local falls back to http://localhost:3000");
+  else warn("NEXT_PUBLIC_SITE_URL", `missing — local falls back to ${resolveLocalDevBaseUrl()}`);
 } else if (!/^https?:\/\/[^/\s]+$/i.test(siteUrl.replace(/\/$/, ""))) {
   fail("NEXT_PUBLIC_SITE_URL", "must be absolute origin, no path (e.g. https://app.example.com)");
 } else if (productionMode && !siteUrl.startsWith("https://")) {

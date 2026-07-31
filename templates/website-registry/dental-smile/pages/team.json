@@ -1,0 +1,12 @@
+{
+  "id": "team",
+  "title": "Team",
+  "path": "/team",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "overlay",
+    "footer"
+  ]
+}

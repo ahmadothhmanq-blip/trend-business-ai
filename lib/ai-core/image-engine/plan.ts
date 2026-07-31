@@ -42,12 +42,14 @@ export function planWebsiteImages(params: {
   designPlanContext?: DesignPlanImageContext;
   maxItems?: number;
   masterPlan?: MasterWebsitePlan | null;
+  businessProfile?: import("@/lib/ai-core/business-intelligence/types").BusinessIntelligenceProfile | null;
 }): ImageEnginePlanItem[] {
   const maxItems = params.maxItems ?? 14;
   const ctx = buildImageIntelligence({
     ...params,
     structuredRequirements: params.structuredRequirements,
     masterPlan: params.masterPlan,
+    businessProfile: params.businessProfile,
   });
   const style = styleFromContext(ctx);
   const sections = Array.isArray(params.strategy.sectionPlan)
@@ -76,7 +78,15 @@ export function planWebsiteImages(params: {
       inferSectionKey(opts.sectionName || purpose);
     const shotBrief =
       opts.shotBrief ||
-      resolveShotBriefForRole(ctx, purpose, sectionKey, varietyIndex, usedBriefs);
+      resolveShotBriefForRole(
+        ctx,
+        purpose,
+        sectionKey,
+        varietyIndex,
+        usedBriefs,
+        opts.sectionName,
+        opts.contentNotes,
+      );
     if (shotBrief) {
       usedBriefs.add(shotBrief);
       varietyIndex += 1;

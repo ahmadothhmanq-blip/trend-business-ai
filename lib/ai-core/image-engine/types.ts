@@ -5,6 +5,7 @@ import type { AssetQualityReport } from "@/lib/ai-core/image-engine/validate";
 import type { VideoAssetPackage } from "@/lib/ai-core/image-engine/video";
 import type { SectionKey } from "@/lib/ai-core/image-engine/section-strategies";
 import type { DesignPlanImageRequirement } from "@/lib/ai-core/design-plan/types";
+import type { BusinessIntelligenceProfile } from "@/lib/ai-core/business-intelligence/types";
 
 /** Why the image exists on the generated website. */
 export type ImagePurpose =
@@ -25,6 +26,9 @@ export type ImageAssetMetadata = {
   prompt: string;
   provider?: string;
   artDirection?: string;
+  visualConcept?: string;
+  sectionPurpose?: string;
+  pagePurpose?: string;
 };
 
 export type ImageEnginePlanItem = {
@@ -70,6 +74,8 @@ export type ImageIntelligenceContext = {
   templateLabel?: string;
   premiumStyleId?: string;
   colors: { primary: string; secondary: string; accent?: string };
+  /** AI Business Intelligence profile — gates semantic asset selection. */
+  businessProfile?: BusinessIntelligenceProfile | null;
 };
 
 export type DesignPlanImageContext = {

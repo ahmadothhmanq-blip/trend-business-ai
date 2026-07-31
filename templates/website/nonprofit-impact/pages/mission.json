@@ -1,0 +1,12 @@
+{
+  "id": "mission",
+  "title": "Mission",
+  "path": "/mission",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "footer",
+    "utility",
+    "main"
+  ]
+}

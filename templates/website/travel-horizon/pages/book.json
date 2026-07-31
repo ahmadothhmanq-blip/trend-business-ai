@@ -1,0 +1,13 @@
+{
+  "id": "book",
+  "title": "Book",
+  "path": "/book",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "utility",
+    "overlay",
+    "footer"
+  ]
+}

@@ -41,6 +41,35 @@ export {
 } from "@/lib/website/builder/design-system";
 
 export {
+  WEBSITE_STRUCTURE_TEMPLATES,
+  getWebsiteStructureTemplate,
+  resolveStructureTemplateForIndustry,
+  type WebsiteStructureTemplate,
+  type WebsiteStructureTemplateId,
+  type WebsiteStructureTemplateChoice,
+} from "@/lib/website/builder/structure-templates";
+
+export {
+  mapListItemToStructureTemplate,
+  mapListItemToStructureTemplateChoice,
+  isLegacyMarketplaceStructureTemplate,
+  toStructureTemplateChoice,
+  extractAllowedComponentsFromRuntimeModel,
+  BUILDER_DEFAULT_STRUCTURE_TEMPLATE_INTELLIGENCE_ID,
+} from "@/lib/website/builder/template-catalog";
+
+export { fetchBuilderTemplateCatalog } from "@/lib/website/builder/template-catalog-client";
+
+export {
+  WEBSITE_THEME_CATALOG,
+  getWebsiteThemeEntry,
+  resolveThemeForStyle,
+  resolveThemeTemplateIntelligenceId,
+  type WebsiteThemeCatalogEntry,
+  type WebsiteThemePresetId,
+} from "@/lib/website/builder/theme-catalog";
+
+export {
   BUILDER_BREAKPOINTS,
   getBuilderBreakpoint,
   type BuilderBreakpoint,
@@ -113,3 +142,26 @@ export {
   formatWebsiteBuilderApiError,
   readWebsiteBuilderApiError,
 } from "@/lib/website/builder/client-api-error";
+
+export type {
+  BuilderTemplateRuntimeFailure,
+  BuilderTemplateRuntimeResult,
+  BuilderTemplateRuntimeScope,
+  BuilderTemplateRuntimeSuccess,
+  BuilderTemplateRuntimeListResponse,
+} from "@/lib/website/builder/template-runtime.types";
+export { formatBuilderTemplateRuntimeError } from "@/lib/website/builder/template-runtime.types";
+export {
+  getActiveBuilderTemplateRuntimeMeta,
+  getActiveBuilderTemplateRuntimeModel,
+  clearActiveBuilderTemplateRuntime,
+  setActiveBuilderTemplateRuntime,
+} from "@/lib/website/builder/builder-template-runtime-session.client";
+export {
+  fetchBuilderTemplateRuntimeModel,
+  fetchInstalledBuilderTemplatePackageIds,
+} from "@/lib/website/builder/template-runtime-client";
+export {
+  useBuilderTemplateRuntime,
+  type BuilderTemplateRuntimeState,
+} from "@/lib/website/builder/use-template-runtime";

@@ -1,0 +1,12 @@
+{
+  "id": "donate",
+  "title": "Donate",
+  "path": "/donate",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "footer",
+    "utility",
+    "main"
+  ]
+}

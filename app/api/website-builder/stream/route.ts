@@ -24,6 +24,7 @@ import { isRetryableError, isStreamDisconnectError, withRetry } from "@/lib/ai/r
 import { clampWebsitePrompt } from "@/lib/ai/timeouts";
 import { resolveRequestLanguage } from "@/lib/i18n/api";
 import { logger } from "@/lib/logger";
+import { ArchitectureValidationFailure } from "@/lib/ai-core/architecture-validation";
 import {
   isWebsiteIncrementalPreviewEnabled,
   isUltraFastWebsiteGenerationEnabled,
@@ -326,6 +327,10 @@ export async function POST(request: Request) {
         }
       } catch (error) {
         await checkpointQueue;
+        const architectureFailure =
+          error instanceof ArchitectureValidationFailure
+            ? error.toExplainablePayload()
+            : null;
         const message = isStreamDisconnectError(error)
           ? "AI provider connection interrupted during generation. Progress was saved — use Resume to continue."
           : error instanceof Error
@@ -338,6 +343,7 @@ export async function POST(request: Request) {
             runId,
             phase: "catch",
             disconnect: isStreamDisconnectError(error),
+            architectureValidation: architectureFailure?.code ?? null,
             sseClosed: isClosed(),
             elapsedMs: Date.now() - startedAt,
             sessionId,
@@ -354,7 +360,16 @@ export async function POST(request: Request) {
             files: lastFiles,
           });
         }
-        send("error", { error: message, generationId: sessionId });
+        send(
+          "error",
+          architectureFailure
+            ? {
+                error: message,
+                generationId: sessionId,
+                architectureValidation: architectureFailure,
+              }
+            : { error: message, generationId: sessionId },
+        );
       } finally {
         logger.info("Website Builder stream finally close", WB_STREAM_LOG, {
           runId,

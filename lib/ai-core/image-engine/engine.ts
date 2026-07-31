@@ -2,9 +2,22 @@ import { generateCoreAssets } from "@/lib/ai-core/assets/generate";
 import { getDefaultImageSettings } from "@/lib/ai-core/assets/settings";
 import type { CoreAssetPlanItem } from "@/lib/ai-core/assets/types";
 import type { BrandIdentityBrief } from "@/lib/ai-core/brand-identity/types";
+import type { DesignSystemSpec } from "@/lib/ai-core/design-intelligence/die-types";
 import { buildArtDirectionMap } from "@/lib/ai-core/image-engine/art-direction";
 import { buildImageIntelligence } from "@/lib/ai-core/image-engine/intelligence";
-import { planWebsiteImages } from "@/lib/ai-core/image-engine/plan";
+import {
+  runImageIntelligenceEngine,
+} from "@/lib/ai-core/image-intelligence/iie-engine";
+import { imageSpecificationsToPlanItems } from "@/lib/ai-core/image-intelligence/build-spec";
+import {
+  IMAGE_INTELLIGENCE_SPEC_KEY,
+  IMAGE_INTELLIGENCE_TRACE_KEY,
+  type ImageIntelligenceEngineResult,
+} from "@/lib/ai-core/image-intelligence/iie-types";
+import {
+  getWorkflowStateFromBrief,
+  superviseAgentSync,
+} from "@/lib/ai-core/multi-agent-orchestration";
 import {
   getCachedPrompt,
   setCachedPrompt,
@@ -27,8 +40,15 @@ import type {
   StructuredImageRequirement,
 } from "@/lib/ai-core/image-engine/types";
 import type { MasterWebsitePlan } from "@/lib/ai-core/master-planner/types";
+import type { WebsiteGenerationPlan } from "@/lib/ai-core/architecture-validation/types";
+import type { BusinessIntelligenceProfile } from "@/lib/ai-core/business-intelligence/types";
+import {
+  repairImagePromptForProfile,
+  validateImagePromptsAgainstProfile,
+} from "@/lib/ai-core/business-intelligence/validate";
 import type {
   CoreAssetManifest,
+  CoreBrief,
   CoreBusinessProfile,
   CoreDesignSystem,
   CoreProductStrategy,
@@ -76,17 +96,71 @@ export async function runAiImageEngine(params: {
   }) => Promise<{ publicUrl: string; storagePath: string } | null>;
   onProgress?: (message: string) => void;
   masterPlan?: MasterWebsitePlan | null;
-}): Promise<CoreAssetManifest> {
+  websiteGenerationPlan?: WebsiteGenerationPlan | null;
+  designSystemSpec?: DesignSystemSpec | null;
+  businessProfile?: BusinessIntelligenceProfile | null;
+  brief?: CoreBrief | null;
+  /** Pre-computed IIE result — skips re-running image intelligence. */
+  imageIntelligence?: ImageIntelligenceEngineResult | null;
+}): Promise<CoreAssetManifest & { imageIntelligence?: ImageIntelligenceEngineResult }> {
   const maxImages = params.maxImages ?? 14;
+
+  const iieParams = {
+    strategy: params.strategy,
+    designSystem: params.designSystem,
+    profile: params.profile,
+    templateSelection: params.templateSelection,
+    brandIdentity: params.brandIdentity,
+    preferredStyle: params.preferredStyle,
+    designPlanImageRequirements: params.designPlanImageRequirements,
+    structuredImageRequirements: params.structuredImageRequirements,
+    designPlanContext: params.designPlanContext,
+    maxImages,
+    masterPlan: params.masterPlan,
+    websiteGenerationPlan: params.websiteGenerationPlan,
+    designSystemSpec: params.designSystemSpec,
+    businessProfile: params.businessProfile,
+    onProgress: params.onProgress,
+  };
+
+  let iieResult: ImageIntelligenceEngineResult;
+  if (params.imageIntelligence) {
+    iieResult = params.imageIntelligence;
+  } else if (params.brief && getWorkflowStateFromBrief(params.brief)) {
+    const supervised = superviseAgentSync({
+      agentId: "IIE",
+      brief: params.brief,
+      relaxedDependencies: true,
+      onProgress: params.onProgress,
+      executor: () => runImageIntelligenceEngine(iieParams),
+      updateBrief: (result, currentBrief) => ({
+        ...currentBrief,
+        metadata: {
+          ...(currentBrief.metadata ?? {}),
+          [IMAGE_INTELLIGENCE_TRACE_KEY]: result.trace,
+          [IMAGE_INTELLIGENCE_SPEC_KEY]: result.spec,
+          imageIntelligenceValidation: result.validation,
+        },
+      }),
+      shareArtifacts: (result) => ({
+        imageSystemSpec: result.spec,
+      }),
+    });
+    iieResult = supervised.result;
+  } else {
+    iieResult = runImageIntelligenceEngine(iieParams);
+  }
+
   const intel = buildImageIntelligence({
     strategy: params.strategy,
     designSystem: params.designSystem,
     profile: params.profile,
     templateSelection: params.templateSelection,
-    preferredStyle: params.preferredStyle,
+    preferredStyle: params.preferredStyle || iieResult.spec.imageStyle,
     brandIdentity: params.brandIdentity,
     structuredRequirements: params.structuredImageRequirements,
     masterPlan: params.masterPlan,
+    businessProfile: params.businessProfile,
   });
   if (params.designPlanImageRequirements?.length) {
     intel.imageRequirements = params.designPlanImageRequirements;
@@ -107,29 +181,46 @@ export async function runAiImageEngine(params: {
   });
 
   params.onProgress?.(
-    `AI Assets Engine: art direction for ${intel.industry} · ${intel.brandStyle}…`,
-  );
-  params.onProgress?.(
-    `AI Assets Engine: planning ${intel.imageStyle} imagery with section-specific strategies…`,
+    `AI Assets Engine: IIE locked ${iieResult.spec.specifications.length} ImageSpecifications · ${intel.industry} · ${intel.brandStyle}…`,
   );
 
-  let planned = planWebsiteImages({
-    strategy: params.strategy,
-    designSystem: params.designSystem,
-    profile: params.profile,
-    templateSelection: params.templateSelection,
-    preferredStyle:
-      params.preferredStyle ||
-      params.brandIdentity?.imageDirection ||
-      intel.imageStyle,
-    brandIdentity: params.brandIdentity,
-    structuredRequirements: params.structuredImageRequirements,
-    designPlanContext: params.designPlanContext,
-    maxItems: maxImages,
-    masterPlan: params.masterPlan,
-  });
+  let planned = imageSpecificationsToPlanItems(iieResult.spec.specifications);
 
-  planned = scoreAndImprovePlannedPrompts(planned, intel, params.onProgress);
+  if (params.businessProfile) {
+    const biValidation = validateImagePromptsAgainstProfile({
+      profile: params.businessProfile,
+      prompts: planned.map((p) => ({
+        id: p.id,
+        prompt: p.prompt,
+        alt: p.alt,
+        purpose: p.metadata.purpose,
+      })),
+    });
+    params.onProgress?.(biValidation.summary);
+    if (!biValidation.passed) {
+      planned = planned.map((item) => ({
+        ...item,
+        prompt: repairImagePromptForProfile(
+          item.prompt,
+          params.businessProfile!,
+          item.metadata.artDirection,
+        ),
+      }));
+      params.onProgress?.(
+        "[business-intelligence] Repaired image prompts before generation for industry relevance",
+      );
+    }
+    params.onProgress?.(
+      `[business-intelligence] Asset gate passed · ${params.businessProfile.industry} · photography locked`,
+    );
+  }
+
+  planned = scoreAndImprovePlannedPrompts(
+    planned,
+    intel,
+    params.onProgress,
+    params.businessProfile,
+  );
   planned = await refinePromptsWithDeepSeek(planned, intel, params.onProgress);
 
   const defaultSettings = getDefaultImageSettings({
@@ -191,8 +282,14 @@ export async function runAiImageEngine(params: {
     aiRunId: params.aiRunId,
     maxImages,
     imageSettings: defaultSettings,
-    negativePrompt:
+    negativePrompt: [
       "text, watermark, logo, UI mockup, blurry, low quality, distorted anatomy, placeholder, cartoon, clipart, generic stock smile, empty background, blank image",
+      params.businessProfile?.forbiddenSubjects.length
+        ? `avoid: ${params.businessProfile.forbiddenSubjects.join(", ")}`
+        : "",
+    ]
+      .filter(Boolean)
+      .join(", "),
     persist: params.persist,
     upload: params.upload,
     onProgress: params.onProgress,
@@ -204,6 +301,7 @@ export async function runAiImageEngine(params: {
     items: raw.items.map((item) => {
       const plan = planned.find((p) => p.id === item.id);
       const purpose = plan?.metadata.purpose ?? (item.role as "hero");
+      const spec = iieResult.spec.specifications.find((s) => s.id === item.id);
       return {
         ...item,
         metadata: {
@@ -212,6 +310,8 @@ export async function runAiImageEngine(params: {
           style: plan?.metadata.style ?? defaultSettings.style,
           prompt: plan?.prompt ?? item.prompt,
           artDirection: plan?.metadata.artDirection || artMap[purpose]?.summary,
+          visualConcept: spec?.visualConcept || plan?.metadata.visualConcept,
+          sectionPurpose: spec?.sectionPurpose || plan?.metadata.sectionPurpose,
           provider:
             item.status === "generated"
               ? item.metadata?.provider || raw.provider
@@ -224,12 +324,15 @@ export async function runAiImageEngine(params: {
   };
 
   const preferred = preferAiImages(withMeta);
-  const complete = ensureRequiredPhotoAssets(
-    preferred,
+  const stockIndustry =
+    params.businessProfile?.routingIndustryId ||
     params.templateSelection?.industryId ||
-      params.profile?.industry ||
-      intel.industry,
-  );
+    params.profile?.industry ||
+    intel.industry;
+  const complete = ensureRequiredPhotoAssets(preferred, stockIndustry, {
+    routingIndustryId: params.businessProfile?.routingIndustryId,
+    imageSystemSpec: iieResult.spec,
+  });
 
   params.onProgress?.("AI Assets Engine: validating visual coverage…");
   const qualityReport = validateAssetManifest(complete, {
@@ -258,6 +361,7 @@ export async function runAiImageEngine(params: {
     engine: "ai-assets-engine",
     qualityReport,
     videoPackage,
+    imageIntelligence: iieResult,
   };
 }
 
@@ -266,6 +370,7 @@ function scoreAndImprovePlannedPrompts(
   planned: ImageEnginePlanItem[],
   intel: ReturnType<typeof buildImageIntelligence>,
   onProgress?: (message: string) => void,
+  businessProfile?: BusinessIntelligenceProfile | null,
 ): ImageEnginePlanItem[] {
   let improved = 0;
   const result = planned.map((item) => {

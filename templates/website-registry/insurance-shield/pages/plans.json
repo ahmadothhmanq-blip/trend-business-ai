@@ -1,0 +1,13 @@
+{
+  "id": "plans",
+  "title": "Plans",
+  "path": "/plans",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "utility",
+    "sidebar",
+    "footer"
+  ]
+}

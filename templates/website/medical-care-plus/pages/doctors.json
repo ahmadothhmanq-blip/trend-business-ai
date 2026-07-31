@@ -1,0 +1,12 @@
+{
+  "id": "doctors",
+  "title": "Doctors",
+  "path": "/doctors",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "utility",
+    "footer"
+  ]
+}

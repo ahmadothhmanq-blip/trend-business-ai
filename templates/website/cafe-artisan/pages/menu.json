@@ -1,0 +1,13 @@
+{
+  "id": "menu",
+  "title": "Menu",
+  "path": "/menu",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "utility",
+    "main",
+    "overlay",
+    "footer"
+  ]
+}

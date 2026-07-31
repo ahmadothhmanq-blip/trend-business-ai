@@ -22,6 +22,11 @@ import type {
   CoreProductStrategy,
   CoreStrategySection,
 } from "@/lib/ai-core/layers/types";
+import {
+  resolveInnerPageSections,
+  resolveSectionShellVariantFromSpec,
+  type CompositionMode,
+} from "@/lib/ai-core/website-builder/excellence";
 
 function resolveIndustryId(input: DesignRendererInput): IndustryId {
   const raw = String(input.industryId || "").trim().toLowerCase();
@@ -43,6 +48,14 @@ function resolveIndustryId(input: DesignRendererInput): IndustryId {
   if (label.includes("educat") || label.includes("school")) return "education";
   if (label.includes("e-com") || label.includes("shop") || label.includes("retail")) {
     return "ecommerce";
+  }
+  if (
+    label.includes("furniture") ||
+    label.includes("furnish") ||
+    label.includes("sofa") ||
+    label.includes("showroom")
+  ) {
+    return "furniture";
   }
   if (label.includes("agency") || label.includes("studio")) return "agency";
 
@@ -114,6 +127,11 @@ function buildSections(
   preset: IndustryDesignPreset,
   strategy: CoreProductStrategy,
   websiteSections?: string[],
+  options?: {
+    industryId?: IndustryId;
+    compositionMode?: CompositionMode;
+    heroTreatment?: string;
+  },
 ): DesignRendererSection[] {
   const pages =
     strategy.pages?.length > 0
@@ -143,39 +161,16 @@ function buildSections(
       continue;
     }
 
-    // Fall back to strategy keySections mapped loosely onto Contact/Cta/SocialProof.
-    const keys =
-      page.keySections?.length > 0
-        ? page.keySections
-        : (websiteSections ?? []).slice(0, 3);
-    if (!keys.length) {
-      out.push(
-        toRenderedSection(
-          { name: "Contact", componentId: "ContactCta" },
-          page.name,
-          cursor,
-        ),
-      );
-      cursor += 1;
-      continue;
-    }
-    for (const key of keys.slice(0, 4)) {
-      const lower = key.toLowerCase();
-      let componentId: DesignRendererComponentId = "FeatureHighlights";
-      if (lower.includes("contact") || lower.includes("inquiry")) {
-        componentId = "ContactCta";
-      } else if (lower.includes("testimonial") || lower.includes("review")) {
-        componentId = "TestimonialsCarousel";
-      } else if (lower.includes("faq")) {
-        componentId = "FaqAccordion";
-      } else if (lower.includes("cta") || lower.includes("book")) {
-        componentId = "CtaBand";
-      } else if (lower.includes("service")) {
-        componentId = "ServicesGrid";
-      }
-      out.push(
-        toRenderedSection({ name: key, componentId }, page.name, cursor),
-      );
+    // Intelligence-driven inner page sections (not generic FeatureHighlights defaults).
+    const innerCtx = {
+      industryId: options?.industryId,
+      compositionMode: options?.compositionMode,
+      heroTreatment: options?.heroTreatment,
+      pagePurpose: page.purpose,
+    };
+    const resolved = resolveInnerPageSections(page, websiteSections, innerCtx);
+    for (const section of resolved) {
+      out.push(toRenderedSection(section, page.name, cursor));
       cursor += 1;
     }
   }
@@ -269,9 +264,12 @@ function applyToDesignSystem(
   designSystem: CoreDesignSystem,
   plan: DesignRenderPlan,
   designStyle?: string,
+  designSystemSpec?: DesignRendererInput["designSystemSpec"],
 ): CoreDesignSystem {
   const palette = plan.componentPalette.map(String);
   const premiumLayout = designSystem.premium?.layout;
+  const specComponentStyle = designSystemSpec?.componentStyling;
+  const specSpacing = designSystemSpec?.spacing;
   return {
     ...designSystem,
     style: designStyle || plan.visualStyle.heroTreatment || designSystem.style,
@@ -296,6 +294,10 @@ function applyToDesignSystem(
           : []),
         ...plan.visualStyle.uiPatterns,
         ...(designSystem.uiPatterns ?? []),
+        ...(plan.sectionShellVariant
+          ? [`section-shell:${plan.sectionShellVariant}`]
+          : []),
+        ...(plan.compositionMode ? [`composition:${plan.compositionMode}`] : []),
       ]),
     ).slice(0, 16),
     componentPalette: plan.homeComponentOrder?.length
@@ -304,6 +306,26 @@ function applyToDesignSystem(
           new Set([...palette, ...(designSystem.componentPalette ?? [])]),
         ).slice(0, 24),
     homeComponentOrder: plan.homeComponentOrder?.map(String),
+    sectionShellVariant: plan.sectionShellVariant,
+    compositionMode: plan.compositionMode,
+    componentStyle: specComponentStyle
+      ? {
+          buttons: specComponentStyle.buttons,
+          cards: specComponentStyle.cards,
+          inputs: specComponentStyle.forms,
+          navigation: specComponentStyle.navigation,
+          palette: designSystem.componentStyle?.palette ?? palette.slice(0, 6),
+        }
+      : designSystem.componentStyle,
+    uiStyle: specSpacing
+      ? {
+          density: specSpacing.density,
+          corners: designSystem.uiStyle?.corners ?? "soft",
+          elevation: designSystem.uiStyle?.elevation ?? "soft",
+          contrast: designSystem.uiStyle?.contrast ?? "medium",
+          notes: specSpacing.notes,
+        }
+      : designSystem.uiStyle,
   };
 }
 
@@ -318,6 +340,16 @@ export function renderWebsiteDesign(
   const industryId = resolveIndustryId(input);
   const preset =
     getIndustryDesignPreset(industryId) ?? fallbackPreset(industryId);
+
+  const compositionMode =
+    input.compositionMode ??
+    (input.designSystemSpec?.layoutComposition.compositionMode as
+      | CompositionMode
+      | undefined) ??
+    "balanced";
+  const sectionShellVariant = resolveSectionShellVariantFromSpec(
+    input.designSystemSpec,
+  );
 
   const selection = selectProfessionalComponents({
     industryId,
@@ -337,6 +369,8 @@ export function renderWebsiteDesign(
     premiumSectionLayout:
       input.premiumSectionLayout ||
       input.designSystem.premium?.layout?.sectionLayout,
+    compositionMode,
+    componentStyling: input.designSystemSpec?.componentStyling,
     brandName: input.brandName,
     language: input.language,
   });
@@ -388,6 +422,13 @@ export function renderWebsiteDesign(
     preset,
     input.strategy,
     input.websiteSections,
+    {
+      industryId,
+      compositionMode,
+      heroTreatment:
+        input.premiumHeroStyle ||
+        input.designSystem.premium?.layout?.heroStyle,
+    },
   );
   const nonHome = presetSections.filter((s) => s.page !== homeName);
   const sections = [...intelligentHome, ...nonHome];
@@ -501,6 +542,8 @@ export function renderWebsiteDesign(
           new Set([...selection.layoutRules, ...preset.layoutRules]),
         ),
     source: dnaDriven ? "merged" : "professional-library",
+    sectionShellVariant,
+    compositionMode,
   };
 
   const strategy = applyToStrategy(
@@ -512,6 +555,7 @@ export function renderWebsiteDesign(
     input.designSystem,
     plan,
     input.designStyle,
+    input.designSystemSpec,
   );
 
   return { plan, strategy, designSystem };

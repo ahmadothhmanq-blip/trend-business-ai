@@ -838,7 +838,9 @@ This project uses **Next.js 16** conventions (`proxy.ts`). Read `node_modules/ne
 - `HEALTH_DETAILED`
 - `WEBSITE_PREVIEW_BUILDER_ENABLED`
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (alias path in some scripts)
-- `QA_BASE` (QA harness only)
+- `QA_BASE` (QA harness only — overrides probe target; else local harness URL via `resolveHarnessBaseUrl`)
+- `PORT` / `DEV_PORT` (local dev server port; default `3003`)
+- Dev server lifecycle: `npm run dev` (single instance), `dev:ensure`, `dev:stop`, `dev:status` — see `scripts/lib/dev-server.mjs`
 
 ---
 

@@ -17,6 +17,7 @@ import {
 import { provisionAppBackend } from "@/lib/ai-core/app-design-platform/backend";
 import { syncAppModelToFiles, syncPagesFromModel } from "@/lib/ai-core/app-design-platform/sync";
 import { z } from "zod";
+import { getLocalDevOrigin } from "@/lib/dev-origin";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -133,7 +134,7 @@ export async function POST(request: Request, { params }: Params) {
         ? process.env.VERCEL_URL.startsWith("http")
           ? process.env.VERCEL_URL
           : `https://${process.env.VERCEL_URL}`
-        : "http://localhost:3000");
+        : getLocalDevOrigin());
 
     const record = createDeployment({
       generationId: parsedId.id,

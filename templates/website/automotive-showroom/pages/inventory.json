@@ -1,0 +1,12 @@
+{
+  "id": "inventory",
+  "title": "Inventory",
+  "path": "/inventory",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "footer",
+    "overlay"
+  ]
+}

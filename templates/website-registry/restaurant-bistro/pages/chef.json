@@ -1,0 +1,13 @@
+{
+  "id": "chef",
+  "title": "Chef",
+  "path": "/chef",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "overlay",
+    "utility",
+    "footer"
+  ]
+}

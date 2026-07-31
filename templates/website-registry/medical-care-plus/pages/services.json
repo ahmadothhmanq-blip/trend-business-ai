@@ -1,0 +1,12 @@
+{
+  "id": "services",
+  "title": "Services",
+  "path": "/services",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "utility",
+    "footer"
+  ]
+}

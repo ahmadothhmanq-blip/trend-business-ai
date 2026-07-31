@@ -1,0 +1,12 @@
+{
+  "id": "impact",
+  "title": "Impact",
+  "path": "/impact",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "footer",
+    "utility",
+    "main"
+  ]
+}

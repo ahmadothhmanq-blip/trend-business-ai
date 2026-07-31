@@ -1,8 +1,6 @@
-import {
-  buildStaticPreviewHtml,
-  extractStaticPreviewHtml,
-  type StaticPreviewInput,
-} from "@/lib/website/build-static-preview";
+import { normalizePremiumStockUrl } from "@/lib/ai-core/image-engine/stock";
+import type { StaticPreviewInput } from "@/lib/website/preview-input";
+import { parseSiteImagesModule, findSiteImagesSource } from "@/lib/website/site-images-parser";
 import type { GeneratedWebsiteProject } from "@/plugins/website/types";
 import type { WebsiteGeneration } from "@/types/database";
 
@@ -20,18 +18,21 @@ function extractHeroImageUrl(
   const heroAsset = blueprint?.assetManifest?.items?.find(
     (item) => item.role === "hero" && item.url,
   );
-  if (heroAsset?.url) return heroAsset.url;
+  if (heroAsset?.url) {
+    return normalizePremiumStockUrl(heroAsset.url);
+  }
 
-  const siteImages = blueprint?.files?.find(
-    (f) => f.path === "lib/site-images.ts" || f.path === "lib/site-images.js",
-  );
-  if (!siteImages?.content) return null;
-  const match = siteImages.content.match(
+  const siteImagesContent = findSiteImagesSource(blueprint?.files);
+  const parsed = parseSiteImagesModule(siteImagesContent);
+  if (parsed?.HERO_IMAGE) return parsed.HERO_IMAGE;
+
+  if (!siteImagesContent) return null;
+  const match = siteImagesContent.match(
     /export const HERO_IMAGE = ("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|null)/,
   );
   if (!match?.[1] || match[1] === "null") return null;
   try {
-    return JSON.parse(match[1]) as string;
+    return normalizePremiumStockUrl(JSON.parse(match[1]) as string);
   } catch {
     return null;
   }
@@ -54,35 +55,13 @@ export function previewInputFromGeneration(
     content: blueprint?.content,
     components: blueprint?.components,
     heroImageUrl: extractHeroImageUrl(blueprint),
+    files: blueprint?.files,
     templateIntelligenceId:
       (blueprint?.settings as { templateIntelligenceId?: string } | undefined)
         ?.templateIntelligenceId ?? null,
+    websiteThemeId:
+      (blueprint?.settings as { websiteThemeId?: string } | undefined)
+        ?.websiteThemeId ?? null,
     language: generation.language ?? null,
-  };
-}
-
-/** Resolve sanitized live-preview HTML for an owned website generation. */
-export function resolveLivePreviewHtml(generation: WebsiteGeneration): string {
-  const input = previewInputFromGeneration(generation);
-  const blueprint = isGeneratedWebsiteProject(generation.blueprint)
-    ? generation.blueprint
-    : null;
-
-  if (blueprint?.files?.length) {
-    return extractStaticPreviewHtml(blueprint.files, input);
-  }
-
-  return buildStaticPreviewHtml(input);
-}
-
-export function livePreviewResponseHeaders() {
-  return {
-    "Content-Type": "text/html; charset=utf-8",
-    "Cache-Control": "private, no-store",
-    "Content-Security-Policy":
-      "default-src 'none'; style-src 'unsafe-inline'; img-src data: https: blob:; base-uri 'none'; form-action 'none'; frame-ancestors 'self'",
-    "X-Content-Type-Options": "nosniff",
-    "Referrer-Policy": "same-origin",
-    "X-Frame-Options": "SAMEORIGIN",
   };
 }

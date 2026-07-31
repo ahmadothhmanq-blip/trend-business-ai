@@ -8,8 +8,14 @@ import {
   MOTION_PATH,
   MOTION_SOURCE,
   SECTION_SHELL_PATH,
-  SECTION_SHELL_SOURCE,
+  resolveSectionShellSource,
+  type SectionShellVariant,
 } from "@/lib/ai-core/components/scaffolds";
+import {
+  resolveThemeSectionShellSource,
+  isThemeSectionShellTheme,
+} from "@/lib/ai-core/components/scaffolds/themes";
+import type { WebsiteThemePresetId } from "@/lib/website/builder/theme-catalog";
 
 const SITE_IMAGES_STUB = `export const HERO_IMAGE = null as string | null;
 export const PRODUCT_IMAGE = null as string | null;
@@ -52,6 +58,14 @@ export function injectProfessionalComponents(params: {
   language?: string | null;
   templateIntelligenceId?: string | null;
   templateVisualCss?: string | null;
+  /** Section shell variant — each theme uses a different section wrapper. */
+  sectionShellVariant?: SectionShellVariant | null;
+  /** Curated theme id — enables exclusive theme component library + section shell. */
+  websiteThemeId?: WebsiteThemePresetId | string | null;
+  pageTopology?: import("@/lib/website/builder/theme-architecture").ThemePageTopology | null;
+  floatingCta?: boolean;
+  /** When true, rebuild home page design even for localized LLM copy projects. */
+  forceDesignRebuild?: boolean;
 }): GeneratedProjectFile[] {
   const paths = new Set<string>([
     SECTION_SHELL_PATH,
@@ -61,11 +75,14 @@ export function injectProfessionalComponents(params: {
   ]);
 
   const byPath = new Map(params.files.map((f) => [f.path, f]));
-  const localizedCopy = usesLlmLocalizedWebsiteCopy(params.language);
+  const localizedCopy =
+    usesLlmLocalizedWebsiteCopy(params.language) && !params.forceDesignRebuild;
 
   byPath.set(SECTION_SHELL_PATH, {
     path: SECTION_SHELL_PATH,
-    content: SECTION_SHELL_SOURCE,
+    content: isThemeSectionShellTheme(params.websiteThemeId)
+      ? resolveThemeSectionShellSource(params.websiteThemeId)
+      : resolveSectionShellSource(params.sectionShellVariant ?? "default"),
     language: "tsx",
   });
 
@@ -115,6 +132,9 @@ export function injectProfessionalComponents(params: {
         content: params.content,
         language: params.language,
         templateId: params.templateIntelligenceId,
+        websiteThemeId: params.websiteThemeId,
+        pageTopology: params.pageTopology,
+        floatingCta: params.floatingCta,
       }),
       language: "tsx",
     });

@@ -127,7 +127,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  serverExternalPackages: ["openai", "jspdf", "jszip"],
+  serverExternalPackages: ["openai", "jspdf", "jszip", "typescript"],
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion", "radix-ui"],
   },

@@ -1,0 +1,13 @@
+{
+  "id": "practice",
+  "title": "Practice Areas",
+  "path": "/practice",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "overlay",
+    "utility",
+    "footer"
+  ]
+}

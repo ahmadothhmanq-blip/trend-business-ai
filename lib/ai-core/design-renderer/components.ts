@@ -1,4 +1,5 @@
 import type { DesignRendererComponentId } from "@/lib/ai-core/design-renderer/types";
+import { THEME_RENDERER_COMPONENTS } from "@/lib/ai-core/design-renderer/theme-components";
 
 export type DesignRendererComponentSpec = {
   id: DesignRendererComponentId;
@@ -11,10 +12,7 @@ export type DesignRendererComponentSpec = {
 };
 
 /** Registry of real UI components generation must implement. */
-export const DESIGN_RENDERER_COMPONENTS: Record<
-  DesignRendererComponentId,
-  DesignRendererComponentSpec
-> = {
+const BASE_RENDERER_COMPONENTS = {
   SiteHeader: {
     id: "SiteHeader",
     exportName: "SiteHeader",
@@ -41,6 +39,33 @@ export const DESIGN_RENDERER_COMPONENTS: Record<
       "Modern navigation with pill CTA, underline active states, and mobile sheet menu.",
     defaultGoal: "Provide a polished conversion-ready navigation",
   },
+  NavSidebar: {
+    id: "NavSidebar",
+    exportName: "NavSidebar",
+    path: "components/layout/nav-sidebar.tsx",
+    pattern: "vertical sidebar navigation",
+    description:
+      "Fixed sidebar rail with icon links, brand mark, and mobile collapse drawer.",
+    defaultGoal: "Product-dashboard style persistent navigation",
+  },
+  NavHamburger: {
+    id: "NavHamburger",
+    exportName: "NavHamburger",
+    path: "components/layout/nav-hamburger.tsx",
+    pattern: "hamburger off-canvas navigation",
+    description:
+      "Minimal top bar with full-screen off-canvas menu for editorial sites.",
+    defaultGoal: "Maximize content canvas with hidden navigation",
+  },
+  NavCentered: {
+    id: "NavCentered",
+    exportName: "NavCentered",
+    path: "components/layout/nav-centered.tsx",
+    pattern: "centered logo navigation",
+    description:
+      "Centered brand with split link columns — card-first and minimal layouts.",
+    defaultGoal: "Symmetrical, gallery-like navigation",
+  },
   SiteFooter: {
     id: "SiteFooter",
     exportName: "SiteFooter",
@@ -48,6 +73,32 @@ export const DESIGN_RENDERER_COMPONENTS: Record<
     pattern: "multi-column footer",
     description: "Footer with columns, legal links, and optional newsletter.",
     defaultGoal: "Close the page with trust and secondary navigation",
+  },
+  SiteFooterMinimal: {
+    id: "SiteFooterMinimal",
+    exportName: "SiteFooterMinimal",
+    path: "components/layout/site-footer-minimal.tsx",
+    pattern: "minimal single-row footer",
+    description: "Compact footer with brand, tagline, and inline legal links.",
+    defaultGoal: "Close quietly without visual weight",
+  },
+  SiteFooterEditorial: {
+    id: "SiteFooterEditorial",
+    exportName: "SiteFooterEditorial",
+    path: "components/layout/site-footer-editorial.tsx",
+    pattern: "editorial magazine footer",
+    description:
+      "Large-type editorial footer with newsletter band and asymmetric columns.",
+    defaultGoal: "Magazine-style brand closure",
+  },
+  FloatingCta: {
+    id: "FloatingCta",
+    exportName: "FloatingCta",
+    path: "components/layout/floating-cta.tsx",
+    pattern: "persistent floating action CTA",
+    description:
+      "Fixed bottom-right conversion button with optional secondary link.",
+    defaultGoal: "Keep primary action visible during scroll",
   },
   HeroFullBleed: {
     id: "HeroFullBleed",
@@ -611,7 +662,12 @@ export const DESIGN_RENDERER_COMPONENTS: Record<
       "Asymmetric gallery experience with intentional scale hierarchy.",
     defaultGoal: "Immerse visitors in brand atmosphere",
   },
-};
+} satisfies Record<string, DesignRendererComponentSpec>;
+
+export const DESIGN_RENDERER_COMPONENTS = {
+  ...BASE_RENDERER_COMPONENTS,
+  ...THEME_RENDERER_COMPONENTS,
+} as Record<DesignRendererComponentId, DesignRendererComponentSpec>;
 
 export function getRendererComponent(
   id: DesignRendererComponentId,

@@ -1,0 +1,13 @@
+{
+  "id": "dining",
+  "title": "Dining",
+  "path": "/dining",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "overlay",
+    "main",
+    "utility",
+    "footer"
+  ]
+}

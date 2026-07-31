@@ -1,7 +1,7 @@
 # Phase 20 — Enterprise Functional QA & Acceptance Report
 
 **Date:** 2026-07-16  
-**Environment:** local `npm run dev` @ `http://localhost:3000`  
+**Environment:** local `npm run dev` @ configured origin (default `http://localhost:3003`)  
 **Harness:** `scripts/phase20-qa.mjs`, `scripts/phase20-auth-qa.mjs`
 
 ---

@@ -1,0 +1,148 @@
+{
+  "specVersion": "2.0.0",
+  "id": "modern-business",
+  "version": "2.0.0",
+  "name": "Corporate Command",
+  "description": "Executive-grade corporate presence with trust-first hierarchy, boardroom typography, and measured conversion paths.",
+  "metadata": {
+    "category": "corporate",
+    "industry": "Corporate",
+    "tags": [
+      "corporate",
+      "enterprise",
+      "trust",
+      "b2b"
+    ],
+    "author": {
+      "name": "Trend Business AI",
+      "organization": "Premium Template Studio"
+    },
+    "license": "MIT",
+    "keywords": [
+      "corporate",
+      "executive",
+      "boardroom",
+      "trust"
+    ],
+    "templateIntelligenceId": "ti-corporate-trust",
+    "premium": true,
+    "tier": "agency"
+  },
+  "media": {
+    "thumbnail": "assets/thumbnail.png",
+    "preview": "assets/preview.png"
+  },
+  "compatibility": {
+    "engineVersion": ">=1.0.0",
+    "specVersion": "2.0.0",
+    "features": [
+      "regions",
+      "placement-rules",
+      "responsive",
+      "premium-canvas"
+    ]
+  },
+  "update": {
+    "channel": "stable",
+    "releasedAt": "2026-07-30T17:52:37.371Z"
+  },
+  "responsive": {
+    "breakpoints": [
+      {
+        "name": "sm",
+        "minWidth": 640
+      },
+      {
+        "name": "md",
+        "minWidth": 768
+      },
+      {
+        "name": "lg",
+        "minWidth": 1024
+      },
+      {
+        "name": "xl",
+        "minWidth": 1280
+      },
+      {
+        "name": "2xl",
+        "minWidth": 1536
+      }
+    ],
+    "containerMaxWidth": "76rem",
+    "fluidTypography": true
+  },
+  "canvas": {
+    "file": "canvas.json"
+  },
+  "placementRules": {
+    "file": "placement-rules.json"
+  },
+  "layouts": [
+    {
+      "id": "default",
+      "file": "layouts/default.json",
+      "kind": "single-column",
+      "label": "Default",
+      "description": "Premium single-column layout for Corporate."
+    }
+  ],
+  "regions": [
+    {
+      "id": "header",
+      "file": "regions/header.json",
+      "role": "header",
+      "label": "Header Region",
+      "description": "Premium header region for Corporate Command."
+    },
+    {
+      "id": "main",
+      "file": "regions/main.json",
+      "role": "main",
+      "label": "Main Region",
+      "description": "Premium main region for Corporate Command."
+    },
+    {
+      "id": "footer",
+      "file": "regions/footer.json",
+      "role": "footer",
+      "label": "Footer Region",
+      "description": "Premium footer region for Corporate Command."
+    }
+  ],
+  "pages": [
+    {
+      "id": "home",
+      "title": "Home",
+      "path": "/",
+      "layoutId": "default",
+      "file": "pages/home.json",
+      "description": "Home — premium Corporate page blueprint."
+    },
+    {
+      "id": "about",
+      "title": "About",
+      "path": "/about",
+      "layoutId": "default",
+      "file": "pages/about.json",
+      "description": "About — premium Corporate page blueprint."
+    },
+    {
+      "id": "services",
+      "title": "Services",
+      "path": "/services",
+      "layoutId": "default",
+      "file": "pages/services.json",
+      "description": "Services — premium Corporate page blueprint."
+    },
+    {
+      "id": "contact",
+      "title": "Contact",
+      "path": "/contact",
+      "layoutId": "default",
+      "file": "pages/contact.json",
+      "description": "Contact — premium Corporate page blueprint."
+    }
+  ],
+  "entry": "package.entry.json"
+}

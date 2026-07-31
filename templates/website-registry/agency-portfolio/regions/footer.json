@@ -1,0 +1,29 @@
+{
+  "id": "footer",
+  "role": "footer",
+  "label": "Footer Region",
+  "layout": {
+    "width": "contained",
+    "alignment": "center",
+    "maxWidth": "90rem",
+    "padding": "1.75rem"
+  },
+  "placement": {
+    "allowedComponentTypes": [
+      "navigation",
+      "logo",
+      "contact",
+      "cta",
+      "custom"
+    ],
+    "ordering": "horizontal",
+    "allowNesting": false,
+    "maxComponents": 10,
+    "minComponents": 0,
+    "allowCustomComponents": true
+  },
+  "responsive": {
+    "collapseBelow": "md",
+    "stackOrder": "normal"
+  }
+}

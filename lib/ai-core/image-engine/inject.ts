@@ -1,8 +1,10 @@
 import type { GeneratedProjectFile } from "@/lib/ai/types";
 import type { CoreAssetManifest } from "@/lib/ai-core/layers/types";
+import type { ImageSystemSpec } from "@/lib/ai-core/image-intelligence/iie-types";
 import { preferAiImages } from "@/lib/ai-core/image-engine/prefer";
 import {
   isPremiumStockUrl,
+  normalizePremiumStockUrl,
   resolvePremiumStockUrl,
 } from "@/lib/ai-core/image-engine/stock";
 import { buildSiteVideoModule } from "@/lib/ai-core/image-engine/video";
@@ -26,17 +28,21 @@ const REQUIRED_PHOTO_ROLES = [
 ] as const;
 
 /**
- * Emit a typed site image map and strip placeholder / empty image slots
- * when real photographic URLs exist.
+ * Emit a typed site image map and replace template layout placeholders with
+ * ImageSpecification-driven photographic URLs only.
  */
 export function injectAiImagesIntoProject(params: {
   files: GeneratedProjectFile[];
   assetManifest: CoreAssetManifest;
   industry?: string | null;
+  imageSystemSpec?: ImageSystemSpec | null;
 }): GeneratedProjectFile[] {
   const manifest = ensureRequiredPhotoAssets(
     preferAiImages(params.assetManifest),
     params.industry,
+    {
+      imageSystemSpec: params.imageSystemSpec,
+    },
   );
   const byRole = groupByRole(manifest);
   const hero = firstUrl(byRole, "hero");
@@ -164,20 +170,40 @@ function isPhotographicUrl(url: string | null | undefined): boolean {
 export function ensureRequiredPhotoAssets(
   manifest: CoreAssetManifest,
   industry?: string | null,
+  options?: {
+    routingIndustryId?: string | null;
+    imageSystemSpec?: ImageSystemSpec | null;
+  },
 ): CoreAssetManifest {
   const items = [...manifest.items];
+  const specById = new Map(
+    (options?.imageSystemSpec?.specifications ?? []).map((s) => [s.id, s]),
+  );
 
-  // Replace SVG / generic placeholders with premium stock photography.
+  const semanticForItem = (item: (typeof items)[number]) => {
+    const spec = specById.get(item.id);
+    return (
+      spec?.providerPrompt ||
+      spec?.visualConcept ||
+      item.metadata?.prompt ||
+      item.prompt
+    );
+  };
+
+  // Replace SVG / generic placeholders with spec-aligned premium stock photography.
   for (let i = 0; i < items.length; i += 1) {
     const item = items[i]!;
     if (item.role === "icon") continue;
     if (isPhotographicUrl(item.url)) continue;
+    const semanticQuery = semanticForItem(item);
     items[i] = {
       ...item,
       url: resolvePremiumStockUrl({
         industry,
+        routingIndustryId: options?.routingIndustryId,
         role: item.role,
         seed: item.id,
+        semanticQuery,
       }),
       status: "generated",
       mimeType: "image/jpeg",
@@ -186,10 +212,9 @@ export function ensureRequiredPhotoAssets(
         purpose: (item.metadata?.purpose || item.role) as "hero",
         provider: "premium-stock",
         style: item.metadata?.style || "premium-stock",
-        prompt:
-          item.metadata?.prompt ||
-          item.prompt ||
-          `Premium ${item.role} photography for website`,
+        prompt: semanticQuery || `Semantic ${item.role} photography`,
+        visualConcept: specById.get(item.id)?.visualConcept,
+        sectionPurpose: specById.get(item.id)?.sectionPurpose,
       },
     };
   }
@@ -209,17 +234,24 @@ export function ensureRequiredPhotoAssets(
       if (items.some((item) => item.id === id && isPhotographicUrl(item.url))) {
         continue;
       }
+      const spec =
+        specById.get(id) ||
+        [...specById.values()].find((s) => s.role === role);
+      const semanticQuery =
+        spec?.providerPrompt || spec?.visualConcept || undefined;
       const url = resolvePremiumStockUrl({
         industry,
+        routingIndustryId: options?.routingIndustryId,
         role,
         seed: `${id}-${industry || "business"}`,
+        semanticQuery,
       });
       items.push({
-        id,
+        id: spec?.id || id,
         role,
         name: `${role} image ${need === 1 ? "" : i + 1}`.trim(),
-        prompt: `Premium ${role} photography for website — industry ${industry || "business"}`,
-        alt: `Premium ${role} photography`,
+        prompt: semanticQuery || `Semantic ${role} photography for ${industry || "business"}`,
+        alt: spec?.accessibility.altText || `Premium ${role} photography`,
         url,
         storagePath: null,
         status: "generated",
@@ -228,7 +260,9 @@ export function ensureRequiredPhotoAssets(
           purpose: role as "hero",
           provider: "premium-stock",
           style: "premium-stock",
-          prompt: `Premium ${role} photography for website`,
+          prompt: semanticQuery || `Semantic ${role} photography`,
+          visualConcept: spec?.visualConcept,
+          sectionPurpose: spec?.sectionPurpose,
         },
       });
     }
@@ -279,6 +313,11 @@ function urlsForRole(
     .filter((u): u is string => Boolean(u));
 }
 
+function normalizePhotoUrl(url: string | null | undefined): string | null {
+  if (!url?.trim()) return null;
+  return normalizePremiumStockUrl(url.trim());
+}
+
 function buildSiteImagesModule(params: {
   hero: string | null;
   product: string | null;
@@ -295,7 +334,7 @@ function buildSiteImagesModule(params: {
     role: item.role,
     name: item.name,
     alt: item.alt,
-    url: item.url,
+    url: normalizePhotoUrl(item.url),
     status: item.status,
     purpose: item.metadata?.purpose ?? item.role,
     section: item.metadata?.section,
@@ -314,23 +353,25 @@ function buildSiteImagesModule(params: {
     ...params.sections,
     ...params.gallery,
     ...params.testimonials,
-  ].filter((u): u is string => Boolean(u));
+  ]
+    .map((url) => normalizePhotoUrl(url))
+    .filter((u): u is string => Boolean(u));
   const fallback = pool[0] ?? null;
-  const hero = params.hero || fallback;
-  const product = params.product || params.hero || fallback;
-  const service = params.service || params.product || fallback;
-  const background = params.background || params.hero || fallback;
+  const hero = normalizePhotoUrl(params.hero) || fallback;
+  const product = normalizePhotoUrl(params.product) || hero || fallback;
+  const service = normalizePhotoUrl(params.service) || product || fallback;
+  const background = normalizePhotoUrl(params.background) || hero || fallback;
   const sections =
     params.sections.length > 0
-      ? params.sections
+      ? params.sections.map((url) => normalizePhotoUrl(url)!).filter(Boolean)
       : ([service, product, hero].filter(Boolean) as string[]);
   const gallery =
     params.gallery.length > 0
-      ? params.gallery
+      ? params.gallery.map((url) => normalizePhotoUrl(url)!).filter(Boolean)
       : ([product, hero, service].filter(Boolean) as string[]);
   const testimonials =
     params.testimonials.length > 0
-      ? params.testimonials
+      ? params.testimonials.map((url) => normalizePhotoUrl(url)!).filter(Boolean)
       : ([hero, product].filter(Boolean) as string[]);
 
   return `/**
@@ -343,7 +384,7 @@ export const HERO_IMAGE = ${JSON.stringify(hero)};
 export const PRODUCT_IMAGE = ${JSON.stringify(product)};
 export const SERVICE_IMAGE = ${JSON.stringify(service)};
 export const BACKGROUND_IMAGE = ${JSON.stringify(background)};
-export const BRAND_IMAGE = ${JSON.stringify(params.brand || hero)};
+export const BRAND_IMAGE = ${JSON.stringify(normalizePhotoUrl(params.brand) || hero)};
 export const SECTION_IMAGES = ${JSON.stringify(sections)} as const;
 export const GALLERY_IMAGES = ${JSON.stringify(gallery)} as const;
 export const TESTIMONIAL_IMAGES = ${JSON.stringify(testimonials)} as const;
