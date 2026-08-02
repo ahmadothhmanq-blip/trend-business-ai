@@ -1,7 +1,7 @@
 import { validateWbTemplatePackage } from "../lib/website/template-engine/index.server";
 
 async function main() {
-  const ids = ["saas-starter", "restaurant-bistro", "agency-portfolio"];
+  const ids = ["modern-business", "ai-startup-signal"];
   for (const id of ids) {
     const result = await validateWbTemplatePackage(
       `templates/website-registry/${id}`,

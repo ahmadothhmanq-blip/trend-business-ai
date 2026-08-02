@@ -7,19 +7,11 @@ import type { WebsiteThemePresetId } from "@/lib/website/builder/theme-catalog";
 import { INDUSTRY_THEME_ARCHITECTURES } from "@/lib/website/builder/industry-theme-architectures";
 import { getIndustryHomeComponents } from "@/lib/website/builder/industry-home-compositions";
 
-export type ThemePageTopology =
-  | "classic-stack"
-  | "sidebar-rail"
-  | "fullscreen-editorial"
-  | "card-first-masonry";
-
-export type ThemeSectionShellVariant =
-  | "default"
-  | "editorial"
-  | "magazine"
-  | "bento"
-  | "card-first"
-  | "minimal";
+import type { ThemePageTopology, ThemeSectionShellVariant } from "@/lib/website/contracts/theme-architecture";
+export type {
+  ThemePageTopology,
+  ThemeSectionShellVariant,
+} from "@/lib/website/contracts/theme-architecture";
 
 export type ThemePageArchitecture = {
   themeId: WebsiteThemePresetId;

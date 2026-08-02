@@ -11,8 +11,6 @@ export {
   WEBSITE_GENERATION_PLAN_KEY,
 } from "@/lib/ai-core/architecture-validation/types";
 export {
-  ALLOWED_LAYOUT_FAMILIES,
-  EDITORIAL_LAYOUT_STRUCTURES,
   allowedFamiliesForIndustry,
   isLayoutFamilyAllowed,
 } from "@/lib/ai-core/architecture-validation/rules";

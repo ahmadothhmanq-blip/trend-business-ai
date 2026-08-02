@@ -24,7 +24,7 @@ describe("EDS-002 Planning & Reasoning Engine", () => {
     });
     collector.beginPhase("template-routing");
     collector.mergeReasoningChain(
-      ["Industry locked: furniture", "Structure: ecommerce-atelier"],
+      ["Industry locked: furniture", "Structure: modern-business"],
       "template-routing",
       "route",
     );

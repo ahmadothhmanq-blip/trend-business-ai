@@ -17,10 +17,10 @@ function read(rel) {
 const required = [
   "lib/ai/generator.ts",
   "lib/ai/website-scaffold.ts",
+  "lib/website/orchestrator.ts",
   "lib/deepseek.ts",
   "plugins/website/pipeline-validate.ts",
   "plugins/website/iteration.ts",
-  "plugins/website/analyze.ts",
   "plugins/website/plan.ts",
   "plugins/website/generate.ts",
   "app/api/website-builder/stream/route.ts",
@@ -40,9 +40,12 @@ const scaffold = read("lib/ai/website-scaffold.ts");
 assert.match(scaffold, /MAX_WEBSITE_FILES\s*=\s*48/);
 assert.match(scaffold, /syncPackageJsonDependencies/);
 
+const orchestrator = read("lib/website/orchestrator.ts");
+assert.match(orchestrator, /autoFallback/);
+assert.match(orchestrator, /listConfigured/);
+
 const deepseek = read("lib/deepseek.ts");
-assert.match(deepseek, /autoFallback/);
-assert.match(deepseek, /listConfigured/);
+assert.match(deepseek, /lib\/website\/orchestrator/);
 
 const planPrompt = read("lib/ai/prompts/website.ts");
 assert.match(planPrompt, /HARD RULES/);

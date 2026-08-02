@@ -1,5 +1,6 @@
 import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
+import { executeWithUpstashFallback, getUpstashRedis, isUpstashRedisConfigured } from "@/lib/api/upstash-redis";
+export { isUpstashRedisConfigured, pingUpstashRedis } from "@/lib/api/upstash-redis";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { consumeCreditsForUsage } from "@/lib/billing/credits";
 import { withTiming } from "@/lib/perf/timing";
@@ -46,16 +47,17 @@ const AI_RATE_LIMITS: Record<
 };
 
 function isUpstashConfigured(): boolean {
-  return Boolean(
-    process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN,
-  );
+  return isUpstashRedisConfigured();
 }
 
-function createLimiter(resource: AiRateLimitResource): Ratelimit {
+function createLimiter(resource: AiRateLimitResource): Ratelimit | null {
+  const redis = getUpstashRedis();
+  if (!redis) return null;
+
   const { requests, window } = AI_RATE_LIMITS[resource];
 
   return new Ratelimit({
-    redis: Redis.fromEnv(),
+    redis,
     limiter: Ratelimit.slidingWindow(requests, window),
     prefix: `ratelimit:ai:${resource}`,
     analytics: true,
@@ -65,13 +67,13 @@ function createLimiter(resource: AiRateLimitResource): Ratelimit {
 const limiterCache = new Map<AiRateLimitResource, Ratelimit>();
 const memoryLimitStore = new Map<string, number[]>();
 
-function getLimiter(resource: AiRateLimitResource): Ratelimit {
+function getLimiter(resource: AiRateLimitResource): Ratelimit | null {
   let limiter = limiterCache.get(resource);
   if (!limiter) {
-    limiter = createLimiter(resource);
-    limiterCache.set(resource, limiter);
+    limiter = createLimiter(resource) ?? undefined;
+    if (limiter) limiterCache.set(resource, limiter);
   }
-  return limiter;
+  return limiter ?? null;
 }
 
 function rateLimitHeaders(limit: number, remaining: number, reset: number) {
@@ -135,28 +137,42 @@ export async function enforceAiRateLimit(
   userId: string,
   resource: AiRateLimitResource,
 ): Promise<NextResponse | null> {
-  if (!isUpstashConfigured()) {
-    return process.env.NODE_ENV === "production"
+  const memoryFallback = () =>
+    process.env.NODE_ENV === "production"
       ? enforceMemoryRateLimit(userId, resource)
       : null;
+
+  if (!isUpstashConfigured()) {
+    return memoryFallback();
   }
 
-  const { success, limit, remaining, reset } = await getLimiter(resource).limit(userId);
-
-  if (!success) {
-    return NextResponse.json(
-      {
-        error: "Too many AI requests. Please try again later.",
-        retryAfter: Math.max(1, Math.ceil((reset - Date.now()) / 1000)),
-      },
-      {
-        status: 429,
-        headers: rateLimitHeaders(limit, remaining, reset),
-      },
-    );
+  const limiter = getLimiter(resource);
+  if (!limiter) {
+    return memoryFallback();
   }
 
-  return null;
+  return executeWithUpstashFallback(
+    async () => {
+      const { success, limit, remaining, reset } = await limiter.limit(userId);
+
+      if (!success) {
+        return NextResponse.json(
+          {
+            error: "Too many AI requests. Please try again later.",
+            retryAfter: Math.max(1, Math.ceil((reset - Date.now()) / 1000)),
+          },
+          {
+            status: 429,
+            headers: rateLimitHeaders(limit, remaining, reset),
+          },
+        );
+      }
+
+      return null;
+    },
+    memoryFallback,
+    "ai-rate-limit",
+  );
 }
 
 /**
@@ -269,31 +285,43 @@ const mutationUpstashCache = new Map<string, Ratelimit>();
 export async function enforceMutationRateLimitAsync(
   userId: string,
 ): Promise<NextResponse | null> {
-  if (isUpstashConfigured()) {
-    let limiter = mutationUpstashCache.get("mutation");
-    if (!limiter) {
-      limiter = new Ratelimit({
-        redis: Redis.fromEnv(),
-        limiter: Ratelimit.slidingWindow(MUTATION_RATE.requests, MUTATION_RATE.window),
-        prefix: "ratelimit:mutation",
-        analytics: true,
-      });
-      mutationUpstashCache.set("mutation", limiter);
-    }
-    const { success, limit, remaining, reset } = await limiter.limit(userId);
-    if (!success) {
-      return NextResponse.json(
-        {
-          error: "Too many requests. Please slow down.",
-          retryAfter: Math.max(1, Math.ceil((reset - Date.now()) / 1000)),
-        },
-        { status: 429, headers: rateLimitHeaders(limit, remaining, reset) },
-      );
-    }
-    return null;
+  if (!isUpstashConfigured()) {
+    return enforceMutationRateLimit(userId);
   }
 
-  return enforceMutationRateLimit(userId);
+  const redis = getUpstashRedis();
+  if (!redis) {
+    return enforceMutationRateLimit(userId);
+  }
+
+  let limiter = mutationUpstashCache.get("mutation");
+  if (!limiter) {
+    limiter = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(MUTATION_RATE.requests, MUTATION_RATE.window),
+      prefix: "ratelimit:mutation",
+      analytics: true,
+    });
+    mutationUpstashCache.set("mutation", limiter);
+  }
+
+  return executeWithUpstashFallback(
+    async () => {
+      const { success, limit, remaining, reset } = await limiter!.limit(userId);
+      if (!success) {
+        return NextResponse.json(
+          {
+            error: "Too many requests. Please slow down.",
+            retryAfter: Math.max(1, Math.ceil((reset - Date.now()) / 1000)),
+          },
+          { status: 429, headers: rateLimitHeaders(limit, remaining, reset) },
+        );
+      }
+      return null;
+    },
+    () => enforceMutationRateLimit(userId),
+    "mutation-rate-limit",
+  );
 }
 
 /** Auth endpoints: 10 attempts per minute per email (or IP key). */

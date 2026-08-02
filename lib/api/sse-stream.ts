@@ -47,7 +47,17 @@ export function createSseStreamHelpers(
     }
   };
 
+  const sendCommentKeepalive = () => {
+    if (closed) return;
+    try {
+      controller.enqueue(encoder.encode(`: keepalive ${Date.now()}\n\n`));
+    } catch {
+      closed = true;
+    }
+  };
+
   const heartbeat = setInterval(() => {
+    sendCommentKeepalive();
     send("ping", { t: Date.now() });
   }, SSE_HEARTBEAT_INTERVAL_MS);
 

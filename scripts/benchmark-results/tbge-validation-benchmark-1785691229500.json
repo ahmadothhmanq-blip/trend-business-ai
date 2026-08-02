@@ -1,0 +1,839 @@
+{
+  "benchmarkReport": {
+    "title": "TBGE vs Legacy Benchmark Report",
+    "timestamp": "2026-08-02T17:20:29.498Z",
+    "industries": [
+      "restaurant",
+      "real-estate",
+      "saas",
+      "medical",
+      "gaming"
+    ],
+    "runs": [
+      {
+        "engine": "legacy",
+        "industryId": "restaurant",
+        "success": false,
+        "error": "MAOE: PRE failed after 3 attempt(s): Website architecture validation failed after 3 attempt(s): Industry \"restaurant\" cannot use editorial layout structure \"travel-premium\".",
+        "wallClockMs": 207056.73,
+        "generationTimeMs": 0,
+        "llmCalls": 0,
+        "promptTokens": 0,
+        "completionTokens": 0,
+        "totalTokens": 0,
+        "estimatedCostUsd": 0,
+        "fileCount": 0,
+        "buildSuccess": false,
+        "quality": {
+          "accessibilityScore": 0,
+          "visualOverall": 0,
+          "responsiveQuality": 0,
+          "semanticSeo": 0,
+          "semanticOverall": 0,
+          "heuristicQuality": 0
+        },
+        "provider": "none"
+      },
+      {
+        "engine": "tbge",
+        "industryId": "restaurant",
+        "success": true,
+        "wallClockMs": 19188.7,
+        "generationTimeMs": 19187.879199999996,
+        "llmCalls": 1,
+        "promptTokens": 726,
+        "completionTokens": 2194,
+        "totalTokens": 2920,
+        "estimatedCostUsd": 0.000716,
+        "fileCount": 10,
+        "buildSuccess": true,
+        "plannerTimeMs": 19184.49,
+        "assemblyTimeMs": 0.51,
+        "composerTimeMs": 0.46,
+        "specHash": "d0e8cf8386b5164b",
+        "componentReuseRate": 0.9756,
+        "quality": {
+          "accessibilityScore": 80,
+          "visualOverall": 78,
+          "responsiveQuality": 64,
+          "semanticSeo": 76,
+          "semanticOverall": 86,
+          "heuristicQuality": 100
+        },
+        "provider": "deepseek"
+      },
+      {
+        "engine": "legacy",
+        "industryId": "real-estate",
+        "success": false,
+        "error": "Generation blocked by quality gates (1 critical issue).",
+        "wallClockMs": 1327281.43,
+        "generationTimeMs": 0,
+        "llmCalls": 0,
+        "promptTokens": 0,
+        "completionTokens": 0,
+        "totalTokens": 0,
+        "estimatedCostUsd": 0,
+        "fileCount": 0,
+        "buildSuccess": false,
+        "quality": {
+          "accessibilityScore": 0,
+          "visualOverall": 0,
+          "responsiveQuality": 0,
+          "semanticSeo": 0,
+          "semanticOverall": 0,
+          "heuristicQuality": 0
+        },
+        "provider": "none"
+      },
+      {
+        "engine": "tbge",
+        "industryId": "real-estate",
+        "success": true,
+        "wallClockMs": 318336.69,
+        "generationTimeMs": 318335.02059999993,
+        "llmCalls": 1,
+        "promptTokens": 727,
+        "completionTokens": 5935,
+        "totalTokens": 6662,
+        "estimatedCostUsd": 0.001764,
+        "fileCount": 10,
+        "buildSuccess": true,
+        "plannerTimeMs": 318333.7,
+        "assemblyTimeMs": 0.3,
+        "composerTimeMs": 0.7,
+        "specHash": "fc8028869b6f9971",
+        "componentReuseRate": 0.9855,
+        "quality": {
+          "accessibilityScore": 80,
+          "visualOverall": 78,
+          "responsiveQuality": 64,
+          "semanticSeo": 84,
+          "semanticOverall": 89,
+          "heuristicQuality": 100
+        },
+        "provider": "deepseek"
+      },
+      {
+        "engine": "legacy",
+        "industryId": "saas",
+        "success": false,
+        "error": "Generation failed after 3 attempts: Generated file contains placeholder or incomplete content.",
+        "wallClockMs": 385102.51,
+        "generationTimeMs": 0,
+        "llmCalls": 0,
+        "promptTokens": 0,
+        "completionTokens": 0,
+        "totalTokens": 0,
+        "estimatedCostUsd": 0,
+        "fileCount": 0,
+        "buildSuccess": false,
+        "quality": {
+          "accessibilityScore": 0,
+          "visualOverall": 0,
+          "responsiveQuality": 0,
+          "semanticSeo": 0,
+          "semanticOverall": 0,
+          "heuristicQuality": 0
+        },
+        "provider": "none"
+      },
+      {
+        "engine": "tbge",
+        "industryId": "saas",
+        "success": true,
+        "wallClockMs": 27561.71,
+        "generationTimeMs": 27559.870300000068,
+        "llmCalls": 1,
+        "promptTokens": 727,
+        "completionTokens": 4219,
+        "totalTokens": 4946,
+        "estimatedCostUsd": 0.001283,
+        "fileCount": 10,
+        "buildSuccess": true,
+        "plannerTimeMs": 27554.65,
+        "assemblyTimeMs": 1.35,
+        "composerTimeMs": 2.26,
+        "specHash": "98922a6006cd22b9",
+        "componentReuseRate": 0.9796,
+        "quality": {
+          "accessibilityScore": 80,
+          "visualOverall": 77,
+          "responsiveQuality": 64,
+          "semanticSeo": 76,
+          "semanticOverall": 86,
+          "heuristicQuality": 100
+        },
+        "provider": "deepseek"
+      },
+      {
+        "engine": "legacy",
+        "industryId": "medical",
+        "success": true,
+        "wallClockMs": 1859714.12,
+        "generationTimeMs": 1859713,
+        "llmCalls": 35,
+        "promptTokens": 0,
+        "completionTokens": 0,
+        "totalTokens": 0,
+        "estimatedCostUsd": 0,
+        "fileCount": 80,
+        "buildSuccess": true,
+        "plannerTimeMs": 86223,
+        "quality": {
+          "accessibilityScore": 95,
+          "visualOverall": 82,
+          "responsiveQuality": 85,
+          "semanticSeo": 84,
+          "semanticOverall": 75,
+          "heuristicQuality": 100
+        },
+        "provider": "deepseek"
+      },
+      {
+        "engine": "tbge",
+        "industryId": "medical",
+        "success": true,
+        "wallClockMs": 34421.72,
+        "generationTimeMs": 34420.300200000405,
+        "llmCalls": 1,
+        "promptTokens": 725,
+        "completionTokens": 4269,
+        "totalTokens": 4994,
+        "estimatedCostUsd": 0.001297,
+        "fileCount": 10,
+        "buildSuccess": true,
+        "plannerTimeMs": 34418.19,
+        "assemblyTimeMs": 0.81,
+        "composerTimeMs": 1.3,
+        "specHash": "500ce05dc17bbc23",
+        "componentReuseRate": 0.9808,
+        "quality": {
+          "accessibilityScore": 80,
+          "visualOverall": 77,
+          "responsiveQuality": 64,
+          "semanticSeo": 84,
+          "semanticOverall": 88,
+          "heuristicQuality": 100
+        },
+        "provider": "deepseek"
+      },
+      {
+        "engine": "legacy",
+        "industryId": "gaming",
+        "success": false,
+        "error": "Generation blocked by quality gates (2 critical issues).",
+        "wallClockMs": 1519233.9,
+        "generationTimeMs": 0,
+        "llmCalls": 0,
+        "promptTokens": 0,
+        "completionTokens": 0,
+        "totalTokens": 0,
+        "estimatedCostUsd": 0,
+        "fileCount": 0,
+        "buildSuccess": false,
+        "quality": {
+          "accessibilityScore": 0,
+          "visualOverall": 0,
+          "responsiveQuality": 0,
+          "semanticSeo": 0,
+          "semanticOverall": 0,
+          "heuristicQuality": 0
+        },
+        "provider": "none"
+      },
+      {
+        "engine": "tbge",
+        "industryId": "gaming",
+        "success": true,
+        "wallClockMs": 22781.42,
+        "generationTimeMs": 22780.427699999884,
+        "llmCalls": 1,
+        "promptTokens": 726,
+        "completionTokens": 2653,
+        "totalTokens": 3379,
+        "estimatedCostUsd": 0.000844,
+        "fileCount": 10,
+        "buildSuccess": true,
+        "plannerTimeMs": 22778.72,
+        "assemblyTimeMs": 0.28,
+        "composerTimeMs": 0.19,
+        "specHash": "425530980962d3e7",
+        "componentReuseRate": 0.9714,
+        "quality": {
+          "accessibilityScore": 80,
+          "visualOverall": 78,
+          "responsiveQuality": 64,
+          "semanticSeo": 84,
+          "semanticOverall": 86,
+          "heuristicQuality": 100
+        },
+        "provider": "deepseek"
+      }
+    ],
+    "determinism": {
+      "restaurant": 100,
+      "real-estate": 100,
+      "saas": 100,
+      "medical": 100,
+      "gaming": 100
+    },
+    "summary": {
+      "legacy": {
+        "count": 5,
+        "successRate": 20,
+        "buildRate": 20,
+        "avgWallMs": 1059677.738,
+        "avgLlmCalls": 7,
+        "avgCostUsd": 0,
+        "avgFiles": 16,
+        "avgVisual": 16.4
+      },
+      "tbge": {
+        "count": 5,
+        "successRate": 100,
+        "buildRate": 100,
+        "avgWallMs": 84458.04800000001,
+        "avgLlmCalls": 1,
+        "avgCostUsd": 0.0011808,
+        "avgFiles": 10,
+        "avgPlannerMs": 84453.95,
+        "avgAssemblyMs": 0.65,
+        "avgComposerMs": 0.982
+      }
+    }
+  },
+  "performanceReport": {
+    "title": "TBGE Performance Report",
+    "timestamp": "2026-08-02T17:20:29.498Z",
+    "comparisons": [
+      {
+        "industryId": "restaurant",
+        "legacyWallMs": 207056.73,
+        "tbgeWallMs": 19188.7,
+        "speedupRatio": 10.79,
+        "legacyLlmCalls": 0,
+        "tbgeLlmCalls": 1,
+        "plannerTimeMs": 19184.49,
+        "assemblyTimeMs": 0.51,
+        "composerTimeMs": 0.46
+      },
+      {
+        "industryId": "real-estate",
+        "legacyWallMs": 1327281.43,
+        "tbgeWallMs": 318336.69,
+        "speedupRatio": 4.17,
+        "legacyLlmCalls": 0,
+        "tbgeLlmCalls": 1,
+        "plannerTimeMs": 318333.7,
+        "assemblyTimeMs": 0.3,
+        "composerTimeMs": 0.7
+      },
+      {
+        "industryId": "saas",
+        "legacyWallMs": 385102.51,
+        "tbgeWallMs": 27561.71,
+        "speedupRatio": 13.97,
+        "legacyLlmCalls": 0,
+        "tbgeLlmCalls": 1,
+        "plannerTimeMs": 27554.65,
+        "assemblyTimeMs": 1.35,
+        "composerTimeMs": 2.26
+      },
+      {
+        "industryId": "medical",
+        "legacyWallMs": 1859714.12,
+        "tbgeWallMs": 34421.72,
+        "speedupRatio": 54.03,
+        "legacyLlmCalls": 35,
+        "tbgeLlmCalls": 1,
+        "plannerTimeMs": 34418.19,
+        "assemblyTimeMs": 0.81,
+        "composerTimeMs": 1.3
+      },
+      {
+        "industryId": "gaming",
+        "legacyWallMs": 1519233.9,
+        "tbgeWallMs": 22781.42,
+        "speedupRatio": 66.69,
+        "legacyLlmCalls": 0,
+        "tbgeLlmCalls": 1,
+        "plannerTimeMs": 22778.72,
+        "assemblyTimeMs": 0.28,
+        "composerTimeMs": 0.19
+      }
+    ],
+    "aggregates": {
+      "legacy": {
+        "count": 5,
+        "successRate": 20,
+        "buildRate": 20,
+        "avgWallMs": 1059677.738,
+        "avgLlmCalls": 7,
+        "avgCostUsd": 0,
+        "avgFiles": 16,
+        "avgVisual": 16.4
+      },
+      "tbge": {
+        "count": 5,
+        "successRate": 100,
+        "buildRate": 100,
+        "avgWallMs": 84458.04800000001,
+        "avgLlmCalls": 1,
+        "avgCostUsd": 0.0011808,
+        "avgFiles": 10,
+        "avgPlannerMs": 84453.95,
+        "avgAssemblyMs": 0.65,
+        "avgComposerMs": 0.982
+      }
+    }
+  },
+  "qualityReport": {
+    "title": "TBGE Quality Report",
+    "timestamp": "2026-08-02T17:20:29.498Z",
+    "byIndustry": [
+      {
+        "industryId": "restaurant",
+        "legacy": {
+          "accessibilityScore": 0,
+          "visualOverall": 0,
+          "responsiveQuality": 0,
+          "semanticSeo": 0,
+          "semanticOverall": 0,
+          "heuristicQuality": 0
+        },
+        "tbge": {
+          "accessibilityScore": 80,
+          "visualOverall": 78,
+          "responsiveQuality": 64,
+          "semanticSeo": 76,
+          "semanticOverall": 86,
+          "heuristicQuality": 100
+        },
+        "componentReuseRate": 0.9756,
+        "determinismRate": 100
+      },
+      {
+        "industryId": "real-estate",
+        "legacy": {
+          "accessibilityScore": 0,
+          "visualOverall": 0,
+          "responsiveQuality": 0,
+          "semanticSeo": 0,
+          "semanticOverall": 0,
+          "heuristicQuality": 0
+        },
+        "tbge": {
+          "accessibilityScore": 80,
+          "visualOverall": 78,
+          "responsiveQuality": 64,
+          "semanticSeo": 84,
+          "semanticOverall": 89,
+          "heuristicQuality": 100
+        },
+        "componentReuseRate": 0.9855,
+        "determinismRate": 100
+      },
+      {
+        "industryId": "saas",
+        "legacy": {
+          "accessibilityScore": 0,
+          "visualOverall": 0,
+          "responsiveQuality": 0,
+          "semanticSeo": 0,
+          "semanticOverall": 0,
+          "heuristicQuality": 0
+        },
+        "tbge": {
+          "accessibilityScore": 80,
+          "visualOverall": 77,
+          "responsiveQuality": 64,
+          "semanticSeo": 76,
+          "semanticOverall": 86,
+          "heuristicQuality": 100
+        },
+        "componentReuseRate": 0.9796,
+        "determinismRate": 100
+      },
+      {
+        "industryId": "medical",
+        "legacy": {
+          "accessibilityScore": 95,
+          "visualOverall": 82,
+          "responsiveQuality": 85,
+          "semanticSeo": 84,
+          "semanticOverall": 75,
+          "heuristicQuality": 100
+        },
+        "tbge": {
+          "accessibilityScore": 80,
+          "visualOverall": 77,
+          "responsiveQuality": 64,
+          "semanticSeo": 84,
+          "semanticOverall": 88,
+          "heuristicQuality": 100
+        },
+        "componentReuseRate": 0.9808,
+        "determinismRate": 100
+      },
+      {
+        "industryId": "gaming",
+        "legacy": {
+          "accessibilityScore": 0,
+          "visualOverall": 0,
+          "responsiveQuality": 0,
+          "semanticSeo": 0,
+          "semanticOverall": 0,
+          "heuristicQuality": 0
+        },
+        "tbge": {
+          "accessibilityScore": 80,
+          "visualOverall": 78,
+          "responsiveQuality": 64,
+          "semanticSeo": 84,
+          "semanticOverall": 86,
+          "heuristicQuality": 100
+        },
+        "componentReuseRate": 0.9714,
+        "determinismRate": 100
+      }
+    ]
+  },
+  "costReport": {
+    "title": "TBGE Cost Report",
+    "timestamp": "2026-08-02T17:20:29.498Z",
+    "pricingModel": {
+      "provider": "deepseek",
+      "inputPerMillion": 0.14,
+      "outputPerMillion": 0.28
+    },
+    "byIndustry": [
+      {
+        "industryId": "restaurant",
+        "legacyCostUsd": 0,
+        "tbgeCostUsd": 0.000716,
+        "savingsUsd": -0.000716,
+        "legacyTokens": 0,
+        "tbgeTokens": 2920
+      },
+      {
+        "industryId": "real-estate",
+        "legacyCostUsd": 0,
+        "tbgeCostUsd": 0.001764,
+        "savingsUsd": -0.001764,
+        "legacyTokens": 0,
+        "tbgeTokens": 6662
+      },
+      {
+        "industryId": "saas",
+        "legacyCostUsd": 0,
+        "tbgeCostUsd": 0.001283,
+        "savingsUsd": -0.001283,
+        "legacyTokens": 0,
+        "tbgeTokens": 4946
+      },
+      {
+        "industryId": "medical",
+        "legacyCostUsd": 0,
+        "tbgeCostUsd": 0.001297,
+        "savingsUsd": -0.001297,
+        "legacyTokens": 0,
+        "tbgeTokens": 4994
+      },
+      {
+        "industryId": "gaming",
+        "legacyCostUsd": 0,
+        "tbgeCostUsd": 0.000844,
+        "savingsUsd": -0.000844,
+        "legacyTokens": 0,
+        "tbgeTokens": 3379
+      }
+    ],
+    "totals": {
+      "legacyCostUsd": 0,
+      "tbgeCostUsd": 0.005904
+    }
+  },
+  "recommendation": {
+    "title": "TBGE Readiness Recommendation",
+    "timestamp": "2026-08-02T17:20:29.498Z",
+    "readyToReplaceLegacy": true,
+    "verdict": "TBGE meets benchmark thresholds for cost, speed, and reliability.",
+    "improvements": [
+      "Validate Lighthouse scores on TBGE output (preview build or static HTML audit)."
+    ],
+    "strengths": [
+      "TBGE is 12.5x faster on average.",
+      "TBGE averages 1.0 LLM calls vs legacy."
+    ]
+  },
+  "runs": [
+    {
+      "engine": "legacy",
+      "industryId": "restaurant",
+      "success": false,
+      "error": "MAOE: PRE failed after 3 attempt(s): Website architecture validation failed after 3 attempt(s): Industry \"restaurant\" cannot use editorial layout structure \"travel-premium\".",
+      "wallClockMs": 207056.73,
+      "generationTimeMs": 0,
+      "llmCalls": 0,
+      "promptTokens": 0,
+      "completionTokens": 0,
+      "totalTokens": 0,
+      "estimatedCostUsd": 0,
+      "fileCount": 0,
+      "buildSuccess": false,
+      "quality": {
+        "accessibilityScore": 0,
+        "visualOverall": 0,
+        "responsiveQuality": 0,
+        "semanticSeo": 0,
+        "semanticOverall": 0,
+        "heuristicQuality": 0
+      },
+      "provider": "none"
+    },
+    {
+      "engine": "tbge",
+      "industryId": "restaurant",
+      "success": true,
+      "wallClockMs": 19188.7,
+      "generationTimeMs": 19187.879199999996,
+      "llmCalls": 1,
+      "promptTokens": 726,
+      "completionTokens": 2194,
+      "totalTokens": 2920,
+      "estimatedCostUsd": 0.000716,
+      "fileCount": 10,
+      "buildSuccess": true,
+      "plannerTimeMs": 19184.49,
+      "assemblyTimeMs": 0.51,
+      "composerTimeMs": 0.46,
+      "specHash": "d0e8cf8386b5164b",
+      "componentReuseRate": 0.9756,
+      "quality": {
+        "accessibilityScore": 80,
+        "visualOverall": 78,
+        "responsiveQuality": 64,
+        "semanticSeo": 76,
+        "semanticOverall": 86,
+        "heuristicQuality": 100
+      },
+      "provider": "deepseek"
+    },
+    {
+      "engine": "legacy",
+      "industryId": "real-estate",
+      "success": false,
+      "error": "Generation blocked by quality gates (1 critical issue).",
+      "wallClockMs": 1327281.43,
+      "generationTimeMs": 0,
+      "llmCalls": 0,
+      "promptTokens": 0,
+      "completionTokens": 0,
+      "totalTokens": 0,
+      "estimatedCostUsd": 0,
+      "fileCount": 0,
+      "buildSuccess": false,
+      "quality": {
+        "accessibilityScore": 0,
+        "visualOverall": 0,
+        "responsiveQuality": 0,
+        "semanticSeo": 0,
+        "semanticOverall": 0,
+        "heuristicQuality": 0
+      },
+      "provider": "none"
+    },
+    {
+      "engine": "tbge",
+      "industryId": "real-estate",
+      "success": true,
+      "wallClockMs": 318336.69,
+      "generationTimeMs": 318335.02059999993,
+      "llmCalls": 1,
+      "promptTokens": 727,
+      "completionTokens": 5935,
+      "totalTokens": 6662,
+      "estimatedCostUsd": 0.001764,
+      "fileCount": 10,
+      "buildSuccess": true,
+      "plannerTimeMs": 318333.7,
+      "assemblyTimeMs": 0.3,
+      "composerTimeMs": 0.7,
+      "specHash": "fc8028869b6f9971",
+      "componentReuseRate": 0.9855,
+      "quality": {
+        "accessibilityScore": 80,
+        "visualOverall": 78,
+        "responsiveQuality": 64,
+        "semanticSeo": 84,
+        "semanticOverall": 89,
+        "heuristicQuality": 100
+      },
+      "provider": "deepseek"
+    },
+    {
+      "engine": "legacy",
+      "industryId": "saas",
+      "success": false,
+      "error": "Generation failed after 3 attempts: Generated file contains placeholder or incomplete content.",
+      "wallClockMs": 385102.51,
+      "generationTimeMs": 0,
+      "llmCalls": 0,
+      "promptTokens": 0,
+      "completionTokens": 0,
+      "totalTokens": 0,
+      "estimatedCostUsd": 0,
+      "fileCount": 0,
+      "buildSuccess": false,
+      "quality": {
+        "accessibilityScore": 0,
+        "visualOverall": 0,
+        "responsiveQuality": 0,
+        "semanticSeo": 0,
+        "semanticOverall": 0,
+        "heuristicQuality": 0
+      },
+      "provider": "none"
+    },
+    {
+      "engine": "tbge",
+      "industryId": "saas",
+      "success": true,
+      "wallClockMs": 27561.71,
+      "generationTimeMs": 27559.870300000068,
+      "llmCalls": 1,
+      "promptTokens": 727,
+      "completionTokens": 4219,
+      "totalTokens": 4946,
+      "estimatedCostUsd": 0.001283,
+      "fileCount": 10,
+      "buildSuccess": true,
+      "plannerTimeMs": 27554.65,
+      "assemblyTimeMs": 1.35,
+      "composerTimeMs": 2.26,
+      "specHash": "98922a6006cd22b9",
+      "componentReuseRate": 0.9796,
+      "quality": {
+        "accessibilityScore": 80,
+        "visualOverall": 77,
+        "responsiveQuality": 64,
+        "semanticSeo": 76,
+        "semanticOverall": 86,
+        "heuristicQuality": 100
+      },
+      "provider": "deepseek"
+    },
+    {
+      "engine": "legacy",
+      "industryId": "medical",
+      "success": true,
+      "wallClockMs": 1859714.12,
+      "generationTimeMs": 1859713,
+      "llmCalls": 35,
+      "promptTokens": 0,
+      "completionTokens": 0,
+      "totalTokens": 0,
+      "estimatedCostUsd": 0,
+      "fileCount": 80,
+      "buildSuccess": true,
+      "plannerTimeMs": 86223,
+      "quality": {
+        "accessibilityScore": 95,
+        "visualOverall": 82,
+        "responsiveQuality": 85,
+        "semanticSeo": 84,
+        "semanticOverall": 75,
+        "heuristicQuality": 100
+      },
+      "provider": "deepseek"
+    },
+    {
+      "engine": "tbge",
+      "industryId": "medical",
+      "success": true,
+      "wallClockMs": 34421.72,
+      "generationTimeMs": 34420.300200000405,
+      "llmCalls": 1,
+      "promptTokens": 725,
+      "completionTokens": 4269,
+      "totalTokens": 4994,
+      "estimatedCostUsd": 0.001297,
+      "fileCount": 10,
+      "buildSuccess": true,
+      "plannerTimeMs": 34418.19,
+      "assemblyTimeMs": 0.81,
+      "composerTimeMs": 1.3,
+      "specHash": "500ce05dc17bbc23",
+      "componentReuseRate": 0.9808,
+      "quality": {
+        "accessibilityScore": 80,
+        "visualOverall": 77,
+        "responsiveQuality": 64,
+        "semanticSeo": 84,
+        "semanticOverall": 88,
+        "heuristicQuality": 100
+      },
+      "provider": "deepseek"
+    },
+    {
+      "engine": "legacy",
+      "industryId": "gaming",
+      "success": false,
+      "error": "Generation blocked by quality gates (2 critical issues).",
+      "wallClockMs": 1519233.9,
+      "generationTimeMs": 0,
+      "llmCalls": 0,
+      "promptTokens": 0,
+      "completionTokens": 0,
+      "totalTokens": 0,
+      "estimatedCostUsd": 0,
+      "fileCount": 0,
+      "buildSuccess": false,
+      "quality": {
+        "accessibilityScore": 0,
+        "visualOverall": 0,
+        "responsiveQuality": 0,
+        "semanticSeo": 0,
+        "semanticOverall": 0,
+        "heuristicQuality": 0
+      },
+      "provider": "none"
+    },
+    {
+      "engine": "tbge",
+      "industryId": "gaming",
+      "success": true,
+      "wallClockMs": 22781.42,
+      "generationTimeMs": 22780.427699999884,
+      "llmCalls": 1,
+      "promptTokens": 726,
+      "completionTokens": 2653,
+      "totalTokens": 3379,
+      "estimatedCostUsd": 0.000844,
+      "fileCount": 10,
+      "buildSuccess": true,
+      "plannerTimeMs": 22778.72,
+      "assemblyTimeMs": 0.28,
+      "composerTimeMs": 0.19,
+      "specHash": "425530980962d3e7",
+      "componentReuseRate": 0.9714,
+      "quality": {
+        "accessibilityScore": 80,
+        "visualOverall": 78,
+        "responsiveQuality": 64,
+        "semanticSeo": 84,
+        "semanticOverall": 86,
+        "heuristicQuality": 100
+      },
+      "provider": "deepseek"
+    }
+  ],
+  "determinism": {
+    "restaurant": 100,
+    "real-estate": 100,
+    "saas": 100,
+    "medical": 100,
+    "gaming": 100
+  }
+}

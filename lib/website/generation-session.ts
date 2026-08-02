@@ -8,9 +8,11 @@ import { getGeneratingWebsiteLabel } from "@/lib/ai-core/content/content-languag
 import { getActiveProvider } from "@/lib/ai/provider-config";
 import { emptyTokenUsage } from "@/lib/ai/usage";
 import { logger } from "@/lib/logger";
+import { getActiveWebsiteProfiler } from "@/lib/ai-core/performance/profiler-context";
 import { ensureWebsiteWorkspaceProject } from "@/lib/website/save-generation";
 import type { GenerationMode, WebsiteGeneration } from "@/types/database";
 import type { GeneratedProjectFile, GeneratedWebsiteProject } from "@/plugins/website/types";
+import type { WaveGenerationState } from "@/lib/website/wave-checkpoint-engine";
 
 const LOG = "wb-session";
 
@@ -55,12 +57,25 @@ function baseBlueprint(
     roadmap: partial?.roadmap ?? [],
     files: partial?.files ?? [],
     progressEvents: partial?.progressEvents ?? [],
+    waveGenerationState: partial?.waveGenerationState,
     ...partial,
   };
 }
 
 /** Insert a running generation row before AI work starts. */
 export async function beginWebsiteGenerationSession(args: {
+  supabase: SupabaseClient;
+  userId: string;
+  input: WebsiteGenerationSessionInput;
+}): Promise<{ ok: true; generation: WebsiteGeneration } | { ok: false; error: string }> {
+  const profiler = getActiveWebsiteProfiler();
+  const run = async () => beginWebsiteGenerationSessionInner(args);
+  return profiler
+    ? profiler.measure("supabase", "beginWebsiteGenerationSession", run)
+    : run();
+}
+
+async function beginWebsiteGenerationSessionInner(args: {
   supabase: SupabaseClient;
   userId: string;
   input: WebsiteGenerationSessionInput;
@@ -148,7 +163,28 @@ export async function checkpointWebsiteGeneration(args: {
   generationId: string;
   message?: string;
   files?: GeneratedProjectFile[];
-  partialProject?: Partial<GeneratedWebsiteProject>;
+  partialProject?: Partial<GeneratedWebsiteProject> & {
+    waveGenerationState?: WaveGenerationState;
+  };
+}): Promise<boolean> {
+  const profiler = getActiveWebsiteProfiler();
+  const run = async () => checkpointWebsiteGenerationInner(args);
+  return profiler
+    ? profiler.measure("supabase", "checkpointWebsiteGeneration", run, {
+        fileCount: args.files?.length ?? 0,
+      })
+    : run();
+}
+
+async function checkpointWebsiteGenerationInner(args: {
+  supabase: SupabaseClient;
+  userId: string;
+  generationId: string;
+  message?: string;
+  files?: GeneratedProjectFile[];
+  partialProject?: Partial<GeneratedWebsiteProject> & {
+    waveGenerationState?: WaveGenerationState;
+  };
 }): Promise<boolean> {
   if (!isUuid(args.generationId)) return false;
 

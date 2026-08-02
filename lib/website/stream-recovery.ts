@@ -1,6 +1,6 @@
 import {
   CLIENT_STREAM_RECOVERY_INTERVAL_MS,
-  CLIENT_STREAM_RECOVERY_POLL_MS,
+  getClientStreamRecoveryPollMs,
 } from "@/lib/ai/timeouts";
 import type { GeneratedWebsiteProject } from "@/plugins/website/types";
 import type { WebsiteGeneration } from "@/types/database";
@@ -82,7 +82,7 @@ export async function tryRecoverCompletedWebsiteGeneration(
     intervalMs?: number;
   },
 ): Promise<{ project: GeneratedWebsiteProject; generation: WebsiteGeneration } | null> {
-  const pollMs = options.pollMs ?? CLIENT_STREAM_RECOVERY_POLL_MS;
+  const pollMs = options.pollMs ?? getClientStreamRecoveryPollMs();
   const intervalMs = options.intervalMs ?? CLIENT_STREAM_RECOVERY_INTERVAL_MS;
   const deadline = Date.now() + pollMs;
   let attempt = 0;

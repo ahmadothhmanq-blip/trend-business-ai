@@ -1,0 +1,111 @@
+{
+  "title": "TBGE Quality Report",
+  "timestamp": "2026-08-02T17:20:29.498Z",
+  "byIndustry": [
+    {
+      "industryId": "restaurant",
+      "legacy": {
+        "accessibilityScore": 0,
+        "visualOverall": 0,
+        "responsiveQuality": 0,
+        "semanticSeo": 0,
+        "semanticOverall": 0,
+        "heuristicQuality": 0
+      },
+      "tbge": {
+        "accessibilityScore": 80,
+        "visualOverall": 78,
+        "responsiveQuality": 64,
+        "semanticSeo": 76,
+        "semanticOverall": 86,
+        "heuristicQuality": 100
+      },
+      "componentReuseRate": 0.9756,
+      "determinismRate": 100
+    },
+    {
+      "industryId": "real-estate",
+      "legacy": {
+        "accessibilityScore": 0,
+        "visualOverall": 0,
+        "responsiveQuality": 0,
+        "semanticSeo": 0,
+        "semanticOverall": 0,
+        "heuristicQuality": 0
+      },
+      "tbge": {
+        "accessibilityScore": 80,
+        "visualOverall": 78,
+        "responsiveQuality": 64,
+        "semanticSeo": 84,
+        "semanticOverall": 89,
+        "heuristicQuality": 100
+      },
+      "componentReuseRate": 0.9855,
+      "determinismRate": 100
+    },
+    {
+      "industryId": "saas",
+      "legacy": {
+        "accessibilityScore": 0,
+        "visualOverall": 0,
+        "responsiveQuality": 0,
+        "semanticSeo": 0,
+        "semanticOverall": 0,
+        "heuristicQuality": 0
+      },
+      "tbge": {
+        "accessibilityScore": 80,
+        "visualOverall": 77,
+        "responsiveQuality": 64,
+        "semanticSeo": 76,
+        "semanticOverall": 86,
+        "heuristicQuality": 100
+      },
+      "componentReuseRate": 0.9796,
+      "determinismRate": 100
+    },
+    {
+      "industryId": "medical",
+      "legacy": {
+        "accessibilityScore": 95,
+        "visualOverall": 82,
+        "responsiveQuality": 85,
+        "semanticSeo": 84,
+        "semanticOverall": 75,
+        "heuristicQuality": 100
+      },
+      "tbge": {
+        "accessibilityScore": 80,
+        "visualOverall": 77,
+        "responsiveQuality": 64,
+        "semanticSeo": 84,
+        "semanticOverall": 88,
+        "heuristicQuality": 100
+      },
+      "componentReuseRate": 0.9808,
+      "determinismRate": 100
+    },
+    {
+      "industryId": "gaming",
+      "legacy": {
+        "accessibilityScore": 0,
+        "visualOverall": 0,
+        "responsiveQuality": 0,
+        "semanticSeo": 0,
+        "semanticOverall": 0,
+        "heuristicQuality": 0
+      },
+      "tbge": {
+        "accessibilityScore": 80,
+        "visualOverall": 78,
+        "responsiveQuality": 64,
+        "semanticSeo": 84,
+        "semanticOverall": 86,
+        "heuristicQuality": 100
+      },
+      "componentReuseRate": 0.9714,
+      "determinismRate": 100
+    }
+  ]
+}

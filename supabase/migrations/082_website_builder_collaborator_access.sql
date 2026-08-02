@@ -1,6 +1,7 @@
--- Migration 082: Collaborator read/update access on website_generations
+-- Migration 082: Collaborator edit access on website_generations
+-- Uses private helpers (085+) — SELECT consolidation is handled by 087.
 
-create or replace function public.can_edit_website_generation(
+create or replace function private.can_edit_website_generation(
   p_generation_id uuid,
   p_user_id uuid
 )
@@ -20,20 +21,14 @@ as $$
   );
 $$;
 
-revoke all on function public.can_edit_website_generation(uuid, uuid) from public;
-grant execute on function public.can_edit_website_generation(uuid, uuid) to authenticated;
-
-drop policy if exists "Members can view shared website generations"
-  on public.website_generations;
-create policy "Members can view shared website generations"
-  on public.website_generations for select
-  using (public.is_website_generation_member(id, auth.uid()));
+revoke all on all functions in schema private from public;
+grant execute on all functions in schema private to authenticated, service_role;
 
 drop policy if exists "Editors can update shared website generations"
   on public.website_generations;
 create policy "Editors can update shared website generations"
   on public.website_generations for update
-  using (public.can_edit_website_generation(id, auth.uid()));
+  using (private.can_edit_website_generation(id, auth.uid()));
 
-comment on function public.can_edit_website_generation is
+comment on function private.can_edit_website_generation is
   'Accepted editor/owner members may update shared website generations (RLS).';

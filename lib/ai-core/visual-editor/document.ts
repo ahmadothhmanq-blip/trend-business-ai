@@ -10,6 +10,11 @@ import {
   isTemplateToken,
   resolveVisualNodeText,
 } from "@/lib/ai-core/visual-editor/hydrate-node-text";
+import { extractButtonsFromSection } from "@/lib/ai-core/visual-editor/button-extract";
+import { extractIconsFromSection } from "@/lib/ai-core/visual-editor/icon-extract";
+import { extractSectionBackground } from "@/lib/ai-core/visual-editor/section-bg-extract";
+import { extractSectionConfig } from "@/lib/ai-core/visual-editor/section-extract";
+import { extractLinksFromSection } from "@/lib/ai-core/visual-editor/link-extract";
 import type {
   VisualDesignTokens,
   VisualDocument,
@@ -88,6 +93,36 @@ export function buildVisualDocument(params: {
         project: params.project,
       }) ||
       (rawExtract && !isTemplateToken(rawExtract) ? rawExtract : undefined);
+    const buttons = extractButtonsFromSection({
+      exportName: name,
+      componentSource: file?.content,
+      pageSource,
+      bodyFont: defaultTokens().bodyFont,
+    });
+    const links = extractLinksFromSection({
+      exportName: name,
+      componentSource: file?.content,
+      pageSource,
+      bodyFont: defaultTokens().bodyFont,
+      kindHint: section?.kindHint || name,
+    });
+    const icons = extractIconsFromSection({
+      exportName: name,
+      componentSource: file?.content,
+      pageSource,
+      kindHint: section?.kindHint || name,
+    });
+    const sectionBackground = extractSectionBackground({
+      exportName: name,
+      kind,
+      componentSource: file?.content,
+      pageSource,
+    });
+    const sectionConfig = extractSectionConfig({
+      exportName: name,
+      kind,
+      componentSource: file?.content,
+    });
     return {
       id: `node-${index}-${name}`,
       exportName: name,
@@ -95,6 +130,12 @@ export function buildVisualDocument(params: {
       kind,
       label: name.replace(/([a-z])([A-Z])/g, "$1 $2"),
       text: hydratedText,
+      buttons,
+      links,
+      icons,
+      sectionBackground,
+      sectionConfig,
+      imageUrl: sectionBackground.url || undefined,
       locked: kind === "header" || kind === "footer",
     };
   });
@@ -119,6 +160,9 @@ export function buildVisualDocument(params: {
     nodes,
     tokens,
     selectedNodeId: nodes.find((n) => n.kind === "hero")?.id || nodes[0]?.id || null,
+    selectedButtonId: null,
+    selectedLinkId: null,
+    selectedIconId: null,
     viewport: "desktop",
     extensions: {
       "component-marketplace": { ready: true },

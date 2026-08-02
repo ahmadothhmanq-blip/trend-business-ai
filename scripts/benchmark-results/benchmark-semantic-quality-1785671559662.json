@@ -1,0 +1,44 @@
+{
+  "phase": "QE-3",
+  "timestamp": "2026-08-02T11:52:39.661Z",
+  "totalLatencyMs": 5,
+  "additionalTokenUsage": 0,
+  "llmCalls": 0,
+  "contentQualityImprovement": 12,
+  "genericContentReductionSignal": true,
+  "industryRelevanceDelta": 16,
+  "ctaQualityDelta": 16,
+  "seoSemanticDelta": 16,
+  "localizationDelta": 0,
+  "crossPageConsistencyDelta": 0,
+  "fixtures": [
+    {
+      "name": "furniture-good",
+      "overall": 92,
+      "genericCopy": 92,
+      "industryRelevance": 92,
+      "ctaQuality": 92,
+      "semanticSeo": 92,
+      "localization": 92,
+      "crossPageConsistency": 92,
+      "issueCount": 0,
+      "latencyMs": 4,
+      "llmApplied": false,
+      "promptChars": 0
+    },
+    {
+      "name": "generic-weak",
+      "overall": 80,
+      "genericCopy": 68,
+      "industryRelevance": 76,
+      "ctaQuality": 76,
+      "semanticSeo": 76,
+      "localization": 92,
+      "crossPageConsistency": 92,
+      "issueCount": 10,
+      "latencyMs": 1,
+      "llmApplied": false,
+      "promptChars": 0
+    }
+  ]
+}

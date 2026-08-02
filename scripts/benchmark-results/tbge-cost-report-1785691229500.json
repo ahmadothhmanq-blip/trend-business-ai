@@ -1,0 +1,55 @@
+{
+  "title": "TBGE Cost Report",
+  "timestamp": "2026-08-02T17:20:29.498Z",
+  "pricingModel": {
+    "provider": "deepseek",
+    "inputPerMillion": 0.14,
+    "outputPerMillion": 0.28
+  },
+  "byIndustry": [
+    {
+      "industryId": "restaurant",
+      "legacyCostUsd": 0,
+      "tbgeCostUsd": 0.000716,
+      "savingsUsd": -0.000716,
+      "legacyTokens": 0,
+      "tbgeTokens": 2920
+    },
+    {
+      "industryId": "real-estate",
+      "legacyCostUsd": 0,
+      "tbgeCostUsd": 0.001764,
+      "savingsUsd": -0.001764,
+      "legacyTokens": 0,
+      "tbgeTokens": 6662
+    },
+    {
+      "industryId": "saas",
+      "legacyCostUsd": 0,
+      "tbgeCostUsd": 0.001283,
+      "savingsUsd": -0.001283,
+      "legacyTokens": 0,
+      "tbgeTokens": 4946
+    },
+    {
+      "industryId": "medical",
+      "legacyCostUsd": 0,
+      "tbgeCostUsd": 0.001297,
+      "savingsUsd": -0.001297,
+      "legacyTokens": 0,
+      "tbgeTokens": 4994
+    },
+    {
+      "industryId": "gaming",
+      "legacyCostUsd": 0,
+      "tbgeCostUsd": 0.000844,
+      "savingsUsd": -0.000844,
+      "legacyTokens": 0,
+      "tbgeTokens": 3379
+    }
+  ],
+  "totals": {
+    "legacyCostUsd": 0,
+    "tbgeCostUsd": 0.005904
+  }
+}

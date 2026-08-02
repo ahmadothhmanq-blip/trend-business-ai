@@ -1,0 +1,1699 @@
+{
+  "timestamp": "2026-08-02T01:49:35.648Z",
+  "scope": "file-generation-stage-isolated",
+  "promptCount": 12,
+  "overallPassed": false,
+  "passedCount": 9,
+  "averageStructureScore": 100,
+  "averageJaccard": 1,
+  "averageSpeedupPercent": 43,
+  "results": [
+    {
+      "promptId": "restaurant",
+      "label": "Restaurant",
+      "legacy": {
+        "durationMs": 400846,
+        "llmCalls": 6,
+        "fileCount": 8
+      },
+      "wave": {
+        "durationMs": 174436,
+        "llmCalls": 6,
+        "fileCount": 8
+      },
+      "speedupPercent": 56,
+      "quality": {
+        "promptId": "restaurant",
+        "fileCountMatch": true,
+        "filePathJaccard": 1,
+        "structureScore": 100,
+        "validationPassedMatch": true,
+        "projectValidationMatch": true,
+        "legacy": {
+          "fileCount": 8,
+          "filePaths": [
+            "app/layout.tsx",
+            "app/page.tsx",
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx",
+            "components/ui/motion.tsx",
+            "components/ui/section-shell.tsx"
+          ],
+          "sectionComponents": [
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx"
+          ],
+          "layoutFiles": [
+            "app/layout.tsx"
+          ],
+          "pageFiles": [
+            "app/page.tsx"
+          ],
+          "hasLayout": true,
+          "hasHomePage": true,
+          "hasGlobalsCss": false,
+          "seoMetaCount": 2,
+          "validationPassed": true,
+          "validationIssueCount": 0,
+          "validationIssues": [],
+          "projectValidationPassed": false,
+          "projectValidationIssues": [
+            "Missing required production file: .eslintrc.json",
+            "Missing required production file: .prettierrc",
+            "Missing required production file: tsconfig.json",
+            "Missing required production file: next.config.ts",
+            "Missing required production file: postcss.config.js",
+            "Missing required production file: tailwind.config.ts",
+            "Missing required production file: package.json",
+            "Missing required production file: README.md",
+            "Missing required production file: app/globals.css",
+            "Missing required production file: app/not-found.tsx",
+            "Missing required production file: app/loading.tsx",
+            "Missing required production file: app/error.tsx",
+            "Missing required production file: lib/utils.ts",
+            "Missing required production file: lib/seo.ts",
+            "Missing required production file: components/ui/button.tsx",
+            "Missing required production file: components/ui/card.tsx",
+            "Missing required production file: components/ui/input.tsx",
+            "app/layout.tsx: missing relative import \"./globals.css\" (resolved to app/globals.css).",
+            "components/ui/section-shell.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/ui/motion.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ServicesModern.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ContactSection.tsx: imports \"react\" but package.json is missing \"react\"."
+          ],
+          "brokenImportCount": 5
+        },
+        "wave": {
+          "fileCount": 8,
+          "filePaths": [
+            "app/layout.tsx",
+            "app/page.tsx",
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx",
+            "components/ui/motion.tsx",
+            "components/ui/section-shell.tsx"
+          ],
+          "sectionComponents": [
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx"
+          ],
+          "layoutFiles": [
+            "app/layout.tsx"
+          ],
+          "pageFiles": [
+            "app/page.tsx"
+          ],
+          "hasLayout": true,
+          "hasHomePage": true,
+          "hasGlobalsCss": false,
+          "seoMetaCount": 3,
+          "validationPassed": true,
+          "validationIssueCount": 0,
+          "validationIssues": [],
+          "projectValidationPassed": false,
+          "projectValidationIssues": [
+            "Missing required production file: .eslintrc.json",
+            "Missing required production file: .prettierrc",
+            "Missing required production file: tsconfig.json",
+            "Missing required production file: next.config.ts",
+            "Missing required production file: postcss.config.js",
+            "Missing required production file: tailwind.config.ts",
+            "Missing required production file: package.json",
+            "Missing required production file: README.md",
+            "Missing required production file: app/globals.css",
+            "Missing required production file: app/not-found.tsx",
+            "Missing required production file: app/loading.tsx",
+            "Missing required production file: app/error.tsx",
+            "Missing required production file: lib/utils.ts",
+            "Missing required production file: lib/seo.ts",
+            "Missing required production file: components/ui/button.tsx",
+            "Missing required production file: components/ui/card.tsx",
+            "Missing required production file: components/ui/input.tsx",
+            "app/layout.tsx: missing relative import \"./globals.css\" (resolved to app/globals.css).",
+            "app/layout.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/ui/section-shell.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/ui/motion.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ContactSection.tsx: imports \"react\" but package.json is missing \"react\"."
+          ],
+          "brokenImportCount": 5
+        },
+        "regressions": [],
+        "passed": true
+      }
+    },
+    {
+      "promptId": "saas",
+      "label": "SaaS",
+      "legacy": {
+        "durationMs": 216919,
+        "llmCalls": 6,
+        "fileCount": 8
+      },
+      "wave": {
+        "durationMs": 126332,
+        "llmCalls": 6,
+        "fileCount": 8
+      },
+      "speedupPercent": 42,
+      "quality": {
+        "promptId": "saas",
+        "fileCountMatch": true,
+        "filePathJaccard": 1,
+        "structureScore": 100,
+        "validationPassedMatch": true,
+        "projectValidationMatch": true,
+        "legacy": {
+          "fileCount": 8,
+          "filePaths": [
+            "app/layout.tsx",
+            "app/page.tsx",
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx",
+            "components/ui/motion.tsx",
+            "components/ui/section-shell.tsx"
+          ],
+          "sectionComponents": [
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx"
+          ],
+          "layoutFiles": [
+            "app/layout.tsx"
+          ],
+          "pageFiles": [
+            "app/page.tsx"
+          ],
+          "hasLayout": true,
+          "hasHomePage": true,
+          "hasGlobalsCss": false,
+          "seoMetaCount": 3,
+          "validationPassed": true,
+          "validationIssueCount": 0,
+          "validationIssues": [],
+          "projectValidationPassed": false,
+          "projectValidationIssues": [
+            "Missing required production file: .eslintrc.json",
+            "Missing required production file: .prettierrc",
+            "Missing required production file: tsconfig.json",
+            "Missing required production file: next.config.ts",
+            "Missing required production file: postcss.config.js",
+            "Missing required production file: tailwind.config.ts",
+            "Missing required production file: package.json",
+            "Missing required production file: README.md",
+            "Missing required production file: app/globals.css",
+            "Missing required production file: app/not-found.tsx",
+            "Missing required production file: app/loading.tsx",
+            "Missing required production file: app/error.tsx",
+            "Missing required production file: lib/utils.ts",
+            "Missing required production file: lib/seo.ts",
+            "Missing required production file: components/ui/button.tsx",
+            "Missing required production file: components/ui/card.tsx",
+            "Missing required production file: components/ui/input.tsx",
+            "app/layout.tsx: missing relative import \"./globals.css\" (resolved to app/globals.css).",
+            "components/ui/section-shell.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/ui/motion.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ServicesModern.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ContactSection.tsx: imports \"react\" but package.json is missing \"react\"."
+          ],
+          "brokenImportCount": 5
+        },
+        "wave": {
+          "fileCount": 8,
+          "filePaths": [
+            "app/layout.tsx",
+            "app/page.tsx",
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx",
+            "components/ui/motion.tsx",
+            "components/ui/section-shell.tsx"
+          ],
+          "sectionComponents": [
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx"
+          ],
+          "layoutFiles": [
+            "app/layout.tsx"
+          ],
+          "pageFiles": [
+            "app/page.tsx"
+          ],
+          "hasLayout": true,
+          "hasHomePage": true,
+          "hasGlobalsCss": false,
+          "seoMetaCount": 3,
+          "validationPassed": true,
+          "validationIssueCount": 0,
+          "validationIssues": [],
+          "projectValidationPassed": false,
+          "projectValidationIssues": [
+            "Missing required production file: .eslintrc.json",
+            "Missing required production file: .prettierrc",
+            "Missing required production file: tsconfig.json",
+            "Missing required production file: next.config.ts",
+            "Missing required production file: postcss.config.js",
+            "Missing required production file: tailwind.config.ts",
+            "Missing required production file: package.json",
+            "Missing required production file: README.md",
+            "Missing required production file: app/globals.css",
+            "Missing required production file: app/not-found.tsx",
+            "Missing required production file: app/loading.tsx",
+            "Missing required production file: app/error.tsx",
+            "Missing required production file: lib/utils.ts",
+            "Missing required production file: lib/seo.ts",
+            "Missing required production file: components/ui/button.tsx",
+            "Missing required production file: components/ui/card.tsx",
+            "Missing required production file: components/ui/input.tsx",
+            "app/layout.tsx: missing relative import \"./globals.css\" (resolved to app/globals.css).",
+            "components/ui/section-shell.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/ui/motion.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ContactSection.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ServicesModern.tsx: imports \"react\" but package.json is missing \"react\"."
+          ],
+          "brokenImportCount": 5
+        },
+        "regressions": [],
+        "passed": true
+      }
+    },
+    {
+      "promptId": "corporate",
+      "label": "Corporate",
+      "legacy": {
+        "durationMs": 161144,
+        "llmCalls": 6,
+        "fileCount": 8
+      },
+      "wave": {
+        "durationMs": 105420,
+        "llmCalls": 6,
+        "fileCount": 8
+      },
+      "speedupPercent": 35,
+      "quality": {
+        "promptId": "corporate",
+        "fileCountMatch": true,
+        "filePathJaccard": 1,
+        "structureScore": 100,
+        "validationPassedMatch": true,
+        "projectValidationMatch": true,
+        "legacy": {
+          "fileCount": 8,
+          "filePaths": [
+            "app/layout.tsx",
+            "app/page.tsx",
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx",
+            "components/ui/motion.tsx",
+            "components/ui/section-shell.tsx"
+          ],
+          "sectionComponents": [
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx"
+          ],
+          "layoutFiles": [
+            "app/layout.tsx"
+          ],
+          "pageFiles": [
+            "app/page.tsx"
+          ],
+          "hasLayout": true,
+          "hasHomePage": true,
+          "hasGlobalsCss": false,
+          "seoMetaCount": 3,
+          "validationPassed": true,
+          "validationIssueCount": 0,
+          "validationIssues": [],
+          "projectValidationPassed": false,
+          "projectValidationIssues": [
+            "Missing required production file: .eslintrc.json",
+            "Missing required production file: .prettierrc",
+            "Missing required production file: tsconfig.json",
+            "Missing required production file: next.config.ts",
+            "Missing required production file: postcss.config.js",
+            "Missing required production file: tailwind.config.ts",
+            "Missing required production file: package.json",
+            "Missing required production file: README.md",
+            "Missing required production file: app/globals.css",
+            "Missing required production file: app/not-found.tsx",
+            "Missing required production file: app/loading.tsx",
+            "Missing required production file: app/error.tsx",
+            "Missing required production file: lib/utils.ts",
+            "Missing required production file: lib/seo.ts",
+            "Missing required production file: components/ui/button.tsx",
+            "Missing required production file: components/ui/card.tsx",
+            "Missing required production file: components/ui/input.tsx",
+            "app/layout.tsx: missing relative import \"./globals.css\" (resolved to app/globals.css).",
+            "components/ui/section-shell.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/ui/motion.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/HeroLuxury.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ContactSection.tsx: imports \"react\" but package.json is missing \"react\"."
+          ],
+          "brokenImportCount": 5
+        },
+        "wave": {
+          "fileCount": 8,
+          "filePaths": [
+            "app/layout.tsx",
+            "app/page.tsx",
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx",
+            "components/ui/motion.tsx",
+            "components/ui/section-shell.tsx"
+          ],
+          "sectionComponents": [
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx"
+          ],
+          "layoutFiles": [
+            "app/layout.tsx"
+          ],
+          "pageFiles": [
+            "app/page.tsx"
+          ],
+          "hasLayout": true,
+          "hasHomePage": true,
+          "hasGlobalsCss": false,
+          "seoMetaCount": 4,
+          "validationPassed": true,
+          "validationIssueCount": 0,
+          "validationIssues": [],
+          "projectValidationPassed": false,
+          "projectValidationIssues": [
+            "Missing required production file: .eslintrc.json",
+            "Missing required production file: .prettierrc",
+            "Missing required production file: tsconfig.json",
+            "Missing required production file: next.config.ts",
+            "Missing required production file: postcss.config.js",
+            "Missing required production file: tailwind.config.ts",
+            "Missing required production file: package.json",
+            "Missing required production file: README.md",
+            "Missing required production file: app/globals.css",
+            "Missing required production file: app/not-found.tsx",
+            "Missing required production file: app/loading.tsx",
+            "Missing required production file: app/error.tsx",
+            "Missing required production file: lib/utils.ts",
+            "Missing required production file: lib/seo.ts",
+            "Missing required production file: components/ui/button.tsx",
+            "Missing required production file: components/ui/card.tsx",
+            "Missing required production file: components/ui/input.tsx",
+            "app/layout.tsx: missing relative import \"./globals.css\" (resolved to app/globals.css).",
+            "components/ui/section-shell.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/ui/motion.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ContactSection.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/HeroLuxury.tsx: imports \"react\" but package.json is missing \"react\"."
+          ],
+          "brokenImportCount": 5
+        },
+        "regressions": [],
+        "passed": true
+      }
+    },
+    {
+      "promptId": "agency",
+      "label": "Agency",
+      "legacy": {
+        "durationMs": 182287,
+        "llmCalls": 6,
+        "fileCount": 8
+      },
+      "wave": {
+        "durationMs": 93291,
+        "llmCalls": 6,
+        "fileCount": 8
+      },
+      "speedupPercent": 49,
+      "quality": {
+        "promptId": "agency",
+        "fileCountMatch": true,
+        "filePathJaccard": 1,
+        "structureScore": 100,
+        "validationPassedMatch": true,
+        "projectValidationMatch": true,
+        "legacy": {
+          "fileCount": 8,
+          "filePaths": [
+            "app/layout.tsx",
+            "app/page.tsx",
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx",
+            "components/ui/motion.tsx",
+            "components/ui/section-shell.tsx"
+          ],
+          "sectionComponents": [
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx"
+          ],
+          "layoutFiles": [
+            "app/layout.tsx"
+          ],
+          "pageFiles": [
+            "app/page.tsx"
+          ],
+          "hasLayout": true,
+          "hasHomePage": true,
+          "hasGlobalsCss": false,
+          "seoMetaCount": 3,
+          "validationPassed": true,
+          "validationIssueCount": 0,
+          "validationIssues": [],
+          "projectValidationPassed": false,
+          "projectValidationIssues": [
+            "Missing required production file: .eslintrc.json",
+            "Missing required production file: .prettierrc",
+            "Missing required production file: tsconfig.json",
+            "Missing required production file: next.config.ts",
+            "Missing required production file: postcss.config.js",
+            "Missing required production file: tailwind.config.ts",
+            "Missing required production file: package.json",
+            "Missing required production file: README.md",
+            "Missing required production file: app/globals.css",
+            "Missing required production file: app/not-found.tsx",
+            "Missing required production file: app/loading.tsx",
+            "Missing required production file: app/error.tsx",
+            "Missing required production file: lib/utils.ts",
+            "Missing required production file: lib/seo.ts",
+            "Missing required production file: components/ui/button.tsx",
+            "Missing required production file: components/ui/card.tsx",
+            "Missing required production file: components/ui/input.tsx",
+            "app/layout.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/ui/section-shell.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/ui/motion.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ContactSection.tsx: imports \"react\" but package.json is missing \"react\"."
+          ],
+          "brokenImportCount": 4
+        },
+        "wave": {
+          "fileCount": 8,
+          "filePaths": [
+            "app/layout.tsx",
+            "app/page.tsx",
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx",
+            "components/ui/motion.tsx",
+            "components/ui/section-shell.tsx"
+          ],
+          "sectionComponents": [
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx"
+          ],
+          "layoutFiles": [
+            "app/layout.tsx"
+          ],
+          "pageFiles": [
+            "app/page.tsx"
+          ],
+          "hasLayout": true,
+          "hasHomePage": true,
+          "hasGlobalsCss": false,
+          "seoMetaCount": 2,
+          "validationPassed": true,
+          "validationIssueCount": 0,
+          "validationIssues": [],
+          "projectValidationPassed": false,
+          "projectValidationIssues": [
+            "Missing required production file: .eslintrc.json",
+            "Missing required production file: .prettierrc",
+            "Missing required production file: tsconfig.json",
+            "Missing required production file: next.config.ts",
+            "Missing required production file: postcss.config.js",
+            "Missing required production file: tailwind.config.ts",
+            "Missing required production file: package.json",
+            "Missing required production file: README.md",
+            "Missing required production file: app/globals.css",
+            "Missing required production file: app/not-found.tsx",
+            "Missing required production file: app/loading.tsx",
+            "Missing required production file: app/error.tsx",
+            "Missing required production file: lib/utils.ts",
+            "Missing required production file: lib/seo.ts",
+            "Missing required production file: components/ui/button.tsx",
+            "Missing required production file: components/ui/card.tsx",
+            "Missing required production file: components/ui/input.tsx",
+            "app/layout.tsx: missing relative import \"./globals.css\" (resolved to app/globals.css).",
+            "components/ui/section-shell.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/ui/motion.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ContactSection.tsx: imports \"react\" but package.json is missing \"react\"."
+          ],
+          "brokenImportCount": 4
+        },
+        "regressions": [],
+        "passed": true
+      }
+    },
+    {
+      "promptId": "medical",
+      "label": "Medical",
+      "legacy": {
+        "durationMs": 239389,
+        "llmCalls": 6,
+        "fileCount": 8
+      },
+      "wave": {
+        "durationMs": 186997,
+        "llmCalls": 6,
+        "fileCount": 8
+      },
+      "speedupPercent": 22,
+      "quality": {
+        "promptId": "medical",
+        "fileCountMatch": true,
+        "filePathJaccard": 1,
+        "structureScore": 100,
+        "validationPassedMatch": true,
+        "projectValidationMatch": true,
+        "legacy": {
+          "fileCount": 8,
+          "filePaths": [
+            "app/layout.tsx",
+            "app/page.tsx",
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx",
+            "components/ui/motion.tsx",
+            "components/ui/section-shell.tsx"
+          ],
+          "sectionComponents": [
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx"
+          ],
+          "layoutFiles": [
+            "app/layout.tsx"
+          ],
+          "pageFiles": [
+            "app/page.tsx"
+          ],
+          "hasLayout": true,
+          "hasHomePage": true,
+          "hasGlobalsCss": false,
+          "seoMetaCount": 3,
+          "validationPassed": true,
+          "validationIssueCount": 0,
+          "validationIssues": [],
+          "projectValidationPassed": false,
+          "projectValidationIssues": [
+            "Missing required production file: .eslintrc.json",
+            "Missing required production file: .prettierrc",
+            "Missing required production file: tsconfig.json",
+            "Missing required production file: next.config.ts",
+            "Missing required production file: postcss.config.js",
+            "Missing required production file: tailwind.config.ts",
+            "Missing required production file: package.json",
+            "Missing required production file: README.md",
+            "Missing required production file: app/globals.css",
+            "Missing required production file: app/not-found.tsx",
+            "Missing required production file: app/loading.tsx",
+            "Missing required production file: app/error.tsx",
+            "Missing required production file: lib/utils.ts",
+            "Missing required production file: lib/seo.ts",
+            "Missing required production file: components/ui/button.tsx",
+            "Missing required production file: components/ui/card.tsx",
+            "Missing required production file: components/ui/input.tsx",
+            "app/layout.tsx: missing relative import \"./globals.css\" (resolved to app/globals.css).",
+            "components/ui/section-shell.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/ui/motion.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ServicesModern.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ContactSection.tsx: imports \"react\" but package.json is missing \"react\"."
+          ],
+          "brokenImportCount": 5
+        },
+        "wave": {
+          "fileCount": 8,
+          "filePaths": [
+            "app/layout.tsx",
+            "app/page.tsx",
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx",
+            "components/ui/motion.tsx",
+            "components/ui/section-shell.tsx"
+          ],
+          "sectionComponents": [
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx"
+          ],
+          "layoutFiles": [
+            "app/layout.tsx"
+          ],
+          "pageFiles": [
+            "app/page.tsx"
+          ],
+          "hasLayout": true,
+          "hasHomePage": true,
+          "hasGlobalsCss": false,
+          "seoMetaCount": 2,
+          "validationPassed": true,
+          "validationIssueCount": 0,
+          "validationIssues": [],
+          "projectValidationPassed": false,
+          "projectValidationIssues": [
+            "Missing required production file: .eslintrc.json",
+            "Missing required production file: .prettierrc",
+            "Missing required production file: tsconfig.json",
+            "Missing required production file: next.config.ts",
+            "Missing required production file: postcss.config.js",
+            "Missing required production file: tailwind.config.ts",
+            "Missing required production file: package.json",
+            "Missing required production file: README.md",
+            "Missing required production file: app/globals.css",
+            "Missing required production file: app/not-found.tsx",
+            "Missing required production file: app/loading.tsx",
+            "Missing required production file: app/error.tsx",
+            "Missing required production file: lib/utils.ts",
+            "Missing required production file: lib/seo.ts",
+            "Missing required production file: components/ui/button.tsx",
+            "Missing required production file: components/ui/card.tsx",
+            "Missing required production file: components/ui/input.tsx",
+            "app/layout.tsx: missing relative import \"./globals.css\" (resolved to app/globals.css).",
+            "components/ui/section-shell.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/ui/motion.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ContactSection.tsx: imports \"react\" but package.json is missing \"react\"."
+          ],
+          "brokenImportCount": 4
+        },
+        "regressions": [],
+        "passed": true
+      }
+    },
+    {
+      "promptId": "law-firm",
+      "label": "Law Firm",
+      "legacy": {
+        "durationMs": 167536,
+        "llmCalls": 6,
+        "fileCount": 8
+      },
+      "wave": {
+        "durationMs": 93000,
+        "llmCalls": 6,
+        "fileCount": 8
+      },
+      "speedupPercent": 44,
+      "quality": {
+        "promptId": "law-firm",
+        "fileCountMatch": true,
+        "filePathJaccard": 1,
+        "structureScore": 100,
+        "validationPassedMatch": true,
+        "projectValidationMatch": true,
+        "legacy": {
+          "fileCount": 8,
+          "filePaths": [
+            "app/layout.tsx",
+            "app/page.tsx",
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx",
+            "components/ui/motion.tsx",
+            "components/ui/section-shell.tsx"
+          ],
+          "sectionComponents": [
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx"
+          ],
+          "layoutFiles": [
+            "app/layout.tsx"
+          ],
+          "pageFiles": [
+            "app/page.tsx"
+          ],
+          "hasLayout": true,
+          "hasHomePage": true,
+          "hasGlobalsCss": false,
+          "seoMetaCount": 3,
+          "validationPassed": true,
+          "validationIssueCount": 0,
+          "validationIssues": [],
+          "projectValidationPassed": false,
+          "projectValidationIssues": [
+            "Missing required production file: .eslintrc.json",
+            "Missing required production file: .prettierrc",
+            "Missing required production file: tsconfig.json",
+            "Missing required production file: next.config.ts",
+            "Missing required production file: postcss.config.js",
+            "Missing required production file: tailwind.config.ts",
+            "Missing required production file: package.json",
+            "Missing required production file: README.md",
+            "Missing required production file: app/globals.css",
+            "Missing required production file: app/not-found.tsx",
+            "Missing required production file: app/loading.tsx",
+            "Missing required production file: app/error.tsx",
+            "Missing required production file: lib/utils.ts",
+            "Missing required production file: lib/seo.ts",
+            "Missing required production file: components/ui/button.tsx",
+            "Missing required production file: components/ui/card.tsx",
+            "Missing required production file: components/ui/input.tsx",
+            "app/layout.tsx: missing relative import \"./globals.css\" (resolved to app/globals.css).",
+            "components/ui/section-shell.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/ui/motion.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ContactSection.tsx: imports \"react\" but package.json is missing \"react\"."
+          ],
+          "brokenImportCount": 4
+        },
+        "wave": {
+          "fileCount": 8,
+          "filePaths": [
+            "app/layout.tsx",
+            "app/page.tsx",
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx",
+            "components/ui/motion.tsx",
+            "components/ui/section-shell.tsx"
+          ],
+          "sectionComponents": [
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx"
+          ],
+          "layoutFiles": [
+            "app/layout.tsx"
+          ],
+          "pageFiles": [
+            "app/page.tsx"
+          ],
+          "hasLayout": true,
+          "hasHomePage": true,
+          "hasGlobalsCss": false,
+          "seoMetaCount": 2,
+          "validationPassed": true,
+          "validationIssueCount": 0,
+          "validationIssues": [],
+          "projectValidationPassed": false,
+          "projectValidationIssues": [
+            "Missing required production file: .eslintrc.json",
+            "Missing required production file: .prettierrc",
+            "Missing required production file: tsconfig.json",
+            "Missing required production file: next.config.ts",
+            "Missing required production file: postcss.config.js",
+            "Missing required production file: tailwind.config.ts",
+            "Missing required production file: package.json",
+            "Missing required production file: README.md",
+            "Missing required production file: app/globals.css",
+            "Missing required production file: app/not-found.tsx",
+            "Missing required production file: app/loading.tsx",
+            "Missing required production file: app/error.tsx",
+            "Missing required production file: lib/utils.ts",
+            "Missing required production file: lib/seo.ts",
+            "Missing required production file: components/ui/button.tsx",
+            "Missing required production file: components/ui/card.tsx",
+            "Missing required production file: components/ui/input.tsx",
+            "app/layout.tsx: missing relative import \"./globals.css\" (resolved to app/globals.css).",
+            "components/ui/section-shell.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/ui/motion.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ContactSection.tsx: imports \"react\" but package.json is missing \"react\"."
+          ],
+          "brokenImportCount": 4
+        },
+        "regressions": [],
+        "passed": true
+      }
+    },
+    {
+      "promptId": "construction",
+      "label": "Construction",
+      "legacy": {
+        "durationMs": 195695,
+        "llmCalls": 6,
+        "fileCount": 8
+      },
+      "wave": {
+        "durationMs": 123748,
+        "llmCalls": 6,
+        "fileCount": 8
+      },
+      "speedupPercent": 37,
+      "quality": {
+        "promptId": "construction",
+        "fileCountMatch": true,
+        "filePathJaccard": 1,
+        "structureScore": 100,
+        "validationPassedMatch": true,
+        "projectValidationMatch": true,
+        "legacy": {
+          "fileCount": 8,
+          "filePaths": [
+            "app/layout.tsx",
+            "app/page.tsx",
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx",
+            "components/ui/motion.tsx",
+            "components/ui/section-shell.tsx"
+          ],
+          "sectionComponents": [
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx"
+          ],
+          "layoutFiles": [
+            "app/layout.tsx"
+          ],
+          "pageFiles": [
+            "app/page.tsx"
+          ],
+          "hasLayout": true,
+          "hasHomePage": true,
+          "hasGlobalsCss": false,
+          "seoMetaCount": 2,
+          "validationPassed": true,
+          "validationIssueCount": 0,
+          "validationIssues": [],
+          "projectValidationPassed": false,
+          "projectValidationIssues": [
+            "Missing required production file: .eslintrc.json",
+            "Missing required production file: .prettierrc",
+            "Missing required production file: tsconfig.json",
+            "Missing required production file: next.config.ts",
+            "Missing required production file: postcss.config.js",
+            "Missing required production file: tailwind.config.ts",
+            "Missing required production file: package.json",
+            "Missing required production file: README.md",
+            "Missing required production file: app/globals.css",
+            "Missing required production file: app/not-found.tsx",
+            "Missing required production file: app/loading.tsx",
+            "Missing required production file: app/error.tsx",
+            "Missing required production file: lib/utils.ts",
+            "Missing required production file: lib/seo.ts",
+            "Missing required production file: components/ui/button.tsx",
+            "Missing required production file: components/ui/card.tsx",
+            "Missing required production file: components/ui/input.tsx",
+            "app/layout.tsx: missing relative import \"./globals.css\" (resolved to app/globals.css).",
+            "app/layout.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/ui/section-shell.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/ui/motion.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ServicesModern.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ContactSection.tsx: imports \"react\" but package.json is missing \"react\"."
+          ],
+          "brokenImportCount": 6
+        },
+        "wave": {
+          "fileCount": 8,
+          "filePaths": [
+            "app/layout.tsx",
+            "app/page.tsx",
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx",
+            "components/ui/motion.tsx",
+            "components/ui/section-shell.tsx"
+          ],
+          "sectionComponents": [
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx"
+          ],
+          "layoutFiles": [
+            "app/layout.tsx"
+          ],
+          "pageFiles": [
+            "app/page.tsx"
+          ],
+          "hasLayout": true,
+          "hasHomePage": true,
+          "hasGlobalsCss": false,
+          "seoMetaCount": 2,
+          "validationPassed": true,
+          "validationIssueCount": 0,
+          "validationIssues": [],
+          "projectValidationPassed": false,
+          "projectValidationIssues": [
+            "Missing required production file: .eslintrc.json",
+            "Missing required production file: .prettierrc",
+            "Missing required production file: tsconfig.json",
+            "Missing required production file: next.config.ts",
+            "Missing required production file: postcss.config.js",
+            "Missing required production file: tailwind.config.ts",
+            "Missing required production file: package.json",
+            "Missing required production file: README.md",
+            "Missing required production file: app/globals.css",
+            "Missing required production file: app/not-found.tsx",
+            "Missing required production file: app/loading.tsx",
+            "Missing required production file: app/error.tsx",
+            "Missing required production file: lib/utils.ts",
+            "Missing required production file: lib/seo.ts",
+            "Missing required production file: components/ui/button.tsx",
+            "Missing required production file: components/ui/card.tsx",
+            "Missing required production file: components/ui/input.tsx",
+            "app/layout.tsx: missing relative import \"./globals.css\" (resolved to app/globals.css).",
+            "components/ui/section-shell.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/ui/motion.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ContactSection.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ServicesModern.tsx: imports \"react\" but package.json is missing \"react\"."
+          ],
+          "brokenImportCount": 5
+        },
+        "regressions": [],
+        "passed": true
+      }
+    },
+    {
+      "promptId": "ecommerce",
+      "label": "Ecommerce",
+      "legacy": {
+        "durationMs": 305215,
+        "llmCalls": 6,
+        "fileCount": 8
+      },
+      "wave": {
+        "durationMs": 109068,
+        "llmCalls": 6,
+        "fileCount": 8
+      },
+      "speedupPercent": 64,
+      "quality": {
+        "promptId": "ecommerce",
+        "fileCountMatch": true,
+        "filePathJaccard": 1,
+        "structureScore": 100,
+        "validationPassedMatch": true,
+        "projectValidationMatch": true,
+        "legacy": {
+          "fileCount": 8,
+          "filePaths": [
+            "app/layout.tsx",
+            "app/page.tsx",
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx",
+            "components/ui/motion.tsx",
+            "components/ui/section-shell.tsx"
+          ],
+          "sectionComponents": [
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx"
+          ],
+          "layoutFiles": [
+            "app/layout.tsx"
+          ],
+          "pageFiles": [
+            "app/page.tsx"
+          ],
+          "hasLayout": true,
+          "hasHomePage": true,
+          "hasGlobalsCss": false,
+          "seoMetaCount": 2,
+          "validationPassed": true,
+          "validationIssueCount": 0,
+          "validationIssues": [],
+          "projectValidationPassed": false,
+          "projectValidationIssues": [
+            "Missing required production file: .eslintrc.json",
+            "Missing required production file: .prettierrc",
+            "Missing required production file: tsconfig.json",
+            "Missing required production file: next.config.ts",
+            "Missing required production file: postcss.config.js",
+            "Missing required production file: tailwind.config.ts",
+            "Missing required production file: package.json",
+            "Missing required production file: README.md",
+            "Missing required production file: app/globals.css",
+            "Missing required production file: app/not-found.tsx",
+            "Missing required production file: app/loading.tsx",
+            "Missing required production file: app/error.tsx",
+            "Missing required production file: lib/utils.ts",
+            "Missing required production file: lib/seo.ts",
+            "Missing required production file: components/ui/button.tsx",
+            "Missing required production file: components/ui/card.tsx",
+            "Missing required production file: components/ui/input.tsx",
+            "app/layout.tsx: missing relative import \"./globals.css\" (resolved to app/globals.css).",
+            "components/ui/section-shell.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/ui/motion.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ServicesModern.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ContactSection.tsx: imports \"react\" but package.json is missing \"react\"."
+          ],
+          "brokenImportCount": 5
+        },
+        "wave": {
+          "fileCount": 8,
+          "filePaths": [
+            "app/layout.tsx",
+            "app/page.tsx",
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx",
+            "components/ui/motion.tsx",
+            "components/ui/section-shell.tsx"
+          ],
+          "sectionComponents": [
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx"
+          ],
+          "layoutFiles": [
+            "app/layout.tsx"
+          ],
+          "pageFiles": [
+            "app/page.tsx"
+          ],
+          "hasLayout": true,
+          "hasHomePage": true,
+          "hasGlobalsCss": false,
+          "seoMetaCount": 2,
+          "validationPassed": true,
+          "validationIssueCount": 0,
+          "validationIssues": [],
+          "projectValidationPassed": false,
+          "projectValidationIssues": [
+            "Missing required production file: .eslintrc.json",
+            "Missing required production file: .prettierrc",
+            "Missing required production file: tsconfig.json",
+            "Missing required production file: next.config.ts",
+            "Missing required production file: postcss.config.js",
+            "Missing required production file: tailwind.config.ts",
+            "Missing required production file: package.json",
+            "Missing required production file: README.md",
+            "Missing required production file: app/globals.css",
+            "Missing required production file: app/not-found.tsx",
+            "Missing required production file: app/loading.tsx",
+            "Missing required production file: app/error.tsx",
+            "Missing required production file: lib/utils.ts",
+            "Missing required production file: lib/seo.ts",
+            "Missing required production file: components/ui/button.tsx",
+            "Missing required production file: components/ui/card.tsx",
+            "Missing required production file: components/ui/input.tsx",
+            "app/layout.tsx: missing relative import \"./globals.css\" (resolved to app/globals.css).",
+            "components/ui/section-shell.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/ui/motion.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ContactSection.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ServicesModern.tsx: imports \"react\" but package.json is missing \"react\"."
+          ],
+          "brokenImportCount": 5
+        },
+        "regressions": [],
+        "passed": true
+      }
+    },
+    {
+      "promptId": "portfolio",
+      "label": "Portfolio",
+      "legacy": {
+        "durationMs": 223060,
+        "llmCalls": 6,
+        "fileCount": 8
+      },
+      "wave": {
+        "durationMs": 192041,
+        "llmCalls": 6,
+        "fileCount": 8
+      },
+      "speedupPercent": 14,
+      "quality": {
+        "promptId": "portfolio",
+        "fileCountMatch": true,
+        "filePathJaccard": 1,
+        "structureScore": 100,
+        "validationPassedMatch": true,
+        "projectValidationMatch": true,
+        "legacy": {
+          "fileCount": 8,
+          "filePaths": [
+            "app/layout.tsx",
+            "app/page.tsx",
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx",
+            "components/ui/motion.tsx",
+            "components/ui/section-shell.tsx"
+          ],
+          "sectionComponents": [
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx"
+          ],
+          "layoutFiles": [
+            "app/layout.tsx"
+          ],
+          "pageFiles": [
+            "app/page.tsx"
+          ],
+          "hasLayout": true,
+          "hasHomePage": true,
+          "hasGlobalsCss": false,
+          "seoMetaCount": 3,
+          "validationPassed": true,
+          "validationIssueCount": 0,
+          "validationIssues": [],
+          "projectValidationPassed": false,
+          "projectValidationIssues": [
+            "Missing required production file: .eslintrc.json",
+            "Missing required production file: .prettierrc",
+            "Missing required production file: tsconfig.json",
+            "Missing required production file: next.config.ts",
+            "Missing required production file: postcss.config.js",
+            "Missing required production file: tailwind.config.ts",
+            "Missing required production file: package.json",
+            "Missing required production file: README.md",
+            "Missing required production file: app/globals.css",
+            "Missing required production file: app/not-found.tsx",
+            "Missing required production file: app/loading.tsx",
+            "Missing required production file: app/error.tsx",
+            "Missing required production file: lib/utils.ts",
+            "Missing required production file: lib/seo.ts",
+            "Missing required production file: components/ui/button.tsx",
+            "Missing required production file: components/ui/card.tsx",
+            "Missing required production file: components/ui/input.tsx",
+            "app/layout.tsx: missing relative import \"./globals.css\" (resolved to app/globals.css).",
+            "components/ui/section-shell.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/ui/motion.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ContactSection.tsx: imports \"react\" but package.json is missing \"react\"."
+          ],
+          "brokenImportCount": 4
+        },
+        "wave": {
+          "fileCount": 8,
+          "filePaths": [
+            "app/layout.tsx",
+            "app/page.tsx",
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx",
+            "components/ui/motion.tsx",
+            "components/ui/section-shell.tsx"
+          ],
+          "sectionComponents": [
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx"
+          ],
+          "layoutFiles": [
+            "app/layout.tsx"
+          ],
+          "pageFiles": [
+            "app/page.tsx"
+          ],
+          "hasLayout": true,
+          "hasHomePage": true,
+          "hasGlobalsCss": false,
+          "seoMetaCount": 3,
+          "validationPassed": true,
+          "validationIssueCount": 0,
+          "validationIssues": [],
+          "projectValidationPassed": false,
+          "projectValidationIssues": [
+            "Missing required production file: .eslintrc.json",
+            "Missing required production file: .prettierrc",
+            "Missing required production file: tsconfig.json",
+            "Missing required production file: next.config.ts",
+            "Missing required production file: postcss.config.js",
+            "Missing required production file: tailwind.config.ts",
+            "Missing required production file: package.json",
+            "Missing required production file: README.md",
+            "Missing required production file: app/globals.css",
+            "Missing required production file: app/not-found.tsx",
+            "Missing required production file: app/loading.tsx",
+            "Missing required production file: app/error.tsx",
+            "Missing required production file: lib/utils.ts",
+            "Missing required production file: lib/seo.ts",
+            "Missing required production file: components/ui/button.tsx",
+            "Missing required production file: components/ui/card.tsx",
+            "Missing required production file: components/ui/input.tsx",
+            "app/layout.tsx: missing relative import \"./globals.css\" (resolved to app/globals.css).",
+            "components/ui/section-shell.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/ui/motion.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ContactSection.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ServicesModern.tsx: imports \"react\" but package.json is missing \"react\"."
+          ],
+          "brokenImportCount": 5
+        },
+        "regressions": [
+          "Wave mode has more import issues (5 vs 4)"
+        ],
+        "passed": false
+      }
+    },
+    {
+      "promptId": "education",
+      "label": "Education",
+      "legacy": {
+        "durationMs": 149873,
+        "llmCalls": 6,
+        "fileCount": 8
+      },
+      "wave": {
+        "durationMs": 70986,
+        "llmCalls": 6,
+        "fileCount": 8
+      },
+      "speedupPercent": 53,
+      "quality": {
+        "promptId": "education",
+        "fileCountMatch": true,
+        "filePathJaccard": 1,
+        "structureScore": 100,
+        "validationPassedMatch": true,
+        "projectValidationMatch": true,
+        "legacy": {
+          "fileCount": 8,
+          "filePaths": [
+            "app/layout.tsx",
+            "app/page.tsx",
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx",
+            "components/ui/motion.tsx",
+            "components/ui/section-shell.tsx"
+          ],
+          "sectionComponents": [
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx"
+          ],
+          "layoutFiles": [
+            "app/layout.tsx"
+          ],
+          "pageFiles": [
+            "app/page.tsx"
+          ],
+          "hasLayout": true,
+          "hasHomePage": true,
+          "hasGlobalsCss": false,
+          "seoMetaCount": 2,
+          "validationPassed": true,
+          "validationIssueCount": 0,
+          "validationIssues": [],
+          "projectValidationPassed": false,
+          "projectValidationIssues": [
+            "Missing required production file: .eslintrc.json",
+            "Missing required production file: .prettierrc",
+            "Missing required production file: tsconfig.json",
+            "Missing required production file: next.config.ts",
+            "Missing required production file: postcss.config.js",
+            "Missing required production file: tailwind.config.ts",
+            "Missing required production file: package.json",
+            "Missing required production file: README.md",
+            "Missing required production file: app/globals.css",
+            "Missing required production file: app/not-found.tsx",
+            "Missing required production file: app/loading.tsx",
+            "Missing required production file: app/error.tsx",
+            "Missing required production file: lib/utils.ts",
+            "Missing required production file: lib/seo.ts",
+            "Missing required production file: components/ui/button.tsx",
+            "Missing required production file: components/ui/card.tsx",
+            "Missing required production file: components/ui/input.tsx",
+            "app/layout.tsx: missing relative import \"./globals.css\" (resolved to app/globals.css).",
+            "components/ui/section-shell.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/ui/motion.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ContactSection.tsx: imports \"react\" but package.json is missing \"react\"."
+          ],
+          "brokenImportCount": 4
+        },
+        "wave": {
+          "fileCount": 8,
+          "filePaths": [
+            "app/layout.tsx",
+            "app/page.tsx",
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx",
+            "components/ui/motion.tsx",
+            "components/ui/section-shell.tsx"
+          ],
+          "sectionComponents": [
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx"
+          ],
+          "layoutFiles": [
+            "app/layout.tsx"
+          ],
+          "pageFiles": [
+            "app/page.tsx"
+          ],
+          "hasLayout": true,
+          "hasHomePage": true,
+          "hasGlobalsCss": false,
+          "seoMetaCount": 2,
+          "validationPassed": true,
+          "validationIssueCount": 0,
+          "validationIssues": [],
+          "projectValidationPassed": false,
+          "projectValidationIssues": [
+            "Missing required production file: .eslintrc.json",
+            "Missing required production file: .prettierrc",
+            "Missing required production file: tsconfig.json",
+            "Missing required production file: next.config.ts",
+            "Missing required production file: postcss.config.js",
+            "Missing required production file: tailwind.config.ts",
+            "Missing required production file: package.json",
+            "Missing required production file: README.md",
+            "Missing required production file: app/globals.css",
+            "Missing required production file: app/not-found.tsx",
+            "Missing required production file: app/loading.tsx",
+            "Missing required production file: app/error.tsx",
+            "Missing required production file: lib/utils.ts",
+            "Missing required production file: lib/seo.ts",
+            "Missing required production file: components/ui/button.tsx",
+            "Missing required production file: components/ui/card.tsx",
+            "Missing required production file: components/ui/input.tsx",
+            "app/layout.tsx: missing relative import \"./globals.css\" (resolved to app/globals.css).",
+            "components/ui/section-shell.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/ui/motion.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ContactSection.tsx: imports \"react\" but package.json is missing \"react\"."
+          ],
+          "brokenImportCount": 4
+        },
+        "regressions": [],
+        "passed": true
+      }
+    },
+    {
+      "promptId": "real-estate",
+      "label": "Real Estate",
+      "legacy": {
+        "durationMs": 340168,
+        "llmCalls": 6,
+        "fileCount": 8
+      },
+      "wave": {
+        "durationMs": 88840,
+        "llmCalls": 6,
+        "fileCount": 8
+      },
+      "speedupPercent": 74,
+      "quality": {
+        "promptId": "real-estate",
+        "fileCountMatch": true,
+        "filePathJaccard": 1,
+        "structureScore": 100,
+        "validationPassedMatch": true,
+        "projectValidationMatch": true,
+        "legacy": {
+          "fileCount": 8,
+          "filePaths": [
+            "app/layout.tsx",
+            "app/page.tsx",
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx",
+            "components/ui/motion.tsx",
+            "components/ui/section-shell.tsx"
+          ],
+          "sectionComponents": [
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx"
+          ],
+          "layoutFiles": [
+            "app/layout.tsx"
+          ],
+          "pageFiles": [
+            "app/page.tsx"
+          ],
+          "hasLayout": true,
+          "hasHomePage": true,
+          "hasGlobalsCss": false,
+          "seoMetaCount": 2,
+          "validationPassed": true,
+          "validationIssueCount": 0,
+          "validationIssues": [],
+          "projectValidationPassed": false,
+          "projectValidationIssues": [
+            "Missing required production file: .eslintrc.json",
+            "Missing required production file: .prettierrc",
+            "Missing required production file: tsconfig.json",
+            "Missing required production file: next.config.ts",
+            "Missing required production file: postcss.config.js",
+            "Missing required production file: tailwind.config.ts",
+            "Missing required production file: package.json",
+            "Missing required production file: README.md",
+            "Missing required production file: app/globals.css",
+            "Missing required production file: app/not-found.tsx",
+            "Missing required production file: app/loading.tsx",
+            "Missing required production file: app/error.tsx",
+            "Missing required production file: lib/utils.ts",
+            "Missing required production file: lib/seo.ts",
+            "Missing required production file: components/ui/button.tsx",
+            "Missing required production file: components/ui/card.tsx",
+            "Missing required production file: components/ui/input.tsx",
+            "app/layout.tsx: missing relative import \"./globals.css\" (resolved to app/globals.css).",
+            "components/ui/section-shell.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/ui/motion.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ContactSection.tsx: imports \"react\" but package.json is missing \"react\"."
+          ],
+          "brokenImportCount": 4
+        },
+        "wave": {
+          "fileCount": 8,
+          "filePaths": [
+            "app/layout.tsx",
+            "app/page.tsx",
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx",
+            "components/ui/motion.tsx",
+            "components/ui/section-shell.tsx"
+          ],
+          "sectionComponents": [
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx"
+          ],
+          "layoutFiles": [
+            "app/layout.tsx"
+          ],
+          "pageFiles": [
+            "app/page.tsx"
+          ],
+          "hasLayout": true,
+          "hasHomePage": true,
+          "hasGlobalsCss": false,
+          "seoMetaCount": 2,
+          "validationPassed": true,
+          "validationIssueCount": 0,
+          "validationIssues": [],
+          "projectValidationPassed": false,
+          "projectValidationIssues": [
+            "Missing required production file: .eslintrc.json",
+            "Missing required production file: .prettierrc",
+            "Missing required production file: tsconfig.json",
+            "Missing required production file: next.config.ts",
+            "Missing required production file: postcss.config.js",
+            "Missing required production file: tailwind.config.ts",
+            "Missing required production file: package.json",
+            "Missing required production file: README.md",
+            "Missing required production file: app/globals.css",
+            "Missing required production file: app/not-found.tsx",
+            "Missing required production file: app/loading.tsx",
+            "Missing required production file: app/error.tsx",
+            "Missing required production file: lib/utils.ts",
+            "Missing required production file: lib/seo.ts",
+            "Missing required production file: components/ui/button.tsx",
+            "Missing required production file: components/ui/card.tsx",
+            "Missing required production file: components/ui/input.tsx",
+            "app/layout.tsx: missing relative import \"./globals.css\" (resolved to app/globals.css).",
+            "components/ui/section-shell.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/ui/motion.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ContactSection.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ContactSection.tsx: imports \"react\" but package.json is missing \"react\"."
+          ],
+          "brokenImportCount": 5
+        },
+        "regressions": [
+          "Wave mode has more import issues (5 vs 4)"
+        ],
+        "passed": false
+      }
+    },
+    {
+      "promptId": "hotel",
+      "label": "Hotel",
+      "legacy": {
+        "durationMs": 188856,
+        "llmCalls": 6,
+        "fileCount": 8
+      },
+      "wave": {
+        "durationMs": 131333,
+        "llmCalls": 6,
+        "fileCount": 8
+      },
+      "speedupPercent": 30,
+      "quality": {
+        "promptId": "hotel",
+        "fileCountMatch": true,
+        "filePathJaccard": 1,
+        "structureScore": 100,
+        "validationPassedMatch": true,
+        "projectValidationMatch": true,
+        "legacy": {
+          "fileCount": 8,
+          "filePaths": [
+            "app/layout.tsx",
+            "app/page.tsx",
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx",
+            "components/ui/motion.tsx",
+            "components/ui/section-shell.tsx"
+          ],
+          "sectionComponents": [
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx"
+          ],
+          "layoutFiles": [
+            "app/layout.tsx"
+          ],
+          "pageFiles": [
+            "app/page.tsx"
+          ],
+          "hasLayout": true,
+          "hasHomePage": true,
+          "hasGlobalsCss": false,
+          "seoMetaCount": 4,
+          "validationPassed": true,
+          "validationIssueCount": 0,
+          "validationIssues": [],
+          "projectValidationPassed": false,
+          "projectValidationIssues": [
+            "Missing required production file: .eslintrc.json",
+            "Missing required production file: .prettierrc",
+            "Missing required production file: tsconfig.json",
+            "Missing required production file: next.config.ts",
+            "Missing required production file: postcss.config.js",
+            "Missing required production file: tailwind.config.ts",
+            "Missing required production file: package.json",
+            "Missing required production file: README.md",
+            "Missing required production file: app/globals.css",
+            "Missing required production file: app/not-found.tsx",
+            "Missing required production file: app/loading.tsx",
+            "Missing required production file: app/error.tsx",
+            "Missing required production file: lib/utils.ts",
+            "Missing required production file: lib/seo.ts",
+            "Missing required production file: components/ui/button.tsx",
+            "Missing required production file: components/ui/card.tsx",
+            "Missing required production file: components/ui/input.tsx",
+            "app/layout.tsx: missing relative import \"./globals.css\" (resolved to app/globals.css).",
+            "components/ui/section-shell.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/ui/motion.tsx: imports \"react\" but package.json is missing \"react\"."
+          ],
+          "brokenImportCount": 3
+        },
+        "wave": {
+          "fileCount": 8,
+          "filePaths": [
+            "app/layout.tsx",
+            "app/page.tsx",
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx",
+            "components/ui/motion.tsx",
+            "components/ui/section-shell.tsx"
+          ],
+          "sectionComponents": [
+            "components/sections/ContactSection.tsx",
+            "components/sections/HeroLuxury.tsx",
+            "components/sections/ServicesModern.tsx",
+            "components/sections/TestimonialsModern.tsx"
+          ],
+          "layoutFiles": [
+            "app/layout.tsx"
+          ],
+          "pageFiles": [
+            "app/page.tsx"
+          ],
+          "hasLayout": true,
+          "hasHomePage": true,
+          "hasGlobalsCss": false,
+          "seoMetaCount": 3,
+          "validationPassed": true,
+          "validationIssueCount": 0,
+          "validationIssues": [],
+          "projectValidationPassed": false,
+          "projectValidationIssues": [
+            "Missing required production file: .eslintrc.json",
+            "Missing required production file: .prettierrc",
+            "Missing required production file: tsconfig.json",
+            "Missing required production file: next.config.ts",
+            "Missing required production file: postcss.config.js",
+            "Missing required production file: tailwind.config.ts",
+            "Missing required production file: package.json",
+            "Missing required production file: README.md",
+            "Missing required production file: app/globals.css",
+            "Missing required production file: app/not-found.tsx",
+            "Missing required production file: app/loading.tsx",
+            "Missing required production file: app/error.tsx",
+            "Missing required production file: lib/utils.ts",
+            "Missing required production file: lib/seo.ts",
+            "Missing required production file: components/ui/button.tsx",
+            "Missing required production file: components/ui/card.tsx",
+            "Missing required production file: components/ui/input.tsx",
+            "app/layout.tsx: missing relative import \"./globals.css\" (resolved to app/globals.css).",
+            "components/ui/section-shell.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/ui/motion.tsx: imports \"react\" but package.json is missing \"react\".",
+            "components/sections/ContactSection.tsx: imports \"react\" but package.json is missing \"react\"."
+          ],
+          "brokenImportCount": 4
+        },
+        "regressions": [
+          "Wave mode has more import issues (4 vs 3)"
+        ],
+        "passed": false
+      }
+    }
+  ]
+}

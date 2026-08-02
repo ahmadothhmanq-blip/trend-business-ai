@@ -1,0 +1,41 @@
+{
+  "title": "TBGE Performance Report",
+  "timestamp": "2026-08-02T15:32:14.773Z",
+  "comparisons": [
+    {
+      "industryId": "gaming",
+      "legacyWallMs": 538783.37,
+      "tbgeWallMs": 75738.89,
+      "speedupRatio": 7.11,
+      "legacyLlmCalls": 0,
+      "tbgeLlmCalls": 1,
+      "plannerTimeMs": 75733.3,
+      "assemblyTimeMs": 0.7,
+      "composerTimeMs": 0.51
+    }
+  ],
+  "aggregates": {
+    "legacy": {
+      "count": 1,
+      "successRate": 0,
+      "buildRate": 0,
+      "avgWallMs": 538783.37,
+      "avgLlmCalls": 0,
+      "avgCostUsd": 0,
+      "avgFiles": 0,
+      "avgVisual": 0
+    },
+    "tbge": {
+      "count": 1,
+      "successRate": 100,
+      "buildRate": 100,
+      "avgWallMs": 75738.89,
+      "avgLlmCalls": 1,
+      "avgCostUsd": 0.002463,
+      "avgFiles": 10,
+      "avgPlannerMs": 75733.3,
+      "avgAssemblyMs": 0.7,
+      "avgComposerMs": 0.51
+    }
+  }
+}

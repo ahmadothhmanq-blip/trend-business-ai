@@ -9,23 +9,15 @@ import {
 import { resolveStructureTemplateForIndustry as resolveByIndustry } from "@/lib/website/builder/industry-structure-routing";
 
 export type { WebsiteStructureTemplateChoice } from "@/lib/website/builder/template-catalog";
-export type WebsiteStructureTemplateId = string;
+import type {
+  WebsiteStructureTemplate,
+  WebsiteStructureTemplateId,
+} from "@/lib/website/contracts/structure";
 
-export type WebsiteStructureTemplate = {
-  id: WebsiteStructureTemplateId;
-  label: string;
-  description: string;
-  industry: string;
-  layoutType: string;
-  heroType: string;
-  navigationType: string;
-  footerType: string;
-  sections: string[];
-  /** Template Intelligence id retained for legacy generation compatibility. */
-  templateIntelligenceId: string;
-  marketplaceTemplateId: string;
-  premiumTemplateId: string;
-};
+export type {
+  WebsiteStructureTemplate,
+  WebsiteStructureTemplateId,
+} from "@/lib/website/contracts/structure";
 
 export { WEBSITE_STRUCTURE_TEMPLATES };
 

@@ -20,6 +20,7 @@ import {
 
 const FEATURED_INSTALLED_RANKS: Record<string, number> = {
   "modern-business": 1,
+  "ai-startup-signal": 2,
 };
 
 /**

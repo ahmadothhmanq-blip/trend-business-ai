@@ -7,6 +7,7 @@ import { configurePremiumTemplate } from "@/lib/ai-core/premium-templates/config
 import { selectPremiumTemplate } from "@/lib/ai-core/premium-templates/select";
 import {
   getTemplateIntelligence,
+  listTemplateIntelligence,
   selectTemplateIntelligence,
 } from "@/lib/ai-core/template-intelligence";
 import {
@@ -14,6 +15,8 @@ import {
 } from "@/lib/website/builder/structure-templates";
 import {
   getIndustryKnowledge,
+  isEditorialLayoutIndustry,
+  isEditorialLayoutStructure,
   normalizeRoutingIndustryId,
   resolveIndustryLayoutFamily,
   resolveStructureTemplateIdForIndustry,
@@ -142,7 +145,7 @@ export async function routeWebsiteGeneration(
 
   const layoutTiId =
     explicitTemplateId || structureSeed.templateIntelligenceId;
-  const layoutTemplate =
+  let layoutTemplate =
     getTemplateIntelligence(layoutTiId) ||
     selectTemplateIntelligence({
       prompt,
@@ -154,6 +157,30 @@ export async function routeWebsiteGeneration(
       explicitTemplateId: layoutTiId,
     }).template;
 
+  const editorialLayoutBlocked = (template: typeof layoutTemplate) =>
+    !isEditorialLayoutIndustry(industryId) &&
+    isEditorialLayoutStructure(template.layoutStructure);
+
+  if (editorialLayoutBlocked(layoutTemplate)) {
+    const structureFallback = getTemplateIntelligence(
+      structureSeed.templateIntelligenceId,
+    );
+    const industryFallback = listTemplateIntelligence({ industry: industryId }).find(
+      (tpl) => tpl.industry === industryId && !editorialLayoutBlocked(tpl),
+    );
+    const fallback =
+      (structureFallback && !editorialLayoutBlocked(structureFallback)
+        ? structureFallback
+        : null) ?? industryFallback;
+
+    if (fallback) {
+      layoutTemplate = fallback;
+      reasoningChain.push(
+        `Blocked editorial layoutStructure for ${industryId} — using TI ${fallback.id} (${fallback.layoutStructure})`,
+      );
+    }
+  }
+
   reasoningChain.push(`Layout TI: ${layoutTemplate.id} (${layoutTemplate.layoutStructure})`);
 
   const layoutArch =
@@ -161,15 +188,6 @@ export async function routeWebsiteGeneration(
     getThemePageArchitecture(visualThemeEntry.templateIntelligenceId);
   const layoutFamily = resolveIndustryLayoutFamily(industryId).value;
   const pageTopology = layoutArch?.pageTopology ?? "classic-stack";
-
-  if (
-    layoutTemplate.layoutStructure === "editorial-hero" &&
-    layoutFamily !== "editorial-magazine"
-  ) {
-    reasoningChain.push(
-      `Blocked editorial layoutStructure for ${industryId} — using structure TI ${structureSeed.templateIntelligenceId}`,
-    );
-  }
 
   params.onProgress?.(
     `[template-router] ${industryId} · structure=${structureSeed.id} · layout=${layoutTemplate.id} · theme=${visualThemePresetId}`,

@@ -1,0 +1,234 @@
+{
+  "source": "benchmark:scripts/benchmark-results/benchmark-professional-1785518656616.json",
+  "profile": "professional",
+  "prompt": "Fine dining restaurant in Dubai with reservations, menu highlights, chef story, and private dining events. Premium luxury aesthetic.",
+  "wallClockMs": 1105126,
+  "fileCount": 48,
+  "llmRequestCount": 26,
+  "llmByStage": {
+    "file-generation": {
+      "count": 18,
+      "durationMs": 820602,
+      "promptChars": 482504,
+      "totalTokens": 252478
+    },
+    "dynamic-plan": {
+      "count": 1,
+      "durationMs": 106088,
+      "promptChars": 9709,
+      "totalTokens": 15613
+    },
+    "generateJson": {
+      "count": 4,
+      "durationMs": 91050,
+      "promptChars": 64051,
+      "totalTokens": 24432
+    },
+    "strategy": {
+      "count": 1,
+      "durationMs": 48807,
+      "promptChars": 6927,
+      "totalTokens": 8150
+    },
+    "business-idea": {
+      "count": 1,
+      "durationMs": 23048,
+      "promptChars": 4285,
+      "totalTokens": 4134
+    },
+    "design-system": {
+      "count": 1,
+      "durationMs": 15332,
+      "promptChars": 16285,
+      "totalTokens": 5989
+    }
+  },
+  "stages": [
+    {
+      "id": "request-received",
+      "label": "Request received (auth, validation, session)",
+      "durationMs": 0,
+      "source": "not measured (generation-only run)",
+      "startMs": 0,
+      "endMs": 0,
+      "sharePercent": 0
+    },
+    {
+      "id": "pre-orchestration",
+      "label": "PRE / template routing / master plan lock",
+      "durationMs": 8478,
+      "source": "layer-runner progress",
+      "meta": {
+        "templateExecutions": 3,
+        "masterPlannerExecutions": 6
+      },
+      "startMs": 0,
+      "endMs": 8478,
+      "sharePercent": 0.8
+    },
+    {
+      "id": "business-analysis",
+      "label": "Business analysis",
+      "durationMs": 23049,
+      "source": "layer-runner idea + business-idea LLM",
+      "meta": {
+        "llmCalls": 1
+      },
+      "startMs": 8478,
+      "endMs": 31527,
+      "sharePercent": 2.1
+    },
+    {
+      "id": "strategy-generation",
+      "label": "Strategy generation",
+      "durationMs": 48812,
+      "source": "layer-runner strategy",
+      "meta": {
+        "count": 1,
+        "durationMs": 48807,
+        "promptChars": 6927,
+        "totalTokens": 8150
+      },
+      "startMs": 31527,
+      "endMs": 80339,
+      "sharePercent": 4.4
+    },
+    {
+      "id": "brand-generation",
+      "label": "Brand generation (premium design / brand kit)",
+      "durationMs": 19090,
+      "source": "design layer minus design-system LLM",
+      "startMs": 80339,
+      "endMs": 99429,
+      "sharePercent": 1.7
+    },
+    {
+      "id": "design-system-generation",
+      "label": "Design system generation",
+      "durationMs": 15332,
+      "source": "design-system LLM",
+      "meta": {
+        "count": 1,
+        "durationMs": 15332,
+        "promptChars": 16285,
+        "totalTokens": 5989
+      },
+      "startMs": 99429,
+      "endMs": 114761,
+      "sharePercent": 1.4
+    },
+    {
+      "id": "assets-generation",
+      "label": "Assets generation",
+      "durationMs": 22746,
+      "source": "layer-runner assets",
+      "startMs": 114761,
+      "endMs": 137507,
+      "sharePercent": 2.1
+    },
+    {
+      "id": "page-planning",
+      "label": "Page planning (blueprint + dynamic plan)",
+      "durationMs": 179515,
+      "source": "planWebsite LLM stages inside generation",
+      "meta": {
+        "dynamicPlan": {
+          "count": 1,
+          "durationMs": 106088,
+          "promptChars": 9709,
+          "totalTokens": 15613
+        },
+        "generateJson": {
+          "count": 4,
+          "durationMs": 91050,
+          "promptChars": 64051,
+          "totalTokens": 24432
+        }
+      },
+      "startMs": 137507,
+      "endMs": 317022,
+      "sharePercent": 16.2
+    },
+    {
+      "id": "page-generation",
+      "label": "Page generation (per-file LLM)",
+      "durationMs": 747243,
+      "source": "file-generation LLM",
+      "meta": {
+        "count": 18,
+        "durationMs": 820602,
+        "promptChars": 482504,
+        "totalTokens": 252478
+      },
+      "startMs": 317022,
+      "endMs": 1064265,
+      "sharePercent": 67.6
+    },
+    {
+      "id": "content-generation",
+      "label": "Content generation (scaffold, validation, repair)",
+      "durationMs": 0,
+      "source": "generation layer non-LLM + repair loops",
+      "startMs": 1064265,
+      "endMs": 1064265,
+      "sharePercent": 0
+    },
+    {
+      "id": "seo-generation",
+      "label": "SEO generation",
+      "durationMs": 21,
+      "source": "layer-runner seo + quality + performance",
+      "startMs": 1064265,
+      "endMs": 1064286,
+      "sharePercent": 0
+    },
+    {
+      "id": "zip-generation",
+      "label": "ZIP generation",
+      "durationMs": 0,
+      "source": "not executed during Generate (on-demand export route)",
+      "startMs": 1064286,
+      "endMs": 1064286,
+      "sharePercent": 0
+    },
+    {
+      "id": "finalize",
+      "label": "Finalize (design platform, packaging)",
+      "durationMs": 40839,
+      "source": "layer-runner finalize",
+      "startMs": 1064286,
+      "endMs": 1105125,
+      "sharePercent": 3.7
+    },
+    {
+      "id": "database-save",
+      "label": "Database save (persist generation)",
+      "durationMs": 0,
+      "source": "not measured (generation-only run)",
+      "startMs": 1105125,
+      "endMs": 1105125,
+      "sharePercent": 0
+    },
+    {
+      "id": "api-response",
+      "label": "API response (SSE complete)",
+      "durationMs": 0,
+      "source": "not measured (generation-only run)",
+      "startMs": 1105125,
+      "endMs": 1105125,
+      "sharePercent": 0
+    }
+  ],
+  "anomalies": [
+    "Duplicate orchestration bookkeeping: `template` logged 3× (profiler emits per sub-step, not separate LLM runs).",
+    "Duplicate orchestration bookkeeping: `master-planner` logged 6× (profiler emits per sub-step, not separate LLM runs).",
+    "Duplicate orchestration bookkeeping: `template-intelligence` logged 2× (profiler emits per sub-step, not separate LLM runs).",
+    "Sequential per-file LLM: 18 file-generation calls (820602ms total, ~45589ms avg) — each waits for the previous to finish.",
+    "Repeated AI calls: file-generation stage invoked 18× with 482,504 cumulative prompt chars (re-prompts prior file context each call).",
+    "Repeated planning LLM: 5 planning JSON calls before file loop (dynamic-plan + blueprint + generateJson).",
+    "Unnecessary waiting: stream route throttles Supabase checkpoints to once per 4s during generation (adds latency between progress events and DB).",
+    "ZIP generation not in Generate path — export is a separate API call after generation completes (no ZIP cost in wall time).",
+    "JSON parsing/serialization: each LLM response parsed and validated in generateJsonWithValidation; untracked time between instrumented boundaries includes JSON.parse + Zod validation."
+  ],
+  "markdown": "# Website Builder — Complete Pipeline Performance Report\n\n**Profile:** professional\n**Source:** historical benchmark (2026-07-31T17:24:16.541Z)\n**Total wall time:** 1105126ms (18.4 min)\n**Files generated:** 48\n**LLM requests:** 26\n\n## Stage Timeline (Generate click → project finished)\n\n| Stage | Start (ms) | End (ms) | Duration (ms) | % of Total |\n|-------|-----------|---------|---------------|------------|\n| Request received (auth, validation, session) | 0 | 0 | 0 | 0% |\n| PRE / template routing / master plan lock | 0 | 8478 | 8478 | 0.8% |\n| Business analysis | 8478 | 31527 | 23049 | 2.1% |\n| Strategy generation | 31527 | 80339 | 48812 | 4.4% |\n| Brand generation (premium design / brand kit) | 80339 | 99429 | 19090 | 1.7% |\n| Design system generation | 99429 | 114761 | 15332 | 1.4% |\n| Assets generation | 114761 | 137507 | 22746 | 2.1% |\n| Page planning (blueprint + dynamic plan) | 137507 | 317022 | 179515 | 16.2% |\n| Page generation (per-file LLM) | 317022 | 1064265 | 747243 | 67.6% |\n| Content generation (scaffold, validation, repair) | 1064265 | 1064265 | 0 | 0% |\n| SEO generation | 1064265 | 1064286 | 21 | 0% |\n| ZIP generation | 1064286 | 1064286 | 0 | 0% |\n| Finalize (design platform, packaging) | 1064286 | 1105125 | 40839 | 3.7% |\n| Database save (persist generation) | 1105125 | 1105125 | 0 | 0% |\n| API response (SSE complete) | 1105125 | 1105125 | 0 | 0% |\n\n## Stage | Duration | % of Total | Recommendation\n\n| PRE / template routing / master plan lock | 8478ms | 0.8% | 6× master-planner logs are bookkeeping duplicates — consolidate profiler spans only |\n| Business analysis | 23049ms | 2.1% | Cache business profile for continue/regenerate modes |\n| Strategy generation | 48812ms | 4.4% | Largest pre-file LLM; consider deterministic blueprint when PRE plan exists |\n| Brand generation (premium design / brand kit) | 19090ms | 1.7% | Runs inside design layer; parallelize with design-system LLM where independent |\n| Design system generation | 15332ms | 1.4% | Single LLM call; prompt is large — trim context passed from strategy |\n| Assets generation | 22746ms | 2.1% | Image slots sequential; parallel image API requests would help |\n| Page planning (blueprint + dynamic plan) | 179515ms | 16.2% | dynamic-plan + blueprint LLM before file loop; skip when upstream artifacts present |\n| Page generation (per-file LLM) | 747243ms | 67.6% | **CRITICAL BOTTLENECK** — batch or parallelize independent file LLM calls |\n| SEO generation | 21ms | 0% | Fast (<0.1%); no action needed |\n| ZIP generation | 0ms | 0% | Not in Generate path; export is separate API call |\n| Finalize (design platform, packaging) | 40839ms | 3.7% | Design platform finalize can be deferred post-response |\n\n## AI Calls by Stage\n\n- **file-generation**: 18 calls · 820602ms · 482,504 prompt chars\n- **dynamic-plan**: 1 calls · 106088ms · 9,709 prompt chars\n- **generateJson**: 4 calls · 91050ms · 64,051 prompt chars\n- **strategy**: 1 calls · 48807ms · 6,927 prompt chars\n- **business-idea**: 1 calls · 23048ms · 4,285 prompt chars\n- **design-system**: 1 calls · 15332ms · 16,285 prompt chars\n\n## Anomalies Detected\n\n- Duplicate orchestration bookkeeping: `template` logged 3× (profiler emits per sub-step, not separate LLM runs).\n- Duplicate orchestration bookkeeping: `master-planner` logged 6× (profiler emits per sub-step, not separate LLM runs).\n- Duplicate orchestration bookkeeping: `template-intelligence` logged 2× (profiler emits per sub-step, not separate LLM runs).\n- Sequential per-file LLM: 18 file-generation calls (820602ms total, ~45589ms avg) — each waits for the previous to finish.\n- Repeated AI calls: file-generation stage invoked 18× with 482,504 cumulative prompt chars (re-prompts prior file context each call).\n- Repeated planning LLM: 5 planning JSON calls before file loop (dynamic-plan + blueprint + generateJson).\n- Unnecessary waiting: stream route throttles Supabase checkpoints to once per 4s during generation (adds latency between progress events and DB).\n- ZIP generation not in Generate path — export is a separate API call after generation completes (no ZIP cost in wall time).\n- JSON parsing/serialization: each LLM response parsed and validated in generateJsonWithValidation; untracked time between instrumented boundaries includes JSON.parse + Zod validation."
+}

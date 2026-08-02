@@ -8,5 +8,3 @@ export {
   getUnifiedTemplateRouteFromBrief,
   routeWebsiteGeneration,
 } from "@/lib/ai-core/template-router/engine";
-/** @deprecated Use routeWebsiteGeneration */
-export { routeWebsiteGeneration as routeUnifiedTemplate } from "@/lib/ai-core/template-router/engine";

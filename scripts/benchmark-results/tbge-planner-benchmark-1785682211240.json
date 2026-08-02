@@ -1,0 +1,33 @@
+{
+  "generatedAt": "2026-08-02T14:50:11.240Z",
+  "sprint": "TBGE Sprint 2",
+  "iterations": 200,
+  "llmMode": "mock",
+  "results": [
+    {
+      "label": "parsePlanDraftFromLlm",
+      "medianMs": 0.0057,
+      "totalMs": 1.61
+    },
+    {
+      "label": "validatePlanDraft",
+      "medianMs": 0.0018,
+      "totalMs": 1.46
+    },
+    {
+      "label": "buildGenerationSpecFromDraft",
+      "medianMs": 0.0041,
+      "totalMs": 1.77
+    },
+    {
+      "label": "lockSpec",
+      "medianMs": 0.0075,
+      "totalMs": 2.88
+    },
+    {
+      "label": "runPlanningPipeline (mock LLM)",
+      "medianMs": 0.0252,
+      "totalMs": 7.22
+    }
+  ]
+}

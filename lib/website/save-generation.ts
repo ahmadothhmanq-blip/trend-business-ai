@@ -6,6 +6,7 @@ import { ensureStaticPreviewFile } from "@/lib/website/build-static-preview.serv
 import { usesLlmLocalizedWebsiteCopy } from "@/lib/ai-core/content/content-language";
 import { productionContentForPreview } from "@/lib/ai-core/content/production-content";
 import { logger } from "@/lib/logger";
+import { getActiveWebsiteProfiler } from "@/lib/ai-core/performance/profiler-context";
 import type {
   PromptVersion,
   TokenUsage,
@@ -149,6 +150,19 @@ export type PersistWebsiteGenerationArgs = {
 };
 
 export async function persistWebsiteGeneration(args: PersistWebsiteGenerationArgs): Promise<
+  | { ok: true; generation: WebsiteGeneration; project: GeneratedWebsiteProject }
+  | { ok: false; error: string }
+> {
+  const profiler = getActiveWebsiteProfiler();
+  const run = async () => persistWebsiteGenerationInner(args);
+  return profiler
+    ? profiler.measure("supabase", "persistWebsiteGeneration", run, {
+        fileCount: args.project.files?.length ?? 0,
+      })
+    : run();
+}
+
+async function persistWebsiteGenerationInner(args: PersistWebsiteGenerationArgs): Promise<
   | { ok: true; generation: WebsiteGeneration; project: GeneratedWebsiteProject }
   | { ok: false; error: string }
 > {

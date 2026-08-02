@@ -1,0 +1,88 @@
+{
+  "title": "TBGE vs Legacy Benchmark Report",
+  "timestamp": "2026-08-02T15:21:32.338Z",
+  "industries": [
+    "restaurant",
+    "real-estate",
+    "saas",
+    "medical",
+    "gaming"
+  ],
+  "runs": [
+    {
+      "engine": "legacy",
+      "industryId": "gaming",
+      "success": false,
+      "error": "No AI provider configured. Set DEEPSEEK_API_KEY to enable generation.",
+      "wallClockMs": 0.71,
+      "generationTimeMs": 0,
+      "llmCalls": 0,
+      "promptTokens": 0,
+      "completionTokens": 0,
+      "totalTokens": 0,
+      "estimatedCostUsd": 0,
+      "fileCount": 0,
+      "buildSuccess": false,
+      "quality": {
+        "accessibilityScore": 0,
+        "visualOverall": 0,
+        "responsiveQuality": 0,
+        "semanticSeo": 0,
+        "semanticOverall": 0,
+        "heuristicQuality": 0
+      },
+      "provider": "none"
+    },
+    {
+      "engine": "tbge",
+      "industryId": "gaming",
+      "success": false,
+      "error": "No AI provider configured. Set DEEPSEEK_API_KEY to enable generation.",
+      "wallClockMs": 0.18,
+      "generationTimeMs": 0,
+      "llmCalls": 0,
+      "promptTokens": 0,
+      "completionTokens": 0,
+      "totalTokens": 0,
+      "estimatedCostUsd": 0,
+      "fileCount": 0,
+      "buildSuccess": false,
+      "quality": {
+        "accessibilityScore": 0,
+        "visualOverall": 0,
+        "responsiveQuality": 0,
+        "semanticSeo": 0,
+        "semanticOverall": 0,
+        "heuristicQuality": 0
+      },
+      "provider": "none"
+    }
+  ],
+  "determinism": {
+    "gaming": 0
+  },
+  "summary": {
+    "legacy": {
+      "count": 1,
+      "successRate": 0,
+      "buildRate": 0,
+      "avgWallMs": 0.71,
+      "avgLlmCalls": 0,
+      "avgCostUsd": 0,
+      "avgFiles": 0,
+      "avgVisual": 0
+    },
+    "tbge": {
+      "count": 1,
+      "successRate": 0,
+      "buildRate": 0,
+      "avgWallMs": 0.18,
+      "avgLlmCalls": 0,
+      "avgCostUsd": 0,
+      "avgFiles": 0,
+      "avgPlannerMs": 0,
+      "avgAssemblyMs": 0,
+      "avgComposerMs": 0
+    }
+  }
+}

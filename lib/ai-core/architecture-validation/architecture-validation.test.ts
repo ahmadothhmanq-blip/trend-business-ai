@@ -61,8 +61,8 @@ function baseRoute(overrides: Partial<UnifiedTemplateRoute> = {}): UnifiedTempla
   return {
     version: "1",
     industryId: "furniture",
-    structureTemplateId: "ecommerce-atelier",
-    layoutTemplateIntelligenceId: "ti-ecommerce-atelier",
+    structureTemplateId: "modern-business",
+    layoutTemplateIntelligenceId: "ti-corporate-trust",
     visualThemePresetId: "luxury",
     visualThemeTemplateIntelligenceId: "ti-luxury-noir",
     premiumTemplateId: "ecommerce",
@@ -130,8 +130,8 @@ describe("architecture validation layer", () => {
     };
     const route = baseRoute({
       industryId: "restaurant",
-      structureTemplateId: "portfolio-showcase",
-      layoutTemplateIntelligenceId: "ti-creative-studio",
+      structureTemplateId: "ai-startup-signal",
+      layoutTemplateIntelligenceId: "ti-ai-company-signal",
       layoutFamily: "editorial-magazine",
       pageTopology: "fullscreen-editorial",
     });
@@ -172,8 +172,8 @@ describe("architecture validation layer", () => {
     };
     const route = baseRoute({
       industryId: "law",
-      structureTemplateId: "ecommerce-atelier",
-      layoutTemplateIntelligenceId: "ti-ecommerce-atelier",
+      structureTemplateId: "ai-startup-signal",
+      layoutTemplateIntelligenceId: "ti-ai-company-signal",
       layoutFamily: "commerce-grid",
       premiumTemplateId: "ecommerce",
     });
@@ -206,7 +206,7 @@ describe("architecture validation layer", () => {
     const invalid = validateWebsiteGenerationPlan(
       planFromRoute(
         baseRoute({
-          structureTemplateId: "fashion-runway",
+          structureTemplateId: "ai-startup-signal",
           layoutTemplateIntelligenceId: "ti-luxury-noir",
         }),
         { layoutStructure: "editorial-hero", layoutFamily: "editorial-magazine" },
@@ -217,17 +217,17 @@ describe("architecture validation layer", () => {
       { prompt: "Furniture", productId: "website-builder", metadata: {} },
       invalid.recommendedCorrections,
     );
-    assert.equal(brief.metadata?.websiteStructureTemplateId, "ecommerce-atelier");
+    assert.equal(brief.metadata?.websiteStructureTemplateId, "modern-business");
     assert.equal(
       brief.metadata?.templateIntelligenceId,
-      "ti-ecommerce-atelier",
+      "ti-corporate-trust",
     );
     assert.equal(brief.metadata?.architectureReplanAttempt, 1);
   });
 
   it("returns explainable failure payload", () => {
     const validation = validateWebsiteGenerationPlan(
-      planFromRoute(baseRoute({ structureTemplateId: "law-firm-authority" }), {
+      planFromRoute(baseRoute({ structureTemplateId: "ai-startup-signal" }), {
         layoutStructure: "legal-trust",
       }),
     );
@@ -305,8 +305,8 @@ describe("architecture validation re-planning metadata", () => {
       [
         {
           field: "structureTemplateId",
-          currentValue: "fashion-runway",
-          recommendedValue: "ecommerce-atelier",
+          currentValue: "ai-startup-signal",
+          recommendedValue: "modern-business",
           reason: "test",
         },
       ],

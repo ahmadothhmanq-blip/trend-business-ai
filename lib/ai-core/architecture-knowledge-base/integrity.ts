@@ -5,7 +5,7 @@ import {
   mergeIndustryEntry,
 } from "@/lib/ai-core/architecture-knowledge-base/registry";
 import type { IndustryKnowledgeEntry } from "@/lib/ai-core/architecture-knowledge-base/types";
-import { WEBSITE_STRUCTURE_TEMPLATE_INDEX } from "@/lib/website/builder/template-package-index";
+import { isKnownStructureTemplateId } from "@/lib/website/contracts/structure-registry";
 
 export type KnowledgeIntegrityReport = {
   valid: boolean;
@@ -92,7 +92,7 @@ export function validateKnowledgeBaseIntegrity(
 
     if (
       merged.defaultStructureTemplateId &&
-      !WEBSITE_STRUCTURE_TEMPLATE_INDEX[merged.defaultStructureTemplateId]
+      !isKnownStructureTemplateId(merged.defaultStructureTemplateId)
     ) {
       issues.push({
         severity: "error",

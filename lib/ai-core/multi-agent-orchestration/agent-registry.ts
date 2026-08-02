@@ -55,6 +55,8 @@ export const AGENT_REGISTRY: Record<AgentId, AgentContract> = {
     outputs: ["ProductionContentPack"],
     traceKey: CONTENT_INTELLIGENCE_TRACE_KEY,
     validationKey: CONTENT_INTELLIGENCE_VALIDATION_KEY,
+    // Runtime: executed inside PRE phase 2 (agency orchestrator), not as a separate MAOE step.
+    // See docs/MAOE_EXECUTION_ORDER.md
     dependsOn: ["PRE"],
     preconditionRules: ["pre-trace-or-master-plan"],
     postconditionRules: ["content-trace-present"],

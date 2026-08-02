@@ -10,14 +10,8 @@ import {
   resolveVisualThemePresetForIndustry as akbResolveVisualTheme,
 } from "@/lib/ai-core/architecture-knowledge-base";
 
-export type IndustryLayoutFamily =
-  | "commerce-grid"
-  | "corporate-trust"
-  | "editorial-magazine"
-  | "product-saas"
-  | "showroom"
-  | "hospitality"
-  | "classic-stack";
+import type { IndustryLayoutFamily } from "@/lib/website/contracts/layout";
+export type { IndustryLayoutFamily } from "@/lib/website/contracts/layout";
 
 /** @deprecated Use Architecture Knowledge Base editorial flags on industry entries. */
 export const EDITORIAL_LAYOUT_INDUSTRIES = new Set(

@@ -13,13 +13,13 @@ import {
 } from "@/lib/website/template-marketplace/index.server";
 
 describe("template marketplace foundation", () => {
-  it("initializes registry with installed and remote listings", async () => {
+  it("initializes registry with exactly two installed listings", async () => {
     resetWbTemplateMarketplaceRegistry();
     const status = await initializeWbTemplateMarketplace();
 
-    assert.ok(status.installedCount >= 30);
-    assert.equal(status.listingCount, status.installedCount);
-    assert.ok(status.featuredCount >= 1);
+    assert.equal(status.installedCount, 2);
+    assert.equal(status.listingCount, 2);
+    assert.equal(status.featuredCount, 2);
   });
 
   it("lists installed modern-business as an installed listing", async () => {
@@ -33,14 +33,14 @@ describe("template marketplace foundation", () => {
     assert.ok(listing?.tags.includes("corporate"));
   });
 
-  it("includes installed listings for pre-shipped premium templates", async () => {
+  it("lists installed ai-startup-signal as an installed listing", async () => {
     resetWbTemplateMarketplaceRegistry();
-    const listing = await getTemplateMarketplaceListing("saas-starter");
+    const listing = await getTemplateMarketplaceListing("ai-startup-signal");
 
     assert.ok(listing);
     assert.equal(listing?.availability, "installed");
     assert.equal(listing?.source, "installed");
-    assert.ok(listing?.tags.includes("saas"));
+    assert.ok(listing?.tags.includes("ai"));
   });
 
   it("prefers installed listings over remote seeds with the same id", async () => {
@@ -54,22 +54,22 @@ describe("template marketplace foundation", () => {
 
   it("filters listings by category", async () => {
     resetWbTemplateMarketplaceRegistry();
-    const catalog = await listTemplateMarketplaceCatalog({ category: "saas" });
+    const catalog = await listTemplateMarketplaceCatalog({ category: "ai-startup" });
 
-    assert.ok(catalog.total >= 1);
-    assert.ok(catalog.listings.every((listing) => listing.category === "saas"));
+    assert.equal(catalog.total, 1);
+    assert.ok(catalog.listings.every((listing) => listing.category === "ai-startup"));
   });
 
   it("filters listings by tags", async () => {
     resetWbTemplateMarketplaceRegistry();
     const catalog = await listTemplateMarketplaceCatalog({
-      tags: ["restaurant"],
+      tags: ["corporate"],
     });
 
-    assert.ok(catalog.total >= 1);
+    assert.equal(catalog.total, 1);
     assert.ok(
       catalog.listings.every((listing) =>
-        listing.tags.map((tag) => tag.toLowerCase()).includes("restaurant"),
+        listing.tags.map((tag) => tag.toLowerCase()).includes("corporate"),
       ),
     );
   });
@@ -102,16 +102,18 @@ describe("template marketplace foundation", () => {
     resetWbTemplateMarketplaceRegistry();
     const featured = await listFeaturedTemplateMarketplaceListings(10);
 
-    assert.ok(featured.length >= 2);
+    assert.equal(featured.length, 2);
     assert.ok(featured.every((listing) => listing.featured));
     assert.equal(featured[0]?.id, "modern-business");
+    assert.equal(featured[1]?.id, "ai-startup-signal");
   });
 
   it("builds facets for categories, tags, and sources", async () => {
     resetWbTemplateMarketplaceRegistry();
+    await initializeWbTemplateMarketplace();
     const catalog = await listTemplateMarketplaceCatalog();
 
-    assert.ok(catalog.facets.categories.length >= 2);
+    assert.equal(catalog.facets.categories.length, 2);
     assert.ok(catalog.facets.tags.length >= 3);
     assert.ok(catalog.facets.sources.some((source) => source.id === "installed"));
   });
@@ -126,7 +128,7 @@ describe("template marketplace foundation", () => {
       direction: "asc",
     });
 
-    assert.ok(filtered.length >= 2);
+    assert.equal(filtered.length, 2);
     assert.ok(sorted[0]!.name.localeCompare(sorted.at(-1)!.name) <= 0);
   });
 });

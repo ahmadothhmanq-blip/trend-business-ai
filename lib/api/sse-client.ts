@@ -30,6 +30,10 @@ export type SseReadResult = {
 
   aborted: boolean;
 
+  /** True when the server emitted a handoff event (switch to DB polling). */
+
+  handedOff: boolean;
+
 };
 
 
@@ -48,6 +52,14 @@ export type SseSessionMeta = {
   generationId: string;
   incrementalPreview?: boolean;
   generationProfile?: string;
+};
+
+export type SseHandoffMeta = {
+  generationId: string;
+  reason?: string;
+  pollMode?: boolean;
+  maxDurationSec?: number;
+  message?: string;
 };
 
 
@@ -172,6 +184,10 @@ export async function readSseStream<TComplete extends Record<string, unknown>>(
 
     onSession?: (session: SseSessionMeta) => void;
 
+    /** Optional: server requests durable DB polling before route budget ends. */
+
+    onHandoff?: (handoff: SseHandoffMeta) => void;
+
   },
 
   options?: SseReadOptions,
@@ -203,6 +219,8 @@ export async function readSseStream<TComplete extends Record<string, unknown>>(
   let lastProgressMessage: string | null = null;
 
   let aborted = false;
+
+  let handedOff = false;
 
 
 
@@ -281,6 +299,52 @@ export async function readSseStream<TComplete extends Record<string, unknown>>(
         handlers.onSession?.({ generationId: id });
 
       }
+
+    }
+
+
+
+    if (event === "handoff") {
+
+      handedOff = true;
+
+      const id = extractGenerationId(payload as Record<string, unknown>);
+
+      if (id) generationId = id;
+
+      handlers.onHandoff?.({
+
+        generationId: id ?? generationId ?? "",
+
+        reason: typeof payload.reason === "string" ? payload.reason : undefined,
+
+        pollMode: payload.pollMode === true,
+
+        maxDurationSec:
+
+          typeof payload.maxDurationSec === "number"
+
+            ? payload.maxDurationSec
+
+            : undefined,
+
+        message: typeof payload.message === "string" ? payload.message : undefined,
+
+      });
+
+      if (payload.message) {
+
+        lastProgressMessage = payload.message;
+
+        handlers.onProgress(payload.message, null, {
+
+          generationId: id ?? generationId ?? undefined,
+
+        });
+
+      }
+
+      return;
 
     }
 
@@ -481,6 +545,8 @@ export async function readSseStream<TComplete extends Record<string, unknown>>(
     endedEarly: !completed && !error && !aborted,
 
     aborted,
+
+    handedOff,
 
   };
 

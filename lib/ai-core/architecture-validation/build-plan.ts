@@ -5,7 +5,7 @@ import type { WebsiteGenerationPlan } from "@/lib/ai-core/architecture-validatio
 import { getTemplateIntelligence, resolveTemplateDNA } from "@/lib/ai-core/template-intelligence";
 import { getThemePageArchitecture } from "@/lib/website/builder/theme-architecture";
 import { resolveIndustryLayoutFamily } from "@/lib/website/builder/industry-layout-policy";
-import type { IndustryLayoutFamily } from "@/lib/website/builder/industry-layout-policy";
+import type { IndustryLayoutFamily } from "@/lib/website/contracts/layout";
 
 export type BuildWebsiteGenerationPlanParams = {
   route: UnifiedTemplateRoute;

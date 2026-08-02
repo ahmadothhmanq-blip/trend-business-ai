@@ -12,15 +12,15 @@ import {
 import { resolveStructureTemplateForIndustry } from "@/lib/website/builder/structure-templates";
 
 describe("EDS-001 industry structure routing", () => {
-  it("maps furniture to ecommerce-atelier structure package", () => {
+  it("maps furniture to modern-business structure package", () => {
     assert.equal(normalizeRoutingIndustryId("Furniture Showroom"), "furniture");
     assert.equal(
       resolveStructureTemplateIdForIndustry("furniture"),
-      "ecommerce-atelier",
+      "modern-business",
     );
     const structure = resolveStructureTemplateForIndustry("furniture");
-    assert.equal(structure.id, "ecommerce-atelier");
-    assert.equal(structure.templateIntelligenceId, "ti-ecommerce-atelier");
+    assert.equal(structure.id, "modern-business");
+    assert.equal(structure.templateIntelligenceId, "ti-corporate-trust");
   });
 
   it("does not treat furniture as generic retail store", () => {
@@ -55,10 +55,20 @@ describe("EDS-001 industry structure routing", () => {
     );
   });
 
-  it("maps tourism to travel-horizon", () => {
+  it("maps tourism to modern-business", () => {
     assert.equal(
       resolveStructureTemplateIdForIndustry("tourism"),
-      "travel-horizon",
+      "modern-business",
     );
+  });
+
+  it("maps technology to ai-startup-signal", () => {
+    assert.equal(
+      resolveStructureTemplateIdForIndustry("technology"),
+      "ai-startup-signal",
+    );
+    const structure = resolveStructureTemplateForIndustry("technology");
+    assert.equal(structure.id, "ai-startup-signal");
+    assert.equal(structure.templateIntelligenceId, "ti-ai-company-signal");
   });
 });

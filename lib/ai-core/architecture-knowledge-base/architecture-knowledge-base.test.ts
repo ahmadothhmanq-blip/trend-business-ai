@@ -32,7 +32,7 @@ describe("Architecture Knowledge Base", () => {
     assert.equal(normalizeRoutingIndustryId("home-furniture-store"), "furniture");
 
     const cafe = resolveIndustryKnowledge("cafe");
-    assert.equal(cafe.value.defaultStructureTemplateId, "cafe-artisan");
+    assert.equal(cafe.value.defaultStructureTemplateId, "modern-business");
     assert.ok(cafe.inheritanceChain.includes("restaurant"));
     assert.ok(cafe.resolvedFrom.some((r) => r.startsWith("industry:cafe")));
   });
@@ -41,13 +41,13 @@ describe("Architecture Knowledge Base", () => {
     const registry = buildKnowledgeRegistry();
     const dental = registry.byId.get("dental")!;
     const merged = mergeIndustryEntry(dental as never, registry);
-    assert.equal(merged.defaultStructureTemplateId, "dental-smile");
+    assert.equal(merged.defaultStructureTemplateId, "modern-business");
     assert.ok(merged.forbiddenPremiumTemplateIds?.includes("ecommerce"));
   });
 
   it("provides explainable structure routing for furniture", () => {
     const lookup = resolveStructureTemplateIdForIndustry("furniture");
-    assert.equal(lookup.value, "ecommerce-atelier");
+    assert.equal(lookup.value, "modern-business");
     assert.equal(lookup.entryId, "furniture");
     assert.ok(lookup.resolvedFrom.length > 0);
   });
@@ -62,8 +62,8 @@ describe("Architecture Knowledge Base", () => {
   });
 
   it("detects forbidden structure templates from KB", () => {
-    assert.equal(isForbiddenStructureTemplate("furniture", "fashion-runway"), true);
-    assert.equal(isForbiddenStructureTemplate("furniture", "ecommerce-atelier"), false);
+    assert.equal(isForbiddenStructureTemplate("furniture", "ai-startup-signal"), true);
+    assert.equal(isForbiddenStructureTemplate("furniture", "modern-business"), false);
   });
 
   it("enforces layout family rules from KB", () => {
@@ -101,7 +101,7 @@ describe("AKB routing and validation consistency", () => {
   const furnitureRoute: UnifiedTemplateRoute = {
     version: "1",
     industryId: "furniture",
-    structureTemplateId: "ecommerce-atelier",
+    structureTemplateId: "modern-business",
     layoutTemplateIntelligenceId: "ti-ecommerce-atelier",
     visualThemePresetId: "luxury",
     visualThemeTemplateIntelligenceId: "ti-luxury-noir",

@@ -1,0 +1,93 @@
+{
+  "title": "TBGE vs Legacy Benchmark Report",
+  "timestamp": "2026-08-02T15:32:14.773Z",
+  "industries": [
+    "restaurant",
+    "real-estate",
+    "saas",
+    "medical",
+    "gaming"
+  ],
+  "runs": [
+    {
+      "engine": "legacy",
+      "industryId": "gaming",
+      "success": false,
+      "error": "DeepSeek returned an empty response.",
+      "wallClockMs": 538783.37,
+      "generationTimeMs": 0,
+      "llmCalls": 0,
+      "promptTokens": 0,
+      "completionTokens": 0,
+      "totalTokens": 0,
+      "estimatedCostUsd": 0,
+      "fileCount": 0,
+      "buildSuccess": false,
+      "quality": {
+        "accessibilityScore": 0,
+        "visualOverall": 0,
+        "responsiveQuality": 0,
+        "semanticSeo": 0,
+        "semanticOverall": 0,
+        "heuristicQuality": 0
+      },
+      "provider": "none"
+    },
+    {
+      "engine": "tbge",
+      "industryId": "gaming",
+      "success": true,
+      "wallClockMs": 75738.89,
+      "generationTimeMs": 75738.0368,
+      "llmCalls": 1,
+      "promptTokens": 726,
+      "completionTokens": 8435,
+      "totalTokens": 9161,
+      "estimatedCostUsd": 0.002463,
+      "fileCount": 10,
+      "buildSuccess": true,
+      "plannerTimeMs": 75733.3,
+      "assemblyTimeMs": 0.7,
+      "composerTimeMs": 0.51,
+      "specHash": "1f9e7c729d0de744",
+      "specJson": "{\"specVersion\":\"1.0\",\"specId\":\"spec-20e9aa03-6dc7-44c2-bb93-b43e80070f85\",\"promptHash\":\"4683309658d2a3b4\",\"productId\":\"website-builder\",\"profile\":\"professional\",\"mode\":\"generate\",\"locale\":{\"language\":\"en\",\"dir\":\"ltr\",\"rtl\":false,\"htmlLang\":\"en\"},\"business\":{\"name\":\"Neon Circuit Games\",\"industry\":\"Video Games\",\"industryId\":\"video-games\",\"audience\":[\"Gamers\",\"Indie game fans\",\"Streamers and content creators\",\"Press and media\",\"Potential collaborators\"],\"goals\":[\"Showcase released titles\",\"Build excitement for upcoming games\",\"Grow the Discord community\",\"Share development insights through the blog\",\"Provide press with downloadable assets\",\"Generate contact form leads\"],\"tone\":\"Bold, futuristic, gritty, enthusiastic\",\"offer\":\"A neon-soaked indie game portfolio with behind-the-scenes development content and a thriving community\",\"geography\":\"Global\"},\"structure\":{\"kind\":\"website\",\"pages\":[{\"name\":\"Home\",\"path\":\"/\",\"purpose\":\"Main landing page introducing the studio, highlighting featured games and latest news, and driving visitors to explore games, blog, community Discord, and contact.\",\"sections\":[\"Hero with cyberpunk neon backdrop\",\"Featured Games\",\"Latest Blog Posts\",\"Upcoming Releases Teaser\",\"Discord Community CTA\",\"Newsletter Signup\"],\"primaryCta\":\"Explore Games\"},{\"name\":\"Games\",\"path\":\"/games\",\"purpose\":\"Catalog of all released and upcoming games with quick-look cards, release status, and links to individual game pages.\",\"sections\":[\"Page Header\",\"Released Games Grid\",\"Upcoming Games Grid\",\"Call to Action\"],\"primaryCta\":\"View Latest Game\"},{\"name\":\"Neon Drift\",\"path\":\"/games/neon-drift\",\"purpose\":\"Landing page for the released game Neon Drift, featuring key gameplay elements, media, reviews, and purchase links.\",\"sections\":[\"Game Hero\",\"About the Game\",\"Key Features\",\"Screenshots Gallery\",\"Reviews\",\"Buy / Download CTA\",\"Related Games\"],\"primaryCta\":\"Buy Now\"},{\"name\":\"Void Protocol\",\"path\":\"/games/void-protocol\",\"purpose\":\"Landing page for the released game Void Protocol, providing details, media, reviews, and store links.\",\"sections\":[\"Game Hero\",\"About the Game\",\"Key Features\",\"Screenshots Gallery\",\"Reviews\",\"Buy / Download CTA\",\"Related Games\"],\"primaryCta\":\"Buy Now\"},{\"name\":\"Project Spectral\",\"path\":\"/games/project-spectral\",\"purpose\":\"Hype page for the upcoming unreleased game Project Spectral, featuring trailer, roadmap, and wishlist CTA.\",\"sections\":[\"Game Hero\",\"Announcement Trailer\",\"Features\",\"Development Roadmap\",\"Wishlist / Newsletter CTA\"],\"primaryCta\":\"Wishlist Now\"},{\"name\":\"Blog\",\"path\":\"/blog\",\"purpose\":\"Developer blog index with posts about game development, art, lore, and studio updates.\",\"sections\":[\"Page Header\",\"Blog Post Grid\",\"Categories\",\"Newsletter Signup\"],\"primaryCta\":\"Read Latest Post\"},{\"name\":\"Community\",\"path\":\"/community\",\"purpose\":\"Hub for community members with Discord invite, social channels, guidelines, and events.\",\"sections\":[\"Page Header\",\"Discord Invite CTA\",\"Social Channels\",\"Community Guidelines\",\"Events\"],\"primaryCta\":\"Join Discord\"},{\"name\":\"Press Kit\",\"path\":\"/press\",\"purpose\":\"Press kit page with downloadable assets, fact sheet, screenshots, logos, and media contact information.\",\"sections\":[\"Page Header\",\"Fact Sheet\",\"Downloadable Assets\",\"Screenshots & Logos\",\"Press Contact\"],\"primaryCta\":\"Download Press Kit\"},{\"name\":\"Contact\",\"path\":\"/contact\",\"purpose\":\"Contact page with a form for business, press, and general inquiries.\",\"sections\":[\"Page Header\",\"Contact Form\",\"Business Inquiries\",\"Press Inquiries\",\"FAQ\",\"Social Links\"],\"primaryCta\":\"Send Message\"}],\"navigation\":{\"items\":[{\"label\":\"Home\",\"href\":\"/\"},{\"label\":\"Games\",\"href\":\"/games\"},{\"label\":\"Blog\",\"href\":\"/blog\"},{\"label\":\"Community\",\"href\":\"/community\"},{\"label\":\"Press Kit\",\"href\":\"/press\"},{\"label\":\"Contact\",\"href\":\"/contact\"},{\"label\":\"Discord\",\"href\":\"https://discord.gg/neoncircuit\"}],\"style\":\"Sticky transparent navbar that turns to dark glass with neon border on scroll\"},\"footerSections\":[\"Studio logo and tagline\",\"Quick links\",\"Games\",\"Community / Discord\",\"Social icons\",\"Legal links\"]},\"design\":{\"templateId\":\"cyberpunk_neon\",\"templateIntelligenceId\":\"cyberpunk_neon_intel\",\"premiumTemplateId\":\"cyberpunk_neon_premium\",\"tokens\":{\"primary\":\"#00e5ff\",\"secondary\":\"#ff2a6d\",\"accent\":\"#ccff00\",\"background\":\"#0d0f14\",\"foreground\":\"#e6f7ff\",\"surface\":\"#151b24\",\"neutral\":\"#8a94a6\"},\"componentPalette\":[\"navbar\",\"footer\",\"hero\",\"game-card\",\"game-grid\",\"game-detail\",\"feature-list\",\"blog-card\",\"blog-grid\",\"newsletter-signup\",\"contact-form\",\"press-assets\",\"fact-sheet\",\"faq\",\"discord-cta\",\"social-links\",\"video-embed\",\"screenshots-gallery\",\"cta-banner\",\"responsive-container\",\"seo-meta\"],\"layoutProfile\":\"Modern responsive dark cyberpunk marketing layout with full-bleed neon sections\",\"imageStyle\":\"Dramatic neon-lit sci-fi environments, high contrast, dark backgrounds\",\"headingFont\":\"Orbitron\",\"bodyFont\":\"Rajdhani\"},\"capabilities\":{\"auth\":false,\"database\":{\"provider\":\"none\",\"entities\":[]},\"dashboard\":false,\"ecommerce\":false,\"saas\":false},\"fileGraph\":[{\"path\":\"package.json\",\"generator\":\"scaffold-static\",\"deps\":[],\"wave\":\"static-scaffold\",\"priority\":0},{\"path\":\"app/globals.css\",\"generator\":\"scaffold-css\",\"deps\":[\"package.json\"],\"wave\":\"static-scaffold\",\"priority\":1},{\"path\":\"app/layout.tsx\",\"generator\":\"layout-root\",\"deps\":[\"app/globals.css\"],\"wave\":\"foundation\",\"priority\":2},{\"path\":\"components/layout/site-shell.tsx\",\"generator\":\"ux-shells\",\"deps\":[\"app/layout.tsx\"],\"wave\":\"components\",\"priority\":3},{\"path\":\"components/ui/button.tsx\",\"generator\":\"ui-primitives\",\"deps\":[\"components/layout/site-shell.tsx\"],\"wave\":\"components\",\"priority\":4},{\"path\":\"lib/seo.ts\",\"generator\":\"lib-seo\",\"deps\":[\"app/layout.tsx\"],\"wave\":\"hooks-api\",\"priority\":5},{\"path\":\"app/page.tsx\",\"generator\":\"page-home\",\"deps\":[\"components/layout/site-shell.tsx\",\"lib/seo.ts\"],\"wave\":\"pages\",\"priority\":6},{\"path\":\"app/about/page.tsx\",\"generator\":\"page-secondary\",\"deps\":[\"components/layout/site-shell.tsx\"],\"wave\":\"pages\",\"priority\":7,\"optional\":true},{\"path\":\"components/sections/bindings.ts\",\"generator\":\"component-bind\",\"deps\":[\"app/page.tsx\"],\"wave\":\"inject\",\"priority\":8},{\"path\":\"package-lock.json\",\"generator\":\"package-sync\",\"deps\":[\"package.json\"],\"wave\":\"configs-tail\",\"priority\":9}],\"provenance\":{\"lockedAt\":\"2026-08-02T15:32:14.754Z\",\"promptHash\":\"4683309658d2a3b4\",\"plannerModel\":\"deepseek\"}}",
+      "componentReuseRate": 0.9796,
+      "quality": {
+        "accessibilityScore": 80,
+        "visualOverall": 77,
+        "responsiveQuality": 64,
+        "semanticSeo": 84,
+        "semanticOverall": 86,
+        "heuristicQuality": 100
+      },
+      "provider": "deepseek"
+    }
+  ],
+  "determinism": {
+    "gaming": 100
+  },
+  "summary": {
+    "legacy": {
+      "count": 1,
+      "successRate": 0,
+      "buildRate": 0,
+      "avgWallMs": 538783.37,
+      "avgLlmCalls": 0,
+      "avgCostUsd": 0,
+      "avgFiles": 0,
+      "avgVisual": 0
+    },
+    "tbge": {
+      "count": 1,
+      "successRate": 100,
+      "buildRate": 100,
+      "avgWallMs": 75738.89,
+      "avgLlmCalls": 1,
+      "avgCostUsd": 0.002463,
+      "avgFiles": 10,
+      "avgPlannerMs": 75733.3,
+      "avgAssemblyMs": 0.7,
+      "avgComposerMs": 0.51
+    }
+  }
+}

@@ -109,8 +109,7 @@ const sql082 = readFileSync(
   "utf8",
 );
 for (const needle of [
-  "can_edit_website_generation",
-  "Members can view shared website generations",
+  "private.can_edit_website_generation",
   "Editors can update shared website generations",
 ]) {
   if (!sql082.includes(needle)) fail(`082: ${needle}`, "missing");

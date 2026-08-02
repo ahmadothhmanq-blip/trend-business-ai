@@ -33,13 +33,8 @@ import type {
   CopilotEditResultPayload,
 } from "@/lib/ai-core/website-copilot/types";
 import { validatePostCommandL1 } from "@/lib/ai-core/website-copilot/validators/post-command";
-import { findIdempotentCommit, storeIdempotentCommit } from "@/lib/website/platform/idempotency";
-import {
-  loadWebsiteGenerationForUser,
-  toWebsiteProject,
-} from "@/lib/website/platform/load-generation";
-import { readBlueprintRevisionFromGeneration } from "@/lib/website/platform/revision";
-import type { GeneratedWebsiteProject } from "@/plugins/website/types";
+import { getWebsitePlatformPort } from "@/lib/website/platform/port";
+import type { GeneratedWebsiteProject } from "@/lib/website/types";
 import type { WebsiteGeneration } from "@/types/database";
 import type { WebsiteEditServiceSuccess } from "@/lib/website/platform/services/edit-service";
 import type { WebsiteSeoApplySuccess } from "@/lib/website/platform/services/seo-service";
@@ -76,7 +71,7 @@ function buildEditMutationSuccess(params: {
     capability: params.capability,
     tier: params.tier,
     mutated: true,
-    revision: readBlueprintRevisionFromGeneration(generation),
+    revision: getWebsitePlatformPort().readBlueprintRevision(generation),
     aiRunId: params.edit.aiRunId ?? null,
     fromIdempotency: params.fromIdempotency,
     summary: editResult.summary,
@@ -102,7 +97,7 @@ function buildStructureMutationSuccess(params: {
     capability: params.capability,
     tier: "local",
     mutated: true,
-    revision: readBlueprintRevisionFromGeneration(generation!),
+    revision: getWebsitePlatformPort().readBlueprintRevision(generation!),
     aiRunId: null,
     fromIdempotency: false,
     summary,
@@ -130,7 +125,7 @@ function buildSeoMutationSuccess(params: {
     mutated: true,
     revision:
       params.result.revision ??
-      readBlueprintRevisionFromGeneration(generation),
+      getWebsitePlatformPort().readBlueprintRevision(generation),
     aiRunId: params.result.aiRunId ?? null,
     fromIdempotency: false,
     summary,
@@ -198,13 +193,14 @@ export async function runCopilotCommand(params: {
   routing?: CopilotRoutingOverride;
   onProgress?: (message: string) => void;
 }): Promise<CopilotCommandResult> {
+  const port = getWebsitePlatformPort();
   const rawCommand = params.request.command.trim();
   const memoryEnabled = copilotMemoryEnabled(params.request);
   const idempotencyKey = params.request.idempotencyKey?.trim();
   const applyAi = params.request.applyAi !== false;
 
   if (idempotencyKey) {
-    const cached = await findIdempotentCommit(params.supabase, {
+    const cached = await port.findIdempotentCommit(params.supabase, {
       userId: params.userId,
       generationId: params.generationId,
       idempotencyKey,
@@ -229,7 +225,7 @@ export async function runCopilotCommand(params: {
     }
   }
 
-  const generation = await loadWebsiteGenerationForUser(
+  const generation = await port.loadGeneration(
     params.supabase,
     params.userId,
     params.generationId,
@@ -242,7 +238,7 @@ export async function runCopilotCommand(params: {
     };
   }
 
-  const project = toWebsiteProject(generation);
+  const project = port.toProject(generation);
 
   const crossProduct = detectCrossProductCommand(
     rawCommand,
@@ -423,7 +419,7 @@ export async function runCopilotCommand(params: {
     });
 
     if (idempotencyKey) {
-      await storeIdempotentCommit(params.supabase, {
+      await port.storeIdempotentCommit(params.supabase, {
         userId: params.userId,
         generationId: params.generationId,
         idempotencyKey,
@@ -489,7 +485,7 @@ export async function runCopilotCommand(params: {
     });
 
     if (idempotencyKey) {
-      await storeIdempotentCommit(params.supabase, {
+      await port.storeIdempotentCommit(params.supabase, {
         userId: params.userId,
         generationId: params.generationId,
         idempotencyKey,
@@ -583,10 +579,10 @@ export async function runCopilotCommand(params: {
     generation: editResult.generation,
   });
 
-  success.revision = readBlueprintRevisionFromGeneration(editResult.generation);
+  success.revision = port.readBlueprintRevision(editResult.generation);
 
   if (idempotencyKey) {
-    await storeIdempotentCommit(params.supabase, {
+    await port.storeIdempotentCommit(params.supabase, {
       userId: params.userId,
       generationId: params.generationId,
       idempotencyKey,

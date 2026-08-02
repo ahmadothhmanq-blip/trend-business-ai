@@ -1,0 +1,23 @@
+{
+  "title": "TBGE Cost Report",
+  "timestamp": "2026-08-02T15:21:32.338Z",
+  "pricingModel": {
+    "provider": "deepseek",
+    "inputPerMillion": 0.14,
+    "outputPerMillion": 0.28
+  },
+  "byIndustry": [
+    {
+      "industryId": "gaming",
+      "legacyCostUsd": 0,
+      "tbgeCostUsd": 0,
+      "savingsUsd": 0,
+      "legacyTokens": 0,
+      "tbgeTokens": 0
+    }
+  ],
+  "totals": {
+    "legacyCostUsd": 0,
+    "tbgeCostUsd": 0
+  }
+}

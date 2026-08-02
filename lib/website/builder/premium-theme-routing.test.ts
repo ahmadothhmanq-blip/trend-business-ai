@@ -7,8 +7,8 @@ import { getThemePageArchitecture } from "@/lib/website/builder/theme-architectu
 describe("premium theme routing", () => {
   it("maps every structure template TI to a Theme* architecture", () => {
     const tiIds = Object.values(STRUCTURE_TEMPLATE_INTELLIGENCE_MAP);
-    assert.equal(tiIds.length, 30);
-    assert.equal(new Set(tiIds).size, 30);
+    assert.equal(tiIds.length, 2);
+    assert.equal(new Set(tiIds).size, 2);
 
     for (const tiId of tiIds) {
       const arch = getThemePageArchitecture(tiId);

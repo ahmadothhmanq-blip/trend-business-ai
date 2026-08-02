@@ -1,0 +1,43 @@
+{
+  "title": "TBGE Quality Report",
+  "timestamp": "2026-08-02T15:32:14.773Z",
+  "byIndustry": [
+    {
+      "industryId": "restaurant",
+      "determinismRate": 0
+    },
+    {
+      "industryId": "real-estate",
+      "determinismRate": 0
+    },
+    {
+      "industryId": "saas",
+      "determinismRate": 0
+    },
+    {
+      "industryId": "medical",
+      "determinismRate": 0
+    },
+    {
+      "industryId": "gaming",
+      "legacy": {
+        "accessibilityScore": 0,
+        "visualOverall": 0,
+        "responsiveQuality": 0,
+        "semanticSeo": 0,
+        "semanticOverall": 0,
+        "heuristicQuality": 0
+      },
+      "tbge": {
+        "accessibilityScore": 80,
+        "visualOverall": 77,
+        "responsiveQuality": 64,
+        "semanticSeo": 84,
+        "semanticOverall": 86,
+        "heuristicQuality": 100
+      },
+      "componentReuseRate": 0.9796,
+      "determinismRate": 100
+    }
+  ]
+}

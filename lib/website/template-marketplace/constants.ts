@@ -15,6 +15,8 @@ export const WB_TEMPLATE_MARKETPLACE_CATEGORY_DEFINITIONS: Array<{
   description: string;
 }> = [
   { id: "business", label: "Business", description: "Corporate and professional layouts" },
+  { id: "corporate", label: "Corporate", description: "Executive and enterprise layouts" },
+  { id: "ai-startup", label: "AI Startup", description: "Futuristic AI and ML product sites" },
   { id: "restaurant", label: "Restaurant", description: "Dining, menus, and reservations" },
   { id: "healthcare", label: "Healthcare", description: "Clinics and medical services" },
   { id: "real-estate", label: "Real Estate", description: "Listings and property showcases" },

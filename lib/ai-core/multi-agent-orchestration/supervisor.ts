@@ -119,7 +119,7 @@ function finalizeSupervision<T>(
     eventBus.emit("context:shared", agentId, { keys: Object.keys(artifacts) });
   }
 
-  let nextState = updateAgentState(workflowState, agentId, {
+  const nextState = updateAgentState(workflowState, agentId, {
     status: "completed",
     completedAt: new Date().toISOString(),
     durationMs: Date.now() - startedAt,

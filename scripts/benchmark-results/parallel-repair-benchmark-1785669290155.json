@@ -1,0 +1,33 @@
+{
+  "timestamp": "2026-08-02T11:14:50.154Z",
+  "targetCount": 8,
+  "repairDelayMs": 40,
+  "serialRepairWaves": 8,
+  "plannedRepairWaves": 1,
+  "parallelizableTargets": 8,
+  "waveReductionPercent": 88,
+  "peakParallelWaveSize": 8,
+  "timing": {
+    "serialDurationMs": 326,
+    "parallelDurationMs": 82,
+    "speedupPercent": 75,
+    "serialPeakConcurrency": 1,
+    "parallelPeakConcurrency": 4,
+    "parallelWaveCount": 1
+  },
+  "waves": [
+    {
+      "index": 0,
+      "targets": [
+        "components/sections/Section1.tsx",
+        "components/sections/Section2.tsx",
+        "components/sections/Section3.tsx",
+        "components/sections/Section4.tsx",
+        "components/sections/Section5.tsx",
+        "components/sections/Section6.tsx",
+        "components/sections/Section7.tsx",
+        "components/sections/Section8.tsx"
+      ]
+    }
+  ]
+}

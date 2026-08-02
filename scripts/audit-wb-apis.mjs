@@ -92,7 +92,7 @@ const publicRoutes = [
   },
   {
     name: "template-marketplace remote listing",
-    path: "/api/website-builder/template-marketplace?id=saas-starter",
+    path: "/api/website-builder/template-marketplace?id=modern-business",
     assert: (data) => {
       assert.equal(data.ok, true);
       assert.equal(data.listing.availability, "remote");

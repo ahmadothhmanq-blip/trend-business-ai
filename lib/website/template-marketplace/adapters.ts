@@ -3,6 +3,7 @@ import type {
   WbTemplateManifest,
   WbTemplateRegistryEntry,
 } from "@/lib/website/template-engine/types";
+import { resolveInstalledTemplateMediaUrl } from "@/lib/website/template-marketplace/media-url";
 import type { WbTemplateMarketplaceListing } from "@/lib/website/template-marketplace/types";
 
 export function mapInstalledListItemToMarketplaceListing(
@@ -26,8 +27,8 @@ export function mapInstalledListItemToMarketplaceListing(
     layout: item.layout,
     regionCount: item.regionCount,
     pageCount: item.pageCount,
-    thumbnail: item.thumbnail,
-    preview: item.preview,
+    thumbnail: resolveInstalledTemplateMediaUrl(item.id, "thumbnail"),
+    preview: resolveInstalledTemplateMediaUrl(item.id, "preview"),
     source: "installed",
     availability: "installed",
     featured: options?.featured ?? false,

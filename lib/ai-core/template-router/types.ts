@@ -1,4 +1,4 @@
-import type { WebsiteThemePresetId } from "@/lib/website/builder/theme-catalog";
+import type { WebsiteThemePresetId } from "@/lib/website/contracts/theme";
 
 export const UNIFIED_TEMPLATE_ROUTE_KEY = "unifiedTemplateRoute";
 

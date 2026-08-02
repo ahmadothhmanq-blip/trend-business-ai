@@ -4,7 +4,13 @@ import {
   validateGeneratedProject,
   type ProjectCapabilityFlags,
 } from "@/lib/ai/validator";
-import { syncPackageJsonDependencies } from "@/lib/ai/website-scaffold";
+import {
+  buildWebsiteScaffold,
+  mergeMissingScaffoldFiles,
+  resolveProjectNameFromFiles,
+  syncPackageJsonDependencies,
+} from "@/lib/ai/website-scaffold";
+import { buildPlatformProductionScaffolds } from "@/lib/website/platform-scaffolds";
 import { remediateSiteImagesInFiles } from "@/lib/website/site-images-parser";
 
 const EXPORT_FLAGS: ProjectCapabilityFlags = {
@@ -160,6 +166,22 @@ function stripUnresolvedImports(
   return [...byPath.values()];
 }
 
+function injectProductionScaffolds(
+  files: GeneratedProjectFile[],
+  fixes: string[],
+): GeneratedProjectFile[] {
+  const projectName = resolveProjectNameFromFiles(files);
+  const scaffolds = [
+    ...buildWebsiteScaffold(projectName),
+    ...buildPlatformProductionScaffolds(projectName),
+  ];
+  const { files: merged, injected } = mergeMissingScaffoldFiles(files, scaffolds);
+  for (const path of injected) {
+    fixes.push(`Injected production scaffold: ${path}`);
+  }
+  return merged;
+}
+
 function classifyExportIssues(issues: string[]): {
   blocking: string[];
   warnings: string[];
@@ -205,10 +227,12 @@ export function prepareWebsiteProjectForExport(
   ) {
     fixesApplied.push("Remediated premium stock URLs in lib/site-images.ts");
   }
+  current = injectProductionScaffolds(current, fixesApplied);
   current = injectMissingScaffolds(current, fixesApplied);
   current = stripUnresolvedImports(current, fixesApplied);
   current = syncPackageJsonDependencies(current);
   current = injectMissingScaffolds(current, fixesApplied);
+  current = injectProductionScaffolds(current, fixesApplied);
   current = syncPackageJsonDependencies(current);
 
   const validation = validateGeneratedProject(current, EXPORT_FLAGS);

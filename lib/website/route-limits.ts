@@ -5,7 +5,8 @@
 
 const VERCEL_DEFAULT_SEC = 300;
 const SELF_HOSTED_DEFAULT_SEC = 900;
-const MAX_ALLOWED_SEC = 900;
+/** Self-hosted / Enterprise — up to 30 minutes for long website generations. */
+const MAX_ALLOWED_SEC = 1800;
 
 function parseDurationEnv(): number | null {
   const raw = process.env.WEBSITE_STREAM_MAX_DURATION_SEC?.trim();

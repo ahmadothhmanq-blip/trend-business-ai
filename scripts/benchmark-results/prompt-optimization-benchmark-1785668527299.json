@@ -1,0 +1,32 @@
+{
+  "timestamp": "2026-08-02T11:02:07.298Z",
+  "legacyPromptChars": 31981,
+  "optimizedPromptChars": 18480,
+  "promptReductionPercent": 42,
+  "metadataReductionPercent": 51,
+  "estimatedTokenReductionPercent": 38,
+  "estimatedApiCostReductionPercent": 36,
+  "assemblyLatencyMs": {
+    "legacy": 1,
+    "optimized": 1
+  },
+  "metadataStats": {
+    "enabled": true,
+    "analysisCharsBefore": 3872,
+    "analysisCharsAfter": 1469,
+    "blueprintCharsBefore": 4052,
+    "blueprintCharsAfter": 2460,
+    "dynamicPlanCharsBefore": 711,
+    "dynamicPlanCharsAfter": 711,
+    "projectTreeCharsBefore": 7522,
+    "projectTreeCharsAfter": 4864,
+    "strategyCharsBefore": 5585,
+    "strategyCharsAfter": 2761,
+    "designSystemCharsBefore": 4682,
+    "designSystemCharsAfter": 658,
+    "totalMetadataCharsBefore": 26424,
+    "totalMetadataCharsAfter": 12923,
+    "metadataReductionPercent": 51
+  },
+  "preservesInstructions": true
+}

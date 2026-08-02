@@ -1,5 +1,5 @@
-import type { WebsiteThemePresetId } from "@/lib/website/builder/theme-catalog";
-import type { IndustryLayoutFamily } from "@/lib/website/builder/industry-layout-policy";
+import type { WebsiteThemePresetId } from "@/lib/website/contracts/theme";
+import type { IndustryLayoutFamily } from "@/lib/website/contracts/layout";
 import type { UnifiedTemplateRoute } from "@/lib/ai-core/template-router/types";
 
 export const ARCHITECTURE_VALIDATION_KEY = "architectureValidation";

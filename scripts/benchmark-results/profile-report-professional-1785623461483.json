@@ -1,0 +1,174 @@
+{
+  "source": "historical-benchmark",
+  "profile": "professional",
+  "prompt": "Fine dining restaurant in Dubai with reservations, menu highlights, chef story, and private dining events. Premium luxury aesthetic.",
+  "gitHead": "92f9b33",
+  "timestamp": "2026-07-31T17:45:43.296Z",
+  "totalGenerationMs": 252522,
+  "measuredWallMs": 252522,
+  "layerRunnerMs": 252521,
+  "fileCount": 60,
+  "provider": "deepseek",
+  "llmRequestCount": 6,
+  "llmByStage": {
+    "file-generation": {
+      "count": 4,
+      "durationMs": 200198,
+      "promptChars": 105846,
+      "totalTokens": 56148
+    },
+    "strategy": {
+      "count": 1,
+      "durationMs": 36907,
+      "promptChars": 5430,
+      "totalTokens": 6385
+    },
+    "design-system": {
+      "count": 1,
+      "durationMs": 15265,
+      "promptChars": 16044,
+      "totalTokens": 5875
+    }
+  },
+  "stageTimings": [
+    {
+      "category": "plugin",
+      "label": "generation",
+      "totalMs": 200240,
+      "count": 1,
+      "avgMs": 200240,
+      "sharePercent": 79.3
+    },
+    {
+      "category": "layer-runner",
+      "label": "strategy",
+      "totalMs": 36915,
+      "count": 1,
+      "avgMs": 36915,
+      "sharePercent": 14.6
+    },
+    {
+      "category": "layer-runner",
+      "label": "design",
+      "totalMs": 15273,
+      "count": 1,
+      "avgMs": 15273,
+      "sharePercent": 6
+    },
+    {
+      "category": "layer-runner",
+      "label": "finalize",
+      "totalMs": 38,
+      "count": 1,
+      "avgMs": 38,
+      "sharePercent": 0
+    },
+    {
+      "category": "layer-runner",
+      "label": "assets",
+      "totalMs": 16,
+      "count": 1,
+      "avgMs": 16,
+      "sharePercent": 0
+    },
+    {
+      "category": "layer-runner",
+      "label": "quality",
+      "totalMs": 9,
+      "count": 1,
+      "avgMs": 9,
+      "sharePercent": 0
+    },
+    {
+      "category": "layer-runner",
+      "label": "template",
+      "totalMs": 8,
+      "count": 3,
+      "avgMs": 3,
+      "sharePercent": 0
+    },
+    {
+      "category": "layer-runner",
+      "label": "master-planner",
+      "totalMs": 6,
+      "count": 6,
+      "avgMs": 1,
+      "sharePercent": 0
+    },
+    {
+      "category": "layer-runner",
+      "label": "seo",
+      "totalMs": 6,
+      "count": 1,
+      "avgMs": 6,
+      "sharePercent": 0
+    },
+    {
+      "category": "layer-runner",
+      "label": "performance",
+      "totalMs": 5,
+      "count": 1,
+      "avgMs": 5,
+      "sharePercent": 0
+    },
+    {
+      "category": "layer-runner",
+      "label": "template-intelligence",
+      "totalMs": 3,
+      "count": 2,
+      "avgMs": 2,
+      "sharePercent": 0
+    },
+    {
+      "category": "layer-runner",
+      "label": "idea",
+      "totalMs": 1,
+      "count": 1,
+      "avgMs": 1,
+      "sharePercent": 0
+    },
+    {
+      "category": "layer-runner",
+      "label": "start",
+      "totalMs": 0,
+      "count": 1,
+      "avgMs": 0,
+      "sharePercent": 0
+    },
+    {
+      "category": "layer-runner",
+      "label": "auto-design",
+      "totalMs": 0,
+      "count": 1,
+      "avgMs": 0,
+      "sharePercent": 0
+    },
+    {
+      "category": "layer-runner",
+      "label": "done",
+      "totalMs": 0,
+      "count": 1,
+      "avgMs": 0,
+      "sharePercent": 0
+    }
+  ],
+  "aiSharePercent": 99.9,
+  "duplicateStageExecutions": {
+    "start": 1,
+    "template": 3,
+    "master-planner": 6,
+    "template-intelligence": 2,
+    "auto-design": 1,
+    "idea": 1,
+    "strategy": 1,
+    "design": 1,
+    "assets": 1,
+    "generation": 1,
+    "quality": 1,
+    "seo": 1,
+    "performance": 1,
+    "finalize": 1,
+    "done": 1
+  },
+  "markdown": "# Website Builder — Performance Profiling Report\n\n> **Source:** Historical benchmark (git `92f9b33`, 2026-07-31T17:45:43.296Z)\n> **Profile:** professional\n\n**Total generation time:** 252522ms (252.5s)\n**Files generated:** 60\n**LLM requests:** 6\n**AI time share:** ~99.9%\n\n## Time per Pipeline Stage\n\n- **generation**: 200240ms (79.3%) · 1 execution(s)\n- **strategy**: 36915ms (14.6%) · 1 execution(s)\n- **design**: 15273ms (6%) · 1 execution(s)\n- **finalize**: 38ms (0%) · 1 execution(s)\n- **assets**: 16ms (0%) · 1 execution(s)\n- **quality**: 9ms (0%) · 1 execution(s)\n- **template**: 8ms (0%) · 3 execution(s)\n- **master-planner**: 6ms (0%) · 6 execution(s)\n- **seo**: 6ms (0%) · 1 execution(s)\n- **performance**: 5ms (0%) · 1 execution(s)\n- **template-intelligence**: 3ms (0%) · 2 execution(s)\n- **idea**: 1ms (0%) · 1 execution(s)\n- **start**: 0ms (0%) · 1 execution(s)\n- **auto-design**: 0ms (0%) · 1 execution(s)\n- **done**: 0ms (0%) · 1 execution(s)\n\n## AI Requests by Stage\n\n- **file-generation**: 4 calls · 200198ms · 105846 prompt chars\n- **strategy**: 1 calls · 36907ms · 5430 prompt chars\n- **design-system**: 1 calls · 15265ms · 16044 prompt chars\n\n## Duplicate Stage Executions\n\n- `template`: 3×\n- `master-planner`: 6×\n- `template-intelligence`: 2×\n\n## Recommendations (by impact)\n\n1. **[critical]** Per-file LLM generation is the dominant cost — batch or parallelize independent files.\n2. **[high]** Strategy + design-system LLM calls add significant pre-generation latency.\n3. **[medium]** Duplicate master-planner/template stage entries suggest redundant orchestration steps.\n4. **[medium]** Run live profiler with API keys for Supabase checkpoint/persist measurements.\n"
+}

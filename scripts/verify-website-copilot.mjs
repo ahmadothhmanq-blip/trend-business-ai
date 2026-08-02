@@ -146,7 +146,9 @@ const requiredPaths = [
   "lib/ai-core/website-copilot/router.ts",
   "lib/ai-core/website-copilot/composer.ts",
   "lib/ai-core/website-copilot/processor.ts",
-  "lib/ai-core/website-copilot/sync-blueprint.ts",
+  "lib/website/platform/sync-blueprint.ts",
+  "lib/website/platform/port.ts",
+  "lib/website/contracts/platform-port.ts",
   "lib/ai-core/website-copilot/validators/post-command.ts",
   "lib/ai-core/website-copilot/executors/local.ts",
   "lib/ai-core/website-copilot/executors/ai-continue.ts",
@@ -173,6 +175,14 @@ const routeSrc = readFileSync(
 if (!routeSrc.includes("runCopilotCommand")) {
   fail("commands route delegates", "missing runCopilotCommand");
 } else ok("commands route delegates to runCopilotCommand");
+
+const processorSrc = readFileSync(
+  join(root, "lib/ai-core/website-copilot/processor.ts"),
+  "utf8",
+);
+if (!processorSrc.includes("getWebsitePlatformPort")) {
+  fail("processor platform port", "missing getWebsitePlatformPort");
+} else ok("processor uses WebsitePlatformPort");
 
 const commitSrc = readFileSync(
   join(root, "lib/website/platform/commit.ts"),

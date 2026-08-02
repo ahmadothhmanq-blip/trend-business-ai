@@ -1,0 +1,154 @@
+{
+  "profile": "professional",
+  "prompt": "Fine dining restaurant in Dubai with reservations, menu highlights, chef story, and private dining events. Premium luxury aesthetic.",
+  "gitHead": "92f9b33",
+  "wallClockMs": 1555519,
+  "layerRunnerMs": 1555517,
+  "fileCount": 56,
+  "provider": "deepseek",
+  "usage": {
+    "promptTokens": 0,
+    "completionTokens": 0,
+    "totalTokens": 0
+  },
+  "llmRequestCount": 43,
+  "llmByStage": {
+    "file-generation": {
+      "count": 34,
+      "durationMs": 1333292,
+      "promptChars": 3643613,
+      "totalTokens": 1255921
+    },
+    "generateJson": {
+      "count": 4,
+      "durationMs": 95998,
+      "promptChars": 63299,
+      "totalTokens": 25964
+    },
+    "dynamic-plan": {
+      "count": 1,
+      "durationMs": 45277,
+      "promptChars": 11209,
+      "totalTokens": 9758
+    },
+    "strategy": {
+      "count": 1,
+      "durationMs": 42631,
+      "promptChars": 6616,
+      "totalTokens": 8508
+    },
+    "blueprint": {
+      "count": 1,
+      "durationMs": 14216,
+      "promptChars": 18697,
+      "totalTokens": 7028
+    },
+    "business-idea": {
+      "count": 1,
+      "durationMs": 12791,
+      "promptChars": 4285,
+      "totalTokens": 3267
+    },
+    "design-system": {
+      "count": 1,
+      "durationMs": 10825,
+      "promptChars": 17879,
+      "totalTokens": 5889
+    }
+  },
+  "progressStageTimings": [
+    {
+      "stage": "start",
+      "durationMs": 0
+    },
+    {
+      "stage": "template",
+      "durationMs": 7
+    },
+    {
+      "stage": "master-planner",
+      "durationMs": 1
+    },
+    {
+      "stage": "master-planner",
+      "durationMs": 0
+    },
+    {
+      "stage": "master-planner",
+      "durationMs": 7
+    },
+    {
+      "stage": "master-planner",
+      "durationMs": 0
+    },
+    {
+      "stage": "master-planner",
+      "durationMs": 0
+    },
+    {
+      "stage": "master-planner",
+      "durationMs": 1
+    },
+    {
+      "stage": "template",
+      "durationMs": 4522
+    },
+    {
+      "stage": "template",
+      "durationMs": 0
+    },
+    {
+      "stage": "template-intelligence",
+      "durationMs": 6
+    },
+    {
+      "stage": "auto-design",
+      "durationMs": 0
+    },
+    {
+      "stage": "template-intelligence",
+      "durationMs": 0
+    },
+    {
+      "stage": "idea",
+      "durationMs": 12794
+    },
+    {
+      "stage": "strategy",
+      "durationMs": 42638
+    },
+    {
+      "stage": "design",
+      "durationMs": 21159
+    },
+    {
+      "stage": "assets",
+      "durationMs": 32171
+    },
+    {
+      "stage": "generation",
+      "durationMs": 1392992
+    },
+    {
+      "stage": "quality",
+      "durationMs": 30
+    },
+    {
+      "stage": "seo",
+      "durationMs": 14
+    },
+    {
+      "stage": "performance",
+      "durationMs": 13
+    },
+    {
+      "stage": "finalize",
+      "durationMs": 49162
+    },
+    {
+      "stage": "done",
+      "durationMs": 0
+    }
+  ],
+  "timestamp": "2026-07-31T16:31:09.847Z"
+}

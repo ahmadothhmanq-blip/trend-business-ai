@@ -1,10 +1,9 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { getWebsitePlatformPort } from "@/lib/website/platform/port";
+
 /**
  * SEO executor — applies top SEO fix via WebsiteSeoService (Phase 2).
  */
-
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { executeWebsiteSeoImprove } from "@/lib/website/platform/services/seo-service";
-import type { WebsiteSeoApplySuccess } from "@/lib/website/platform/services/seo-service";
 
 export async function executeSeoCopilotCommand(params: {
   supabase: SupabaseClient;
@@ -13,10 +12,9 @@ export async function executeSeoCopilotCommand(params: {
   command: string;
   capability: string;
   expectedRevision?: number;
-}): Promise<
-  WebsiteSeoApplySuccess | { ok: false; code: string; error: string }
-> {
-  const result = await executeWebsiteSeoImprove({
+}) {
+  const port = getWebsitePlatformPort();
+  return port.executeSeoImprove({
     supabase: params.supabase,
     userId: params.userId,
     generationId: params.generationId,
@@ -31,10 +29,4 @@ export async function executeSeoCopilotCommand(params: {
       },
     },
   });
-
-  if (!result.ok) {
-    return result;
-  }
-
-  return result;
 }

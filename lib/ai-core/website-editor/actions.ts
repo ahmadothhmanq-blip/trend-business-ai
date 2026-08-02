@@ -20,6 +20,32 @@ import {
   resolveTextPropNameForComponent,
   updateComponentJsxStringProp,
 } from "@/lib/ai-core/visual-editor/hydrate-node-text";
+import {
+  applyButtonToPageSource,
+  applyButtonToSectionSource,
+} from "@/lib/ai-core/visual-editor/button-persist";
+import { ensureWbButtonGlobalsCss } from "@/lib/ai-core/visual-editor/button-config";
+import {
+  applyLinkToPageSource,
+  applyLinkToSectionSource,
+} from "@/lib/ai-core/visual-editor/link-persist";
+import type { VisualButton } from "@/lib/ai-core/visual-editor/button-types";
+import type { VisualIcon } from "@/lib/ai-core/visual-editor/icon-types";
+import {
+  applyIconToPageSource,
+  applyIconToSectionSource,
+} from "@/lib/ai-core/visual-editor/icon-persist";
+import {
+  applySectionBackgroundToPageSource,
+  applySectionBackgroundToSectionSource,
+} from "@/lib/ai-core/visual-editor/section-bg-persist";
+import { ensureWbSectionBgGlobalsCss } from "@/lib/ai-core/visual-editor/section-bg-config";
+import type { VisualSectionBackground } from "@/lib/ai-core/visual-editor/section-bg-types";
+import { applySectionConfigToSectionSource } from "@/lib/ai-core/visual-editor/section-persist";
+import { ensureWbSectionGlobalsCss } from "@/lib/ai-core/visual-editor/section-config";
+import type { VisualSectionConfig } from "@/lib/ai-core/visual-editor/section-types";
+import { ensureWbIconGlobalsCss } from "@/lib/ai-core/visual-editor/icon-config";
+import type { VisualLink } from "@/lib/ai-core/visual-editor/link-types";
 
 function isComponentId(id: string): id is DesignRendererComponentId {
   return id in DESIGN_RENDERER_COMPONENTS;
@@ -477,6 +503,392 @@ export function applyWebsiteEditActions(params: {
         files = upsertFile(files, file.path, content, file.language || "tsx");
         applied.push(action);
         notes.push(`Updated image in ${target}`);
+        break;
+      }
+      case "update-button": {
+        const target = action.target;
+        const raw = action.value?.trim();
+        if (!target || !raw) {
+          notes.push("Skip update-button: need target + value");
+          break;
+        }
+        let button: VisualButton;
+        try {
+          button = JSON.parse(raw) as VisualButton;
+        } catch {
+          notes.push("Skip update-button: invalid JSON payload");
+          break;
+        }
+        const section = params.understanding.sections.find(
+          (s) => s.exportName === target,
+        );
+        if (!section) {
+          notes.push(`Skip update-button: unknown section ${target}`);
+          break;
+        }
+        const sectionFile = files.find(
+          (f) =>
+            f.path.replace(/\\/g, "/") === section.path.replace(/\\/g, "/"),
+        );
+        const home = findHome(files);
+        let changed = false;
+
+        if (button.sourceKind === "prop" && home) {
+          const nextPage = applyButtonToPageSource(
+            home.content,
+            target,
+            button,
+          );
+          if (nextPage) {
+            files = upsertFile(files, home.path, nextPage, home.language || "tsx");
+            changed = true;
+          }
+        }
+
+        if (sectionFile) {
+          const nextSection = applyButtonToSectionSource(
+            sectionFile.content,
+            button,
+          );
+          if (nextSection) {
+            files = upsertFile(
+              files,
+              sectionFile.path,
+              nextSection,
+              sectionFile.language || "tsx",
+            );
+            changed = true;
+          }
+        }
+
+        const globals = files.find((f) =>
+          f.path.replace(/\\/g, "/").endsWith("globals.css"),
+        );
+        if (globals) {
+          const nextCss = ensureWbButtonGlobalsCss(globals.content);
+          if (nextCss !== globals.content) {
+            files = upsertFile(files, globals.path, nextCss, "css");
+            changed = true;
+          }
+        }
+
+        if (!changed) {
+          pendingAiActions.push({
+            type: "rewrite-content",
+            target,
+            notes: `Update button ${button.label} in ${target}`,
+          });
+          notes.push(`Queued button update for AI: ${target}`);
+          break;
+        }
+        applied.push(action);
+        notes.push(`Updated button in ${target}`);
+        break;
+      }
+      case "update-link": {
+        const target = action.target;
+        const raw = action.value?.trim();
+        if (!target || !raw) {
+          notes.push("Skip update-link: need target + value");
+          break;
+        }
+        let link: VisualLink;
+        try {
+          link = JSON.parse(raw) as VisualLink;
+        } catch {
+          notes.push("Skip update-link: invalid JSON payload");
+          break;
+        }
+        const section = params.understanding.sections.find(
+          (s) => s.exportName === target,
+        );
+        if (!section) {
+          notes.push(`Skip update-link: unknown section ${target}`);
+          break;
+        }
+        const sectionFile = files.find(
+          (f) =>
+            f.path.replace(/\\/g, "/") === section.path.replace(/\\/g, "/"),
+        );
+        const home = findHome(files);
+        let changed = false;
+
+        if (home) {
+          const nextPage = applyLinkToPageSource(
+            home.content,
+            target,
+            link,
+          );
+          if (nextPage) {
+            files = upsertFile(files, home.path, nextPage, home.language || "tsx");
+            changed = true;
+          }
+        }
+
+        if (sectionFile) {
+          const nextSection = applyLinkToSectionSource(
+            sectionFile.content,
+            link,
+          );
+          if (nextSection) {
+            files = upsertFile(
+              files,
+              sectionFile.path,
+              nextSection,
+              sectionFile.language || "tsx",
+            );
+            changed = true;
+          }
+        }
+
+        const globals = files.find((f) =>
+          f.path.replace(/\\/g, "/").endsWith("globals.css"),
+        );
+        if (globals) {
+          const nextCss = ensureWbButtonGlobalsCss(globals.content);
+          if (nextCss !== globals.content) {
+            files = upsertFile(files, globals.path, nextCss, "css");
+            changed = true;
+          }
+        }
+
+        if (!changed) {
+          pendingAiActions.push({
+            type: "rewrite-content",
+            target,
+            notes: `Update link ${link.label} in ${target}`,
+          });
+          notes.push(`Queued link update for AI: ${target}`);
+          break;
+        }
+        applied.push(action);
+        notes.push(`Updated link in ${target}`);
+        break;
+      }
+      case "update-icon": {
+        const target = action.target;
+        const raw = action.value?.trim();
+        if (!target || !raw) {
+          notes.push("Skip update-icon: need target + value");
+          break;
+        }
+        let icon: VisualIcon;
+        try {
+          icon = JSON.parse(raw) as VisualIcon;
+        } catch {
+          notes.push("Skip update-icon: invalid JSON payload");
+          break;
+        }
+        const section = params.understanding.sections.find(
+          (s) => s.exportName === target,
+        );
+        if (!section) {
+          notes.push(`Skip update-icon: unknown section ${target}`);
+          break;
+        }
+        const sectionFile = files.find(
+          (f) =>
+            f.path.replace(/\\/g, "/") === section.path.replace(/\\/g, "/"),
+        );
+        const home = findHome(files);
+        let changed = false;
+
+        if (home) {
+          const nextPage = applyIconToPageSource(home.content, target, icon);
+          if (nextPage) {
+            files = upsertFile(files, home.path, nextPage, home.language || "tsx");
+            changed = true;
+          }
+        }
+
+        if (sectionFile) {
+          const nextSection = applyIconToSectionSource(sectionFile.content, icon);
+          if (nextSection) {
+            files = upsertFile(
+              files,
+              sectionFile.path,
+              nextSection,
+              sectionFile.language || "tsx",
+            );
+            changed = true;
+          }
+        }
+
+        const globals = files.find((f) =>
+          f.path.replace(/\\/g, "/").endsWith("globals.css"),
+        );
+        if (globals) {
+          let nextCss = ensureWbButtonGlobalsCss(globals.content);
+          nextCss = ensureWbIconGlobalsCss(nextCss);
+          if (nextCss !== globals.content) {
+            files = upsertFile(files, globals.path, nextCss, "css");
+            changed = true;
+          }
+        }
+
+        if (!changed) {
+          pendingAiActions.push({
+            type: "rewrite-content",
+            target,
+            notes: `Update icon ${icon.name} in ${target}`,
+          });
+          notes.push(`Queued icon update for AI: ${target}`);
+          break;
+        }
+        applied.push(action);
+        notes.push(`Updated icon in ${target}`);
+        break;
+      }
+      case "update-section-background": {
+        const target = action.target;
+        const raw = action.value?.trim();
+        if (!target || !raw) {
+          notes.push("Skip update-section-background: need target + value");
+          break;
+        }
+        let bg: VisualSectionBackground;
+        try {
+          bg = JSON.parse(raw) as VisualSectionBackground;
+        } catch {
+          notes.push("Skip update-section-background: invalid JSON payload");
+          break;
+        }
+        const section = params.understanding.sections.find(
+          (s) => s.exportName === target,
+        );
+        if (!section) {
+          notes.push(`Skip update-section-background: unknown section ${target}`);
+          break;
+        }
+        const sectionFile = files.find(
+          (f) =>
+            f.path.replace(/\\/g, "/") === section.path.replace(/\\/g, "/"),
+        );
+        const home = findHome(files);
+        let changed = false;
+
+        if (home) {
+          const nextPage = applySectionBackgroundToPageSource(
+            home.content,
+            target,
+            bg,
+          );
+          if (nextPage) {
+            files = upsertFile(files, home.path, nextPage, home.language || "tsx");
+            changed = true;
+          }
+        }
+
+        if (sectionFile) {
+          const nextSection = applySectionBackgroundToSectionSource(
+            sectionFile.content,
+            bg,
+          );
+          if (nextSection) {
+            files = upsertFile(
+              files,
+              sectionFile.path,
+              nextSection,
+              sectionFile.language || "tsx",
+            );
+            changed = true;
+          }
+        }
+
+        const globals = files.find((f) =>
+          f.path.replace(/\\/g, "/").endsWith("globals.css"),
+        );
+        if (globals) {
+          let nextCss = ensureWbButtonGlobalsCss(globals.content);
+          nextCss = ensureWbIconGlobalsCss(nextCss);
+          nextCss = ensureWbSectionBgGlobalsCss(nextCss);
+          if (nextCss !== globals.content) {
+            files = upsertFile(files, globals.path, nextCss, "css");
+            changed = true;
+          }
+        }
+
+        if (!changed) {
+          pendingAiActions.push({
+            type: "rewrite-content",
+            target,
+            notes: `Update section background in ${target}`,
+          });
+          notes.push(`Queued section background update for AI: ${target}`);
+          break;
+        }
+        applied.push(action);
+        notes.push(`Updated section background in ${target}`);
+        break;
+      }
+      case "update-section": {
+        const target = action.target;
+        const raw = action.value?.trim();
+        if (!target || !raw) {
+          notes.push("Skip update-section: need target + value");
+          break;
+        }
+        let config: VisualSectionConfig;
+        try {
+          config = JSON.parse(raw) as VisualSectionConfig;
+        } catch {
+          notes.push("Skip update-section: invalid JSON payload");
+          break;
+        }
+        const section = params.understanding.sections.find(
+          (s) => s.exportName === target,
+        );
+        if (!section) {
+          notes.push(`Skip update-section: unknown section ${target}`);
+          break;
+        }
+        const sectionFile = files.find(
+          (f) =>
+            f.path.replace(/\\/g, "/") === section.path.replace(/\\/g, "/"),
+        );
+        let changed = false;
+
+        if (sectionFile) {
+          const nextSection = applySectionConfigToSectionSource(
+            sectionFile.content,
+            config,
+          );
+          if (nextSection) {
+            files = upsertFile(
+              files,
+              sectionFile.path,
+              nextSection,
+              sectionFile.language || "tsx",
+            );
+            changed = true;
+          }
+        }
+
+        const globals = files.find((f) =>
+          f.path.replace(/\\/g, "/").endsWith("globals.css"),
+        );
+        if (globals) {
+          let nextCss = ensureWbButtonGlobalsCss(globals.content);
+          nextCss = ensureWbIconGlobalsCss(nextCss);
+          nextCss = ensureWbSectionBgGlobalsCss(nextCss);
+          nextCss = ensureWbSectionGlobalsCss(nextCss);
+          if (nextCss !== globals.content) {
+            files = upsertFile(files, globals.path, nextCss, "css");
+            changed = true;
+          }
+        }
+
+        if (!changed) {
+          pendingAiActions.push({
+            type: "rewrite-content",
+            target,
+            notes: `Update section settings in ${target}`,
+          });
+          notes.push(`Queued section config update for AI: ${target}`);
+          break;
+        }
+        applied.push(action);
+        notes.push(`Updated section config in ${target}`);
         break;
       }
       case "improve-luxury": {

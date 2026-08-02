@@ -6,7 +6,9 @@ import { toast } from "sonner";
 import { readSseStream } from "@/lib/api/sse-client";
 import { isWebsiteIncrementalPreviewEnabled } from "@/lib/website/generation-flags";
 import { tryRecoverCompletedWebsiteGeneration } from "@/lib/website/stream-recovery";
+import { getClientStreamRecoveryPollMs } from "@/lib/website/stream-limits";
 import { MAX_RECENT_PROJECTS } from "@/lib/website/constants";
+import { prepareWebsiteProjectForExport } from "@/lib/website/prepare-export";
 import { useTranslation } from "@/lib/i18n/client";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
 import { inferWebsiteOnboardingDefaults } from "@/lib/ai-core/website-builder/onboarding-inference";
@@ -101,6 +103,12 @@ import type { OutputTab } from "@/components/dashboard/website-builder/tool/type
 import { readWebsiteBuilderApiError, formatWebsiteBuilderApiError } from "@/lib/website/builder/client-api-error";
 import { useBuilderTemplateRuntime } from "@/lib/website/builder/use-template-runtime";
 import { resolveTemplateIntelligenceForMarketplace } from "@/lib/ai-core/template-intelligence/resolve-marketplace";
+import { resolveGenerationPrompt } from "@/lib/website/builder/resolve-generation-prompt";
+import {
+  buildBriefFromStructureTemplate,
+  buildBriefFromTemplatePayload,
+  resolveEffectiveProjectBrief,
+} from "@/lib/website/builder/resolve-effective-project-brief";
 
 type WebsiteBuilderToolProps = {
   /** Serializable product id only — never pass ProductDefinition (contains LucideIcon). */
@@ -157,14 +165,6 @@ const LANGUAGE_KEYS: Record<(typeof LANGUAGES)[number], string> = {
   Portuguese: "portuguese",
   Italian: "italian",
 };
-
-const TEMPLATES = [
-  "Luxury real estate marketplace",
-  "Premium SaaS landing page",
-  "Clinic website with booking",
-  "Restaurant ordering platform",
-  "Executive portfolio website",
-] as const;
 
 const PAGES = ["Home", "About", "Services", "Pricing", "Dashboard", "Admin", "Contact"];
 
@@ -317,31 +317,6 @@ function mapIndustryToProjectType(industry: string): string | null {
   return null;
 }
 
-function buildBriefFromTemplate(
-  payload: TemplateUsePayload,
-  websiteLanguage: string,
-): string {
-  const structureOnly =
-    websiteLanguage !== "English"
-      ? `\n\nSTRUCTURE ONLY (do not copy English labels into the website): Template metadata below describes layout, sections, and design — NOT the output language. Every visible string in the generated site MUST be in ${websiteLanguage}.`
-      : "";
-  return [
-    `Build a ${payload.name} website.`,
-    payload.tagline,
-    payload.description,
-    `Industry: ${payload.industry}. Style: ${payload.style}. Layout: ${payload.layoutType}.`,
-    payload.features.length
-      ? `Include: ${payload.features.slice(0, 8).join(", ")}.`
-      : "",
-    payload.components.length
-      ? `Preferred sections: ${payload.components.join(", ")}.`
-      : "",
-    structureOnly,
-  ]
-    .filter(Boolean)
-    .join(" ");
-}
-
 export function WebsiteBuilderTool({
   productId,
   initialGenerations = [],
@@ -349,9 +324,6 @@ export function WebsiteBuilderTool({
   const { t } = useTranslation();
   const wb = useProductT("websiteBuilder");
   const product = productId ? getProductDefinition(productId) : undefined;
-  const productTemplates = product?.templates?.length
-    ? product.templates
-    : [...TEMPLATES];
   const [projectBrief, setProjectBrief] = useState("");
   const onePrompt = getOnePromptProduct("website-builder");
   const applyIdea = useCallback((idea: string) => {
@@ -807,21 +779,59 @@ export function WebsiteBuilderTool({
         ? activeProject.language
         : language;
 
-    const templateBrief = tpl
-      ? buildBriefFromTemplate(tpl, resolvedLanguage)
+    const templateBriefForLog = tpl
+      ? buildBriefFromTemplatePayload(tpl, resolvedLanguage)
       : null;
-    const brief =
-      templateBrief ||
-      projectBrief.trim() ||
-      (mode === "regenerate" || options?.resume
-        ? activeProject?.description.trim()
-        : "") ||
-      productTemplates[0] ||
-      "I need a luxury real estate website with booking, clear services pages, and a premium brand look.";
 
-    if (mode === "regenerate" && !projectBrief.trim() && activeProject?.description) {
-      setProjectBrief(activeProject.description);
+    let effectiveProjectBrief = resolveEffectiveProjectBrief({
+      projectBrief,
+      language: resolvedLanguage,
+      tpl,
+      websiteStructureTemplateId:
+        templateRuntimeModelRef.current?.template.id ?? websiteStructureTemplateId,
+      templateIndustry,
+      templateComponents,
+      autoDesignHint,
+      templateRuntimeModel: templateRuntimeModelRef.current,
+      placeholderFallback: product?.promptPlaceholder ?? onePrompt.placeholder,
+    });
+
+    if (
+      mode === "regenerate" &&
+      !effectiveProjectBrief.trim() &&
+      activeProject?.description
+    ) {
+      effectiveProjectBrief = activeProject.description;
     }
+
+    if (effectiveProjectBrief.trim() && effectiveProjectBrief !== projectBrief.trim()) {
+      setProjectBrief(effectiveProjectBrief);
+    }
+
+    const promptResult = resolveGenerationPrompt({
+      mode,
+      projectBrief: effectiveProjectBrief,
+      activeProjectDescription: activeProject?.description,
+      resume: options?.resume,
+      iterationOnActiveProject:
+        mode === "continue" &&
+        Boolean(
+          options?.resume ||
+            options?.continue ||
+            options?.optimize ||
+            options?.layerImprove,
+        ),
+    });
+
+    if (!promptResult.ok) {
+      toast.error(wb("errors.noBrief"));
+      if (mode === "generate") {
+        setEditMode(false);
+      }
+      return;
+    }
+
+    const apiPrompt = promptResult.prompt;
 
     const resolvedTemplateId = tpl?.templateId ?? selectedTemplateId;
     const resolvedMarketplaceId =
@@ -838,7 +848,7 @@ export function WebsiteBuilderTool({
       : templateStyle
         ? ` ${templateStyle}`
         : "";
-    const inferred = inferWebsiteOnboardingDefaults(brief);
+    const inferred = inferWebsiteOnboardingDefaults(apiPrompt);
     const resolvedProjectType =
       (tpl?.industry ? mapIndustryToProjectType(tpl.industry) : null) ||
       inferred.projectType;
@@ -875,7 +885,7 @@ export function WebsiteBuilderTool({
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            prompt: brief,
+            prompt: apiPrompt,
             language: resolvedLanguage,
             brandStyle: inferred.designStyle,
             industry: templateIndustry || inferred.industryId || undefined,
@@ -939,7 +949,7 @@ export function WebsiteBuilderTool({
     };
 
     const requestBody = {
-      prompt: mode === "continue" ? activeProject?.description || brief : brief,
+      prompt: apiPrompt,
       projectType: resolvedProjectType,
       language: resolvedLanguage,
       theme: `${inferredTheme}${resolvedThemeStyle}`,
@@ -1023,6 +1033,8 @@ export function WebsiteBuilderTool({
       finalizing: wb("stream.finalizingSavedProject"),
     };
 
+    const recoveryPollMs = getClientStreamRecoveryPollMs();
+
     const tryApplyRecoveredGeneration = async (
       generationId: string,
       lastProgressMessage: string | null,
@@ -1031,6 +1043,7 @@ export function WebsiteBuilderTool({
         onStatus: setStreamStatus,
         messages: recoveryMessages,
         lastProgressMessage,
+        pollMs: recoveryPollMs,
       });
       if (!recovered) return false;
       applySavedGeneration(recovered.project, recovered.generation);
@@ -1038,6 +1051,14 @@ export function WebsiteBuilderTool({
       setApiError(null);
       return true;
     };
+
+    console.info("[website-builder] prompt verification", {
+      generationMode: requestBody.mode ?? mode,
+      projectBrief: effectiveProjectBrief.trim(),
+      requestBodyPrompt: requestBody.prompt,
+      templateBrief: templateBriefForLog,
+      activeProjectDescription: activeProject?.description ?? null,
+    });
 
     streamAbortRef.current?.abort();
     const streamAbort = new AbortController();
@@ -1059,6 +1080,18 @@ export function WebsiteBuilderTool({
       if (streamResponse.ok && streamResponse.body) {
         let incrementalPreview = isWebsiteIncrementalPreviewEnabled();
         let lastPreviewBumpAt = 0;
+        let handoffRecoveryStarted = false;
+
+        const startHandoffRecovery = (generationId: string, message?: string | null) => {
+          if (handoffRecoveryStarted) return;
+          handoffRecoveryStarted = true;
+          void tryApplyRecoveredGeneration(generationId, message ?? null).then((recovered) => {
+            if (recovered) {
+              setPreviewRevision((n) => n + 1);
+              setApiError(null);
+            }
+          });
+        };
 
         const sseResult = await readSseStream<{
           project?: GeneratedWebsiteProject;
@@ -1097,7 +1130,7 @@ export function WebsiteBuilderTool({
               description:
                 typeof requestBody.prompt === "string"
                   ? requestBody.prompt
-                  : brief,
+                  : apiPrompt,
               type: resolvedProjectType,
               style: inferred.designStyle,
               theme: inferred.colorTheme,
@@ -1111,6 +1144,16 @@ export function WebsiteBuilderTool({
             );
             setOutputTab("preview");
             setPreviewRevision((n) => n + 1);
+          },
+          onHandoff: (handoff) => {
+            if (handoff.message) setStreamStatus(handoff.message);
+            if (handoff.generationId) {
+              sessionGenerationId = handoff.generationId;
+              activeStreamSessionRef.current = handoff.generationId;
+              if (handoff.pollMode) {
+                startHandoffRecovery(handoff.generationId, handoff.message);
+              }
+            }
           },
           onComplete: async (payload) => {
             if (payload.project && payload.generation?.id) {
@@ -1147,6 +1190,9 @@ export function WebsiteBuilderTool({
         if (!sseResult.completed && !sseResult.aborted) {
           const recoveryId = sessionGenerationId ?? sseResult.generationId;
           if (recoveryId) {
+            if (handoffRecoveryStarted) {
+              return;
+            }
             const recovered = await tryApplyRecoveredGeneration(
               recoveryId,
               sseResult.lastProgressMessage,
@@ -1291,6 +1337,11 @@ export function WebsiteBuilderTool({
       setTemplateComponents(choice.components);
     }
     if (!activeProject?.id) {
+      setProjectBrief(
+        buildBriefFromStructureTemplate(choice, language, {
+          components: choice.components,
+        }),
+      );
       toast.success(wb("templates.structureApplied", { name: choice.label }));
       return;
     }
@@ -1580,7 +1631,6 @@ export function WebsiteBuilderTool({
     setTemplateIndustry(payload.industry);
     setTemplateComponents(payload.components);
     setTemplateDesignSystem(payload.designSystem);
-    setProjectBrief(buildBriefFromTemplate(payload, language));
     setEditMode(false);
     setOutputTab("preview");
 
@@ -1809,8 +1859,8 @@ export function WebsiteBuilderTool({
         return;
       }
 
-      if (exportResponse.status === 409) {
-        // Hydrate client copy, then fall back to client ZIP if files appear.
+      if (exportResponse.status === 409 || exportResponse.status === 422) {
+        // Hydrate client copy, then fall back to prepared client ZIP if files appear.
         const detail = await fetch(`/api/website-builder/${project.id}`);
         if (detail.ok) {
           const data = (await detail.json()) as {
@@ -1831,18 +1881,26 @@ export function WebsiteBuilderTool({
         throw new Error(data?.error ?? wb("errors.download"));
       }
 
-      const files = project.generatedProject?.files ?? [];
-      if (!files.length) {
+      const rawFiles = project.generatedProject?.files ?? [];
+      if (!rawFiles.length) {
         toast.error(
           wb("errors.download"),
         );
         return;
       }
 
+      const prepared = prepareWebsiteProjectForExport(rawFiles);
+      if (!prepared.ready) {
+        throw new Error(
+          prepared.blockingIssues[0] ??
+            "This project has export blockers. Fix validation issues in Website Builder, then try again.",
+        );
+      }
+
       const JSZip = (await import("jszip")).default;
       const zip = new JSZip();
       let skippedFiles = 0;
-      files.forEach((file) => {
+      prepared.files.forEach((file) => {
         const safePath = sanitizeZipPath(file.path);
         if (!safePath) {
           skippedFiles += 1;

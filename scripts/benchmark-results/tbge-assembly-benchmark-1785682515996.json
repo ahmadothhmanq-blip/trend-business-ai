@@ -1,0 +1,18 @@
+{
+  "generatedAt": "2026-08-02T14:55:15.995Z",
+  "sprint": "TBGE Sprint 3",
+  "iterations": 100,
+  "llmMode": "none",
+  "results": [
+    {
+      "label": "assemble single-node spec",
+      "medianMs": 0.4926,
+      "totalMs": 2.81
+    },
+    {
+      "label": "assemble full website graph",
+      "medianMs": 4.4229,
+      "totalMs": 18.58
+    }
+  ]
+}

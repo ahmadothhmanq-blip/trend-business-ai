@@ -1,10 +1,9 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { getWebsitePlatformPort } from "@/lib/website/platform/port";
+
 /**
  * Local executor — deterministic edits without AI continue.
  */
-
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { executeWebsiteEdit } from "@/lib/website/platform/services/edit-service";
-import type { WebsiteEditServiceSuccess } from "@/lib/website/platform/services/edit-service";
 
 export async function executeLocalCopilotCommand(params: {
   supabase: SupabaseClient;
@@ -13,8 +12,9 @@ export async function executeLocalCopilotCommand(params: {
   command: string;
   expectedRevision?: number;
   capability: string;
-}): Promise<WebsiteEditServiceSuccess | { ok: false; code: string; error: string }> {
-  const result = await executeWebsiteEdit({
+}) {
+  const port = getWebsitePlatformPort();
+  return port.executeEdit({
     supabase: params.supabase,
     userId: params.userId,
     generationId: params.generationId,
@@ -32,10 +32,4 @@ export async function executeLocalCopilotCommand(params: {
       },
     },
   });
-
-  if (!result.ok) {
-    return result;
-  }
-
-  return result;
 }

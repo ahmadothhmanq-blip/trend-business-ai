@@ -107,7 +107,10 @@ import {
 import { analyzeBusinessIdea } from "@/plugins/website/layers/business-idea";
 import { buildDesignSystem } from "@/plugins/website/layers/design-engine";
 import { buildWebsiteStrategy } from "@/plugins/website/layers/strategy";
-import { uploadWebsiteAsset } from "@/lib/website/assets-storage";
+import {
+  completeWebsiteBuilderRun,
+  prepareWebsiteTemplateStage,
+} from "@/lib/website/layer-hooks/prepare-template";
 import {
   generateWebsite as generateWebsiteFiles,
   runWebsiteQualityLayer,
@@ -137,7 +140,10 @@ import {
   isUltraFastWebsiteGenerationEnabled,
   resolveWebsiteGenerationProfile,
 } from "@/lib/website/generation-flags";
+import { computeUnifiedQualityScores } from "@/lib/ai-core/quality-authority";
+import { validateGeneratedProject } from "@/lib/ai/validator";
 import { normalizeWebsiteFeatureList } from "@/lib/website/builder/feature-registry";
+import { uploadWebsiteAsset } from "@/lib/website/assets-storage";
 import {
   buildGenerationRepairInstruction,
   validateWebsiteGeneration,
@@ -546,6 +552,22 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
       seo: true,
       performance: true,
       finalize: true,
+    },
+
+    async prepareTemplate(brief, artifacts, ctx) {
+      return prepareWebsiteTemplateStage({
+        brief,
+        artifacts,
+        onProgress: ctx.onProgress,
+      });
+    },
+
+    async completeRun(brief, artifacts, ctx) {
+      return completeWebsiteBuilderRun({
+        brief,
+        artifacts,
+        onProgress: ctx.onProgress,
+      });
     },
 
     async runIdea(brief, ctx) {
@@ -1346,7 +1368,7 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
           }).result
         : runQualityAssuranceEngine(qasheParams);
 
-      let autoReport = qasheResult.spec.qualityReport;
+      const autoReport = qasheResult.spec.qualityReport;
       const qualityFiles =
         qasheResult.files && qasheResult.files.length > 0
           ? qualityResult.files.map((file) => {
@@ -1846,9 +1868,24 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
             }
           : base.editorSuggestions;
 
+        const unifiedQualityScores = computeUnifiedQualityScores({
+          validationIssues: validateGeneratedProject(base.files, {
+            requiresAuth: false,
+            requiresDatabase: false,
+            requiresDashboard: false,
+            isEcommerce: false,
+            isSaas: false,
+            databaseProvider: "none",
+          }).issues,
+          qualityReport: base.qualityReport,
+          optimizationScores: base.optimizationReport?.scores,
+          finalQualityScores: finalQualityReport.scores,
+        });
+
         base = {
           ...base,
           finalQualityReport,
+          unifiedQualityScores,
           editorSuggestions: mergedSuggestions,
           qualityReport: {
             ...(base.qualityReport ?? {
@@ -1858,9 +1895,9 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
               issues: [],
               improveApplied: false,
             }),
-            score: finalQualityReport.scores.overall,
+            score: unifiedQualityScores.overall,
             publishReady: finalQualityReport.publishReady,
-            seoReadinessScore: finalQualityReport.scores.seo,
+            seoReadinessScore: unifiedQualityScores.seo,
             performanceScore: finalQualityReport.scores.performance,
             improveNotes: [
               ...(base.qualityReport?.improveNotes ?? []),

@@ -4,6 +4,8 @@ import {
   logLlmRequest,
   type LlmAuditContext,
 } from "@/lib/ai/llm-audit";
+import { getActiveWebsiteProfilerSlot } from "@/lib/ai/profiler-slot";
+import { performance } from "node:perf_hooks";
 
 export type GenerateJsonOptions<T> = {
   provider: AIProvider;
@@ -43,11 +45,25 @@ export async function generateJsonWithValidation<T>(
       logLlmRequest(audit, prompt);
     }
 
+    const profiler = getActiveWebsiteProfilerSlot();
+    const llmStart = performance.now();
     const result = await options.provider.generateJson<T>({
       prompt,
       schema: options.schema,
       audit,
     });
+    const llmDurationMs = Math.round(performance.now() - llmStart);
+
+    if (profiler && audit) {
+      profiler.recordLlm({
+        stage: audit.stage,
+        filePath: audit.filePath,
+        durationMs: llmDurationMs,
+        attempt: audit.attempt ?? attempt + 1,
+        success: true,
+        promptChars: prompt.length,
+      });
+    }
 
     if (audit) {
       logLlmParsedResult(audit, result);

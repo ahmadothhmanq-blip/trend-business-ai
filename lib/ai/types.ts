@@ -85,6 +85,13 @@ export type GenerationContext = {
   /** Optional mid-run file checkpoint (Website Builder stream resilience). */
   onFilesCheckpoint?: (
     files: GeneratedProjectFile[],
-    meta: { message: string },
+    meta: {
+      message: string;
+      waveCheckpoint?: {
+        type: "task" | "wave-end";
+        waveName: string;
+        policy: import("@/lib/ai-core/file-generation/types").WaveCheckpointPolicy;
+      };
+    },
   ) => void | Promise<void>;
 };

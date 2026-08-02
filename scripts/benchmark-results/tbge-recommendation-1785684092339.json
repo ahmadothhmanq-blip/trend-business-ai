@@ -1,0 +1,16 @@
+{
+  "title": "TBGE Readiness Recommendation",
+  "timestamp": "2026-08-02T15:21:32.338Z",
+  "readyToReplaceLegacy": false,
+  "verdict": "TBGE is NOT ready to replace Legacy Website Builder.",
+  "improvements": [
+    "Improve build success rate (current TBGE: 0%).",
+    "Fix generation errors (current TBGE error rate: 100%).",
+    "Improve deterministic generation — identical prompts should produce identical spec hashes.",
+    "Validate Lighthouse scores on TBGE output (preview build or static HTML audit)."
+  ],
+  "strengths": [
+    "TBGE is 0.7x faster on average.",
+    "TBGE averages 0.0 LLM calls vs legacy."
+  ]
+}

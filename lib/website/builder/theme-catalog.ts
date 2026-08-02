@@ -12,15 +12,8 @@ import {
   type ThemePageTopology,
 } from "@/lib/website/builder/theme-architecture";
 
-export type WebsiteThemePresetId =
-  | "luxury"
-  | "modern"
-  | "minimal"
-  | "corporate"
-  | "creative"
-  | "technology"
-  | "editorial"
-  | "bold";
+import type { WebsiteThemePresetId } from "@/lib/website/contracts/theme";
+export type { WebsiteThemePresetId } from "@/lib/website/contracts/theme";
 
 export type WebsiteThemeCatalogEntry = {
   id: WebsiteThemePresetId;

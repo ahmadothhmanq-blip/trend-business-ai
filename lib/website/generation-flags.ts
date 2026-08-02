@@ -8,14 +8,30 @@
  *   WB_INCREMENTAL_PREVIEW=1       — server-side hint (optional)
  *   WB_FAST_GENERATION=1           — default generation profile to fast (overridable per request)
  *   WB_ULTRA_FAST_GENERATION=1     — ultra fast mode (essential files, no plan/optimizer LLM)
+ *   WB_WAVE_SCHEDULER=1            — wave planner + scheduler (W2 sections parallel in 2.2)
+ *   WB_WAVE_CHECKPOINT_ENGINE=1    — wave-level checkpoint batching (default on with wave scheduler)
+ *   WB_PARALLEL_REPAIR=1           — dependency-aware parallel repair waves
+ *   WB_REPAIR_CONCURRENCY=4        — max parallel repairs per wave
+ *   WB_SMART_CONTEXT=1             — dependency-aware minimal LLM context (Phase 2.5)
+ *   WB_CONTEXT_CHAR_LIMIT=3500     — per-file context char cap
+ *   WB_CONTEXT_CHAR_BUDGET=0       — optional total context char budget (0 = unlimited)
+ *   WB_PROMPT_OPTIMIZATION=1         — compact file-generation metadata (Phase 2.6)
+ *   WB_LLM_CONCURRENCY=4           — global LLM cap for W2 parallel pool (default 4)
+ *   WB_WAVE_STRICT_CONTEXT=1       — disable W2 snapshot context; full serial context
  *
  * Client (incremental preview iframe during streaming):
  *   NEXT_PUBLIC_WB_INCREMENTAL_PREVIEW=1
  */
 
 import type { WebsiteGenerationInput } from "@/plugins/website/types";
+import { isPaidWebsitePlan } from "@/lib/ai-core/quality-authority/billing";
 
 export type WebsiteGenerationProfile = "fast" | "professional" | "ultra";
+
+export type WebsiteProfileResolutionInput = Pick<
+  WebsiteGenerationInput,
+  "generationProfile" | "hasPaidPlan" | "billingPlanId"
+>;
 
 function envTruthy(name: string): boolean {
   const value = process.env[name];
@@ -37,17 +53,26 @@ export const websiteGenerationFlags = {
 
 /**
  * Resolve generation profile.
- * Request `generationProfile` wins; else WB_ULTRA_FAST_GENERATION → ultra;
- * else WB_FAST_GENERATION → fast.
+ * Request `generationProfile` wins.
+ * Env fast/ultra flags apply only for non-paid users (paid users must opt in explicitly).
+ * Paid users default to professional quality.
  */
 export function resolveWebsiteGenerationProfile(
-  input?: Pick<WebsiteGenerationInput, "generationProfile">,
+  input?: WebsiteProfileResolutionInput,
 ): WebsiteGenerationProfile {
   if (input?.generationProfile === "professional") return "professional";
   if (input?.generationProfile === "ultra") return "ultra";
   if (input?.generationProfile === "fast") return "fast";
-  if (websiteGenerationFlags.ultraFastGeneration) return "ultra";
-  if (websiteGenerationFlags.fastGenerationDefault) return "fast";
+
+  const paid =
+    input?.hasPaidPlan === true ||
+    isPaidWebsitePlan(input?.billingPlanId);
+
+  if (!paid) {
+    if (envTruthy("WB_ULTRA_FAST_GENERATION")) return "ultra";
+    if (envTruthy("WB_FAST_GENERATION")) return "fast";
+  }
+
   return "professional";
 }
 

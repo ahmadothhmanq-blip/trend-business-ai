@@ -809,7 +809,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
     industry: "restaurant",
     designStyle: "Dining atmosphere",
     designPreset: "luxury",
-    layoutStructure: "editorial-hero",
+    layoutStructure: "travel-premium",
     colors: {
       primary: "#1C1917",
       secondary: "#78716C",

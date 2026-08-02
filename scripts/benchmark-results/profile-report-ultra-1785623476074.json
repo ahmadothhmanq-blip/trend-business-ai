@@ -1,0 +1,186 @@
+{
+  "source": "historical-benchmark",
+  "profile": "ultra",
+  "prompt": "Fine dining restaurant in Dubai with reservations, menu highlights, chef story, and private dining events. Premium luxury aesthetic.",
+  "gitHead": "92f9b33",
+  "timestamp": "2026-07-31T16:34:42.513Z",
+  "totalGenerationMs": 170223,
+  "measuredWallMs": 170223,
+  "layerRunnerMs": 170222,
+  "fileCount": 46,
+  "provider": "deepseek",
+  "llmRequestCount": 7,
+  "llmByStage": {
+    "generateJson": {
+      "count": 3,
+      "durationMs": 58872,
+      "promptChars": 29519,
+      "totalTokens": 12896
+    },
+    "strategy": {
+      "count": 1,
+      "durationMs": 49222,
+      "promptChars": 6428,
+      "totalTokens": 8127
+    },
+    "file-generation": {
+      "count": 1,
+      "durationMs": 27954,
+      "promptChars": 39253,
+      "totalTokens": 14069
+    },
+    "business-idea": {
+      "count": 1,
+      "durationMs": 17198,
+      "promptChars": 4285,
+      "totalTokens": 3440
+    },
+    "design-system": {
+      "count": 1,
+      "durationMs": 16690,
+      "promptChars": 13924,
+      "totalTokens": 5429
+    }
+  },
+  "stageTimings": [
+    {
+      "category": "layer-runner",
+      "label": "design",
+      "totalMs": 49373,
+      "count": 1,
+      "avgMs": 49373,
+      "sharePercent": 29
+    },
+    {
+      "category": "layer-runner",
+      "label": "strategy",
+      "totalMs": 49246,
+      "count": 1,
+      "avgMs": 49246,
+      "sharePercent": 28.9
+    },
+    {
+      "category": "plugin",
+      "label": "generation",
+      "totalMs": 28011,
+      "count": 1,
+      "avgMs": 28011,
+      "sharePercent": 16.5
+    },
+    {
+      "category": "layer-runner",
+      "label": "assets",
+      "totalMs": 19455,
+      "count": 1,
+      "avgMs": 19455,
+      "sharePercent": 11.4
+    },
+    {
+      "category": "layer-runner",
+      "label": "idea",
+      "totalMs": 17203,
+      "count": 1,
+      "avgMs": 17203,
+      "sharePercent": 10.1
+    },
+    {
+      "category": "layer-runner",
+      "label": "template",
+      "totalMs": 6829,
+      "count": 3,
+      "avgMs": 2276,
+      "sharePercent": 4
+    },
+    {
+      "category": "layer-runner",
+      "label": "finalize",
+      "totalMs": 67,
+      "count": 1,
+      "avgMs": 67,
+      "sharePercent": 0
+    },
+    {
+      "category": "layer-runner",
+      "label": "seo",
+      "totalMs": 11,
+      "count": 1,
+      "avgMs": 11,
+      "sharePercent": 0
+    },
+    {
+      "category": "layer-runner",
+      "label": "performance",
+      "totalMs": 9,
+      "count": 1,
+      "avgMs": 9,
+      "sharePercent": 0
+    },
+    {
+      "category": "layer-runner",
+      "label": "master-planner",
+      "totalMs": 8,
+      "count": 6,
+      "avgMs": 1,
+      "sharePercent": 0
+    },
+    {
+      "category": "layer-runner",
+      "label": "quality",
+      "totalMs": 6,
+      "count": 1,
+      "avgMs": 6,
+      "sharePercent": 0
+    },
+    {
+      "category": "layer-runner",
+      "label": "template-intelligence",
+      "totalMs": 3,
+      "count": 2,
+      "avgMs": 2,
+      "sharePercent": 0
+    },
+    {
+      "category": "layer-runner",
+      "label": "start",
+      "totalMs": 0,
+      "count": 1,
+      "avgMs": 0,
+      "sharePercent": 0
+    },
+    {
+      "category": "layer-runner",
+      "label": "auto-design",
+      "totalMs": 0,
+      "count": 1,
+      "avgMs": 0,
+      "sharePercent": 0
+    },
+    {
+      "category": "layer-runner",
+      "label": "done",
+      "totalMs": 0,
+      "count": 1,
+      "avgMs": 0,
+      "sharePercent": 0
+    }
+  ],
+  "aiSharePercent": 99.8,
+  "duplicateStageExecutions": {
+    "start": 1,
+    "template": 3,
+    "master-planner": 6,
+    "template-intelligence": 2,
+    "auto-design": 1,
+    "idea": 1,
+    "strategy": 1,
+    "design": 1,
+    "assets": 1,
+    "generation": 1,
+    "quality": 1,
+    "seo": 1,
+    "performance": 1,
+    "finalize": 1,
+    "done": 1
+  },
+  "markdown": "# Website Builder — Performance Profiling Report\n\n> **Source:** Historical benchmark (git `92f9b33`, 2026-07-31T16:34:42.513Z)\n> **Profile:** ultra\n\n**Total generation time:** 170223ms (170.2s)\n**Files generated:** 46\n**LLM requests:** 7\n**AI time share:** ~99.8%\n\n## Time per Pipeline Stage\n\n- **design**: 49373ms (29%) · 1 execution(s)\n- **strategy**: 49246ms (28.9%) · 1 execution(s)\n- **generation**: 28011ms (16.5%) · 1 execution(s)\n- **assets**: 19455ms (11.4%) · 1 execution(s)\n- **idea**: 17203ms (10.1%) · 1 execution(s)\n- **template**: 6829ms (4%) · 3 execution(s)\n- **finalize**: 67ms (0%) · 1 execution(s)\n- **seo**: 11ms (0%) · 1 execution(s)\n- **performance**: 9ms (0%) · 1 execution(s)\n- **master-planner**: 8ms (0%) · 6 execution(s)\n- **quality**: 6ms (0%) · 1 execution(s)\n- **template-intelligence**: 3ms (0%) · 2 execution(s)\n- **start**: 0ms (0%) · 1 execution(s)\n- **auto-design**: 0ms (0%) · 1 execution(s)\n- **done**: 0ms (0%) · 1 execution(s)\n\n## AI Requests by Stage\n\n- **generateJson**: 3 calls · 58872ms · 29519 prompt chars\n- **strategy**: 1 calls · 49222ms · 6428 prompt chars\n- **file-generation**: 1 calls · 27954ms · 39253 prompt chars\n- **business-idea**: 1 calls · 17198ms · 4285 prompt chars\n- **design-system**: 1 calls · 16690ms · 13924 prompt chars\n\n## Duplicate Stage Executions\n\n- `template`: 3×\n- `master-planner`: 6×\n- `template-intelligence`: 2×\n\n## Recommendations (by impact)\n\n1. **[critical]** Per-file LLM generation is the dominant cost — batch or parallelize independent files.\n2. **[high]** Strategy + design-system LLM calls add significant pre-generation latency.\n3. **[medium]** Duplicate master-planner/template stage entries suggest redundant orchestration steps.\n4. **[medium]** Run live profiler with API keys for Supabase checkpoint/persist measurements.\n"
+}

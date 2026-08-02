@@ -43,9 +43,9 @@ describe("builder template runtime integration", () => {
     assert.equal(result.ok, true);
     if (!result.ok) return;
 
-    assert.equal(result.model.metadata.category, "business");
+    assert.equal(result.model.metadata.category, "corporate");
     assert.equal(result.model.canvas.id, "canvas");
-    assert.equal(result.model.responsive.containerMaxWidth, "72rem");
+    assert.equal(result.model.responsive.containerMaxWidth, "76rem");
     assert.ok(result.model.media.thumbnail.length > 0);
     assert.ok(result.model.media.preview.length > 0);
   });

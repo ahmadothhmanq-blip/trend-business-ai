@@ -324,6 +324,40 @@ const KNOWN_PACKAGE_VERSIONS: Record<string, { version: string; dev?: boolean }>
   prettier: { version: "^3.3.0", dev: true },
 };
 
+/** Toolchain packages every exported Next.js project must declare. */
+const REQUIRED_TOOLCHAIN_PACKAGES = [
+  "typescript",
+  "tailwindcss",
+  "eslint",
+  "eslint-config-next",
+  "prettier",
+  "postcss",
+  "autoprefixer",
+  "@types/node",
+  "@types/react",
+  "@types/react-dom",
+] as const;
+
+function ensurePackageJsonScripts(pkg: {
+  scripts?: Record<string, string>;
+  [key: string]: unknown;
+}): { pkg: typeof pkg; changed: boolean } {
+  const scripts = { ...(pkg.scripts ?? {}) };
+  let changed = false;
+  for (const [name, value] of Object.entries({
+    dev: "next dev",
+    build: "next build",
+    start: "next start",
+    lint: "next lint",
+  })) {
+    if (!scripts[name]) {
+      scripts[name] = value;
+      changed = true;
+    }
+  }
+  return changed ? { pkg: { ...pkg, scripts }, changed: true } : { pkg, changed: false };
+}
+
 /**
  * Merge missing npm imports from generated source into package.json.
  * Only known packages are added (no arbitrary registry names).
@@ -403,16 +437,81 @@ export function syncPackageJsonDependencies(
     changed = true;
   }
 
+  // Ensure export toolchain packages are always declared
+  for (const name of REQUIRED_TOOLCHAIN_PACKAGES) {
+    if (declared.has(name)) continue;
+    const known = KNOWN_PACKAGE_VERSIONS[name];
+    if (!known) continue;
+    if (known.dev) {
+      devDependencies[name] = known.version;
+    } else {
+      dependencies[name] = known.version;
+    }
+    declared.add(name);
+    changed = true;
+  }
+
+  const scriptsResult = ensurePackageJsonScripts({
+    ...pkg,
+    dependencies,
+    devDependencies,
+  });
+  if (scriptsResult.changed) changed = true;
+
   if (!changed) return files;
 
   const nextFiles = [...files];
   nextFiles[pkgIndex] = {
     ...files[pkgIndex]!,
-    content: JSON.stringify(
-      { ...pkg, dependencies, devDependencies },
-      null,
-      2,
-    ),
+    content: JSON.stringify(scriptsResult.pkg, null, 2),
   };
   return nextFiles;
+}
+
+/**
+ * Merge static scaffold files into a project without overwriting existing paths.
+ */
+export function mergeMissingScaffoldFiles(
+  files: GeneratedProjectFile[],
+  scaffolds: GeneratedProjectFile[],
+): { files: GeneratedProjectFile[]; injected: string[] } {
+  const byPath = new Map(
+    files.map((file) => [file.path.replaceAll("\\", "/"), { ...file }]),
+  );
+  const injected: string[] = [];
+
+  for (const scaffold of scaffolds) {
+    const path = scaffold.path.replaceAll("\\", "/");
+    if (byPath.has(path)) continue;
+    byPath.set(path, { ...scaffold, path });
+    injected.push(path);
+  }
+
+  return { files: [...byPath.values()], injected };
+}
+
+/**
+ * Resolve a human-readable project name from generated files.
+ */
+export function resolveProjectNameFromFiles(
+  files: GeneratedProjectFile[],
+  fallback = "generated-website",
+): string {
+  const pkg = files.find((file) => file.path === "package.json");
+  if (pkg) {
+    try {
+      const parsed = JSON.parse(pkg.content) as { name?: string };
+      if (parsed.name?.trim()) return parsed.name.trim();
+    } catch {
+      // fall through
+    }
+  }
+
+  const readme = files.find((file) => file.path === "README.md");
+  if (readme) {
+    const match = readme.content.match(/^#\s+(.+)$/m);
+    if (match?.[1]?.trim()) return match[1].trim();
+  }
+
+  return fallback;
 }

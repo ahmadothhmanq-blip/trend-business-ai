@@ -1,0 +1,64 @@
+{
+  "timestamp": "2026-08-02T10:56:12.394Z",
+  "fileCount": 18,
+  "targetScenarios": [
+    {
+      "targetPath": "components/sections/Section6.tsx",
+      "legacyFileCount": 18,
+      "smartFileCount": 3,
+      "legacyChars": 29366,
+      "smartChars": 4881,
+      "filesPruned": 15,
+      "charsSaved": 24485,
+      "reductionPercent": 83,
+      "requiredPaths": [
+        "app/layout.tsx",
+        "components/ui/motion.tsx",
+        "components/ui/section-shell.tsx"
+      ]
+    },
+    {
+      "targetPath": "app/page.tsx",
+      "legacyFileCount": 18,
+      "smartFileCount": 15,
+      "legacyChars": 29366,
+      "smartChars": 24516,
+      "filesPruned": 3,
+      "charsSaved": 4850,
+      "reductionPercent": 17,
+      "requiredPaths": [
+        "app/layout.tsx",
+        "components/sections/Section1.tsx",
+        "components/sections/Section10.tsx",
+        "components/sections/Section11.tsx",
+        "components/sections/Section12.tsx",
+        "components/sections/Section2.tsx",
+        "components/sections/Section3.tsx",
+        "components/sections/Section4.tsx",
+        "components/sections/Section5.tsx",
+        "components/sections/Section6.tsx",
+        "components/sections/Section7.tsx",
+        "components/sections/Section8.tsx",
+        "components/sections/Section9.tsx",
+        "components/ui/motion.tsx",
+        "components/ui/section-shell.tsx"
+      ]
+    },
+    {
+      "targetPath": "components/ui/motion.tsx",
+      "legacyFileCount": 18,
+      "smartFileCount": 1,
+      "legacyChars": 29366,
+      "smartChars": 1618,
+      "filesPruned": 17,
+      "charsSaved": 27748,
+      "reductionPercent": 94,
+      "requiredPaths": [
+        "app/layout.tsx"
+      ]
+    }
+  ],
+  "averageContextReductionPercent": 65,
+  "estimatedTokenReductionPercent": 59,
+  "estimatedApiCostReductionPercent": 55
+}

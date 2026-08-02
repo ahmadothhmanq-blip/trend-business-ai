@@ -3,7 +3,7 @@
  */
 
 import type { PublishGateResult } from "@/lib/website/publish-gates";
-import { evaluatePublishGates } from "@/lib/website/publish-gates";
+import { evaluateUnifiedPublishGates } from "@/lib/ai-core/quality-platform";
 import type { WebsiteGeneration } from "@/types/database";
 
 export type PublishQualityPayload = {
@@ -83,7 +83,7 @@ export function shouldBlockPublish(
 export function evaluateGenerationPublishGates(
   generation: WebsiteGeneration,
 ): PublishGateResult {
-  return evaluatePublishGates(generation);
+  return evaluateUnifiedPublishGates(generation).legacy;
 }
 
 export function publishSuccessMessage(

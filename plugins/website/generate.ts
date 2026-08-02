@@ -1,6 +1,8 @@
 import { generateJsonWithValidation } from "@/lib/ai/generator";
-import { truncateForContext, type PlannedFile } from "@/lib/ai/planner";
+import { type PlannedFile } from "@/lib/ai/planner";
 import { sortFilesByDependency } from "@/lib/ai/planner";
+import { resolvePromptContext } from "@/lib/ai-core/context-engine";
+import { assemblePrompt } from "@/lib/ai-core/prompt-engine";
 import { websiteFilePrompt } from "@/lib/ai/prompts/website";
 import {
   validateGeneratedFileContent,
@@ -18,14 +20,10 @@ import {
   generateWebsiteAssets,
 } from "@/plugins/website/layers/assets";
 import {
-  hasProfessionalScaffold,
   injectProfessionalComponents,
-  getProfessionalScaffoldByPath,
 } from "@/lib/ai-core/components";
 import {
-  composedHomePagePlaceholder,
   resolveWebsiteGenerationProfile,
-  shouldSkipLlmForComposedHomePage,
 } from "@/lib/website/generation-flags";
 import { injectAiImagesIntoProject } from "@/lib/ai-core/image-engine";
 import { getThemePageArchitecture } from "@/lib/website/builder/theme-architecture";
@@ -33,6 +31,20 @@ import { buildGenerationRepairInstruction,
   validateWebsiteGeneration,
 } from "@/lib/ai-core/website-builder/generation-validation";
 import { usesLlmLocalizedWebsiteCopy } from "@/lib/ai-core/content/content-language";
+import { getActiveWebsiteProfiler } from "@/lib/ai-core/performance/profiler-context";
+import type { ProfilerCategory } from "@/lib/ai-core/performance/website-profiler";
+import {
+  isParallelRepairEnabled,
+  runSafeParallelRepair,
+  runSerialRepair,
+} from "@/lib/ai-core/repair-engine";
+import {
+  evaluateProjectQualityGate,
+  isQualityGateEnforcementEnabled,
+  QualityGateBlockedError,
+  verifyPostRepair,
+} from "@/lib/ai-core/quality-authority";
+import { performance } from "node:perf_hooks";
 import {
   buildWebsiteLanguageDirective,
 } from "@/lib/ai-core/website-builder/language-directive";
@@ -41,9 +53,13 @@ import { productionContentForPreview } from "@/lib/ai-core/content/production-co
 import { buildWebsiteGenerationKey } from "@/lib/ai-core/website-builder/prompt-industry";
 import { designSystemCssVariables } from "@/plugins/website/layers/design-engine";
 import {
-  buildQualityImproveInstruction,
-  runWebsiteQualityCheck,
-} from "@/plugins/website/layers/quality";
+  runUnifiedQualityPipeline,
+  type UnifiedQualityDashboardModel,
+  type UnifiedQualityPipelineResult,
+  type UnifiedQualityReport,
+} from "@/lib/ai-core/quality-platform";
+import type { SemanticContentQualityReport } from "@/lib/ai-core/semantic-content-quality";
+import type { VisualDesignQualityReport } from "@/lib/ai-core/visual-design-quality";
 import { generatedFileSchema } from "@/plugins/website/schemas";
 import type {
   AssetManifest,
@@ -54,9 +70,20 @@ import type {
   WebsiteProjectAnalysis,
 } from "@/plugins/website/types";
 import type { GenerationContext } from "@/lib/ai/types";
+import { runWebsiteFileLoop } from "@/plugins/website/file-generation-loop";
 
 const FILE_GENERATION_RETRIES = 3;
 const PROJECT_VALIDATION_ROUNDS = 2;
+
+async function profilePlugin<T>(
+  category: ProfilerCategory,
+  label: string,
+  fn: () => Promise<T>,
+): Promise<T> {
+  const profiler = getActiveWebsiteProfiler();
+  if (!profiler) return fn();
+  return profiler.measure(category, label, fn);
+}
 
 async function generateFileWithValidation(
   input: WebsiteGenerationInput,
@@ -69,14 +96,18 @@ async function generateFileWithValidation(
   extraValidationReason = "",
   assetSummary = "",
 ) {
-  return websiteGenerateJson<GeneratedProjectFile>({
-    stage: "file-generation",
-    input,
-    provider: ctx.provider,
-    maxAttempts: FILE_GENERATION_RETRIES,
-    filePath: filePlan.path,
-    prompt: websiteFilePrompt({
-      input,
+  const profiler = getActiveWebsiteProfiler();
+  const promptStart = performance.now();
+  const { promptFiles } = resolvePromptContext({
+    targetPath: filePlan.path,
+    targetCategory: filePlan.category,
+    availableFiles: existingFiles,
+    filePlans,
+    composeHomePage: true,
+    productId: "website",
+  });
+  const { prompt } = assemblePrompt(
+    {
       analysis,
       blueprint: plan.blueprint,
       dynamicPlan: {
@@ -91,22 +122,47 @@ async function generateFileWithValidation(
         types: plan.dynamicPlan.types,
         configs: plan.dynamicPlan.configs,
       },
-      filePlan,
       projectTree: filePlans.map((file) => ({
         path: file.path,
         category: file.category,
         purpose: file.purpose,
       })),
-      existingFiles: existingFiles.map((file) => ({
-        path: file.path,
-        language: file.language,
-        content: truncateForContext(file.content),
-      })),
-      validationReason: extraValidationReason,
       strategy: plan.strategy,
       designSystem: plan.designSystem,
-      assetManifestSummary: assetSummary,
-    }),
+      filePlan,
+      productId: "website",
+    },
+    (compacted) =>
+      websiteFilePrompt({
+        input,
+        analysis: compacted.analysis,
+        blueprint: compacted.blueprint,
+        dynamicPlan: compacted.dynamicPlan,
+        filePlan,
+        projectTree: compacted.projectTree,
+        existingFiles: promptFiles,
+        validationReason: extraValidationReason,
+        strategy: compacted.strategy,
+        designSystem: compacted.designSystem,
+        assetManifestSummary: assetSummary,
+      }),
+  );
+  if (profiler) {
+    profiler.record(
+      "prompt-generation",
+      `websiteFilePrompt · ${filePlan.path}`,
+      Math.round(performance.now() - promptStart),
+      { promptChars: prompt.length },
+    );
+  }
+
+  return websiteGenerateJson<GeneratedProjectFile>({
+    stage: "file-generation",
+    input,
+    provider: ctx.provider,
+    maxAttempts: FILE_GENERATION_RETRIES,
+    filePath: filePlan.path,
+    prompt,
     schema: generatedFileSchema,
     validate: (result) => validateGeneratedFileContent(result, filePlan.path),
   }).then((file) => ({
@@ -168,41 +224,90 @@ async function validateAndRepairProject(
     }
 
     const regenerated = new Map(currentFiles.map((file) => [file.path, file]));
+    const repairTargets = [...targets].filter(
+      (targetPath) =>
+        planByPath.has(targetPath) && !SCAFFOLD_PATHS.has(targetPath),
+    );
 
-    for (const targetPath of targets) {
-      const filePlan = planByPath.get(targetPath);
-      if (!filePlan) continue;
-      if (SCAFFOLD_PATHS.has(targetPath)) continue;
+    const runRepair = isParallelRepairEnabled()
+      ? runSafeParallelRepair
+      : runSerialRepair;
 
-      const projectIssues = validation.issues
-        .filter(
-          (issue) =>
-            issue.startsWith(`${targetPath}:`) || issue.includes(targetPath),
-        )
-        .join("\n");
+    const repairResult = await runRepair({
+      targets: repairTargets,
+      filePlans: [...planByPath.values()],
+      files: currentFiles,
+      composeHomePage: true,
+      onProgress: (message) => ctx.progress.emit(message),
+      repairFile: async (targetPath, snapshotFiles) => {
+        const filePlan = planByPath.get(targetPath);
+        if (!filePlan) {
+          throw new Error(`Missing file plan for ${targetPath}`);
+        }
 
-      const existingWithoutTarget = currentFiles.filter(
-        (file) => file.path !== targetPath,
-      );
+        const projectIssues = validation.issues
+          .filter(
+            (issue) =>
+              issue.startsWith(`${targetPath}:`) || issue.includes(targetPath),
+          )
+          .join("\n");
 
-      const repaired = await generateFileWithValidation(
-        input,
-        analysis,
-        plan,
-        sortFilesByDependency([...planByPath.values()]),
-        existingWithoutTarget,
-        filePlan,
-        ctx,
-        projectIssues,
-        assetSummary,
-      );
+        const existingWithoutTarget = snapshotFiles.filter(
+          (file) => file.path !== targetPath,
+        );
 
-      regenerated.set(targetPath, repaired);
+        return generateFileWithValidation(
+          input,
+          analysis,
+          plan,
+          sortFilesByDependency([...planByPath.values()]),
+          existingWithoutTarget,
+          filePlan,
+          ctx,
+          projectIssues,
+          assetSummary,
+        );
+      },
+      validateWave: (filesAfterWave, repairedPaths) => {
+        const waveValidation = validateGeneratedProject(filesAfterWave, plan.flags, {
+          requiredPaths,
+        });
+        return !repairedPaths.some((path) =>
+          waveValidation.filesToRegenerate.includes(path),
+        );
+      },
+    });
+
+    const repairedFiles = [...repairResult.files];
+    for (const file of repairedFiles) {
+      regenerated.set(file.path, file);
     }
 
-    currentFiles = sortFilesByDependency([...planByPath.values()])
+    const candidateFiles = sortFilesByDependency([...planByPath.values()])
       .map((entry) => regenerated.get(entry.path))
       .filter((file): file is GeneratedProjectFile => Boolean(file));
+
+    const verification = verifyPostRepair({
+      beforeIssues: validation.issues,
+      afterIssues: validateGeneratedProject(candidateFiles, plan.flags, {
+        requiredPaths,
+      }).issues,
+    });
+
+    if (!verification.accepted) {
+      logger.warn(
+        "Post-repair regression detected — rolling back repair wave",
+        "website-generate",
+        {
+          beforeBlockerCount: verification.beforeBlockerCount,
+          afterBlockerCount: verification.afterBlockerCount,
+          regressionIssues: verification.regressionIssues.slice(0, 8),
+        },
+      );
+      break;
+    }
+
+    currentFiles = candidateFiles;
   }
 
   currentFiles = syncPackageJsonDependencies(currentFiles);
@@ -210,7 +315,20 @@ async function validateAndRepairProject(
   const finalValidation = validateGeneratedProject(currentFiles, plan.flags, {
     requiredPaths,
   });
-  if (!finalValidation.valid) {
+  const finalGate = evaluateProjectQualityGate(finalValidation.issues);
+
+  if (finalGate.warningIssues.length > 0) {
+    logger.warn("Non-blocking website project validation warnings", "website-generate", {
+      warningCount: finalGate.warningIssues.length,
+      sampleWarnings: finalGate.warningIssues.slice(0, 12),
+    });
+  }
+
+  if (isQualityGateEnforcementEnabled() && !finalGate.passed) {
+    throw new QualityGateBlockedError(finalGate.blockingIssues);
+  }
+
+  if (!finalValidation.valid && !isQualityGateEnforcementEnabled()) {
     logger.warn(
       "Soft-passing website project validation issues",
       "website-generate",
@@ -313,20 +431,22 @@ export async function generateWebsite(
   const assetManifest =
     options?.skipAssetGeneration && options.assetManifest
       ? options.assetManifest
-      : await generateWebsiteAssets({
-          input,
-          businessProfile: analysis.businessProfile,
-          strategy: plan.strategy,
-          designSystem: plan.designSystem,
-          ctx,
-          userId: input.userId,
-          generationKey: buildWebsiteGenerationKey({
+      : await profilePlugin("image-generation", "generateWebsiteAssets", () =>
+          generateWebsiteAssets({
+            input,
+            businessProfile: analysis.businessProfile,
+            strategy: plan.strategy,
+            designSystem: plan.designSystem,
+            ctx,
             userId: input.userId,
-            parentGenerationId: input.parentGenerationId,
-            mode: input.mode,
-            prompt: input.prompt,
+            generationKey: buildWebsiteGenerationKey({
+              userId: input.userId,
+              parentGenerationId: input.parentGenerationId,
+              mode: input.mode,
+              prompt: input.prompt,
+            }),
           }),
-        });
+        );
   const assetSummary = assetManifestForPrompt(assetManifest);
 
   ctx.progress.emit("Generating files...");
@@ -342,7 +462,7 @@ export async function generateWebsite(
   );
   const scaffoldByPath = new Map(scaffold.map((file) => [file.path, file]));
 
-  const files: GeneratedProjectFile[] = [];
+  let files: GeneratedProjectFile[] = [];
   for (const planned of plan.filePlans) {
     if (!SCAFFOLD_PATHS.has(planned.path)) continue;
     const scaffoldFile = scaffoldByPath.get(planned.path);
@@ -379,95 +499,34 @@ export async function generateWebsite(
   );
   const localizedCopy = usesLlmLocalizedWebsiteCopy(input.language);
 
-  let index = 0;
-  for (const filePlan of aiFilePlans) {
-    index += 1;
-    const prior = reusePrevious ? previousByPath.get(filePlan.path) : undefined;
-
-    if (
-      input.mode === "continue" &&
-      prior &&
-      !input.continueInstruction?.toLowerCase().includes(filePlan.path.toLowerCase()) &&
-      !input.continueInstruction?.toLowerCase().includes("[quality]") &&
-      !input.continueInstruction?.toLowerCase().includes("[design]") &&
-      !input.continueInstruction?.toLowerCase().includes("[strategy]")
-    ) {
-      ctx.progress.emit(
-        `Reusing file ${index}/${aiFilePlans.length}: ${filePlan.path}`,
-      );
-      files.push(prior);
-      continue;
-    }
-
-    if (
-      !localizedCopy &&
-      shouldSkipLlmForComposedHomePage({
-        filePath: filePlan.path,
-        componentPalette: componentPaletteForCompose,
-        composePage: true,
-        generationProfile,
-      })
-    ) {
-      ctx.progress.emit(
-        `Deferring home page ${index}/${aiFilePlans.length}: ${filePlan.path} (composed after sections)`,
-      );
-      files.push(composedHomePagePlaceholder(filePlan));
-      try {
-        await ctx.onFilesCheckpoint?.(files, {
-          message: `Saved progress · ${files.length} files · ${filePlan.path} (deferred)`,
-        });
-      } catch {
-        // Checkpoint failures must never abort generation.
-      }
-      continue;
-    }
-
-    const scaffold = getProfessionalScaffoldByPath(filePlan.path);
-    const preferLlmCopy = localizedCopy;
-    if (
-      scaffold &&
-      hasProfessionalScaffold(filePlan.path) &&
-      !preferLlmCopy
-    ) {
-      ctx.progress.emit(
-        `Using Professional Components Library ${index}/${aiFilePlans.length}: ${filePlan.path}`,
-      );
-      files.push({
-        path: filePlan.path,
-        content: scaffold,
-        language: filePlan.language || "tsx",
-      });
-      continue;
-    }
-
-    ctx.progress.emit(
-      `Generating file ${index}/${aiFilePlans.length}: ${filePlan.path}`,
-    );
-    files.push(
-      await generateFileWithValidation(
+  files = await runWebsiteFileLoop({
+    input,
+    analysis,
+    plan,
+    ctx,
+    assetSummary,
+    files,
+    aiFilePlans,
+    generationProfile,
+    minimalGeneration,
+    ultraGeneration,
+    localizedCopy,
+    componentPaletteForCompose,
+    reusePrevious,
+    previousByPath,
+    generateFile: (filePlan, existingFiles, extraValidationReason) =>
+      generateFileWithValidation(
         input,
         analysis,
         plan,
         plan.filePlans,
-        files,
+        existingFiles,
         filePlan,
         ctx,
-        prior
-          ? `Improve this existing file while preserving working imports:\n${prior.content.slice(0, 4000)}`
-          : "",
+        extraValidationReason,
         assetSummary,
       ),
-    );
-
-    // Persist partial file progress so disconnects can resume instead of losing work.
-    try {
-      await ctx.onFilesCheckpoint?.(files, {
-        message: `Saved progress · ${files.length} files · ${filePlan.path}`,
-      });
-    } catch {
-      // Checkpoint failures must never abort generation.
-    }
-  }
+  });
 
   // AI Image Engine: inject lib/site-images.ts and wire photographic URLs into components.
   const industryHint =
@@ -601,15 +660,20 @@ export async function generateWebsite(
 
   ctx.progress.emit("Validating project...");
 
-  let validatedFiles = await validateAndRepairProject(
-    input,
-    analysis,
-    plan,
-    plan.filePlans,
-    filesWithComponents,
-    ctx,
-    assetSummary,
-    minimalGeneration ? "fatal-only" : "full",
+  let validatedFiles = await profilePlugin(
+    "validation",
+    "validateAndRepairProject",
+    () =>
+      validateAndRepairProject(
+        input,
+        analysis,
+        plan,
+        plan.filePlans,
+        filesWithComponents,
+        ctx,
+        assetSummary,
+        minimalGeneration ? "fatal-only" : "full",
+      ),
   );
 
   // Re-inject after validation repairs so LLM rewrites cannot drop site imagery.
@@ -644,6 +708,10 @@ export async function generateWebsite(
   }
 
   let qualityReport: QualityReport | undefined;
+  let semanticContentQualityReport: SemanticContentQualityReport | undefined;
+  let visualDesignQualityReport: VisualDesignQualityReport | undefined;
+  let unifiedQualityReport: UnifiedQualityReport | undefined;
+  let qualityDashboard: UnifiedQualityDashboardModel | undefined;
   if (options?.skipQuality) {
     qualityReport = {
       passed: true,
@@ -664,6 +732,10 @@ export async function generateWebsite(
     });
     validatedFiles = qualityResult.files;
     qualityReport = qualityResult.qualityReport;
+    semanticContentQualityReport = qualityResult.semanticContentQualityReport;
+    visualDesignQualityReport = qualityResult.visualDesignQualityReport;
+    unifiedQualityReport = qualityResult.unifiedQualityReport;
+    qualityDashboard = qualityResult.qualityDashboard;
   }
 
   const validation = validateWebsiteGeneration({
@@ -779,6 +851,10 @@ export async function generateWebsite(
     designSystem: plan.designSystem,
     assetManifest,
     qualityReport,
+    semanticContentQualityReport,
+    visualDesignQualityReport,
+    unifiedQualityReport,
+    qualityDashboard,
     agencyContract: input.agencyContract,
     settings: {
       framework: "Next.js App Router",
@@ -814,70 +890,48 @@ export async function runWebsiteQualityLayer(params: {
   ctx: GenerationContext;
   /** When true, run checks only — skip applyQualityImprovePass (fast generation). */
   skipImprove?: boolean;
-}): Promise<{ files: GeneratedProjectFile[]; qualityReport: QualityReport }> {
+}): Promise<
+  UnifiedQualityPipelineResult & {
+    semanticContentQualityReport?: SemanticContentQualityReport;
+    visualDesignQualityReport?: VisualDesignQualityReport;
+  }
+> {
   const { input, analysis, plan, assetManifest, ctx } = params;
-  let validatedFiles = params.files;
   const assetSummary = assetManifestForPrompt(assetManifest);
 
-  ctx.progress.emit("Running quality check...");
-  let qualityReport = runWebsiteQualityCheck({
-    files: validatedFiles,
-    strategy: plan.strategy,
-    designSystem: plan.designSystem,
+  const pipelineResult = await runUnifiedQualityPipeline({
+    input,
+    analysis,
+    plan,
+    files: params.files,
     assetManifest,
-    pages: plan.blueprint.pages,
-    requiredSections: analysis.businessProfile.requiredSections,
-    language: input.language,
-  });
-
-  if (
-    !params.skipImprove &&
-    (!qualityReport.passed || qualityReport.weakSections.length > 0)
-  ) {
-    ctx.progress.emit("Improving weak sections...");
-    const improveInstruction = buildQualityImproveInstruction(
-      qualityReport,
-      input.language,
-    );
-    try {
-      validatedFiles = await applyQualityImprovePass(
+    ctx,
+    skipImprove: params.skipImprove,
+    improveFile: async (instruction, files) =>
+      applyQualityImprovePass(
         input,
         analysis,
         plan,
-        validatedFiles,
+        files,
         ctx,
         assetSummary,
-        improveInstruction,
-      );
-      qualityReport = {
-        ...runWebsiteQualityCheck({
-          files: validatedFiles,
-          strategy: plan.strategy,
-          designSystem: plan.designSystem,
-          assetManifest,
-          pages: plan.blueprint.pages,
-          requiredSections: analysis.businessProfile.requiredSections,
-          language: input.language,
-        }),
-        improveApplied: true,
-        improveNotes: [improveInstruction],
-      };
-    } catch (error) {
-      logger.warn("quality improve pass failed", "website-generate", {
-        error: error instanceof Error ? error.message : String(error),
-      });
-      qualityReport = { ...qualityReport, improveApplied: false };
-    }
-  }
+        instruction,
+      ),
+  });
 
-  // Restore AI Image Engine wiring after improve rewrites.
-  validatedFiles = injectAiImagesIntoProject({
-    files: validatedFiles,
+  const validatedFiles = injectAiImagesIntoProject({
+    files: pipelineResult.files,
     assetManifest:
       assetManifest as import("@/lib/ai-core/layers/types").CoreAssetManifest,
     industry:
       analysis.businessProfile?.industry || plan.designSystem.industryPattern,
   });
 
-  return { files: validatedFiles, qualityReport };
+  return {
+    ...pipelineResult,
+    files: validatedFiles,
+    semanticContentQualityReport: pipelineResult.semanticContentQualityReport,
+    visualDesignQualityReport: pipelineResult.visualDesignQualityReport,
+  };
 }
+

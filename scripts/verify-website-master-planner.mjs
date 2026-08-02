@@ -17,6 +17,7 @@ const types = read("lib/ai-core/master-planner/types.ts");
 const pre = read("lib/ai-core/planning-reasoning-engine/orchestrator.ts");
 const apply = read("lib/ai-core/master-planner/apply.ts");
 const runner = read("lib/ai-core/layers/runner.ts");
+const prepareStage = read("lib/website/layer-hooks/prepare-template.ts");
 const detect = read("lib/ai-core/industry-intelligence/detect.ts");
 const intelligence = read("lib/ai-core/image-engine/intelligence.ts");
 const imageEngine = read("lib/ai-core/image-engine/engine.ts");
@@ -89,8 +90,9 @@ assert.ok(
   "PRE must define structured DecisionTraceEntry (EDS-002)",
 );
 assert.ok(
-  runner.includes("runPlanningReasoningEngine"),
-  "runner must invoke PRE for website-builder (EDS-002)",
+  runner.includes("prepareTemplate") ||
+    prepareStage.includes("runPlanningReasoningEngine"),
+  "website template stage must invoke PRE (EDS-002)",
 );
 assert.ok(
   pre.includes("runBusinessIntelligenceAnalysis") ||
@@ -132,9 +134,10 @@ assert.ok(
 );
 
 assert.ok(
-  runner.includes("runPlanningReasoningEngine") ||
+  runner.includes("prepareTemplate") ||
+    runner.includes("runPlanningReasoningEngine") ||
     runner.includes("runMasterWebsitePlanner"),
-  "runner must invoke PRE or master planner for website-builder",
+  "runner must delegate template stage to adapter prepareTemplate",
 );
 assert.ok(
   !runner.includes("detectWebsiteIndustry(brief)") ||
@@ -142,8 +145,9 @@ assert.ok(
   "runner must not call detectWebsiteIndustry directly before master planner",
 );
 assert.ok(
-  runner.includes("Applying locked layout template from master plan"),
-  "runner must apply locked layout template from master plan",
+  prepareStage.includes("Applying locked layout template from master plan") ||
+    runner.includes("Applying locked layout template from master plan"),
+  "website template stage must apply locked layout template from master plan",
 );
 
 assert.ok(
@@ -169,6 +173,10 @@ assert.ok(
   "image engine must pass master plan through",
 );
 
+assert.ok(
+  adapter.includes("prepareTemplate"),
+  "website adapter must implement prepareTemplate hook",
+);
 assert.ok(
   adapter.includes("getMasterWebsitePlan"),
   "website adapter must read master plan",

@@ -96,7 +96,7 @@ const furnitureWebsitePlan: WebsiteGenerationPlan = {
   industryLabel: "Furniture",
   routingIndustryId: "furniture",
   layoutFamily: "commerce-grid",
-  structureTemplateId: "ecommerce-atelier",
+  structureTemplateId: "modern-business",
   layoutTemplateIntelligenceId: "ti-ecommerce-atelier",
   layoutStructure: "commerce-grid",
   pageTopology: "single-page",
@@ -121,7 +121,7 @@ const furnitureWebsitePlan: WebsiteGenerationPlan = {
   route: {
     version: "1",
     industryId: "furniture",
-    structureTemplateId: "ecommerce-atelier",
+    structureTemplateId: "modern-business",
     layoutTemplateIntelligenceId: "ti-ecommerce-atelier",
     visualThemePresetId: "luxury",
     visualThemeTemplateIntelligenceId: "ti-luxury",

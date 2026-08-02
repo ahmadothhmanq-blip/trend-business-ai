@@ -1,0 +1,23 @@
+{
+  "generatedAt": "2026-08-02T15:00:25.231Z",
+  "sprint": "TBGE Sprint 4",
+  "iterations": 200,
+  "llmMode": "none",
+  "results": [
+    {
+      "label": "composeTheme",
+      "medianMs": 0.0008,
+      "totalMs": 0.54
+    },
+    {
+      "label": "composePage",
+      "medianMs": 0.0151,
+      "totalMs": 5.66
+    },
+    {
+      "label": "composeSite (full runtime)",
+      "medianMs": 0.0172,
+      "totalMs": 5.27
+    }
+  ]
+}

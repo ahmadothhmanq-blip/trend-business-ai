@@ -4,7 +4,7 @@
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { GeneratedWebsiteProject } from "@/plugins/website/types";
+import type { GeneratedWebsiteProject } from "@/lib/website/types";
 import type { WebsiteGeneration } from "@/types/database";
 import {
   persistWebsiteGeneration,
@@ -25,8 +25,8 @@ import type {
   WebsiteCommitOptions,
   WebsiteCommitResult,
 } from "@/lib/website/platform/types";
-import { syncBlueprintMaterializedView } from "@/lib/ai-core/website-copilot/sync-blueprint";
-import { validatePostCommandL0 } from "@/lib/ai-core/website-copilot/validators/post-command";
+import { syncBlueprintMaterializedView } from "@/lib/website/platform/sync-blueprint";
+import { validatePostCommandL0 } from "@/lib/website/validation/post-command";
 
 export type CommitBlueprintRevisionParams = {
   supabase: SupabaseClient;

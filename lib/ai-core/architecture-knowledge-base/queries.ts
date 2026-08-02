@@ -1,4 +1,8 @@
-import type { WebsiteThemePresetId } from "@/lib/website/builder/theme-catalog";
+import type { WebsiteThemePresetId } from "@/lib/website/contracts/theme";
+import { WEBSITE_THEME_PRESET_IDS } from "@/lib/website/contracts/theme";
+import {
+  isKnownStructureTemplateId,
+} from "@/lib/website/contracts/structure-registry";
 import {
   ARCHITECTURE_KNOWLEDGE_ENTRIES,
   businessRules,
@@ -20,7 +24,6 @@ import type {
   IndustryKnowledgeEntry,
   ValidationPolicyKnowledgeEntry,
 } from "@/lib/ai-core/architecture-knowledge-base/types";
-import { WEBSITE_STRUCTURE_TEMPLATE_INDEX } from "@/lib/website/builder/template-package-index";
 
 export type ResolvedIndustry = IndustryKnowledgeEntry & {
   inheritanceChain: string[];
@@ -114,7 +117,7 @@ export function resolveStructureTemplateIdForIndustry(
 ): ExplainableLookup<string> {
   const industry = resolveIndustryKnowledge(industryId);
   const structureId = industry.value.defaultStructureTemplateId;
-  const valid = WEBSITE_STRUCTURE_TEMPLATE_INDEX[structureId]
+  const valid = isKnownStructureTemplateId(structureId)
     ? structureId
     : DEFAULT_STRUCTURE_TEMPLATE_ID;
   return explain(
@@ -195,16 +198,7 @@ export function getValidationPolicyKnowledge(): ValidationPolicyKnowledgeEntry {
   return validationPolicy();
 }
 
-const THEME_PRESET_IDS = new Set([
-  "luxury",
-  "modern",
-  "minimal",
-  "corporate",
-  "creative",
-  "technology",
-  "editorial",
-  "bold",
-]);
+const THEME_PRESET_IDS = new Set<string>(WEBSITE_THEME_PRESET_IDS);
 
 export function resolveVisualThemePresetForIndustry(
   industryId: string,

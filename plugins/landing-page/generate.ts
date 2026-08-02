@@ -1,5 +1,7 @@
 import { generateWithValidation } from "@/lib/ai/generator";
-import { truncateForContext, type PlannedFile } from "@/lib/ai/planner";
+import { type PlannedFile } from "@/lib/ai/planner";
+import { resolvePromptContext } from "@/lib/ai-core/context-engine";
+import { assemblePrompt } from "@/lib/ai-core/prompt-engine";
 import {
   inferCategoryFromPath,
   normalizeCategory,
@@ -34,11 +36,16 @@ async function generateFileWithValidation(
   ctx: GenerationContext,
   extraValidationReason = "",
 ) {
-  return generateWithValidation<GeneratedProjectFile>({
-    provider: ctx.provider,
-    maxAttempts: FILE_GENERATION_RETRIES,
-    prompt: lpFilePrompt({
-      input,
+  const { promptFiles } = resolvePromptContext({
+    targetPath: filePlan.path,
+    targetCategory: filePlan.category,
+    availableFiles: existingFiles,
+    filePlans,
+    productId: "landing-page",
+  });
+
+  const { prompt } = assemblePrompt(
+    {
       analysis,
       blueprint: plan.blueprint,
       dynamicPlan: {
@@ -53,19 +60,31 @@ async function generateFileWithValidation(
         types: plan.dynamicPlan.types,
         configs: plan.dynamicPlan.configs,
       },
-      filePlan,
       projectTree: filePlans.map((f) => ({
         path: f.path,
         category: f.category,
         purpose: f.purpose,
       })),
-      existingFiles: existingFiles.map((f) => ({
-        path: f.path,
-        language: f.language,
-        content: truncateForContext(f.content),
-      })),
-      validationReason: extraValidationReason,
-    }),
+      filePlan,
+      productId: "landing-page",
+    },
+    (compacted) =>
+      lpFilePrompt({
+        input,
+        analysis: compacted.analysis,
+        blueprint: compacted.blueprint,
+        dynamicPlan: compacted.dynamicPlan,
+        filePlan,
+        projectTree: compacted.projectTree,
+        existingFiles: promptFiles,
+        validationReason: extraValidationReason,
+      }),
+  );
+
+  return generateWithValidation<GeneratedProjectFile>({
+    provider: ctx.provider,
+    maxAttempts: FILE_GENERATION_RETRIES,
+    prompt,
     schema: lpGeneratedFileSchema,
     validate: (result) => validateGeneratedFileContent(result, filePlan.path),
   }).then((file) => ({

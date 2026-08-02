@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-08-02T11:14:46.113Z",
+  "sectionCount": 8,
+  "delayMs": 100,
+  "serial": {
+    "label": "serial-w2",
+    "durationMs": 806,
+    "peak": 1,
+    "sectionCount": 8,
+    "maxConcurrency": 1
+  },
+  "parallel": {
+    "label": "parallel-w2",
+    "durationMs": 203,
+    "peak": 4,
+    "sectionCount": 8,
+    "maxConcurrency": 4
+  },
+  "speedup": 3.97,
+  "improvementPercent": 75
+}

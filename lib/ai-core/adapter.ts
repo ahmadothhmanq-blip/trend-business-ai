@@ -13,6 +13,21 @@ import type {
   CoreSeoPackage,
 } from "@/lib/ai-core/layers/types";
 
+export type LayerRunnerHookContext = {
+  onProgress?: (message: string) => void;
+};
+
+export type PrepareTemplateResult = {
+  brief: CoreBrief;
+  artifacts: CoreLayerArtifacts;
+  layersExecuted?: string[];
+};
+
+export type CompleteRunResult = {
+  brief: CoreBrief;
+  artifacts: CoreLayerArtifacts;
+};
+
 /**
  * Thin product bridge into the AI Core LayerRunner.
  * Phase 0: interface only — products are not migrated yet.
@@ -24,6 +39,16 @@ export type ProductEngineAdapter<TGeneration = unknown, TFinal = unknown> = {
   label: string;
   /** Which Core layers this product participates in */
   layers: CoreLayerFlags;
+
+  /**
+   * Optional: product-specific template / planning stage before idea layer.
+   * Website Builder uses this for MAOE, PRE, and template intelligence locking.
+   */
+  prepareTemplate?(
+    brief: CoreBrief,
+    artifacts: CoreLayerArtifacts,
+    ctx: LayerRunnerHookContext,
+  ): Promise<PrepareTemplateResult>;
 
   /** Optional: Idea layer */
   runIdea?(
@@ -94,6 +119,16 @@ export type ProductEngineAdapter<TGeneration = unknown, TFinal = unknown> = {
     generation: TGeneration,
     ctx: GenerationContext,
   ): Promise<TFinal>;
+
+  /**
+   * Optional: product-specific completion hook after all layers run.
+   * Website Builder uses this for MAOE workflow completion.
+   */
+  completeRun?(
+    brief: CoreBrief,
+    artifacts: CoreLayerArtifacts,
+    ctx: LayerRunnerHookContext,
+  ): Promise<CompleteRunResult>;
 };
 
 export type LayerRunnerInput = {

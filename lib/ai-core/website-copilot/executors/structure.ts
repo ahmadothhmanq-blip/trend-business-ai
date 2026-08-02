@@ -4,11 +4,9 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { CapabilityMatch } from "@/lib/ai-core/website-copilot/types";
-import {
-  executeWebsiteStructureMutation,
-  type WebsiteManageAction,
-  type WebsiteStructureServiceSuccess,
-} from "@/lib/website/platform/services/structure-service";
+import type { WebsiteManageAction } from "@/lib/website/platform/services/structure-service";
+import type { WebsiteStructureServiceSuccess } from "@/lib/website/platform/services/structure-service";
+import { getWebsitePlatformPort } from "@/lib/website/platform/port";
 
 function slugify(label: string): string {
   return label
@@ -90,7 +88,8 @@ export async function executeStructureCopilotCommand(params: {
     params.match,
   );
 
-  const result = await executeWebsiteStructureMutation({
+  const port = getWebsitePlatformPort();
+  const result = await port.executeStructureMutation({
     supabase: params.supabase,
     userId: params.userId,
     generationId: params.generationId,

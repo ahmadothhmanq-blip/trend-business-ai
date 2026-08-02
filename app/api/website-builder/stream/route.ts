@@ -19,28 +19,54 @@ import {
   checkpointWebsiteGeneration,
   failWebsiteGenerationSession,
 } from "@/lib/website/generation-session";
+import {
+  createWaveCheckpointEngine,
+  isWaveCheckpointEngineEnabled,
+} from "@/lib/website/wave-checkpoint-engine";
+import { isWaveSchedulerEnabled } from "@/lib/ai-core/file-generation/flags";
 import { createSseStreamHelpers } from "@/lib/api/sse-stream";
 import { isRetryableError, isStreamDisconnectError, withRetry } from "@/lib/ai/retry";
 import { clampWebsitePrompt } from "@/lib/ai/timeouts";
 import { resolveRequestLanguage } from "@/lib/i18n/api";
 import { logger } from "@/lib/logger";
-import { ArchitectureValidationFailure } from "@/lib/ai-core/architecture-validation";
 import {
   isWebsiteIncrementalPreviewEnabled,
   isUltraFastWebsiteGenerationEnabled,
   resolveWebsiteGenerationProfile,
 } from "@/lib/website/generation-flags";
+import { createBillingManager } from "@/lib/billing";
+import { isPaidWebsitePlan } from "@/lib/ai-core/quality-authority/billing";
+import {
+  ArchitectureValidationFailure,
+  E2EWebsiteProfiler,
+  formatE2EMarkdownReport,
+  runWithE2EProfiler,
+  runWithWebsiteProfiler,
+  WebsitePipelineProfiler,
+} from "@/lib/website/generation-api";
 import { normalizeWebsiteFeatureList } from "@/lib/website/builder/feature-registry";
 import type { GeneratedProjectFile } from "@/plugins/website/types";
 import { NextResponse } from "next/server";
+import { performance } from "node:perf_hooks";
+import {
+  getStreamHandoffDelayMs,
+  getWebsiteStreamMaxDurationSec,
+} from "@/lib/website/stream-limits";
 
 export const runtime = "nodejs";
-/** Long Website Builder generations (multiple DeepSeek + image calls). Vercel Pro max is 300s. */
-export const maxDuration = 300;
+/**
+ * Website Builder SSE route budget (seconds).
+ * Set to 900 to match the JSON generation route; Vercel Pro enforces 300s at runtime.
+ * Handoff + client DB recovery cover generations that exceed the platform cap.
+ */
+export const maxDuration = 900;
 
 const WB_STREAM_LOG = "wb-stream";
 
 export async function POST(request: Request) {
+  const e2eProfileEnabled = request.headers.get("X-WB-E2E-Profile") === "1";
+  const apiRouteStartedAt = performance.now();
+
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
@@ -73,6 +99,7 @@ export async function POST(request: Request) {
     mode: input.mode ?? "generate",
     projectKind,
     promptChars: input.prompt.length,
+    promptPreview: input.prompt.slice(0, 100),
     parentGenerationId: input.parentGenerationId ?? null,
     optimizeWithAi: Boolean(input.optimizeWithAi),
   });
@@ -87,23 +114,98 @@ export async function POST(request: Request) {
     input.parentGenerationId,
   );
 
+  let billingPlanId = "free";
+  try {
+    const billing = createBillingManager(auth.supabase);
+    const billingStatus = await billing.getStatus(auth.user!.id);
+    billingPlanId = billingStatus.currentPlanId;
+  } catch (error) {
+    logger.warn("Billing status unavailable for generation profile", WB_STREAM_LOG, {
+      runId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+
+  const generationInput = {
+    ...localizedInput,
+    hasPaidPlan: isPaidWebsitePlan(billingPlanId),
+    billingPlanId,
+  };
+
   const stream = new ReadableStream({
     async start(controller) {
-      const { send, close, isClosed } = createSseStreamHelpers(
+      const pipelineProfiler = e2eProfileEnabled
+        ? new WebsitePipelineProfiler()
+        : null;
+      const e2eProfiler = e2eProfileEnabled
+        ? new E2EWebsiteProfiler(runId)
+        : null;
+
+      const runStreamBody = async () => {
+      const { send: rawSend, close, isClosed } = createSseStreamHelpers(
         controller,
         WB_STREAM_LOG,
       );
+      const send: typeof rawSend = (event, data) => {
+        if (e2eProfiler && event !== "ping") {
+          const payload = JSON.stringify(data ?? {});
+          e2eProfiler.recordSseEvent(
+            event,
+            payload.length,
+            typeof data === "object" &&
+              data !== null &&
+              "generationId" in data &&
+              typeof (data as { generationId?: unknown }).generationId === "string"
+              ? (data as { generationId: string }).generationId
+              : undefined,
+          );
+        }
+        return rawSend(event, data);
+      };
       const startedAt = Date.now();
       let sessionId: string | null = null;
       let lastFiles: GeneratedProjectFile[] = [];
       let checkpointQueue: Promise<void> = Promise.resolve();
       let lastCheckpointAt = 0;
+      let handoffSent = false;
+      let handoffTimer: ReturnType<typeof setTimeout> | null = null;
+
+      const waveCheckpointEngine = createWaveCheckpointEngine({
+        enabled: isWaveCheckpointEngineEnabled(),
+        schedulerMode: isWaveSchedulerEnabled() ? "wave" : "serial",
+        coalesceMs: 300,
+        flush: async ({ files, message, waveState }) => {
+          if (!sessionId) return;
+          lastFiles = files;
+          lastCheckpointAt = Date.now();
+          checkpointQueue = checkpointQueue
+            .then(async () => {
+              if (!sessionId) return;
+              await checkpointWebsiteGeneration({
+                supabase: auth.supabase,
+                userId: auth.user!.id,
+                generationId: sessionId,
+                message,
+                files,
+                partialProject: { waveGenerationState: waveState },
+              });
+            })
+            .catch((error) => {
+              logger.warn("Wave checkpoint flush failed (non-fatal)", WB_STREAM_LOG, {
+                runId,
+                sessionId,
+                error: error instanceof Error ? error.message : String(error),
+              });
+            });
+          await checkpointQueue;
+        },
+      });
 
       const queueCheckpoint = (message?: string, files?: GeneratedProjectFile[]) => {
         if (!sessionId) return;
         if (files) lastFiles = files;
         const now = Date.now();
-        // Throttle DB writes — keep progress fresh without hammering Supabase.
+        // Throttle progress-only DB writes — file checkpoints go through wave engine.
         if (!files && now - lastCheckpointAt < 4000) return;
         lastCheckpointAt = now;
         checkpointQueue = checkpointQueue
@@ -115,6 +217,9 @@ export async function POST(request: Request) {
               generationId: sessionId,
               message,
               files: lastFiles.length ? lastFiles : undefined,
+              partialProject: {
+                waveGenerationState: waveCheckpointEngine.getState(),
+              },
             });
           })
           .catch((error) => {
@@ -127,6 +232,7 @@ export async function POST(request: Request) {
       };
 
       try {
+        e2eProfiler?.markStart("stream-initialization");
         const session = await beginWebsiteGenerationSession({
           supabase: auth.supabase,
           userId: auth.user!.id,
@@ -145,7 +251,7 @@ export async function POST(request: Request) {
         });
         if (session.ok) {
           sessionId = session.generation.id;
-          const generationProfile = resolveWebsiteGenerationProfile(localizedInput);
+          const generationProfile = resolveWebsiteGenerationProfile(generationInput);
           send("session", {
             generationId: sessionId,
             incrementalPreview:
@@ -155,6 +261,22 @@ export async function POST(request: Request) {
             generationProfile,
             message: "Generation session started — progress is saved as we go.",
           });
+
+          handoffTimer = setTimeout(() => {
+            if (handoffSent || !sessionId) return;
+            handoffSent = true;
+            const maxSec = getWebsiteStreamMaxDurationSec();
+            send("handoff", {
+              generationId: sessionId,
+              reason: "route_budget",
+              pollMode: true,
+              maxDurationSec: maxSec,
+              message:
+                "Generation continues — tracking progress via saved checkpoints while the live stream winds down.",
+            });
+            void waveCheckpointEngine.drain();
+            queueCheckpoint("Stream handoff — progress saved for client recovery.");
+          }, getStreamHandoffDelayMs());
         } else {
           send("error", {
             message:
@@ -164,6 +286,8 @@ export async function POST(request: Request) {
           controller.close();
           return;
         }
+
+        e2eProfiler?.markEnd("stream-initialization");
 
         const okConnect = send("progress", {
           message: "Connecting to AI website engine...",
@@ -183,11 +307,17 @@ export async function POST(request: Request) {
           sessionId,
         });
 
+        e2eProfiler?.markStart("ai-core");
+        let generateAttempts = 0;
         // Retry transient AI / disconnect failures once the session row exists.
         const project = await withRetry(
-          () =>
-            generateWebsite({
-              ...localizedInput,
+          () => {
+            generateAttempts += 1;
+            if (e2eProfiler && generateAttempts > 1) {
+              e2eProfiler.recordRetry("generateWebsite", generateAttempts);
+            }
+            return generateWebsite({
+              ...generationInput,
               projectKind,
               ...parentContext,
               userId: auth.user!.id,
@@ -196,6 +326,7 @@ export async function POST(request: Request) {
                 | undefined,
               autoFallback: settings?.auto_fallback ?? true,
               onProgress: (message) => {
+                e2eProfiler?.handleProgressMessage(message);
                 const delivered = send("progress", {
                   message,
                   generationId: sessionId,
@@ -212,14 +343,15 @@ export async function POST(request: Request) {
               },
               onFilesCheckpoint: async (files, meta) => {
                 lastFiles = files;
-                queueCheckpoint(meta.message, files);
+                await waveCheckpointEngine.handleFilesCheckpoint(files, meta);
                 send("progress", {
                   message: meta.message,
                   generationId: sessionId,
                   fileCount: files.length,
                 });
               },
-            }),
+            });
+          },
           {
             maxAttempts: 3,
             delaysMs: [2500, 5000, 10000],
@@ -227,7 +359,9 @@ export async function POST(request: Request) {
               isRetryableError(error) || isStreamDisconnectError(error),
           },
         );
+        e2eProfiler?.markEnd("ai-core");
 
+        await waveCheckpointEngine.drain();
         await checkpointQueue;
 
         logger.info("Website Builder generateWebsite done", WB_STREAM_LOG, {
@@ -251,6 +385,7 @@ export async function POST(request: Request) {
           sessionId,
         });
 
+        e2eProfiler?.markStart("supabase-writes");
         const saved = await persistWebsiteGeneration({
           supabase: auth.supabase,
           userId: auth.user!.id,
@@ -269,6 +404,7 @@ export async function POST(request: Request) {
             continueInstruction: localizedInput.continueInstruction,
           },
         });
+        e2eProfiler?.markEnd("supabase-writes");
 
         if (!saved.ok) {
           logger.error("Final database save failed", WB_STREAM_LOG, {
@@ -297,6 +433,16 @@ export async function POST(request: Request) {
           sseClosed: isClosed(),
         });
 
+        e2eProfiler?.markStart("api-response");
+        const e2eReport =
+          e2eProfiler && pipelineProfiler
+            ? e2eProfiler.toReport({
+                pipelineReport: pipelineProfiler.toReport(),
+                profile: resolveWebsiteGenerationProfile(generationInput),
+                promptChars: localizedInput.prompt.length,
+              })
+            : null;
+
         const completeDelivered = send("complete", {
           generationId: saved.generation.id,
           summary: {
@@ -305,7 +451,14 @@ export async function POST(request: Request) {
             projectKind: saved.project.projectKind ?? projectKind,
           },
           message: "Website saved to your workspace.",
+          ...(e2eReport
+            ? {
+                e2ePerformanceReport: e2eReport,
+                e2ePerformanceMarkdown: formatE2EMarkdownReport(e2eReport),
+              }
+            : {}),
         });
+        e2eProfiler?.markEnd("api-response");
 
         if (!completeDelivered) {
           logger.error(
@@ -326,6 +479,7 @@ export async function POST(request: Request) {
           });
         }
       } catch (error) {
+        await waveCheckpointEngine.drain();
         await checkpointQueue;
         const architectureFailure =
           error instanceof ArchitectureValidationFailure
@@ -371,6 +525,7 @@ export async function POST(request: Request) {
             : { error: message, generationId: sessionId },
         );
       } finally {
+        if (handoffTimer) clearTimeout(handoffTimer);
         logger.info("Website Builder stream finally close", WB_STREAM_LOG, {
           runId,
           elapsedMs: Date.now() - startedAt,
@@ -378,6 +533,19 @@ export async function POST(request: Request) {
           sessionId,
         });
         close();
+      }
+      };
+
+      if (e2eProfileEnabled && pipelineProfiler && e2eProfiler) {
+        e2eProfiler.recordDuration(
+          "api-route",
+          Math.round(performance.now() - apiRouteStartedAt),
+        );
+        await runWithWebsiteProfiler(pipelineProfiler, () =>
+          runWithE2EProfiler(e2eProfiler, runStreamBody),
+        );
+      } else {
+        await runStreamBody();
       }
     },
   });
@@ -387,6 +555,7 @@ export async function POST(request: Request) {
       "Content-Type": "text/event-stream; charset=utf-8",
       "Cache-Control": "no-cache, no-transform",
       Connection: "keep-alive",
+      "X-WB-Stream-Max-Duration": String(getWebsiteStreamMaxDurationSec()),
       // Hint proxies/CDNs not to buffer SSE
       "X-Accel-Buffering": "no",
     },

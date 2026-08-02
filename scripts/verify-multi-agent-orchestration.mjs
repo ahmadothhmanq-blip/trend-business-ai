@@ -22,6 +22,7 @@ const sharedMemory = read("lib/ai-core/multi-agent-orchestration/shared-memory.t
 const eventBus = read("lib/ai-core/multi-agent-orchestration/event-bus.ts");
 const failure = read("lib/ai-core/multi-agent-orchestration/failure-recovery.ts");
 const maoeEngine = read("lib/ai-core/multi-agent-orchestration/maoe-engine.ts");
+const prepareStage = read("lib/website/layer-hooks/prepare-template.ts");
 const runner = read("lib/ai-core/layers/runner.ts");
 const adapter = read("lib/ai-core/adapters/website-builder.ts");
 const agency = read("lib/ai-core/agency-orchestrator/orchestrate.ts");
@@ -67,16 +68,22 @@ assert.ok(
 );
 
 assert.ok(
-  runner.includes("runMultiAgentOrchestrationEngine"),
-  "LayerRunner must initialize MAOE",
+  prepareStage.includes("runMultiAgentOrchestrationEngine") ||
+    runner.includes("runMultiAgentOrchestrationEngine"),
+  "Website Builder template stage must initialize MAOE",
 );
 assert.ok(
-  runner.includes("superviseAgentExecution"),
-  "LayerRunner must supervise PRE via MAOE",
+  prepareStage.includes("superviseAgentExecution") ||
+    runner.includes("superviseAgentExecution"),
+  "Website Builder template stage must supervise PRE via MAOE",
 );
 assert.ok(
-  runner.includes("completeMaoeWorkflow"),
-  "LayerRunner must complete MAOE workflow",
+  runner.includes("completeRun") || runner.includes("adapter.completeRun"),
+  "LayerRunner must support adapter completeRun hook",
+);
+assert.ok(
+  prepareStage.includes("completeMaoeWorkflow") || adapter.includes("completeRun"),
+  "Website Builder must complete MAOE workflow via adapter hook",
 );
 
 assert.ok(

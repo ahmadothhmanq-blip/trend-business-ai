@@ -1,0 +1,214 @@
+{
+  "phase": "QE-4",
+  "timestamp": "2026-08-02T11:58:20.397Z",
+  "totalLatencyMs": 3,
+  "additionalTokenUsage": 0,
+  "llmCalls": 0,
+  "visualConsistencyDelta": 0,
+  "responsiveQualityDelta": 21,
+  "heroQualityDelta": 21,
+  "navigationQualityDelta": 0,
+  "ctaPlacementDelta": 0,
+  "typographyScoreDelta": 21,
+  "layoutScoreDelta": 16,
+  "uxScoreDelta": 6,
+  "overallDelta": 11,
+  "premium": {
+    "passed": true,
+    "scores": {
+      "designTokens": 92,
+      "visualHierarchy": 85,
+      "responsiveLayout": 85,
+      "heroQuality": 92,
+      "navigationUx": 92,
+      "ctaPlacement": 92,
+      "componentSpacing": 92,
+      "typographyHierarchy": 85,
+      "crossPageConsistency": 92,
+      "layout": 89,
+      "ux": 91,
+      "overall": 89
+    },
+    "issues": [
+      {
+        "id": "hierarchy-no-h1-app/page.tsx",
+        "dimension": "visualHierarchy",
+        "severity": "warning",
+        "message": "app/page.tsx: Missing H1 — weak visual hierarchy.",
+        "filePath": "app/page.tsx",
+        "repairHint": "Lead each page with one decisive H1 in the hero."
+      },
+      {
+        "id": "responsive-no-viewport",
+        "dimension": "responsiveLayout",
+        "severity": "warning",
+        "message": "Viewport meta configuration not detected.",
+        "repairHint": "Ensure mobile viewport is configured in root layout metadata."
+      },
+      {
+        "id": "type-no-h2",
+        "dimension": "typographyHierarchy",
+        "severity": "warning",
+        "message": "No H2 section headings — weak typographic structure.",
+        "repairHint": "Add H2 headings for each major content band."
+      }
+    ],
+    "weakSections": [
+      "app/page.tsx: Missing H1 — weak visual hierarchy.",
+      "Viewport meta configuration not detected.",
+      "No H2 section headings — weak typographic structure."
+    ],
+    "summary": "Visual design quality 89/100 — 3 UX/visual findings."
+  },
+  "weak": {
+    "passed": true,
+    "scores": {
+      "designTokens": 85,
+      "visualHierarchy": 78,
+      "responsiveLayout": 64,
+      "heroQuality": 71,
+      "navigationUx": 92,
+      "ctaPlacement": 92,
+      "componentSpacing": 78,
+      "typographyHierarchy": 64,
+      "crossPageConsistency": 92,
+      "layout": 73,
+      "ux": 85,
+      "overall": 78
+    },
+    "issues": [
+      {
+        "id": "tokens-missing-core",
+        "dimension": "designTokens",
+        "severity": "warning",
+        "message": "Core design tokens are underused in generated styles.",
+        "repairHint": "Apply --color-primary, --font-heading, and --section-y tokens in globals.css and section components."
+      },
+      {
+        "id": "hierarchy-no-h1-app/page.tsx",
+        "dimension": "visualHierarchy",
+        "severity": "warning",
+        "message": "app/page.tsx: Missing H1 — weak visual hierarchy.",
+        "filePath": "app/page.tsx",
+        "repairHint": "Lead each page with one decisive H1 in the hero."
+      },
+      {
+        "id": "hierarchy-layering",
+        "dimension": "visualHierarchy",
+        "severity": "warning",
+        "message": "Limited layering/positioning signals for visual depth.",
+        "repairHint": "Use relative/absolute/sticky positioning for hero overlays and nav."
+      },
+      {
+        "id": "responsive-no-breakpoints",
+        "dimension": "responsiveLayout",
+        "severity": "warning",
+        "message": "No responsive breakpoint utilities (sm/md/lg) detected.",
+        "repairHint": "Add sm/md/lg grid and flex adjustments for hero, nav, and sections."
+      },
+      {
+        "id": "responsive-no-viewport",
+        "dimension": "responsiveLayout",
+        "severity": "warning",
+        "message": "Viewport meta configuration not detected.",
+        "repairHint": "Ensure mobile viewport is configured in root layout metadata."
+      },
+      {
+        "id": "responsive-home-stack",
+        "dimension": "responsiveLayout",
+        "severity": "warning",
+        "message": "Home layout may not stack cleanly on mobile.",
+        "filePath": "app/page.tsx",
+        "repairHint": "Use flex-col / grid-cols-1 with md: breakpoints on the hero."
+      },
+      {
+        "id": "responsive-no-container",
+        "dimension": "responsiveLayout",
+        "severity": "warning",
+        "message": "Content width constraints (container/max-w) not detected.",
+        "repairHint": "Wrap sections in container/max-w-* for readable line lengths."
+      },
+      {
+        "id": "hero-no-h1",
+        "dimension": "heroQuality",
+        "severity": "warning",
+        "message": "Hero section lacks a primary H1 headline.",
+        "filePath": "app/page.tsx",
+        "repairHint": "Place the main value proposition in a single H1 inside the hero."
+      },
+      {
+        "id": "hero-no-visual",
+        "dimension": "heroQuality",
+        "severity": "warning",
+        "message": "Hero section lacks strong visual imagery or background treatment.",
+        "filePath": "app/page.tsx",
+        "repairHint": "Add hero imagery via HERO_IMAGE, Image, or premium gradient overlay."
+      },
+      {
+        "id": "hero-shallow",
+        "dimension": "heroQuality",
+        "severity": "warning",
+        "message": "Hero vertical presence is shallow — may feel cramped.",
+        "filePath": "app/page.tsx",
+        "repairHint": "Use min-h-screen or generous py-20+ padding for hero band."
+      },
+      {
+        "id": "spacing-no-rhythm",
+        "dimension": "componentSpacing",
+        "severity": "warning",
+        "message": "Section vertical rhythm (py-16+, gap, SectionShell) is weak.",
+        "repairHint": "Apply consistent section padding via --section-y or py-20 tokens."
+      },
+      {
+        "id": "spacing-no-surface-depth",
+        "dimension": "componentSpacing",
+        "severity": "warning",
+        "message": "Card/surface depth (rounded, shadow) is underused.",
+        "repairHint": "Use rounded-lg/xl and subtle shadows on feature cards."
+      },
+      {
+        "id": "type-no-display",
+        "dimension": "typographyHierarchy",
+        "severity": "warning",
+        "message": "Display/heading typography identity is not established.",
+        "repairHint": "Wire --font-heading or a premium display font for headlines."
+      },
+      {
+        "id": "type-no-body-scale",
+        "dimension": "typographyHierarchy",
+        "severity": "warning",
+        "message": "Body copy typography scale (text-base/lg, leading) is weak.",
+        "repairHint": "Use text-base/lg with leading-relaxed for readable body copy."
+      },
+      {
+        "id": "type-no-h2",
+        "dimension": "typographyHierarchy",
+        "severity": "warning",
+        "message": "No H2 section headings — weak typographic structure.",
+        "repairHint": "Add H2 headings for each major content band."
+      },
+      {
+        "id": "type-no-muted",
+        "dimension": "typographyHierarchy",
+        "severity": "warning",
+        "message": "Muted/subhead text styles not detected for hierarchy contrast.",
+        "repairHint": "Use text-muted-foreground or opacity for supporting copy."
+      }
+    ],
+    "weakSections": [
+      "Core design tokens are underused in generated styles.",
+      "app/page.tsx: Missing H1 — weak visual hierarchy.",
+      "Limited layering/positioning signals for visual depth.",
+      "No responsive breakpoint utilities (sm/md/lg) detected.",
+      "Viewport meta configuration not detected.",
+      "Home layout may not stack cleanly on mobile.",
+      "Content width constraints (container/max-w) not detected.",
+      "Hero section lacks a primary H1 headline.",
+      "Hero section lacks strong visual imagery or background treatment.",
+      "Hero vertical presence is shallow — may feel cramped.",
+      "Section vertical rhythm (py-16+, gap, SectionShell) is weak.",
+      "Card/surface depth (rounded, shadow) is underused."
+    ],
+    "summary": "Visual design quality 78/100 — 16 UX/visual findings."
+  }
+}

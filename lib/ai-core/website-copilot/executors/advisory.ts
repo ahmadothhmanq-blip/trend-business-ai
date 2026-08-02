@@ -3,8 +3,8 @@
  */
 
 import { suggestWebsiteImprovements } from "@/lib/ai-core/website-editor";
-import { readBlueprintRevisionFromGeneration } from "@/lib/website/platform/revision";
-import type { GeneratedWebsiteProject } from "@/plugins/website/types";
+import { getWebsitePlatformPort } from "@/lib/website/platform/port";
+import type { GeneratedWebsiteProject } from "@/lib/website/types";
 import type { WebsiteGeneration } from "@/types/database";
 import {
   COPILOT_MVP_EXAMPLES,
@@ -20,6 +20,7 @@ export function executeAdvisoryCopilotCommand(params: {
   includeExamples?: boolean;
   includePhase2Examples?: boolean;
 }): CopilotCommandSuccess {
+  const port = getWebsitePlatformPort();
   const report = suggestWebsiteImprovements({
     files: params.project.files ?? [],
     project: params.project,
@@ -37,7 +38,7 @@ export function executeAdvisoryCopilotCommand(params: {
     capability: params.capability,
     tier: "advisory",
     mutated: false,
-    revision: readBlueprintRevisionFromGeneration(params.generation),
+    revision: port.readBlueprintRevision(params.generation),
     aiRunId: null,
     fromIdempotency: false,
     summary: params.summary,

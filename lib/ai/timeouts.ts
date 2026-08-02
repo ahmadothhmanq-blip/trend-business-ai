@@ -37,8 +37,17 @@ export const MAX_CONTINUE_INSTRUCTION_CHARS = 6_000;
 /** Safe image prompt length for DALL·E / Stability / Replicate. */
 export const MAX_IMAGE_PROMPT_CHARS = 3_500;
 
-/** Client poll window after SSE disconnect (ms). */
-export const CLIENT_STREAM_RECOVERY_POLL_MS = 90_000;
+/** Client poll window after SSE disconnect (ms). Override with WEBSITE_STREAM_RECOVERY_POLL_MS. */
+export function getClientStreamRecoveryPollMs(): number {
+  const fromEnv = Number(process.env.WEBSITE_STREAM_RECOVERY_POLL_MS);
+  if (Number.isFinite(fromEnv) && fromEnv >= 60_000) {
+    return Math.min(fromEnv, 3_600_000);
+  }
+  return 1_500_000;
+}
+
+/** @deprecated Prefer getClientStreamRecoveryPollMs() — minimum recovery window is now 25 minutes. */
+export const CLIENT_STREAM_RECOVERY_POLL_MS = 1_500_000;
 
 /** Delay between client recovery polls (ms). */
 export const CLIENT_STREAM_RECOVERY_INTERVAL_MS = 2_500;

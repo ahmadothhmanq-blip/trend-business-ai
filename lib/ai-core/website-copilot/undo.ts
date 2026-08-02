@@ -3,10 +3,8 @@
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { GeneratedWebsiteProject } from "@/plugins/website/types";
-import { commitBlueprintRevision } from "@/lib/website/platform/commit";
-import { loadWebsiteGenerationForUser } from "@/lib/website/platform/load-generation";
-import { readBlueprintRevisionFromGeneration } from "@/lib/website/platform/revision";
+import type { GeneratedWebsiteProject } from "@/lib/website/types";
+import { getWebsitePlatformPort } from "@/lib/website/platform/port";
 import type { CopilotCommandSuccess } from "@/lib/ai-core/website-copilot/types";
 
 export async function restoreCopilotSnapshot(params: {
@@ -19,7 +17,8 @@ export async function restoreCopilotSnapshot(params: {
   | CopilotCommandSuccess
   | { ok: false; code: "NOT_FOUND" | "CONFLICT" | "VALIDATION" | "SERVER"; error: string }
 > {
-  const generation = await loadWebsiteGenerationForUser(
+  const port = getWebsitePlatformPort();
+  const generation = await port.loadGeneration(
     params.supabase,
     params.userId,
     params.generationId,
@@ -36,7 +35,7 @@ export async function restoreCopilotSnapshot(params: {
     };
   }
 
-  const committed = await commitBlueprintRevision({
+  const committed = await port.commitBlueprint({
     supabase: params.supabase,
     userId: params.userId,
     generationId: params.generationId,
@@ -73,7 +72,7 @@ export async function restoreCopilotSnapshot(params: {
     capability: "website.copilot.undo",
     tier: "local",
     mutated: true,
-    revision: readBlueprintRevisionFromGeneration(committed.generation),
+    revision: port.readBlueprintRevision(committed.generation),
     aiRunId: committed.aiRunId,
     fromIdempotency: false,
     summary: "Restored previous website state.",

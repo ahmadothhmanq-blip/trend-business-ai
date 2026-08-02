@@ -1,0 +1,33 @@
+{
+  "phase": "QE-5",
+  "timestamp": "2026-08-02T12:04:07.090Z",
+  "repairDeduplication": {
+    "rawMessages": 5,
+    "collapsed": 3,
+    "dedupedInstructions": 2,
+    "queueItems": 3,
+    "dedupedCount": 0,
+    "collapseMs": 0.345,
+    "dedupeMs": 0.052,
+    "queueMs": 0.877
+  },
+  "pipelineLatency": {
+    "samples": 10,
+    "avgReportBuildMs": 0.405,
+    "maxReportBuildMs": 2.396
+  },
+  "scoreStability": {
+    "minOverall": 71,
+    "maxOverall": 71,
+    "spread": 0,
+    "uniqueHashes": 1,
+    "stable": true
+  },
+  "publishConsistency": {
+    "uniqueDecisions": 1,
+    "consistent": true
+  },
+  "dashboardConsistency": {
+    "allMatchReport": true
+  }
+}

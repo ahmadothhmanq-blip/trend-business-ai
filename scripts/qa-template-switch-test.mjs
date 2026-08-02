@@ -78,9 +78,7 @@ const cookie = await buildCookieHeader(
 
 const packages = [
   "modern-business",
-  "saas-starter",
-  "restaurant-bistro",
-  "agency-portfolio",
+  "ai-startup-signal",
 ];
 
 const results = [];

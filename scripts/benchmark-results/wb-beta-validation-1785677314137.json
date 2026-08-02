@@ -1,0 +1,268 @@
+{
+  "timestamp": "2026-08-02T13:28:34.135Z",
+  "base": "http://localhost:3003",
+  "flags": {
+    "waveScheduler": true,
+    "smartContext": true,
+    "promptOptimization": true,
+    "parallelRepair": true
+  },
+  "summary": {
+    "total": 10,
+    "passed": 0,
+    "failed": 10,
+    "successRate": 0,
+    "avgGenerationTimeMs": 157726,
+    "avgQualityScore": null,
+    "avgRepairs": 0
+  },
+  "results": [
+    {
+      "industry": "restaurant",
+      "label": "Restaurant",
+      "status": "FAIL",
+      "generationTimeMs": null,
+      "llmCalls": null,
+      "promptSize": null,
+      "repairCount": null,
+      "qualityScore": null,
+      "buildResult": null,
+      "publishResult": null,
+      "errors": [
+        "MAOE: PRE failed after 3 attempt(s): Website architecture validation failed after 3 attempt(s): Industry \"restaurant\" cannot use editorial layout structure \"travel-premium\"."
+      ],
+      "warnings": [
+        "SSE ended without complete — attempting DB recovery"
+      ],
+      "checks": {},
+      "generationId": null,
+      "fileCount": 0
+    },
+    {
+      "industry": "saas",
+      "label": "SaaS",
+      "status": "FAIL",
+      "generationTimeMs": null,
+      "llmCalls": null,
+      "promptSize": null,
+      "repairCount": null,
+      "qualityScore": null,
+      "buildResult": null,
+      "publishResult": null,
+      "errors": [
+        "Generation blocked by quality gates (4 critical issues)."
+      ],
+      "warnings": [
+        "SSE ended without complete — attempting DB recovery"
+      ],
+      "checks": {},
+      "generationId": null,
+      "fileCount": 0
+    },
+    {
+      "industry": "medical",
+      "label": "Medical Clinic",
+      "status": "FAIL",
+      "generationTimeMs": 1252644,
+      "llmCalls": 0,
+      "promptSize": 0,
+      "repairCount": 0,
+      "qualityScore": null,
+      "buildResult": "PASS",
+      "publishResult": "PASS_FORCED",
+      "errors": [],
+      "warnings": [
+        "SSE ended without complete — attempting DB recovery",
+        "Publish required force=true (quality gates)",
+        "Failed checks: analysis, planning, designSystem, repairEngine, qualityPlatform"
+      ],
+      "checks": {
+        "analysis": false,
+        "planning": false,
+        "blueprint": true,
+        "designSystem": false,
+        "fileGeneration": true,
+        "waveScheduler": true,
+        "smartContext": true,
+        "promptOptimization": true,
+        "repairEngine": false,
+        "qualityPlatform": false,
+        "build": true,
+        "typeCheck": true,
+        "publish": true,
+        "seo": true,
+        "accessibility": true,
+        "responsiveDesign": true,
+        "visualQuality": true,
+        "contentQuality": true
+      },
+      "generationId": "4a830783-b141-41fa-b5ef-46106cacd2c2",
+      "fileCount": 31
+    },
+    {
+      "industry": "law",
+      "label": "Law Firm",
+      "status": "FAIL",
+      "generationTimeMs": 324616,
+      "llmCalls": 4,
+      "promptSize": 53049,
+      "repairCount": 1,
+      "qualityScore": null,
+      "buildResult": "PASS",
+      "publishResult": "PASS_FORCED",
+      "errors": [],
+      "warnings": [
+        "Publish required force=true (quality gates)",
+        "Failed checks: accessibility"
+      ],
+      "checks": {
+        "analysis": true,
+        "planning": true,
+        "blueprint": true,
+        "designSystem": true,
+        "fileGeneration": true,
+        "waveScheduler": true,
+        "smartContext": true,
+        "promptOptimization": true,
+        "repairEngine": true,
+        "qualityPlatform": true,
+        "build": true,
+        "typeCheck": true,
+        "publish": true,
+        "seo": true,
+        "accessibility": false,
+        "responsiveDesign": true,
+        "visualQuality": true,
+        "contentQuality": true
+      },
+      "generationId": "1ad8bb57-197f-4831-afba-fb6c8f47512e",
+      "fileCount": 56
+    },
+    {
+      "industry": "real-estate",
+      "label": "Real Estate",
+      "status": "FAIL",
+      "generationTimeMs": null,
+      "llmCalls": null,
+      "promptSize": null,
+      "repairCount": null,
+      "qualityScore": null,
+      "buildResult": null,
+      "publishResult": null,
+      "errors": [
+        "402 Insufficient Balance"
+      ],
+      "warnings": [
+        "SSE ended without complete — attempting DB recovery"
+      ],
+      "checks": {},
+      "generationId": null,
+      "fileCount": 0
+    },
+    {
+      "industry": "ecommerce",
+      "label": "Ecommerce",
+      "status": "FAIL",
+      "generationTimeMs": null,
+      "llmCalls": null,
+      "promptSize": null,
+      "repairCount": null,
+      "qualityScore": null,
+      "buildResult": null,
+      "publishResult": null,
+      "errors": [
+        "402 Insufficient Balance"
+      ],
+      "warnings": [
+        "SSE ended without complete — attempting DB recovery"
+      ],
+      "checks": {},
+      "generationId": null,
+      "fileCount": 0
+    },
+    {
+      "industry": "construction",
+      "label": "Construction",
+      "status": "FAIL",
+      "generationTimeMs": null,
+      "llmCalls": null,
+      "promptSize": null,
+      "repairCount": null,
+      "qualityScore": null,
+      "buildResult": null,
+      "publishResult": null,
+      "errors": [
+        "402 Insufficient Balance"
+      ],
+      "warnings": [
+        "SSE ended without complete — attempting DB recovery"
+      ],
+      "checks": {},
+      "generationId": null,
+      "fileCount": 0
+    },
+    {
+      "industry": "education",
+      "label": "Education",
+      "status": "FAIL",
+      "generationTimeMs": null,
+      "llmCalls": null,
+      "promptSize": null,
+      "repairCount": null,
+      "qualityScore": null,
+      "buildResult": null,
+      "publishResult": null,
+      "errors": [
+        "402 Insufficient Balance"
+      ],
+      "warnings": [
+        "SSE ended without complete — attempting DB recovery"
+      ],
+      "checks": {},
+      "generationId": null,
+      "fileCount": 0
+    },
+    {
+      "industry": "hotel",
+      "label": "Hotel",
+      "status": "FAIL",
+      "generationTimeMs": null,
+      "llmCalls": null,
+      "promptSize": null,
+      "repairCount": null,
+      "qualityScore": null,
+      "buildResult": null,
+      "publishResult": null,
+      "errors": [
+        "402 Insufficient Balance"
+      ],
+      "warnings": [
+        "SSE ended without complete — attempting DB recovery"
+      ],
+      "checks": {},
+      "generationId": null,
+      "fileCount": 0
+    },
+    {
+      "industry": "marketing",
+      "label": "Marketing Agency",
+      "status": "FAIL",
+      "generationTimeMs": null,
+      "llmCalls": null,
+      "promptSize": null,
+      "repairCount": null,
+      "qualityScore": null,
+      "buildResult": null,
+      "publishResult": null,
+      "errors": [
+        "402 Insufficient Balance"
+      ],
+      "warnings": [
+        "SSE ended without complete — attempting DB recovery"
+      ],
+      "checks": {},
+      "generationId": null,
+      "fileCount": 0
+    }
+  ]
+}

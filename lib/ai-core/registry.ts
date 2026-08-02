@@ -1,8 +1,10 @@
 import type { ProductEngineAdapter } from "@/lib/ai-core/adapter";
 
 /**
- * Legacy adapter instance map (side-effect registration from adapter modules).
- * Phase 5 canonical catalog + factories live in `lib/ai-core/products.ts`.
+ * Adapter instance map (side-effect registration from adapter modules).
+ *
+ * Canonical resolution: `createAdapterForProduct()` in `lib/ai-core/products.ts`.
+ * `getProductEngineAdapter()` is retained for diagnostics and future registry APIs.
  */
 const adapters = new Map<string, ProductEngineAdapter<unknown, unknown>>();
 

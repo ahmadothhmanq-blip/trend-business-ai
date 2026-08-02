@@ -1,5 +1,5 @@
 import type { ArchitectureValidationTraceEntry } from "@/lib/ai-core/architecture-validation/types";
-import type { IndustryLayoutFamily } from "@/lib/website/builder/industry-layout-policy";
+import type { IndustryLayoutFamily } from "@/lib/website/contracts/layout";
 import {
   getAllowedLayoutFamilies,
   isLayoutFamilyAllowed as akbIsLayoutFamilyAllowed,

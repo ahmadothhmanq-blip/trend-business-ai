@@ -31,10 +31,10 @@ describe("builder template catalog migration", () => {
     assert.ok(template?.sections.includes("footer"));
   });
 
-  it("indexes all 30 premium installed template packages", () => {
-    assert.equal(WEBSITE_STRUCTURE_TEMPLATES.length, 30);
+  it("indexes both premium installed template packages", () => {
+    assert.equal(WEBSITE_STRUCTURE_TEMPLATES.length, 2);
     const ids = WEBSITE_STRUCTURE_TEMPLATES.map((template) => template.id);
-    assert.equal(new Set(ids).size, 30);
+    assert.deepEqual(new Set(ids), new Set(["modern-business", "ai-startup-signal"]));
   });
 
   it("resolves installed packages from the sync structure index", () => {
@@ -81,14 +81,21 @@ describe("builder template catalog migration", () => {
       (template) => template.templateIntelligenceId,
     );
     assert.equal(new Set(tiIds).size, WEBSITE_STRUCTURE_TEMPLATES.length);
-    assert.equal(resolveStructureTemplateIntelligenceId("saas-starter"), "ti-saas-growth");
     assert.equal(
-      STRUCTURE_TEMPLATE_INTELLIGENCE_MAP["agency-portfolio"],
-      "ti-creative-studio",
+      resolveStructureTemplateIntelligenceId("modern-business"),
+      "ti-corporate-trust",
     );
     assert.equal(
-      STRUCTURE_TEMPLATE_INTELLIGENCE_MAP["restaurant-bistro"],
-      "ti-restaurant-dining",
+      resolveStructureTemplateIntelligenceId("ai-startup-signal"),
+      "ti-ai-company-signal",
+    );
+    assert.equal(
+      STRUCTURE_TEMPLATE_INTELLIGENCE_MAP["modern-business"],
+      "ti-corporate-trust",
+    );
+    assert.equal(
+      STRUCTURE_TEMPLATE_INTELLIGENCE_MAP["ai-startup-signal"],
+      "ti-ai-company-signal",
     );
   });
 

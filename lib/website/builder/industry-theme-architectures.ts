@@ -1,6 +1,6 @@
 /**
  * Industry Template Intelligence → Theme Architecture routing.
- * Enables Theme* scaffold preview/injection for all 30 structure templates.
+ * Enables Theme* scaffold preview/injection for installed structure templates.
  */
 import type { DesignRendererComponentId } from "@/lib/ai-core/design-renderer/types";
 import type {
@@ -302,35 +302,7 @@ export const INDUSTRY_THEME_ARCHITECTURES: ThemePageArchitecture[] = [
 /** Structure-template TI ids that must resolve to Theme* architecture. */
 export const PREMIUM_STRUCTURE_TEMPLATE_TI_IDS = [
   "ti-corporate-trust",
-  "ti-consulting-clarity",
-  "ti-saas-growth",
   "ti-ai-company-signal",
-  "ti-creative-studio",
-  "ti-agency-portfolio",
-  "ti-blog-editorial",
-  "ti-restaurant-dining",
-  "ti-cafe-artisan",
-  "ti-hotel-sanctuary",
-  "ti-travel-horizon",
-  "ti-real-estate-listings",
-  "ti-architecture-monograph",
-  "ti-construction-industrial",
-  "ti-medical-care",
-  "ti-dental-smile",
-  "ti-pharmacy-wellness",
-  "ti-law-firm",
-  "ti-finance-ledger",
-  "ti-insurance-shield",
-  "ti-education-campus",
-  "ti-university-heritage",
-  "ti-ecommerce-atelier",
-  "ti-luxury-brands-atelier",
-  "ti-beauty-glow",
-  "ti-fitness-pulse",
-  "ti-automotive-showroom",
-  "ti-logistics-freight",
-  "ti-manufacturing-precision",
-  "ti-nonprofit-impact",
 ] as const;
 
 export function topologyForIndustryTi(

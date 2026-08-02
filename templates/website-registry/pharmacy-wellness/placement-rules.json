@@ -1,8 +1,0 @@
-{
-  "global": {
-    "maxComponentsPerPage": 36,
-    "allowDuplicateTypes": true,
-    "defaultOrdering": "vertical"
-  },
-  "constraints": []
-}

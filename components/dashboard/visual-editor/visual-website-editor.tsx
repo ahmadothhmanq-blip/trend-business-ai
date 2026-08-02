@@ -11,7 +11,6 @@ import {
   type DragEvent,
 } from "react";
 import {
-  Copy,
   GripVertical,
   ImageIcon,
   Loader2,
@@ -41,13 +40,24 @@ import {
   duplicateNode,
   insertMarketplaceComponent,
   moveNode,
+  moveNodeDown,
+  moveNodeToPosition,
+  moveNodeUp,
   pushVisualHistory,
   redoVisualHistory,
   selectNode,
+  selectButton,
+  selectLink,
+  selectIcon,
   setViewport,
   undoVisualHistory,
   updateNodeText,
   updateNodeImage,
+  updateNodeSectionBackground,
+  updateNodeSectionConfig,
+  updateNodeButton,
+  updateNodeLink,
+  updateNodeIcon,
   updateTokens,
   type VisualDocument,
   type VisualHistoryState,
@@ -68,6 +78,36 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { SectionPropertiesPanel } from "@/components/dashboard/visual-editor/section-properties-panel";
+import { ButtonPropertiesPanel } from "@/components/dashboard/visual-editor/button-properties-panel";
+import { IconPropertiesPanel } from "@/components/dashboard/visual-editor/icon-properties-panel";
+import { LinkPropertiesPanel } from "@/components/dashboard/visual-editor/link-properties-panel";
+import { resolveLucideIcon } from "@/components/dashboard/visual-editor/icon-render";
+import {
+  listAnchorSections,
+  listInternalPageRoutes,
+} from "@/lib/ai-core/visual-editor/link-extract";
+import { hasBlockingLinkSaveErrors } from "@/lib/ai-core/visual-editor/link-validate";
+import { resolveButtonPreviewStyle } from "@/lib/ai-core/visual-editor/button-styles";
+import { resolveIconPreviewStyle } from "@/lib/ai-core/visual-editor/icon-styles";
+import {
+  resolveSectionBgImageStyle,
+  resolveSectionBgOverlayStyle,
+  sectionBgPreviewUrl,
+  sectionHeightClass,
+} from "@/lib/ai-core/visual-editor/section-bg-styles";
+import {
+  createDefaultSectionBackground,
+} from "@/lib/ai-core/visual-editor/section-bg-types";
+import { createDefaultSectionConfig } from "@/lib/ai-core/visual-editor/section-types";
+import {
+  resolveSectionPreviewStyle,
+  sectionIsVisible,
+  sectionPreviewClassName,
+} from "@/lib/ai-core/visual-editor/section-styles";
+import type { WebsiteEditAction } from "@/lib/ai-core/website-editor/types";
+import type { ButtonPreviewState, VisualButton } from "@/lib/ai-core/visual-editor/button-types";
+import type { IconPreviewState } from "@/lib/ai-core/visual-editor/icon-types";
 import {
   createBuilderAutosaveScheduler,
 } from "@/lib/website/builder/autosave";
@@ -168,8 +208,18 @@ export const VisualWebsiteEditor = forwardRef<
   const [saving, setSaving] = useState(false);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [mediaOpen, setMediaOpen] = useState(false);
+  const [templatesOpen, setTemplatesOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [libraryInsertIndex, setLibraryInsertIndex] = useState<number | undefined>(
+    undefined,
+  );
+  const pendingSectionAiActionsRef = useRef<WebsiteEditAction[]>([]);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [cropAspect, setCropAspect] = useState<"free" | "1:1" | "16:9">("free");
+  const [buttonPreviewState, setButtonPreviewState] =
+    useState<ButtonPreviewState>("normal");
+  const [iconPreviewState, setIconPreviewState] =
+    useState<IconPreviewState>("normal");
   const imageInputRef = useRef<HTMLInputElement>(null);
   const autosaveSchedulerRef = useRef(createBuilderAutosaveScheduler());
   const isWorkspace = chrome === "workspace";
@@ -236,8 +286,11 @@ export const VisualWebsiteEditor = forwardRef<
         throw new Error(json.error || "Upload failed");
       }
       commit(
-        updateNodeImage(doc, selected.id, json.asset.url),
-        pt("history.replaceImage"),
+        updateNodeSectionBackground(doc, selected.id, {
+          url: json.asset.url,
+          source: "upload",
+        }),
+        pt("backgroundEditor.history"),
       );
       toast.success(pt("toasts.saved"));
     } catch (error) {
@@ -257,6 +310,19 @@ export const VisualWebsiteEditor = forwardRef<
   const doc = history.present;
   const selected =
     doc.nodes.find((n) => n.id === doc.selectedNodeId) || doc.nodes[0] || null;
+  const selectedButton: VisualButton | null =
+    selected?.buttons?.find((b) => b.id === doc.selectedButtonId) ?? null;
+  const selectedLink =
+    selected?.links?.find((l) => l.id === doc.selectedLinkId) ??
+    selected?.links?.find((l) => l.id === doc.selectedButtonId) ??
+    null;
+  const selectedIcon =
+    selected?.icons?.find((i) => i.id === doc.selectedIconId) ?? null;
+  const internalRoutes = useMemo(
+    () => listInternalPageRoutes(files),
+    [files],
+  );
+  const anchorSections = useMemo(() => listAnchorSections(files), [files]);
 
   useEffect(() => {
     onTokensChange?.(doc.tokens);
@@ -300,6 +366,114 @@ export const VisualWebsiteEditor = forwardRef<
     setHistory((h) => pushVisualHistory(h, next, label));
   }, []);
 
+  const patchSelectedLink = useCallback(
+    (patch: Partial<NonNullable<typeof selectedLink>>) => {
+      if (!selected || !selectedLink) return;
+      commit(
+        updateNodeLink(doc, selected.id, selectedLink.id, patch),
+        pt("linkEditor.history"),
+      );
+    },
+    [commit, doc, pt, selected, selectedLink],
+  );
+
+  const patchSelectedButton = useCallback(
+    (patch: Partial<VisualButton>) => {
+      if (!selected || !selectedButton) return;
+      commit(
+        updateNodeButton(doc, selected.id, selectedButton.id, patch),
+        pt("buttonEditor.history"),
+      );
+    },
+    [commit, doc, pt, selected, selectedButton],
+  );
+
+  const patchSelectedIcon = useCallback(
+    (patch: Partial<NonNullable<typeof selectedIcon>>) => {
+      if (!selected || !selectedIcon) return;
+      commit(
+        updateNodeIcon(doc, selected.id, selectedIcon.id, patch),
+        pt("iconEditor.history"),
+      );
+    },
+    [commit, doc, pt, selected, selectedIcon],
+  );
+
+  const patchSelectedBackground = useCallback(
+    (patch: Partial<NonNullable<typeof selected.sectionBackground>>) => {
+      if (!selected) return;
+      commit(
+        updateNodeSectionBackground(doc, selected.id, patch),
+        pt("backgroundEditor.history"),
+      );
+    },
+    [commit, doc, pt, selected],
+  );
+
+  const selectedSectionConfig = useMemo(() => {
+    if (!selected) return null;
+    return (
+      selected.sectionConfig ??
+      createDefaultSectionConfig({
+        id: `${selected.exportName}-section`,
+        sectionExportName: selected.exportName,
+        sectionType:
+          selected.kind === "hero"
+            ? "hero"
+            : selected.kind === "header"
+              ? "header"
+              : selected.kind === "footer"
+                ? "footer"
+                : selected.kind === "cta"
+                  ? "cta"
+                  : "custom",
+        kind: selected.kind,
+      })
+    );
+  }, [selected]);
+
+  const selectedNodeIndex = selected
+    ? doc.nodes.findIndex((n) => n.id === selected.id)
+    : -1;
+
+  const patchSelectedSectionConfig = useCallback(
+    (patch: Parameters<typeof updateNodeSectionConfig>[2]) => {
+      if (!selected) return;
+      commit(
+        updateNodeSectionConfig(doc, selected.id, patch),
+        pt("sectionEditor.history"),
+      );
+    },
+    [commit, doc, pt, selected],
+  );
+
+  const queueSectionAiAction = useCallback(
+    (action: WebsiteEditAction) => {
+      if (!selected) return;
+      pendingSectionAiActionsRef.current.push({
+        ...action,
+        target: action.target ?? selected.exportName,
+      });
+      commit(
+        {
+          ...doc,
+          dirty: true,
+          updatedAt: new Date().toISOString(),
+        },
+        pt("sectionEditor.aiQueued"),
+      );
+      toast.message(pt("sectionEditor.aiQueuedHint"));
+    },
+    [commit, doc, pt, selected],
+  );
+
+  const confirmDeleteSection = useCallback(() => {
+    if (!selected) return;
+    commit(deleteNode(doc, selected.id), pt("history.delete"));
+    setDeleteConfirmOpen(false);
+    toast.message(pt("sectionEditor.deleted"));
+  }, [commit, doc, pt, selected]);
+
   const onUndo = () => setHistory((h) => undoVisualHistory(h));
   const onRedo = () => setHistory((h) => redoVisualHistory(h));
 
@@ -325,6 +499,8 @@ export const VisualWebsiteEditor = forwardRef<
       pt("history.insert", { name: component.name }),
     );
     toast.message(pt("toasts.componentAdded", { name: component.name }));
+    setTemplatesOpen(false);
+    setLibraryInsertIndex(undefined);
   };
 
   const onCanvasLibraryDrop = (e: DragEvent, index?: number) => {
@@ -352,7 +528,23 @@ export const VisualWebsiteEditor = forwardRef<
       if (!options?.silent) toast.message(pt("toasts.noChanges"));
       return true;
     }
-    const actions = documentToSaveActions(baseline, doc);
+    const linkCtx = {
+      internalRoutes: internalRoutes.map((r) => r.path),
+      anchorIds: anchorSections.map((a) => a.id),
+    };
+    const baselineLinks = baseline.nodes.flatMap((n) => n.links ?? []);
+    const currentLinks = doc.nodes.flatMap((n) => n.links ?? []);
+    if (hasBlockingLinkSaveErrors(baselineLinks, currentLinks, linkCtx)) {
+      if (!options?.silent) {
+        toast.error(pt("linkEditor.validationBlocked"));
+      }
+      return false;
+    }
+    const actions = [
+      ...documentToSaveActions(baseline, doc),
+      ...pendingSectionAiActionsRef.current,
+    ];
+    const applyAi = pendingSectionAiActionsRef.current.length > 0;
     if (!actions.length) {
       if (!options?.silent) toast.message(pt("toasts.nothingToPersist"));
       return true;
@@ -365,7 +557,7 @@ export const VisualWebsiteEditor = forwardRef<
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ actions, applyAi: false }),
+          body: JSON.stringify({ actions, applyAi }),
         },
       );
       const data = (await response.json()) as {
@@ -384,6 +576,7 @@ export const VisualWebsiteEditor = forwardRef<
       });
       setBaseline(nextDoc);
       setHistory(createVisualHistory(nextDoc));
+      pendingSectionAiActionsRef.current = [];
       onSaved({ project: data.project, generation: data.generation });
       if (!options?.silent) {
         toast.success(data.editResult?.summary || pt("toasts.saved"));
@@ -631,10 +824,34 @@ export const VisualWebsiteEditor = forwardRef<
                   node={node}
                   tokens={doc.tokens}
                   selected={doc.selectedNodeId === node.id}
+                  selectedButtonId={doc.selectedButtonId}
+                  selectedLinkId={doc.selectedLinkId}
+                  selectedIconId={doc.selectedIconId}
+                  buttonPreviewState={buttonPreviewState}
+                  iconPreviewState={iconPreviewState}
+                  viewport={doc.viewport}
                   onSelect={() =>
                     setHistory((h) => ({
                       ...h,
                       present: selectNode(h.present, node.id),
+                    }))
+                  }
+                  onSelectButton={(buttonId) =>
+                    setHistory((h) => ({
+                      ...h,
+                      present: selectButton(h.present, node.id, buttonId),
+                    }))
+                  }
+                  onSelectLink={(linkId) =>
+                    setHistory((h) => ({
+                      ...h,
+                      present: selectLink(h.present, node.id, linkId),
+                    }))
+                  }
+                  onSelectIcon={(iconId) =>
+                    setHistory((h) => ({
+                      ...h,
+                      present: selectIcon(h.present, node.id, iconId),
                     }))
                   }
                   onTextChange={(text) =>
@@ -667,16 +884,57 @@ export const VisualWebsiteEditor = forwardRef<
         <aside className="space-y-4 border-l border-white/[0.08] bg-black/30 p-3">
           <div>
             <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/35">
-              {pt("properties")}
+              {selectedIcon
+                ? pt("iconEditor.title")
+                : selectedLink
+                ? pt("linkEditor.title")
+                : selectedButton
+                  ? pt("buttonEditor.title")
+                  : selected
+                    ? pt("sectionEditor.title")
+                    : pt("properties")}
             </p>
-            {selected ? (
+            {selectedIcon && selected ? (
+              <IconPropertiesPanel
+                icon={selectedIcon}
+                disabled={disabled || selected.locked}
+                previewState={iconPreviewState}
+                onPreviewStateChange={setIconPreviewState}
+                onChange={patchSelectedIcon}
+              />
+            ) : selectedLink && selected ? (
+              <div className="space-y-4">
+                <LinkPropertiesPanel
+                  link={selectedLink}
+                  internalRoutes={internalRoutes}
+                  anchorSections={anchorSections}
+                  disabled={disabled}
+                  onChange={patchSelectedLink}
+                />
+                {selectedButton &&
+                (selectedLink.kind === "button" || selectedLink.kind === "cta") ? (
+                  <ButtonPropertiesPanel
+                    button={selectedButton}
+                    internalRoutes={internalRoutes}
+                    disabled={disabled || selected.locked}
+                    previewState={buttonPreviewState}
+                    onPreviewStateChange={setButtonPreviewState}
+                    onChange={patchSelectedButton}
+                    hideLinkFields
+                  />
+                ) : null}
+              </div>
+            ) : selectedButton && selected ? (
+              <ButtonPropertiesPanel
+                button={selectedButton}
+                internalRoutes={internalRoutes}
+                disabled={disabled || selected.locked}
+                previewState={buttonPreviewState}
+                onPreviewStateChange={setButtonPreviewState}
+                onChange={patchSelectedButton}
+              />
+            ) : selected && selectedSectionConfig ? (
               <div className="space-y-3">
-                <div>
-                  <p className="text-[11px] text-white/40">{pt("component")}</p>
-                  <p className="text-sm font-semibold text-white">
-                    {selected.label}
-                  </p>
-                </div>
                 <div>
                   <p className="mb-1 text-[11px] text-white/40">{pt("canvasText")}</p>
                   <Input
@@ -692,119 +950,109 @@ export const VisualWebsiteEditor = forwardRef<
                     placeholder={pt("headlinePlaceholder")}
                   />
                 </div>
-                <div>
-                  <p className="mb-1 text-[11px] text-white/40">{pt("imageUrl")}</p>
-                  <Input
-                    value={selected.imageUrl || ""}
-                    onChange={(e) =>
-                      commit(
-                        updateNodeImage(doc, selected.id, e.target.value),
-                        pt("history.replaceImage"),
-                      )
-                    }
-                    disabled={disabled || selected.locked}
-                    className="border-white/10 bg-white/5 text-white"
-                    placeholder={pt("imagePlaceholder")}
-                  />
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    <select
-                      value={cropAspect}
-                      onChange={(e) =>
-                        setCropAspect(e.target.value as "free" | "1:1" | "16:9")
-                      }
-                      className="h-8 rounded-md border border-white/10 bg-[#121212] px-2 text-[11px] text-white"
-                      disabled={disabled || selected.locked}
-                    >
-                      <option value="free">Crop: Free</option>
-                      <option value="1:1">Crop: 1:1</option>
-                      <option value="16:9">Crop: 16:9</option>
-                    </select>
-                    <input
-                      ref={imageInputRef}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) void optimizeAndUpload(file);
-                        e.target.value = "";
-                      }}
-                    />
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-white/15 text-white"
-                      disabled={disabled || selected.locked || uploadingImage}
-                      onClick={() => imageInputRef.current?.click()}
-                    >
-                      {uploadingImage ? (
-                        <Loader2 className="size-3.5 animate-spin" />
-                      ) : (
-                        <Upload className="size-3.5" />
-                      )}
-                      Upload
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-white/15 text-white"
-                      disabled={disabled || selected.locked}
-                      onClick={() => setMediaOpen(true)}
-                    >
-                      <ImageIcon className="size-3.5" />
-                      Library
-                    </Button>
-                    {selected.imageUrl ? (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="border-white/15 text-white"
-                        disabled={disabled || selected.locked}
-                        onClick={() =>
-                          commit(
-                            updateNodeImage(doc, selected.id, ""),
-                            pt("history.replaceImage"),
-                          )
-                        }
-                      >
-                        <X className="size-3.5" />
-                        Remove
-                      </Button>
-                    ) : null}
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="flex-1 border-white/15 text-white"
-                    disabled={disabled || selected.locked}
-                    onClick={() =>
-                      commit(duplicateNode(doc, selected.id), pt("history.duplicate"))
-                    }
-                  >
-                    <Copy className="size-3.5" />
-                    {pt("duplicate")}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="flex-1 border-red-500/30 text-red-300"
-                    disabled={disabled || selected.locked}
-                    onClick={() =>
-                      commit(deleteNode(doc, selected.id), pt("history.delete"))
-                    }
-                  >
-                    <Trash2 className="size-3.5" />
-                    {pt("delete")}
-                  </Button>
-                </div>
+                <SectionPropertiesPanel
+                  config={selectedSectionConfig}
+                  viewport={doc.viewport}
+                  nodeIndex={selectedNodeIndex}
+                  nodeCount={doc.nodes.length}
+                  locked={selected.locked}
+                  disabled={disabled}
+                  uploadingBackground={uploadingImage}
+                  sectionBackground={
+                    selected.sectionBackground ??
+                    createDefaultSectionBackground({
+                      id: `${selected.exportName}-bg`,
+                      sectionExportName: selected.exportName,
+                      kind: selected.kind,
+                      url: selected.imageUrl ?? "",
+                      source: selected.imageUrl ? "url" : "none",
+                      alt: selected.text || selected.label,
+                    })
+                  }
+                  onChange={patchSelectedSectionConfig}
+                  onBackgroundChange={patchSelectedBackground}
+                  onUploadBackground={() => imageInputRef.current?.click()}
+                  onMediaLibraryBackground={() => setMediaOpen(true)}
+                  onInsertBefore={() => {
+                    setLibraryInsertIndex(selectedNodeIndex);
+                    setTemplatesOpen(true);
+                  }}
+                  onInsertAfter={() => {
+                    setLibraryInsertIndex(
+                      selectedNodeIndex < 0 ? undefined : selectedNodeIndex + 1,
+                    );
+                    setTemplatesOpen(true);
+                  }}
+                  onInsertAtEnd={() => {
+                    setLibraryInsertIndex(doc.nodes.length);
+                    setTemplatesOpen(true);
+                  }}
+                  onOpenTemplates={() => {
+                    setLibraryInsertIndex(undefined);
+                    setTemplatesOpen(true);
+                  }}
+                  onDelete={() => setDeleteConfirmOpen(true)}
+                  onDuplicate={() =>
+                    commit(duplicateNode(doc, selected.id), pt("history.duplicate"))
+                  }
+                  onMoveUp={() =>
+                    commit(moveNodeUp(doc, selected.id), pt("sectionEditor.historyMove"))
+                  }
+                  onMoveDown={() =>
+                    commit(moveNodeDown(doc, selected.id), pt("sectionEditor.historyMove"))
+                  }
+                  onMoveToPosition={(index) =>
+                    commit(
+                      moveNodeToPosition(doc, selected.id, index),
+                      pt("sectionEditor.historyMove"),
+                    )
+                  }
+                  onAiImprove={() =>
+                    queueSectionAiAction({
+                      type: "improve-layout",
+                      notes: `Improve section layout for ${selected.exportName}`,
+                    })
+                  }
+                  onAiRegenerate={() =>
+                    queueSectionAiAction({
+                      type: "replace-section",
+                      target: selected.exportName,
+                      notes: `Regenerate section ${selected.exportName}`,
+                    })
+                  }
+                  onAiRewrite={() =>
+                    queueSectionAiAction({
+                      type: "rewrite-content",
+                      target: selected.exportName,
+                      notes: `Rewrite content for ${selected.exportName}`,
+                    })
+                  }
+                  onAiGenerateMore={() =>
+                    queueSectionAiAction({
+                      type: "rewrite-content",
+                      target: selected.exportName,
+                      notes: `Generate more items for ${selected.exportName}`,
+                    })
+                  }
+                />
+                <input
+                  ref={imageInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) void optimizeAndUpload(file);
+                    e.target.value = "";
+                  }}
+                />
               </div>
             ) : (
               <p className="text-[12px] text-white/35">{pt("selectLayer")}</p>
             )}
           </div>
 
+          {!selectedButton ? (
           <div>
             <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/35">
               {pt("designTokens")}
@@ -900,6 +1148,7 @@ export const VisualWebsiteEditor = forwardRef<
               </label>
             </div>
           </div>
+          ) : null}
         </aside>
       </div>
 
@@ -914,12 +1163,53 @@ export const VisualWebsiteEditor = forwardRef<
             onSelect={(asset) => {
               if (!selected) return;
               commit(
-                updateNodeImage(doc, selected.id, asset.url),
-                pt("history.replaceImage"),
+                updateNodeSectionBackground(doc, selected.id, {
+                  url: asset.url,
+                  source: "library",
+                }),
+                pt("backgroundEditor.history"),
               );
               setMediaOpen(false);
             }}
           />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={templatesOpen} onOpenChange={setTemplatesOpen}>
+        <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto border-white/10 bg-[#0a0a0a] text-white">
+          <DialogHeader>
+            <DialogTitle>{pt("sectionEditor.fromTemplates")}</DialogTitle>
+          </DialogHeader>
+          <ComponentLibraryPanel
+            compact
+            onInsert={(c) => insertFromLibrary(c, libraryInsertIndex)}
+          />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <DialogContent className="max-w-md border-white/10 bg-[#0a0a0a] text-white">
+          <DialogHeader>
+            <DialogTitle>{pt("sectionEditor.deleteTitle")}</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-white/60">{pt("sectionEditor.deleteBody")}</p>
+          <div className="mt-4 flex justify-end gap-2">
+            <Button
+              variant="outline"
+              className="border-white/15 text-white"
+              onClick={() => setDeleteConfirmOpen(false)}
+            >
+              {pt("sectionEditor.cancel")}
+            </Button>
+            <Button
+              variant="outline"
+              className="border-red-500/30 text-red-300"
+              onClick={confirmDeleteSection}
+            >
+              <Trash2 className="size-3.5" />
+              {pt("delete")}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
@@ -930,16 +1220,67 @@ function CanvasBlock(props: {
   node: VisualNode;
   tokens: VisualDocument["tokens"];
   selected: boolean;
+  selectedButtonId: string | null;
+  selectedLinkId: string | null;
+  selectedIconId: string | null;
+  buttonPreviewState: ButtonPreviewState;
+  iconPreviewState: IconPreviewState;
+  viewport: VisualViewport;
   onSelect: () => void;
+  onSelectButton: (buttonId: string) => void;
+  onSelectLink: (linkId: string) => void;
+  onSelectIcon: (iconId: string) => void;
   onTextChange: (text: string) => void;
   onDragStart: () => void;
   onDrop: (e?: DragEvent) => void;
   disabled?: boolean;
 }) {
   const pt = useProductT("visualEditor");
-  const { node, tokens, selected, onSelect, onTextChange, onDragStart, onDrop, disabled } =
-    props;
+  const {
+    node,
+    tokens,
+    selected,
+    selectedButtonId,
+    selectedLinkId,
+    selectedIconId,
+    buttonPreviewState,
+    iconPreviewState,
+    viewport,
+    onSelect,
+    onSelectButton,
+    onSelectLink,
+    onSelectIcon,
+    onTextChange,
+    onDragStart,
+    onDrop,
+    disabled,
+  } = props;
   const isHero = node.kind === "hero";
+  const sectionConfig =
+    node.sectionConfig ??
+    createDefaultSectionConfig({
+      id: `${node.exportName}-section`,
+      sectionExportName: node.exportName,
+      sectionType: isHero ? "hero" : node.kind === "header" ? "header" : node.kind === "footer" ? "footer" : "custom",
+      kind: node.kind,
+    });
+  const sectionVisible = sectionIsVisible(sectionConfig, viewport);
+  const sectionStyle = resolveSectionPreviewStyle(sectionConfig, viewport);
+  const sectionClass = sectionPreviewClassName(sectionConfig);
+
+  if (!sectionVisible) {
+    return (
+      <section
+        className="relative border-b border-dashed border-white/10 px-5 py-3 opacity-40"
+        onClick={onSelect}
+      >
+        <p className="text-[10px] uppercase tracking-wider text-white/40">
+          {pt("sectionEditor.hiddenOnViewport")} · {node.label}
+        </p>
+      </section>
+    );
+  }
+
   return (
     <section
       draggable={!node.locked && !disabled}
@@ -949,12 +1290,14 @@ function CanvasBlock(props: {
       onClick={onSelect}
       className={cn(
         "relative border-b border-white/5 px-5 py-6 transition-shadow",
+        sectionClass,
         selected && "ring-2 ring-inset ring-premium-gold/70",
         isHero && "min-h-[200px]",
       )}
       style={{
-        paddingTop: isHero ? "3rem" : undefined,
-        paddingBottom: isHero ? "3rem" : undefined,
+        ...sectionStyle,
+        paddingTop: isHero ? sectionStyle.padding ?? "3rem" : sectionStyle.padding,
+        paddingBottom: isHero ? sectionStyle.padding ?? "3rem" : sectionStyle.padding,
       }}
     >
       <div className="mb-2 flex items-center justify-between gap-2">
@@ -1001,13 +1344,46 @@ function CanvasBlock(props: {
           {node.text || node.label}
         </div>
       )}
-      {node.imageUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={node.imageUrl}
-          alt={node.label}
-          className="mt-3 h-32 w-full rounded-lg object-cover"
-        />
+      {node.sectionBackground?.url || node.imageUrl ? (
+        <div
+          className={cn(
+            "relative mt-3 overflow-hidden rounded-lg",
+            node.sectionBackground
+              ? sectionHeightClass(node.sectionBackground) ?? "h-32"
+              : "h-32",
+          )}
+          style={
+            node.sectionBackground?.sectionHeight === "custom"
+              ? { minHeight: node.sectionBackground.customHeightPx }
+              : undefined
+          }
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={
+              (node.sectionBackground
+                ? sectionBgPreviewUrl(node.sectionBackground, viewport)
+                : node.imageUrl) || ""
+            }
+            alt={
+              node.sectionBackground?.decorative
+                ? ""
+                : node.sectionBackground?.alt || node.label
+            }
+            className="absolute inset-0 h-full w-full"
+            style={
+              node.sectionBackground
+                ? resolveSectionBgImageStyle(node.sectionBackground, viewport)
+                : { objectFit: "cover" }
+            }
+          />
+          {node.sectionBackground?.overlay.enabled ? (
+            <div
+              className="absolute inset-0"
+              style={resolveSectionBgOverlayStyle(node.sectionBackground)}
+            />
+          ) : null}
+        </div>
       ) : (
         <div
           className="mt-3 h-16 rounded-lg opacity-80"
@@ -1019,6 +1395,108 @@ function CanvasBlock(props: {
       <p className="mt-3 max-w-prose text-[12px] opacity-55">
         {pt("canvasHint")}
       </p>
+      {node.icons && node.icons.length > 0 ? (
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {node.icons.map((icon) => {
+            const isSelected = selectedIconId === icon.id;
+            const Icon = resolveLucideIcon(icon.name);
+            const iconStyle = resolveIconPreviewStyle(icon, iconPreviewState);
+            return (
+              <button
+                key={icon.id}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelect();
+                  onSelectIcon(icon.id);
+                }}
+                className={cn(
+                  "inline-flex items-center gap-1 rounded-full border border-white/15 px-2 py-1 text-[10px] text-white/70",
+                  isSelected && "ring-2 ring-premium-gold text-white",
+                )}
+              >
+                <span style={iconStyle}>
+                  <Icon className="size-3" />
+                </span>
+                {icon.label}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
+      {node.links && node.links.length > 0 ? (
+        <div className="mt-4 flex flex-wrap gap-1.5">
+          {node.links
+            .filter((l) => l.kind !== "button" && l.kind !== "cta")
+            .map((link) => {
+              const isSelected = selectedLinkId === link.id;
+              return (
+                <button
+                  key={link.id}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSelect();
+                    onSelectLink(link.id);
+                  }}
+                  className={cn(
+                    "rounded-full border border-white/15 px-2.5 py-1 text-[10px] text-white/70",
+                    isSelected && "ring-2 ring-premium-gold text-white",
+                  )}
+                >
+                  {link.label}
+                </button>
+              );
+            })}
+        </div>
+      ) : null}
+      {node.buttons && node.buttons.length > 0 ? (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {node.buttons.map((button) => {
+            const isButtonSelected = selectedButtonId === button.id;
+            const style = resolveButtonPreviewStyle(button, buttonPreviewState);
+            const linkedIcon = node.icons?.find((i) => i.buttonId === button.id);
+            const BtnIcon = linkedIcon ? resolveLucideIcon(linkedIcon.name) : null;
+            const iconStyle = linkedIcon
+              ? resolveIconPreviewStyle(linkedIcon, iconPreviewState)
+              : undefined;
+            return (
+              <button
+                key={button.id}
+                type="button"
+                style={style}
+                disabled={button.disabled}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelect();
+                  onSelectButton(button.id);
+                  onSelectLink(button.id);
+                  if (linkedIcon) onSelectIcon(linkedIcon.id);
+                }}
+                className={cn(
+                  "inline-flex items-center gap-1.5",
+                  isButtonSelected &&
+                    "ring-2 ring-premium-gold ring-offset-2 ring-offset-[var(--canvas-bg,#080808)]",
+                )}
+                aria-label={button.ariaLabel || button.label}
+                title={button.title || undefined}
+              >
+                {linkedIcon && linkedIcon.position === "left" && BtnIcon ? (
+                  <span style={iconStyle}>
+                    <BtnIcon className="size-3.5" />
+                  </span>
+                ) : null}
+                {button.label}
+                {linkedIcon && linkedIcon.position === "right" && BtnIcon ? (
+                  <span style={iconStyle}>
+                    <BtnIcon className="size-3.5" />
+                  </span>
+                ) : null}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
     </section>
   );
 }

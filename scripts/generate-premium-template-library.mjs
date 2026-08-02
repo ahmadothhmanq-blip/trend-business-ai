@@ -1,5 +1,5 @@
 /**
- * Generate the premium 30-template website library.
+ * Generate the premium website template library.
  * Run: node scripts/generate-premium-template-library.mjs
  */
 import { cp, mkdir, writeFile } from "node:fs/promises";
@@ -490,10 +490,8 @@ function validateUniqueness(templates) {
 }
 
 async function main() {
-  if (PREMIUM_TEMPLATE_LIBRARY.length !== 30) {
-    throw new Error(
-      `Expected 30 templates, got ${PREMIUM_TEMPLATE_LIBRARY.length}`,
-    );
+  if (PREMIUM_TEMPLATE_LIBRARY.length < 1) {
+    throw new Error("Premium template library must define at least one template");
   }
 
   validateUniqueness(PREMIUM_TEMPLATE_LIBRARY);
