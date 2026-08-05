@@ -1,0 +1,14 @@
+{
+  "title": "Northline",
+  "fileCount": 16,
+  "settings": {
+    "templateIntelligenceId": "ti-saas-growth",
+    "templateIntelligenceCategory": "SaaS",
+    "templateArchitectureVersion": "v2",
+    "templatePresentationHash": "5521d6b6a5d5c0c0",
+    "templateComposerId": "region-grid",
+    "websiteStructureTemplateId": "saas-enterprise",
+    "templatePackageId": "saas-enterprise",
+    "selectedTemplateId": "saas-enterprise"
+  }
+}

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en" data-v2-render="v2-files" data-v2-package="real-estate-prestige" data-v2-layout="sidebar-right">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Monolith Estate — Live Preview</title>
+  <style>/* Template Architecture V2 — real-estate-prestige · spec 2.0.0 */
+:root {
+  --v2-package: "real-estate-prestige";
+  --color-primary: #1C1917;
+  --color-secondary: #3D3A36;
+  --color-accent: #B8956B;
+  --color-background: #F5F0EB;
+  --color-foreground: #1C1917;
+  --color-muted: rgba(28,25,23,0.58);
+  --color-surface: #FDFCFA;
+  --color-stone: #E8E2DA;
+  --color-brass: #B8956B;
+  --color-linen: #FAF8F5;
+  --font-display: Fraunces, ui-sans-serif, system-ui, sans-serif;
+  --font-body: Outfit, ui-sans-serif, system-ui, sans-serif;
+  --spacing-unit: 0.25rem;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --shadow-surface: 0 24px 64px rgba(28,25,23,0.12);
+  --shadow-glow: 0 0 80px rgba(184,149,107,0.14);
+  --shadow-inset: inset 0 1px 0 rgba(253,252,250,0.8);
+  --border-default: rgba(28,25,23,0.1);
+  --border-brass: rgba(184,149,107,0.32);
+  --border-subtle: rgba(28,25,23,0.05);
+}
+
+/* V2 language profile — RTL typography adaptation */
+[dir="rtl"] {
+  --font-display: Tajawal, ui-serif, Georgia, serif;
+  --font-body: "Noto Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Noto+Sans+Arabic:wght@400;500;600&family=Outfit:wght@300;400;500;600&family=Tajawal:wght@500;600;700&display=swap");
+
+@keyframes rep-parallax-lift {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes rep-stone-rise {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes rep-brass-draw {
+  from { transform: scaleX(0); opacity: 0; }
+  to { transform: scaleX(1); opacity: 1; }
+}
+@keyframes rep-ken-burns {
+  from { transform: scale(1.03); }
+  to { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rep-animate, [data-rep-motion] { animation: none !important; transition: none !important; }
+}
+
+.rep-font-display { font-family: var(--font-display), "Fraunces", Georgia, serif; }
+.rep-font-body { font-family: var(--font-body), "Outfit", system-ui, sans-serif; }
+.rep-eyebrow {
+  font-family: var(--font-body), "Outfit", system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--color-brass, #B8956B);
+}
+.rep-headline {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-size: clamp(2.5rem, 5.5vw, 4.5rem);
+  font-weight: 400;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  color: var(--color-foreground);
+}
+.rep-headline-sm {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  color: var(--color-foreground);
+}
+.rep-body {
+  font-family: var(--font-body), "Outfit", system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.72;
+  color: var(--color-muted, rgba(28,25,23,0.58));
+}
+.rep-brass-rule {
+  height: 1px;
+  width: 3.5rem;
+  background: linear-gradient(90deg, var(--color-brass, #B8956B), transparent);
+  transform-origin: left;
+}
+[dir="rtl"] .rep-brass-rule { transform-origin: right; }
+.rep-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.875rem;
+  padding: 0.875rem 2rem;
+  font-family: var(--font-body), "Outfit", system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-linen, #FAF8F5);
+  background: var(--color-primary, #1C1917);
+  border: 1px solid var(--border-brass, rgba(184,149,107,0.32));
+  transition: background 0.4s ease, box-shadow 0.4s ease;
+}
+.rep-btn-primary:hover {
+  background: var(--color-secondary, #3D3A36);
+  box-shadow: var(--shadow-glow);
+}
+.rep-btn-primary:focus-visible { outline: 2px solid var(--color-brass); outline-offset: 3px; }
+.rep-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.875rem;
+  padding: 0.875rem 1.75rem;
+  font-family: var(--font-body), "Outfit", system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-foreground);
+  border: 1px solid var(--border-default, rgba(28,25,23,0.1));
+  background: transparent;
+  transition: border-color 0.35s ease, color 0.35s ease;
+}
+.rep-btn-ghost:hover { border-color: var(--color-brass); color: var(--color-brass); }
+.rep-btn-ghost:focus-visible { outline: 2px solid var(--color-brass); outline-offset: 3px; }
+.rep-section { padding-block: clamp(5rem, 11vw, 7.5rem); }
+.rep-card {
+  border: 1px solid var(--border-subtle);
+  background: var(--color-surface);
+  transition: box-shadow 0.5s ease, transform 0.5s ease;
+}
+.rep-card:hover { box-shadow: var(--shadow-surface); transform: translateY(-2px); }
+.rep-focus-ring:focus-visible { outline: 2px solid var(--color-brass); outline-offset: 2px; }
+/* V2 sidebar-left layout */
+.v2-layout-sidebar-left .v2-sidebar-shell { gap: 0; align-items: flex-start; }
+.v2-sidebar-rail {
+  border-inline-end: 1px solid var(--border-subtle, rgba(244,237,228,0.06));
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-inline-end: clamp(1.25rem, 3vw, 2rem);
+}
+[dir='rtl'] .v2-sidebar-rail { border-inline-end: none; border-inline-start: 1px solid var(--border-subtle, rgba(244,237,228,0.06)); }
+.v2-main-canvas > [data-v2-component] + [data-v2-component] { margin-top: 0; }
+.v2-layout-sidebar-left .v2-main-canvas { padding-inline-start: 0; }
+@media (max-width: 1023px) {
+  .v2-sidebar-rail { display: none !important; }
+}
+
+/* V2 sidebar-right layout */
+.v2-layout-sidebar-right .v2-sidebar-shell { gap: 0; align-items: flex-start; }
+.v2-layout-sidebar-right .v2-sidebar-rail {
+  border-inline-start: 1px solid var(--border-subtle, rgba(28,25,23,0.06));
+  border-inline-end: none;
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-inline-start: clamp(1.25rem, 3vw, 2rem);
+}
+[dir='rtl'] .v2-layout-sidebar-right .v2-sidebar-rail {
+  border-inline-start: none;
+  border-inline-end: 1px solid var(--border-subtle, rgba(28,25,23,0.06));
+}
+
+:root {
+  --container-max: 88rem;
+  --font-body: Outfit, ui-sans-serif, system-ui, sans-serif;
+  --font-display: Fraunces, ui-sans-serif, system-ui, sans-serif;
+  --color-surface: #FDFCFA;
+  --color-foreground: #1C1917;
+  --color-background: #F5F0EB;
+  --color-accent: #B8956B;
+  --color-secondary: #3D3A36; --color-primary: #1C1917; }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--color-background, #0f172a);
+      color: var(--color-foreground, #f8fafc);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .page { display: none; padding-bottom: 2rem; }
+    .page:target { display: block; }
+    body:not(:has(.page:target)) .page#home { display: block; }
+    img { max-width: 100%; height: auto; display: block; }
+    a { color: inherit; }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <div class="page" id="home">
+    <div class="min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] antialiased v2-template v2-real-estate-prestige v2-layout-sidebar-right" data-v2-package="real-estate-prestige" data-v2-composer="region-grid" data-v2-layout="sidebar-right"><header data-v2-region="header"><header data-v2-component="real-estate-prestige-nav" class="fixed inset-x-0 top-0 z-[60] transition-all duration-500 border-b border-transparent bg-transparent"><div class="mx-auto flex h-[4.75rem] max-w-[88rem] items-center justify-between gap-6 px-5 sm:px-8 lg:px-10"><a href="#top" class="rep-font-display text-lg tracking-[0.04em] text-[var(--color-foreground)] transition hover:text-[var(--color-brass)] rep-focus-ring">Monolith Estate</a><nav aria-label="Primary" class="hidden items-center gap-10 lg:flex"><a href="#services" class="rep-font-body text-[0.6875rem] font-medium uppercase tracking-[0.28em] text-[var(--color-muted)] transition hover:text-[var(--color-foreground)] rep-focus-ring">Services</a><a href="#features" class="rep-font-body text-[0.6875rem] font-medium uppercase tracking-[0.28em] text-[var(--color-muted)] transition hover:text-[var(--color-foreground)] rep-focus-ring">Why us</a><a href="#pricing" class="rep-font-body text-[0.6875rem] font-medium uppercase tracking-[0.28em] text-[var(--color-muted)] transition hover:text-[var(--color-foreground)] rep-focus-ring">Packages</a><a href="#testimonials" class="rep-font-body text-[0.6875rem] font-medium uppercase tracking-[0.28em] text-[var(--color-muted)] transition hover:text-[var(--color-foreground)] rep-focus-ring">Clients</a><a href="#contact" class="rep-font-body text-[0.6875rem] font-medium uppercase tracking-[0.28em] text-[var(--color-muted)] transition hover:text-[var(--color-foreground)] rep-focus-ring">Contact</a></nav><div class="flex items-center gap-3"><a href="#inquire" class="rep-btn-primary hidden sm:inline-flex">Get started</a><button type="button" aria-expanded="false" aria-controls="rep-mobile-nav" aria-label="Open menu" class="inline-flex h-11 w-11 items-center justify-center border border-[var(--border-default)] lg:hidden rep-focus-ring"><span class="sr-only">Menu</span><span aria-hidden="true" class="flex flex-col gap-1.5"><span class="block h-px w-5 bg-current transition "></span><span class="block h-px w-5 bg-current transition "></span><span class="block h-px w-5 bg-current transition "></span></span></button></div></div></header></header><div class="v2-sidebar-shell mx-auto flex w-full max-w-[var(--container-max,82rem)] flex-col lg:flex-row"><main data-v2-region="main" class="v2-main-canvas min-w-0 flex-1"><section id="top" data-v2-component="real-estate-prestige-hero" aria-labelledby="rep-hero-title" class="relative min-h-[92svh] overflow-hidden bg-[var(--color-background)]"><div class="absolute inset-0"><div class="h-full w-full" style="background:linear-gradient(165deg, var(--color-stone) 0%, var(--color-background) 45%, var(--color-secondary) 100%)"></div><div class="absolute inset-0 bg-gradient-to-t from-[var(--color-background)] via-[var(--color-background)]/50 to-[var(--color-background)]/20"></div><div class="absolute inset-0 bg-gradient-to-r from-[var(--color-background)]/80 via-transparent to-transparent"></div></div><div class="relative z-10 flex min-h-[92svh] flex-col justify-end px-5 pb-16 pt-36 sm:px-8 lg:px-10 lg:pb-24"><div class="max-w-2xl"><p class="rep-eyebrow mb-6 motion-safe:animate-[rep-stone-rise_0.9s_ease_0.1s_both]">Professional presence</p><h1 id="rep-hero-title" class="rep-headline motion-safe:animate-[rep-parallax-lift_1s_ease_0.2s_both]">Monolith Estate</h1><div class="rep-brass-rule my-8 motion-safe:animate-[rep-brass-draw_0.8s_ease_0.45s_both]"></div><p class="rep-body max-w-lg motion-safe:animate-[rep-stone-rise_0.9s_ease_0.5s_both]">Ultra-premium luxury real estate advisory</p><div class="mt-10 flex flex-wrap gap-4 motion-safe:animate-[rep-stone-rise_0.9s_ease_0.6s_both]"><a href="#inquire" class="rep-btn-primary">Get started</a><a href="#collection" class="rep-btn-ghost">Learn more</a></div></div><dl class="mt-16 flex flex-wrap gap-8 border-t border-[var(--border-subtle)] pt-8 motion-safe:animate-[rep-stone-rise_1s_ease_0.75s_both]"><div><dt class="rep-font-body text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">Bedrooms</dt><dd class="rep-font-display mt-1 text-2xl text-[var(--color-foreground)]">5–7</dd></div><div><dt class="rep-font-body text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">Sq ft</dt><dd class="rep-font-display mt-1 text-2xl text-[var(--color-foreground)]">8,400</dd></div><div><dt class="rep-font-body text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">Terrace</dt><dd class="rep-font-display mt-1 text-2xl text-[var(--color-foreground)]">2,100</dd></div></dl></div></section><section id="collection" data-v2-component="real-estate-prestige-collection" aria-labelledby="rep-collection-title" class="rep-section"><div class="px-5 sm:px-8 lg:px-10"><header class="mb-14 max-w-xl"><p class="rep-eyebrow mb-5">Curated collection</p><h2 id="rep-collection-title" class="rep-headline-sm">Moments from the work</h2><div class="rep-brass-rule my-6"></div><p class="rep-body">Each property selected for architectural merit, provenance, and the quality of light.</p></header><div class="space-y-16"><article class="grid items-center gap-8 lg:grid-cols-2 lg:gap-14 "><figure class="rep-card overflow-hidden "><div class="aspect-[4/3] w-full" style="background:linear-gradient(145deg, var(--color-stone), var(--color-secondary))"></div></figure><div class=""><p class="rep-font-body text-[0.625rem] uppercase tracking-[0.28em] text-[var(--color-brass)]">Upper East Side, Manhattan</p><h3 class="rep-font-display mt-3 text-3xl text-[var(--color-foreground)]">The Whitmore Penthouse</h3><p class="rep-font-display mt-4 text-2xl text-[var(--color-foreground)]">$18.5M</p><dl class="rep-font-body mt-6 flex gap-8 text-sm text-[var(--color-muted)]"><div><dt class="text-[0.625rem] uppercase tracking-[0.2em]">Beds</dt><dd class="mt-1 text-[var(--color-foreground)]">6</dd></div><div><dt class="text-[0.625rem] uppercase tracking-[0.2em]">Sq ft</dt><dd class="mt-1 text-[var(--color-foreground)]">8,400</dd></div></dl><a href="#inquire" class="rep-btn-ghost mt-8 inline-flex">Request dossier</a></div></article><article class="grid items-center gap-8 lg:grid-cols-2 lg:gap-14 lg:[direction:rtl]"><figure class="rep-card overflow-hidden lg:[direction:ltr]"><div class="aspect-[4/3] w-full" style="background:linear-gradient(160deg, var(--color-stone), var(--color-secondary))"></div></figure><div class="lg:[direction:ltr]"><p class="rep-font-body text-[0.625rem] uppercase tracking-[0.28em] text-[var(--color-brass)]">East Hampton</p><h3 class="rep-font-display mt-3 text-3xl text-[var(--color-foreground)]">Stonegate Manor</h3><p class="rep-font-display mt-4 text-2xl text-[var(--color-foreground)]">$12.2M</p><dl class="rep-font-body mt-6 flex gap-8 text-sm text-[var(--color-muted)]"><div><dt class="text-[0.625rem] uppercase tracking-[0.2em]">Beds</dt><dd class="mt-1 text-[var(--color-foreground)]">7</dd></div><div><dt class="text-[0.625rem] uppercase tracking-[0.2em]">Sq ft</dt><dd class="mt-1 text-[var(--color-foreground)]">11,200</dd></div></dl><a href="#inquire" class="rep-btn-ghost mt-8 inline-flex">Request dossier</a></div></article><article class="grid items-center gap-8 lg:grid-cols-2 lg:gap-14 "><figure class="rep-card overflow-hidden "><div class="aspect-[4/3] w-full" style="background:linear-gradient(175deg, var(--color-stone), var(--color-secondary))"></div></figure><div class=""><p class="rep-font-body text-[0.625rem] uppercase tracking-[0.28em] text-[var(--color-brass)]">Aspen, Colorado</p><h3 class="rep-font-display mt-3 text-3xl text-[var(--color-foreground)]">Alpine Ridge Estate</h3><p class="rep-font-display mt-4 text-2xl text-[var(--color-foreground)]">$24.8M</p><dl class="rep-font-body mt-6 flex gap-8 text-sm text-[var(--color-muted)]"><div><dt class="text-[0.625rem] uppercase tracking-[0.2em]">Beds</dt><dd class="mt-1 text-[var(--color-foreground)]">5</dd></div><div><dt class="text-[0.625rem] uppercase tracking-[0.2em]">Sq ft</dt><dd class="mt-1 text-[var(--color-foreground)]">9,600</dd></div></dl><a href="#inquire" class="rep-btn-ghost mt-8 inline-flex">Request dossier</a></div></article></div></div></section><section id="neighborhoods" data-v2-component="real-estate-prestige-neighborhoods" aria-labelledby="rep-neighborhoods-title" class="rep-section bg-[var(--color-surface)]"><div class="px-5 sm:px-8 lg:px-10"><header class="mb-12 max-w-xl"><p class="rep-eyebrow mb-5">Studio</p><h2 id="rep-neighborhoods-title" class="rep-headline-sm">Moments from the work</h2><div class="rep-brass-rule my-6"></div><p class="rep-body">Visual proof that feels editorial and intentional.</p></header><figure class="rep-card mb-12 overflow-hidden"><div class="aspect-[21/9] w-full bg-[var(--color-stone)]"></div></figure><div class="grid gap-px border border-[var(--border-subtle)] bg-[var(--border-subtle)] md:grid-cols-3"><article class="bg-[var(--color-surface)] p-8 lg:p-10"><p class="rep-font-body text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-brass)]">4 residences</p><h3 class="rep-font-display mt-3 text-2xl text-[var(--color-foreground)]">Upper East Side</h3><p class="rep-font-body mt-4 text-sm leading-relaxed text-[var(--color-muted)]">Classic pre-war elegance meets museum-district refinement.</p></article><article class="bg-[var(--color-surface)] p-8 lg:p-10"><p class="rep-font-body text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-brass)]">3 residences</p><h3 class="rep-font-display mt-3 text-2xl text-[var(--color-foreground)]">Tribeca</h3><p class="rep-font-body mt-4 text-sm leading-relaxed text-[var(--color-muted)]">Loft-scale living with cast-iron character and gallery proximity.</p></article><article class="bg-[var(--color-surface)] p-8 lg:p-10"><p class="rep-font-body text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-brass)]">5 residences</p><h3 class="rep-font-display mt-3 text-2xl text-[var(--color-foreground)]">East Hampton</h3><p class="rep-font-body mt-4 text-sm leading-relaxed text-[var(--color-muted)]">Oceanfront estates and hedgerow privacy on Long Island&#x27;s gold coast.</p></article></div></div></section><section id="architecture" data-v2-component="real-estate-prestige-architecture" aria-labelledby="rep-arch-title" class="rep-section"><div class="px-5 sm:px-8 lg:px-10"><div class="grid gap-12 lg:grid-cols-12 lg:gap-8"><div class="lg:col-span-5 lg:pt-8"><p class="rep-eyebrow mb-5">Services</p><h2 id="rep-arch-title" class="rep-headline-sm">What we deliver for clients</h2><div class="rep-brass-rule my-6"></div><p class="rep-body">Plain-language offerings with outcomes — ready for a premium business site.</p><ul class="rep-font-body mt-10 space-y-4 text-sm text-[var(--color-muted)]"><li class="flex gap-3 border-s-2 border-[var(--color-brass)] ps-4">Limestone, travertine, and aged brass — materials that deepen with time</li><li class="flex gap-3 border-s-2 border-[var(--color-brass)] ps-4">Floor-to-ceiling glazing calibrated for natural light and privacy</li><li class="flex gap-3 border-s-2 border-[var(--color-brass)] ps-4">Landscape integration by award-winning garden architects</li></ul></div><div class="grid gap-4 lg:col-span-7"><figure class="rep-card overflow-hidden"><div class="aspect-[16/10] w-full bg-[var(--color-stone)]"></div></figure><figure class="rep-card ms-auto w-4/5 overflow-hidden"><div class="aspect-[4/3] w-full bg-[var(--color-stone)]"></div></figure></div></div></div></section><section id="advisors" data-v2-component="real-estate-prestige-advisors" aria-labelledby="rep-advisors-title" class="rep-section bg-[var(--color-surface)]"><div class="px-5 sm:px-8 lg:px-10"><header class="mb-14 max-w-xl"><p class="rep-eyebrow mb-5">Advisors</p><h2 id="rep-advisors-title" class="rep-headline-sm">Ready to look established online?</h2><div class="rep-brass-rule my-6"></div><p class="rep-body">Share your goals — we will propose a clear path and timeline.</p></header><div class="grid gap-8 md:grid-cols-3"><article class="group"><figure class="rep-card overflow-hidden"><div class="aspect-[3/4] w-full" style="background:var(--color-stone)"></div></figure><div class="mt-5"><h3 class="rep-font-display text-xl text-[var(--color-foreground)]">Eleanor Whitmore</h3><p class="rep-font-body mt-1 text-sm text-[var(--color-brass)]">Managing Director</p><p class="rep-font-body mt-2 text-xs uppercase tracking-[0.2em] text-[var(--color-muted)]">Manhattan</p></div></article><article class="group"><figure class="rep-card overflow-hidden"><div class="aspect-[3/4] w-full" style="background:var(--color-stone)"></div></figure><div class="mt-5"><h3 class="rep-font-display text-xl text-[var(--color-foreground)]">James Calder</h3><p class="rep-font-body mt-1 text-sm text-[var(--color-brass)]">Senior Advisor</p><p class="rep-font-body mt-2 text-xs uppercase tracking-[0.2em] text-[var(--color-muted)]">Hamptons</p></div></article><article class="group"><figure class="rep-card overflow-hidden"><div class="aspect-[3/4] w-full" style="background:var(--color-stone)"></div></figure><div class="mt-5"><h3 class="rep-font-display text-xl text-[var(--color-foreground)]">Sofia Marchetti</h3><p class="rep-font-body mt-1 text-sm text-[var(--color-brass)]">Private Client Lead</p><p class="rep-font-body mt-2 text-xs uppercase tracking-[0.2em] text-[var(--color-muted)]">Aspen</p></div></article></div></div></section><section data-v2-component="real-estate-prestige-testimonials" aria-labelledby="rep-testimonials-title" class="rep-section"><div class="px-5 sm:px-8 lg:px-10"><header class="mb-14 text-center"><p class="rep-eyebrow mb-5">Clients</p><h2 id="rep-testimonials-title" class="rep-headline-sm">Businesses that raised their standard</h2><p class="rep-body mx-auto mt-4 max-w-lg">Specific results from professional services teams.</p></header><div class="grid gap-8 md:grid-cols-2"><blockquote class="rep-card border-s-2 border-s-[var(--color-brass)] p-8 lg:p-10"><p class="rep-font-display text-xl italic leading-relaxed text-[var(--color-foreground)]">“We finally look as professional as the work we deliver — working with Monolith Estate.”</p><footer class="rep-font-body mt-8 text-[0.6875rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">— </footer></blockquote><blockquote class="rep-card border-s-2 border-s-[var(--color-brass)] p-8 lg:p-10"><p class="rep-font-display text-xl italic leading-relaxed text-[var(--color-foreground)]">“Inquiries went up after the redesign — messaging is clearer.”</p><footer class="rep-font-body mt-8 text-[0.6875rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">— </footer></blockquote><blockquote class="rep-card border-s-2 border-s-[var(--color-brass)] p-8 lg:p-10"><p class="rep-font-display text-xl italic leading-relaxed text-[var(--color-foreground)]">“Clients comment on the site before meetings now.”</p><footer class="rep-font-body mt-8 text-[0.6875rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">— </footer></blockquote></div></div></section><section id="inquire" data-v2-component="real-estate-prestige-inquiry" aria-labelledby="rep-inquire-title" class="rep-section border-t border-[var(--border-subtle)] bg-[var(--color-stone)]/40"><div class="px-5 sm:px-8 lg:px-10"><div class="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20"><div><p class="rep-eyebrow mb-5">Inquire</p><h2 id="rep-inquire-title" class="rep-headline-sm">Request a quote</h2><div class="rep-brass-rule my-6"></div><p class="rep-body max-w-md">Tell us about your business and we will respond promptly.</p><p class="rep-font-body mt-8 text-sm text-[var(--color-muted)]">All inquiries handled with complete confidentiality.</p></div><form class="rep-card bg-[var(--color-surface)] p-6 sm:p-8" aria-label="Private showing inquiry"><div class="grid gap-5 sm:grid-cols-2"><label class="block sm:col-span-2"><span class="rep-font-body mb-2 block text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">Full name</span><input required="" type="text" autoComplete="name" class="w-full border border-[var(--border-default)] bg-transparent px-4 py-3 rep-font-body text-sm focus:border-[var(--color-brass)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brass)]"/></label><label class="block"><span class="rep-font-body mb-2 block text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">Email</span><input required="" type="email" autoComplete="email" class="w-full border border-[var(--border-default)] bg-transparent px-4 py-3 rep-font-body text-sm focus:border-[var(--color-brass)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brass)]"/></label><label class="block"><span class="rep-font-body mb-2 block text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">Phone</span><input type="tel" autoComplete="tel" class="w-full border border-[var(--border-default)] bg-transparent px-4 py-3 rep-font-body text-sm focus:border-[var(--color-brass)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brass)]"/></label><label class="block sm:col-span-2"><span class="rep-font-body mb-2 block text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">Preferred market</span><select class="w-full border border-[var(--border-default)] bg-transparent px-4 py-3 rep-font-body text-sm focus:border-[var(--color-brass)] focus:outline-none"><option>Manhattan</option><option>Hamptons</option><option>Aspen</option><option>Other</option></select></label><label class="block sm:col-span-2"><span class="rep-font-body mb-2 block text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">Message</span><textarea rows="4" class="w-full resize-none border border-[var(--border-default)] bg-transparent px-4 py-3 rep-font-body text-sm focus:border-[var(--color-brass)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brass)]"></textarea></label><div class="sm:col-span-2 pt-2"><button type="submit" class="rep-btn-primary w-full sm:w-auto">Get started</button></div></div></form></div></div></section></main><aside data-v2-region="sidebar" class="v2-sidebar-rail hidden shrink-0 lg:block lg:w-56 xl:w-64"><nav data-v2-component="real-estate-prestige-dossier-rail" aria-label="Property dossier" class="sticky top-28 hidden lg:block"><p class="rep-eyebrow mb-6">Dossier</p><dl class="mb-10 space-y-4 border-b border-[var(--border-subtle)] pb-8"><div><dt class="rep-font-body text-[0.625rem] uppercase tracking-[0.2em] text-[var(--color-muted)]">Price range</dt><dd class="rep-font-display mt-1 text-xl text-[var(--color-foreground)]">$4.2M – $28M</dd></div><div><dt class="rep-font-body text-[0.625rem] uppercase tracking-[0.2em] text-[var(--color-muted)]">Available</dt><dd class="rep-font-display mt-1 text-xl text-[var(--color-brass)]">12 residences</dd></div><div><dt class="rep-font-body text-[0.625rem] uppercase tracking-[0.2em] text-[var(--color-muted)]">Markets</dt><dd class="rep-font-body mt-1 text-sm text-[var(--color-foreground)]">Manhattan · Hamptons · Aspen</dd></div></dl><ol class="space-y-1"><li><a href="#services" class="group flex items-center gap-3 py-2 transition rep-focus-ring"><span class="rep-font-body text-[0.625rem] tabular-nums tracking-[0.16em] text-[var(--color-brass)]/70">01</span><span class="rep-font-body text-[0.6875rem] uppercase tracking-[0.22em] text-[var(--color-muted)] transition group-hover:text-[var(--color-foreground)]">Services</span></a></li><li><a href="#features" class="group flex items-center gap-3 py-2 transition rep-focus-ring"><span class="rep-font-body text-[0.625rem] tabular-nums tracking-[0.16em] text-[var(--color-brass)]/70">02</span><span class="rep-font-body text-[0.6875rem] uppercase tracking-[0.22em] text-[var(--color-muted)] transition group-hover:text-[var(--color-foreground)]">Why us</span></a></li><li><a href="#pricing" class="group flex items-center gap-3 py-2 transition rep-focus-ring"><span class="rep-font-body text-[0.625rem] tabular-nums tracking-[0.16em] text-[var(--color-brass)]/70">03</span><span class="rep-font-body text-[0.6875rem] uppercase tracking-[0.22em] text-[var(--color-muted)] transition group-hover:text-[var(--color-foreground)]">Packages</span></a></li><li><a href="#testimonials" class="group flex items-center gap-3 py-2 transition rep-focus-ring"><span class="rep-font-body text-[0.625rem] tabular-nums tracking-[0.16em] text-[var(--color-brass)]/70">04</span><span class="rep-font-body text-[0.6875rem] uppercase tracking-[0.22em] text-[var(--color-muted)] transition group-hover:text-[var(--color-foreground)]">Clients</span></a></li><li><a href="#contact" class="group flex items-center gap-3 py-2 transition rep-focus-ring"><span class="rep-font-body text-[0.625rem] tabular-nums tracking-[0.16em] text-[var(--color-brass)]/70">05</span><span class="rep-font-body text-[0.6875rem] uppercase tracking-[0.22em] text-[var(--color-muted)] transition group-hover:text-[var(--color-foreground)]">Contact</span></a></li></ol><div class="mt-12 border-t border-[var(--border-subtle)] pt-8"><p class="rep-eyebrow mb-3">Concierge</p><a href="tel:+12125550100" class="rep-font-body text-sm text-[var(--color-brass)] hover:underline rep-focus-ring">+1 (212) 555-0100</a></div></nav></aside></div><footer data-v2-region="footer"><footer data-v2-component="real-estate-prestige-footer" class="border-t border-[var(--border-subtle)] bg-[var(--color-primary)] text-[var(--color-linen)]" role="contentinfo"><div class="mx-auto max-w-[88rem] px-5 py-16 sm:px-8 lg:px-10"><div class="grid gap-12 md:grid-cols-[1.5fr_1fr]"><div><p class="rep-font-display text-3xl">Monolith Estate</p><p class="rep-font-body mt-3 max-w-sm text-sm leading-relaxed text-white/60">Clear messaging and conversion-focused pages that earn trust quickly.</p><address class="rep-font-body mt-6 not-italic text-sm text-white/50">900 Madison Avenue, New York</address></div><nav aria-label="Footer navigation"><p class="rep-eyebrow text-white/40">Explore</p><ul class="mt-4 space-y-3"><li><a href="#collection" class="rep-font-body text-sm text-white/65 transition hover:text-[var(--color-brass)] rep-focus-ring">Collection</a></li><li><a href="#neighborhoods" class="rep-font-body text-sm text-white/65 transition hover:text-[var(--color-brass)] rep-focus-ring">Neighborhoods</a></li><li><a href="#advisors" class="rep-font-body text-sm text-white/65 transition hover:text-[var(--color-brass)] rep-focus-ring">Advisors</a></li><li><a href="#inquire" class="rep-font-body text-sm text-white/65 transition hover:text-[var(--color-brass)] rep-focus-ring">Inquire</a></li></ul></nav></div><div class="rep-brass-rule mt-14 opacity-40"></div><div class="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><p class="rep-font-body text-[0.6875rem] uppercase tracking-[0.22em] text-white/40">© 2026 Monolith Estate. All rights reserved.</p><div class="flex gap-6"><a href="#" class="rep-font-body text-[0.6875rem] uppercase tracking-[0.18em] text-white/40 hover:text-[var(--color-brass)]">Privacy</a><a href="#" class="rep-font-body text-[0.6875rem] uppercase tracking-[0.18em] text-white/40 hover:text-[var(--color-brass)]">Fair Housing</a></div></div></div></footer></footer></div>
+  </div>
+  <section class="page v2-secondary-page" id="listings">
+  <div class="mx-auto max-w-3xl px-6 py-16">
+    <p class="text-xs uppercase tracking-widest text-[var(--color-foreground)]/50">listings</p>
+    <pre class="mt-4 overflow-x-auto rounded border border-[var(--color-foreground)]/10 p-4 text-xs text-[var(--color-foreground)]/70">export default function Listings(){return &lt;main&gt;Listings&lt;/main&gt;}</pre>
+    <a class="mt-6 inline-block text-sm text-[var(--color-accent,#B87333)]" href="#home">Back to home</a>
+  </div>
+</section>
+<section class="page v2-secondary-page" id="neighborhoods">
+  <div class="mx-auto max-w-3xl px-6 py-16">
+    <p class="text-xs uppercase tracking-widest text-[var(--color-foreground)]/50">neighborhoods</p>
+    <h1 class="mt-4 text-3xl font-semibold text-[var(--color-foreground)]">neighborhoods</h1>
+    <p class="mt-4 text-[var(--color-foreground)]/70">neighborhoods — Monolith Estate</p>
+    <a class="mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]" href="#home">Back to home</a>
+  </div>
+</section>
+<section class="page v2-secondary-page" id="contact">
+  <div class="mx-auto max-w-3xl px-6 py-16">
+    <p class="text-xs uppercase tracking-widest text-[var(--color-foreground)]/50">contact</p>
+    <h1 class="mt-4 text-3xl font-semibold text-[var(--color-foreground)]">contact</h1>
+    <p class="mt-4 text-[var(--color-foreground)]/70">contact — Monolith Estate</p>
+    <a class="mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]" href="#home">Back to home</a>
+  </div>
+</section>
+</body>
+</html>

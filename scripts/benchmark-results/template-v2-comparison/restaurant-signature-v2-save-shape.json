@@ -1,0 +1,14 @@
+{
+  "title": "Maison Verdant",
+  "fileCount": 17,
+  "settings": {
+    "templateIntelligenceId": "ti-restaurant-dining",
+    "templateIntelligenceCategory": "Restaurant",
+    "templateArchitectureVersion": "v2",
+    "templatePresentationHash": "d2b421aed63dba83",
+    "templateComposerId": "region-grid",
+    "websiteStructureTemplateId": "restaurant-signature",
+    "templatePackageId": "restaurant-signature",
+    "selectedTemplateId": "restaurant-signature"
+  }
+}

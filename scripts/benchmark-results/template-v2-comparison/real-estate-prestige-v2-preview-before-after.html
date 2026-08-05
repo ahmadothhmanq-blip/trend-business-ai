@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Real Estate Prestige — V2 Before/After</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 0; background: #0a0a0a; color: #eee; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #333; min-height: 100vh; }
+  .panel { background: #111; padding: 1rem; overflow: auto; }
+  h2 { margin: 0 0 0.75rem; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.12em; }
+  .bad { color: #f87171; }
+  .good { color: #4ade80; }
+  iframe { width: 100%; height: 70vh; border: 1px solid #333; background: #fff; }
+  pre { font-size: 0.75rem; color: #aaa; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<div class="grid">
+  <div class="panel">
+    <h2 class="bad">Before (V1 ThemeCorporate fallback)</h2>
+    <pre>ThemeCorporateNav, ThemeCorporateHero
+Navy-champagne canvas only — no package components
+No sidebar-right dossier rail
+No rep-* design system</pre>
+  </div>
+  <div class="panel">
+    <h2 class="good">After (Monolith Estate V2 rebuild)</h2>
+    <pre>Palette: #F5F0EB limestone / #B8956B brass
+Typography: Fraunces + Outfit
+Layout: sidebar-RIGHT dossier rail
+11 independent RealEstatePrestige* components</pre>
+    <iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot; data-v2-render=&quot;v2-files&quot; data-v2-package=&quot;real-estate-prestige&quot; data-v2-layout=&quot;sidebar-right&quot;>
+<head>
+  <meta charset=&quot;utf-8&quot; />
+  <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot; />
+  <title>Monolith Estate — Live Preview</title>
+  <style>/* Template Architecture V2 — real-estate-prestige · spec 2.0.0 */
+:root {
+  --v2-package: &quot;real-estate-prestige&quot;;
+  --color-primary: #1C1917;
+  --color-secondary: #3D3A36;
+  --color-accent: #B8956B;
+  --color-background: #F5F0EB;
+  --color-foreground: #1C1917;
+  --color-muted: rgba(28,25,23,0.58);
+  --color-surface: #FDFCFA;
+  --color-stone: #E8E2DA;
+  --color-brass: #B8956B;
+  --color-linen: #FAF8F5;
+  --font-display: Fraunces, ui-sans-serif, system-ui, sans-serif;
+  --font-body: Outfit, ui-sans-serif, system-ui, sans-serif;
+  --spacing-unit: 0.25rem;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --shadow-surface: 0 24px 64px rgba(28,25,23,0.12);
+  --shadow-glow: 0 0 80px rgba(184,149,107,0.14);
+  --shadow-inset: inset 0 1px 0 rgba(253,252,250,0.8);
+  --border-default: rgba(28,25,23,0.1);
+  --border-brass: rgba(184,149,107,0.32);
+  --border-subtle: rgba(28,25,23,0.05);
+}
+
+/* V2 language profile — RTL typography adaptation */
+[dir=&quot;rtl&quot;] {
+  --font-display: Tajawal, ui-serif, Georgia, serif;
+  --font-body: &quot;Noto Sans Arabic&quot;, ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+@import url(&quot;https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Noto+Sans+Arabic:wght@400;500;600&family=Outfit:wght@300;400;500;600&family=Tajawal:wght@500;600;700&display=swap&quot;);
+
+@keyframes rep-parallax-lift {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes rep-stone-rise {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes rep-brass-draw {
+  from { transform: scaleX(0); opacity: 0; }
+  to { transform: scaleX(1); opacity: 1; }
+}
+@keyframes rep-ken-burns {
+  from { transform: scale(1.03); }
+  to { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rep-animate, [data-rep-motion] { animation: none !important; transition: none !important; }
+}
+
+.rep-font-display { font-family: var(--font-display), &quot;Fraunces&quot;, Georgia, serif; }
+.rep-font-body { font-family: var(--font-body), &quot;Outfit&quot;, system-ui, sans-serif; }
+.rep-eyebrow {
+  font-family: var(--font-body), &quot;Outfit&quot;, system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--color-brass, #B8956B);
+}
+.rep-headline {
+  font-family: var(--font-display), &quot;Fraunces&quot;, Georgia, serif;
+  font-size: clamp(2.5rem, 5.5vw, 4.5rem);
+  font-weight: 400;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  color: var(--color-foreground);
+}
+.rep-headline-sm {
+  font-family: var(--font-display), &quot;Fraunces&quot;, Georgia, serif;
+  font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  color: var(--color-foreground);
+}
+.rep-body {
+  font-family: var(--font-body), &quot;Outfit&quot;, system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.72;
+  color: var(--color-muted, rgba(28,25,23,0.58));
+}
+.rep-brass-rule {
+  height: 1px;
+  width: 3.5rem;
+  background: linear-gradient(90deg, var(--color-brass, #B8956B), transparent);
+  transform-origin: left;
+}
+[dir=&quot;rtl&quot;] .rep-brass-rule { transform-origin: right; }
+.rep-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.875rem;
+  padding: 0.875rem 2rem;
+  font-family: var(--font-body), &quot;Outfit&quot;, system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-linen, #FAF8F5);
+  background: var(--color-primary, #1C1917);
+  border: 1px solid var(--border-brass, rgba(184,149,107,0.32));
+  transition: background 0.4s ease, box-shadow 0.4s ease;
+}
+.rep-btn-primary:hover {
+  background: var(--color-secondary, #3D3A36);
+  box-shadow: var(--shadow-glow);
+}
+.rep-btn-primary:focus-visible { outline: 2px solid var(--color-brass); outline-offset: 3px; }
+.rep-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.875rem;
+  padding: 0.875rem 1.75rem;
+  font-family: var(--font-body), &quot;Outfit&quot;, system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-foreground);
+  border: 1px solid var(--border-default, rgba(28,25,23,0.1));
+  background: transparent;
+  transition: border-color 0.35s ease, color 0.35s ease;
+}
+.rep-btn-ghost:hover { border-color: var(--color-brass); color: var(--color-brass); }
+.rep-btn-ghost:focus-visible { outline: 2px solid var(--color-brass); outline-offset: 3px; }
+.rep-section { padding-block: clamp(5rem, 11vw, 7.5rem); }
+.rep-card {
+  border: 1px solid var(--border-subtle);
+  background: var(--color-surface);
+  transition: box-shadow 0.5s ease, transform 0.5s ease;
+}
+.rep-card:hover { box-shadow: var(--shadow-surface); transform: translateY(-2px); }
+.rep-focus-ring:focus-visible { outline: 2px solid var(--color-brass); outline-offset: 2px; }
+/* V2 sidebar-left layout */
+.v2-layout-sidebar-left .v2-sidebar-shell { gap: 0; align-items: flex-start; }
+.v2-sidebar-rail {
+  border-inline-end: 1px solid var(--border-subtle, rgba(244,237,228,0.06));
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-inline-end: clamp(1.25rem, 3vw, 2rem);
+}
+[dir='rtl'] .v2-sidebar-rail { border-inline-end: none; border-inline-start: 1px solid var(--border-subtle, rgba(244,237,228,0.06)); }
+.v2-main-canvas > [data-v2-component] + [data-v2-component] { margin-top: 0; }
+.v2-layout-sidebar-left .v2-main-canvas { padding-inline-start: 0; }
+@media (max-width: 1023px) {
+  .v2-sidebar-rail { display: none !important; }
+}
+
+/* V2 sidebar-right layout */
+.v2-layout-sidebar-right .v2-sidebar-shell { gap: 0; align-items: flex-start; }
+.v2-layout-sidebar-right .v2-sidebar-rail {
+  border-inline-start: 1px solid var(--border-subtle, rgba(28,25,23,0.06));
+  border-inline-end: none;
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-inline-start: clamp(1.25rem, 3vw, 2rem);
+}
+[dir='rtl'] .v2-layout-sidebar-right .v2-sidebar-rail {
+  border-inline-start: none;
+  border-inline-end: 1px solid var(--border-subtle, rgba(28,25,23,0.06));
+}
+
+:root {
+  --container-max: 88rem;
+  --font-body: Outfit, ui-sans-serif, system-ui, sans-serif;
+  --font-display: Fraunces, ui-sans-serif, system-ui, sans-serif;
+  --color-surface: #FDFCFA;
+  --color-foreground: #1C1917;
+  --color-background: #F5F0EB;
+  --color-accent: #B8956B;
+  --color-secondary: #3D3A36; --color-primary: #1C1917; }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--color-background, #0f172a);
+      color: var(--color-foreground, #f8fafc);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .page { display: none; padding-bottom: 2rem; }
+    .page:target { display: block; }
+    body:not(:has(.page:target)) .page#home { display: block; }
+    img { max-width: 100%; height: auto; display: block; }
+    a { color: inherit; }
+  </style>
+  <script src=&quot;https://cdn.tailwindcss.com&quot;></script>
+</head>
+<body>
+  <div class=&quot;page&quot; id=&quot;home&quot;>
+    <div class=&quot;min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] antialiased v2-template v2-real-estate-prestige v2-layout-sidebar-right&quot; data-v2-package=&quot;real-estate-prestige&quot; data-v2-composer=&quot;region-grid&quot; data-v2-layout=&quot;sidebar-right&quot;><header data-v2-region=&quot;header&quot;><header data-v2-component=&quot;real-estate-prestige-nav&quot; class=&quot;fixed inset-x-0 top-0 z-[60] transition-all duration-500 border-b border-transparent bg-transparent&quot;><div class=&quot;mx-auto flex h-[4.75rem] max-w-[88rem] items-center justify-between gap-6 px-5 sm:px-8 lg:px-10&quot;><a href=&quot;#top&quot; class=&quot;rep-font-display text-lg tracking-[0.04em] text-[var(--color-foreground)] transition hover:text-[var(--color-brass)] rep-focus-ring&quot;>Monolith Estate</a><nav aria-label=&quot;Primary&quot; class=&quot;hidden items-center gap-10 lg:flex&quot;><a href=&quot;#services&quot; class=&quot;rep-font-body text-[0.6875rem] font-medium uppercase tracking-[0.28em] text-[var(--color-muted)] transition hover:text-[var(--color-foreground)] rep-focus-ring&quot;>Services</a><a href=&quot;#features&quot; class=&quot;rep-font-body text-[0.6875rem] font-medium uppercase tracking-[0.28em] text-[var(--color-muted)] transition hover:text-[var(--color-foreground)] rep-focus-ring&quot;>Why us</a><a href=&quot;#pricing&quot; class=&quot;rep-font-body text-[0.6875rem] font-medium uppercase tracking-[0.28em] text-[var(--color-muted)] transition hover:text-[var(--color-foreground)] rep-focus-ring&quot;>Packages</a><a href=&quot;#testimonials&quot; class=&quot;rep-font-body text-[0.6875rem] font-medium uppercase tracking-[0.28em] text-[var(--color-muted)] transition hover:text-[var(--color-foreground)] rep-focus-ring&quot;>Clients</a><a href=&quot;#contact&quot; class=&quot;rep-font-body text-[0.6875rem] font-medium uppercase tracking-[0.28em] text-[var(--color-muted)] transition hover:text-[var(--color-foreground)] rep-focus-ring&quot;>Contact</a></nav><div class=&quot;flex items-center gap-3&quot;><a href=&quot;#inquire&quot; class=&quot;rep-btn-primary hidden sm:inline-flex&quot;>Get started</a><button type=&quot;button&quot; aria-expanded=&quot;false&quot; aria-controls=&quot;rep-mobile-nav&quot; aria-label=&quot;Open menu&quot; class=&quot;inline-flex h-11 w-11 items-center justify-center border border-[var(--border-default)] lg:hidden rep-focus-ring&quot;><span class=&quot;sr-only&quot;>Menu</span><span aria-hidden=&quot;true&quot; class=&quot;flex flex-col gap-1.5&quot;><span class=&quot;block h-px w-5 bg-current transition &quot;></span><span class=&quot;block h-px w-5 bg-current transition &quot;></span><span class=&quot;block h-px w-5 bg-current transition &quot;></span></span></button></div></div></header></header><div class=&quot;v2-sidebar-shell mx-auto flex w-full max-w-[var(--container-max,82rem)] flex-col lg:flex-row&quot;><main data-v2-region=&quot;main&quot; class=&quot;v2-main-canvas min-w-0 flex-1&quot;><section id=&quot;top&quot; data-v2-component=&quot;real-estate-prestige-hero&quot; aria-labelledby=&quot;rep-hero-title&quot; class=&quot;relative min-h-[92svh] overflow-hidden bg-[var(--color-background)]&quot;><div class=&quot;absolute inset-0&quot;><div class=&quot;h-full w-full&quot; style=&quot;background:linear-gradient(165deg, var(--color-stone) 0%, var(--color-background) 45%, var(--color-secondary) 100%)&quot;></div><div class=&quot;absolute inset-0 bg-gradient-to-t from-[var(--color-background)] via-[var(--color-background)]/50 to-[var(--color-background)]/20&quot;></div><div class=&quot;absolute inset-0 bg-gradient-to-r from-[var(--color-background)]/80 via-transparent to-transparent&quot;></div></div><div class=&quot;relative z-10 flex min-h-[92svh] flex-col justify-end px-5 pb-16 pt-36 sm:px-8 lg:px-10 lg:pb-24&quot;><div class=&quot;max-w-2xl&quot;><p class=&quot;rep-eyebrow mb-6 motion-safe:animate-[rep-stone-rise_0.9s_ease_0.1s_both]&quot;>Professional presence</p><h1 id=&quot;rep-hero-title&quot; class=&quot;rep-headline motion-safe:animate-[rep-parallax-lift_1s_ease_0.2s_both]&quot;>Monolith Estate</h1><div class=&quot;rep-brass-rule my-8 motion-safe:animate-[rep-brass-draw_0.8s_ease_0.45s_both]&quot;></div><p class=&quot;rep-body max-w-lg motion-safe:animate-[rep-stone-rise_0.9s_ease_0.5s_both]&quot;>Ultra-premium luxury real estate advisory</p><div class=&quot;mt-10 flex flex-wrap gap-4 motion-safe:animate-[rep-stone-rise_0.9s_ease_0.6s_both]&quot;><a href=&quot;#inquire&quot; class=&quot;rep-btn-primary&quot;>Get started</a><a href=&quot;#collection&quot; class=&quot;rep-btn-ghost&quot;>Learn more</a></div></div><dl class=&quot;mt-16 flex flex-wrap gap-8 border-t border-[var(--border-subtle)] pt-8 motion-safe:animate-[rep-stone-rise_1s_ease_0.75s_both]&quot;><div><dt class=&quot;rep-font-body text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-muted)]&quot;>Bedrooms</dt><dd class=&quot;rep-font-display mt-1 text-2xl text-[var(--color-foreground)]&quot;>5–7</dd></div><div><dt class=&quot;rep-font-body text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-muted)]&quot;>Sq ft</dt><dd class=&quot;rep-font-display mt-1 text-2xl text-[var(--color-foreground)]&quot;>8,400</dd></div><div><dt class=&quot;rep-font-body text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-muted)]&quot;>Terrace</dt><dd class=&quot;rep-font-display mt-1 text-2xl text-[var(--color-foreground)]&quot;>2,100</dd></div></dl></div></section><section id=&quot;collection&quot; data-v2-component=&quot;real-estate-prestige-collection&quot; aria-labelledby=&quot;rep-collection-title&quot; class=&quot;rep-section&quot;><div class=&quot;px-5 sm:px-8 lg:px-10&quot;><header class=&quot;mb-14 max-w-xl&quot;><p class=&quot;rep-eyebrow mb-5&quot;>Curated collection</p><h2 id=&quot;rep-collection-title&quot; class=&quot;rep-headline-sm&quot;>Moments from the work</h2><div class=&quot;rep-brass-rule my-6&quot;></div><p class=&quot;rep-body&quot;>Each property selected for architectural merit, provenance, and the quality of light.</p></header><div class=&quot;space-y-16&quot;><article class=&quot;grid items-center gap-8 lg:grid-cols-2 lg:gap-14 &quot;><figure class=&quot;rep-card overflow-hidden &quot;><div class=&quot;aspect-[4/3] w-full&quot; style=&quot;background:linear-gradient(145deg, var(--color-stone), var(--color-secondary))&quot;></div></figure><div class=&quot;&quot;><p class=&quot;rep-font-body text-[0.625rem] uppercase tracking-[0.28em] text-[var(--color-brass)]&quot;>Upper East Side, Manhattan</p><h3 class=&quot;rep-font-display mt-3 text-3xl text-[var(--color-foreground)]&quot;>The Whitmore Penthouse</h3><p class=&quot;rep-font-display mt-4 text-2xl text-[var(--color-foreground)]&quot;>$18.5M</p><dl class=&quot;rep-font-body mt-6 flex gap-8 text-sm text-[var(--color-muted)]&quot;><div><dt class=&quot;text-[0.625rem] uppercase tracking-[0.2em]&quot;>Beds</dt><dd class=&quot;mt-1 text-[var(--color-foreground)]&quot;>6</dd></div><div><dt class=&quot;text-[0.625rem] uppercase tracking-[0.2em]&quot;>Sq ft</dt><dd class=&quot;mt-1 text-[var(--color-foreground)]&quot;>8,400</dd></div></dl><a href=&quot;#inquire&quot; class=&quot;rep-btn-ghost mt-8 inline-flex&quot;>Request dossier</a></div></article><article class=&quot;grid items-center gap-8 lg:grid-cols-2 lg:gap-14 lg:[direction:rtl]&quot;><figure class=&quot;rep-card overflow-hidden lg:[direction:ltr]&quot;><div class=&quot;aspect-[4/3] w-full&quot; style=&quot;background:linear-gradient(160deg, var(--color-stone), var(--color-secondary))&quot;></div></figure><div class=&quot;lg:[direction:ltr]&quot;><p class=&quot;rep-font-body text-[0.625rem] uppercase tracking-[0.28em] text-[var(--color-brass)]&quot;>East Hampton</p><h3 class=&quot;rep-font-display mt-3 text-3xl text-[var(--color-foreground)]&quot;>Stonegate Manor</h3><p class=&quot;rep-font-display mt-4 text-2xl text-[var(--color-foreground)]&quot;>$12.2M</p><dl class=&quot;rep-font-body mt-6 flex gap-8 text-sm text-[var(--color-muted)]&quot;><div><dt class=&quot;text-[0.625rem] uppercase tracking-[0.2em]&quot;>Beds</dt><dd class=&quot;mt-1 text-[var(--color-foreground)]&quot;>7</dd></div><div><dt class=&quot;text-[0.625rem] uppercase tracking-[0.2em]&quot;>Sq ft</dt><dd class=&quot;mt-1 text-[var(--color-foreground)]&quot;>11,200</dd></div></dl><a href=&quot;#inquire&quot; class=&quot;rep-btn-ghost mt-8 inline-flex&quot;>Request dossier</a></div></article><article class=&quot;grid items-center gap-8 lg:grid-cols-2 lg:gap-14 &quot;><figure class=&quot;rep-card overflow-hidden &quot;><div class=&quot;aspect-[4/3] w-full&quot; style=&quot;background:linear-gradient(175deg, var(--color-stone), var(--color-secondary))&quot;></div></figure><div class=&quot;&quot;><p class=&quot;rep-font-body text-[0.625rem] uppercase tracking-[0.28em] text-[var(--color-brass)]&quot;>Aspen, Colorado</p><h3 class=&quot;rep-font-display mt-3 text-3xl text-[var(--color-foreground)]&quot;>Alpine Ridge Estate</h3><p class=&quot;rep-font-display mt-4 text-2xl text-[var(--color-foreground)]&quot;>$24.8M</p><dl class=&quot;rep-font-body mt-6 flex gap-8 text-sm text-[var(--color-muted)]&quot;><div><dt class=&quot;text-[0.625rem] uppercase tracking-[0.2em]&quot;>Beds</dt><dd class=&quot;mt-1 text-[var(--color-foreground)]&quot;>5</dd></div><div><dt class=&quot;text-[0.625rem] uppercase tracking-[0.2em]&quot;>Sq ft</dt><dd class=&quot;mt-1 text-[var(--color-foreground)]&quot;>9,600</dd></div></dl><a href=&quot;#inquire&quot; class=&quot;rep-btn-ghost mt-8 inline-flex&quot;>Request dossier</a></div></article></div></div></section><section id=&quot;neighborhoods&quot; data-v2-component=&quot;real-estate-prestige-neighborhoods&quot; aria-labelledby=&quot;rep-neighborhoods-title&quot; class=&quot;rep-section bg-[var(--color-surface)]&quot;><div class=&quot;px-5 sm:px-8 lg:px-10&quot;><header class=&quot;mb-12 max-w-xl&quot;><p class=&quot;rep-eyebrow mb-5&quot;>Studio</p><h2 id=&quot;rep-neighborhoods-title&quot; class=&quot;rep-headline-sm&quot;>Moments from the work</h2><div class=&quot;rep-brass-rule my-6&quot;></div><p class=&quot;rep-body&quot;>Visual proof that feels editorial and intentional.</p></header><figure class=&quot;rep-card mb-12 overflow-hidden&quot;><div class=&quot;aspect-[21/9] w-full bg-[var(--color-stone)]&quot;></div></figure><div class=&quot;grid gap-px border border-[var(--border-subtle)] bg-[var(--border-subtle)] md:grid-cols-3&quot;><article class=&quot;bg-[var(--color-surface)] p-8 lg:p-10&quot;><p class=&quot;rep-font-body text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-brass)]&quot;>4 residences</p><h3 class=&quot;rep-font-display mt-3 text-2xl text-[var(--color-foreground)]&quot;>Upper East Side</h3><p class=&quot;rep-font-body mt-4 text-sm leading-relaxed text-[var(--color-muted)]&quot;>Classic pre-war elegance meets museum-district refinement.</p></article><article class=&quot;bg-[var(--color-surface)] p-8 lg:p-10&quot;><p class=&quot;rep-font-body text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-brass)]&quot;>3 residences</p><h3 class=&quot;rep-font-display mt-3 text-2xl text-[var(--color-foreground)]&quot;>Tribeca</h3><p class=&quot;rep-font-body mt-4 text-sm leading-relaxed text-[var(--color-muted)]&quot;>Loft-scale living with cast-iron character and gallery proximity.</p></article><article class=&quot;bg-[var(--color-surface)] p-8 lg:p-10&quot;><p class=&quot;rep-font-body text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-brass)]&quot;>5 residences</p><h3 class=&quot;rep-font-display mt-3 text-2xl text-[var(--color-foreground)]&quot;>East Hampton</h3><p class=&quot;rep-font-body mt-4 text-sm leading-relaxed text-[var(--color-muted)]&quot;>Oceanfront estates and hedgerow privacy on Long Island&#x27;s gold coast.</p></article></div></div></section><section id=&quot;architecture&quot; data-v2-component=&quot;real-estate-prestige-architecture&quot; aria-labelledby=&quot;rep-arch-title&quot; class=&quot;rep-section&quot;><div class=&quot;px-5 sm:px-8 lg:px-10&quot;><div class=&quot;grid gap-12 lg:grid-cols-12 lg:gap-8&quot;><div class=&quot;lg:col-span-5 lg:pt-8&quot;><p class=&quot;rep-eyebrow mb-5&quot;>Services</p><h2 id=&quot;rep-arch-title&quot; class=&quot;rep-headline-sm&quot;>What we deliver for clients</h2><div class=&quot;rep-brass-rule my-6&quot;></div><p class=&quot;rep-body&quot;>Plain-language offerings with outcomes — ready for a premium business site.</p><ul class=&quot;rep-font-body mt-10 space-y-4 text-sm text-[var(--color-muted)]&quot;><li class=&quot;flex gap-3 border-s-2 border-[var(--color-brass)] ps-4&quot;>Limestone, travertine, and aged brass — materials that deepen with time</li><li class=&quot;flex gap-3 border-s-2 border-[var(--color-brass)] ps-4&quot;>Floor-to-ceiling glazing calibrated for natural light and privacy</li><li class=&quot;flex gap-3 border-s-2 border-[var(--color-brass)] ps-4&quot;>Landscape integration by award-winning garden architects</li></ul></div><div class=&quot;grid gap-4 lg:col-span-7&quot;><figure class=&quot;rep-card overflow-hidden&quot;><div class=&quot;aspect-[16/10] w-full bg-[var(--color-stone)]&quot;></div></figure><figure class=&quot;rep-card ms-auto w-4/5 overflow-hidden&quot;><div class=&quot;aspect-[4/3] w-full bg-[var(--color-stone)]&quot;></div></figure></div></div></div></section><section id=&quot;advisors&quot; data-v2-component=&quot;real-estate-prestige-advisors&quot; aria-labelledby=&quot;rep-advisors-title&quot; class=&quot;rep-section bg-[var(--color-surface)]&quot;><div class=&quot;px-5 sm:px-8 lg:px-10&quot;><header class=&quot;mb-14 max-w-xl&quot;><p class=&quot;rep-eyebrow mb-5&quot;>Advisors</p><h2 id=&quot;rep-advisors-title&quot; class=&quot;rep-headline-sm&quot;>Ready to look established online?</h2><div class=&quot;rep-brass-rule my-6&quot;></div><p class=&quot;rep-body&quot;>Share your goals — we will propose a clear path and timeline.</p></header><div class=&quot;grid gap-8 md:grid-cols-3&quot;><article class=&quot;group&quot;><figure class=&quot;rep-card overflow-hidden&quot;><div class=&quot;aspect-[3/4] w-full&quot; style=&quot;background:var(--color-stone)&quot;></div></figure><div class=&quot;mt-5&quot;><h3 class=&quot;rep-font-display text-xl text-[var(--color-foreground)]&quot;>Eleanor Whitmore</h3><p class=&quot;rep-font-body mt-1 text-sm text-[var(--color-brass)]&quot;>Managing Director</p><p class=&quot;rep-font-body mt-2 text-xs uppercase tracking-[0.2em] text-[var(--color-muted)]&quot;>Manhattan</p></div></article><article class=&quot;group&quot;><figure class=&quot;rep-card overflow-hidden&quot;><div class=&quot;aspect-[3/4] w-full&quot; style=&quot;background:var(--color-stone)&quot;></div></figure><div class=&quot;mt-5&quot;><h3 class=&quot;rep-font-display text-xl text-[var(--color-foreground)]&quot;>James Calder</h3><p class=&quot;rep-font-body mt-1 text-sm text-[var(--color-brass)]&quot;>Senior Advisor</p><p class=&quot;rep-font-body mt-2 text-xs uppercase tracking-[0.2em] text-[var(--color-muted)]&quot;>Hamptons</p></div></article><article class=&quot;group&quot;><figure class=&quot;rep-card overflow-hidden&quot;><div class=&quot;aspect-[3/4] w-full&quot; style=&quot;background:var(--color-stone)&quot;></div></figure><div class=&quot;mt-5&quot;><h3 class=&quot;rep-font-display text-xl text-[var(--color-foreground)]&quot;>Sofia Marchetti</h3><p class=&quot;rep-font-body mt-1 text-sm text-[var(--color-brass)]&quot;>Private Client Lead</p><p class=&quot;rep-font-body mt-2 text-xs uppercase tracking-[0.2em] text-[var(--color-muted)]&quot;>Aspen</p></div></article></div></div></section><section data-v2-component=&quot;real-estate-prestige-testimonials&quot; aria-labelledby=&quot;rep-testimonials-title&quot; class=&quot;rep-section&quot;><div class=&quot;px-5 sm:px-8 lg:px-10&quot;><header class=&quot;mb-14 text-center&quot;><p class=&quot;rep-eyebrow mb-5&quot;>Clients</p><h2 id=&quot;rep-testimonials-title&quot; class=&quot;rep-headline-sm&quot;>Businesses that raised their standard</h2><p class=&quot;rep-body mx-auto mt-4 max-w-lg&quot;>Specific results from professional services teams.</p></header><div class=&quot;grid gap-8 md:grid-cols-2&quot;><blockquote class=&quot;rep-card border-s-2 border-s-[var(--color-brass)] p-8 lg:p-10&quot;><p class=&quot;rep-font-display text-xl italic leading-relaxed text-[var(--color-foreground)]&quot;>“We finally look as professional as the work we deliver — working with Monolith Estate.”</p><footer class=&quot;rep-font-body mt-8 text-[0.6875rem] uppercase tracking-[0.24em] text-[var(--color-muted)]&quot;>— </footer></blockquote><blockquote class=&quot;rep-card border-s-2 border-s-[var(--color-brass)] p-8 lg:p-10&quot;><p class=&quot;rep-font-display text-xl italic leading-relaxed text-[var(--color-foreground)]&quot;>“Inquiries went up after the redesign — messaging is clearer.”</p><footer class=&quot;rep-font-body mt-8 text-[0.6875rem] uppercase tracking-[0.24em] text-[var(--color-muted)]&quot;>— </footer></blockquote><blockquote class=&quot;rep-card border-s-2 border-s-[var(--color-brass)] p-8 lg:p-10&quot;><p class=&quot;rep-font-display text-xl italic leading-relaxed text-[var(--color-foreground)]&quot;>“Clients comment on the site before meetings now.”</p><footer class=&quot;rep-font-body mt-8 text-[0.6875rem] uppercase tracking-[0.24em] text-[var(--color-muted)]&quot;>— </footer></blockquote></div></div></section><section id=&quot;inquire&quot; data-v2-component=&quot;real-estate-prestige-inquiry&quot; aria-labelledby=&quot;rep-inquire-title&quot; class=&quot;rep-section border-t border-[var(--border-subtle)] bg-[var(--color-stone)]/40&quot;><div class=&quot;px-5 sm:px-8 lg:px-10&quot;><div class=&quot;grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20&quot;><div><p class=&quot;rep-eyebrow mb-5&quot;>Inquire</p><h2 id=&quot;rep-inquire-title&quot; class=&quot;rep-headline-sm&quot;>Request a quote</h2><div class=&quot;rep-brass-rule my-6&quot;></div><p class=&quot;rep-body max-w-md&quot;>Tell us about your business and we will respond promptly.</p><p class=&quot;rep-font-body mt-8 text-sm text-[var(--color-muted)]&quot;>All inquiries handled with complete confidentiality.</p></div><form class=&quot;rep-card bg-[var(--color-surface)] p-6 sm:p-8&quot; aria-label=&quot;Private showing inquiry&quot;><div class=&quot;grid gap-5 sm:grid-cols-2&quot;><label class=&quot;block sm:col-span-2&quot;><span class=&quot;rep-font-body mb-2 block text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-muted)]&quot;>Full name</span><input required=&quot;&quot; type=&quot;text&quot; autoComplete=&quot;name&quot; class=&quot;w-full border border-[var(--border-default)] bg-transparent px-4 py-3 rep-font-body text-sm focus:border-[var(--color-brass)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brass)]&quot;/></label><label class=&quot;block&quot;><span class=&quot;rep-font-body mb-2 block text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-muted)]&quot;>Email</span><input required=&quot;&quot; type=&quot;email&quot; autoComplete=&quot;email&quot; class=&quot;w-full border border-[var(--border-default)] bg-transparent px-4 py-3 rep-font-body text-sm focus:border-[var(--color-brass)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brass)]&quot;/></label><label class=&quot;block&quot;><span class=&quot;rep-font-body mb-2 block text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-muted)]&quot;>Phone</span><input type=&quot;tel&quot; autoComplete=&quot;tel&quot; class=&quot;w-full border border-[var(--border-default)] bg-transparent px-4 py-3 rep-font-body text-sm focus:border-[var(--color-brass)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brass)]&quot;/></label><label class=&quot;block sm:col-span-2&quot;><span class=&quot;rep-font-body mb-2 block text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-muted)]&quot;>Preferred market</span><select class=&quot;w-full border border-[var(--border-default)] bg-transparent px-4 py-3 rep-font-body text-sm focus:border-[var(--color-brass)] focus:outline-none&quot;><option>Manhattan</option><option>Hamptons</option><option>Aspen</option><option>Other</option></select></label><label class=&quot;block sm:col-span-2&quot;><span class=&quot;rep-font-body mb-2 block text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-muted)]&quot;>Message</span><textarea rows=&quot;4&quot; class=&quot;w-full resize-none border border-[var(--border-default)] bg-transparent px-4 py-3 rep-font-body text-sm focus:border-[var(--color-brass)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brass)]&quot;></textarea></label><div class=&quot;sm:col-span-2 pt-2&quot;><button type=&quot;submit&quot; class=&quot;rep-btn-primary w-full sm:w-auto&quot;>Get started</button></div></div></form></div></div></section></main><aside data-v2-region=&quot;sidebar&quot; class=&quot;v2-sidebar-rail hidden shrink-0 lg:block lg:w-56 xl:w-64&quot;><nav data-v2-component=&quot;real-estate-prestige-dossier-rail&quot; aria-label=&quot;Property dossier&quot; class=&quot;sticky top-28 hidden lg:block&quot;><p class=&quot;rep-eyebrow mb-6&quot;>Dossier</p><dl class=&quot;mb-10 space-y-4 border-b border-[var(--border-subtle)] pb-8&quot;><div><dt class=&quot;rep-font-body text-[0.625rem] uppercase tracking-[0.2em] text-[var(--color-muted)]&quot;>Price range</dt><dd class=&quot;rep-font-display mt-1 text-xl text-[var(--color-foreground)]&quot;>$4.2M – $28M</dd></div><div><dt class=&quot;rep-font-body text-[0.625rem] uppercase tracking-[0.2em] text-[var(--color-muted)]&quot;>Available</dt><dd class=&quot;rep-font-display mt-1 text-xl text-[var(--color-brass)]&quot;>12 residences</dd></div><div><dt class=&quot;rep-font-body text-[0.625rem] uppercase tracking-[0.2em] text-[var(--color-muted)]&quot;>Markets</dt><dd class=&quot;rep-font-body mt-1 text-sm text-[var(--color-foreground)]&quot;>Manhattan · Hamptons · Aspen</dd></div></dl><ol class=&quot;space-y-1&quot;><li><a href=&quot;#services&quot; class=&quot;group flex items-center gap-3 py-2 transition rep-focus-ring&quot;><span class=&quot;rep-font-body text-[0.625rem] tabular-nums tracking-[0.16em] text-[var(--color-brass)]/70&quot;>01</span><span class=&quot;rep-font-body text-[0.6875rem] uppercase tracking-[0.22em] text-[var(--color-muted)] transition group-hover:text-[var(--color-foreground)]&quot;>Services</span></a></li><li><a href=&quot;#features&quot; class=&quot;group flex items-center gap-3 py-2 transition rep-focus-ring&quot;><span class=&quot;rep-font-body text-[0.625rem] tabular-nums tracking-[0.16em] text-[var(--color-brass)]/70&quot;>02</span><span class=&quot;rep-font-body text-[0.6875rem] uppercase tracking-[0.22em] text-[var(--color-muted)] transition group-hover:text-[var(--color-foreground)]&quot;>Why us</span></a></li><li><a href=&quot;#pricing&quot; class=&quot;group flex items-center gap-3 py-2 transition rep-focus-ring&quot;><span class=&quot;rep-font-body text-[0.625rem] tabular-nums tracking-[0.16em] text-[var(--color-brass)]/70&quot;>03</span><span class=&quot;rep-font-body text-[0.6875rem] uppercase tracking-[0.22em] text-[var(--color-muted)] transition group-hover:text-[var(--color-foreground)]&quot;>Packages</span></a></li><li><a href=&quot;#testimonials&quot; class=&quot;group flex items-center gap-3 py-2 transition rep-focus-ring&quot;><span class=&quot;rep-font-body text-[0.625rem] tabular-nums tracking-[0.16em] text-[var(--color-brass)]/70&quot;>04</span><span class=&quot;rep-font-body text-[0.6875rem] uppercase tracking-[0.22em] text-[var(--color-muted)] transition group-hover:text-[var(--color-foreground)]&quot;>Clients</span></a></li><li><a href=&quot;#contact&quot; class=&quot;group flex items-center gap-3 py-2 transition rep-focus-ring&quot;><span class=&quot;rep-font-body text-[0.625rem] tabular-nums tracking-[0.16em] text-[var(--color-brass)]/70&quot;>05</span><span class=&quot;rep-font-body text-[0.6875rem] uppercase tracking-[0.22em] text-[var(--color-muted)] transition group-hover:text-[var(--color-foreground)]&quot;>Contact</span></a></li></ol><div class=&quot;mt-12 border-t border-[var(--border-subtle)] pt-8&quot;><p class=&quot;rep-eyebrow mb-3&quot;>Concierge</p><a href=&quot;tel:+12125550100&quot; class=&quot;rep-font-body text-sm text-[var(--color-brass)] hover:underline rep-focus-ring&quot;>+1 (212) 555-0100</a></div></nav></aside></div><footer data-v2-region=&quot;footer&quot;><footer data-v2-component=&quot;real-estate-prestige-footer&quot; class=&quot;border-t border-[var(--border-subtle)] bg-[var(--color-primary)] text-[var(--color-linen)]&quot; role=&quot;contentinfo&quot;><div class=&quot;mx-auto max-w-[88rem] px-5 py-16 sm:px-8 lg:px-10&quot;><div class=&quot;grid gap-12 md:grid-cols-[1.5fr_1fr]&quot;><div><p class=&quot;rep-font-display text-3xl&quot;>Monolith Estate</p><p class=&quot;rep-font-body mt-3 max-w-sm text-sm leading-relaxed text-white/60&quot;>Clear messaging and conversion-focused pages that earn trust quickly.</p><address class=&quot;rep-font-body mt-6 not-italic text-sm text-white/50&quot;>900 Madison Avenue, New York</address></div><nav aria-label=&quot;Footer navigation&quot;><p class=&quot;rep-eyebrow text-white/40&quot;>Explore</p><ul class=&quot;mt-4 space-y-3&quot;><li><a href=&quot;#collection&quot; class=&quot;rep-font-body text-sm text-white/65 transition hover:text-[var(--color-brass)] rep-focus-ring&quot;>Collection</a></li><li><a href=&quot;#neighborhoods&quot; class=&quot;rep-font-body text-sm text-white/65 transition hover:text-[var(--color-brass)] rep-focus-ring&quot;>Neighborhoods</a></li><li><a href=&quot;#advisors&quot; class=&quot;rep-font-body text-sm text-white/65 transition hover:text-[var(--color-brass)] rep-focus-ring&quot;>Advisors</a></li><li><a href=&quot;#inquire&quot; class=&quot;rep-font-body text-sm text-white/65 transition hover:text-[var(--color-brass)] rep-focus-ring&quot;>Inquire</a></li></ul></nav></div><div class=&quot;rep-brass-rule mt-14 opacity-40&quot;></div><div class=&quot;mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between&quot;><p class=&quot;rep-font-body text-[0.6875rem] uppercase tracking-[0.22em] text-white/40&quot;>© 2026 Monolith Estate. All rights reserved.</p><div class=&quot;flex gap-6&quot;><a href=&quot;#&quot; class=&quot;rep-font-body text-[0.6875rem] uppercase tracking-[0.18em] text-white/40 hover:text-[var(--color-brass)]&quot;>Privacy</a><a href=&quot;#&quot; class=&quot;rep-font-body text-[0.6875rem] uppercase tracking-[0.18em] text-white/40 hover:text-[var(--color-brass)]&quot;>Fair Housing</a></div></div></div></footer></footer></div>
+  </div>
+  <section class=&quot;page v2-secondary-page&quot; id=&quot;listings&quot;>
+  <div class=&quot;mx-auto max-w-3xl px-6 py-16&quot;>
+    <p class=&quot;text-xs uppercase tracking-widest text-[var(--color-foreground)]/50&quot;>listings</p>
+    <pre class=&quot;mt-4 overflow-x-auto rounded border border-[var(--color-foreground)]/10 p-4 text-xs text-[var(--color-foreground)]/70&quot;>export default function Listings(){return &lt;main&gt;Listings&lt;/main&gt;}</pre>
+    <a class=&quot;mt-6 inline-block text-sm text-[var(--color-accent,#B87333)]&quot; href=&quot;#home&quot;>Back to home</a>
+  </div>
+</section>
+<section class=&quot;page v2-secondary-page&quot; id=&quot;neighborhoods&quot;>
+  <div class=&quot;mx-auto max-w-3xl px-6 py-16&quot;>
+    <p class=&quot;text-xs uppercase tracking-widest text-[var(--color-foreground)]/50&quot;>neighborhoods</p>
+    <h1 class=&quot;mt-4 text-3xl font-semibold text-[var(--color-foreground)]&quot;>neighborhoods</h1>
+    <p class=&quot;mt-4 text-[var(--color-foreground)]/70&quot;>neighborhoods — Monolith Estate</p>
+    <a class=&quot;mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]&quot; href=&quot;#home&quot;>Back to home</a>
+  </div>
+</section>
+<section class=&quot;page v2-secondary-page&quot; id=&quot;contact&quot;>
+  <div class=&quot;mx-auto max-w-3xl px-6 py-16&quot;>
+    <p class=&quot;text-xs uppercase tracking-widest text-[var(--color-foreground)]/50&quot;>contact</p>
+    <h1 class=&quot;mt-4 text-3xl font-semibold text-[var(--color-foreground)]&quot;>contact</h1>
+    <p class=&quot;mt-4 text-[var(--color-foreground)]/70&quot;>contact — Monolith Estate</p>
+    <a class=&quot;mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]&quot; href=&quot;#home&quot;>Back to home</a>
+  </div>
+</section>
+</body>
+</html>"></iframe>
+  </div>
+</div>
+</body>
+</html>

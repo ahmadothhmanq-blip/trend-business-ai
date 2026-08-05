@@ -1,0 +1,16 @@
+{
+  "pageId": "home",
+  "layoutId": "editorial-reveal",
+  "regions": {
+    "main": [
+      "creative-agency-premium-hero",
+      "creative-agency-premium-selected-work",
+      "creative-agency-premium-case-grid",
+      "creative-agency-premium-manifesto",
+      "creative-agency-premium-capabilities",
+      "creative-agency-premium-process",
+      "creative-agency-premium-collaborate-cta"
+    ],
+    "overlay": ["creative-agency-premium-overlay-showcase"]
+  }
+}

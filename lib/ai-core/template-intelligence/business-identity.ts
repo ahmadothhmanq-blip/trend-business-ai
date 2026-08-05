@@ -11,6 +11,7 @@
 
 import type { ProductionContentPack } from "@/lib/ai-core/content/production-content";
 import { buildProductionContentPack } from "@/lib/ai-core/content/production-content";
+import { getComposeUiFallbacks } from "@/lib/ai-core/content/content-language";
 import { getBrandPreset } from "@/lib/ai-core/brand-identity/presets";
 import type { TemplateIntelligenceDefinition } from "@/lib/ai-core/template-intelligence/types";
 import type { GeneratedWebsiteProject } from "@/plugins/website/types";
@@ -114,21 +115,53 @@ export function buildProductionContentFromProject(
     project.designSystem?.industryPattern ||
     "business";
 
-  const heroHeadline =
+  const tbgeBusiness = (
+    project as {
+      tbgeSpec?: {
+        business?: {
+          name?: string;
+          offer?: string;
+          tone?: string;
+          geography?: string;
+        };
+      };
+    }
+  ).tbgeSpec?.business;
+
+  let heroHeadline =
     project.title?.trim() ||
     profile?.projectName?.trim() ||
     blocks[0] ||
     "Brand";
-  const heroSubheadline =
+  let heroSubheadline =
     project.description?.trim() ||
     profile?.summary?.trim() ||
     blocks[1] ||
     "";
+  if (tbgeBusiness?.offer) {
+    heroSubheadline = tbgeBusiness.offer.trim() || heroSubheadline;
+    if (
+      heroHeadline === tbgeBusiness.name ||
+      heroHeadline === profile?.projectName
+    ) {
+      const offerLead = tbgeBusiness.offer.split(/[.!?]/)[0]?.trim();
+      if (offerLead && offerLead.length > 12) {
+        heroHeadline = offerLead;
+      }
+    }
+    const normalizedOffer = heroSubheadline.replace(/\.\s*$/, "");
+    if (heroHeadline === normalizedOffer && tbgeBusiness.geography) {
+      heroSubheadline = `Serving ${tbgeBusiness.geography}`;
+    } else if (heroHeadline === normalizedOffer && tbgeBusiness.tone) {
+      heroSubheadline = tbgeBusiness.tone;
+    }
+  }
+  const uiFallbacks = getComposeUiFallbacks(language);
   const primaryCta =
     strategy?.ctas?.[0] ||
     strategy?.pages?.[0]?.primaryCta ||
-    "Get started";
-  const secondaryCta = strategy?.ctas?.[1] || "Learn more";
+    uiFallbacks.primaryCta;
+  const secondaryCta = strategy?.ctas?.[1] || uiFallbacks.secondaryCta;
 
   const serviceDescriptions =
     strategy?.sectionPlan

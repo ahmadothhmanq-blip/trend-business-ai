@@ -1,0 +1,63 @@
+{
+  "generatedAt": "2026-08-03T22:20:55.234Z",
+  "phase": "quality-1",
+  "schemaVersion": "1.0.0",
+  "testsPassed": true,
+  "exitCode": 0,
+  "checks": [
+    {
+      "id": "constants",
+      "ok": true
+    },
+    {
+      "id": "lifecycle",
+      "ok": true
+    },
+    {
+      "id": "evaluate",
+      "ok": true
+    },
+    {
+      "id": "improve",
+      "ok": true
+    },
+    {
+      "id": "pipeline",
+      "ok": true
+    },
+    {
+      "id": "validation",
+      "ok": true
+    },
+    {
+      "id": "improvementReport",
+      "ok": true
+    },
+    {
+      "id": "settingsPatch",
+      "ok": true
+    },
+    {
+      "id": "masterPlanImmutable",
+      "ok": true
+    },
+    {
+      "id": "providerIndependent",
+      "ok": true
+    }
+  ],
+  "performance": {
+    "note": "AWQE pipeline is synchronous, <5ms per call",
+    "noLlmCalls": true,
+    "noNetworkCalls": true,
+    "noAiProvider": true
+  },
+  "backwardCompatibility": {
+    "masterPlanUnchanged": true,
+    "tbdpUnchanged": true,
+    "glsUnchanged": true,
+    "builderUnchanged": true,
+    "templatesUnchanged": true,
+    "notWired": true
+  }
+}

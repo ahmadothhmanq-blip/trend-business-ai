@@ -1,0 +1,16 @@
+{
+  "pageId": "home",
+  "layoutId": "full-bleed",
+  "regions": {
+    "overlay": ["medical-premium-trust-hero"],
+    "utility": ["medical-premium-appointment-band"],
+    "main": [
+      "medical-premium-specialties",
+      "medical-premium-physicians",
+      "medical-premium-care-journey",
+      "medical-premium-wellness",
+      "medical-premium-testimonials",
+      "medical-premium-contact"
+    ]
+  }
+}

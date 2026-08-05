@@ -1,0 +1,7 @@
+{
+  "pageId": "customers",
+  "layoutId": "default",
+  "regions": {
+    "main": ["education-premium-hero", "education-premium-portfolio", "education-premium-features"]
+  }
+}

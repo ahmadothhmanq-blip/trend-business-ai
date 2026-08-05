@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en" data-v2-render="v2-files" data-v2-package="hotel-resort-premium" data-v2-layout="sidebar-left">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Azure Haven Resort — Live Preview</title>
+  <style>/* Template Architecture V2 — hotel-resort-premium · spec 2.0.0 */
+:root {
+  --v2-package: "hotel-resort-premium";
+  --color-primary: #0C2340;
+  --color-secondary: #1A4A6E;
+  --color-accent: #C9A96E;
+  --color-background: #F8F6F2;
+  --color-foreground: #0C2340;
+  --color-muted: rgba(12,35,64,0.58);
+  --color-surface: #FFFFFF;
+  --color-sand: #E8DFD0;
+  --color-lagoon: #2A7F8F;
+  --color-pearl: #FDFBF7;
+  --font-display: "Cormorant Garamond", ui-sans-serif, system-ui, sans-serif;
+  --font-body: Jost, ui-sans-serif, system-ui, sans-serif;
+  --spacing-unit: 0.25rem;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --shadow-surface: 0 8px 32px rgba(12,35,64,0.1);
+  --shadow-glow: 0 0 72px rgba(201,169,110,0.14);
+  --shadow-card: 0 1px 3px rgba(12,35,64,0.04), 0 12px 40px rgba(12,35,64,0.06);
+  --border-default: rgba(12,35,64,0.08);
+  --border-accent: rgba(201,169,110,0.24);
+  --border-subtle: rgba(12,35,64,0.04);
+}
+
+/* V2 language profile — RTL typography adaptation */
+[dir="rtl"] {
+  --font-display: Amiri, ui-serif, Georgia, serif;
+  --font-body: "Noto Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Amiri:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Noto+Sans+Arabic:wght@400;500;600&display=swap");
+
+@keyframes hr-reveal-hero {
+  from { opacity: 0; transform: translateY(36px); filter: blur(6px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+@keyframes hr-reveal-section {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes hr-draw-line {
+  from { transform: scaleX(0); opacity: 0; }
+  to { transform: scaleX(1); opacity: 1; }
+}
+@keyframes hr-scroll-pulse {
+  0%, 100% { opacity: 0.35; transform: scaleY(0.6); }
+  50% { opacity: 1; transform: scaleY(1); }
+}
+@keyframes hr-ken-burns {
+  from { transform: scale(1.04); }
+  to { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hr-motion, [data-hr-motion] { animation: none !important; transition: none !important; }
+}
+
+.hr-font-display { font-family: var(--font-display), "Cormorant Garamond", Georgia, serif; }
+.hr-font-body { font-family: var(--font-body), "DM Sans", system-ui, sans-serif; }
+.hr-eyebrow {
+  font-family: var(--font-body), "DM Sans", system-ui, sans-serif;
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: var(--color-copper, #D4A574);
+}
+.hr-headline {
+  font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(2.5rem, 5.5vw, 4.25rem);
+  font-weight: 400;
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  color: var(--color-foreground);
+}
+.hr-body {
+  font-family: var(--font-body), "DM Sans", system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  color: color-mix(in srgb, var(--color-foreground) 68%, transparent);
+}
+.hr-copper-rule {
+  height: 1px;
+  width: 4rem;
+  background: linear-gradient(90deg, var(--color-copper, #D4A574), transparent);
+  transform-origin: left;
+}
+[dir="rtl"] .hr-copper-rule { transform-origin: right; }
+.hr-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.875rem 2rem;
+  font-family: var(--font-body), "DM Sans", system-ui, sans-serif;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-linen, #FFFCF7);
+  background: var(--color-accent, #B87333);
+  border: 1px solid color-mix(in srgb, var(--color-copper) 40%, transparent);
+  transition: background 0.4s ease, box-shadow 0.4s ease, transform 0.35s ease;
+}
+.hr-btn-primary:hover {
+  background: var(--color-copper, #D4A574);
+  box-shadow: var(--shadow-glow);
+}
+.hr-btn-primary:focus-visible {
+  outline: 2px solid var(--color-copper);
+  outline-offset: 3px;
+}
+.hr-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0.875rem 1.75rem;
+  font-family: var(--font-body), "DM Sans", system-ui, sans-serif;
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: color-mix(in srgb, var(--color-foreground) 85%, transparent);
+  border: 1px solid var(--border-copper, rgba(212,165,116,0.32));
+  background: transparent;
+  transition: border-color 0.35s ease, color 0.35s ease;
+}
+.hr-btn-ghost:hover { border-color: var(--color-copper); color: var(--color-copper); }
+.hr-btn-ghost:focus-visible { outline: 2px solid var(--color-copper); outline-offset: 3px; }
+.hr-section { padding-block: clamp(5rem, 12vw, 8rem); }
+.hr-grain::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.hr-focus-ring:focus-visible { outline: 2px solid var(--color-copper); outline-offset: 2px; }
+
+.hr-card {
+  border: 1px solid var(--border-subtle, rgba(244,237,228,0.06));
+  background: var(--color-surface);
+  border-radius: var(--radius-md, 4px);
+  box-shadow: var(--shadow-surface);
+  transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hr-card:hover {
+  border-color: color-mix(in srgb, var(--color-copper) 35%, transparent);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+.hr-section-alt {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-primary) 6%, var(--color-background)), var(--color-background));
+}
+.hr-headline-sm {
+  font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(1.75rem, 3.2vw, 2.5rem);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  color: var(--color-foreground);
+}
+.hr-metric {
+  font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 400;
+  line-height: 1;
+  color: var(--color-copper, #D4A574);
+}
+
+.hr-grain {
+  position: relative;
+}
+.hr-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* TBDP Native Consumption — hotel-resort-premium
+   sector:hotel-resort · experience:hospitality, luxury, editorial
+   identity:azure-haven · context:a1557d10f1db1e90
+   integration:5.0.0 · consumption:1.0.0 */
+:root {
+  --tbdp-native: 1;
+  --tbdp-native-package: "hotel-resort-premium";
+  --tbdp-sector-dna: "hotel-resort";
+  --tbdp-template-identity: "azure-haven";
+  --tbdp-experience-primary: "hospitality";
+  --tbdp-context-hash: "a1557d10f1db1e90";
+  --tbdp-theme-mode: "light";
+  --tbdp-direction: "ltr";
+}
+
+/* TBDP Foundations — official design authority (scoped vars) */
+/* Trend Business AI Design Platform · 1.0.0 · foundations-1 */
+:root {
+  --tbdp-color-primary: #0047E6;
+  --tbdp-color-secondary: #334155;
+  --tbdp-color-accent: #4D85FF;
+  --tbdp-color-success: #10B981;
+  --tbdp-color-warning: #F59E0B;
+  --tbdp-color-danger: #EF4444;
+  --tbdp-color-info: #3B82F6;
+  --tbdp-color-surface-base: #FFFFFF;
+  --tbdp-color-surface-raised: #F8FAFC;
+  --tbdp-color-surface-overlay: #FFFFFF;
+  --tbdp-color-surface-sunken: #F1F5F9;
+  --tbdp-color-surface-inverse: #0F172A;
+  --tbdp-color-background-canvas: #F8FAFC;
+  --tbdp-color-background-subtle: #F1F5F9;
+  --tbdp-color-background-emphasis: #FFFFFF;
+  --tbdp-color-background-inverse: #020617;
+  --tbdp-color-text-primary: #0F172A;
+  --tbdp-color-text-secondary: #475569;
+  --tbdp-color-text-tertiary: #64748B;
+  --tbdp-color-text-disabled: #94A3B8;
+  --tbdp-color-text-inverse: #FFFFFF;
+  --tbdp-color-text-link: #0047E6;
+  --tbdp-color-text-linkHover: #0038B8;
+  --tbdp-color-border-default: #E2E8F0;
+  --tbdp-color-border-subtle: #F1F5F9;
+  --tbdp-color-border-strong: #CBD5E1;
+  --tbdp-color-border-focus: #1A5CFF;
+  --tbdp-color-border-inverse: rgba(255, 255, 255, 0.16);
+  --tbdp-color-overlay-scrim: rgba(2, 6, 23, 0.4);
+  --tbdp-color-overlay-scrimStrong: rgba(2, 6, 23, 0.64);
+  --tbdp-color-overlay-backdrop: rgba(2, 6, 23, 0.24);
+  --tbdp-color-overlay-highlight: rgba(26, 92, 255, 0.12);
+  --tbdp-opacity-transparent: 0;
+  --tbdp-opacity-subtle: 0.04;
+  --tbdp-opacity-muted: 0.08;
+  --tbdp-opacity-soft: 0.12;
+  --tbdp-opacity-medium: 0.24;
+  --tbdp-opacity-strong: 0.48;
+  --tbdp-opacity-opaque: 1;
+  --tbdp-spacing-micro: 0.125rem;
+  --tbdp-spacing-xs: 0.25rem;
+  --tbdp-spacing-sm: 0.5rem;
+  --tbdp-spacing-md: 1rem;
+  --tbdp-spacing-lg: 1.5rem;
+  --tbdp-spacing-xl: 2rem;
+  --tbdp-spacing-2xl: 3rem;
+  --tbdp-spacing-3xl: 4rem;
+  --tbdp-spacing-4xl: 6rem;
+  --tbdp-radius-sharp: 0;
+  --tbdp-radius-sm: 0.25rem;
+  --tbdp-radius-md: 0.5rem;
+  --tbdp-radius-lg: 0.75rem;
+  --tbdp-radius-pill: 9999px;
+  --tbdp-radius-circle: 50%;
+  --tbdp-shadow-0: none;
+  --tbdp-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-2: 0 2px 8px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-3: 0 8px 24px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);
+  --tbdp-shadow-4: 0 16px 48px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.08);
+  --tbdp-shadow-5: 0 24px 64px rgba(15, 23, 42, 0.18), 0 8px 24px rgba(15, 23, 42, 0.1);
+  --tbdp-container-sm: 640px;
+  --tbdp-container-md: 768px;
+  --tbdp-container-lg: 1024px;
+  --tbdp-container-xl: 1280px;
+  --tbdp-container-2xl: 1440px;
+  --tbdp-container-full: 100%;
+  --tbdp-font-display: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --tbdp-font-body: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --tbdp-font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", monospace;
+}
+
+/* TBDP Experience — motion, interaction, RTL, accessibility */
+/* TBDP Phase 3 — Motion System · tbdp-xp */
+
+@keyframes tbdp-xp-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes tbdp-xp-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes tbdp-xp-rise {
+  from { opacity: 0; transform: translateY(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tbdp-xp-rise-rtl {
+  from { opacity: 0; transform: translateX(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes tbdp-xp-slide-end {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-slide-start {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(calc(var(--tbdp-spacing-sm) * -1)); }
+  40%, 80% { transform: translateX(var(--tbdp-spacing-sm)); }
+}
+
+@keyframes tbdp-xp-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@keyframes tbdp-xp-lift {
+  to { transform: translateY(calc(var(--tbdp-spacing-sm) * -1)); box-shadow: var(--tbdp-shadow-2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp-motion] { animation: none !important; transition: none !important; }
+}
+
+[data-tbdp-xp-motion] { will-change: transform, opacity; }
+[data-tbdp-xp-motion="page-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="page-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="section-reveal"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-headline"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-media"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="card-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="grid-stagger"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="modal-enter"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="modal-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="drawer-slide"] { animation-name: tbdp-xp-slide-end; }
+[data-tbdp-xp-motion="toast-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="toast-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="tooltip-fade"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="scroll-reveal-up"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="stagger-children"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hover-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="focus-ring"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="success-pulse"] { animation-name: tbdp-xp-pulse; }
+[data-tbdp-xp-motion="error-shake"] { animation-name: tbdp-xp-shake; }
+
+/* TBDP Experience — interaction utilities */
+[data-tbdp-xp] { --tbdp-xp-focus: var(--tbdp-color-border-focus); }
+[data-tbdp-xp-feedback="loading"] { cursor: wait; }
+[data-tbdp-xp-feedback="error"] { border-color: var(--tbdp-color-danger); }
+[data-tbdp-xp-feedback="success"] { border-color: var(--tbdp-color-success); }
+[data-tbdp-xp-touch="true"] { min-height: var(--tbdp-spacing-2xl); min-width: var(--tbdp-spacing-2xl); }
+[data-tbdp-xp-gpu] { transform: translateZ(0); backface-visibility: hidden; }
+[data-tbdp-xp-contain] { content-visibility: auto; contain-intrinsic-size: auto 500px; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp], [data-tbdp-xp-motion] { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+/* V2 sidebar-left layout */
+.v2-layout-sidebar-left .v2-sidebar-shell { gap: 0; align-items: flex-start; }
+.v2-sidebar-rail {
+  border-inline-end: 1px solid var(--border-subtle, rgba(244,237,228,0.06));
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-inline-end: clamp(1.25rem, 3vw, 2rem);
+}
+[dir='rtl'] .v2-sidebar-rail { border-inline-end: none; border-inline-start: 1px solid var(--border-subtle, rgba(244,237,228,0.06)); }
+.v2-main-canvas > [data-v2-component] + [data-v2-component] { margin-top: 0; }
+.v2-layout-sidebar-left .v2-main-canvas { padding-inline-start: 0; }
+@media (max-width: 1023px) {
+  .v2-sidebar-rail { display: none !important; }
+}
+
+/* V2 sidebar-right layout */
+.v2-layout-sidebar-right .v2-sidebar-shell { gap: 0; align-items: flex-start; }
+.v2-layout-sidebar-right .v2-sidebar-rail {
+  border-inline-start: 1px solid var(--border-subtle, rgba(28,25,23,0.06));
+  border-inline-end: none;
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-inline-start: clamp(1.25rem, 3vw, 2rem);
+}
+[dir='rtl'] .v2-layout-sidebar-right .v2-sidebar-rail {
+  border-inline-start: none;
+  border-inline-end: 1px solid var(--border-subtle, rgba(28,25,23,0.06));
+}
+
+/* V2 full-bleed layout */
+.v2-layout-full-bleed .v2-overlay-canvas { width: 100%; }
+.v2-layout-full-bleed .v2-main-canvas { width: 100%; max-width: var(--container-max, 76rem); margin-inline: auto; }
+
+/* V2 editorial-reveal layout (creative portfolio) */
+.v2-layout-editorial-reveal .v2-main-canvas { width: 100%; }
+.v2-layout-editorial-reveal .v2-overlay-reveal { width: 100%; }
+
+:root {
+  --container-max: 82rem;
+  --font-body: Jost, ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Cormorant Garamond", ui-sans-serif, system-ui, sans-serif;
+  --color-surface: #FFFFFF;
+  --color-foreground: #0C2340;
+  --color-background: #F8F6F2;
+  --color-accent: #C9A96E;
+  --color-secondary: #1A4A6E; --color-primary: #0C2340; }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--color-background, #0f172a);
+      color: var(--color-foreground, #f8fafc);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .page { display: none; padding-bottom: 2rem; }
+    .page:target { display: block; }
+    body:not(:has(.page:target)) .page#home { display: block; }
+    img { max-width: 100%; height: auto; display: block; }
+    a { color: inherit; }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+<style id="tbdp-wiring-layer">
+/* TBDP Integration Layer — advisory token layer */
+
+/* Trend Business AI Design Platform · 1.0.0 · foundations-1 */
+:root {
+  --tbdp-color-primary: #0047E6;
+  --tbdp-color-secondary: #334155;
+  --tbdp-color-accent: #4D85FF;
+  --tbdp-color-success: #10B981;
+  --tbdp-color-warning: #F59E0B;
+  --tbdp-color-danger: #EF4444;
+  --tbdp-color-info: #3B82F6;
+  --tbdp-color-surface-base: #FFFFFF;
+  --tbdp-color-surface-raised: #F8FAFC;
+  --tbdp-color-surface-overlay: #FFFFFF;
+  --tbdp-color-surface-sunken: #F1F5F9;
+  --tbdp-color-surface-inverse: #0F172A;
+  --tbdp-color-background-canvas: #F8FAFC;
+  --tbdp-color-background-subtle: #F1F5F9;
+  --tbdp-color-background-emphasis: #FFFFFF;
+  --tbdp-color-background-inverse: #020617;
+  --tbdp-color-text-primary: #0F172A;
+  --tbdp-color-text-secondary: #475569;
+  --tbdp-color-text-tertiary: #64748B;
+  --tbdp-color-text-disabled: #94A3B8;
+  --tbdp-color-text-inverse: #FFFFFF;
+  --tbdp-color-text-link: #0047E6;
+  --tbdp-color-text-linkHover: #0038B8;
+  --tbdp-color-border-default: #E2E8F0;
+  --tbdp-color-border-subtle: #F1F5F9;
+  --tbdp-color-border-strong: #CBD5E1;
+  --tbdp-color-border-focus: #1A5CFF;
+  --tbdp-color-border-inverse: rgba(255, 255, 255, 0.16);
+  --tbdp-color-overlay-scrim: rgba(2, 6, 23, 0.4);
+  --tbdp-color-overlay-scrimStrong: rgba(2, 6, 23, 0.64);
+  --tbdp-color-overlay-backdrop: rgba(2, 6, 23, 0.24);
+  --tbdp-color-overlay-highlight: rgba(26, 92, 255, 0.12);
+  --tbdp-opacity-transparent: 0;
+  --tbdp-opacity-subtle: 0.04;
+  --tbdp-opacity-muted: 0.08;
+  --tbdp-opacity-soft: 0.12;
+  --tbdp-opacity-medium: 0.24;
+  --tbdp-opacity-strong: 0.48;
+  --tbdp-opacity-opaque: 1;
+  --tbdp-spacing-micro: 0.125rem;
+  --tbdp-spacing-xs: 0.25rem;
+  --tbdp-spacing-sm: 0.5rem;
+  --tbdp-spacing-md: 1rem;
+  --tbdp-spacing-lg: 1.5rem;
+  --tbdp-spacing-xl: 2rem;
+  --tbdp-spacing-2xl: 3rem;
+  --tbdp-spacing-3xl: 4rem;
+  --tbdp-spacing-4xl: 6rem;
+  --tbdp-radius-sharp: 0;
+  --tbdp-radius-sm: 0.25rem;
+  --tbdp-radius-md: 0.5rem;
+  --tbdp-radius-lg: 0.75rem;
+  --tbdp-radius-pill: 9999px;
+  --tbdp-radius-circle: 50%;
+  --tbdp-shadow-0: none;
+  --tbdp-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-2: 0 2px 8px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-3: 0 8px 24px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);
+  --tbdp-shadow-4: 0 16px 48px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.08);
+  --tbdp-shadow-5: 0 24px 64px rgba(15, 23, 42, 0.18), 0 8px 24px rgba(15, 23, 42, 0.1);
+  --tbdp-container-sm: 640px;
+  --tbdp-container-md: 768px;
+  --tbdp-container-lg: 1024px;
+  --tbdp-container-xl: 1280px;
+  --tbdp-container-2xl: 1440px;
+  --tbdp-container-full: 100%;
+  --tbdp-font-display: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --tbdp-font-body: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --tbdp-font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", monospace;
+}
+
+/* TBDP Phase 3 — Motion System · tbdp-xp */
+
+@keyframes tbdp-xp-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes tbdp-xp-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes tbdp-xp-rise {
+  from { opacity: 0; transform: translateY(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tbdp-xp-rise-rtl {
+  from { opacity: 0; transform: translateX(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes tbdp-xp-slide-end {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-slide-start {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(calc(var(--tbdp-spacing-sm) * -1)); }
+  40%, 80% { transform: translateX(var(--tbdp-spacing-sm)); }
+}
+
+@keyframes tbdp-xp-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@keyframes tbdp-xp-lift {
+  to { transform: translateY(calc(var(--tbdp-spacing-sm) * -1)); box-shadow: var(--tbdp-shadow-2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp-motion] { animation: none !important; transition: none !important; }
+}
+
+[data-tbdp-xp-motion] { will-change: transform, opacity; }
+[data-tbdp-xp-motion="page-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="page-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="section-reveal"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-headline"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-media"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="card-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="grid-stagger"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="modal-enter"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="modal-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="drawer-slide"] { animation-name: tbdp-xp-slide-end; }
+[data-tbdp-xp-motion="toast-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="toast-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="tooltip-fade"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="scroll-reveal-up"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="stagger-children"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hover-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="focus-ring"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="success-pulse"] { animation-name: tbdp-xp-pulse; }
+[data-tbdp-xp-motion="error-shake"] { animation-name: tbdp-xp-shake; }
+
+/* TBDP Experience — interaction utilities */
+[data-tbdp-xp] { --tbdp-xp-focus: var(--tbdp-color-border-focus); }
+[data-tbdp-xp-feedback="loading"] { cursor: wait; }
+[data-tbdp-xp-feedback="error"] { border-color: var(--tbdp-color-danger); }
+[data-tbdp-xp-feedback="success"] { border-color: var(--tbdp-color-success); }
+[data-tbdp-xp-touch="true"] { min-height: var(--tbdp-spacing-2xl); min-width: var(--tbdp-spacing-2xl); }
+[data-tbdp-xp-gpu] { transform: translateZ(0); backface-visibility: hidden; }
+[data-tbdp-xp-contain] { content-visibility: auto; contain-intrinsic-size: auto 500px; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp], [data-tbdp-xp-motion] { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+  <div class="page" id="home">
+    <link rel="preload" as="image" href="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" fetchPriority="high"/><div class="flex min-h-screen flex-col bg-[var(--color-background)] text-[var(--color-foreground)] antialiased v2-template v2-hotel-resort-premium v2-layout-sidebar-left" data-v2-package="hotel-resort-premium" data-v2-composer="region-grid" data-v2-layout="sidebar-left"><header data-v2-region="header"><header data-v2-component="hotel-resort-premium-nav" class="fixed inset-x-0 top-0 z-[60] transition-all duration-500 border-b border-transparent bg-transparent"><div class="mx-auto flex h-[4.5rem] max-w-[90rem] items-center justify-between gap-6 px-5 sm:px-8 lg:px-10"><a href="#top" class="hr-font-display text-lg tracking-[0.06em] text-[var(--color-foreground)] transition hover:text-[var(--color-copper)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-copper)]">Azure Haven Resort</a><nav aria-label="Primary" class="hidden items-center gap-10 lg:flex"><a href="#menu" class="hr-font-body text-[0.625rem] font-medium uppercase tracking-[0.32em] text-[var(--color-muted)] transition hover:text-[var(--color-copper)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-copper)]">Menu</a><a href="#chef" class="hr-font-body text-[0.625rem] font-medium uppercase tracking-[0.32em] text-[var(--color-muted)] transition hover:text-[var(--color-copper)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-copper)]">Chef</a><a href="#gallery" class="hr-font-body text-[0.625rem] font-medium uppercase tracking-[0.32em] text-[var(--color-muted)] transition hover:text-[var(--color-copper)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-copper)]">Gallery</a><a href="#reservation" class="hr-font-body text-[0.625rem] font-medium uppercase tracking-[0.32em] text-[var(--color-muted)] transition hover:text-[var(--color-copper)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-copper)]">Reserve</a></nav><div class="flex items-center gap-3"><a href="#reservation" class="hr-btn-primary hidden sm:inline-flex">Get started</a><button type="button" aria-expanded="false" aria-controls="hr-mobile-nav" aria-label="Open menu" class="inline-flex h-11 w-11 items-center justify-center border border-[var(--border-subtle)] text-[var(--color-foreground)] lg:hidden hr-focus-ring"><span class="sr-only">Menu</span><span aria-hidden="true" class="flex flex-col gap-1.5"><span class="block h-px w-5 bg-current transition "></span><span class="block h-px w-5 bg-current transition "></span><span class="block h-px w-5 bg-current transition "></span></span></button></div></div></header></header><div class="v2-sidebar-shell mx-auto flex w-full max-w-[var(--container-max,82rem)] flex-col lg:flex-row"><h1 class="sr-only text-4xl font-bold">Azure Haven Resort</h1><aside data-v2-region="sidebar" class="v2-sidebar-rail hidden shrink-0 lg:block lg:w-56 xl:w-64"><nav data-v2-component="hotel-resort-premium-sidebar-rail" aria-label="Page chapters" class="sticky top-28 hidden lg:block"><p class="hr-eyebrow mb-8">Chapters</p><ol class="space-y-1 border-s border-[var(--border-subtle)] ps-4"><li><a href="#menu" class="group flex items-baseline gap-3 py-2 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-copper)]"><span class="hr-font-body text-[0.625rem] tabular-nums tracking-[0.2em] text-[var(--color-copper)]/70">01</span><span class="hr-font-body text-[0.6875rem] uppercase tracking-[0.26em] text-[var(--color-muted)] transition group-hover:text-[var(--color-foreground)]">Menu</span></a></li><li><a href="#chef" class="group flex items-baseline gap-3 py-2 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-copper)]"><span class="hr-font-body text-[0.625rem] tabular-nums tracking-[0.2em] text-[var(--color-copper)]/70">02</span><span class="hr-font-body text-[0.6875rem] uppercase tracking-[0.26em] text-[var(--color-muted)] transition group-hover:text-[var(--color-foreground)]">Chef</span></a></li><li><a href="#gallery" class="group flex items-baseline gap-3 py-2 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-copper)]"><span class="hr-font-body text-[0.625rem] tabular-nums tracking-[0.2em] text-[var(--color-copper)]/70">03</span><span class="hr-font-body text-[0.6875rem] uppercase tracking-[0.26em] text-[var(--color-muted)] transition group-hover:text-[var(--color-foreground)]">Gallery</span></a></li><li><a href="#reservation" class="group flex items-baseline gap-3 py-2 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-copper)]"><span class="hr-font-body text-[0.625rem] tabular-nums tracking-[0.2em] text-[var(--color-copper)]/70">04</span><span class="hr-font-body text-[0.6875rem] uppercase tracking-[0.26em] text-[var(--color-muted)] transition group-hover:text-[var(--color-foreground)]">Reserve</span></a></li></ol><div class="mt-12 space-y-3 border-t border-[var(--border-subtle)] pt-8"><p class="hr-eyebrow">Hours</p><p class="hr-font-body text-xs leading-relaxed text-[var(--color-muted)]">Tue–Sat · 6pm – 11pm<br/>Sun · Closed</p><a href="tel:+12125550188" class="hr-font-body inline-block text-xs uppercase tracking-[0.22em] text-[var(--color-copper)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-copper)]">+1 (212) 555-0188</a></div></nav></aside><main data-v2-region="main" class="v2-main-canvas min-w-0 flex-1"><section id="top" data-v2-component="hotel-resort-premium-hero" aria-labelledby="hr-hero-title" class="relative min-h-[100svh] overflow-hidden bg-[var(--color-background)]"><div class="absolute inset-0 hr-grain" aria-hidden="true"><img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="Luxury coastal resort with infinity pool and ocean views at sunset" class="h-full w-full object-cover object-[center_35%] motion-safe:animate-[hr-ken-burns_14s_ease-out_both]" fetchPriority="high"/><div class="absolute inset-0 bg-gradient-to-t from-[var(--color-background)] via-[var(--color-background)]/78 to-[var(--color-background)]/20"></div><div class="absolute inset-0 bg-gradient-to-r from-[var(--color-background)]/92 via-[var(--color-background)]/40 to-transparent"></div></div><div class="relative z-10 flex min-h-[100svh] flex-col justify-end px-5 pb-16 pt-32 sm:px-8 sm:pb-24 lg:px-10 lg:pb-32"><div class="max-w-3xl"><div class="mb-6 flex flex-wrap items-center gap-3 motion-safe:animate-[hr-reveal-section_1s_cubic-bezier(0.22,1,0.36,1)_0.05s_both]"><p class="hr-eyebrow">Azure Haven · coastal sanctuary</p><span class="hr-font-body rounded-full border border-[var(--border-copper,rgba(212,165,116,0.32))] px-3 py-1 text-[0.625rem] uppercase tracking-[0.2em] text-[var(--color-copper)]">Forbes Five-Star · 2026</span></div><h1 id="hr-hero-title" class="hr-headline motion-safe:animate-[hr-reveal-hero_1.1s_cubic-bezier(0.22,1,0.36,1)_0.2s_both]">Where horizon meets hospitality</h1><div class="hr-copper-rule my-8 motion-safe:animate-[hr-draw-line_0.8s_cubic-bezier(0.22,1,0.36,1)_0.5s_both]"></div><p class="hr-body text-muted-foreground max-w-xl motion-safe:animate-[hr-reveal-section_1s_cubic-bezier(0.22,1,0.36,1)_0.45s_both]">Luxury coastal sanctuary with private villas, ocean spa rituals, and Michelin dining</p><div class="mt-10 flex flex-wrap gap-4 motion-safe:animate-[hr-reveal-section_1s_cubic-bezier(0.22,1,0.36,1)_0.6s_both]"><a href="#reservation" class="hr-btn-primary hr-focus-ring">Get started</a><a href="#suites" class="hr-btn-ghost hr-focus-ring">Learn more</a></div><p class="hr-font-body mt-8 text-xs uppercase tracking-[0.22em] text-[var(--color-muted)] motion-safe:animate-[hr-reveal-section_1s_ease_0.75s_both]">Private villas · Ocean spa · Michelin dining</p></div><div class="mt-16 flex items-center gap-4 motion-safe:animate-[hr-reveal-section_1s_ease_1s_both]" aria-hidden="true"><span class="block h-12 w-px origin-top bg-[var(--color-copper)]/50 motion-safe:animate-[hr-scroll-pulse_2.4s_ease-in-out_infinite]"></span><span class="hr-font-body text-[0.625rem] uppercase tracking-[0.34em] text-[var(--color-muted)]">Scroll</span></div></div></section><section id="menu" data-v2-component="hotel-resort-premium-tasting-menu" aria-labelledby="hr-menu-title" class="hr-section hr-section-alt"><div class="mx-auto max-w-[90rem] px-5 sm:px-8 lg:px-10"><header class="max-w-2xl"><p class="hr-eyebrow mb-5">Seasonal tasting</p><h2 id="hr-menu-title" class="hr-headline text-[clamp(2rem,4vw,3.25rem)]">Seven courses of quiet revelation</h2><div class="hr-copper-rule my-6"></div><p class="hr-body">Our menu evolves with the forest floor. Each evening is composed anew.</p><p class="hr-font-body mt-6 inline-flex items-center gap-3 text-sm text-[var(--color-copper)]"><span class="h-px w-8 bg-[var(--color-copper)]/50" aria-hidden="true"></span>Tasting menu · $185 per guest · Wine pairing +$95</p></header><ol class="mt-16 divide-y divide-[var(--border-subtle)] border-y border-[var(--border-subtle)]"><li class="group grid gap-4 py-9 transition-colors hover:bg-[color-mix(in_srgb,var(--color-copper)_4%,transparent)] sm:grid-cols-[4rem_1fr_auto] sm:items-start sm:gap-8 sm:px-4"><span class="hr-font-display text-3xl text-[var(--color-copper)]/70 transition-colors group-hover:text-[var(--color-copper)]" aria-hidden="true">I</span><div><h3 class="hr-font-display text-xl text-[var(--color-foreground)] transition-colors group-hover:text-[var(--color-copper)] sm:text-2xl">Amuse — Forest broth</h3><p class="hr-font-body mt-2 max-w-prose text-sm leading-relaxed text-[var(--color-muted)]">Wild mushroom essence, pine oil, crisp shallot</p></div><p class="hr-font-body text-[0.6875rem] uppercase tracking-[0.2em] text-[var(--color-copper)]/60 transition-colors group-hover:text-[var(--color-copper)] sm:text-end">Champagne · NV</p></li><li class="group grid gap-4 py-9 transition-colors hover:bg-[color-mix(in_srgb,var(--color-copper)_4%,transparent)] sm:grid-cols-[4rem_1fr_auto] sm:items-start sm:gap-8 sm:px-4"><span class="hr-font-display text-3xl text-[var(--color-copper)]/70 transition-colors group-hover:text-[var(--color-copper)]" aria-hidden="true">II</span><div><h3 class="hr-font-display text-xl text-[var(--color-foreground)] transition-colors group-hover:text-[var(--color-copper)] sm:text-2xl">Raw — Scallop</h3><p class="hr-font-body mt-2 max-w-prose text-sm leading-relaxed text-[var(--color-muted)]">Cucumber, green apple, smoked salt</p></div><p class="hr-font-body text-[0.6875rem] uppercase tracking-[0.2em] text-[var(--color-copper)]/60 transition-colors group-hover:text-[var(--color-copper)] sm:text-end">Muscadet · 2022</p></li><li class="group grid gap-4 py-9 transition-colors hover:bg-[color-mix(in_srgb,var(--color-copper)_4%,transparent)] sm:grid-cols-[4rem_1fr_auto] sm:items-start sm:gap-8 sm:px-4"><span class="hr-font-display text-3xl text-[var(--color-copper)]/70 transition-colors group-hover:text-[var(--color-copper)]" aria-hidden="true">III</span><div><h3 class="hr-font-display text-xl text-[var(--color-foreground)] transition-colors group-hover:text-[var(--color-copper)] sm:text-2xl">Fire — Venison</h3><p class="hr-font-body mt-2 max-w-prose text-sm leading-relaxed text-[var(--color-muted)]">Juniper, beet, ember jus</p></div><p class="hr-font-body text-[0.6875rem] uppercase tracking-[0.2em] text-[var(--color-copper)]/60 transition-colors group-hover:text-[var(--color-copper)] sm:text-end">Pinot Noir · Willamette</p></li><li class="group grid gap-4 py-9 transition-colors hover:bg-[color-mix(in_srgb,var(--color-copper)_4%,transparent)] sm:grid-cols-[4rem_1fr_auto] sm:items-start sm:gap-8 sm:px-4"><span class="hr-font-display text-3xl text-[var(--color-copper)]/70 transition-colors group-hover:text-[var(--color-copper)]" aria-hidden="true">IV</span><div><h3 class="hr-font-display text-xl text-[var(--color-foreground)] transition-colors group-hover:text-[var(--color-copper)] sm:text-2xl">Garden — Heritage carrots</h3><p class="hr-font-body mt-2 max-w-prose text-sm leading-relaxed text-[var(--color-muted)]">Fermented cashew, herb oil</p></div><span></span></li><li class="group grid gap-4 py-9 transition-colors hover:bg-[color-mix(in_srgb,var(--color-copper)_4%,transparent)] sm:grid-cols-[4rem_1fr_auto] sm:items-start sm:gap-8 sm:px-4"><span class="hr-font-display text-3xl text-[var(--color-copper)]/70 transition-colors group-hover:text-[var(--color-copper)]" aria-hidden="true">V</span><div><h3 class="hr-font-display text-xl text-[var(--color-foreground)] transition-colors group-hover:text-[var(--color-copper)] sm:text-2xl">Sweet — Dark chocolate</h3><p class="hr-font-body mt-2 max-w-prose text-sm leading-relaxed text-[var(--color-muted)]">Smoked cream, hazelnut, gold leaf</p></div><p class="hr-font-body text-[0.6875rem] uppercase tracking-[0.2em] text-[var(--color-copper)]/60 transition-colors group-hover:text-[var(--color-copper)] sm:text-end">Banyuls · 2018</p></li></ol></div></section><section id="chef" data-v2-component="hotel-resort-premium-chef-story" aria-labelledby="hr-chef-title" class="hr-section"><div class="mx-auto max-w-[90rem] px-5 sm:px-8 lg:px-10"><div class="grid items-center gap-12 lg:grid-cols-2 lg:gap-20"><div class="relative order-2 lg:order-1"><figure class="hr-card relative aspect-[4/5] overflow-hidden"><img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="Executive chef finishing a course at the pass" class="h-full w-full object-cover" loading="lazy"/><div class="absolute inset-0 ring-1 ring-inset ring-[var(--border-subtle)]" aria-hidden="true"></div></figure><div class="absolute -bottom-6 -end-6 hidden h-32 w-32 border border-[var(--border-copper)] bg-[var(--color-background)]/90 p-4 backdrop-blur-sm lg:block" aria-hidden="true"><p class="hr-font-display text-center text-3xl text-[var(--color-copper)]">★</p><p class="hr-font-body mt-1 text-center text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">Michelin</p></div></div><div class="order-1 lg:order-2"><p class="hr-eyebrow mb-5">The kitchen</p><h2 id="hr-chef-title" class="hr-headline text-[clamp(2rem,4vw,3.25rem)]">A philosophy written in flame</h2><div class="hr-copper-rule my-6"></div><p class="hr-body text-muted-foreground max-w-lg">Chef Élise Marche trained under the great kitchens of Lyon before returning to compose a cuisine of restraint — where each course reveals a single idea, fully realized.</p></div></div><div class="mt-20 grid gap-px border border-[var(--border-subtle)] bg-[var(--border-subtle)] sm:grid-cols-3"><article class="bg-[var(--color-background)] p-8 transition-colors hover:bg-[color-mix(in_srgb,var(--color-copper)_4%,var(--color-background))] lg:p-10"><h3 class="hr-font-display text-2xl text-[var(--color-copper)]">Fire</h3><p class="hr-font-body mt-4 text-sm leading-relaxed text-[var(--color-muted)]">Live ember cooking over seasonal hardwood — technique as ritual.</p></article><article class="bg-[var(--color-background)] p-8 transition-colors hover:bg-[color-mix(in_srgb,var(--color-copper)_4%,var(--color-background))] lg:p-10"><h3 class="hr-font-display text-2xl text-[var(--color-copper)]">Forage</h3><p class="hr-font-body mt-4 text-sm leading-relaxed text-[var(--color-muted)]">Ingredients gathered within forty miles, composed at peak expression.</p></article><article class="bg-[var(--color-background)] p-8 transition-colors hover:bg-[color-mix(in_srgb,var(--color-copper)_4%,var(--color-background))] lg:p-10"><h3 class="hr-font-display text-2xl text-[var(--color-copper)]">Terroir</h3><p class="hr-font-body mt-4 text-sm leading-relaxed text-[var(--color-muted)]">Wine pairings drawn from small producers who share our philosophy.</p></article></div></div></section><section id="stats" data-v2-component="hotel-resort-premium-stats" aria-labelledby="stats-title" class="rp-section se-section-glow relative overflow-hidden bg-[var(--color-background)]"><div class="se-glow-orb -start-24 top-0 h-64 w-64 bg-[var(--color-accent)]" aria-hidden="true"></div><div class="se-glow-orb end-0 bottom-0 h-48 w-48 bg-[var(--color-primary)]" aria-hidden="true"></div><div class="mx-auto max-w-[90rem] px-5 sm:px-8 lg:px-10 relative"><header class="mb-12 mx-auto text-center max-w-3xl"><p class="rp-eyebrow mb-3">Our legacy</p><h2 id="stats-title" class="rp-headline-sm">Craft measured in seasons</h2><div class="mt-4 h-px w-12 bg-gradient-to-r from-[var(--color-accent)] to-transparent mx-auto" aria-hidden="true"></div></header><dl class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><div class="rp-card p-6 text-center sm:p-7"><dt class="rp-font-body text-sm font-medium text-[var(--color-muted)]">Years of excellence</dt><dd class="rp-metric mt-3 block">18</dd><dd class="rp-font-body mt-2 text-xs text-[var(--color-muted)]">Since opening</dd></div><div class="rp-card p-6 text-center sm:p-7"><dt class="rp-font-body text-sm font-medium text-[var(--color-muted)]">Michelin stars</dt><dd class="rp-metric mt-3 block">2</dd><dd class="rp-font-body mt-2 text-xs text-[var(--color-muted)]">Current season</dd></div><div class="rp-card p-6 text-center sm:p-7"><dt class="rp-font-body text-sm font-medium text-[var(--color-muted)]">Tables nightly</dt><dd class="rp-metric mt-3 block">12</dd><dd class="rp-font-body mt-2 text-xs text-[var(--color-muted)]">Intimate seating</dd></div><div class="rp-card p-6 text-center sm:p-7"><dt class="rp-font-body text-sm font-medium text-[var(--color-muted)]">Guest rating</dt><dd class="rp-metric mt-3 block">4.9</dd><dd class="rp-font-body mt-2 text-xs text-[var(--color-muted)]">2,400+ reviews</dd></div></dl></div></section><section id="signatures" data-v2-component="hotel-resort-premium-signature-dishes" aria-labelledby="hr-dishes-title" class="hr-section hr-section-alt"><div class="mx-auto max-w-[90rem] px-5 sm:px-8 lg:px-10"><header class="mb-16 max-w-xl"><p class="hr-eyebrow mb-5">Signatures</p><h2 id="hr-dishes-title" class="hr-headline text-[clamp(2rem,4vw,3rem)]">Plates that define the evening</h2><div class="hr-copper-rule my-6"></div><p class="hr-body">Three compositions returned to each season — refined, never repeated exactly.</p></header><div class="grid gap-6 md:grid-cols-3 md:gap-5"><article class="hr-card group relative overflow-hidden"><figure class="relative aspect-[3/4] overflow-hidden"><img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="Fire-kissed duck with sour cherry glaze" class="h-full w-full object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-[1.05]" loading="lazy"/><div class="absolute inset-0 bg-gradient-to-t from-[var(--color-background)] via-[var(--color-background)]/25 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-95"></div><figcaption class="absolute inset-x-0 bottom-0 p-7"><span class="hr-font-body text-[0.625rem] uppercase tracking-[0.28em] text-[var(--color-copper)]">No. 01</span><h3 class="hr-font-display mt-2 text-2xl text-[var(--color-foreground)]">Ember-roasted duck</h3><p class="hr-font-body mt-2 text-sm leading-relaxed text-[var(--color-muted)]">Black garlic, sour cherry, smoked potato purée</p></figcaption></figure></article><article class="hr-card group relative overflow-hidden"><figure class="relative aspect-[3/4] overflow-hidden"><img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="Day-boat scallop with cucumber granite" class="h-full w-full object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-[1.05]" loading="lazy"/><div class="absolute inset-0 bg-gradient-to-t from-[var(--color-background)] via-[var(--color-background)]/25 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-95"></div><figcaption class="absolute inset-x-0 bottom-0 p-7"><span class="hr-font-body text-[0.625rem] uppercase tracking-[0.28em] text-[var(--color-copper)]">No. 02</span><h3 class="hr-font-display mt-2 text-2xl text-[var(--color-foreground)]">Hand-dived scallop</h3><p class="hr-font-body mt-2 text-sm leading-relaxed text-[var(--color-muted)]">Cucumber granite, yuzu, crispy rice</p></figcaption></figure></article><article class="hr-card group relative overflow-hidden"><figure class="relative aspect-[3/4] overflow-hidden"><img src="https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="Forest mushroom tart with aged comté" class="h-full w-full object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-[1.05]" loading="lazy"/><div class="absolute inset-0 bg-gradient-to-t from-[var(--color-background)] via-[var(--color-background)]/25 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-95"></div><figcaption class="absolute inset-x-0 bottom-0 p-7"><span class="hr-font-body text-[0.625rem] uppercase tracking-[0.28em] text-[var(--color-copper)]">No. 03</span><h3 class="hr-font-display mt-2 text-2xl text-[var(--color-foreground)]">Wild mushroom tart</h3><p class="hr-font-body mt-2 text-sm leading-relaxed text-[var(--color-muted)]">Truffle cream, aged comté, herb salad</p></figcaption></figure></article></div></div></section><section id="testimonials" data-v2-component="hotel-resort-premium-testimonials" aria-labelledby="testimonials-title" class="rp-section se-section-alt bg-[var(--color-surface)]"><div class="mx-auto max-w-[90rem] px-5 sm:px-8 lg:px-10"><header class="mb-12 mx-auto text-center max-w-3xl"><p class="rp-eyebrow mb-3">Guest voices</p><h2 id="testimonials-title" class="rp-headline-sm">An evening they remember</h2><div class="mt-4 h-px w-12 bg-gradient-to-r from-[var(--color-accent)] to-transparent mx-auto" aria-hidden="true"></div></header><div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-6"><figure class="rp-card relative flex flex-col p-7 sm:p-8 "><span class="se-quote-mark absolute end-6 top-4 select-none" aria-hidden="true">“</span><blockquote class="rp-body text-muted-foreground relative z-[1] mt-4 flex-1 text-base leading-relaxed">Every course felt like a story — the wine pairings were impeccable and the service was invisible in the best way.</blockquote><figcaption class="mt-8 flex items-center gap-3 border-t border-[var(--border-default,rgba(0,0,0,0.08))] pt-5"><img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&amp;fit=crop&amp;w=800&amp;q=82" alt="" class="h-11 w-11 rounded-full object-cover ring-2 ring-[var(--color-surface)]" loading="lazy" width="44" height="44"/><div><p class="rp-font-body text-sm font-semibold text-[var(--color-foreground)]">Claire Dubois</p><p class="rp-font-body text-xs text-[var(--color-muted)]">Food critic · Le Monde Gastronomique</p></div></figcaption></figure><figure class="rp-card relative flex flex-col p-7 sm:p-8 se-card-featured md:-translate-y-1 lg:col-span-1"><span class="se-quote-mark absolute end-6 top-4 select-none" aria-hidden="true">“</span><blockquote class="rp-body text-muted-foreground relative z-[1] mt-4 flex-1 text-base leading-relaxed">We celebrated our anniversary here and it exceeded every expectation. The chef&#x27;s tasting menu is world-class.</blockquote><figcaption class="mt-8 flex items-center gap-3 border-t border-[var(--border-default,rgba(0,0,0,0.08))] pt-5"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&amp;fit=crop&amp;w=800&amp;q=82" alt="" class="h-11 w-11 rounded-full object-cover ring-2 ring-[var(--color-surface)]" loading="lazy" width="44" height="44"/><div><p class="rp-font-body text-sm font-semibold text-[var(--color-foreground)]">Marcus &amp; Elena Webb</p><p class="rp-font-body text-xs text-[var(--color-muted)]">Guests · Anniversary dinner</p></div></figcaption></figure><figure class="rp-card relative flex flex-col p-7 sm:p-8 "><span class="se-quote-mark absolute end-6 top-4 select-none" aria-hidden="true">“</span><blockquote class="rp-body text-muted-foreground relative z-[1] mt-4 flex-1 text-base leading-relaxed">The atmosphere, the fire, the seasonality — this is what fine dining should feel like in 2026.</blockquote><figcaption class="mt-8 flex items-center gap-3 border-t border-[var(--border-default,rgba(0,0,0,0.08))] pt-5"><img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&amp;fit=crop&amp;w=800&amp;q=82" alt="" class="h-11 w-11 rounded-full object-cover ring-2 ring-[var(--color-surface)]" loading="lazy" width="44" height="44"/><div><p class="rp-font-body text-sm font-semibold text-[var(--color-foreground)]">James Okonkwo</p><p class="rp-font-body text-xs text-[var(--color-muted)]">Editor · City Table Magazine</p></div></figcaption></figure></div></div></section><section id="atmosphere" data-v2-component="hotel-resort-premium-atmosphere" aria-labelledby="hr-atmosphere-title" class="hr-section overflow-hidden"><div class="mx-auto max-w-[90rem] px-5 sm:px-8 lg:px-10"><div class="grid gap-8 lg:grid-cols-12 lg:gap-10"><div class="lg:col-span-7"><figure class="hr-card group relative aspect-[16/10] overflow-hidden"><img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&amp;fit=crop&amp;w=1800&amp;q=85" alt="Vaulted dining room with candlelight and copper fixtures" class="h-full w-full object-cover transition-transform duration-[1.6s] ease-out group-hover:scale-[1.03]" loading="lazy"/><div class="pointer-events-none absolute inset-0 ring-1 ring-inset ring-[var(--border-copper,rgba(212,165,116,0.2))]" aria-hidden="true"></div></figure></div><div class="flex flex-col justify-center lg:col-span-5"><p class="hr-eyebrow mb-5">The room</p><h2 id="hr-atmosphere-title" class="hr-headline text-[clamp(2rem,4vw,3rem)]">Candlelit intimacy</h2><div class="hr-copper-rule my-6"></div><p class="hr-body">Twelve tables beneath vaulted timber and soft copper light. The room breathes with the rhythm of service — unhurried, attentive, present.</p><figure class="hr-card group relative mt-10 aspect-[4/3] overflow-hidden"><img src="https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&amp;fit=crop&amp;w=1400&amp;q=85" alt="Hand-finished table setting with crystal stemware" class="h-full w-full object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-[1.04]" loading="lazy"/></figure></div></div><blockquote class="relative mx-auto mt-24 max-w-3xl px-6 text-center sm:px-10"><span class="hr-font-display pointer-events-none absolute -top-6 start-1/2 -translate-x-1/2 text-6xl text-[var(--color-copper)]/25" aria-hidden="true">“</span><p class="hr-font-display text-[clamp(1.5rem,3vw,2.25rem)] italic leading-snug text-[var(--color-foreground)]">An evening that unfolds like a well-composed sonnet — each course a verse, the room its refrain.</p><footer class="hr-font-body mt-8 text-[0.6875rem] uppercase tracking-[0.28em] text-[var(--color-muted)]">— The Evening Standard</footer></blockquote></div></section><section id="gallery" data-v2-component="hotel-resort-premium-gallery" aria-labelledby="hr-gallery-title" class="hr-section bg-[var(--color-surface)]/20"><div class="mx-auto max-w-[90rem] px-5 sm:px-8 lg:px-10"><header class="mb-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><p class="hr-eyebrow mb-5">Gallery</p><h2 id="hr-gallery-title" class="hr-headline text-[clamp(2rem,4vw,3rem)]">Moments from the table</h2><div class="hr-copper-rule mt-6"></div></div><p class="hr-font-body text-sm text-[var(--color-muted)]">12 photographs · Updated seasonally</p></header><div class="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-4 lg:gap-4"><button type="button" class="hr-card group relative overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-copper)] row-span-2 aspect-[3/4] md:col-span-1" aria-label="View photograph: Candlelit main dining room"><img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&amp;fit=crop&amp;w=1400&amp;q=85" alt="Candlelit main dining room" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy"/><div class="absolute inset-0 bg-gradient-to-t from-[var(--color-background)]/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div><span class="hr-font-body absolute inset-x-0 bottom-0 p-3 text-start text-[0.625rem] uppercase tracking-[0.2em] text-white/90 opacity-0 transition-opacity duration-500 group-hover:opacity-100">Candlelit main dining room</span></button><button type="button" class="hr-card group relative overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-copper)] aspect-square" aria-label="View photograph: Chef&#x27;s counter with open flame"><img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&amp;fit=crop&amp;w=1400&amp;q=85" alt="Chef&#x27;s counter with open flame" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy"/><div class="absolute inset-0 bg-gradient-to-t from-[var(--color-background)]/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div><span class="hr-font-body absolute inset-x-0 bottom-0 p-3 text-start text-[0.625rem] uppercase tracking-[0.2em] text-white/90 opacity-0 transition-opacity duration-500 group-hover:opacity-100">Chef&#x27;s counter with open flame</span></button><button type="button" class="hr-card group relative overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-copper)] aspect-square" aria-label="View photograph: Sommelier-led wine service"><img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&amp;fit=crop&amp;w=1400&amp;q=85" alt="Sommelier-led wine service" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy"/><div class="absolute inset-0 bg-gradient-to-t from-[var(--color-background)]/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div><span class="hr-font-body absolute inset-x-0 bottom-0 p-3 text-start text-[0.625rem] uppercase tracking-[0.2em] text-white/90 opacity-0 transition-opacity duration-500 group-hover:opacity-100">Sommelier-led wine service</span></button><button type="button" class="hr-card group relative overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-copper)] aspect-square" aria-label="View photograph: Seasonal tasting course"><img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&amp;fit=crop&amp;w=1400&amp;q=85" alt="Seasonal tasting course" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy"/><div class="absolute inset-0 bg-gradient-to-t from-[var(--color-background)]/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div><span class="hr-font-body absolute inset-x-0 bottom-0 p-3 text-start text-[0.625rem] uppercase tracking-[0.2em] text-white/90 opacity-0 transition-opacity duration-500 group-hover:opacity-100">Seasonal tasting course</span></button><button type="button" class="hr-card group relative overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-copper)] aspect-square" aria-label="View photograph: Hand-dived scallop composition"><img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&amp;fit=crop&amp;w=1400&amp;q=85" alt="Hand-dived scallop composition" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy"/><div class="absolute inset-0 bg-gradient-to-t from-[var(--color-background)]/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div><span class="hr-font-body absolute inset-x-0 bottom-0 p-3 text-start text-[0.625rem] uppercase tracking-[0.2em] text-white/90 opacity-0 transition-opacity duration-500 group-hover:opacity-100">Hand-dived scallop composition</span></button><button type="button" class="hr-card group relative overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-copper)] row-span-2 aspect-[3/4] md:col-span-1" aria-label="View photograph: Ember-roasted heritage duck"><img src="https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&amp;fit=crop&amp;w=1400&amp;q=85" alt="Ember-roasted heritage duck" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy"/><div class="absolute inset-0 bg-gradient-to-t from-[var(--color-background)]/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div><span class="hr-font-body absolute inset-x-0 bottom-0 p-3 text-start text-[0.625rem] uppercase tracking-[0.2em] text-white/90 opacity-0 transition-opacity duration-500 group-hover:opacity-100">Ember-roasted heritage duck</span></button><button type="button" class="hr-card group relative overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-copper)] aspect-square" aria-label="View photograph: Private dining alcove"><img src="https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&amp;fit=crop&amp;w=1400&amp;q=85" alt="Private dining alcove" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy"/><div class="absolute inset-0 bg-gradient-to-t from-[var(--color-background)]/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div><span class="hr-font-body absolute inset-x-0 bottom-0 p-3 text-start text-[0.625rem] uppercase tracking-[0.2em] text-white/90 opacity-0 transition-opacity duration-500 group-hover:opacity-100">Private dining alcove</span></button><button type="button" class="hr-card group relative overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-copper)] aspect-square" aria-label="View photograph: Pastry finale with smoked cream"><img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&amp;fit=crop&amp;w=1400&amp;q=85" alt="Pastry finale with smoked cream" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy"/><div class="absolute inset-0 bg-gradient-to-t from-[var(--color-background)]/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div><span class="hr-font-body absolute inset-x-0 bottom-0 p-3 text-start text-[0.625rem] uppercase tracking-[0.2em] text-white/90 opacity-0 transition-opacity duration-500 group-hover:opacity-100">Pastry finale with smoked cream</span></button><button type="button" class="hr-card group relative overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-copper)] aspect-square" aria-label="View photograph: Barrel-aged cocktail program"><img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&amp;fit=crop&amp;w=1400&amp;q=85" alt="Barrel-aged cocktail program" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy"/><div class="absolute inset-0 bg-gradient-to-t from-[var(--color-background)]/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div><span class="hr-font-body absolute inset-x-0 bottom-0 p-3 text-start text-[0.625rem] uppercase tracking-[0.2em] text-white/90 opacity-0 transition-opacity duration-500 group-hover:opacity-100">Barrel-aged cocktail program</span></button><button type="button" class="hr-card group relative overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-copper)] aspect-square" aria-label="View photograph: Garden terrace at dusk"><img src="https://images.unsplash.com/photo-1476224207861-95ecdfb56aa8?auto=format&amp;fit=crop&amp;w=1400&amp;q=85" alt="Garden terrace at dusk" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy"/><div class="absolute inset-0 bg-gradient-to-t from-[var(--color-background)]/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div><span class="hr-font-body absolute inset-x-0 bottom-0 p-3 text-start text-[0.625rem] uppercase tracking-[0.2em] text-white/90 opacity-0 transition-opacity duration-500 group-hover:opacity-100">Garden terrace at dusk</span></button><button type="button" class="hr-card group relative overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-copper)] row-span-2 aspect-[3/4] md:col-span-1" aria-label="View photograph: Open kitchen during service"><img src="https://images.unsplash.com/photo-1505253758473-96b7015fcd40?auto=format&amp;fit=crop&amp;w=1400&amp;q=85" alt="Open kitchen during service" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy"/><div class="absolute inset-0 bg-gradient-to-t from-[var(--color-background)]/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div><span class="hr-font-body absolute inset-x-0 bottom-0 p-3 text-start text-[0.625rem] uppercase tracking-[0.2em] text-white/90 opacity-0 transition-opacity duration-500 group-hover:opacity-100">Open kitchen during service</span></button><button type="button" class="hr-card group relative overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-copper)] aspect-square" aria-label="View photograph: Tableside finishing ritual"><img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&amp;fit=crop&amp;w=1400&amp;q=85" alt="Tableside finishing ritual" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy"/><div class="absolute inset-0 bg-gradient-to-t from-[var(--color-background)]/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div><span class="hr-font-body absolute inset-x-0 bottom-0 p-3 text-start text-[0.625rem] uppercase tracking-[0.2em] text-white/90 opacity-0 transition-opacity duration-500 group-hover:opacity-100">Tableside finishing ritual</span></button></div></div></section><section id="faq" data-v2-component="hotel-resort-premium-faq" aria-labelledby="faq-title" class="rp-section se-section-alt bg-[var(--color-surface)]"><div class="mx-auto max-w-[90rem] px-5 sm:px-8 lg:px-10"><div class="grid gap-12 lg:grid-cols-[1fr_1.4fr] lg:items-start"><header class="mb-12 max-w-2xl"><p class="rp-eyebrow mb-3">Reservations</p><h2 id="faq-title" class="rp-headline-sm">Before you visit</h2><div class="mt-4 h-px w-12 bg-gradient-to-r from-[var(--color-accent)] to-transparent " aria-hidden="true"></div></header><div class="space-y-3"><div class="rp-card overflow-hidden transition-shadow duration-300 shadow-[var(--shadow-surface)]"><h3><button type="button" id="_R_4u_-trigger-0" aria-expanded="true" aria-controls="_R_4u_-panel-0" class="rp-font-body flex w-full items-center justify-between gap-4 px-5 py-4 text-start text-sm font-semibold text-[var(--color-foreground)] transition-colors hover:text-[var(--color-primary)] rp-focus-ring">What is the dress code?<span aria-hidden="true" class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-sm font-medium text-[var(--color-accent)] transition-transform duration-300 rotate-180 bg-[color-mix(in_srgb,var(--color-accent)_8%,transparent)]">−</span></button></h3><div id="_R_4u_-panel-0" role="region" aria-labelledby="_R_4u_-trigger-0" class="rp-font-body border-t border-[var(--border-subtle,rgba(0,0,0,0.06))] px-5 py-4 text-sm leading-relaxed text-[var(--color-muted)] motion-safe:animate-[se-slide-up_0.35s_ease_both]">Smart casual to formal. We welcome guests who dress with intention for an elevated dining experience.</div></div><div class="rp-card overflow-hidden transition-shadow duration-300 "><h3><button type="button" id="_R_4u_-trigger-1" aria-expanded="false" aria-controls="_R_4u_-panel-1" class="rp-font-body flex w-full items-center justify-between gap-4 px-5 py-4 text-start text-sm font-semibold text-[var(--color-foreground)] transition-colors hover:text-[var(--color-primary)] rp-focus-ring">Do you accommodate dietary restrictions?<span aria-hidden="true" class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-sm font-medium text-[var(--color-accent)] transition-transform duration-300 ">+</span></button></h3><div id="_R_4u_-panel-1" role="region" aria-labelledby="_R_4u_-trigger-1" hidden="" class="rp-font-body border-t border-[var(--border-subtle,rgba(0,0,0,0.06))] px-5 py-4 text-sm leading-relaxed text-[var(--color-muted)] motion-safe:animate-[se-slide-up_0.35s_ease_both]">Yes. Please note allergies and preferences when booking — our kitchen prepares thoughtful alternatives for every course.</div></div><div class="rp-card overflow-hidden transition-shadow duration-300 "><h3><button type="button" id="_R_4u_-trigger-2" aria-expanded="false" aria-controls="_R_4u_-panel-2" class="rp-font-body flex w-full items-center justify-between gap-4 px-5 py-4 text-start text-sm font-semibold text-[var(--color-foreground)] transition-colors hover:text-[var(--color-primary)] rp-focus-ring">How far in advance should I book?<span aria-hidden="true" class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-sm font-medium text-[var(--color-accent)] transition-transform duration-300 ">+</span></button></h3><div id="_R_4u_-panel-2" role="region" aria-labelledby="_R_4u_-trigger-2" hidden="" class="rp-font-body border-t border-[var(--border-subtle,rgba(0,0,0,0.06))] px-5 py-4 text-sm leading-relaxed text-[var(--color-muted)] motion-safe:animate-[se-slide-up_0.35s_ease_both]">We recommend reserving two to three weeks ahead for weekend service. Private dining may require additional notice.</div></div><div class="rp-card overflow-hidden transition-shadow duration-300 "><h3><button type="button" id="_R_4u_-trigger-3" aria-expanded="false" aria-controls="_R_4u_-panel-3" class="rp-font-body flex w-full items-center justify-between gap-4 px-5 py-4 text-start text-sm font-semibold text-[var(--color-foreground)] transition-colors hover:text-[var(--color-primary)] rp-focus-ring">Is there a tasting menu?<span aria-hidden="true" class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-sm font-medium text-[var(--color-accent)] transition-transform duration-300 ">+</span></button></h3><div id="_R_4u_-panel-3" role="region" aria-labelledby="_R_4u_-trigger-3" hidden="" class="rp-font-body border-t border-[var(--border-subtle,rgba(0,0,0,0.06))] px-5 py-4 text-sm leading-relaxed text-[var(--color-muted)] motion-safe:animate-[se-slide-up_0.35s_ease_both]">Our chef&#x27;s tasting menu changes with the season. A curated wine pairing is available for each seating.</div></div></div></div></div></section><section id="reservation" data-v2-component="hotel-resort-premium-reservation-cta" aria-labelledby="hr-cta-title" class="relative min-h-[28rem] overflow-hidden py-24 sm:min-h-[32rem] sm:py-32"><div class="absolute inset-0" aria-hidden="true"><img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&amp;fit=crop&amp;w=1920&amp;q=85" alt="" class="h-full w-full object-cover object-center" loading="lazy"/><div class="absolute inset-0 bg-[var(--color-background)]/82"></div><div class="absolute inset-0" style="background:radial-gradient(ellipse 90% 70% at 50% 100%, color-mix(in srgb, var(--color-copper) 22%, transparent), transparent 65%)"></div></div><div class="relative mx-auto max-w-[90rem] px-5 text-center sm:px-8 lg:px-10"><p class="hr-eyebrow mb-6">Reservations</p><h2 id="hr-cta-title" class="hr-headline mx-auto max-w-2xl text-[clamp(2.25rem,5vw,3.75rem)]">Your table awaits</h2><div class="hr-copper-rule mx-auto my-8"></div><p class="hr-body text-muted-foreground mx-auto max-w-lg">We hold twelve seats each evening. Reserve early for weekends and special occasions.</p><div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row"><a href="#contact" class="hr-btn-primary hr-focus-ring min-w-[12rem]">Book Now</a><a href="tel:+12125550188" class="hr-btn-ghost hr-focus-ring min-w-[12rem]">+1 (212) 555-0188</a></div><p class="hr-font-body mt-8 text-[0.6875rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">Tue – Sat · 6pm seating · Dress code: smart casual</p></div></section><section id="contact" data-v2-component="hotel-resort-premium-contact" aria-labelledby="contact-title" class="rp-section se-section-glow relative bg-[var(--color-background)]"><div class="mx-auto max-w-[90rem] px-5 sm:px-8 lg:px-10"><div class="grid gap-12 lg:grid-cols-2 lg:gap-16"><div><p class="rp-eyebrow mb-3">Visit us</p><h2 id="contact-title" class="rp-headline-sm">Contact our team</h2><div class="mt-4 h-px w-12 bg-gradient-to-r from-[var(--color-accent)] to-transparent" aria-hidden="true"></div><p class="rp-body text-muted-foreground mt-5">Private events, press inquiries, and general questions — we respond within 24 hours.</p><address class="rp-font-body mt-8 space-y-4 text-sm not-italic"><p class="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] p-4"><span class="block font-semibold text-[var(--color-foreground)]">Email</span><a href="mailto:reservations@ember-table.com" class="rp-focus-ring mt-1 inline-block text-[var(--color-muted)] hover:text-[var(--color-accent)]">reservations@ember-table.com</a></p><p class="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] p-4"><span class="block font-semibold text-[var(--color-foreground)]">Phone</span><a href="tel:+1(212)555-0188" class="rp-focus-ring mt-1 inline-block text-[var(--color-muted)] hover:text-[var(--color-accent)]">+1 (212) 555-0188</a></p><p class="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] p-4"><span class="block font-semibold text-[var(--color-foreground)]">Office</span><span class="mt-1 block text-[var(--color-muted)]">48 West 10th Street, New York, NY</span></p></address></div><form id="_R_5u_" class="rp-card p-6 sm:p-8" noValidate=""><div class="space-y-5"><div><label for="_R_5u_-name" class="rp-font-body mb-2 block text-sm font-medium text-[var(--color-foreground)]">Name</label><input id="_R_5u_-name" type="text" required="" autoComplete="name" class="se-input rp-focus-ring" name="name"/></div><div><label for="_R_5u_-email" class="rp-font-body mb-2 block text-sm font-medium text-[var(--color-foreground)]">Email</label><input id="_R_5u_-email" type="email" required="" autoComplete="email" class="se-input rp-focus-ring" name="email"/></div><div><label for="_R_5u_-message" class="rp-font-body mb-2 block text-sm font-medium text-[var(--color-foreground)]">Message</label><textarea id="_R_5u_-message" name="message" rows="4" required="" class="se-textarea resize-y rp-focus-ring"></textarea></div><button type="submit" class="rp-btn-primary w-full sm:w-auto rp-focus-ring">Send inquiry</button></div></form></div></div></section></main></div><footer data-v2-region="footer"><footer data-v2-component="hotel-resort-premium-footer" class="border-t border-[var(--border-subtle)] bg-[var(--color-background)]" role="contentinfo"><div class="mx-auto max-w-[90rem] px-5 py-16 sm:px-8 lg:px-10"><div class="grid gap-12 md:grid-cols-[1.5fr_1fr_1fr]"><div><p class="hr-font-display text-3xl text-[var(--color-foreground)]">Azure Haven Resort</p><p class="hr-font-body mt-2 text-sm text-[var(--color-muted)]">Contemporary fine dining · West Village</p><address class="hr-font-body mt-6 not-italic text-sm leading-relaxed text-[var(--color-muted)]">48 West 10th Street, New York, NY</address></div><nav aria-label="Footer navigation"><p class="hr-eyebrow mb-4">Explore</p><ul class="space-y-3"><li><a href="#menu" class="hr-font-body text-sm text-[var(--color-muted)] transition-colors hover:text-[var(--color-copper)] focus:outline-none focus-visible:text-[var(--color-copper)] focus-visible:underline">Menu</a></li><li><a href="#chef" class="hr-font-body text-sm text-[var(--color-muted)] transition-colors hover:text-[var(--color-copper)] focus:outline-none focus-visible:text-[var(--color-copper)] focus-visible:underline">Chef</a></li><li><a href="#gallery" class="hr-font-body text-sm text-[var(--color-muted)] transition-colors hover:text-[var(--color-copper)] focus:outline-none focus-visible:text-[var(--color-copper)] focus-visible:underline">Gallery</a></li><li><a href="#reservation" class="hr-font-body text-sm text-[var(--color-muted)] transition-colors hover:text-[var(--color-copper)] focus:outline-none focus-visible:text-[var(--color-copper)] focus-visible:underline">Reserve</a></li></ul></nav><div><p class="hr-eyebrow mb-4">Hours</p><dl class="hr-font-body space-y-2 text-sm text-[var(--color-muted)]"><div class="flex justify-between gap-4"><dt>Tue – Thu</dt><dd>6pm – 10pm</dd></div><div class="flex justify-between gap-4"><dt>Fri – Sat</dt><dd>5:30pm – 11pm</dd></div><div class="flex justify-between gap-4"><dt>Sunday</dt><dd>Closed</dd></div></dl></div></div><div class="hr-copper-rule mt-16"></div><div class="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><p class="hr-font-body text-[0.6875rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">© 2026 Azure Haven Resort. All rights reserved.</p><div class="flex gap-6"><a href="#" class="hr-font-body text-[0.6875rem] uppercase tracking-[0.2em] text-[var(--color-muted)] hover:text-[var(--color-copper)] focus:outline-none focus-visible:underline">Instagram</a><a href="#" class="hr-font-body text-[0.6875rem] uppercase tracking-[0.2em] text-[var(--color-muted)] hover:text-[var(--color-copper)] focus:outline-none focus-visible:underline">Privacy</a></div></div></div></footer></footer></div>
+  </div>
+  
+</body>
+</html>

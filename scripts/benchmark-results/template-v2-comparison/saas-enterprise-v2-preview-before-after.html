@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>SaaS Enterprise — V2 Before/After</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 0; background: #0a0a0a; color: #eee; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #333; min-height: 100vh; }
+  .panel { background: #111; padding: 1rem; overflow: auto; }
+  h2 { margin: 0 0 0.75rem; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.12em; }
+  .bad { color: #f87171; }
+  .good { color: #4ade80; }
+  iframe { width: 100%; height: 70vh; border: 1px solid #333; background: #fff; }
+  pre { font-size: 0.75rem; color: #aaa; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<div class="grid">
+  <div class="panel">
+    <h2 class="bad">Before (generic teal MVP scaffold)</h2>
+    <pre>Palette: #0E4D64 teal / #14B8A6 accent
+Typography: Sora + Manrope
+Layout: basic split hero, rounded cards
+No se-* design system classes</pre>
+  </div>
+  <div class="panel">
+    <h2 class="good">After (Nexus Command V2 rebuild)</h2>
+    <pre>Palette: #1D4ED8 cobalt / #F8FAFC arctic
+Typography: Plus Jakarta Sans + IBM Plex Sans
+Layout: bento-grid hero, logo marquee, asymmetric features
+Design system: se-* classes, grid backgrounds, metric cards</pre>
+    <iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot; data-v2-render=&quot;v2-files&quot; data-v2-package=&quot;saas-enterprise&quot; data-v2-layout=&quot;default&quot;>
+<head>
+  <meta charset=&quot;utf-8&quot; />
+  <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot; />
+  <title>Northline — Live Preview</title>
+  <style>/* Template Architecture V2 — saas-enterprise · spec 2.0.0 */
+:root {
+  --v2-package: &quot;saas-enterprise&quot;;
+  --color-primary: #1D4ED8;
+  --color-secondary: #1E293B;
+  --color-accent: #3B82F6;
+  --color-background: #F8FAFC;
+  --color-foreground: #0F172A;
+  --color-muted: rgba(15,23,42,0.58);
+  --color-surface: #FFFFFF;
+  --color-signal: #059669;
+  --color-grid: rgba(15,23,42,0.06);
+  --color-ink: #020617;
+  --font-display: &quot;Plus Jakarta Sans&quot;, ui-sans-serif, system-ui, sans-serif;
+  --font-body: &quot;IBM Plex Sans&quot;, ui-sans-serif, system-ui, sans-serif;
+  --spacing-unit: 0.25rem;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --shadow-surface: 0 1px 3px rgba(15,23,42,0.06), 0 12px 40px rgba(15,23,42,0.08);
+  --shadow-glow: 0 0 80px rgba(59,130,246,0.18);
+  --shadow-card: 0 0 0 1px rgba(15,23,42,0.04), 0 4px 24px rgba(15,23,42,0.06);
+  --border-default: rgba(15,23,42,0.08);
+  --border-accent: rgba(59,130,246,0.24);
+  --border-subtle: rgba(15,23,42,0.04);
+}
+
+/* V2 language profile — RTL typography adaptation */
+[dir=&quot;rtl&quot;] {
+  --font-display: Cairo, ui-serif, Georgia, serif;
+  --font-body: &quot;IBM Plex Sans Arabic&quot;, ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+@import url(&quot;https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:ital,wght@0,500;0,600;0,700;0,800;1,500&display=swap&quot;);
+
+@keyframes se-grid-reveal {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes se-slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes se-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes se-pulse-dot {
+  0%, 100% { opacity: 0.4; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1); }
+}
+@keyframes se-scan-line {
+  0% { transform: translateY(-100%); opacity: 0; }
+  50% { opacity: 0.06; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .se-animate, [data-se-motion] { animation: none !important; transition: none !important; }
+}
+
+.se-font-display { font-family: var(--font-display), &quot;Plus Jakarta Sans&quot;, system-ui, sans-serif; }
+.se-font-body { font-family: var(--font-body), &quot;IBM Plex Sans&quot;, system-ui, sans-serif; }
+.se-font-mono { font-family: &quot;IBM Plex Mono&quot;, ui-monospace, monospace; }
+.se-eyebrow {
+  font-family: var(--font-body), &quot;IBM Plex Sans&quot;, system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent, #3B82F6);
+}
+.se-headline {
+  font-family: var(--font-display), &quot;Plus Jakarta Sans&quot;, system-ui, sans-serif;
+  font-size: clamp(2.25rem, 4.5vw, 3.75rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: var(--color-foreground);
+}
+.se-headline-sm {
+  font-family: var(--font-display), &quot;Plus Jakarta Sans&quot;, system-ui, sans-serif;
+  font-size: clamp(1.5rem, 2.8vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: var(--color-foreground);
+}
+.se-body {
+  font-family: var(--font-body), &quot;IBM Plex Sans&quot;, system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--color-muted, rgba(15,23,42,0.58));
+}
+.se-grid-bg {
+  background-image:
+    linear-gradient(var(--color-grid, rgba(15,23,42,0.06)) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid, rgba(15,23,42,0.06)) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.se-card {
+  border: 1px solid var(--border-subtle, rgba(15,23,42,0.04));
+  background: var(--color-surface);
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease;
+}
+.se-card:hover {
+  box-shadow: var(--shadow-surface);
+  border-color: var(--border-accent, rgba(59,130,246,0.24));
+}
+.se-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.75rem 1.5rem;
+  font-family: var(--font-body), &quot;IBM Plex Sans&quot;, system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: #fff;
+  background: var(--color-primary, #1D4ED8);
+  border-radius: var(--radius-md, 10px);
+  border: 1px solid transparent;
+  box-shadow: 0 1px 2px rgba(15,23,42,0.06);
+  transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+}
+.se-btn-primary:hover {
+  background: var(--color-accent, #3B82F6);
+  box-shadow: var(--shadow-glow);
+}
+.se-btn-primary:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+.se-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.75rem 1.5rem;
+  font-family: var(--font-body), &quot;IBM Plex Sans&quot;, system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--color-foreground);
+  background: var(--color-surface);
+  border: 1px solid var(--border-default, rgba(15,23,42,0.08));
+  border-radius: var(--radius-md, 10px);
+  transition: border-color 0.25s ease, background 0.25s ease;
+}
+.se-btn-secondary:hover { border-color: var(--color-accent); background: color-mix(in srgb, var(--color-accent) 4%, var(--color-surface)); }
+.se-btn-secondary:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.se-section { padding-block: clamp(4rem, 10vw, 6.5rem); }
+.se-metric {
+  font-family: var(--font-display), &quot;Plus Jakarta Sans&quot;, system-ui, sans-serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-primary);
+}
+.se-signal { color: var(--color-signal, #059669); }
+.se-focus-ring:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+/* V2 sidebar-left layout */
+.v2-layout-sidebar-left .v2-sidebar-shell { gap: 0; align-items: flex-start; }
+.v2-sidebar-rail {
+  border-inline-end: 1px solid var(--border-subtle, rgba(244,237,228,0.06));
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-inline-end: clamp(1.25rem, 3vw, 2rem);
+}
+[dir='rtl'] .v2-sidebar-rail { border-inline-end: none; border-inline-start: 1px solid var(--border-subtle, rgba(244,237,228,0.06)); }
+.v2-main-canvas > [data-v2-component] + [data-v2-component] { margin-top: 0; }
+.v2-layout-sidebar-left .v2-main-canvas { padding-inline-start: 0; }
+@media (max-width: 1023px) {
+  .v2-sidebar-rail { display: none !important; }
+}
+
+:root {
+  --container-max: 82rem;
+  --font-body: &quot;IBM Plex Sans&quot;, ui-sans-serif, system-ui, sans-serif;
+  --font-display: &quot;Plus Jakarta Sans&quot;, ui-sans-serif, system-ui, sans-serif;
+  --color-surface: #FFFFFF;
+  --color-foreground: #0F172A;
+  --color-background: #F8FAFC;
+  --color-accent: #3B82F6;
+  --color-secondary: #1E293B; --color-primary: #1D4ED8; }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--color-background, #0f172a);
+      color: var(--color-foreground, #f8fafc);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .page { display: none; padding-bottom: 2rem; }
+    .page:target { display: block; }
+    body:not(:has(.page:target)) .page#home { display: block; }
+    img { max-width: 100%; height: auto; display: block; }
+    a { color: inherit; }
+  </style>
+  <script src=&quot;https://cdn.tailwindcss.com&quot;></script>
+</head>
+<body>
+  <div class=&quot;page&quot; id=&quot;home&quot;>
+    <div class=&quot;min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] antialiased v2-template v2-saas-enterprise&quot; data-v2-package=&quot;saas-enterprise&quot; data-v2-composer=&quot;region-grid&quot; data-v2-layout=&quot;default&quot;><header data-v2-region=&quot;header&quot;><header data-v2-component=&quot;saas-enterprise-nav&quot; class=&quot;sticky top-0 z-50 border-b transition-all duration-300 border-transparent bg-[var(--color-background)]/80 backdrop-blur-md&quot;><div class=&quot;mx-auto flex h-16 max-w-[82rem] items-center justify-between gap-4 px-5 sm:px-8 lg:h-[4.25rem]&quot;><a href=&quot;#top&quot; class=&quot;se-font-display flex items-center gap-2.5 text-base font-bold tracking-tight text-[var(--color-foreground)] se-focus-ring rounded-sm&quot;><span class=&quot;flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-primary)] text-xs font-bold text-white&quot; aria-hidden=&quot;true&quot;>N</span>Northline</a><nav aria-label=&quot;Primary&quot; class=&quot;hidden items-center gap-8 lg:flex&quot;><a href=&quot;#services&quot; class=&quot;se-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] se-focus-ring rounded-sm&quot;>Services</a><a href=&quot;#features&quot; class=&quot;se-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] se-focus-ring rounded-sm&quot;>Why us</a><a href=&quot;#pricing&quot; class=&quot;se-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] se-focus-ring rounded-sm&quot;>Packages</a><a href=&quot;#testimonials&quot; class=&quot;se-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] se-focus-ring rounded-sm&quot;>Clients</a><a href=&quot;#contact&quot; class=&quot;se-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] se-focus-ring rounded-sm&quot;>Contact</a></nav><div class=&quot;flex items-center gap-2&quot;><a href=&quot;#contact&quot; class=&quot;se-btn-primary hidden sm:inline-flex&quot;>Get started</a><button type=&quot;button&quot; aria-expanded=&quot;false&quot; aria-controls=&quot;se-mobile-nav&quot; aria-label=&quot;Open menu&quot; class=&quot;inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] lg:hidden se-focus-ring&quot;><span class=&quot;sr-only&quot;>Menu</span><span aria-hidden=&quot;true&quot; class=&quot;flex flex-col gap-1&quot;><span class=&quot;block h-0.5 w-5 bg-current transition &quot;></span><span class=&quot;block h-0.5 w-5 bg-current transition &quot;></span><span class=&quot;block h-0.5 w-5 bg-current transition &quot;></span></span></button></div></div></header></header><main data-v2-region=&quot;main&quot; class=&quot;v2-region-grid&quot;><section id=&quot;top&quot; data-v2-component=&quot;saas-enterprise-hero&quot; aria-labelledby=&quot;se-hero-title&quot; class=&quot;se-section relative overflow-hidden bg-[var(--color-background)]&quot;><div class=&quot;se-grid-bg pointer-events-none absolute inset-0 opacity-60&quot; aria-hidden=&quot;true&quot;></div><div class=&quot;pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_80%_0%,rgba(59,130,246,0.12),transparent_60%)]&quot; aria-hidden=&quot;true&quot;></div><div class=&quot;relative mx-auto max-w-[82rem] px-5 sm:px-8&quot;><div class=&quot;grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-14&quot;><div class=&quot;max-w-xl&quot;><p class=&quot;se-eyebrow mb-4 motion-safe:animate-[se-slide-up_0.6s_ease_both]&quot;>Professional presence</p><h1 id=&quot;se-hero-title&quot; class=&quot;se-headline motion-safe:animate-[se-slide-up_0.65s_ease_0.08s_both]&quot;>Northline</h1><p class=&quot;se-body mt-5 motion-safe:animate-[se-slide-up_0.65s_ease_0.16s_both]&quot;>Enterprise revenue operations platform</p><div class=&quot;mt-8 flex flex-wrap gap-3 motion-safe:animate-[se-slide-up_0.65s_ease_0.24s_both]&quot;><a href=&quot;#contact&quot; class=&quot;se-btn-primary&quot;>Get started</a><a href=&quot;#platform&quot; class=&quot;se-btn-secondary&quot;>Learn more</a></div><div class=&quot;mt-8 flex flex-wrap items-center gap-4 motion-safe:animate-[se-slide-up_0.65s_ease_0.32s_both]&quot;><span class=&quot;se-font-mono flex items-center gap-2 text-xs text-[var(--color-signal)]&quot;><span class=&quot;h-2 w-2 rounded-full bg-[var(--color-signal)] motion-safe:animate-[se-pulse-dot_2s_ease-in-out_infinite]&quot;></span>Live platform status</span><span class=&quot;se-font-body text-xs text-[var(--color-muted)]&quot;>SOC 2 Type II · GDPR · SSO</span></div></div><div class=&quot;grid gap-3 sm:grid-cols-2 motion-safe:animate-[se-grid-reveal_0.8s_ease_0.2s_both]&quot;><div class=&quot;se-card col-span-2 overflow-hidden p-1&quot;><div class=&quot;se-grid-bg relative aspect-[16/9] overflow-hidden rounded-[calc(var(--radius-lg)-4px)] bg-[var(--color-surface)]&quot;><div class=&quot;absolute inset-4 space-y-3&quot;><div class=&quot;h-3 w-32 rounded bg-[var(--color-grid)]&quot;></div><div class=&quot;grid grid-cols-3 gap-2&quot;><div class=&quot;h-16 rounded-[var(--radius-sm)] bg-[var(--color-grid)]&quot;></div><div class=&quot;h-16 rounded-[var(--radius-sm)] bg-[var(--color-grid)]&quot;></div><div class=&quot;h-16 rounded-[var(--radius-sm)] bg-[var(--color-grid)]&quot;></div></div><div class=&quot;h-24 rounded-[var(--radius-sm)] bg-[var(--color-grid)]&quot;></div></div></div></div><div class=&quot;se-card p-4 motion-safe:animate-[se-grid-reveal_0.6s_ease_both]&quot; style=&quot;animation-delay:0.3s&quot;><div class=&quot;flex items-baseline justify-between gap-2&quot;><p class=&quot;se-metric&quot;>38%</p><span class=&quot;se-font-mono text-[0.625rem] text-[var(--color-signal)]&quot;>+12%</span></div><p class=&quot;se-font-body mt-1 text-xs text-[var(--color-muted)]&quot;>Pipeline velocity</p></div><div class=&quot;se-card p-4 motion-safe:animate-[se-grid-reveal_0.6s_ease_both]&quot; style=&quot;animation-delay:0.38s&quot;><div class=&quot;flex items-baseline justify-between gap-2&quot;><p class=&quot;se-metric&quot;>$2.4M</p><span class=&quot;se-font-mono text-[0.625rem] text-[var(--color-signal)]&quot;>avg.</span></div><p class=&quot;se-font-body mt-1 text-xs text-[var(--color-muted)]&quot;>ARR unlocked</p></div><div class=&quot;se-card p-4 motion-safe:animate-[se-grid-reveal_0.6s_ease_both]&quot; style=&quot;animation-delay:0.45999999999999996s&quot;><div class=&quot;flex items-baseline justify-between gap-2&quot;><p class=&quot;se-metric&quot;>14d</p><span class=&quot;se-font-mono text-[0.625rem] text-[var(--color-signal)]&quot;>median</span></div><p class=&quot;se-font-body mt-1 text-xs text-[var(--color-muted)]&quot;>Time to value</p></div><div class=&quot;se-card p-4 motion-safe:animate-[se-grid-reveal_0.6s_ease_both]&quot; style=&quot;animation-delay:0.54s&quot;><div class=&quot;flex items-baseline justify-between gap-2&quot;><p class=&quot;se-metric&quot;>99.9%</p><span class=&quot;se-font-mono text-[0.625rem] text-[var(--color-signal)]&quot;>FY24</span></div><p class=&quot;se-font-body mt-1 text-xs text-[var(--color-muted)]&quot;>Uptime SLA</p></div></div></div></div></section><section id=&quot;customers&quot; data-v2-component=&quot;saas-enterprise-portfolio&quot; aria-labelledby=&quot;se-portfolio-title&quot; class=&quot;se-section bg-[var(--color-surface)]&quot;><div class=&quot;mx-auto max-w-[82rem] px-5 sm:px-8&quot;><header class=&quot;mb-12 max-w-2xl&quot;><p class=&quot;se-eyebrow mb-3&quot;>Customer outcomes</p><h2 id=&quot;se-portfolio-title&quot; class=&quot;se-headline-sm&quot;>Moments from the work</h2><p class=&quot;se-body mt-4&quot;>Enterprise GTM teams accelerate pipeline velocity and unlock expansion revenue with measurable ROI.</p></header><div class=&quot;grid gap-4 md:grid-cols-3&quot;><article class=&quot;se-card group relative overflow-hidden p-6&quot;><div class=&quot;absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] opacity-0 transition-opacity group-hover:opacity-100&quot; aria-hidden=&quot;true&quot;></div><p class=&quot;se-font-mono text-[0.625rem] font-medium uppercase tracking-wider text-[var(--color-muted)]&quot;>FinTech</p><h3 class=&quot;se-font-display mt-2 text-lg font-bold text-[var(--color-foreground)]&quot;>Vertex Systems</h3><div class=&quot;mt-6 flex items-baseline gap-2&quot;><span class=&quot;se-metric text-3xl&quot;>42%</span><span class=&quot;se-font-body text-sm text-[var(--color-muted)]&quot;>faster deal cycles</span></div><p class=&quot;se-font-body mt-4 text-sm leading-relaxed text-[var(--color-muted)]&quot;>Unified pipeline data across 6 regions and reduced forecast variance by 28%.</p><p class=&quot;se-font-mono mt-6 text-[0.625rem] text-[var(--color-accent)]&quot;>Case study 01</p></article><article class=&quot;se-card group relative overflow-hidden p-6&quot;><div class=&quot;absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] opacity-0 transition-opacity group-hover:opacity-100&quot; aria-hidden=&quot;true&quot;></div><p class=&quot;se-font-mono text-[0.625rem] font-medium uppercase tracking-wider text-[var(--color-muted)]&quot;>Healthcare SaaS</p><h3 class=&quot;se-font-display mt-2 text-lg font-bold text-[var(--color-foreground)]&quot;>Helix Health</h3><div class=&quot;mt-6 flex items-baseline gap-2&quot;><span class=&quot;se-metric text-3xl&quot;>$3.1M</span><span class=&quot;se-font-body text-sm text-[var(--color-muted)]&quot;>expansion ARR</span></div><p class=&quot;se-font-body mt-4 text-sm leading-relaxed text-[var(--color-muted)]&quot;>Identified expansion signals 3 weeks earlier with account health scoring.</p><p class=&quot;se-font-mono mt-6 text-[0.625rem] text-[var(--color-accent)]&quot;>Case study 02</p></article><article class=&quot;se-card group relative overflow-hidden p-6&quot;><div class=&quot;absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] opacity-0 transition-opacity group-hover:opacity-100&quot; aria-hidden=&quot;true&quot;></div><p class=&quot;se-font-mono text-[0.625rem] font-medium uppercase tracking-wider text-[var(--color-muted)]&quot;>Supply Chain</p><h3 class=&quot;se-font-display mt-2 text-lg font-bold text-[var(--color-foreground)]&quot;>Axiom Logistics</h3><div class=&quot;mt-6 flex items-baseline gap-2&quot;><span class=&quot;se-metric text-3xl&quot;>99.2%</span><span class=&quot;se-font-body text-sm text-[var(--color-muted)]&quot;>forecast accuracy</span></div><p class=&quot;se-font-body mt-4 text-sm leading-relaxed text-[var(--color-muted)]&quot;>Replaced manual spreadsheets with live revenue intelligence dashboards.</p><p class=&quot;se-font-mono mt-6 text-[0.625rem] text-[var(--color-accent)]&quot;>Case study 03</p></article></div></div></section><section id=&quot;platform&quot; data-v2-component=&quot;saas-enterprise-integrations&quot; aria-labelledby=&quot;se-integrations-title&quot; class=&quot;border-y border-[var(--border-default)] bg-[var(--color-background)] py-12 sm:py-14&quot;><div class=&quot;mx-auto max-w-[82rem] px-5 sm:px-8&quot;><header class=&quot;mb-10 text-center&quot;><p class=&quot;se-eyebrow mb-3&quot;>Integrations</p><h2 id=&quot;se-integrations-title&quot; class=&quot;se-headline-sm&quot;>A presence that earns trust</h2><p class=&quot;se-body mx-auto mt-3 max-w-lg text-sm&quot;>Native bi-directional sync with CRM, data warehouse, and collaboration tools.</p></header></div><div class=&quot;relative overflow-hidden&quot; aria-label=&quot;Integration partners&quot;><div class=&quot;flex motion-safe:animate-[se-marquee_40s_linear_infinite] hover:[animation-play-state:paused]&quot;><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Salesforce</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>HubSpot</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Slack</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Snowflake</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Workday</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Gong</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Outreach</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Segment</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Databricks</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Zendesk</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Salesforce</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>HubSpot</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Slack</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Snowflake</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Workday</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Gong</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Outreach</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Segment</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Databricks</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Zendesk</span></div></div></div><p class=&quot;se-font-body mx-auto mt-8 max-w-[82rem] px-5 text-center text-xs text-[var(--color-muted)] sm:px-8&quot;>120+ integrations · Custom API connectors available</p></section><section data-v2-component=&quot;saas-enterprise-features&quot; aria-labelledby=&quot;se-features-title&quot; class=&quot;se-section bg-[var(--color-background)]&quot;><div class=&quot;mx-auto max-w-[82rem] px-5 sm:px-8&quot;><header class=&quot;mb-12 max-w-2xl&quot;><p class=&quot;se-eyebrow mb-3&quot;>Why us</p><h2 id=&quot;se-features-title&quot; class=&quot;se-headline-sm&quot;>A presence that earns trust</h2><p class=&quot;se-body mt-4&quot;>Webflow-caliber spacing, type, and hierarchy for serious brands.</p></header><div class=&quot;grid gap-4 sm:grid-cols-2 lg:grid-cols-3&quot;><article class=&quot;se-card group p-6 &quot;><div class=&quot;mb-4 flex items-center justify-between&quot;><span class=&quot;se-font-mono flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] text-xs font-medium text-[var(--color-primary)]&quot;>01</span><span class=&quot;h-px flex-1 ms-4 bg-[var(--border-default)] transition group-hover:bg-[var(--color-accent)]&quot; aria-hidden=&quot;true&quot;></span></div><h3 class=&quot;se-font-display text-lg font-bold text-[var(--color-foreground)]&quot;>Clear offer</h3><p class=&quot;se-font-body mt-2 text-sm leading-relaxed text-[var(--color-muted)]&quot;></p></article><article class=&quot;se-card group p-6 &quot;><div class=&quot;mb-4 flex items-center justify-between&quot;><span class=&quot;se-font-mono flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] text-xs font-medium text-[var(--color-primary)]&quot;>02</span><span class=&quot;h-px flex-1 ms-4 bg-[var(--border-default)] transition group-hover:bg-[var(--color-accent)]&quot; aria-hidden=&quot;true&quot;></span></div><h3 class=&quot;se-font-display text-lg font-bold text-[var(--color-foreground)]&quot;>Premium presentation</h3><p class=&quot;se-font-body mt-2 text-sm leading-relaxed text-[var(--color-muted)]&quot;></p></article><article class=&quot;se-card group p-6 &quot;><div class=&quot;mb-4 flex items-center justify-between&quot;><span class=&quot;se-font-mono flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] text-xs font-medium text-[var(--color-primary)]&quot;>03</span><span class=&quot;h-px flex-1 ms-4 bg-[var(--border-default)] transition group-hover:bg-[var(--color-accent)]&quot; aria-hidden=&quot;true&quot;></span></div><h3 class=&quot;se-font-display text-lg font-bold text-[var(--color-foreground)]&quot;>Conversion paths</h3><p class=&quot;se-font-body mt-2 text-sm leading-relaxed text-[var(--color-muted)]&quot;></p></article><article class=&quot;se-card group p-6 &quot;><div class=&quot;mb-4 flex items-center justify-between&quot;><span class=&quot;se-font-mono flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] text-xs font-medium text-[var(--color-primary)]&quot;>04</span><span class=&quot;h-px flex-1 ms-4 bg-[var(--border-default)] transition group-hover:bg-[var(--color-accent)]&quot; aria-hidden=&quot;true&quot;></span></div><h3 class=&quot;se-font-display text-lg font-bold text-[var(--color-foreground)]&quot;>Trusted contact</h3><p class=&quot;se-font-body mt-2 text-sm leading-relaxed text-[var(--color-muted)]&quot;></p></article></div></div></section><section data-v2-component=&quot;saas-enterprise-faq&quot; aria-labelledby=&quot;se-faq-title&quot; class=&quot;se-section bg-[var(--color-surface)]&quot;><div class=&quot;mx-auto max-w-[82rem] px-5 sm:px-8&quot;><div class=&quot;grid gap-12 lg:grid-cols-[0.9fr_1.1fr]&quot;><header><p class=&quot;se-eyebrow mb-3&quot;>FAQ</p><h2 id=&quot;se-faq-title&quot; class=&quot;se-headline-sm&quot;>Common questions</h2><p class=&quot;se-body mt-4&quot;>Launch timing, edits, and languages.</p></header><div class=&quot;space-y-2&quot;><div class=&quot;overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-background)]&quot;><h3><button type=&quot;button&quot; id=&quot;se-faq-trigger-0&quot; aria-expanded=&quot;true&quot; aria-controls=&quot;se-faq-panel-0&quot; class=&quot;flex w-full items-center justify-between gap-4 px-5 py-4 text-start se-focus-ring&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-foreground)]&quot;></span><span class=&quot;se-font-mono flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-xs text-[var(--color-accent)]&quot; aria-hidden=&quot;true&quot;>−</span></button></h3><div id=&quot;se-faq-panel-0&quot; role=&quot;region&quot; aria-labelledby=&quot;se-faq-trigger-0&quot; class=&quot;border-t border-[var(--border-subtle)] px-5 py-4&quot;><p class=&quot;se-font-body text-sm leading-relaxed text-[var(--color-muted)]&quot;></p></div></div><div class=&quot;overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-background)]&quot;><h3><button type=&quot;button&quot; id=&quot;se-faq-trigger-1&quot; aria-expanded=&quot;false&quot; aria-controls=&quot;se-faq-panel-1&quot; class=&quot;flex w-full items-center justify-between gap-4 px-5 py-4 text-start se-focus-ring&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-foreground)]&quot;></span><span class=&quot;se-font-mono flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-xs text-[var(--color-accent)]&quot; aria-hidden=&quot;true&quot;>+</span></button></h3><div id=&quot;se-faq-panel-1&quot; role=&quot;region&quot; aria-labelledby=&quot;se-faq-trigger-1&quot; hidden=&quot;&quot; class=&quot;border-t border-[var(--border-subtle)] px-5 py-4&quot;><p class=&quot;se-font-body text-sm leading-relaxed text-[var(--color-muted)]&quot;></p></div></div><div class=&quot;overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-background)]&quot;><h3><button type=&quot;button&quot; id=&quot;se-faq-trigger-2&quot; aria-expanded=&quot;false&quot; aria-controls=&quot;se-faq-panel-2&quot; class=&quot;flex w-full items-center justify-between gap-4 px-5 py-4 text-start se-focus-ring&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-foreground)]&quot;></span><span class=&quot;se-font-mono flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-xs text-[var(--color-accent)]&quot; aria-hidden=&quot;true&quot;>+</span></button></h3><div id=&quot;se-faq-panel-2&quot; role=&quot;region&quot; aria-labelledby=&quot;se-faq-trigger-2&quot; hidden=&quot;&quot; class=&quot;border-t border-[var(--border-subtle)] px-5 py-4&quot;><p class=&quot;se-font-body text-sm leading-relaxed text-[var(--color-muted)]&quot;></p></div></div></div></div></div></section><section id=&quot;pricing&quot; data-v2-component=&quot;saas-enterprise-pricing&quot; aria-labelledby=&quot;se-pricing-title&quot; class=&quot;se-section bg-[var(--color-background)]&quot;><div class=&quot;mx-auto max-w-[82rem] px-5 sm:px-8&quot;><header class=&quot;mb-12 text-center&quot;><p class=&quot;se-eyebrow mb-3&quot;>Packages</p><h2 id=&quot;se-pricing-title&quot; class=&quot;se-headline-sm&quot;>Simple engagement options</h2><p class=&quot;se-body mx-auto mt-4 max-w-lg&quot;>Start lean or go deeper — both look premium.</p></header><div class=&quot;grid gap-4 lg:grid-cols-3&quot;><article class=&quot;se-card flex flex-col p-6 &quot;><h3 class=&quot;se-font-display text-lg font-bold text-[var(--color-foreground)]&quot;>Growth</h3><p class=&quot;se-font-body mt-2 text-sm text-[var(--color-muted)]&quot;>For scaling GTM teams building their revenue foundation.</p><p class=&quot;mt-6&quot;><span class=&quot;se-metric text-4xl&quot;>$499</span><span class=&quot;se-font-body text-sm text-[var(--color-muted)]&quot;>/seat/mo</span></p><ul class=&quot;mt-6 flex-1 space-y-3&quot;><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>Pipeline intelligence</li><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>CRM sync</li><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>Standard dashboards</li><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>Email support</li></ul><a href=&quot;#contact&quot; class=&quot;se-btn-secondary mt-8 w-full&quot;>Start trial</a></article><article class=&quot;se-card flex flex-col p-6 relative border-[var(--border-accent)] ring-2 ring-[var(--color-accent)]/20&quot;><span class=&quot;se-eyebrow absolute -top-3 start-6 rounded-full bg-[var(--color-primary)] px-3 py-1 text-[0.625rem] text-white&quot;>Most popular</span><h3 class=&quot;se-font-display text-lg font-bold text-[var(--color-foreground)]&quot;>Enterprise</h3><p class=&quot;se-font-body mt-2 text-sm text-[var(--color-muted)]&quot;>Full platform for revenue leaders with advanced forecasting.</p><p class=&quot;mt-6&quot;><span class=&quot;se-metric text-4xl&quot;>$899</span><span class=&quot;se-font-body text-sm text-[var(--color-muted)]&quot;>/seat/mo</span></p><ul class=&quot;mt-6 flex-1 space-y-3&quot;><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>Everything in Growth</li><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>AI forecast models</li><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>Custom dashboards</li><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>Dedicated CSM</li><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>SSO &amp; SCIM</li></ul><a href=&quot;#contact&quot; class=&quot;se-btn-primary mt-8 w-full&quot;>Book a demo</a></article><article class=&quot;se-card flex flex-col p-6 &quot;><h3 class=&quot;se-font-display text-lg font-bold text-[var(--color-foreground)]&quot;>Global</h3><p class=&quot;se-font-body mt-2 text-sm text-[var(--color-muted)]&quot;>Multi-region deployments with enterprise security and SLAs.</p><p class=&quot;mt-6&quot;><span class=&quot;se-metric text-4xl&quot;>Custom</span></p><ul class=&quot;mt-6 flex-1 space-y-3&quot;><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>Everything in Enterprise</li><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>Multi-region hosting</li><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>Custom integrations</li><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>24/7 priority support</li><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>Executive business reviews</li></ul><a href=&quot;#contact&quot; class=&quot;se-btn-secondary mt-8 w-full&quot;>Contact sales</a></article></div></div></section></main><utility data-v2-region=&quot;utility&quot;><section id=&quot;contact&quot; data-v2-component=&quot;saas-enterprise-utility-band&quot; aria-labelledby=&quot;se-utility-title&quot; class=&quot;relative overflow-hidden bg-[var(--color-primary)] py-14 sm:py-16&quot;><div class=&quot;se-grid-bg pointer-events-none absolute inset-0 opacity-20&quot; aria-hidden=&quot;true&quot;></div><div class=&quot;pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_0%_50%,rgba(255,255,255,0.12),transparent)]&quot; aria-hidden=&quot;true&quot;></div><div class=&quot;relative mx-auto flex max-w-[82rem] flex-col items-start justify-between gap-8 px-5 sm:flex-row sm:items-center sm:px-8&quot;><div class=&quot;max-w-xl&quot;><p class=&quot;se-font-mono text-xs font-medium uppercase tracking-wider text-white/70&quot;>Get started</p><h2 id=&quot;se-utility-title&quot; class=&quot;se-font-display mt-2 text-[clamp(1.5rem,2.8vw,2.25rem)] font-bold text-white&quot;>Ready to look established online?</h2><p class=&quot;se-font-body mt-3 text-sm leading-relaxed text-white/75 sm:text-base&quot;>Share your goals — we will propose a clear path and timeline.</p></div><div class=&quot;flex flex-wrap gap-3&quot;><a href=&quot;#contact&quot; class=&quot;inline-flex min-h-[2.75rem] items-center justify-center rounded-[var(--radius-md)] bg-white px-5 py-3 text-sm font-semibold text-[var(--color-primary)] transition hover:bg-white/90 se-focus-ring&quot;>Get started</a><a href=&quot;#resources&quot; class=&quot;inline-flex min-h-[2.75rem] items-center justify-center rounded-[var(--radius-md)] border border-white/30 px-5 py-3 text-sm font-semibold text-white transition hover:border-white/60 se-focus-ring&quot;>Learn more</a></div></div></section></utility><footer data-v2-region=&quot;footer&quot;><footer data-v2-component=&quot;saas-enterprise-footer&quot; class=&quot;border-t border-[var(--border-default)] bg-[var(--color-ink,#020617)] text-white&quot; role=&quot;contentinfo&quot;><div class=&quot;mx-auto max-w-[82rem] px-5 py-14 sm:px-8 sm:py-16&quot;><div class=&quot;grid gap-10 md:grid-cols-[1.4fr_1fr]&quot;><div><p class=&quot;se-font-display text-xl font-bold&quot;>Northline</p><p class=&quot;se-font-body mt-3 max-w-sm text-sm leading-relaxed text-white/60&quot;>Clear messaging and conversion-focused pages that earn trust quickly.</p><div class=&quot;mt-6 flex flex-wrap gap-3&quot;><span class=&quot;se-font-mono rounded-[var(--radius-sm)] border border-white/10 px-2.5 py-1 text-[0.625rem] text-white/50&quot;>SOC 2</span><span class=&quot;se-font-mono rounded-[var(--radius-sm)] border border-white/10 px-2.5 py-1 text-[0.625rem] text-white/50&quot;>GDPR</span><span class=&quot;se-font-mono rounded-[var(--radius-sm)] border border-white/10 px-2.5 py-1 text-[0.625rem] text-white/50&quot;>ISO 27001</span></div></div><nav aria-label=&quot;Footer&quot;><p class=&quot;se-eyebrow text-white/40&quot;>Explore</p><ul class=&quot;mt-4 grid grid-cols-2 gap-x-6 gap-y-2.5&quot;><li><a href=&quot;#services&quot; class=&quot;se-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] se-focus-ring rounded-sm&quot;>Services</a></li><li><a href=&quot;#features&quot; class=&quot;se-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] se-focus-ring rounded-sm&quot;>Why us</a></li><li><a href=&quot;#pricing&quot; class=&quot;se-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] se-focus-ring rounded-sm&quot;>Packages</a></li><li><a href=&quot;#testimonials&quot; class=&quot;se-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] se-focus-ring rounded-sm&quot;>Clients</a></li><li><a href=&quot;#contact&quot; class=&quot;se-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] se-focus-ring rounded-sm&quot;>Contact</a></li></ul></nav></div><div class=&quot;mt-12 border-t border-white/10 pt-6&quot;><p class=&quot;se-font-body text-xs text-white/40&quot;>© 2026 Northline. All rights reserved.</p></div></div></footer></footer><div data-v2-region=&quot;overlay&quot; class=&quot;pointer-events-none fixed inset-x-0 bottom-0 z-50&quot;></div></div>
+  </div>
+  <section class=&quot;page v2-secondary-page&quot; id=&quot;platform&quot;>
+  <div class=&quot;mx-auto max-w-3xl px-6 py-16&quot;>
+    <p class=&quot;text-xs uppercase tracking-widest text-[var(--color-foreground)]/50&quot;>platform</p>
+    <pre class=&quot;mt-4 overflow-x-auto rounded border border-[var(--color-foreground)]/10 p-4 text-xs text-[var(--color-foreground)]/70&quot;>export default function Platform(){return &lt;main&gt;Platform&lt;/main&gt;}</pre>
+    <a class=&quot;mt-6 inline-block text-sm text-[var(--color-accent,#B87333)]&quot; href=&quot;#home&quot;>Back to home</a>
+  </div>
+</section>
+<section class=&quot;page v2-secondary-page&quot; id=&quot;pricing&quot;>
+  <div class=&quot;mx-auto max-w-3xl px-6 py-16&quot;>
+    <p class=&quot;text-xs uppercase tracking-widest text-[var(--color-foreground)]/50&quot;>pricing</p>
+    <h1 class=&quot;mt-4 text-3xl font-semibold text-[var(--color-foreground)]&quot;>pricing</h1>
+    <p class=&quot;mt-4 text-[var(--color-foreground)]/70&quot;>pricing — Northline</p>
+    <a class=&quot;mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]&quot; href=&quot;#home&quot;>Back to home</a>
+  </div>
+</section>
+<section class=&quot;page v2-secondary-page&quot; id=&quot;customers&quot;>
+  <div class=&quot;mx-auto max-w-3xl px-6 py-16&quot;>
+    <p class=&quot;text-xs uppercase tracking-widest text-[var(--color-foreground)]/50&quot;>customers</p>
+    <h1 class=&quot;mt-4 text-3xl font-semibold text-[var(--color-foreground)]&quot;>customers</h1>
+    <p class=&quot;mt-4 text-[var(--color-foreground)]/70&quot;>customers — Northline</p>
+    <a class=&quot;mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]&quot; href=&quot;#home&quot;>Back to home</a>
+  </div>
+</section>
+</body>
+</html>"></iframe>
+  </div>
+</div>
+</body>
+</html>

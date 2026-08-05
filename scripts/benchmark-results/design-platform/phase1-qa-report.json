@@ -1,0 +1,118 @@
+{
+  "phase": "foundations-1",
+  "specVersion": "1.0.0",
+  "ok": true,
+  "passed": 27,
+  "total": 27,
+  "checks": [
+    {
+      "id": "spec.version",
+      "ok": true
+    },
+    {
+      "id": "phase.scope",
+      "ok": true
+    },
+    {
+      "id": "foundation.color",
+      "ok": true
+    },
+    {
+      "id": "foundation.typography",
+      "ok": true
+    },
+    {
+      "id": "foundation.spacing",
+      "ok": true
+    },
+    {
+      "id": "foundation.grid",
+      "ok": true
+    },
+    {
+      "id": "foundation.radius",
+      "ok": true
+    },
+    {
+      "id": "foundation.shadow",
+      "ok": true
+    },
+    {
+      "id": "foundation.border",
+      "ok": true
+    },
+    {
+      "id": "foundation.icon",
+      "ok": true
+    },
+    {
+      "id": "foundation.elevation",
+      "ok": true
+    },
+    {
+      "id": "tokens.light",
+      "ok": true
+    },
+    {
+      "id": "tokens.dark",
+      "ok": true
+    },
+    {
+      "id": "tokens.arabic",
+      "ok": true
+    },
+    {
+      "id": "css.prefix",
+      "ok": true
+    },
+    {
+      "id": "css.no.primitives",
+      "ok": true
+    },
+    {
+      "id": "isolation.lib.website.template-v2",
+      "ok": true
+    },
+    {
+      "id": "isolation.templates.website",
+      "ok": true
+    },
+    {
+      "id": "isolation.lib.website.builder.apply-structure-template.ts",
+      "ok": true
+    },
+    {
+      "id": "isolation.lib.ai-core.website-design-platform",
+      "ok": true
+    },
+    {
+      "id": "file.count",
+      "ok": true,
+      "detail": "count=48"
+    },
+    {
+      "id": "docs.readme",
+      "ok": true
+    },
+    {
+      "id": "docs.architecture",
+      "ok": true
+    },
+    {
+      "id": "docs.tokens",
+      "ok": true
+    },
+    {
+      "id": "docs.compat",
+      "ok": true
+    },
+    {
+      "id": "typescript",
+      "ok": true
+    },
+    {
+      "id": "eslint",
+      "ok": true
+    }
+  ]
+}

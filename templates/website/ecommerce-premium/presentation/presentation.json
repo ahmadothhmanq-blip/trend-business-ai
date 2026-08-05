@@ -1,0 +1,70 @@
+{
+  "packageId": "ecommerce-premium",
+  "templateIntelligenceHint": "ti-ecommerce-atelier",
+  "layout": {
+    "defaultLayoutId": "default",
+    "regions": {
+      "header": {
+        "role": "header",
+        "sticky": true
+      },
+      "main": {
+        "role": "main"
+      },
+      "utility": {
+        "role": "utility"
+      },
+      "footer": {
+        "role": "footer"
+      },
+      "overlay": {
+        "role": "overlay"
+      }
+    }
+  },
+  "navigation": {
+    "componentId": "ecommerce-premium-nav",
+    "variant": "atelier-glass"
+  },
+  "hero": {
+    "componentId": "ecommerce-premium-hero",
+    "region": "main"
+  },
+  "footer": {
+    "componentId": "ecommerce-premium-footer",
+    "region": "footer"
+  },
+  "homeFlow": {
+    "regions": {
+      "main": [
+        "ecommerce-premium-hero",
+        "ecommerce-premium-collections",
+        "ecommerce-premium-product-grid",
+        "ecommerce-premium-brand-story",
+        "ecommerce-premium-stats",
+        "ecommerce-premium-testimonials",
+        "ecommerce-premium-shipping",
+        "ecommerce-premium-faq",
+        "ecommerce-premium-contact"
+      ],
+      "utility": [
+        "ecommerce-premium-utility-band"
+      ],
+      "overlay": [
+        "ecommerce-premium-floating-cta"
+      ]
+    }
+  },
+  "sectionShell": {
+    "strategy": "package",
+    "componentId": "ecommerce-premium-section-shell"
+  },
+  "aiGeneration": {
+    "contentProfile": "ecommerce-premium-atelier",
+    "suggestedPages": [
+      "shop",
+      "collections",
+      "about"
+    ]
+  }
+}

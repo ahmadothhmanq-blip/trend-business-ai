@@ -1,0 +1,23 @@
+[
+  "lib/site-images.ts",
+  "app/layout.tsx",
+  "components/ui/motion.tsx",
+  "app/globals.css",
+  "components/hotel-resort-premium-nav.tsx",
+  "components/hotel-resort-premium-sidebar-rail.tsx",
+  "components/hotel-resort-premium-hero.tsx",
+  "components/hotel-resort-premium-tasting-menu.tsx",
+  "components/hotel-resort-premium-chef-story.tsx",
+  "components/hotel-resort-premium-stats.tsx",
+  "components/hotel-resort-premium-signature-dishes.tsx",
+  "components/hotel-resort-premium-testimonials.tsx",
+  "components/hotel-resort-premium-atmosphere.tsx",
+  "components/hotel-resort-premium-gallery.tsx",
+  "components/hotel-resort-premium-faq.tsx",
+  "components/hotel-resort-premium-reservation-cta.tsx",
+  "components/hotel-resort-premium-contact.tsx",
+  "components/hotel-resort-premium-reservation.tsx",
+  "components/hotel-resort-premium-footer.tsx",
+  "components/hotel-resort-premium-section-shell.tsx",
+  "app/page.tsx"
+]

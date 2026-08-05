@@ -27,7 +27,14 @@ import {
 } from "@/lib/website/generation-flags";
 import { injectAiImagesIntoProject } from "@/lib/ai-core/image-engine";
 import { getThemePageArchitecture } from "@/lib/website/builder/theme-architecture";
-import { buildGenerationRepairInstruction,
+import {
+  applyV2StructureDuringGeneration,
+  resolveGenerationTemplatePackageId,
+  resolveTemplateIntelligenceForStructurePackage,
+  shouldUseV2StructureDuringGeneration,
+} from "@/lib/website/template-v2/generation/v2-generation-bridge";
+import {
+  buildGenerationRepairInstruction,
   validateWebsiteGeneration,
 } from "@/lib/ai-core/website-builder/generation-validation";
 import { usesLlmLocalizedWebsiteCopy } from "@/lib/ai-core/content/content-language";
@@ -64,6 +71,7 @@ import { generatedFileSchema } from "@/plugins/website/schemas";
 import type {
   AssetManifest,
   GeneratedProjectFile,
+  GeneratedWebsiteProject,
   QualityReport,
   WebsiteGenerationInput,
   WebsitePlanResult,
@@ -428,12 +436,28 @@ export async function generateWebsite(
     generationProfile === "fast" || generationProfile === "ultra";
   const ultraGeneration = generationProfile === "ultra";
 
+  const structurePackageId = resolveGenerationTemplatePackageId(input);
+  const useV2Structure = structurePackageId
+    ? await shouldUseV2StructureDuringGeneration(structurePackageId)
+    : false;
+  const generationInput: WebsiteGenerationInput = useV2Structure && structurePackageId
+    ? {
+        ...input,
+        templateIntelligenceId: resolveTemplateIntelligenceForStructurePackage(
+          input,
+          structurePackageId,
+        ),
+        websiteStructureTemplateId:
+          input.websiteStructureTemplateId?.trim() || structurePackageId,
+      }
+    : input;
+
   const assetManifest =
     options?.skipAssetGeneration && options.assetManifest
       ? options.assetManifest
       : await profilePlugin("image-generation", "generateWebsiteAssets", () =>
           generateWebsiteAssets({
-            input,
+            input: generationInput,
             businessProfile: analysis.businessProfile,
             strategy: plan.strategy,
             designSystem: plan.designSystem,
@@ -500,7 +524,7 @@ export async function generateWebsite(
   const localizedCopy = usesLlmLocalizedWebsiteCopy(input.language);
 
   files = await runWebsiteFileLoop({
-    input,
+    input: generationInput,
     analysis,
     plan,
     ctx,
@@ -511,12 +535,13 @@ export async function generateWebsite(
     minimalGeneration,
     ultraGeneration,
     localizedCopy,
-    componentPaletteForCompose,
+    componentPaletteForCompose: useV2Structure ? undefined : componentPaletteForCompose,
+    useV2Structure,
     reusePrevious,
     previousByPath,
     generateFile: (filePlan, existingFiles, extraValidationReason) =>
       generateFileWithValidation(
-        input,
+        generationInput,
         analysis,
         plan,
         plan.filePlans,
@@ -553,10 +578,10 @@ export async function generateWebsite(
     analysis.businessProfile?.projectName || analysis.projectName;
   const componentIds = plan.designSystem.componentPalette?.map(String);
   const homeComponentOrder = plan.designSystem.homeComponentOrder?.map(String);
-  const themeArch = input.templateIntelligenceId
-    ? getThemePageArchitecture(input.templateIntelligenceId)
-    : input.websiteThemeId
-      ? getThemePageArchitecture(input.websiteThemeId)
+  const themeArch = !useV2Structure && generationInput.templateIntelligenceId
+    ? getThemePageArchitecture(generationInput.templateIntelligenceId)
+    : !useV2Structure && generationInput.websiteThemeId
+      ? getThemePageArchitecture(generationInput.websiteThemeId)
       : null;
   const excellenceShell =
     (plan.designSystem.sectionShellVariant as
@@ -572,14 +597,14 @@ export async function generateWebsite(
     : homeComponentOrder;
 
   let templateVisualCss: string | null = null;
-  if (input.templateIntelligenceId) {
+  if (!useV2Structure && generationInput.templateIntelligenceId) {
     const { getTemplateIntelligence } = await import(
       "@/lib/ai-core/template-intelligence/catalog"
     );
     const { buildTemplateVisualCss } = await import(
       "@/lib/ai-core/template-intelligence/visual-preset"
     );
-    const ti = getTemplateIntelligence(input.templateIntelligenceId);
+    const ti = getTemplateIntelligence(generationInput.templateIntelligenceId);
     if (ti) templateVisualCss = buildTemplateVisualCss(ti);
   }
 
@@ -591,21 +616,36 @@ export async function generateWebsite(
     ReturnType<typeof resolveProductionContentWithIntelligence>
   >["trace"] | null = null;
 
-  if (localizedCopy) {
+  if (useV2Structure) {
+    const contentResolution = resolveProductionContentWithIntelligence({
+      agencyContract: generationInput.agencyContract ?? null,
+      brandName,
+      language: generationInput.language,
+      profile: analysis.businessProfile,
+      strategy: plan.strategy,
+      masterPlan: generationInput.masterWebsitePlan ?? null,
+      businessProfile:
+        generationInput.agencyContract?.businessIntelligence.profile ?? null,
+    });
+    productionContent = contentResolution.pack;
+    contentIntelligenceTrace = contentResolution.trace;
+    filesWithComponents = filesWithImages;
+  } else if (localizedCopy) {
     filesWithComponents = injectProfessionalComponents({
       files: filesWithImages,
       composePage: false,
-      language: input.language,
+      language: generationInput.language,
     });
   } else {
     const contentResolution = resolveProductionContentWithIntelligence({
-      agencyContract: input.agencyContract ?? null,
+      agencyContract: generationInput.agencyContract ?? null,
       brandName,
-      language: input.language,
+      language: generationInput.language,
       profile: analysis.businessProfile,
       strategy: plan.strategy,
-      masterPlan: input.masterWebsitePlan ?? null,
-      businessProfile: input.agencyContract?.businessIntelligence.profile ?? null,
+      masterPlan: generationInput.masterWebsitePlan ?? null,
+      businessProfile:
+        generationInput.agencyContract?.businessIntelligence.profile ?? null,
     });
     productionContent = contentResolution.pack;
     contentIntelligenceTrace = contentResolution.trace;
@@ -634,8 +674,8 @@ export async function generateWebsite(
       heroEyebrow: productionContent.heroEyebrow,
       content: productionContent,
       composePage: true,
-      language: input.language,
-      templateIntelligenceId: input.templateIntelligenceId,
+      language: generationInput.language,
+      templateIntelligenceId: generationInput.templateIntelligenceId,
       templateVisualCss,
       sectionShellVariant,
       websiteThemeId: themeArch?.themeId ?? null,
@@ -652,8 +692,8 @@ export async function generateWebsite(
       pageDescription:
         plan.blueprint.description || productionContent.heroSubheadline,
       content: productionContent,
-      language: input.language,
-      eliteColors: input.agencyContract?.brandKit.colorPalette,
+      language: generationInput.language,
+      eliteColors: generationInput.agencyContract?.brandKit.colorPalette,
       spacingDensity: plan.designSystem.uiStyle?.density,
     });
   }
@@ -665,7 +705,7 @@ export async function generateWebsite(
     "validateAndRepairProject",
     () =>
       validateAndRepairProject(
-        input,
+        generationInput,
         analysis,
         plan,
         plan.filePlans,
@@ -757,7 +797,7 @@ export async function generateWebsite(
       );
       try {
         validatedFiles = await applyQualityImprovePass(
-          input,
+          generationInput,
           analysis,
           plan,
           validatedFiles,
@@ -770,7 +810,7 @@ export async function generateWebsite(
           assetManifest: coreManifest,
           industry: industryHint,
         });
-        if (!localizedCopy && productionContent) {
+        if (!useV2Structure && !localizedCopy && productionContent) {
           validatedFiles = injectProfessionalComponents({
             files: validatedFiles,
             componentPaths: plan.filePlans
@@ -797,18 +837,18 @@ export async function generateWebsite(
             heroEyebrow: productionContent.heroEyebrow,
             content: productionContent,
             composePage: true,
-            language: input.language,
-            templateIntelligenceId: input.templateIntelligenceId,
+            language: generationInput.language,
+            templateIntelligenceId: generationInput.templateIntelligenceId,
             sectionShellVariant,
             websiteThemeId: themeArch?.themeId ?? null,
             pageTopology: themeArch?.pageTopology ?? null,
             floatingCta: themeArch?.floatingCta ?? false,
           });
-        } else if (localizedCopy) {
+        } else if (!useV2Structure && localizedCopy) {
           validatedFiles = injectProfessionalComponents({
             files: validatedFiles,
             composePage: false,
-            language: input.language,
+            language: generationInput.language,
           });
         }
       } catch (error) {
@@ -833,29 +873,64 @@ export async function generateWebsite(
         ? productionContentForPreview(productionContent)
         : plan.blueprint.content;
 
+  let v2AppliedProject: GeneratedWebsiteProject | null = null;
+  if (useV2Structure && structurePackageId) {
+    ctx.progress.emit(
+      `[v2] Applying structure template ${structurePackageId}…`,
+    );
+    v2AppliedProject = await applyV2StructureDuringGeneration({
+      project: {
+        projectKind: generationInput.projectKind,
+        title: plan.blueprint.title || analysis.projectName,
+        description: plan.blueprint.description,
+        pages: plan.blueprint.pages,
+        sections: plan.blueprint.sections,
+        colorPalette: plan.blueprint.colorPalette,
+        typography: plan.blueprint.typography,
+        components: plan.blueprint.components,
+        content: localizedContent,
+        seo: plan.blueprint.seo,
+        roadmap: plan.blueprint.roadmap,
+        files: validatedFiles,
+        businessProfile: analysis.businessProfile,
+        strategy: plan.strategy,
+        designSystem: plan.designSystem,
+        assetManifest,
+        settings: {
+          templateIntelligenceId: generationInput.templateIntelligenceId,
+        } as GeneratedWebsiteProject["settings"],
+      },
+      templatePackageId: structurePackageId,
+      language: generationInput.language,
+    });
+    validatedFiles = v2AppliedProject.files ?? validatedFiles;
+  }
+
+  const v2Settings = (v2AppliedProject?.settings ?? {}) as Record<string, unknown>;
+
   return {
-    projectKind: input.projectKind,
-    title: plan.blueprint.title || analysis.projectName,
-    description: plan.blueprint.description,
-    pages: plan.blueprint.pages,
-    sections: plan.blueprint.sections,
-    colorPalette: plan.blueprint.colorPalette,
-    typography: plan.blueprint.typography,
-    components: plan.blueprint.components,
-    content: localizedContent,
-    seo: plan.blueprint.seo,
-    roadmap: plan.blueprint.roadmap,
+    projectKind: generationInput.projectKind,
+    title: v2AppliedProject?.title ?? (plan.blueprint.title || analysis.projectName),
+    description: v2AppliedProject?.description ?? plan.blueprint.description,
+    pages: v2AppliedProject?.pages ?? plan.blueprint.pages,
+    sections: v2AppliedProject?.sections ?? plan.blueprint.sections,
+    colorPalette: v2AppliedProject?.colorPalette ?? plan.blueprint.colorPalette,
+    typography: v2AppliedProject?.typography ?? plan.blueprint.typography,
+    components: v2AppliedProject?.components ?? plan.blueprint.components,
+    content: v2AppliedProject?.content ?? localizedContent,
+    seo: v2AppliedProject?.seo ?? plan.blueprint.seo,
+    roadmap: v2AppliedProject?.roadmap ?? plan.blueprint.roadmap,
     files: validatedFiles,
     businessProfile: analysis.businessProfile,
     strategy: plan.strategy,
-    designSystem: plan.designSystem,
+    designSystem: v2AppliedProject?.designSystem ?? plan.designSystem,
     assetManifest,
     qualityReport,
     semanticContentQualityReport,
     visualDesignQualityReport,
     unifiedQualityReport,
     qualityDashboard,
-    agencyContract: input.agencyContract,
+    agencyContract: generationInput.agencyContract,
     settings: {
       framework: "Next.js App Router",
       styling: "Tailwind CSS",
@@ -870,12 +945,13 @@ export async function generateWebsite(
       isSaas: String(plan.flags.isSaas),
       databaseProvider: plan.flags.databaseProvider,
       generationProfile: String(generationProfile),
-      ...(input.templateIntelligenceId
-        ? { templateIntelligenceId: input.templateIntelligenceId }
+      ...(generationInput.templateIntelligenceId
+        ? { templateIntelligenceId: generationInput.templateIntelligenceId }
         : {}),
       ...(contentIntelligenceTrace
         ? { contentIntelligenceTrace }
         : {}),
+      ...v2Settings,
     },
   };
 }

@@ -1,0 +1,6 @@
+{
+  "tbdpNative": true,
+  "sectorDnaId": "education",
+  "experienceProfiles": ["corporate", "editorial", "minimal"],
+  "presetBinding": "heritage-reveal"
+}

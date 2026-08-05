@@ -1,0 +1,225 @@
+[
+  {
+    "slug": "corporate-ai-en",
+    "templateId": "corporate-business",
+    "language": "English",
+    "title": "Cortex Intelligence",
+    "wallMs": 44276,
+    "generationTimeMs": 44240.9245,
+    "provider": "deepseek",
+    "fileCount": 21,
+    "checks": {
+      "v2": true,
+      "packageId": true,
+      "noTheme": true,
+      "usesV2Components": true,
+      "v2Preview": true,
+      "packageMarker": true
+    },
+    "generated": {
+      "imageCount": 9,
+      "hasHeroImage": true,
+      "hasPlaceholder": false,
+      "hasMotion": true,
+      "hasRtl": true,
+      "isFrench": false,
+      "isArabic": false,
+      "components": [
+        "corporate-business-about",
+        "corporate-business-contact",
+        "corporate-business-faq",
+        "corporate-business-features",
+        "corporate-business-footer",
+        "corporate-business-hero",
+        "corporate-business-nav",
+        "corporate-business-portfolio",
+        "corporate-business-pricing",
+        "corporate-business-stats",
+        "corporate-business-testimonials",
+        "corporate-business-utility-band"
+      ],
+      "bytes": 76320
+    },
+    "flagship": {
+      "imageCount": 9,
+      "hasHeroImage": true,
+      "hasPlaceholder": false,
+      "hasMotion": true,
+      "hasRtl": true,
+      "isFrench": false,
+      "isArabic": false,
+      "components": [
+        "corporate-business-about",
+        "corporate-business-contact",
+        "corporate-business-faq",
+        "corporate-business-features",
+        "corporate-business-footer",
+        "corporate-business-hero",
+        "corporate-business-nav",
+        "corporate-business-portfolio",
+        "corporate-business-pricing",
+        "corporate-business-stats",
+        "corporate-business-testimonials",
+        "corporate-business-utility-band"
+      ],
+      "bytes": 72603
+    },
+    "comparison": {
+      "regressions": [],
+      "missingComponents": [],
+      "extraOk": []
+    },
+    "passed": true,
+    "previewPath": "C:\\Users\\PC\\Desktop\\trend-business-ai\\scripts\\benchmark-results\\generated-flagship-websites\\corporate-ai-en\\preview.html"
+  },
+  {
+    "slug": "restaurant-ar",
+    "templateId": "restaurant-premium",
+    "language": "Arabic",
+    "title": "مطعم نوار",
+    "wallMs": 51077,
+    "generationTimeMs": 51057.5247,
+    "provider": "deepseek",
+    "fileCount": 22,
+    "checks": {
+      "v2": true,
+      "packageId": true,
+      "noTheme": true,
+      "usesV2Components": true,
+      "v2Preview": true,
+      "packageMarker": true
+    },
+    "generated": {
+      "imageCount": 21,
+      "hasHeroImage": true,
+      "hasPlaceholder": false,
+      "hasMotion": true,
+      "hasRtl": true,
+      "isFrench": false,
+      "isArabic": true,
+      "components": [
+        "restaurant-premium-atmosphere",
+        "restaurant-premium-chef-story",
+        "restaurant-premium-contact",
+        "restaurant-premium-faq",
+        "restaurant-premium-footer",
+        "restaurant-premium-gallery",
+        "restaurant-premium-hero",
+        "restaurant-premium-nav",
+        "restaurant-premium-reservation-cta",
+        "restaurant-premium-sidebar-rail",
+        "restaurant-premium-signature-dishes",
+        "restaurant-premium-stats",
+        "restaurant-premium-tasting-menu",
+        "restaurant-premium-testimonials"
+      ],
+      "bytes": 67855
+    },
+    "flagship": {
+      "imageCount": 24,
+      "hasHeroImage": true,
+      "hasPlaceholder": false,
+      "hasMotion": true,
+      "hasRtl": true,
+      "isFrench": false,
+      "isArabic": false,
+      "components": [
+        "restaurant-premium-atmosphere",
+        "restaurant-premium-chef-story",
+        "restaurant-premium-contact",
+        "restaurant-premium-faq",
+        "restaurant-premium-footer",
+        "restaurant-premium-gallery",
+        "restaurant-premium-hero",
+        "restaurant-premium-nav",
+        "restaurant-premium-reservation-cta",
+        "restaurant-premium-sidebar-rail",
+        "restaurant-premium-signature-dishes",
+        "restaurant-premium-stats",
+        "restaurant-premium-tasting-menu",
+        "restaurant-premium-testimonials"
+      ],
+      "bytes": 74066
+    },
+    "comparison": {
+      "regressions": [],
+      "missingComponents": [],
+      "extraOk": []
+    },
+    "passed": true,
+    "previewPath": "C:\\Users\\PC\\Desktop\\trend-business-ai\\scripts\\benchmark-results\\generated-flagship-websites\\restaurant-ar\\preview.html"
+  },
+  {
+    "slug": "saas-pm-fr",
+    "templateId": "saas-enterprise",
+    "language": "French",
+    "title": "Planium",
+    "wallMs": 30851,
+    "generationTimeMs": 30830.847899999993,
+    "provider": "deepseek",
+    "fileCount": 21,
+    "checks": {
+      "v2": true,
+      "packageId": true,
+      "noTheme": true,
+      "usesV2Components": true,
+      "v2Preview": true,
+      "packageMarker": true
+    },
+    "generated": {
+      "imageCount": 3,
+      "hasHeroImage": true,
+      "hasPlaceholder": false,
+      "hasMotion": true,
+      "hasRtl": true,
+      "isFrench": true,
+      "isArabic": false,
+      "components": [
+        "saas-enterprise-about",
+        "saas-enterprise-contact",
+        "saas-enterprise-faq",
+        "saas-enterprise-features",
+        "saas-enterprise-footer",
+        "saas-enterprise-hero",
+        "saas-enterprise-integrations",
+        "saas-enterprise-nav",
+        "saas-enterprise-pricing",
+        "saas-enterprise-stats",
+        "saas-enterprise-testimonials",
+        "saas-enterprise-utility-band"
+      ],
+      "bytes": 68194
+    },
+    "flagship": {
+      "imageCount": 6,
+      "hasHeroImage": true,
+      "hasPlaceholder": false,
+      "hasMotion": true,
+      "hasRtl": true,
+      "isFrench": false,
+      "isArabic": false,
+      "components": [
+        "saas-enterprise-about",
+        "saas-enterprise-contact",
+        "saas-enterprise-faq",
+        "saas-enterprise-features",
+        "saas-enterprise-footer",
+        "saas-enterprise-hero",
+        "saas-enterprise-integrations",
+        "saas-enterprise-nav",
+        "saas-enterprise-pricing",
+        "saas-enterprise-stats",
+        "saas-enterprise-testimonials",
+        "saas-enterprise-utility-band"
+      ],
+      "bytes": 78775
+    },
+    "comparison": {
+      "regressions": [],
+      "missingComponents": [],
+      "extraOk": []
+    },
+    "passed": true,
+    "previewPath": "C:\\Users\\PC\\Desktop\\trend-business-ai\\scripts\\benchmark-results\\generated-flagship-websites\\saas-pm-fr\\preview.html"
+  }
+]

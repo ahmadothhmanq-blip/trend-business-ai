@@ -59,6 +59,8 @@ export interface AIProvider {
   generateJson<T>(request: JsonGenerationRequest): Promise<T>;
   generateText?(request: TextGenerationRequest): Promise<string>;
   streamText?(request: StreamTextRequest): Promise<string>;
+  /** Active model identifier for this provider instance. */
+  getModelName(): string;
   /** Last recorded token usage from the most recent provider call. */
   getLastUsage?(): TokenUsage | null;
 }

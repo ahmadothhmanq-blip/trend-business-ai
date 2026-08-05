@@ -1,0 +1,9 @@
+{
+  "slug": "real-estate-luxury-en",
+  "packageId": "real-estate-premium",
+  "title": "Monolith Estate",
+  "language": "English",
+  "hasV2": true,
+  "componentCount": 11,
+  "source": "structure-template"
+}

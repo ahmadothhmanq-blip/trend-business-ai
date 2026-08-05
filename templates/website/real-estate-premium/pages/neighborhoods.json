@@ -1,0 +1,12 @@
+{
+  "id": "neighborhoods",
+  "title": "Neighborhoods",
+  "path": "/neighborhoods",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "sidebar",
+    "footer"
+  ]
+}

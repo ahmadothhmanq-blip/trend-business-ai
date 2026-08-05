@@ -1,0 +1,20 @@
+{
+  "pageId": "home",
+  "layoutId": "default",
+  "regions": {
+    "header": ["corporate-business-nav"],
+    "main": [
+      "corporate-business-hero",
+      "corporate-business-features",
+      "corporate-business-about",
+      "corporate-business-stats",
+      "corporate-business-testimonials",
+      "corporate-business-pricing",
+      "corporate-business-faq",
+      "corporate-business-contact"
+    ],
+    "utility": ["corporate-business-utility-band"],
+    "overlay": ["corporate-business-floating-cta"],
+    "footer": ["corporate-business-footer"]
+  }
+}

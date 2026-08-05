@@ -1,0 +1,59 @@
+{
+  "generatedAt": "2026-08-03T22:30:54.755Z",
+  "release": "RC2",
+  "generationProfile": "professional",
+  "wallMs": 86346,
+  "generationTimeMs": 86330.409,
+  "fileCount": 10,
+  "tokens": {
+    "promptTokens": 6385,
+    "completionTokens": 12114,
+    "totalTokens": 18499
+  },
+  "provider": "content-provider",
+  "publishReady": false,
+  "blockers": [
+    "Weak mobile responsive coverage",
+    "Contact / conversion endpoint missing",
+    "Weak responsive breakpoint coverage",
+    "SEO title is missing or too short",
+    "Meta description is weak or missing",
+    "Sitemap missing",
+    "Viewport meta / viewport export not detected",
+    "No responsive breakpoint utilities detected",
+    "Mobile-first experience needs work",
+    "6 link errors.",
+    "Missing: /menu, /gallery, /reservation, /contact",
+    "Missing SEO title metadata.",
+    "Missing SEO meta description."
+  ],
+  "warnings": [
+    "Visual coverage is thin",
+    "Layout feels flat / card-grid heavy",
+    "Typography lacks brand display identity",
+    "Multiple H1s weaken hierarchy",
+    "Inconsistent section spacing",
+    "Section spacing feels tight or inconsistent",
+    "Typography lacks premium display identity",
+    "Sparse imagery — site may feel empty",
+    "Section structure is too thin for conversion",
+    "Add service for Agency conversion",
+    "Add portfolio for Agency conversion",
+    "Multiple H1 headings detected (2) — prefer a single H1 per page",
+    "Primary keywords underused in page content",
+    "robots.txt not detected",
+    "Schema.org structured data missing",
+    "Open Graph metadata missing",
+    "Hero/media imagery should be present for premium feel.",
+    "Responsive utility classes detected."
+  ],
+  "scores": {
+    "overall": 57,
+    "seo": 5,
+    "conversion": 66,
+    "performance": 85,
+    "design": 60,
+    "ux": 75
+  },
+  "passed": false
+}

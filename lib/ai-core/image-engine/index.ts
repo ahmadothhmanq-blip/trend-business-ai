@@ -99,3 +99,69 @@ export {
 } from "@/lib/ai-core/image-engine/video";
 
 export { runAiImageEngine } from "@/lib/ai-core/image-engine/engine";
+
+export type { ImageSlotKind, ImageSlotAssignment, SiteImageSlotMap } from "@/lib/ai-core/image-engine/slots";
+export {
+  IMAGE_SLOT_KINDS,
+  SLOT_MIN_COUNTS,
+  emptySlotMap,
+  pickSlotUrl,
+  roleToSlotKind,
+  slotUrls,
+  flattenSlotUrls,
+} from "@/lib/ai-core/image-engine/slots";
+
+export {
+  buildSlotsFromProfile,
+  hydrateSlotsFromManifest,
+  enrichManifestWithProfileSlots,
+  slotsToManifestItems,
+} from "@/lib/ai-core/image-engine/profile-engine";
+
+export {
+  resolveImageProfile,
+  getImageProfileById,
+  listImageProfiles,
+  INDUSTRY_IMAGE_PROFILES,
+} from "@/lib/ai-core/image-engine/profiles";
+
+export type {
+  IndustryImageProfile,
+  ImageProfileContext,
+  ResolvedImageProfile,
+} from "@/lib/ai-core/image-engine/profiles";
+
+export {
+  validateAndRepairSlots,
+  checkAspectRatioHint,
+} from "@/lib/ai-core/image-engine/slot-validator";
+export type {
+  SlotValidationIssue,
+  SlotValidationReport,
+} from "@/lib/ai-core/image-engine/slot-validator";
+
+export {
+  optimizeImageUrl,
+  buildResponsiveSrcSet,
+  defaultSizesAttr,
+  lazyImageAttrs,
+} from "@/lib/ai-core/image-engine/optimize";
+
+export {
+  runIndustryImageRulesEngine,
+  validateImageCandidate,
+  detectImageContext,
+  resolveSlotImageSource,
+  getIndustrySlotRules,
+  isWrongIndustryUrl,
+  contextFromPackage,
+  PACKAGE_INDUSTRY_MAP,
+} from "@/lib/ai-core/image-engine/rules";
+
+export type {
+  IndustryImageRulesReport,
+  ImageRejectionRecord,
+  ImageSelectionRecord,
+  ImageSourceTier,
+  DetectedImageContext,
+} from "@/lib/ai-core/image-engine/rules";

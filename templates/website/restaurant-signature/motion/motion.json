@@ -1,0 +1,6 @@
+{
+  "tbdpNative": true,
+  "sectorDnaId": "restaurant",
+  "experienceProfiles": ["hospitality", "luxury", "editorial"],
+  "presetBinding": "forest-table-reveal"
+}

@@ -1,0 +1,109 @@
+{
+  "phase": "experience-3",
+  "version": "3.0.0",
+  "ok": true,
+  "passed": 25,
+  "total": 25,
+  "checks": [
+    {
+      "id": "xp.phase",
+      "ok": true
+    },
+    {
+      "id": "xp.version",
+      "ok": true
+    },
+    {
+      "id": "motion.count",
+      "ok": true
+    },
+    {
+      "id": "interaction.count",
+      "ok": true
+    },
+    {
+      "id": "feedback.count",
+      "ok": true
+    },
+    {
+      "id": "behavior.catalog",
+      "ok": true
+    },
+    {
+      "id": "subsystem.motion",
+      "ok": true
+    },
+    {
+      "id": "subsystem.interaction",
+      "ok": true
+    },
+    {
+      "id": "subsystem.feedback",
+      "ok": true
+    },
+    {
+      "id": "subsystem.responsive",
+      "ok": true
+    },
+    {
+      "id": "subsystem.accessibility",
+      "ok": true
+    },
+    {
+      "id": "subsystem.direction",
+      "ok": true
+    },
+    {
+      "id": "subsystem.performance",
+      "ok": true
+    },
+    {
+      "id": "css.reduced.motion",
+      "ok": true
+    },
+    {
+      "id": "css.tbdp.tokens",
+      "ok": true
+    },
+    {
+      "id": "css.no.raw.hex",
+      "ok": true
+    },
+    {
+      "id": "config.reduced",
+      "ok": true
+    },
+    {
+      "id": "config.rtl",
+      "ok": true
+    },
+    {
+      "id": "isolation.lib.website.template-v2",
+      "ok": true
+    },
+    {
+      "id": "isolation.templates.website",
+      "ok": true
+    },
+    {
+      "id": "isolation.lib.website.builder",
+      "ok": true
+    },
+    {
+      "id": "isolation.lib.ai-core.website-design-platform",
+      "ok": true
+    },
+    {
+      "id": "docs.architecture",
+      "ok": true
+    },
+    {
+      "id": "typescript",
+      "ok": true
+    },
+    {
+      "id": "eslint",
+      "ok": true
+    }
+  ]
+}

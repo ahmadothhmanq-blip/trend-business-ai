@@ -1,0 +1,59 @@
+{
+  "id": "canvas",
+  "grid": {
+    "columns": 12,
+    "gutter": "1.5rem",
+    "margin": "1.25rem",
+    "maxWidth": "90rem"
+  },
+  "spacing": {
+    "unit": "rem",
+    "scale": ["0.5", "1", "1.5", "2", "3", "4", "5", "6", "8", "10", "12"]
+  },
+  "visualIdentity": {
+    "colors": {
+      "primary": "#142820",
+      "secondary": "#1E3D32",
+      "accent": "#C4622D",
+      "background": "#080E0C",
+      "foreground": "#F6EFE6",
+      "muted": "rgba(246,239,230,0.55)",
+      "surface": "#101A16",
+      "copper": "#D9A86C",
+      "ember": "#9A4E28",
+      "linen": "#FFFCF8"
+    },
+    "typography": {
+      "display": "Fraunces, ui-serif, Georgia, serif",
+      "body": "Literata, ui-serif, Georgia, serif",
+      "scale": {
+        "sm": "0.8125rem",
+        "base": "1.0625rem",
+        "lg": "1.4375rem",
+        "xl": "3.625rem",
+        "display": "clamp(3rem, 7vw, 5.25rem)"
+      }
+    },
+    "radius": {
+      "sm": "2px",
+      "md": "4px",
+      "lg": "8px"
+    },
+    "shadows": {
+      "surface": "0 36px 88px rgba(0,0,0,0.62)",
+      "glow": "0 0 120px rgba(217,168,108,0.16)"
+    },
+    "borders": {
+      "default": "rgba(246,239,230,0.1)",
+      "copper": "rgba(217,168,108,0.34)",
+      "subtle": "rgba(246,239,230,0.05)"
+    },
+    "animation": "ember-table-reveal"
+  },
+  "designSystem": {
+    "tier": "premium",
+    "industry": "Restaurant",
+    "layoutKind": "sidebar-left",
+    "templateIntelligenceId": "ti-restaurant-dining"
+  }
+}

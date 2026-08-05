@@ -1,0 +1,37 @@
+{
+  "packageId": "saas-enterprise",
+  "tbdpNative": {
+    "enabled": true,
+    "packageId": "saas-enterprise",
+    "sectorDnaId": "saas",
+    "experienceProfileIds": [
+      "technical",
+      "corporate",
+      "executive"
+    ],
+    "templateIdentity": "nexus-command",
+    "presetBinding": "nexus-grid-reveal",
+    "contextHash": "1037788af35209ca",
+    "integrationVersion": "5.0.0",
+    "consumptionVersion": "1.0.0"
+  },
+  "tokenSnapshot": {
+    "primary": "#1D4ED8",
+    "secondary": "#1E293B",
+    "accent": "#3B82F6",
+    "background": "#F8FAFC",
+    "foreground": "#0F172A",
+    "muted": "rgba(15,23,42,0.58)",
+    "surface": "#FFFFFF",
+    "signal": "#059669",
+    "grid": "rgba(15,23,42,0.06)",
+    "ink": "#020617"
+  },
+  "motionPreset": "nexus-grid-reveal",
+  "responsiveContainer": "82rem",
+  "globalsMarkers": {
+    "tbdpAuthority": true,
+    "primaryColor": true,
+    "accentColor": true
+  }
+}

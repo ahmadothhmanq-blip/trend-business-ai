@@ -1,0 +1,174 @@
+{
+  "specVersion": "2.0.0",
+  "id": "real-estate-prestige",
+  "version": "2.0.0",
+  "name": "Real Estate Prestige",
+  "description": "Brokerage intelligence rail — sidebar-right dossier, navy-champagne palette, and testimonial-led property trust.",
+  "metadata": {
+    "category": "real-estate",
+    "industry": "Real Estate",
+    "tags": [
+      "real-estate",
+      "luxury",
+      "property",
+      "brokerage"
+    ],
+    "author": {
+      "name": "Trend Business AI",
+      "organization": "Premium Template Studio"
+    },
+    "license": "MIT",
+    "keywords": [
+      "real estate",
+      "property",
+      "listings",
+      "brokerage"
+    ],
+    "templateIntelligenceId": "ti-real-estate-listings",
+    "premium": true,
+    "tier": "agency"
+  },
+  "media": {
+    "thumbnail": "assets/thumbnail.png",
+    "preview": "assets/preview.png"
+  },
+  "compatibility": {
+    "engineVersion": ">=1.0.0",
+    "specVersion": "2.0.0",
+    "features": [
+      "regions",
+      "placement-rules",
+      "responsive",
+      "premium-canvas"
+    ]
+  },
+  "update": {
+    "channel": "stable",
+    "releasedAt": "2026-08-03T16:09:45.087Z"
+  },
+  "responsive": {
+    "breakpoints": [
+      {
+        "name": "sm",
+        "minWidth": 640
+      },
+      {
+        "name": "md",
+        "minWidth": 768
+      },
+      {
+        "name": "lg",
+        "minWidth": 1024
+      },
+      {
+        "name": "xl",
+        "minWidth": 1280
+      },
+      {
+        "name": "2xl",
+        "minWidth": 1536
+      }
+    ],
+    "containerMaxWidth": "82rem",
+    "fluidTypography": true
+  },
+  "canvas": {
+    "file": "canvas.json"
+  },
+  "placementRules": {
+    "file": "placement-rules.json"
+  },
+  "layouts": [
+    {
+      "id": "default",
+      "file": "layouts/default.json",
+      "kind": "sidebar-right",
+      "label": "Default",
+      "description": "Premium sidebar-right layout for Real Estate."
+    }
+  ],
+  "regions": [
+    {
+      "id": "header",
+      "file": "regions/header.json",
+      "role": "header",
+      "label": "Header Region",
+      "description": "Premium header region for Real Estate Prestige."
+    },
+    {
+      "id": "main",
+      "file": "regions/main.json",
+      "role": "main",
+      "label": "Main Region",
+      "description": "Premium main region for Real Estate Prestige."
+    },
+    {
+      "id": "sidebar",
+      "file": "regions/sidebar.json",
+      "role": "sidebar",
+      "label": "Sidebar Region",
+      "description": "Premium sidebar region for Real Estate Prestige."
+    },
+    {
+      "id": "footer",
+      "file": "regions/footer.json",
+      "role": "footer",
+      "label": "Footer Region",
+      "description": "Premium footer region for Real Estate Prestige."
+    }
+  ],
+  "pages": [
+    {
+      "id": "home",
+      "title": "Home",
+      "path": "/",
+      "layoutId": "default",
+      "file": "pages/home.json",
+      "description": "Home — premium Real Estate page blueprint."
+    },
+    {
+      "id": "listings",
+      "title": "Listings",
+      "path": "/listings",
+      "layoutId": "default",
+      "file": "pages/listings.json",
+      "description": "Listings — premium Real Estate page blueprint."
+    },
+    {
+      "id": "neighborhoods",
+      "title": "Neighborhoods",
+      "path": "/neighborhoods",
+      "layoutId": "default",
+      "file": "pages/neighborhoods.json",
+      "description": "Neighborhoods — premium Real Estate page blueprint."
+    },
+    {
+      "id": "contact",
+      "title": "Contact",
+      "path": "/contact",
+      "layoutId": "default",
+      "file": "pages/contact.json",
+      "description": "Contact — premium Real Estate page blueprint."
+    }
+  ],
+  "entry": "package.entry.json",
+  "architecture": {
+    "version": "v2",
+    "composer": "region-grid",
+    "sdkVersion": "1.0.0"
+  },
+  "presentation": { "file": "presentation/presentation.json" },
+  "tokens": { "file": "tokens/tokens.json" },
+  "motion": { "file": "motion/motion.json" },
+  "responsiveConfig": { "file": "responsive/responsive.json" },
+  "componentLibrary": {
+    "file": "components/registry.json",
+    "root": "components"
+  },
+  "pageFlows": {
+    "home": "flows/home.json",
+    "listings": "flows/listings.json",
+    "neighborhoods": "flows/neighborhoods.json",
+    "contact": "flows/contact.json"
+  }
+}

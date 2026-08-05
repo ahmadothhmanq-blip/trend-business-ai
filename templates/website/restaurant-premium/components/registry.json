@@ -1,0 +1,88 @@
+{
+  "components": [
+    {
+      "id": "restaurant-premium-nav",
+      "role": "navigation",
+      "scaffold": "components/restaurant-premium-nav.tsx",
+      "slots": ["logo", "links", "cta"]
+    },
+    {
+      "id": "restaurant-premium-sidebar-rail",
+      "role": "navigation",
+      "scaffold": "components/restaurant-premium-sidebar-rail.tsx",
+      "slots": ["links", "hours"]
+    },
+    {
+      "id": "restaurant-premium-hero",
+      "role": "hero",
+      "scaffold": "components/restaurant-premium-hero.tsx",
+      "slots": ["headline", "subheadline", "cta", "scroll-cue"]
+    },
+    {
+      "id": "restaurant-premium-tasting-menu",
+      "role": "services",
+      "scaffold": "components/restaurant-premium-tasting-menu.tsx"
+    },
+    {
+      "id": "restaurant-premium-chef-story",
+      "role": "story",
+      "scaffold": "components/restaurant-premium-chef-story.tsx"
+    },
+    {
+      "id": "restaurant-premium-stats",
+      "role": "custom",
+      "scaffold": "components/restaurant-premium-stats.tsx"
+    },
+    {
+      "id": "restaurant-premium-signature-dishes",
+      "role": "features",
+      "scaffold": "components/restaurant-premium-signature-dishes.tsx"
+    },
+    {
+      "id": "restaurant-premium-testimonials",
+      "role": "testimonials",
+      "scaffold": "components/restaurant-premium-testimonials.tsx"
+    },
+    {
+      "id": "restaurant-premium-atmosphere",
+      "role": "custom",
+      "scaffold": "components/restaurant-premium-atmosphere.tsx"
+    },
+    {
+      "id": "restaurant-premium-gallery",
+      "role": "gallery",
+      "scaffold": "components/restaurant-premium-gallery.tsx"
+    },
+    {
+      "id": "restaurant-premium-faq",
+      "role": "faq",
+      "scaffold": "components/restaurant-premium-faq.tsx"
+    },
+    {
+      "id": "restaurant-premium-reservation-cta",
+      "role": "cta",
+      "scaffold": "components/restaurant-premium-reservation-cta.tsx"
+    },
+    {
+      "id": "restaurant-premium-contact",
+      "role": "contact",
+      "scaffold": "components/restaurant-premium-contact.tsx"
+    },
+    {
+      "id": "restaurant-premium-reservation",
+      "role": "contact",
+      "scaffold": "components/restaurant-premium-reservation.tsx",
+      "slots": ["steps", "cta"]
+    },
+    {
+      "id": "restaurant-premium-footer",
+      "role": "footer",
+      "scaffold": "components/restaurant-premium-footer.tsx"
+    },
+    {
+      "id": "restaurant-premium-section-shell",
+      "role": "custom",
+      "scaffold": "components/restaurant-premium-section-shell.tsx"
+    }
+  ]
+}

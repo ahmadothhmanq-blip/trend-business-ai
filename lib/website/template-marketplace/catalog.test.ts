@@ -12,19 +12,21 @@ import {
   sortTemplateMarketplaceListings,
 } from "@/lib/website/template-marketplace/index.server";
 
+const FLAGSHIP_IDS = ["saas-enterprise", "corporate-business", "restaurant-premium"] as const;
+
 describe("template marketplace foundation", () => {
-  it("initializes registry with exactly two installed listings", async () => {
+  it("initializes registry with all nine installed listings", async () => {
     resetWbTemplateMarketplaceRegistry();
     const status = await initializeWbTemplateMarketplace();
 
-    assert.equal(status.installedCount, 2);
-    assert.equal(status.listingCount, 2);
-    assert.equal(status.featuredCount, 2);
+    assert.equal(status.installedCount, 9);
+    assert.equal(status.listingCount, 9);
+    assert.ok(status.featuredCount >= 7);
   });
 
-  it("lists installed modern-business as an installed listing", async () => {
+  it("lists installed corporate-business as an installed listing", async () => {
     resetWbTemplateMarketplaceRegistry();
-    const listing = await getTemplateMarketplaceListing("modern-business");
+    const listing = await getTemplateMarketplaceListing("corporate-business");
 
     assert.ok(listing);
     assert.equal(listing?.availability, "installed");
@@ -47,9 +49,11 @@ describe("template marketplace foundation", () => {
     resetWbTemplateMarketplaceRegistry();
     await initializeWbTemplateMarketplace();
 
-    const listing = await getTemplateMarketplaceListing("modern-business");
-    assert.equal(listing?.availability, "installed");
-    assert.equal(listing?.source, "installed");
+    for (const id of FLAGSHIP_IDS) {
+      const listing = await getTemplateMarketplaceListing(id);
+      assert.equal(listing?.availability, "installed");
+      assert.equal(listing?.source, "installed");
+    }
   });
 
   it("filters listings by category", async () => {
@@ -66,7 +70,10 @@ describe("template marketplace foundation", () => {
       tags: ["corporate"],
     });
 
-    assert.equal(catalog.total, 1);
+    assert.equal(catalog.total, 2);
+    assert.ok(
+      catalog.listings.some((listing) => listing.id === "corporate-business"),
+    );
     assert.ok(
       catalog.listings.every((listing) =>
         listing.tags.map((tag) => tag.toLowerCase()).includes("corporate"),
@@ -77,12 +84,12 @@ describe("template marketplace foundation", () => {
   it("searches listings by query", async () => {
     resetWbTemplateMarketplaceRegistry();
     const catalog = await searchTemplateMarketplaceCatalog({
-      query: "modern business",
+      query: "corporate business",
     });
 
     assert.ok(catalog.total >= 1);
     assert.ok(
-      catalog.listings.some((listing) => listing.id === "modern-business"),
+      catalog.listings.some((listing) => listing.id === "corporate-business"),
     );
   });
 
@@ -102,10 +109,15 @@ describe("template marketplace foundation", () => {
     resetWbTemplateMarketplaceRegistry();
     const featured = await listFeaturedTemplateMarketplaceListings(10);
 
-    assert.equal(featured.length, 2);
+    assert.ok(featured.length >= 7);
     assert.ok(featured.every((listing) => listing.featured));
-    assert.equal(featured[0]?.id, "modern-business");
-    assert.equal(featured[1]?.id, "ai-startup-signal");
+    assert.equal(featured[0]?.id, "corporate-business");
+    assert.equal(featured[1]?.id, "saas-enterprise");
+    assert.equal(featured[2]?.id, "restaurant-premium");
+    assert.ok(featured.some((listing) => listing.id === "ai-startup-signal"));
+    assert.ok(featured.some((listing) => listing.id === "real-estate-prestige"));
+    assert.ok(featured.some((listing) => listing.id === "medical-premium"));
+    assert.ok(featured.some((listing) => listing.id === "creative-portfolio"));
   });
 
   it("builds facets for categories, tags, and sources", async () => {
@@ -113,7 +125,10 @@ describe("template marketplace foundation", () => {
     await initializeWbTemplateMarketplace();
     const catalog = await listTemplateMarketplaceCatalog();
 
-    assert.equal(catalog.facets.categories.length, 2);
+    const uniqueCategories = new Set(
+      catalog.listings.map((listing) => listing.category),
+    );
+    assert.equal(catalog.facets.categories.length, uniqueCategories.size);
     assert.ok(catalog.facets.tags.length >= 3);
     assert.ok(catalog.facets.sources.some((source) => source.id === "installed"));
   });
@@ -128,7 +143,9 @@ describe("template marketplace foundation", () => {
       direction: "asc",
     });
 
-    assert.equal(filtered.length, 2);
+    assert.equal(filtered.length, 7);
     assert.ok(sorted[0]!.name.localeCompare(sorted.at(-1)!.name) <= 0);
+    assert.ok(filtered.some((listing) => listing.id === "corporate-business"));
+    assert.ok(filtered.some((listing) => listing.id === "restaurant-premium"));
   });
 });

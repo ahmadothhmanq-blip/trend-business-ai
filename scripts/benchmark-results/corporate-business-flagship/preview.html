@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en" data-v2-render="v2-files" data-v2-package="corporate-business" data-v2-layout="default">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Trend Business AI — Live Preview</title>
+  <style>/* Template Architecture V2 — corporate-business · spec 2.0.0 */
+:root {
+  --v2-package: "corporate-business";
+  --color-primary: #0F2B46;
+  --color-secondary: #1E4976;
+  --color-accent: #2563EB;
+  --color-background: #FFFFFF;
+  --color-foreground: #0F172A;
+  --color-muted: rgba(15,23,42,0.58);
+  --color-surface: #F8FAFC;
+  --color-signal: #C5A572;
+  --color-grid: rgba(15,43,70,0.06);
+  --color-ink: #071018;
+  --font-display: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --spacing-unit: 0.25rem;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --shadow-surface: 0 1px 2px rgba(15,23,42,0.06), 0 16px 48px rgba(15,43,70,0.08);
+  --shadow-glow: 0 0 64px rgba(197,165,114,0.2);
+  --shadow-card: 0 0 0 1px rgba(15,43,70,0.05), 0 4px 20px rgba(15,43,70,0.06);
+  --border-default: rgba(15,43,70,0.1);
+  --border-accent: rgba(37,99,235,0.22);
+  --border-subtle: rgba(15,43,70,0.05);
+}
+
+/* V2 language profile — RTL typography adaptation */
+[dir="rtl"] {
+  --font-display: Tajawal, ui-serif, Georgia, serif;
+  --font-body: "Noto Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:ital,wght@0,500;0,600;0,700;0,800;1,500&display=swap");
+
+@keyframes cb-grid-reveal {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes cb-slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes cb-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+[dir="rtl"] [class*="se-marquee"],
+[dir="rtl"] [class*="cb-marquee"] {
+  animation-direction: reverse;
+}
+@keyframes cb-pulse-dot {
+  0%, 100% { opacity: 0.4; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1); }
+}
+@keyframes cb-scan-line {
+  0% { transform: translateY(-100%); opacity: 0; }
+  50% { opacity: 0.06; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cb-animate, [data-cb-motion] { animation: none !important; transition: none !important; }
+}
+
+.cb-font-display { font-family: var(--font-display), "IBM Plex Sans", system-ui, sans-serif; }
+.cb-font-body { font-family: var(--font-body), "IBM Plex Sans", system-ui, sans-serif; }
+.cb-font-mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+.cb-eyebrow {
+  font-family: var(--font-body), "IBM Plex Sans", system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent, #3B82F6);
+}
+.cb-headline {
+  font-family: var(--font-display), "IBM Plex Sans", system-ui, sans-serif;
+  font-size: clamp(2.25rem, 4.5vw, 3.75rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: var(--color-foreground);
+}
+.cb-headline-sm {
+  font-family: var(--font-display), "IBM Plex Sans", system-ui, sans-serif;
+  font-size: clamp(1.5rem, 2.8vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: var(--color-foreground);
+}
+.cb-body {
+  font-family: var(--font-body), "IBM Plex Sans", system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--color-muted, rgba(15,23,42,0.58));
+}
+.cb-grid-bg {
+  background-image:
+    linear-gradient(var(--color-grid, rgba(15,23,42,0.06)) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid, rgba(15,23,42,0.06)) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.cb-card {
+  border: 1px solid var(--border-subtle, rgba(15,23,42,0.04));
+  background: var(--color-surface);
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease;
+}
+.cb-card:hover {
+  box-shadow: var(--shadow-surface);
+  border-color: var(--border-accent, rgba(59,130,246,0.24));
+}
+.cb-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.75rem 1.5rem;
+  font-family: var(--font-body), "IBM Plex Sans", system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: #fff;
+  background: var(--color-primary, #1D4ED8);
+  border-radius: var(--radius-md, 10px);
+  border: 1px solid transparent;
+  box-shadow: 0 1px 2px rgba(15,23,42,0.06);
+  transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+}
+.cb-btn-primary:hover {
+  background: var(--color-accent, #3B82F6);
+  box-shadow: var(--shadow-glow);
+}
+.cb-btn-primary:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+.cb-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.75rem 1.5rem;
+  font-family: var(--font-body), "IBM Plex Sans", system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--color-foreground);
+  background: var(--color-surface);
+  border: 1px solid var(--border-default, rgba(15,23,42,0.08));
+  border-radius: var(--radius-md, 10px);
+  transition: border-color 0.25s ease, background 0.25s ease;
+}
+.cb-btn-secondary:hover { border-color: var(--color-accent); background: color-mix(in srgb, var(--color-accent) 4%, var(--color-surface)); }
+.cb-btn-secondary:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.cb-section { padding-block: clamp(4rem, 10vw, 6.5rem); }
+.cb-metric {
+  font-family: var(--font-display), "IBM Plex Sans", system-ui, sans-serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-primary);
+}
+.cb-signal { color: var(--color-signal, #059669); }
+.cb-focus-ring:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+.cb-signal { color: var(--color-signal, #C5A572); }
+
+/* TBDP Native Consumption — corporate-business
+   sector:law-firm · experience:corporate, executive, trust
+   identity:executive-atlas · context:8820d847ff5f54e9
+   integration:5.0.0 · consumption:1.0.0 */
+:root {
+  --tbdp-native: 1;
+  --tbdp-native-package: "corporate-business";
+  --tbdp-sector-dna: "law-firm";
+  --tbdp-template-identity: "executive-atlas";
+  --tbdp-experience-primary: "executive";
+  --tbdp-context-hash: "8820d847ff5f54e9";
+  --tbdp-theme-mode: "light";
+  --tbdp-direction: "ltr";
+}
+
+/* TBDP Foundations — official design authority (scoped vars) */
+/* Trend Business AI Design Platform · 1.0.0 · foundations-1 */
+:root {
+  --tbdp-color-primary: #0047E6;
+  --tbdp-color-secondary: #334155;
+  --tbdp-color-accent: #4D85FF;
+  --tbdp-color-success: #10B981;
+  --tbdp-color-warning: #F59E0B;
+  --tbdp-color-danger: #EF4444;
+  --tbdp-color-info: #3B82F6;
+  --tbdp-color-surface-base: #FFFFFF;
+  --tbdp-color-surface-raised: #F8FAFC;
+  --tbdp-color-surface-overlay: #FFFFFF;
+  --tbdp-color-surface-sunken: #F1F5F9;
+  --tbdp-color-surface-inverse: #0F172A;
+  --tbdp-color-background-canvas: #F8FAFC;
+  --tbdp-color-background-subtle: #F1F5F9;
+  --tbdp-color-background-emphasis: #FFFFFF;
+  --tbdp-color-background-inverse: #020617;
+  --tbdp-color-text-primary: #0F172A;
+  --tbdp-color-text-secondary: #475569;
+  --tbdp-color-text-tertiary: #64748B;
+  --tbdp-color-text-disabled: #94A3B8;
+  --tbdp-color-text-inverse: #FFFFFF;
+  --tbdp-color-text-link: #0047E6;
+  --tbdp-color-text-linkHover: #0038B8;
+  --tbdp-color-border-default: #E2E8F0;
+  --tbdp-color-border-subtle: #F1F5F9;
+  --tbdp-color-border-strong: #CBD5E1;
+  --tbdp-color-border-focus: #1A5CFF;
+  --tbdp-color-border-inverse: rgba(255, 255, 255, 0.16);
+  --tbdp-color-overlay-scrim: rgba(2, 6, 23, 0.4);
+  --tbdp-color-overlay-scrimStrong: rgba(2, 6, 23, 0.64);
+  --tbdp-color-overlay-backdrop: rgba(2, 6, 23, 0.24);
+  --tbdp-color-overlay-highlight: rgba(26, 92, 255, 0.12);
+  --tbdp-opacity-transparent: 0;
+  --tbdp-opacity-subtle: 0.04;
+  --tbdp-opacity-muted: 0.08;
+  --tbdp-opacity-soft: 0.12;
+  --tbdp-opacity-medium: 0.24;
+  --tbdp-opacity-strong: 0.48;
+  --tbdp-opacity-opaque: 1;
+  --tbdp-spacing-micro: 0.125rem;
+  --tbdp-spacing-xs: 0.25rem;
+  --tbdp-spacing-sm: 0.5rem;
+  --tbdp-spacing-md: 1rem;
+  --tbdp-spacing-lg: 1.5rem;
+  --tbdp-spacing-xl: 2rem;
+  --tbdp-spacing-2xl: 3rem;
+  --tbdp-spacing-3xl: 4rem;
+  --tbdp-spacing-4xl: 6rem;
+  --tbdp-radius-sharp: 0;
+  --tbdp-radius-sm: 0.25rem;
+  --tbdp-radius-md: 0.5rem;
+  --tbdp-radius-lg: 0.75rem;
+  --tbdp-radius-pill: 9999px;
+  --tbdp-radius-circle: 50%;
+  --tbdp-shadow-0: none;
+  --tbdp-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-2: 0 2px 8px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-3: 0 8px 24px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);
+  --tbdp-shadow-4: 0 16px 48px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.08);
+  --tbdp-shadow-5: 0 24px 64px rgba(15, 23, 42, 0.18), 0 8px 24px rgba(15, 23, 42, 0.1);
+  --tbdp-container-sm: 640px;
+  --tbdp-container-md: 768px;
+  --tbdp-container-lg: 1024px;
+  --tbdp-container-xl: 1280px;
+  --tbdp-container-2xl: 1440px;
+  --tbdp-container-full: 100%;
+  --tbdp-font-display: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --tbdp-font-body: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --tbdp-font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", monospace;
+}
+
+/* TBDP Experience — motion, interaction, RTL, accessibility */
+/* TBDP Phase 3 — Motion System · tbdp-xp */
+
+@keyframes tbdp-xp-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes tbdp-xp-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes tbdp-xp-rise {
+  from { opacity: 0; transform: translateY(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tbdp-xp-rise-rtl {
+  from { opacity: 0; transform: translateX(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes tbdp-xp-slide-end {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-slide-start {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(calc(var(--tbdp-spacing-sm) * -1)); }
+  40%, 80% { transform: translateX(var(--tbdp-spacing-sm)); }
+}
+
+@keyframes tbdp-xp-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@keyframes tbdp-xp-lift {
+  to { transform: translateY(calc(var(--tbdp-spacing-sm) * -1)); box-shadow: var(--tbdp-shadow-2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp-motion] { animation: none !important; transition: none !important; }
+}
+
+[data-tbdp-xp-motion] { will-change: transform, opacity; }
+[data-tbdp-xp-motion="page-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="page-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="section-reveal"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-headline"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-media"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="card-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="grid-stagger"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="modal-enter"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="modal-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="drawer-slide"] { animation-name: tbdp-xp-slide-end; }
+[data-tbdp-xp-motion="toast-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="toast-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="tooltip-fade"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="scroll-reveal-up"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="stagger-children"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hover-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="focus-ring"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="success-pulse"] { animation-name: tbdp-xp-pulse; }
+[data-tbdp-xp-motion="error-shake"] { animation-name: tbdp-xp-shake; }
+
+/* TBDP Experience — interaction utilities */
+[data-tbdp-xp] { --tbdp-xp-focus: var(--tbdp-color-border-focus); }
+[data-tbdp-xp-feedback="loading"] { cursor: wait; }
+[data-tbdp-xp-feedback="error"] { border-color: var(--tbdp-color-danger); }
+[data-tbdp-xp-feedback="success"] { border-color: var(--tbdp-color-success); }
+[data-tbdp-xp-touch="true"] { min-height: var(--tbdp-spacing-2xl); min-width: var(--tbdp-spacing-2xl); }
+[data-tbdp-xp-gpu] { transform: translateZ(0); backface-visibility: hidden; }
+[data-tbdp-xp-contain] { content-visibility: auto; contain-intrinsic-size: auto 500px; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp], [data-tbdp-xp-motion] { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+/* V2 sidebar-left layout */
+.v2-layout-sidebar-left .v2-sidebar-shell { gap: 0; align-items: flex-start; }
+.v2-sidebar-rail {
+  border-inline-end: 1px solid var(--border-subtle, rgba(244,237,228,0.06));
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-inline-end: clamp(1.25rem, 3vw, 2rem);
+}
+[dir='rtl'] .v2-sidebar-rail { border-inline-end: none; border-inline-start: 1px solid var(--border-subtle, rgba(244,237,228,0.06)); }
+.v2-main-canvas > [data-v2-component] + [data-v2-component] { margin-top: 0; }
+.v2-layout-sidebar-left .v2-main-canvas { padding-inline-start: 0; }
+@media (max-width: 1023px) {
+  .v2-sidebar-rail { display: none !important; }
+}
+
+/* V2 sidebar-right layout */
+.v2-layout-sidebar-right .v2-sidebar-shell { gap: 0; align-items: flex-start; }
+.v2-layout-sidebar-right .v2-sidebar-rail {
+  border-inline-start: 1px solid var(--border-subtle, rgba(28,25,23,0.06));
+  border-inline-end: none;
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-inline-start: clamp(1.25rem, 3vw, 2rem);
+}
+[dir='rtl'] .v2-layout-sidebar-right .v2-sidebar-rail {
+  border-inline-start: none;
+  border-inline-end: 1px solid var(--border-subtle, rgba(28,25,23,0.06));
+}
+
+/* V2 full-bleed layout */
+.v2-layout-full-bleed .v2-overlay-canvas { width: 100%; }
+.v2-layout-full-bleed .v2-main-canvas { width: 100%; max-width: var(--container-max, 76rem); margin-inline: auto; }
+
+/* V2 editorial-reveal layout (creative portfolio) */
+.v2-layout-editorial-reveal .v2-main-canvas { width: 100%; }
+.v2-layout-editorial-reveal .v2-overlay-reveal { width: 100%; }
+
+:root {
+  --container-max: 76rem;
+  --font-body: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --color-surface: #F8FAFC;
+  --color-foreground: #0F172A;
+  --color-background: #FFFFFF;
+  --color-accent: #2563EB;
+  --color-secondary: #1E4976; --color-primary: #0F2B46; }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--color-background, #0f172a);
+      color: var(--color-foreground, #f8fafc);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .page { display: none; padding-bottom: 2rem; }
+    .page:target { display: block; }
+    body:not(:has(.page:target)) .page#home { display: block; }
+    img { max-width: 100%; height: auto; display: block; }
+    a { color: inherit; }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+<style id="tbdp-wiring-layer">
+/* TBDP Integration Layer — advisory token layer */
+
+/* Trend Business AI Design Platform · 1.0.0 · foundations-1 */
+:root {
+  --tbdp-color-primary: #0047E6;
+  --tbdp-color-secondary: #334155;
+  --tbdp-color-accent: #4D85FF;
+  --tbdp-color-success: #10B981;
+  --tbdp-color-warning: #F59E0B;
+  --tbdp-color-danger: #EF4444;
+  --tbdp-color-info: #3B82F6;
+  --tbdp-color-surface-base: #FFFFFF;
+  --tbdp-color-surface-raised: #F8FAFC;
+  --tbdp-color-surface-overlay: #FFFFFF;
+  --tbdp-color-surface-sunken: #F1F5F9;
+  --tbdp-color-surface-inverse: #0F172A;
+  --tbdp-color-background-canvas: #F8FAFC;
+  --tbdp-color-background-subtle: #F1F5F9;
+  --tbdp-color-background-emphasis: #FFFFFF;
+  --tbdp-color-background-inverse: #020617;
+  --tbdp-color-text-primary: #0F172A;
+  --tbdp-color-text-secondary: #475569;
+  --tbdp-color-text-tertiary: #64748B;
+  --tbdp-color-text-disabled: #94A3B8;
+  --tbdp-color-text-inverse: #FFFFFF;
+  --tbdp-color-text-link: #0047E6;
+  --tbdp-color-text-linkHover: #0038B8;
+  --tbdp-color-border-default: #E2E8F0;
+  --tbdp-color-border-subtle: #F1F5F9;
+  --tbdp-color-border-strong: #CBD5E1;
+  --tbdp-color-border-focus: #1A5CFF;
+  --tbdp-color-border-inverse: rgba(255, 255, 255, 0.16);
+  --tbdp-color-overlay-scrim: rgba(2, 6, 23, 0.4);
+  --tbdp-color-overlay-scrimStrong: rgba(2, 6, 23, 0.64);
+  --tbdp-color-overlay-backdrop: rgba(2, 6, 23, 0.24);
+  --tbdp-color-overlay-highlight: rgba(26, 92, 255, 0.12);
+  --tbdp-opacity-transparent: 0;
+  --tbdp-opacity-subtle: 0.04;
+  --tbdp-opacity-muted: 0.08;
+  --tbdp-opacity-soft: 0.12;
+  --tbdp-opacity-medium: 0.24;
+  --tbdp-opacity-strong: 0.48;
+  --tbdp-opacity-opaque: 1;
+  --tbdp-spacing-micro: 0.125rem;
+  --tbdp-spacing-xs: 0.25rem;
+  --tbdp-spacing-sm: 0.5rem;
+  --tbdp-spacing-md: 1rem;
+  --tbdp-spacing-lg: 1.5rem;
+  --tbdp-spacing-xl: 2rem;
+  --tbdp-spacing-2xl: 3rem;
+  --tbdp-spacing-3xl: 4rem;
+  --tbdp-spacing-4xl: 6rem;
+  --tbdp-radius-sharp: 0;
+  --tbdp-radius-sm: 0.25rem;
+  --tbdp-radius-md: 0.5rem;
+  --tbdp-radius-lg: 0.75rem;
+  --tbdp-radius-pill: 9999px;
+  --tbdp-radius-circle: 50%;
+  --tbdp-shadow-0: none;
+  --tbdp-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-2: 0 2px 8px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-3: 0 8px 24px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);
+  --tbdp-shadow-4: 0 16px 48px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.08);
+  --tbdp-shadow-5: 0 24px 64px rgba(15, 23, 42, 0.18), 0 8px 24px rgba(15, 23, 42, 0.1);
+  --tbdp-container-sm: 640px;
+  --tbdp-container-md: 768px;
+  --tbdp-container-lg: 1024px;
+  --tbdp-container-xl: 1280px;
+  --tbdp-container-2xl: 1440px;
+  --tbdp-container-full: 100%;
+  --tbdp-font-display: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --tbdp-font-body: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --tbdp-font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", monospace;
+}
+
+/* TBDP Phase 3 — Motion System · tbdp-xp */
+
+@keyframes tbdp-xp-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes tbdp-xp-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes tbdp-xp-rise {
+  from { opacity: 0; transform: translateY(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tbdp-xp-rise-rtl {
+  from { opacity: 0; transform: translateX(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes tbdp-xp-slide-end {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-slide-start {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(calc(var(--tbdp-spacing-sm) * -1)); }
+  40%, 80% { transform: translateX(var(--tbdp-spacing-sm)); }
+}
+
+@keyframes tbdp-xp-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@keyframes tbdp-xp-lift {
+  to { transform: translateY(calc(var(--tbdp-spacing-sm) * -1)); box-shadow: var(--tbdp-shadow-2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp-motion] { animation: none !important; transition: none !important; }
+}
+
+[data-tbdp-xp-motion] { will-change: transform, opacity; }
+[data-tbdp-xp-motion="page-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="page-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="section-reveal"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-headline"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-media"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="card-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="grid-stagger"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="modal-enter"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="modal-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="drawer-slide"] { animation-name: tbdp-xp-slide-end; }
+[data-tbdp-xp-motion="toast-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="toast-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="tooltip-fade"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="scroll-reveal-up"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="stagger-children"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hover-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="focus-ring"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="success-pulse"] { animation-name: tbdp-xp-pulse; }
+[data-tbdp-xp-motion="error-shake"] { animation-name: tbdp-xp-shake; }
+
+/* TBDP Experience — interaction utilities */
+[data-tbdp-xp] { --tbdp-xp-focus: var(--tbdp-color-border-focus); }
+[data-tbdp-xp-feedback="loading"] { cursor: wait; }
+[data-tbdp-xp-feedback="error"] { border-color: var(--tbdp-color-danger); }
+[data-tbdp-xp-feedback="success"] { border-color: var(--tbdp-color-success); }
+[data-tbdp-xp-touch="true"] { min-height: var(--tbdp-spacing-2xl); min-width: var(--tbdp-spacing-2xl); }
+[data-tbdp-xp-gpu] { transform: translateZ(0); backface-visibility: hidden; }
+[data-tbdp-xp-contain] { content-visibility: auto; contain-intrinsic-size: auto 500px; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp], [data-tbdp-xp-motion] { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+  <div class="page" id="home">
+    <div class="min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] antialiased v2-template v2-corporate-business" data-v2-package="corporate-business" data-v2-composer="region-grid" data-v2-layout="default"><header data-v2-region="header"><header data-v2-component="corporate-business-nav" class="sticky top-0 z-50 border-b transition-all duration-300 border-transparent bg-[var(--color-background)]/80 backdrop-blur-md"><div class="mx-auto flex h-16 max-w-[82rem] items-center justify-between gap-4 px-5 sm:px-8 lg:h-[4.25rem]"><a href="#top" class="cb-font-display flex items-center gap-2.5 text-base font-bold tracking-tight text-[var(--color-foreground)] cb-focus-ring rounded-sm"><span class="flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-primary)] text-xs font-bold text-white" aria-hidden="true">M</span>Trend Business AI</a><nav aria-label="Primary" class="hidden items-center gap-8 lg:flex"><a href="#services" class="cb-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] cb-focus-ring rounded-sm">Services</a><a href="#features" class="cb-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] cb-focus-ring rounded-sm">Why us</a><a href="#pricing" class="cb-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] cb-focus-ring rounded-sm">Packages</a><a href="#testimonials" class="cb-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] cb-focus-ring rounded-sm">Clients</a><a href="#contact" class="cb-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] cb-focus-ring rounded-sm">Contact</a></nav><div class="flex items-center gap-2"><a href="#contact" class="cb-btn-primary hidden sm:inline-flex">Get started</a><button type="button" aria-expanded="false" aria-controls="cb-mobile-nav" aria-label="Open menu" class="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] lg:hidden cb-focus-ring"><span class="sr-only">Menu</span><span aria-hidden="true" class="flex flex-col gap-1"><span class="block h-0.5 w-5 bg-current transition "></span><span class="block h-0.5 w-5 bg-current transition "></span><span class="block h-0.5 w-5 bg-current transition "></span></span></button></div></div></header></header><main data-v2-region="main" class="v2-region-grid"><section id="top" data-v2-component="corporate-business-hero" aria-labelledby="cb-hero-title" class="cb-section relative overflow-hidden bg-[var(--color-background)]"><div class="cb-grid-bg pointer-events-none absolute inset-0 opacity-60" aria-hidden="true"></div><div class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_80%_0%,rgba(197,165,114,0.14),transparent_60%)]" aria-hidden="true"></div><div class="relative mx-auto max-w-[82rem] px-5 sm:px-8"><div class="grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-14"><div class="max-w-xl"><p class="cb-eyebrow mb-4 motion-safe:animate-[cb-slide-up_0.6s_ease_both]">Professional presence</p><h1 id="cb-hero-title" class="cb-headline motion-safe:animate-[cb-slide-up_0.65s_ease_0.08s_both]">Trend Business AI</h1><p class="cb-body mt-5 motion-safe:animate-[cb-slide-up_0.65s_ease_0.16s_both]">Business automation, website generation, and enterprise AI products</p><div class="mt-8 flex flex-wrap gap-3 motion-safe:animate-[cb-slide-up_0.65s_ease_0.24s_both]"><a href="#contact" class="cb-btn-primary">Get started</a><a href="#features" class="cb-btn-secondary">Learn more</a></div><div class="mt-8 flex flex-wrap items-center gap-4 motion-safe:animate-[cb-slide-up_0.65s_ease_0.32s_both]"><span class="cb-font-mono flex items-center gap-2 text-xs text-[var(--color-signal)]"><span class="h-2 w-2 rounded-full bg-[var(--color-signal)] motion-safe:animate-[cb-pulse-dot_2s_ease-in-out_infinite]"></span>Trusted advisory partner</span><span class="cb-font-body text-xs text-[var(--color-muted)]">Fortune 500 · ISO 9001 · Global reach</span></div></div><div class="grid gap-3 sm:grid-cols-2 motion-safe:animate-[cb-grid-reveal_0.8s_ease_0.2s_both]"><div class="cb-card col-span-2 overflow-hidden p-1"><div class="cb-grid-bg relative aspect-[16/9] overflow-hidden rounded-[calc(var(--radius-lg)-4px)] bg-[var(--color-surface)]"><div class="absolute inset-4 space-y-3"><div class="h-3 w-32 rounded bg-[var(--color-grid)]"></div><div class="grid grid-cols-3 gap-2"><div class="h-16 rounded-[var(--radius-sm)] bg-[var(--color-grid)]"></div><div class="h-16 rounded-[var(--radius-sm)] bg-[var(--color-grid)]"></div><div class="h-16 rounded-[var(--radius-sm)] bg-[var(--color-grid)]"></div></div><div class="h-24 rounded-[var(--radius-sm)] bg-[var(--color-grid)]"></div></div></div></div><div class="cb-card p-4 motion-safe:animate-[cb-grid-reveal_0.6s_ease_both]" style="animation-delay:0.3s"><div class="flex items-baseline justify-between gap-2"><p class="cb-metric">500+</p><span class="cb-font-mono text-[0.625rem] text-[var(--color-signal)]">Global</span></div><p class="cb-font-body mt-1 text-xs text-[var(--color-muted)]">Enterprise clients</p></div><div class="cb-card p-4 motion-safe:animate-[cb-grid-reveal_0.6s_ease_both]" style="animation-delay:0.38s"><div class="flex items-baseline justify-between gap-2"><p class="cb-metric">28</p><span class="cb-font-mono text-[0.625rem] text-[var(--color-signal)]">Active</span></div><p class="cb-font-body mt-1 text-xs text-[var(--color-muted)]">Countries served</p></div><div class="cb-card p-4 motion-safe:animate-[cb-grid-reveal_0.6s_ease_both]" style="animation-delay:0.45999999999999996s"><div class="flex items-baseline justify-between gap-2"><p class="cb-metric">97%</p><span class="cb-font-mono text-[0.625rem] text-[var(--color-signal)]">3-year avg.</span></div><p class="cb-font-body mt-1 text-xs text-[var(--color-muted)]">Client retention</p></div><div class="cb-card p-4 motion-safe:animate-[cb-grid-reveal_0.6s_ease_both]" style="animation-delay:0.54s"><div class="flex items-baseline justify-between gap-2"><p class="cb-metric">40yr</p><span class="cb-font-mono text-[0.625rem] text-[var(--color-signal)]">Experience</span></div><p class="cb-font-body mt-1 text-xs text-[var(--color-muted)]">Combined leadership</p></div></div></div></div></section><section id="features" data-v2-component="corporate-business-features" aria-labelledby="cb-features-title" class="cb-section bg-[var(--color-background)]"><div class="mx-auto max-w-[82rem] px-5 sm:px-8"><header class="mb-12 max-w-2xl"><p class="cb-eyebrow mb-3">Why us</p><h2 id="cb-features-title" class="cb-headline-sm">A presence that earns trust</h2><p class="cb-body mt-4">Webflow-caliber spacing, type, and hierarchy for serious brands.</p></header><div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"><article class="cb-card group p-6 "><div class="mb-4 flex items-center justify-between"><span class="cb-font-mono flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] text-xs font-medium text-[var(--color-primary)]">01</span><span class="h-px flex-1 ms-4 bg-[var(--border-default)] transition group-hover:bg-[var(--color-accent)]" aria-hidden="true"></span></div><h3 class="cb-font-display text-lg font-bold text-[var(--color-foreground)]">Clear offer</h3><p class="cb-font-body mt-2 text-sm leading-relaxed text-[var(--color-muted)]"></p></article><article class="cb-card group p-6 "><div class="mb-4 flex items-center justify-between"><span class="cb-font-mono flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] text-xs font-medium text-[var(--color-primary)]">02</span><span class="h-px flex-1 ms-4 bg-[var(--border-default)] transition group-hover:bg-[var(--color-accent)]" aria-hidden="true"></span></div><h3 class="cb-font-display text-lg font-bold text-[var(--color-foreground)]">Premium presentation</h3><p class="cb-font-body mt-2 text-sm leading-relaxed text-[var(--color-muted)]"></p></article><article class="cb-card group p-6 "><div class="mb-4 flex items-center justify-between"><span class="cb-font-mono flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] text-xs font-medium text-[var(--color-primary)]">03</span><span class="h-px flex-1 ms-4 bg-[var(--border-default)] transition group-hover:bg-[var(--color-accent)]" aria-hidden="true"></span></div><h3 class="cb-font-display text-lg font-bold text-[var(--color-foreground)]">Conversion paths</h3><p class="cb-font-body mt-2 text-sm leading-relaxed text-[var(--color-muted)]"></p></article><article class="cb-card group p-6 "><div class="mb-4 flex items-center justify-between"><span class="cb-font-mono flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] text-xs font-medium text-[var(--color-primary)]">04</span><span class="h-px flex-1 ms-4 bg-[var(--border-default)] transition group-hover:bg-[var(--color-accent)]" aria-hidden="true"></span></div><h3 class="cb-font-display text-lg font-bold text-[var(--color-foreground)]">Trusted contact</h3><p class="cb-font-body mt-2 text-sm leading-relaxed text-[var(--color-muted)]"></p></article></div></div></section><section id="about" data-v2-component="corporate-business-about" aria-labelledby="about-title" class="cb-section bg-[var(--color-background)]"><div class="mx-auto max-w-[82rem] px-5 sm:px-8"><div class="grid items-center gap-12 lg:grid-cols-2 lg:gap-16"><div><header class="mb-12 max-w-2xl mb-0"><p class="cb-eyebrow mb-3">Services</p><h2 id="about-title" class="cb-headline-sm">What we deliver for clients</h2><p class="cb-body mt-4">Plain-language offerings with outcomes — ready for a premium business site.</p></header><p class="cb-body mt-6">For over two decades we have partnered with global enterprises to deliver strategy, transformation, and measurable outcomes — with integrity at the center of every engagement.</p><ul class="mt-8 space-y-3" role="list"><li class="cb-font-body flex gap-3 text-sm text-[var(--color-foreground)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" aria-hidden="true"></span>Fortune 500 advisory experience</li><li class="cb-font-body flex gap-3 text-sm text-[var(--color-foreground)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" aria-hidden="true"></span>Offices across North America, Europe, and MENA</li><li class="cb-font-body flex gap-3 text-sm text-[var(--color-foreground)]"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" aria-hidden="true"></span>ISO-certified governance frameworks</li></ul><a href="#contact" class="cb-btn-primary mt-8 inline-flex cb-focus-ring">Speak with an advisor</a></div><div class="cb-card overflow-hidden"><div class="aspect-[4/3] w-full bg-[color-mix(in_srgb,var(--color-primary)_12%,var(--color-surface))]" aria-hidden="true"></div></div></div></div></section><section id="stats" data-v2-component="corporate-business-stats" aria-labelledby="stats-title" class="cb-section bg-[var(--color-surface)]"><div class="mx-auto max-w-[82rem] px-5 sm:px-8"><header class="mb-12 mx-auto text-center"><p class="cb-eyebrow mb-3">Track record</p><h2 id="stats-title" class="cb-headline-sm">Ready to look established online?</h2><p class="cb-body mt-4">Share your goals — we will propose a clear path and timeline.</p></header><dl class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><div class="cb-card p-6 text-center"><dt class="cb-font-body text-sm font-medium text-[var(--color-foreground)]">Combined partner tenure</dt><dd class="cb-metric mt-2 block">40yr</dd><dd class="cb-font-body mt-1 text-xs text-[var(--color-muted)]">Senior leadership</dd></div><div class="cb-card p-6 text-center"><dt class="cb-font-body text-sm font-medium text-[var(--color-foreground)]">Countries served</dt><dd class="cb-metric mt-2 block">28</dd><dd class="cb-font-body mt-1 text-xs text-[var(--color-muted)]">Global delivery</dd></div><div class="cb-card p-6 text-center"><dt class="cb-font-body text-sm font-medium text-[var(--color-foreground)]">Client retention</dt><dd class="cb-metric mt-2 block">97%</dd><dd class="cb-font-body mt-1 text-xs text-[var(--color-muted)]">Three-year average</dd></div><div class="cb-card p-6 text-center"><dt class="cb-font-body text-sm font-medium text-[var(--color-foreground)]">Discovery to roadmap</dt><dd class="cb-metric mt-2 block">14wk</dd><dd class="cb-font-body mt-1 text-xs text-[var(--color-muted)]">Typical engagement</dd></div></dl></div></section><section id="testimonials" data-v2-component="corporate-business-testimonials" aria-labelledby="testimonials-title" class="cb-section bg-[var(--color-background)]"><div class="mx-auto max-w-[82rem] px-5 sm:px-8"><header class="mb-12 mx-auto text-center"><p class="cb-eyebrow mb-3">Clients</p><h2 id="testimonials-title" class="cb-headline-sm">Businesses that raised their standard</h2><p class="cb-body mt-4">Specific results from professional services teams.</p></header><div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"><figure class="cb-card flex flex-col p-6"><blockquote class="cb-body flex-1 text-base leading-relaxed">“We finally look as professional as the work we deliver — working with Trend Business AI.”</blockquote><figcaption class="mt-6 flex items-center gap-3 border-t border-[var(--border-default,rgba(0,0,0,0.08))] pt-4"><span class="cb-font-display flex h-10 w-10 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-primary)_15%,transparent)] text-sm font-semibold text-[var(--color-primary)]" aria-hidden="true">A</span><div><p class="cb-font-body text-sm font-semibold text-[var(--color-foreground)]">Andrea Wells</p><p class="cb-font-body text-xs text-[var(--color-muted)]">Owner, Wells Advisory</p></div></figcaption></figure><figure class="cb-card flex flex-col p-6"><blockquote class="cb-body flex-1 text-base leading-relaxed">“Inquiries went up after the redesign — messaging is clearer.”</blockquote><figcaption class="mt-6 flex items-center gap-3 border-t border-[var(--border-default,rgba(0,0,0,0.08))] pt-4"><span class="cb-font-display flex h-10 w-10 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-primary)_15%,transparent)] text-sm font-semibold text-[var(--color-primary)]" aria-hidden="true">K</span><div><p class="cb-font-body text-sm font-semibold text-[var(--color-foreground)]">Kevin Zhao</p><p class="cb-font-body text-xs text-[var(--color-muted)]">Managing Partner</p></div></figcaption></figure><figure class="cb-card flex flex-col p-6"><blockquote class="cb-body flex-1 text-base leading-relaxed">“Clients comment on the site before meetings now.”</blockquote><figcaption class="mt-6 flex items-center gap-3 border-t border-[var(--border-default,rgba(0,0,0,0.08))] pt-4"><span class="cb-font-display flex h-10 w-10 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-primary)_15%,transparent)] text-sm font-semibold text-[var(--color-primary)]" aria-hidden="true">R</span><div><p class="cb-font-body text-sm font-semibold text-[var(--color-foreground)]">Ruth Okonkwo</p><p class="cb-font-body text-xs text-[var(--color-muted)]">Consultant</p></div></figcaption></figure></div></div></section><section id="pricing" data-v2-component="corporate-business-pricing" aria-labelledby="cb-pricing-title" class="cb-section bg-[var(--color-background)]"><div class="mx-auto max-w-[82rem] px-5 sm:px-8"><header class="mb-12 text-center"><p class="cb-eyebrow mb-3">Packages</p><h2 id="cb-pricing-title" class="cb-headline-sm">Simple engagement options</h2><p class="cb-body mx-auto mt-4 max-w-lg">Start lean or go deeper — both look premium.</p></header><div class="grid gap-4 lg:grid-cols-3"><article class="cb-card flex flex-col p-6 "><h3 class="cb-font-display text-lg font-bold text-[var(--color-foreground)]">Advisory</h3><p class="cb-font-body mt-2 text-sm text-[var(--color-muted)]">Focused strategic counsel for leadership teams navigating priority initiatives.</p><p class="mt-6"><span class="cb-metric text-4xl">From $18k</span><span class="cb-font-body text-sm text-[var(--color-muted)]">/month</span></p><ul class="mt-6 flex-1 space-y-3"><li class="flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]"><span class="cb-signal mt-0.5 shrink-0" aria-hidden="true">✓</span>Executive workshops</li><li class="flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]"><span class="cb-signal mt-0.5 shrink-0" aria-hidden="true">✓</span>Market &amp; competitive analysis</li><li class="flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]"><span class="cb-signal mt-0.5 shrink-0" aria-hidden="true">✓</span>Quarterly board briefings</li><li class="flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]"><span class="cb-signal mt-0.5 shrink-0" aria-hidden="true">✓</span>Dedicated partner access</li></ul><a href="#contact" class="cb-btn-secondary mt-8 w-full">Request proposal</a></article><article class="cb-card flex flex-col p-6 relative border-[var(--border-accent)] ring-2 ring-[var(--color-accent)]/20"><span class="cb-eyebrow absolute -top-3 start-6 rounded-full bg-[var(--color-primary)] px-3 py-1 text-[0.625rem] text-white">Most popular</span><h3 class="cb-font-display text-lg font-bold text-[var(--color-foreground)]">Transformation</h3><p class="cb-font-body mt-2 text-sm text-[var(--color-muted)]">Full-program leadership for enterprise change with measurable operational outcomes.</p><p class="mt-6"><span class="cb-metric text-4xl">From $45k</span><span class="cb-font-body text-sm text-[var(--color-muted)]">/month</span></p><ul class="mt-6 flex-1 space-y-3"><li class="flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]"><span class="cb-signal mt-0.5 shrink-0" aria-hidden="true">✓</span>Everything in Advisory</li><li class="flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]"><span class="cb-signal mt-0.5 shrink-0" aria-hidden="true">✓</span>Program management office</li><li class="flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]"><span class="cb-signal mt-0.5 shrink-0" aria-hidden="true">✓</span>Change &amp; communications</li><li class="flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]"><span class="cb-signal mt-0.5 shrink-0" aria-hidden="true">✓</span>KPI dashboards &amp; reporting</li><li class="flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]"><span class="cb-signal mt-0.5 shrink-0" aria-hidden="true">✓</span>On-site leadership support</li></ul><a href="#contact" class="cb-btn-primary mt-8 w-full">Schedule consultation</a></article><article class="cb-card flex flex-col p-6 "><h3 class="cb-font-display text-lg font-bold text-[var(--color-foreground)]">Enterprise</h3><p class="cb-font-body mt-2 text-sm text-[var(--color-muted)]">Multi-region engagements with retained senior partners and bespoke governance models.</p><p class="mt-6"><span class="cb-metric text-4xl">Custom</span></p><ul class="mt-6 flex-1 space-y-3"><li class="flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]"><span class="cb-signal mt-0.5 shrink-0" aria-hidden="true">✓</span>Everything in Transformation</li><li class="flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]"><span class="cb-signal mt-0.5 shrink-0" aria-hidden="true">✓</span>Global delivery teams</li><li class="flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]"><span class="cb-signal mt-0.5 shrink-0" aria-hidden="true">✓</span>Board &amp; investor relations</li><li class="flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]"><span class="cb-signal mt-0.5 shrink-0" aria-hidden="true">✓</span>24/7 executive escalation</li><li class="flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]"><span class="cb-signal mt-0.5 shrink-0" aria-hidden="true">✓</span>Multi-year partnership terms</li></ul><a href="#contact" class="cb-btn-secondary mt-8 w-full">Contact partners</a></article></div></div></section><section data-v2-component="corporate-business-faq" aria-labelledby="cb-faq-title" class="cb-section bg-[var(--color-surface)]"><div class="mx-auto max-w-[82rem] px-5 sm:px-8"><div class="grid gap-12 lg:grid-cols-[0.9fr_1.1fr]"><header><p class="cb-eyebrow mb-3">FAQ</p><h2 id="cb-faq-title" class="cb-headline-sm">Common questions</h2><p class="cb-body mt-4">Launch timing, edits, and languages.</p></header><div class="space-y-2"><div class="overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-background)]"><h3><button type="button" id="cb-faq-trigger-0" aria-expanded="true" aria-controls="cb-faq-panel-0" class="flex w-full items-center justify-between gap-4 px-5 py-4 text-start cb-focus-ring"><span class="cb-font-display text-sm font-semibold text-[var(--color-foreground)]"></span><span class="cb-font-mono flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-xs text-[var(--color-accent)]" aria-hidden="true">−</span></button></h3><div id="cb-faq-panel-0" role="region" aria-labelledby="cb-faq-trigger-0" class="border-t border-[var(--border-subtle)] px-5 py-4"><p class="cb-font-body text-sm leading-relaxed text-[var(--color-muted)]"></p></div></div><div class="overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-background)]"><h3><button type="button" id="cb-faq-trigger-1" aria-expanded="false" aria-controls="cb-faq-panel-1" class="flex w-full items-center justify-between gap-4 px-5 py-4 text-start cb-focus-ring"><span class="cb-font-display text-sm font-semibold text-[var(--color-foreground)]"></span><span class="cb-font-mono flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-xs text-[var(--color-accent)]" aria-hidden="true">+</span></button></h3><div id="cb-faq-panel-1" role="region" aria-labelledby="cb-faq-trigger-1" hidden="" class="border-t border-[var(--border-subtle)] px-5 py-4"><p class="cb-font-body text-sm leading-relaxed text-[var(--color-muted)]"></p></div></div><div class="overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-background)]"><h3><button type="button" id="cb-faq-trigger-2" aria-expanded="false" aria-controls="cb-faq-panel-2" class="flex w-full items-center justify-between gap-4 px-5 py-4 text-start cb-focus-ring"><span class="cb-font-display text-sm font-semibold text-[var(--color-foreground)]"></span><span class="cb-font-mono flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-xs text-[var(--color-accent)]" aria-hidden="true">+</span></button></h3><div id="cb-faq-panel-2" role="region" aria-labelledby="cb-faq-trigger-2" hidden="" class="border-t border-[var(--border-subtle)] px-5 py-4"><p class="cb-font-body text-sm leading-relaxed text-[var(--color-muted)]"></p></div></div></div></div></div></section><section id="contact" data-v2-component="corporate-business-contact" aria-labelledby="contact-title" class="cb-section bg-[var(--color-background)]"><div class="mx-auto max-w-[82rem] px-5 sm:px-8"><div class="grid gap-12 lg:grid-cols-2 lg:gap-16"><div><p class="cb-eyebrow mb-3">Contact</p><h2 id="contact-title" class="cb-headline-sm">Request a quote</h2><p class="cb-body mt-4">Tell us about your business and we will respond promptly.</p><address class="cb-font-body mt-8 space-y-3 text-sm not-italic text-[var(--color-muted)]"><p><span class="font-medium text-[var(--color-foreground)]">Email</span><br/><a href="mailto:partners@meridianadvisory.com" class="cb-focus-ring hover:text-[var(--color-accent)]">partners@meridianadvisory.com</a></p><p><span class="font-medium text-[var(--color-foreground)]">Phone</span><br/><a href="tel:+1(212)555-0180" class="cb-focus-ring hover:text-[var(--color-accent)]">+1 (212) 555-0180</a></p><p><span class="font-medium text-[var(--color-foreground)]">Office</span><br/>200 Park Avenue, New York, NY</p></address></div><form id="_R_22_" class="cb-card p-6 sm:p-8" noValidate=""><div class="space-y-4"><div><label for="_R_22_-name" class="cb-font-body mb-1.5 block text-sm font-medium">Name</label><input id="_R_22_-name" type="text" required="" autoComplete="name" class="cb-font-body w-full rounded-[var(--radius-md,8px)] border border-[var(--border-default)] bg-[var(--color-surface)] px-3 py-2.5 text-sm cb-focus-ring" name="name"/></div><div><label for="_R_22_-email" class="cb-font-body mb-1.5 block text-sm font-medium">Email</label><input id="_R_22_-email" type="email" required="" autoComplete="email" class="cb-font-body w-full rounded-[var(--radius-md,8px)] border border-[var(--border-default)] bg-[var(--color-surface)] px-3 py-2.5 text-sm cb-focus-ring" name="email"/></div><div><label for="_R_22_-message" class="cb-font-body mb-1.5 block text-sm font-medium">Message</label><textarea id="_R_22_-message" name="message" rows="4" required="" class="cb-font-body w-full resize-y rounded-[var(--radius-md,8px)] border border-[var(--border-default)] bg-[var(--color-surface)] px-3 py-2.5 text-sm cb-focus-ring"></textarea></div><button type="submit" class="cb-btn-primary w-full sm:w-auto cb-focus-ring">Request consultation</button></div></form></div></div></section></main><utility data-v2-region="utility"><section id="cta-band" data-v2-component="corporate-business-utility-band" aria-labelledby="cb-utility-title" class="relative overflow-hidden bg-[var(--color-primary)] py-14 sm:py-16"><div class="cb-grid-bg pointer-events-none absolute inset-0 opacity-20" aria-hidden="true"></div><div class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_0%_50%,rgba(255,255,255,0.12),transparent)]" aria-hidden="true"></div><div class="relative mx-auto flex max-w-[82rem] flex-col items-start justify-between gap-8 px-5 sm:flex-row sm:items-center sm:px-8"><div class="max-w-xl"><p class="cb-font-mono text-xs font-medium uppercase tracking-wider text-white/70">Partner with us</p><h2 id="cb-utility-title" class="cb-font-display mt-2 text-[clamp(1.5rem,2.8vw,2.25rem)] font-bold text-white">Ready to look established online?</h2><p class="cb-font-body mt-3 text-sm leading-relaxed text-white/75 sm:text-base">Share your goals — we will propose a clear path and timeline.</p></div><div class="flex flex-wrap gap-3"><a href="#contact" class="inline-flex min-h-[2.75rem] items-center justify-center rounded-[var(--radius-md)] bg-white px-5 py-3 text-sm font-semibold text-[var(--color-primary)] transition hover:bg-white/90 cb-focus-ring">Get started</a><a href="#about" class="inline-flex min-h-[2.75rem] items-center justify-center rounded-[var(--radius-md)] border border-white/30 px-5 py-3 text-sm font-semibold text-white transition hover:border-white/60 cb-focus-ring">Learn more</a></div></div></section></utility><footer data-v2-region="footer"><footer data-v2-component="corporate-business-footer" class="border-t border-[var(--border-default)] bg-[var(--color-ink,#020617)] text-white" role="contentinfo"><div class="mx-auto max-w-[82rem] px-5 py-14 sm:px-8 sm:py-16"><div class="grid gap-10 md:grid-cols-[1.4fr_1fr]"><div><p class="cb-font-display text-xl font-bold">Trend Business AI</p><p class="cb-font-body mt-3 max-w-sm text-sm leading-relaxed text-white/60">Business automation, website generation, and enterprise AI products</p><div class="mt-6 flex flex-wrap gap-3"><span class="cb-font-mono rounded-[var(--radius-sm)] border border-white/10 px-2.5 py-1 text-[0.625rem] text-white/50">ISO 9001</span><span class="cb-font-mono rounded-[var(--radius-sm)] border border-white/10 px-2.5 py-1 text-[0.625rem] text-white/50">GDPR</span><span class="cb-font-mono rounded-[var(--radius-sm)] border border-white/10 px-2.5 py-1 text-[0.625rem] text-white/50">B Corp</span></div></div><nav aria-label="Footer"><p class="cb-eyebrow text-white/40">Explore</p><ul class="mt-4 grid grid-cols-2 gap-x-6 gap-y-2.5"><li><a href="#services" class="cb-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] cb-focus-ring rounded-sm">Services</a></li><li><a href="#features" class="cb-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] cb-focus-ring rounded-sm">Why us</a></li><li><a href="#pricing" class="cb-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] cb-focus-ring rounded-sm">Packages</a></li><li><a href="#testimonials" class="cb-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] cb-focus-ring rounded-sm">Clients</a></li><li><a href="#contact" class="cb-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] cb-focus-ring rounded-sm">Contact</a></li></ul></nav></div><div class="mt-12 border-t border-white/10 pt-6"><p class="cb-font-body text-xs text-white/40">© 2026 Trend Business AI. All rights reserved.</p></div></div></footer></footer><div data-v2-region="overlay" class="pointer-events-none fixed inset-x-0 bottom-0 z-50"></div></div>
+  </div>
+  <section class="page v2-secondary-page" id="solutions">
+  <div class="mx-auto max-w-3xl px-6 py-16">
+    <p class="text-xs uppercase tracking-widest text-[var(--color-foreground)]/50">Solutions</p>
+    <h1 class="mt-4 text-3xl font-semibold text-[var(--color-foreground)]">Solutions</h1>
+    <p class="mt-4 text-[var(--color-foreground)]/70">Solutions — Trend Business AI</p>
+    <a class="mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]" href="#home">Back to home</a>
+  </div>
+</section>
+<section class="page v2-secondary-page" id="products">
+  <div class="mx-auto max-w-3xl px-6 py-16">
+    <p class="text-xs uppercase tracking-widest text-[var(--color-foreground)]/50">Products</p>
+    <h1 class="mt-4 text-3xl font-semibold text-[var(--color-foreground)]">Products</h1>
+    <p class="mt-4 text-[var(--color-foreground)]/70">Products — Trend Business AI</p>
+    <a class="mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]" href="#home">Back to home</a>
+  </div>
+</section>
+<section class="page v2-secondary-page" id="about">
+  <div class="mx-auto max-w-3xl px-6 py-16">
+    <p class="text-xs uppercase tracking-widest text-[var(--color-foreground)]/50">About</p>
+    <pre class="mt-4 overflow-x-auto rounded border border-[var(--color-foreground)]/10 p-4 text-xs text-[var(--color-foreground)]/70">import { SiteShell } from &quot;@/components/layout/site-shell&quot;;
+import { buildPageTitle } from &quot;@/lib/seo&quot;;
+
+export const metadata = {
+  title: buildPageTitle(&quot;About&quot;),
+  description: &quot;Build trust through company story, leadership, and mission.&quot;,
+};
+
+export default function SecondaryPage() {
+  return (
+    &lt;SiteShell&gt;
+      &lt;h1&gt;About&lt;/h1&gt;
+      &lt;p&gt;Build trust through company story, leadership, and mission.&lt;/p&gt;
+      &lt;section&gt;&lt;h2&gt;Company story&lt;/h2&gt;&lt;/section&gt;
+      &lt;section&gt;&lt;h2&gt;Leadership team&lt;/h2&gt;&lt;/section&gt;
+      &lt;section&gt;&lt;h2&gt;Mission and values&lt;/h2&gt;&lt;/section&gt;
+      &lt;section&gt;&lt;h2&gt;Trust and security standards&lt;/h2&gt;&lt;/section&gt;
+      &lt;section&gt;&lt;h2&gt;Career / partner CTA&lt;/h2&gt;&lt;/section&gt;
+      &lt;section&gt;&lt;h2&gt;Contact link&lt;/h2&gt;&lt;/section&gt;
+    &lt;/SiteShell&gt;
+  );
+}
+</pre>
+    <a class="mt-6 inline-block text-sm text-[var(--color-accent,#B87333)]" href="#home">Back to home</a>
+  </div>
+</section>
+<section class="page v2-secondary-page" id="insights">
+  <div class="mx-auto max-w-3xl px-6 py-16">
+    <p class="text-xs uppercase tracking-widest text-[var(--color-foreground)]/50">Insights</p>
+    <h1 class="mt-4 text-3xl font-semibold text-[var(--color-foreground)]">Insights</h1>
+    <p class="mt-4 text-[var(--color-foreground)]/70">Insights — Trend Business AI</p>
+    <a class="mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]" href="#home">Back to home</a>
+  </div>
+</section>
+<section class="page v2-secondary-page" id="contact">
+  <div class="mx-auto max-w-3xl px-6 py-16">
+    <p class="text-xs uppercase tracking-widest text-[var(--color-foreground)]/50">Contact</p>
+    <h1 class="mt-4 text-3xl font-semibold text-[var(--color-foreground)]">Contact</h1>
+    <p class="mt-4 text-[var(--color-foreground)]/70">Contact — Trend Business AI</p>
+    <a class="mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]" href="#home">Back to home</a>
+  </div>
+</section>
+</body>
+</html>

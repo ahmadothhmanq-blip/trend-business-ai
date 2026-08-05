@@ -62,6 +62,18 @@ export function previewInputFromGeneration(
     websiteThemeId:
       (blueprint?.settings as { websiteThemeId?: string } | undefined)
         ?.websiteThemeId ?? null,
+    templateArchitectureVersion:
+      (blueprint?.settings as { templateArchitectureVersion?: "v1" | "v2" } | undefined)
+        ?.templateArchitectureVersion ?? null,
+    templatePackageId:
+      (blueprint?.settings as { templatePackageId?: string } | undefined)
+        ?.templatePackageId ?? null,
+    settings: (blueprint?.settings as Record<string, unknown> | undefined) ?? null,
     language: generation.language ?? null,
+    industryId:
+      (blueprint?.settings as { tbdpSectorDnaId?: string } | undefined)
+        ?.tbdpSectorDnaId ??
+      (blueprint?.settings as { industryId?: string } | undefined)?.industryId ??
+      null,
   };
 }

@@ -1,0 +1,13 @@
+{
+  "id": "physicians",
+  "title": "Physicians",
+  "path": "/physicians",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "overlay",
+    "utility",
+    "main",
+    "footer"
+  ]
+}

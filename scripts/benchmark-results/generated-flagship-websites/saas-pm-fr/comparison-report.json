@@ -1,0 +1,73 @@
+{
+  "slug": "saas-pm-fr",
+  "templateId": "saas-enterprise",
+  "language": "French",
+  "title": "Planium",
+  "wallMs": 30851,
+  "generationTimeMs": 30830.847899999993,
+  "provider": "deepseek",
+  "fileCount": 21,
+  "checks": {
+    "v2": true,
+    "packageId": true,
+    "noTheme": true,
+    "usesV2Components": true,
+    "v2Preview": true,
+    "packageMarker": true
+  },
+  "generated": {
+    "imageCount": 3,
+    "hasHeroImage": true,
+    "hasPlaceholder": false,
+    "hasMotion": true,
+    "hasRtl": true,
+    "isFrench": true,
+    "isArabic": false,
+    "components": [
+      "saas-enterprise-about",
+      "saas-enterprise-contact",
+      "saas-enterprise-faq",
+      "saas-enterprise-features",
+      "saas-enterprise-footer",
+      "saas-enterprise-hero",
+      "saas-enterprise-integrations",
+      "saas-enterprise-nav",
+      "saas-enterprise-pricing",
+      "saas-enterprise-stats",
+      "saas-enterprise-testimonials",
+      "saas-enterprise-utility-band"
+    ],
+    "bytes": 68194
+  },
+  "flagship": {
+    "imageCount": 6,
+    "hasHeroImage": true,
+    "hasPlaceholder": false,
+    "hasMotion": true,
+    "hasRtl": true,
+    "isFrench": false,
+    "isArabic": false,
+    "components": [
+      "saas-enterprise-about",
+      "saas-enterprise-contact",
+      "saas-enterprise-faq",
+      "saas-enterprise-features",
+      "saas-enterprise-footer",
+      "saas-enterprise-hero",
+      "saas-enterprise-integrations",
+      "saas-enterprise-nav",
+      "saas-enterprise-pricing",
+      "saas-enterprise-stats",
+      "saas-enterprise-testimonials",
+      "saas-enterprise-utility-band"
+    ],
+    "bytes": 78775
+  },
+  "comparison": {
+    "regressions": [],
+    "missingComponents": [],
+    "extraOk": []
+  },
+  "passed": true,
+  "previewPath": "C:\\Users\\PC\\Desktop\\trend-business-ai\\scripts\\benchmark-results\\generated-flagship-websites\\saas-pm-fr\\preview.html"
+}

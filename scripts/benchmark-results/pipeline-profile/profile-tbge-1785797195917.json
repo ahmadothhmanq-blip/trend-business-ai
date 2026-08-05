@@ -1,0 +1,47 @@
+{
+  "mode": "tbge",
+  "route": "tbge-primary",
+  "wallMs": 80665,
+  "fileCount": 10,
+  "stageTimingsMs": {
+    "Master Plan": 17,
+    "AWQE": 0,
+    "Content Provider": 80633,
+    "TBGE / Builder": 80648,
+    "PRE / Layers": 0,
+    "Business Analysis": 0,
+    "Strategy": 0,
+    "Design System": 0,
+    "Page Planning": 0,
+    "Assets": 0,
+    "File Generation": 0,
+    "Validation / Quality": 0,
+    "Export / Finalize": 0,
+    "Other": 2161
+  },
+  "totalStageMs": 163459,
+  "llmCallCount": 1,
+  "llmCalls": [
+    {
+      "index": 1,
+      "method": "generateText",
+      "label": "DeepSeek Request #1",
+      "module": "content-provider.ts:43:38",
+      "auditStage": null,
+      "promptChars": 23337,
+      "systemChars": 556,
+      "responseChars": 6259,
+      "latencyMs": 80630,
+      "tokens": {
+        "promptTokens": 6383,
+        "completionTokens": 9682,
+        "totalTokens": 16065
+      },
+      "promptHash": "cee12f7a31e48396"
+    }
+  ],
+  "duplicates": [],
+  "exceededTwoCalls": false,
+  "modulesBeyondTwoCalls": [],
+  "pipelineLlmByStage": {}
+}

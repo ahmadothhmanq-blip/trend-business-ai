@@ -1,0 +1,6 @@
+{
+  "tbdpNative": true,
+  "sectorDnaId": "medical",
+  "experienceProfiles": ["healthcare", "corporate", "minimal"],
+  "presetBinding": "serenity-fade"
+}

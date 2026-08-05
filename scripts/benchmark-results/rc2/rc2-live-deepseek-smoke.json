@@ -1,0 +1,220 @@
+{
+  "generatedAt": "2026-08-03T22:26:12.300Z",
+  "release": "RC2",
+  "provider": "deepseek",
+  "generationProfile": "fast",
+  "scenarios": [
+    {
+      "scenario": "restaurant",
+      "label": "Restaurant",
+      "passed": true,
+      "errors": [],
+      "warnings": [
+        "Provider was content-provider, expected deepseek"
+      ],
+      "timing": {
+        "wallMs": 40601,
+        "planningMs": 14,
+        "contentMs": 40537,
+        "builderMs": 40571,
+        "totalMs": 40572.1077
+      },
+      "tokens": {
+        "promptTokens": 6383,
+        "completionTokens": 5270,
+        "totalTokens": 11653
+      },
+      "estimatedCostUsd": 0.0075,
+      "publishReady": false,
+      "publishBlockers": [
+        "Weak mobile responsive coverage",
+        "Contact / conversion endpoint missing",
+        "Weak responsive breakpoint coverage",
+        "SEO title is missing or too short",
+        "Meta description is weak or missing",
+        "Sitemap missing",
+        "Viewport meta / viewport export not detected",
+        "No responsive breakpoint utilities detected",
+        "Mobile-first experience needs work",
+        "6 link errors.",
+        "Missing: /menu, /gallery, /reservation, /contact",
+        "Missing SEO title metadata.",
+        "Missing SEO meta description."
+      ],
+      "fileCount": 10,
+      "provider": "content-provider",
+      "templateResolved": "restaurant-signature"
+    },
+    {
+      "scenario": "saas",
+      "label": "SaaS",
+      "passed": true,
+      "errors": [],
+      "warnings": [
+        "Provider was content-provider, expected deepseek"
+      ],
+      "timing": {
+        "wallMs": 83202,
+        "planningMs": 2,
+        "contentMs": 83196,
+        "builderMs": 83197,
+        "totalMs": 83197.07380000001
+      },
+      "tokens": {
+        "promptTokens": 6728,
+        "completionTokens": 11770,
+        "totalTokens": 18498
+      },
+      "estimatedCostUsd": 0.0148,
+      "publishReady": false,
+      "publishBlockers": [
+        "Weak mobile responsive coverage",
+        "Contact / conversion endpoint missing",
+        "Weak responsive breakpoint coverage",
+        "SEO title is missing or too short",
+        "Meta description is weak or missing",
+        "Sitemap missing",
+        "Viewport meta / viewport export not detected",
+        "No responsive breakpoint utilities detected",
+        "Mobile-first experience needs work",
+        "7 link errors.",
+        "Missing: /services, /projects, /pricing, /contact",
+        "Missing SEO title metadata.",
+        "Missing SEO meta description."
+      ],
+      "fileCount": 10,
+      "provider": "content-provider",
+      "templateResolved": "saas-enterprise"
+    },
+    {
+      "scenario": "medical",
+      "label": "Medical clinic",
+      "passed": true,
+      "errors": [],
+      "warnings": [
+        "Provider was content-provider, expected deepseek"
+      ],
+      "timing": {
+        "wallMs": 105471,
+        "planningMs": 3,
+        "contentMs": 105464,
+        "builderMs": 105465,
+        "totalMs": 105465.14610000001
+      },
+      "tokens": {
+        "promptTokens": 7143,
+        "completionTokens": 13069,
+        "totalTokens": 20212
+      },
+      "estimatedCostUsd": 0.0163,
+      "publishReady": false,
+      "publishBlockers": [
+        "Weak mobile responsive coverage",
+        "Contact / conversion endpoint missing",
+        "Weak responsive breakpoint coverage",
+        "SEO title is missing or too short",
+        "Meta description is weak or missing",
+        "Sitemap missing",
+        "Viewport meta / viewport export not detected",
+        "No responsive breakpoint utilities detected",
+        "Mobile-first experience needs work",
+        "5 link errors.",
+        "Missing: /services, /projects, /contact",
+        "Missing SEO title metadata.",
+        "Missing SEO meta description."
+      ],
+      "fileCount": 10,
+      "provider": "content-provider",
+      "templateResolved": "medical-premium"
+    },
+    {
+      "scenario": "real-estate",
+      "label": "Real estate",
+      "passed": true,
+      "errors": [],
+      "warnings": [
+        "Provider was content-provider, expected deepseek"
+      ],
+      "timing": {
+        "wallMs": 71126,
+        "planningMs": 2,
+        "contentMs": 71120,
+        "builderMs": 71121,
+        "totalMs": 71121.07200000001
+      },
+      "tokens": {
+        "promptTokens": 5315,
+        "completionTokens": 9369,
+        "totalTokens": 14684
+      },
+      "estimatedCostUsd": 0.0117,
+      "publishReady": false,
+      "publishBlockers": [
+        "Weak mobile responsive coverage",
+        "Contact / conversion endpoint missing",
+        "Weak responsive breakpoint coverage",
+        "SEO title is missing or too short",
+        "Meta description is weak or missing",
+        "Sitemap missing",
+        "Viewport meta / viewport export not detected",
+        "No responsive breakpoint utilities detected",
+        "Mobile-first experience needs work",
+        "5 link errors.",
+        "Missing: /listings, /services, /contact",
+        "Missing SEO title metadata.",
+        "Missing SEO meta description."
+      ],
+      "fileCount": 10,
+      "provider": "content-provider",
+      "templateResolved": "real-estate-prestige"
+    },
+    {
+      "scenario": "creative-agency",
+      "label": "Creative agency",
+      "passed": true,
+      "errors": [],
+      "warnings": [
+        "Provider was content-provider, expected deepseek"
+      ],
+      "timing": {
+        "wallMs": 48479,
+        "planningMs": 2,
+        "contentMs": 48475,
+        "builderMs": 48475,
+        "totalMs": 48475.31229999999
+      },
+      "tokens": {
+        "promptTokens": 6782,
+        "completionTokens": 6209,
+        "totalTokens": 12991
+      },
+      "estimatedCostUsd": 0.0087,
+      "publishReady": false,
+      "publishBlockers": [
+        "Weak mobile responsive coverage",
+        "Contact / conversion endpoint missing",
+        "Weak responsive breakpoint coverage",
+        "SEO title is missing or too short",
+        "Meta description is weak or missing",
+        "Sitemap missing",
+        "Mobile-first experience needs work",
+        "5 link errors.",
+        "Missing: /services, /projects, /contact",
+        "Missing SEO title metadata.",
+        "Missing SEO meta description."
+      ],
+      "fileCount": 10,
+      "provider": "content-provider",
+      "templateResolved": "creative-portfolio"
+    }
+  ],
+  "summary": {
+    "total": 5,
+    "passed": 5,
+    "failed": 0,
+    "totalTokens": 78038,
+    "totalEstimatedCostUsd": 0.059,
+    "avgWallMs": 69776,
+    "publishReadyCount": 0
+  }
+}

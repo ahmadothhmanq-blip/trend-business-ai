@@ -1,0 +1,81 @@
+{
+  "components": [
+    {
+      "id": "corporate-business-nav",
+      "role": "navigation",
+      "scaffold": "components/corporate-business-nav.tsx",
+      "slots": ["logo", "links", "cta"]
+    },
+    {
+      "id": "corporate-business-hero",
+      "role": "hero",
+      "scaffold": "components/corporate-business-hero.tsx",
+      "slots": ["headline", "metrics", "cta"]
+    },
+    {
+      "id": "corporate-business-features",
+      "role": "features",
+      "scaffold": "components/corporate-business-features.tsx"
+    },
+    {
+      "id": "corporate-business-about",
+      "role": "story",
+      "scaffold": "components/corporate-business-about.tsx"
+    },
+    {
+      "id": "corporate-business-stats",
+      "role": "custom",
+      "scaffold": "components/corporate-business-stats.tsx"
+    },
+    {
+      "id": "corporate-business-testimonials",
+      "role": "testimonials",
+      "scaffold": "components/corporate-business-testimonials.tsx"
+    },
+    {
+      "id": "corporate-business-pricing",
+      "role": "pricing",
+      "scaffold": "components/corporate-business-pricing.tsx"
+    },
+    {
+      "id": "corporate-business-faq",
+      "role": "faq",
+      "scaffold": "components/corporate-business-faq.tsx"
+    },
+    {
+      "id": "corporate-business-contact",
+      "role": "contact",
+      "scaffold": "components/corporate-business-contact.tsx"
+    },
+    {
+      "id": "corporate-business-footer",
+      "role": "footer",
+      "scaffold": "components/corporate-business-footer.tsx"
+    },
+    {
+      "id": "corporate-business-floating-cta",
+      "role": "cta",
+      "scaffold": "components/corporate-business-floating-cta.tsx"
+    },
+    {
+      "id": "corporate-business-utility-band",
+      "role": "cta",
+      "scaffold": "components/corporate-business-utility-band.tsx"
+    },
+    {
+      "id": "corporate-business-section-shell",
+      "role": "custom",
+      "scaffold": "components/corporate-business-section-shell.tsx"
+    },
+    {
+      "id": "corporate-business-portfolio",
+      "role": "custom",
+      "scaffold": "components/corporate-business-portfolio.tsx"
+    },
+    {
+      "id": "corporate-business-integrations",
+      "role": "custom",
+      "scaffold": "components/corporate-business-integrations.tsx"
+    }
+  ]
+}

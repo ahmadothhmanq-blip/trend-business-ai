@@ -8,6 +8,11 @@ import type {
 
 export class GeminiAdapter implements AIProvider {
   readonly name = "gemini" as const;
+  private readonly model = "gemini-2.0-flash";
+
+  getModelName(): string {
+    return this.model;
+  }
 
   async generateJson<T>(_request: JsonGenerationRequest): Promise<T> {
     void _request;

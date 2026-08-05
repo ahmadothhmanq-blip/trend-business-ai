@@ -1,0 +1,12 @@
+{
+  "id": "customers",
+  "title": "Customers",
+  "path": "/customers",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "utility",
+    "footer"
+  ]
+}

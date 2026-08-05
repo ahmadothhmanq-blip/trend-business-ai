@@ -1,0 +1,55 @@
+{
+  "colors": {
+    "primary": "#1C1917",
+    "secondary": "#3D3A36",
+    "accent": "#B8956B",
+    "background": "#F5F0EB",
+    "foreground": "#1C1917",
+    "muted": "rgba(28,25,23,0.58)",
+    "surface": "#FDFCFA",
+    "stone": "#E8E2DA",
+    "brass": "#B8956B",
+    "linen": "#FAF8F5"
+  },
+  "typography": {
+    "display": "Fraunces",
+    "body": "Outfit",
+    "scale": {
+      "sm": "0.8125rem",
+      "base": "1.0625rem",
+      "lg": "1.375rem",
+      "xl": "3.25rem",
+      "display": "clamp(2.75rem, 6vw, 4.5rem)"
+    }
+  },
+  "languageProfile": {
+    "directionAdaptation": true,
+    "rtlTypography": {
+      "display": "Tajawal",
+      "body": "Noto Sans Arabic"
+    },
+    "ltrTypography": {
+      "display": "Fraunces",
+      "body": "Outfit"
+    }
+  },
+  "spacing": {
+    "unit": "0.25rem",
+    "scale": ["0", "1", "2", "4", "6", "8", "12", "16", "20", "24", "32", "40", "48", "64", "80"]
+  },
+  "radius": {
+    "sm": "2px",
+    "md": "4px",
+    "lg": "8px"
+  },
+  "shadows": {
+    "surface": "0 24px 64px rgba(28,25,23,0.12)",
+    "glow": "0 0 80px rgba(184,149,107,0.14)",
+    "inset": "inset 0 1px 0 rgba(253,252,250,0.8)"
+  },
+  "borders": {
+    "default": "rgba(28,25,23,0.1)",
+    "brass": "rgba(184,149,107,0.32)",
+    "subtle": "rgba(28,25,23,0.05)"
+  }
+}

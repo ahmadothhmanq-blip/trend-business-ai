@@ -1,0 +1,68 @@
+{
+  "components": [
+    {
+      "id": "restaurant-signature-nav",
+      "role": "navigation",
+      "scaffold": "components/restaurant-signature-nav.tsx",
+      "slots": ["logo", "links", "cta"]
+    },
+    {
+      "id": "restaurant-signature-sidebar-rail",
+      "role": "navigation",
+      "scaffold": "components/restaurant-signature-sidebar-rail.tsx",
+      "slots": ["links", "hours"]
+    },
+    {
+      "id": "restaurant-signature-hero",
+      "role": "hero",
+      "scaffold": "components/restaurant-signature-hero.tsx",
+      "slots": ["headline", "subheadline", "cta", "scroll-cue"]
+    },
+    {
+      "id": "restaurant-signature-reservation",
+      "role": "contact",
+      "scaffold": "components/restaurant-signature-reservation.tsx",
+      "slots": ["steps", "cta"]
+    },
+    {
+      "id": "restaurant-signature-chef-story",
+      "role": "story",
+      "scaffold": "components/restaurant-signature-chef-story.tsx"
+    },
+    {
+      "id": "restaurant-signature-tasting-menu",
+      "role": "services",
+      "scaffold": "components/restaurant-signature-tasting-menu.tsx"
+    },
+    {
+      "id": "restaurant-signature-signature-dishes",
+      "role": "portfolio",
+      "scaffold": "components/restaurant-signature-signature-dishes.tsx"
+    },
+    {
+      "id": "restaurant-signature-atmosphere",
+      "role": "custom",
+      "scaffold": "components/restaurant-signature-atmosphere.tsx"
+    },
+    {
+      "id": "restaurant-signature-gallery",
+      "role": "gallery",
+      "scaffold": "components/restaurant-signature-gallery.tsx"
+    },
+    {
+      "id": "restaurant-signature-reservation-cta",
+      "role": "cta",
+      "scaffold": "components/restaurant-signature-reservation-cta.tsx"
+    },
+    {
+      "id": "restaurant-signature-footer",
+      "role": "footer",
+      "scaffold": "components/restaurant-signature-footer.tsx"
+    },
+    {
+      "id": "restaurant-signature-section-shell",
+      "role": "custom",
+      "scaffold": "components/restaurant-signature-section-shell.tsx"
+    }
+  ]
+}

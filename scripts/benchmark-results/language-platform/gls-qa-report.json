@@ -1,0 +1,73 @@
+{
+  "generatedAt": "2026-08-03T22:35:03.764Z",
+  "phase": "gls-1",
+  "version": "1.0.0",
+  "testsPassed": true,
+  "exitCode": 0,
+  "checks": [
+    {
+      "id": "constants",
+      "ok": true
+    },
+    {
+      "id": "worldLanguageRegistry",
+      "ok": true
+    },
+    {
+      "id": "serviceRegistry",
+      "ok": true
+    },
+    {
+      "id": "unifiedContext",
+      "ok": true
+    },
+    {
+      "id": "rtlArabic",
+      "ok": true
+    },
+    {
+      "id": "cjkTypography",
+      "ok": true
+    },
+    {
+      "id": "aiResolver",
+      "ok": true
+    },
+    {
+      "id": "localeEngine",
+      "ok": true
+    },
+    {
+      "id": "seoLocalization",
+      "ok": true
+    },
+    {
+      "id": "directionCss",
+      "ok": true
+    },
+    {
+      "id": "tbdpBridge",
+      "ok": true
+    },
+    {
+      "id": "translationContracts",
+      "ok": true
+    },
+    {
+      "id": "typographyProfiles",
+      "ok": true
+    }
+  ],
+  "performance": {
+    "note": "GLS context resolution is synchronous, <1ms per call",
+    "noLlmCalls": true,
+    "noNetworkCalls": true
+  },
+  "backwardCompatibility": {
+    "libI18nUnchanged": true,
+    "websiteOutputLocaleUnchanged": true,
+    "tbdpLanguageBridgeUnchanged": true,
+    "templatesUnchanged": true,
+    "builderUnchanged": true
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "packageId": "real-estate-prestige",
+  "templateIntelligenceHint": "ti-real-estate-listings",
+  "layout": {
+    "defaultLayoutId": "sidebar-right",
+    "regions": {
+      "header": { "role": "header", "sticky": true },
+      "sidebar": { "role": "sidebar", "sticky": true, "collapseBelow": "lg" },
+      "main": { "role": "main" },
+      "footer": { "role": "footer" }
+    }
+  },
+  "navigation": {
+    "componentId": "real-estate-prestige-nav",
+    "variant": "estate-minimal"
+  },
+  "hero": {
+    "componentId": "real-estate-prestige-hero",
+    "region": "main"
+  },
+  "footer": {
+    "componentId": "real-estate-prestige-footer",
+    "region": "footer"
+  },
+  "homeFlow": {
+    "regions": {
+      "sidebar": ["real-estate-prestige-dossier-rail"],
+      "main": [
+        "real-estate-prestige-hero",
+        "real-estate-prestige-collection",
+        "real-estate-prestige-neighborhoods",
+        "real-estate-prestige-architecture",
+        "real-estate-prestige-advisors",
+        "real-estate-prestige-testimonials",
+        "real-estate-prestige-inquiry"
+      ]
+    }
+  },
+  "sectionShell": {
+    "strategy": "package",
+    "componentId": "real-estate-prestige-section-shell"
+  },
+  "aiGeneration": {
+    "contentProfile": "real-estate-prestige-luxury",
+    "suggestedPages": ["listings", "neighborhoods", "contact"]
+  }
+}

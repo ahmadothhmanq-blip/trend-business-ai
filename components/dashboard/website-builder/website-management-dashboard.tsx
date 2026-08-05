@@ -32,7 +32,7 @@ import { cn } from "@/lib/utils";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
 import { useTranslation } from "@/lib/i18n/client";
 import type { CatalogItem, CmsEntry, NavLink } from "@/lib/ai-core/website-management";
-import { MediaLibraryPanel } from "@/components/dashboard/website-builder/media-library-panel";
+import { SiteImageManagerPanel } from "@/components/dashboard/website-builder/site-image-manager-panel";
 import { useCopilotCommand } from "@/components/dashboard/website-builder/hooks/use-copilot-command";
 
 type Tab =
@@ -728,7 +728,7 @@ export function WebsiteManagementDashboard({
           <p className="mb-4 text-[12px] font-semibold uppercase tracking-wide text-white/40">
             Media library
           </p>
-          <MediaLibraryPanel generationId={generationId} />
+          <SiteImageManagerPanel generationId={generationId} />
         </DashboardPanel>
       ) : null}
 

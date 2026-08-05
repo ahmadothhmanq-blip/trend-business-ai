@@ -3,6 +3,10 @@ import { getActiveProvider } from "@/lib/ai/provider-config";
 import { emptyTokenUsage } from "@/lib/ai/usage";
 import { appendPromptVersion } from "@/lib/workspace/persist";
 import { ensureStaticPreviewFile } from "@/lib/website/build-static-preview.server";
+import {
+  mergeTbdpSettings,
+  validateWebsiteAgainstTbdp,
+} from "@/lib/website/tbdp-wiring";
 import { usesLlmLocalizedWebsiteCopy } from "@/lib/ai-core/content/content-language";
 import { productionContentForPreview } from "@/lib/ai-core/content/production-content";
 import { logger } from "@/lib/logger";
@@ -221,6 +225,19 @@ async function persistWebsiteGenerationInner(args: PersistWebsiteGenerationArgs)
           ? industryContentForPreview(copyPack)
           : productionContentForPreview(productionContent).filter(Boolean);
 
+  const tbdpValidation = validateWebsiteAgainstTbdp(args.project);
+  if (!tbdpValidation.valid && tbdpValidation.errors.length > 0) {
+    logger.warn("wb-save TBDP validation warnings", "wb-save", {
+      errors: tbdpValidation.errors,
+      warnings: tbdpValidation.warnings,
+    });
+  }
+
+  const projectSettings = mergeTbdpSettings(
+    (args.project.settings ?? {}) as Record<string, unknown>,
+    {},
+  );
+
   const files = ensureStaticPreviewFile({
     title: args.project.title || productionContent.heroHeadline,
     description:
@@ -253,11 +270,26 @@ async function persistWebsiteGenerationInner(args: PersistWebsiteGenerationArgs)
     templateIntelligenceId:
       (args.project.settings as { templateIntelligenceId?: string } | undefined)
         ?.templateIntelligenceId ?? undefined,
+    templateArchitectureVersion:
+      (args.project.settings as { templateArchitectureVersion?: "v1" | "v2" } | undefined)
+        ?.templateArchitectureVersion ?? undefined,
+    templatePackageId:
+      (args.project.settings as { templatePackageId?: string } | undefined)
+        ?.templatePackageId ??
+      (args.project.settings as { websiteStructureTemplateId?: string } | undefined)
+        ?.websiteStructureTemplateId ??
+      undefined,
     websiteThemeId:
       (args.project.settings as { websiteThemeId?: string } | undefined)
         ?.websiteThemeId ?? undefined,
     language: args.input.language,
+    industryId:
+      (args.project.settings as { industryId?: string; tbdpSectorDnaId?: string } | undefined)
+        ?.industryId ??
+      (args.project.settings as { tbdpSectorDnaId?: string } | undefined)?.tbdpSectorDnaId ??
+      null,
     files: args.project.files,
+    settings: projectSettings,
   });
 
   const savedProject: GeneratedWebsiteProject = {
@@ -270,8 +302,14 @@ async function persistWebsiteGenerationInner(args: PersistWebsiteGenerationArgs)
       styling: "Tailwind CSS",
       packageManager: "npm",
       deploymentTarget: "Vercel or Node hosting",
-      ...args.project.settings,
-    },
+      ...projectSettings,
+      tbdpValidation: {
+        valid: tbdpValidation.valid,
+        sectorDnaId: tbdpValidation.sectorDnaId,
+        errorCount: tbdpValidation.errors.length,
+        warningCount: tbdpValidation.warnings.length,
+      },
+    } as GeneratedWebsiteProject["settings"],
     progressEvents: [
       ...(args.project.progressEvents ?? []),
       "Building product preview...",

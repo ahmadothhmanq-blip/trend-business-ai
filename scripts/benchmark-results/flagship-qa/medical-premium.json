@@ -1,0 +1,75 @@
+{
+  "packageId": "medical-premium",
+  "completedAt": "2026-08-05T22:07:25.071Z",
+  "marketplaceScore": 96,
+  "passed95": true,
+  "visual": {
+    "designTokens": 92,
+    "visualHierarchy": 92,
+    "responsiveLayout": 92,
+    "heroQuality": 92,
+    "navigationUx": 92,
+    "ctaPlacement": 92,
+    "componentSpacing": 92,
+    "typographyHierarchy": 92,
+    "crossPageConsistency": 92,
+    "layout": 92,
+    "ux": 92,
+    "overall": 92
+  },
+  "preview": {
+    "imageCount": 0,
+    "hasHeroImage": false,
+    "hasPlaceholder": false,
+    "sectionCount": 0,
+    "premiumSignals": 4,
+    "duplicateImages": 0,
+    "uniquePhotoCount": 1,
+    "usesSlotImages": false
+  },
+  "slotIndependence": {
+    "slotUsages": 6,
+    "imageIndependent": true
+  },
+  "imageValidation": {
+    "passed": true,
+    "repairs": 45,
+    "duplicatesRemoved": 31,
+    "industryId": "medical",
+    "uniqueUrlCount": 12,
+    "issues": [
+      "duplicate: Duplicate image URL rejected.",
+      "duplicate: Duplicate image URL rejected.",
+      "duplicate: Duplicate image URL rejected.",
+      "duplicate: Duplicate image URL rejected.",
+      "duplicate: Duplicate image URL rejected."
+    ],
+    "rulesReport": {
+      "passed": true,
+      "score": 70,
+      "industryDetected": "medical",
+      "industryLabel": "Medical & Healthcare",
+      "subcategory": null,
+      "visualStyle": "clinical trust, calm precision",
+      "profileId": "medical",
+      "selectedCount": 44,
+      "rejectedCount": 32,
+      "replacedCount": 32,
+      "sourceCounts": {
+        "user": 0,
+        "ai": 0,
+        "library": 44,
+        "stock": 0
+      },
+      "summary": "Industry image rules passed for Medical & Healthcare (medical). 44 images selected, 32 replaced."
+    }
+  },
+  "lighthouse": null,
+  "previewPath": "C:\\Users\\PC\\Desktop\\trend-business-ai\\scripts\\benchmark-results\\flagship-previews\\medical-premium\\preview.html",
+  "bytes": 23488,
+  "v2Markers": {
+    "package": true,
+    "hero": false,
+    "render": true
+  }
+}

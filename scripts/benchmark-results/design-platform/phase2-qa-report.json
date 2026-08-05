@@ -1,0 +1,66 @@
+{
+  "phase": "components-2",
+  "version": "2.0.0",
+  "componentCount": 75,
+  "ok": true,
+  "passed": 14,
+  "total": 14,
+  "checks": [
+    {
+      "id": "ui.phase",
+      "ok": true
+    },
+    {
+      "id": "ui.version",
+      "ok": true
+    },
+    {
+      "id": "catalog.count",
+      "ok": true
+    },
+    {
+      "id": "component.structure",
+      "ok": true
+    },
+    {
+      "id": "styles.tbdp.vars",
+      "ok": true
+    },
+    {
+      "id": "styles.no.raw.hex",
+      "ok": true
+    },
+    {
+      "id": "accessibility.aa",
+      "ok": true
+    },
+    {
+      "id": "isolation.lib.website.template-v2",
+      "ok": true
+    },
+    {
+      "id": "isolation.templates.website",
+      "ok": true
+    },
+    {
+      "id": "isolation.lib.website.builder",
+      "ok": true
+    },
+    {
+      "id": "isolation.lib.ai-core.website-design-platform",
+      "ok": true
+    },
+    {
+      "id": "docs.phase2",
+      "ok": true
+    },
+    {
+      "id": "typescript",
+      "ok": true
+    },
+    {
+      "id": "eslint",
+      "ok": true
+    }
+  ]
+}

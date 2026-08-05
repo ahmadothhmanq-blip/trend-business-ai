@@ -1,0 +1,55 @@
+﻿node.exe : npm warn Unknown env config "devdir". This will stop working in the next major version of npm. See `npm 
+help npmrc` for supported config options.
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Users\PC\AppData\Roaming\npm ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (npm warn Unknow...config options.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Warning: Custom Cache-Control headers detected for the following routes:
+  - /_next/static/:path*
+
+Setting a custom Cache-Control header can break Next.js development behavior.
+Γû▓ Next.js 16.2.9 (Turbopack)
+- Environments: .env.local
+- Experiments (use with caution):
+  ┬╖ optimizePackageImports
+
+  Creating an optimized production build ...
+Turbopack build encountered 1 warnings:
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace 
+below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Import trace:
+  App Route:
+    ./next.config.ts
+    ./lib/ai-core/video-production-platform/assemble.ts
+    ./app/api/video-studio/[id]/manage/route.ts
+
+
+Γ£ô Compiled successfully in 17.7s
+  Running TypeScript ...
+Failed to type check.
+
+./lib/ai-core/architecture-knowledge-base/template-compatibility.ts:12:42
+Type error: Cannot find module '@/lib/website/builder/theme-architecture' or its corresponding type declarations.
+
+  [90m10 |[0m } [36mfrom[0m [32m"@/lib/ai-core/template-intelligence/types"[0m;
+  [90m11 |[0m [36mimport[0m { normalizeVerticalIndustryId } [36mfrom[0m 
+[32m"@/lib/ai-core/template-intelligence/industry-...[0m
+[31m[1m>[0m [90m12 |[0m [36mimport[0m { getThemePageArchitecture } [36mfrom[0m 
+[32m"@/lib/website/builder/theme-architecture"[0m;
+  [90m   |[0m                                          [31m[1m^[0m
+  [90m13 |[0m [36mimport[0m {
+  [90m14 |[0m   getWebsiteStructureTemplate,
+  [90m15 |[0m } [36mfrom[0m [32m"@/lib/website/builder/structure-templates"[0m;
+Next.js build worker exited with code: 1 and signal: null

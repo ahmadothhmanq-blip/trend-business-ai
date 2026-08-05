@@ -1,0 +1,645 @@
+{
+  "generatedAt": "2026-08-04T15:45:56.543Z",
+  "release": "RC1",
+  "architectureFrozen": true,
+  "scenarios": [
+    {
+      "scenario": "restaurant",
+      "label": "Restaurant website",
+      "packageId": "restaurant-signature",
+      "passed": true,
+      "errors": [],
+      "warnings": [
+        "Publish gates would block this scenario fixture output"
+      ],
+      "stages": [
+        {
+          "name": "Template Resolution + Runtime",
+          "ok": true,
+          "ms": 130.99,
+          "level": "pass",
+          "resolvedLegacy": "restaurant-signature",
+          "resolvedPackage": "restaurant-signature",
+          "templateId": "restaurant-signature"
+        },
+        {
+          "name": "Master Plan + Production Planning",
+          "ok": true,
+          "ms": 19.75,
+          "level": "pass",
+          "masterPlanId": "e532b565-d9c3-48a7-91f3-4f62c425c2d9",
+          "websiteType": "local-business",
+          "industry": "Restaurant",
+          "validationPassed": true,
+          "awqeScore": 89,
+          "planningMs": 12.772300000000087,
+          "qualityMs": 2.8510999999998603
+        },
+        {
+          "name": "AWQE",
+          "ok": true,
+          "ms": 0.3,
+          "level": "pass",
+          "specHash": "a278e545769e0d47",
+          "stagesCompleted": 7
+        },
+        {
+          "name": "Content Provider (copy-only request)",
+          "ok": true,
+          "ms": 0.17,
+          "level": "pass",
+          "hasLockedMarker": true,
+          "copyTaskCount": 43
+        },
+        {
+          "name": "TBGE (locked spec)",
+          "ok": true,
+          "ms": 0.11,
+          "level": "pass",
+          "pageCount": 5,
+          "locked": true,
+          "plannerModel": "master-plan-engine"
+        },
+        {
+          "name": "TBDP Wiring",
+          "ok": true,
+          "ms": 1.7,
+          "level": "pass",
+          "enabled": true,
+          "sectorDnaId": "restaurant"
+        },
+        {
+          "name": "GLS",
+          "ok": true,
+          "ms": 0.4,
+          "level": "pass",
+          "direction": {
+            "direction": "ltr",
+            "adaptations": {
+              "spacingMirror": false,
+              "motionReverse": false,
+              "gridFlow": "row",
+              "iconMirror": false,
+              "navigationAlign": "start",
+              "carouselDirection": "ltr",
+              "timelineDirection": "ltr",
+              "drawerSide": "left"
+            }
+          }
+        },
+        {
+          "name": "Website Builder (structure apply)",
+          "ok": true,
+          "ms": 21.76,
+          "level": "pass",
+          "fileCount": 16,
+          "templateIntelligenceId": "ti-restaurant-dining",
+          "notes": 4
+        },
+        {
+          "name": "WQBS",
+          "ok": true,
+          "ms": 5.56,
+          "level": "pass",
+          "passed": true
+        },
+        {
+          "name": "Review Studio",
+          "ok": true,
+          "ms": 7.56,
+          "level": "pass",
+          "overallScore": 76,
+          "improvements": 5,
+          "providerIndependent": true
+        },
+        {
+          "name": "Publish Flow (gates)",
+          "ok": true,
+          "ms": 14.71,
+          "level": "pass",
+          "publishReady": false,
+          "wouldBlock": true,
+          "qualityScore": 76,
+          "blockers": 8,
+          "warnings": 5
+        }
+      ],
+      "performance": {
+        "totalMs": 203.01,
+        "slowestStage": "Template Resolution + Runtime"
+      }
+    },
+    {
+      "scenario": "saas",
+      "label": "SaaS website",
+      "packageId": "saas-enterprise",
+      "passed": true,
+      "errors": [],
+      "warnings": [
+        "Publish gates would block this scenario fixture output"
+      ],
+      "stages": [
+        {
+          "name": "Template Resolution + Runtime",
+          "ok": true,
+          "ms": 89.11,
+          "level": "pass",
+          "resolvedLegacy": "saas-enterprise",
+          "resolvedPackage": "saas-enterprise",
+          "templateId": "saas-enterprise"
+        },
+        {
+          "name": "Master Plan + Production Planning",
+          "ok": true,
+          "ms": 3.26,
+          "level": "pass",
+          "masterPlanId": "3c7f7c44-a7d4-4bd7-80c4-bd871246d26c",
+          "websiteType": "saas",
+          "industry": "Saas",
+          "validationPassed": true,
+          "awqeScore": 89,
+          "planningMs": 1.9837999999999738,
+          "qualityMs": 0.5333000000000538
+        },
+        {
+          "name": "AWQE",
+          "ok": true,
+          "ms": 0.19,
+          "level": "pass",
+          "specHash": "54e94ecbdb16a825",
+          "stagesCompleted": 7
+        },
+        {
+          "name": "Content Provider (copy-only request)",
+          "ok": true,
+          "ms": 0.15,
+          "level": "pass",
+          "hasLockedMarker": true,
+          "copyTaskCount": 46
+        },
+        {
+          "name": "TBGE (locked spec)",
+          "ok": true,
+          "ms": 0.09,
+          "level": "pass",
+          "pageCount": 5,
+          "locked": true,
+          "plannerModel": "master-plan-engine"
+        },
+        {
+          "name": "TBDP Wiring",
+          "ok": true,
+          "ms": 0.41,
+          "level": "pass",
+          "enabled": true,
+          "sectorDnaId": "saas"
+        },
+        {
+          "name": "GLS",
+          "ok": true,
+          "ms": 0.27,
+          "level": "pass",
+          "direction": {
+            "direction": "ltr",
+            "adaptations": {
+              "spacingMirror": false,
+              "motionReverse": false,
+              "gridFlow": "row",
+              "iconMirror": false,
+              "navigationAlign": "start",
+              "carouselDirection": "ltr",
+              "timelineDirection": "ltr",
+              "drawerSide": "left"
+            }
+          }
+        },
+        {
+          "name": "Website Builder (structure apply)",
+          "ok": true,
+          "ms": 8.66,
+          "level": "pass",
+          "fileCount": 15,
+          "templateIntelligenceId": "ti-saas-growth",
+          "notes": 4
+        },
+        {
+          "name": "WQBS",
+          "ok": true,
+          "ms": 1.87,
+          "level": "pass",
+          "passed": true
+        },
+        {
+          "name": "Review Studio",
+          "ok": true,
+          "ms": 4.62,
+          "level": "pass",
+          "overallScore": 76,
+          "improvements": 5,
+          "providerIndependent": true
+        },
+        {
+          "name": "Publish Flow (gates)",
+          "ok": true,
+          "ms": 5.43,
+          "level": "pass",
+          "publishReady": false,
+          "wouldBlock": true,
+          "qualityScore": 74,
+          "blockers": 7,
+          "warnings": 6
+        }
+      ],
+      "performance": {
+        "totalMs": 114.06,
+        "slowestStage": "Template Resolution + Runtime"
+      }
+    },
+    {
+      "scenario": "medical",
+      "label": "Medical clinic",
+      "packageId": "medical-premium",
+      "passed": true,
+      "errors": [],
+      "warnings": [
+        "Publish gates would block this scenario fixture output"
+      ],
+      "stages": [
+        {
+          "name": "Template Resolution + Runtime",
+          "ok": true,
+          "ms": 81.31,
+          "level": "pass",
+          "resolvedLegacy": "medical-premium",
+          "resolvedPackage": "medical-premium",
+          "templateId": "medical-premium"
+        },
+        {
+          "name": "Master Plan + Production Planning",
+          "ok": true,
+          "ms": 2.17,
+          "level": "pass",
+          "masterPlanId": "6ffafdad-ddca-484f-aa18-4366cca0e775",
+          "websiteType": "local-business",
+          "industry": "Clinic",
+          "validationPassed": true,
+          "awqeScore": 90,
+          "planningMs": 1.317199999999957,
+          "qualityMs": 0.19600000000036744
+        },
+        {
+          "name": "AWQE",
+          "ok": true,
+          "ms": 0.13,
+          "level": "pass",
+          "specHash": "d116b4c26eecafa2",
+          "stagesCompleted": 7
+        },
+        {
+          "name": "Content Provider (copy-only request)",
+          "ok": true,
+          "ms": 0.17,
+          "level": "pass",
+          "hasLockedMarker": true,
+          "copyTaskCount": 49
+        },
+        {
+          "name": "TBGE (locked spec)",
+          "ok": true,
+          "ms": 0.06,
+          "level": "pass",
+          "pageCount": 5,
+          "locked": true,
+          "plannerModel": "master-plan-engine"
+        },
+        {
+          "name": "TBDP Wiring",
+          "ok": true,
+          "ms": 0.42,
+          "level": "pass",
+          "enabled": true,
+          "sectorDnaId": "medical"
+        },
+        {
+          "name": "GLS",
+          "ok": true,
+          "ms": 0.54,
+          "level": "pass",
+          "direction": {
+            "direction": "ltr",
+            "adaptations": {
+              "spacingMirror": false,
+              "motionReverse": false,
+              "gridFlow": "row",
+              "iconMirror": false,
+              "navigationAlign": "start",
+              "carouselDirection": "ltr",
+              "timelineDirection": "ltr",
+              "drawerSide": "left"
+            }
+          }
+        },
+        {
+          "name": "Website Builder (structure apply)",
+          "ok": true,
+          "ms": 9.4,
+          "level": "pass",
+          "fileCount": 15,
+          "templateIntelligenceId": "ti-medical-care",
+          "notes": 4
+        },
+        {
+          "name": "WQBS",
+          "ok": true,
+          "ms": 1.79,
+          "level": "pass",
+          "passed": true
+        },
+        {
+          "name": "Review Studio",
+          "ok": true,
+          "ms": 3.99,
+          "level": "pass",
+          "overallScore": 78,
+          "improvements": 4,
+          "providerIndependent": true
+        },
+        {
+          "name": "Publish Flow (gates)",
+          "ok": true,
+          "ms": 5.93,
+          "level": "pass",
+          "publishReady": false,
+          "wouldBlock": true,
+          "qualityScore": 76,
+          "blockers": 7,
+          "warnings": 5
+        }
+      ],
+      "performance": {
+        "totalMs": 105.91,
+        "slowestStage": "Template Resolution + Runtime"
+      }
+    },
+    {
+      "scenario": "real-estate",
+      "label": "Real estate company",
+      "packageId": "real-estate-prestige",
+      "passed": true,
+      "errors": [],
+      "warnings": [
+        "Publish gates would block this scenario fixture output"
+      ],
+      "stages": [
+        {
+          "name": "Template Resolution + Runtime",
+          "ok": true,
+          "ms": 84.96,
+          "level": "pass",
+          "resolvedLegacy": "real-estate-prestige",
+          "resolvedPackage": "real-estate-prestige",
+          "templateId": "real-estate-prestige"
+        },
+        {
+          "name": "Master Plan + Production Planning",
+          "ok": true,
+          "ms": 2.16,
+          "level": "pass",
+          "masterPlanId": "9b38db3e-99ae-4661-a32d-6d35bd24c801",
+          "websiteType": "corporate",
+          "industry": "Real Estate",
+          "validationPassed": true,
+          "awqeScore": 89,
+          "planningMs": 1.2670999999991182,
+          "qualityMs": 0.31529999999929714
+        },
+        {
+          "name": "AWQE",
+          "ok": true,
+          "ms": 0.18,
+          "level": "pass",
+          "specHash": "b7f2f94b9d8660a3",
+          "stagesCompleted": 7
+        },
+        {
+          "name": "Content Provider (copy-only request)",
+          "ok": true,
+          "ms": 0.13,
+          "level": "pass",
+          "hasLockedMarker": true,
+          "copyTaskCount": 35
+        },
+        {
+          "name": "TBGE (locked spec)",
+          "ok": true,
+          "ms": 0.07,
+          "level": "pass",
+          "pageCount": 4,
+          "locked": true,
+          "plannerModel": "master-plan-engine"
+        },
+        {
+          "name": "TBDP Wiring",
+          "ok": true,
+          "ms": 0.41,
+          "level": "pass",
+          "enabled": true,
+          "sectorDnaId": "real-estate"
+        },
+        {
+          "name": "GLS",
+          "ok": true,
+          "ms": 0.29,
+          "level": "pass",
+          "direction": {
+            "direction": "ltr",
+            "adaptations": {
+              "spacingMirror": false,
+              "motionReverse": false,
+              "gridFlow": "row",
+              "iconMirror": false,
+              "navigationAlign": "start",
+              "carouselDirection": "ltr",
+              "timelineDirection": "ltr",
+              "drawerSide": "left"
+            }
+          }
+        },
+        {
+          "name": "Website Builder (structure apply)",
+          "ok": true,
+          "ms": 8.43,
+          "level": "pass",
+          "fileCount": 15,
+          "templateIntelligenceId": "ti-real-estate-listings",
+          "notes": 4
+        },
+        {
+          "name": "WQBS",
+          "ok": true,
+          "ms": 1.91,
+          "level": "pass",
+          "passed": true
+        },
+        {
+          "name": "Review Studio",
+          "ok": true,
+          "ms": 3.92,
+          "level": "pass",
+          "overallScore": 77,
+          "improvements": 4,
+          "providerIndependent": true
+        },
+        {
+          "name": "Publish Flow (gates)",
+          "ok": true,
+          "ms": 5.33,
+          "level": "pass",
+          "publishReady": false,
+          "wouldBlock": true,
+          "qualityScore": 74,
+          "blockers": 7,
+          "warnings": 6
+        }
+      ],
+      "performance": {
+        "totalMs": 107.79,
+        "slowestStage": "Template Resolution + Runtime"
+      }
+    },
+    {
+      "scenario": "creative-agency",
+      "label": "Creative agency",
+      "packageId": "creative-portfolio",
+      "passed": true,
+      "errors": [],
+      "warnings": [
+        "Publish gates would block this scenario fixture output"
+      ],
+      "stages": [
+        {
+          "name": "Template Resolution + Runtime",
+          "ok": true,
+          "ms": 78.63,
+          "level": "pass",
+          "resolvedLegacy": "creative-portfolio",
+          "resolvedPackage": "creative-portfolio",
+          "templateId": "creative-portfolio"
+        },
+        {
+          "name": "Master Plan + Production Planning",
+          "ok": true,
+          "ms": 3.35,
+          "level": "pass",
+          "masterPlanId": "7f041461-1631-40ed-9a95-91f554424a15",
+          "websiteType": "portfolio",
+          "industry": "Agency",
+          "validationPassed": true,
+          "awqeScore": 89,
+          "planningMs": 1.9733000000005632,
+          "qualityMs": 0.21309999999994034
+        },
+        {
+          "name": "AWQE",
+          "ok": true,
+          "ms": 0.22,
+          "level": "pass",
+          "specHash": "ac9aebe8a4e8e4f6",
+          "stagesCompleted": 7
+        },
+        {
+          "name": "Content Provider (copy-only request)",
+          "ok": true,
+          "ms": 0.1,
+          "level": "pass",
+          "hasLockedMarker": true,
+          "copyTaskCount": 35
+        },
+        {
+          "name": "TBGE (locked spec)",
+          "ok": true,
+          "ms": 0.1,
+          "level": "pass",
+          "pageCount": 4,
+          "locked": true,
+          "plannerModel": "master-plan-engine"
+        },
+        {
+          "name": "TBDP Wiring",
+          "ok": true,
+          "ms": 0.26,
+          "level": "pass",
+          "enabled": true,
+          "sectorDnaId": "creative-studio"
+        },
+        {
+          "name": "GLS",
+          "ok": true,
+          "ms": 0.19,
+          "level": "pass",
+          "direction": {
+            "direction": "ltr",
+            "adaptations": {
+              "spacingMirror": false,
+              "motionReverse": false,
+              "gridFlow": "row",
+              "iconMirror": false,
+              "navigationAlign": "start",
+              "carouselDirection": "ltr",
+              "timelineDirection": "ltr",
+              "drawerSide": "left"
+            }
+          }
+        },
+        {
+          "name": "Website Builder (structure apply)",
+          "ok": true,
+          "ms": 10.42,
+          "level": "pass",
+          "fileCount": 15,
+          "templateIntelligenceId": "ti-creative-studio",
+          "notes": 4
+        },
+        {
+          "name": "WQBS",
+          "ok": true,
+          "ms": 1.73,
+          "level": "pass",
+          "passed": true
+        },
+        {
+          "name": "Review Studio",
+          "ok": true,
+          "ms": 4.27,
+          "level": "pass",
+          "overallScore": 74,
+          "improvements": 5,
+          "providerIndependent": true
+        },
+        {
+          "name": "Publish Flow (gates)",
+          "ok": true,
+          "ms": 4.64,
+          "level": "pass",
+          "publishReady": false,
+          "wouldBlock": true,
+          "qualityScore": 76,
+          "blockers": 7,
+          "warnings": 5
+        }
+      ],
+      "performance": {
+        "totalMs": 103.91,
+        "slowestStage": "Template Resolution + Runtime"
+      }
+    }
+  ],
+  "summary": {
+    "total": 5,
+    "passed": 5,
+    "failed": 0,
+    "totalErrors": 0,
+    "totalWarnings": 5,
+    "avgScenarioMs": 126.94
+  }
+}

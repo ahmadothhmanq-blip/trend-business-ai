@@ -42,7 +42,7 @@ export function detectHeroQuality(
   }
 
   const hasVisual =
-    /<Image\b|<img\b|HERO_IMAGE|background-image|bg-cover|bg-gradient/i.test(blob);
+    /<Image\b|<img\b|SlotImage\b|slot="hero"|HERO_IMAGE|background-image|bg-cover|bg-gradient/i.test(blob);
   if (!hasVisual) {
     issues.push({
       id: "hero-no-visual",
@@ -50,7 +50,7 @@ export function detectHeroQuality(
       severity: "warning",
       message: "Hero section lacks strong visual imagery or background treatment.",
       filePath: heroes[0]?.path,
-      repairHint: "Add hero imagery via HERO_IMAGE, Image, or premium gradient overlay.",
+      repairHint: "Add hero imagery via SlotImage, Image, or premium gradient overlay.",
     });
   }
 

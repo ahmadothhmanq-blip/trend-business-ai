@@ -3,93 +3,615 @@ import type { WbTemplateMarketplaceListing } from "@/lib/website/template-market
 
 export const PREMIUM_REMOTE_TEMPLATE_SEEDS: WbTemplateMarketplaceListing[] = [
   {
-    id: "modern-business",
-    version: "2.0.0",
-    name: "Corporate Command",
-    description:
-      "Executive-grade corporate presence with trust-first hierarchy, boardroom typography, and measured conversion paths.",
-    category: "corporate",
-    tags: ["corporate", "enterprise", "trust", "b2b"],
-    layout: "single-column",
-    regionCount: 3,
-    pageCount: 4,
-    thumbnail: "remote/modern-business/thumbnail.png",
-    preview: "remote/modern-business/preview.png",
-    source: "remote",
-    availability: "remote",
-    featured: true,
-    featuredRank: 1,
-    metadata: {
-      author: {
-        name: "Trend Business AI",
-        organization: "Premium Template Studio",
+    "id": "corporate-business",
+    "version": "2.0.0",
+    "name": "Corporate Business",
+    "description": "Executive-grade corporate presence — trust-first hierarchy, boardroom typography, and conversion-optimized enterprise layouts.",
+    "category": "corporate",
+    "tags": [
+      "corporate",
+      "enterprise",
+      "trust",
+      "b2b"
+    ],
+    "layout": "single-column",
+    "regionCount": 3,
+    "pageCount": 4,
+    "thumbnail": "remote/corporate-business/thumbnail.svg",
+    "preview": "remote/corporate-business/preview.svg",
+    "source": "remote",
+    "availability": "remote",
+    "featured": true,
+    "featuredRank": 1,
+    "metadata": {
+      "author": {
+        "name": "Trend Business AI",
+        "organization": "Premium Template Studio"
       },
-      license: "MIT",
-      keywords: ["corporate", "executive", "boardroom", "trust"],
-      updateChannel: "stable",
-      releasedAt: "2026-07-30T17:52:40.193Z",
-      templateIntelligenceId: "ti-corporate-trust",
-      premium: true,
-      compatibility: {
-        engineVersion: ">=1.0.0",
-        specVersion: "2.0.0",
-        features: [
+      "license": "MIT",
+      "keywords": [
+        "corporate",
+        "executive",
+        "boardroom",
+        "trust"
+      ],
+      "updateChannel": "stable",
+      "releasedAt": "2026-08-03T16:09:45.123Z",
+      "templateIntelligenceId": "ti-corporate-trust",
+      "premium": true,
+      "compatibility": {
+        "engineVersion": ">=1.0.0",
+        "specVersion": "2.0.0",
+        "features": [
           "regions",
           "placement-rules",
           "responsive",
-          "premium-canvas",
-        ],
-      },
+          "premium-canvas"
+        ]
+      }
     },
-    remote: {
-      registryId: "modern-business",
-      publisher: "trend-business-ai",
-      publishedAt: "2026-07-30T17:52:40.193Z",
-    },
+    "remote": {
+      "registryId": "corporate-business",
+      "publisher": "trend-business-ai",
+      "publishedAt": "2026-08-03T16:09:45.123Z"
+    }
   },
   {
-    id: "ai-startup-signal",
-    version: "2.0.0",
-    name: "AI Signal",
-    description:
-      "Futuristic AI startup with cinematic full-bleed hero, glass bento panels, and signal-grade dark mode aesthetics.",
-    category: "ai-startup",
-    tags: ["ai", "startup", "ml", "futuristic"],
-    layout: "full-bleed",
-    regionCount: 4,
-    pageCount: 4,
-    thumbnail: "remote/ai-startup-signal/thumbnail.png",
-    preview: "remote/ai-startup-signal/preview.png",
-    source: "remote",
-    availability: "remote",
-    featured: true,
-    featuredRank: 2,
-    metadata: {
-      author: {
-        name: "Trend Business AI",
-        organization: "Premium Template Studio",
+    "id": "ai-startup-signal",
+    "version": "2.0.0",
+    "name": "AI Signal",
+    "description": "Futuristic AI startup with cinematic full-bleed hero, glass bento panels, and signal-grade dark mode aesthetics.",
+    "category": "ai-startup",
+    "tags": [
+      "ai",
+      "startup",
+      "ml",
+      "futuristic"
+    ],
+    "layout": "full-bleed",
+    "regionCount": 4,
+    "pageCount": 4,
+    "thumbnail": "remote/ai-startup-signal/thumbnail.png",
+    "preview": "remote/ai-startup-signal/preview.png",
+    "source": "remote",
+    "availability": "remote",
+    "featured": true,
+    "featuredRank": 4,
+    "metadata": {
+      "author": {
+        "name": "Trend Business AI",
+        "organization": "Premium Template Studio"
       },
-      license: "MIT",
-      keywords: ["ai", "machine learning", "startup", "signal"],
-      updateChannel: "stable",
-      releasedAt: "2026-07-30T17:52:40.193Z",
-      templateIntelligenceId: "ti-ai-company-signal",
-      premium: true,
-      compatibility: {
-        engineVersion: ">=1.0.0",
-        specVersion: "2.0.0",
-        features: [
+      "license": "MIT",
+      "keywords": [
+        "ai",
+        "machine learning",
+        "startup",
+        "signal"
+      ],
+      "updateChannel": "stable",
+      "releasedAt": "2026-08-03T16:09:45.123Z",
+      "templateIntelligenceId": "ti-ai-company-signal",
+      "premium": true,
+      "compatibility": {
+        "engineVersion": ">=1.0.0",
+        "specVersion": "2.0.0",
+        "features": [
           "regions",
           "placement-rules",
           "responsive",
-          "premium-canvas",
-        ],
-      },
+          "premium-canvas"
+        ]
+      }
     },
-    remote: {
-      registryId: "ai-startup-signal",
-      publisher: "trend-business-ai",
-      publishedAt: "2026-07-30T17:52:40.193Z",
-    },
+    "remote": {
+      "registryId": "ai-startup-signal",
+      "publisher": "trend-business-ai",
+      "publishedAt": "2026-08-03T16:09:45.123Z"
+    }
   },
-];
+  {
+    "id": "ecommerce-premium",
+    "version": "2.0.0",
+    "name": "E-commerce Premium",
+    "description": "Atelier commerce — editorial product curation, luxury catalog grids, and conversion-optimized storefront architecture.",
+    "category": "ecommerce",
+    "tags": [
+      "ecommerce",
+      "retail",
+      "luxury",
+      "editorial"
+    ],
+    "layout": "single-column",
+    "regionCount": 4,
+    "pageCount": 4,
+    "thumbnail": "remote/ecommerce-premium/thumbnail.svg",
+    "preview": "remote/ecommerce-premium/preview.svg",
+    "source": "remote",
+    "availability": "remote",
+    "featured": true,
+    "featuredRank": 4,
+    "metadata": {
+      "author": {
+        "name": "Trend Business AI",
+        "organization": "Premium Template Studio"
+      },
+      "license": "MIT",
+      "keywords": [
+        "ecommerce",
+        "shop",
+        "store",
+        "catalog"
+      ],
+      "updateChannel": "stable",
+      "releasedAt": "2026-08-05T18:00:00.000Z",
+      "templateIntelligenceId": "ti-ecommerce-atelier",
+      "premium": true,
+      "compatibility": {
+        "engineVersion": ">=1.0.0",
+        "specVersion": "2.0.0",
+        "features": [
+          "regions",
+          "placement-rules",
+          "responsive",
+          "premium-canvas"
+        ]
+      }
+    },
+    "remote": {
+      "registryId": "ecommerce-premium",
+      "publisher": "trend-business-ai",
+      "publishedAt": "2026-08-05T18:00:00.000Z"
+    }
+  },
+  {
+    "id": "saas-enterprise",
+    "version": "2.0.0",
+    "name": "SaaS Enterprise",
+    "description": "Northline product systems — contained split hero, bottom conversion utility band, and enterprise GTM architecture.",
+    "category": "saas",
+    "tags": [
+      "saas",
+      "enterprise",
+      "product",
+      "b2b"
+    ],
+    "layout": "single-column",
+    "regionCount": 4,
+    "pageCount": 4,
+    "thumbnail": "remote/saas-enterprise/thumbnail.png",
+    "preview": "remote/saas-enterprise/preview.png",
+    "source": "remote",
+    "availability": "remote",
+    "featured": true,
+    "featuredRank": 2,
+    "metadata": {
+      "author": {
+        "name": "Trend Business AI",
+        "organization": "Premium Template Studio"
+      },
+      "license": "MIT",
+      "keywords": [
+        "saas",
+        "enterprise",
+        "platform",
+        "revenue"
+      ],
+      "updateChannel": "stable",
+      "releasedAt": "2026-08-03T16:09:45.123Z",
+      "templateIntelligenceId": "ti-saas-growth",
+      "premium": true,
+      "compatibility": {
+        "engineVersion": ">=1.0.0",
+        "specVersion": "2.0.0",
+        "features": [
+          "regions",
+          "placement-rules",
+          "responsive",
+          "premium-canvas"
+        ]
+      }
+    },
+    "remote": {
+      "registryId": "saas-enterprise",
+      "publisher": "trend-business-ai",
+      "publishedAt": "2026-08-03T16:09:45.123Z"
+    }
+  },
+  {
+    "id": "restaurant-premium",
+    "version": "2.0.0",
+    "name": "Restaurant Premium",
+    "description": "World-class fine dining — cinematic hero, chef-led storytelling, reservations, and hospitality-grade conversion paths.",
+    "category": "restaurant",
+    "tags": [
+      "restaurant",
+      "fine-dining",
+      "hospitality",
+      "reservations"
+    ],
+    "layout": "sidebar-left",
+    "regionCount": 4,
+    "pageCount": 4,
+    "thumbnail": "remote/restaurant-premium/thumbnail.svg",
+    "preview": "remote/restaurant-premium/preview.svg",
+    "source": "remote",
+    "availability": "remote",
+    "featured": true,
+    "featuredRank": 3,
+    "metadata": {
+      "author": {
+        "name": "Trend Business AI",
+        "organization": "Premium Template Studio"
+      },
+      "license": "MIT",
+      "keywords": [
+        "restaurant",
+        "dining",
+        "chef",
+        "reservation"
+      ],
+      "updateChannel": "stable",
+      "releasedAt": "2026-08-03T16:09:45.123Z",
+      "templateIntelligenceId": "ti-restaurant-dining",
+      "premium": true,
+      "compatibility": {
+        "engineVersion": ">=1.0.0",
+        "specVersion": "2.0.0",
+        "features": [
+          "regions",
+          "placement-rules",
+          "responsive",
+          "premium-canvas"
+        ]
+      }
+    },
+    "remote": {
+      "registryId": "restaurant-premium",
+      "publisher": "trend-business-ai",
+      "publishedAt": "2026-08-03T16:09:45.123Z"
+    }
+  },
+  {
+    "id": "real-estate-prestige",
+    "version": "2.0.0",
+    "name": "Real Estate Prestige",
+    "description": "Brokerage intelligence rail — sidebar-right dossier, navy-champagne palette, and testimonial-led property trust.",
+    "category": "real-estate",
+    "tags": [
+      "real-estate",
+      "luxury",
+      "property",
+      "brokerage"
+    ],
+    "layout": "sidebar-right",
+    "regionCount": 4,
+    "pageCount": 4,
+    "thumbnail": "remote/real-estate-prestige/thumbnail.png",
+    "preview": "remote/real-estate-prestige/preview.png",
+    "source": "remote",
+    "availability": "remote",
+    "featured": true,
+    "featuredRank": 5,
+    "metadata": {
+      "author": {
+        "name": "Trend Business AI",
+        "organization": "Premium Template Studio"
+      },
+      "license": "MIT",
+      "keywords": [
+        "real estate",
+        "property",
+        "listings",
+        "brokerage"
+      ],
+      "updateChannel": "stable",
+      "releasedAt": "2026-08-03T16:09:45.123Z",
+      "templateIntelligenceId": "ti-real-estate-listings",
+      "premium": true,
+      "compatibility": {
+        "engineVersion": ">=1.0.0",
+        "specVersion": "2.0.0",
+        "features": [
+          "regions",
+          "placement-rules",
+          "responsive",
+          "premium-canvas"
+        ]
+      }
+    },
+    "remote": {
+      "registryId": "real-estate-prestige",
+      "publisher": "trend-business-ai",
+      "publishedAt": "2026-08-03T16:09:45.123Z"
+    }
+  },
+  {
+    "id": "medical-premium",
+    "version": "2.0.0",
+    "name": "Medical Premium",
+    "description": "Swiss clinical clarity — layered trust hero, sage surfaces, appointment-first utility flow, and accessible calm.",
+    "category": "healthcare",
+    "tags": [
+      "medical",
+      "healthcare",
+      "clinic",
+      "wellness"
+    ],
+    "layout": "full-bleed",
+    "regionCount": 5,
+    "pageCount": 4,
+    "thumbnail": "remote/medical-premium/thumbnail.png",
+    "preview": "remote/medical-premium/preview.png",
+    "source": "remote",
+    "availability": "remote",
+    "featured": true,
+    "featuredRank": 6,
+    "metadata": {
+      "author": {
+        "name": "Trend Business AI",
+        "organization": "Premium Template Studio"
+      },
+      "license": "MIT",
+      "keywords": [
+        "medical",
+        "healthcare",
+        "clinic",
+        "appointments"
+      ],
+      "updateChannel": "stable",
+      "releasedAt": "2026-08-03T16:09:45.123Z",
+      "templateIntelligenceId": "ti-medical-care",
+      "premium": true,
+      "compatibility": {
+        "engineVersion": ">=1.0.0",
+        "specVersion": "2.0.0",
+        "features": [
+          "regions",
+          "placement-rules",
+          "responsive",
+          "premium-canvas"
+        ]
+      }
+    },
+    "remote": {
+      "registryId": "medical-premium",
+      "publisher": "trend-business-ai",
+      "publishedAt": "2026-08-03T16:09:45.123Z"
+    }
+  },
+  {
+    "id": "real-estate-premium",
+    "version": "2.0.0",
+    "name": "Real Estate Premium",
+    "description": "Monolith Estate — brokerage intelligence rail, navy-champagne palette, and testimonial-led property trust for luxury listings.",
+    "category": "real-estate",
+    "tags": ["real-estate", "luxury", "property", "brokerage"],
+    "layout": "sidebar-right",
+    "regionCount": 4,
+    "pageCount": 4,
+    "thumbnail": "remote/real-estate-premium/thumbnail.png",
+    "preview": "remote/real-estate-premium/preview.png",
+    "source": "remote",
+    "availability": "remote",
+    "featured": true,
+    "featuredRank": 8,
+    "metadata": {
+      "author": { "name": "Trend Business AI", "organization": "Premium Template Studio" },
+      "license": "MIT",
+      "keywords": ["real estate", "property", "listings", "brokerage"],
+      "updateChannel": "stable",
+      "releasedAt": "2026-08-03T16:09:45.123Z",
+      "templateIntelligenceId": "ti-real-estate-listings",
+      "premium": true,
+      "compatibility": {
+        "engineVersion": ">=1.0.0",
+        "specVersion": "2.0.0",
+        "features": ["regions", "placement-rules", "responsive", "premium-canvas"]
+      }
+    },
+    "remote": {
+      "registryId": "real-estate-premium",
+      "publisher": "trend-business-ai",
+      "publishedAt": "2026-08-03T16:09:45.123Z"
+    }
+  },
+  {
+    "id": "creative-agency-premium",
+    "version": "2.0.0",
+    "name": "Creative Agency Premium",
+    "description": "Kinetic Atelier — post-scroll overlay showcase, electric lime accents, and case-study-first creative agency energy.",
+    "category": "portfolio",
+    "tags": ["portfolio", "creative", "agency", "design"],
+    "layout": "full-bleed",
+    "regionCount": 4,
+    "pageCount": 4,
+    "thumbnail": "remote/creative-agency-premium/thumbnail.png",
+    "preview": "remote/creative-agency-premium/preview.png",
+    "source": "remote",
+    "availability": "remote",
+    "featured": true,
+    "featuredRank": 9,
+    "metadata": {
+      "author": { "name": "Trend Business AI", "organization": "Premium Template Studio" },
+      "license": "MIT",
+      "keywords": ["portfolio", "creative", "agency", "design"],
+      "updateChannel": "stable",
+      "releasedAt": "2026-08-03T16:09:45.123Z",
+      "templateIntelligenceId": "ti-creative-studio",
+      "premium": true,
+      "compatibility": {
+        "engineVersion": ">=1.0.0",
+        "specVersion": "2.0.0",
+        "features": ["regions", "placement-rules", "responsive", "premium-canvas"]
+      }
+    },
+    "remote": {
+      "registryId": "creative-agency-premium",
+      "publisher": "trend-business-ai",
+      "publishedAt": "2026-08-03T16:09:45.123Z"
+    }
+  },
+  {
+    "id": "education-premium",
+    "version": "2.0.0",
+    "name": "Education Premium",
+    "description": "Heritage Academy — scholarly trust hierarchy, admissions-first conversion, and campus excellence storytelling.",
+    "category": "education",
+    "tags": ["education", "university", "academy", "admissions"],
+    "layout": "single-column",
+    "regionCount": 4,
+    "pageCount": 4,
+    "thumbnail": "remote/education-premium/thumbnail.svg",
+    "preview": "remote/education-premium/preview.svg",
+    "source": "remote",
+    "availability": "remote",
+    "featured": true,
+    "featuredRank": 10,
+    "metadata": {
+      "author": { "name": "Trend Business AI", "organization": "Premium Template Studio" },
+      "license": "MIT",
+      "keywords": ["education", "university", "academy", "admissions"],
+      "updateChannel": "stable",
+      "releasedAt": "2026-08-03T16:09:45.123Z",
+      "templateIntelligenceId": "ti-university-heritage",
+      "premium": true,
+      "compatibility": {
+        "engineVersion": ">=1.0.0",
+        "specVersion": "2.0.0",
+        "features": ["regions", "placement-rules", "responsive", "premium-canvas"]
+      }
+    },
+    "remote": {
+      "registryId": "education-premium",
+      "publisher": "trend-business-ai",
+      "publishedAt": "2026-08-03T16:09:45.123Z"
+    }
+  },
+  {
+    "id": "finance-premium",
+    "version": "2.0.0",
+    "name": "Finance Premium",
+    "description": "Apex Ledger — institutional wealth management, fiduciary trust hierarchy, and private banking conversion architecture.",
+    "category": "finance",
+    "tags": ["finance", "wealth", "banking", "investment"],
+    "layout": "single-column",
+    "regionCount": 4,
+    "pageCount": 4,
+    "thumbnail": "remote/finance-premium/thumbnail.svg",
+    "preview": "remote/finance-premium/preview.svg",
+    "source": "remote",
+    "availability": "remote",
+    "featured": true,
+    "featuredRank": 11,
+    "metadata": {
+      "author": { "name": "Trend Business AI", "organization": "Premium Template Studio" },
+      "license": "MIT",
+      "keywords": ["finance", "wealth", "banking", "investment"],
+      "updateChannel": "stable",
+      "releasedAt": "2026-08-03T16:09:45.123Z",
+      "templateIntelligenceId": "ti-finance-ledger",
+      "premium": true,
+      "compatibility": {
+        "engineVersion": ">=1.0.0",
+        "specVersion": "2.0.0",
+        "features": ["regions", "placement-rules", "responsive", "premium-canvas"]
+      }
+    },
+    "remote": {
+      "registryId": "finance-premium",
+      "publisher": "trend-business-ai",
+      "publishedAt": "2026-08-03T16:09:45.123Z"
+    }
+  },
+  {
+    "id": "hotel-resort-premium",
+    "version": "2.0.0",
+    "name": "Hotel & Resort Premium",
+    "description": "Azure Haven — coastal luxury resort with cinematic hospitality, suite storytelling, and reservation-first conversion paths.",
+    "category": "hotel",
+    "tags": ["hotel", "resort", "hospitality", "luxury"],
+    "layout": "sidebar-left",
+    "regionCount": 4,
+    "pageCount": 4,
+    "thumbnail": "remote/hotel-resort-premium/thumbnail.svg",
+    "preview": "remote/hotel-resort-premium/preview.svg",
+    "source": "remote",
+    "availability": "remote",
+    "featured": true,
+    "featuredRank": 12,
+    "metadata": {
+      "author": { "name": "Trend Business AI", "organization": "Premium Template Studio" },
+      "license": "MIT",
+      "keywords": ["hotel", "resort", "spa", "luxury"],
+      "updateChannel": "stable",
+      "releasedAt": "2026-08-03T16:09:45.123Z",
+      "templateIntelligenceId": "ti-hotel-sanctuary",
+      "premium": true,
+      "compatibility": {
+        "engineVersion": ">=1.0.0",
+        "specVersion": "2.0.0",
+        "features": ["regions", "placement-rules", "responsive", "premium-canvas"]
+      }
+    },
+    "remote": {
+      "registryId": "hotel-resort-premium",
+      "publisher": "trend-business-ai",
+      "publishedAt": "2026-08-03T16:09:45.123Z"
+    }
+  },
+  {
+    "id": "creative-portfolio",
+    "version": "2.0.0",
+    "name": "Creative Portfolio",
+    "description": "Kinetic culture studio — post-scroll overlay showcase, electric lime accents, and case-study-first portfolio energy.",
+    "category": "portfolio",
+    "tags": [
+      "portfolio",
+      "creative",
+      "agency",
+      "design"
+    ],
+    "layout": "full-bleed",
+    "regionCount": 4,
+    "pageCount": 4,
+    "thumbnail": "remote/creative-portfolio/thumbnail.png",
+    "preview": "remote/creative-portfolio/preview.png",
+    "source": "remote",
+    "availability": "remote",
+    "featured": true,
+    "featuredRank": 7,
+    "metadata": {
+      "author": {
+        "name": "Trend Business AI",
+        "organization": "Premium Template Studio"
+      },
+      "license": "MIT",
+      "keywords": [
+        "portfolio",
+        "creative",
+        "agency",
+        "design"
+      ],
+      "updateChannel": "stable",
+      "releasedAt": "2026-08-03T16:09:45.123Z",
+      "templateIntelligenceId": "ti-creative-studio",
+      "premium": true,
+      "compatibility": {
+        "engineVersion": ">=1.0.0",
+        "specVersion": "2.0.0",
+        "features": [
+          "regions",
+          "placement-rules",
+          "responsive",
+          "premium-canvas"
+        ]
+      }
+    },
+    "remote": {
+      "registryId": "creative-portfolio",
+      "publisher": "trend-business-ai",
+      "publishedAt": "2026-08-03T16:09:45.123Z"
+    }
+  }
+] as WbTemplateMarketplaceListing[];

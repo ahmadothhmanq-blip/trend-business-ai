@@ -1,0 +1,10 @@
+{
+  "pageId": "reserve",
+  "layoutId": "default",
+  "regions": {
+    "header": ["hotel-resort-premium-nav"],
+    "sidebar": ["hotel-resort-premium-sidebar-rail"],
+    "main": ["hotel-resort-premium-reservation", "hotel-resort-premium-reservation-cta"],
+    "footer": ["hotel-resort-premium-footer"]
+  }
+}

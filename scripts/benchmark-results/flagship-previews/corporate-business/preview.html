@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en" data-v2-render="v2-files" data-v2-package="corporate-business" data-v2-layout="default">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Meridian Advisory — Live Preview</title>
+  <style>/* Template Architecture V2 — corporate-business · spec 2.0.0 */
+:root {
+  --v2-package: "corporate-business";
+  --color-primary: #080E18;
+  --color-secondary: #152238;
+  --color-accent: #C4A574;
+  --color-background: #F7F6F3;
+  --color-foreground: #080E18;
+  --color-muted: rgba(8,14,24,0.58);
+  --color-surface: #FFFFFF;
+  --color-signal: #C4A574;
+  --color-grid: rgba(8,14,24,0.04);
+  --color-ink: #080E18;
+  --font-display: "Cormorant Garamond", ui-sans-serif, system-ui, sans-serif;
+  --font-body: Inter, ui-sans-serif, system-ui, sans-serif;
+  --spacing-unit: 0.25rem;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 20px;
+  --shadow-surface: 0 20px 60px rgba(8,14,24,0.07), 0 2px 8px rgba(8,14,24,0.03);
+  --shadow-glow: 0 0 64px rgba(196,165,116,0.18);
+  --shadow-card: 0 0 0 1px rgba(8,14,24,0.04), 0 4px 24px rgba(8,14,24,0.04);
+  --border-default: rgba(8,14,24,0.08);
+  --border-accent: rgba(196,165,116,0.32);
+  --border-subtle: rgba(8,14,24,0.05);
+}
+
+/* V2 language profile — RTL typography adaptation */
+[dir="rtl"] {
+  --font-display: Amiri, ui-serif, Georgia, serif;
+  --font-body: "Noto Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Mono:ital@0;1&family=Inter:wght@300;400;500;600&family=Noto+Sans+Arabic:wght@400;500;600&display=swap");
+
+@keyframes cb-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+[dir="rtl"] .cb-marquee-track { animation-direction: reverse; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cb-animate, [data-cb-motion], .cb-marquee-track { animation: none !important; transition: none !important; }
+}
+
+.cb-font-display { font-family: var(--font-display), "Cormorant Garamond", Georgia, serif; }
+.cb-font-body { font-family: var(--font-body), "Inter", system-ui, sans-serif; }
+.cb-font-mono { font-family: "DM Mono", ui-monospace, monospace; }
+.cb-eyebrow {
+  font-family: var(--font-body), "Inter", system-ui, sans-serif;
+  font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--color-signal);
+}
+.cb-headline {
+  font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(3.25rem, 7.5vw, 5.75rem);
+  font-weight: 500; line-height: 0.98; letter-spacing: -0.035em;
+  color: var(--color-foreground); text-wrap: balance;
+}
+.cb-headline-sm {
+  font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  font-weight: 500; line-height: 1.06; letter-spacing: -0.028em;
+  color: var(--color-foreground); text-wrap: balance;
+}
+.cb-body {
+  font-family: var(--font-body), "Inter", system-ui, sans-serif;
+  font-size: 1.125rem; line-height: 1.8; font-weight: 400;
+  color: var(--color-muted); max-width: 38rem;
+}
+.cb-prose { font-size: 1.0625rem; line-height: 1.85; color: var(--color-muted); max-width: 36rem; }
+
+.cb-section { padding-block: clamp(6.5rem, 14vw, 10rem); }
+.cb-section-tight { padding-block: clamp(5rem, 10vw, 7rem); }
+.cb-section-alt { background: var(--color-surface-elevated, #FDFCF9); }
+.cb-section-ink { background: var(--color-ink); color: #fff; }
+.cb-divider { height: 1px; background: var(--border-subtle); width: 100%; }
+.cb-container { margin-inline: auto; max-width: 88rem; padding-inline: clamp(1.25rem, 4vw, 2.5rem); }
+
+.cb-surface {
+  background: var(--color-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+.cb-surface-elevated {
+  background: linear-gradient(165deg, #fff 0%, var(--color-surface-elevated, #FDFCF9) 100%);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl, 20px);
+  box-shadow: var(--shadow-surface);
+}
+.cb-card {
+  border: 1px solid var(--border-subtle);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.5s cubic-bezier(0.22,1,0.36,1), transform 0.5s cubic-bezier(0.22,1,0.36,1), border-color 0.4s ease;
+}
+.cb-card:hover {
+  box-shadow: var(--shadow-surface);
+  border-color: var(--border-accent);
+  transform: translateY(-2px);
+}
+.cb-card-featured, .se-card-featured {
+  border-color: color-mix(in srgb, var(--color-signal) 28%, var(--border-subtle));
+  background: linear-gradient(155deg, var(--color-ink) 0%, color-mix(in srgb, var(--color-ink) 88%, var(--color-primary)) 100%);
+  color: #fff; box-shadow: var(--shadow-surface);
+}
+.cb-card-glass {
+  background: color-mix(in srgb, var(--color-surface) 82%, transparent);
+  backdrop-filter: blur(20px);
+  border: 1px solid color-mix(in srgb, #fff 60%, var(--border-subtle));
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(8,14,24,0.06);
+}
+
+.cb-btn-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  min-height: 3.125rem; padding: 0 1.75rem;
+  font-family: var(--font-body), "Inter", system-ui, sans-serif;
+  font-size: 0.9375rem; font-weight: 500; letter-spacing: -0.01em;
+  text-decoration: none; color: var(--color-ink);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-signal) 95%, #fff), var(--color-signal));
+  border: 1px solid color-mix(in srgb, var(--color-signal) 70%, #000);
+  border-radius: 9999px;
+  box-shadow: 0 1px 2px rgba(8,14,24,0.06), 0 8px 24px color-mix(in srgb, var(--color-signal) 25%, transparent);
+  transition: transform 0.25s ease, box-shadow 0.35s ease, filter 0.25s ease;
+}
+.cb-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(8,14,24,0.08), 0 12px 32px color-mix(in srgb, var(--color-signal) 32%, transparent);
+  filter: brightness(1.03);
+}
+.cb-btn-secondary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  min-height: 3.125rem; padding: 0 1.75rem;
+  font-family: var(--font-body), "Inter", system-ui, sans-serif;
+  font-size: 0.9375rem; font-weight: 500; letter-spacing: -0.01em;
+  text-decoration: none; color: var(--color-foreground);
+  background: var(--color-surface);
+  border: 1px solid var(--border-default);
+  border-radius: 9999px;
+  box-shadow: 0 1px 2px rgba(8,14,24,0.04);
+  transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+}
+.cb-btn-secondary:hover {
+  border-color: color-mix(in srgb, var(--color-foreground) 18%, var(--border-default));
+  background: var(--color-surface-elevated, #FDFCF9);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(8,14,24,0.06);
+}
+.cb-btn-ghost {
+  display: inline-flex; align-items: center; gap: 0.375rem;
+  font-family: var(--font-body), "Inter", system-ui, sans-serif;
+  font-size: 0.875rem; font-weight: 500; color: var(--color-signal);
+  text-decoration: none; transition: gap 0.25s ease, opacity 0.25s ease;
+}
+.cb-btn-ghost:hover { gap: 0.625rem; opacity: 0.85; }
+.cb-focus-ring:focus-visible { outline: 2px solid var(--color-signal); outline-offset: 3px; }
+
+.cb-metric {
+  font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(2rem, 3.5vw, 2.75rem);
+  font-weight: 500; letter-spacing: -0.03em;
+  color: var(--color-foreground); line-height: 1;
+}
+.cb-metric-label {
+  font-family: var(--font-body), "Inter", system-ui, sans-serif;
+  font-size: 0.8125rem; line-height: 1.5; color: var(--color-muted);
+}
+.cb-metric-detail {
+  font-family: var(--font-mono), "DM Mono", monospace;
+  font-size: 0.625rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--color-signal);
+}
+.cb-signal { color: var(--color-signal); }
+
+.cb-hero-atmosphere {
+  pointer-events: none; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 90% 70% at 85% 15%, color-mix(in srgb, var(--color-signal) 9%, transparent), transparent 55%),
+    radial-gradient(ellipse 60% 50% at 10% 80%, color-mix(in srgb, var(--color-primary) 6%, transparent), transparent 50%),
+    linear-gradient(180deg, var(--color-background) 0%, color-mix(in srgb, var(--color-surface-elevated, #FDFCF9) 40%, var(--color-background)) 100%);
+}
+.cb-hero-grid {
+  pointer-events: none; position: absolute; inset: 0; opacity: 0.35;
+  background-image:
+    linear-gradient(var(--color-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse 80% 70% at 70% 40%, #000 20%, transparent 75%);
+}
+.cb-grid-bg {
+  background-image:
+    linear-gradient(var(--color-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid) 1px, transparent 1px);
+  background-size: 72px 72px;
+}
+.cb-paper-grain::after {
+  content: ""; pointer-events: none; position: absolute; inset: 0; opacity: 0.022;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.cb-hero-visual-glow {
+  pointer-events: none; position: absolute; inset: -12%;
+  background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--color-signal) 14%, transparent), transparent 62%);
+  filter: blur(40px);
+}
+.cb-hero-frame {
+  position: relative; overflow: hidden;
+  border-radius: var(--radius-xl, 20px);
+  border: 1px solid color-mix(in srgb, #fff 50%, var(--border-default));
+  box-shadow: var(--shadow-surface), inset 0 1px 0 color-mix(in srgb, #fff 80%, transparent);
+}
+.cb-hero-frame::after {
+  content: ""; pointer-events: none; position: absolute; inset: 0;
+  background: linear-gradient(195deg, transparent 40%, color-mix(in srgb, var(--color-ink) 35%, transparent) 100%);
+}
+.cb-accent-line { height: 1px; width: 4rem; background: linear-gradient(90deg, var(--color-signal), transparent); }
+[dir="rtl"] .cb-accent-line { transform-origin: right; }
+
+.cb-trust-logo {
+  font-family: var(--font-body), "Inter", system-ui, sans-serif;
+  font-size: 0.75rem; font-weight: 500; letter-spacing: 0.16em;
+  text-transform: uppercase; color: color-mix(in srgb, var(--color-foreground) 32%, transparent);
+  white-space: nowrap;
+}
+.cb-trust-badge {
+  display: inline-flex; align-items: center; gap: 0.375rem;
+  border-radius: 9999px; border: 1px solid var(--border-default);
+  background: var(--color-surface); padding: 0.35rem 0.875rem;
+  font-family: var(--font-body), "Inter", system-ui, sans-serif;
+  font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--color-muted);
+}
+.cb-trust-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 1.5rem 2rem; }
+.cb-marquee-track { animation: cb-marquee 36s linear infinite; }
+.cb-trust-fade {
+  mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+}
+
+.cb-nav-link {
+  font-family: var(--font-body), "Inter", system-ui, sans-serif;
+  font-size: 0.875rem; font-weight: 500; letter-spacing: -0.01em;
+  color: color-mix(in srgb, var(--color-foreground) 65%, transparent);
+  text-decoration: none; position: relative; padding-block: 0.25rem;
+  transition: color 0.2s ease;
+}
+.cb-nav-link:hover, .cb-nav-link[data-active="true"] { color: var(--color-foreground); }
+.cb-nav-link::after {
+  content: ""; position: absolute; bottom: 0; left: 0; height: 1px; width: 0;
+  background: var(--color-signal); transition: width 0.3s cubic-bezier(0.22,1,0.36,1);
+}
+.cb-nav-link:hover::after, .cb-nav-link[data-active="true"]::after { width: 100%; }
+
+.cb-quote-mark {
+  font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+  font-size: 5rem; line-height: 0.8; color: color-mix(in srgb, var(--color-signal) 22%, transparent);
+}
+.cb-star { color: var(--color-signal); letter-spacing: 0.14em; }
+
+.cb-input, .cb-textarea, .se-input, .se-textarea {
+  width: 100%; border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background: var(--color-surface);
+  padding: 0.875rem 1rem;
+  font-family: var(--font-body), "Inter", system-ui, sans-serif;
+  font-size: 0.9375rem; color: var(--color-foreground);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.cb-input:focus-visible, .cb-textarea:focus-visible,
+.se-input:focus-visible, .se-textarea:focus-visible {
+  outline: none; border-color: var(--color-signal);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-signal) 12%, transparent);
+}
+
+.se-section { padding-block: clamp(6.5rem, 14vw, 10rem); }
+.se-section-alt { background: var(--color-surface-elevated, #FDFCF9); }
+.se-section-glow { position: relative; isolation: isolate; }
+.se-section-glow::before {
+  content: ""; pointer-events: none; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 80% 50% at 50% -10%, color-mix(in srgb, var(--color-signal) 6%, transparent), transparent 70%);
+}
+.se-eyebrow { font-family: var(--font-body), "Inter", system-ui, sans-serif; font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: var(--color-signal); }
+.se-headline { font-family: var(--font-display), "Cormorant Garamond", Georgia, serif; font-size: clamp(3.25rem, 7.5vw, 5.75rem); font-weight: 500; line-height: 0.98; letter-spacing: -0.035em; color: var(--color-foreground); text-wrap: balance; }
+.se-headline-sm { font-family: var(--font-display), "Cormorant Garamond", Georgia, serif; font-size: clamp(2rem, 4vw, 3.25rem); font-weight: 500; line-height: 1.06; letter-spacing: -0.028em; color: var(--color-foreground); text-wrap: balance; }
+.se-body { font-family: var(--font-body), "Inter", system-ui, sans-serif; font-size: 1.125rem; line-height: 1.8; color: var(--color-muted); font-weight: 400; }
+.se-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 3.125rem; padding: 0 1.75rem; font-family: var(--font-body), "Inter", system-ui, sans-serif; font-size: 0.9375rem; font-weight: 500; letter-spacing: -0.01em; text-decoration: none; color: var(--color-ink); background: linear-gradient(180deg, color-mix(in srgb, var(--color-signal) 95%, #fff), var(--color-signal)); border: 1px solid color-mix(in srgb, var(--color-signal) 70%, #000); border-radius: 9999px; box-shadow: 0 1px 2px rgba(8,14,24,0.06), 0 8px 24px color-mix(in srgb, var(--color-signal) 25%, transparent); transition: transform 0.25s ease, box-shadow 0.35s ease, filter 0.25s ease; }
+.se-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 2px 4px rgba(8,14,24,0.08), 0 12px 32px color-mix(in srgb, var(--color-signal) 32%, transparent); filter: brightness(1.03); }
+.se-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 3.125rem; padding: 0 1.75rem; font-family: var(--font-body), "Inter", system-ui, sans-serif; font-size: 0.9375rem; font-weight: 500; letter-spacing: -0.01em; text-decoration: none; color: var(--color-foreground); background: var(--color-surface); border: 1px solid var(--border-default); border-radius: 9999px; box-shadow: 0 1px 2px rgba(8,14,24,0.04); transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease; }
+.se-btn-secondary:hover { border-color: color-mix(in srgb, var(--color-foreground) 18%, var(--border-default)); background: var(--color-surface-elevated, #FDFCF9); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(8,14,24,0.06); }
+.se-card { border: 1px solid var(--border-subtle); background: var(--color-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); transition: box-shadow 0.5s cubic-bezier(0.22,1,0.36,1), transform 0.5s cubic-bezier(0.22,1,0.36,1), border-color 0.4s ease; }
+.se-card:hover { box-shadow: var(--shadow-surface); border-color: var(--border-accent); transform: translateY(-2px); }
+.se-metric { font-family: var(--font-display), "Cormorant Garamond", Georgia, serif; font-size: clamp(2rem, 3.5vw, 2.75rem); font-weight: 500; letter-spacing: -0.03em; color: var(--color-foreground); line-height: 1; }
+.se-focus-ring:focus-visible { outline: 2px solid var(--color-signal); outline-offset: 3px; }
+.se-font-display { font-family: var(--font-display), "Cormorant Garamond", Georgia, serif; }
+.se-font-body { font-family: var(--font-body), "Inter", system-ui, sans-serif; }
+.se-font-mono { font-family: "DM Mono", ui-monospace, monospace; }
+.se-star { color: var(--color-signal); letter-spacing: 0.14em; }
+.se-quote-mark { font-family: var(--font-display), "Cormorant Garamond", Georgia, serif; font-size: 5rem; line-height: 0.8; color: color-mix(in srgb, var(--color-signal) 22%, transparent); }
+.se-trust-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 1.5rem 2rem; }
+.se-trust-badge { display: inline-flex; align-items: center; gap: 0.375rem; border-radius: 9999px; border: 1px solid var(--border-default); background: var(--color-surface); padding: 0.35rem 0.875rem; font-family: var(--font-body), "Inter", system-ui, sans-serif; font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-muted); }
+.se-card-featured { border-color: color-mix(in srgb, var(--color-signal) 28%, var(--border-subtle)); background: linear-gradient(155deg, var(--color-ink) 0%, color-mix(in srgb, var(--color-ink) 88%, var(--color-primary)) 100%); color: #fff; box-shadow: var(--shadow-surface); }
+.se-input, .se-textarea { width: 100%; border-radius: var(--radius-md); border: 1px solid var(--border-default); background: var(--color-surface); padding: 0.875rem 1rem; font-family: var(--font-body), "Inter", system-ui, sans-serif; font-size: 0.9375rem; color: var(--color-foreground); }
+
+/* TBDP Native Consumption — corporate-business
+   sector:law-firm · experience:corporate, executive, trust
+   identity:executive-atlas · context:8820d847ff5f54e9
+   integration:5.0.0 · consumption:1.0.0 */
+:root {
+  --tbdp-native: 1;
+  --tbdp-native-package: "corporate-business";
+  --tbdp-sector-dna: "law-firm";
+  --tbdp-template-identity: "executive-atlas";
+  --tbdp-experience-primary: "executive";
+  --tbdp-context-hash: "8820d847ff5f54e9";
+  --tbdp-theme-mode: "light";
+  --tbdp-direction: "ltr";
+}
+
+/* TBDP Foundations — official design authority (scoped vars) */
+/* Trend Business AI Design Platform · 1.0.0 · foundations-1 */
+:root {
+  --tbdp-color-primary: #0047E6;
+  --tbdp-color-secondary: #334155;
+  --tbdp-color-accent: #4D85FF;
+  --tbdp-color-success: #10B981;
+  --tbdp-color-warning: #F59E0B;
+  --tbdp-color-danger: #EF4444;
+  --tbdp-color-info: #3B82F6;
+  --tbdp-color-surface-base: #FFFFFF;
+  --tbdp-color-surface-raised: #F8FAFC;
+  --tbdp-color-surface-overlay: #FFFFFF;
+  --tbdp-color-surface-sunken: #F1F5F9;
+  --tbdp-color-surface-inverse: #0F172A;
+  --tbdp-color-background-canvas: #F8FAFC;
+  --tbdp-color-background-subtle: #F1F5F9;
+  --tbdp-color-background-emphasis: #FFFFFF;
+  --tbdp-color-background-inverse: #020617;
+  --tbdp-color-text-primary: #0F172A;
+  --tbdp-color-text-secondary: #475569;
+  --tbdp-color-text-tertiary: #64748B;
+  --tbdp-color-text-disabled: #94A3B8;
+  --tbdp-color-text-inverse: #FFFFFF;
+  --tbdp-color-text-link: #0047E6;
+  --tbdp-color-text-linkHover: #0038B8;
+  --tbdp-color-border-default: #E2E8F0;
+  --tbdp-color-border-subtle: #F1F5F9;
+  --tbdp-color-border-strong: #CBD5E1;
+  --tbdp-color-border-focus: #1A5CFF;
+  --tbdp-color-border-inverse: rgba(255, 255, 255, 0.16);
+  --tbdp-color-overlay-scrim: rgba(2, 6, 23, 0.4);
+  --tbdp-color-overlay-scrimStrong: rgba(2, 6, 23, 0.64);
+  --tbdp-color-overlay-backdrop: rgba(2, 6, 23, 0.24);
+  --tbdp-color-overlay-highlight: rgba(26, 92, 255, 0.12);
+  --tbdp-opacity-transparent: 0;
+  --tbdp-opacity-subtle: 0.04;
+  --tbdp-opacity-muted: 0.08;
+  --tbdp-opacity-soft: 0.12;
+  --tbdp-opacity-medium: 0.24;
+  --tbdp-opacity-strong: 0.48;
+  --tbdp-opacity-opaque: 1;
+  --tbdp-spacing-micro: 0.125rem;
+  --tbdp-spacing-xs: 0.25rem;
+  --tbdp-spacing-sm: 0.5rem;
+  --tbdp-spacing-md: 1rem;
+  --tbdp-spacing-lg: 1.5rem;
+  --tbdp-spacing-xl: 2rem;
+  --tbdp-spacing-2xl: 3rem;
+  --tbdp-spacing-3xl: 4rem;
+  --tbdp-spacing-4xl: 6rem;
+  --tbdp-radius-sharp: 0;
+  --tbdp-radius-sm: 0.25rem;
+  --tbdp-radius-md: 0.5rem;
+  --tbdp-radius-lg: 0.75rem;
+  --tbdp-radius-pill: 9999px;
+  --tbdp-radius-circle: 50%;
+  --tbdp-shadow-0: none;
+  --tbdp-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-2: 0 2px 8px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-3: 0 8px 24px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);
+  --tbdp-shadow-4: 0 16px 48px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.08);
+  --tbdp-shadow-5: 0 24px 64px rgba(15, 23, 42, 0.18), 0 8px 24px rgba(15, 23, 42, 0.1);
+  --tbdp-container-sm: 640px;
+  --tbdp-container-md: 768px;
+  --tbdp-container-lg: 1024px;
+  --tbdp-container-xl: 1280px;
+  --tbdp-container-2xl: 1440px;
+  --tbdp-container-full: 100%;
+  --tbdp-font-display: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --tbdp-font-body: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --tbdp-font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", monospace;
+}
+
+/* TBDP Experience — motion, interaction, RTL, accessibility */
+/* TBDP Phase 3 — Motion System · tbdp-xp */
+
+@keyframes tbdp-xp-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes tbdp-xp-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes tbdp-xp-rise {
+  from { opacity: 0; transform: translateY(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tbdp-xp-rise-rtl {
+  from { opacity: 0; transform: translateX(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes tbdp-xp-slide-end {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-slide-start {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(calc(var(--tbdp-spacing-sm) * -1)); }
+  40%, 80% { transform: translateX(var(--tbdp-spacing-sm)); }
+}
+
+@keyframes tbdp-xp-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@keyframes tbdp-xp-lift {
+  to { transform: translateY(calc(var(--tbdp-spacing-sm) * -1)); box-shadow: var(--tbdp-shadow-2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp-motion] { animation: none !important; transition: none !important; }
+}
+
+[data-tbdp-xp-motion] { will-change: transform, opacity; }
+[data-tbdp-xp-motion="page-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="page-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="section-reveal"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-headline"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-media"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="card-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="grid-stagger"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="modal-enter"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="modal-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="drawer-slide"] { animation-name: tbdp-xp-slide-end; }
+[data-tbdp-xp-motion="toast-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="toast-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="tooltip-fade"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="scroll-reveal-up"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="stagger-children"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hover-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="focus-ring"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="success-pulse"] { animation-name: tbdp-xp-pulse; }
+[data-tbdp-xp-motion="error-shake"] { animation-name: tbdp-xp-shake; }
+
+/* TBDP Experience — interaction utilities */
+[data-tbdp-xp] { --tbdp-xp-focus: var(--tbdp-color-border-focus); }
+[data-tbdp-xp-feedback="loading"] { cursor: wait; }
+[data-tbdp-xp-feedback="error"] { border-color: var(--tbdp-color-danger); }
+[data-tbdp-xp-feedback="success"] { border-color: var(--tbdp-color-success); }
+[data-tbdp-xp-touch="true"] { min-height: var(--tbdp-spacing-2xl); min-width: var(--tbdp-spacing-2xl); }
+[data-tbdp-xp-gpu] { transform: translateZ(0); backface-visibility: hidden; }
+[data-tbdp-xp-contain] { content-visibility: auto; contain-intrinsic-size: auto 500px; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp], [data-tbdp-xp-motion] { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+/* V2 sidebar-left layout */
+.v2-layout-sidebar-left .v2-sidebar-shell { gap: 0; align-items: flex-start; }
+.v2-sidebar-rail {
+  border-inline-end: 1px solid var(--border-subtle, rgba(244,237,228,0.06));
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-inline-end: clamp(1.25rem, 3vw, 2rem);
+}
+[dir='rtl'] .v2-sidebar-rail { border-inline-end: none; border-inline-start: 1px solid var(--border-subtle, rgba(244,237,228,0.06)); }
+.v2-main-canvas > [data-v2-component] + [data-v2-component] { margin-top: 0; }
+.v2-layout-sidebar-left .v2-main-canvas { padding-inline-start: 0; }
+@media (max-width: 1023px) {
+  .v2-sidebar-rail { display: none !important; }
+}
+
+/* V2 sidebar-right layout */
+.v2-layout-sidebar-right .v2-sidebar-shell { gap: 0; align-items: flex-start; }
+.v2-layout-sidebar-right .v2-sidebar-rail {
+  border-inline-start: 1px solid var(--border-subtle, rgba(28,25,23,0.06));
+  border-inline-end: none;
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-inline-start: clamp(1.25rem, 3vw, 2rem);
+}
+[dir='rtl'] .v2-layout-sidebar-right .v2-sidebar-rail {
+  border-inline-start: none;
+  border-inline-end: 1px solid var(--border-subtle, rgba(28,25,23,0.06));
+}
+
+/* V2 full-bleed layout */
+.v2-layout-full-bleed .v2-overlay-canvas { width: 100%; }
+.v2-layout-full-bleed .v2-main-canvas { width: 100%; max-width: var(--container-max, 76rem); margin-inline: auto; }
+
+/* V2 editorial-reveal layout (creative portfolio) */
+.v2-layout-editorial-reveal .v2-main-canvas { width: 100%; }
+.v2-layout-editorial-reveal .v2-overlay-reveal { width: 100%; }
+
+:root {
+  --container-max: 88rem;
+  --font-body: Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Cormorant Garamond", ui-sans-serif, system-ui, sans-serif;
+  --color-surface: #FFFFFF;
+  --color-foreground: #080E18;
+  --color-background: #F7F6F3;
+  --color-accent: #C4A574;
+  --color-secondary: #152238; --color-primary: #080E18; }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    .sr-only, .v2-sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    [class*="animate-"] { animation-fill-mode: both; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--color-background, #0f172a);
+      color: var(--color-foreground, #f8fafc);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .page { display: none; padding-bottom: 2rem; }
+    .page:target { display: block; }
+    body:not(:has(.page:target)) .page#home { display: block; }
+    img { max-width: 100%; height: auto; display: block; }
+    a { color: inherit; }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+<style id="tbdp-wiring-layer">
+/* TBDP Integration Layer — advisory token layer */
+
+/* Trend Business AI Design Platform · 1.0.0 · foundations-1 */
+:root {
+  --tbdp-color-primary: #0047E6;
+  --tbdp-color-secondary: #334155;
+  --tbdp-color-accent: #4D85FF;
+  --tbdp-color-success: #10B981;
+  --tbdp-color-warning: #F59E0B;
+  --tbdp-color-danger: #EF4444;
+  --tbdp-color-info: #3B82F6;
+  --tbdp-color-surface-base: #FFFFFF;
+  --tbdp-color-surface-raised: #F8FAFC;
+  --tbdp-color-surface-overlay: #FFFFFF;
+  --tbdp-color-surface-sunken: #F1F5F9;
+  --tbdp-color-surface-inverse: #0F172A;
+  --tbdp-color-background-canvas: #F8FAFC;
+  --tbdp-color-background-subtle: #F1F5F9;
+  --tbdp-color-background-emphasis: #FFFFFF;
+  --tbdp-color-background-inverse: #020617;
+  --tbdp-color-text-primary: #0F172A;
+  --tbdp-color-text-secondary: #475569;
+  --tbdp-color-text-tertiary: #64748B;
+  --tbdp-color-text-disabled: #94A3B8;
+  --tbdp-color-text-inverse: #FFFFFF;
+  --tbdp-color-text-link: #0047E6;
+  --tbdp-color-text-linkHover: #0038B8;
+  --tbdp-color-border-default: #E2E8F0;
+  --tbdp-color-border-subtle: #F1F5F9;
+  --tbdp-color-border-strong: #CBD5E1;
+  --tbdp-color-border-focus: #1A5CFF;
+  --tbdp-color-border-inverse: rgba(255, 255, 255, 0.16);
+  --tbdp-color-overlay-scrim: rgba(2, 6, 23, 0.4);
+  --tbdp-color-overlay-scrimStrong: rgba(2, 6, 23, 0.64);
+  --tbdp-color-overlay-backdrop: rgba(2, 6, 23, 0.24);
+  --tbdp-color-overlay-highlight: rgba(26, 92, 255, 0.12);
+  --tbdp-opacity-transparent: 0;
+  --tbdp-opacity-subtle: 0.04;
+  --tbdp-opacity-muted: 0.08;
+  --tbdp-opacity-soft: 0.12;
+  --tbdp-opacity-medium: 0.24;
+  --tbdp-opacity-strong: 0.48;
+  --tbdp-opacity-opaque: 1;
+  --tbdp-spacing-micro: 0.125rem;
+  --tbdp-spacing-xs: 0.25rem;
+  --tbdp-spacing-sm: 0.5rem;
+  --tbdp-spacing-md: 1rem;
+  --tbdp-spacing-lg: 1.5rem;
+  --tbdp-spacing-xl: 2rem;
+  --tbdp-spacing-2xl: 3rem;
+  --tbdp-spacing-3xl: 4rem;
+  --tbdp-spacing-4xl: 6rem;
+  --tbdp-radius-sharp: 0;
+  --tbdp-radius-sm: 0.25rem;
+  --tbdp-radius-md: 0.5rem;
+  --tbdp-radius-lg: 0.75rem;
+  --tbdp-radius-pill: 9999px;
+  --tbdp-radius-circle: 50%;
+  --tbdp-shadow-0: none;
+  --tbdp-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-2: 0 2px 8px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-3: 0 8px 24px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);
+  --tbdp-shadow-4: 0 16px 48px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.08);
+  --tbdp-shadow-5: 0 24px 64px rgba(15, 23, 42, 0.18), 0 8px 24px rgba(15, 23, 42, 0.1);
+  --tbdp-container-sm: 640px;
+  --tbdp-container-md: 768px;
+  --tbdp-container-lg: 1024px;
+  --tbdp-container-xl: 1280px;
+  --tbdp-container-2xl: 1440px;
+  --tbdp-container-full: 100%;
+  --tbdp-font-display: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --tbdp-font-body: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --tbdp-font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", monospace;
+}
+
+/* TBDP Phase 3 — Motion System · tbdp-xp */
+
+@keyframes tbdp-xp-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes tbdp-xp-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes tbdp-xp-rise {
+  from { opacity: 0; transform: translateY(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tbdp-xp-rise-rtl {
+  from { opacity: 0; transform: translateX(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes tbdp-xp-slide-end {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-slide-start {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(calc(var(--tbdp-spacing-sm) * -1)); }
+  40%, 80% { transform: translateX(var(--tbdp-spacing-sm)); }
+}
+
+@keyframes tbdp-xp-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@keyframes tbdp-xp-lift {
+  to { transform: translateY(calc(var(--tbdp-spacing-sm) * -1)); box-shadow: var(--tbdp-shadow-2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp-motion] { animation: none !important; transition: none !important; }
+}
+
+[data-tbdp-xp-motion] { will-change: transform, opacity; }
+[data-tbdp-xp-motion="page-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="page-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="section-reveal"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-headline"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-media"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="card-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="grid-stagger"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="modal-enter"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="modal-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="drawer-slide"] { animation-name: tbdp-xp-slide-end; }
+[data-tbdp-xp-motion="toast-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="toast-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="tooltip-fade"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="scroll-reveal-up"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="stagger-children"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hover-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="focus-ring"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="success-pulse"] { animation-name: tbdp-xp-pulse; }
+[data-tbdp-xp-motion="error-shake"] { animation-name: tbdp-xp-shake; }
+
+/* TBDP Experience — interaction utilities */
+[data-tbdp-xp] { --tbdp-xp-focus: var(--tbdp-color-border-focus); }
+[data-tbdp-xp-feedback="loading"] { cursor: wait; }
+[data-tbdp-xp-feedback="error"] { border-color: var(--tbdp-color-danger); }
+[data-tbdp-xp-feedback="success"] { border-color: var(--tbdp-color-success); }
+[data-tbdp-xp-touch="true"] { min-height: var(--tbdp-spacing-2xl); min-width: var(--tbdp-spacing-2xl); }
+[data-tbdp-xp-gpu] { transform: translateZ(0); backface-visibility: hidden; }
+[data-tbdp-xp-contain] { content-visibility: auto; contain-intrinsic-size: auto 500px; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp], [data-tbdp-xp-motion] { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+  <div class="page" id="home">
+    <link rel="preload" as="image" href="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" fetchPriority="high"/><div class="flex min-h-screen flex-col bg-[var(--color-background)] text-[var(--color-foreground)] antialiased v2-template v2-corporate-business" data-v2-package="corporate-business" data-v2-composer="region-grid" data-v2-layout="default"><header data-v2-region="header"><header data-v2-component="corporate-business-nav" class="sticky top-0 z-50 transition-all duration-500 border-b border-transparent bg-transparent"><div class="cb-container flex h-[4.5rem] items-center justify-between gap-8 lg:h-[5rem]"><a href="#top" class="cb-font-display group flex items-center gap-3.5 text-[1.125rem] font-medium tracking-tight text-[var(--color-foreground)] cb-focus-ring"><span class="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border-accent)] bg-[var(--color-ink)] text-sm font-medium text-[var(--color-signal)] transition group-hover:border-[var(--color-signal)]" aria-hidden="true">M</span><span class="hidden sm:inline">Meridian Advisory</span></a><nav aria-label="Primary" class="hidden items-center gap-11 lg:flex"><a href="#about" class="cb-nav-link cb-focus-ring">About</a><a href="#features" class="cb-nav-link cb-focus-ring">Capabilities</a><a href="#customers" class="cb-nav-link cb-focus-ring">Outcomes</a><a href="#contact" class="cb-nav-link cb-focus-ring">Contact</a></nav><div class="flex items-center gap-3"><a href="#contact" class="cb-btn-primary hidden sm:inline-flex">Schedule consultation</a><button type="button" aria-expanded="false" aria-controls="cb-mobile-nav" aria-label="Open menu" class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border-default)] bg-[var(--color-surface)] lg:hidden cb-focus-ring"><span class="sr-only">Menu</span><span aria-hidden="true" class="flex flex-col gap-1.5"><span class="block h-px w-5 bg-current transition "></span><span class="block h-px w-5 bg-current transition "></span><span class="block h-px w-5 bg-current transition "></span></span></button></div></div></header></header><main data-v2-region="main" class="v2-region-grid flex flex-col"><h1 class="v2-sr-only">Meridian Advisory</h1><section id="top" data-v2-component="corporate-business-hero" aria-labelledby="cb-hero-title" class="relative min-h-[100svh] overflow-hidden bg-[var(--color-background)]"><div class="cb-hero-atmosphere" aria-hidden="true"></div><div class="cb-hero-grid" aria-hidden="true"></div><div class="cb-paper-grain pointer-events-none absolute inset-0" aria-hidden="true"></div><div class="cb-container relative flex min-h-[calc(100svh-5rem)] flex-col justify-center py-20 lg:py-28"><div class="grid items-center gap-16 lg:grid-cols-12 lg:gap-20"><div class="lg:col-span-6 xl:col-span-5"><p class="cb-eyebrow mb-7">Corporate advisory</p><h1 id="cb-hero-title" class="cb-headline max-w-[11ch]">Strategy and execution for the enterprise</h1><p class="cb-body mt-10">We help global organizations modernize operations, strengthen governance, and deliver lasting stakeholder value — with board-ready counsel and measurable outcomes.</p><div class="mt-12 flex flex-wrap items-center gap-4"><a href="#contact" class="cb-btn-primary cb-focus-ring">Schedule consultation</a><a href="#features" class="cb-btn-secondary cb-focus-ring">Our capabilities</a></div><div class="mt-20"><p class="cb-font-body mb-6 text-[0.6875rem] font-medium uppercase tracking-[0.2em] text-[var(--color-muted)]">Advising leaders at</p><div class="cb-trust-fade overflow-hidden" aria-label="Trusted by leading organizations"><div class="cb-marquee-track flex w-max gap-14"><span class="cb-trust-logo">Goldman Sachs</span><span class="cb-trust-logo">Siemens</span><span class="cb-trust-logo">Deloitte</span><span class="cb-trust-logo">McKinsey</span><span class="cb-trust-logo">Accenture</span><span class="cb-trust-logo">Blackstone</span><span class="cb-trust-logo">JPMorgan</span><span class="cb-trust-logo">Goldman Sachs</span><span class="cb-trust-logo">Siemens</span><span class="cb-trust-logo">Deloitte</span><span class="cb-trust-logo">McKinsey</span><span class="cb-trust-logo">Accenture</span><span class="cb-trust-logo">Blackstone</span><span class="cb-trust-logo">JPMorgan</span></div></div></div></div><div class="relative lg:col-span-6 xl:col-span-7"><div class="cb-hero-visual-glow" aria-hidden="true"></div><div class="relative ms-auto aspect-[4/5] max-w-[36rem] sm:aspect-[5/6]"><div class="absolute inset-0 overflow-hidden rounded-[var(--radius-xl,20px)] border border-[var(--border-subtle)] bg-[var(--color-ink)] shadow-[var(--shadow-surface)]" aria-hidden="true"><div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_70%_20%,rgba(196,165,116,0.22),transparent_55%),radial-gradient(ellipse_50%_40%_at_20%_80%,rgba(255,255,255,0.06),transparent_50%),linear-gradient(165deg,#0a1220_0%,#080e18_45%,#121c2e_100%)]"></div><div class="absolute inset-0 opacity-[0.18]" style="background-image:linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px);background-size:48px 48px"></div><div class="absolute -end-8 top-[18%] h-40 w-40 rounded-full bg-[radial-gradient(circle,rgba(196,165,116,0.35),transparent_68%)] blur-2xl"></div><div class="absolute start-[12%] top-[58%] h-px w-[76%] bg-gradient-to-r from-transparent via-[var(--color-signal)]/50 to-transparent"></div><div class="absolute start-[12%] top-[68%] h-px w-[52%] bg-gradient-to-r from-transparent via-white/20 to-transparent"></div><div class="absolute inset-0 opacity-[0.14] mix-blend-overlay"><img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="" class="h-full w-full scale-110 object-cover object-center saturate-0 contrast-125" loading="eager" fetchPriority="high"/></div><div class="absolute inset-x-8 top-8 flex items-center justify-between"><span class="cb-font-mono text-[0.5625rem] uppercase tracking-[0.18em] text-white/35">Meridian Atlas</span><span class="h-2 w-2 rounded-full bg-[var(--color-signal)] shadow-[0_0_16px_rgba(196,165,116,0.8)]"></span></div><div class="absolute inset-x-8 bottom-8 rounded-[var(--radius-lg)] border border-white/10 bg-white/5 p-6 backdrop-blur-md"><p class="cb-font-display text-[clamp(1.5rem,2.5vw,2rem)] font-medium leading-tight text-white">Board-ready counsel for global enterprises</p><p class="cb-font-body mt-3 text-sm leading-relaxed text-white/55">Strategy, governance, and transformation under one senior partner team.</p></div></div><div class="absolute -start-4 top-10 z-10 hidden rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--color-surface)] px-5 py-4 shadow-[var(--shadow-surface)] sm:block lg:-start-8"><p class="cb-metric text-3xl">40yr</p><p class="cb-metric-label mt-1">Partner tenure</p></div><div class="absolute -end-3 bottom-24 z-10 hidden rounded-[var(--radius-lg)] border border-white/10 bg-[var(--color-ink)] px-5 py-4 shadow-[var(--shadow-surface)] sm:block lg:-end-6"><p class="cb-font-mono text-[0.5625rem] uppercase tracking-[0.14em] text-[var(--color-signal)]">Retention</p><p class="cb-font-display mt-1 text-3xl font-medium text-white">97%</p></div></div><div class="mt-6 grid grid-cols-3 gap-3 sm:gap-4"><div class="cb-card-glass px-4 py-5 sm:px-5 sm:py-6"><p class="cb-metric text-[clamp(1.5rem,2.5vw,2rem)]">500+</p><p class="cb-metric-label mt-2">Enterprise clients</p><p class="cb-metric-detail mt-1.5">Global footprint</p></div><div class="cb-card-glass px-4 py-5 sm:px-5 sm:py-6"><p class="cb-metric text-[clamp(1.5rem,2.5vw,2rem)]">28</p><p class="cb-metric-label mt-2">Countries served</p><p class="cb-metric-detail mt-1.5">Active markets</p></div><div class="cb-card-glass px-4 py-5 sm:px-5 sm:py-6"><p class="cb-metric text-[clamp(1.5rem,2.5vw,2rem)]">97%</p><p class="cb-metric-label mt-2">Client retention</p><p class="cb-metric-detail mt-1.5">3-year average</p></div></div></div></div></div></section><section id="features" data-v2-component="corporate-business-features" aria-labelledby="cb-features-title" class="cb-section cb-section-alt"><div class="cb-container"><div class="mb-20 grid gap-10 lg:grid-cols-2 lg:items-end"><header><p class="cb-eyebrow mb-6">Capabilities</p><h2 id="cb-features-title" class="cb-headline-sm max-w-[14ch]">Advisory built for enterprise complexity</h2><div class="cb-accent-line mt-8" aria-hidden="true"></div></header><p class="cb-prose lg:justify-self-end lg:text-end">Integrated practices across strategy, operations, and governance — delivered by senior partners with sector depth.</p></div><div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-12"><article class="group relative flex flex-col justify-between overflow-hidden p-9 sm:p-10 cb-card-featured min-h-[22rem] lg:min-h-[24rem] lg:col-span-7 lg:row-span-2"><div><span class="cb-font-mono text-[0.625rem] tracking-[0.18em] text-[var(--color-signal)]">01</span><h3 class="cb-font-display mt-8 text-[clamp(1.375rem,2vw,1.75rem)] font-medium leading-tight text-white">Strategic advisory</h3><p class="cb-font-body mt-5 max-w-md text-[0.9375rem] leading-[1.75] text-white/68">Board-level counsel on market entry, portfolio optimization, and long-range capital allocation.</p></div><a href="#contact" class="cb-btn-ghost mt-10 text-[var(--color-signal)]">Learn more <span aria-hidden="true">→</span></a></article><article class="group relative flex flex-col justify-between overflow-hidden p-9 sm:p-10 cb-card lg:col-span-5"><div><span class="cb-font-mono text-[0.625rem] tracking-[0.18em] text-[var(--color-signal)]">02</span><h3 class="cb-font-display mt-8 text-[clamp(1.375rem,2vw,1.75rem)] font-medium leading-tight text-[var(--color-foreground)]">Operational excellence</h3><p class="cb-font-body mt-5 max-w-md text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Lean operating models, supply-chain resilience, and performance management at scale.</p></div><a href="#contact" class="cb-btn-ghost mt-10 ">Learn more <span aria-hidden="true">→</span></a></article><article class="group relative flex flex-col justify-between overflow-hidden p-9 sm:p-10 cb-card lg:col-span-5"><div><span class="cb-font-mono text-[0.625rem] tracking-[0.18em] text-[var(--color-signal)]">03</span><h3 class="cb-font-display mt-8 text-[clamp(1.375rem,2vw,1.75rem)] font-medium leading-tight text-[var(--color-foreground)]">Governance &amp; risk</h3><p class="cb-font-body mt-5 max-w-md text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Enterprise risk frameworks, compliance programs, and stakeholder reporting you can defend.</p></div><a href="#contact" class="cb-btn-ghost mt-10 ">Learn more <span aria-hidden="true">→</span></a></article><article class="group relative flex flex-col justify-between overflow-hidden p-9 sm:p-10 cb-card lg:col-span-12"><div><span class="cb-font-mono text-[0.625rem] tracking-[0.18em] text-[var(--color-signal)]">04</span><h3 class="cb-font-display mt-8 text-[clamp(1.375rem,2vw,1.75rem)] font-medium leading-tight text-[var(--color-foreground)]">Transformation delivery</h3><p class="cb-font-body mt-5 max-w-md text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">End-to-end program leadership from discovery through change management and measurable outcomes.</p></div><a href="#contact" class="cb-btn-ghost mt-10 ">Learn more <span aria-hidden="true">→</span></a></article></div></div></section><section id="about" data-v2-component="corporate-business-about" aria-labelledby="cb-about-title" class="cb-section"><div class="cb-container"><div class="grid items-center gap-16 lg:grid-cols-12 lg:gap-20"><div class="relative lg:col-span-6"><div class="absolute -start-4 -top-4 h-24 w-24 border border-[var(--border-accent)]/50" aria-hidden="true"></div><div class="cb-hero-frame relative aspect-[4/5] max-w-md"><img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="Meridian Advisory leadership team" class="h-full w-full object-cover object-center saturate-[0.9]" loading="lazy"/></div><div class="cb-card-glass absolute -bottom-6 -end-4 max-w-[14rem] px-5 py-4 sm:-end-8"><p class="cb-metric text-3xl">40yr</p><p class="cb-metric-label mt-1">Combined partner tenure</p></div></div><div class="lg:col-span-6 lg:ps-8"><p class="cb-eyebrow mb-6">About Meridian</p><p class="cb-font-body mb-4 text-sm text-[var(--color-signal)]">Four decades of board-level counsel</p><h2 id="cb-about-title" class="cb-headline-sm max-w-[16ch]">Trusted leadership for complex organizations</h2><div class="cb-accent-line mt-8" aria-hidden="true"></div><p class="cb-prose mt-8">For over twenty years we have partnered with global enterprises to deliver strategy, transformation, and measurable outcomes — with integrity at the center of every engagement.</p><ul class="mt-10 space-y-4"><li class="flex gap-4"><span class="mt-1.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-[0.625rem] text-[var(--color-signal)]" aria-hidden="true">✓</span><span class="cb-font-body text-sm leading-relaxed text-[var(--color-foreground)]">Fortune 500 advisory experience across financial services and industrials</span></li><li class="flex gap-4"><span class="mt-1.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-[0.625rem] text-[var(--color-signal)]" aria-hidden="true">✓</span><span class="cb-font-body text-sm leading-relaxed text-[var(--color-foreground)]">Offices across North America, Europe, and MENA with local partner coverage</span></li><li class="flex gap-4"><span class="mt-1.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-[0.625rem] text-[var(--color-signal)]" aria-hidden="true">✓</span><span class="cb-font-body text-sm leading-relaxed text-[var(--color-foreground)]">ISO-certified governance frameworks and independent ethics review</span></li></ul><a href="#contact" class="cb-btn-primary cb-focus-ring mt-12 inline-flex">Speak with an advisor</a></div></div></div></section><section id="stats" data-v2-component="corporate-business-stats" aria-labelledby="cb-stats-title" class="cb-section-tight cb-section-ink relative overflow-hidden"><div class="cb-grid-bg pointer-events-none absolute inset-0 opacity-[0.05]" aria-hidden="true"></div><div class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--color-signal)]/25 to-transparent" aria-hidden="true"></div><div class="cb-container relative"><div class="mb-14 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between"><div><p class="cb-eyebrow text-[var(--color-signal)]/80">Track record</p><h2 id="cb-stats-title" class="cb-headline-sm mt-4 max-w-[14ch] text-white">Outcomes our clients measure</h2></div><p class="cb-font-body max-w-sm text-sm leading-relaxed text-white/50 lg:text-end">Representative results from recent advisory and transformation engagements.</p></div><div class="grid gap-px overflow-hidden rounded-[var(--radius-xl,20px)] border border-white/8 bg-white/8 sm:grid-cols-2 lg:grid-cols-4"><div class="bg-[color-mix(in_srgb,var(--color-ink)_92%,var(--color-primary))] px-8 py-10 sm:px-10 sm:py-12"><p class="cb-font-mono text-[0.5625rem] uppercase tracking-[0.16em] text-[var(--color-signal)]/70">01</p><p class="cb-font-display mt-4 text-[clamp(2.25rem,4vw,3rem)] font-medium leading-none text-white">40yr</p><p class="cb-font-body mt-3 text-sm text-white/70">Combined partner tenure</p><p class="cb-font-mono mt-2 text-[0.625rem] uppercase tracking-[0.1em] text-white/35">Senior leadership</p></div><div class="bg-[color-mix(in_srgb,var(--color-ink)_92%,var(--color-primary))] px-8 py-10 sm:px-10 sm:py-12"><p class="cb-font-mono text-[0.5625rem] uppercase tracking-[0.16em] text-[var(--color-signal)]/70">02</p><p class="cb-font-display mt-4 text-[clamp(2.25rem,4vw,3rem)] font-medium leading-none text-white">28</p><p class="cb-font-body mt-3 text-sm text-white/70">Countries served</p><p class="cb-font-mono mt-2 text-[0.625rem] uppercase tracking-[0.1em] text-white/35">Global delivery</p></div><div class="bg-[color-mix(in_srgb,var(--color-ink)_92%,var(--color-primary))] px-8 py-10 sm:px-10 sm:py-12"><p class="cb-font-mono text-[0.5625rem] uppercase tracking-[0.16em] text-[var(--color-signal)]/70">03</p><p class="cb-font-display mt-4 text-[clamp(2.25rem,4vw,3rem)] font-medium leading-none text-white">97%</p><p class="cb-font-body mt-3 text-sm text-white/70">Client retention</p><p class="cb-font-mono mt-2 text-[0.625rem] uppercase tracking-[0.1em] text-white/35">Three-year average</p></div><div class="bg-[color-mix(in_srgb,var(--color-ink)_92%,var(--color-primary))] px-8 py-10 sm:px-10 sm:py-12"><p class="cb-font-mono text-[0.5625rem] uppercase tracking-[0.16em] text-[var(--color-signal)]/70">04</p><p class="cb-font-display mt-4 text-[clamp(2.25rem,4vw,3rem)] font-medium leading-none text-white">14wk</p><p class="cb-font-body mt-3 text-sm text-white/70">Discovery to roadmap</p><p class="cb-font-mono mt-2 text-[0.625rem] uppercase tracking-[0.1em] text-white/35">Typical engagement</p></div></div></div></section><section id="customers" data-v2-component="corporate-business-portfolio" aria-labelledby="cb-portfolio-title" class="cb-section"><div class="cb-container"><div class="mb-16 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between"><header class="max-w-xl"><p class="cb-eyebrow mb-6">Client outcomes</p><h2 id="cb-portfolio-title" class="cb-headline-sm">Boards trust Meridian Advisory</h2></header><p class="cb-prose lg:max-w-md lg:text-end">Executive teams navigate transformation, governance, and global expansion with measurable strategic impact.</p></div><div class="space-y-6"><article class="cb-card group grid overflow-hidden lg:grid-cols-12"><div class="relative aspect-[16/9] overflow-hidden lg:col-span-5 lg:aspect-auto lg:min-h-[16rem]"><img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="Apex Holdings engagement" class="h-full w-full object-cover saturate-[0.88] transition-transform duration-700 group-hover:scale-[1.03]" loading="lazy"/><div class="absolute inset-0 bg-gradient-to-r from-[var(--color-ink)]/40 to-transparent lg:bg-gradient-to-t lg:from-[var(--color-ink)]/50"></div><div class="absolute bottom-6 start-6"><p class="cb-font-mono text-[0.5625rem] uppercase tracking-[0.14em] text-white/60">Case study 01</p><p class="cb-font-display mt-1 text-xl font-medium text-white">Apex Holdings</p></div></div><div class="flex flex-col justify-center p-8 sm:p-10 lg:col-span-7"><p class="cb-font-mono text-[0.625rem] uppercase tracking-[0.12em] text-[var(--color-muted)]">Private Equity</p><div class="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-1"><span class="cb-metric">3.2×</span><span class="cb-font-body text-sm text-[var(--color-muted)]">portfolio value uplift</span></div><p class="cb-font-body mt-6 max-w-lg text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Restructured operating model across 4 portfolio companies within 18 months.</p><a href="#contact" class="cb-btn-ghost mt-8">Discuss a similar engagement <span aria-hidden="true">→</span></a></div></article><article class="cb-card group grid overflow-hidden lg:grid-cols-12"><div class="relative aspect-[16/9] overflow-hidden lg:col-span-5 lg:aspect-auto lg:min-h-[16rem]"><img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="Northgate Financial engagement" class="h-full w-full object-cover saturate-[0.88] transition-transform duration-700 group-hover:scale-[1.03]" loading="lazy"/><div class="absolute inset-0 bg-gradient-to-r from-[var(--color-ink)]/40 to-transparent lg:bg-gradient-to-t lg:from-[var(--color-ink)]/50"></div><div class="absolute bottom-6 start-6"><p class="cb-font-mono text-[0.5625rem] uppercase tracking-[0.14em] text-white/60">Case study 02</p><p class="cb-font-display mt-1 text-xl font-medium text-white">Northgate Financial</p></div></div><div class="flex flex-col justify-center p-8 sm:p-10 lg:col-span-7"><p class="cb-font-mono text-[0.625rem] uppercase tracking-[0.12em] text-[var(--color-muted)]">Banking</p><div class="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-1"><span class="cb-metric">$840M</span><span class="cb-font-body text-sm text-[var(--color-muted)]">risk exposure reduced</span></div><p class="cb-font-body mt-6 max-w-lg text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Board-level governance framework aligned regulatory compliance with growth strategy.</p><a href="#contact" class="cb-btn-ghost mt-8">Discuss a similar engagement <span aria-hidden="true">→</span></a></div></article><article class="cb-card group grid overflow-hidden lg:grid-cols-12"><div class="relative aspect-[16/9] overflow-hidden lg:col-span-5 lg:aspect-auto lg:min-h-[16rem]"><img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="Helix Manufacturing engagement" class="h-full w-full object-cover saturate-[0.88] transition-transform duration-700 group-hover:scale-[1.03]" loading="lazy"/><div class="absolute inset-0 bg-gradient-to-r from-[var(--color-ink)]/40 to-transparent lg:bg-gradient-to-t lg:from-[var(--color-ink)]/50"></div><div class="absolute bottom-6 start-6"><p class="cb-font-mono text-[0.5625rem] uppercase tracking-[0.14em] text-white/60">Case study 03</p><p class="cb-font-display mt-1 text-xl font-medium text-white">Helix Manufacturing</p></div></div><div class="flex flex-col justify-center p-8 sm:p-10 lg:col-span-7"><p class="cb-font-mono text-[0.625rem] uppercase tracking-[0.12em] text-[var(--color-muted)]">Industrial</p><div class="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-1"><span class="cb-metric">28%</span><span class="cb-font-body text-sm text-[var(--color-muted)]">margin improvement</span></div><p class="cb-font-body mt-6 max-w-lg text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Supply chain optimization and leadership succession planning across 3 regions.</p><a href="#contact" class="cb-btn-ghost mt-8">Discuss a similar engagement <span aria-hidden="true">→</span></a></div></article></div></div></section><section id="testimonials" data-v2-component="corporate-business-testimonials" aria-labelledby="cb-testimonials-title" class="cb-section cb-section-alt"><div class="cb-container"><header class="mb-16 max-w-2xl"><p class="cb-eyebrow mb-5">Client stories</p><h2 id="cb-testimonials-title" class="cb-headline-sm">Trusted by executive sponsors</h2><p class="cb-prose mt-6">Leaders who partner with Meridian for strategy, transformation, and governance.</p></header><div class="grid gap-6 lg:grid-cols-12 lg:gap-8"><article class="cb-card-featured relative flex flex-col justify-between p-10 sm:p-12 lg:col-span-7 lg:row-span-2 lg:min-h-[24rem]"><div><span class="cb-quote-mark" aria-hidden="true">&quot;</span><blockquote class="cb-font-display -mt-6 text-[clamp(1.375rem,2.5vw,1.75rem)] font-medium leading-[1.45] text-white/92">Meridian brought board-level clarity to a complex transformation — our operating model is stronger and our stakeholders finally align on priorities.</blockquote></div><footer class="mt-10 border-t border-white/10 pt-8"><p class="cb-font-body text-sm font-medium text-white">Catherine Holt</p><p class="cb-font-body mt-1 text-sm text-white/55">Chief Operating Officer, Axiom Industrial Group</p><p class="cb-star mt-4 text-sm" aria-label="5 out of 5 stars">★★★★★</p></footer></article><article class="cb-card flex flex-col justify-between p-8 lg:col-span-5"><blockquote class="cb-font-body text-[0.9375rem] leading-[1.75] text-[var(--color-foreground)]">&quot;Their partners embedded with our leadership team and delivered measurable EBITDA impact within the first two quarters.&quot;</blockquote><footer class="mt-8 border-t border-[var(--border-subtle)] pt-6"><p class="cb-font-body text-sm font-medium text-[var(--color-foreground)]">Raj Mehta</p><p class="cb-font-body mt-1 text-xs text-[var(--color-muted)]">Managing Director, Harbor Capital Partners</p></footer></article><article class="cb-card flex flex-col justify-between p-8 lg:col-span-5"><blockquote class="cb-font-body text-[0.9375rem] leading-[1.75] text-[var(--color-foreground)]">&quot;The most rigorous advisory relationship we have had — governance, risk, and execution under one disciplined program.&quot;</blockquote><footer class="mt-8 border-t border-[var(--border-subtle)] pt-6"><p class="cb-font-body text-sm font-medium text-[var(--color-foreground)]">Elena Brandt</p><p class="cb-font-body mt-1 text-xs text-[var(--color-muted)]">General Counsel, Northgate Financial</p></footer></article></div></div></section><section id="pricing" data-v2-component="corporate-business-pricing" aria-labelledby="cb-pricing-title" class="cb-section cb-section-alt relative"><div class="cb-container"><header class="mx-auto mb-16 max-w-2xl text-center"><p class="cb-eyebrow mb-6">Engagements</p><h2 id="cb-pricing-title" class="cb-headline-sm">Partnership models that scale with ambition</h2><p class="cb-prose mx-auto mt-6">Transparent engagement structures. Retained partnerships receive preferred rates and dedicated partner coverage.</p></header><div class="grid items-stretch gap-6 lg:grid-cols-3"><article class="relative flex flex-col p-9 sm:p-10 cb-card"><h3 class="cb-font-display text-xl font-medium text-[var(--color-foreground)]">Advisory</h3><p class="cb-font-body mt-3 text-sm leading-relaxed text-[var(--color-muted)]">Focused strategic counsel for leadership teams navigating priority initiatives.</p><p class="mt-10 border-b border-[var(--border-subtle)] pb-8"><span class="cb-metric text-4xl ">From $18k</span><span class="cb-font-body text-sm text-[var(--color-muted)]">/month</span></p><ul class="mt-8 flex-1 space-y-4"><li class="flex gap-3 cb-font-body text-sm text-[var(--color-foreground)]"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Executive workshops</li><li class="flex gap-3 cb-font-body text-sm text-[var(--color-foreground)]"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Market &amp; competitive analysis</li><li class="flex gap-3 cb-font-body text-sm text-[var(--color-foreground)]"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Quarterly board briefings</li><li class="flex gap-3 cb-font-body text-sm text-[var(--color-foreground)]"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Dedicated partner access</li></ul><a href="#contact" class="cb-btn-secondary cb-focus-ring mt-10 w-full">Request proposal</a></article><article class="relative flex flex-col p-9 sm:p-10 cb-card-featured lg:-translate-y-2"><span class="cb-font-mono absolute -top-3 start-1/2 -translate-x-1/2 rounded-full border border-white/15 bg-[var(--color-ink)] px-4 py-1.5 text-[0.5625rem] uppercase tracking-[0.14em] text-[var(--color-signal)]">Most popular</span><h3 class="cb-font-display text-xl font-medium text-white">Transformation</h3><p class="cb-font-body mt-3 text-sm leading-relaxed text-white/60">Full-program leadership for enterprise change with measurable operational outcomes.</p><p class="mt-10 border-b border-[var(--border-subtle)] pb-8"><span class="cb-metric text-4xl text-white">From $45k</span><span class="cb-font-body text-sm text-white/50">/month</span></p><ul class="mt-8 flex-1 space-y-4"><li class="flex gap-3 cb-font-body text-sm text-white/85"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Everything in Advisory</li><li class="flex gap-3 cb-font-body text-sm text-white/85"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Program management office</li><li class="flex gap-3 cb-font-body text-sm text-white/85"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Change &amp; communications</li><li class="flex gap-3 cb-font-body text-sm text-white/85"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>KPI dashboards &amp; reporting</li><li class="flex gap-3 cb-font-body text-sm text-white/85"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>On-site leadership support</li></ul><a href="#contact" class="cb-btn-primary cb-focus-ring mt-10 w-full">Schedule consultation</a></article><article class="relative flex flex-col p-9 sm:p-10 cb-card"><h3 class="cb-font-display text-xl font-medium text-[var(--color-foreground)]">Enterprise</h3><p class="cb-font-body mt-3 text-sm leading-relaxed text-[var(--color-muted)]">Multi-region engagements with retained senior partners and bespoke governance models.</p><p class="mt-10 border-b border-[var(--border-subtle)] pb-8"><span class="cb-metric text-4xl ">Custom</span></p><ul class="mt-8 flex-1 space-y-4"><li class="flex gap-3 cb-font-body text-sm text-[var(--color-foreground)]"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Everything in Transformation</li><li class="flex gap-3 cb-font-body text-sm text-[var(--color-foreground)]"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Global delivery teams</li><li class="flex gap-3 cb-font-body text-sm text-[var(--color-foreground)]"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Board &amp; investor relations</li><li class="flex gap-3 cb-font-body text-sm text-[var(--color-foreground)]"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>24/7 executive escalation</li><li class="flex gap-3 cb-font-body text-sm text-[var(--color-foreground)]"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Multi-year partnership terms</li></ul><a href="#contact" class="cb-btn-secondary cb-focus-ring mt-10 w-full">Contact partners</a></article></div></div></section><section id="faq" data-v2-component="corporate-business-faq" aria-labelledby="cb-faq-title" class="cb-section"><div class="cb-container"><div class="grid gap-16 lg:grid-cols-[0.85fr_1.15fr] lg:items-start"><header class="lg:sticky lg:top-28"><p class="cb-eyebrow mb-6">FAQ</p><h2 id="cb-faq-title" class="cb-headline-sm max-w-[12ch]">Answers for executive sponsors</h2><div class="cb-accent-line mt-8" aria-hidden="true"></div><p class="cb-prose mt-8">What leadership teams ask before engaging a strategic advisory partner.</p></header><div class="divide-y divide-[var(--border-subtle)] border-y border-[var(--border-subtle)]"><div><h3><button type="button" id="cb-faq-trigger-0" aria-expanded="true" aria-controls="cb-faq-panel-0" class="flex w-full items-center justify-between gap-6 py-6 text-start cb-focus-ring"><span class="cb-font-display text-[1.0625rem] font-medium text-[var(--color-foreground)]">How do engagements typically begin?</span><span class="cb-font-mono flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-sm transition-all duration-300 rotate-45 border-[var(--color-signal)] bg-[color-mix(in_srgb,var(--color-signal)_10%,transparent)] text-[var(--color-signal)]" aria-hidden="true">+</span></button></h3><div id="cb-faq-panel-0" role="region" aria-labelledby="cb-faq-trigger-0" class="pb-6"><p class="cb-font-body max-w-prose text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">We start with a confidential discovery phase — stakeholder interviews, data review, and a prioritized opportunity map — usually completed within two weeks.</p></div></div><div><h3><button type="button" id="cb-faq-trigger-1" aria-expanded="false" aria-controls="cb-faq-panel-1" class="flex w-full items-center justify-between gap-6 py-6 text-start cb-focus-ring"><span class="cb-font-display text-[1.0625rem] font-medium text-[var(--color-foreground)]">Which industries do you serve?</span><span class="cb-font-mono flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-sm transition-all duration-300 border-[var(--border-default)] text-[var(--color-muted)]" aria-hidden="true">+</span></button></h3><div id="cb-faq-panel-1" role="region" aria-labelledby="cb-faq-trigger-1" hidden="" class="pb-6"><p class="cb-font-body max-w-prose text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Our partners have deep experience across financial services, healthcare, industrials, technology, and public sector organizations globally.</p></div></div><div><h3><button type="button" id="cb-faq-trigger-2" aria-expanded="false" aria-controls="cb-faq-panel-2" class="flex w-full items-center justify-between gap-6 py-6 text-start cb-focus-ring"><span class="cb-font-display text-[1.0625rem] font-medium text-[var(--color-foreground)]">How do you measure success?</span><span class="cb-font-mono flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-sm transition-all duration-300 border-[var(--border-default)] text-[var(--color-muted)]" aria-hidden="true">+</span></button></h3><div id="cb-faq-panel-2" role="region" aria-labelledby="cb-faq-trigger-2" hidden="" class="pb-6"><p class="cb-font-body max-w-prose text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Every engagement defines outcome metrics upfront — EBITDA impact, cycle-time reduction, risk exposure, or stakeholder satisfaction — with quarterly executive reviews.</p></div></div><div><h3><button type="button" id="cb-faq-trigger-3" aria-expanded="false" aria-controls="cb-faq-panel-3" class="flex w-full items-center justify-between gap-6 py-6 text-start cb-focus-ring"><span class="cb-font-display text-[1.0625rem] font-medium text-[var(--color-foreground)]">Can you work alongside our internal teams?</span><span class="cb-font-mono flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-sm transition-all duration-300 border-[var(--border-default)] text-[var(--color-muted)]" aria-hidden="true">+</span></button></h3><div id="cb-faq-panel-3" role="region" aria-labelledby="cb-faq-trigger-3" hidden="" class="pb-6"><p class="cb-font-body max-w-prose text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Yes. We embed with leadership and delivery teams, transfer capabilities, and leave behind playbooks so improvements sustain after our engagement ends.</p></div></div></div></div></div></section><section id="contact" data-v2-component="corporate-business-contact" aria-labelledby="cb-contact-title" class="cb-section relative"><div class="cb-container"><div class="cb-surface-elevated overflow-hidden"><div class="grid lg:grid-cols-2"><div class="border-b border-[var(--border-subtle)] p-10 sm:p-12 lg:border-b-0 lg:border-e"><p class="cb-eyebrow mb-5">Contact</p><h2 id="cb-contact-title" class="cb-headline-sm max-w-[14ch]">Speak with a senior partner</h2><p class="cb-prose mt-6">Share your priorities and we will assemble the right advisory team for a confidential consultation.</p><dl class="mt-12 space-y-6"><div><dt class="cb-font-mono text-[0.625rem] uppercase tracking-[0.14em] text-[var(--color-muted)]">Email</dt><dd class="cb-font-body mt-2"><a href="mailto:partners@meridianadvisory.com" class="text-[var(--color-foreground)] hover:text-[var(--color-signal)] cb-focus-ring">partners@meridianadvisory.com</a></dd></div><div><dt class="cb-font-mono text-[0.625rem] uppercase tracking-[0.14em] text-[var(--color-muted)]">Phone</dt><dd class="cb-font-body mt-2 text-[var(--color-foreground)]">+1 (212) 555-0180</dd></div><div><dt class="cb-font-mono text-[0.625rem] uppercase tracking-[0.14em] text-[var(--color-muted)]">Headquarters</dt><dd class="cb-font-body mt-2 text-[var(--color-foreground)]">200 Park Avenue, New York, NY</dd></div></dl></div><div class="bg-[var(--color-surface)] p-10 sm:p-12"><form class="space-y-5"><div class="grid gap-5 sm:grid-cols-2"><div><label for="cb-first" class="cb-font-body mb-2 block text-xs font-medium text-[var(--color-muted)]">First name</label><input id="cb-first" required="" class="cb-input cb-focus-ring" name="firstName"/></div><div><label for="cb-last" class="cb-font-body mb-2 block text-xs font-medium text-[var(--color-muted)]">Last name</label><input id="cb-last" required="" class="cb-input cb-focus-ring" name="lastName"/></div></div><div><label for="cb-email" class="cb-font-body mb-2 block text-xs font-medium text-[var(--color-muted)]">Work email</label><input id="cb-email" type="email" required="" class="cb-input cb-focus-ring" name="email"/></div><div><label for="cb-company" class="cb-font-body mb-2 block text-xs font-medium text-[var(--color-muted)]">Company</label><input id="cb-company" class="cb-input cb-focus-ring" name="company"/></div><div><label for="cb-message" class="cb-font-body mb-2 block text-xs font-medium text-[var(--color-muted)]">How can we help?</label><textarea id="cb-message" name="message" rows="4" class="cb-textarea cb-focus-ring"></textarea></div><button type="submit" class="cb-btn-primary cb-focus-ring w-full sm:w-auto">Request consultation</button></form></div></div></div></div></section></main><utility data-v2-region="utility"><section id="cta-band" data-v2-component="corporate-business-utility-band" aria-labelledby="cb-utility-title" class="relative overflow-hidden bg-[var(--color-ink)] py-20 sm:py-24"><div class="cb-grid-bg pointer-events-none absolute inset-0 opacity-[0.06]" aria-hidden="true"></div><div class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_20%_50%,rgba(196,165,116,0.12),transparent_55%)]" aria-hidden="true"></div><div class="cb-container relative flex flex-col items-start justify-between gap-12 lg:flex-row lg:items-center"><div class="max-w-xl"><p class="cb-eyebrow text-[var(--color-signal)]/80">Partner with us</p><h2 id="cb-utility-title" class="cb-font-display mt-5 text-[clamp(2rem,4vw,3rem)] font-medium leading-[1.08] text-white text-wrap-balance">Ready to move from strategy to results?</h2><p class="cb-font-body mt-5 text-base leading-relaxed text-white/55">Join 500+ organizations that rely on Meridian for board-ready counsel and transformation delivery.</p><div class="mt-8 flex flex-wrap gap-3"><span class="rounded-full border border-white/12 bg-white/5 px-4 py-2 text-[0.6875rem] font-medium text-white/70">Fortune 500</span><span class="rounded-full border border-white/12 bg-white/5 px-4 py-2 text-[0.6875rem] font-medium text-white/70">40+ countries</span><span class="rounded-full border border-white/12 bg-white/5 px-4 py-2 text-[0.6875rem] font-medium text-white/70">Senior partners</span></div></div><div class="flex w-full flex-col gap-4 sm:w-auto sm:flex-row"><a href="#contact" class="inline-flex min-h-[3.125rem] items-center justify-center rounded-full bg-white px-7 text-[0.9375rem] font-medium text-[var(--color-ink)] shadow-[0_8px_32px_rgba(0,0,0,0.2)] transition hover:-translate-y-0.5 cb-focus-ring">Schedule consultation</a><a href="#about" class="inline-flex min-h-[3.125rem] items-center justify-center rounded-full border border-white/25 px-7 text-[0.9375rem] font-medium text-white transition hover:border-white/45 hover:bg-white/5 cb-focus-ring">Download capabilities brief</a></div></div></section></utility><footer data-v2-region="footer"><footer data-v2-component="corporate-business-footer" class="cb-section-ink relative overflow-hidden" role="contentinfo"><div class="cb-grid-bg pointer-events-none absolute inset-0 opacity-[0.04]" aria-hidden="true"></div><div class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--color-signal)]/30 to-transparent" aria-hidden="true"></div><div class="cb-container relative"><div class="grid gap-16 border-b border-white/8 pb-16 lg:grid-cols-12 lg:gap-12"><div class="lg:col-span-4"><a href="#top" class="cb-font-display inline-flex items-center gap-3.5 text-2xl font-medium text-white cb-focus-ring"><span class="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--color-signal)]/40 text-sm text-[var(--color-signal)]" aria-hidden="true">M</span>Meridian Advisory</a><p class="cb-font-body mt-6 max-w-xs text-sm leading-[1.75] text-white/50">Executive advisory for organizations navigating transformation, governance, and global growth.</p><div class="mt-8 flex flex-wrap gap-2"><span class="cb-font-mono rounded-full border border-white/10 px-3 py-1.5 text-[0.5625rem] uppercase tracking-[0.14em] text-white/40">ISO 9001</span><span class="cb-font-mono rounded-full border border-white/10 px-3 py-1.5 text-[0.5625rem] uppercase tracking-[0.14em] text-white/40">GDPR</span><span class="cb-font-mono rounded-full border border-white/10 px-3 py-1.5 text-[0.5625rem] uppercase tracking-[0.14em] text-white/40">SOC 2</span></div></div><nav aria-label="Explore" class="lg:col-span-2 lg:col-start-6"><p class="cb-font-body text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-white/35">Explore</p><ul class="mt-5 space-y-3.5"><li><a href="#features" class="cb-font-body text-sm text-white/55 transition hover:text-[var(--color-signal)] cb-focus-ring">Capabilities</a></li><li><a href="#about" class="cb-font-body text-sm text-white/55 transition hover:text-[var(--color-signal)] cb-focus-ring">About</a></li><li><a href="#customers" class="cb-font-body text-sm text-white/55 transition hover:text-[var(--color-signal)] cb-focus-ring">Outcomes</a></li><li><a href="#pricing" class="cb-font-body text-sm text-white/55 transition hover:text-[var(--color-signal)] cb-focus-ring">Engagements</a></li><li><a href="#contact" class="cb-font-body text-sm text-white/55 transition hover:text-[var(--color-signal)] cb-focus-ring">Contact</a></li></ul></nav><div class="lg:col-span-2"><p class="cb-font-body text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-white/35">Offices</p><ul class="cb-font-body mt-5 space-y-3 text-sm text-white/50"><li><span class="block text-white/70">New York</span>200 Park Avenue</li><li><span class="block text-white/70">London</span>30 St Mary Axe</li><li><span class="block text-white/70">Dubai</span>DIFC Gate Village</li></ul></div><div class="lg:col-span-3"><p class="cb-font-body text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-white/35">Insights</p><p class="cb-font-body mt-5 text-sm leading-relaxed text-white/50">Quarterly perspectives on governance, transformation, and global markets.</p><form class="mt-6 flex gap-2"><label for="cb-footer-email" class="sr-only">Email address</label><input id="cb-footer-email" type="email" placeholder="Work email" class="cb-input flex-1 border-white/10 bg-white/5 text-white placeholder:text-white/30"/><button type="submit" class="cb-btn-primary shrink-0 px-5 text-sm">Subscribe</button></form></div></div><div class="flex flex-col gap-6 py-10 sm:flex-row sm:items-center sm:justify-between"><p class="cb-font-body text-xs text-white/30">© 2026 Meridian Advisory. All rights reserved.</p><nav aria-label="Legal" class="flex flex-wrap gap-6"><a href="#privacy" class="cb-font-body text-xs text-white/30 transition hover:text-white/55 cb-focus-ring">Privacy</a><a href="#terms" class="cb-font-body text-xs text-white/30 transition hover:text-white/55 cb-focus-ring">Terms</a><a href="#cookies" class="cb-font-body text-xs text-white/30 transition hover:text-white/55 cb-focus-ring">Cookies</a></nav></div></div></footer></footer><div data-v2-region="overlay" class="pointer-events-none fixed inset-x-0 bottom-0 z-50"></div></div>
+  </div>
+  
+</body>
+</html>

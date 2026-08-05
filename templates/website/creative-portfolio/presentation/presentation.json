@@ -1,0 +1,47 @@
+{
+  "packageId": "creative-portfolio",
+  "templateIntelligenceHint": "ti-creative-studio",
+  "layout": {
+    "defaultLayoutId": "editorial-reveal",
+    "regions": {
+      "header": { "role": "header", "sticky": true },
+      "main": { "role": "main" },
+      "overlay": { "role": "overlay" },
+      "footer": { "role": "footer" }
+    }
+  },
+  "navigation": {
+    "componentId": "creative-portfolio-nav",
+    "variant": "studio-transparent"
+  },
+  "hero": {
+    "componentId": "creative-portfolio-hero",
+    "region": "main"
+  },
+  "footer": {
+    "componentId": "creative-portfolio-footer",
+    "region": "footer"
+  },
+  "homeFlow": {
+    "regions": {
+      "main": [
+        "creative-portfolio-hero",
+        "creative-portfolio-selected-work",
+        "creative-portfolio-case-grid",
+        "creative-portfolio-manifesto",
+        "creative-portfolio-capabilities",
+        "creative-portfolio-process",
+        "creative-portfolio-collaborate-cta"
+      ],
+      "overlay": ["creative-portfolio-overlay-showcase"]
+    }
+  },
+  "sectionShell": {
+    "strategy": "package",
+    "componentId": "creative-portfolio-section-shell"
+  },
+  "aiGeneration": {
+    "contentProfile": "creative-portfolio-kinetic",
+    "suggestedPages": ["work", "studio", "contact"]
+  }
+}

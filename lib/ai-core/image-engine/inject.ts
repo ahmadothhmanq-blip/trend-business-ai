@@ -8,6 +8,9 @@ import {
   resolvePremiumStockUrl,
 } from "@/lib/ai-core/image-engine/stock";
 import { buildSiteVideoModule } from "@/lib/ai-core/image-engine/video";
+import { enrichManifestWithProfileSlots } from "@/lib/ai-core/image-engine/profile-engine";
+import { hydrateSlotsFromManifest } from "@/lib/ai-core/image-engine/profile-engine";
+import { slotUrls } from "@/lib/ai-core/image-engine/slots";
 
 const SITE_IMAGES_PATH = "lib/site-images.ts";
 const SITE_VIDEOS_PATH = "lib/site-videos.ts";
@@ -44,7 +47,15 @@ export function injectAiImagesIntoProject(params: {
       imageSystemSpec: params.imageSystemSpec,
     },
   );
-  const byRole = groupByRole(manifest);
+  const enriched = enrichManifestWithProfileSlots(manifest, {
+    industry: params.industry,
+    routingIndustryId: params.industry,
+  }, { projectSeed: params.industry ?? "website" });
+  const slotResult = hydrateSlotsFromManifest(enriched, {
+    industry: params.industry,
+    routingIndustryId: params.industry,
+  }, { projectSeed: params.industry ?? "website" });
+  const byRole = groupByRole(enriched);
   const hero = firstUrl(byRole, "hero");
   const product = firstUrl(byRole, "product");
   const service = firstUrl(byRole, "service");
@@ -54,7 +65,7 @@ export function injectAiImagesIntoProject(params: {
   const gallery = urlsForRole(byRole, "gallery");
   const testimonials = urlsForRole(byRole, "testimonial");
 
-  const hasPhotos = manifest.items.some(
+  const hasPhotos = enriched.items.some(
     (i) =>
       Boolean(i.url) &&
       !i.url!.startsWith("data:image/svg") &&
@@ -72,7 +83,10 @@ export function injectAiImagesIntoProject(params: {
     sections,
     gallery,
     testimonials,
-    items: manifest.items,
+    about: slotUrls(slotResult.slots, "about"),
+    features: slotUrls(slotResult.slots, "features"),
+    team: slotUrls(slotResult.slots, "team"),
+    items: enriched.items,
   });
 
   const out: GeneratedProjectFile[] = [];
@@ -92,11 +106,11 @@ export function injectAiImagesIntoProject(params: {
     }
     if (file.path === SITE_VIDEOS_PATH || file.path === "lib/site-videos.js") {
       sawSiteVideos = true;
-      if (manifest.videoPackage) {
+      if (enriched.videoPackage) {
         out.push({
           ...file,
           path: SITE_VIDEOS_PATH,
-          content: buildSiteVideoModule(manifest.videoPackage),
+          content: buildSiteVideoModule(enriched.videoPackage),
           language: "typescript",
         });
         continue;
@@ -139,10 +153,10 @@ export function injectAiImagesIntoProject(params: {
       language: "typescript",
     });
   }
-  if (!sawSiteVideos && manifest.videoPackage) {
+  if (!sawSiteVideos && enriched.videoPackage) {
     out.push({
       path: SITE_VIDEOS_PATH,
-      content: buildSiteVideoModule(manifest.videoPackage),
+      content: buildSiteVideoModule(enriched.videoPackage),
       language: "typescript",
     });
   }
@@ -327,6 +341,9 @@ function buildSiteImagesModule(params: {
   sections: string[];
   gallery: string[];
   testimonials: string[];
+  about: string[];
+  features: string[];
+  team: string[];
   items: CoreAssetManifest["items"];
 }): string {
   const meta = params.items.map((item) => ({
@@ -373,21 +390,45 @@ function buildSiteImagesModule(params: {
     params.testimonials.length > 0
       ? params.testimonials.map((url) => normalizePhotoUrl(url)!).filter(Boolean)
       : ([hero, product].filter(Boolean) as string[]);
+  const about =
+    params.about.length > 0
+      ? params.about.map((url) => normalizePhotoUrl(url)!).filter(Boolean)
+      : sections;
+  const features =
+    params.features.length > 0
+      ? params.features.map((url) => normalizePhotoUrl(url)!).filter(Boolean)
+      : ([service, product].filter(Boolean) as string[]);
+  const team =
+    params.team.length > 0
+      ? params.team.map((url) => normalizePhotoUrl(url)!).filter(Boolean)
+      : testimonials;
 
   return `/**
- * Advanced AI Assets Engine — generated site imagery.
- * Prefer these URLs over placeholders in components.
- * Never leave empty visual areas — resolveSiteImage always returns a photo URL when available.
+ * Website Builder Image Engine — generated site imagery.
+ * Semantic slots: hero, gallery, about, features, team, products, testimonials, backgrounds.
  */
 
 export const HERO_IMAGE = ${JSON.stringify(hero)};
 export const PRODUCT_IMAGE = ${JSON.stringify(product)};
 export const SERVICE_IMAGE = ${JSON.stringify(service)};
 export const BACKGROUND_IMAGE = ${JSON.stringify(background)};
+export const ABOUT_IMAGE = ${JSON.stringify(about[0] ?? hero)};
 export const BRAND_IMAGE = ${JSON.stringify(normalizePhotoUrl(params.brand) || hero)};
-export const SECTION_IMAGES = ${JSON.stringify(sections)} as const;
+export const SECTION_IMAGES = ${JSON.stringify(about.length ? about : sections)} as const;
+export const FEATURE_IMAGES = ${JSON.stringify(features)} as const;
+export const TEAM_IMAGES = ${JSON.stringify(team)} as const;
 export const GALLERY_IMAGES = ${JSON.stringify(gallery)} as const;
 export const TESTIMONIAL_IMAGES = ${JSON.stringify(testimonials)} as const;
+
+export type ImageSlotKind =
+  | "hero"
+  | "gallery"
+  | "about"
+  | "features"
+  | "team"
+  | "products"
+  | "testimonials"
+  | "backgrounds";
 
 export type SiteImageMeta = {
   id: string;
@@ -402,6 +443,9 @@ export type SiteImageMeta = {
   prompt?: string;
   provider?: string;
   artDirection?: string;
+  slot?: ImageSlotKind;
+  objectPosition?: string;
+  isUserOverride?: boolean;
 };
 
 export const SITE_IMAGES: SiteImageMeta[] = ${JSON.stringify(meta, null, 2)};
@@ -412,10 +456,36 @@ export function siteImagePool(): string[] {
     PRODUCT_IMAGE,
     SERVICE_IMAGE,
     BACKGROUND_IMAGE,
+    ABOUT_IMAGE,
     ...SECTION_IMAGES,
+    ...FEATURE_IMAGES,
+    ...TEAM_IMAGES,
     ...GALLERY_IMAGES,
     ...TESTIMONIAL_IMAGES,
   ].filter((u): u is string => Boolean(u));
+}
+
+export function slotImages(kind: ImageSlotKind): readonly string[] {
+  switch (kind) {
+    case "hero":
+      return [HERO_IMAGE];
+    case "gallery":
+      return GALLERY_IMAGES;
+    case "about":
+      return SECTION_IMAGES.length ? SECTION_IMAGES : [ABOUT_IMAGE];
+    case "features":
+      return FEATURE_IMAGES.length ? FEATURE_IMAGES : SECTION_IMAGES;
+    case "team":
+      return TEAM_IMAGES;
+    case "products":
+      return [PRODUCT_IMAGE, ...GALLERY_IMAGES].filter(Boolean);
+    case "testimonials":
+      return TESTIMONIAL_IMAGES;
+    case "backgrounds":
+      return [BACKGROUND_IMAGE, HERO_IMAGE].filter(Boolean);
+    default:
+      return siteImagePool();
+  }
 }
 
 export function imageByRole(role: string): string | null {
@@ -423,12 +493,23 @@ export function imageByRole(role: string): string | null {
   return hit?.url ?? null;
 }
 
+export function resolveSlotImage(
+  kind: ImageSlotKind,
+  index = 0,
+  preferred?: string | null,
+): string {
+  if (preferred?.trim()) return preferred.trim();
+  const images = slotImages(kind);
+  if (images.length > 0) return images[index % images.length]!;
+  return resolveSiteImage(null, index);
+}
+
 /** Resolve a photographic URL for a slot — never returns empty string when pool has images. */
 export function resolveSiteImage(
   preferred?: string | null,
   index = 0,
 ): string {
-  if (preferred) return preferred;
+  if (preferred?.trim()) return preferred.trim();
   const pool = siteImagePool();
   if (!pool.length) return "";
   return pool[index % pool.length]!;

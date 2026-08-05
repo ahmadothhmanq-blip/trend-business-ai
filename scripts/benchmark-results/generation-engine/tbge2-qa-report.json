@@ -1,0 +1,85 @@
+{
+  "generatedAt": "2026-08-03T21:05:28.816Z",
+  "phase": "planning-1",
+  "version": "2.0.0",
+  "testsPassed": true,
+  "exitCode": 0,
+  "checks": [
+    {
+      "id": "constants",
+      "ok": true
+    },
+    {
+      "id": "lifecycle",
+      "ok": true
+    },
+    {
+      "id": "intentAnalyzer",
+      "ok": true
+    },
+    {
+      "id": "businessAnalyzer",
+      "ok": true
+    },
+    {
+      "id": "requirementsAnalyzer",
+      "ok": true
+    },
+    {
+      "id": "websitePlanner",
+      "ok": true
+    },
+    {
+      "id": "pagePlanner",
+      "ok": true
+    },
+    {
+      "id": "sectionPlanner",
+      "ok": true
+    },
+    {
+      "id": "contentPlanner",
+      "ok": true
+    },
+    {
+      "id": "planningPipeline",
+      "ok": true
+    },
+    {
+      "id": "llmRequestBuilder",
+      "ok": true
+    },
+    {
+      "id": "structuredOutput",
+      "ok": true
+    },
+    {
+      "id": "validation",
+      "ok": true
+    },
+    {
+      "id": "tbgeBridge",
+      "ok": true
+    },
+    {
+      "id": "glsBridge",
+      "ok": true
+    },
+    {
+      "id": "websiteBridge",
+      "ok": true
+    }
+  ],
+  "performance": {
+    "note": "TBGE2 planning is synchronous, <5ms per call without LLM",
+    "noLlmCallsByDefault": true,
+    "noNetworkCallsByDefault": true
+  },
+  "backwardCompatibility": {
+    "tbgeV1Unchanged": true,
+    "websiteOrchestratorUnchanged": true,
+    "templatesUnchanged": true,
+    "builderUnchanged": true,
+    "legacyPlannerUnchanged": true
+  }
+}

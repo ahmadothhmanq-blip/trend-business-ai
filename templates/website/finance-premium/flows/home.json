@@ -1,0 +1,20 @@
+{
+  "pageId": "home",
+  "layoutId": "default",
+  "regions": {
+    "header": ["finance-premium-nav"],
+    "main": [
+      "finance-premium-hero",
+      "finance-premium-features",
+      "finance-premium-about",
+      "finance-premium-stats",
+      "finance-premium-testimonials",
+      "finance-premium-pricing",
+      "finance-premium-faq",
+      "finance-premium-contact"
+    ],
+    "utility": ["finance-premium-utility-band"],
+    "overlay": ["finance-premium-floating-cta"],
+    "footer": ["finance-premium-footer"]
+  }
+}

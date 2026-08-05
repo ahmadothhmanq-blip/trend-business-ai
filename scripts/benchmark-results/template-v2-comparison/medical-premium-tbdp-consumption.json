@@ -1,0 +1,37 @@
+{
+  "packageId": "medical-premium",
+  "tbdpNative": {
+    "enabled": true,
+    "packageId": "medical-premium",
+    "sectorDnaId": "medical",
+    "experienceProfileIds": [
+      "healthcare",
+      "corporate",
+      "minimal"
+    ],
+    "templateIdentity": "serenity-clinical",
+    "presetBinding": "serenity-fade",
+    "contextHash": "151c007f33734706",
+    "integrationVersion": "5.0.0",
+    "consumptionVersion": "1.0.0"
+  },
+  "tokenSnapshot": {
+    "primary": "#0F4C4C",
+    "secondary": "#1A6B6B",
+    "accent": "#C4706A",
+    "background": "#F7FAF9",
+    "foreground": "#0F2929",
+    "muted": "rgba(15,41,41,0.58)",
+    "surface": "#E4F2EE",
+    "healing": "#5B9A8B",
+    "pearl": "#FDFEFE",
+    "sage": "#D4E8E0"
+  },
+  "motionPreset": "serenity-fade",
+  "responsiveContainer": "76rem",
+  "globalsMarkers": {
+    "tbdpAuthority": true,
+    "primaryColor": true,
+    "healingColor": true
+  }
+}

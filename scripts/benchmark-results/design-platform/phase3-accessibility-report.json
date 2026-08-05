@@ -1,0 +1,9 @@
+{
+  "wcagLevel": "AA",
+  "reducedMotion": true,
+  "keyboardNav": true,
+  "focusManagement": true,
+  "screenReaders": true,
+  "touchTargets": true,
+  "contrastBehaviors": true
+}

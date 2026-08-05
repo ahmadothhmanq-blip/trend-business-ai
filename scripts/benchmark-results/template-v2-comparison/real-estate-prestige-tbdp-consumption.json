@@ -1,0 +1,37 @@
+{
+  "packageId": "real-estate-prestige",
+  "tbdpNative": {
+    "enabled": true,
+    "packageId": "real-estate-prestige",
+    "sectorDnaId": "real-estate",
+    "experienceProfileIds": [
+      "luxury",
+      "executive",
+      "corporate"
+    ],
+    "templateIdentity": "monolith-estate",
+    "presetBinding": "monolith-reveal",
+    "contextHash": "09b8ba0dc171ca5c",
+    "integrationVersion": "5.0.0",
+    "consumptionVersion": "1.0.0"
+  },
+  "tokenSnapshot": {
+    "primary": "#1C1917",
+    "secondary": "#3D3A36",
+    "accent": "#B8956B",
+    "background": "#F5F0EB",
+    "foreground": "#1C1917",
+    "muted": "rgba(28,25,23,0.58)",
+    "surface": "#FDFCFA",
+    "stone": "#E8E2DA",
+    "brass": "#B8956B",
+    "linen": "#FAF8F5"
+  },
+  "motionPreset": "monolith-reveal",
+  "responsiveContainer": "88rem",
+  "globalsMarkers": {
+    "tbdpAuthority": true,
+    "primaryColor": true,
+    "brassColor": true
+  }
+}

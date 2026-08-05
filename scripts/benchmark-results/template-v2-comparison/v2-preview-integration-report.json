@@ -1,0 +1,65 @@
+{
+  "checks": [
+    {
+      "id": "v2.render.version",
+      "ok": true
+    },
+    {
+      "id": "v2.package.marker",
+      "ok": true
+    },
+    {
+      "id": "v2.layout.marker",
+      "ok": true
+    },
+    {
+      "id": "v2.component.hero",
+      "ok": true
+    },
+    {
+      "id": "v2.component.nav",
+      "ok": true
+    },
+    {
+      "id": "v2.no.theme.luxury",
+      "ok": true
+    },
+    {
+      "id": "v2.no.theme.corporate",
+      "ok": true
+    },
+    {
+      "id": "v2.no.theme.tech",
+      "ok": true
+    },
+    {
+      "id": "v2.no.v1.preview",
+      "ok": true
+    },
+    {
+      "id": "v2.tokens.primary",
+      "ok": true
+    },
+    {
+      "id": "v2.tailwind.cdn",
+      "ok": true
+    },
+    {
+      "id": "v2.rtl.dir",
+      "ok": true
+    },
+    {
+      "id": "v1.modern.still.theme",
+      "ok": true
+    },
+    {
+      "id": "v1.modern.corporate",
+      "ok": true
+    },
+    {
+      "id": "v1.modern.no.v2render",
+      "ok": true
+    }
+  ],
+  "generatedAt": "2026-08-03T18:45:32.460Z"
+}

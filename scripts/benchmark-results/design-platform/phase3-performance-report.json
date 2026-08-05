@@ -1,0 +1,7 @@
+{
+  "gpuSafeAnimations": true,
+  "animationBudgetMs": 16,
+  "maxConcurrentAnimations": 16,
+  "layoutShiftPrevention": true,
+  "lazyInteractions": true
+}

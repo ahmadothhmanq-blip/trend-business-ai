@@ -1,0 +1,10 @@
+{
+  "tbdpNative": true,
+  "sectorDnaId": "restaurant",
+  "experienceProfiles": [
+    "hospitality",
+    "luxury",
+    "editorial"
+  ],
+  "presetBinding": "ember-table-reveal"
+}

@@ -1,0 +1,7 @@
+{
+  "pageId": "home",
+  "layoutId": "default",
+  "regions": {
+    "main": ["hero-primary", "features-primary", "cta-primary"]
+  }
+}

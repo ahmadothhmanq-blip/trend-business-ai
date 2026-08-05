@@ -1,0 +1,76 @@
+{
+  "components": [
+    {
+      "id": "ecommerce-premium-nav",
+      "role": "navigation",
+      "scaffold": "components/ecommerce-premium-nav.tsx",
+      "slots": ["logo", "links", "cta"]
+    },
+    {
+      "id": "ecommerce-premium-hero",
+      "role": "hero",
+      "scaffold": "components/ecommerce-premium-hero.tsx",
+      "slots": ["headline", "cta", "image"]
+    },
+    {
+      "id": "ecommerce-premium-collections",
+      "role": "features",
+      "scaffold": "components/ecommerce-premium-collections.tsx"
+    },
+    {
+      "id": "ecommerce-premium-product-grid",
+      "role": "gallery",
+      "scaffold": "components/ecommerce-premium-product-grid.tsx"
+    },
+    {
+      "id": "ecommerce-premium-brand-story",
+      "role": "story",
+      "scaffold": "components/ecommerce-premium-brand-story.tsx"
+    },
+    {
+      "id": "ecommerce-premium-stats",
+      "role": "custom",
+      "scaffold": "components/ecommerce-premium-stats.tsx"
+    },
+    {
+      "id": "ecommerce-premium-testimonials",
+      "role": "testimonials",
+      "scaffold": "components/ecommerce-premium-testimonials.tsx"
+    },
+    {
+      "id": "ecommerce-premium-shipping",
+      "role": "custom",
+      "scaffold": "components/ecommerce-premium-shipping.tsx"
+    },
+    {
+      "id": "ecommerce-premium-faq",
+      "role": "faq",
+      "scaffold": "components/ecommerce-premium-faq.tsx"
+    },
+    {
+      "id": "ecommerce-premium-contact",
+      "role": "contact",
+      "scaffold": "components/ecommerce-premium-contact.tsx"
+    },
+    {
+      "id": "ecommerce-premium-footer",
+      "role": "footer",
+      "scaffold": "components/ecommerce-premium-footer.tsx"
+    },
+    {
+      "id": "ecommerce-premium-floating-cta",
+      "role": "cta",
+      "scaffold": "components/ecommerce-premium-floating-cta.tsx"
+    },
+    {
+      "id": "ecommerce-premium-utility-band",
+      "role": "cta",
+      "scaffold": "components/ecommerce-premium-utility-band.tsx"
+    },
+    {
+      "id": "ecommerce-premium-section-shell",
+      "role": "custom",
+      "scaffold": "components/ecommerce-premium-section-shell.tsx"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "shop",
+  "title": "Shop",
+  "path": "/shop",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "utility",
+    "footer"
+  ]
+}

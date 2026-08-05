@@ -1,0 +1,77 @@
+{
+  "slug": "restaurant-ar",
+  "templateId": "restaurant-premium",
+  "language": "Arabic",
+  "title": "مطعم نوار",
+  "wallMs": 51077,
+  "generationTimeMs": 51057.5247,
+  "provider": "deepseek",
+  "fileCount": 22,
+  "checks": {
+    "v2": true,
+    "packageId": true,
+    "noTheme": true,
+    "usesV2Components": true,
+    "v2Preview": true,
+    "packageMarker": true
+  },
+  "generated": {
+    "imageCount": 21,
+    "hasHeroImage": true,
+    "hasPlaceholder": false,
+    "hasMotion": true,
+    "hasRtl": true,
+    "isFrench": false,
+    "isArabic": true,
+    "components": [
+      "restaurant-premium-atmosphere",
+      "restaurant-premium-chef-story",
+      "restaurant-premium-contact",
+      "restaurant-premium-faq",
+      "restaurant-premium-footer",
+      "restaurant-premium-gallery",
+      "restaurant-premium-hero",
+      "restaurant-premium-nav",
+      "restaurant-premium-reservation-cta",
+      "restaurant-premium-sidebar-rail",
+      "restaurant-premium-signature-dishes",
+      "restaurant-premium-stats",
+      "restaurant-premium-tasting-menu",
+      "restaurant-premium-testimonials"
+    ],
+    "bytes": 67855
+  },
+  "flagship": {
+    "imageCount": 24,
+    "hasHeroImage": true,
+    "hasPlaceholder": false,
+    "hasMotion": true,
+    "hasRtl": true,
+    "isFrench": false,
+    "isArabic": false,
+    "components": [
+      "restaurant-premium-atmosphere",
+      "restaurant-premium-chef-story",
+      "restaurant-premium-contact",
+      "restaurant-premium-faq",
+      "restaurant-premium-footer",
+      "restaurant-premium-gallery",
+      "restaurant-premium-hero",
+      "restaurant-premium-nav",
+      "restaurant-premium-reservation-cta",
+      "restaurant-premium-sidebar-rail",
+      "restaurant-premium-signature-dishes",
+      "restaurant-premium-stats",
+      "restaurant-premium-tasting-menu",
+      "restaurant-premium-testimonials"
+    ],
+    "bytes": 74066
+  },
+  "comparison": {
+    "regressions": [],
+    "missingComponents": [],
+    "extraOk": []
+  },
+  "passed": true,
+  "previewPath": "C:\\Users\\PC\\Desktop\\trend-business-ai\\scripts\\benchmark-results\\generated-flagship-websites\\restaurant-ar\\preview.html"
+}

@@ -1,0 +1,9 @@
+{
+  "slug": "medical-clinic-en",
+  "packageId": "medical-premium",
+  "title": "Serenity Clinical",
+  "language": "English",
+  "hasV2": true,
+  "componentCount": 11,
+  "source": "structure-template"
+}

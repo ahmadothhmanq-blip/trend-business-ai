@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import type { WebsiteMediaAsset } from "@/lib/ai-core/website-management/types";
 import { useBuilderLocale } from "@/lib/website/builder/use-builder-locale";
 import { useTranslation } from "@/lib/i18n/client";
+import { optimizeImageFile } from "@/lib/website/image-management/client-optimize";
 
 type MediaLibraryPanelProps = {
   generationId: string;
@@ -30,6 +31,7 @@ export function MediaLibraryPanel({
   const [uploading, setUploading] = useState(false);
   const [query, setQuery] = useState("");
   const [folder, setFolder] = useState("uploads");
+  const [dragOver, setDragOver] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
@@ -55,8 +57,13 @@ export function MediaLibraryPanel({
   async function uploadFile(file: File) {
     setUploading(true);
     try {
+      const optimized = await optimizeImageFile(file, {
+        maxWidth: 1920,
+        quality: 0.85,
+        format: "webp",
+      });
       const form = new FormData();
-      form.append("file", file);
+      form.append("file", optimized.blob, optimized.filename);
       form.append("folder", folder);
       const res = await fetch(`/api/website-builder/${generationId}/media`, {
         method: "POST",
@@ -65,6 +72,13 @@ export function MediaLibraryPanel({
       if (res.ok) await load();
     } finally {
       setUploading(false);
+    }
+  }
+
+  async function uploadFiles(files: FileList | File[]) {
+    const list = Array.from(files).filter((f) => f.type.startsWith("image/"));
+    for (const file of list) {
+      await uploadFile(file);
     }
   }
 
@@ -77,7 +91,27 @@ export function MediaLibraryPanel({
   }
 
   return (
-    <div className={cn("space-y-3", className)}>
+    <div
+      className={cn("space-y-3", className)}
+      onDragOver={(e) => {
+        e.preventDefault();
+        setDragOver(true);
+      }}
+      onDragLeave={() => setDragOver(false)}
+      onDrop={(e) => {
+        e.preventDefault();
+        setDragOver(false);
+        if (e.dataTransfer.files?.length) void uploadFiles(e.dataTransfer.files);
+      }}
+    >
+      <div
+        className={cn(
+          "rounded-lg border border-dashed p-2 text-center text-[10px] text-white/45 transition",
+          dragOver && "border-premium-gold/50 bg-premium-gold/5",
+        )}
+      >
+        Drag & drop images to upload (WebP optimized)
+      </div>
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative min-w-[140px] flex-1">
           <Search className="absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-white/30" />
@@ -98,10 +132,10 @@ export function MediaLibraryPanel({
           ref={fileRef}
           type="file"
           accept="image/*"
+          multiple
           className="hidden"
           onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) void uploadFile(file);
+            if (e.target.files?.length) void uploadFiles(e.target.files);
             e.target.value = "";
           }}
         />

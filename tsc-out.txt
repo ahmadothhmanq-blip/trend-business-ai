@@ -1,0 +1,35 @@
+﻿node.exe : npm warn Unknown env config "devdir". This will stop working in the next major version of npm. See `npm 
+help npmrc` for supported config options.
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Users\PC\AppData\Roaming\npm ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (npm warn Unknow...config options.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+> trend-business-ai@0.1.0 type-check
+> tsc --noEmit
+
+lib/ai-core/architecture-knowledge-base/template-compatibility.test.ts(11,47): error TS2307: Cannot find module '@/lib/ai-core/architecture-validation/validate' or its corresponding type declarations.
+lib/ai-core/architecture-knowledge-base/template-compatibility.test.ts(12,44): error TS2307: Cannot find module '@/lib/ai-core/architecture-validation/build-plan' or its corresponding type declarations.
+lib/ai-core/architecture-knowledge-base/template-compatibility.test.ts(14,50): error TS2307: Cannot find module '@/lib/ai-core/business-intelligence/types' or its corresponding type declarations.
+lib/ai-core/architecture-knowledge-base/template-compatibility.test.ts(16,43): error TS2307: Cannot find module '@/lib/ai-core/template-router/types' or its corresponding type declarations.
+lib/ai-core/architecture-knowledge-base/template-compatibility.test.ts(173,27): error TS7006: Parameter 'error' implicitly has an 'any' type.
+lib/ai-core/architecture-knowledge-base/template-compatibility.ts(12,42): error TS2307: Cannot find module '@/lib/website/builder/theme-architecture' or its corresponding type declarations.
+lib/ai-core/architecture-knowledge-base/template-compatibility.ts(15,8): error TS2307: Cannot find module '@/lib/website/builder/structure-templates' or its corresponding type declarations.
+lib/ai-core/architecture-knowledge-base/template-compatibility.ts(24,8): error TS2307: Cannot find module '@/lib/ai-core/architecture-knowledge-base/queries' or its corresponding type declarations.
+lib/ai-core/image-engine/section-binding.test.ts(9,36): error TS2307: Cannot find module '@/lib/ai-core/image-intelligence/policies' or its corresponding type declarations.
+lib/ai-core/image-engine/section-binding.test.ts(10,38): error TS2307: Cannot find module '@/lib/ai-core/image-intelligence/build-spec' or its corresponding type declarations.
+lib/ai-core/image-engine/section-binding.test.ts(159,39): error TS2551: Property 'sectionId' does not exist on type 'ImageAssetMetadata'. Did you mean 'section'?
+lib/ai-core/image-engine/section-binding.test.ts(194,42): error TS7006: Parameter 's' implicitly has an 'any' type.
+lib/ai-core/optimizer/run.ts(121,27): error TS2339: Property 'summary' does not exist on type 'WebsiteAuditResult'.
+lib/ai/adapters/instrumented-provider.ts(19,23): error TS2339: Property 'getModelId' does not exist on type 'AIProvider'.
+lib/ai/adapters/instrumented-provider.ts(20,21): error TS2339: Property 'getModelId' does not exist on type 'AIProvider'.
+lib/ai/adapters/instrumented-provider.ts(86,5): error TS2353: Object literal may only specify known properties, and 'getModelId' does not exist in type 'AIProvider'.
+lib/website/file-generation-policy.ts(30,10): error TS2304: Cannot find name 'GeneratedProjectFile'.
+lib/website/file-generation-policy.ts(42,4): error TS2304: Cannot find name 'GeneratedProjectFile'.
+lib/website/file-generation-policy.ts(90,54): error TS2304: Cannot find name 'GeneratedProjectFile'.
+lib/website/file-generation-policy.ts(117,34): error TS2304: Cannot find name 'GeneratedProjectFile'.
+plugins/website/composition/batch-generation.ts(1,10): error TS2305: Module '"@/lib/ai/prompts/website"' has no exported member 'websiteBatchModulePrompt'.
+plugins/website/composition/batch-generation.ts(7,10): error TS2305: Module '"@/plugins/website/schemas"' has no exported member 'generatedBatchSchema'.
+plugins/website/composition/file-context.ts(201,29): error TS2551: Property 'uiStyle' does not exist on type 'DesignSystem'. Did you mean 'style'?

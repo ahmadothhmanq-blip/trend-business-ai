@@ -1,0 +1,75 @@
+{
+  "generatedAt": "2026-08-04T15:56:29.202Z",
+  "phase": "production-1",
+  "testsPassed": true,
+  "exitCode": 0,
+  "suites": [
+    {
+      "file": "lib/ai-core/generation-engine/production/production-pipeline.test.ts",
+      "passed": true
+    },
+    {
+      "file": "lib/ai-core/generation-engine/integration/integration.test.ts",
+      "passed": true
+    },
+    {
+      "file": "lib/ai-core/generation-engine/quality-engine/quality-engine.test.ts",
+      "passed": true
+    }
+  ],
+  "checks": [
+    {
+      "id": "productionPlanning",
+      "ok": true
+    },
+    {
+      "id": "masterPlanIntegration",
+      "ok": true
+    },
+    {
+      "id": "awqeQuality",
+      "ok": true
+    },
+    {
+      "id": "flagGated",
+      "ok": true
+    },
+    {
+      "id": "providerIndependent",
+      "ok": true
+    },
+    {
+      "id": "validationPipeline",
+      "ok": true
+    },
+    {
+      "id": "observabilityReports",
+      "ok": true
+    }
+  ],
+  "performance": {
+    "measuredStages": [
+      "planning",
+      "quality",
+      "content",
+      "builder",
+      "total"
+    ],
+    "deterministicPlanning": true,
+    "contentProviderCopyOnly": true
+  },
+  "regression": {
+    "flagOffBehaviorUnchanged": true,
+    "templatesUnchanged": true,
+    "builderUiUnchanged": true,
+    "tbdpUnchanged": true,
+    "glsUnchanged": true,
+    "awqeCoreUnchanged": true,
+    "masterPlanCoreUnchanged": true
+  },
+  "backwardCompatibility": {
+    "requiresFlag": "WB_PRODUCTION_PIPELINE=1",
+    "masterPlanFlagStillSupported": "WB_MASTER_PLAN=1",
+    "additiveOnly": true
+  }
+}

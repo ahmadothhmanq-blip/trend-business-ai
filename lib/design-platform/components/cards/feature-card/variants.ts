@@ -1,0 +1,21 @@
+import { v } from "@/lib/design-platform/components/core";
+import type { TbdpComponentSize } from "@/lib/design-platform/components/core";
+
+export const F_E_A_T_U_R_E_C_A_R_D_VARIANTS = {
+  default: {
+    color: v.color.text.primary,
+    background: v.color.surface.base,
+  },
+  emphasis: {
+    color: v.color.text.inverse,
+    background: v.color.primary,
+  },
+} as const;
+
+export const F_E_A_T_U_R_E_C_A_R_D_SIZES: Record<TbdpComponentSize, { padding: string; fontSize: string }> = {
+  xs: { padding: v.spacing.xs, fontSize: "0.75rem" },
+  sm: { padding: v.spacing.sm, fontSize: "0.8125rem" },
+  md: { padding: v.spacing.md, fontSize: "0.875rem" },
+  lg: { padding: v.spacing.lg, fontSize: "1rem" },
+  xl: { padding: v.spacing.xl, fontSize: "1.0625rem" },
+};

@@ -1,0 +1,89 @@
+name: Website Builder v1
+
+on:
+  pull_request:
+    paths:
+      - "lib/website/**"
+      - "lib/ai-core/image-engine/**"
+      - "lib/site-images.ts"
+      - "plugins/website/**"
+      - "templates/website/**"
+      - "templates/website-registry/**"
+      - "scripts/flagship-template-qa.mts"
+      - "scripts/run-all-flagship-qa.mjs"
+      - "scripts/website-builder-v1-*.mjs"
+      - "scripts/sync-flagship-registry.mjs"
+      - "lib/website/v1-baseline/**"
+      - ".github/workflows/website-builder-v1.yml"
+  push:
+    branches: [main, master]
+    paths:
+      - "lib/website/**"
+      - "lib/ai-core/image-engine/**"
+      - "lib/site-images.ts"
+      - "plugins/website/**"
+      - "templates/website/**"
+      - "templates/website-registry/**"
+      - "lib/website/v1-baseline/**"
+
+concurrency:
+  group: website-builder-v1-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  regression:
+    name: Website Builder v1 Regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript
+        run: npm run type-check
+
+      - name: V1 baseline regression tests
+        run: npx tsx --test lib/website/v1-baseline/regression.test.ts
+
+      - name: Template registry validation
+        run: npx tsx --test lib/website/builder/validate-template-registry.test.ts
+
+      - name: V2 generation bridge
+        run: npx tsx --test lib/website/template-v2/generation/v2-generation-bridge.test.ts
+
+      - name: Image Rules Engine tests
+        run: npx tsx --test lib/ai-core/image-engine/rules/rules-engine.test.ts
+
+      - name: Image Engine tests
+        run: npx tsx --test lib/ai-core/image-engine/image-engine.test.ts
+
+      - name: Image validation tests
+        run: npx tsx --test lib/website/image-management/image-management.test.ts
+
+      - name: Marketplace catalog tests
+        run: npx tsx --test lib/website/template-marketplace/catalog.test.ts
+
+      - name: Flagship registry sync check
+        run: node scripts/sync-flagship-registry.mjs --check
+
+      - name: Flagship generation & marketplace QA
+        run: npx tsx scripts/run-all-flagship-qa.mjs --skip-lighthouse
+
+      - name: Golden baseline compare (visual regression)
+        run: node scripts/website-builder-v1-golden-compare.mjs
+
+      - name: Production build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key

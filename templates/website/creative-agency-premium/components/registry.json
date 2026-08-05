@@ -1,0 +1,61 @@
+{
+  "components": [
+    {
+      "id": "creative-agency-premium-nav",
+      "role": "navigation",
+      "scaffold": "components/creative-agency-premium-nav.tsx",
+      "slots": ["logo", "links", "cta"]
+    },
+    {
+      "id": "creative-agency-premium-hero",
+      "role": "hero",
+      "scaffold": "components/creative-agency-premium-hero.tsx",
+      "slots": ["headline", "subheadline", "scroll-cue"]
+    },
+    {
+      "id": "creative-agency-premium-selected-work",
+      "role": "portfolio",
+      "scaffold": "components/creative-agency-premium-selected-work.tsx"
+    },
+    {
+      "id": "creative-agency-premium-case-grid",
+      "role": "gallery",
+      "scaffold": "components/creative-agency-premium-case-grid.tsx"
+    },
+    {
+      "id": "creative-agency-premium-manifesto",
+      "role": "story",
+      "scaffold": "components/creative-agency-premium-manifesto.tsx"
+    },
+    {
+      "id": "creative-agency-premium-capabilities",
+      "role": "features",
+      "scaffold": "components/creative-agency-premium-capabilities.tsx"
+    },
+    {
+      "id": "creative-agency-premium-process",
+      "role": "process",
+      "scaffold": "components/creative-agency-premium-process.tsx"
+    },
+    {
+      "id": "creative-agency-premium-collaborate-cta",
+      "role": "cta",
+      "scaffold": "components/creative-agency-premium-collaborate-cta.tsx"
+    },
+    {
+      "id": "creative-agency-premium-overlay-showcase",
+      "role": "custom",
+      "scaffold": "components/creative-agency-premium-overlay-showcase.tsx"
+    },
+    {
+      "id": "creative-agency-premium-footer",
+      "role": "footer",
+      "scaffold": "components/creative-agency-premium-footer.tsx"
+    },
+    {
+      "id": "creative-agency-premium-section-shell",
+      "role": "custom",
+      "scaffold": "components/creative-agency-premium-section-shell.tsx"
+    }
+  ]
+}

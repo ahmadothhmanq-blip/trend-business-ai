@@ -1,0 +1,51 @@
+{
+  "packageId": "education-premium",
+  "templateIntelligenceHint": "ti-university-heritage",
+  "layout": {
+    "defaultLayoutId": "default",
+    "regions": {
+      "header": { "role": "header", "sticky": true },
+      "main": { "role": "main" },
+      "utility": { "role": "utility" },
+      "footer": { "role": "footer" },
+      "overlay": { "role": "overlay" }
+    }
+  },
+  "navigation": {
+    "componentId": "education-premium-nav",
+    "variant": "executive-glass"
+  },
+  "hero": {
+    "componentId": "education-premium-hero",
+    "region": "main"
+  },
+  "footer": {
+    "componentId": "education-premium-footer",
+    "region": "footer"
+  },
+  "homeFlow": {
+    "regions": {
+      "main": [
+        "education-premium-hero",
+        "education-premium-features",
+        "education-premium-about",
+        "education-premium-stats",
+        "education-premium-portfolio",
+        "education-premium-testimonials",
+        "education-premium-pricing",
+        "education-premium-faq",
+        "education-premium-contact"
+      ],
+      "utility": ["education-premium-utility-band"],
+      "overlay": ["education-premium-floating-cta"]
+    }
+  },
+  "sectionShell": {
+    "strategy": "package",
+    "componentId": "education-premium-section-shell"
+  },
+  "aiGeneration": {
+    "contentProfile": "education-premium-heritage",
+    "suggestedPages": ["academics", "admissions", "campus"]
+  }
+}

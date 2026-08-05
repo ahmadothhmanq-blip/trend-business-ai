@@ -1,0 +1,8 @@
+{
+  "pageId": "reserve",
+  "layoutId": "sidebar-left",
+  "regions": {
+    "sidebar": ["restaurant-signature-sidebar-rail"],
+    "main": ["restaurant-signature-reservation", "restaurant-signature-reservation-cta"]
+  }
+}

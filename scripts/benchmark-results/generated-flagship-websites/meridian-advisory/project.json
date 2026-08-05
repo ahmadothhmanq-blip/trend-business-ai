@@ -1,0 +1,9 @@
+{
+  "slug": "meridian-advisory",
+  "packageId": "corporate-business",
+  "title": "Meridian Advisory",
+  "language": "English",
+  "hasV2": true,
+  "componentCount": 15,
+  "source": "structure-template"
+}

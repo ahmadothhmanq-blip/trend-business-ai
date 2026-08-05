@@ -1,0 +1,38 @@
+{
+  "packageId": "creative-portfolio",
+  "tbdpNative": {
+    "enabled": true,
+    "packageId": "creative-portfolio",
+    "sectorDnaId": "creative-studio",
+    "experienceProfileIds": [
+      "creative",
+      "editorial",
+      "playful"
+    ],
+    "templateIdentity": "kinetic-atelier",
+    "presetBinding": "kinetic-spring-stagger",
+    "contextHash": "ecb1b006b3b728c8",
+    "integrationVersion": "5.0.0",
+    "consumptionVersion": "1.0.0"
+  },
+  "tokenSnapshot": {
+    "primary": "#09090B",
+    "secondary": "#18181B",
+    "accent": "#E8FF47",
+    "background": "#09090B",
+    "foreground": "#F4F4EF",
+    "muted": "rgba(244,244,239,0.55)",
+    "surface": "#141416",
+    "volt": "#E8FF47",
+    "magenta": "#FF2D6A",
+    "ghost": "#F4F4EF",
+    "zinc": "#71717A"
+  },
+  "motionPreset": "kinetic-spring-stagger",
+  "responsiveContainer": "100%",
+  "globalsMarkers": {
+    "tbdpAuthority": true,
+    "primaryColor": true,
+    "voltColor": true
+  }
+}

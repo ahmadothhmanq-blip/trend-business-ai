@@ -1,0 +1,89 @@
+{
+  "generatedAt": "2026-08-03T22:20:59.771Z",
+  "phase": "review-studio-1",
+  "testsPassed": true,
+  "exitCode": 0,
+  "suites": [
+    {
+      "file": "lib/website/review-studio/review-studio.test.ts",
+      "passed": true
+    }
+  ],
+  "checks": [
+    {
+      "id": "websiteAnalyzer",
+      "ok": true
+    },
+    {
+      "id": "reviewEngine",
+      "ok": true
+    },
+    {
+      "id": "improvementEngine",
+      "ok": true
+    },
+    {
+      "id": "impactEstimator",
+      "ok": true
+    },
+    {
+      "id": "versionManager",
+      "ok": true
+    },
+    {
+      "id": "comparisonEngine",
+      "ok": true
+    },
+    {
+      "id": "recommendationEngine",
+      "ok": true
+    },
+    {
+      "id": "executionEngine",
+      "ok": true
+    },
+    {
+      "id": "wqbsIntegration",
+      "ok": true
+    },
+    {
+      "id": "providerIndependent",
+      "ok": true
+    }
+  ],
+  "modules": [
+    "Website Analyzer",
+    "Review Engine",
+    "Improvement Engine",
+    "Impact Estimator",
+    "Version Manager",
+    "Comparison Engine",
+    "Recommendation Engine",
+    "Execution Engine"
+  ],
+  "integrations": [
+    "WQBS",
+    "TBGE",
+    "Master Plan",
+    "AWQE",
+    "TBDP",
+    "GLS"
+  ],
+  "performance": {
+    "deterministicReview": true,
+    "noLlmRequired": true,
+    "targetedImprovementsOnly": true,
+    "typicalReviewMs": "<100ms"
+  },
+  "regression": {
+    "noRuntimeChanges": true,
+    "noBuilderRedesign": true,
+    "noTemplateRedesign": true,
+    "noVisualEditor": true,
+    "additiveOnly": true
+  },
+  "backwardCompatibility": {
+    "optIn": true,
+    "doesNotGenerateWebsites": true
+  }
+}

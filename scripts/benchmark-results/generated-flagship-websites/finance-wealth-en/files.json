@@ -1,0 +1,22 @@
+[
+  "lib/site-images.ts",
+  "app/layout.tsx",
+  "components/ui/motion.tsx",
+  "app/globals.css",
+  "components/finance-premium-nav.tsx",
+  "components/finance-premium-hero.tsx",
+  "components/finance-premium-features.tsx",
+  "components/finance-premium-about.tsx",
+  "components/finance-premium-stats.tsx",
+  "components/finance-premium-testimonials.tsx",
+  "components/finance-premium-pricing.tsx",
+  "components/finance-premium-faq.tsx",
+  "components/finance-premium-contact.tsx",
+  "components/finance-premium-footer.tsx",
+  "components/finance-premium-floating-cta.tsx",
+  "components/finance-premium-utility-band.tsx",
+  "components/finance-premium-section-shell.tsx",
+  "components/finance-premium-portfolio.tsx",
+  "components/finance-premium-integrations.tsx",
+  "app/page.tsx"
+]

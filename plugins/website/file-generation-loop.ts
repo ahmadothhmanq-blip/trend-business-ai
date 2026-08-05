@@ -42,6 +42,8 @@ export type WebsiteFileLoopParams = {
   ultraGeneration: boolean;
   localizedCopy: boolean;
   componentPaletteForCompose?: string[];
+  /** When true, defer home page and skip Theme* scaffold injection — V2 apply composes later. */
+  useV2Structure?: boolean;
   reusePrevious: boolean;
   previousByPath: Map<string, GeneratedProjectFile>;
   generateFile: (
@@ -76,6 +78,27 @@ async function processWebsiteFilePlan(
   } = params;
 
   const prior = reusePrevious ? previousByPath.get(filePlan.path) : undefined;
+  const normalizedPath = filePlan.path.replaceAll("\\", "/");
+
+  if (params.useV2Structure) {
+    if (normalizedPath === "app/page.tsx") {
+      ctx.progress.emit(
+        `Deferring home page ${index}/${aiFilePlans.length}: ${filePlan.path} (V2 structure apply)`,
+      );
+      return composedHomePagePlaceholder(filePlan);
+    }
+    if (
+      normalizedPath.startsWith("components/themes/") ||
+      /Theme(Bold|Corporate|Luxury|Tech|Creative|Editorial|Minimal|Modern)/.test(
+        normalizedPath,
+      )
+    ) {
+      ctx.progress.emit(
+        `Skipping legacy Theme scaffold ${index}/${aiFilePlans.length}: ${filePlan.path}`,
+      );
+      return null;
+    }
+  }
 
   if (
     input.mode === "continue" &&
@@ -124,7 +147,7 @@ async function processWebsiteFilePlan(
 
   const scaffold = getProfessionalScaffoldByPath(filePlan.path);
   const preferLlmCopy = localizedCopy;
-  if (scaffold && hasProfessionalScaffold(filePlan.path) && !preferLlmCopy) {
+  if (scaffold && hasProfessionalScaffold(filePlan.path) && !preferLlmCopy && !params.useV2Structure) {
     ctx.progress.emit(
       `Using Professional Components Library ${index}/${aiFilePlans.length}: ${filePlan.path}`,
     );

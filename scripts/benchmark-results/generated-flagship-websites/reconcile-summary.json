@@ -1,0 +1,91 @@
+[
+  {
+    "slug": "corporate-ai-en",
+    "generated": {
+      "imageCount": 9,
+      "hasHeroImage": true,
+      "hasPlaceholder": false,
+      "hasRtl": true,
+      "isFrench": false,
+      "isArabic": false,
+      "hasEnglishLeak": true,
+      "components": [
+        "corporate-business-about",
+        "corporate-business-contact",
+        "corporate-business-faq",
+        "corporate-business-features",
+        "corporate-business-footer",
+        "corporate-business-hero",
+        "corporate-business-nav",
+        "corporate-business-portfolio",
+        "corporate-business-pricing",
+        "corporate-business-stats",
+        "corporate-business-testimonials",
+        "corporate-business-utility-band"
+      ]
+    },
+    "missing": [],
+    "regressions": [],
+    "passed": true
+  },
+  {
+    "slug": "restaurant-ar",
+    "generated": {
+      "imageCount": 24,
+      "hasHeroImage": true,
+      "hasPlaceholder": false,
+      "hasRtl": true,
+      "isFrench": false,
+      "isArabic": false,
+      "hasEnglishLeak": true,
+      "components": [
+        "restaurant-premium-atmosphere",
+        "restaurant-premium-chef-story",
+        "restaurant-premium-contact",
+        "restaurant-premium-faq",
+        "restaurant-premium-footer",
+        "restaurant-premium-gallery",
+        "restaurant-premium-hero",
+        "restaurant-premium-nav",
+        "restaurant-premium-reservation-cta",
+        "restaurant-premium-sidebar-rail",
+        "restaurant-premium-signature-dishes",
+        "restaurant-premium-stats",
+        "restaurant-premium-tasting-menu",
+        "restaurant-premium-testimonials"
+      ]
+    },
+    "missing": [],
+    "regressions": [],
+    "passed": true
+  },
+  {
+    "slug": "saas-pm-fr",
+    "generated": {
+      "imageCount": 6,
+      "hasHeroImage": true,
+      "hasPlaceholder": false,
+      "hasRtl": true,
+      "isFrench": true,
+      "isArabic": false,
+      "hasEnglishLeak": true,
+      "components": [
+        "saas-enterprise-about",
+        "saas-enterprise-contact",
+        "saas-enterprise-faq",
+        "saas-enterprise-features",
+        "saas-enterprise-footer",
+        "saas-enterprise-hero",
+        "saas-enterprise-integrations",
+        "saas-enterprise-nav",
+        "saas-enterprise-pricing",
+        "saas-enterprise-stats",
+        "saas-enterprise-testimonials",
+        "saas-enterprise-utility-band"
+      ]
+    },
+    "missing": [],
+    "regressions": [],
+    "passed": true
+  }
+]

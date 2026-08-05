@@ -1,0 +1,303 @@
+{
+  "generatedAt": "2026-08-03T20:50:31.737Z",
+  "v2TemplateCount": 5,
+  "allTbdpNative": true,
+  "allChecksPass": true,
+  "templates": [
+    {
+      "packageId": "restaurant-signature",
+      "tbdpNative": true,
+      "sectorDnaId": "restaurant",
+      "templateIdentity": "forest-table",
+      "experienceProfiles": [
+        "hospitality",
+        "luxury",
+        "editorial"
+      ],
+      "motionPreset": "forest-table-reveal",
+      "containerMaxWidth": "90rem",
+      "loadMs": 23.62,
+      "applyMs": 16.18,
+      "globalsHasTbdpAuthority": true,
+      "exportOk": true,
+      "checks": [
+        {
+          "id": "load.ok",
+          "ok": true
+        },
+        {
+          "id": "tbdpNative.enabled",
+          "ok": true
+        },
+        {
+          "id": "tbdpDesignContext",
+          "ok": true
+        },
+        {
+          "id": "tokens.resolved",
+          "ok": true
+        },
+        {
+          "id": "motion.resolved",
+          "ok": true
+        },
+        {
+          "id": "responsive.resolved",
+          "ok": true
+        },
+        {
+          "id": "globals.tbdpAuthority",
+          "ok": true
+        },
+        {
+          "id": "apply.v2",
+          "ok": true
+        },
+        {
+          "id": "apply.globals.tbdp",
+          "ok": true
+        },
+        {
+          "id": "export.shape",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "packageId": "saas-enterprise",
+      "tbdpNative": true,
+      "sectorDnaId": "saas",
+      "templateIdentity": "nexus-command",
+      "experienceProfiles": [
+        "technical",
+        "corporate",
+        "executive"
+      ],
+      "motionPreset": "nexus-grid-reveal",
+      "containerMaxWidth": "82rem",
+      "loadMs": 6.01,
+      "applyMs": 7.79,
+      "globalsHasTbdpAuthority": true,
+      "exportOk": true,
+      "checks": [
+        {
+          "id": "load.ok",
+          "ok": true
+        },
+        {
+          "id": "tbdpNative.enabled",
+          "ok": true
+        },
+        {
+          "id": "tbdpDesignContext",
+          "ok": true
+        },
+        {
+          "id": "tokens.resolved",
+          "ok": true
+        },
+        {
+          "id": "motion.resolved",
+          "ok": true
+        },
+        {
+          "id": "responsive.resolved",
+          "ok": true
+        },
+        {
+          "id": "globals.tbdpAuthority",
+          "ok": true
+        },
+        {
+          "id": "apply.v2",
+          "ok": true
+        },
+        {
+          "id": "apply.globals.tbdp",
+          "ok": true
+        },
+        {
+          "id": "export.shape",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "packageId": "real-estate-prestige",
+      "tbdpNative": true,
+      "sectorDnaId": "real-estate",
+      "templateIdentity": "monolith-estate",
+      "experienceProfiles": [
+        "luxury",
+        "executive",
+        "corporate"
+      ],
+      "motionPreset": "monolith-reveal",
+      "containerMaxWidth": "88rem",
+      "loadMs": 3.09,
+      "applyMs": 7.84,
+      "globalsHasTbdpAuthority": true,
+      "exportOk": true,
+      "checks": [
+        {
+          "id": "load.ok",
+          "ok": true
+        },
+        {
+          "id": "tbdpNative.enabled",
+          "ok": true
+        },
+        {
+          "id": "tbdpDesignContext",
+          "ok": true
+        },
+        {
+          "id": "tokens.resolved",
+          "ok": true
+        },
+        {
+          "id": "motion.resolved",
+          "ok": true
+        },
+        {
+          "id": "responsive.resolved",
+          "ok": true
+        },
+        {
+          "id": "globals.tbdpAuthority",
+          "ok": true
+        },
+        {
+          "id": "apply.v2",
+          "ok": true
+        },
+        {
+          "id": "apply.globals.tbdp",
+          "ok": true
+        },
+        {
+          "id": "export.shape",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "packageId": "medical-premium",
+      "tbdpNative": true,
+      "sectorDnaId": "medical",
+      "templateIdentity": "serenity-clinical",
+      "experienceProfiles": [
+        "healthcare",
+        "corporate",
+        "minimal"
+      ],
+      "motionPreset": "serenity-fade",
+      "containerMaxWidth": "76rem",
+      "loadMs": 4.79,
+      "applyMs": 8.23,
+      "globalsHasTbdpAuthority": true,
+      "exportOk": true,
+      "checks": [
+        {
+          "id": "load.ok",
+          "ok": true
+        },
+        {
+          "id": "tbdpNative.enabled",
+          "ok": true
+        },
+        {
+          "id": "tbdpDesignContext",
+          "ok": true
+        },
+        {
+          "id": "tokens.resolved",
+          "ok": true
+        },
+        {
+          "id": "motion.resolved",
+          "ok": true
+        },
+        {
+          "id": "responsive.resolved",
+          "ok": true
+        },
+        {
+          "id": "globals.tbdpAuthority",
+          "ok": true
+        },
+        {
+          "id": "apply.v2",
+          "ok": true
+        },
+        {
+          "id": "apply.globals.tbdp",
+          "ok": true
+        },
+        {
+          "id": "export.shape",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "packageId": "creative-portfolio",
+      "tbdpNative": true,
+      "sectorDnaId": "creative-studio",
+      "templateIdentity": "kinetic-atelier",
+      "experienceProfiles": [
+        "creative",
+        "editorial",
+        "playful"
+      ],
+      "motionPreset": "kinetic-spring-stagger",
+      "containerMaxWidth": "100%",
+      "loadMs": 4.97,
+      "applyMs": 9.45,
+      "globalsHasTbdpAuthority": true,
+      "exportOk": true,
+      "checks": [
+        {
+          "id": "load.ok",
+          "ok": true
+        },
+        {
+          "id": "tbdpNative.enabled",
+          "ok": true
+        },
+        {
+          "id": "tbdpDesignContext",
+          "ok": true
+        },
+        {
+          "id": "tokens.resolved",
+          "ok": true
+        },
+        {
+          "id": "motion.resolved",
+          "ok": true
+        },
+        {
+          "id": "responsive.resolved",
+          "ok": true
+        },
+        {
+          "id": "globals.tbdpAuthority",
+          "ok": true
+        },
+        {
+          "id": "apply.v2",
+          "ok": true
+        },
+        {
+          "id": "apply.globals.tbdp",
+          "ok": true
+        },
+        {
+          "id": "export.shape",
+          "ok": true
+        }
+      ]
+    }
+  ]
+}

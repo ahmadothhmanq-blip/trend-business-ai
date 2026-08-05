@@ -1,0 +1,62 @@
+{
+  "components": [
+    {
+      "id": "real-estate-premium-nav",
+      "role": "navigation",
+      "scaffold": "components/real-estate-premium-nav.tsx",
+      "slots": ["logo", "links", "cta"]
+    },
+    {
+      "id": "real-estate-premium-dossier-rail",
+      "role": "navigation",
+      "scaffold": "components/real-estate-premium-dossier-rail.tsx",
+      "slots": ["property-intel", "links", "cta"]
+    },
+    {
+      "id": "real-estate-premium-hero",
+      "role": "hero",
+      "scaffold": "components/real-estate-premium-hero.tsx",
+      "slots": ["headline", "subheadline", "cta", "property-stats"]
+    },
+    {
+      "id": "real-estate-premium-collection",
+      "role": "portfolio",
+      "scaffold": "components/real-estate-premium-collection.tsx"
+    },
+    {
+      "id": "real-estate-premium-neighborhoods",
+      "role": "gallery",
+      "scaffold": "components/real-estate-premium-neighborhoods.tsx"
+    },
+    {
+      "id": "real-estate-premium-architecture",
+      "role": "story",
+      "scaffold": "components/real-estate-premium-architecture.tsx"
+    },
+    {
+      "id": "real-estate-premium-advisors",
+      "role": "custom",
+      "scaffold": "components/real-estate-premium-advisors.tsx"
+    },
+    {
+      "id": "real-estate-premium-testimonials",
+      "role": "testimonials",
+      "scaffold": "components/real-estate-premium-testimonials.tsx"
+    },
+    {
+      "id": "real-estate-premium-inquiry",
+      "role": "contact",
+      "scaffold": "components/real-estate-premium-inquiry.tsx"
+    },
+    {
+      "id": "real-estate-premium-footer",
+      "role": "footer",
+      "scaffold": "components/real-estate-premium-footer.tsx"
+    },
+    {
+      "id": "real-estate-premium-section-shell",
+      "role": "custom",
+      "scaffold": "components/real-estate-premium-section-shell.tsx"
+    }
+  ]
+}

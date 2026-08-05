@@ -1,0 +1,61 @@
+{
+  "id": "canvas",
+  "grid": {
+    "columns": 12,
+    "gutter": "1.625rem",
+    "margin": "1.5rem",
+    "maxWidth": "82rem"
+  },
+  "spacing": {
+    "unit": "rem",
+    "scale": [
+      "0.25",
+      "0.625",
+      "1.125",
+      "1.75",
+      "2.75",
+      "4.25",
+      "6.75",
+      "11"
+    ]
+  },
+  "visualIdentity": {
+    "colors": {
+      "primary": "#1A2744",
+      "secondary": "#3D4F6F",
+      "accent": "#C5B896",
+      "background": "#F9F7F4",
+      "foreground": "#141E33",
+      "muted": "rgba(20,30,51,0.54)",
+      "surface": "#FFFFFF"
+    },
+    "typography": {
+      "display": "DM Serif Display, Georgia, ui-serif, serif",
+      "body": "DM Sans, ui-sans-serif, system-ui, sans-serif",
+      "scale": {
+        "sm": "0.875rem",
+        "base": "1rem",
+        "lg": "1.5rem",
+        "xl": "3.125rem"
+      }
+    },
+    "radius": {
+      "sm": "4px",
+      "md": "8px",
+      "lg": "14px"
+    },
+    "shadows": {
+      "surface": "0 4px 20px rgba(26,39,68,0.1)"
+    },
+    "borders": {
+      "default": "rgba(0,0,0,0.08)"
+    },
+    "animation": "property-lift-fade"
+  },
+  "designSystem": {
+    "tier": "premium",
+    "industry": "Real Estate",
+    "layoutKind": "sidebar-right",
+    "templateIntelligenceId": "ti-real-estate-listings"
+  }
+}

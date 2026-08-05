@@ -1,0 +1,36 @@
+{
+  "generatedAt": "2026-08-04T21:21:35.192Z",
+  "company": "Trend Business AI",
+  "industry": "AI & Software Company",
+  "template": "corporate-business",
+  "wallMs": 27488,
+  "generationTimeMs": 27446.706000000002,
+  "fileCount": 20,
+  "provider": "deepseek",
+  "checks": {
+    "templateArchitectureVersion": true,
+    "templatePackageId": true,
+    "websiteStructureTemplateId": true,
+    "presentationHash": true,
+    "noThemeComponents": true,
+    "usesV2Components": true,
+    "v2PreviewRenderer": true,
+    "v2PackageMarker": true,
+    "noThemePreview": true,
+    "noFallbackRenderer": true,
+    "sections": {
+      "corporate-business-hero": true,
+      "corporate-business-features": true,
+      "corporate-business-about": true,
+      "corporate-business-stats": true,
+      "corporate-business-testimonials": true,
+      "corporate-business-pricing": true,
+      "corporate-business-faq": true,
+      "corporate-business-utility-band": true,
+      "corporate-business-contact": true,
+      "corporate-business-footer": true
+    }
+  },
+  "allOk": true,
+  "previewPath": "C:\\Users\\PC\\Desktop\\trend-business-ai\\scripts\\benchmark-results\\corporate-business-flagship\\preview.html"
+}

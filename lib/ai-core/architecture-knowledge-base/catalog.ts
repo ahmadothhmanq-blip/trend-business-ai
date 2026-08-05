@@ -30,7 +30,7 @@ function industry(
         forbiddenPremiumTemplateIds: [],
         defaultLayoutFamily: "classic-stack",
         allowedLayoutFamilies: ["classic-stack"],
-        defaultStructureTemplateId: "modern-business",
+        defaultStructureTemplateId: "corporate-business",
         defaultVisualThemeId: "modern",
         editorialLayoutAllowed: false,
       };
@@ -270,6 +270,7 @@ export const ARCHITECTURE_KNOWLEDGE_ENTRIES: ArchitectureKnowledgeEntry[] = [
     aliases: ["retail", "shop", "store"],
     defaultLayoutFamily: "commerce-grid",
     allowedLayoutFamilies: ["commerce-grid", "classic-stack"],
+    defaultStructureTemplateId: "ecommerce-premium",
     defaultVisualThemeId: "modern",
     editorialLayoutAllowed: false,
   }),
@@ -296,6 +297,9 @@ export const ARCHITECTURE_KNOWLEDGE_ENTRIES: ArchitectureKnowledgeEntry[] = [
     id: "hotel",
     label: "Hotel",
     extends: "tourism",
+    overrides: {
+      defaultStructureTemplateId: "hotel-resort-premium",
+    },
   }),
   industryExtend({
     id: "cafe",
@@ -319,6 +323,7 @@ export const ARCHITECTURE_KNOWLEDGE_ENTRIES: ArchitectureKnowledgeEntry[] = [
     extends: "law",
     overrides: {
       forbiddenPremiumTemplateIds: ["ecommerce", "fashion", "travel", "restaurant"],
+      defaultStructureTemplateId: "finance-premium",
     },
   }),
   industry({
@@ -334,6 +339,7 @@ export const ARCHITECTURE_KNOWLEDGE_ENTRIES: ArchitectureKnowledgeEntry[] = [
     allowedLayoutFamilies: ["corporate-trust", "classic-stack"],
     forbiddenStructureTemplateIds: ["ai-startup-signal"],
     forbiddenPremiumTemplateIds: ["ecommerce", "fashion", "travel"],
+    defaultStructureTemplateId: "medical-premium",
     defaultVisualThemeId: "corporate",
     editorialLayoutAllowed: false,
   }),
@@ -366,6 +372,7 @@ export const ARCHITECTURE_KNOWLEDGE_ENTRIES: ArchitectureKnowledgeEntry[] = [
     label: "Creative Agency",
     defaultLayoutFamily: "editorial-magazine",
     allowedLayoutFamilies: ["editorial-magazine", "classic-stack"],
+    defaultStructureTemplateId: "creative-agency-premium",
     defaultVisualThemeId: "creative",
     editorialLayoutAllowed: true,
   }),
@@ -405,6 +412,7 @@ export const ARCHITECTURE_KNOWLEDGE_ENTRIES: ArchitectureKnowledgeEntry[] = [
     aliases: ["realestate", "property"],
     defaultLayoutFamily: "showroom",
     allowedLayoutFamilies: ["showroom", "classic-stack"],
+    defaultStructureTemplateId: "real-estate-premium",
     defaultVisualThemeId: "modern",
     editorialLayoutAllowed: false,
   }),
@@ -413,6 +421,7 @@ export const ARCHITECTURE_KNOWLEDGE_ENTRIES: ArchitectureKnowledgeEntry[] = [
     label: "Education",
     defaultLayoutFamily: "classic-stack",
     allowedLayoutFamilies: ["classic-stack", "corporate-trust"],
+    defaultStructureTemplateId: "education-premium",
     defaultVisualThemeId: "corporate",
     editorialLayoutAllowed: false,
   }),
@@ -422,7 +431,7 @@ export const ARCHITECTURE_KNOWLEDGE_ENTRIES: ArchitectureKnowledgeEntry[] = [
     aliases: ["corporate", "company"],
     defaultLayoutFamily: "corporate-trust",
     allowedLayoutFamilies: ["corporate-trust", "classic-stack", "product-saas"],
-    defaultStructureTemplateId: "modern-business",
+    defaultStructureTemplateId: "corporate-business",
     defaultVisualThemeId: "corporate",
     editorialLayoutAllowed: false,
   }),
@@ -467,7 +476,7 @@ export const ARCHITECTURE_KNOWLEDGE_ENTRIES: ArchitectureKnowledgeEntry[] = [
 ];
 
 export const DEFAULT_INDUSTRY_ID = "business";
-export const DEFAULT_STRUCTURE_TEMPLATE_ID = "modern-business";
+export const DEFAULT_STRUCTURE_TEMPLATE_ID = "corporate-business";
 
 export function layoutFamilies(): LayoutFamilyKnowledgeEntry[] {
   return ARCHITECTURE_KNOWLEDGE_ENTRIES.filter(

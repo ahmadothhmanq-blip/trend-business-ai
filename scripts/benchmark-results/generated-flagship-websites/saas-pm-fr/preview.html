@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="fr" data-v2-render="v2-files" data-v2-package="saas-enterprise" data-v2-layout="default">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Planium — Live Preview</title>
+  <style>/* Template Architecture V2 — saas-enterprise · spec 2.0.0 */
+:root {
+  --v2-package: "saas-enterprise";
+  --color-primary: #1D4ED8;
+  --color-secondary: #1E293B;
+  --color-accent: #3B82F6;
+  --color-background: #F8FAFC;
+  --color-foreground: #0F172A;
+  --color-muted: rgba(15,23,42,0.58);
+  --color-surface: #FFFFFF;
+  --color-signal: #059669;
+  --color-grid: rgba(15,23,42,0.06);
+  --color-ink: #020617;
+  --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --spacing-unit: 0.25rem;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --shadow-surface: 0 1px 3px rgba(15,23,42,0.06), 0 12px 40px rgba(15,23,42,0.08);
+  --shadow-glow: 0 0 80px rgba(59,130,246,0.18);
+  --shadow-card: 0 0 0 1px rgba(15,23,42,0.04), 0 4px 24px rgba(15,23,42,0.06);
+  --border-default: rgba(15,23,42,0.08);
+  --border-accent: rgba(59,130,246,0.24);
+  --border-subtle: rgba(15,23,42,0.04);
+}
+
+/* V2 language profile — RTL typography adaptation */
+[dir="rtl"] {
+  --font-display: Cairo, ui-serif, Georgia, serif;
+  --font-body: "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:ital,wght@0,500;0,600;0,700;0,800;1,500&display=swap");
+
+@keyframes se-grid-reveal {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes se-slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes se-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+[dir="rtl"] [class*="se-marquee"],
+[dir="rtl"] [class*="cb-marquee"] {
+  animation-direction: reverse;
+}
+@keyframes se-pulse-dot {
+  0%, 100% { opacity: 0.4; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1); }
+}
+@keyframes se-scan-line {
+  0% { transform: translateY(-100%); opacity: 0; }
+  50% { opacity: 0.06; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .se-animate, [data-se-motion] { animation: none !important; transition: none !important; }
+}
+
+.se-font-display { font-family: var(--font-display), "Plus Jakarta Sans", system-ui, sans-serif; }
+.se-font-body { font-family: var(--font-body), "IBM Plex Sans", system-ui, sans-serif; }
+.se-font-mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+.se-eyebrow {
+  font-family: var(--font-body), "IBM Plex Sans", system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent, #3B82F6);
+}
+.se-headline {
+  font-family: var(--font-display), "Plus Jakarta Sans", system-ui, sans-serif;
+  font-size: clamp(2.25rem, 4.5vw, 3.75rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: var(--color-foreground);
+  text-wrap: balance;
+}
+.se-headline-sm {
+  font-family: var(--font-display), "Plus Jakarta Sans", system-ui, sans-serif;
+  font-size: clamp(1.5rem, 2.8vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: var(--color-foreground);
+  text-wrap: balance;
+}
+.se-body {
+  font-family: var(--font-body), "IBM Plex Sans", system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--color-muted, rgba(15,23,42,0.58));
+}
+.se-grid-bg {
+  background-image:
+    linear-gradient(var(--color-grid, rgba(15,23,42,0.06)) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid, rgba(15,23,42,0.06)) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.se-card {
+  border: 1px solid var(--border-subtle, rgba(15,23,42,0.04));
+  background: var(--color-surface);
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1), transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease;
+}
+.se-card:hover {
+  box-shadow: var(--shadow-surface);
+  border-color: var(--border-accent, rgba(59,130,246,0.24));
+  transform: translateY(-2px);
+}
+.se-card-featured {
+  border-color: var(--border-accent, rgba(59,130,246,0.28));
+  background: linear-gradient(165deg, color-mix(in srgb, var(--color-accent) 5%, var(--color-surface)), var(--color-surface));
+  box-shadow: var(--shadow-surface), 0 0 0 1px color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+.se-section-alt {
+  background: linear-gradient(180deg, var(--color-surface) 0%, var(--color-background) 100%);
+}
+.se-section-glow {
+  position: relative;
+  isolation: isolate;
+}
+.se-section-glow::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 90% 55% at 50% -15%, color-mix(in srgb, var(--color-accent) 9%, transparent), transparent 68%);
+}
+.se-glow-orb {
+  pointer-events: none;
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(64px);
+  opacity: 0.45;
+}
+.se-browser-frame {
+  border: 1px solid var(--border-default, rgba(15,23,42,0.08));
+  border-radius: var(--radius-xl, 20px);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-surface), 0 0 0 1px color-mix(in srgb, var(--color-accent) 8%, transparent);
+  overflow: hidden;
+}
+.se-browser-chrome {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  border-bottom: 1px solid var(--border-subtle);
+  background: color-mix(in srgb, var(--color-foreground) 3%, var(--color-surface));
+  padding: 0.625rem 0.875rem;
+}
+.se-browser-dot {
+  height: 0.5rem;
+  width: 0.5rem;
+  border-radius: 50%;
+  background: var(--border-default);
+}
+.se-trust-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.25rem 1.75rem;
+}
+.se-trust-logo {
+  font-family: var(--font-display), "Plus Jakarta Sans", system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: color-mix(in srgb, var(--color-foreground) 42%, transparent);
+  transition: color 0.25s ease;
+}
+.se-trust-logo:hover { color: var(--color-foreground); }
+.se-trust-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border-default);
+  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+  padding: 0.25rem 0.625rem;
+  font-family: var(--font-body), "IBM Plex Sans", system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  backdrop-filter: blur(8px);
+}
+.se-star {
+  color: var(--color-signal, #059669);
+  letter-spacing: 0.12em;
+}
+.se-quote-mark {
+  font-family: var(--font-display), "Plus Jakarta Sans", system-ui, sans-serif;
+  font-size: 3.5rem;
+  line-height: 1;
+  color: color-mix(in srgb, var(--color-accent) 35%, transparent);
+}
+.se-divider-gradient {
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(90deg, transparent, var(--border-default), transparent);
+}
+.se-input,
+.se-textarea {
+  width: 100%;
+  border-radius: var(--radius-md, 10px);
+  border: 1px solid var(--border-default);
+  background: var(--color-background);
+  padding: 0.625rem 0.875rem;
+  font-family: var(--font-body), "IBM Plex Sans", system-ui, sans-serif;
+  font-size: 0.875rem;
+  color: var(--color-foreground);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.se-input:focus-visible,
+.se-textarea:focus-visible {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 18%, transparent);
+}
+.se-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.75rem 1.5rem;
+  font-family: var(--font-body), "IBM Plex Sans", system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: #fff;
+  background: var(--color-primary, #1D4ED8);
+  border-radius: var(--radius-md, 10px);
+  border: 1px solid transparent;
+  box-shadow: 0 1px 2px rgba(15,23,42,0.06);
+  transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+}
+.se-btn-primary:hover {
+  background: var(--color-accent, #3B82F6);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-1px);
+}
+.se-btn-primary:active {
+  transform: translateY(0) scale(0.98);
+}
+.se-btn-primary:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+.se-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.75rem 1.5rem;
+  font-family: var(--font-body), "IBM Plex Sans", system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--color-foreground);
+  background: var(--color-surface);
+  border: 1px solid var(--border-default, rgba(15,23,42,0.08));
+  border-radius: var(--radius-md, 10px);
+  transition: border-color 0.25s ease, background 0.25s ease;
+}
+.se-btn-secondary:hover { border-color: var(--color-accent); background: color-mix(in srgb, var(--color-accent) 4%, var(--color-surface)); transform: translateY(-1px); }
+.se-btn-secondary:active { transform: translateY(0) scale(0.98); }
+.se-btn-secondary:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.se-section { padding-block: clamp(4rem, 10vw, 6.5rem); }
+.se-metric {
+  font-family: var(--font-display), "Plus Jakarta Sans", system-ui, sans-serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-primary);
+}
+.se-signal { color: var(--color-signal, #059669); }
+.se-focus-ring:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+/* TBDP Native Consumption — saas-enterprise
+   sector:saas · experience:technical, corporate, executive
+   identity:nexus-command · context:4d32d29b328f461c
+   integration:5.0.0 · consumption:1.0.0 */
+:root {
+  --tbdp-native: 1;
+  --tbdp-native-package: "saas-enterprise";
+  --tbdp-sector-dna: "saas";
+  --tbdp-template-identity: "nexus-command";
+  --tbdp-experience-primary: "technical";
+  --tbdp-context-hash: "4d32d29b328f461c";
+  --tbdp-theme-mode: "light";
+  --tbdp-direction: "ltr";
+}
+
+/* TBDP Foundations — official design authority (scoped vars) */
+/* Trend Business AI Design Platform · 1.0.0 · foundations-1 */
+:root {
+  --tbdp-color-primary: #0047E6;
+  --tbdp-color-secondary: #334155;
+  --tbdp-color-accent: #4D85FF;
+  --tbdp-color-success: #10B981;
+  --tbdp-color-warning: #F59E0B;
+  --tbdp-color-danger: #EF4444;
+  --tbdp-color-info: #3B82F6;
+  --tbdp-color-surface-base: #FFFFFF;
+  --tbdp-color-surface-raised: #F8FAFC;
+  --tbdp-color-surface-overlay: #FFFFFF;
+  --tbdp-color-surface-sunken: #F1F5F9;
+  --tbdp-color-surface-inverse: #0F172A;
+  --tbdp-color-background-canvas: #F8FAFC;
+  --tbdp-color-background-subtle: #F1F5F9;
+  --tbdp-color-background-emphasis: #FFFFFF;
+  --tbdp-color-background-inverse: #020617;
+  --tbdp-color-text-primary: #0F172A;
+  --tbdp-color-text-secondary: #475569;
+  --tbdp-color-text-tertiary: #64748B;
+  --tbdp-color-text-disabled: #94A3B8;
+  --tbdp-color-text-inverse: #FFFFFF;
+  --tbdp-color-text-link: #0047E6;
+  --tbdp-color-text-linkHover: #0038B8;
+  --tbdp-color-border-default: #E2E8F0;
+  --tbdp-color-border-subtle: #F1F5F9;
+  --tbdp-color-border-strong: #CBD5E1;
+  --tbdp-color-border-focus: #1A5CFF;
+  --tbdp-color-border-inverse: rgba(255, 255, 255, 0.16);
+  --tbdp-color-overlay-scrim: rgba(2, 6, 23, 0.4);
+  --tbdp-color-overlay-scrimStrong: rgba(2, 6, 23, 0.64);
+  --tbdp-color-overlay-backdrop: rgba(2, 6, 23, 0.24);
+  --tbdp-color-overlay-highlight: rgba(26, 92, 255, 0.12);
+  --tbdp-opacity-transparent: 0;
+  --tbdp-opacity-subtle: 0.04;
+  --tbdp-opacity-muted: 0.08;
+  --tbdp-opacity-soft: 0.12;
+  --tbdp-opacity-medium: 0.24;
+  --tbdp-opacity-strong: 0.48;
+  --tbdp-opacity-opaque: 1;
+  --tbdp-spacing-micro: 0.125rem;
+  --tbdp-spacing-xs: 0.25rem;
+  --tbdp-spacing-sm: 0.5rem;
+  --tbdp-spacing-md: 1rem;
+  --tbdp-spacing-lg: 1.5rem;
+  --tbdp-spacing-xl: 2rem;
+  --tbdp-spacing-2xl: 3rem;
+  --tbdp-spacing-3xl: 4rem;
+  --tbdp-spacing-4xl: 6rem;
+  --tbdp-radius-sharp: 0;
+  --tbdp-radius-sm: 0.25rem;
+  --tbdp-radius-md: 0.5rem;
+  --tbdp-radius-lg: 0.75rem;
+  --tbdp-radius-pill: 9999px;
+  --tbdp-radius-circle: 50%;
+  --tbdp-shadow-0: none;
+  --tbdp-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-2: 0 2px 8px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-3: 0 8px 24px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);
+  --tbdp-shadow-4: 0 16px 48px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.08);
+  --tbdp-shadow-5: 0 24px 64px rgba(15, 23, 42, 0.18), 0 8px 24px rgba(15, 23, 42, 0.1);
+  --tbdp-container-sm: 640px;
+  --tbdp-container-md: 768px;
+  --tbdp-container-lg: 1024px;
+  --tbdp-container-xl: 1280px;
+  --tbdp-container-2xl: 1440px;
+  --tbdp-container-full: 100%;
+  --tbdp-font-display: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --tbdp-font-body: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --tbdp-font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", monospace;
+}
+
+/* TBDP Experience — motion, interaction, RTL, accessibility */
+/* TBDP Phase 3 — Motion System · tbdp-xp */
+
+@keyframes tbdp-xp-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes tbdp-xp-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes tbdp-xp-rise {
+  from { opacity: 0; transform: translateY(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tbdp-xp-rise-rtl {
+  from { opacity: 0; transform: translateX(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes tbdp-xp-slide-end {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-slide-start {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(calc(var(--tbdp-spacing-sm) * -1)); }
+  40%, 80% { transform: translateX(var(--tbdp-spacing-sm)); }
+}
+
+@keyframes tbdp-xp-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@keyframes tbdp-xp-lift {
+  to { transform: translateY(calc(var(--tbdp-spacing-sm) * -1)); box-shadow: var(--tbdp-shadow-2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp-motion] { animation: none !important; transition: none !important; }
+}
+
+[data-tbdp-xp-motion] { will-change: transform, opacity; }
+[data-tbdp-xp-motion="page-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="page-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="section-reveal"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-headline"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-media"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="card-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="grid-stagger"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="modal-enter"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="modal-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="drawer-slide"] { animation-name: tbdp-xp-slide-end; }
+[data-tbdp-xp-motion="toast-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="toast-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="tooltip-fade"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="scroll-reveal-up"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="stagger-children"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hover-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="focus-ring"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="success-pulse"] { animation-name: tbdp-xp-pulse; }
+[data-tbdp-xp-motion="error-shake"] { animation-name: tbdp-xp-shake; }
+
+/* TBDP Experience — interaction utilities */
+[data-tbdp-xp] { --tbdp-xp-focus: var(--tbdp-color-border-focus); }
+[data-tbdp-xp-feedback="loading"] { cursor: wait; }
+[data-tbdp-xp-feedback="error"] { border-color: var(--tbdp-color-danger); }
+[data-tbdp-xp-feedback="success"] { border-color: var(--tbdp-color-success); }
+[data-tbdp-xp-touch="true"] { min-height: var(--tbdp-spacing-2xl); min-width: var(--tbdp-spacing-2xl); }
+[data-tbdp-xp-gpu] { transform: translateZ(0); backface-visibility: hidden; }
+[data-tbdp-xp-contain] { content-visibility: auto; contain-intrinsic-size: auto 500px; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp], [data-tbdp-xp-motion] { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+/* V2 sidebar-left layout */
+.v2-layout-sidebar-left .v2-sidebar-shell { gap: 0; align-items: flex-start; }
+.v2-sidebar-rail {
+  border-inline-end: 1px solid var(--border-subtle, rgba(244,237,228,0.06));
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-inline-end: clamp(1.25rem, 3vw, 2rem);
+}
+[dir='rtl'] .v2-sidebar-rail { border-inline-end: none; border-inline-start: 1px solid var(--border-subtle, rgba(244,237,228,0.06)); }
+.v2-main-canvas > [data-v2-component] + [data-v2-component] { margin-top: 0; }
+.v2-layout-sidebar-left .v2-main-canvas { padding-inline-start: 0; }
+@media (max-width: 1023px) {
+  .v2-sidebar-rail { display: none !important; }
+}
+
+/* V2 sidebar-right layout */
+.v2-layout-sidebar-right .v2-sidebar-shell { gap: 0; align-items: flex-start; }
+.v2-layout-sidebar-right .v2-sidebar-rail {
+  border-inline-start: 1px solid var(--border-subtle, rgba(28,25,23,0.06));
+  border-inline-end: none;
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-inline-start: clamp(1.25rem, 3vw, 2rem);
+}
+[dir='rtl'] .v2-layout-sidebar-right .v2-sidebar-rail {
+  border-inline-start: none;
+  border-inline-end: 1px solid var(--border-subtle, rgba(28,25,23,0.06));
+}
+
+/* V2 full-bleed layout */
+.v2-layout-full-bleed .v2-overlay-canvas { width: 100%; }
+.v2-layout-full-bleed .v2-main-canvas { width: 100%; max-width: var(--container-max, 76rem); margin-inline: auto; }
+
+/* V2 editorial-reveal layout (creative portfolio) */
+.v2-layout-editorial-reveal .v2-main-canvas { width: 100%; }
+.v2-layout-editorial-reveal .v2-overlay-reveal { width: 100%; }
+
+:root {
+  --container-max: 82rem;
+  --font-body: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --color-surface: #FFFFFF;
+  --color-foreground: #0F172A;
+  --color-background: #F8FAFC;
+  --color-accent: #3B82F6;
+  --color-secondary: #1E293B; --color-primary: #1D4ED8; }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--color-background, #0f172a);
+      color: var(--color-foreground, #f8fafc);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .page { display: none; padding-bottom: 2rem; }
+    .page:target { display: block; }
+    body:not(:has(.page:target)) .page#accueil { display: block; }
+    img { max-width: 100%; height: auto; display: block; }
+    a { color: inherit; }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+<style id="tbdp-wiring-layer">
+/* TBDP Integration Layer — advisory token layer */
+
+/* Trend Business AI Design Platform · 1.0.0 · foundations-1 */
+:root {
+  --tbdp-color-primary: #0047E6;
+  --tbdp-color-secondary: #334155;
+  --tbdp-color-accent: #4D85FF;
+  --tbdp-color-success: #10B981;
+  --tbdp-color-warning: #F59E0B;
+  --tbdp-color-danger: #EF4444;
+  --tbdp-color-info: #3B82F6;
+  --tbdp-color-surface-base: #FFFFFF;
+  --tbdp-color-surface-raised: #F8FAFC;
+  --tbdp-color-surface-overlay: #FFFFFF;
+  --tbdp-color-surface-sunken: #F1F5F9;
+  --tbdp-color-surface-inverse: #0F172A;
+  --tbdp-color-background-canvas: #F8FAFC;
+  --tbdp-color-background-subtle: #F1F5F9;
+  --tbdp-color-background-emphasis: #FFFFFF;
+  --tbdp-color-background-inverse: #020617;
+  --tbdp-color-text-primary: #0F172A;
+  --tbdp-color-text-secondary: #475569;
+  --tbdp-color-text-tertiary: #64748B;
+  --tbdp-color-text-disabled: #94A3B8;
+  --tbdp-color-text-inverse: #FFFFFF;
+  --tbdp-color-text-link: #0047E6;
+  --tbdp-color-text-linkHover: #0038B8;
+  --tbdp-color-border-default: #E2E8F0;
+  --tbdp-color-border-subtle: #F1F5F9;
+  --tbdp-color-border-strong: #CBD5E1;
+  --tbdp-color-border-focus: #1A5CFF;
+  --tbdp-color-border-inverse: rgba(255, 255, 255, 0.16);
+  --tbdp-color-overlay-scrim: rgba(2, 6, 23, 0.4);
+  --tbdp-color-overlay-scrimStrong: rgba(2, 6, 23, 0.64);
+  --tbdp-color-overlay-backdrop: rgba(2, 6, 23, 0.24);
+  --tbdp-color-overlay-highlight: rgba(26, 92, 255, 0.12);
+  --tbdp-opacity-transparent: 0;
+  --tbdp-opacity-subtle: 0.04;
+  --tbdp-opacity-muted: 0.08;
+  --tbdp-opacity-soft: 0.12;
+  --tbdp-opacity-medium: 0.24;
+  --tbdp-opacity-strong: 0.48;
+  --tbdp-opacity-opaque: 1;
+  --tbdp-spacing-micro: 0.125rem;
+  --tbdp-spacing-xs: 0.25rem;
+  --tbdp-spacing-sm: 0.5rem;
+  --tbdp-spacing-md: 1rem;
+  --tbdp-spacing-lg: 1.5rem;
+  --tbdp-spacing-xl: 2rem;
+  --tbdp-spacing-2xl: 3rem;
+  --tbdp-spacing-3xl: 4rem;
+  --tbdp-spacing-4xl: 6rem;
+  --tbdp-radius-sharp: 0;
+  --tbdp-radius-sm: 0.25rem;
+  --tbdp-radius-md: 0.5rem;
+  --tbdp-radius-lg: 0.75rem;
+  --tbdp-radius-pill: 9999px;
+  --tbdp-radius-circle: 50%;
+  --tbdp-shadow-0: none;
+  --tbdp-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-2: 0 2px 8px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-3: 0 8px 24px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);
+  --tbdp-shadow-4: 0 16px 48px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.08);
+  --tbdp-shadow-5: 0 24px 64px rgba(15, 23, 42, 0.18), 0 8px 24px rgba(15, 23, 42, 0.1);
+  --tbdp-container-sm: 640px;
+  --tbdp-container-md: 768px;
+  --tbdp-container-lg: 1024px;
+  --tbdp-container-xl: 1280px;
+  --tbdp-container-2xl: 1440px;
+  --tbdp-container-full: 100%;
+  --tbdp-font-display: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --tbdp-font-body: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --tbdp-font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", monospace;
+}
+
+/* TBDP Phase 3 — Motion System · tbdp-xp */
+
+@keyframes tbdp-xp-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes tbdp-xp-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes tbdp-xp-rise {
+  from { opacity: 0; transform: translateY(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tbdp-xp-rise-rtl {
+  from { opacity: 0; transform: translateX(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes tbdp-xp-slide-end {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-slide-start {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(calc(var(--tbdp-spacing-sm) * -1)); }
+  40%, 80% { transform: translateX(var(--tbdp-spacing-sm)); }
+}
+
+@keyframes tbdp-xp-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@keyframes tbdp-xp-lift {
+  to { transform: translateY(calc(var(--tbdp-spacing-sm) * -1)); box-shadow: var(--tbdp-shadow-2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp-motion] { animation: none !important; transition: none !important; }
+}
+
+[data-tbdp-xp-motion] { will-change: transform, opacity; }
+[data-tbdp-xp-motion="page-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="page-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="section-reveal"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-headline"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-media"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="card-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="grid-stagger"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="modal-enter"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="modal-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="drawer-slide"] { animation-name: tbdp-xp-slide-end; }
+[data-tbdp-xp-motion="toast-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="toast-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="tooltip-fade"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="scroll-reveal-up"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="stagger-children"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hover-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="focus-ring"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="success-pulse"] { animation-name: tbdp-xp-pulse; }
+[data-tbdp-xp-motion="error-shake"] { animation-name: tbdp-xp-shake; }
+
+/* TBDP Experience — interaction utilities */
+[data-tbdp-xp] { --tbdp-xp-focus: var(--tbdp-color-border-focus); }
+[data-tbdp-xp-feedback="loading"] { cursor: wait; }
+[data-tbdp-xp-feedback="error"] { border-color: var(--tbdp-color-danger); }
+[data-tbdp-xp-feedback="success"] { border-color: var(--tbdp-color-success); }
+[data-tbdp-xp-touch="true"] { min-height: var(--tbdp-spacing-2xl); min-width: var(--tbdp-spacing-2xl); }
+[data-tbdp-xp-gpu] { transform: translateZ(0); backface-visibility: hidden; }
+[data-tbdp-xp-contain] { content-visibility: auto; contain-intrinsic-size: auto 500px; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp], [data-tbdp-xp-motion] { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+  <div class="page" id="accueil">
+    <link rel="preload" as="image" href="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" fetchPriority="high"/><div class="flex min-h-screen flex-col bg-[var(--color-background)] text-[var(--color-foreground)] antialiased v2-template v2-saas-enterprise" data-v2-package="saas-enterprise" data-v2-composer="region-grid" data-v2-layout="default"><header data-v2-region="header"><header data-v2-component="saas-enterprise-nav" class="sticky top-0 z-50 border-b transition-all duration-300 border-transparent bg-[var(--color-background)]/80 backdrop-blur-md"><div class="mx-auto flex h-16 max-w-[82rem] items-center justify-between gap-4 px-5 sm:px-8 lg:h-[4.25rem]"><a href="#top" class="se-font-display flex items-center gap-2.5 text-base font-bold tracking-tight text-[var(--color-foreground)] se-focus-ring rounded-sm"><span class="flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-primary)] text-xs font-bold text-white" aria-hidden="true">N</span>Planium</a><nav aria-label="Primary" class="hidden items-center gap-8 lg:flex"><a href="#features" class="se-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] se-focus-ring rounded-sm">Fonctionnalités</a><a href="#platform" class="se-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] se-focus-ring rounded-sm">Services</a><a href="#pricing" class="se-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] se-focus-ring rounded-sm">Tarifs</a><a href="#contact" class="se-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] se-focus-ring rounded-sm">Contact</a></nav><div class="flex items-center gap-2"><a href="#contact" class="se-btn-primary hidden sm:inline-flex">Commencer</a><button type="button" aria-expanded="false" aria-controls="se-mobile-nav" aria-label="Open menu" class="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] lg:hidden se-focus-ring"><span class="sr-only">Menu</span><span aria-hidden="true" class="flex flex-col gap-1"><span class="block h-0.5 w-5 bg-current transition "></span><span class="block h-0.5 w-5 bg-current transition "></span><span class="block h-0.5 w-5 bg-current transition "></span></span></button></div></div></header></header><main data-v2-region="main" class="v2-region-grid flex flex-col"><h1 class="sr-only text-4xl font-bold">Planium</h1><section id="top" data-v2-component="saas-enterprise-hero" aria-labelledby="se-hero-title" class="se-section se-section-glow relative min-h-[min(92vh,56rem)] overflow-hidden bg-[var(--color-background)] py-16 sm:py-20 lg:py-24"><div class="se-grid-bg pointer-events-none absolute inset-0 opacity-50" aria-hidden="true"></div><div class="se-glow-orb start-1/4 top-0 h-72 w-72 bg-[var(--color-accent)]" aria-hidden="true"></div><div class="se-glow-orb end-0 top-1/3 h-56 w-56 bg-[var(--color-primary)]" aria-hidden="true"></div><div class="relative mx-auto max-w-[82rem] px-5 sm:px-8"><div class="grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16"><div class="max-w-xl"><p class="se-eyebrow mb-4 motion-safe:animate-[se-slide-up_0.6s_ease_both]">Revenue command platform</p><h1 id="se-hero-title" class="se-headline motion-safe:animate-[se-slide-up_0.65s_ease_0.08s_both]">Planium est la plateforme SaaS française de gestion de projet pour équipes distribuées : roadmaps, tableaux Kanban, suivi du temps, automatisations, rapports exécutifs en temps réel, intégrations natives et sécurité entreprise</h1><p class="se-body text-muted-foreground mt-6 max-w-lg motion-safe:animate-[se-slide-up_0.65s_ease_0.16s_both]">Serving France / Europe</p><div class="mt-9 flex flex-wrap gap-3 motion-safe:animate-[se-slide-up_0.65s_ease_0.24s_both]"><a href="#contact" class="se-btn-primary se-focus-ring">Commencer</a><a href="/platform" class="se-btn-secondary se-focus-ring">En savoir plus</a></div><div class="mt-10 space-y-5 motion-safe:animate-[se-slide-up_0.65s_ease_0.32s_both]"><div class="flex flex-wrap items-center gap-3"><span class="se-trust-badge"><span class="h-1.5 w-1.5 rounded-full bg-[var(--color-signal)] motion-safe:animate-[se-pulse-dot_2s_ease-in-out_infinite]" aria-hidden="true"></span>Live platform status</span><span class="se-font-body text-xs text-[var(--color-muted)]">SOC 2 Type II · GDPR · SSO</span></div><div><p class="se-font-body mb-3 text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-[var(--color-muted)]">Trusted by GTM teams at</p><div class="se-trust-strip" aria-label="Trusted by leading companies"><span class="se-trust-logo inline-flex items-center gap-2"><span class="flex h-6 w-6 items-center justify-center rounded-md bg-[color-mix(in_srgb,var(--color-foreground)_6%,transparent)] text-[0.625rem] font-bold text-[var(--color-muted)]" aria-hidden="true">▲</span>Vercel</span><span class="se-trust-logo inline-flex items-center gap-2"><span class="flex h-6 w-6 items-center justify-center rounded-md bg-[color-mix(in_srgb,var(--color-foreground)_6%,transparent)] text-[0.625rem] font-bold text-[var(--color-muted)]" aria-hidden="true">—</span>Linear</span><span class="se-trust-logo inline-flex items-center gap-2"><span class="flex h-6 w-6 items-center justify-center rounded-md bg-[color-mix(in_srgb,var(--color-foreground)_6%,transparent)] text-[0.625rem] font-bold text-[var(--color-muted)]" aria-hidden="true">S</span>Stripe</span><span class="se-trust-logo inline-flex items-center gap-2"><span class="flex h-6 w-6 items-center justify-center rounded-md bg-[color-mix(in_srgb,var(--color-foreground)_6%,transparent)] text-[0.625rem] font-bold text-[var(--color-muted)]" aria-hidden="true">N</span>Notion</span><span class="se-trust-logo inline-flex items-center gap-2"><span class="flex h-6 w-6 items-center justify-center rounded-md bg-[color-mix(in_srgb,var(--color-foreground)_6%,transparent)] text-[0.625rem] font-bold text-[var(--color-muted)]" aria-hidden="true">F</span>Figma</span></div></div></div></div><div class="motion-safe:animate-[se-grid-reveal_0.85s_ease_0.15s_both]"><div class="se-browser-frame"><div class="se-browser-chrome" aria-hidden="true"><span class="se-browser-dot"></span><span class="se-browser-dot"></span><span class="se-browser-dot"></span><span class="se-font-mono ms-2 text-[0.625rem] text-[var(--color-muted)]">app.northline.io</span></div><img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="Northline revenue command dashboard with pipeline analytics and forecast charts" class="aspect-[16/10] w-full object-cover object-top" fetchPriority="high"/></div><div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4"><div class="se-card p-4 motion-safe:animate-[se-grid-reveal_0.6s_ease_both]" style="animation-delay:0.35s"><p class="se-metric text-2xl">38%</p><p class="se-font-body mt-1 text-[0.6875rem] text-[var(--color-muted)]">Pipeline velocity</p><p class="se-font-mono mt-0.5 text-[0.625rem] text-[var(--color-signal)]">+12%</p></div><div class="se-card p-4 motion-safe:animate-[se-grid-reveal_0.6s_ease_both]" style="animation-delay:0.42s"><p class="se-metric text-2xl">$2.4M</p><p class="se-font-body mt-1 text-[0.6875rem] text-[var(--color-muted)]">ARR unlocked</p><p class="se-font-mono mt-0.5 text-[0.625rem] text-[var(--color-signal)]">avg.</p></div><div class="se-card p-4 motion-safe:animate-[se-grid-reveal_0.6s_ease_both]" style="animation-delay:0.49s"><p class="se-metric text-2xl">14d</p><p class="se-font-body mt-1 text-[0.6875rem] text-[var(--color-muted)]">Time to value</p><p class="se-font-mono mt-0.5 text-[0.625rem] text-[var(--color-signal)]">median</p></div><div class="se-card p-4 motion-safe:animate-[se-grid-reveal_0.6s_ease_both]" style="animation-delay:0.56s"><p class="se-metric text-2xl">99.9%</p><p class="se-font-body mt-1 text-[0.6875rem] text-[var(--color-muted)]">Uptime SLA</p><p class="se-font-mono mt-0.5 text-[0.625rem] text-[var(--color-signal)]">FY24</p></div></div></div></div></div></section><section id="features" data-v2-component="saas-enterprise-features" aria-labelledby="se-features-title" class="se-section se-section-alt bg-[var(--color-surface)]"><div class="mx-auto max-w-[82rem] px-5 sm:px-8"><header class="mb-14 max-w-2xl"><p class="se-eyebrow mb-3">Platform capabilities</p><h2 id="se-features-title" class="se-headline-sm">Built for revenue operations at scale</h2><div class="mt-4 h-px w-12 bg-gradient-to-r from-[var(--color-accent)] to-transparent" aria-hidden="true"></div><p class="se-body text-muted-foreground mt-5">Purpose-built modules from pipeline to post-sale expansion — one command center for your GTM.</p></header><div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5"><article class="se-card group relative overflow-hidden p-7 sm:p-8 transition-transform duration-500 motion-safe:hover:-translate-y-1 lg:col-span-2" style="animation-delay:0s"><div class="pointer-events-none absolute -end-8 -top-8 h-32 w-32 rounded-full bg-[color-mix(in_srgb,var(--color-accent)_8%,transparent)] blur-2xl transition group-hover:bg-[color-mix(in_srgb,var(--color-accent)_14%,transparent)]" aria-hidden="true"></div><div class="relative mb-5 flex items-center gap-4"><span class="se-font-mono flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-gradient-to-br from-[color-mix(in_srgb,var(--color-primary)_12%,transparent)] to-[color-mix(in_srgb,var(--color-accent)_8%,transparent)] text-xs font-semibold text-[var(--color-primary)] ring-1 ring-[var(--border-subtle)]">01</span><span class="h-px flex-1 bg-gradient-to-r from-[var(--border-default)] to-transparent transition group-hover:from-[var(--color-accent)]" aria-hidden="true"></span></div><h3 class="se-font-display relative text-lg font-bold text-[var(--color-foreground)]">Pipeline intelligence</h3><p class="se-font-body relative mt-3 text-sm leading-relaxed text-[var(--color-muted)]">Real-time deal health scoring with AI-powered risk signals across every stage.</p></article><article class="se-card group relative overflow-hidden p-7 sm:p-8 transition-transform duration-500 motion-safe:hover:-translate-y-1 " style="animation-delay:0.06s"><div class="pointer-events-none absolute -end-8 -top-8 h-32 w-32 rounded-full bg-[color-mix(in_srgb,var(--color-accent)_8%,transparent)] blur-2xl transition group-hover:bg-[color-mix(in_srgb,var(--color-accent)_14%,transparent)]" aria-hidden="true"></div><div class="relative mb-5 flex items-center gap-4"><span class="se-font-mono flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-gradient-to-br from-[color-mix(in_srgb,var(--color-primary)_12%,transparent)] to-[color-mix(in_srgb,var(--color-accent)_8%,transparent)] text-xs font-semibold text-[var(--color-primary)] ring-1 ring-[var(--border-subtle)]">02</span><span class="h-px flex-1 bg-gradient-to-r from-[var(--border-default)] to-transparent transition group-hover:from-[var(--color-accent)]" aria-hidden="true"></span></div><h3 class="se-font-display relative text-lg font-bold text-[var(--color-foreground)]">Forecast accuracy</h3><p class="se-font-body relative mt-3 text-sm leading-relaxed text-[var(--color-muted)]">Unified revenue models aligning sales, finance, and leadership on one source of truth.</p></article><article class="se-card group relative overflow-hidden p-7 sm:p-8 transition-transform duration-500 motion-safe:hover:-translate-y-1 " style="animation-delay:0.12s"><div class="pointer-events-none absolute -end-8 -top-8 h-32 w-32 rounded-full bg-[color-mix(in_srgb,var(--color-accent)_8%,transparent)] blur-2xl transition group-hover:bg-[color-mix(in_srgb,var(--color-accent)_14%,transparent)]" aria-hidden="true"></div><div class="relative mb-5 flex items-center gap-4"><span class="se-font-mono flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-gradient-to-br from-[color-mix(in_srgb,var(--color-primary)_12%,transparent)] to-[color-mix(in_srgb,var(--color-accent)_8%,transparent)] text-xs font-semibold text-[var(--color-primary)] ring-1 ring-[var(--border-subtle)]">03</span><span class="h-px flex-1 bg-gradient-to-r from-[var(--border-default)] to-transparent transition group-hover:from-[var(--color-accent)]" aria-hidden="true"></span></div><h3 class="se-font-display relative text-lg font-bold text-[var(--color-foreground)]">Account expansion</h3><p class="se-font-body relative mt-3 text-sm leading-relaxed text-[var(--color-muted)]">Surface upsell opportunities before competitors reach your accounts.</p></article><article class="se-card group relative overflow-hidden p-7 sm:p-8 transition-transform duration-500 motion-safe:hover:-translate-y-1 lg:col-span-2" style="animation-delay:0.18s"><div class="pointer-events-none absolute -end-8 -top-8 h-32 w-32 rounded-full bg-[color-mix(in_srgb,var(--color-accent)_8%,transparent)] blur-2xl transition group-hover:bg-[color-mix(in_srgb,var(--color-accent)_14%,transparent)]" aria-hidden="true"></div><div class="relative mb-5 flex items-center gap-4"><span class="se-font-mono flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-gradient-to-br from-[color-mix(in_srgb,var(--color-primary)_12%,transparent)] to-[color-mix(in_srgb,var(--color-accent)_8%,transparent)] text-xs font-semibold text-[var(--color-primary)] ring-1 ring-[var(--border-subtle)]">04</span><span class="h-px flex-1 bg-gradient-to-r from-[var(--border-default)] to-transparent transition group-hover:from-[var(--color-accent)]" aria-hidden="true"></span></div><h3 class="se-font-display relative text-lg font-bold text-[var(--color-foreground)]">Executive dashboards</h3><p class="se-font-body relative mt-3 text-sm leading-relaxed text-[var(--color-muted)]">Board-ready reporting with drill-down from ARR to rep-level activity in seconds.</p></article></div></div></section><section id="platform" data-v2-component="saas-enterprise-integrations" aria-labelledby="se-integrations-title" class="se-section-glow relative overflow-hidden border-y border-[var(--border-default)] bg-[var(--color-background)] py-14 sm:py-16"><div class="mx-auto max-w-[82rem] px-5 sm:px-8"><header class="mb-12 text-center"><p class="se-eyebrow mb-3">Integrations</p><h2 id="se-integrations-title" class="se-headline-sm">Your entire GTM stack, connected</h2><div class="mx-auto mt-4 h-px w-12 bg-gradient-to-r from-transparent via-[var(--color-accent)] to-transparent" aria-hidden="true"></div><p class="se-body text-muted-foreground mx-auto mt-5 max-w-lg text-sm">Native bi-directional sync with CRM, data warehouse, and collaboration tools — no middleware required.</p></header></div><div class="relative" aria-label="Integration partners"><div class="pointer-events-none absolute inset-y-0 start-0 z-10 w-24 bg-gradient-to-r from-[var(--color-background)] to-transparent" aria-hidden="true"></div><div class="pointer-events-none absolute inset-y-0 end-0 z-10 w-24 bg-gradient-to-l from-[var(--color-background)] to-transparent" aria-hidden="true"></div><div class="flex motion-safe:animate-[se-marquee_45s_linear_infinite] hover:[animation-play-state:paused]"><div class="se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]">Salesforce</span><span class="se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">CRM</span></div><div class="se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]">HubSpot</span><span class="se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Marketing</span></div><div class="se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]">Slack</span><span class="se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Collab</span></div><div class="se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]">Snowflake</span><span class="se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Data</span></div><div class="se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]">Workday</span><span class="se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">HR</span></div><div class="se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]">Gong</span><span class="se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Revenue</span></div><div class="se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]">Outreach</span><span class="se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Sales</span></div><div class="se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]">Segment</span><span class="se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">CDP</span></div><div class="se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]">Databricks</span><span class="se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Lakehouse</span></div><div class="se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]">Zendesk</span><span class="se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Support</span></div><div class="se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]">Salesforce</span><span class="se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">CRM</span></div><div class="se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]">HubSpot</span><span class="se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Marketing</span></div><div class="se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]">Slack</span><span class="se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Collab</span></div><div class="se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]">Snowflake</span><span class="se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Data</span></div><div class="se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]">Workday</span><span class="se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">HR</span></div><div class="se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]">Gong</span><span class="se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Revenue</span></div><div class="se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]">Outreach</span><span class="se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Sales</span></div><div class="se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]">Segment</span><span class="se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">CDP</span></div><div class="se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]">Databricks</span><span class="se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Lakehouse</span></div><div class="se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]">Zendesk</span><span class="se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Support</span></div></div></div><p class="se-font-body mx-auto mt-10 max-w-[82rem] px-5 text-center text-xs text-[var(--color-muted)] sm:px-8">120+ integrations · OAuth 2.0 · Webhooks · Custom API connectors</p></section><section id="about" data-v2-component="saas-enterprise-about" aria-labelledby="about-title" class="se-section bg-[var(--color-background)]"><div class="mx-auto max-w-[82rem] px-5 sm:px-8"><div class="grid items-center gap-12 lg:grid-cols-2 lg:gap-20"><div><header class="mb-12 max-w-2xl mb-0"><p class="se-eyebrow mb-3">Our story</p><h2 id="about-title" class="se-headline-sm">Built by operators, for operators</h2><div class="mt-4 h-px w-12 bg-gradient-to-r from-[var(--color-accent)] to-transparent " aria-hidden="true"></div></header><p class="se-body text-muted-foreground mt-6">Northline began inside a revenue operations team that was tired of stitching together spreadsheets, CRM exports, and BI tools. We built the command center we wished existed — and now power GTM teams at scale.</p><ul class="mt-8 grid gap-3 sm:grid-cols-2" role="list"><li class="se-font-body flex gap-3 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-foreground)]"><span class="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-accent)_12%,transparent)] text-[0.625rem] font-bold text-[var(--color-accent)]" aria-hidden="true">✓</span>Founded by former Salesforce and Snowflake leaders</li><li class="se-font-body flex gap-3 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-foreground)]"><span class="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-accent)_12%,transparent)] text-[0.625rem] font-bold text-[var(--color-accent)]" aria-hidden="true">✓</span>Backed by tier-one enterprise investors</li><li class="se-font-body flex gap-3 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-foreground)]"><span class="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-accent)_12%,transparent)] text-[0.625rem] font-bold text-[var(--color-accent)]" aria-hidden="true">✓</span>Deployed across 40+ countries</li></ul><a href="#contact" class="se-btn-primary mt-8 inline-flex se-focus-ring">Meet the team</a></div><div class="relative"><div class="se-card overflow-hidden p-1.5" style="background:linear-gradient(145deg, color-mix(in srgb, var(--color-accent) 18%, transparent), color-mix(in srgb, var(--color-primary) 8%, transparent))"><div class="overflow-hidden rounded-[calc(var(--radius-lg)-6px)] bg-[var(--color-surface)]"><img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="" class="aspect-[4/3] w-full object-cover" loading="lazy"/></div></div></div></div></div></section><section id="stats" data-v2-component="saas-enterprise-stats" aria-labelledby="stats-title" class="se-section se-section-glow relative overflow-hidden bg-[var(--color-background)]"><div class="se-glow-orb -start-24 top-0 h-64 w-64 bg-[var(--color-accent)]" aria-hidden="true"></div><div class="se-glow-orb end-0 bottom-0 h-48 w-48 bg-[var(--color-primary)]" aria-hidden="true"></div><div class="mx-auto max-w-[82rem] px-5 sm:px-8 relative"><header class="mb-12 mx-auto text-center max-w-3xl"><p class="se-eyebrow mb-3">Platform impact</p><h2 id="stats-title" class="se-headline-sm">Numbers that move the needle</h2><div class="mt-4 h-px w-12 bg-gradient-to-r from-[var(--color-accent)] to-transparent mx-auto" aria-hidden="true"></div><p class="se-body text-muted-foreground text-muted-foreground mt-5">Measured across our enterprise customer base in the last twelve months.</p></header><dl class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><div class="se-card p-6 text-center sm:p-7"><dt class="se-font-body text-sm font-medium text-[var(--color-muted)]">Enterprise customers</dt><dd class="se-metric mt-3 block">500+</dd><dd class="se-font-body mt-2 text-xs text-[var(--color-muted)]">Across 28 countries</dd></div><div class="se-card p-6 text-center sm:p-7"><dt class="se-font-body text-sm font-medium text-[var(--color-muted)]">G2 satisfaction</dt><dd class="se-metric mt-3 block">4.9/5</dd><dd class="se-font-body mt-2 text-xs text-[var(--color-muted)]">Verified reviews</dd></div><div class="se-card p-6 text-center sm:p-7"><dt class="se-font-body text-sm font-medium text-[var(--color-muted)]">Forecast accuracy</dt><dd class="se-metric mt-3 block">2.1×</dd><dd class="se-font-body mt-2 text-xs text-[var(--color-muted)]">vs. prior stack</dd></div><div class="se-card p-6 text-center sm:p-7"><dt class="se-font-body text-sm font-medium text-[var(--color-muted)]">Avg. retention</dt><dd class="se-metric mt-3 block">18mo</dd><dd class="se-font-body mt-2 text-xs text-[var(--color-muted)]">Enterprise cohort</dd></div></dl></div></section><section id="testimonials" data-v2-component="saas-enterprise-testimonials" aria-labelledby="testimonials-title" class="se-section se-section-alt bg-[var(--color-surface)]"><div class="mx-auto max-w-[82rem] px-5 sm:px-8"><header class="mb-12 mx-auto text-center max-w-3xl"><p class="se-eyebrow mb-3">Testimonials</p><h2 id="testimonials-title" class="se-headline-sm">Trusted by leaders worldwide</h2><div class="mt-4 h-px w-12 bg-gradient-to-r from-[var(--color-accent)] to-transparent mx-auto" aria-hidden="true"></div></header><div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-6"><figure class="se-card relative flex flex-col p-7 sm:p-8 "><span class="se-quote-mark absolute end-6 top-4 select-none" aria-hidden="true">“</span><span class="se-font-body se-star text-sm" aria-label="5 out of 5 stars"><span aria-hidden="true">★</span><span aria-hidden="true">★</span><span aria-hidden="true">★</span><span aria-hidden="true">★</span><span aria-hidden="true">★</span></span><blockquote class="se-body text-muted-foreground relative z-[1] mt-4 flex-1 text-base leading-relaxed">The platform transformed how our teams collaborate — we cut reporting time in half and finally have one source of truth.</blockquote><figcaption class="mt-8 flex items-center gap-3 border-t border-[var(--border-default,rgba(0,0,0,0.08))] pt-5"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&amp;fit=crop&amp;w=800&amp;q=82" alt="" class="h-11 w-11 rounded-full object-cover ring-2 ring-[var(--color-surface)]" loading="lazy" width="44" height="44"/><div><p class="se-font-body text-sm font-semibold text-[var(--color-foreground)]">Elena Vasquez</p><p class="se-font-body text-xs text-[var(--color-muted)]">Chief Revenue Officer · Meridian Systems</p></div></figcaption></figure><figure class="se-card relative flex flex-col p-7 sm:p-8 se-card-featured md:-translate-y-1 lg:col-span-1"><span class="se-quote-mark absolute end-6 top-4 select-none" aria-hidden="true">“</span><span class="se-font-body se-star text-sm" aria-label="5 out of 5 stars"><span aria-hidden="true">★</span><span aria-hidden="true">★</span><span aria-hidden="true">★</span><span aria-hidden="true">★</span><span aria-hidden="true">★</span></span><blockquote class="se-body text-muted-foreground relative z-[1] mt-4 flex-1 text-base leading-relaxed">Implementation was seamless. Within six weeks we had executive dashboards our board actually trusts.</blockquote><figcaption class="mt-8 flex items-center gap-3 border-t border-[var(--border-default,rgba(0,0,0,0.08))] pt-5"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&amp;fit=crop&amp;w=800&amp;q=82" alt="" class="h-11 w-11 rounded-full object-cover ring-2 ring-[var(--color-surface)]" loading="lazy" width="44" height="44"/><div><p class="se-font-body text-sm font-semibold text-[var(--color-foreground)]">James Okonkwo</p><p class="se-font-body text-xs text-[var(--color-muted)]">VP Operations · Northbridge Capital</p></div></figcaption></figure><figure class="se-card relative flex flex-col p-7 sm:p-8 "><span class="se-quote-mark absolute end-6 top-4 select-none" aria-hidden="true">“</span><span class="se-font-body se-star text-sm" aria-label="5 out of 5 stars"><span aria-hidden="true">★</span><span aria-hidden="true">★</span><span aria-hidden="true">★</span><span aria-hidden="true">★</span><span aria-hidden="true">★</span></span><blockquote class="se-body text-muted-foreground relative z-[1] mt-4 flex-1 text-base leading-relaxed">Best investment we made this year. The ROI was visible in the first quarter.</blockquote><figcaption class="mt-8 flex items-center gap-3 border-t border-[var(--border-default,rgba(0,0,0,0.08))] pt-5"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&amp;fit=crop&amp;w=800&amp;q=82" alt="" class="h-11 w-11 rounded-full object-cover ring-2 ring-[var(--color-surface)]" loading="lazy" width="44" height="44"/><div><p class="se-font-body text-sm font-semibold text-[var(--color-foreground)]">Sophie Laurent</p><p class="se-font-body text-xs text-[var(--color-muted)]">Managing Director · Atlas Partners</p></div></figcaption></figure></div></div></section><section id="pricing" data-v2-component="saas-enterprise-pricing" aria-labelledby="se-pricing-title" class="se-section se-section-glow relative bg-[var(--color-background)]"><div class="mx-auto max-w-[82rem] px-5 sm:px-8"><header class="mb-14 text-center"><p class="se-eyebrow mb-3">Pricing</p><h2 id="se-pricing-title" class="se-headline-sm">Plans that scale with your GTM</h2><div class="mx-auto mt-4 h-px w-12 bg-gradient-to-r from-transparent via-[var(--color-accent)] to-transparent" aria-hidden="true"></div><p class="se-body text-muted-foreground mx-auto mt-5 max-w-lg">Transparent per-seat pricing. Annual commitments receive up to 20% discount.</p></header><div class="grid items-stretch gap-5 lg:grid-cols-3 lg:gap-6"><article class="se-card flex flex-col p-7 sm:p-8 transition-transform duration-500 motion-safe:hover:-translate-y-1"><h3 class="se-font-display text-lg font-bold text-[var(--color-foreground)]">Growth</h3><p class="se-font-body mt-2 text-sm text-[var(--color-muted)]">For scaling GTM teams building their revenue foundation.</p><p class="mt-8 border-b border-[var(--border-subtle)] pb-6"><span class="se-metric text-4xl">$499</span><span class="se-font-body text-sm text-[var(--color-muted)]">/seat/mo</span></p><ul class="mt-6 flex-1 space-y-3.5"><li class="flex gap-3 se-font-body text-sm text-[var(--color-foreground)]"><span class="se-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>Pipeline intelligence</li><li class="flex gap-3 se-font-body text-sm text-[var(--color-foreground)]"><span class="se-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>CRM sync</li><li class="flex gap-3 se-font-body text-sm text-[var(--color-foreground)]"><span class="se-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>Standard dashboards</li><li class="flex gap-3 se-font-body text-sm text-[var(--color-foreground)]"><span class="se-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>Email support</li></ul><a href="#contact" class="se-btn-secondary se-focus-ring mt-8 w-full">Start trial</a></article><article class="se-card flex flex-col p-7 sm:p-8 transition-transform duration-500 se-card-featured relative lg:-translate-y-2 lg:shadow-[var(--shadow-surface)] ring-1 ring-[color-mix(in_srgb,var(--color-accent)_35%,transparent)] before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:bg-[radial-gradient(ellipse_at_top,color-mix(in_srgb,var(--color-accent)_12%,transparent),transparent_65%)]"><span class="se-eyebrow absolute -top-3 start-1/2 -translate-x-1/2 rounded-full bg-[var(--color-primary)] px-4 py-1 text-[0.625rem] text-white shadow-[var(--shadow-card)]">Most popular</span><h3 class="se-font-display text-lg font-bold text-[var(--color-foreground)]">Enterprise</h3><p class="se-font-body mt-2 text-sm text-[var(--color-muted)]">Full platform for revenue leaders with advanced forecasting.</p><p class="mt-8 border-b border-[var(--border-subtle)] pb-6"><span class="se-metric text-4xl">$899</span><span class="se-font-body text-sm text-[var(--color-muted)]">/seat/mo</span></p><ul class="mt-6 flex-1 space-y-3.5"><li class="flex gap-3 se-font-body text-sm text-[var(--color-foreground)]"><span class="se-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>Everything in Growth</li><li class="flex gap-3 se-font-body text-sm text-[var(--color-foreground)]"><span class="se-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>AI forecast models</li><li class="flex gap-3 se-font-body text-sm text-[var(--color-foreground)]"><span class="se-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>Custom dashboards</li><li class="flex gap-3 se-font-body text-sm text-[var(--color-foreground)]"><span class="se-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>Dedicated CSM</li><li class="flex gap-3 se-font-body text-sm text-[var(--color-foreground)]"><span class="se-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>SSO &amp; SCIM</li></ul><a href="#contact" class="se-btn-primary se-focus-ring mt-8 w-full">Book a demo</a></article><article class="se-card flex flex-col p-7 sm:p-8 transition-transform duration-500 motion-safe:hover:-translate-y-1"><h3 class="se-font-display text-lg font-bold text-[var(--color-foreground)]">Global</h3><p class="se-font-body mt-2 text-sm text-[var(--color-muted)]">Multi-region deployments with enterprise security and SLAs.</p><p class="mt-8 border-b border-[var(--border-subtle)] pb-6"><span class="se-metric text-4xl">Custom</span></p><ul class="mt-6 flex-1 space-y-3.5"><li class="flex gap-3 se-font-body text-sm text-[var(--color-foreground)]"><span class="se-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>Everything in Enterprise</li><li class="flex gap-3 se-font-body text-sm text-[var(--color-foreground)]"><span class="se-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>Multi-region hosting</li><li class="flex gap-3 se-font-body text-sm text-[var(--color-foreground)]"><span class="se-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>Custom integrations</li><li class="flex gap-3 se-font-body text-sm text-[var(--color-foreground)]"><span class="se-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>24/7 priority support</li><li class="flex gap-3 se-font-body text-sm text-[var(--color-foreground)]"><span class="se-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>Executive business reviews</li></ul><a href="#contact" class="se-btn-secondary se-focus-ring mt-8 w-full">Contact sales</a></article></div></div></section><section id="faq" data-v2-component="saas-enterprise-faq" aria-labelledby="se-faq-title" class="se-section se-section-alt bg-[var(--color-surface)]"><div class="mx-auto max-w-[82rem] px-5 sm:px-8"><div class="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start"><header class="lg:sticky lg:top-28"><p class="se-eyebrow mb-3">FAQ</p><h2 id="se-faq-title" class="se-headline-sm">Answers for revenue leaders</h2><div class="mt-4 h-px w-12 bg-gradient-to-r from-[var(--color-accent)] to-transparent" aria-hidden="true"></div><p class="se-body text-muted-foreground mt-5">Everything you need to know before your first demo.</p></header><div class="space-y-3"><div class="se-card overflow-hidden transition-shadow duration-300 shadow-[var(--shadow-surface)]"><h3><button type="button" id="se-faq-trigger-0" aria-expanded="true" aria-controls="se-faq-panel-0" class="flex w-full items-center justify-between gap-4 px-5 py-4 text-start se-focus-ring transition-colors hover:text-[var(--color-primary)]"><span class="se-font-display text-sm font-semibold text-[var(--color-foreground)]">How long does implementation take?</span><span class="se-font-mono flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-xs text-[var(--color-accent)] transition-all duration-300 rotate-180 bg-[color-mix(in_srgb,var(--color-accent)_10%,transparent)]" aria-hidden="true">−</span></button></h3><div id="se-faq-panel-0" role="region" aria-labelledby="se-faq-trigger-0" class="border-t border-[var(--border-subtle)] px-5 py-4 motion-safe:animate-[se-slide-up_0.35s_ease_both]"><p class="se-font-body text-sm leading-relaxed text-[var(--color-muted)]">Most enterprise teams go live in 14 days with guided onboarding. Complex multi-region rollouts typically complete within 30 days.</p></div></div><div class="se-card overflow-hidden transition-shadow duration-300 "><h3><button type="button" id="se-faq-trigger-1" aria-expanded="false" aria-controls="se-faq-panel-1" class="flex w-full items-center justify-between gap-4 px-5 py-4 text-start se-focus-ring transition-colors hover:text-[var(--color-primary)]"><span class="se-font-display text-sm font-semibold text-[var(--color-foreground)]">Does Northline integrate with our CRM?</span><span class="se-font-mono flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-xs text-[var(--color-accent)] transition-all duration-300 " aria-hidden="true">+</span></button></h3><div id="se-faq-panel-1" role="region" aria-labelledby="se-faq-trigger-1" hidden="" class="border-t border-[var(--border-subtle)] px-5 py-4 motion-safe:animate-[se-slide-up_0.35s_ease_both]"><p class="se-font-body text-sm leading-relaxed text-[var(--color-muted)]">Yes. Native bi-directional sync with Salesforce, HubSpot, and Microsoft Dynamics, plus custom API connectors for proprietary systems.</p></div></div><div class="se-card overflow-hidden transition-shadow duration-300 "><h3><button type="button" id="se-faq-trigger-2" aria-expanded="false" aria-controls="se-faq-panel-2" class="flex w-full items-center justify-between gap-4 px-5 py-4 text-start se-focus-ring transition-colors hover:text-[var(--color-primary)]"><span class="se-font-display text-sm font-semibold text-[var(--color-foreground)]">What security certifications do you hold?</span><span class="se-font-mono flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-xs text-[var(--color-accent)] transition-all duration-300 " aria-hidden="true">+</span></button></h3><div id="se-faq-panel-2" role="region" aria-labelledby="se-faq-trigger-2" hidden="" class="border-t border-[var(--border-subtle)] px-5 py-4 motion-safe:animate-[se-slide-up_0.35s_ease_both]"><p class="se-font-body text-sm leading-relaxed text-[var(--color-muted)]">Northline is SOC 2 Type II certified, GDPR compliant, and supports HIPAA BAA agreements for healthcare customers.</p></div></div><div class="se-card overflow-hidden transition-shadow duration-300 "><h3><button type="button" id="se-faq-trigger-3" aria-expanded="false" aria-controls="se-faq-panel-3" class="flex w-full items-center justify-between gap-4 px-5 py-4 text-start se-focus-ring transition-colors hover:text-[var(--color-primary)]"><span class="se-font-display text-sm font-semibold text-[var(--color-foreground)]">Can we customize dashboards for executives?</span><span class="se-font-mono flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-xs text-[var(--color-accent)] transition-all duration-300 " aria-hidden="true">+</span></button></h3><div id="se-faq-panel-3" role="region" aria-labelledby="se-faq-trigger-3" hidden="" class="border-t border-[var(--border-subtle)] px-5 py-4 motion-safe:animate-[se-slide-up_0.35s_ease_both]"><p class="se-font-body text-sm leading-relaxed text-[var(--color-muted)]">Role-based dashboards let CROs, VPs, and reps each see the metrics that matter most, with drill-down to deal-level detail.</p></div></div></div></div></div></section><section id="contact" data-v2-component="saas-enterprise-contact" aria-labelledby="contact-title" class="se-section se-section-glow relative bg-[var(--color-background)]"><div class="mx-auto max-w-[82rem] px-5 sm:px-8"><div class="grid gap-12 lg:grid-cols-2 lg:gap-16"><div><p class="se-eyebrow mb-3">Contact sales</p><h2 id="contact-title" class="se-headline-sm">Book a personalized demo</h2><div class="mt-4 h-px w-12 bg-gradient-to-r from-[var(--color-accent)] to-transparent" aria-hidden="true"></div><p class="se-body text-muted-foreground mt-5">See how Northline fits your revenue stack. Enterprise teams get a dedicated solutions architect.</p><address class="se-font-body mt-8 space-y-4 text-sm not-italic"><p class="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] p-4"><span class="block font-semibold text-[var(--color-foreground)]">Email</span><a href="mailto:sales@northline.io" class="se-focus-ring mt-1 inline-block text-[var(--color-muted)] hover:text-[var(--color-accent)]">sales@northline.io</a></p><p class="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] p-4"><span class="block font-semibold text-[var(--color-foreground)]">Phone</span><a href="tel:+1(888)555-0142" class="se-focus-ring mt-1 inline-block text-[var(--color-muted)] hover:text-[var(--color-accent)]">+1 (888) 555-0142</a></p><p class="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] p-4"><span class="block font-semibold text-[var(--color-foreground)]">Office</span><span class="mt-1 block text-[var(--color-muted)]">535 Mission Street, San Francisco, CA</span></p></address></div><form id="_R_2i_" class="se-card p-6 sm:p-8" noValidate=""><div class="space-y-5"><div><label for="_R_2i_-name" class="se-font-body mb-2 block text-sm font-medium text-[var(--color-foreground)]">Name</label><input id="_R_2i_-name" type="text" required="" autoComplete="name" class="se-input se-focus-ring" name="name"/></div><div><label for="_R_2i_-email" class="se-font-body mb-2 block text-sm font-medium text-[var(--color-foreground)]">Email</label><input id="_R_2i_-email" type="email" required="" autoComplete="email" class="se-input se-focus-ring" name="email"/></div><div><label for="_R_2i_-message" class="se-font-body mb-2 block text-sm font-medium text-[var(--color-foreground)]">Message</label><textarea id="_R_2i_-message" name="message" rows="4" required="" class="se-textarea resize-y se-focus-ring"></textarea></div><button type="submit" class="se-btn-primary w-full sm:w-auto se-focus-ring">Request demo</button></div></form></div></div></section></main><utility data-v2-region="utility"><section id="cta-band" data-v2-component="saas-enterprise-utility-band" aria-labelledby="se-utility-title" class="relative overflow-hidden bg-[var(--color-primary)] py-16 sm:py-20"><div class="se-grid-bg pointer-events-none absolute inset-0 opacity-[0.18]" aria-hidden="true"></div><div class="pointer-events-none absolute -start-1/4 top-0 h-full w-1/2 bg-[radial-gradient(ellipse_70%_90%_at_0%_50%,rgba(255,255,255,0.14),transparent)]" aria-hidden="true"></div><div class="pointer-events-none absolute -end-1/4 bottom-0 h-2/3 w-1/2 bg-[radial-gradient(ellipse_60%_80%_at_100%_100%,rgba(59,130,246,0.25),transparent)]" aria-hidden="true"></div><div class="relative mx-auto flex max-w-[82rem] flex-col items-start justify-between gap-10 px-5 sm:flex-row sm:items-center sm:px-8"><div class="max-w-xl"><p class="se-font-mono text-xs font-medium uppercase tracking-[0.2em] text-white/70">Get started</p><h2 id="se-utility-title" class="se-font-display mt-3 text-[clamp(1.75rem,3vw,2.5rem)] font-bold leading-tight text-white text-wrap-balance">See Northline in action</h2><p class="se-font-body mt-4 text-sm leading-relaxed text-white/78 sm:text-base">Join 500+ revenue teams who&#x27;ve transformed their GTM operations.</p><div class="se-trust-strip mt-6"><span class="se-trust-badge border-white/15 bg-white/8 text-white/80"><span class="se-signal text-[0.5rem]" aria-hidden="true">✓</span>SOC 2</span><span class="se-trust-badge border-white/15 bg-white/8 text-white/80"><span class="se-signal text-[0.5rem]" aria-hidden="true">✓</span>99.9% uptime</span><span class="se-trust-badge border-white/15 bg-white/8 text-white/80"><span class="se-signal text-[0.5rem]" aria-hidden="true">✓</span>14-day onboarding</span></div></div><div class="flex w-full flex-col gap-3 sm:w-auto sm:flex-row"><a href="#contact" class="inline-flex min-h-[3rem] items-center justify-center rounded-[var(--radius-md)] bg-white px-6 py-3 text-sm font-semibold text-[var(--color-primary)] shadow-[0_8px_24px_rgba(0,0,0,0.18)] transition hover:-translate-y-0.5 hover:bg-white/95 hover:shadow-[0_12px_32px_rgba(0,0,0,0.22)] se-focus-ring">Commencer</a><a href="/platform" class="inline-flex min-h-[3rem] items-center justify-center rounded-[var(--radius-md)] border border-white/35 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:border-white/60 hover:bg-white/10 se-focus-ring">En savoir plus</a></div></div></section></utility><footer data-v2-region="footer"><footer data-v2-component="saas-enterprise-footer" class="border-t border-[var(--border-default)] bg-[var(--color-ink,#020617)] text-white" role="contentinfo"><div class="mx-auto max-w-[82rem] px-5 py-14 sm:px-8 sm:py-16"><div class="grid gap-10 md:grid-cols-[1.4fr_1fr]"><div><p class="se-font-display text-xl font-bold">Planium</p><p class="se-font-body mt-3 max-w-sm text-sm leading-relaxed text-white/60">Serving France / Europe</p><div class="mt-6 flex flex-wrap gap-3"><span class="se-font-mono rounded-[var(--radius-sm)] border border-white/10 px-2.5 py-1 text-[0.625rem] text-white/50">SOC 2</span><span class="se-font-mono rounded-[var(--radius-sm)] border border-white/10 px-2.5 py-1 text-[0.625rem] text-white/50">GDPR</span><span class="se-font-mono rounded-[var(--radius-sm)] border border-white/10 px-2.5 py-1 text-[0.625rem] text-white/50">ISO 27001</span></div></div><nav aria-label="Footer"><p class="se-eyebrow text-white/40">Explore</p><ul class="mt-4 grid grid-cols-2 gap-x-6 gap-y-2.5"><li><a href="#features" class="se-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] se-focus-ring rounded-sm">Fonctionnalités</a></li><li><a href="#platform" class="se-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] se-focus-ring rounded-sm">Services</a></li><li><a href="#pricing" class="se-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] se-focus-ring rounded-sm">Tarifs</a></li><li><a href="#contact" class="se-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] se-focus-ring rounded-sm">Contact</a></li></ul></nav></div><div class="mt-12 border-t border-white/10 pt-6"><p class="se-font-body text-xs text-white/40">© 2026 Planium. All rights reserved.</p></div></div></footer></footer><div data-v2-region="overlay" class="pointer-events-none fixed inset-x-0 bottom-0 z-50"></div></div>
+  </div>
+  <section class="page v2-secondary-page" id="fonctionnalit-s">
+  <div class="mx-auto max-w-3xl px-6 py-16">
+    <p class="text-xs uppercase tracking-widest text-[var(--color-foreground)]/50">Fonctionnalités</p>
+    <h1 class="mt-4 text-3xl font-semibold text-[var(--color-foreground)]">Fonctionnalités</h1>
+    <p class="mt-4 text-[var(--color-foreground)]/70">Fonctionnalités — Planium</p>
+    <a class="mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]" href="#accueil">Back to home</a>
+  </div>
+</section>
+<section class="page v2-secondary-page" id="int-grations">
+  <div class="mx-auto max-w-3xl px-6 py-16">
+    <p class="text-xs uppercase tracking-widest text-[var(--color-foreground)]/50">Intégrations</p>
+    <h1 class="mt-4 text-3xl font-semibold text-[var(--color-foreground)]">Intégrations</h1>
+    <p class="mt-4 text-[var(--color-foreground)]/70">Intégrations — Planium</p>
+    <a class="mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]" href="#accueil">Back to home</a>
+  </div>
+</section>
+<section class="page v2-secondary-page" id="s-curit-entreprise">
+  <div class="mx-auto max-w-3xl px-6 py-16">
+    <p class="text-xs uppercase tracking-widest text-[var(--color-foreground)]/50">Sécurité &amp; Entreprise</p>
+    <h1 class="mt-4 text-3xl font-semibold text-[var(--color-foreground)]">Sécurité &amp; Entreprise</h1>
+    <p class="mt-4 text-[var(--color-foreground)]/70">Sécurité &amp; Entreprise — Planium</p>
+    <a class="mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]" href="#accueil">Back to home</a>
+  </div>
+</section>
+<section class="page v2-secondary-page" id="tarifs">
+  <div class="mx-auto max-w-3xl px-6 py-16">
+    <p class="text-xs uppercase tracking-widest text-[var(--color-foreground)]/50">Tarifs</p>
+    <h1 class="mt-4 text-3xl font-semibold text-[var(--color-foreground)]">Tarifs</h1>
+    <p class="mt-4 text-[var(--color-foreground)]/70">Tarifs — Planium</p>
+    <a class="mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]" href="#accueil">Back to home</a>
+  </div>
+</section>
+<section class="page v2-secondary-page" id="tudes-de-cas">
+  <div class="mx-auto max-w-3xl px-6 py-16">
+    <p class="text-xs uppercase tracking-widest text-[var(--color-foreground)]/50">Études de cas</p>
+    <h1 class="mt-4 text-3xl font-semibold text-[var(--color-foreground)]">Études de cas</h1>
+    <p class="mt-4 text-[var(--color-foreground)]/70">Études de cas — Planium</p>
+    <a class="mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]" href="#accueil">Back to home</a>
+  </div>
+</section>
+<section class="page v2-secondary-page" id="ressources">
+  <div class="mx-auto max-w-3xl px-6 py-16">
+    <p class="text-xs uppercase tracking-widest text-[var(--color-foreground)]/50">Ressources</p>
+    <h1 class="mt-4 text-3xl font-semibold text-[var(--color-foreground)]">Ressources</h1>
+    <p class="mt-4 text-[var(--color-foreground)]/70">Ressources — Planium</p>
+    <a class="mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]" href="#accueil">Back to home</a>
+  </div>
+</section>
+<section class="page v2-secondary-page" id="contact">
+  <div class="mx-auto max-w-3xl px-6 py-16">
+    <p class="text-xs uppercase tracking-widest text-[var(--color-foreground)]/50">Contact</p>
+    <h1 class="mt-4 text-3xl font-semibold text-[var(--color-foreground)]">Contact</h1>
+    <p class="mt-4 text-[var(--color-foreground)]/70">Contact — Planium</p>
+    <a class="mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]" href="#accueil">Back to home</a>
+  </div>
+</section>
+</body>
+</html>

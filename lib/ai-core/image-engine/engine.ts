@@ -29,6 +29,7 @@ import {
 } from "@/lib/ai-core/image-engine/prompt-scoring";
 import { preferAiImages } from "@/lib/ai-core/image-engine/prefer";
 import { ensureRequiredPhotoAssets } from "@/lib/ai-core/image-engine/inject";
+import { enrichManifestWithProfileSlots } from "@/lib/ai-core/image-engine/profile-engine";
 import {
   assertPublishableAssets,
   validateAssetManifest,
@@ -333,9 +334,21 @@ export async function runAiImageEngine(params: {
     routingIndustryId: params.businessProfile?.routingIndustryId,
     imageSystemSpec: iieResult.spec,
   });
+  const slotted = enrichManifestWithProfileSlots(
+    complete,
+    {
+      industry: stockIndustry,
+      routingIndustryId: params.businessProfile?.routingIndustryId,
+      subcategory: params.businessProfile?.subcategory,
+      visualStyle: intel.brandStyle,
+      businessType: params.profile?.industry,
+      brandStyle: intel.brandStyle,
+    },
+    { projectSeed: params.generationKey ?? params.websiteGenerationId ?? stockIndustry },
+  );
 
   params.onProgress?.("AI Assets Engine: validating visual coverage…");
-  const qualityReport = validateAssetManifest(complete, {
+  const qualityReport = validateAssetManifest(slotted, {
     industry: intel.industry,
     brandStyle: intel.brandStyle,
     plannedPrompts: planned.map((p) => ({
@@ -345,19 +358,19 @@ export async function runAiImageEngine(params: {
       section: p.metadata.section,
     })),
   });
-  assertPublishableAssets(complete);
+  assertPublishableAssets(slotted);
 
   const videoPackage = prepareVideoAssets({
     ctx: intel,
     brandIdentity: params.brandIdentity,
-    imageManifest: complete,
+    imageManifest: slotted,
   });
 
   params.onProgress?.(qualityReport.summary);
   params.onProgress?.(videoPackage.summary);
 
   return {
-    ...complete,
+    ...slotted,
     engine: "ai-assets-engine",
     qualityReport,
     videoPackage,

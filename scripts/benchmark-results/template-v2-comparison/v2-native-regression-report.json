@@ -1,0 +1,35 @@
+{
+  "generatedAt": "2026-08-03T20:50:31.737Z",
+  "visualRegression": "none detected — locked identity bindings preserved",
+  "runtimeRegression": "none detected — component trees unchanged",
+  "previewRegression": "none detected — V2 markers present on apply",
+  "builderRegression": "none detected — apply pipeline succeeds for all templates",
+  "exportRegression": "none detected — export shape valid for all templates",
+  "perTemplate": [
+    {
+      "packageId": "restaurant-signature",
+      "checksPass": true,
+      "failedChecks": []
+    },
+    {
+      "packageId": "saas-enterprise",
+      "checksPass": true,
+      "failedChecks": []
+    },
+    {
+      "packageId": "real-estate-prestige",
+      "checksPass": true,
+      "failedChecks": []
+    },
+    {
+      "packageId": "medical-premium",
+      "checksPass": true,
+      "failedChecks": []
+    },
+    {
+      "packageId": "creative-portfolio",
+      "checksPass": true,
+      "failedChecks": []
+    }
+  ]
+}

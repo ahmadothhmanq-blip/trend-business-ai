@@ -3,8 +3,21 @@ import { BUILDER_DEFAULT_STRUCTURE_TEMPLATE_INTELLIGENCE_ID } from "@/lib/websit
 
 /** Distinct Template Intelligence profile per premium structure package. */
 export const STRUCTURE_TEMPLATE_INTELLIGENCE_MAP: Record<string, string> = {
+  "corporate-business": "ti-corporate-trust",
   "modern-business": "ti-corporate-trust",
   "ai-startup-signal": "ti-ai-company-signal",
+  "saas-enterprise": "ti-saas-growth",
+  "restaurant-premium": "ti-restaurant-dining",
+  "restaurant-signature": "ti-restaurant-dining",
+  "real-estate-premium": "ti-real-estate-listings",
+  "real-estate-prestige": "ti-real-estate-listings",
+  "medical-premium": "ti-medical-care",
+  "creative-agency-premium": "ti-creative-studio",
+  "creative-portfolio": "ti-creative-studio",
+  "hotel-resort-premium": "ti-hotel-sanctuary",
+  "finance-premium": "ti-finance-ledger",
+  "education-premium": "ti-university-heritage",
+  "ecommerce-premium": "ti-ecommerce-atelier",
 };
 
 export function resolveStructureTemplateIntelligenceId(

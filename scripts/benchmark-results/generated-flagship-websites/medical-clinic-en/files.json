@@ -1,0 +1,18 @@
+[
+  "lib/site-images.ts",
+  "app/layout.tsx",
+  "components/ui/motion.tsx",
+  "app/globals.css",
+  "components/medical-premium-nav.tsx",
+  "components/medical-premium-trust-hero.tsx",
+  "components/medical-premium-appointment-band.tsx",
+  "components/medical-premium-specialties.tsx",
+  "components/medical-premium-physicians.tsx",
+  "components/medical-premium-care-journey.tsx",
+  "components/medical-premium-wellness.tsx",
+  "components/medical-premium-testimonials.tsx",
+  "components/medical-premium-contact.tsx",
+  "components/medical-premium-footer.tsx",
+  "components/medical-premium-section-shell.tsx",
+  "app/page.tsx"
+]

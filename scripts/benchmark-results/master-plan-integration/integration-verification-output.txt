@@ -1,0 +1,44 @@
+▶ TBGE2 Master Plan Engine — Phase 1.5
+  ✔ exports master plan constants (1.0264ms)
+  ✔ defines master plan lifecycle (0.2158ms)
+  ✔ builds master plan from TBGE2 analysis (3.1805ms)
+  ✔ includes all required master plan domains (1.1168ms)
+  ✔ validates master plan comprehensively (0.5987ms)
+  ✔ runs full master plan pipeline (0.5467ms)
+  ✔ builds LLM request for copy execution only (0.6822ms)
+  ✔ forbids LLM from making planning decisions (0.6406ms)
+  ✔ resolves components for every section (0.5388ms)
+  ✔ supports Arabic localization in master plan (0.5427ms)
+  ✔ produces settings patch for project storage (0.9679ms)
+  ✔ is provider independent (0.5364ms)
+✔ TBGE2 Master Plan Engine — Phase 1.5 (11.9929ms)
+ℹ tests 12
+ℹ suites 1
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1358.4665
+npm warn Unknown env config "devdir". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+▶ Master Plan + Website Builder integration
+  ✔ is disabled by default (0.9171ms)
+  ✔ enables with WB_MASTER_PLAN=1 (0.2137ms)
+  ✔ wires master plan into builder lifecycle (8.5086ms)
+  ✔ validates master plan before generation (1.0148ms)
+  ✔ builds copy-only content tasks (1.1896ms)
+  ✔ bridges master plan to legacy website plan (0.7684ms)
+  ✔ builds locked TBGE spec from master plan (0.6955ms)
+  ✔ maps brief with master plan metadata patch (1.3837ms)
+  ✔ validates export requirements (0.2016ms)
+✔ Master Plan + Website Builder integration (16.0427ms)
+ℹ tests 9
+ℹ suites 1
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1385.7075
+npm warn Unknown env config "devdir". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.

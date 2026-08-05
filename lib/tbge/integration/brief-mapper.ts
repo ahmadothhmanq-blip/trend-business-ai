@@ -8,7 +8,10 @@ import type { TbgeBrief } from "@/lib/tbge/kernel/types";
 import type { TbgeGenerationProfile, TbgeRunMode } from "@/lib/tbge/spec/types";
 import type { WebsiteGenerationInput } from "@/lib/website/types";
 
-export function mapWebsiteInputToTbgeBrief(input: WebsiteGenerationInput): TbgeBrief {
+export function mapWebsiteInputToTbgeBrief(
+  input: WebsiteGenerationInput,
+  metadataPatch?: Record<string, unknown>,
+): TbgeBrief {
   return {
     prompt: input.prompt,
     productId: WEBSITE_BUILDER_PRODUCT_ID,
@@ -16,10 +19,11 @@ export function mapWebsiteInputToTbgeBrief(input: WebsiteGenerationInput): TbgeB
     theme: input.theme,
     features: input.features,
     metadata: {
+      ...metadataPatch,
       projectType: input.projectType,
       projectKind: input.projectKind,
       templateId: input.templateId,
-      industryId: input.industryId,
+      industryId: input.industryId ?? metadataPatch?.industryId,
     },
   };
 }

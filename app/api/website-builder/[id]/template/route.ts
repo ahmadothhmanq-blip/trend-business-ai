@@ -88,7 +88,7 @@ export async function POST(request: Request, context: RouteContext) {
 
     const switched =
       "templatePackageId" in parsed.data
-        ? applyStructureTemplateToProject({
+        ? await applyStructureTemplateToProject({
             project,
             templatePackageId: parsed.data.templatePackageId,
             language: generation.language,

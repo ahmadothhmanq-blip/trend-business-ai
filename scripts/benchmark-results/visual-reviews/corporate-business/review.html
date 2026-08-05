@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Corporate Business — Visual Review</title>
+  <style>
+    :root { color-scheme: light; }
+    body { margin: 0; font-family: Inter, system-ui, sans-serif; background: #111; color: #eee; }
+    header { padding: 2rem; border-bottom: 1px solid #333; }
+    h1 { margin: 0 0 .5rem; font-size: 1.5rem; }
+    a { color: #c4a574; }
+    section { padding: 2rem; border-bottom: 1px solid #222; }
+    h2 { margin: 0 0 1rem; font-size: 1.125rem; color: #c4a574; text-transform: uppercase; letter-spacing: .12em; }
+    .grid { display: grid; gap: 1.5rem; }
+    .grid-2 { grid-template-columns: 1fr 1fr; }
+    img { width: 100%; height: auto; border: 1px solid #333; border-radius: 8px; background: #fff; }
+    .note { color: #999; font-size: .875rem; margin-top: .5rem; }
+    @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Meridian Advisory — Corporate Business Visual Review</h1>
+    <p>Live preview: <a href="http://localhost:3456/corporate-business/preview.html" target="_blank">http://localhost:3456/corporate-business/preview.html</a></p>
+    <p class="note">Captured at 1440×900 desktop and 390×844 mobile. Reference: Mercury.com hero.</p>
+  </header>
+
+  <section>
+    <h2>1 · After — Full page (desktop)</h2>
+    <img src="after-desktop-full.png" alt="After full page desktop" />
+  </section>
+
+  <section>
+    <h2>2 · After — Full page (mobile)</h2>
+    <img src="after-mobile-full.png" alt="After full page mobile" />
+  </section>
+
+  <section>
+    <h2>3 · Before / After — Hero (desktop)</h2>
+    <div class="grid grid-2">
+      <div>
+        <p><strong>Before</strong> — dominant stock skyscraper photo, generic stat grid</p>
+        <img src="before-hero-desktop.png" alt="Before hero desktop" />
+      </div>
+      <div>
+        <p><strong>After</strong> — art-directed ink panel, glass overlay, floating metrics</p>
+        <img src="after-hero-desktop.png" alt="After hero desktop" />
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>4 · Before / After — Full page (desktop)</h2>
+    <div class="grid grid-2">
+      <div>
+        <p><strong>Before</strong> (rejected pass — stock hero, generic sections)</p>
+        <img src="before-desktop-full.png" alt="Before full page desktop" />
+      </div>
+      <div>
+        <p><strong>After</strong> (current pass — art-directed hero, bespoke sections)</p>
+        <img src="after-desktop-full.png" alt="After full page desktop" />
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>5 · Reference — Mercury.com hero</h2>
+    <img src="reference-mercury-hero.png" alt="Mercury.com reference hero" />
+    <p class="note">Mercury uses warm neutral canvas, oversized editorial headline, product UI as hero focal point (not stock photography), pill CTAs, generous whitespace.</p>
+  </section>
+</body>
+</html>

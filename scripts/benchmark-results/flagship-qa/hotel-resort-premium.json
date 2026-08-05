@@ -1,0 +1,75 @@
+{
+  "packageId": "hotel-resort-premium",
+  "completedAt": "2026-08-05T22:07:40.782Z",
+  "marketplaceScore": 96,
+  "passed95": true,
+  "visual": {
+    "designTokens": 92,
+    "visualHierarchy": 92,
+    "responsiveLayout": 92,
+    "heroQuality": 92,
+    "navigationUx": 92,
+    "ctaPlacement": 92,
+    "componentSpacing": 92,
+    "typographyHierarchy": 92,
+    "crossPageConsistency": 92,
+    "layout": 92,
+    "ux": 92,
+    "overall": 92
+  },
+  "preview": {
+    "imageCount": 0,
+    "hasHeroImage": false,
+    "hasPlaceholder": false,
+    "sectionCount": 0,
+    "premiumSignals": 4,
+    "duplicateImages": 0,
+    "uniquePhotoCount": 1,
+    "usesSlotImages": false
+  },
+  "slotIndependence": {
+    "slotUsages": 14,
+    "imageIndependent": true
+  },
+  "imageValidation": {
+    "passed": true,
+    "repairs": 31,
+    "duplicatesRemoved": 26,
+    "industryId": "hotel",
+    "uniqueUrlCount": 18,
+    "issues": [
+      "duplicate: Duplicate image URL rejected.",
+      "duplicate: Duplicate image URL rejected.",
+      "duplicate: Duplicate image URL rejected.",
+      "duplicate: Duplicate image URL rejected.",
+      "duplicate: Duplicate image URL rejected."
+    ],
+    "rulesReport": {
+      "passed": true,
+      "score": 70,
+      "industryDetected": "hotel",
+      "industryLabel": "Hotel & Resort",
+      "subcategory": null,
+      "visualStyle": "luxury sanctuary, cinematic hospitality",
+      "profileId": "hotel",
+      "selectedCount": 44,
+      "rejectedCount": 26,
+      "replacedCount": 26,
+      "sourceCounts": {
+        "user": 0,
+        "ai": 0,
+        "library": 44,
+        "stock": 0
+      },
+      "summary": "Industry image rules passed for Hotel & Resort (hotel). 44 images selected, 26 replaced."
+    }
+  },
+  "lighthouse": null,
+  "previewPath": "C:\\Users\\PC\\Desktop\\trend-business-ai\\scripts\\benchmark-results\\flagship-previews\\hotel-resort-premium\\preview.html",
+  "bytes": 24056,
+  "v2Markers": {
+    "package": true,
+    "hero": false,
+    "render": true
+  }
+}

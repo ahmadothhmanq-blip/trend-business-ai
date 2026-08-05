@@ -1,0 +1,2361 @@
+{
+  "projectKind": "website",
+  "title": "Trend Business AI",
+  "description": "Business automation, website generation, and enterprise AI products",
+  "prompt": "Trend Business AI — an AI & software company building world-class business automation, website generation, and enterprise AI products. Premium corporate presence with trust-first messaging, executive advisory tone, measurable outcomes, and clear conversion paths.",
+  "generatedAt": "2026-08-04T21:21:34.943Z",
+  "pages": [
+    "Home",
+    "Solutions",
+    "Products",
+    "About",
+    "Insights",
+    "Contact"
+  ],
+  "sections": [
+    "corporate-business-nav",
+    "corporate-business-hero",
+    "corporate-business-features",
+    "corporate-business-about",
+    "corporate-business-stats",
+    "corporate-business-testimonials",
+    "corporate-business-pricing",
+    "corporate-business-faq",
+    "corporate-business-contact",
+    "corporate-business-footer",
+    "corporate-business-floating-cta",
+    "corporate-business-utility-band",
+    "corporate-business-section-shell",
+    "corporate-business-portfolio",
+    "corporate-business-integrations"
+  ],
+  "colorPalette": [
+    "#0F2B46",
+    "#1E4976",
+    "#2563EB",
+    "#FFFFFF",
+    "#0F172A",
+    "#F8FAFC"
+  ],
+  "typography": [
+    "IBM Plex Sans",
+    "IBM Plex Sans"
+  ],
+  "components": [
+    "corporate-business-nav",
+    "corporate-business-hero",
+    "corporate-business-features",
+    "corporate-business-about",
+    "corporate-business-stats",
+    "corporate-business-testimonials",
+    "corporate-business-pricing",
+    "corporate-business-faq",
+    "corporate-business-contact",
+    "corporate-business-footer",
+    "corporate-business-floating-cta",
+    "corporate-business-utility-band",
+    "corporate-business-section-shell",
+    "corporate-business-portfolio",
+    "corporate-business-integrations"
+  ],
+  "content": [
+    "Home",
+    "Trust indicators / client logos",
+    "Executive summary",
+    "Capabilities overview",
+    "Measurable outcomes",
+    "Featured products",
+    "Testimonials",
+    "Contact Us",
+    "Solutions",
+    "Solutions grid",
+    "Industry use cases",
+    "Integration approach",
+    "Outcome metrics",
+    "Trend Business AI",
+    "Products",
+    "Product catalog",
+    "Product deep dive",
+    "Technical differentiators",
+    "Security and trust",
+    "Pricing / engagement models",
+    "Trend Business AI",
+    "Company story",
+    "Leadership team",
+    "Mission and values",
+    "Trust and security standards",
+    "Trend Business AI",
+    "Contact Us",
+    "Insights",
+    "Featured insights",
+    "Article grid",
+    "Industry reports",
+    "Trend Business AI",
+    "Trend Business AI",
+    "Contact",
+    "Contact Us",
+    "Sales and support channels",
+    "Response time commitment",
+    "Office locations / global presence",
+    "FAQ"
+  ],
+  "seo": [
+    "Home",
+    "Solutions",
+    "Products",
+    "About",
+    "Insights",
+    "Contact"
+  ],
+  "roadmap": [
+    "Generate qualified enterprise leads",
+    "Establish premium trust and thought leadership",
+    "Showcase business automation and AI products",
+    "Drive conversions through clear CTAs"
+  ],
+  "files": [
+    {
+      "path": "app/about/page.tsx",
+      "content": "import { SiteShell } from \"@/components/layout/site-shell\";\nimport { buildPageTitle } from \"@/lib/seo\";\n\nexport const metadata = {\n  title: buildPageTitle(\"About\"),\n  description: \"Build trust through company story, leadership, and mission.\",\n};\n\nexport default function SecondaryPage() {\n  return (\n    <SiteShell>\n      <h1>About</h1>\n      <p>Build trust through company story, leadership, and mission.</p>\n      <section><h2>Company story</h2></section>\n      <section><h2>Leadership team</h2></section>\n      <section><h2>Mission and values</h2></section>\n      <section><h2>Trust and security standards</h2></section>\n      <section><h2>Career / partner CTA</h2></section>\n      <section><h2>Contact link</h2></section>\n    </SiteShell>\n  );\n}\n",
+      "language": "tsx"
+    },
+    {
+      "path": "lib/site-images.ts",
+      "content": "export const HERO_IMAGE = null as string | null;\nexport const PRODUCT_IMAGE = null as string | null;\nexport const SERVICE_IMAGE = null as string | null;\nexport const BACKGROUND_IMAGE = null as string | null;\nexport const BRAND_IMAGE = null as string | null;\nexport const SECTION_IMAGES = [] as readonly string[];\nexport const GALLERY_IMAGES = [] as readonly string[];\nexport const TESTIMONIAL_IMAGES = [] as readonly string[];\nexport const SITE_IMAGES: Array<{ id: string; role: string; url: string | null }> = [];\nexport function imageByRole(_role: string): string | null { return null; }\nexport function siteImagePool(): string[] { return []; }\nexport function resolveSiteImage(preferred?: string | null, index = 0): string | null {\n  if (preferred) return preferred;\n  const pool = siteImagePool();\n  return pool[index % Math.max(pool.length, 1)] ?? null;\n}\n",
+      "language": "typescript"
+    },
+    {
+      "path": "components/ui/motion.tsx",
+      "content": "\"use client\";\n\nimport type { ReactNode } from \"react\";\n\ntype MotionProps = {\n  children: ReactNode;\n  className?: string;\n  entrance?: string;\n  delayMs?: number;\n};\n\nconst PRESET = \"atlas-reveal\";\nconst REDUCED_MOTION = \"fade\";\nconst DEFAULT_DURATION = 520;\n\nconst ENTRANCE_TYPES: Record<string, string> = {\n  \"hero\": \"slide-up\",\n  \"section\": \"slide-up\",\n  \"metric\": \"count-up\",\n};\n\nexport function Motion({ children, className = \"\", entrance, delayMs = 0 }: MotionProps) {\n  const motionType = entrance ? ENTRANCE_TYPES[entrance] ?? \"fade-in\" : \"fade-in\";\n  const duration = DEFAULT_DURATION;\n\n  return (\n    <div\n      className={[\"v2-motion\", className].filter(Boolean).join(\" \")}\n      data-v2-motion={PRESET}\n      data-entrance={motionType}\n      style={{\n        animation: `${motionType} ${duration}ms cubic-bezier(0.22, 1, 0.36, 1) both`,\n        animationDelay: `${delayMs}ms`,\n      }}\n    >\n      {children}\n    </div>\n  );\n}\n",
+      "language": "tsx"
+    },
+    {
+      "path": "app/globals.css",
+      "content": "@tailwind base;\n@tailwind components;\n@tailwind utilities;\n\n/* Template Architecture V2 — corporate-business · spec 2.0.0 */\n:root {\n  --v2-package: \"corporate-business\";\n  --color-primary: #0F2B46;\n  --color-secondary: #1E4976;\n  --color-accent: #2563EB;\n  --color-background: #FFFFFF;\n  --color-foreground: #0F172A;\n  --color-muted: rgba(15,23,42,0.58);\n  --color-surface: #F8FAFC;\n  --color-signal: #C5A572;\n  --color-grid: rgba(15,43,70,0.06);\n  --color-ink: #071018;\n  --font-display: \"IBM Plex Sans\", ui-sans-serif, system-ui, sans-serif;\n  --font-body: \"IBM Plex Sans\", ui-sans-serif, system-ui, sans-serif;\n  --spacing-unit: 0.25rem;\n  --radius-sm: 4px;\n  --radius-md: 8px;\n  --radius-lg: 12px;\n  --radius-xl: 16px;\n  --shadow-surface: 0 1px 2px rgba(15,23,42,0.06), 0 16px 48px rgba(15,43,70,0.08);\n  --shadow-glow: 0 0 64px rgba(197,165,114,0.2);\n  --shadow-card: 0 0 0 1px rgba(15,43,70,0.05), 0 4px 20px rgba(15,43,70,0.06);\n  --border-default: rgba(15,43,70,0.1);\n  --border-accent: rgba(37,99,235,0.22);\n  --border-subtle: rgba(15,43,70,0.05);\n}\n\n/* V2 language profile — RTL typography adaptation */\n[dir=\"rtl\"] {\n  --font-display: Tajawal, ui-serif, Georgia, serif;\n  --font-body: \"Noto Sans Arabic\", ui-sans-serif, system-ui, sans-serif;\n  letter-spacing: 0.01em;\n}\n\n@import url(\"https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:ital,wght@0,500;0,600;0,700;0,800;1,500&display=swap\");\n\n@keyframes cb-grid-reveal {\n  from { opacity: 0; transform: translateY(20px) scale(0.98); }\n  to { opacity: 1; transform: translateY(0) scale(1); }\n}\n@keyframes cb-slide-up {\n  from { opacity: 0; transform: translateY(16px); }\n  to { opacity: 1; transform: translateY(0); }\n}\n@keyframes cb-marquee {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n[dir=\"rtl\"] [class*=\"se-marquee\"],\n[dir=\"rtl\"] [class*=\"cb-marquee\"] {\n  animation-direction: reverse;\n}\n@keyframes cb-pulse-dot {\n  0%, 100% { opacity: 0.4; transform: scale(0.85); }\n  50% { opacity: 1; transform: scale(1); }\n}\n@keyframes cb-scan-line {\n  0% { transform: translateY(-100%); opacity: 0; }\n  50% { opacity: 0.06; }\n  100% { transform: translateY(100vh); opacity: 0; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .cb-animate, [data-cb-motion] { animation: none !important; transition: none !important; }\n}\n\n.cb-font-display { font-family: var(--font-display), \"IBM Plex Sans\", system-ui, sans-serif; }\n.cb-font-body { font-family: var(--font-body), \"IBM Plex Sans\", system-ui, sans-serif; }\n.cb-font-mono { font-family: \"IBM Plex Mono\", ui-monospace, monospace; }\n.cb-eyebrow {\n  font-family: var(--font-body), \"IBM Plex Sans\", system-ui, sans-serif;\n  font-size: 0.6875rem;\n  font-weight: 600;\n  letter-spacing: 0.14em;\n  text-transform: uppercase;\n  color: var(--color-accent, #3B82F6);\n}\n.cb-headline {\n  font-family: var(--font-display), \"IBM Plex Sans\", system-ui, sans-serif;\n  font-size: clamp(2.25rem, 4.5vw, 3.75rem);\n  font-weight: 700;\n  line-height: 1.08;\n  letter-spacing: -0.03em;\n  color: var(--color-foreground);\n}\n.cb-headline-sm {\n  font-family: var(--font-display), \"IBM Plex Sans\", system-ui, sans-serif;\n  font-size: clamp(1.5rem, 2.8vw, 2.25rem);\n  font-weight: 700;\n  line-height: 1.15;\n  letter-spacing: -0.025em;\n  color: var(--color-foreground);\n}\n.cb-body {\n  font-family: var(--font-body), \"IBM Plex Sans\", system-ui, sans-serif;\n  font-size: 1.0625rem;\n  line-height: 1.65;\n  color: var(--color-muted, rgba(15,23,42,0.58));\n}\n.cb-grid-bg {\n  background-image:\n    linear-gradient(var(--color-grid, rgba(15,23,42,0.06)) 1px, transparent 1px),\n    linear-gradient(90deg, var(--color-grid, rgba(15,23,42,0.06)) 1px, transparent 1px);\n  background-size: 48px 48px;\n}\n.cb-card {\n  border: 1px solid var(--border-subtle, rgba(15,23,42,0.04));\n  background: var(--color-surface);\n  border-radius: var(--radius-lg, 16px);\n  box-shadow: var(--shadow-card);\n  transition: box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease;\n}\n.cb-card:hover {\n  box-shadow: var(--shadow-surface);\n  border-color: var(--border-accent, rgba(59,130,246,0.24));\n}\n.cb-btn-primary {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  min-height: 2.75rem;\n  padding: 0.75rem 1.5rem;\n  font-family: var(--font-body), \"IBM Plex Sans\", system-ui, sans-serif;\n  font-size: 0.875rem;\n  font-weight: 600;\n  text-decoration: none;\n  color: #fff;\n  background: var(--color-primary, #1D4ED8);\n  border-radius: var(--radius-md, 10px);\n  border: 1px solid transparent;\n  box-shadow: 0 1px 2px rgba(15,23,42,0.06);\n  transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;\n}\n.cb-btn-primary:hover {\n  background: var(--color-accent, #3B82F6);\n  box-shadow: var(--shadow-glow);\n}\n.cb-btn-primary:focus-visible {\n  outline: 2px solid var(--color-accent);\n  outline-offset: 2px;\n}\n.cb-btn-secondary {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  min-height: 2.75rem;\n  padding: 0.75rem 1.5rem;\n  font-family: var(--font-body), \"IBM Plex Sans\", system-ui, sans-serif;\n  font-size: 0.875rem;\n  font-weight: 600;\n  text-decoration: none;\n  color: var(--color-foreground);\n  background: var(--color-surface);\n  border: 1px solid var(--border-default, rgba(15,23,42,0.08));\n  border-radius: var(--radius-md, 10px);\n  transition: border-color 0.25s ease, background 0.25s ease;\n}\n.cb-btn-secondary:hover { border-color: var(--color-accent); background: color-mix(in srgb, var(--color-accent) 4%, var(--color-surface)); }\n.cb-btn-secondary:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }\n.cb-section { padding-block: clamp(4rem, 10vw, 6.5rem); }\n.cb-metric {\n  font-family: var(--font-display), \"IBM Plex Sans\", system-ui, sans-serif;\n  font-size: 1.75rem;\n  font-weight: 700;\n  letter-spacing: -0.02em;\n  color: var(--color-primary);\n}\n.cb-signal { color: var(--color-signal, #059669); }\n.cb-focus-ring:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }\n\n.cb-signal { color: var(--color-signal, #C5A572); }\n\n/* TBDP Native Consumption — corporate-business\n   sector:law-firm · experience:corporate, executive, trust\n   identity:executive-atlas · context:8820d847ff5f54e9\n   integration:5.0.0 · consumption:1.0.0 */\n:root {\n  --tbdp-native: 1;\n  --tbdp-native-package: \"corporate-business\";\n  --tbdp-sector-dna: \"law-firm\";\n  --tbdp-template-identity: \"executive-atlas\";\n  --tbdp-experience-primary: \"executive\";\n  --tbdp-context-hash: \"8820d847ff5f54e9\";\n  --tbdp-theme-mode: \"light\";\n  --tbdp-direction: \"ltr\";\n}\n\n/* TBDP Foundations — official design authority (scoped vars) */\n/* Trend Business AI Design Platform · 1.0.0 · foundations-1 */\n:root {\n  --tbdp-color-primary: #0047E6;\n  --tbdp-color-secondary: #334155;\n  --tbdp-color-accent: #4D85FF;\n  --tbdp-color-success: #10B981;\n  --tbdp-color-warning: #F59E0B;\n  --tbdp-color-danger: #EF4444;\n  --tbdp-color-info: #3B82F6;\n  --tbdp-color-surface-base: #FFFFFF;\n  --tbdp-color-surface-raised: #F8FAFC;\n  --tbdp-color-surface-overlay: #FFFFFF;\n  --tbdp-color-surface-sunken: #F1F5F9;\n  --tbdp-color-surface-inverse: #0F172A;\n  --tbdp-color-background-canvas: #F8FAFC;\n  --tbdp-color-background-subtle: #F1F5F9;\n  --tbdp-color-background-emphasis: #FFFFFF;\n  --tbdp-color-background-inverse: #020617;\n  --tbdp-color-text-primary: #0F172A;\n  --tbdp-color-text-secondary: #475569;\n  --tbdp-color-text-tertiary: #64748B;\n  --tbdp-color-text-disabled: #94A3B8;\n  --tbdp-color-text-inverse: #FFFFFF;\n  --tbdp-color-text-link: #0047E6;\n  --tbdp-color-text-linkHover: #0038B8;\n  --tbdp-color-border-default: #E2E8F0;\n  --tbdp-color-border-subtle: #F1F5F9;\n  --tbdp-color-border-strong: #CBD5E1;\n  --tbdp-color-border-focus: #1A5CFF;\n  --tbdp-color-border-inverse: rgba(255, 255, 255, 0.16);\n  --tbdp-color-overlay-scrim: rgba(2, 6, 23, 0.4);\n  --tbdp-color-overlay-scrimStrong: rgba(2, 6, 23, 0.64);\n  --tbdp-color-overlay-backdrop: rgba(2, 6, 23, 0.24);\n  --tbdp-color-overlay-highlight: rgba(26, 92, 255, 0.12);\n  --tbdp-opacity-transparent: 0;\n  --tbdp-opacity-subtle: 0.04;\n  --tbdp-opacity-muted: 0.08;\n  --tbdp-opacity-soft: 0.12;\n  --tbdp-opacity-medium: 0.24;\n  --tbdp-opacity-strong: 0.48;\n  --tbdp-opacity-opaque: 1;\n  --tbdp-spacing-micro: 0.125rem;\n  --tbdp-spacing-xs: 0.25rem;\n  --tbdp-spacing-sm: 0.5rem;\n  --tbdp-spacing-md: 1rem;\n  --tbdp-spacing-lg: 1.5rem;\n  --tbdp-spacing-xl: 2rem;\n  --tbdp-spacing-2xl: 3rem;\n  --tbdp-spacing-3xl: 4rem;\n  --tbdp-spacing-4xl: 6rem;\n  --tbdp-radius-sharp: 0;\n  --tbdp-radius-sm: 0.25rem;\n  --tbdp-radius-md: 0.5rem;\n  --tbdp-radius-lg: 0.75rem;\n  --tbdp-radius-pill: 9999px;\n  --tbdp-radius-circle: 50%;\n  --tbdp-shadow-0: none;\n  --tbdp-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);\n  --tbdp-shadow-2: 0 2px 8px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);\n  --tbdp-shadow-3: 0 8px 24px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);\n  --tbdp-shadow-4: 0 16px 48px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.08);\n  --tbdp-shadow-5: 0 24px 64px rgba(15, 23, 42, 0.18), 0 8px 24px rgba(15, 23, 42, 0.1);\n  --tbdp-container-sm: 640px;\n  --tbdp-container-md: 768px;\n  --tbdp-container-lg: 1024px;\n  --tbdp-container-xl: 1280px;\n  --tbdp-container-2xl: 1440px;\n  --tbdp-container-full: 100%;\n  --tbdp-font-display: \"Plus Jakarta Sans\", \"Inter\", ui-sans-serif, system-ui, sans-serif;\n  --tbdp-font-body: \"Inter\", ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", sans-serif;\n  --tbdp-font-mono: \"IBM Plex Mono\", ui-monospace, \"Cascadia Code\", monospace;\n}\n\n/* TBDP Experience — motion, interaction, RTL, accessibility */\n/* TBDP Phase 3 — Motion System · tbdp-xp */\n\n@keyframes tbdp-xp-fade-in {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n\n@keyframes tbdp-xp-fade-out {\n  from { opacity: 1; }\n  to { opacity: 0; }\n}\n\n@keyframes tbdp-xp-rise {\n  from { opacity: 0; transform: translateY(var(--tbdp-spacing-lg)); }\n  to { opacity: 1; transform: translateY(0); }\n}\n\n@keyframes tbdp-xp-rise-rtl {\n  from { opacity: 0; transform: translateX(var(--tbdp-spacing-lg)); }\n  to { opacity: 1; transform: translateX(0); }\n}\n\n@keyframes tbdp-xp-scale-in {\n  from { opacity: 0; transform: scale(0.96); }\n  to { opacity: 1; transform: scale(1); }\n}\n\n@keyframes tbdp-xp-slide-end {\n  from { transform: translateX(100%); }\n  to { transform: translateX(0); }\n}\n\n@keyframes tbdp-xp-slide-start {\n  from { transform: translateX(-100%); }\n  to { transform: translateX(0); }\n}\n\n@keyframes tbdp-xp-shake {\n  0%, 100% { transform: translateX(0); }\n  20%, 60% { transform: translateX(calc(var(--tbdp-spacing-sm) * -1)); }\n  40%, 80% { transform: translateX(var(--tbdp-spacing-sm)); }\n}\n\n@keyframes tbdp-xp-pulse {\n  0%, 100% { transform: scale(1); }\n  50% { transform: scale(1.04); }\n}\n\n@keyframes tbdp-xp-lift {\n  to { transform: translateY(calc(var(--tbdp-spacing-sm) * -1)); box-shadow: var(--tbdp-shadow-2); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  [data-tbdp-xp-motion] { animation: none !important; transition: none !important; }\n}\n\n[data-tbdp-xp-motion] { will-change: transform, opacity; }\n[data-tbdp-xp-motion=\"page-enter\"] { animation-name: tbdp-xp-rise; }\n[data-tbdp-xp-motion=\"page-exit\"] { animation-name: tbdp-xp-fade-out; }\n[data-tbdp-xp-motion=\"section-reveal\"] { animation-name: tbdp-xp-rise; }\n[data-tbdp-xp-motion=\"hero-headline\"] { animation-name: tbdp-xp-rise; }\n[data-tbdp-xp-motion=\"hero-media\"] { animation-name: tbdp-xp-scale-in; }\n[data-tbdp-xp-motion=\"card-lift\"] { animation-name: tbdp-xp-lift; }\n[data-tbdp-xp-motion=\"grid-stagger\"] { animation-name: tbdp-xp-rise; }\n[data-tbdp-xp-motion=\"modal-enter\"] { animation-name: tbdp-xp-scale-in; }\n[data-tbdp-xp-motion=\"modal-exit\"] { animation-name: tbdp-xp-fade-out; }\n[data-tbdp-xp-motion=\"drawer-slide\"] { animation-name: tbdp-xp-slide-end; }\n[data-tbdp-xp-motion=\"toast-enter\"] { animation-name: tbdp-xp-rise; }\n[data-tbdp-xp-motion=\"toast-exit\"] { animation-name: tbdp-xp-fade-out; }\n[data-tbdp-xp-motion=\"tooltip-fade\"] { animation-name: tbdp-xp-fade-in; }\n[data-tbdp-xp-motion=\"scroll-reveal-up\"] { animation-name: tbdp-xp-rise; }\n[data-tbdp-xp-motion=\"stagger-children\"] { animation-name: tbdp-xp-rise; }\n[data-tbdp-xp-motion=\"hover-lift\"] { animation-name: tbdp-xp-lift; }\n[data-tbdp-xp-motion=\"focus-ring\"] { animation-name: tbdp-xp-fade-in; }\n[data-tbdp-xp-motion=\"success-pulse\"] { animation-name: tbdp-xp-pulse; }\n[data-tbdp-xp-motion=\"error-shake\"] { animation-name: tbdp-xp-shake; }\n\n/* TBDP Experience — interaction utilities */\n[data-tbdp-xp] { --tbdp-xp-focus: var(--tbdp-color-border-focus); }\n[data-tbdp-xp-feedback=\"loading\"] { cursor: wait; }\n[data-tbdp-xp-feedback=\"error\"] { border-color: var(--tbdp-color-danger); }\n[data-tbdp-xp-feedback=\"success\"] { border-color: var(--tbdp-color-success); }\n[data-tbdp-xp-touch=\"true\"] { min-height: var(--tbdp-spacing-2xl); min-width: var(--tbdp-spacing-2xl); }\n[data-tbdp-xp-gpu] { transform: translateZ(0); backface-visibility: hidden; }\n[data-tbdp-xp-contain] { content-visibility: auto; contain-intrinsic-size: auto 500px; }\n\n@media (prefers-reduced-motion: reduce) {\n  [data-tbdp-xp], [data-tbdp-xp-motion] { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }\n}\n/* V2 sidebar-left layout */\n.v2-layout-sidebar-left .v2-sidebar-shell { gap: 0; align-items: flex-start; }\n.v2-sidebar-rail {\n  border-inline-end: 1px solid var(--border-subtle, rgba(244,237,228,0.06));\n  padding-block: clamp(2rem, 5vw, 3.5rem);\n  padding-inline-end: clamp(1.25rem, 3vw, 2rem);\n}\n[dir='rtl'] .v2-sidebar-rail { border-inline-end: none; border-inline-start: 1px solid var(--border-subtle, rgba(244,237,228,0.06)); }\n.v2-main-canvas > [data-v2-component] + [data-v2-component] { margin-top: 0; }\n.v2-layout-sidebar-left .v2-main-canvas { padding-inline-start: 0; }\n@media (max-width: 1023px) {\n  .v2-sidebar-rail { display: none !important; }\n}\n\n/* V2 sidebar-right layout */\n.v2-layout-sidebar-right .v2-sidebar-shell { gap: 0; align-items: flex-start; }\n.v2-layout-sidebar-right .v2-sidebar-rail {\n  border-inline-start: 1px solid var(--border-subtle, rgba(28,25,23,0.06));\n  border-inline-end: none;\n  padding-block: clamp(2rem, 5vw, 3.5rem);\n  padding-inline-start: clamp(1.25rem, 3vw, 2rem);\n}\n[dir='rtl'] .v2-layout-sidebar-right .v2-sidebar-rail {\n  border-inline-start: none;\n  border-inline-end: 1px solid var(--border-subtle, rgba(28,25,23,0.06));\n}\n\n/* V2 full-bleed layout */\n.v2-layout-full-bleed .v2-overlay-canvas { width: 100%; }\n.v2-layout-full-bleed .v2-main-canvas { width: 100%; max-width: var(--container-max, 76rem); margin-inline: auto; }\n\n/* V2 editorial-reveal layout (creative portfolio) */\n.v2-layout-editorial-reveal .v2-main-canvas { width: 100%; }\n.v2-layout-editorial-reveal .v2-overlay-reveal { width: 100%; }\n\n:root {\n  --container-max: 76rem;\n  --font-body: \"IBM Plex Sans\", ui-sans-serif, system-ui, sans-serif;\n  --font-display: \"IBM Plex Sans\", ui-sans-serif, system-ui, sans-serif;\n  --color-surface: #F8FAFC;\n  --color-foreground: #0F172A;\n  --color-background: #FFFFFF;\n  --color-accent: #2563EB;\n  --color-secondary: #1E4976; --color-primary: #0F2B46; }\n",
+      "language": "css"
+    },
+    {
+      "path": "components/corporate-business-nav.tsx",
+      "content": "\"use client\";\r\n\r\nimport { useEffect, useState } from \"react\";\r\n\r\nconst DEFAULT_LINKS = [\r\n  { href: \"#features\", label: \"Capabilities\" },\r\n  { href: \"#about\", label: \"About\" },\r\n  { href: \"#testimonials\", label: \"Client stories\" },\r\n  { href: \"#contact\", label: \"Contact\" },\r\n];\r\n\r\ntype CorporateBusinessNavProps = {\r\n  brandName?: string;\r\n  ctaLabel?: string;\r\n  links?: Array<{ href: string; label: string }>;\r\n};\r\n\r\nexport function CorporateBusinessNav({\r\n  brandName = \"Meridian Advisory\",\r\n  ctaLabel = \"Schedule consultation\",\r\n  links = DEFAULT_LINKS,\r\n}: CorporateBusinessNavProps) {\r\n  const [scrolled, setScrolled] = useState(false);\r\n  const [open, setOpen] = useState(false);\r\n\r\n  useEffect(() => {\r\n    const onScroll = () => setScrolled(window.scrollY > 8);\r\n    onScroll();\r\n    window.addEventListener(\"scroll\", onScroll, { passive: true });\r\n    return () => window.removeEventListener(\"scroll\", onScroll);\r\n  }, []);\r\n\r\n  useEffect(() => {\r\n    if (!open) return;\r\n    const onKeyDown = (event: KeyboardEvent) => {\r\n      if (event.key === \"Escape\") setOpen(false);\r\n    };\r\n    window.addEventListener(\"keydown\", onKeyDown);\r\n    return () => window.removeEventListener(\"keydown\", onKeyDown);\r\n  }, [open]);\r\n\r\n  return (\r\n    <header\r\n      data-v2-component=\"corporate-business-nav\"\r\n      className={[\r\n        \"sticky top-0 z-50 border-b transition-all duration-300\",\r\n        scrolled\r\n          ? \"border-[var(--border-default)] bg-[var(--color-surface)]/90 shadow-[var(--shadow-card)] backdrop-blur-xl\"\r\n          : \"border-transparent bg-[var(--color-background)]/80 backdrop-blur-md\",\r\n      ].join(\" \")}\r\n    >\r\n      <div className=\"mx-auto flex h-16 max-w-[82rem] items-center justify-between gap-4 px-5 sm:px-8 lg:h-[4.25rem]\">\r\n        <a\r\n          href=\"#top\"\r\n          className=\"cb-font-display flex items-center gap-2.5 text-base font-bold tracking-tight text-[var(--color-foreground)] cb-focus-ring rounded-sm\"\r\n        >\r\n          <span\r\n            className=\"flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-primary)] text-xs font-bold text-white\"\r\n            aria-hidden\r\n          >\r\n            M\r\n          </span>\r\n          {brandName}\r\n        </a>\r\n\r\n        <nav aria-label=\"Primary\" className=\"hidden items-center gap-8 lg:flex\">\r\n          {links.map((link) => (\r\n            <a\r\n              key={link.href}\r\n              href={link.href}\r\n              className=\"cb-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] cb-focus-ring rounded-sm\"\r\n            >\r\n              {link.label}\r\n            </a>\r\n          ))}\r\n        </nav>\r\n\r\n        <div className=\"flex items-center gap-2\">\r\n          <a href=\"#contact\" className=\"cb-btn-primary hidden sm:inline-flex\">\r\n            {ctaLabel}\r\n          </a>\r\n          <button\r\n            type=\"button\"\r\n            aria-expanded={open}\r\n            aria-controls=\"cb-mobile-nav\"\r\n            aria-label={open ? \"Close menu\" : \"Open menu\"}\r\n            onClick={() => setOpen((v) => !v)}\r\n            className=\"inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] lg:hidden cb-focus-ring\"\r\n          >\r\n            <span className=\"sr-only\">Menu</span>\r\n            <span aria-hidden className=\"flex flex-col gap-1\">\r\n              <span className={`block h-0.5 w-5 bg-current transition ${open ? \"translate-y-[5px] rotate-45\" : \"\"}`} />\r\n              <span className={`block h-0.5 w-5 bg-current transition ${open ? \"opacity-0\" : \"\"}`} />\r\n              <span className={`block h-0.5 w-5 bg-current transition ${open ? \"-translate-y-[5px] -rotate-45\" : \"\"}`} />\r\n            </span>\r\n          </button>\r\n        </div>\r\n      </div>\r\n\r\n      {open ? (\r\n        <nav\r\n          id=\"cb-mobile-nav\"\r\n          aria-label=\"Mobile\"\r\n          className=\"border-t border-[var(--border-default)] bg-[var(--color-surface)] px-5 py-4 lg:hidden\"\r\n        >\r\n          <ul className=\"flex flex-col gap-3\">\r\n            {links.map((link) => (\r\n              <li key={link.href}>\r\n                <a\r\n                  href={link.href}\r\n                  onClick={() => setOpen(false)}\r\n                  className=\"cb-font-body block py-1 text-sm font-medium text-[var(--color-foreground)]\"\r\n                >\r\n                  {link.label}\r\n                </a>\r\n              </li>\r\n            ))}\r\n            <li className=\"pt-2\">\r\n              <a href=\"#contact\" onClick={() => setOpen(false)} className=\"cb-btn-primary w-full\">\r\n                {ctaLabel}\r\n              </a>\r\n            </li>\r\n          </ul>\r\n        </nav>\r\n      ) : null}\r\n    </header>\r\n  );\r\n}\r\n",
+      "language": "tsx"
+    },
+    {
+      "path": "components/corporate-business-hero.tsx",
+      "content": "\"use client\";\r\n\r\nimport { HERO_IMAGE, resolveSiteImage } from \"@/lib/site-images\";\r\n\r\nconst DEFAULT_METRICS = [\r\n  { value: \"500+\", label: \"Enterprise clients\", trend: \"Global\" },\r\n  { value: \"28\", label: \"Countries served\", trend: \"Active\" },\r\n  { value: \"97%\", label: \"Client retention\", trend: \"3-year avg.\" },\r\n  { value: \"40yr\", label: \"Combined leadership\", trend: \"Experience\" },\r\n];\r\n\r\ntype CorporateBusinessHeroProps = {\r\n  title?: string;\r\n  subtitle?: string;\r\n  eyebrow?: string;\r\n  primaryCta?: string;\r\n  secondaryCta?: string;\r\n  imageUrl?: string | null;\r\n  metrics?: Array<{ value: string; label: string; trend?: string }>;\r\n};\r\n\r\nexport function CorporateBusinessHero({\r\n  title = \"Strategy and execution for the enterprise\",\r\n  subtitle = \"We help global organizations modernize operations, strengthen governance, and deliver lasting stakeholder value.\",\r\n  eyebrow = \"Corporate advisory\",\r\n  primaryCta = \"Schedule consultation\",\r\n  secondaryCta = \"Our capabilities\",\r\n  imageUrl,\r\n  metrics = DEFAULT_METRICS,\r\n}: CorporateBusinessHeroProps) {\r\n  const src = resolveSiteImage(imageUrl || HERO_IMAGE, 0);\r\n\r\n  return (\r\n    <section\r\n      id=\"top\"\r\n      data-v2-component=\"corporate-business-hero\"\r\n      aria-labelledby=\"cb-hero-title\"\r\n      className=\"cb-section relative overflow-hidden bg-[var(--color-background)]\"\r\n    >\r\n      <div className=\"cb-grid-bg pointer-events-none absolute inset-0 opacity-60\" aria-hidden />\r\n      <div\r\n        className=\"pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_80%_0%,rgba(197,165,114,0.14),transparent_60%)]\"\r\n        aria-hidden\r\n      />\r\n\r\n      <div className=\"relative mx-auto max-w-[82rem] px-5 sm:px-8\">\r\n        <div className=\"grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-14\">\r\n          <div className=\"max-w-xl\">\r\n            <p className=\"cb-eyebrow mb-4 motion-safe:animate-[cb-slide-up_0.6s_ease_both]\">\r\n              {eyebrow}\r\n            </p>\r\n            <h1\r\n              id=\"cb-hero-title\"\r\n              className=\"cb-headline motion-safe:animate-[cb-slide-up_0.65s_ease_0.08s_both]\"\r\n            >\r\n              {title}\r\n            </h1>\r\n            <p className=\"cb-body mt-5 motion-safe:animate-[cb-slide-up_0.65s_ease_0.16s_both]\">\r\n              {subtitle}\r\n            </p>\r\n            <div className=\"mt-8 flex flex-wrap gap-3 motion-safe:animate-[cb-slide-up_0.65s_ease_0.24s_both]\">\r\n              <a href=\"#contact\" className=\"cb-btn-primary\">\r\n                {primaryCta}\r\n              </a>\r\n              <a href=\"#features\" className=\"cb-btn-secondary\">\r\n                {secondaryCta}\r\n              </a>\r\n            </div>\r\n            <div className=\"mt-8 flex flex-wrap items-center gap-4 motion-safe:animate-[cb-slide-up_0.65s_ease_0.32s_both]\">\r\n              <span className=\"cb-font-mono flex items-center gap-2 text-xs text-[var(--color-signal)]\">\r\n                <span className=\"h-2 w-2 rounded-full bg-[var(--color-signal)] motion-safe:animate-[cb-pulse-dot_2s_ease-in-out_infinite]\" />\r\n                Trusted advisory partner\r\n              </span>\r\n              <span className=\"cb-font-body text-xs text-[var(--color-muted)]\">\r\n                Fortune 500 · ISO 9001 · Global reach\r\n              </span>\r\n            </div>\r\n          </div>\r\n\r\n          <div className=\"grid gap-3 sm:grid-cols-2 motion-safe:animate-[cb-grid-reveal_0.8s_ease_0.2s_both]\">\r\n            <div className=\"cb-card col-span-2 overflow-hidden p-1\">\r\n              {src ? (\r\n                <img\r\n                  src={src}\r\n                  alt=\"Executive leadership and boardroom strategy session\"\r\n                  className=\"aspect-[16/9] w-full rounded-[calc(var(--radius-lg)-4px)] object-cover\"\r\n                />\r\n              ) : (\r\n                <div className=\"cb-grid-bg relative aspect-[16/9] overflow-hidden rounded-[calc(var(--radius-lg)-4px)] bg-[var(--color-surface)]\">\r\n                  <div className=\"absolute inset-4 space-y-3\">\r\n                    <div className=\"h-3 w-32 rounded bg-[var(--color-grid)]\" />\r\n                    <div className=\"grid grid-cols-3 gap-2\">\r\n                      {[1, 2, 3].map((i) => (\r\n                        <div key={i} className=\"h-16 rounded-[var(--radius-sm)] bg-[var(--color-grid)]\" />\r\n                      ))}\r\n                    </div>\r\n                    <div className=\"h-24 rounded-[var(--radius-sm)] bg-[var(--color-grid)]\" />\r\n                  </div>\r\n                </div>\r\n              )}\r\n            </div>\r\n\r\n            {metrics.map((metric, i) => (\r\n              <div\r\n                key={metric.label}\r\n                className=\"cb-card p-4 motion-safe:animate-[cb-grid-reveal_0.6s_ease_both]\"\r\n                style={{ animationDelay: `${0.3 + i * 0.08}s` }}\r\n              >\r\n                <div className=\"flex items-baseline justify-between gap-2\">\r\n                  <p className=\"cb-metric\">{metric.value}</p>\r\n                  {metric.trend ? (\r\n                    <span className=\"cb-font-mono text-[0.625rem] text-[var(--color-signal)]\">\r\n                      {metric.trend}\r\n                    </span>\r\n                  ) : null}\r\n                </div>\r\n                <p className=\"cb-font-body mt-1 text-xs text-[var(--color-muted)]\">{metric.label}</p>\r\n              </div>\r\n            ))}\r\n          </div>\r\n        </div>\r\n      </div>\r\n    </section>\r\n  );\r\n}\r\n",
+      "language": "tsx"
+    },
+    {
+      "path": "components/corporate-business-features.tsx",
+      "content": "\"use client\";\r\n\r\nconst DEFAULT_FEATURES = [\r\n  {\r\n    title: \"Strategic advisory\",\r\n    description: \"Board-level counsel on market entry, portfolio optimization, and long-range capital allocation.\",\r\n    icon: \"01\",\r\n    span: \"lg:col-span-2\",\r\n  },\r\n  {\r\n    title: \"Operational excellence\",\r\n    description: \"Lean operating models, supply-chain resilience, and performance management at scale.\",\r\n    icon: \"02\",\r\n    span: \"\",\r\n  },\r\n  {\r\n    title: \"Governance & risk\",\r\n    description: \"Enterprise risk frameworks, compliance programs, and stakeholder reporting you can defend.\",\r\n    icon: \"03\",\r\n    span: \"\",\r\n  },\r\n  {\r\n    title: \"Transformation delivery\",\r\n    description: \"End-to-end program leadership from discovery through change management and measurable outcomes.\",\r\n    icon: \"04\",\r\n    span: \"lg:col-span-2\",\r\n  },\r\n];\r\n\r\ntype CorporateBusinessFeaturesProps = {\r\n  eyebrow?: string;\r\n  title?: string;\r\n  subtitle?: string;\r\n  items?: Array<{ title: string; description: string; icon?: string; span?: string }>;\r\n};\r\n\r\nexport function CorporateBusinessFeatures({\r\n  eyebrow = \"Capabilities\",\r\n  title = \"Advisory built for enterprise complexity\",\r\n  subtitle = \"Integrated practices across strategy, operations, and governance — delivered by senior partners with sector depth.\",\r\n  items = DEFAULT_FEATURES,\r\n}: CorporateBusinessFeaturesProps) {\r\n  return (\r\n    <section\r\n      id=\"features\"\r\n      data-v2-component=\"corporate-business-features\"\r\n      aria-labelledby=\"cb-features-title\"\r\n      className=\"cb-section bg-[var(--color-background)]\"\r\n    >\r\n      <div className=\"mx-auto max-w-[82rem] px-5 sm:px-8\">\r\n        <header className=\"mb-12 max-w-2xl\">\r\n          <p className=\"cb-eyebrow mb-3\">{eyebrow}</p>\r\n          <h2 id=\"cb-features-title\" className=\"cb-headline-sm\">\r\n            {title}\r\n          </h2>\r\n          <p className=\"cb-body mt-4\">{subtitle}</p>\r\n        </header>\r\n\r\n        <div className=\"grid gap-4 sm:grid-cols-2 lg:grid-cols-3\">\r\n          {items.map((item, index) => (\r\n            <article\r\n              key={item.title}\r\n              className={`cb-card group p-6 ${item.span ?? \"\"}`}\r\n            >\r\n              <div className=\"mb-4 flex items-center justify-between\">\r\n                <span className=\"cb-font-mono flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] text-xs font-medium text-[var(--color-primary)]\">\r\n                  {item.icon ?? String(index + 1).padStart(2, \"0\")}\r\n                </span>\r\n                <span\r\n                  className=\"h-px flex-1 ms-4 bg-[var(--border-default)] transition group-hover:bg-[var(--color-accent)]\"\r\n                  aria-hidden\r\n                />\r\n              </div>\r\n              <h3 className=\"cb-font-display text-lg font-bold text-[var(--color-foreground)]\">\r\n                {item.title}\r\n              </h3>\r\n              <p className=\"cb-font-body mt-2 text-sm leading-relaxed text-[var(--color-muted)]\">\r\n                {item.description}\r\n              </p>\r\n            </article>\r\n          ))}\r\n        </div>\r\n      </div>\r\n    </section>\r\n  );\r\n}\r\n",
+      "language": "tsx"
+    },
+    {
+      "path": "components/corporate-business-about.tsx",
+      "content": "\"use client\";\r\n\r\nimport { FlagshipAboutSection } from \"@/lib/website/template-v2/flagship/about-section\";\r\nimport { CORPORATE_FLAGSHIP_UI } from \"@/lib/website/template-v2/flagship/themes\";\r\n\r\ntype Props = {\r\n  eyebrow?: string;\r\n  title?: string;\r\n  subtitle?: string;\r\n  body?: string;\r\n  imageUrl?: string | null;\r\n  highlights?: string[];\r\n  primaryCta?: string;\r\n};\r\n\r\nexport function CorporateBusinessAbout({\r\n  eyebrow = \"Corporate excellence\",\r\n  title = \"Trusted leadership for complex organizations\",\r\n  subtitle,\r\n  body = \"For over two decades we have partnered with global enterprises to deliver strategy, transformation, and measurable outcomes — with integrity at the center of every engagement.\",\r\n  imageUrl,\r\n  highlights = [\r\n    \"Fortune 500 advisory experience\",\r\n    \"Offices across North America, Europe, and MENA\",\r\n    \"ISO-certified governance frameworks\",\r\n  ],\r\n  primaryCta = \"Speak with an advisor\",\r\n}: Props) {\r\n  return (\r\n    <FlagshipAboutSection\r\n      ui={CORPORATE_FLAGSHIP_UI}\r\n      componentId=\"corporate-business-about\"\r\n      id=\"about\"\r\n      eyebrow={eyebrow}\r\n      title={title}\r\n      subtitle={subtitle}\r\n      body={body}\r\n      imageUrl={imageUrl}\r\n      highlights={highlights}\r\n      primaryCta={primaryCta}\r\n      primaryCtaHref=\"#contact\"\r\n    />\r\n  );\r\n}\r\n",
+      "language": "tsx"
+    },
+    {
+      "path": "components/corporate-business-stats.tsx",
+      "content": "\"use client\";\r\n\r\nimport { FlagshipStatsSection } from \"@/lib/website/template-v2/flagship/stats-section\";\r\nimport { CORPORATE_FLAGSHIP_UI } from \"@/lib/website/template-v2/flagship/themes\";\r\n\r\ntype Props = {\r\n  eyebrow?: string;\r\n  title?: string;\r\n  subtitle?: string;\r\n  stats?: Array<{ value: string; label: string; detail?: string }>;\r\n};\r\n\r\nexport function CorporateBusinessStats({\r\n  eyebrow = \"Track record\",\r\n  title = \"Outcomes our clients measure\",\r\n  subtitle = \"Representative results from recent advisory and transformation engagements.\",\r\n  stats = [\r\n    { value: \"40yr\", label: \"Combined partner tenure\", detail: \"Senior leadership\" },\r\n    { value: \"28\", label: \"Countries served\", detail: \"Global delivery\" },\r\n    { value: \"97%\", label: \"Client retention\", detail: \"Three-year average\" },\r\n    { value: \"14wk\", label: \"Discovery to roadmap\", detail: \"Typical engagement\" },\r\n  ],\r\n}: Props) {\r\n  return (\r\n    <FlagshipStatsSection\r\n      ui={CORPORATE_FLAGSHIP_UI}\r\n      componentId=\"corporate-business-stats\"\r\n      id=\"stats\"\r\n      eyebrow={eyebrow}\r\n      title={title}\r\n      subtitle={subtitle}\r\n      stats={stats}\r\n    />\r\n  );\r\n}\r\n",
+      "language": "tsx"
+    },
+    {
+      "path": "components/corporate-business-testimonials.tsx",
+      "content": "\"use client\";\r\n\r\nimport {\r\n  FlagshipTestimonialsSection,\r\n  type FlagshipTestimonial,\r\n} from \"@/lib/website/template-v2/flagship/testimonials-section\";\r\nimport { CORPORATE_FLAGSHIP_UI } from \"@/lib/website/template-v2/flagship/themes\";\r\n\r\nconst CORPORATE_TESTIMONIALS: FlagshipTestimonial[] = [\r\n  {\r\n    quote:\r\n      \"Meridian brought board-level clarity to a complex transformation — our operating model is stronger and our stakeholders finally align on priorities.\",\r\n    name: \"Catherine Holt\",\r\n    role: \"Chief Operating Officer\",\r\n    company: \"Axiom Industrial Group\",\r\n  },\r\n  {\r\n    quote:\r\n      \"Their partners embedded with our leadership team and delivered measurable EBITDA impact within the first two quarters.\",\r\n    name: \"Raj Mehta\",\r\n    role: \"Managing Director\",\r\n    company: \"Harbor Capital Partners\",\r\n  },\r\n  {\r\n    quote:\r\n      \"The most rigorous advisory relationship we have had — governance, risk, and execution under one disciplined program.\",\r\n    name: \"Elena Brandt\",\r\n    role: \"General Counsel\",\r\n    company: \"Northgate Financial\",\r\n  },\r\n];\r\n\r\ntype Props = {\r\n  eyebrow?: string;\r\n  title?: string;\r\n  subtitle?: string;\r\n  items?: FlagshipTestimonial[];\r\n};\r\n\r\nexport function CorporateBusinessTestimonials({\r\n  eyebrow = \"Client stories\",\r\n  title = \"Trusted by executive sponsors\",\r\n  subtitle = \"Leaders who partner with Meridian for strategy, transformation, and governance.\",\r\n  items = CORPORATE_TESTIMONIALS,\r\n}: Props) {\r\n  return (\r\n    <FlagshipTestimonialsSection\r\n      ui={CORPORATE_FLAGSHIP_UI}\r\n      componentId=\"corporate-business-testimonials\"\r\n      id=\"testimonials\"\r\n      eyebrow={eyebrow}\r\n      title={title}\r\n      subtitle={subtitle}\r\n      items={items}\r\n    />\r\n  );\r\n}\r\n",
+      "language": "tsx"
+    },
+    {
+      "path": "components/corporate-business-pricing.tsx",
+      "content": "\"use client\";\r\n\r\ntype PricingTier = {\r\n  name: string;\r\n  price: string;\r\n  period: string;\r\n  description: string;\r\n  features: string[];\r\n  cta: string;\r\n  highlighted?: boolean;\r\n};\r\n\r\nconst DEFAULT_TIERS: PricingTier[] = [\r\n  {\r\n    name: \"Advisory\",\r\n    price: \"From $18k\",\r\n    period: \"/month\",\r\n    description: \"Focused strategic counsel for leadership teams navigating priority initiatives.\",\r\n    features: [\r\n      \"Executive workshops\",\r\n      \"Market & competitive analysis\",\r\n      \"Quarterly board briefings\",\r\n      \"Dedicated partner access\",\r\n    ],\r\n    cta: \"Request proposal\",\r\n  },\r\n  {\r\n    name: \"Transformation\",\r\n    price: \"From $45k\",\r\n    period: \"/month\",\r\n    description: \"Full-program leadership for enterprise change with measurable operational outcomes.\",\r\n    features: [\r\n      \"Everything in Advisory\",\r\n      \"Program management office\",\r\n      \"Change & communications\",\r\n      \"KPI dashboards & reporting\",\r\n      \"On-site leadership support\",\r\n    ],\r\n    cta: \"Schedule consultation\",\r\n    highlighted: true,\r\n  },\r\n  {\r\n    name: \"Enterprise\",\r\n    price: \"Custom\",\r\n    period: \"\",\r\n    description: \"Multi-region engagements with retained senior partners and bespoke governance models.\",\r\n    features: [\r\n      \"Everything in Transformation\",\r\n      \"Global delivery teams\",\r\n      \"Board & investor relations\",\r\n      \"24/7 executive escalation\",\r\n      \"Multi-year partnership terms\",\r\n    ],\r\n    cta: \"Contact partners\",\r\n  },\r\n];\r\n\r\ntype CorporateBusinessPricingProps = {\r\n  eyebrow?: string;\r\n  title?: string;\r\n  subtitle?: string;\r\n  tiers?: PricingTier[];\r\n};\r\n\r\nexport function CorporateBusinessPricing({\r\n  eyebrow = \"Engagements\",\r\n  title = \"Partnership models that scale with ambition\",\r\n  subtitle = \"Transparent engagement structures. Retained partnerships receive preferred rates and dedicated partner coverage.\",\r\n  tiers = DEFAULT_TIERS,\r\n}: CorporateBusinessPricingProps) {\r\n  return (\r\n    <section\r\n      id=\"pricing\"\r\n      data-v2-component=\"corporate-business-pricing\"\r\n      aria-labelledby=\"cb-pricing-title\"\r\n      className=\"cb-section bg-[var(--color-background)]\"\r\n    >\r\n      <div className=\"mx-auto max-w-[82rem] px-5 sm:px-8\">\r\n        <header className=\"mb-12 text-center\">\r\n          <p className=\"cb-eyebrow mb-3\">{eyebrow}</p>\r\n          <h2 id=\"cb-pricing-title\" className=\"cb-headline-sm\">\r\n            {title}\r\n          </h2>\r\n          <p className=\"cb-body mx-auto mt-4 max-w-lg\">{subtitle}</p>\r\n        </header>\r\n\r\n        <div className=\"grid gap-4 lg:grid-cols-3\">\r\n          {tiers.map((tier) => (\r\n            <article\r\n              key={tier.name}\r\n              className={[\r\n                \"cb-card flex flex-col p-6\",\r\n                tier.highlighted\r\n                  ? \"relative border-[var(--border-accent)] ring-2 ring-[var(--color-accent)]/20\"\r\n                  : \"\",\r\n              ].join(\" \")}\r\n            >\r\n              {tier.highlighted ? (\r\n                <span className=\"cb-eyebrow absolute -top-3 start-6 rounded-full bg-[var(--color-primary)] px-3 py-1 text-[0.625rem] text-white\">\r\n                  Most popular\r\n                </span>\r\n              ) : null}\r\n              <h3 className=\"cb-font-display text-lg font-bold text-[var(--color-foreground)]\">\r\n                {tier.name}\r\n              </h3>\r\n              <p className=\"cb-font-body mt-2 text-sm text-[var(--color-muted)]\">{tier.description}</p>\r\n              <p className=\"mt-6\">\r\n                <span className=\"cb-metric text-4xl\">{tier.price}</span>\r\n                {tier.period ? (\r\n                  <span className=\"cb-font-body text-sm text-[var(--color-muted)]\">{tier.period}</span>\r\n                ) : null}\r\n              </p>\r\n              <ul className=\"mt-6 flex-1 space-y-3\">\r\n                {tier.features.map((feature) => (\r\n                  <li\r\n                    key={feature}\r\n                    className=\"flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]\"\r\n                  >\r\n                    <span className=\"cb-signal mt-0.5 shrink-0\" aria-hidden>\r\n                      ✓\r\n                    </span>\r\n                    {feature}\r\n                  </li>\r\n                ))}\r\n              </ul>\r\n              <a\r\n                href=\"#contact\"\r\n                className={tier.highlighted ? \"cb-btn-primary mt-8 w-full\" : \"cb-btn-secondary mt-8 w-full\"}\r\n              >\r\n                {tier.cta}\r\n              </a>\r\n            </article>\r\n          ))}\r\n        </div>\r\n      </div>\r\n    </section>\r\n  );\r\n}\r\n",
+      "language": "tsx"
+    },
+    {
+      "path": "components/corporate-business-faq.tsx",
+      "content": "\"use client\";\r\n\r\nimport { useState } from \"react\";\r\n\r\nconst DEFAULT_FAQ = [\r\n  {\r\n    question: \"How do engagements typically begin?\",\r\n    answer:\r\n      \"We start with a confidential discovery phase — stakeholder interviews, data review, and a prioritized opportunity map — usually completed within two weeks.\",\r\n  },\r\n  {\r\n    question: \"Which industries do you serve?\",\r\n    answer:\r\n      \"Our partners have deep experience across financial services, healthcare, industrials, technology, and public sector organizations globally.\",\r\n  },\r\n  {\r\n    question: \"How do you measure success?\",\r\n    answer:\r\n      \"Every engagement defines outcome metrics upfront — EBITDA impact, cycle-time reduction, risk exposure, or stakeholder satisfaction — with quarterly executive reviews.\",\r\n  },\r\n  {\r\n    question: \"Can you work alongside our internal teams?\",\r\n    answer:\r\n      \"Yes. We embed with leadership and delivery teams, transfer capabilities, and leave behind playbooks so improvements sustain after our engagement ends.\",\r\n  },\r\n];\r\n\r\ntype CorporateBusinessFaqProps = {\r\n  eyebrow?: string;\r\n  title?: string;\r\n  subtitle?: string;\r\n  items?: Array<{ question: string; answer: string }>;\r\n};\r\n\r\nexport function CorporateBusinessFaq({\r\n  eyebrow = \"FAQ\",\r\n  title = \"Answers for executive sponsors\",\r\n  subtitle = \"What leadership teams ask before engaging a strategic advisory partner.\",\r\n  items = DEFAULT_FAQ,\r\n}: CorporateBusinessFaqProps) {\r\n  const [openIndex, setOpenIndex] = useState<number | null>(0);\r\n\r\n  return (\r\n    <section\r\n      data-v2-component=\"corporate-business-faq\"\r\n      aria-labelledby=\"cb-faq-title\"\r\n      className=\"cb-section bg-[var(--color-surface)]\"\r\n    >\r\n      <div className=\"mx-auto max-w-[82rem] px-5 sm:px-8\">\r\n        <div className=\"grid gap-12 lg:grid-cols-[0.9fr_1.1fr]\">\r\n          <header>\r\n            <p className=\"cb-eyebrow mb-3\">{eyebrow}</p>\r\n            <h2 id=\"cb-faq-title\" className=\"cb-headline-sm\">\r\n              {title}\r\n            </h2>\r\n            <p className=\"cb-body mt-4\">{subtitle}</p>\r\n          </header>\r\n\r\n          <div className=\"space-y-2\">\r\n            {items.map((item, index) => {\r\n              const open = openIndex === index;\r\n              const panelId = `cb-faq-panel-${index}`;\r\n              return (\r\n                <div\r\n                  key={`faq-${index}-${item.question}`}\r\n                  className=\"overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-background)]\"\r\n                >\r\n                  <h3>\r\n                    <button\r\n                      type=\"button\"\r\n                      id={`cb-faq-trigger-${index}`}\r\n                      aria-expanded={open}\r\n                      aria-controls={panelId}\r\n                      className=\"flex w-full items-center justify-between gap-4 px-5 py-4 text-start cb-focus-ring\"\r\n                      onClick={() => setOpenIndex(open ? null : index)}\r\n                    >\r\n                      <span className=\"cb-font-display text-sm font-semibold text-[var(--color-foreground)]\">\r\n                        {item.question}\r\n                      </span>\r\n                      <span\r\n                        className=\"cb-font-mono flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-xs text-[var(--color-accent)]\"\r\n                        aria-hidden\r\n                      >\r\n                        {open ? \"−\" : \"+\"}\r\n                      </span>\r\n                    </button>\r\n                  </h3>\r\n                  <div\r\n                    id={panelId}\r\n                    role=\"region\"\r\n                    aria-labelledby={`cb-faq-trigger-${index}`}\r\n                    hidden={!open}\r\n                    className=\"border-t border-[var(--border-subtle)] px-5 py-4\"\r\n                  >\r\n                    <p className=\"cb-font-body text-sm leading-relaxed text-[var(--color-muted)]\">\r\n                      {item.answer}\r\n                    </p>\r\n                  </div>\r\n                </div>\r\n              );\r\n            })}\r\n          </div>\r\n        </div>\r\n      </div>\r\n    </section>\r\n  );\r\n}\r\n",
+      "language": "tsx"
+    },
+    {
+      "path": "components/corporate-business-contact.tsx",
+      "content": "\"use client\";\r\n\r\nimport { FlagshipContactSection } from \"@/lib/website/template-v2/flagship/contact-section\";\r\nimport { CORPORATE_FLAGSHIP_UI } from \"@/lib/website/template-v2/flagship/themes\";\r\n\r\nexport function CorporateBusinessContact(\r\n  props: Partial<{\r\n    eyebrow: string;\r\n    title: string;\r\n    subtitle: string;\r\n    email: string;\r\n    phone: string;\r\n    address: string;\r\n    submitLabel: string;\r\n  }> = {},\r\n) {\r\n  return (\r\n    <FlagshipContactSection\r\n      ui={CORPORATE_FLAGSHIP_UI}\r\n      componentId=\"corporate-business-contact\"\r\n      id=\"contact\"\r\n      eyebrow=\"Contact\"\r\n      title=\"Speak with a senior partner\"\r\n      subtitle=\"Share your priorities and we will assemble the right advisory team for a confidential consultation.\"\r\n      email=\"partners@meridianadvisory.com\"\r\n      phone=\"+1 (212) 555-0180\"\r\n      address=\"200 Park Avenue, New York, NY\"\r\n      submitLabel=\"Request consultation\"\r\n      {...props}\r\n    />\r\n  );\r\n}\r\n",
+      "language": "tsx"
+    },
+    {
+      "path": "components/corporate-business-footer.tsx",
+      "content": "\"use client\";\r\n\r\nconst DEFAULT_LINKS = [\r\n  { href: \"#features\", label: \"Capabilities\" },\r\n  { href: \"#about\", label: \"About\" },\r\n  { href: \"#pricing\", label: \"Engagements\" },\r\n  { href: \"#contact\", label: \"Contact\" },\r\n  { href: \"#privacy\", label: \"Privacy\" },\r\n  { href: \"#terms\", label: \"Terms\" },\r\n];\r\n\r\ntype CorporateBusinessFooterProps = {\r\n  brandName?: string;\r\n  tagline?: string;\r\n  links?: Array<{ href: string; label: string }>;\r\n};\r\n\r\nexport function CorporateBusinessFooter({\r\n  brandName = \"Meridian Advisory\",\r\n  tagline = \"Executive advisory for organizations navigating transformation, governance, and global growth.\",\r\n  links = DEFAULT_LINKS,\r\n}: CorporateBusinessFooterProps) {\r\n  const year = new Date().getFullYear();\r\n\r\n  return (\r\n    <footer\r\n      data-v2-component=\"corporate-business-footer\"\r\n      className=\"border-t border-[var(--border-default)] bg-[var(--color-ink,#020617)] text-white\"\r\n      role=\"contentinfo\"\r\n    >\r\n      <div className=\"mx-auto max-w-[82rem] px-5 py-14 sm:px-8 sm:py-16\">\r\n        <div className=\"grid gap-10 md:grid-cols-[1.4fr_1fr]\">\r\n          <div>\r\n            <p className=\"cb-font-display text-xl font-bold\">{brandName}</p>\r\n            <p className=\"cb-font-body mt-3 max-w-sm text-sm leading-relaxed text-white/60\">\r\n              {tagline}\r\n            </p>\r\n            <div className=\"mt-6 flex flex-wrap gap-3\">\r\n              {[\"ISO 9001\", \"GDPR\", \"B Corp\"].map((badge) => (\r\n                <span\r\n                  key={badge}\r\n                  className=\"cb-font-mono rounded-[var(--radius-sm)] border border-white/10 px-2.5 py-1 text-[0.625rem] text-white/50\"\r\n                >\r\n                  {badge}\r\n                </span>\r\n              ))}\r\n            </div>\r\n          </div>\r\n\r\n          <nav aria-label=\"Footer\">\r\n            <p className=\"cb-eyebrow text-white/40\">Explore</p>\r\n            <ul className=\"mt-4 grid grid-cols-2 gap-x-6 gap-y-2.5\">\r\n              {links.map((link) => (\r\n                <li key={link.href}>\r\n                  <a\r\n                    href={link.href}\r\n                    className=\"cb-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] cb-focus-ring rounded-sm\"\r\n                  >\r\n                    {link.label}\r\n                  </a>\r\n                </li>\r\n              ))}\r\n            </ul>\r\n          </nav>\r\n        </div>\r\n\r\n        <div className=\"mt-12 border-t border-white/10 pt-6\">\r\n          <p className=\"cb-font-body text-xs text-white/40\">\r\n            © {year} {brandName}. All rights reserved.\r\n          </p>\r\n        </div>\r\n      </div>\r\n    </footer>\r\n  );\r\n}\r\n",
+      "language": "tsx"
+    },
+    {
+      "path": "components/corporate-business-floating-cta.tsx",
+      "content": "\"use client\";\r\n\r\nimport { useEffect, useState } from \"react\";\r\n\r\ntype CorporateBusinessFloatingCtaProps = {\r\n  title?: string;\r\n  subtitle?: string;\r\n  ctaLabel?: string;\r\n  ctaHref?: string;\r\n};\r\n\r\nexport function CorporateBusinessFloatingCta({\r\n  title = \"Discuss your next strategic initiative\",\r\n  subtitle = \"Confidential consultation with a senior partner.\",\r\n  ctaLabel = \"Schedule consultation\",\r\n  ctaHref = \"#contact\",\r\n}: CorporateBusinessFloatingCtaProps) {\r\n  const [visible, setVisible] = useState(false);\r\n\r\n  useEffect(() => {\r\n    const onScroll = () => setVisible(window.scrollY > 480);\r\n    onScroll();\r\n    window.addEventListener(\"scroll\", onScroll, { passive: true });\r\n    return () => window.removeEventListener(\"scroll\", onScroll);\r\n  }, []);\r\n\r\n  if (!visible) return null;\r\n\r\n  return (\r\n    <div\r\n      data-v2-component=\"corporate-business-floating-cta\"\r\n      className=\"pointer-events-none fixed inset-x-0 bottom-0 z-40 px-4 pb-4 sm:px-6 motion-safe:animate-[cb-slide-up_0.4s_ease_both]\"\r\n      role=\"complementary\"\r\n      aria-label=\"Quick action\"\r\n    >\r\n      <div className=\"pointer-events-auto mx-auto flex max-w-[82rem] items-center justify-between gap-4 rounded-[var(--radius-xl)] border border-[var(--border-default)] bg-[var(--color-surface)]/95 px-5 py-3 shadow-[var(--shadow-surface)] backdrop-blur-xl sm:px-6 sm:py-4\">\r\n        <div className=\"min-w-0\">\r\n          <p className=\"cb-font-display truncate text-sm font-bold text-[var(--color-foreground)] sm:text-base\">\r\n            {title}\r\n          </p>\r\n          <p className=\"cb-font-body hidden truncate text-xs text-[var(--color-muted)] sm:block\">\r\n            {subtitle}\r\n          </p>\r\n        </div>\r\n        <a href={ctaHref} className=\"cb-btn-primary shrink-0 text-xs sm:text-sm\">\r\n          {ctaLabel}\r\n        </a>\r\n      </div>\r\n    </div>\r\n  );\r\n}\r\n",
+      "language": "tsx"
+    },
+    {
+      "path": "components/corporate-business-utility-band.tsx",
+      "content": "\"use client\";\r\n\r\ntype CorporateBusinessUtilityBandProps = {\r\n  eyebrow?: string;\r\n  title?: string;\r\n  subtitle?: string;\r\n  primaryCta?: string;\r\n  secondaryCta?: string;\r\n};\r\n\r\nexport function CorporateBusinessUtilityBand({\r\n  eyebrow = \"Partner with us\",\r\n  title = \"Ready to move from strategy to results?\",\r\n  subtitle = \"Join 500+ organizations that rely on Meridian for board-ready counsel and transformation delivery.\",\r\n  primaryCta = \"Schedule consultation\",\r\n  secondaryCta = \"Download capabilities brief\",\r\n}: CorporateBusinessUtilityBandProps) {\r\n  return (\r\n    <section\r\n      id=\"cta-band\"\r\n      data-v2-component=\"corporate-business-utility-band\"\r\n      aria-labelledby=\"cb-utility-title\"\r\n      className=\"relative overflow-hidden bg-[var(--color-primary)] py-14 sm:py-16\"\r\n    >\r\n      <div className=\"cb-grid-bg pointer-events-none absolute inset-0 opacity-20\" aria-hidden />\r\n      <div\r\n        className=\"pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_0%_50%,rgba(255,255,255,0.12),transparent)]\"\r\n        aria-hidden\r\n      />\r\n\r\n      <div className=\"relative mx-auto flex max-w-[82rem] flex-col items-start justify-between gap-8 px-5 sm:flex-row sm:items-center sm:px-8\">\r\n        <div className=\"max-w-xl\">\r\n          <p className=\"cb-font-mono text-xs font-medium uppercase tracking-wider text-white/70\">\r\n            {eyebrow}\r\n          </p>\r\n          <h2 id=\"cb-utility-title\" className=\"cb-font-display mt-2 text-[clamp(1.5rem,2.8vw,2.25rem)] font-bold text-white\">\r\n            {title}\r\n          </h2>\r\n          <p className=\"cb-font-body mt-3 text-sm leading-relaxed text-white/75 sm:text-base\">\r\n            {subtitle}\r\n          </p>\r\n        </div>\r\n        <div className=\"flex flex-wrap gap-3\">\r\n          <a\r\n            href=\"#contact\"\r\n            className=\"inline-flex min-h-[2.75rem] items-center justify-center rounded-[var(--radius-md)] bg-white px-5 py-3 text-sm font-semibold text-[var(--color-primary)] transition hover:bg-white/90 cb-focus-ring\"\r\n          >\r\n            {primaryCta}\r\n          </a>\r\n          <a\r\n            href=\"#about\"\r\n            className=\"inline-flex min-h-[2.75rem] items-center justify-center rounded-[var(--radius-md)] border border-white/30 px-5 py-3 text-sm font-semibold text-white transition hover:border-white/60 cb-focus-ring\"\r\n          >\r\n            {secondaryCta}\r\n          </a>\r\n        </div>\r\n      </div>\r\n    </section>\r\n  );\r\n}\r\n",
+      "language": "tsx"
+    },
+    {
+      "path": "components/corporate-business-section-shell.tsx",
+      "content": "\"use client\";\r\n\r\nimport type { ReactNode } from \"react\";\r\n\r\ntype CorporateBusinessSectionShellProps = {\r\n  id?: string;\r\n  eyebrow?: string;\r\n  title?: string;\r\n  subtitle?: string;\r\n  children?: ReactNode;\r\n  className?: string;\r\n};\r\n\r\nexport function CorporateBusinessSectionShell({\r\n  id,\r\n  eyebrow,\r\n  title,\r\n  subtitle,\r\n  children,\r\n  className = \"\",\r\n}: CorporateBusinessSectionShellProps) {\r\n  return (\r\n    <section\r\n      id={id}\r\n      data-v2-component=\"corporate-business-section-shell\"\r\n      className={`cb-section bg-[var(--color-background)] ${className}`.trim()}\r\n      aria-labelledby={title ? `${id ?? \"section\"}-title` : undefined}\r\n    >\r\n      <div className=\"mx-auto max-w-[82rem] px-5 sm:px-8\">\r\n        {(eyebrow || title || subtitle) && (\r\n          <header className=\"mb-12 max-w-2xl\">\r\n            {eyebrow && <p className=\"cb-eyebrow mb-3\">{eyebrow}</p>}\r\n            {title && (\r\n              <h2 id={`${id ?? \"section\"}-title`} className=\"cb-headline-sm\">\r\n                {title}\r\n              </h2>\r\n            )}\r\n            {subtitle && <p className=\"cb-body mt-4\">{subtitle}</p>}\r\n          </header>\r\n        )}\r\n        {children}\r\n      </div>\r\n    </section>\r\n  );\r\n}\r\n",
+      "language": "tsx"
+    },
+    {
+      "path": "components/corporate-business-portfolio.tsx",
+      "content": "\"use client\";\r\n\r\nconst DEFAULT_OUTCOMES = [\r\n  {\r\n    company: \"Apex Holdings\",\r\n    industry: \"Private Equity\",\r\n    outcome: \"3.2×\",\r\n    outcomeLabel: \"portfolio value uplift\",\r\n    detail: \"Restructured operating model across 4 portfolio companies within 18 months.\",\r\n  },\r\n  {\r\n    company: \"Northgate Financial\",\r\n    industry: \"Banking\",\r\n    outcome: \"$840M\",\r\n    outcomeLabel: \"risk exposure reduced\",\r\n    detail: \"Board-level governance framework aligned regulatory compliance with growth strategy.\",\r\n  },\r\n  {\r\n    company: \"Helix Manufacturing\",\r\n    industry: \"Industrial\",\r\n    outcome: \"28%\",\r\n    outcomeLabel: \"margin improvement\",\r\n    detail: \"Supply chain optimization and leadership succession planning across 3 regions.\",\r\n  },\r\n];\r\n\r\ntype CorporateBusinessPortfolioProps = {\r\n  eyebrow?: string;\r\n  title?: string;\r\n  subtitle?: string;\r\n  items?: Array<{\r\n    company: string;\r\n    industry: string;\r\n    outcome: string;\r\n    outcomeLabel?: string;\r\n    detail: string;\r\n  }>;\r\n};\r\n\r\nexport function CorporateBusinessPortfolio({\r\n  eyebrow = \"Client outcomes\",\r\n  title = \"Boards trust Meridian Advisory\",\r\n  subtitle = \"Executive teams navigate transformation, governance, and global expansion with measurable strategic impact.\",\r\n  items = DEFAULT_OUTCOMES,\r\n}: CorporateBusinessPortfolioProps) {\r\n  return (\r\n    <section\r\n      id=\"customers\"\r\n      data-v2-component=\"corporate-business-portfolio\"\r\n      aria-labelledby=\"cb-portfolio-title\"\r\n      className=\"cb-section bg-[var(--color-surface)]\"\r\n    >\r\n      <div className=\"mx-auto max-w-[82rem] px-5 sm:px-8\">\r\n        <header className=\"mb-12 max-w-2xl\">\r\n          <p className=\"cb-eyebrow mb-3\">{eyebrow}</p>\r\n          <h2 id=\"cb-portfolio-title\" className=\"cb-headline-sm\">\r\n            {title}\r\n          </h2>\r\n          <p className=\"cb-body mt-4\">{subtitle}</p>\r\n        </header>\r\n\r\n        <div className=\"grid gap-4 md:grid-cols-3\">\r\n          {items.map((item, index) => (\r\n            <article\r\n              key={item.company}\r\n              className=\"cb-card group relative overflow-hidden p-6\"\r\n            >\r\n              <div\r\n                className=\"absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] opacity-0 transition-opacity group-hover:opacity-100\"\r\n                aria-hidden\r\n              />\r\n              <p className=\"cb-font-mono text-[0.625rem] font-medium uppercase tracking-wider text-[var(--color-muted)]\">\r\n                {item.industry}\r\n              </p>\r\n              <h3 className=\"cb-font-display mt-2 text-lg font-bold text-[var(--color-foreground)]\">\r\n                {item.company}\r\n              </h3>\r\n              <div className=\"mt-6 flex items-baseline gap-2\">\r\n                <span className=\"cb-metric text-3xl\">{item.outcome}</span>\r\n                {item.outcomeLabel ? (\r\n                  <span className=\"cb-font-body text-sm text-[var(--color-muted)]\">\r\n                    {item.outcomeLabel}\r\n                  </span>\r\n                ) : null}\r\n              </div>\r\n              <p className=\"cb-font-body mt-4 text-sm leading-relaxed text-[var(--color-muted)]\">\r\n                {item.detail}\r\n              </p>\r\n              <p className=\"cb-font-mono mt-6 text-[0.625rem] text-[var(--color-accent)]\">\r\n                Case study 0{index + 1}\r\n              </p>\r\n            </article>\r\n          ))}\r\n        </div>\r\n      </div>\r\n    </section>\r\n  );\r\n}\r\n",
+      "language": "tsx"
+    },
+    {
+      "path": "components/corporate-business-integrations.tsx",
+      "content": "\"use client\";\r\n\r\nconst DEFAULT_INTEGRATIONS = [\r\n  \"SAP\",\r\n  \"Oracle\",\r\n  \"Microsoft\",\r\n  \"Workday\",\r\n  \"ServiceNow\",\r\n  \"Salesforce\",\r\n  \"Deloitte\",\r\n  \"PwC\",\r\n  \"EY\",\r\n  \"KPMG\",\r\n];\r\n\r\ntype CorporateBusinessIntegrationsProps = {\r\n  eyebrow?: string;\r\n  title?: string;\r\n  subtitle?: string;\r\n  logos?: string[];\r\n};\r\n\r\nexport function CorporateBusinessIntegrations({\r\n  eyebrow = \"Partner ecosystem\",\r\n  title = \"Trusted advisory network\",\r\n  subtitle = \"Certified partnerships with enterprise platforms and global advisory firms for seamless execution.\",\r\n  logos = DEFAULT_INTEGRATIONS,\r\n}: CorporateBusinessIntegrationsProps) {\r\n  const doubled = [...logos, ...logos];\r\n\r\n  return (\r\n    <section\r\n      id=\"platform\"\r\n      data-v2-component=\"corporate-business-integrations\"\r\n      aria-labelledby=\"cb-integrations-title\"\r\n      className=\"border-y border-[var(--border-default)] bg-[var(--color-background)] py-12 sm:py-14\"\r\n    >\r\n      <div className=\"mx-auto max-w-[82rem] px-5 sm:px-8\">\r\n        <header className=\"mb-10 text-center\">\r\n          <p className=\"cb-eyebrow mb-3\">{eyebrow}</p>\r\n          <h2 id=\"cb-integrations-title\" className=\"cb-headline-sm\">\r\n            {title}\r\n          </h2>\r\n          <p className=\"cb-body mx-auto mt-3 max-w-lg text-sm\">{subtitle}</p>\r\n        </header>\r\n      </div>\r\n\r\n      <div className=\"relative overflow-hidden\" aria-label=\"Integration partners\">\r\n        <div className=\"flex motion-safe:animate-[cb-marquee_40s_linear_infinite] hover:[animation-play-state:paused]\">\r\n          {doubled.map((logo, i) => (\r\n            <div\r\n              key={`${logo}-${i}`}\r\n              className=\"mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]\"\r\n            >\r\n              <span className=\"cb-font-display text-sm font-semibold text-[var(--color-muted)]\">\r\n                {logo}\r\n              </span>\r\n            </div>\r\n          ))}\r\n        </div>\r\n      </div>\r\n\r\n      <p className=\"cb-font-body mx-auto mt-8 max-w-[82rem] px-5 text-center text-xs text-[var(--color-muted)] sm:px-8\">\r\n        Certified partner network · Custom advisory engagements\r\n      </p>\r\n    </section>\r\n  );\r\n}\r\n",
+      "language": "tsx"
+    },
+    {
+      "path": "app/page.tsx",
+      "content": "import type { Metadata } from \"next\";\nimport { CorporateBusinessHero } from \"@/components/corporate-business-hero\";\nimport { CorporateBusinessFeatures } from \"@/components/corporate-business-features\";\nimport { CorporateBusinessAbout } from \"@/components/corporate-business-about\";\nimport { CorporateBusinessStats } from \"@/components/corporate-business-stats\";\nimport { CorporateBusinessTestimonials } from \"@/components/corporate-business-testimonials\";\nimport { CorporateBusinessPricing } from \"@/components/corporate-business-pricing\";\nimport { CorporateBusinessFaq } from \"@/components/corporate-business-faq\";\nimport { CorporateBusinessContact } from \"@/components/corporate-business-contact\";\nimport { CorporateBusinessUtilityBand } from \"@/components/corporate-business-utility-band\";\nimport { CorporateBusinessFloatingCta } from \"@/components/corporate-business-floating-cta\";\nimport { CorporateBusinessNav } from \"@/components/corporate-business-nav\";\nimport { CorporateBusinessFooter } from \"@/components/corporate-business-footer\";\n\nexport const metadata: Metadata = {\n  title: \"Trend Business AI\",\n  description: \"Business automation, website generation, and enterprise AI products\",\n};\n\nexport default function HomePage() {\n  return (\n    <div className=\"min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] antialiased v2-template v2-corporate-business\" data-v2-package=\"corporate-business\" data-v2-composer=\"region-grid\" data-v2-layout=\"default\">\n      <header data-v2-region=\"header\">\n      <CorporateBusinessNav\n        brandName={\"Trend Business AI\"}\n        ctaLabel={\"Get started\"}\n        links={[{\"href\":\"#services\",\"label\":\"Services\"},{\"href\":\"#features\",\"label\":\"Why us\"},{\"href\":\"#pricing\",\"label\":\"Packages\"},{\"href\":\"#testimonials\",\"label\":\"Clients\"},{\"href\":\"#contact\",\"label\":\"Contact\"}]}\n      />\n      </header>\n      <main data-v2-region=\"main\" className=\"v2-region-grid\">\n      <CorporateBusinessHero\n        title={\"Trend Business AI\"}\n        subtitle={\"Business automation, website generation, and enterprise AI products\"}\n        eyebrow={\"Professional presence\"}\n        primaryCta={\"Get started\"}\n        secondaryCta={\"Learn more\"}\n      />\n      <CorporateBusinessFeatures\n        eyebrow={\"Why us\"}\n        title={\"A presence that earns trust\"}\n        subtitle={\"Webflow-caliber spacing, type, and hierarchy for serious brands.\"}\n        items={[{\"title\":\"Clear offer\",\"body\":\"Explain what you do and who you help without jargon.\"},{\"title\":\"Premium presentation\",\"body\":\"Typography, spacing, and imagery that feel established.\"},{\"title\":\"Conversion paths\",\"body\":\"CTAs that guide visitors to the next decisive step.\"},{\"title\":\"Trusted contact\",\"body\":\"Forms and contact paths that get answered.\"}]}\n      />\n      <CorporateBusinessAbout\n        eyebrow={\"Services\"}\n        title={\"What we deliver for clients\"}\n        subtitle={\"Plain-language offerings with outcomes — ready for a premium business site.\"}\n      />\n      <CorporateBusinessStats\n        primaryCta={\"Get started\"}\n        secondaryCta={\"Learn more\"}\n        title={\"Ready to look established online?\"}\n        subtitle={\"Share your goals — we will propose a clear path and timeline.\"}\n      />\n      <CorporateBusinessTestimonials\n        eyebrow={\"Clients\"}\n        title={\"Businesses that raised their standard\"}\n        subtitle={\"Specific results from professional services teams.\"}\n        items={[{\"quote\":\"We finally look as professional as the work we deliver — working with Trend Business AI.\",\"name\":\"Andrea Wells\",\"role\":\"Owner, Wells Advisory\"},{\"quote\":\"Inquiries went up after the redesign — messaging is clearer.\",\"name\":\"Kevin Zhao\",\"role\":\"Managing Partner\"},{\"quote\":\"Clients comment on the site before meetings now.\",\"name\":\"Ruth Okonkwo\",\"role\":\"Consultant\"}]}\n      />\n      <CorporateBusinessPricing\n        eyebrow={\"Packages\"}\n        title={\"Simple engagement options\"}\n        subtitle={\"Start lean or go deeper — both look premium.\"}\n      />\n      <CorporateBusinessFaq\n        eyebrow={\"FAQ\"}\n        title={\"Common questions\"}\n        subtitle={\"Launch timing, edits, and languages.\"}\n        items={[{\"q\":\"How soon can we launch?\",\"a\":\"Most first versions ship quickly once messaging and assets are aligned.\"},{\"q\":\"Can we update content ourselves?\",\"a\":\"Yes — structured sections make ongoing edits straightforward.\"},{\"q\":\"Do you support bilingual sites?\",\"a\":\"Language options can be configured during generation and refinement.\"}]}\n      />\n      <CorporateBusinessContact\n        title={\"Request a quote\"}\n        subtitle={\"Tell us about your business and we will respond promptly.\"}\n        ctaLabel={\"Get started\"}\n      />\n      </main>\n      <utility data-v2-region=\"utility\">\n      <CorporateBusinessUtilityBand\n        primaryCta={\"Get started\"}\n        secondaryCta={\"Learn more\"}\n        title={\"Ready to look established online?\"}\n        subtitle={\"Share your goals — we will propose a clear path and timeline.\"}\n      />\n      </utility>\n      <footer data-v2-region=\"footer\">\n      <CorporateBusinessFooter\n        brandName={\"Trend Business AI\"}\n        tagline={\"Business automation, website generation, and enterprise AI products\"}\n        links={[{\"href\":\"#services\",\"label\":\"Services\"},{\"href\":\"#features\",\"label\":\"Why us\"},{\"href\":\"#pricing\",\"label\":\"Packages\"},{\"href\":\"#testimonials\",\"label\":\"Clients\"},{\"href\":\"#contact\",\"label\":\"Contact\"}]}\n      />\n      </footer>\n      <div data-v2-region=\"overlay\" className=\"pointer-events-none fixed inset-x-0 bottom-0 z-50\">\n      <CorporateBusinessFloatingCta\n        primaryCta={\"Get started\"}\n        secondaryCta={\"Learn more\"}\n        title={\"Ready to look established online?\"}\n        subtitle={\"Share your goals — we will propose a clear path and timeline.\"}\n      />\n      </div>\n    </div>\n  );\n}\n",
+      "language": "tsx"
+    },
+    {
+      "path": "preview/index.html",
+      "language": "html",
+      "content": "<!DOCTYPE html>\n<html lang=\"en\" data-v2-render=\"v2-files\" data-v2-package=\"corporate-business\" data-v2-layout=\"default\">\n<head>\n  <meta charset=\"utf-8\" />\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n  <title>Trend Business AI — Live Preview</title>\n  <style>/* Template Architecture V2 — corporate-business · spec 2.0.0 */\n:root {\n  --v2-package: \"corporate-business\";\n  --color-primary: #0F2B46;\n  --color-secondary: #1E4976;\n  --color-accent: #2563EB;\n  --color-background: #FFFFFF;\n  --color-foreground: #0F172A;\n  --color-muted: rgba(15,23,42,0.58);\n  --color-surface: #F8FAFC;\n  --color-signal: #C5A572;\n  --color-grid: rgba(15,43,70,0.06);\n  --color-ink: #071018;\n  --font-display: \"IBM Plex Sans\", ui-sans-serif, system-ui, sans-serif;\n  --font-body: \"IBM Plex Sans\", ui-sans-serif, system-ui, sans-serif;\n  --spacing-unit: 0.25rem;\n  --radius-sm: 4px;\n  --radius-md: 8px;\n  --radius-lg: 12px;\n  --radius-xl: 16px;\n  --shadow-surface: 0 1px 2px rgba(15,23,42,0.06), 0 16px 48px rgba(15,43,70,0.08);\n  --shadow-glow: 0 0 64px rgba(197,165,114,0.2);\n  --shadow-card: 0 0 0 1px rgba(15,43,70,0.05), 0 4px 20px rgba(15,43,70,0.06);\n  --border-default: rgba(15,43,70,0.1);\n  --border-accent: rgba(37,99,235,0.22);\n  --border-subtle: rgba(15,43,70,0.05);\n}\n\n/* V2 language profile — RTL typography adaptation */\n[dir=\"rtl\"] {\n  --font-display: Tajawal, ui-serif, Georgia, serif;\n  --font-body: \"Noto Sans Arabic\", ui-sans-serif, system-ui, sans-serif;\n  letter-spacing: 0.01em;\n}\n\n@import url(\"https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:ital,wght@0,500;0,600;0,700;0,800;1,500&display=swap\");\n\n@keyframes cb-grid-reveal {\n  from { opacity: 0; transform: translateY(20px) scale(0.98); }\n  to { opacity: 1; transform: translateY(0) scale(1); }\n}\n@keyframes cb-slide-up {\n  from { opacity: 0; transform: translateY(16px); }\n  to { opacity: 1; transform: translateY(0); }\n}\n@keyframes cb-marquee {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n[dir=\"rtl\"] [class*=\"se-marquee\"],\n[dir=\"rtl\"] [class*=\"cb-marquee\"] {\n  animation-direction: reverse;\n}\n@keyframes cb-pulse-dot {\n  0%, 100% { opacity: 0.4; transform: scale(0.85); }\n  50% { opacity: 1; transform: scale(1); }\n}\n@keyframes cb-scan-line {\n  0% { transform: translateY(-100%); opacity: 0; }\n  50% { opacity: 0.06; }\n  100% { transform: translateY(100vh); opacity: 0; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .cb-animate, [data-cb-motion] { animation: none !important; transition: none !important; }\n}\n\n.cb-font-display { font-family: var(--font-display), \"IBM Plex Sans\", system-ui, sans-serif; }\n.cb-font-body { font-family: var(--font-body), \"IBM Plex Sans\", system-ui, sans-serif; }\n.cb-font-mono { font-family: \"IBM Plex Mono\", ui-monospace, monospace; }\n.cb-eyebrow {\n  font-family: var(--font-body), \"IBM Plex Sans\", system-ui, sans-serif;\n  font-size: 0.6875rem;\n  font-weight: 600;\n  letter-spacing: 0.14em;\n  text-transform: uppercase;\n  color: var(--color-accent, #3B82F6);\n}\n.cb-headline {\n  font-family: var(--font-display), \"IBM Plex Sans\", system-ui, sans-serif;\n  font-size: clamp(2.25rem, 4.5vw, 3.75rem);\n  font-weight: 700;\n  line-height: 1.08;\n  letter-spacing: -0.03em;\n  color: var(--color-foreground);\n}\n.cb-headline-sm {\n  font-family: var(--font-display), \"IBM Plex Sans\", system-ui, sans-serif;\n  font-size: clamp(1.5rem, 2.8vw, 2.25rem);\n  font-weight: 700;\n  line-height: 1.15;\n  letter-spacing: -0.025em;\n  color: var(--color-foreground);\n}\n.cb-body {\n  font-family: var(--font-body), \"IBM Plex Sans\", system-ui, sans-serif;\n  font-size: 1.0625rem;\n  line-height: 1.65;\n  color: var(--color-muted, rgba(15,23,42,0.58));\n}\n.cb-grid-bg {\n  background-image:\n    linear-gradient(var(--color-grid, rgba(15,23,42,0.06)) 1px, transparent 1px),\n    linear-gradient(90deg, var(--color-grid, rgba(15,23,42,0.06)) 1px, transparent 1px);\n  background-size: 48px 48px;\n}\n.cb-card {\n  border: 1px solid var(--border-subtle, rgba(15,23,42,0.04));\n  background: var(--color-surface);\n  border-radius: var(--radius-lg, 16px);\n  box-shadow: var(--shadow-card);\n  transition: box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease;\n}\n.cb-card:hover {\n  box-shadow: var(--shadow-surface);\n  border-color: var(--border-accent, rgba(59,130,246,0.24));\n}\n.cb-btn-primary {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  min-height: 2.75rem;\n  padding: 0.75rem 1.5rem;\n  font-family: var(--font-body), \"IBM Plex Sans\", system-ui, sans-serif;\n  font-size: 0.875rem;\n  font-weight: 600;\n  text-decoration: none;\n  color: #fff;\n  background: var(--color-primary, #1D4ED8);\n  border-radius: var(--radius-md, 10px);\n  border: 1px solid transparent;\n  box-shadow: 0 1px 2px rgba(15,23,42,0.06);\n  transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;\n}\n.cb-btn-primary:hover {\n  background: var(--color-accent, #3B82F6);\n  box-shadow: var(--shadow-glow);\n}\n.cb-btn-primary:focus-visible {\n  outline: 2px solid var(--color-accent);\n  outline-offset: 2px;\n}\n.cb-btn-secondary {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  min-height: 2.75rem;\n  padding: 0.75rem 1.5rem;\n  font-family: var(--font-body), \"IBM Plex Sans\", system-ui, sans-serif;\n  font-size: 0.875rem;\n  font-weight: 600;\n  text-decoration: none;\n  color: var(--color-foreground);\n  background: var(--color-surface);\n  border: 1px solid var(--border-default, rgba(15,23,42,0.08));\n  border-radius: var(--radius-md, 10px);\n  transition: border-color 0.25s ease, background 0.25s ease;\n}\n.cb-btn-secondary:hover { border-color: var(--color-accent); background: color-mix(in srgb, var(--color-accent) 4%, var(--color-surface)); }\n.cb-btn-secondary:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }\n.cb-section { padding-block: clamp(4rem, 10vw, 6.5rem); }\n.cb-metric {\n  font-family: var(--font-display), \"IBM Plex Sans\", system-ui, sans-serif;\n  font-size: 1.75rem;\n  font-weight: 700;\n  letter-spacing: -0.02em;\n  color: var(--color-primary);\n}\n.cb-signal { color: var(--color-signal, #059669); }\n.cb-focus-ring:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }\n\n.cb-signal { color: var(--color-signal, #C5A572); }\n\n/* TBDP Native Consumption — corporate-business\n   sector:law-firm · experience:corporate, executive, trust\n   identity:executive-atlas · context:8820d847ff5f54e9\n   integration:5.0.0 · consumption:1.0.0 */\n:root {\n  --tbdp-native: 1;\n  --tbdp-native-package: \"corporate-business\";\n  --tbdp-sector-dna: \"law-firm\";\n  --tbdp-template-identity: \"executive-atlas\";\n  --tbdp-experience-primary: \"executive\";\n  --tbdp-context-hash: \"8820d847ff5f54e9\";\n  --tbdp-theme-mode: \"light\";\n  --tbdp-direction: \"ltr\";\n}\n\n/* TBDP Foundations — official design authority (scoped vars) */\n/* Trend Business AI Design Platform · 1.0.0 · foundations-1 */\n:root {\n  --tbdp-color-primary: #0047E6;\n  --tbdp-color-secondary: #334155;\n  --tbdp-color-accent: #4D85FF;\n  --tbdp-color-success: #10B981;\n  --tbdp-color-warning: #F59E0B;\n  --tbdp-color-danger: #EF4444;\n  --tbdp-color-info: #3B82F6;\n  --tbdp-color-surface-base: #FFFFFF;\n  --tbdp-color-surface-raised: #F8FAFC;\n  --tbdp-color-surface-overlay: #FFFFFF;\n  --tbdp-color-surface-sunken: #F1F5F9;\n  --tbdp-color-surface-inverse: #0F172A;\n  --tbdp-color-background-canvas: #F8FAFC;\n  --tbdp-color-background-subtle: #F1F5F9;\n  --tbdp-color-background-emphasis: #FFFFFF;\n  --tbdp-color-background-inverse: #020617;\n  --tbdp-color-text-primary: #0F172A;\n  --tbdp-color-text-secondary: #475569;\n  --tbdp-color-text-tertiary: #64748B;\n  --tbdp-color-text-disabled: #94A3B8;\n  --tbdp-color-text-inverse: #FFFFFF;\n  --tbdp-color-text-link: #0047E6;\n  --tbdp-color-text-linkHover: #0038B8;\n  --tbdp-color-border-default: #E2E8F0;\n  --tbdp-color-border-subtle: #F1F5F9;\n  --tbdp-color-border-strong: #CBD5E1;\n  --tbdp-color-border-focus: #1A5CFF;\n  --tbdp-color-border-inverse: rgba(255, 255, 255, 0.16);\n  --tbdp-color-overlay-scrim: rgba(2, 6, 23, 0.4);\n  --tbdp-color-overlay-scrimStrong: rgba(2, 6, 23, 0.64);\n  --tbdp-color-overlay-backdrop: rgba(2, 6, 23, 0.24);\n  --tbdp-color-overlay-highlight: rgba(26, 92, 255, 0.12);\n  --tbdp-opacity-transparent: 0;\n  --tbdp-opacity-subtle: 0.04;\n  --tbdp-opacity-muted: 0.08;\n  --tbdp-opacity-soft: 0.12;\n  --tbdp-opacity-medium: 0.24;\n  --tbdp-opacity-strong: 0.48;\n  --tbdp-opacity-opaque: 1;\n  --tbdp-spacing-micro: 0.125rem;\n  --tbdp-spacing-xs: 0.25rem;\n  --tbdp-spacing-sm: 0.5rem;\n  --tbdp-spacing-md: 1rem;\n  --tbdp-spacing-lg: 1.5rem;\n  --tbdp-spacing-xl: 2rem;\n  --tbdp-spacing-2xl: 3rem;\n  --tbdp-spacing-3xl: 4rem;\n  --tbdp-spacing-4xl: 6rem;\n  --tbdp-radius-sharp: 0;\n  --tbdp-radius-sm: 0.25rem;\n  --tbdp-radius-md: 0.5rem;\n  --tbdp-radius-lg: 0.75rem;\n  --tbdp-radius-pill: 9999px;\n  --tbdp-radius-circle: 50%;\n  --tbdp-shadow-0: none;\n  --tbdp-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);\n  --tbdp-shadow-2: 0 2px 8px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);\n  --tbdp-shadow-3: 0 8px 24px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);\n  --tbdp-shadow-4: 0 16px 48px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.08);\n  --tbdp-shadow-5: 0 24px 64px rgba(15, 23, 42, 0.18), 0 8px 24px rgba(15, 23, 42, 0.1);\n  --tbdp-container-sm: 640px;\n  --tbdp-container-md: 768px;\n  --tbdp-container-lg: 1024px;\n  --tbdp-container-xl: 1280px;\n  --tbdp-container-2xl: 1440px;\n  --tbdp-container-full: 100%;\n  --tbdp-font-display: \"Plus Jakarta Sans\", \"Inter\", ui-sans-serif, system-ui, sans-serif;\n  --tbdp-font-body: \"Inter\", ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", sans-serif;\n  --tbdp-font-mono: \"IBM Plex Mono\", ui-monospace, \"Cascadia Code\", monospace;\n}\n\n/* TBDP Experience — motion, interaction, RTL, accessibility */\n/* TBDP Phase 3 — Motion System · tbdp-xp */\n\n@keyframes tbdp-xp-fade-in {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n\n@keyframes tbdp-xp-fade-out {\n  from { opacity: 1; }\n  to { opacity: 0; }\n}\n\n@keyframes tbdp-xp-rise {\n  from { opacity: 0; transform: translateY(var(--tbdp-spacing-lg)); }\n  to { opacity: 1; transform: translateY(0); }\n}\n\n@keyframes tbdp-xp-rise-rtl {\n  from { opacity: 0; transform: translateX(var(--tbdp-spacing-lg)); }\n  to { opacity: 1; transform: translateX(0); }\n}\n\n@keyframes tbdp-xp-scale-in {\n  from { opacity: 0; transform: scale(0.96); }\n  to { opacity: 1; transform: scale(1); }\n}\n\n@keyframes tbdp-xp-slide-end {\n  from { transform: translateX(100%); }\n  to { transform: translateX(0); }\n}\n\n@keyframes tbdp-xp-slide-start {\n  from { transform: translateX(-100%); }\n  to { transform: translateX(0); }\n}\n\n@keyframes tbdp-xp-shake {\n  0%, 100% { transform: translateX(0); }\n  20%, 60% { transform: translateX(calc(var(--tbdp-spacing-sm) * -1)); }\n  40%, 80% { transform: translateX(var(--tbdp-spacing-sm)); }\n}\n\n@keyframes tbdp-xp-pulse {\n  0%, 100% { transform: scale(1); }\n  50% { transform: scale(1.04); }\n}\n\n@keyframes tbdp-xp-lift {\n  to { transform: translateY(calc(var(--tbdp-spacing-sm) * -1)); box-shadow: var(--tbdp-shadow-2); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  [data-tbdp-xp-motion] { animation: none !important; transition: none !important; }\n}\n\n[data-tbdp-xp-motion] { will-change: transform, opacity; }\n[data-tbdp-xp-motion=\"page-enter\"] { animation-name: tbdp-xp-rise; }\n[data-tbdp-xp-motion=\"page-exit\"] { animation-name: tbdp-xp-fade-out; }\n[data-tbdp-xp-motion=\"section-reveal\"] { animation-name: tbdp-xp-rise; }\n[data-tbdp-xp-motion=\"hero-headline\"] { animation-name: tbdp-xp-rise; }\n[data-tbdp-xp-motion=\"hero-media\"] { animation-name: tbdp-xp-scale-in; }\n[data-tbdp-xp-motion=\"card-lift\"] { animation-name: tbdp-xp-lift; }\n[data-tbdp-xp-motion=\"grid-stagger\"] { animation-name: tbdp-xp-rise; }\n[data-tbdp-xp-motion=\"modal-enter\"] { animation-name: tbdp-xp-scale-in; }\n[data-tbdp-xp-motion=\"modal-exit\"] { animation-name: tbdp-xp-fade-out; }\n[data-tbdp-xp-motion=\"drawer-slide\"] { animation-name: tbdp-xp-slide-end; }\n[data-tbdp-xp-motion=\"toast-enter\"] { animation-name: tbdp-xp-rise; }\n[data-tbdp-xp-motion=\"toast-exit\"] { animation-name: tbdp-xp-fade-out; }\n[data-tbdp-xp-motion=\"tooltip-fade\"] { animation-name: tbdp-xp-fade-in; }\n[data-tbdp-xp-motion=\"scroll-reveal-up\"] { animation-name: tbdp-xp-rise; }\n[data-tbdp-xp-motion=\"stagger-children\"] { animation-name: tbdp-xp-rise; }\n[data-tbdp-xp-motion=\"hover-lift\"] { animation-name: tbdp-xp-lift; }\n[data-tbdp-xp-motion=\"focus-ring\"] { animation-name: tbdp-xp-fade-in; }\n[data-tbdp-xp-motion=\"success-pulse\"] { animation-name: tbdp-xp-pulse; }\n[data-tbdp-xp-motion=\"error-shake\"] { animation-name: tbdp-xp-shake; }\n\n/* TBDP Experience — interaction utilities */\n[data-tbdp-xp] { --tbdp-xp-focus: var(--tbdp-color-border-focus); }\n[data-tbdp-xp-feedback=\"loading\"] { cursor: wait; }\n[data-tbdp-xp-feedback=\"error\"] { border-color: var(--tbdp-color-danger); }\n[data-tbdp-xp-feedback=\"success\"] { border-color: var(--tbdp-color-success); }\n[data-tbdp-xp-touch=\"true\"] { min-height: var(--tbdp-spacing-2xl); min-width: var(--tbdp-spacing-2xl); }\n[data-tbdp-xp-gpu] { transform: translateZ(0); backface-visibility: hidden; }\n[data-tbdp-xp-contain] { content-visibility: auto; contain-intrinsic-size: auto 500px; }\n\n@media (prefers-reduced-motion: reduce) {\n  [data-tbdp-xp], [data-tbdp-xp-motion] { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }\n}\n/* V2 sidebar-left layout */\n.v2-layout-sidebar-left .v2-sidebar-shell { gap: 0; align-items: flex-start; }\n.v2-sidebar-rail {\n  border-inline-end: 1px solid var(--border-subtle, rgba(244,237,228,0.06));\n  padding-block: clamp(2rem, 5vw, 3.5rem);\n  padding-inline-end: clamp(1.25rem, 3vw, 2rem);\n}\n[dir='rtl'] .v2-sidebar-rail { border-inline-end: none; border-inline-start: 1px solid var(--border-subtle, rgba(244,237,228,0.06)); }\n.v2-main-canvas > [data-v2-component] + [data-v2-component] { margin-top: 0; }\n.v2-layout-sidebar-left .v2-main-canvas { padding-inline-start: 0; }\n@media (max-width: 1023px) {\n  .v2-sidebar-rail { display: none !important; }\n}\n\n/* V2 sidebar-right layout */\n.v2-layout-sidebar-right .v2-sidebar-shell { gap: 0; align-items: flex-start; }\n.v2-layout-sidebar-right .v2-sidebar-rail {\n  border-inline-start: 1px solid var(--border-subtle, rgba(28,25,23,0.06));\n  border-inline-end: none;\n  padding-block: clamp(2rem, 5vw, 3.5rem);\n  padding-inline-start: clamp(1.25rem, 3vw, 2rem);\n}\n[dir='rtl'] .v2-layout-sidebar-right .v2-sidebar-rail {\n  border-inline-start: none;\n  border-inline-end: 1px solid var(--border-subtle, rgba(28,25,23,0.06));\n}\n\n/* V2 full-bleed layout */\n.v2-layout-full-bleed .v2-overlay-canvas { width: 100%; }\n.v2-layout-full-bleed .v2-main-canvas { width: 100%; max-width: var(--container-max, 76rem); margin-inline: auto; }\n\n/* V2 editorial-reveal layout (creative portfolio) */\n.v2-layout-editorial-reveal .v2-main-canvas { width: 100%; }\n.v2-layout-editorial-reveal .v2-overlay-reveal { width: 100%; }\n\n:root {\n  --container-max: 76rem;\n  --font-body: \"IBM Plex Sans\", ui-sans-serif, system-ui, sans-serif;\n  --font-display: \"IBM Plex Sans\", ui-sans-serif, system-ui, sans-serif;\n  --color-surface: #F8FAFC;\n  --color-foreground: #0F172A;\n  --color-background: #FFFFFF;\n  --color-accent: #2563EB;\n  --color-secondary: #1E4976; --color-primary: #0F2B46; }\n\n    * { box-sizing: border-box; }\n    html { scroll-behavior: smooth; }\n    body {\n      margin: 0;\n      min-height: 100vh;\n      background: var(--color-background, #0f172a);\n      color: var(--color-foreground, #f8fafc);\n      -webkit-font-smoothing: antialiased;\n      -moz-osx-font-smoothing: grayscale;\n    }\n    .page { display: none; padding-bottom: 2rem; }\n    .page:target { display: block; }\n    body:not(:has(.page:target)) .page#home { display: block; }\n    img { max-width: 100%; height: auto; display: block; }\n    a { color: inherit; }\n  </style>\n  <script src=\"https://cdn.tailwindcss.com\"></script>\n<style id=\"tbdp-wiring-layer\">\n/* TBDP Integration Layer — advisory token layer */\n\n/* Trend Business AI Design Platform · 1.0.0 · foundations-1 */\n:root {\n  --tbdp-color-primary: #0047E6;\n  --tbdp-color-secondary: #334155;\n  --tbdp-color-accent: #4D85FF;\n  --tbdp-color-success: #10B981;\n  --tbdp-color-warning: #F59E0B;\n  --tbdp-color-danger: #EF4444;\n  --tbdp-color-info: #3B82F6;\n  --tbdp-color-surface-base: #FFFFFF;\n  --tbdp-color-surface-raised: #F8FAFC;\n  --tbdp-color-surface-overlay: #FFFFFF;\n  --tbdp-color-surface-sunken: #F1F5F9;\n  --tbdp-color-surface-inverse: #0F172A;\n  --tbdp-color-background-canvas: #F8FAFC;\n  --tbdp-color-background-subtle: #F1F5F9;\n  --tbdp-color-background-emphasis: #FFFFFF;\n  --tbdp-color-background-inverse: #020617;\n  --tbdp-color-text-primary: #0F172A;\n  --tbdp-color-text-secondary: #475569;\n  --tbdp-color-text-tertiary: #64748B;\n  --tbdp-color-text-disabled: #94A3B8;\n  --tbdp-color-text-inverse: #FFFFFF;\n  --tbdp-color-text-link: #0047E6;\n  --tbdp-color-text-linkHover: #0038B8;\n  --tbdp-color-border-default: #E2E8F0;\n  --tbdp-color-border-subtle: #F1F5F9;\n  --tbdp-color-border-strong: #CBD5E1;\n  --tbdp-color-border-focus: #1A5CFF;\n  --tbdp-color-border-inverse: rgba(255, 255, 255, 0.16);\n  --tbdp-color-overlay-scrim: rgba(2, 6, 23, 0.4);\n  --tbdp-color-overlay-scrimStrong: rgba(2, 6, 23, 0.64);\n  --tbdp-color-overlay-backdrop: rgba(2, 6, 23, 0.24);\n  --tbdp-color-overlay-highlight: rgba(26, 92, 255, 0.12);\n  --tbdp-opacity-transparent: 0;\n  --tbdp-opacity-subtle: 0.04;\n  --tbdp-opacity-muted: 0.08;\n  --tbdp-opacity-soft: 0.12;\n  --tbdp-opacity-medium: 0.24;\n  --tbdp-opacity-strong: 0.48;\n  --tbdp-opacity-opaque: 1;\n  --tbdp-spacing-micro: 0.125rem;\n  --tbdp-spacing-xs: 0.25rem;\n  --tbdp-spacing-sm: 0.5rem;\n  --tbdp-spacing-md: 1rem;\n  --tbdp-spacing-lg: 1.5rem;\n  --tbdp-spacing-xl: 2rem;\n  --tbdp-spacing-2xl: 3rem;\n  --tbdp-spacing-3xl: 4rem;\n  --tbdp-spacing-4xl: 6rem;\n  --tbdp-radius-sharp: 0;\n  --tbdp-radius-sm: 0.25rem;\n  --tbdp-radius-md: 0.5rem;\n  --tbdp-radius-lg: 0.75rem;\n  --tbdp-radius-pill: 9999px;\n  --tbdp-radius-circle: 50%;\n  --tbdp-shadow-0: none;\n  --tbdp-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);\n  --tbdp-shadow-2: 0 2px 8px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);\n  --tbdp-shadow-3: 0 8px 24px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);\n  --tbdp-shadow-4: 0 16px 48px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.08);\n  --tbdp-shadow-5: 0 24px 64px rgba(15, 23, 42, 0.18), 0 8px 24px rgba(15, 23, 42, 0.1);\n  --tbdp-container-sm: 640px;\n  --tbdp-container-md: 768px;\n  --tbdp-container-lg: 1024px;\n  --tbdp-container-xl: 1280px;\n  --tbdp-container-2xl: 1440px;\n  --tbdp-container-full: 100%;\n  --tbdp-font-display: \"Plus Jakarta Sans\", \"Inter\", ui-sans-serif, system-ui, sans-serif;\n  --tbdp-font-body: \"Inter\", ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", sans-serif;\n  --tbdp-font-mono: \"IBM Plex Mono\", ui-monospace, \"Cascadia Code\", monospace;\n}\n\n/* TBDP Phase 3 — Motion System · tbdp-xp */\n\n@keyframes tbdp-xp-fade-in {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n\n@keyframes tbdp-xp-fade-out {\n  from { opacity: 1; }\n  to { opacity: 0; }\n}\n\n@keyframes tbdp-xp-rise {\n  from { opacity: 0; transform: translateY(var(--tbdp-spacing-lg)); }\n  to { opacity: 1; transform: translateY(0); }\n}\n\n@keyframes tbdp-xp-rise-rtl {\n  from { opacity: 0; transform: translateX(var(--tbdp-spacing-lg)); }\n  to { opacity: 1; transform: translateX(0); }\n}\n\n@keyframes tbdp-xp-scale-in {\n  from { opacity: 0; transform: scale(0.96); }\n  to { opacity: 1; transform: scale(1); }\n}\n\n@keyframes tbdp-xp-slide-end {\n  from { transform: translateX(100%); }\n  to { transform: translateX(0); }\n}\n\n@keyframes tbdp-xp-slide-start {\n  from { transform: translateX(-100%); }\n  to { transform: translateX(0); }\n}\n\n@keyframes tbdp-xp-shake {\n  0%, 100% { transform: translateX(0); }\n  20%, 60% { transform: translateX(calc(var(--tbdp-spacing-sm) * -1)); }\n  40%, 80% { transform: translateX(var(--tbdp-spacing-sm)); }\n}\n\n@keyframes tbdp-xp-pulse {\n  0%, 100% { transform: scale(1); }\n  50% { transform: scale(1.04); }\n}\n\n@keyframes tbdp-xp-lift {\n  to { transform: translateY(calc(var(--tbdp-spacing-sm) * -1)); box-shadow: var(--tbdp-shadow-2); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  [data-tbdp-xp-motion] { animation: none !important; transition: none !important; }\n}\n\n[data-tbdp-xp-motion] { will-change: transform, opacity; }\n[data-tbdp-xp-motion=\"page-enter\"] { animation-name: tbdp-xp-rise; }\n[data-tbdp-xp-motion=\"page-exit\"] { animation-name: tbdp-xp-fade-out; }\n[data-tbdp-xp-motion=\"section-reveal\"] { animation-name: tbdp-xp-rise; }\n[data-tbdp-xp-motion=\"hero-headline\"] { animation-name: tbdp-xp-rise; }\n[data-tbdp-xp-motion=\"hero-media\"] { animation-name: tbdp-xp-scale-in; }\n[data-tbdp-xp-motion=\"card-lift\"] { animation-name: tbdp-xp-lift; }\n[data-tbdp-xp-motion=\"grid-stagger\"] { animation-name: tbdp-xp-rise; }\n[data-tbdp-xp-motion=\"modal-enter\"] { animation-name: tbdp-xp-scale-in; }\n[data-tbdp-xp-motion=\"modal-exit\"] { animation-name: tbdp-xp-fade-out; }\n[data-tbdp-xp-motion=\"drawer-slide\"] { animation-name: tbdp-xp-slide-end; }\n[data-tbdp-xp-motion=\"toast-enter\"] { animation-name: tbdp-xp-rise; }\n[data-tbdp-xp-motion=\"toast-exit\"] { animation-name: tbdp-xp-fade-out; }\n[data-tbdp-xp-motion=\"tooltip-fade\"] { animation-name: tbdp-xp-fade-in; }\n[data-tbdp-xp-motion=\"scroll-reveal-up\"] { animation-name: tbdp-xp-rise; }\n[data-tbdp-xp-motion=\"stagger-children\"] { animation-name: tbdp-xp-rise; }\n[data-tbdp-xp-motion=\"hover-lift\"] { animation-name: tbdp-xp-lift; }\n[data-tbdp-xp-motion=\"focus-ring\"] { animation-name: tbdp-xp-fade-in; }\n[data-tbdp-xp-motion=\"success-pulse\"] { animation-name: tbdp-xp-pulse; }\n[data-tbdp-xp-motion=\"error-shake\"] { animation-name: tbdp-xp-shake; }\n\n/* TBDP Experience — interaction utilities */\n[data-tbdp-xp] { --tbdp-xp-focus: var(--tbdp-color-border-focus); }\n[data-tbdp-xp-feedback=\"loading\"] { cursor: wait; }\n[data-tbdp-xp-feedback=\"error\"] { border-color: var(--tbdp-color-danger); }\n[data-tbdp-xp-feedback=\"success\"] { border-color: var(--tbdp-color-success); }\n[data-tbdp-xp-touch=\"true\"] { min-height: var(--tbdp-spacing-2xl); min-width: var(--tbdp-spacing-2xl); }\n[data-tbdp-xp-gpu] { transform: translateZ(0); backface-visibility: hidden; }\n[data-tbdp-xp-contain] { content-visibility: auto; contain-intrinsic-size: auto 500px; }\n\n@media (prefers-reduced-motion: reduce) {\n  [data-tbdp-xp], [data-tbdp-xp-motion] { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }\n}\n</style>\n</head>\n<body>\n  <div class=\"page\" id=\"home\">\n    <div class=\"min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] antialiased v2-template v2-corporate-business\" data-v2-package=\"corporate-business\" data-v2-composer=\"region-grid\" data-v2-layout=\"default\"><header data-v2-region=\"header\"><header data-v2-component=\"corporate-business-nav\" class=\"sticky top-0 z-50 border-b transition-all duration-300 border-transparent bg-[var(--color-background)]/80 backdrop-blur-md\"><div class=\"mx-auto flex h-16 max-w-[82rem] items-center justify-between gap-4 px-5 sm:px-8 lg:h-[4.25rem]\"><a href=\"#top\" class=\"cb-font-display flex items-center gap-2.5 text-base font-bold tracking-tight text-[var(--color-foreground)] cb-focus-ring rounded-sm\"><span class=\"flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-primary)] text-xs font-bold text-white\" aria-hidden=\"true\">M</span>Trend Business AI</a><nav aria-label=\"Primary\" class=\"hidden items-center gap-8 lg:flex\"><a href=\"#services\" class=\"cb-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] cb-focus-ring rounded-sm\">Services</a><a href=\"#features\" class=\"cb-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] cb-focus-ring rounded-sm\">Why us</a><a href=\"#pricing\" class=\"cb-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] cb-focus-ring rounded-sm\">Packages</a><a href=\"#testimonials\" class=\"cb-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] cb-focus-ring rounded-sm\">Clients</a><a href=\"#contact\" class=\"cb-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] cb-focus-ring rounded-sm\">Contact</a></nav><div class=\"flex items-center gap-2\"><a href=\"#contact\" class=\"cb-btn-primary hidden sm:inline-flex\">Get started</a><button type=\"button\" aria-expanded=\"false\" aria-controls=\"cb-mobile-nav\" aria-label=\"Open menu\" class=\"inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] lg:hidden cb-focus-ring\"><span class=\"sr-only\">Menu</span><span aria-hidden=\"true\" class=\"flex flex-col gap-1\"><span class=\"block h-0.5 w-5 bg-current transition \"></span><span class=\"block h-0.5 w-5 bg-current transition \"></span><span class=\"block h-0.5 w-5 bg-current transition \"></span></span></button></div></div></header></header><main data-v2-region=\"main\" class=\"v2-region-grid\"><section id=\"top\" data-v2-component=\"corporate-business-hero\" aria-labelledby=\"cb-hero-title\" class=\"cb-section relative overflow-hidden bg-[var(--color-background)]\"><div class=\"cb-grid-bg pointer-events-none absolute inset-0 opacity-60\" aria-hidden=\"true\"></div><div class=\"pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_80%_0%,rgba(197,165,114,0.14),transparent_60%)]\" aria-hidden=\"true\"></div><div class=\"relative mx-auto max-w-[82rem] px-5 sm:px-8\"><div class=\"grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-14\"><div class=\"max-w-xl\"><p class=\"cb-eyebrow mb-4 motion-safe:animate-[cb-slide-up_0.6s_ease_both]\">Professional presence</p><h1 id=\"cb-hero-title\" class=\"cb-headline motion-safe:animate-[cb-slide-up_0.65s_ease_0.08s_both]\">Trend Business AI</h1><p class=\"cb-body mt-5 motion-safe:animate-[cb-slide-up_0.65s_ease_0.16s_both]\">Business automation, website generation, and enterprise AI products</p><div class=\"mt-8 flex flex-wrap gap-3 motion-safe:animate-[cb-slide-up_0.65s_ease_0.24s_both]\"><a href=\"#contact\" class=\"cb-btn-primary\">Get started</a><a href=\"#features\" class=\"cb-btn-secondary\">Learn more</a></div><div class=\"mt-8 flex flex-wrap items-center gap-4 motion-safe:animate-[cb-slide-up_0.65s_ease_0.32s_both]\"><span class=\"cb-font-mono flex items-center gap-2 text-xs text-[var(--color-signal)]\"><span class=\"h-2 w-2 rounded-full bg-[var(--color-signal)] motion-safe:animate-[cb-pulse-dot_2s_ease-in-out_infinite]\"></span>Trusted advisory partner</span><span class=\"cb-font-body text-xs text-[var(--color-muted)]\">Fortune 500 · ISO 9001 · Global reach</span></div></div><div class=\"grid gap-3 sm:grid-cols-2 motion-safe:animate-[cb-grid-reveal_0.8s_ease_0.2s_both]\"><div class=\"cb-card col-span-2 overflow-hidden p-1\"><div class=\"cb-grid-bg relative aspect-[16/9] overflow-hidden rounded-[calc(var(--radius-lg)-4px)] bg-[var(--color-surface)]\"><div class=\"absolute inset-4 space-y-3\"><div class=\"h-3 w-32 rounded bg-[var(--color-grid)]\"></div><div class=\"grid grid-cols-3 gap-2\"><div class=\"h-16 rounded-[var(--radius-sm)] bg-[var(--color-grid)]\"></div><div class=\"h-16 rounded-[var(--radius-sm)] bg-[var(--color-grid)]\"></div><div class=\"h-16 rounded-[var(--radius-sm)] bg-[var(--color-grid)]\"></div></div><div class=\"h-24 rounded-[var(--radius-sm)] bg-[var(--color-grid)]\"></div></div></div></div><div class=\"cb-card p-4 motion-safe:animate-[cb-grid-reveal_0.6s_ease_both]\" style=\"animation-delay:0.3s\"><div class=\"flex items-baseline justify-between gap-2\"><p class=\"cb-metric\">500+</p><span class=\"cb-font-mono text-[0.625rem] text-[var(--color-signal)]\">Global</span></div><p class=\"cb-font-body mt-1 text-xs text-[var(--color-muted)]\">Enterprise clients</p></div><div class=\"cb-card p-4 motion-safe:animate-[cb-grid-reveal_0.6s_ease_both]\" style=\"animation-delay:0.38s\"><div class=\"flex items-baseline justify-between gap-2\"><p class=\"cb-metric\">28</p><span class=\"cb-font-mono text-[0.625rem] text-[var(--color-signal)]\">Active</span></div><p class=\"cb-font-body mt-1 text-xs text-[var(--color-muted)]\">Countries served</p></div><div class=\"cb-card p-4 motion-safe:animate-[cb-grid-reveal_0.6s_ease_both]\" style=\"animation-delay:0.45999999999999996s\"><div class=\"flex items-baseline justify-between gap-2\"><p class=\"cb-metric\">97%</p><span class=\"cb-font-mono text-[0.625rem] text-[var(--color-signal)]\">3-year avg.</span></div><p class=\"cb-font-body mt-1 text-xs text-[var(--color-muted)]\">Client retention</p></div><div class=\"cb-card p-4 motion-safe:animate-[cb-grid-reveal_0.6s_ease_both]\" style=\"animation-delay:0.54s\"><div class=\"flex items-baseline justify-between gap-2\"><p class=\"cb-metric\">40yr</p><span class=\"cb-font-mono text-[0.625rem] text-[var(--color-signal)]\">Experience</span></div><p class=\"cb-font-body mt-1 text-xs text-[var(--color-muted)]\">Combined leadership</p></div></div></div></div></section><section id=\"features\" data-v2-component=\"corporate-business-features\" aria-labelledby=\"cb-features-title\" class=\"cb-section bg-[var(--color-background)]\"><div class=\"mx-auto max-w-[82rem] px-5 sm:px-8\"><header class=\"mb-12 max-w-2xl\"><p class=\"cb-eyebrow mb-3\">Why us</p><h2 id=\"cb-features-title\" class=\"cb-headline-sm\">A presence that earns trust</h2><p class=\"cb-body mt-4\">Webflow-caliber spacing, type, and hierarchy for serious brands.</p></header><div class=\"grid gap-4 sm:grid-cols-2 lg:grid-cols-3\"><article class=\"cb-card group p-6 \"><div class=\"mb-4 flex items-center justify-between\"><span class=\"cb-font-mono flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] text-xs font-medium text-[var(--color-primary)]\">01</span><span class=\"h-px flex-1 ms-4 bg-[var(--border-default)] transition group-hover:bg-[var(--color-accent)]\" aria-hidden=\"true\"></span></div><h3 class=\"cb-font-display text-lg font-bold text-[var(--color-foreground)]\">Clear offer</h3><p class=\"cb-font-body mt-2 text-sm leading-relaxed text-[var(--color-muted)]\"></p></article><article class=\"cb-card group p-6 \"><div class=\"mb-4 flex items-center justify-between\"><span class=\"cb-font-mono flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] text-xs font-medium text-[var(--color-primary)]\">02</span><span class=\"h-px flex-1 ms-4 bg-[var(--border-default)] transition group-hover:bg-[var(--color-accent)]\" aria-hidden=\"true\"></span></div><h3 class=\"cb-font-display text-lg font-bold text-[var(--color-foreground)]\">Premium presentation</h3><p class=\"cb-font-body mt-2 text-sm leading-relaxed text-[var(--color-muted)]\"></p></article><article class=\"cb-card group p-6 \"><div class=\"mb-4 flex items-center justify-between\"><span class=\"cb-font-mono flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] text-xs font-medium text-[var(--color-primary)]\">03</span><span class=\"h-px flex-1 ms-4 bg-[var(--border-default)] transition group-hover:bg-[var(--color-accent)]\" aria-hidden=\"true\"></span></div><h3 class=\"cb-font-display text-lg font-bold text-[var(--color-foreground)]\">Conversion paths</h3><p class=\"cb-font-body mt-2 text-sm leading-relaxed text-[var(--color-muted)]\"></p></article><article class=\"cb-card group p-6 \"><div class=\"mb-4 flex items-center justify-between\"><span class=\"cb-font-mono flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] text-xs font-medium text-[var(--color-primary)]\">04</span><span class=\"h-px flex-1 ms-4 bg-[var(--border-default)] transition group-hover:bg-[var(--color-accent)]\" aria-hidden=\"true\"></span></div><h3 class=\"cb-font-display text-lg font-bold text-[var(--color-foreground)]\">Trusted contact</h3><p class=\"cb-font-body mt-2 text-sm leading-relaxed text-[var(--color-muted)]\"></p></article></div></div></section><section id=\"about\" data-v2-component=\"corporate-business-about\" aria-labelledby=\"about-title\" class=\"cb-section bg-[var(--color-background)]\"><div class=\"mx-auto max-w-[82rem] px-5 sm:px-8\"><div class=\"grid items-center gap-12 lg:grid-cols-2 lg:gap-16\"><div><header class=\"mb-12 max-w-2xl mb-0\"><p class=\"cb-eyebrow mb-3\">Services</p><h2 id=\"about-title\" class=\"cb-headline-sm\">What we deliver for clients</h2><p class=\"cb-body mt-4\">Plain-language offerings with outcomes — ready for a premium business site.</p></header><p class=\"cb-body mt-6\">For over two decades we have partnered with global enterprises to deliver strategy, transformation, and measurable outcomes — with integrity at the center of every engagement.</p><ul class=\"mt-8 space-y-3\" role=\"list\"><li class=\"cb-font-body flex gap-3 text-sm text-[var(--color-foreground)]\"><span class=\"mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]\" aria-hidden=\"true\"></span>Fortune 500 advisory experience</li><li class=\"cb-font-body flex gap-3 text-sm text-[var(--color-foreground)]\"><span class=\"mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]\" aria-hidden=\"true\"></span>Offices across North America, Europe, and MENA</li><li class=\"cb-font-body flex gap-3 text-sm text-[var(--color-foreground)]\"><span class=\"mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]\" aria-hidden=\"true\"></span>ISO-certified governance frameworks</li></ul><a href=\"#contact\" class=\"cb-btn-primary mt-8 inline-flex cb-focus-ring\">Speak with an advisor</a></div><div class=\"cb-card overflow-hidden\"><div class=\"aspect-[4/3] w-full bg-[color-mix(in_srgb,var(--color-primary)_12%,var(--color-surface))]\" aria-hidden=\"true\"></div></div></div></div></section><section id=\"stats\" data-v2-component=\"corporate-business-stats\" aria-labelledby=\"stats-title\" class=\"cb-section bg-[var(--color-surface)]\"><div class=\"mx-auto max-w-[82rem] px-5 sm:px-8\"><header class=\"mb-12 mx-auto text-center\"><p class=\"cb-eyebrow mb-3\">Track record</p><h2 id=\"stats-title\" class=\"cb-headline-sm\">Ready to look established online?</h2><p class=\"cb-body mt-4\">Share your goals — we will propose a clear path and timeline.</p></header><dl class=\"grid gap-4 sm:grid-cols-2 lg:grid-cols-4\"><div class=\"cb-card p-6 text-center\"><dt class=\"cb-font-body text-sm font-medium text-[var(--color-foreground)]\">Combined partner tenure</dt><dd class=\"cb-metric mt-2 block\">40yr</dd><dd class=\"cb-font-body mt-1 text-xs text-[var(--color-muted)]\">Senior leadership</dd></div><div class=\"cb-card p-6 text-center\"><dt class=\"cb-font-body text-sm font-medium text-[var(--color-foreground)]\">Countries served</dt><dd class=\"cb-metric mt-2 block\">28</dd><dd class=\"cb-font-body mt-1 text-xs text-[var(--color-muted)]\">Global delivery</dd></div><div class=\"cb-card p-6 text-center\"><dt class=\"cb-font-body text-sm font-medium text-[var(--color-foreground)]\">Client retention</dt><dd class=\"cb-metric mt-2 block\">97%</dd><dd class=\"cb-font-body mt-1 text-xs text-[var(--color-muted)]\">Three-year average</dd></div><div class=\"cb-card p-6 text-center\"><dt class=\"cb-font-body text-sm font-medium text-[var(--color-foreground)]\">Discovery to roadmap</dt><dd class=\"cb-metric mt-2 block\">14wk</dd><dd class=\"cb-font-body mt-1 text-xs text-[var(--color-muted)]\">Typical engagement</dd></div></dl></div></section><section id=\"testimonials\" data-v2-component=\"corporate-business-testimonials\" aria-labelledby=\"testimonials-title\" class=\"cb-section bg-[var(--color-background)]\"><div class=\"mx-auto max-w-[82rem] px-5 sm:px-8\"><header class=\"mb-12 mx-auto text-center\"><p class=\"cb-eyebrow mb-3\">Clients</p><h2 id=\"testimonials-title\" class=\"cb-headline-sm\">Businesses that raised their standard</h2><p class=\"cb-body mt-4\">Specific results from professional services teams.</p></header><div class=\"grid gap-6 md:grid-cols-2 lg:grid-cols-3\"><figure class=\"cb-card flex flex-col p-6\"><blockquote class=\"cb-body flex-1 text-base leading-relaxed\">“We finally look as professional as the work we deliver — working with Trend Business AI.”</blockquote><figcaption class=\"mt-6 flex items-center gap-3 border-t border-[var(--border-default,rgba(0,0,0,0.08))] pt-4\"><span class=\"cb-font-display flex h-10 w-10 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-primary)_15%,transparent)] text-sm font-semibold text-[var(--color-primary)]\" aria-hidden=\"true\">A</span><div><p class=\"cb-font-body text-sm font-semibold text-[var(--color-foreground)]\">Andrea Wells</p><p class=\"cb-font-body text-xs text-[var(--color-muted)]\">Owner, Wells Advisory</p></div></figcaption></figure><figure class=\"cb-card flex flex-col p-6\"><blockquote class=\"cb-body flex-1 text-base leading-relaxed\">“Inquiries went up after the redesign — messaging is clearer.”</blockquote><figcaption class=\"mt-6 flex items-center gap-3 border-t border-[var(--border-default,rgba(0,0,0,0.08))] pt-4\"><span class=\"cb-font-display flex h-10 w-10 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-primary)_15%,transparent)] text-sm font-semibold text-[var(--color-primary)]\" aria-hidden=\"true\">K</span><div><p class=\"cb-font-body text-sm font-semibold text-[var(--color-foreground)]\">Kevin Zhao</p><p class=\"cb-font-body text-xs text-[var(--color-muted)]\">Managing Partner</p></div></figcaption></figure><figure class=\"cb-card flex flex-col p-6\"><blockquote class=\"cb-body flex-1 text-base leading-relaxed\">“Clients comment on the site before meetings now.”</blockquote><figcaption class=\"mt-6 flex items-center gap-3 border-t border-[var(--border-default,rgba(0,0,0,0.08))] pt-4\"><span class=\"cb-font-display flex h-10 w-10 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-primary)_15%,transparent)] text-sm font-semibold text-[var(--color-primary)]\" aria-hidden=\"true\">R</span><div><p class=\"cb-font-body text-sm font-semibold text-[var(--color-foreground)]\">Ruth Okonkwo</p><p class=\"cb-font-body text-xs text-[var(--color-muted)]\">Consultant</p></div></figcaption></figure></div></div></section><section id=\"pricing\" data-v2-component=\"corporate-business-pricing\" aria-labelledby=\"cb-pricing-title\" class=\"cb-section bg-[var(--color-background)]\"><div class=\"mx-auto max-w-[82rem] px-5 sm:px-8\"><header class=\"mb-12 text-center\"><p class=\"cb-eyebrow mb-3\">Packages</p><h2 id=\"cb-pricing-title\" class=\"cb-headline-sm\">Simple engagement options</h2><p class=\"cb-body mx-auto mt-4 max-w-lg\">Start lean or go deeper — both look premium.</p></header><div class=\"grid gap-4 lg:grid-cols-3\"><article class=\"cb-card flex flex-col p-6 \"><h3 class=\"cb-font-display text-lg font-bold text-[var(--color-foreground)]\">Advisory</h3><p class=\"cb-font-body mt-2 text-sm text-[var(--color-muted)]\">Focused strategic counsel for leadership teams navigating priority initiatives.</p><p class=\"mt-6\"><span class=\"cb-metric text-4xl\">From $18k</span><span class=\"cb-font-body text-sm text-[var(--color-muted)]\">/month</span></p><ul class=\"mt-6 flex-1 space-y-3\"><li class=\"flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]\"><span class=\"cb-signal mt-0.5 shrink-0\" aria-hidden=\"true\">✓</span>Executive workshops</li><li class=\"flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]\"><span class=\"cb-signal mt-0.5 shrink-0\" aria-hidden=\"true\">✓</span>Market &amp; competitive analysis</li><li class=\"flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]\"><span class=\"cb-signal mt-0.5 shrink-0\" aria-hidden=\"true\">✓</span>Quarterly board briefings</li><li class=\"flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]\"><span class=\"cb-signal mt-0.5 shrink-0\" aria-hidden=\"true\">✓</span>Dedicated partner access</li></ul><a href=\"#contact\" class=\"cb-btn-secondary mt-8 w-full\">Request proposal</a></article><article class=\"cb-card flex flex-col p-6 relative border-[var(--border-accent)] ring-2 ring-[var(--color-accent)]/20\"><span class=\"cb-eyebrow absolute -top-3 start-6 rounded-full bg-[var(--color-primary)] px-3 py-1 text-[0.625rem] text-white\">Most popular</span><h3 class=\"cb-font-display text-lg font-bold text-[var(--color-foreground)]\">Transformation</h3><p class=\"cb-font-body mt-2 text-sm text-[var(--color-muted)]\">Full-program leadership for enterprise change with measurable operational outcomes.</p><p class=\"mt-6\"><span class=\"cb-metric text-4xl\">From $45k</span><span class=\"cb-font-body text-sm text-[var(--color-muted)]\">/month</span></p><ul class=\"mt-6 flex-1 space-y-3\"><li class=\"flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]\"><span class=\"cb-signal mt-0.5 shrink-0\" aria-hidden=\"true\">✓</span>Everything in Advisory</li><li class=\"flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]\"><span class=\"cb-signal mt-0.5 shrink-0\" aria-hidden=\"true\">✓</span>Program management office</li><li class=\"flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]\"><span class=\"cb-signal mt-0.5 shrink-0\" aria-hidden=\"true\">✓</span>Change &amp; communications</li><li class=\"flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]\"><span class=\"cb-signal mt-0.5 shrink-0\" aria-hidden=\"true\">✓</span>KPI dashboards &amp; reporting</li><li class=\"flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]\"><span class=\"cb-signal mt-0.5 shrink-0\" aria-hidden=\"true\">✓</span>On-site leadership support</li></ul><a href=\"#contact\" class=\"cb-btn-primary mt-8 w-full\">Schedule consultation</a></article><article class=\"cb-card flex flex-col p-6 \"><h3 class=\"cb-font-display text-lg font-bold text-[var(--color-foreground)]\">Enterprise</h3><p class=\"cb-font-body mt-2 text-sm text-[var(--color-muted)]\">Multi-region engagements with retained senior partners and bespoke governance models.</p><p class=\"mt-6\"><span class=\"cb-metric text-4xl\">Custom</span></p><ul class=\"mt-6 flex-1 space-y-3\"><li class=\"flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]\"><span class=\"cb-signal mt-0.5 shrink-0\" aria-hidden=\"true\">✓</span>Everything in Transformation</li><li class=\"flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]\"><span class=\"cb-signal mt-0.5 shrink-0\" aria-hidden=\"true\">✓</span>Global delivery teams</li><li class=\"flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]\"><span class=\"cb-signal mt-0.5 shrink-0\" aria-hidden=\"true\">✓</span>Board &amp; investor relations</li><li class=\"flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]\"><span class=\"cb-signal mt-0.5 shrink-0\" aria-hidden=\"true\">✓</span>24/7 executive escalation</li><li class=\"flex gap-2.5 cb-font-body text-sm text-[var(--color-foreground)]\"><span class=\"cb-signal mt-0.5 shrink-0\" aria-hidden=\"true\">✓</span>Multi-year partnership terms</li></ul><a href=\"#contact\" class=\"cb-btn-secondary mt-8 w-full\">Contact partners</a></article></div></div></section><section data-v2-component=\"corporate-business-faq\" aria-labelledby=\"cb-faq-title\" class=\"cb-section bg-[var(--color-surface)]\"><div class=\"mx-auto max-w-[82rem] px-5 sm:px-8\"><div class=\"grid gap-12 lg:grid-cols-[0.9fr_1.1fr]\"><header><p class=\"cb-eyebrow mb-3\">FAQ</p><h2 id=\"cb-faq-title\" class=\"cb-headline-sm\">Common questions</h2><p class=\"cb-body mt-4\">Launch timing, edits, and languages.</p></header><div class=\"space-y-2\"><div class=\"overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-background)]\"><h3><button type=\"button\" id=\"cb-faq-trigger-0\" aria-expanded=\"true\" aria-controls=\"cb-faq-panel-0\" class=\"flex w-full items-center justify-between gap-4 px-5 py-4 text-start cb-focus-ring\"><span class=\"cb-font-display text-sm font-semibold text-[var(--color-foreground)]\"></span><span class=\"cb-font-mono flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-xs text-[var(--color-accent)]\" aria-hidden=\"true\">−</span></button></h3><div id=\"cb-faq-panel-0\" role=\"region\" aria-labelledby=\"cb-faq-trigger-0\" class=\"border-t border-[var(--border-subtle)] px-5 py-4\"><p class=\"cb-font-body text-sm leading-relaxed text-[var(--color-muted)]\"></p></div></div><div class=\"overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-background)]\"><h3><button type=\"button\" id=\"cb-faq-trigger-1\" aria-expanded=\"false\" aria-controls=\"cb-faq-panel-1\" class=\"flex w-full items-center justify-between gap-4 px-5 py-4 text-start cb-focus-ring\"><span class=\"cb-font-display text-sm font-semibold text-[var(--color-foreground)]\"></span><span class=\"cb-font-mono flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-xs text-[var(--color-accent)]\" aria-hidden=\"true\">+</span></button></h3><div id=\"cb-faq-panel-1\" role=\"region\" aria-labelledby=\"cb-faq-trigger-1\" hidden=\"\" class=\"border-t border-[var(--border-subtle)] px-5 py-4\"><p class=\"cb-font-body text-sm leading-relaxed text-[var(--color-muted)]\"></p></div></div><div class=\"overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-background)]\"><h3><button type=\"button\" id=\"cb-faq-trigger-2\" aria-expanded=\"false\" aria-controls=\"cb-faq-panel-2\" class=\"flex w-full items-center justify-between gap-4 px-5 py-4 text-start cb-focus-ring\"><span class=\"cb-font-display text-sm font-semibold text-[var(--color-foreground)]\"></span><span class=\"cb-font-mono flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-xs text-[var(--color-accent)]\" aria-hidden=\"true\">+</span></button></h3><div id=\"cb-faq-panel-2\" role=\"region\" aria-labelledby=\"cb-faq-trigger-2\" hidden=\"\" class=\"border-t border-[var(--border-subtle)] px-5 py-4\"><p class=\"cb-font-body text-sm leading-relaxed text-[var(--color-muted)]\"></p></div></div></div></div></div></section><section id=\"contact\" data-v2-component=\"corporate-business-contact\" aria-labelledby=\"contact-title\" class=\"cb-section bg-[var(--color-background)]\"><div class=\"mx-auto max-w-[82rem] px-5 sm:px-8\"><div class=\"grid gap-12 lg:grid-cols-2 lg:gap-16\"><div><p class=\"cb-eyebrow mb-3\">Contact</p><h2 id=\"contact-title\" class=\"cb-headline-sm\">Request a quote</h2><p class=\"cb-body mt-4\">Tell us about your business and we will respond promptly.</p><address class=\"cb-font-body mt-8 space-y-3 text-sm not-italic text-[var(--color-muted)]\"><p><span class=\"font-medium text-[var(--color-foreground)]\">Email</span><br/><a href=\"mailto:partners@meridianadvisory.com\" class=\"cb-focus-ring hover:text-[var(--color-accent)]\">partners@meridianadvisory.com</a></p><p><span class=\"font-medium text-[var(--color-foreground)]\">Phone</span><br/><a href=\"tel:+1(212)555-0180\" class=\"cb-focus-ring hover:text-[var(--color-accent)]\">+1 (212) 555-0180</a></p><p><span class=\"font-medium text-[var(--color-foreground)]\">Office</span><br/>200 Park Avenue, New York, NY</p></address></div><form id=\"_R_22_\" class=\"cb-card p-6 sm:p-8\" noValidate=\"\"><div class=\"space-y-4\"><div><label for=\"_R_22_-name\" class=\"cb-font-body mb-1.5 block text-sm font-medium\">Name</label><input id=\"_R_22_-name\" type=\"text\" required=\"\" autoComplete=\"name\" class=\"cb-font-body w-full rounded-[var(--radius-md,8px)] border border-[var(--border-default)] bg-[var(--color-surface)] px-3 py-2.5 text-sm cb-focus-ring\" name=\"name\"/></div><div><label for=\"_R_22_-email\" class=\"cb-font-body mb-1.5 block text-sm font-medium\">Email</label><input id=\"_R_22_-email\" type=\"email\" required=\"\" autoComplete=\"email\" class=\"cb-font-body w-full rounded-[var(--radius-md,8px)] border border-[var(--border-default)] bg-[var(--color-surface)] px-3 py-2.5 text-sm cb-focus-ring\" name=\"email\"/></div><div><label for=\"_R_22_-message\" class=\"cb-font-body mb-1.5 block text-sm font-medium\">Message</label><textarea id=\"_R_22_-message\" name=\"message\" rows=\"4\" required=\"\" class=\"cb-font-body w-full resize-y rounded-[var(--radius-md,8px)] border border-[var(--border-default)] bg-[var(--color-surface)] px-3 py-2.5 text-sm cb-focus-ring\"></textarea></div><button type=\"submit\" class=\"cb-btn-primary w-full sm:w-auto cb-focus-ring\">Request consultation</button></div></form></div></div></section></main><utility data-v2-region=\"utility\"><section id=\"cta-band\" data-v2-component=\"corporate-business-utility-band\" aria-labelledby=\"cb-utility-title\" class=\"relative overflow-hidden bg-[var(--color-primary)] py-14 sm:py-16\"><div class=\"cb-grid-bg pointer-events-none absolute inset-0 opacity-20\" aria-hidden=\"true\"></div><div class=\"pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_0%_50%,rgba(255,255,255,0.12),transparent)]\" aria-hidden=\"true\"></div><div class=\"relative mx-auto flex max-w-[82rem] flex-col items-start justify-between gap-8 px-5 sm:flex-row sm:items-center sm:px-8\"><div class=\"max-w-xl\"><p class=\"cb-font-mono text-xs font-medium uppercase tracking-wider text-white/70\">Partner with us</p><h2 id=\"cb-utility-title\" class=\"cb-font-display mt-2 text-[clamp(1.5rem,2.8vw,2.25rem)] font-bold text-white\">Ready to look established online?</h2><p class=\"cb-font-body mt-3 text-sm leading-relaxed text-white/75 sm:text-base\">Share your goals — we will propose a clear path and timeline.</p></div><div class=\"flex flex-wrap gap-3\"><a href=\"#contact\" class=\"inline-flex min-h-[2.75rem] items-center justify-center rounded-[var(--radius-md)] bg-white px-5 py-3 text-sm font-semibold text-[var(--color-primary)] transition hover:bg-white/90 cb-focus-ring\">Get started</a><a href=\"#about\" class=\"inline-flex min-h-[2.75rem] items-center justify-center rounded-[var(--radius-md)] border border-white/30 px-5 py-3 text-sm font-semibold text-white transition hover:border-white/60 cb-focus-ring\">Learn more</a></div></div></section></utility><footer data-v2-region=\"footer\"><footer data-v2-component=\"corporate-business-footer\" class=\"border-t border-[var(--border-default)] bg-[var(--color-ink,#020617)] text-white\" role=\"contentinfo\"><div class=\"mx-auto max-w-[82rem] px-5 py-14 sm:px-8 sm:py-16\"><div class=\"grid gap-10 md:grid-cols-[1.4fr_1fr]\"><div><p class=\"cb-font-display text-xl font-bold\">Trend Business AI</p><p class=\"cb-font-body mt-3 max-w-sm text-sm leading-relaxed text-white/60\">Business automation, website generation, and enterprise AI products</p><div class=\"mt-6 flex flex-wrap gap-3\"><span class=\"cb-font-mono rounded-[var(--radius-sm)] border border-white/10 px-2.5 py-1 text-[0.625rem] text-white/50\">ISO 9001</span><span class=\"cb-font-mono rounded-[var(--radius-sm)] border border-white/10 px-2.5 py-1 text-[0.625rem] text-white/50\">GDPR</span><span class=\"cb-font-mono rounded-[var(--radius-sm)] border border-white/10 px-2.5 py-1 text-[0.625rem] text-white/50\">B Corp</span></div></div><nav aria-label=\"Footer\"><p class=\"cb-eyebrow text-white/40\">Explore</p><ul class=\"mt-4 grid grid-cols-2 gap-x-6 gap-y-2.5\"><li><a href=\"#services\" class=\"cb-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] cb-focus-ring rounded-sm\">Services</a></li><li><a href=\"#features\" class=\"cb-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] cb-focus-ring rounded-sm\">Why us</a></li><li><a href=\"#pricing\" class=\"cb-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] cb-focus-ring rounded-sm\">Packages</a></li><li><a href=\"#testimonials\" class=\"cb-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] cb-focus-ring rounded-sm\">Clients</a></li><li><a href=\"#contact\" class=\"cb-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] cb-focus-ring rounded-sm\">Contact</a></li></ul></nav></div><div class=\"mt-12 border-t border-white/10 pt-6\"><p class=\"cb-font-body text-xs text-white/40\">© 2026 Trend Business AI. All rights reserved.</p></div></div></footer></footer><div data-v2-region=\"overlay\" class=\"pointer-events-none fixed inset-x-0 bottom-0 z-50\"></div></div>\n  </div>\n  <section class=\"page v2-secondary-page\" id=\"solutions\">\n  <div class=\"mx-auto max-w-3xl px-6 py-16\">\n    <p class=\"text-xs uppercase tracking-widest text-[var(--color-foreground)]/50\">Solutions</p>\n    <h1 class=\"mt-4 text-3xl font-semibold text-[var(--color-foreground)]\">Solutions</h1>\n    <p class=\"mt-4 text-[var(--color-foreground)]/70\">Solutions — Trend Business AI</p>\n    <a class=\"mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]\" href=\"#home\">Back to home</a>\n  </div>\n</section>\n<section class=\"page v2-secondary-page\" id=\"products\">\n  <div class=\"mx-auto max-w-3xl px-6 py-16\">\n    <p class=\"text-xs uppercase tracking-widest text-[var(--color-foreground)]/50\">Products</p>\n    <h1 class=\"mt-4 text-3xl font-semibold text-[var(--color-foreground)]\">Products</h1>\n    <p class=\"mt-4 text-[var(--color-foreground)]/70\">Products — Trend Business AI</p>\n    <a class=\"mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]\" href=\"#home\">Back to home</a>\n  </div>\n</section>\n<section class=\"page v2-secondary-page\" id=\"about\">\n  <div class=\"mx-auto max-w-3xl px-6 py-16\">\n    <p class=\"text-xs uppercase tracking-widest text-[var(--color-foreground)]/50\">About</p>\n    <pre class=\"mt-4 overflow-x-auto rounded border border-[var(--color-foreground)]/10 p-4 text-xs text-[var(--color-foreground)]/70\">import { SiteShell } from &quot;@/components/layout/site-shell&quot;;\nimport { buildPageTitle } from &quot;@/lib/seo&quot;;\n\nexport const metadata = {\n  title: buildPageTitle(&quot;About&quot;),\n  description: &quot;Build trust through company story, leadership, and mission.&quot;,\n};\n\nexport default function SecondaryPage() {\n  return (\n    &lt;SiteShell&gt;\n      &lt;h1&gt;About&lt;/h1&gt;\n      &lt;p&gt;Build trust through company story, leadership, and mission.&lt;/p&gt;\n      &lt;section&gt;&lt;h2&gt;Company story&lt;/h2&gt;&lt;/section&gt;\n      &lt;section&gt;&lt;h2&gt;Leadership team&lt;/h2&gt;&lt;/section&gt;\n      &lt;section&gt;&lt;h2&gt;Mission and values&lt;/h2&gt;&lt;/section&gt;\n      &lt;section&gt;&lt;h2&gt;Trust and security standards&lt;/h2&gt;&lt;/section&gt;\n      &lt;section&gt;&lt;h2&gt;Career / partner CTA&lt;/h2&gt;&lt;/section&gt;\n      &lt;section&gt;&lt;h2&gt;Contact link&lt;/h2&gt;&lt;/section&gt;\n    &lt;/SiteShell&gt;\n  );\n}\n</pre>\n    <a class=\"mt-6 inline-block text-sm text-[var(--color-accent,#B87333)]\" href=\"#home\">Back to home</a>\n  </div>\n</section>\n<section class=\"page v2-secondary-page\" id=\"insights\">\n  <div class=\"mx-auto max-w-3xl px-6 py-16\">\n    <p class=\"text-xs uppercase tracking-widest text-[var(--color-foreground)]/50\">Insights</p>\n    <h1 class=\"mt-4 text-3xl font-semibold text-[var(--color-foreground)]\">Insights</h1>\n    <p class=\"mt-4 text-[var(--color-foreground)]/70\">Insights — Trend Business AI</p>\n    <a class=\"mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]\" href=\"#home\">Back to home</a>\n  </div>\n</section>\n<section class=\"page v2-secondary-page\" id=\"contact\">\n  <div class=\"mx-auto max-w-3xl px-6 py-16\">\n    <p class=\"text-xs uppercase tracking-widest text-[var(--color-foreground)]/50\">Contact</p>\n    <h1 class=\"mt-4 text-3xl font-semibold text-[var(--color-foreground)]\">Contact</h1>\n    <p class=\"mt-4 text-[var(--color-foreground)]/70\">Contact — Trend Business AI</p>\n    <a class=\"mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]\" href=\"#home\">Back to home</a>\n  </div>\n</section>\n</body>\n</html>"
+    }
+  ],
+  "settings": {
+    "framework": "next",
+    "styling": "tailwind",
+    "requiresAuth": "false",
+    "requiresDatabase": "false",
+    "requiresDashboard": "false",
+    "isEcommerce": "false",
+    "isSaas": "false",
+    "databaseProvider": "none",
+    "templateIntelligenceId": "ti-corporate-trust",
+    "templateIntelligenceCategory": "Corporate",
+    "templateArchitectureVersion": "v2",
+    "templatePresentationHash": "6963344cb84c3c09",
+    "templateComposerId": "region-grid",
+    "websiteStructureTemplateId": "corporate-business",
+    "templatePackageId": "corporate-business",
+    "selectedTemplateId": "corporate-business",
+    "tbdpSectorDnaId": "saas",
+    "tbdpDesignContextHash": "c18d034ca777128d",
+    "tbdpIntegrationVersion": "5.0.0",
+    "tbdpWiringVersion": "6.0.0",
+    "tbdpComponentIds": [
+      "navbar",
+      "sidebar",
+      "primary-button",
+      "feature-grid",
+      "pricing-table",
+      "testimonial",
+      "stats",
+      "tabs",
+      "data-table",
+      "modal"
+    ],
+    "tbdpLayoutId": "single-column",
+    "tbdpPageFlow": [
+      "hero",
+      "logos",
+      "features",
+      "testimonials",
+      "pricing",
+      "cta"
+    ],
+    "tbdpTypographyProfile": "latin-ltr",
+    "tbdpDirection": "ltr",
+    "tbdpThemeMode": "light",
+    "tbdpExperienceProfileId": "technical",
+    "tbdpMotionPresets": [
+      "page-enter",
+      "grid-stagger",
+      "modal-enter"
+    ],
+    "tbdpResolvedAt": "2026-08-04T21:21:07.508Z"
+  },
+  "progressEvents": [
+    "[tbge] Starting TBGE website generation",
+    "[tbge] planning",
+    "[tbge] normalizing brief",
+    "[tbge] invoking master planner",
+    "[tbge] spec_locked",
+    "[tbge] assembling",
+    "[tbge:assembly] level 1/6 (1 tasks)",
+    "[tbge:assembly] level 2/6 (2 tasks)",
+    "[tbge:assembly] level 3/6 (1 tasks)",
+    "[tbge:assembly] level 4/6 (2 tasks)",
+    "[tbge:assembly] level 5/6 (3 tasks)",
+    "[tbge:assembly] level 6/6 (1 tasks)",
+    "[tbge] verifying",
+    "[tbge] quality",
+    "[tbge] finalizing",
+    "[tbge] completed",
+    "[tbge] Running Component Composer",
+    "[tbge] Composed 39 sections across 6 pages",
+    "[tbge] Generation complete"
+  ],
+  "usage": {
+    "promptTokens": 735,
+    "completionTokens": 2775,
+    "totalTokens": 3510
+  },
+  "generationTimeMs": 27446.706000000002,
+  "provider": "deepseek",
+  "tbgeIntegration": {
+    "route": "tbge-primary",
+    "durationMs": 27446.71,
+    "llmCalls": 1,
+    "fileCount": 10,
+    "sectionCount": 39,
+    "qualityScore": 100
+  },
+  "tbgeSpec": {
+    "specVersion": "1.0",
+    "specId": "spec-d12bc966-8fe8-4f35-b43b-bc4ca80958c8",
+    "promptHash": "bfba31f09f354fd8",
+    "productId": "website-builder",
+    "profile": "professional",
+    "mode": "generate",
+    "locale": {
+      "language": "en",
+      "dir": "ltr",
+      "rtl": false,
+      "htmlLang": "en-US"
+    },
+    "business": {
+      "name": "Trend Business AI",
+      "industry": "Artificial Intelligence & Business Software",
+      "industryId": "ai-software",
+      "audience": [
+        "Enterprise executives",
+        "Operations leaders",
+        "IT decision makers",
+        "Digital transformation teams"
+      ],
+      "goals": [
+        "Generate qualified enterprise leads",
+        "Establish premium trust and thought leadership",
+        "Showcase business automation and AI products",
+        "Drive conversions through clear CTAs"
+      ],
+      "tone": "Executive advisory, professional, confident, trust-first",
+      "offer": "Business automation, website generation, and enterprise AI products",
+      "geography": "Global"
+    },
+    "structure": {
+      "kind": "website",
+      "pages": [
+        {
+          "name": "Home",
+          "path": "/",
+          "purpose": "Establish credibility and lead with executive value proposition.",
+          "sections": [
+            "Hero with value proposition",
+            "Trust indicators / client logos",
+            "Executive summary",
+            "Capabilities overview",
+            "Measurable outcomes",
+            "Featured products",
+            "Testimonials",
+            "Contact CTA"
+          ],
+          "primaryCta": "Book a consultation"
+        },
+        {
+          "name": "Solutions",
+          "path": "/solutions",
+          "purpose": "Demonstrate industry-specific AI and automation solutions.",
+          "sections": [
+            "Subpage hero",
+            "Solutions grid",
+            "Industry use cases",
+            "Integration approach",
+            "Outcome metrics",
+            "CTA"
+          ],
+          "primaryCta": "Request a demo"
+        },
+        {
+          "name": "Products",
+          "path": "/products",
+          "purpose": "Showcase enterprise AI and business automation products with clear capabilities.",
+          "sections": [
+            "Hero",
+            "Product catalog",
+            "Product deep dive",
+            "Technical differentiators",
+            "Security and trust",
+            "Pricing / engagement models",
+            "CTA"
+          ],
+          "primaryCta": "Schedule product walkthrough"
+        },
+        {
+          "name": "About",
+          "path": "/about",
+          "purpose": "Build trust through company story, leadership, and mission.",
+          "sections": [
+            "Company story",
+            "Leadership team",
+            "Mission and values",
+            "Trust and security standards",
+            "Career / partner CTA",
+            "Contact link"
+          ],
+          "primaryCta": "Meet our team"
+        },
+        {
+          "name": "Insights",
+          "path": "/insights",
+          "purpose": "Support SEO and thought leadership with resources and executive perspectives.",
+          "sections": [
+            "Resource hero",
+            "Featured insights",
+            "Article grid",
+            "Industry reports",
+            "Newsletter signup",
+            "CTA"
+          ],
+          "primaryCta": "Subscribe to insights"
+        },
+        {
+          "name": "Contact",
+          "path": "/contact",
+          "purpose": "Capture leads through a comprehensive contact and consultation form.",
+          "sections": [
+            "Contact hero",
+            "Contact form",
+            "Sales and support channels",
+            "Response time commitment",
+            "Office locations / global presence",
+            "FAQ"
+          ],
+          "primaryCta": "Send message"
+        }
+      ],
+      "navigation": {
+        "items": [
+          {
+            "label": "Home",
+            "href": "/"
+          },
+          {
+            "label": "Solutions",
+            "href": "/solutions"
+          },
+          {
+            "label": "Products",
+            "href": "/products"
+          },
+          {
+            "label": "About",
+            "href": "/about"
+          },
+          {
+            "label": "Insights",
+            "href": "/insights"
+          },
+          {
+            "label": "Contact",
+            "href": "/contact"
+          }
+        ],
+        "style": "Corporate top navigation"
+      },
+      "footerSections": [
+        "Company overview and values",
+        "Product and solutions links",
+        "Industries served",
+        "Legal, privacy, and security",
+        "Newsletter subscription",
+        "Global offices"
+      ]
+    },
+    "design": {
+      "templateId": "corporate-premium",
+      "templateIntelligenceId": "enterprise-trust-template",
+      "premiumTemplateId": "corporate-executive",
+      "tokens": {
+        "primary": "#0A2540",
+        "secondary": "#0055A5",
+        "accent": "#00B4D8",
+        "background": "#FFFFFF",
+        "foreground": "#1A1A2E",
+        "surface": "#F5F7FA",
+        "neutral": "#5C6B7A"
+      },
+      "componentPalette": [
+        "Hero",
+        "LogoCloud",
+        "ValueProposition",
+        "CapabilitiesGrid",
+        "MetricsBar",
+        "ProductCards",
+        "TestimonialSlider",
+        "ContactForm",
+        "FAQAccordion",
+        "NewsletterSignup",
+        "AnalyticsBar",
+        "SEOOptimizedSections"
+      ],
+      "layoutProfile": "Executive corporate",
+      "imageStyle": "Professional, clean, minimal corporate photography",
+      "headingFont": "Inter",
+      "bodyFont": "Inter"
+    },
+    "capabilities": {
+      "auth": false,
+      "database": {
+        "provider": "none",
+        "entities": []
+      },
+      "dashboard": false,
+      "ecommerce": false,
+      "saas": false
+    },
+    "fileGraph": [
+      {
+        "path": "package.json",
+        "generator": "scaffold-static",
+        "deps": [],
+        "wave": "static-scaffold",
+        "priority": 0
+      },
+      {
+        "path": "app/globals.css",
+        "generator": "scaffold-css",
+        "deps": [
+          "package.json"
+        ],
+        "wave": "static-scaffold",
+        "priority": 1
+      },
+      {
+        "path": "app/layout.tsx",
+        "generator": "layout-root",
+        "deps": [
+          "app/globals.css"
+        ],
+        "wave": "foundation",
+        "priority": 2
+      },
+      {
+        "path": "components/layout/site-shell.tsx",
+        "generator": "ux-shells",
+        "deps": [
+          "app/layout.tsx"
+        ],
+        "wave": "components",
+        "priority": 3
+      },
+      {
+        "path": "components/ui/button.tsx",
+        "generator": "ui-primitives",
+        "deps": [
+          "components/layout/site-shell.tsx"
+        ],
+        "wave": "components",
+        "priority": 4
+      },
+      {
+        "path": "lib/seo.ts",
+        "generator": "lib-seo",
+        "deps": [
+          "app/layout.tsx"
+        ],
+        "wave": "hooks-api",
+        "priority": 5
+      },
+      {
+        "path": "app/page.tsx",
+        "generator": "page-home",
+        "deps": [
+          "components/layout/site-shell.tsx",
+          "lib/seo.ts"
+        ],
+        "wave": "pages",
+        "priority": 6
+      },
+      {
+        "path": "app/about/page.tsx",
+        "generator": "page-secondary",
+        "deps": [
+          "components/layout/site-shell.tsx"
+        ],
+        "wave": "pages",
+        "priority": 7,
+        "optional": true
+      },
+      {
+        "path": "components/sections/bindings.ts",
+        "generator": "component-bind",
+        "deps": [
+          "app/page.tsx"
+        ],
+        "wave": "inject",
+        "priority": 8
+      },
+      {
+        "path": "package-lock.json",
+        "generator": "package-sync",
+        "deps": [
+          "package.json"
+        ],
+        "wave": "configs-tail",
+        "priority": 9
+      }
+    ],
+    "provenance": {
+      "lockedAt": "2026-08-04T21:21:34.943Z",
+      "promptHash": "bfba31f09f354fd8",
+      "plannerModel": "deepseek"
+    }
+  },
+  "tbgeComposition": {
+    "specId": "spec-d12bc966-8fe8-4f35-b43b-bc4ca80958c8",
+    "productId": "website-builder",
+    "profile": "professional",
+    "theme": {
+      "templateId": "corporate-premium",
+      "tokens": {
+        "primary": "#0A2540",
+        "secondary": "#0055A5",
+        "accent": "#00B4D8",
+        "background": "#FFFFFF",
+        "foreground": "#1A1A2E",
+        "surface": "#F5F7FA",
+        "neutral": "#5C6B7A"
+      },
+      "typography": {
+        "headingFont": "Inter",
+        "bodyFont": "Inter"
+      },
+      "layoutProfile": "Executive corporate",
+      "imageStyle": "Professional, clean, minimal corporate photography",
+      "cssVariables": {
+        "--color-primary": "#0A2540",
+        "--color-secondary": "#0055A5",
+        "--color-accent": "#00B4D8",
+        "--color-background": "#FFFFFF",
+        "--color-foreground": "#1A1A2E",
+        "--color-surface": "#F5F7FA",
+        "--color-neutral": "#5C6B7A",
+        "--font-heading": "Inter",
+        "--font-body": "Inter"
+      }
+    },
+    "industryPattern": {
+      "id": "business",
+      "label": "Business",
+      "sectionOrderBias": [
+        "Hero",
+        "Services",
+        "Features",
+        "Team",
+        "Contact"
+      ],
+      "defaultVariantDensity": "comfortable"
+    },
+    "pages": [
+      {
+        "path": "/",
+        "name": "Home",
+        "title": "Home",
+        "description": "Establish credibility and lead with executive value proposition.",
+        "purpose": "Establish credibility and lead with executive value proposition.",
+        "primaryCta": "Book a consultation",
+        "layout": {
+          "breakpoints": {
+            "sm": 640,
+            "md": 768,
+            "lg": 1024,
+            "xl": 1280
+          },
+          "container": {
+            "maxWidth": "1200px",
+            "padding": "1.5rem"
+          },
+          "grid": {
+            "columns": 12,
+            "gap": "1.5rem"
+          },
+          "stackDirection": "column"
+        },
+        "sections": [
+          {
+            "id": "hero-with-value-proposition-0",
+            "type": "content-block",
+            "label": "Hero with value proposition",
+            "variant": {
+              "id": "content-block-comfortable-primary",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "primary"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 0,
+            "props": {
+              "headline": "Home",
+              "subheadline": "Establish credibility and lead with executive value proposition.",
+              "body": "Business automation, website generation, and enterprise AI products",
+              "cta": "Book a consultation",
+              "align": "start"
+            }
+          },
+          {
+            "id": "trust-indicators--client-logos-1",
+            "type": "content-block",
+            "label": "Trust indicators / client logos",
+            "variant": {
+              "id": "content-block-comfortable-neutral",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "neutral"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 1,
+            "props": {
+              "headline": "Trust indicators / client logos",
+              "body": "Establish credibility and lead with executive value proposition.",
+              "items": []
+            }
+          },
+          {
+            "id": "executive-summary-2",
+            "type": "content-block",
+            "label": "Executive summary",
+            "variant": {
+              "id": "content-block-comfortable-secondary",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "secondary"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 2,
+            "props": {
+              "headline": "Executive summary",
+              "body": "Establish credibility and lead with executive value proposition.",
+              "items": []
+            }
+          },
+          {
+            "id": "capabilities-overview-3",
+            "type": "content-block",
+            "label": "Capabilities overview",
+            "variant": {
+              "id": "content-block-comfortable-neutral",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "neutral"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 3,
+            "props": {
+              "headline": "Capabilities overview",
+              "body": "Establish credibility and lead with executive value proposition.",
+              "items": []
+            }
+          },
+          {
+            "id": "measurable-outcomes-4",
+            "type": "content-block",
+            "label": "Measurable outcomes",
+            "variant": {
+              "id": "content-block-comfortable-secondary",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "secondary"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 4,
+            "props": {
+              "headline": "Measurable outcomes",
+              "body": "Establish credibility and lead with executive value proposition.",
+              "items": []
+            }
+          },
+          {
+            "id": "featured-products-5",
+            "type": "content-block",
+            "label": "Featured products",
+            "variant": {
+              "id": "content-block-comfortable-neutral",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "neutral"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 5,
+            "props": {
+              "headline": "Featured products",
+              "items": [
+                {
+                  "title": "Generate qualified enterprise leads",
+                  "description": "Business automation, website generation, and enterprise AI products"
+                },
+                {
+                  "title": "Establish premium trust and thought leadership",
+                  "description": "Business automation, website generation, and enterprise AI products"
+                },
+                {
+                  "title": "Showcase business automation and AI products",
+                  "description": "Business automation, website generation, and enterprise AI products"
+                },
+                {
+                  "title": "Drive conversions through clear CTAs",
+                  "description": "Business automation, website generation, and enterprise AI products"
+                }
+              ],
+              "columns": 3
+            }
+          },
+          {
+            "id": "testimonials-6",
+            "type": "testimonials",
+            "label": "Testimonials",
+            "variant": {
+              "id": "testimonials-comfortable-secondary",
+              "componentType": "testimonials",
+              "density": "comfortable",
+              "emphasis": "secondary"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 6,
+            "props": {
+              "headline": "Testimonials",
+              "body": "Establish credibility and lead with executive value proposition.",
+              "items": []
+            }
+          },
+          {
+            "id": "contact-cta-7",
+            "type": "content-block",
+            "label": "Contact CTA",
+            "variant": {
+              "id": "content-block-comfortable-neutral",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "neutral"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 7,
+            "props": {
+              "headline": "Contact Us",
+              "body": "Business automation, website generation, and enterprise AI products",
+              "cta": "Book a consultation",
+              "fields": [
+                "name",
+                "email",
+                "message"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "path": "/solutions",
+        "name": "Solutions",
+        "title": "Solutions",
+        "description": "Demonstrate industry-specific AI and automation solutions.",
+        "purpose": "Demonstrate industry-specific AI and automation solutions.",
+        "primaryCta": "Request a demo",
+        "layout": {
+          "breakpoints": {
+            "sm": 640,
+            "md": 768,
+            "lg": 1024,
+            "xl": 1280
+          },
+          "container": {
+            "maxWidth": "1200px",
+            "padding": "1.5rem"
+          },
+          "grid": {
+            "columns": 12,
+            "gap": "1.5rem"
+          },
+          "stackDirection": "column"
+        },
+        "sections": [
+          {
+            "id": "subpage-hero-0",
+            "type": "content-block",
+            "label": "Subpage hero",
+            "variant": {
+              "id": "content-block-comfortable-primary",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "primary"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 0,
+            "props": {
+              "headline": "Solutions",
+              "subheadline": "Demonstrate industry-specific AI and automation solutions.",
+              "body": "Business automation, website generation, and enterprise AI products",
+              "cta": "Request a demo",
+              "align": "start"
+            }
+          },
+          {
+            "id": "solutions-grid-1",
+            "type": "content-block",
+            "label": "Solutions grid",
+            "variant": {
+              "id": "content-block-comfortable-neutral",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "neutral"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 1,
+            "props": {
+              "headline": "Solutions grid",
+              "body": "Demonstrate industry-specific AI and automation solutions.",
+              "items": []
+            }
+          },
+          {
+            "id": "industry-use-cases-2",
+            "type": "content-block",
+            "label": "Industry use cases",
+            "variant": {
+              "id": "content-block-comfortable-secondary",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "secondary"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 2,
+            "props": {
+              "headline": "Industry use cases",
+              "body": "Demonstrate industry-specific AI and automation solutions.",
+              "items": []
+            }
+          },
+          {
+            "id": "integration-approach-3",
+            "type": "content-block",
+            "label": "Integration approach",
+            "variant": {
+              "id": "content-block-comfortable-neutral",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "neutral"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 3,
+            "props": {
+              "headline": "Integration approach",
+              "body": "Demonstrate industry-specific AI and automation solutions.",
+              "items": []
+            }
+          },
+          {
+            "id": "outcome-metrics-4",
+            "type": "content-block",
+            "label": "Outcome metrics",
+            "variant": {
+              "id": "content-block-comfortable-secondary",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "secondary"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 4,
+            "props": {
+              "headline": "Outcome metrics",
+              "body": "Demonstrate industry-specific AI and automation solutions.",
+              "items": []
+            }
+          },
+          {
+            "id": "cta-5",
+            "type": "cta",
+            "label": "CTA",
+            "variant": {
+              "id": "cta-comfortable-neutral",
+              "componentType": "cta",
+              "density": "comfortable",
+              "emphasis": "neutral"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 5,
+            "props": {
+              "headline": "Trend Business AI",
+              "subheadline": "Business automation, website generation, and enterprise AI products",
+              "cta": "Learn More"
+            }
+          }
+        ]
+      },
+      {
+        "path": "/products",
+        "name": "Products",
+        "title": "Products",
+        "description": "Showcase enterprise AI and business automation products with clear capabilities.",
+        "purpose": "Showcase enterprise AI and business automation products with clear capabilities.",
+        "primaryCta": "Schedule product walkthrough",
+        "layout": {
+          "breakpoints": {
+            "sm": 640,
+            "md": 768,
+            "lg": 1024,
+            "xl": 1280
+          },
+          "container": {
+            "maxWidth": "1200px",
+            "padding": "1.5rem"
+          },
+          "grid": {
+            "columns": 12,
+            "gap": "1.5rem"
+          },
+          "stackDirection": "column"
+        },
+        "sections": [
+          {
+            "id": "hero-0",
+            "type": "hero",
+            "label": "Hero",
+            "variant": {
+              "id": "hero-comfortable-primary",
+              "componentType": "hero",
+              "density": "comfortable",
+              "emphasis": "primary"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 0,
+            "props": {
+              "headline": "Products",
+              "subheadline": "Showcase enterprise AI and business automation products with clear capabilities.",
+              "body": "Business automation, website generation, and enterprise AI products",
+              "cta": "Schedule product walkthrough",
+              "align": "start"
+            }
+          },
+          {
+            "id": "product-catalog-1",
+            "type": "content-block",
+            "label": "Product catalog",
+            "variant": {
+              "id": "content-block-comfortable-neutral",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "neutral"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 1,
+            "props": {
+              "headline": "Product catalog",
+              "items": [
+                {
+                  "title": "Generate qualified enterprise leads",
+                  "description": "Business automation, website generation, and enterprise AI products"
+                },
+                {
+                  "title": "Establish premium trust and thought leadership",
+                  "description": "Business automation, website generation, and enterprise AI products"
+                },
+                {
+                  "title": "Showcase business automation and AI products",
+                  "description": "Business automation, website generation, and enterprise AI products"
+                },
+                {
+                  "title": "Drive conversions through clear CTAs",
+                  "description": "Business automation, website generation, and enterprise AI products"
+                }
+              ],
+              "columns": 3
+            }
+          },
+          {
+            "id": "product-deep-dive-2",
+            "type": "content-block",
+            "label": "Product deep dive",
+            "variant": {
+              "id": "content-block-comfortable-secondary",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "secondary"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 2,
+            "props": {
+              "headline": "Product deep dive",
+              "items": [
+                {
+                  "title": "Generate qualified enterprise leads",
+                  "description": "Business automation, website generation, and enterprise AI products"
+                },
+                {
+                  "title": "Establish premium trust and thought leadership",
+                  "description": "Business automation, website generation, and enterprise AI products"
+                },
+                {
+                  "title": "Showcase business automation and AI products",
+                  "description": "Business automation, website generation, and enterprise AI products"
+                },
+                {
+                  "title": "Drive conversions through clear CTAs",
+                  "description": "Business automation, website generation, and enterprise AI products"
+                }
+              ],
+              "columns": 3
+            }
+          },
+          {
+            "id": "technical-differentiators-3",
+            "type": "content-block",
+            "label": "Technical differentiators",
+            "variant": {
+              "id": "content-block-comfortable-neutral",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "neutral"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 3,
+            "props": {
+              "headline": "Technical differentiators",
+              "body": "Showcase enterprise AI and business automation products with clear capabilities.",
+              "items": []
+            }
+          },
+          {
+            "id": "security-and-trust-4",
+            "type": "content-block",
+            "label": "Security and trust",
+            "variant": {
+              "id": "content-block-comfortable-secondary",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "secondary"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 4,
+            "props": {
+              "headline": "Security and trust",
+              "body": "Showcase enterprise AI and business automation products with clear capabilities.",
+              "items": []
+            }
+          },
+          {
+            "id": "pricing--engagement-models-5",
+            "type": "content-block",
+            "label": "Pricing / engagement models",
+            "variant": {
+              "id": "content-block-comfortable-neutral",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "neutral"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 5,
+            "props": {
+              "headline": "Pricing / engagement models",
+              "body": "Showcase enterprise AI and business automation products with clear capabilities.",
+              "items": []
+            }
+          },
+          {
+            "id": "cta-6",
+            "type": "cta",
+            "label": "CTA",
+            "variant": {
+              "id": "cta-comfortable-secondary",
+              "componentType": "cta",
+              "density": "comfortable",
+              "emphasis": "secondary"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 6,
+            "props": {
+              "headline": "Trend Business AI",
+              "subheadline": "Business automation, website generation, and enterprise AI products",
+              "cta": "Learn More"
+            }
+          }
+        ]
+      },
+      {
+        "path": "/about",
+        "name": "About",
+        "title": "About",
+        "description": "Build trust through company story, leadership, and mission.",
+        "purpose": "Build trust through company story, leadership, and mission.",
+        "primaryCta": "Meet our team",
+        "layout": {
+          "breakpoints": {
+            "sm": 640,
+            "md": 768,
+            "lg": 1024,
+            "xl": 1280
+          },
+          "container": {
+            "maxWidth": "1200px",
+            "padding": "1.5rem"
+          },
+          "grid": {
+            "columns": 12,
+            "gap": "1.5rem"
+          },
+          "stackDirection": "column"
+        },
+        "sections": [
+          {
+            "id": "company-story-0",
+            "type": "content-block",
+            "label": "Company story",
+            "variant": {
+              "id": "content-block-comfortable-primary",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "primary"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 0,
+            "props": {
+              "headline": "Company story",
+              "body": "Build trust through company story, leadership, and mission.",
+              "items": []
+            }
+          },
+          {
+            "id": "leadership-team-1",
+            "type": "content-block",
+            "label": "Leadership team",
+            "variant": {
+              "id": "content-block-comfortable-neutral",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "neutral"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 1,
+            "props": {
+              "headline": "Leadership team",
+              "body": "Build trust through company story, leadership, and mission.",
+              "items": []
+            }
+          },
+          {
+            "id": "mission-and-values-2",
+            "type": "content-block",
+            "label": "Mission and values",
+            "variant": {
+              "id": "content-block-comfortable-secondary",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "secondary"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 2,
+            "props": {
+              "headline": "Mission and values",
+              "body": "Build trust through company story, leadership, and mission.",
+              "items": []
+            }
+          },
+          {
+            "id": "trust-and-security-standards-3",
+            "type": "content-block",
+            "label": "Trust and security standards",
+            "variant": {
+              "id": "content-block-comfortable-neutral",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "neutral"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 3,
+            "props": {
+              "headline": "Trust and security standards",
+              "body": "Build trust through company story, leadership, and mission.",
+              "items": []
+            }
+          },
+          {
+            "id": "career--partner-cta-4",
+            "type": "content-block",
+            "label": "Career / partner CTA",
+            "variant": {
+              "id": "content-block-comfortable-secondary",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "secondary"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 4,
+            "props": {
+              "headline": "Trend Business AI",
+              "subheadline": "Business automation, website generation, and enterprise AI products",
+              "cta": "Learn More"
+            }
+          },
+          {
+            "id": "contact-link-5",
+            "type": "content-block",
+            "label": "Contact link",
+            "variant": {
+              "id": "content-block-comfortable-neutral",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "neutral"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 5,
+            "props": {
+              "headline": "Contact Us",
+              "body": "Business automation, website generation, and enterprise AI products",
+              "cta": "Meet our team",
+              "fields": [
+                "name",
+                "email",
+                "message"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "path": "/insights",
+        "name": "Insights",
+        "title": "Insights",
+        "description": "Support SEO and thought leadership with resources and executive perspectives.",
+        "purpose": "Support SEO and thought leadership with resources and executive perspectives.",
+        "primaryCta": "Subscribe to insights",
+        "layout": {
+          "breakpoints": {
+            "sm": 640,
+            "md": 768,
+            "lg": 1024,
+            "xl": 1280
+          },
+          "container": {
+            "maxWidth": "1200px",
+            "padding": "1.5rem"
+          },
+          "grid": {
+            "columns": 12,
+            "gap": "1.5rem"
+          },
+          "stackDirection": "column"
+        },
+        "sections": [
+          {
+            "id": "resource-hero-0",
+            "type": "content-block",
+            "label": "Resource hero",
+            "variant": {
+              "id": "content-block-comfortable-primary",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "primary"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 0,
+            "props": {
+              "headline": "Insights",
+              "subheadline": "Support SEO and thought leadership with resources and executive perspectives.",
+              "body": "Business automation, website generation, and enterprise AI products",
+              "cta": "Subscribe to insights",
+              "align": "start"
+            }
+          },
+          {
+            "id": "featured-insights-1",
+            "type": "content-block",
+            "label": "Featured insights",
+            "variant": {
+              "id": "content-block-comfortable-neutral",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "neutral"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 1,
+            "props": {
+              "headline": "Featured insights",
+              "items": [
+                {
+                  "title": "Generate qualified enterprise leads",
+                  "description": "Business automation, website generation, and enterprise AI products"
+                },
+                {
+                  "title": "Establish premium trust and thought leadership",
+                  "description": "Business automation, website generation, and enterprise AI products"
+                },
+                {
+                  "title": "Showcase business automation and AI products",
+                  "description": "Business automation, website generation, and enterprise AI products"
+                },
+                {
+                  "title": "Drive conversions through clear CTAs",
+                  "description": "Business automation, website generation, and enterprise AI products"
+                }
+              ],
+              "columns": 3
+            }
+          },
+          {
+            "id": "article-grid-2",
+            "type": "content-block",
+            "label": "Article grid",
+            "variant": {
+              "id": "content-block-comfortable-secondary",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "secondary"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 2,
+            "props": {
+              "headline": "Article grid",
+              "body": "Support SEO and thought leadership with resources and executive perspectives.",
+              "items": []
+            }
+          },
+          {
+            "id": "industry-reports-3",
+            "type": "content-block",
+            "label": "Industry reports",
+            "variant": {
+              "id": "content-block-comfortable-neutral",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "neutral"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 3,
+            "props": {
+              "headline": "Industry reports",
+              "body": "Support SEO and thought leadership with resources and executive perspectives.",
+              "items": []
+            }
+          },
+          {
+            "id": "newsletter-signup-4",
+            "type": "content-block",
+            "label": "Newsletter signup",
+            "variant": {
+              "id": "content-block-comfortable-secondary",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "secondary"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 4,
+            "props": {
+              "headline": "Trend Business AI",
+              "subheadline": "Business automation, website generation, and enterprise AI products",
+              "cta": "Learn More"
+            }
+          },
+          {
+            "id": "cta-5",
+            "type": "cta",
+            "label": "CTA",
+            "variant": {
+              "id": "cta-comfortable-neutral",
+              "componentType": "cta",
+              "density": "comfortable",
+              "emphasis": "neutral"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 5,
+            "props": {
+              "headline": "Trend Business AI",
+              "subheadline": "Business automation, website generation, and enterprise AI products",
+              "cta": "Learn More"
+            }
+          }
+        ]
+      },
+      {
+        "path": "/contact",
+        "name": "Contact",
+        "title": "Contact",
+        "description": "Capture leads through a comprehensive contact and consultation form.",
+        "purpose": "Capture leads through a comprehensive contact and consultation form.",
+        "primaryCta": "Send message",
+        "layout": {
+          "breakpoints": {
+            "sm": 640,
+            "md": 768,
+            "lg": 1024,
+            "xl": 1280
+          },
+          "container": {
+            "maxWidth": "1200px",
+            "padding": "1.5rem"
+          },
+          "grid": {
+            "columns": 12,
+            "gap": "1.5rem"
+          },
+          "stackDirection": "column"
+        },
+        "sections": [
+          {
+            "id": "contact-hero-0",
+            "type": "content-block",
+            "label": "Contact hero",
+            "variant": {
+              "id": "content-block-comfortable-primary",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "primary"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 0,
+            "props": {
+              "headline": "Contact",
+              "subheadline": "Capture leads through a comprehensive contact and consultation form.",
+              "body": "Business automation, website generation, and enterprise AI products",
+              "cta": "Send message",
+              "align": "start"
+            }
+          },
+          {
+            "id": "contact-form-1",
+            "type": "content-block",
+            "label": "Contact form",
+            "variant": {
+              "id": "content-block-comfortable-neutral",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "neutral"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 1,
+            "props": {
+              "headline": "Contact Us",
+              "body": "Business automation, website generation, and enterprise AI products",
+              "cta": "Send message",
+              "fields": [
+                "name",
+                "email",
+                "message"
+              ]
+            }
+          },
+          {
+            "id": "sales-and-support-channels-2",
+            "type": "content-block",
+            "label": "Sales and support channels",
+            "variant": {
+              "id": "content-block-comfortable-secondary",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "secondary"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 2,
+            "props": {
+              "headline": "Sales and support channels",
+              "body": "Capture leads through a comprehensive contact and consultation form.",
+              "items": []
+            }
+          },
+          {
+            "id": "response-time-commitment-3",
+            "type": "content-block",
+            "label": "Response time commitment",
+            "variant": {
+              "id": "content-block-comfortable-neutral",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "neutral"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 3,
+            "props": {
+              "headline": "Response time commitment",
+              "body": "Capture leads through a comprehensive contact and consultation form.",
+              "items": []
+            }
+          },
+          {
+            "id": "office-locations--global-presence-4",
+            "type": "content-block",
+            "label": "Office locations / global presence",
+            "variant": {
+              "id": "content-block-comfortable-secondary",
+              "componentType": "content-block",
+              "density": "comfortable",
+              "emphasis": "secondary"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 4,
+            "props": {
+              "headline": "Office locations / global presence",
+              "body": "Capture leads through a comprehensive contact and consultation form.",
+              "items": []
+            }
+          },
+          {
+            "id": "faq-5",
+            "type": "faq",
+            "label": "FAQ",
+            "variant": {
+              "id": "faq-comfortable-neutral",
+              "componentType": "faq",
+              "density": "comfortable",
+              "emphasis": "neutral"
+            },
+            "layout": {
+              "breakpoints": {
+                "sm": 640,
+                "md": 768,
+                "lg": 1024,
+                "xl": 1280
+              },
+              "container": {
+                "maxWidth": "1200px",
+                "padding": "1.5rem"
+              },
+              "grid": {
+                "columns": 12,
+                "gap": "1.5rem"
+              },
+              "stackDirection": "column"
+            },
+            "order": 5,
+            "props": {
+              "headline": "FAQ",
+              "body": "Capture leads through a comprehensive contact and consultation form.",
+              "items": []
+            }
+          }
+        ]
+      }
+    ],
+    "navigation": [
+      {
+        "label": "Home",
+        "href": "/"
+      },
+      {
+        "label": "Solutions",
+        "href": "/solutions"
+      },
+      {
+        "label": "Products",
+        "href": "/products"
+      },
+      {
+        "label": "About",
+        "href": "/about"
+      },
+      {
+        "label": "Insights",
+        "href": "/insights"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "footerSections": [
+      "Company overview and values",
+      "Product and solutions links",
+      "Industries served",
+      "Legal, privacy, and security",
+      "Newsletter subscription",
+      "Global offices"
+    ]
+  },
+  "tbgeTrace": {
+    "runId": "tbge-def0a278-80d9-41c0-8e23-8a1914e8c89b",
+    "phases": [
+      "accepted",
+      "planning",
+      "spec_locked",
+      "assembling",
+      "verifying",
+      "quality",
+      "finalizing",
+      "completed"
+    ],
+    "llmCalls": 1,
+    "startedAt": "2026-08-04T21:21:07.510Z",
+    "completedAt": "2026-08-04T21:21:34.953Z"
+  },
+  "designSystem": {
+    "style": "Executive trust",
+    "stylePreset": "corporate",
+    "industryPattern": "business",
+    "colors": {
+      "primary": "#0B1F3A",
+      "secondary": "#1E3A5F",
+      "accent": "#1D4ED8",
+      "neutral": "#64748B",
+      "surface": "#F4F7FB",
+      "background": "#F4F7FB",
+      "foreground": "#0B1F3A"
+    },
+    "typography": {
+      "headingFont": "IBM Plex Sans",
+      "bodyFont": "IBM Plex Sans",
+      "scale": [
+        "display",
+        "h1",
+        "h2",
+        "body",
+        "small"
+      ],
+      "notes": "IBM Plex Sans / IBM Plex Sans"
+    },
+    "layoutRules": [
+      "corporate-trust layout",
+      "Fade up motion"
+    ],
+    "layoutStyle": "corporate-trust",
+    "uiPatterns": [
+      "SiteHeader",
+      "HeroSplit",
+      "ServicesModern",
+      "ProcessSteps",
+      "BrandTrust",
+      "TestimonialsModern",
+      "ContactSection",
+      "SiteFooter"
+    ],
+    "componentPalette": [
+      "SiteHeader",
+      "HeroSplit",
+      "ServicesModern",
+      "ProcessSteps",
+      "BrandTrust",
+      "TestimonialsModern",
+      "ContactSection",
+      "SiteFooter"
+    ],
+    "homeComponentOrder": [
+      "SiteHeader",
+      "HeroSplit",
+      "ServicesModern",
+      "ProcessSteps",
+      "BrandTrust",
+      "TestimonialsModern",
+      "ContactSection",
+      "SiteFooter"
+    ],
+    "spacingScale": [
+      "3.5rem",
+      "5.5rem",
+      "72rem"
+    ],
+    "borderRadius": "1rem",
+    "shadowStyle": "soft premium"
+  }
+}

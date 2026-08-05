@@ -1,0 +1,37 @@
+{
+  "components": [
+    {
+      "id": "nav-primary",
+      "role": "navigation",
+      "scaffold": "components/nav-primary.tsx",
+      "slots": ["logo", "links", "cta"]
+    },
+    {
+      "id": "hero-primary",
+      "role": "hero",
+      "scaffold": "components/hero-primary.tsx",
+      "slots": ["headline", "subheadline", "cta"],
+      "defaultProps": { "variant": "corporate" }
+    },
+    {
+      "id": "features-primary",
+      "role": "features",
+      "scaffold": "components/features-primary.tsx"
+    },
+    {
+      "id": "cta-primary",
+      "role": "cta",
+      "scaffold": "components/cta-primary.tsx"
+    },
+    {
+      "id": "footer-primary",
+      "role": "footer",
+      "scaffold": "components/footer-primary.tsx"
+    },
+    {
+      "id": "section-shell",
+      "role": "custom",
+      "scaffold": "components/section-shell.tsx"
+    }
+  ]
+}

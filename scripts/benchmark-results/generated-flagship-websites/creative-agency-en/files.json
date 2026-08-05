@@ -1,0 +1,18 @@
+[
+  "lib/site-images.ts",
+  "app/layout.tsx",
+  "components/ui/motion.tsx",
+  "app/globals.css",
+  "components/creative-agency-premium-nav.tsx",
+  "components/creative-agency-premium-hero.tsx",
+  "components/creative-agency-premium-selected-work.tsx",
+  "components/creative-agency-premium-case-grid.tsx",
+  "components/creative-agency-premium-manifesto.tsx",
+  "components/creative-agency-premium-capabilities.tsx",
+  "components/creative-agency-premium-process.tsx",
+  "components/creative-agency-premium-collaborate-cta.tsx",
+  "components/creative-agency-premium-overlay-showcase.tsx",
+  "components/creative-agency-premium-footer.tsx",
+  "components/creative-agency-premium-section-shell.tsx",
+  "app/page.tsx"
+]

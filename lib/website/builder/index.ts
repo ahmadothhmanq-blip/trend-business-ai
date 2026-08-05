@@ -165,3 +165,7 @@ export {
   useBuilderTemplateRuntime,
   type BuilderTemplateRuntimeState,
 } from "@/lib/website/builder/use-template-runtime";
+export {
+  resolveBuilderTemplatePackageId,
+  getLegacyBuilderTemplatePackageMap,
+} from "@/lib/website/builder/resolve-builder-template-package-id";

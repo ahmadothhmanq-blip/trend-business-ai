@@ -12,7 +12,7 @@ import { getThemePageArchitecture } from "@/lib/website/builder/theme-architectu
 describe("phase 4 industry redesign", () => {
   it("defines home compositions for installed structure templates", () => {
     const tiIds = Object.values(STRUCTURE_TEMPLATE_INTELLIGENCE_MAP);
-    assert.equal(tiIds.length, 2);
+    assert.equal(tiIds.length, 7);
 
     for (const tiId of tiIds) {
       assert.ok(

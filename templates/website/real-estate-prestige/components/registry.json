@@ -1,0 +1,62 @@
+{
+  "components": [
+    {
+      "id": "real-estate-prestige-nav",
+      "role": "navigation",
+      "scaffold": "components/real-estate-prestige-nav.tsx",
+      "slots": ["logo", "links", "cta"]
+    },
+    {
+      "id": "real-estate-prestige-dossier-rail",
+      "role": "navigation",
+      "scaffold": "components/real-estate-prestige-dossier-rail.tsx",
+      "slots": ["property-intel", "links", "cta"]
+    },
+    {
+      "id": "real-estate-prestige-hero",
+      "role": "hero",
+      "scaffold": "components/real-estate-prestige-hero.tsx",
+      "slots": ["headline", "subheadline", "cta", "property-stats"]
+    },
+    {
+      "id": "real-estate-prestige-collection",
+      "role": "portfolio",
+      "scaffold": "components/real-estate-prestige-collection.tsx"
+    },
+    {
+      "id": "real-estate-prestige-neighborhoods",
+      "role": "gallery",
+      "scaffold": "components/real-estate-prestige-neighborhoods.tsx"
+    },
+    {
+      "id": "real-estate-prestige-architecture",
+      "role": "story",
+      "scaffold": "components/real-estate-prestige-architecture.tsx"
+    },
+    {
+      "id": "real-estate-prestige-advisors",
+      "role": "custom",
+      "scaffold": "components/real-estate-prestige-advisors.tsx"
+    },
+    {
+      "id": "real-estate-prestige-testimonials",
+      "role": "testimonials",
+      "scaffold": "components/real-estate-prestige-testimonials.tsx"
+    },
+    {
+      "id": "real-estate-prestige-inquiry",
+      "role": "contact",
+      "scaffold": "components/real-estate-prestige-inquiry.tsx"
+    },
+    {
+      "id": "real-estate-prestige-footer",
+      "role": "footer",
+      "scaffold": "components/real-estate-prestige-footer.tsx"
+    },
+    {
+      "id": "real-estate-prestige-section-shell",
+      "role": "custom",
+      "scaffold": "components/real-estate-prestige-section-shell.tsx"
+    }
+  ]
+}

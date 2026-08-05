@@ -1,0 +1,11 @@
+{
+  "pageId": "contact",
+  "layoutId": "editorial-reveal",
+  "regions": {
+    "main": [
+      "creative-portfolio-hero",
+      "creative-portfolio-collaborate-cta"
+    ],
+    "overlay": ["creative-portfolio-overlay-showcase"]
+  }
+}

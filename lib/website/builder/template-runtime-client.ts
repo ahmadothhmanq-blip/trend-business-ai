@@ -4,13 +4,15 @@ import type {
   BuilderTemplateRuntimeResult,
   BuilderTemplateRuntimeScope,
 } from "@/lib/website/builder/template-runtime.types";
+import { resolveBuilderTemplatePackageId } from "@/lib/website/builder/resolve-builder-template-package-id";
 
 export async function fetchBuilderTemplateRuntimeModel(
   templateId: string,
   scope?: BuilderTemplateRuntimeScope,
 ): Promise<BuilderTemplateRuntimeResult> {
+  const resolvedTemplateId = resolveBuilderTemplatePackageId(templateId);
   const url = new URL("/api/website-builder/template-runtime", window.location.origin);
-  url.searchParams.set("id", templateId);
+  url.searchParams.set("id", resolvedTemplateId);
   if (scope?.pageId) url.searchParams.set("pageId", scope.pageId);
   if (scope?.layoutId) url.searchParams.set("layoutId", scope.layoutId);
 
@@ -28,7 +30,7 @@ export async function fetchBuilderTemplateRuntimeModel(
   if (!payload || typeof payload !== "object") {
     return {
       ok: false,
-      templateId,
+      templateId: resolvedTemplateId,
       code: "output.invalid_model",
       message: "template runtime API returned an invalid response",
       issues: [
@@ -50,7 +52,7 @@ export async function fetchBuilderTemplateRuntimeModel(
 
   return {
     ok: false,
-    templateId,
+    templateId: resolvedTemplateId,
     code: "output.invalid_model",
     message: "template runtime API request failed",
     issues: [

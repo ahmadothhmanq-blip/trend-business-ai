@@ -1,0 +1,21 @@
+▶ Website Quality Benchmark System (WQBS)
+  ✔ exports constants and categories (0.986ms)
+  ✔ extracts artifact signals from files (1.2956ms)
+  ✔ evaluates all 8 benchmark categories (0.8779ms)
+  ✔ runs full benchmark on strong website (2.9325ms)
+  ✔ scores weak website lower than strong website (0.8853ms)
+  ✔ quick mode evaluates subset of categories (0.4167ms)
+  ✔ generates recommendations for weak dimensions (0.5889ms)
+  ✔ compares generated vs reference website (1.3816ms)
+  ✔ fails on empty input (0.1728ms)
+  ✔ is provider and framework independent (1.1383ms)
+✔ Website Quality Benchmark System (WQBS) (11.9468ms)
+ℹ tests 10
+ℹ suites 1
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 230.568
+npm warn Unknown env config "devdir". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.

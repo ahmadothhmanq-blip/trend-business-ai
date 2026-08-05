@@ -5,8 +5,10 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { readSseStream } from "@/lib/api/sse-client";
 import { isWebsiteIncrementalPreviewEnabled } from "@/lib/website/generation-flags";
+import { recoverAfterIncompleteSse } from "@/lib/website/post-stream-handoff-recovery";
 import { tryRecoverCompletedWebsiteGeneration } from "@/lib/website/stream-recovery";
 import { getClientStreamRecoveryPollMs } from "@/lib/website/stream-limits";
+import { upsertRecentProject } from "@/lib/website/recent-projects";
 import { MAX_RECENT_PROJECTS } from "@/lib/website/constants";
 import { prepareWebsiteProjectForExport } from "@/lib/website/prepare-export";
 import { useTranslation } from "@/lib/i18n/client";
@@ -79,6 +81,7 @@ import { cn } from "@/lib/utils";
 import { AnalyticsIntelligencePanel } from "@/components/dashboard/website-builder/analytics-intelligence-panel";
 import { ExperimentsPanel } from "@/components/dashboard/website-builder/experiments-panel";
 import { SeoAgentPanel } from "@/components/dashboard/website-builder/seo-agent-panel";
+import { ReviewStudioPanel } from "@/components/dashboard/website-builder/review-studio-panel";
 import { DeploymentDashboardPanel } from "@/components/dashboard/website-builder/deployment-dashboard-panel";
 import {
   type TemplateUsePayload,
@@ -104,6 +107,7 @@ import { readWebsiteBuilderApiError, formatWebsiteBuilderApiError } from "@/lib/
 import { useBuilderTemplateRuntime } from "@/lib/website/builder/use-template-runtime";
 import { resolveTemplateIntelligenceForMarketplace } from "@/lib/ai-core/template-intelligence/resolve-marketplace";
 import { resolveGenerationPrompt } from "@/lib/website/builder/resolve-generation-prompt";
+import { resolveBuilderTemplatePackageId } from "@/lib/website/builder/resolve-builder-template-package-id";
 import {
   buildBriefFromStructureTemplate,
   buildBriefFromTemplatePayload,
@@ -270,8 +274,9 @@ function restoreTemplateStateFromSettings(
       ? settings.templateIntelligenceId
       : null;
   if (structureId) {
-    handlers.setWebsiteStructureTemplateId(structureId);
-    handlers.setSelectedTemplateId(structureId);
+    const resolvedStructureId = resolveBuilderTemplatePackageId(structureId);
+    handlers.setWebsiteStructureTemplateId(resolvedStructureId);
+    handlers.setSelectedTemplateId(resolvedStructureId);
   }
   if (tiId) handlers.setTemplateIntelligenceId(tiId);
 }
@@ -349,7 +354,9 @@ export function WebsiteBuilderTool({
   const [websiteStructureTemplateId, setWebsiteStructureTemplateId] = useState<
     string | null
   >(null);
-  const builderTemplatePackageId = websiteStructureTemplateId ?? selectedTemplateId;
+  const builderTemplatePackageId = resolveBuilderTemplatePackageId(
+    websiteStructureTemplateId ?? selectedTemplateId ?? "",
+  ) || null;
   const {
     model: templateRuntimeModel,
     error: templateRuntimeError,
@@ -424,6 +431,25 @@ export function WebsiteBuilderTool({
     initialGenerations[0] ? toProject(initialGenerations[0]) : null,
   );
 
+  /** Authoritative Recent Projects + active workspace sync. */
+  const commitWorkspaceProject = useCallback(
+    (project: WorkspaceProject, options?: { activate?: boolean }) => {
+      setProjects((items) => upsertRecentProject(items, project));
+      if (options?.activate === false) {
+        setActiveProject((current) =>
+          current?.id === project.id ? project : current,
+        );
+      } else {
+        setActiveProject(project);
+      }
+    },
+    [],
+  );
+
+  const upsertProjectInList = useCallback((project: WorkspaceProject) => {
+    setProjects((items) => upsertRecentProject(items, project));
+  }, []);
+
   const inferredFromBrief = useMemo(
     () =>
       inferWebsiteOnboardingDefaults(
@@ -458,11 +484,7 @@ export function WebsiteBuilderTool({
           return;
         }
         const project = toProject(data.generation);
-        setProjects((items) => {
-          const filtered = items.filter((item) => item.id !== project.id);
-          return [project, ...filtered].slice(0, MAX_RECENT_PROJECTS);
-        });
-        setActiveProject(project);
+        commitWorkspaceProject(project);
         setSelectedFilePath(project.generatedProject?.files[0]?.path ?? "");
         setFileSearch("");
         setEditMode(false);
@@ -488,7 +510,7 @@ export function WebsiteBuilderTool({
         toast.error(wb("errors.api"));
       }
     },
-    [visualEditorDirty, outputTab, wb],
+    [visualEditorDirty, outputTab, wb, commitWorkspaceProject],
   );
 
   useGenerationQueryParam(openGenerationFromQuery, () => {
@@ -558,10 +580,7 @@ export function WebsiteBuilderTool({
         const data = (await response.json()) as { generation?: WebsiteGeneration };
         if (!data.generation || cancelled) return;
         const hydrated = toProject(data.generation);
-        setProjects((items) =>
-          items.map((item) => (item.id === hydrated.id ? hydrated : item)),
-        );
-        setActiveProject(hydrated);
+        commitWorkspaceProject(hydrated);
         setSelectedFilePath(hydrated.generatedProject?.files[0]?.path ?? "");
       } catch {
         // Keep stub until user selects again
@@ -587,9 +606,8 @@ export function WebsiteBuilderTool({
         const data = (await response.json()) as { generation?: WebsiteGeneration };
         if (!data.generation || cancelled) return;
         const hydrated = toProject(data.generation);
-        setProjects((items) =>
-          items.map((item) => (item.id === hydrated.id ? hydrated : item)),
-        );
+        if (cancelled || !isGenerating) return;
+        upsertProjectInList(hydrated);
         setActiveProject((current) =>
           current?.id === hydrated.id ? hydrated : current,
         );
@@ -608,7 +626,7 @@ export function WebsiteBuilderTool({
     return () => {
       cancelled = true;
     };
-  }, [previewRevision, isGenerating, activeProject?.id, activeProject?.status]);
+  }, [previewRevision, isGenerating, activeProject?.id, activeProject?.status, upsertProjectInList]);
 
   const currentPages = useMemo(() => {
     const featurePages = features.includes("Blog") ? ["Blog"] : [];
@@ -640,10 +658,7 @@ export function WebsiteBuilderTool({
           const data = (await response.json()) as { generation?: WebsiteGeneration };
           if (data.generation) {
             const hydrated = toProject(data.generation);
-            setProjects((items) =>
-              items.map((item) => (item.id === hydrated.id ? hydrated : item)),
-            );
-            setActiveProject(hydrated);
+            commitWorkspaceProject(hydrated);
             if (
               hydrated.language &&
               (LANGUAGES as readonly string[]).includes(hydrated.language)
@@ -716,7 +731,7 @@ export function WebsiteBuilderTool({
   function patchProject(id: string, generation: WebsiteGeneration) {
     const nextProject = toProject(generation);
 
-    setProjects((items) => items.map((item) => (item.id === id ? nextProject : item)));
+    upsertProjectInList(nextProject);
     setActiveProject((project) => (project?.id === id ? nextProject : project));
     setSelectedFilePath((path) => path || nextProject.generatedProject?.files[0]?.path || "");
   }
@@ -833,7 +848,9 @@ export function WebsiteBuilderTool({
 
     const apiPrompt = promptResult.prompt;
 
-    const resolvedTemplateId = tpl?.templateId ?? selectedTemplateId;
+    const resolvedTemplateId = resolveBuilderTemplatePackageId(
+      tpl?.templateId ?? selectedTemplateId ?? "",
+    ) || null;
     const resolvedMarketplaceId =
       tpl?.marketplaceTemplateId ?? marketplaceTemplateId;
     const resolvedStyle = tpl?.style ?? templateStyle;
@@ -969,7 +986,7 @@ export function WebsiteBuilderTool({
       ],
       productId: product?.id ?? "website-builder",
       projectId: tpl ? undefined : activeProject?.projectId ?? undefined,
-      templateId: autoTemplateId || undefined,
+      templateId: resolveBuilderTemplatePackageId(autoTemplateId || "") || undefined,
       marketplaceTemplateId: resolvedMarketplaceId || undefined,
       templateStyle: resolvedStyle || inferred.designStyle || undefined,
       designPreset: autoPreset || inferred.designPreset || undefined,
@@ -979,9 +996,11 @@ export function WebsiteBuilderTool({
       templateIntelligenceId: autoTiId || undefined,
       templateIntelligenceCategory: autoTiCategory || undefined,
       websiteStructureTemplateId:
-        (templateRuntimeModelRef.current?.template.id ??
-          websiteStructureTemplateId) ||
-        undefined,
+        resolveBuilderTemplatePackageId(
+          templateRuntimeModelRef.current?.template.id ??
+            websiteStructureTemplateId ??
+            "",
+        ) || undefined,
       websiteThemeId: websiteThemeId || undefined,
       brandIdentityId: brandIdentityId || undefined,
       locale: resolvedLanguage || undefined,
@@ -1008,15 +1027,14 @@ export function WebsiteBuilderTool({
         blueprint: generatedProject as unknown as WebsiteGeneration["blueprint"],
       });
 
-      setActiveProject(nextProject);
+      commitWorkspaceProject(nextProject);
       setSelectedFilePath(
         generatedProject.files.find((f) => f.path.includes("preview/"))?.path ||
           generatedProject.files[0]?.path ||
           "",
       );
-      setOutputTab("preview");
+      setOutputTab("review");
       setEditMode(false);
-      setProjects((items) => [nextProject, ...items.filter((p) => p.id !== nextProject.id)].slice(0, MAX_RECENT_PROJECTS));
       setStreamStatus(wb("stream.websiteSaved"));
       toast.success(
         options?.layerImprove
@@ -1081,11 +1099,16 @@ export function WebsiteBuilderTool({
         let incrementalPreview = isWebsiteIncrementalPreviewEnabled();
         let lastPreviewBumpAt = 0;
         let handoffRecoveryStarted = false;
+        let handoffRecoveryPromise: Promise<boolean> | null = null;
 
         const startHandoffRecovery = (generationId: string, message?: string | null) => {
           if (handoffRecoveryStarted) return;
           handoffRecoveryStarted = true;
-          void tryApplyRecoveredGeneration(generationId, message ?? null).then((recovered) => {
+          handoffRecoveryPromise = tryApplyRecoveredGeneration(
+            generationId,
+            message ?? null,
+          );
+          void handoffRecoveryPromise.then((recovered) => {
             if (recovered) {
               setPreviewRevision((n) => n + 1);
               setApiError(null);
@@ -1123,7 +1146,6 @@ export function WebsiteBuilderTool({
             sessionGenerationId = session.generationId;
             activeStreamSessionRef.current = session.generationId;
             if (session.incrementalPreview) incrementalPreview = true;
-            if (!incrementalPreview) return;
             const stub = stubRunningProject({
               id: session.generationId,
               title: wb("statuses.generating"),
@@ -1138,10 +1160,8 @@ export function WebsiteBuilderTool({
               features,
               mode: requestBody.mode as GenerationMode | undefined,
             });
-            setActiveProject(stub);
-            setProjects((items) =>
-              [stub, ...items.filter((p) => p.id !== session.generationId)].slice(0, MAX_RECENT_PROJECTS),
-            );
+            commitWorkspaceProject(stub);
+            if (!incrementalPreview) return;
             setOutputTab("preview");
             setPreviewRevision((n) => n + 1);
           },
@@ -1190,12 +1210,12 @@ export function WebsiteBuilderTool({
         if (!sseResult.completed && !sseResult.aborted) {
           const recoveryId = sessionGenerationId ?? sseResult.generationId;
           if (recoveryId) {
-            if (handoffRecoveryStarted) {
-              return;
-            }
-            const recovered = await tryApplyRecoveredGeneration(
+            const recovered = await recoverAfterIncompleteSse(
+              handoffRecoveryStarted,
+              handoffRecoveryPromise,
               recoveryId,
               sseResult.lastProgressMessage,
+              tryApplyRecoveredGeneration,
             );
             if (!recovered) {
               // Keep partial project selectable for Resume.
@@ -1207,13 +1227,7 @@ export function WebsiteBuilderTool({
                   };
                   if (data.generation) {
                     const partial = toProject(data.generation);
-                    setActiveProject(partial);
-                    setProjects((items) =>
-                      [partial, ...items.filter((p) => p.id !== partial.id)].slice(
-                        0,
-                        MAX_RECENT_PROJECTS,
-                      ),
-                    );
+                    commitWorkspaceProject(partial);
                   }
                 }
               } catch {
@@ -1504,7 +1518,7 @@ export function WebsiteBuilderTool({
       ...generation,
       blueprint: project as unknown as WebsiteGeneration["blueprint"],
     });
-    setActiveProject(nextProject);
+    commitWorkspaceProject(nextProject);
     setSelectedFilePath(
       project.files.find((f) => f.path.includes("preview/"))?.path ||
         project.files[0]?.path ||
@@ -1512,9 +1526,6 @@ export function WebsiteBuilderTool({
     );
     setOutputTab("preview");
     setPreviewRevision((n) => n + 1);
-    setProjects((items) =>
-      items.map((p) => (p.id === nextProject.id ? nextProject : p)),
-    );
     toast.success(
       wb("templates.themeRedesigned", { name: payload.theme.name }),
     );
@@ -1575,7 +1586,7 @@ export function WebsiteBuilderTool({
       ...generation,
       blueprint: project as unknown as WebsiteGeneration["blueprint"],
     });
-    setActiveProject(nextProject);
+    commitWorkspaceProject(nextProject);
     setSelectedFilePath(
       project.files.find((f) => f.path.includes("preview/"))?.path ||
         project.files[0]?.path ||
@@ -1584,9 +1595,6 @@ export function WebsiteBuilderTool({
     setOutputTab("preview");
     setPreviewRevision((n) => n + 1);
     setVisualEditorDirty(false);
-    setProjects((items) =>
-      items.map((p) => (p.id === nextProject.id ? nextProject : p)),
-    );
     restoreTemplateStateFromSettings(
       project.settings as Record<string, unknown> | undefined,
       {
@@ -1604,8 +1612,9 @@ export function WebsiteBuilderTool({
   }, [activeProject?.id]);
 
   useEffect(() => {
-    const pendingId = pendingStructureTemplateApplyRef.current;
-    if (!pendingId || !activeProject?.id || isApplyingTemplate) return;
+    const rawPendingId = pendingStructureTemplateApplyRef.current;
+    if (!rawPendingId || !activeProject?.id || isApplyingTemplate) return;
+    const pendingId = resolveBuilderTemplatePackageId(rawPendingId);
     pendingStructureTemplateApplyRef.current = null;
 
     const url = new URL(window.location.href);
@@ -1624,7 +1633,8 @@ export function WebsiteBuilderTool({
   }, [activeProject?.id, isApplyingTemplate]);
 
   async function handleUseTemplate(payload: TemplateUsePayload) {
-    setSelectedTemplateId(payload.templateId);
+    const resolvedTemplateId = resolveBuilderTemplatePackageId(payload.templateId);
+    setSelectedTemplateId(resolvedTemplateId);
     setMarketplaceTemplateId(payload.marketplaceTemplateId);
     setTemplateStyle(payload.style);
     setDesignPreset(payload.designPreset);
@@ -1635,6 +1645,15 @@ export function WebsiteBuilderTool({
     setOutputTab("preview");
 
     if (activeProject?.id) {
+      const structureTemplate = getWebsiteStructureTemplate(resolvedTemplateId);
+      if (structureTemplate) {
+        const applied = await applyStructureTemplateToActiveProject({
+          templatePackageId: resolvedTemplateId,
+          label: payload.name,
+        });
+        if (applied) return;
+      }
+
       const templateIntelligenceId = resolveTemplateIntelligenceForMarketplace({
         style: payload.style,
         designPreset: payload.designPreset,
@@ -1695,19 +1714,13 @@ export function WebsiteBuilderTool({
         ...data.generation,
         blueprint: data.project as unknown as WebsiteGeneration["blueprint"],
       });
-      setActiveProject(nextProject);
+      commitWorkspaceProject(nextProject);
       setSelectedFilePath(
         data.project.files.find((f) => f.path.includes("preview/"))?.path ||
           data.project.files[0]?.path ||
           "",
       );
       setOutputTab("preview");
-      setProjects((items) =>
-        [nextProject, ...items.filter((p) => p.id !== nextProject.id)].slice(
-          0,
-          24,
-        ),
-      );
       setStreamStatus(wb("stream.editSaved"));
       toast.success(data.editResult?.summary || data.message || wb("toasts.edited"));
     } catch (error) {
@@ -1758,7 +1771,7 @@ export function WebsiteBuilderTool({
       }
 
       const copyProject = toProject(data.generation);
-      setProjects((items) => [copyProject, ...items].slice(0, MAX_RECENT_PROJECTS));
+      commitWorkspaceProject(copyProject);
       selectProject(copyProject);
       toast.success(wb("toasts.projectDuplicated"));
     } catch (error) {
@@ -1946,10 +1959,7 @@ export function WebsiteBuilderTool({
         throw new Error(json.error || "Import failed");
       }
       const imported = toProject(json.generation);
-      setProjects((items) =>
-        [imported, ...items].slice(0, MAX_RECENT_PROJECTS),
-      );
-      setActiveProject(imported);
+      commitWorkspaceProject(imported);
       toast.success("Project imported successfully");
       if (json.warnings?.length) {
         toast.message(json.warnings[0]);
@@ -2442,13 +2452,7 @@ export function WebsiteBuilderTool({
             blueprint:
               savedProject as unknown as WebsiteGeneration["blueprint"],
           });
-          setActiveProject(nextProject);
-          setProjects((items) =>
-            [nextProject, ...items.filter((p) => p.id !== nextProject.id)].slice(
-              0,
-              24,
-            ),
-          );
+          commitWorkspaceProject(nextProject);
           setPreviewRevision((n) => n + 1);
           setVisualEditorDirty(false);
           setSelectedFilePath(
@@ -2463,15 +2467,19 @@ export function WebsiteBuilderTool({
             blueprint:
               savedProject as unknown as WebsiteGeneration["blueprint"],
           });
-          setActiveProject(nextProject);
-          setProjects((items) =>
-            [nextProject, ...items.filter((p) => p.id !== nextProject.id)].slice(
-              0,
-              24,
-            ),
-          );
+          commitWorkspaceProject(nextProject);
           setPreviewRevision((n) => n + 1);
           toast.success(wb("toasts.seoFixApplied"));
+        }}
+        onReviewApplied={({ project: savedProject, generation }) => {
+          const nextProject = toProject({
+            ...generation,
+            blueprint:
+              savedProject as unknown as WebsiteGeneration["blueprint"],
+          });
+          commitWorkspaceProject(nextProject);
+          setPreviewRevision((n) => n + 1);
+          toast.success(wb("toasts.reviewImprovementApplied"));
         }}
         onIntelligenceApply={(command) => {
           if (!activeProject?.id) return;
@@ -3277,6 +3285,7 @@ function OutputWorkspace({
   onVisualEditorDirtyChange,
   onVisualEditorSaved,
   onSeoApplied,
+  onReviewApplied,
   onIntelligenceApply,
   generationStreamMessage,
   onCanvasAiCommand,
@@ -3305,6 +3314,10 @@ function OutputWorkspace({
     generation: WebsiteGeneration;
   }) => void;
   onSeoApplied: (payload: {
+    project: GeneratedWebsiteProject;
+    generation: WebsiteGeneration;
+  }) => void;
+  onReviewApplied: (payload: {
     project: GeneratedWebsiteProject;
     generation: WebsiteGeneration;
   }) => void;
@@ -3416,6 +3429,18 @@ function OutputWorkspace({
         </button>
         <button
           type="button"
+          onClick={() => onOutputTabChange("review")}
+          className={cn(
+            "rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors",
+            outputTab === "review"
+              ? "bg-violet-400/15 text-violet-300"
+              : "text-white/45 hover:text-white/75",
+          )}
+        >
+          {wb("outputTabs.reviewStudio")}
+        </button>
+        <button
+          type="button"
           onClick={() => onOutputTabChange("deploy")}
           className={cn(
             "rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors",
@@ -3470,6 +3495,14 @@ function OutputWorkspace({
             generationId={activeProject?.id ?? null}
             disabled={visualEditorDisabled}
             onApplySuggestion={onIntelligenceApply}
+          />
+        </div>
+      ) : outputTab === "review" ? (
+        <div className="min-h-[760px] overflow-y-auto">
+          <ReviewStudioPanel
+            generationId={activeProject?.id ?? null}
+            disabled={visualEditorDisabled}
+            onApplied={onReviewApplied}
           />
         </div>
       ) : outputTab === "deploy" ? (

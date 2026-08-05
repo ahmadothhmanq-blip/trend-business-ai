@@ -1,0 +1,22 @@
+[
+  "lib/site-images.ts",
+  "app/layout.tsx",
+  "components/ui/motion.tsx",
+  "app/globals.css",
+  "components/education-premium-nav.tsx",
+  "components/education-premium-hero.tsx",
+  "components/education-premium-features.tsx",
+  "components/education-premium-about.tsx",
+  "components/education-premium-stats.tsx",
+  "components/education-premium-testimonials.tsx",
+  "components/education-premium-pricing.tsx",
+  "components/education-premium-faq.tsx",
+  "components/education-premium-contact.tsx",
+  "components/education-premium-footer.tsx",
+  "components/education-premium-floating-cta.tsx",
+  "components/education-premium-utility-band.tsx",
+  "components/education-premium-section-shell.tsx",
+  "components/education-premium-portfolio.tsx",
+  "components/education-premium-integrations.tsx",
+  "app/page.tsx"
+]

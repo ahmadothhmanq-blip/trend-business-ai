@@ -1,5 +1,6 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import { resolveBuilderTemplatePackageId } from "@/lib/website/builder/resolve-builder-template-package-id";
 import { resolveWbTemplatesRoot } from "@/lib/website/template-engine/constants.server";
 import { getWbTemplateRegistry } from "@/lib/website/template-engine/registry";
 import {
@@ -92,7 +93,7 @@ export async function loadWbTemplatePackages(
 
       const pkg = await loadValidatedWbTemplatePackage(directory);
 
-      if (registry.has(pkg.manifest.id)) {
+      if (registry.hasExact(pkg.manifest.id)) {
         report.skipped += 1;
         report.errors.push({
           directory,
@@ -120,5 +121,7 @@ export async function loadWbTemplatePackageById(
   options?: WbTemplateLoaderOptions,
 ): Promise<WbTemplatePackage | null> {
   await loadWbTemplatePackages(options);
-  return getWbTemplateRegistry().getPackage(templateId);
+  return getWbTemplateRegistry().getPackage(
+    resolveBuilderTemplatePackageId(templateId),
+  );
 }

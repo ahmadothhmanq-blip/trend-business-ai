@@ -1,0 +1,51 @@
+{
+  "packageId": "corporate-business",
+  "templateIntelligenceHint": "ti-corporate-trust",
+  "layout": {
+    "defaultLayoutId": "default",
+    "regions": {
+      "header": { "role": "header", "sticky": true },
+      "main": { "role": "main" },
+      "utility": { "role": "utility" },
+      "footer": { "role": "footer" },
+      "overlay": { "role": "overlay" }
+    }
+  },
+  "navigation": {
+    "componentId": "corporate-business-nav",
+    "variant": "executive-glass"
+  },
+  "hero": {
+    "componentId": "corporate-business-hero",
+    "region": "main"
+  },
+  "footer": {
+    "componentId": "corporate-business-footer",
+    "region": "footer"
+  },
+  "homeFlow": {
+    "regions": {
+      "main": [
+        "corporate-business-hero",
+        "corporate-business-features",
+        "corporate-business-about",
+        "corporate-business-stats",
+        "corporate-business-portfolio",
+        "corporate-business-testimonials",
+        "corporate-business-pricing",
+        "corporate-business-faq",
+        "corporate-business-contact"
+      ],
+      "utility": ["corporate-business-utility-band"],
+      "overlay": ["corporate-business-floating-cta"]
+    }
+  },
+  "sectionShell": {
+    "strategy": "package",
+    "componentId": "corporate-business-section-shell"
+  },
+  "aiGeneration": {
+    "contentProfile": "corporate-business-executive",
+    "suggestedPages": ["platform", "pricing", "customers"]
+  }
+}

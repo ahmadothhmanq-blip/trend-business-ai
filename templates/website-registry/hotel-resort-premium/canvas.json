@@ -1,0 +1,71 @@
+{
+  "id": "canvas",
+  "grid": {
+    "columns": 12,
+    "gutter": "1.5rem",
+    "margin": "1.25rem",
+    "maxWidth": "90rem"
+  },
+  "spacing": {
+    "unit": "rem",
+    "scale": [
+      "0.5",
+      "1",
+      "1.5",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "8",
+      "10",
+      "12"
+    ]
+  },
+  "visualIdentity": {
+    "colors": {
+      "primary": "#0C2340",
+      "secondary": "#1A4A6E",
+      "accent": "#4A9FD4",
+      "background": "#0C2340",
+      "foreground": "#F2E8DC",
+      "muted": "rgba(242,232,220,0.58)",
+      "surface": "#0F2A4A",
+      "sand": "#F2E8DC",
+      "azure": "#4A9FD4",
+      "pearl": "#FDFBF7"
+    },
+    "typography": {
+      "display": "Cormorant Garamond, Georgia, ui-serif, serif",
+      "body": "Jost, ui-sans-serif, system-ui, sans-serif",
+      "scale": {
+        "sm": "0.8125rem",
+        "base": "1.0625rem",
+        "lg": "1.375rem",
+        "xl": "3.5rem",
+        "display": "clamp(2.875rem, 6.5vw, 5rem)"
+      }
+    },
+    "radius": {
+      "sm": "2px",
+      "md": "4px",
+      "lg": "8px"
+    },
+    "shadows": {
+      "surface": "0 32px 80px rgba(0,0,0,0.45)",
+      "glow": "0 0 100px rgba(74,159,212,0.18)"
+    },
+    "borders": {
+      "default": "rgba(242,232,220,0.1)",
+      "azure": "rgba(74,159,212,0.32)",
+      "subtle": "rgba(242,232,220,0.06)"
+    },
+    "animation": "azure-haven-reveal"
+  },
+  "designSystem": {
+    "tier": "premium",
+    "industry": "Hotel & Resort",
+    "layoutKind": "sidebar-left",
+    "templateIntelligenceId": "ti-hotel-sanctuary"
+  }
+}

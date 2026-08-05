@@ -1,0 +1,81 @@
+{
+  "components": [
+    {
+      "id": "education-premium-nav",
+      "role": "navigation",
+      "scaffold": "components/education-premium-nav.tsx",
+      "slots": ["logo", "links", "cta"]
+    },
+    {
+      "id": "education-premium-hero",
+      "role": "hero",
+      "scaffold": "components/education-premium-hero.tsx",
+      "slots": ["headline", "metrics", "cta"]
+    },
+    {
+      "id": "education-premium-features",
+      "role": "features",
+      "scaffold": "components/education-premium-features.tsx"
+    },
+    {
+      "id": "education-premium-about",
+      "role": "story",
+      "scaffold": "components/education-premium-about.tsx"
+    },
+    {
+      "id": "education-premium-stats",
+      "role": "custom",
+      "scaffold": "components/education-premium-stats.tsx"
+    },
+    {
+      "id": "education-premium-testimonials",
+      "role": "testimonials",
+      "scaffold": "components/education-premium-testimonials.tsx"
+    },
+    {
+      "id": "education-premium-pricing",
+      "role": "pricing",
+      "scaffold": "components/education-premium-pricing.tsx"
+    },
+    {
+      "id": "education-premium-faq",
+      "role": "faq",
+      "scaffold": "components/education-premium-faq.tsx"
+    },
+    {
+      "id": "education-premium-contact",
+      "role": "contact",
+      "scaffold": "components/education-premium-contact.tsx"
+    },
+    {
+      "id": "education-premium-footer",
+      "role": "footer",
+      "scaffold": "components/education-premium-footer.tsx"
+    },
+    {
+      "id": "education-premium-floating-cta",
+      "role": "cta",
+      "scaffold": "components/education-premium-floating-cta.tsx"
+    },
+    {
+      "id": "education-premium-utility-band",
+      "role": "cta",
+      "scaffold": "components/education-premium-utility-band.tsx"
+    },
+    {
+      "id": "education-premium-section-shell",
+      "role": "custom",
+      "scaffold": "components/education-premium-section-shell.tsx"
+    },
+    {
+      "id": "education-premium-portfolio",
+      "role": "custom",
+      "scaffold": "components/education-premium-portfolio.tsx"
+    },
+    {
+      "id": "education-premium-integrations",
+      "role": "custom",
+      "scaffold": "components/education-premium-integrations.tsx"
+    }
+  ]
+}

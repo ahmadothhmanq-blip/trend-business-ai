@@ -1,0 +1,81 @@
+{
+  "components": [
+    {
+      "id": "finance-premium-nav",
+      "role": "navigation",
+      "scaffold": "components/finance-premium-nav.tsx",
+      "slots": ["logo", "links", "cta"]
+    },
+    {
+      "id": "finance-premium-hero",
+      "role": "hero",
+      "scaffold": "components/finance-premium-hero.tsx",
+      "slots": ["headline", "metrics", "cta"]
+    },
+    {
+      "id": "finance-premium-features",
+      "role": "features",
+      "scaffold": "components/finance-premium-features.tsx"
+    },
+    {
+      "id": "finance-premium-about",
+      "role": "story",
+      "scaffold": "components/finance-premium-about.tsx"
+    },
+    {
+      "id": "finance-premium-stats",
+      "role": "custom",
+      "scaffold": "components/finance-premium-stats.tsx"
+    },
+    {
+      "id": "finance-premium-testimonials",
+      "role": "testimonials",
+      "scaffold": "components/finance-premium-testimonials.tsx"
+    },
+    {
+      "id": "finance-premium-pricing",
+      "role": "pricing",
+      "scaffold": "components/finance-premium-pricing.tsx"
+    },
+    {
+      "id": "finance-premium-faq",
+      "role": "faq",
+      "scaffold": "components/finance-premium-faq.tsx"
+    },
+    {
+      "id": "finance-premium-contact",
+      "role": "contact",
+      "scaffold": "components/finance-premium-contact.tsx"
+    },
+    {
+      "id": "finance-premium-footer",
+      "role": "footer",
+      "scaffold": "components/finance-premium-footer.tsx"
+    },
+    {
+      "id": "finance-premium-floating-cta",
+      "role": "cta",
+      "scaffold": "components/finance-premium-floating-cta.tsx"
+    },
+    {
+      "id": "finance-premium-utility-band",
+      "role": "cta",
+      "scaffold": "components/finance-premium-utility-band.tsx"
+    },
+    {
+      "id": "finance-premium-section-shell",
+      "role": "custom",
+      "scaffold": "components/finance-premium-section-shell.tsx"
+    },
+    {
+      "id": "finance-premium-portfolio",
+      "role": "custom",
+      "scaffold": "components/finance-premium-portfolio.tsx"
+    },
+    {
+      "id": "finance-premium-integrations",
+      "role": "custom",
+      "scaffold": "components/finance-premium-integrations.tsx"
+    }
+  ]
+}

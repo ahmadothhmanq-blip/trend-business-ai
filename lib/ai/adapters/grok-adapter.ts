@@ -8,6 +8,11 @@ import type {
 
 export class GrokAdapter implements AIProvider {
   readonly name = "grok" as const;
+  private readonly model = "grok-2";
+
+  getModelName(): string {
+    return this.model;
+  }
 
   async generateJson<T>(_request: JsonGenerationRequest): Promise<T> {
     void _request;

@@ -1,0 +1,21 @@
+▶ AWQE — AI Website Quality Engine Phase 1
+  ✔ exports constants (0.7162ms)
+  ✔ defines quality lifecycle (0.1835ms)
+  ✔ evaluates quality dimensions from master plan (4.5142ms)
+  ✔ applies quality improvements (1.2029ms)
+  ✔ runs full AWQE pipeline (1.8655ms)
+  ✔ validates website specification (0.9389ms)
+  ✔ produces improvement report with recommendations (0.6397ms)
+  ✔ produces settings patch (0.8508ms)
+  ✔ does not modify master plan input (0.7561ms)
+  ✔ is provider independent (0.7122ms)
+✔ AWQE — AI Website Quality Engine Phase 1 (13.6063ms)
+ℹ tests 10
+ℹ suites 1
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1477.2912
+npm warn Unknown env config "devdir". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.

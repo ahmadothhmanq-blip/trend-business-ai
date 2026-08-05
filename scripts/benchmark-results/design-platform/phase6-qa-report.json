@@ -1,0 +1,83 @@
+{
+  "passed": 19,
+  "total": 19,
+  "checks": [
+    {
+      "id": "wiring.phase",
+      "ok": true
+    },
+    {
+      "id": "wiring.version",
+      "ok": true
+    },
+    {
+      "id": "module.wire-generation",
+      "ok": true
+    },
+    {
+      "id": "module.wire-template",
+      "ok": true
+    },
+    {
+      "id": "module.wire-preview",
+      "ok": true
+    },
+    {
+      "id": "module.wire-design-system",
+      "ok": true
+    },
+    {
+      "id": "module.design-context-store",
+      "ok": true
+    },
+    {
+      "id": "module.validate",
+      "ok": true
+    },
+    {
+      "id": "wired.orchestrator.ts",
+      "ok": true
+    },
+    {
+      "id": "wired.apply-structure-template.ts",
+      "ok": true
+    },
+    {
+      "id": "wired.save-generation.ts",
+      "ok": true
+    },
+    {
+      "id": "wired.build-static-preview.server.ts",
+      "ok": true
+    },
+    {
+      "id": "wired.website-builder.ts",
+      "ok": true
+    },
+    {
+      "id": "wire.generation",
+      "ok": true
+    },
+    {
+      "id": "wire.template",
+      "ok": true
+    },
+    {
+      "id": "wire.validation",
+      "ok": true
+    },
+    {
+      "id": "docs.architecture",
+      "ok": true
+    },
+    {
+      "id": "tsc.wiring",
+      "ok": true
+    },
+    {
+      "id": "eslint.wiring",
+      "ok": true
+    }
+  ],
+  "failed": []
+}

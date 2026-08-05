@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en" data-v2-render="v2-files" data-v2-package="creative-agency-premium" data-v2-layout="editorial-reveal">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kinetic Atelier — Live Preview</title>
+  <style>/* Template Architecture V2 — creative-agency-premium · spec 2.0.0 */
+:root {
+  --v2-package: "creative-agency-premium";
+  --color-primary: #09090B;
+  --color-secondary: #18181B;
+  --color-accent: #E8FF47;
+  --color-background: #09090B;
+  --color-foreground: #F4F4EF;
+  --color-muted: rgba(244,244,239,0.55);
+  --color-surface: #141416;
+  --color-volt: #E8FF47;
+  --color-magenta: #FF2D6A;
+  --color-ghost: #F4F4EF;
+  --color-zinc: #71717A;
+  --font-display: Syne, ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+  --spacing-unit: 0.25rem;
+  --radius-sm: 0;
+  --radius-md: 2px;
+  --radius-lg: 4px;
+  --shadow-surface: 0 24px 80px rgba(0,0,0,0.5);
+  --shadow-glow: 0 0 120px rgba(232,255,71,0.15);
+  --shadow-volt: 0 0 60px rgba(232,255,71,0.25);
+  --border-default: rgba(244,244,239,0.12);
+  --border-volt: rgba(232,255,71,0.4);
+  --border-subtle: rgba(244,244,239,0.06);
+}
+
+/* V2 language profile — RTL typography adaptation */
+[dir="rtl"] {
+  --font-display: Alexandria, ui-serif, Georgia, serif;
+  --font-body: "Noto Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Alexandria:wght@500;600;700&family=DM+Mono:ital@0;1&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Sans+Arabic:wght@400;500;600&family=Syne:wght@500;600;700;800&display=swap");
+
+@keyframes cp-kinetic-slam {
+  from { opacity: 0; transform: translateY(48px) skewY(-2deg); }
+  to { opacity: 1; transform: translateY(0) skewY(0); }
+}
+@keyframes cp-asymmetric-rise {
+  from { opacity: 0; transform: translateX(-24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes cp-scroll-pulse {
+  0%, 100% { transform: scaleY(1); opacity: 0.6; }
+  50% { transform: scaleY(1.4); opacity: 1; }
+}
+@keyframes cp-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes cp-reveal-wipe {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cp-animate-slam, .cp-animate-rise, .cp-marquee-track, .cp-overlay-active { animation: none !important; transition: none !important; }
+}
+
+.cp-font-display { font-family: var(--font-display), "Syne", ui-sans-serif, system-ui, sans-serif; }
+.cp-font-body { font-family: var(--font-body), "Instrument Sans", ui-sans-serif, system-ui, sans-serif; }
+.cp-font-mono { font-family: var(--font-mono, "DM Mono"), ui-monospace, monospace; }
+.cp-eyebrow {
+  font-family: var(--font-mono, "DM Mono"), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-volt, #E8FF47);
+}
+.cp-display {
+  font-family: var(--font-display), "Syne", ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(3rem, 11vw, 7.5rem);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  color: var(--color-ghost, #F4F4EF);
+}
+.cp-headline {
+  font-family: var(--font-display), "Syne", ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  color: var(--color-foreground);
+}
+.cp-headline-sm {
+  font-family: var(--font-display), "Syne", ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.5rem, 3.5vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--color-foreground);
+}
+.cp-body {
+  font-family: var(--font-body), "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--color-muted, rgba(244,244,239,0.55));
+}
+.cp-btn-volt {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.875rem 1.75rem;
+  font-family: var(--font-mono, "DM Mono"), ui-monospace, monospace;
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-primary, #09090B);
+  background: var(--color-volt, #E8FF47);
+  border: 2px solid var(--color-volt, #E8FF47);
+  transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+}
+.cp-btn-volt:hover {
+  background: transparent;
+  color: var(--color-volt, #E8FF47);
+  box-shadow: var(--shadow-volt);
+}
+.cp-btn-volt:focus-visible { outline: 3px solid var(--color-volt); outline-offset: 3px; }
+.cp-link-volt {
+  text-decoration: none;
+  color: var(--color-muted);
+  transition: color 0.2s ease;
+}
+.cp-link-volt:hover { color: var(--color-volt, #E8FF47); }
+.cp-link-volt:focus-visible { outline: 2px solid var(--color-volt); outline-offset: 2px; }
+.cp-section { padding-block: clamp(4rem, 12vw, 7rem); }
+.cp-focus-ring:focus-visible { outline: 2px solid var(--color-volt); outline-offset: 3px; }
+.cp-card-tilt { transition: transform 0.4s ease, border-color 0.4s ease; }
+.cp-card-tilt:hover { transform: translateY(-4px); border-color: var(--border-volt); }
+.cp-case-row:focus-visible { outline: 2px solid var(--color-volt); outline-offset: -2px; }
+.cp-animate-slam { animation: cp-kinetic-slam 0.9s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.cp-animate-rise { animation: cp-asymmetric-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both; }
+.cp-marquee-track { animation: cp-marquee 28s linear infinite; }
+.cp-overlay-active .cp-marquee-track { animation-play-state: running; }
+.cp-overlay-active { animation: cp-reveal-wipe 1.1s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* TBDP Native Consumption — creative-agency-premium
+   sector:creative-studio · experience:creative, editorial, playful
+   identity:kinetic-atelier · context:d74b79e2016499ad
+   integration:5.0.0 · consumption:1.0.0 */
+:root {
+  --tbdp-native: 1;
+  --tbdp-native-package: "creative-agency-premium";
+  --tbdp-sector-dna: "creative-studio";
+  --tbdp-template-identity: "kinetic-atelier";
+  --tbdp-experience-primary: "creative";
+  --tbdp-context-hash: "d74b79e2016499ad";
+  --tbdp-theme-mode: "dark";
+  --tbdp-direction: "ltr";
+}
+
+/* TBDP Foundations — official design authority (scoped vars) */
+/* Trend Business AI Design Platform · 1.0.0 · foundations-1 */
+:root {
+  --tbdp-color-primary: #4D85FF;
+  --tbdp-color-secondary: #CBD5E1;
+  --tbdp-color-accent: #85ADFF;
+  --tbdp-color-success: #6EE7B7;
+  --tbdp-color-warning: #FCD34D;
+  --tbdp-color-danger: #FCA5A5;
+  --tbdp-color-info: #93C5FD;
+  --tbdp-color-surface-base: #0F172A;
+  --tbdp-color-surface-raised: #1E293B;
+  --tbdp-color-surface-overlay: #1E293B;
+  --tbdp-color-surface-sunken: #020617;
+  --tbdp-color-surface-inverse: #FFFFFF;
+  --tbdp-color-background-canvas: #020617;
+  --tbdp-color-background-subtle: #0F172A;
+  --tbdp-color-background-emphasis: #1E293B;
+  --tbdp-color-background-inverse: #FFFFFF;
+  --tbdp-color-text-primary: #F8FAFC;
+  --tbdp-color-text-secondary: #CBD5E1;
+  --tbdp-color-text-tertiary: #94A3B8;
+  --tbdp-color-text-disabled: #475569;
+  --tbdp-color-text-inverse: #0F172A;
+  --tbdp-color-text-link: #85ADFF;
+  --tbdp-color-text-linkHover: #B3CCFF;
+  --tbdp-color-border-default: #334155;
+  --tbdp-color-border-subtle: #1E293B;
+  --tbdp-color-border-strong: #475569;
+  --tbdp-color-border-focus: #4D85FF;
+  --tbdp-color-border-inverse: rgba(255, 255, 255, 0.12);
+  --tbdp-color-overlay-scrim: rgba(2, 6, 23, 0.72);
+  --tbdp-color-overlay-scrimStrong: rgba(2, 6, 23, 0.88);
+  --tbdp-color-overlay-backdrop: rgba(2, 6, 23, 0.48);
+  --tbdp-color-overlay-highlight: rgba(77, 133, 255, 0.16);
+  --tbdp-opacity-transparent: 0;
+  --tbdp-opacity-subtle: 0.04;
+  --tbdp-opacity-muted: 0.08;
+  --tbdp-opacity-soft: 0.12;
+  --tbdp-opacity-medium: 0.24;
+  --tbdp-opacity-strong: 0.48;
+  --tbdp-opacity-opaque: 1;
+  --tbdp-spacing-micro: 0.125rem;
+  --tbdp-spacing-xs: 0.25rem;
+  --tbdp-spacing-sm: 0.5rem;
+  --tbdp-spacing-md: 1rem;
+  --tbdp-spacing-lg: 1.5rem;
+  --tbdp-spacing-xl: 2rem;
+  --tbdp-spacing-2xl: 3rem;
+  --tbdp-spacing-3xl: 4rem;
+  --tbdp-spacing-4xl: 6rem;
+  --tbdp-radius-sharp: 0;
+  --tbdp-radius-sm: 0.25rem;
+  --tbdp-radius-md: 0.5rem;
+  --tbdp-radius-lg: 0.75rem;
+  --tbdp-radius-pill: 9999px;
+  --tbdp-radius-circle: 50%;
+  --tbdp-shadow-0: none;
+  --tbdp-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-2: 0 2px 8px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-3: 0 8px 24px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);
+  --tbdp-shadow-4: 0 16px 48px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.08);
+  --tbdp-shadow-5: 0 24px 64px rgba(15, 23, 42, 0.18), 0 8px 24px rgba(15, 23, 42, 0.1);
+  --tbdp-container-sm: 640px;
+  --tbdp-container-md: 768px;
+  --tbdp-container-lg: 1024px;
+  --tbdp-container-xl: 1280px;
+  --tbdp-container-2xl: 1440px;
+  --tbdp-container-full: 100%;
+  --tbdp-font-display: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --tbdp-font-body: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --tbdp-font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", monospace;
+}
+
+[data-tbdp-mode="dark"] { /* inherits :root dark build */ }
+
+/* TBDP Experience — motion, interaction, RTL, accessibility */
+/* TBDP Phase 3 — Motion System · tbdp-xp */
+
+@keyframes tbdp-xp-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes tbdp-xp-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes tbdp-xp-rise {
+  from { opacity: 0; transform: translateY(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tbdp-xp-rise-rtl {
+  from { opacity: 0; transform: translateX(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes tbdp-xp-slide-end {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-slide-start {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(calc(var(--tbdp-spacing-sm) * -1)); }
+  40%, 80% { transform: translateX(var(--tbdp-spacing-sm)); }
+}
+
+@keyframes tbdp-xp-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@keyframes tbdp-xp-lift {
+  to { transform: translateY(calc(var(--tbdp-spacing-sm) * -1)); box-shadow: var(--tbdp-shadow-2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp-motion] { animation: none !important; transition: none !important; }
+}
+
+[data-tbdp-xp-motion] { will-change: transform, opacity; }
+[data-tbdp-xp-motion="page-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="page-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="section-reveal"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-headline"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-media"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="card-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="grid-stagger"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="modal-enter"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="modal-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="drawer-slide"] { animation-name: tbdp-xp-slide-end; }
+[data-tbdp-xp-motion="toast-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="toast-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="tooltip-fade"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="scroll-reveal-up"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="stagger-children"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hover-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="focus-ring"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="success-pulse"] { animation-name: tbdp-xp-pulse; }
+[data-tbdp-xp-motion="error-shake"] { animation-name: tbdp-xp-shake; }
+
+/* TBDP Experience — interaction utilities */
+[data-tbdp-xp] { --tbdp-xp-focus: var(--tbdp-color-border-focus); }
+[data-tbdp-xp-feedback="loading"] { cursor: wait; }
+[data-tbdp-xp-feedback="error"] { border-color: var(--tbdp-color-danger); }
+[data-tbdp-xp-feedback="success"] { border-color: var(--tbdp-color-success); }
+[data-tbdp-xp-touch="true"] { min-height: var(--tbdp-spacing-2xl); min-width: var(--tbdp-spacing-2xl); }
+[data-tbdp-xp-gpu] { transform: translateZ(0); backface-visibility: hidden; }
+[data-tbdp-xp-contain] { content-visibility: auto; contain-intrinsic-size: auto 500px; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp], [data-tbdp-xp-motion] { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+/* V2 sidebar-left layout */
+.v2-layout-sidebar-left .v2-sidebar-shell { gap: 0; align-items: flex-start; }
+.v2-sidebar-rail {
+  border-inline-end: 1px solid var(--border-subtle, rgba(244,237,228,0.06));
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-inline-end: clamp(1.25rem, 3vw, 2rem);
+}
+[dir='rtl'] .v2-sidebar-rail { border-inline-end: none; border-inline-start: 1px solid var(--border-subtle, rgba(244,237,228,0.06)); }
+.v2-main-canvas > [data-v2-component] + [data-v2-component] { margin-top: 0; }
+.v2-layout-sidebar-left .v2-main-canvas { padding-inline-start: 0; }
+@media (max-width: 1023px) {
+  .v2-sidebar-rail { display: none !important; }
+}
+
+/* V2 sidebar-right layout */
+.v2-layout-sidebar-right .v2-sidebar-shell { gap: 0; align-items: flex-start; }
+.v2-layout-sidebar-right .v2-sidebar-rail {
+  border-inline-start: 1px solid var(--border-subtle, rgba(28,25,23,0.06));
+  border-inline-end: none;
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-inline-start: clamp(1.25rem, 3vw, 2rem);
+}
+[dir='rtl'] .v2-layout-sidebar-right .v2-sidebar-rail {
+  border-inline-start: none;
+  border-inline-end: 1px solid var(--border-subtle, rgba(28,25,23,0.06));
+}
+
+/* V2 full-bleed layout */
+.v2-layout-full-bleed .v2-overlay-canvas { width: 100%; }
+.v2-layout-full-bleed .v2-main-canvas { width: 100%; max-width: var(--container-max, 76rem); margin-inline: auto; }
+
+/* V2 editorial-reveal layout (creative portfolio) */
+.v2-layout-editorial-reveal .v2-main-canvas { width: 100%; }
+.v2-layout-editorial-reveal .v2-overlay-reveal { width: 100%; }
+
+:root {
+  --container-max: 100%;
+  --font-body: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: Syne, ui-sans-serif, system-ui, sans-serif;
+  --color-surface: #141416;
+  --color-foreground: #F4F4EF;
+  --color-background: #09090B;
+  --color-accent: #E8FF47;
+  --color-secondary: #18181B; --color-primary: #09090B; }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--color-background, #0f172a);
+      color: var(--color-foreground, #f8fafc);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .page { display: none; padding-bottom: 2rem; }
+    .page:target { display: block; }
+    body:not(:has(.page:target)) .page#home { display: block; }
+    img { max-width: 100%; height: auto; display: block; }
+    a { color: inherit; }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+<style id="tbdp-wiring-layer">
+/* TBDP Integration Layer — advisory token layer */
+
+/* Trend Business AI Design Platform · 1.0.0 · foundations-1 */
+:root {
+  --tbdp-color-primary: #0047E6;
+  --tbdp-color-secondary: #334155;
+  --tbdp-color-accent: #4D85FF;
+  --tbdp-color-success: #10B981;
+  --tbdp-color-warning: #F59E0B;
+  --tbdp-color-danger: #EF4444;
+  --tbdp-color-info: #3B82F6;
+  --tbdp-color-surface-base: #FFFFFF;
+  --tbdp-color-surface-raised: #F8FAFC;
+  --tbdp-color-surface-overlay: #FFFFFF;
+  --tbdp-color-surface-sunken: #F1F5F9;
+  --tbdp-color-surface-inverse: #0F172A;
+  --tbdp-color-background-canvas: #F8FAFC;
+  --tbdp-color-background-subtle: #F1F5F9;
+  --tbdp-color-background-emphasis: #FFFFFF;
+  --tbdp-color-background-inverse: #020617;
+  --tbdp-color-text-primary: #0F172A;
+  --tbdp-color-text-secondary: #475569;
+  --tbdp-color-text-tertiary: #64748B;
+  --tbdp-color-text-disabled: #94A3B8;
+  --tbdp-color-text-inverse: #FFFFFF;
+  --tbdp-color-text-link: #0047E6;
+  --tbdp-color-text-linkHover: #0038B8;
+  --tbdp-color-border-default: #E2E8F0;
+  --tbdp-color-border-subtle: #F1F5F9;
+  --tbdp-color-border-strong: #CBD5E1;
+  --tbdp-color-border-focus: #1A5CFF;
+  --tbdp-color-border-inverse: rgba(255, 255, 255, 0.16);
+  --tbdp-color-overlay-scrim: rgba(2, 6, 23, 0.4);
+  --tbdp-color-overlay-scrimStrong: rgba(2, 6, 23, 0.64);
+  --tbdp-color-overlay-backdrop: rgba(2, 6, 23, 0.24);
+  --tbdp-color-overlay-highlight: rgba(26, 92, 255, 0.12);
+  --tbdp-opacity-transparent: 0;
+  --tbdp-opacity-subtle: 0.04;
+  --tbdp-opacity-muted: 0.08;
+  --tbdp-opacity-soft: 0.12;
+  --tbdp-opacity-medium: 0.24;
+  --tbdp-opacity-strong: 0.48;
+  --tbdp-opacity-opaque: 1;
+  --tbdp-spacing-micro: 0.125rem;
+  --tbdp-spacing-xs: 0.25rem;
+  --tbdp-spacing-sm: 0.5rem;
+  --tbdp-spacing-md: 1rem;
+  --tbdp-spacing-lg: 1.5rem;
+  --tbdp-spacing-xl: 2rem;
+  --tbdp-spacing-2xl: 3rem;
+  --tbdp-spacing-3xl: 4rem;
+  --tbdp-spacing-4xl: 6rem;
+  --tbdp-radius-sharp: 0;
+  --tbdp-radius-sm: 0.25rem;
+  --tbdp-radius-md: 0.5rem;
+  --tbdp-radius-lg: 0.75rem;
+  --tbdp-radius-pill: 9999px;
+  --tbdp-radius-circle: 50%;
+  --tbdp-shadow-0: none;
+  --tbdp-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-2: 0 2px 8px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-3: 0 8px 24px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);
+  --tbdp-shadow-4: 0 16px 48px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.08);
+  --tbdp-shadow-5: 0 24px 64px rgba(15, 23, 42, 0.18), 0 8px 24px rgba(15, 23, 42, 0.1);
+  --tbdp-container-sm: 640px;
+  --tbdp-container-md: 768px;
+  --tbdp-container-lg: 1024px;
+  --tbdp-container-xl: 1280px;
+  --tbdp-container-2xl: 1440px;
+  --tbdp-container-full: 100%;
+  --tbdp-font-display: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --tbdp-font-body: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --tbdp-font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", monospace;
+}
+
+/* TBDP Phase 3 — Motion System · tbdp-xp */
+
+@keyframes tbdp-xp-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes tbdp-xp-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes tbdp-xp-rise {
+  from { opacity: 0; transform: translateY(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tbdp-xp-rise-rtl {
+  from { opacity: 0; transform: translateX(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes tbdp-xp-slide-end {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-slide-start {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(calc(var(--tbdp-spacing-sm) * -1)); }
+  40%, 80% { transform: translateX(var(--tbdp-spacing-sm)); }
+}
+
+@keyframes tbdp-xp-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@keyframes tbdp-xp-lift {
+  to { transform: translateY(calc(var(--tbdp-spacing-sm) * -1)); box-shadow: var(--tbdp-shadow-2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp-motion] { animation: none !important; transition: none !important; }
+}
+
+[data-tbdp-xp-motion] { will-change: transform, opacity; }
+[data-tbdp-xp-motion="page-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="page-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="section-reveal"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-headline"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-media"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="card-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="grid-stagger"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="modal-enter"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="modal-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="drawer-slide"] { animation-name: tbdp-xp-slide-end; }
+[data-tbdp-xp-motion="toast-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="toast-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="tooltip-fade"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="scroll-reveal-up"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="stagger-children"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hover-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="focus-ring"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="success-pulse"] { animation-name: tbdp-xp-pulse; }
+[data-tbdp-xp-motion="error-shake"] { animation-name: tbdp-xp-shake; }
+
+/* TBDP Experience — interaction utilities */
+[data-tbdp-xp] { --tbdp-xp-focus: var(--tbdp-color-border-focus); }
+[data-tbdp-xp-feedback="loading"] { cursor: wait; }
+[data-tbdp-xp-feedback="error"] { border-color: var(--tbdp-color-danger); }
+[data-tbdp-xp-feedback="success"] { border-color: var(--tbdp-color-success); }
+[data-tbdp-xp-touch="true"] { min-height: var(--tbdp-spacing-2xl); min-width: var(--tbdp-spacing-2xl); }
+[data-tbdp-xp-gpu] { transform: translateZ(0); backface-visibility: hidden; }
+[data-tbdp-xp-contain] { content-visibility: auto; contain-intrinsic-size: auto 500px; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp], [data-tbdp-xp-motion] { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+  <div class="page" id="home">
+    <link rel="preload" as="image" href="https://images.unsplash.com/photo-1558655146-364adaf1fcc9?auto=format&amp;fit=crop&amp;w=1920&amp;q=85" fetchPriority="high"/><link rel="preload" as="image" href="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&amp;fit=crop&amp;w=1600&amp;q=82"/><div class="flex min-h-screen flex-col bg-[var(--color-background)] text-[var(--color-foreground)] antialiased v2-template v2-creative-agency-premium v2-layout-editorial-reveal" data-v2-package="creative-agency-premium" data-v2-composer="region-grid" data-v2-layout="editorial-reveal"><header data-v2-region="header"><header data-v2-component="creative-agency-premium-nav" class="sticky top-0 z-50 border-b transition-all duration-500 border-transparent bg-transparent"><div class="flex h-16 items-center justify-between gap-4 px-5 sm:px-8 lg:h-[4.5rem]"><a href="#top" class="cp-font-display cp-focus-ring group flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-[var(--color-ghost)]"><span class="inline-block h-2 w-2 bg-[var(--color-volt)] transition-transform group-hover:scale-125" aria-hidden="true"></span>Kinetic Atelier</a><nav aria-label="Primary" class="hidden items-center gap-10 lg:flex"><a href="#work" class="cp-font-mono cp-focus-ring text-xs uppercase tracking-[0.18em] text-[var(--color-muted)] transition hover:text-[var(--color-volt)]" style="transition-delay:0ms"><span class="text-[var(--color-zinc)]" aria-hidden="true">01</span> Work</a><a href="#studio" class="cp-font-mono cp-focus-ring text-xs uppercase tracking-[0.18em] text-[var(--color-muted)] transition hover:text-[var(--color-volt)]" style="transition-delay:30ms"><span class="text-[var(--color-zinc)]" aria-hidden="true">02</span> Studio</a><a href="#process" class="cp-font-mono cp-focus-ring text-xs uppercase tracking-[0.18em] text-[var(--color-muted)] transition hover:text-[var(--color-volt)]" style="transition-delay:60ms"><span class="text-[var(--color-zinc)]" aria-hidden="true">03</span> Process</a><a href="#contact" class="cp-font-mono cp-focus-ring text-xs uppercase tracking-[0.18em] text-[var(--color-muted)] transition hover:text-[var(--color-volt)]" style="transition-delay:90ms"><span class="text-[var(--color-zinc)]" aria-hidden="true">04</span> Contact</a></nav><div class="flex items-center gap-3"><a href="#contact" class="cp-btn-volt hidden sm:inline-flex">Get started</a><button type="button" aria-expanded="false" aria-controls="cp-mobile-nav" aria-label="Open menu" class="cp-focus-ring inline-flex h-11 w-11 items-center justify-center border border-[var(--border-default)] lg:hidden"><span class="sr-only">Menu</span><span aria-hidden="true" class="cp-font-mono text-lg text-[var(--color-volt)]">≡</span></button></div></div></header></header><main data-v2-region="main" class="v2-main-canvas flex flex-col"><h1 class="sr-only text-4xl font-bold">Kinetic Atelier</h1><section id="top" data-v2-component="creative-agency-premium-hero" aria-labelledby="cp-hero-title" class="relative min-h-[92vh] overflow-hidden border-b border-[var(--border-subtle)]"><img src="https://images.unsplash.com/photo-1558655146-364adaf1fcc9?auto=format&amp;fit=crop&amp;w=1920&amp;q=85" alt="Creative agency studio — collaborative design environment" class="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-[0.18]" fetchPriority="high"/><div class="pointer-events-none absolute -end-24 top-1/4 h-[28rem] w-[28rem] rounded-full bg-[var(--color-magenta)]/10 blur-[120px]" aria-hidden="true"></div><div class="pointer-events-none absolute -start-16 bottom-0 h-64 w-64 bg-[var(--color-volt)]/8 blur-[80px]" aria-hidden="true"></div><div class="relative flex min-h-[92vh] flex-col justify-between px-5 py-16 sm:px-8 lg:py-24"><div class="flex flex-wrap items-center justify-between gap-4"><p class="cp-eyebrow motion-safe:cp-animate-slam">Elite creative studio</p><p class="cp-font-mono hidden text-[0.6875rem] uppercase tracking-[0.25em] text-[var(--color-zinc)] sm:block">Design · Motion · Brand · Digital</p></div><div class="my-auto py-12 lg:py-20"><h1 id="cp-hero-title" class="cp-display max-w-[14ch] leading-[0.92] motion-safe:cp-animate-slam"><span class="inline-block" style="animation-delay:0ms">We </span><span class="inline-block" style="animation-delay:60ms">craft </span><span class="inline-block text-[var(--color-volt)]" style="animation-delay:120ms">worlds </span><span class="inline-block" style="animation-delay:180ms">that </span><span class="inline-block italic text-[var(--color-magenta)]" style="animation-delay:240ms">refuse </span><span class="inline-block" style="animation-delay:300ms">to </span><span class="inline-block text-[var(--color-volt)]" style="animation-delay:360ms">be </span><span class="inline-block" style="animation-delay:420ms">ignored </span></h1><p class="cp-body mt-8 max-w-xl motion-safe:cp-animate-rise">Award-winning creative agency for brand and digital</p></div><div class="flex items-end justify-between gap-6 border-t border-[var(--border-subtle)] pt-8"><a href="#work" class="cp-font-mono cp-focus-ring group flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-[var(--color-muted)]"><span class="inline-block h-8 w-px bg-[var(--color-volt)] motion-safe:animate-[cp-scroll-pulse_2s_ease-in-out_infinite]" aria-hidden="true"></span>Scroll to explore</a><span class="cp-font-mono text-[4rem] font-bold leading-none text-[var(--color-surface)] sm:text-[6rem]" aria-hidden="true">✦</span></div></div></section><section id="work" data-v2-component="creative-agency-premium-selected-work" aria-labelledby="cp-work-title" class="cp-section border-b border-[var(--border-subtle)]"><div class="px-5 sm:px-8"><header class="mb-12 flex flex-col gap-4 lg:mb-16 lg:flex-row lg:items-end lg:justify-between"><div><p class="cp-eyebrow">Selected work</p><h2 id="cp-work-title" class="cp-headline mt-4 max-w-lg">Cases that move culture forward</h2></div><a href="/work" class="cp-link-volt cp-font-mono text-xs uppercase tracking-widest">View all projects →</a></header><ul class="divide-y divide-[var(--border-subtle)]"><li><a href="#case-01" class="cp-case-row group grid gap-6 py-8 transition-colors hover:bg-[var(--color-surface)]/50 lg:grid-cols-[4rem_1fr_12rem_6rem] lg:items-center lg:gap-8 lg:py-10"><span class="cp-font-mono text-sm text-[var(--color-volt)]">01</span><div><h3 class="cp-font-display text-2xl font-bold uppercase tracking-tight transition group-hover:text-[var(--color-volt)] lg:text-3xl">Monolith Residences</h3><p class="cp-font-mono mt-1 text-xs uppercase tracking-widest text-[var(--color-zinc)]">Architecture · Brand</p></div><div class="relative aspect-[16/10] overflow-hidden border border-[var(--border-default)] lg:aspect-[4/3]"><img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="" class="h-full w-full object-cover transition duration-700 group-hover:scale-105"/></div><span class="cp-font-mono text-end text-sm text-[var(--color-muted)]">2025</span></a></li><li><a href="#case-02" class="cp-case-row group grid gap-6 py-8 transition-colors hover:bg-[var(--color-surface)]/50 lg:grid-cols-[4rem_1fr_12rem_6rem] lg:items-center lg:gap-8 lg:py-10"><span class="cp-font-mono text-sm text-[var(--color-volt)]">02</span><div><h3 class="cp-font-display text-2xl font-bold uppercase tracking-tight transition group-hover:text-[var(--color-volt)] lg:text-3xl">Pulse Festival</h3><p class="cp-font-mono mt-1 text-xs uppercase tracking-widest text-[var(--color-zinc)]">Motion · Experience</p></div><div class="relative aspect-[16/10] overflow-hidden border border-[var(--border-default)] lg:aspect-[4/3]"><img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="" class="h-full w-full object-cover transition duration-700 group-hover:scale-105"/></div><span class="cp-font-mono text-end text-sm text-[var(--color-muted)]">2025</span></a></li><li><a href="#case-03" class="cp-case-row group grid gap-6 py-8 transition-colors hover:bg-[var(--color-surface)]/50 lg:grid-cols-[4rem_1fr_12rem_6rem] lg:items-center lg:gap-8 lg:py-10"><span class="cp-font-mono text-sm text-[var(--color-volt)]">03</span><div><h3 class="cp-font-display text-2xl font-bold uppercase tracking-tight transition group-hover:text-[var(--color-volt)] lg:text-3xl">Forma Type Foundry</h3><p class="cp-font-mono mt-1 text-xs uppercase tracking-widest text-[var(--color-zinc)]">Identity · Digital</p></div><div class="relative aspect-[16/10] overflow-hidden border border-[var(--border-default)] lg:aspect-[4/3]"><img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="" class="h-full w-full object-cover transition duration-700 group-hover:scale-105"/></div><span class="cp-font-mono text-end text-sm text-[var(--color-muted)]">2024</span></a></li></ul></div></section><section data-v2-component="creative-agency-premium-case-grid" aria-labelledby="cp-grid-title" class="cp-section"><div class="px-5 sm:px-8"><header class="mb-10"><p class="cp-eyebrow">Archive</p><h2 id="cp-grid-title" class="cp-headline-sm mt-3">Asymmetric case studies</h2></header><div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-12 lg:gap-4"><article id="case-a" class="cp-card-tilt group relative min-h-[16rem] overflow-hidden border border-[var(--border-default)] lg:col-span-7 lg:row-span-2"><img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="" class="absolute inset-0 h-full w-full object-cover opacity-60 transition duration-700 group-hover:scale-105 group-hover:opacity-80"/><div class="absolute inset-0 bg-gradient-to-t from-[var(--color-background)] via-transparent to-transparent"></div><div class="relative flex h-full min-h-[16rem] flex-col justify-end p-6"><span class="cp-font-mono text-xs text-[var(--color-volt)]" aria-hidden="true">—</span><h3 class="cp-font-display mt-2 text-xl font-bold uppercase tracking-tight lg:text-2xl">Void Gallery</h3></div></article><article id="case-b" class="cp-card-tilt group relative min-h-[16rem] overflow-hidden border border-[var(--border-default)] lg:col-span-5"><img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="" class="absolute inset-0 h-full w-full object-cover opacity-60 transition duration-700 group-hover:scale-105 group-hover:opacity-80"/><div class="absolute inset-0 bg-gradient-to-t from-[var(--color-background)] via-transparent to-transparent"></div><div class="relative flex h-full min-h-[16rem] flex-col justify-end p-6"><span class="cp-font-mono text-xs text-[var(--color-volt)]" aria-hidden="true">—</span><h3 class="cp-font-display mt-2 text-xl font-bold uppercase tracking-tight lg:text-2xl">Neon District</h3></div></article><article id="case-c" class="cp-card-tilt group relative min-h-[16rem] overflow-hidden border border-[var(--border-default)] lg:col-span-5"><img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="" class="absolute inset-0 h-full w-full object-cover opacity-60 transition duration-700 group-hover:scale-105 group-hover:opacity-80"/><div class="absolute inset-0 bg-gradient-to-t from-[var(--color-background)] via-transparent to-transparent"></div><div class="relative flex h-full min-h-[16rem] flex-col justify-end p-6"><span class="cp-font-mono text-xs text-[var(--color-volt)]" aria-hidden="true">—</span><h3 class="cp-font-display mt-2 text-xl font-bold uppercase tracking-tight lg:text-2xl">Silent Type</h3></div></article><article id="case-d" class="cp-card-tilt group relative min-h-[16rem] overflow-hidden border border-[var(--border-default)] lg:col-span-7"><img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="" class="absolute inset-0 h-full w-full object-cover opacity-60 transition duration-700 group-hover:scale-105 group-hover:opacity-80"/><div class="absolute inset-0 bg-gradient-to-t from-[var(--color-background)] via-transparent to-transparent"></div><div class="relative flex h-full min-h-[16rem] flex-col justify-end p-6"><span class="cp-font-mono text-xs text-[var(--color-volt)]" aria-hidden="true">—</span><h3 class="cp-font-display mt-2 text-xl font-bold uppercase tracking-tight lg:text-2xl">Apex Records</h3></div></article><article id="case-e" class="cp-card-tilt group relative min-h-[16rem] overflow-hidden border border-[var(--border-default)] lg:col-span-12"><img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="" class="absolute inset-0 h-full w-full object-cover opacity-60 transition duration-700 group-hover:scale-105 group-hover:opacity-80"/><div class="absolute inset-0 bg-gradient-to-t from-[var(--color-background)] via-transparent to-transparent"></div><div class="relative flex h-full min-h-[16rem] flex-col justify-end p-6"><span class="cp-font-mono text-xs text-[var(--color-volt)]" aria-hidden="true">—</span><h3 class="cp-font-display mt-2 text-xl font-bold uppercase tracking-tight lg:text-2xl">Lumen Labs</h3></div></article></div></div></section><section id="studio" data-v2-component="creative-agency-premium-manifesto" aria-labelledby="cp-manifesto-title" class="cp-section border-y border-[var(--border-subtle)] bg-[var(--color-surface)]"><div class="grid gap-12 px-5 sm:px-8 lg:grid-cols-2 lg:gap-20"><div><p class="cp-eyebrow">Studio manifesto</p><blockquote id="cp-manifesto-title" class="cp-font-display mt-6 text-3xl font-bold leading-[1.1] tracking-tight sm:text-4xl lg:text-5xl"><span class="text-[var(--color-volt)]" aria-hidden="true">“</span>We don&#x27;t decorate brands. We architect belief systems.<span class="text-[var(--color-magenta)]" aria-hidden="true">”</span></blockquote></div><div class="flex flex-col justify-between gap-10"><p class="cp-body max-w-md">Kinetic Atelier is a collective of designers, architects, and motion artists who treat every commission as cultural infrastructure. Our work lives at the intersection of radical craft and commercial impact.</p><dl class="grid grid-cols-3 gap-4 border-t border-[var(--border-default)] pt-8"><div><dt class="sr-only">47 Awards</dt><dd class="cp-font-mono text-xs uppercase tracking-widest text-[var(--color-volt)]">47 Awards</dd></div><div><dt class="sr-only">12 Countries</dt><dd class="cp-font-mono text-xs uppercase tracking-widest text-[var(--color-volt)]">12 Countries</dd></div><div><dt class="sr-only">Since 2011</dt><dd class="cp-font-mono text-xs uppercase tracking-widest text-[var(--color-volt)]">Since 2011</dd></div></dl></div></div></section><section data-v2-component="creative-agency-premium-capabilities" aria-labelledby="cp-cap-title" class="cp-section"><div class="px-5 sm:px-8"><header class="mb-12"><p class="cp-eyebrow">Capabilities</p><h2 id="cp-cap-title" class="cp-headline-sm mt-3">What we build</h2></header><div class="grid gap-px border border-[var(--border-default)] bg-[var(--border-default)] sm:grid-cols-2"><article class="group bg-[var(--color-background)] p-8 transition hover:bg-[var(--color-surface)] lg:p-10"><span class="cp-font-mono text-[0.6875rem] uppercase tracking-[0.2em] text-[var(--color-volt)]">Identity</span><h3 class="cp-font-display mt-4 text-xl font-bold uppercase tracking-tight lg:text-2xl">Brand Systems</h3><p class="cp-body mt-3 text-sm">Identity architectures that scale across every touchpoint — from signage to motion.</p></article><article class="group bg-[var(--color-background)] p-8 transition hover:bg-[var(--color-surface)] lg:p-10" style="transform:translateY(0.5rem)"><span class="cp-font-mono text-[0.6875rem] uppercase tracking-[0.2em] text-[var(--color-volt)]">Space</span><h3 class="cp-font-display mt-4 text-xl font-bold uppercase tracking-tight lg:text-2xl">Spatial Design</h3><p class="cp-body mt-3 text-sm">Exhibition, retail, and architectural experiences with narrative depth.</p></article><article class="group bg-[var(--color-background)] p-8 transition hover:bg-[var(--color-surface)] lg:p-10"><span class="cp-font-mono text-[0.6875rem] uppercase tracking-[0.2em] text-[var(--color-volt)]">Motion</span><h3 class="cp-font-display mt-4 text-xl font-bold uppercase tracking-tight lg:text-2xl">Motion &amp; Film</h3><p class="cp-body mt-3 text-sm">Kinetic storytelling for campaigns, festivals, and product launches.</p></article><article class="group bg-[var(--color-background)] p-8 transition hover:bg-[var(--color-surface)] lg:p-10" style="transform:translateY(0.5rem)"><span class="cp-font-mono text-[0.6875rem] uppercase tracking-[0.2em] text-[var(--color-volt)]">Digital</span><h3 class="cp-font-display mt-4 text-xl font-bold uppercase tracking-tight lg:text-2xl">Digital Products</h3><p class="cp-body mt-3 text-sm">Interfaces and platforms built with the same rigor as physical craft.</p></article></div></div></section><section id="process" data-v2-component="creative-agency-premium-process" aria-labelledby="cp-process-title" class="cp-section border-t border-[var(--border-subtle)]"><div class="px-5 sm:px-8"><header class="mb-12 lg:mb-16"><p class="cp-eyebrow">Process</p><h2 id="cp-process-title" class="cp-headline-sm mt-3">How we move</h2></header><ol class="grid gap-0 border-t border-[var(--border-default)] lg:grid-cols-4"><li class="border-b border-[var(--border-default)] p-8 lg:border-b-0 lg:border-e lg:last:border-e-0"><span class="cp-font-mono text-4xl font-bold text-[var(--color-surface)] lg:text-5xl">01</span><h3 class="cp-font-display mt-4 text-lg font-bold uppercase tracking-tight">Immersion</h3><p class="cp-body mt-3 text-sm">Deep discovery — culture, constraints, and the story only insiders know.</p><span class="cp-font-mono mt-6 hidden text-[var(--color-volt)] lg:inline" aria-hidden="true">→</span></li><li class="border-b border-[var(--border-default)] p-8 lg:border-b-0 lg:border-e lg:last:border-e-0"><span class="cp-font-mono text-4xl font-bold text-[var(--color-surface)] lg:text-5xl">02</span><h3 class="cp-font-display mt-4 text-lg font-bold uppercase tracking-tight">Provocation</h3><p class="cp-body mt-3 text-sm">Bold concepts that challenge assumptions before a single pixel is placed.</p><span class="cp-font-mono mt-6 hidden text-[var(--color-volt)] lg:inline" aria-hidden="true">→</span></li><li class="border-b border-[var(--border-default)] p-8 lg:border-b-0 lg:border-e lg:last:border-e-0"><span class="cp-font-mono text-4xl font-bold text-[var(--color-surface)] lg:text-5xl">03</span><h3 class="cp-font-display mt-4 text-lg font-bold uppercase tracking-tight">Craft</h3><p class="cp-body mt-3 text-sm">Relentless refinement across every medium until the work feels inevitable.</p><span class="cp-font-mono mt-6 hidden text-[var(--color-volt)] lg:inline" aria-hidden="true">→</span></li><li class="border-b border-[var(--border-default)] p-8 lg:border-b-0 lg:border-e lg:last:border-e-0"><span class="cp-font-mono text-4xl font-bold text-[var(--color-surface)] lg:text-5xl">04</span><h3 class="cp-font-display mt-4 text-lg font-bold uppercase tracking-tight">Launch</h3><p class="cp-body mt-3 text-sm">Orchestrated rollout with motion, documentation, and cultural momentum.</p></li></ol></div></section><section id="contact" data-v2-component="creative-agency-premium-collaborate-cta" aria-labelledby="cp-cta-title" class="cp-section relative overflow-hidden"><div class="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,var(--color-volt)_0%,transparent_40%)] opacity-[0.07]" aria-hidden="true"></div><div class="relative px-5 sm:px-8"><div class="border border-[var(--border-volt)] bg-[var(--color-surface)] p-10 lg:p-16"><p class="cp-eyebrow">Collaborate</p><h2 id="cp-cta-title" class="cp-headline mt-4 max-w-2xl">Let&#x27;s build something unforgettable</h2><p class="cp-body mt-4 max-w-lg">We partner with ambitious studios, brands, and institutions ready to invest in work that lasts.</p><div class="mt-10 flex flex-wrap items-center gap-6"><a href="mailto:hello@kineticatelier.studio" class="cp-btn-volt">Start a conversation</a><a href="mailto:hello@kineticatelier.studio" class="cp-font-mono cp-link-volt text-xs uppercase tracking-widest">hello@kineticatelier.studio</a></div></div></div></section></main><div data-v2-region="overlay" class="v2-overlay-reveal"><section data-v2-component="creative-agency-premium-overlay-showcase" aria-label="Studio showcase" class="relative min-h-[50vh] overflow-hidden border-t border-[var(--border-volt)] bg-[var(--color-background)] py-16 lg:min-h-[60vh] lg:py-24 "><div class="absolute inset-0 opacity-30" aria-hidden="true"><div class="cp-marquee-track flex whitespace-nowrap"><span class="cp-font-display mx-8 text-[clamp(3rem,12vw,8rem)] font-bold uppercase tracking-tighter text-[var(--color-surface)]">Brand Systems<span class="mx-8 text-[var(--color-volt)]">✦</span></span><span class="cp-font-display mx-8 text-[clamp(3rem,12vw,8rem)] font-bold uppercase tracking-tighter text-[var(--color-surface)]">Spatial Design<span class="mx-8 text-[var(--color-volt)]">✦</span></span><span class="cp-font-display mx-8 text-[clamp(3rem,12vw,8rem)] font-bold uppercase tracking-tighter text-[var(--color-surface)]">Motion &amp; Film<span class="mx-8 text-[var(--color-volt)]">✦</span></span><span class="cp-font-display mx-8 text-[clamp(3rem,12vw,8rem)] font-bold uppercase tracking-tighter text-[var(--color-surface)]">Digital Products<span class="mx-8 text-[var(--color-volt)]">✦</span></span><span class="cp-font-display mx-8 text-[clamp(3rem,12vw,8rem)] font-bold uppercase tracking-tighter text-[var(--color-surface)]">Cultural Strategy<span class="mx-8 text-[var(--color-volt)]">✦</span></span><span class="cp-font-display mx-8 text-[clamp(3rem,12vw,8rem)] font-bold uppercase tracking-tighter text-[var(--color-surface)]">Art Direction<span class="mx-8 text-[var(--color-volt)]">✦</span></span><span class="cp-font-display mx-8 text-[clamp(3rem,12vw,8rem)] font-bold uppercase tracking-tighter text-[var(--color-surface)]">Brand Systems<span class="mx-8 text-[var(--color-volt)]">✦</span></span><span class="cp-font-display mx-8 text-[clamp(3rem,12vw,8rem)] font-bold uppercase tracking-tighter text-[var(--color-surface)]">Spatial Design<span class="mx-8 text-[var(--color-volt)]">✦</span></span><span class="cp-font-display mx-8 text-[clamp(3rem,12vw,8rem)] font-bold uppercase tracking-tighter text-[var(--color-surface)]">Motion &amp; Film<span class="mx-8 text-[var(--color-volt)]">✦</span></span><span class="cp-font-display mx-8 text-[clamp(3rem,12vw,8rem)] font-bold uppercase tracking-tighter text-[var(--color-surface)]">Digital Products<span class="mx-8 text-[var(--color-volt)]">✦</span></span><span class="cp-font-display mx-8 text-[clamp(3rem,12vw,8rem)] font-bold uppercase tracking-tighter text-[var(--color-surface)]">Cultural Strategy<span class="mx-8 text-[var(--color-volt)]">✦</span></span><span class="cp-font-display mx-8 text-[clamp(3rem,12vw,8rem)] font-bold uppercase tracking-tighter text-[var(--color-surface)]">Art Direction<span class="mx-8 text-[var(--color-volt)]">✦</span></span></div></div><div class="relative px-5 sm:px-8"><div class="mx-auto max-w-3xl text-center"><p class="cp-font-mono text-xs uppercase tracking-[0.3em] text-[var(--color-volt)]">Post-scroll kinetic showcase — our disciplines in perpetual drift</p><h2 class="cp-font-display mt-6 text-4xl font-bold uppercase tracking-tight sm:text-5xl lg:text-6xl">Culture in motion</h2><div class="mt-10 flex flex-wrap justify-center gap-3"><span class="border border-[var(--border-default)] px-4 py-2 cp-font-mono text-[0.6875rem] uppercase tracking-widest text-[var(--color-muted)]">Brand Systems</span><span class="border border-[var(--border-default)] px-4 py-2 cp-font-mono text-[0.6875rem] uppercase tracking-widest text-[var(--color-muted)]">Spatial Design</span><span class="border border-[var(--border-default)] px-4 py-2 cp-font-mono text-[0.6875rem] uppercase tracking-widest text-[var(--color-muted)]">Motion &amp; Film</span><span class="border border-[var(--border-default)] px-4 py-2 cp-font-mono text-[0.6875rem] uppercase tracking-widest text-[var(--color-muted)]">Digital Products</span></div></div></div></section></div><footer data-v2-region="footer"><footer data-v2-component="creative-agency-premium-footer" class="border-t border-[var(--border-default)] bg-[var(--color-background)]" role="contentinfo"><div class="px-5 py-14 sm:px-8 lg:py-20"><div class="grid gap-12 lg:grid-cols-[1.5fr_1fr_1fr]"><div><p class="cp-font-display text-2xl font-bold uppercase tracking-tight">Kinetic Atelier</p><p class="cp-font-mono mt-2 text-xs uppercase tracking-widest text-[var(--color-zinc)]">Elite creative studio</p></div><nav aria-label="Footer"><p class="cp-eyebrow">Navigate</p><ul class="mt-4 space-y-2"><li><a href="#work" class="cp-link-volt cp-font-mono text-xs uppercase tracking-widest">Work</a></li><li><a href="#studio" class="cp-link-volt cp-font-mono text-xs uppercase tracking-widest">Studio</a></li><li><a href="#process" class="cp-link-volt cp-font-mono text-xs uppercase tracking-widest">Process</a></li><li><a href="#contact" class="cp-link-volt cp-font-mono text-xs uppercase tracking-widest">Contact</a></li></ul></nav><nav aria-label="Social"><p class="cp-eyebrow">Connect</p><ul class="mt-4 space-y-2"><li><a href="https://instagram.com" class="cp-link-volt cp-font-mono text-xs uppercase tracking-widest" rel="noopener noreferrer" target="_blank">Instagram</a></li><li><a href="https://behance.net" class="cp-link-volt cp-font-mono text-xs uppercase tracking-widest" rel="noopener noreferrer" target="_blank">Behance</a></li><li><a href="https://linkedin.com" class="cp-link-volt cp-font-mono text-xs uppercase tracking-widest" rel="noopener noreferrer" target="_blank">LinkedIn</a></li></ul></nav></div><p class="cp-font-mono mt-12 border-t border-[var(--border-subtle)] pt-6 text-[0.6875rem] uppercase tracking-widest text-[var(--color-zinc)]">© 2026 Kinetic Atelier. Crafted with intention.</p></div></footer></footer></div>
+  </div>
+  
+</body>
+</html>

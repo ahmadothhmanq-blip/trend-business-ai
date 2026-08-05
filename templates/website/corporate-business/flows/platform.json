@@ -1,0 +1,7 @@
+{
+  "pageId": "platform",
+  "layoutId": "default",
+  "regions": {
+    "main": ["corporate-business-hero", "corporate-business-features", "corporate-business-integrations"]
+  }
+}

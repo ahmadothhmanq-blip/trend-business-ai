@@ -1,0 +1,67 @@
+{
+  "id": "canvas",
+  "grid": {
+    "columns": 12,
+    "gutter": "1.25rem",
+    "margin": "0",
+    "maxWidth": "100%"
+  },
+  "spacing": {
+    "unit": "rem",
+    "scale": [
+      "0.5",
+      "1",
+      "1.5",
+      "2.5",
+      "4",
+      "6",
+      "9",
+      "14"
+    ]
+  },
+  "visualIdentity": {
+    "colors": {
+      "primary": "#09090B",
+      "secondary": "#18181B",
+      "accent": "#E8FF47",
+      "background": "#09090B",
+      "foreground": "#F4F4EF",
+      "muted": "rgba(244,244,239,0.55)",
+      "surface": "#141416",
+      "volt": "#E8FF47",
+      "magenta": "#FF2D6A"
+    },
+    "typography": {
+      "display": "Syne, ui-sans-serif, system-ui, sans-serif",
+      "body": "Instrument Sans, ui-sans-serif, system-ui, sans-serif",
+      "mono": "DM Mono, ui-monospace, monospace",
+      "scale": {
+        "sm": "0.8125rem",
+        "base": "1rem",
+        "lg": "1.375rem",
+        "xl": "4rem"
+      }
+    },
+    "radius": {
+      "sm": "0",
+      "md": "2px",
+      "lg": "4px"
+    },
+    "shadows": {
+      "surface": "0 24px 80px rgba(0,0,0,0.5)",
+      "glow": "0 0 120px rgba(232,255,71,0.15)",
+      "volt": "0 0 60px rgba(232,255,71,0.25)"
+    },
+    "borders": {
+      "default": "rgba(244,244,239,0.12)",
+      "volt": "rgba(232,255,71,0.4)"
+    },
+    "animation": "kinetic-spring-stagger"
+  },
+  "designSystem": {
+    "tier": "premium",
+    "industry": "Creative Agency",
+    "layoutKind": "editorial-reveal",
+    "templateIntelligenceId": "ti-creative-studio"
+  }
+}

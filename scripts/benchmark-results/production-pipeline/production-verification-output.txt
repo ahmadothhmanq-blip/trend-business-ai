@@ -1,0 +1,59 @@
+▶ Production Website Generation Pipeline
+  ✔ is disabled by default (0.9036ms)
+  ✔ enables with WB_PRODUCTION_PIPELINE=1 (0.2245ms)
+  ✔ runs full planning phase with validation and AWQE (12.393ms)
+  ✔ stops on invalid master plan input (0.4627ms)
+  ✔ AWQE produces valid website specification from master plan (1.2682ms)
+✔ Production Website Generation Pipeline (16.1822ms)
+ℹ tests 5
+ℹ suites 1
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1398.2969
+npm warn Unknown env config "devdir". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+▶ Master Plan + Website Builder integration
+  ✔ is disabled by default (0.9175ms)
+  ✔ enables with WB_MASTER_PLAN=1 (0.2223ms)
+  ✔ wires master plan into builder lifecycle (8.5843ms)
+  ✔ validates master plan before generation (0.8267ms)
+  ✔ builds copy-only content tasks (0.911ms)
+  ✔ bridges master plan to legacy website plan (1.0751ms)
+  ✔ builds locked TBGE spec from master plan (0.8099ms)
+  ✔ maps brief with master plan metadata patch (1.3693ms)
+  ✔ validates export requirements (0.2673ms)
+✔ Master Plan + Website Builder integration (16.1369ms)
+ℹ tests 9
+ℹ suites 1
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1359.1861
+npm warn Unknown env config "devdir". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+▶ AWQE — AI Website Quality Engine Phase 1
+  ✔ exports constants (0.8007ms)
+  ✔ defines quality lifecycle (0.2848ms)
+  ✔ evaluates quality dimensions from master plan (4.4497ms)
+  ✔ applies quality improvements (0.9812ms)
+  ✔ runs full AWQE pipeline (1.7302ms)
+  ✔ validates website specification (1.0418ms)
+  ✔ produces improvement report with recommendations (1.2074ms)
+  ✔ produces settings patch (1.0452ms)
+  ✔ does not modify master plan input (0.6202ms)
+  ✔ is provider independent (0.5606ms)
+✔ AWQE — AI Website Quality Engine Phase 1 (14.053ms)
+ℹ tests 10
+ℹ suites 1
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1374.6131
+npm warn Unknown env config "devdir". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.

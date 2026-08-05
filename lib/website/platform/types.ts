@@ -22,6 +22,8 @@ export type WebsiteMutationOperation =
   | "website.manage"
   | "website.manage.cms"
   | "website.seo.apply"
+  | "website.review.apply"
+  | "website.review.rollback"
   | "website.generation.save";
 
 export type WebsiteCommitInput = {

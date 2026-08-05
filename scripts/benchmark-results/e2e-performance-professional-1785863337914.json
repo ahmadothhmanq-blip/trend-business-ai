@@ -1,0 +1,771 @@
+{
+  "runId": "wb-mseww5e0",
+  "profile": "professional",
+  "promptChars": 132,
+  "serverStartedAt": 1785863290822,
+  "serverWallMs": 47089,
+  "stages": [
+    {
+      "id": "browser-request",
+      "label": "Browser request",
+      "startMs": 0,
+      "endMs": 0,
+      "durationMs": 0,
+      "sharePercent": 0,
+      "source": "server"
+    },
+    {
+      "id": "api-route",
+      "label": "API route (auth, validation, stream open)",
+      "startMs": 0,
+      "endMs": 1410,
+      "durationMs": 1410,
+      "sharePercent": 3,
+      "source": "server"
+    },
+    {
+      "id": "stream-initialization",
+      "label": "Stream initialization + session",
+      "startMs": 1410,
+      "endMs": 2122,
+      "durationMs": 712,
+      "sharePercent": 1.5,
+      "source": "server"
+    },
+    {
+      "id": "ai-core",
+      "label": "AI Core (layerRunner total)",
+      "startMs": 2122,
+      "endMs": 47640,
+      "durationMs": 45518,
+      "sharePercent": 96.7,
+      "source": "server"
+    },
+    {
+      "id": "pre",
+      "label": "PRE / Planning & Reasoning Engine",
+      "startMs": 47640,
+      "endMs": 47640,
+      "durationMs": 0,
+      "sharePercent": 0,
+      "source": "server"
+    },
+    {
+      "id": "template-selection",
+      "label": "Template selection",
+      "startMs": 47640,
+      "endMs": 47640,
+      "durationMs": 0,
+      "sharePercent": 0,
+      "source": "server"
+    },
+    {
+      "id": "business-analysis",
+      "label": "Business analysis",
+      "startMs": 47640,
+      "endMs": 47640,
+      "durationMs": 0,
+      "sharePercent": 0,
+      "source": "server"
+    },
+    {
+      "id": "strategy",
+      "label": "Strategy",
+      "startMs": 47640,
+      "endMs": 47640,
+      "durationMs": 0,
+      "sharePercent": 0,
+      "source": "server"
+    },
+    {
+      "id": "brand",
+      "label": "Brand generation",
+      "startMs": 47640,
+      "endMs": 47640,
+      "durationMs": 0,
+      "sharePercent": 0,
+      "source": "server"
+    },
+    {
+      "id": "design-system",
+      "label": "Design system",
+      "startMs": 47640,
+      "endMs": 47640,
+      "durationMs": 0,
+      "sharePercent": 0,
+      "source": "server"
+    },
+    {
+      "id": "assets",
+      "label": "Assets",
+      "startMs": 47640,
+      "endMs": 47640,
+      "durationMs": 0,
+      "sharePercent": 0,
+      "source": "server"
+    },
+    {
+      "id": "page-planning",
+      "label": "Page planning",
+      "startMs": 47640,
+      "endMs": 47640,
+      "durationMs": 0,
+      "sharePercent": 0,
+      "source": "server"
+    },
+    {
+      "id": "file-generation",
+      "label": "File generation",
+      "startMs": 47640,
+      "endMs": 47640,
+      "durationMs": 0,
+      "sharePercent": 0,
+      "source": "server"
+    },
+    {
+      "id": "validation",
+      "label": "Validation / quality",
+      "startMs": 47640,
+      "endMs": 47640,
+      "durationMs": 0,
+      "sharePercent": 0,
+      "source": "server"
+    },
+    {
+      "id": "finalization",
+      "label": "Finalization",
+      "startMs": 47640,
+      "endMs": 47640,
+      "durationMs": 0,
+      "sharePercent": 0,
+      "source": "server"
+    },
+    {
+      "id": "supabase-writes",
+      "label": "Supabase writes (persist + checkpoints)",
+      "startMs": 47640,
+      "endMs": 50733,
+      "durationMs": 3093,
+      "sharePercent": 6.6,
+      "source": "server"
+    },
+    {
+      "id": "streaming-updates",
+      "label": "Streaming updates (SSE)",
+      "startMs": 50733,
+      "endMs": 97106,
+      "durationMs": 46373,
+      "sharePercent": 98.5,
+      "source": "server"
+    },
+    {
+      "id": "api-response",
+      "label": "API response (complete event)",
+      "startMs": 97106,
+      "endMs": 97106,
+      "durationMs": 0,
+      "sharePercent": 0,
+      "source": "server"
+    },
+    {
+      "id": "ui-rendering",
+      "label": "UI rendering complete",
+      "startMs": 97106,
+      "endMs": 97106,
+      "durationMs": 0,
+      "sharePercent": 0,
+      "source": "server"
+    }
+  ],
+  "sseEvents": [
+    {
+      "event": "session",
+      "atMs": 716,
+      "bytes": 185,
+      "generationId": "83df03ea-d51b-4d3f-80b3-486e90c157a6"
+    },
+    {
+      "event": "progress",
+      "atMs": 716,
+      "bytes": 102,
+      "generationId": "83df03ea-d51b-4d3f-80b3-486e90c157a6"
+    },
+    {
+      "event": "progress",
+      "atMs": 718,
+      "bytes": 93,
+      "generationId": "83df03ea-d51b-4d3f-80b3-486e90c157a6"
+    },
+    {
+      "event": "progress",
+      "atMs": 719,
+      "bytes": 109,
+      "generationId": "83df03ea-d51b-4d3f-80b3-486e90c157a6"
+    },
+    {
+      "event": "progress",
+      "atMs": 720,
+      "bytes": 107,
+      "generationId": "83df03ea-d51b-4d3f-80b3-486e90c157a6"
+    },
+    {
+      "event": "progress",
+      "atMs": 720,
+      "bytes": 83,
+      "generationId": "83df03ea-d51b-4d3f-80b3-486e90c157a6"
+    },
+    {
+      "event": "progress",
+      "atMs": 721,
+      "bytes": 92,
+      "generationId": "83df03ea-d51b-4d3f-80b3-486e90c157a6"
+    },
+    {
+      "event": "progress",
+      "atMs": 721,
+      "bytes": 98,
+      "generationId": "83df03ea-d51b-4d3f-80b3-486e90c157a6"
+    },
+    {
+      "event": "progress",
+      "atMs": 45142,
+      "bytes": 86,
+      "generationId": "83df03ea-d51b-4d3f-80b3-486e90c157a6"
+    },
+    {
+      "event": "progress",
+      "atMs": 45143,
+      "bytes": 85,
+      "generationId": "83df03ea-d51b-4d3f-80b3-486e90c157a6"
+    },
+    {
+      "event": "progress",
+      "atMs": 45144,
+      "bytes": 103,
+      "generationId": "83df03ea-d51b-4d3f-80b3-486e90c157a6"
+    },
+    {
+      "event": "progress",
+      "atMs": 45144,
+      "bytes": 103,
+      "generationId": "83df03ea-d51b-4d3f-80b3-486e90c157a6"
+    },
+    {
+      "event": "progress",
+      "atMs": 45145,
+      "bytes": 103,
+      "generationId": "83df03ea-d51b-4d3f-80b3-486e90c157a6"
+    },
+    {
+      "event": "progress",
+      "atMs": 45147,
+      "bytes": 103,
+      "generationId": "83df03ea-d51b-4d3f-80b3-486e90c157a6"
+    },
+    {
+      "event": "progress",
+      "atMs": 45148,
+      "bytes": 103,
+      "generationId": "83df03ea-d51b-4d3f-80b3-486e90c157a6"
+    },
+    {
+      "event": "progress",
+      "atMs": 45148,
+      "bytes": 103,
+      "generationId": "83df03ea-d51b-4d3f-80b3-486e90c157a6"
+    },
+    {
+      "event": "progress",
+      "atMs": 45148,
+      "bytes": 84,
+      "generationId": "83df03ea-d51b-4d3f-80b3-486e90c157a6"
+    },
+    {
+      "event": "progress",
+      "atMs": 45149,
+      "bytes": 82,
+      "generationId": "83df03ea-d51b-4d3f-80b3-486e90c157a6"
+    },
+    {
+      "event": "progress",
+      "atMs": 45149,
+      "bytes": 85,
+      "generationId": "83df03ea-d51b-4d3f-80b3-486e90c157a6"
+    },
+    {
+      "event": "progress",
+      "atMs": 45149,
+      "bytes": 84,
+      "generationId": "83df03ea-d51b-4d3f-80b3-486e90c157a6"
+    },
+    {
+      "event": "progress",
+      "atMs": 45150,
+      "bytes": 101,
+      "generationId": "83df03ea-d51b-4d3f-80b3-486e90c157a6"
+    },
+    {
+      "event": "progress",
+      "atMs": 45151,
+      "bytes": 110,
+      "generationId": "83df03ea-d51b-4d3f-80b3-486e90c157a6"
+    },
+    {
+      "event": "progress",
+      "atMs": 46234,
+      "bytes": 107,
+      "generationId": "83df03ea-d51b-4d3f-80b3-486e90c157a6"
+    },
+    {
+      "event": "progress",
+      "atMs": 46235,
+      "bytes": 94,
+      "generationId": "83df03ea-d51b-4d3f-80b3-486e90c157a6"
+    },
+    {
+      "event": "progress",
+      "atMs": 46236,
+      "bytes": 95,
+      "generationId": "83df03ea-d51b-4d3f-80b3-486e90c157a6"
+    },
+    {
+      "event": "complete",
+      "atMs": 47089,
+      "bytes": 12557,
+      "generationId": "83df03ea-d51b-4d3f-80b3-486e90c157a6"
+    }
+  ],
+  "retries": [],
+  "pipelineReport": {
+    "totalGenerationMs": 47088,
+    "measuredWallMs": 47088,
+    "unaccountedMs": 43995,
+    "stageTimings": [
+      {
+        "category": "supabase",
+        "label": "checkpointWebsiteGeneration",
+        "totalMs": 1531,
+        "count": 3,
+        "avgMs": 510,
+        "sharePercent": 3.3
+      },
+      {
+        "category": "supabase",
+        "label": "persistWebsiteGeneration",
+        "totalMs": 851,
+        "count": 1,
+        "avgMs": 851,
+        "sharePercent": 1.8
+      },
+      {
+        "category": "supabase",
+        "label": "beginWebsiteGenerationSession",
+        "totalMs": 711,
+        "count": 1,
+        "avgMs": 711,
+        "sharePercent": 1.5
+      }
+    ],
+    "categoryTotals": [
+      {
+        "category": "supabase",
+        "totalMs": 3093,
+        "sharePercent": 6.6
+      }
+    ],
+    "slowestFunctions": [
+      {
+        "category": "supabase",
+        "label": "persistWebsiteGeneration",
+        "durationMs": 851,
+        "meta": {
+          "fileCount": 10
+        }
+      },
+      {
+        "category": "supabase",
+        "label": "beginWebsiteGenerationSession",
+        "durationMs": 711
+      },
+      {
+        "category": "supabase",
+        "label": "checkpointWebsiteGeneration",
+        "durationMs": 569,
+        "meta": {
+          "fileCount": 0
+        }
+      },
+      {
+        "category": "supabase",
+        "label": "checkpointWebsiteGeneration",
+        "durationMs": 520,
+        "meta": {
+          "fileCount": 10
+        }
+      },
+      {
+        "category": "supabase",
+        "label": "checkpointWebsiteGeneration",
+        "durationMs": 442,
+        "meta": {
+          "fileCount": 0
+        }
+      }
+    ],
+    "duplicateExecutions": [
+      {
+        "label": "supabase::checkpointWebsiteGeneration",
+        "count": 3,
+        "totalMs": 1531
+      }
+    ],
+    "llmCalls": [],
+    "llmByStage": {},
+    "supabaseOperations": [
+      {
+        "category": "supabase",
+        "label": "persistWebsiteGeneration",
+        "durationMs": 851,
+        "meta": {
+          "fileCount": 10
+        }
+      },
+      {
+        "category": "supabase",
+        "label": "beginWebsiteGenerationSession",
+        "durationMs": 711
+      },
+      {
+        "category": "supabase",
+        "label": "checkpointWebsiteGeneration",
+        "durationMs": 569,
+        "meta": {
+          "fileCount": 0
+        }
+      },
+      {
+        "category": "supabase",
+        "label": "checkpointWebsiteGeneration",
+        "durationMs": 520,
+        "meta": {
+          "fileCount": 10
+        }
+      },
+      {
+        "category": "supabase",
+        "label": "checkpointWebsiteGeneration",
+        "durationMs": 442,
+        "meta": {
+          "fileCount": 0
+        }
+      }
+    ],
+    "fileSystemOperations": [],
+    "memorySnapshots": [],
+    "sequentialParallelAnalysis": [],
+    "bottlenecks": {
+      "ai": [],
+      "database": [
+        {
+          "category": "supabase",
+          "label": "persistWebsiteGeneration",
+          "durationMs": 851,
+          "meta": {
+            "fileCount": 10
+          }
+        },
+        {
+          "category": "supabase",
+          "label": "beginWebsiteGenerationSession",
+          "durationMs": 711
+        },
+        {
+          "category": "supabase",
+          "label": "checkpointWebsiteGeneration",
+          "durationMs": 569,
+          "meta": {
+            "fileCount": 0
+          }
+        },
+        {
+          "category": "supabase",
+          "label": "checkpointWebsiteGeneration",
+          "durationMs": 520,
+          "meta": {
+            "fileCount": 10
+          }
+        },
+        {
+          "category": "supabase",
+          "label": "checkpointWebsiteGeneration",
+          "durationMs": 442,
+          "meta": {
+            "fileCount": 0
+          }
+        }
+      ],
+      "filesystem": []
+    },
+    "recommendations": [
+      {
+        "priority": 1,
+        "impact": "high",
+        "title": "Supabase checkpoint/persist overhead",
+        "detail": "Measured Supabase operations: 3093ms across 5 calls. Stream checkpoints every 4s add write amplification during generation."
+      },
+      {
+        "priority": 2,
+        "impact": "medium",
+        "title": "Significant untracked time",
+        "detail": "43995ms (93%) is unaccounted — likely JSON parsing, prompt assembly, or network latency between instrumented boundaries."
+      }
+    ]
+  },
+  "llmCalls": [],
+  "supabaseOperations": [
+    {
+      "category": "supabase",
+      "label": "persistWebsiteGeneration",
+      "durationMs": 851,
+      "meta": {
+        "fileCount": 10
+      }
+    },
+    {
+      "category": "supabase",
+      "label": "beginWebsiteGenerationSession",
+      "durationMs": 711
+    },
+    {
+      "category": "supabase",
+      "label": "checkpointWebsiteGeneration",
+      "durationMs": 569,
+      "meta": {
+        "fileCount": 0
+      }
+    },
+    {
+      "category": "supabase",
+      "label": "checkpointWebsiteGeneration",
+      "durationMs": 520,
+      "meta": {
+        "fileCount": 10
+      }
+    },
+    {
+      "category": "supabase",
+      "label": "checkpointWebsiteGeneration",
+      "durationMs": 442,
+      "meta": {
+        "fileCount": 0
+      }
+    }
+  ],
+  "duplicateExecutions": [
+    {
+      "label": "supabase::checkpointWebsiteGeneration",
+      "count": 3,
+      "totalMs": 1531
+    }
+  ],
+  "anomalies": [
+    "Repeated operation: `supabase::checkpointWebsiteGeneration` ×3 (1531ms)",
+    "Untracked server time: 43995ms (JSON parse, prompt build, network gaps)",
+    "24 SSE progress events — client re-renders on each message"
+  ],
+  "recommendations": [
+    {
+      "stage": "Streaming updates (SSE)",
+      "durationMs": 46373,
+      "sharePercent": 98.5,
+      "recommendation": "Throttle client preview bumps (already 4s in UI)"
+    },
+    {
+      "stage": "AI Core (layerRunner total)",
+      "durationMs": 45518,
+      "sharePercent": 96.7,
+      "recommendation": "Monitor — no optimization applied in this profiling pass"
+    },
+    {
+      "stage": "Supabase writes (persist + checkpoints)",
+      "durationMs": 3093,
+      "sharePercent": 6.6,
+      "recommendation": "Reduce checkpoint frequency; batch writes"
+    },
+    {
+      "stage": "API route (auth, validation, stream open)",
+      "durationMs": 1410,
+      "sharePercent": 3,
+      "recommendation": "Auth + rate limit + parent context load — cache user settings"
+    },
+    {
+      "stage": "Stream initialization + session",
+      "durationMs": 712,
+      "sharePercent": 1.5,
+      "recommendation": "Monitor — no optimization applied in this profiling pass"
+    }
+  ],
+  "clientWallMs": 48887,
+  "clientStages": {
+    "browser-request": 2519,
+    "ui-rendering": 0
+  },
+  "clientSseEvents": [
+    {
+      "event": "session",
+      "atMs": 2526,
+      "bytes": 185
+    },
+    {
+      "event": "progress",
+      "atMs": 2526,
+      "bytes": 102
+    },
+    {
+      "event": "progress",
+      "atMs": 2526,
+      "bytes": 93
+    },
+    {
+      "event": "progress",
+      "atMs": 2526,
+      "bytes": 109
+    },
+    {
+      "event": "progress",
+      "atMs": 2526,
+      "bytes": 107
+    },
+    {
+      "event": "progress",
+      "atMs": 2526,
+      "bytes": 83
+    },
+    {
+      "event": "progress",
+      "atMs": 2526,
+      "bytes": 92
+    },
+    {
+      "event": "progress",
+      "atMs": 2526,
+      "bytes": 98
+    },
+    {
+      "event": "ping",
+      "atMs": 11802,
+      "bytes": 19
+    },
+    {
+      "event": "ping",
+      "atMs": 21803,
+      "bytes": 19
+    },
+    {
+      "event": "ping",
+      "atMs": 31803,
+      "bytes": 19
+    },
+    {
+      "event": "ping",
+      "atMs": 41804,
+      "bytes": 19
+    },
+    {
+      "event": "progress",
+      "atMs": 46948,
+      "bytes": 86
+    },
+    {
+      "event": "progress",
+      "atMs": 46949,
+      "bytes": 85
+    },
+    {
+      "event": "progress",
+      "atMs": 46949,
+      "bytes": 103
+    },
+    {
+      "event": "progress",
+      "atMs": 46949,
+      "bytes": 103
+    },
+    {
+      "event": "progress",
+      "atMs": 46949,
+      "bytes": 103
+    },
+    {
+      "event": "progress",
+      "atMs": 46949,
+      "bytes": 103
+    },
+    {
+      "event": "progress",
+      "atMs": 46949,
+      "bytes": 103
+    },
+    {
+      "event": "progress",
+      "atMs": 46949,
+      "bytes": 103
+    },
+    {
+      "event": "progress",
+      "atMs": 46949,
+      "bytes": 84
+    },
+    {
+      "event": "progress",
+      "atMs": 46949,
+      "bytes": 82
+    },
+    {
+      "event": "progress",
+      "atMs": 46949,
+      "bytes": 85
+    },
+    {
+      "event": "progress",
+      "atMs": 46949,
+      "bytes": 84
+    },
+    {
+      "event": "progress",
+      "atMs": 46949,
+      "bytes": 101
+    },
+    {
+      "event": "progress",
+      "atMs": 46949,
+      "bytes": 110
+    },
+    {
+      "event": "progress",
+      "atMs": 48036,
+      "bytes": 107
+    },
+    {
+      "event": "progress",
+      "atMs": 48036,
+      "bytes": 94
+    },
+    {
+      "event": "progress",
+      "atMs": 48036,
+      "bytes": 95
+    },
+    {
+      "event": "complete",
+      "atMs": 48887,
+      "bytes": 12659
+    }
+  ],
+  "timings": {
+    "clickToHeadersMs": 2519,
+    "clickToStreamEndMs": 48887,
+    "clickToUiCompleteMs": 48887,
+    "fetchDurationMs": 48887
+  }
+}

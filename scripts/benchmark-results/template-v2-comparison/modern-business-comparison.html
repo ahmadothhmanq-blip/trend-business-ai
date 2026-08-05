@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Corporate Command</title>
+<style>
+/* Template Visual Preset — ti-corporate-trust · Phase 3 Premium */
+:root {
+  --ti-btn-radius: 0.375rem;
+  --ti-btn-weight: 700;
+  --ti-section-y: 5rem;
+  --ti-section-y-mobile: 3.5rem;
+  --ti-container-max: 74rem;
+  --ti-stack: 1.35rem;
+  --ti-header-variant: solid;
+  --ti-footer-variant: multi-column;
+  --ti-section-layout: grid;
+  --ti-card-radius: 1.25rem;
+  --ti-hero-variant: corporate-trust;
+  --ti-ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
+  --ti-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ti-glass-bg: color-mix(in srgb, #F4F7FB 72%, transparent);
+  --ti-glass-border: color-mix(in srgb, #0B1F3A 10%, transparent);
+  --ti-gradient-hero: linear-gradient(135deg, color-mix(in srgb, #0B1F3A 88%, #000) 0%, color-mix(in srgb, #1D4ED8 42%, #F4F7FB) 55%, #F4F7FB 100%);
+  --ti-gradient-accent: linear-gradient(90deg, #1D4ED8, color-mix(in srgb, #1E3A5F 80%, #1D4ED8));
+  --ti-shadow-premium: 0 24px 64px color-mix(in srgb, #0B1F3A 18%, transparent);
+  --ti-shadow-lift: 0 12px 32px color-mix(in srgb, #0B1F3A 12%, transparent);
+}
+.ti-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: #1D4ED8;
+  color: #111111;
+  border: none;
+  border-radius: var(--ti-btn-radius);
+  font-weight: var(--ti-btn-weight);
+  
+  padding: 0.85rem 1.5rem;
+  text-decoration: none;
+  transition: transform 0.35s var(--ti-ease-premium), box-shadow 0.35s var(--ti-ease-premium), background 0.35s var(--ti-ease-premium);
+  box-shadow: 0 1px 2px color-mix(in srgb, #0B1F3A 8%, transparent);
+}
+.ti-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--ti-shadow-lift);
+}
+.ti-btn-primary:active {
+  transform: translateY(0);
+}
+.ti-site-header {
+  background: #F4F7FB;
+  border-bottom: 1px solid color-mix(in srgb, #0B1F3A 12%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.ti-card {
+  border-radius: var(--ti-card-radius);
+  border: 1px solid color-mix(in srgb, #0B1F3A 12%, transparent);
+  box-shadow: none;
+  background: var(--color-surface);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transition: transform 0.45s var(--ti-ease-premium), box-shadow 0.45s var(--ti-ease-premium);
+}
+.ti-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--ti-shadow-premium);
+}
+.ti-section {
+  padding-block: var(--ti-section-y-mobile);
+  max-width: var(--ti-container-max);
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 4vw, 2rem);
+}
+@media (min-width: 768px) {
+  .ti-section { padding-block: var(--ti-section-y); }
+}
+.ti-hero-premium {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.ti-hero-premium::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--ti-gradient-hero);
+  opacity: 0.92;
+  z-index: 0;
+}
+.ti-hero-premium > * {
+  position: relative;
+  z-index: 1;
+}
+.ti-glass-panel {
+  background: var(--ti-glass-bg);
+  border: 1px solid var(--ti-glass-border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: var(--ti-card-radius);
+}
+.ti-gradient-text {
+  background: var(--ti-gradient-accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+@keyframes ti-fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes ti-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes ti-reveal {
+  from { opacity: 0; transform: translateY(32px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.ti-animate-in {
+  animation: fadeUp 0.75s cubic-bezier(0.22,1,0.36,1);
+  animation-fill-mode: both;
+}
+.ti-stagger > * {
+  animation: ti-fade-up 0.75s var(--ti-ease-premium) both;
+}
+.ti-stagger > *:nth-child(2) { animation-delay: 0.08s; }
+.ti-stagger > *:nth-child(3) { animation-delay: 0.16s; }
+.ti-stagger > *:nth-child(4) { animation-delay: 0.24s; }
+@media (prefers-reduced-motion: reduce) {
+  .ti-animate-in, .ti-stagger > * { animation: none; }
+  .ti-card:hover, .ti-btn-primary:hover { transform: none; }
+}
+@media (max-width: 767px) {
+  .ti-btn-primary { min-height: 44px; padding-inline: 1.25rem; }
+}
+/* Template Intelligence — ti-corporate-trust · Corporate */
+:root {
+  --ti-template: "ti-corporate-trust";
+  --ti-category: "Corporate";
+  --ti-animation: "fade-up";
+}
+</style>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+<div data-template="modern-business" data-architecture="v1">
+<pre style="font:12px monospace;padding:8px;background:#f5f5f5">Architecture: v1 | Components: ThemeCorporateNav, ThemeCorporateHero, ThemeCorporateTrust, ThemeCorporateServices</pre>
+<div id="preview-root">
+
+
+
+
+
+
+
+
+
+
+export const metadata: Metadata = {
+  title: "Comparison Corp",
+  description: "Template comparison QA",
+};
+
+</div>
+</body>
+</html>

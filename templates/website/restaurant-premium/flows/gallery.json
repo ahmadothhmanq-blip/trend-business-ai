@@ -1,0 +1,10 @@
+{
+  "pageId": "gallery",
+  "layoutId": "default",
+  "regions": {
+    "header": ["restaurant-premium-nav"],
+    "sidebar": ["restaurant-premium-sidebar-rail"],
+    "main": ["restaurant-premium-gallery", "restaurant-premium-atmosphere"],
+    "footer": ["restaurant-premium-footer"]
+  }
+}

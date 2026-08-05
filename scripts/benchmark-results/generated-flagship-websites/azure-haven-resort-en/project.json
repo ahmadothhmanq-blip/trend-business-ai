@@ -1,0 +1,9 @@
+{
+  "slug": "azure-haven-resort-en",
+  "packageId": "hotel-resort-premium",
+  "title": "Azure Haven Resort",
+  "language": "English",
+  "hasV2": true,
+  "componentCount": 16,
+  "source": "structure-template"
+}

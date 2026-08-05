@@ -1,0 +1,20 @@
+{
+  "tbdpNative": true,
+  "sectorDnaId": "creative-studio",
+  "experienceProfiles": ["creative", "editorial", "playful"],
+  "structure": {
+    "regions": {
+      "header": { "sticky": true, "position": "top" },
+      "overlay": { "collapseBelow": "sm" },
+      "main": { "collapseBelow": "sm" }
+    },
+    "components": {
+      "creative-agency-premium-hero": {
+        "layout": { "lg": "kinetic-split", "sm": "stacked" }
+      },
+      "creative-agency-premium-case-grid": {
+        "layout": { "lg": "asymmetric-masonry", "sm": "stacked" }
+      }
+    }
+  }
+}

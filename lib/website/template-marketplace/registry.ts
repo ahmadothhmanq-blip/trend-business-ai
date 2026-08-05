@@ -19,8 +19,16 @@ import {
 } from "@/lib/website/template-engine/index.server";
 
 const FEATURED_INSTALLED_RANKS: Record<string, number> = {
-  "modern-business": 1,
-  "ai-startup-signal": 2,
+  "corporate-business": 1,
+  "saas-enterprise": 2,
+  "restaurant-premium": 3,
+  "ai-startup-signal": 4,
+  "real-estate-prestige": 5,
+  "medical-premium": 6,
+  "creative-portfolio": 7,
+  "ecommerce-premium": 4,
+  "modern-business": 8,
+  "restaurant-signature": 9,
 };
 
 /**

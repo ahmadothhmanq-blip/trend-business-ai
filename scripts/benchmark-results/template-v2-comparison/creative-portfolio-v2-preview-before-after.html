@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Creative Portfolio — V2 Before/After</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 0; background: #09090B; color: #F4F4EF; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #333; min-height: 100vh; }
+  .panel { background: #111; padding: 1rem; overflow: auto; }
+  h2 { margin: 0 0 0.75rem; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.12em; }
+  .bad { color: #f87171; }
+  .good { color: #E8FF47; }
+  iframe { width: 100%; height: 70vh; border: 1px solid #333; background: #fff; }
+  pre { font-size: 0.75rem; color: #aaa; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<div class="grid">
+  <div class="panel">
+    <h2 class="bad">Before (V1 ThemeCreative fallback)</h2>
+    <pre>ThemeCreativeNav, ThemeCreativeHero
+Generic creative theme — no package components
+No editorial-reveal layout (main → overlay)
+No cp-* design system</pre>
+  </div>
+  <div class="panel">
+    <h2 class="good">After (Kinetic Atelier V2 rebuild)</h2>
+    <pre>Palette: #09090B void / #E8FF47 volt / #FF2D6A magenta
+Typography: Syne + Instrument Sans + DM Mono (WCAG AA)
+Layout: editorial-reveal 4-region (main then overlay showcase)
+11 independent CreativePortfolio* components</pre>
+    <iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot; data-v2-render=&quot;v2-files&quot; data-v2-package=&quot;creative-portfolio&quot; data-v2-layout=&quot;editorial-reveal&quot;>
+<head>
+  <meta charset=&quot;utf-8&quot; />
+  <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot; />
+  <title>Kinetic Atelier — Live Preview</title>
+  <style>/* Template Architecture V2 — creative-portfolio · spec 2.0.0 */
+:root {
+  --v2-package: &quot;creative-portfolio&quot;;
+  --color-primary: #09090B;
+  --color-secondary: #18181B;
+  --color-accent: #E8FF47;
+  --color-background: #09090B;
+  --color-foreground: #F4F4EF;
+  --color-muted: rgba(244,244,239,0.55);
+  --color-surface: #141416;
+  --color-volt: #E8FF47;
+  --color-magenta: #FF2D6A;
+  --color-ghost: #F4F4EF;
+  --color-zinc: #71717A;
+  --font-display: Syne, ui-sans-serif, system-ui, sans-serif;
+  --font-body: &quot;Instrument Sans&quot;, ui-sans-serif, system-ui, sans-serif;
+  --spacing-unit: 0.25rem;
+  --radius-sm: 0;
+  --radius-md: 2px;
+  --radius-lg: 4px;
+  --shadow-surface: 0 24px 80px rgba(0,0,0,0.5);
+  --shadow-glow: 0 0 120px rgba(232,255,71,0.15);
+  --shadow-volt: 0 0 60px rgba(232,255,71,0.25);
+  --border-default: rgba(244,244,239,0.12);
+  --border-volt: rgba(232,255,71,0.4);
+  --border-subtle: rgba(244,244,239,0.06);
+}
+
+/* V2 language profile — RTL typography adaptation */
+[dir=&quot;rtl&quot;] {
+  --font-display: Alexandria, ui-serif, Georgia, serif;
+  --font-body: &quot;Noto Sans Arabic&quot;, ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+@import url(&quot;https://fonts.googleapis.com/css2?family=Alexandria:wght@500;600;700&family=DM+Mono:ital@0;1&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Sans+Arabic:wght@400;500;600&family=Syne:wght@500;600;700;800&display=swap&quot;);
+
+@keyframes cp-kinetic-slam {
+  from { opacity: 0; transform: translateY(48px) skewY(-2deg); }
+  to { opacity: 1; transform: translateY(0) skewY(0); }
+}
+@keyframes cp-asymmetric-rise {
+  from { opacity: 0; transform: translateX(-24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes cp-scroll-pulse {
+  0%, 100% { transform: scaleY(1); opacity: 0.6; }
+  50% { transform: scaleY(1.4); opacity: 1; }
+}
+@keyframes cp-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes cp-reveal-wipe {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cp-animate-slam, .cp-animate-rise, .cp-marquee-track, .cp-overlay-active { animation: none !important; transition: none !important; }
+}
+
+.cp-font-display { font-family: var(--font-display), &quot;Syne&quot;, ui-sans-serif, system-ui, sans-serif; }
+.cp-font-body { font-family: var(--font-body), &quot;Instrument Sans&quot;, ui-sans-serif, system-ui, sans-serif; }
+.cp-font-mono { font-family: var(--font-mono, &quot;DM Mono&quot;), ui-monospace, monospace; }
+.cp-eyebrow {
+  font-family: var(--font-mono, &quot;DM Mono&quot;), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-volt, #E8FF47);
+}
+.cp-display {
+  font-family: var(--font-display), &quot;Syne&quot;, ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(3rem, 11vw, 7.5rem);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  color: var(--color-ghost, #F4F4EF);
+}
+.cp-headline {
+  font-family: var(--font-display), &quot;Syne&quot;, ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  color: var(--color-foreground);
+}
+.cp-headline-sm {
+  font-family: var(--font-display), &quot;Syne&quot;, ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.5rem, 3.5vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--color-foreground);
+}
+.cp-body {
+  font-family: var(--font-body), &quot;Instrument Sans&quot;, ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--color-muted, rgba(244,244,239,0.55));
+}
+.cp-btn-volt {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.875rem 1.75rem;
+  font-family: var(--font-mono, &quot;DM Mono&quot;), ui-monospace, monospace;
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-primary, #09090B);
+  background: var(--color-volt, #E8FF47);
+  border: 2px solid var(--color-volt, #E8FF47);
+  transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+}
+.cp-btn-volt:hover {
+  background: transparent;
+  color: var(--color-volt, #E8FF47);
+  box-shadow: var(--shadow-volt);
+}
+.cp-btn-volt:focus-visible { outline: 3px solid var(--color-volt); outline-offset: 3px; }
+.cp-link-volt {
+  text-decoration: none;
+  color: var(--color-muted);
+  transition: color 0.2s ease;
+}
+.cp-link-volt:hover { color: var(--color-volt, #E8FF47); }
+.cp-link-volt:focus-visible { outline: 2px solid var(--color-volt); outline-offset: 2px; }
+.cp-section { padding-block: clamp(4rem, 12vw, 7rem); }
+.cp-focus-ring:focus-visible { outline: 2px solid var(--color-volt); outline-offset: 3px; }
+.cp-card-tilt { transition: transform 0.4s ease, border-color 0.4s ease; }
+.cp-card-tilt:hover { transform: translateY(-4px); border-color: var(--border-volt); }
+.cp-case-row:focus-visible { outline: 2px solid var(--color-volt); outline-offset: -2px; }
+.cp-animate-slam { animation: cp-kinetic-slam 0.9s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.cp-animate-rise { animation: cp-asymmetric-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both; }
+.cp-marquee-track { animation: cp-marquee 28s linear infinite; }
+.cp-overlay-active .cp-marquee-track { animation-play-state: running; }
+.cp-overlay-active { animation: cp-reveal-wipe 1.1s cubic-bezier(0.16, 1, 0.3, 1) both; }
+/* V2 sidebar-left layout */
+.v2-layout-sidebar-left .v2-sidebar-shell { gap: 0; align-items: flex-start; }
+.v2-sidebar-rail {
+  border-inline-end: 1px solid var(--border-subtle, rgba(244,237,228,0.06));
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-inline-end: clamp(1.25rem, 3vw, 2rem);
+}
+[dir='rtl'] .v2-sidebar-rail { border-inline-end: none; border-inline-start: 1px solid var(--border-subtle, rgba(244,237,228,0.06)); }
+.v2-main-canvas > [data-v2-component] + [data-v2-component] { margin-top: 0; }
+.v2-layout-sidebar-left .v2-main-canvas { padding-inline-start: 0; }
+@media (max-width: 1023px) {
+  .v2-sidebar-rail { display: none !important; }
+}
+
+/* V2 sidebar-right layout */
+.v2-layout-sidebar-right .v2-sidebar-shell { gap: 0; align-items: flex-start; }
+.v2-layout-sidebar-right .v2-sidebar-rail {
+  border-inline-start: 1px solid var(--border-subtle, rgba(28,25,23,0.06));
+  border-inline-end: none;
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-inline-start: clamp(1.25rem, 3vw, 2rem);
+}
+[dir='rtl'] .v2-layout-sidebar-right .v2-sidebar-rail {
+  border-inline-start: none;
+  border-inline-end: 1px solid var(--border-subtle, rgba(28,25,23,0.06));
+}
+
+/* V2 full-bleed layout */
+.v2-layout-full-bleed .v2-overlay-canvas { width: 100%; }
+.v2-layout-full-bleed .v2-main-canvas { width: 100%; max-width: var(--container-max, 76rem); margin-inline: auto; }
+
+/* V2 editorial-reveal layout (creative portfolio) */
+.v2-layout-editorial-reveal .v2-main-canvas { width: 100%; }
+.v2-layout-editorial-reveal .v2-overlay-reveal { width: 100%; }
+
+:root {
+  --container-max: 100%;
+  --font-body: &quot;Instrument Sans&quot;, ui-sans-serif, system-ui, sans-serif;
+  --font-display: Syne, ui-sans-serif, system-ui, sans-serif;
+  --color-surface: #141416;
+  --color-foreground: #F4F4EF;
+  --color-background: #09090B;
+  --color-accent: #E8FF47;
+  --color-secondary: #18181B; --color-primary: #09090B; }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--color-background, #0f172a);
+      color: var(--color-foreground, #f8fafc);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .page { display: none; padding-bottom: 2rem; }
+    .page:target { display: block; }
+    body:not(:has(.page:target)) .page#home { display: block; }
+    img { max-width: 100%; height: auto; display: block; }
+    a { color: inherit; }
+  </style>
+  <script src=&quot;https://cdn.tailwindcss.com&quot;></script>
+</head>
+<body>
+  <div class=&quot;page&quot; id=&quot;home&quot;>
+    <div class=&quot;min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] antialiased v2-template v2-creative-portfolio v2-layout-editorial-reveal&quot; data-v2-package=&quot;creative-portfolio&quot; data-v2-composer=&quot;region-grid&quot; data-v2-layout=&quot;editorial-reveal&quot;><header data-v2-region=&quot;header&quot;><header data-v2-component=&quot;creative-portfolio-nav&quot; class=&quot;sticky top-0 z-50 border-b transition-all duration-500 border-transparent bg-transparent&quot;><div class=&quot;flex h-16 items-center justify-between gap-4 px-5 sm:px-8 lg:h-[4.5rem]&quot;><a href=&quot;#top&quot; class=&quot;cp-font-display cp-focus-ring group flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-[var(--color-ghost)]&quot;><span class=&quot;inline-block h-2 w-2 bg-[var(--color-volt)] transition-transform group-hover:scale-125&quot; aria-hidden=&quot;true&quot;></span>Kinetic Atelier</a><nav aria-label=&quot;Primary&quot; class=&quot;hidden items-center gap-10 lg:flex&quot;><a href=&quot;#services&quot; class=&quot;cp-font-mono cp-focus-ring text-xs uppercase tracking-[0.18em] text-[var(--color-muted)] transition hover:text-[var(--color-volt)]&quot; style=&quot;transition-delay:0ms&quot;><span class=&quot;text-[var(--color-zinc)]&quot; aria-hidden=&quot;true&quot;>01</span> Services</a><a href=&quot;#features&quot; class=&quot;cp-font-mono cp-focus-ring text-xs uppercase tracking-[0.18em] text-[var(--color-muted)] transition hover:text-[var(--color-volt)]&quot; style=&quot;transition-delay:30ms&quot;><span class=&quot;text-[var(--color-zinc)]&quot; aria-hidden=&quot;true&quot;>02</span> Why us</a><a href=&quot;#pricing&quot; class=&quot;cp-font-mono cp-focus-ring text-xs uppercase tracking-[0.18em] text-[var(--color-muted)] transition hover:text-[var(--color-volt)]&quot; style=&quot;transition-delay:60ms&quot;><span class=&quot;text-[var(--color-zinc)]&quot; aria-hidden=&quot;true&quot;>03</span> Packages</a><a href=&quot;#testimonials&quot; class=&quot;cp-font-mono cp-focus-ring text-xs uppercase tracking-[0.18em] text-[var(--color-muted)] transition hover:text-[var(--color-volt)]&quot; style=&quot;transition-delay:90ms&quot;><span class=&quot;text-[var(--color-zinc)]&quot; aria-hidden=&quot;true&quot;>04</span> Clients</a><a href=&quot;#contact&quot; class=&quot;cp-font-mono cp-focus-ring text-xs uppercase tracking-[0.18em] text-[var(--color-muted)] transition hover:text-[var(--color-volt)]&quot; style=&quot;transition-delay:120ms&quot;><span class=&quot;text-[var(--color-zinc)]&quot; aria-hidden=&quot;true&quot;>05</span> Contact</a></nav><div class=&quot;flex items-center gap-3&quot;><a href=&quot;#contact&quot; class=&quot;cp-btn-volt hidden sm:inline-flex&quot;>Get started</a><button type=&quot;button&quot; aria-expanded=&quot;false&quot; aria-controls=&quot;cp-mobile-nav&quot; aria-label=&quot;Open menu&quot; class=&quot;cp-focus-ring inline-flex h-11 w-11 items-center justify-center border border-[var(--border-default)] lg:hidden&quot;><span class=&quot;sr-only&quot;>Menu</span><span aria-hidden=&quot;true&quot; class=&quot;cp-font-mono text-lg text-[var(--color-volt)]&quot;>≡</span></button></div></div></header></header><main data-v2-region=&quot;main&quot; class=&quot;v2-main-canvas&quot;><section id=&quot;top&quot; data-v2-component=&quot;creative-portfolio-hero&quot; aria-labelledby=&quot;cp-hero-title&quot; class=&quot;relative min-h-[92vh] overflow-hidden border-b border-[var(--border-subtle)]&quot;><div class=&quot;pointer-events-none absolute -end-24 top-1/4 h-[28rem] w-[28rem] rounded-full bg-[var(--color-magenta)]/10 blur-[120px]&quot; aria-hidden=&quot;true&quot;></div><div class=&quot;pointer-events-none absolute -start-16 bottom-0 h-64 w-64 bg-[var(--color-volt)]/8 blur-[80px]&quot; aria-hidden=&quot;true&quot;></div><div class=&quot;relative flex min-h-[92vh] flex-col justify-between px-5 py-16 sm:px-8 lg:py-24&quot;><div class=&quot;flex flex-wrap items-center justify-between gap-4&quot;><p class=&quot;cp-eyebrow motion-safe:cp-animate-slam&quot;>Professional presence</p><p class=&quot;cp-font-mono hidden text-[0.6875rem] uppercase tracking-[0.25em] text-[var(--color-zinc)] sm:block&quot;>Design · Motion · Brand · Digital</p></div><div class=&quot;my-auto py-12 lg:py-20&quot;><h1 id=&quot;cp-hero-title&quot; class=&quot;cp-display max-w-[14ch] leading-[0.92] motion-safe:cp-animate-slam&quot;><span class=&quot;inline-block&quot; style=&quot;animation-delay:0ms&quot;>Kinetic </span><span class=&quot;inline-block&quot; style=&quot;animation-delay:60ms&quot;>Atelier </span></h1><p class=&quot;cp-body mt-8 max-w-xl motion-safe:cp-animate-rise&quot;>Elite creative studio</p></div><div class=&quot;flex items-end justify-between gap-6 border-t border-[var(--border-subtle)] pt-8&quot;><a href=&quot;#work&quot; class=&quot;cp-font-mono cp-focus-ring group flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-[var(--color-muted)]&quot;><span class=&quot;inline-block h-8 w-px bg-[var(--color-volt)] motion-safe:animate-[cp-scroll-pulse_2s_ease-in-out_infinite]&quot; aria-hidden=&quot;true&quot;></span>Scroll to explore</a><span class=&quot;cp-font-mono text-[4rem] font-bold leading-none text-[var(--color-surface)] sm:text-[6rem]&quot; aria-hidden=&quot;true&quot;>✦</span></div></div></section><section id=&quot;work&quot; data-v2-component=&quot;creative-portfolio-selected-work&quot; aria-labelledby=&quot;cp-work-title&quot; class=&quot;cp-section border-b border-[var(--border-subtle)]&quot;><div class=&quot;px-5 sm:px-8&quot;><header class=&quot;mb-12 flex flex-col gap-4 lg:mb-16 lg:flex-row lg:items-end lg:justify-between&quot;><div><p class=&quot;cp-eyebrow&quot;>Selected work</p><h2 id=&quot;cp-work-title&quot; class=&quot;cp-headline mt-4 max-w-lg&quot;>Moments from the work</h2></div><a href=&quot;/work&quot; class=&quot;cp-link-volt cp-font-mono text-xs uppercase tracking-widest&quot;>View all projects →</a></header><ul class=&quot;divide-y divide-[var(--border-subtle)]&quot;><li><a href=&quot;#case-01&quot; class=&quot;cp-case-row group grid gap-6 py-8 transition-colors hover:bg-[var(--color-surface)]/50 lg:grid-cols-[4rem_1fr_12rem_6rem] lg:items-center lg:gap-8 lg:py-10&quot;><span class=&quot;cp-font-mono text-sm text-[var(--color-volt)]&quot;>01</span><div><h3 class=&quot;cp-font-display text-2xl font-bold uppercase tracking-tight transition group-hover:text-[var(--color-volt)] lg:text-3xl&quot;>Monolith Residences</h3><p class=&quot;cp-font-mono mt-1 text-xs uppercase tracking-widest text-[var(--color-zinc)]&quot;>Architecture · Brand</p></div><div class=&quot;relative aspect-[16/10] overflow-hidden border border-[var(--border-default)] lg:aspect-[4/3]&quot;><div class=&quot;h-full w-full bg-[var(--color-surface)]&quot;></div></div><span class=&quot;cp-font-mono text-end text-sm text-[var(--color-muted)]&quot;>2025</span></a></li><li><a href=&quot;#case-02&quot; class=&quot;cp-case-row group grid gap-6 py-8 transition-colors hover:bg-[var(--color-surface)]/50 lg:grid-cols-[4rem_1fr_12rem_6rem] lg:items-center lg:gap-8 lg:py-10&quot;><span class=&quot;cp-font-mono text-sm text-[var(--color-volt)]&quot;>02</span><div><h3 class=&quot;cp-font-display text-2xl font-bold uppercase tracking-tight transition group-hover:text-[var(--color-volt)] lg:text-3xl&quot;>Pulse Festival</h3><p class=&quot;cp-font-mono mt-1 text-xs uppercase tracking-widest text-[var(--color-zinc)]&quot;>Motion · Experience</p></div><div class=&quot;relative aspect-[16/10] overflow-hidden border border-[var(--border-default)] lg:aspect-[4/3]&quot;><div class=&quot;h-full w-full bg-[var(--color-surface)]&quot;></div></div><span class=&quot;cp-font-mono text-end text-sm text-[var(--color-muted)]&quot;>2025</span></a></li><li><a href=&quot;#case-03&quot; class=&quot;cp-case-row group grid gap-6 py-8 transition-colors hover:bg-[var(--color-surface)]/50 lg:grid-cols-[4rem_1fr_12rem_6rem] lg:items-center lg:gap-8 lg:py-10&quot;><span class=&quot;cp-font-mono text-sm text-[var(--color-volt)]&quot;>03</span><div><h3 class=&quot;cp-font-display text-2xl font-bold uppercase tracking-tight transition group-hover:text-[var(--color-volt)] lg:text-3xl&quot;>Forma Type Foundry</h3><p class=&quot;cp-font-mono mt-1 text-xs uppercase tracking-widest text-[var(--color-zinc)]&quot;>Identity · Digital</p></div><div class=&quot;relative aspect-[16/10] overflow-hidden border border-[var(--border-default)] lg:aspect-[4/3]&quot;><div class=&quot;h-full w-full bg-[var(--color-surface)]&quot;></div></div><span class=&quot;cp-font-mono text-end text-sm text-[var(--color-muted)]&quot;>2024</span></a></li></ul></div></section><section data-v2-component=&quot;creative-portfolio-case-grid&quot; aria-labelledby=&quot;cp-grid-title&quot; class=&quot;cp-section&quot;><div class=&quot;px-5 sm:px-8&quot;><header class=&quot;mb-10&quot;><p class=&quot;cp-eyebrow&quot;>Studio</p><h2 id=&quot;cp-grid-title&quot; class=&quot;cp-headline-sm mt-3&quot;>Moments from the work</h2></header><div class=&quot;grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-12 lg:gap-4&quot;><article id=&quot;case-a&quot; class=&quot;cp-card-tilt group relative min-h-[16rem] overflow-hidden border border-[var(--border-default)] lg:col-span-7 lg:row-span-2&quot;><div class=&quot;absolute inset-0 bg-[var(--color-surface)]&quot;></div><div class=&quot;absolute inset-0 bg-gradient-to-t from-[var(--color-background)] via-transparent to-transparent&quot;></div><div class=&quot;relative flex h-full min-h-[16rem] flex-col justify-end p-6&quot;><span class=&quot;cp-font-mono text-xs text-[var(--color-volt)]&quot; aria-hidden=&quot;true&quot;>—</span><h3 class=&quot;cp-font-display mt-2 text-xl font-bold uppercase tracking-tight lg:text-2xl&quot;>Void Gallery</h3></div></article><article id=&quot;case-b&quot; class=&quot;cp-card-tilt group relative min-h-[16rem] overflow-hidden border border-[var(--border-default)] lg:col-span-5&quot;><div class=&quot;absolute inset-0 bg-[var(--color-surface)]&quot;></div><div class=&quot;absolute inset-0 bg-gradient-to-t from-[var(--color-background)] via-transparent to-transparent&quot;></div><div class=&quot;relative flex h-full min-h-[16rem] flex-col justify-end p-6&quot;><span class=&quot;cp-font-mono text-xs text-[var(--color-volt)]&quot; aria-hidden=&quot;true&quot;>—</span><h3 class=&quot;cp-font-display mt-2 text-xl font-bold uppercase tracking-tight lg:text-2xl&quot;>Neon District</h3></div></article><article id=&quot;case-c&quot; class=&quot;cp-card-tilt group relative min-h-[16rem] overflow-hidden border border-[var(--border-default)] lg:col-span-5&quot;><div class=&quot;absolute inset-0 bg-[var(--color-surface)]&quot;></div><div class=&quot;absolute inset-0 bg-gradient-to-t from-[var(--color-background)] via-transparent to-transparent&quot;></div><div class=&quot;relative flex h-full min-h-[16rem] flex-col justify-end p-6&quot;><span class=&quot;cp-font-mono text-xs text-[var(--color-volt)]&quot; aria-hidden=&quot;true&quot;>—</span><h3 class=&quot;cp-font-display mt-2 text-xl font-bold uppercase tracking-tight lg:text-2xl&quot;>Silent Type</h3></div></article><article id=&quot;case-d&quot; class=&quot;cp-card-tilt group relative min-h-[16rem] overflow-hidden border border-[var(--border-default)] lg:col-span-7&quot;><div class=&quot;absolute inset-0 bg-[var(--color-surface)]&quot;></div><div class=&quot;absolute inset-0 bg-gradient-to-t from-[var(--color-background)] via-transparent to-transparent&quot;></div><div class=&quot;relative flex h-full min-h-[16rem] flex-col justify-end p-6&quot;><span class=&quot;cp-font-mono text-xs text-[var(--color-volt)]&quot; aria-hidden=&quot;true&quot;>—</span><h3 class=&quot;cp-font-display mt-2 text-xl font-bold uppercase tracking-tight lg:text-2xl&quot;>Apex Records</h3></div></article><article id=&quot;case-e&quot; class=&quot;cp-card-tilt group relative min-h-[16rem] overflow-hidden border border-[var(--border-default)] lg:col-span-12&quot;><div class=&quot;absolute inset-0 bg-[var(--color-surface)]&quot;></div><div class=&quot;absolute inset-0 bg-gradient-to-t from-[var(--color-background)] via-transparent to-transparent&quot;></div><div class=&quot;relative flex h-full min-h-[16rem] flex-col justify-end p-6&quot;><span class=&quot;cp-font-mono text-xs text-[var(--color-volt)]&quot; aria-hidden=&quot;true&quot;>—</span><h3 class=&quot;cp-font-display mt-2 text-xl font-bold uppercase tracking-tight lg:text-2xl&quot;>Lumen Labs</h3></div></article></div></div></section><section id=&quot;studio&quot; data-v2-component=&quot;creative-portfolio-manifesto&quot; aria-labelledby=&quot;cp-manifesto-title&quot; class=&quot;cp-section border-y border-[var(--border-subtle)] bg-[var(--color-surface)]&quot;><div class=&quot;grid gap-12 px-5 sm:px-8 lg:grid-cols-2 lg:gap-20&quot;><div><p class=&quot;cp-eyebrow&quot;>Services</p><blockquote id=&quot;cp-manifesto-title&quot; class=&quot;cp-font-display mt-6 text-3xl font-bold leading-[1.1] tracking-tight sm:text-4xl lg:text-5xl&quot;><span class=&quot;text-[var(--color-volt)]&quot; aria-hidden=&quot;true&quot;>“</span>We don&#x27;t decorate brands. We architect belief systems.<span class=&quot;text-[var(--color-magenta)]&quot; aria-hidden=&quot;true&quot;>”</span></blockquote></div><div class=&quot;flex flex-col justify-between gap-10&quot;><p class=&quot;cp-body max-w-md&quot;>Kinetic Atelier is a collective of designers, architects, and motion artists who treat every commission as cultural infrastructure. Our work lives at the intersection of radical craft and commercial impact.</p><dl class=&quot;grid grid-cols-3 gap-4 border-t border-[var(--border-default)] pt-8&quot;><div><dt class=&quot;sr-only&quot;>47 Awards</dt><dd class=&quot;cp-font-mono text-xs uppercase tracking-widest text-[var(--color-volt)]&quot;>47 Awards</dd></div><div><dt class=&quot;sr-only&quot;>12 Countries</dt><dd class=&quot;cp-font-mono text-xs uppercase tracking-widest text-[var(--color-volt)]&quot;>12 Countries</dd></div><div><dt class=&quot;sr-only&quot;>Since 2011</dt><dd class=&quot;cp-font-mono text-xs uppercase tracking-widest text-[var(--color-volt)]&quot;>Since 2011</dd></div></dl></div></div></section><section data-v2-component=&quot;creative-portfolio-capabilities&quot; aria-labelledby=&quot;cp-cap-title&quot; class=&quot;cp-section&quot;><div class=&quot;px-5 sm:px-8&quot;><header class=&quot;mb-12&quot;><p class=&quot;cp-eyebrow&quot;>Why us</p><h2 id=&quot;cp-cap-title&quot; class=&quot;cp-headline-sm mt-3&quot;>A presence that earns trust</h2></header><div class=&quot;grid gap-px border border-[var(--border-default)] bg-[var(--border-default)] sm:grid-cols-2&quot;><article class=&quot;group bg-[var(--color-background)] p-8 transition hover:bg-[var(--color-surface)] lg:p-10&quot;><span class=&quot;cp-font-mono text-[0.6875rem] uppercase tracking-[0.2em] text-[var(--color-volt)]&quot;>Identity</span><h3 class=&quot;cp-font-display mt-4 text-xl font-bold uppercase tracking-tight lg:text-2xl&quot;>Brand Systems</h3><p class=&quot;cp-body mt-3 text-sm&quot;>Identity architectures that scale across every touchpoint — from signage to motion.</p></article><article class=&quot;group bg-[var(--color-background)] p-8 transition hover:bg-[var(--color-surface)] lg:p-10&quot; style=&quot;transform:translateY(0.5rem)&quot;><span class=&quot;cp-font-mono text-[0.6875rem] uppercase tracking-[0.2em] text-[var(--color-volt)]&quot;>Space</span><h3 class=&quot;cp-font-display mt-4 text-xl font-bold uppercase tracking-tight lg:text-2xl&quot;>Spatial Design</h3><p class=&quot;cp-body mt-3 text-sm&quot;>Exhibition, retail, and architectural experiences with narrative depth.</p></article><article class=&quot;group bg-[var(--color-background)] p-8 transition hover:bg-[var(--color-surface)] lg:p-10&quot;><span class=&quot;cp-font-mono text-[0.6875rem] uppercase tracking-[0.2em] text-[var(--color-volt)]&quot;>Motion</span><h3 class=&quot;cp-font-display mt-4 text-xl font-bold uppercase tracking-tight lg:text-2xl&quot;>Motion &amp; Film</h3><p class=&quot;cp-body mt-3 text-sm&quot;>Kinetic storytelling for campaigns, festivals, and product launches.</p></article><article class=&quot;group bg-[var(--color-background)] p-8 transition hover:bg-[var(--color-surface)] lg:p-10&quot; style=&quot;transform:translateY(0.5rem)&quot;><span class=&quot;cp-font-mono text-[0.6875rem] uppercase tracking-[0.2em] text-[var(--color-volt)]&quot;>Digital</span><h3 class=&quot;cp-font-display mt-4 text-xl font-bold uppercase tracking-tight lg:text-2xl&quot;>Digital Products</h3><p class=&quot;cp-body mt-3 text-sm&quot;>Interfaces and platforms built with the same rigor as physical craft.</p></article></div></div></section><section id=&quot;process&quot; data-v2-component=&quot;creative-portfolio-process&quot; aria-labelledby=&quot;cp-process-title&quot; class=&quot;cp-section border-t border-[var(--border-subtle)]&quot;><div class=&quot;px-5 sm:px-8&quot;><header class=&quot;mb-12 lg:mb-16&quot;><p class=&quot;cp-eyebrow&quot;>Services</p><h2 id=&quot;cp-process-title&quot; class=&quot;cp-headline-sm mt-3&quot;>What we deliver for clients</h2></header><ol class=&quot;grid gap-0 border-t border-[var(--border-default)] lg:grid-cols-4&quot;><li class=&quot;border-b border-[var(--border-default)] p-8 lg:border-b-0 lg:border-e lg:last:border-e-0&quot;><span class=&quot;cp-font-mono text-4xl font-bold text-[var(--color-surface)] lg:text-5xl&quot;>01</span><h3 class=&quot;cp-font-display mt-4 text-lg font-bold uppercase tracking-tight&quot;>Immersion</h3><p class=&quot;cp-body mt-3 text-sm&quot;>Deep discovery — culture, constraints, and the story only insiders know.</p><span class=&quot;cp-font-mono mt-6 hidden text-[var(--color-volt)] lg:inline&quot; aria-hidden=&quot;true&quot;>→</span></li><li class=&quot;border-b border-[var(--border-default)] p-8 lg:border-b-0 lg:border-e lg:last:border-e-0&quot;><span class=&quot;cp-font-mono text-4xl font-bold text-[var(--color-surface)] lg:text-5xl&quot;>02</span><h3 class=&quot;cp-font-display mt-4 text-lg font-bold uppercase tracking-tight&quot;>Provocation</h3><p class=&quot;cp-body mt-3 text-sm&quot;>Bold concepts that challenge assumptions before a single pixel is placed.</p><span class=&quot;cp-font-mono mt-6 hidden text-[var(--color-volt)] lg:inline&quot; aria-hidden=&quot;true&quot;>→</span></li><li class=&quot;border-b border-[var(--border-default)] p-8 lg:border-b-0 lg:border-e lg:last:border-e-0&quot;><span class=&quot;cp-font-mono text-4xl font-bold text-[var(--color-surface)] lg:text-5xl&quot;>03</span><h3 class=&quot;cp-font-display mt-4 text-lg font-bold uppercase tracking-tight&quot;>Craft</h3><p class=&quot;cp-body mt-3 text-sm&quot;>Relentless refinement across every medium until the work feels inevitable.</p><span class=&quot;cp-font-mono mt-6 hidden text-[var(--color-volt)] lg:inline&quot; aria-hidden=&quot;true&quot;>→</span></li><li class=&quot;border-b border-[var(--border-default)] p-8 lg:border-b-0 lg:border-e lg:last:border-e-0&quot;><span class=&quot;cp-font-mono text-4xl font-bold text-[var(--color-surface)] lg:text-5xl&quot;>04</span><h3 class=&quot;cp-font-display mt-4 text-lg font-bold uppercase tracking-tight&quot;>Launch</h3><p class=&quot;cp-body mt-3 text-sm&quot;>Orchestrated rollout with motion, documentation, and cultural momentum.</p></li></ol></div></section><section id=&quot;contact&quot; data-v2-component=&quot;creative-portfolio-collaborate-cta&quot; aria-labelledby=&quot;cp-cta-title&quot; class=&quot;cp-section relative overflow-hidden&quot;><div class=&quot;pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,var(--color-volt)_0%,transparent_40%)] opacity-[0.07]&quot; aria-hidden=&quot;true&quot;></div><div class=&quot;relative px-5 sm:px-8&quot;><div class=&quot;border border-[var(--border-volt)] bg-[var(--color-surface)] p-10 lg:p-16&quot;><p class=&quot;cp-eyebrow&quot;>Collaborate</p><h2 id=&quot;cp-cta-title&quot; class=&quot;cp-headline mt-4 max-w-2xl&quot;>Ready to look established online?</h2><p class=&quot;cp-body mt-4 max-w-lg&quot;>Share your goals — we will propose a clear path and timeline.</p><div class=&quot;mt-10 flex flex-wrap items-center gap-6&quot;><a href=&quot;mailto:hello@kineticatelier.studio&quot; class=&quot;cp-btn-volt&quot;>Get started</a><a href=&quot;mailto:hello@kineticatelier.studio&quot; class=&quot;cp-font-mono cp-link-volt text-xs uppercase tracking-widest&quot;>hello@kineticatelier.studio</a></div></div></div></section></main><div data-v2-region=&quot;overlay&quot; class=&quot;v2-overlay-reveal&quot;><section data-v2-component=&quot;creative-portfolio-overlay-showcase&quot; aria-label=&quot;Studio showcase&quot; class=&quot;relative min-h-[50vh] overflow-hidden border-t border-[var(--border-volt)] bg-[var(--color-background)] py-16 lg:min-h-[60vh] lg:py-24 &quot;><div class=&quot;absolute inset-0 opacity-30&quot; aria-hidden=&quot;true&quot;><div class=&quot;cp-marquee-track flex whitespace-nowrap&quot;><span class=&quot;cp-font-display mx-8 text-[clamp(3rem,12vw,8rem)] font-bold uppercase tracking-tighter text-[var(--color-surface)]&quot;>Brand Systems<span class=&quot;mx-8 text-[var(--color-volt)]&quot;>✦</span></span><span class=&quot;cp-font-display mx-8 text-[clamp(3rem,12vw,8rem)] font-bold uppercase tracking-tighter text-[var(--color-surface)]&quot;>Spatial Design<span class=&quot;mx-8 text-[var(--color-volt)]&quot;>✦</span></span><span class=&quot;cp-font-display mx-8 text-[clamp(3rem,12vw,8rem)] font-bold uppercase tracking-tighter text-[var(--color-surface)]&quot;>Motion &amp; Film<span class=&quot;mx-8 text-[var(--color-volt)]&quot;>✦</span></span><span class=&quot;cp-font-display mx-8 text-[clamp(3rem,12vw,8rem)] font-bold uppercase tracking-tighter text-[var(--color-surface)]&quot;>Digital Products<span class=&quot;mx-8 text-[var(--color-volt)]&quot;>✦</span></span><span class=&quot;cp-font-display mx-8 text-[clamp(3rem,12vw,8rem)] font-bold uppercase tracking-tighter text-[var(--color-surface)]&quot;>Cultural Strategy<span class=&quot;mx-8 text-[var(--color-volt)]&quot;>✦</span></span><span class=&quot;cp-font-display mx-8 text-[clamp(3rem,12vw,8rem)] font-bold uppercase tracking-tighter text-[var(--color-surface)]&quot;>Art Direction<span class=&quot;mx-8 text-[var(--color-volt)]&quot;>✦</span></span><span class=&quot;cp-font-display mx-8 text-[clamp(3rem,12vw,8rem)] font-bold uppercase tracking-tighter text-[var(--color-surface)]&quot;>Brand Systems<span class=&quot;mx-8 text-[var(--color-volt)]&quot;>✦</span></span><span class=&quot;cp-font-display mx-8 text-[clamp(3rem,12vw,8rem)] font-bold uppercase tracking-tighter text-[var(--color-surface)]&quot;>Spatial Design<span class=&quot;mx-8 text-[var(--color-volt)]&quot;>✦</span></span><span class=&quot;cp-font-display mx-8 text-[clamp(3rem,12vw,8rem)] font-bold uppercase tracking-tighter text-[var(--color-surface)]&quot;>Motion &amp; Film<span class=&quot;mx-8 text-[var(--color-volt)]&quot;>✦</span></span><span class=&quot;cp-font-display mx-8 text-[clamp(3rem,12vw,8rem)] font-bold uppercase tracking-tighter text-[var(--color-surface)]&quot;>Digital Products<span class=&quot;mx-8 text-[var(--color-volt)]&quot;>✦</span></span><span class=&quot;cp-font-display mx-8 text-[clamp(3rem,12vw,8rem)] font-bold uppercase tracking-tighter text-[var(--color-surface)]&quot;>Cultural Strategy<span class=&quot;mx-8 text-[var(--color-volt)]&quot;>✦</span></span><span class=&quot;cp-font-display mx-8 text-[clamp(3rem,12vw,8rem)] font-bold uppercase tracking-tighter text-[var(--color-surface)]&quot;>Art Direction<span class=&quot;mx-8 text-[var(--color-volt)]&quot;>✦</span></span></div></div><div class=&quot;relative px-5 sm:px-8&quot;><div class=&quot;mx-auto max-w-3xl text-center&quot;><p class=&quot;cp-font-mono text-xs uppercase tracking-[0.3em] text-[var(--color-volt)]&quot;>Post-scroll kinetic showcase — our disciplines in perpetual drift</p><h2 class=&quot;cp-font-display mt-6 text-4xl font-bold uppercase tracking-tight sm:text-5xl lg:text-6xl&quot;>Culture in motion</h2><div class=&quot;mt-10 flex flex-wrap justify-center gap-3&quot;><span class=&quot;border border-[var(--border-default)] px-4 py-2 cp-font-mono text-[0.6875rem] uppercase tracking-widest text-[var(--color-muted)]&quot;>Brand Systems</span><span class=&quot;border border-[var(--border-default)] px-4 py-2 cp-font-mono text-[0.6875rem] uppercase tracking-widest text-[var(--color-muted)]&quot;>Spatial Design</span><span class=&quot;border border-[var(--border-default)] px-4 py-2 cp-font-mono text-[0.6875rem] uppercase tracking-widest text-[var(--color-muted)]&quot;>Motion &amp; Film</span><span class=&quot;border border-[var(--border-default)] px-4 py-2 cp-font-mono text-[0.6875rem] uppercase tracking-widest text-[var(--color-muted)]&quot;>Digital Products</span></div></div></div></section></div><footer data-v2-region=&quot;footer&quot;><footer data-v2-component=&quot;creative-portfolio-footer&quot; class=&quot;border-t border-[var(--border-default)] bg-[var(--color-background)]&quot; role=&quot;contentinfo&quot;><div class=&quot;px-5 py-14 sm:px-8 lg:py-20&quot;><div class=&quot;grid gap-12 lg:grid-cols-[1.5fr_1fr_1fr]&quot;><div><p class=&quot;cp-font-display text-2xl font-bold uppercase tracking-tight&quot;>Kinetic Atelier</p><p class=&quot;cp-font-mono mt-2 text-xs uppercase tracking-widest text-[var(--color-zinc)]&quot;>Clear messaging and conversion-focused pages that earn trust quickly.</p></div><nav aria-label=&quot;Footer&quot;><p class=&quot;cp-eyebrow&quot;>Navigate</p><ul class=&quot;mt-4 space-y-2&quot;><li><a href=&quot;#work&quot; class=&quot;cp-link-volt cp-font-mono text-xs uppercase tracking-widest&quot;>Work</a></li><li><a href=&quot;#studio&quot; class=&quot;cp-link-volt cp-font-mono text-xs uppercase tracking-widest&quot;>Studio</a></li><li><a href=&quot;#process&quot; class=&quot;cp-link-volt cp-font-mono text-xs uppercase tracking-widest&quot;>Process</a></li><li><a href=&quot;#contact&quot; class=&quot;cp-link-volt cp-font-mono text-xs uppercase tracking-widest&quot;>Contact</a></li></ul></nav><nav aria-label=&quot;Social&quot;><p class=&quot;cp-eyebrow&quot;>Connect</p><ul class=&quot;mt-4 space-y-2&quot;><li><a href=&quot;https://instagram.com&quot; class=&quot;cp-link-volt cp-font-mono text-xs uppercase tracking-widest&quot; rel=&quot;noopener noreferrer&quot; target=&quot;_blank&quot;>Instagram</a></li><li><a href=&quot;https://behance.net&quot; class=&quot;cp-link-volt cp-font-mono text-xs uppercase tracking-widest&quot; rel=&quot;noopener noreferrer&quot; target=&quot;_blank&quot;>Behance</a></li><li><a href=&quot;https://linkedin.com&quot; class=&quot;cp-link-volt cp-font-mono text-xs uppercase tracking-widest&quot; rel=&quot;noopener noreferrer&quot; target=&quot;_blank&quot;>LinkedIn</a></li></ul></nav></div><p class=&quot;cp-font-mono mt-12 border-t border-[var(--border-subtle)] pt-6 text-[0.6875rem] uppercase tracking-widest text-[var(--color-zinc)]&quot;>© 2026 Kinetic Atelier. Crafted with intention.</p></div></footer></footer></div>
+  </div>
+  <section class=&quot;page v2-secondary-page&quot; id=&quot;work&quot;>
+  <div class=&quot;mx-auto max-w-3xl px-6 py-16&quot;>
+    <p class=&quot;text-xs uppercase tracking-widest text-[var(--color-foreground)]/50&quot;>work</p>
+    <pre class=&quot;mt-4 overflow-x-auto rounded border border-[var(--color-foreground)]/10 p-4 text-xs text-[var(--color-foreground)]/70&quot;>export default function Work(){return &lt;main&gt;Work&lt;/main&gt;}</pre>
+    <a class=&quot;mt-6 inline-block text-sm text-[var(--color-accent,#B87333)]&quot; href=&quot;#home&quot;>Back to home</a>
+  </div>
+</section>
+<section class=&quot;page v2-secondary-page&quot; id=&quot;studio&quot;>
+  <div class=&quot;mx-auto max-w-3xl px-6 py-16&quot;>
+    <p class=&quot;text-xs uppercase tracking-widest text-[var(--color-foreground)]/50&quot;>studio</p>
+    <h1 class=&quot;mt-4 text-3xl font-semibold text-[var(--color-foreground)]&quot;>studio</h1>
+    <p class=&quot;mt-4 text-[var(--color-foreground)]/70&quot;>studio — Kinetic Atelier</p>
+    <a class=&quot;mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]&quot; href=&quot;#home&quot;>Back to home</a>
+  </div>
+</section>
+<section class=&quot;page v2-secondary-page&quot; id=&quot;contact&quot;>
+  <div class=&quot;mx-auto max-w-3xl px-6 py-16&quot;>
+    <p class=&quot;text-xs uppercase tracking-widest text-[var(--color-foreground)]/50&quot;>contact</p>
+    <h1 class=&quot;mt-4 text-3xl font-semibold text-[var(--color-foreground)]&quot;>contact</h1>
+    <p class=&quot;mt-4 text-[var(--color-foreground)]/70&quot;>contact — Kinetic Atelier</p>
+    <a class=&quot;mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]&quot; href=&quot;#home&quot;>Back to home</a>
+  </div>
+</section>
+</body>
+</html>"></iframe>
+  </div>
+</div>
+</body>
+</html>

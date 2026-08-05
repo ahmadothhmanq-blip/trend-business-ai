@@ -1,0 +1,7 @@
+{
+  "pageId": "platform",
+  "layoutId": "default",
+  "regions": {
+    "main": ["education-premium-hero", "education-premium-features", "education-premium-integrations"]
+  }
+}

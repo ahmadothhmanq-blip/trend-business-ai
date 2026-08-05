@@ -18,4 +18,9 @@ export type StaticPreviewInput = {
   industryId?: string | null;
   /** Generated project files — preferred scaffold source when present. */
   files?: GeneratedProjectFile[];
+  /** Template Architecture V2 — when "v2", preview renders from project.files directly. */
+  templateArchitectureVersion?: "v1" | "v2" | null;
+  templatePackageId?: string | null;
+  /** Raw project settings — used to detect V2 architecture when templateArchitectureVersion omitted. */
+  settings?: Record<string, unknown> | null;
 };

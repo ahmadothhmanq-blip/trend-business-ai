@@ -1,0 +1,51 @@
+{
+  "packageId": "hotel-resort-premium",
+  "templateIntelligenceHint": "ti-hotel-sanctuary",
+  "layout": {
+    "defaultLayoutId": "sidebar-left",
+    "regions": {
+      "header": { "role": "header", "sticky": true },
+      "sidebar": { "role": "sidebar", "sticky": true, "collapseBelow": "lg" },
+      "main": { "role": "main" },
+      "footer": { "role": "footer" }
+    }
+  },
+  "navigation": {
+    "componentId": "hotel-resort-premium-nav",
+    "variant": "luxury-minimal"
+  },
+  "hero": {
+    "componentId": "hotel-resort-premium-hero",
+    "region": "main"
+  },
+  "footer": {
+    "componentId": "hotel-resort-premium-footer",
+    "region": "footer"
+  },
+  "homeFlow": {
+    "regions": {
+      "sidebar": ["hotel-resort-premium-sidebar-rail"],
+      "main": [
+        "hotel-resort-premium-hero",
+        "hotel-resort-premium-tasting-menu",
+        "hotel-resort-premium-chef-story",
+        "hotel-resort-premium-stats",
+        "hotel-resort-premium-signature-dishes",
+        "hotel-resort-premium-testimonials",
+        "hotel-resort-premium-atmosphere",
+        "hotel-resort-premium-gallery",
+        "hotel-resort-premium-faq",
+        "hotel-resort-premium-reservation-cta",
+        "hotel-resort-premium-contact"
+      ]
+    }
+  },
+  "sectionShell": {
+    "strategy": "package",
+    "componentId": "hotel-resort-premium-section-shell"
+  },
+  "aiGeneration": {
+    "contentProfile": "hotel-resort-premium-luxury",
+    "suggestedPages": ["menu", "gallery", "reserve"]
+  }
+}

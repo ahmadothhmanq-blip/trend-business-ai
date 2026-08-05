@@ -1,0 +1,10 @@
+{
+  "pageId": "menu",
+  "layoutId": "default",
+  "regions": {
+    "header": ["restaurant-premium-nav"],
+    "sidebar": ["restaurant-premium-sidebar-rail"],
+    "main": ["restaurant-premium-tasting-menu", "restaurant-premium-signature-dishes"],
+    "footer": ["restaurant-premium-footer"]
+  }
+}

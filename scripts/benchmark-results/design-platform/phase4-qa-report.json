@@ -1,0 +1,151 @@
+{
+  "passed": 36,
+  "total": 36,
+  "checks": [
+    {
+      "id": "dna.phase",
+      "ok": true
+    },
+    {
+      "id": "dna.version",
+      "ok": true
+    },
+    {
+      "id": "sector.count",
+      "ok": true
+    },
+    {
+      "id": "experience.count",
+      "ok": true
+    },
+    {
+      "id": "catalog.count",
+      "ok": true
+    },
+    {
+      "id": "catalog.valid",
+      "ok": true
+    },
+    {
+      "id": "module.core",
+      "ok": true
+    },
+    {
+      "id": "module.sectors",
+      "ok": true
+    },
+    {
+      "id": "module.experience-profiles",
+      "ok": true
+    },
+    {
+      "id": "module.schema",
+      "ok": true
+    },
+    {
+      "id": "module.validation",
+      "ok": true
+    },
+    {
+      "id": "module.ai",
+      "ok": true
+    },
+    {
+      "id": "module.docs",
+      "ok": true
+    },
+    {
+      "id": "sector.saas",
+      "ok": true
+    },
+    {
+      "id": "sector.restaurant",
+      "ok": true
+    },
+    {
+      "id": "sector.real-estate",
+      "ok": true
+    },
+    {
+      "id": "sector.medical",
+      "ok": true
+    },
+    {
+      "id": "sector.creative-studio",
+      "ok": true
+    },
+    {
+      "id": "sector.hotel-resort",
+      "ok": true
+    },
+    {
+      "id": "sector.law-firm",
+      "ok": true
+    },
+    {
+      "id": "sector.finance",
+      "ok": true
+    },
+    {
+      "id": "sector.education",
+      "ok": true
+    },
+    {
+      "id": "sector.logistics",
+      "ok": true
+    },
+    {
+      "id": "ai.selection",
+      "ok": true
+    },
+    {
+      "id": "ai.confidence",
+      "ok": true
+    },
+    {
+      "id": "resolve.foundations",
+      "ok": true
+    },
+    {
+      "id": "resolve.experience",
+      "ok": true
+    },
+    {
+      "id": "docs.ARCHITECTURE",
+      "ok": true
+    },
+    {
+      "id": "docs.SECTOR-CATALOG",
+      "ok": true
+    },
+    {
+      "id": "docs.EXPERIENCE-CATALOG",
+      "ok": true
+    },
+    {
+      "id": "docs.BACKWARD-COMPATIBILITY",
+      "ok": true
+    },
+    {
+      "id": "isolation.lib.website.template-v2",
+      "ok": true
+    },
+    {
+      "id": "isolation.templates.website",
+      "ok": true
+    },
+    {
+      "id": "isolation.lib.website.builder",
+      "ok": true
+    },
+    {
+      "id": "tsc.sector-dna",
+      "ok": true
+    },
+    {
+      "id": "eslint.sector-dna",
+      "ok": true
+    }
+  ],
+  "failed": []
+}

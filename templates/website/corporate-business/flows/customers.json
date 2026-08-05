@@ -1,0 +1,7 @@
+{
+  "pageId": "customers",
+  "layoutId": "default",
+  "regions": {
+    "main": ["corporate-business-hero", "corporate-business-portfolio", "corporate-business-features"]
+  }
+}

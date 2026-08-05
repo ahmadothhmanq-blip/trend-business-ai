@@ -27,7 +27,7 @@ import { AiBuilderPanel } from "@/components/dashboard/website-builder/ai-builde
 import { ProfessionalPanel } from "@/components/dashboard/website-builder/professional-panel";
 import { BusinessHubPanel } from "@/components/dashboard/website-builder/business-hub-panel";
 import { PublishingHubPanel } from "@/components/dashboard/website-builder/publishing-hub-panel";
-import { EnterprisePanel } from "@/components/dashboard/website-builder/enterprise-panel";
+import { SiteImageManagerPanel } from "@/components/dashboard/website-builder/site-image-manager-panel";
 import type { GeneratedProjectFile } from "@/lib/ai/types";
 import type { GeneratedWebsiteProject } from "@/plugins/website/types";
 import type { WebsiteGeneration } from "@/types/database";
@@ -240,6 +240,21 @@ export function BuilderWorkspace({
         <BlocksPanel
           disabled={disabled}
           onInsert={handleInsertBlock}
+        />
+      );
+    }
+    if (activeTool === "media") {
+      return (
+        <SiteImageManagerPanel
+          generationId={generationId}
+          disabled={disabled}
+          onProjectUpdated={(project) =>
+            onSaved({
+              project: project as GeneratedWebsiteProject,
+              generation: { id: generationId } as WebsiteGeneration,
+            })
+          }
+          className="h-full p-3"
         />
       );
     }

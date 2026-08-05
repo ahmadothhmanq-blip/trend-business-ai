@@ -7,6 +7,7 @@ import {
   WEBSITE_STRUCTURE_TEMPLATE_INDEX,
 } from "@/lib/website/builder/template-package-index";
 import { resolveStructureTemplateForIndustry as resolveByIndustry } from "@/lib/website/builder/industry-structure-routing";
+import { resolveBuilderTemplatePackageId } from "@/lib/website/builder/resolve-builder-template-package-id";
 
 export type { WebsiteStructureTemplateChoice } from "@/lib/website/builder/template-catalog";
 import type {
@@ -43,9 +44,13 @@ const INTERNAL_GENERATION_STRUCTURE_FALLBACK: WebsiteStructureTemplate = {
 export function getWebsiteStructureTemplate(
   id: string,
 ): WebsiteStructureTemplate | undefined {
+  const direct = WEBSITE_STRUCTURE_TEMPLATE_INDEX[id];
+  if (direct) return direct;
+
+  const resolvedId = resolveBuilderTemplatePackageId(id);
   return (
-    WEBSITE_STRUCTURE_TEMPLATE_INDEX[id] ??
-    WEBSITE_STRUCTURE_TEMPLATES.find((template) => template.id === id)
+    WEBSITE_STRUCTURE_TEMPLATE_INDEX[resolvedId] ??
+    WEBSITE_STRUCTURE_TEMPLATES.find((template) => template.id === resolvedId)
   );
 }
 

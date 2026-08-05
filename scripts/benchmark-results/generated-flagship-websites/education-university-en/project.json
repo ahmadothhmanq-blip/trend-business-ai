@@ -1,0 +1,9 @@
+{
+  "slug": "education-university-en",
+  "packageId": "education-premium",
+  "title": "Heritage Academy",
+  "language": "English",
+  "hasV2": true,
+  "componentCount": 15,
+  "source": "structure-template"
+}

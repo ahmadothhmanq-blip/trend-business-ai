@@ -1,0 +1,12 @@
+{
+  "id": "reserve",
+  "title": "Reserve",
+  "path": "/reserve",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "sidebar",
+    "main",
+    "footer"
+  ]
+}

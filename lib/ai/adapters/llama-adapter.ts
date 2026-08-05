@@ -8,6 +8,11 @@ import type {
 
 export class LlamaAdapter implements AIProvider {
   readonly name = "llama" as const;
+  private readonly model = "llama-3.3-70b";
+
+  getModelName(): string {
+    return this.model;
+  }
 
   async generateJson<T>(_request: JsonGenerationRequest): Promise<T> {
     void _request;

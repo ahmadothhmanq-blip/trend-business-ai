@@ -143,7 +143,7 @@ export type WbTemplateRuntimeCanvas = {
 
 export type WbTemplateRuntimeLayout = {
   id: string;
-  kind: "single-column" | "sidebar-left" | "sidebar-right" | "full-bleed";
+  kind: "single-column" | "sidebar-left" | "sidebar-right" | "full-bleed" | "editorial-reveal";
   label?: string;
   description?: string;
   regionOrder: string[];

@@ -3,6 +3,7 @@
 import {
   Blocks,
   Briefcase,
+  ImageIcon,
   Layers,
   Palette,
   Rocket,
@@ -17,6 +18,7 @@ export type BuilderToolId =
   | "structure"
   | "design"
   | "blocks"
+  | "media"
   | "ai"
   | "professional"
   | "business"
@@ -31,6 +33,7 @@ const TOOLS: Array<{
   { id: "structure", labelKey: "structure", icon: Layers },
   { id: "design", labelKey: "design", icon: Palette },
   { id: "blocks", labelKey: "blocks", icon: Blocks },
+  { id: "media", labelKey: "media", icon: ImageIcon },
   { id: "ai", labelKey: "ai", icon: Wand2 },
   { id: "professional", labelKey: "professional", icon: Sparkles },
   { id: "business", labelKey: "business", icon: Briefcase },

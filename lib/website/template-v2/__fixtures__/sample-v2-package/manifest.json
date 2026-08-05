@@ -1,0 +1,23 @@
+{
+  "specVersion": "3.0.0",
+  "id": "sample-v2-package",
+  "version": "1.0.0",
+  "name": "Sample V2 Package",
+  "description": "Fixture package for Template Architecture V2 P0 tests.",
+  "architecture": {
+    "version": "v2",
+    "composer": "region-grid",
+    "sdkVersion": "1.0.0"
+  },
+  "presentation": { "file": "presentation/presentation.json" },
+  "tokens": { "file": "tokens/tokens.json" },
+  "motion": { "file": "motion/motion.json" },
+  "responsive": { "file": "responsive/responsive.json" },
+  "componentLibrary": {
+    "file": "components/registry.json",
+    "root": "components"
+  },
+  "pageFlows": {
+    "home": "flows/home.json"
+  }
+}

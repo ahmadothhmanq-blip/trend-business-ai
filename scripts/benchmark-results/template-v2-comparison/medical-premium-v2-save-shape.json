@@ -1,0 +1,14 @@
+{
+  "title": "Aether Medical",
+  "fileCount": 16,
+  "settings": {
+    "templateIntelligenceId": "ti-medical-care",
+    "templateIntelligenceCategory": "Corporate",
+    "templateArchitectureVersion": "v2",
+    "templatePresentationHash": "6fb3b782cbf51acd",
+    "templateComposerId": "region-grid",
+    "websiteStructureTemplateId": "medical-premium",
+    "templatePackageId": "medical-premium",
+    "selectedTemplateId": "medical-premium"
+  }
+}

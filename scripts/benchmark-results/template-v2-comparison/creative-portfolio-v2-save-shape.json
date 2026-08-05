@@ -1,0 +1,14 @@
+{
+  "title": "Kinetic Atelier",
+  "fileCount": 16,
+  "settings": {
+    "templateIntelligenceId": "ti-creative-studio",
+    "templateIntelligenceCategory": "Creative",
+    "templateArchitectureVersion": "v2",
+    "templatePresentationHash": "1ede199c9ef9ab8a",
+    "templateComposerId": "region-grid",
+    "websiteStructureTemplateId": "creative-portfolio",
+    "templatePackageId": "creative-portfolio",
+    "selectedTemplateId": "creative-portfolio"
+  }
+}

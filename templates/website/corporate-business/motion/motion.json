@@ -1,0 +1,6 @@
+{
+  "tbdpNative": true,
+  "sectorDnaId": "law-firm",
+  "experienceProfiles": ["corporate", "executive", "trust"],
+  "presetBinding": "atlas-reveal"
+}

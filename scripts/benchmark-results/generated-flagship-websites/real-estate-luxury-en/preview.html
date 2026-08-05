@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en" data-v2-render="v2-files" data-v2-package="real-estate-premium" data-v2-layout="sidebar-right">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Monolith Estate — Live Preview</title>
+  <style>/* Template Architecture V2 — real-estate-premium · spec 2.0.0 */
+:root {
+  --v2-package: "real-estate-premium";
+  --color-primary: #1C1917;
+  --color-secondary: #3D3A36;
+  --color-accent: #B8956B;
+  --color-background: #F5F0EB;
+  --color-foreground: #1C1917;
+  --color-muted: rgba(28,25,23,0.58);
+  --color-surface: #FDFCFA;
+  --color-stone: #E8E2DA;
+  --color-brass: #B8956B;
+  --color-linen: #FAF8F5;
+  --font-display: Fraunces, ui-sans-serif, system-ui, sans-serif;
+  --font-body: Outfit, ui-sans-serif, system-ui, sans-serif;
+  --spacing-unit: 0.25rem;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --shadow-surface: 0 24px 64px rgba(28,25,23,0.12);
+  --shadow-glow: 0 0 80px rgba(184,149,107,0.14);
+  --shadow-inset: inset 0 1px 0 rgba(253,252,250,0.8);
+  --border-default: rgba(28,25,23,0.1);
+  --border-brass: rgba(184,149,107,0.32);
+  --border-subtle: rgba(28,25,23,0.05);
+}
+
+/* V2 language profile — RTL typography adaptation */
+[dir="rtl"] {
+  --font-display: Tajawal, ui-serif, Georgia, serif;
+  --font-body: "Noto Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Noto+Sans+Arabic:wght@400;500;600&family=Outfit:wght@300;400;500;600&family=Tajawal:wght@500;600;700&display=swap");
+
+@keyframes rep-parallax-lift {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes rep-stone-rise {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes rep-brass-draw {
+  from { transform: scaleX(0); opacity: 0; }
+  to { transform: scaleX(1); opacity: 1; }
+}
+@keyframes rep-ken-burns {
+  from { transform: scale(1.03); }
+  to { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rep-animate, [data-rep-motion] { animation: none !important; transition: none !important; }
+}
+
+.rep-font-display { font-family: var(--font-display), "Fraunces", Georgia, serif; }
+.rep-font-body { font-family: var(--font-body), "Outfit", system-ui, sans-serif; }
+.rep-eyebrow {
+  font-family: var(--font-body), "Outfit", system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--color-brass, #B8956B);
+}
+.rep-headline {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-size: clamp(2.5rem, 5.5vw, 4.5rem);
+  font-weight: 400;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  color: var(--color-foreground);
+}
+.rep-headline-sm {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  color: var(--color-foreground);
+}
+.rep-body {
+  font-family: var(--font-body), "Outfit", system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.72;
+  color: var(--color-muted, rgba(28,25,23,0.58));
+}
+.rep-brass-rule {
+  height: 1px;
+  width: 3.5rem;
+  background: linear-gradient(90deg, var(--color-brass, #B8956B), transparent);
+  transform-origin: left;
+}
+[dir="rtl"] .rep-brass-rule { transform-origin: right; }
+.rep-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.875rem;
+  padding: 0.875rem 2rem;
+  font-family: var(--font-body), "Outfit", system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-linen, #FAF8F5);
+  background: var(--color-primary, #1C1917);
+  border: 1px solid var(--border-brass, rgba(184,149,107,0.32));
+  transition: background 0.4s ease, box-shadow 0.4s ease;
+}
+.rep-btn-primary:hover {
+  background: var(--color-secondary, #3D3A36);
+  box-shadow: var(--shadow-glow);
+}
+.rep-btn-primary:focus-visible { outline: 2px solid var(--color-brass); outline-offset: 3px; }
+.rep-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.875rem;
+  padding: 0.875rem 1.75rem;
+  font-family: var(--font-body), "Outfit", system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-foreground);
+  border: 1px solid var(--border-default, rgba(28,25,23,0.1));
+  background: transparent;
+  transition: border-color 0.35s ease, color 0.35s ease;
+}
+.rep-btn-ghost:hover { border-color: var(--color-brass); color: var(--color-brass); }
+.rep-btn-ghost:focus-visible { outline: 2px solid var(--color-brass); outline-offset: 3px; }
+.rep-section { padding-block: clamp(5rem, 11vw, 7.5rem); }
+.rep-card {
+  border: 1px solid var(--border-subtle);
+  background: var(--color-surface);
+  transition: box-shadow 0.5s ease, transform 0.5s ease;
+}
+.rep-card:hover { box-shadow: var(--shadow-surface); transform: translateY(-2px); }
+.rep-focus-ring:focus-visible { outline: 2px solid var(--color-brass); outline-offset: 2px; }
+
+/* TBDP Native Consumption — real-estate-premium
+   sector:real-estate · experience:luxury, executive, corporate
+   identity:monolith-estate · context:c7f5916f1540502c
+   integration:5.0.0 · consumption:1.0.0 */
+:root {
+  --tbdp-native: 1;
+  --tbdp-native-package: "real-estate-premium";
+  --tbdp-sector-dna: "real-estate";
+  --tbdp-template-identity: "monolith-estate";
+  --tbdp-experience-primary: "luxury";
+  --tbdp-context-hash: "c7f5916f1540502c";
+  --tbdp-theme-mode: "light";
+  --tbdp-direction: "ltr";
+}
+
+/* TBDP Foundations — official design authority (scoped vars) */
+/* Trend Business AI Design Platform · 1.0.0 · foundations-1 */
+:root {
+  --tbdp-color-primary: #0047E6;
+  --tbdp-color-secondary: #334155;
+  --tbdp-color-accent: #4D85FF;
+  --tbdp-color-success: #10B981;
+  --tbdp-color-warning: #F59E0B;
+  --tbdp-color-danger: #EF4444;
+  --tbdp-color-info: #3B82F6;
+  --tbdp-color-surface-base: #FFFFFF;
+  --tbdp-color-surface-raised: #F8FAFC;
+  --tbdp-color-surface-overlay: #FFFFFF;
+  --tbdp-color-surface-sunken: #F1F5F9;
+  --tbdp-color-surface-inverse: #0F172A;
+  --tbdp-color-background-canvas: #F8FAFC;
+  --tbdp-color-background-subtle: #F1F5F9;
+  --tbdp-color-background-emphasis: #FFFFFF;
+  --tbdp-color-background-inverse: #020617;
+  --tbdp-color-text-primary: #0F172A;
+  --tbdp-color-text-secondary: #475569;
+  --tbdp-color-text-tertiary: #64748B;
+  --tbdp-color-text-disabled: #94A3B8;
+  --tbdp-color-text-inverse: #FFFFFF;
+  --tbdp-color-text-link: #0047E6;
+  --tbdp-color-text-linkHover: #0038B8;
+  --tbdp-color-border-default: #E2E8F0;
+  --tbdp-color-border-subtle: #F1F5F9;
+  --tbdp-color-border-strong: #CBD5E1;
+  --tbdp-color-border-focus: #1A5CFF;
+  --tbdp-color-border-inverse: rgba(255, 255, 255, 0.16);
+  --tbdp-color-overlay-scrim: rgba(2, 6, 23, 0.4);
+  --tbdp-color-overlay-scrimStrong: rgba(2, 6, 23, 0.64);
+  --tbdp-color-overlay-backdrop: rgba(2, 6, 23, 0.24);
+  --tbdp-color-overlay-highlight: rgba(26, 92, 255, 0.12);
+  --tbdp-opacity-transparent: 0;
+  --tbdp-opacity-subtle: 0.04;
+  --tbdp-opacity-muted: 0.08;
+  --tbdp-opacity-soft: 0.12;
+  --tbdp-opacity-medium: 0.24;
+  --tbdp-opacity-strong: 0.48;
+  --tbdp-opacity-opaque: 1;
+  --tbdp-spacing-micro: 0.125rem;
+  --tbdp-spacing-xs: 0.25rem;
+  --tbdp-spacing-sm: 0.5rem;
+  --tbdp-spacing-md: 1rem;
+  --tbdp-spacing-lg: 1.5rem;
+  --tbdp-spacing-xl: 2rem;
+  --tbdp-spacing-2xl: 3rem;
+  --tbdp-spacing-3xl: 4rem;
+  --tbdp-spacing-4xl: 6rem;
+  --tbdp-radius-sharp: 0;
+  --tbdp-radius-sm: 0.25rem;
+  --tbdp-radius-md: 0.5rem;
+  --tbdp-radius-lg: 0.75rem;
+  --tbdp-radius-pill: 9999px;
+  --tbdp-radius-circle: 50%;
+  --tbdp-shadow-0: none;
+  --tbdp-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-2: 0 2px 8px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-3: 0 8px 24px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);
+  --tbdp-shadow-4: 0 16px 48px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.08);
+  --tbdp-shadow-5: 0 24px 64px rgba(15, 23, 42, 0.18), 0 8px 24px rgba(15, 23, 42, 0.1);
+  --tbdp-container-sm: 640px;
+  --tbdp-container-md: 768px;
+  --tbdp-container-lg: 1024px;
+  --tbdp-container-xl: 1280px;
+  --tbdp-container-2xl: 1440px;
+  --tbdp-container-full: 100%;
+  --tbdp-font-display: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --tbdp-font-body: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --tbdp-font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", monospace;
+}
+
+/* TBDP Experience — motion, interaction, RTL, accessibility */
+/* TBDP Phase 3 — Motion System · tbdp-xp */
+
+@keyframes tbdp-xp-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes tbdp-xp-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes tbdp-xp-rise {
+  from { opacity: 0; transform: translateY(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tbdp-xp-rise-rtl {
+  from { opacity: 0; transform: translateX(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes tbdp-xp-slide-end {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-slide-start {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(calc(var(--tbdp-spacing-sm) * -1)); }
+  40%, 80% { transform: translateX(var(--tbdp-spacing-sm)); }
+}
+
+@keyframes tbdp-xp-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@keyframes tbdp-xp-lift {
+  to { transform: translateY(calc(var(--tbdp-spacing-sm) * -1)); box-shadow: var(--tbdp-shadow-2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp-motion] { animation: none !important; transition: none !important; }
+}
+
+[data-tbdp-xp-motion] { will-change: transform, opacity; }
+[data-tbdp-xp-motion="page-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="page-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="section-reveal"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-headline"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-media"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="card-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="grid-stagger"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="modal-enter"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="modal-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="drawer-slide"] { animation-name: tbdp-xp-slide-end; }
+[data-tbdp-xp-motion="toast-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="toast-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="tooltip-fade"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="scroll-reveal-up"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="stagger-children"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hover-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="focus-ring"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="success-pulse"] { animation-name: tbdp-xp-pulse; }
+[data-tbdp-xp-motion="error-shake"] { animation-name: tbdp-xp-shake; }
+
+/* TBDP Experience — interaction utilities */
+[data-tbdp-xp] { --tbdp-xp-focus: var(--tbdp-color-border-focus); }
+[data-tbdp-xp-feedback="loading"] { cursor: wait; }
+[data-tbdp-xp-feedback="error"] { border-color: var(--tbdp-color-danger); }
+[data-tbdp-xp-feedback="success"] { border-color: var(--tbdp-color-success); }
+[data-tbdp-xp-touch="true"] { min-height: var(--tbdp-spacing-2xl); min-width: var(--tbdp-spacing-2xl); }
+[data-tbdp-xp-gpu] { transform: translateZ(0); backface-visibility: hidden; }
+[data-tbdp-xp-contain] { content-visibility: auto; contain-intrinsic-size: auto 500px; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp], [data-tbdp-xp-motion] { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+/* V2 sidebar-left layout */
+.v2-layout-sidebar-left .v2-sidebar-shell { gap: 0; align-items: flex-start; }
+.v2-sidebar-rail {
+  border-inline-end: 1px solid var(--border-subtle, rgba(244,237,228,0.06));
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-inline-end: clamp(1.25rem, 3vw, 2rem);
+}
+[dir='rtl'] .v2-sidebar-rail { border-inline-end: none; border-inline-start: 1px solid var(--border-subtle, rgba(244,237,228,0.06)); }
+.v2-main-canvas > [data-v2-component] + [data-v2-component] { margin-top: 0; }
+.v2-layout-sidebar-left .v2-main-canvas { padding-inline-start: 0; }
+@media (max-width: 1023px) {
+  .v2-sidebar-rail { display: none !important; }
+}
+
+/* V2 sidebar-right layout */
+.v2-layout-sidebar-right .v2-sidebar-shell { gap: 0; align-items: flex-start; }
+.v2-layout-sidebar-right .v2-sidebar-rail {
+  border-inline-start: 1px solid var(--border-subtle, rgba(28,25,23,0.06));
+  border-inline-end: none;
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-inline-start: clamp(1.25rem, 3vw, 2rem);
+}
+[dir='rtl'] .v2-layout-sidebar-right .v2-sidebar-rail {
+  border-inline-start: none;
+  border-inline-end: 1px solid var(--border-subtle, rgba(28,25,23,0.06));
+}
+
+/* V2 full-bleed layout */
+.v2-layout-full-bleed .v2-overlay-canvas { width: 100%; }
+.v2-layout-full-bleed .v2-main-canvas { width: 100%; max-width: var(--container-max, 76rem); margin-inline: auto; }
+
+/* V2 editorial-reveal layout (creative portfolio) */
+.v2-layout-editorial-reveal .v2-main-canvas { width: 100%; }
+.v2-layout-editorial-reveal .v2-overlay-reveal { width: 100%; }
+
+:root {
+  --container-max: 88rem;
+  --font-body: Outfit, ui-sans-serif, system-ui, sans-serif;
+  --font-display: Fraunces, ui-sans-serif, system-ui, sans-serif;
+  --color-surface: #FDFCFA;
+  --color-foreground: #1C1917;
+  --color-background: #F5F0EB;
+  --color-accent: #B8956B;
+  --color-secondary: #3D3A36; --color-primary: #1C1917; }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--color-background, #0f172a);
+      color: var(--color-foreground, #f8fafc);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .page { display: none; padding-bottom: 2rem; }
+    .page:target { display: block; }
+    body:not(:has(.page:target)) .page#home { display: block; }
+    img { max-width: 100%; height: auto; display: block; }
+    a { color: inherit; }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+<style id="tbdp-wiring-layer">
+/* TBDP Integration Layer — advisory token layer */
+
+/* Trend Business AI Design Platform · 1.0.0 · foundations-1 */
+:root {
+  --tbdp-color-primary: #0047E6;
+  --tbdp-color-secondary: #334155;
+  --tbdp-color-accent: #4D85FF;
+  --tbdp-color-success: #10B981;
+  --tbdp-color-warning: #F59E0B;
+  --tbdp-color-danger: #EF4444;
+  --tbdp-color-info: #3B82F6;
+  --tbdp-color-surface-base: #FFFFFF;
+  --tbdp-color-surface-raised: #F8FAFC;
+  --tbdp-color-surface-overlay: #FFFFFF;
+  --tbdp-color-surface-sunken: #F1F5F9;
+  --tbdp-color-surface-inverse: #0F172A;
+  --tbdp-color-background-canvas: #F8FAFC;
+  --tbdp-color-background-subtle: #F1F5F9;
+  --tbdp-color-background-emphasis: #FFFFFF;
+  --tbdp-color-background-inverse: #020617;
+  --tbdp-color-text-primary: #0F172A;
+  --tbdp-color-text-secondary: #475569;
+  --tbdp-color-text-tertiary: #64748B;
+  --tbdp-color-text-disabled: #94A3B8;
+  --tbdp-color-text-inverse: #FFFFFF;
+  --tbdp-color-text-link: #0047E6;
+  --tbdp-color-text-linkHover: #0038B8;
+  --tbdp-color-border-default: #E2E8F0;
+  --tbdp-color-border-subtle: #F1F5F9;
+  --tbdp-color-border-strong: #CBD5E1;
+  --tbdp-color-border-focus: #1A5CFF;
+  --tbdp-color-border-inverse: rgba(255, 255, 255, 0.16);
+  --tbdp-color-overlay-scrim: rgba(2, 6, 23, 0.4);
+  --tbdp-color-overlay-scrimStrong: rgba(2, 6, 23, 0.64);
+  --tbdp-color-overlay-backdrop: rgba(2, 6, 23, 0.24);
+  --tbdp-color-overlay-highlight: rgba(26, 92, 255, 0.12);
+  --tbdp-opacity-transparent: 0;
+  --tbdp-opacity-subtle: 0.04;
+  --tbdp-opacity-muted: 0.08;
+  --tbdp-opacity-soft: 0.12;
+  --tbdp-opacity-medium: 0.24;
+  --tbdp-opacity-strong: 0.48;
+  --tbdp-opacity-opaque: 1;
+  --tbdp-spacing-micro: 0.125rem;
+  --tbdp-spacing-xs: 0.25rem;
+  --tbdp-spacing-sm: 0.5rem;
+  --tbdp-spacing-md: 1rem;
+  --tbdp-spacing-lg: 1.5rem;
+  --tbdp-spacing-xl: 2rem;
+  --tbdp-spacing-2xl: 3rem;
+  --tbdp-spacing-3xl: 4rem;
+  --tbdp-spacing-4xl: 6rem;
+  --tbdp-radius-sharp: 0;
+  --tbdp-radius-sm: 0.25rem;
+  --tbdp-radius-md: 0.5rem;
+  --tbdp-radius-lg: 0.75rem;
+  --tbdp-radius-pill: 9999px;
+  --tbdp-radius-circle: 50%;
+  --tbdp-shadow-0: none;
+  --tbdp-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-2: 0 2px 8px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-3: 0 8px 24px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);
+  --tbdp-shadow-4: 0 16px 48px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.08);
+  --tbdp-shadow-5: 0 24px 64px rgba(15, 23, 42, 0.18), 0 8px 24px rgba(15, 23, 42, 0.1);
+  --tbdp-container-sm: 640px;
+  --tbdp-container-md: 768px;
+  --tbdp-container-lg: 1024px;
+  --tbdp-container-xl: 1280px;
+  --tbdp-container-2xl: 1440px;
+  --tbdp-container-full: 100%;
+  --tbdp-font-display: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --tbdp-font-body: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --tbdp-font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", monospace;
+}
+
+/* TBDP Phase 3 — Motion System · tbdp-xp */
+
+@keyframes tbdp-xp-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes tbdp-xp-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes tbdp-xp-rise {
+  from { opacity: 0; transform: translateY(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tbdp-xp-rise-rtl {
+  from { opacity: 0; transform: translateX(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes tbdp-xp-slide-end {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-slide-start {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(calc(var(--tbdp-spacing-sm) * -1)); }
+  40%, 80% { transform: translateX(var(--tbdp-spacing-sm)); }
+}
+
+@keyframes tbdp-xp-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@keyframes tbdp-xp-lift {
+  to { transform: translateY(calc(var(--tbdp-spacing-sm) * -1)); box-shadow: var(--tbdp-shadow-2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp-motion] { animation: none !important; transition: none !important; }
+}
+
+[data-tbdp-xp-motion] { will-change: transform, opacity; }
+[data-tbdp-xp-motion="page-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="page-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="section-reveal"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-headline"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-media"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="card-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="grid-stagger"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="modal-enter"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="modal-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="drawer-slide"] { animation-name: tbdp-xp-slide-end; }
+[data-tbdp-xp-motion="toast-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="toast-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="tooltip-fade"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="scroll-reveal-up"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="stagger-children"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hover-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="focus-ring"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="success-pulse"] { animation-name: tbdp-xp-pulse; }
+[data-tbdp-xp-motion="error-shake"] { animation-name: tbdp-xp-shake; }
+
+/* TBDP Experience — interaction utilities */
+[data-tbdp-xp] { --tbdp-xp-focus: var(--tbdp-color-border-focus); }
+[data-tbdp-xp-feedback="loading"] { cursor: wait; }
+[data-tbdp-xp-feedback="error"] { border-color: var(--tbdp-color-danger); }
+[data-tbdp-xp-feedback="success"] { border-color: var(--tbdp-color-success); }
+[data-tbdp-xp-touch="true"] { min-height: var(--tbdp-spacing-2xl); min-width: var(--tbdp-spacing-2xl); }
+[data-tbdp-xp-gpu] { transform: translateZ(0); backface-visibility: hidden; }
+[data-tbdp-xp-contain] { content-visibility: auto; contain-intrinsic-size: auto 500px; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp], [data-tbdp-xp-motion] { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+  <div class="page" id="home">
+    <link rel="preload" as="image" href="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" fetchPriority="high"/><div class="flex min-h-screen flex-col bg-[var(--color-background)] text-[var(--color-foreground)] antialiased v2-template v2-real-estate-premium v2-layout-sidebar-right" data-v2-package="real-estate-premium" data-v2-composer="region-grid" data-v2-layout="sidebar-right"><header data-v2-region="header"><header data-v2-component="real-estate-premium-nav" class="fixed inset-x-0 top-0 z-[60] transition-all duration-500 border-b border-transparent bg-transparent"><div class="mx-auto flex h-[4.75rem] max-w-[88rem] items-center justify-between gap-6 px-5 sm:px-8 lg:px-10"><a href="#top" class="rep-font-display text-lg tracking-[0.04em] text-[var(--color-foreground)] transition hover:text-[var(--color-brass)] rep-focus-ring">Monolith Estate</a><nav aria-label="Primary" class="hidden items-center gap-10 lg:flex"><a href="#collection" class="rep-font-body text-[0.6875rem] font-medium uppercase tracking-[0.28em] text-[var(--color-muted)] transition hover:text-[var(--color-foreground)] rep-focus-ring">Collection</a><a href="#neighborhoods" class="rep-font-body text-[0.6875rem] font-medium uppercase tracking-[0.28em] text-[var(--color-muted)] transition hover:text-[var(--color-foreground)] rep-focus-ring">Neighborhoods</a><a href="#advisors" class="rep-font-body text-[0.6875rem] font-medium uppercase tracking-[0.28em] text-[var(--color-muted)] transition hover:text-[var(--color-foreground)] rep-focus-ring">Advisors</a><a href="#inquire" class="rep-font-body text-[0.6875rem] font-medium uppercase tracking-[0.28em] text-[var(--color-muted)] transition hover:text-[var(--color-foreground)] rep-focus-ring">Inquire</a></nav><div class="flex items-center gap-3"><a href="#inquire" class="rep-btn-primary hidden sm:inline-flex">Get started</a><button type="button" aria-expanded="false" aria-controls="rep-mobile-nav" aria-label="Open menu" class="inline-flex h-11 w-11 items-center justify-center border border-[var(--border-default)] lg:hidden rep-focus-ring"><span class="sr-only">Menu</span><span aria-hidden="true" class="flex flex-col gap-1.5"><span class="block h-px w-5 bg-current transition "></span><span class="block h-px w-5 bg-current transition "></span><span class="block h-px w-5 bg-current transition "></span></span></button></div></div></header></header><div class="v2-sidebar-shell mx-auto flex w-full max-w-[var(--container-max,82rem)] flex-col lg:flex-row"><h1 class="sr-only text-4xl font-bold">Monolith Estate</h1><main data-v2-region="main" class="v2-main-canvas min-w-0 flex-1"><section id="top" data-v2-component="real-estate-premium-hero" aria-labelledby="rep-hero-title" class="relative min-h-[92svh] overflow-hidden bg-[var(--color-background)]"><div class="absolute inset-0"><img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="Luxury residence with architectural distinction and horizon views" class="h-full w-full object-cover motion-safe:animate-[rep-ken-burns_14s_ease-out_both]" fetchPriority="high"/><div class="absolute inset-0 bg-gradient-to-t from-[var(--color-background)] via-[var(--color-background)]/50 to-[var(--color-background)]/20"></div><div class="absolute inset-0 bg-gradient-to-r from-[var(--color-background)]/80 via-transparent to-transparent"></div></div><div class="relative z-10 flex min-h-[92svh] flex-col justify-end px-5 pb-16 pt-36 sm:px-8 lg:px-10 lg:pb-24"><div class="max-w-2xl"><p class="rep-eyebrow mb-6 motion-safe:animate-[rep-stone-rise_0.9s_ease_0.1s_both]">Private collection</p><h1 id="rep-hero-title" class="rep-headline motion-safe:animate-[rep-parallax-lift_1s_ease_0.2s_both]">Residences of quiet distinction</h1><div class="rep-brass-rule my-8 motion-safe:animate-[rep-brass-draw_0.8s_ease_0.45s_both]"></div><p class="rep-body max-w-lg motion-safe:animate-[rep-stone-rise_0.9s_ease_0.5s_both]">Luxury residential brokerage in Manhattan</p><div class="mt-10 flex flex-wrap gap-4 motion-safe:animate-[rep-stone-rise_0.9s_ease_0.6s_both]"><a href="#inquire" class="rep-btn-primary">Get started</a><a href="#collection" class="rep-btn-ghost">Learn more</a></div></div><dl class="mt-16 flex flex-wrap gap-8 border-t border-[var(--border-subtle)] pt-8 motion-safe:animate-[rep-stone-rise_1s_ease_0.75s_both]"><div><dt class="rep-font-body text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">Bedrooms</dt><dd class="rep-font-display mt-1 text-2xl text-[var(--color-foreground)]">5–7</dd></div><div><dt class="rep-font-body text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">Sq ft</dt><dd class="rep-font-display mt-1 text-2xl text-[var(--color-foreground)]">8,400</dd></div><div><dt class="rep-font-body text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">Terrace</dt><dd class="rep-font-display mt-1 text-2xl text-[var(--color-foreground)]">2,100</dd></div></dl></div></section><section id="collection" data-v2-component="real-estate-premium-collection" aria-labelledby="rep-collection-title" class="rep-section"><div class="px-5 sm:px-8 lg:px-10"><header class="mb-14 max-w-xl"><p class="rep-eyebrow mb-5">Curated collection</p><h2 id="rep-collection-title" class="rep-headline-sm">Exceptional residences</h2><div class="rep-brass-rule my-6"></div><p class="rep-body">Each property selected for architectural merit, provenance, and the quality of light.</p></header><div class="space-y-16"><article class="grid items-center gap-8 lg:grid-cols-2 lg:gap-14 "><figure class="rep-card overflow-hidden "><img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="The Whitmore Penthouse" class="aspect-[4/3] w-full object-cover transition-transform duration-[1.4s] hover:scale-[1.03]"/></figure><div class=""><p class="rep-font-body text-[0.625rem] uppercase tracking-[0.28em] text-[var(--color-brass)]">Upper East Side, Manhattan</p><h3 class="rep-font-display mt-3 text-3xl text-[var(--color-foreground)]">The Whitmore Penthouse</h3><p class="rep-font-display mt-4 text-2xl text-[var(--color-foreground)]">$18.5M</p><dl class="rep-font-body mt-6 flex gap-8 text-sm text-[var(--color-muted)]"><div><dt class="text-[0.625rem] uppercase tracking-[0.2em]">Beds</dt><dd class="mt-1 text-[var(--color-foreground)]">6</dd></div><div><dt class="text-[0.625rem] uppercase tracking-[0.2em]">Sq ft</dt><dd class="mt-1 text-[var(--color-foreground)]">8,400</dd></div></dl><a href="#inquire" class="rep-btn-ghost mt-8 inline-flex">Request dossier</a></div></article><article class="grid items-center gap-8 lg:grid-cols-2 lg:gap-14 lg:[direction:rtl]"><figure class="rep-card overflow-hidden lg:[direction:ltr]"><img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="Stonegate Manor" class="aspect-[4/3] w-full object-cover transition-transform duration-[1.4s] hover:scale-[1.03]"/></figure><div class="lg:[direction:ltr]"><p class="rep-font-body text-[0.625rem] uppercase tracking-[0.28em] text-[var(--color-brass)]">East Hampton</p><h3 class="rep-font-display mt-3 text-3xl text-[var(--color-foreground)]">Stonegate Manor</h3><p class="rep-font-display mt-4 text-2xl text-[var(--color-foreground)]">$12.2M</p><dl class="rep-font-body mt-6 flex gap-8 text-sm text-[var(--color-muted)]"><div><dt class="text-[0.625rem] uppercase tracking-[0.2em]">Beds</dt><dd class="mt-1 text-[var(--color-foreground)]">7</dd></div><div><dt class="text-[0.625rem] uppercase tracking-[0.2em]">Sq ft</dt><dd class="mt-1 text-[var(--color-foreground)]">11,200</dd></div></dl><a href="#inquire" class="rep-btn-ghost mt-8 inline-flex">Request dossier</a></div></article><article class="grid items-center gap-8 lg:grid-cols-2 lg:gap-14 "><figure class="rep-card overflow-hidden "><img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="Alpine Ridge Estate" class="aspect-[4/3] w-full object-cover transition-transform duration-[1.4s] hover:scale-[1.03]"/></figure><div class=""><p class="rep-font-body text-[0.625rem] uppercase tracking-[0.28em] text-[var(--color-brass)]">Aspen, Colorado</p><h3 class="rep-font-display mt-3 text-3xl text-[var(--color-foreground)]">Alpine Ridge Estate</h3><p class="rep-font-display mt-4 text-2xl text-[var(--color-foreground)]">$24.8M</p><dl class="rep-font-body mt-6 flex gap-8 text-sm text-[var(--color-muted)]"><div><dt class="text-[0.625rem] uppercase tracking-[0.2em]">Beds</dt><dd class="mt-1 text-[var(--color-foreground)]">5</dd></div><div><dt class="text-[0.625rem] uppercase tracking-[0.2em]">Sq ft</dt><dd class="mt-1 text-[var(--color-foreground)]">9,600</dd></div></dl><a href="#inquire" class="rep-btn-ghost mt-8 inline-flex">Request dossier</a></div></article></div></div></section><section id="neighborhoods" data-v2-component="real-estate-premium-neighborhoods" aria-labelledby="rep-neighborhoods-title" class="rep-section bg-[var(--color-surface)]"><div class="px-5 sm:px-8 lg:px-10"><header class="mb-12 max-w-xl"><p class="rep-eyebrow mb-5">Neighborhoods</p><h2 id="rep-neighborhoods-title" class="rep-headline-sm">Places of provenance</h2><div class="rep-brass-rule my-6"></div><p class="rep-body">We represent only the most architecturally significant addresses in each market we serve.</p></header><figure class="rep-card mb-12 overflow-hidden"><img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="Aerial neighborhood view" class="aspect-[21/9] w-full object-cover"/></figure><div class="grid gap-px border border-[var(--border-subtle)] bg-[var(--border-subtle)] md:grid-cols-3"><article class="bg-[var(--color-surface)] p-8 lg:p-10"><p class="rep-font-body text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-brass)]">4 residences</p><h3 class="rep-font-display mt-3 text-2xl text-[var(--color-foreground)]">Upper East Side</h3><p class="rep-font-body mt-4 text-sm leading-relaxed text-[var(--color-muted)]">Classic pre-war elegance meets museum-district refinement.</p></article><article class="bg-[var(--color-surface)] p-8 lg:p-10"><p class="rep-font-body text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-brass)]">3 residences</p><h3 class="rep-font-display mt-3 text-2xl text-[var(--color-foreground)]">Tribeca</h3><p class="rep-font-body mt-4 text-sm leading-relaxed text-[var(--color-muted)]">Loft-scale living with cast-iron character and gallery proximity.</p></article><article class="bg-[var(--color-surface)] p-8 lg:p-10"><p class="rep-font-body text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-brass)]">5 residences</p><h3 class="rep-font-display mt-3 text-2xl text-[var(--color-foreground)]">East Hampton</h3><p class="rep-font-body mt-4 text-sm leading-relaxed text-[var(--color-muted)]">Oceanfront estates and hedgerow privacy on Long Island&#x27;s gold coast.</p></article></div></div></section><section id="architecture" data-v2-component="real-estate-premium-architecture" aria-labelledby="rep-arch-title" class="rep-section"><div class="px-5 sm:px-8 lg:px-10"><div class="grid gap-12 lg:grid-cols-12 lg:gap-8"><div class="lg:col-span-5 lg:pt-8"><p class="rep-eyebrow mb-5">Architecture</p><h2 id="rep-arch-title" class="rep-headline-sm">Designed for permanence</h2><div class="rep-brass-rule my-6"></div><p class="rep-body">We partner with the world&#x27;s most respected architects — each residence a dialogue between material, light, and the landscape it inhabits.</p><ul class="rep-font-body mt-10 space-y-4 text-sm text-[var(--color-muted)]"><li class="flex gap-3 border-s-2 border-[var(--color-brass)] ps-4">Limestone, travertine, and aged brass — materials that deepen with time</li><li class="flex gap-3 border-s-2 border-[var(--color-brass)] ps-4">Floor-to-ceiling glazing calibrated for natural light and privacy</li><li class="flex gap-3 border-s-2 border-[var(--color-brass)] ps-4">Landscape integration by award-winning garden architects</li></ul></div><div class="grid gap-4 lg:col-span-7"><figure class="rep-card overflow-hidden"><img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="Architectural exterior" class="aspect-[16/10] w-full object-cover"/></figure><figure class="rep-card ms-auto w-4/5 overflow-hidden"><img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="Interior architectural detail" class="aspect-[4/3] w-full object-cover"/></figure></div></div></div></section><section id="advisors" data-v2-component="real-estate-premium-advisors" aria-labelledby="rep-advisors-title" class="rep-section bg-[var(--color-surface)]"><div class="px-5 sm:px-8 lg:px-10"><header class="mb-14 max-w-xl"><p class="rep-eyebrow mb-5">Advisors</p><h2 id="rep-advisors-title" class="rep-headline-sm">Your private advisory team</h2><div class="rep-brass-rule my-6"></div><p class="rep-body">Decades of market intelligence, discreet representation, and an unwavering commitment to your interests.</p></header><div class="grid gap-8 md:grid-cols-3"><article class="group"><figure class="rep-card overflow-hidden"><img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="Eleanor Whitmore" class="aspect-[3/4] w-full object-cover grayscale transition duration-700 group-hover:grayscale-0"/></figure><div class="mt-5"><h3 class="rep-font-display text-xl text-[var(--color-foreground)]">Eleanor Whitmore</h3><p class="rep-font-body mt-1 text-sm text-[var(--color-brass)]">Managing Director</p><p class="rep-font-body mt-2 text-xs uppercase tracking-[0.2em] text-[var(--color-muted)]">Manhattan</p></div></article><article class="group"><figure class="rep-card overflow-hidden"><img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="James Calder" class="aspect-[3/4] w-full object-cover grayscale transition duration-700 group-hover:grayscale-0"/></figure><div class="mt-5"><h3 class="rep-font-display text-xl text-[var(--color-foreground)]">James Calder</h3><p class="rep-font-body mt-1 text-sm text-[var(--color-brass)]">Senior Advisor</p><p class="rep-font-body mt-2 text-xs uppercase tracking-[0.2em] text-[var(--color-muted)]">Hamptons</p></div></article><article class="group"><figure class="rep-card overflow-hidden"><img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="Sofia Marchetti" class="aspect-[3/4] w-full object-cover grayscale transition duration-700 group-hover:grayscale-0"/></figure><div class="mt-5"><h3 class="rep-font-display text-xl text-[var(--color-foreground)]">Sofia Marchetti</h3><p class="rep-font-body mt-1 text-sm text-[var(--color-brass)]">Private Client Lead</p><p class="rep-font-body mt-2 text-xs uppercase tracking-[0.2em] text-[var(--color-muted)]">Aspen</p></div></article></div></div></section><section data-v2-component="real-estate-premium-testimonials" aria-labelledby="rep-testimonials-title" class="rep-section"><div class="px-5 sm:px-8 lg:px-10"><header class="mb-14 text-center"><p class="rep-eyebrow mb-5">Client voices</p><h2 id="rep-testimonials-title" class="rep-headline-sm">Trusted by discerning collectors</h2><p class="rep-body mx-auto mt-4 max-w-lg">Our clients value discretion as much as expertise.</p></header><div class="grid gap-8 md:grid-cols-2"><blockquote class="rep-card border-s-2 border-s-[var(--color-brass)] p-8 lg:p-10"><p class="rep-font-display text-xl italic leading-relaxed text-[var(--color-foreground)]">“Monolith understood our requirements before we articulated them. The Whitmore Penthouse was presented with complete discretion and impeccable timing.”</p><footer class="rep-font-body mt-8 text-[0.6875rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">— Private collector<span class="mt-1 block normal-case tracking-normal text-[var(--color-brass)]">Upper East Side acquisition</span></footer></blockquote><blockquote class="rep-card border-s-2 border-s-[var(--color-brass)] p-8 lg:p-10"><p class="rep-font-display text-xl italic leading-relaxed text-[var(--color-foreground)]">“Their architectural knowledge elevated every conversation. We weren&#x27;t simply buying a home — we were acquiring a piece of design history.”</p><footer class="rep-font-body mt-8 text-[0.6875rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">— Design patron<span class="mt-1 block normal-case tracking-normal text-[var(--color-brass)]">Tribeca loft purchase</span></footer></blockquote></div></div></section><section id="inquire" data-v2-component="real-estate-premium-inquiry" aria-labelledby="rep-inquire-title" class="rep-section border-t border-[var(--border-subtle)] bg-[var(--color-stone)]/40"><div class="px-5 sm:px-8 lg:px-10"><div class="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20"><div><p class="rep-eyebrow mb-5">Inquire</p><h2 id="rep-inquire-title" class="rep-headline-sm">Request a private showing</h2><div class="rep-brass-rule my-6"></div><p class="rep-body max-w-md">Share your preferences and our advisory team will curate a selection exclusively for you.</p><p class="rep-font-body mt-8 text-sm text-[var(--color-muted)]">All inquiries handled with complete confidentiality.</p></div><form class="rep-card bg-[var(--color-surface)] p-6 sm:p-8" aria-label="Private showing inquiry"><div class="grid gap-5 sm:grid-cols-2"><label class="block sm:col-span-2"><span class="rep-font-body mb-2 block text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">Full name</span><input required="" type="text" autoComplete="name" class="w-full border border-[var(--border-default)] bg-transparent px-4 py-3 rep-font-body text-sm focus:border-[var(--color-brass)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brass)]"/></label><label class="block"><span class="rep-font-body mb-2 block text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">Email</span><input required="" type="email" autoComplete="email" class="w-full border border-[var(--border-default)] bg-transparent px-4 py-3 rep-font-body text-sm focus:border-[var(--color-brass)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brass)]"/></label><label class="block"><span class="rep-font-body mb-2 block text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">Phone</span><input type="tel" autoComplete="tel" class="w-full border border-[var(--border-default)] bg-transparent px-4 py-3 rep-font-body text-sm focus:border-[var(--color-brass)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brass)]"/></label><label class="block sm:col-span-2"><span class="rep-font-body mb-2 block text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">Preferred market</span><select class="w-full border border-[var(--border-default)] bg-transparent px-4 py-3 rep-font-body text-sm focus:border-[var(--color-brass)] focus:outline-none"><option>Manhattan</option><option>Hamptons</option><option>Aspen</option><option>Other</option></select></label><label class="block sm:col-span-2"><span class="rep-font-body mb-2 block text-[0.625rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">Message</span><textarea rows="4" class="w-full resize-none border border-[var(--border-default)] bg-transparent px-4 py-3 rep-font-body text-sm focus:border-[var(--color-brass)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brass)]"></textarea></label><div class="sm:col-span-2 pt-2"><button type="submit" class="rep-btn-primary w-full sm:w-auto">Submit inquiry</button></div></div></form></div></div></section></main><aside data-v2-region="sidebar" class="v2-sidebar-rail hidden shrink-0 lg:block lg:w-56 xl:w-64"><nav data-v2-component="real-estate-premium-dossier-rail" aria-label="Property dossier" class="sticky top-28 hidden lg:block"><p class="rep-eyebrow mb-6">Dossier</p><dl class="mb-10 space-y-4 border-b border-[var(--border-subtle)] pb-8"><div><dt class="rep-font-body text-[0.625rem] uppercase tracking-[0.2em] text-[var(--color-muted)]">Price range</dt><dd class="rep-font-display mt-1 text-xl text-[var(--color-foreground)]">$4.2M – $28M</dd></div><div><dt class="rep-font-body text-[0.625rem] uppercase tracking-[0.2em] text-[var(--color-muted)]">Available</dt><dd class="rep-font-display mt-1 text-xl text-[var(--color-brass)]">12 residences</dd></div><div><dt class="rep-font-body text-[0.625rem] uppercase tracking-[0.2em] text-[var(--color-muted)]">Markets</dt><dd class="rep-font-body mt-1 text-sm text-[var(--color-foreground)]">Manhattan · Hamptons · Aspen</dd></div></dl><ol class="space-y-1"><li><a href="#collection" class="group flex items-center gap-3 py-2 transition rep-focus-ring"><span class="rep-font-body text-[0.625rem] tabular-nums tracking-[0.16em] text-[var(--color-brass)]/70">01</span><span class="rep-font-body text-[0.6875rem] uppercase tracking-[0.22em] text-[var(--color-muted)] transition group-hover:text-[var(--color-foreground)]">Collection</span></a></li><li><a href="#neighborhoods" class="group flex items-center gap-3 py-2 transition rep-focus-ring"><span class="rep-font-body text-[0.625rem] tabular-nums tracking-[0.16em] text-[var(--color-brass)]/70">02</span><span class="rep-font-body text-[0.6875rem] uppercase tracking-[0.22em] text-[var(--color-muted)] transition group-hover:text-[var(--color-foreground)]">Neighborhoods</span></a></li><li><a href="#advisors" class="group flex items-center gap-3 py-2 transition rep-focus-ring"><span class="rep-font-body text-[0.625rem] tabular-nums tracking-[0.16em] text-[var(--color-brass)]/70">03</span><span class="rep-font-body text-[0.6875rem] uppercase tracking-[0.22em] text-[var(--color-muted)] transition group-hover:text-[var(--color-foreground)]">Advisors</span></a></li><li><a href="#inquire" class="group flex items-center gap-3 py-2 transition rep-focus-ring"><span class="rep-font-body text-[0.625rem] tabular-nums tracking-[0.16em] text-[var(--color-brass)]/70">04</span><span class="rep-font-body text-[0.6875rem] uppercase tracking-[0.22em] text-[var(--color-muted)] transition group-hover:text-[var(--color-foreground)]">Inquire</span></a></li></ol><div class="mt-12 border-t border-[var(--border-subtle)] pt-8"><p class="rep-eyebrow mb-3">Concierge</p><a href="tel:+12125550100" class="rep-font-body text-sm text-[var(--color-brass)] hover:underline rep-focus-ring">+1 (212) 555-0100</a></div></nav></aside></div><footer data-v2-region="footer"><footer data-v2-component="real-estate-premium-footer" class="border-t border-[var(--border-subtle)] bg-[var(--color-primary)] text-[var(--color-linen)]" role="contentinfo"><div class="mx-auto max-w-[88rem] px-5 py-16 sm:px-8 lg:px-10"><div class="grid gap-12 md:grid-cols-[1.5fr_1fr]"><div><p class="rep-font-display text-3xl">Monolith Estate</p><p class="rep-font-body mt-3 max-w-sm text-sm leading-relaxed text-white/60">Ultra-premium real estate advisory</p><address class="rep-font-body mt-6 not-italic text-sm text-white/50">900 Madison Avenue, New York</address></div><nav aria-label="Footer navigation"><p class="rep-eyebrow text-white/40">Explore</p><ul class="mt-4 space-y-3"><li><a href="#collection" class="rep-font-body text-sm text-white/65 transition hover:text-[var(--color-brass)] rep-focus-ring">Collection</a></li><li><a href="#neighborhoods" class="rep-font-body text-sm text-white/65 transition hover:text-[var(--color-brass)] rep-focus-ring">Neighborhoods</a></li><li><a href="#advisors" class="rep-font-body text-sm text-white/65 transition hover:text-[var(--color-brass)] rep-focus-ring">Advisors</a></li><li><a href="#inquire" class="rep-font-body text-sm text-white/65 transition hover:text-[var(--color-brass)] rep-focus-ring">Inquire</a></li></ul></nav></div><div class="rep-brass-rule mt-14 opacity-40"></div><div class="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><p class="rep-font-body text-[0.6875rem] uppercase tracking-[0.22em] text-white/40">© 2026 Monolith Estate. All rights reserved.</p><div class="flex gap-6"><a href="#" class="rep-font-body text-[0.6875rem] uppercase tracking-[0.18em] text-white/40 hover:text-[var(--color-brass)]">Privacy</a><a href="#" class="rep-font-body text-[0.6875rem] uppercase tracking-[0.18em] text-white/40 hover:text-[var(--color-brass)]">Fair Housing</a></div></div></div></footer></footer></div>
+  </div>
+  
+</body>
+</html>

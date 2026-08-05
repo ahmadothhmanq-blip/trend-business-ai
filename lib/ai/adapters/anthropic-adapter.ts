@@ -62,6 +62,10 @@ export class AnthropicAdapter implements AIProvider {
 
   constructor(private readonly model = DEFAULT_MODEL) {}
 
+  getModelName(): string {
+    return this.model;
+  }
+
   getLastUsage() {
     return this.lastUsage;
   }

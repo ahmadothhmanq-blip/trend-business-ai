@@ -12,6 +12,7 @@ import {
 } from "@/lib/ai/website-scaffold";
 import { buildPlatformProductionScaffolds } from "@/lib/website/platform-scaffolds";
 import { remediateSiteImagesInFiles } from "@/lib/website/site-images-parser";
+import { validateAndRepairProjectImages } from "@/lib/website/image-management/validate-before-render";
 
 const EXPORT_FLAGS: ProjectCapabilityFlags = {
   requiresAuth: false,
@@ -226,6 +227,13 @@ export function prepareWebsiteProjectForExport(
     )
   ) {
     fixesApplied.push("Remediated premium stock URLs in lib/site-images.ts");
+  }
+  const validated = validateAndRepairProjectImages(current, {});
+  if (validated.repairs > 0) {
+    current = validated.files;
+    fixesApplied.push(
+      `Validated and repaired ${validated.repairs} image slot(s) before export`,
+    );
   }
   current = injectProductionScaffolds(current, fixesApplied);
   current = injectMissingScaffolds(current, fixesApplied);

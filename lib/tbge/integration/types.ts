@@ -8,6 +8,7 @@ import type { TbgeIntegrationMetrics } from "@/lib/tbge/integration/metrics";
 import type { GenerationSpec } from "@/lib/tbge/spec/types";
 import type { TbgeRunTrace } from "@/lib/tbge/kernel/types";
 import type { PerformanceProfilingReport } from "@/lib/ai-core/performance/website-profiler";
+import type { ProductionPipelineReports } from "@/lib/ai-core/generation-engine/production";
 import type {
   GeneratedProjectFile,
   GeneratedWebsiteProject,
@@ -29,6 +30,7 @@ export type TbgeWebsiteGenerationResult = GeneratedWebsiteProject & {
   tbgeSpec?: GenerationSpec;
   tbgeComposition?: SiteComposition;
   tbgeTrace?: TbgeRunTrace;
+  productionPipelineReports?: ProductionPipelineReports;
 };
 
 export type LegacyWebsiteGenerationRunner = () => Promise<

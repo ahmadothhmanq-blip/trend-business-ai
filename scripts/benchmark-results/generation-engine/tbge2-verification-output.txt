@@ -1,0 +1,29 @@
+▶ TBGE2 Generation Engine — Phase 1
+  ✔ exports phase constants (0.8735ms)
+  ✔ defines full planning lifecycle (0.1452ms)
+  ✔ registers intent patterns (0.1776ms)
+  ✔ registers requirement patterns (0.1313ms)
+  ✔ analyzes restaurant intent from prompt (0.3257ms)
+  ✔ analyzes SaaS business from prompt (0.5306ms)
+  ✔ detects requirements from prompt (0.357ms)
+  ✔ plans website with navigation and CTAs (0.4449ms)
+  ✔ plans pages and sections for restaurant (0.5509ms)
+  ✔ plans content blocks with tone and localization (0.4853ms)
+  ✔ runs full planning pipeline without LLM (1.8888ms)
+  ✔ builds LLM request without raw user prompt (0.4848ms)
+  ✔ produces structured JSON output (0.4227ms)
+  ✔ rejects forbidden markup in LLM output (0.2637ms)
+  ✔ validates planning input and plan (0.354ms)
+  ✔ bridges to TBGE v1 plan draft format (0.51ms)
+  ✔ bridges from website generation input (0.1077ms)
+  ✔ enriches plan with GLS language context (1.393ms)
+✔ TBGE2 Generation Engine — Phase 1 (10.8105ms)
+ℹ tests 18
+ℹ suites 1
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 243.197
+npm warn Unknown env config "devdir". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.

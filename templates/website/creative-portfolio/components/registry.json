@@ -1,0 +1,61 @@
+{
+  "components": [
+    {
+      "id": "creative-portfolio-nav",
+      "role": "navigation",
+      "scaffold": "components/creative-portfolio-nav.tsx",
+      "slots": ["logo", "links", "cta"]
+    },
+    {
+      "id": "creative-portfolio-hero",
+      "role": "hero",
+      "scaffold": "components/creative-portfolio-hero.tsx",
+      "slots": ["headline", "subheadline", "scroll-cue"]
+    },
+    {
+      "id": "creative-portfolio-selected-work",
+      "role": "portfolio",
+      "scaffold": "components/creative-portfolio-selected-work.tsx"
+    },
+    {
+      "id": "creative-portfolio-case-grid",
+      "role": "gallery",
+      "scaffold": "components/creative-portfolio-case-grid.tsx"
+    },
+    {
+      "id": "creative-portfolio-manifesto",
+      "role": "story",
+      "scaffold": "components/creative-portfolio-manifesto.tsx"
+    },
+    {
+      "id": "creative-portfolio-capabilities",
+      "role": "features",
+      "scaffold": "components/creative-portfolio-capabilities.tsx"
+    },
+    {
+      "id": "creative-portfolio-process",
+      "role": "process",
+      "scaffold": "components/creative-portfolio-process.tsx"
+    },
+    {
+      "id": "creative-portfolio-collaborate-cta",
+      "role": "cta",
+      "scaffold": "components/creative-portfolio-collaborate-cta.tsx"
+    },
+    {
+      "id": "creative-portfolio-overlay-showcase",
+      "role": "custom",
+      "scaffold": "components/creative-portfolio-overlay-showcase.tsx"
+    },
+    {
+      "id": "creative-portfolio-footer",
+      "role": "footer",
+      "scaffold": "components/creative-portfolio-footer.tsx"
+    },
+    {
+      "id": "creative-portfolio-section-shell",
+      "role": "custom",
+      "scaffold": "components/creative-portfolio-section-shell.tsx"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "pageId": "gallery",
+  "layoutId": "sidebar-left",
+  "regions": {
+    "sidebar": ["restaurant-signature-sidebar-rail"],
+    "main": ["restaurant-signature-gallery", "restaurant-signature-atmosphere"]
+  }
+}

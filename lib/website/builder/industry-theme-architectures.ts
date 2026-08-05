@@ -70,11 +70,11 @@ export const INDUSTRY_THEME_ARCHITECTURES: ThemePageArchitecture[] = [
   industryArch({
     themeId: "luxury",
     templateIntelligenceId: "ti-restaurant-dining",
-    pageTopology: "fullscreen-editorial",
+    pageTopology: "sidebar-rail",
     sectionShellVariant: "editorial",
-    description: "Fine dining · cinematic food hero · reservation-first",
-    animationLanguage: "cinematic slow-reveal · warm parallax",
-    responsiveBehavior: "immersive hero · atmospheric overlays",
+    description: "Forest-table dining · menu sidebar rail · copper-accent gallery flow",
+    animationLanguage: "warm parallax reveal · copper micro-glint",
+    responsiveBehavior: "menu rail collapses · reservation CTA band",
     floatingCta: false,
   }),
   industryArch({
@@ -110,11 +110,11 @@ export const INDUSTRY_THEME_ARCHITECTURES: ThemePageArchitecture[] = [
   industryArch({
     themeId: "corporate",
     templateIntelligenceId: "ti-real-estate-listings",
-    pageTopology: "classic-stack",
+    pageTopology: "sidebar-rail",
     sectionShellVariant: "default",
-    description: "Property showcase · listing intelligence · agent trust",
-    animationLanguage: "property fade · card lift",
-    responsiveBehavior: "listing grids · neighborhood proof",
+    description: "Brokerage dossier rail · testimonial-led trust · navy-champagne property flow",
+    animationLanguage: "property lift fade · dossier snap-in",
+    responsiveBehavior: "right intelligence rail · private showing CTAs",
     floatingCta: false,
   }),
   industryArch({
@@ -140,11 +140,11 @@ export const INDUSTRY_THEME_ARCHITECTURES: ThemePageArchitecture[] = [
   industryArch({
     themeId: "minimal",
     templateIntelligenceId: "ti-medical-care",
-    pageTopology: "classic-stack",
+    pageTopology: "card-first-masonry",
     sectionShellVariant: "minimal",
-    description: "Clinical calm · care services · physician profiles",
-    animationLanguage: "clinical calm · soft fade-up",
-    responsiveBehavior: "accessible forms · trust hierarchy",
+    description: "Swiss clinical calm · layered trust hero · appointment utility flow",
+    animationLanguage: "clinical soft fade · accessible motion",
+    responsiveBehavior: "WCAG-first forms · sage card masonry",
     floatingCta: false,
   }),
   industryArch({
@@ -303,6 +303,11 @@ export const INDUSTRY_THEME_ARCHITECTURES: ThemePageArchitecture[] = [
 export const PREMIUM_STRUCTURE_TEMPLATE_TI_IDS = [
   "ti-corporate-trust",
   "ti-ai-company-signal",
+  "ti-saas-growth",
+  "ti-restaurant-dining",
+  "ti-real-estate-listings",
+  "ti-medical-care",
+  "ti-creative-studio",
 ] as const;
 
 export function topologyForIndustryTi(

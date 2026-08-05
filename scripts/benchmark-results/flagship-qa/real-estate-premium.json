@@ -1,0 +1,75 @@
+{
+  "packageId": "real-estate-premium",
+  "completedAt": "2026-08-05T22:07:28.105Z",
+  "marketplaceScore": 95,
+  "passed95": true,
+  "visual": {
+    "designTokens": 92,
+    "visualHierarchy": 92,
+    "responsiveLayout": 92,
+    "heroQuality": 92,
+    "navigationUx": 92,
+    "ctaPlacement": 92,
+    "componentSpacing": 92,
+    "typographyHierarchy": 85,
+    "crossPageConsistency": 92,
+    "layout": 92,
+    "ux": 92,
+    "overall": 91
+  },
+  "preview": {
+    "imageCount": 0,
+    "hasHeroImage": false,
+    "hasPlaceholder": false,
+    "sectionCount": 0,
+    "premiumSignals": 4,
+    "duplicateImages": 0,
+    "uniquePhotoCount": 1,
+    "usesSlotImages": false
+  },
+  "slotIndependence": {
+    "slotUsages": 10,
+    "imageIndependent": true
+  },
+  "imageValidation": {
+    "passed": true,
+    "repairs": 40,
+    "duplicatesRemoved": 32,
+    "industryId": "real-estate",
+    "uniqueUrlCount": 12,
+    "issues": [
+      "duplicate: Duplicate image URL rejected.",
+      "duplicate: Duplicate image URL rejected.",
+      "duplicate: Duplicate image URL rejected.",
+      "duplicate: Duplicate image URL rejected.",
+      "duplicate: Duplicate image URL rejected."
+    ],
+    "rulesReport": {
+      "passed": true,
+      "score": 70,
+      "industryDetected": "real-estate",
+      "industryLabel": "Real Estate",
+      "subcategory": null,
+      "visualStyle": "architectural prestige, editorial property",
+      "profileId": "real-estate",
+      "selectedCount": 44,
+      "rejectedCount": 32,
+      "replacedCount": 32,
+      "sourceCounts": {
+        "user": 0,
+        "ai": 0,
+        "library": 44,
+        "stock": 0
+      },
+      "summary": "Industry image rules passed for Real Estate (real-estate). 44 images selected, 32 replaced."
+    }
+  },
+  "lighthouse": null,
+  "previewPath": "C:\\Users\\PC\\Desktop\\trend-business-ai\\scripts\\benchmark-results\\flagship-previews\\real-estate-premium\\preview.html",
+  "bytes": 23551,
+  "v2Markers": {
+    "package": true,
+    "hero": false,
+    "render": true
+  }
+}

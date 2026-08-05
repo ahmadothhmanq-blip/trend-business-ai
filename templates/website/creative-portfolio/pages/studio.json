@@ -1,0 +1,12 @@
+{
+  "id": "studio",
+  "title": "Studio",
+  "path": "/studio",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "main",
+    "overlay",
+    "footer"
+  ]
+}

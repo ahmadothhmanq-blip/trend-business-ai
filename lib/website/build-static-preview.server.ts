@@ -7,6 +7,11 @@ import {
 import { getComposeUiFallbacks, getDefaultPreviewPageNames } from "@/lib/ai-core/content/content-language";
 import type { StaticPreviewInput } from "@/lib/website/preview-input";
 import {
+  appendTbdpPreviewCss,
+  previewInputFromTbdpSettings,
+  wirePreviewContext,
+} from "@/lib/website/tbdp-wiring";
+import {
   PREVIEW_PATH,
   sanitizePreviewHtml,
   slugify,
@@ -23,7 +28,15 @@ import {
   resolvePreviewSections,
   type TemplatePreviewTheme,
 } from "@/lib/website/template-preview-renderer";
+import { buildV2PreviewDocument } from "@/lib/website/template-v2/preview/v2-preview-document";
+import {
+  isV2PreviewInput,
+  resolveV2PackageId,
+  v2PreviewCacheSignature,
+  V2_PREVIEW_RENDER_VERSION,
+} from "@/lib/website/template-v2/preview/v2-preview-input";
 import type { GeneratedProjectFile } from "@/plugins/website/types";
+import { validateAndRepairProjectImages } from "@/lib/website/image-management/validate-before-render";
 
 const PREVIEW_RENDER_VERSION = "v5";
 const LEGACY_PREVIEW_RENDER_VERSION = "v2";
@@ -482,6 +495,10 @@ function buildSecondaryPagesHtml(
   ctaLabel: string,
   locale: ReturnType<typeof resolveLocaleFromLanguage>,
 ): string {
+  if (isV2PreviewInput(input)) {
+    return "";
+  }
+
   const previewCtx = resolveThemePreviewContext(input);
   if (previewCtx?.templateIntelligenceId) {
     const content = buildThemePreviewContent(input);
@@ -516,13 +533,34 @@ function buildSecondaryPagesHtml(
 
 /**
  * Build a self-contained multi-page website preview (CSS :target navigation).
- * Theme projects render from Theme* architecture; legacy projects use TI fallback.
+ * V2 templates render from project.files; V1 uses Theme* architecture or TI fallback.
  */
 export function buildStaticPreviewHtml(input: StaticPreviewInput): string {
-  const locale = resolveLocaleFromLanguage(input.language);
-  const ui = getComposeUiFallbacks(input.language);
-  const defaultPageNames = getDefaultPreviewPageNames(input.language);
-  const pageNames = (input.pages ?? [])
+  const wiredInput = previewInputFromTbdpSettings(input);
+  const previewWire = wirePreviewContext({
+    language: wiredInput.language,
+    industryId: wiredInput.industryId,
+    templatePackageId: wiredInput.templatePackageId,
+    settings: wiredInput.settings,
+  });
+
+  if (isV2PreviewInput(wiredInput) && wiredInput.files?.length) {
+    const validated = validateAndRepairProjectImages(wiredInput.files, {
+      industry: wiredInput.industryId,
+      templatePackageId: wiredInput.templatePackageId,
+    });
+    wiredInput.files = validated.files;
+  }
+
+  if (isV2PreviewInput(wiredInput)) {
+    const v2 = buildV2PreviewDocument(wiredInput);
+    if (v2) return sanitizePreviewHtml(appendTbdpPreviewCss(v2, previewWire.tbdpCssLayer));
+  }
+
+  const locale = resolveLocaleFromLanguage(wiredInput.language);
+  const ui = getComposeUiFallbacks(wiredInput.language);
+  const defaultPageNames = getDefaultPreviewPageNames(wiredInput.language);
+  const pageNames = (wiredInput.pages ?? [])
     .map((p) => p.trim())
     .filter(Boolean)
     .slice(0, 8);
@@ -542,16 +580,18 @@ export function buildStaticPreviewHtml(input: StaticPreviewInput): string {
     locale,
   );
 
-  if (resolveThemePreviewContext(input)) {
-    const themed = buildThemePreviewDocument(input, {
+  if (resolveThemePreviewContext(wiredInput)) {
+    const themed = buildThemePreviewDocument(wiredInput, {
       defaultSlug,
       secondaryPagesHtml: secondaryPages,
     });
-    if (themed) return sanitizePreviewHtml(themed);
+    if (themed) {
+      return sanitizePreviewHtml(appendTbdpPreviewCss(themed, previewWire.tbdpCssLayer));
+    }
   }
 
-  const theme = resolvePreviewTheme(input);
-  const title = input.title?.trim() || (locale.rtl ? "معاينة الموقع" : "Website Preview");
+  const theme = resolvePreviewTheme(wiredInput);
+  const title = wiredInput.title?.trim() || (locale.rtl ? "معاينة الموقع" : "Website Preview");
   const description =
     input.description?.trim() ||
     (locale.rtl
@@ -597,7 +637,9 @@ export function buildStaticPreviewHtml(input: StaticPreviewInput): string {
   const htmlDir = locale.rtl ? ` dir="rtl"` : "";
   const htmlLang = escapeHtml(locale.htmlLang);
 
-  return sanitizePreviewHtml(`<!DOCTYPE html>
+  return sanitizePreviewHtml(
+    appendTbdpPreviewCss(
+      `<!DOCTYPE html>
 <html lang="${htmlLang}"${htmlDir}${templateAttr}>
 <head>
   <meta charset="utf-8" />
@@ -613,7 +655,10 @@ export function buildStaticPreviewHtml(input: StaticPreviewInput): string {
   </div>
   ${secondaryPages}
 </body>
-</html>`);
+</html>`,
+      previewWire.tbdpCssLayer,
+    ),
+  );
 }
 
 function pickContent(content: string[], index: number, fallback: string): string {
@@ -650,6 +695,28 @@ export function extractStaticPreviewHtml(
   const preview = files?.find(
     (file) => file.path.replaceAll("\\", "/") === PREVIEW_PATH,
   );
+
+  if (isV2PreviewInput(fallback)) {
+    const v2Signature = v2PreviewCacheSignature(fallback);
+    const packageId = resolveV2PackageId(fallback);
+    if (preview?.content?.includes("<html")) {
+      const hasV2Render = preview.content.includes(
+        `data-v2-render="${V2_PREVIEW_RENDER_VERSION}"`,
+      );
+      if (hasV2Render && packageId) {
+        const matchesPackage = preview.content.includes(
+          `data-v2-package="${packageId}"`,
+        );
+        if (matchesPackage) {
+          return sanitizePreviewHtml(preview.content);
+        }
+      }
+    }
+    if (v2Signature) {
+      return buildStaticPreviewHtml(fallback);
+    }
+  }
+
   const themeSignature = themePreviewCacheSignature(fallback);
 
   if (preview?.content?.includes("<html")) {

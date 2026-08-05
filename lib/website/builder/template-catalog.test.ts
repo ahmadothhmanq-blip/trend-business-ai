@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { WEBSITE_STRUCTURE_TEMPLATES } from "@/lib/website/builder/template-package-index";
+import { WEBSITE_STRUCTURE_TEMPLATES, WEBSITE_STRUCTURE_TEMPLATE_INDEX } from "@/lib/website/builder/template-package-index";
 import {
   extractAllowedComponentsFromRuntimeModel,
   isLegacyMarketplaceStructureTemplate,
@@ -17,45 +17,56 @@ import {
   resolveStructureTemplateIntelligenceId,
 } from "@/lib/website/builder/template-package-ti-mapping";
 
+const FLAGSHIP_IDS = ["saas-enterprise", "corporate-business", "restaurant-premium"] as const;
+
 describe("builder template catalog migration", () => {
-  it("maps installed package manifests to structure templates", () => {
-    const template = getWebsiteStructureTemplate("modern-business");
+  it("maps corporate-business manifest to structure template", () => {
+    const template = getWebsiteStructureTemplate("corporate-business");
     assert.ok(template);
-    assert.equal(template?.id, "modern-business");
-    assert.equal(template?.label, "Corporate Command");
+    assert.equal(template?.id, "corporate-business");
+    assert.equal(template?.label, "Corporate Business");
     assert.equal(template?.industry, "corporate");
     assert.equal(template?.marketplaceTemplateId, "");
-    assert.equal(template?.premiumTemplateId, "modern-business");
+    assert.equal(template?.premiumTemplateId, "corporate-business");
     assert.ok(template?.sections.includes("header"));
     assert.ok(template?.sections.includes("main"));
     assert.ok(template?.sections.includes("footer"));
   });
 
-  it("indexes both premium installed template packages", () => {
-    assert.equal(WEBSITE_STRUCTURE_TEMPLATES.length, 2);
+  it("indexes all nine premium installed template packages including flagships", () => {
+    assert.equal(WEBSITE_STRUCTURE_TEMPLATES.length, 9);
     const ids = WEBSITE_STRUCTURE_TEMPLATES.map((template) => template.id);
-    assert.deepEqual(new Set(ids), new Set(["modern-business", "ai-startup-signal"]));
+    for (const flagshipId of FLAGSHIP_IDS) {
+      assert.ok(ids.includes(flagshipId), `missing flagship ${flagshipId}`);
+    }
+    assert.ok(ids.includes("modern-business"));
+    assert.ok(ids.includes("ai-startup-signal"));
+    assert.ok(ids.includes("restaurant-signature"));
+    assert.ok(ids.includes("real-estate-prestige"));
+    assert.ok(ids.includes("medical-premium"));
+    assert.ok(ids.includes("creative-portfolio"));
+    assert.equal(new Set(ids).size, 9);
   });
 
   it("resolves installed packages from the sync structure index", () => {
-    const template = getWebsiteStructureTemplate("modern-business");
+    const template = getWebsiteStructureTemplate("corporate-business");
 
     assert.ok(template);
-    assert.equal(template?.id, "modern-business");
+    assert.equal(template?.id, "corporate-business");
   });
 
-  it("prefers installed template packages over the internal generation fallback", () => {
+  it("prefers corporate-business for corporate industry routing", () => {
     const template = resolveStructureTemplateForIndustry("corporate");
 
-    assert.equal(template.id, "modern-business");
+    assert.equal(template.id, "corporate-business");
   });
 
   it("treats installed packages as non-legacy marketplace templates", () => {
-    const template = getWebsiteStructureTemplate("modern-business");
+    const template = getWebsiteStructureTemplate("corporate-business");
     assert.ok(template);
     const choice = toStructureTemplateChoice(template, ["hero", "features"]);
 
-    assert.equal(choice.templatePackageId, "modern-business");
+    assert.equal(choice.templatePackageId, "corporate-business");
     assert.equal(isLegacyMarketplaceStructureTemplate(choice), false);
   });
 
@@ -76,39 +87,29 @@ describe("builder template catalog migration", () => {
     );
   });
 
-  it("maps each installed package to a distinct Template Intelligence id", () => {
-    const tiIds = WEBSITE_STRUCTURE_TEMPLATES.map(
-      (template) => template.templateIntelligenceId,
+  it("maps each installed package to a Template Intelligence profile", () => {
+    for (const template of WEBSITE_STRUCTURE_TEMPLATES) {
+      const tiId = STRUCTURE_TEMPLATE_INTELLIGENCE_MAP[template.id];
+      assert.ok(tiId, `missing TI map for "${template.id}"`);
+      assert.equal(template.templateIntelligenceId, tiId);
+    }
+
+    const flagshipTiIds = FLAGSHIP_IDS.map(
+      (id) => STRUCTURE_TEMPLATE_INTELLIGENCE_MAP[id],
     );
-    assert.equal(new Set(tiIds).size, WEBSITE_STRUCTURE_TEMPLATES.length);
-    assert.equal(
-      resolveStructureTemplateIntelligenceId("modern-business"),
-      "ti-corporate-trust",
-    );
-    assert.equal(
-      resolveStructureTemplateIntelligenceId("ai-startup-signal"),
-      "ti-ai-company-signal",
-    );
-    assert.equal(
-      STRUCTURE_TEMPLATE_INTELLIGENCE_MAP["modern-business"],
-      "ti-corporate-trust",
-    );
-    assert.equal(
-      STRUCTURE_TEMPLATE_INTELLIGENCE_MAP["ai-startup-signal"],
-      "ti-ai-company-signal",
-    );
+    assert.equal(new Set(flagshipTiIds).size, FLAGSHIP_IDS.length);
   });
 
   it("resolves every premium package from the sync structure index", () => {
     for (const template of WEBSITE_STRUCTURE_TEMPLATES) {
-      const resolved = getWebsiteStructureTemplate(template.id);
+      const resolved = WEBSITE_STRUCTURE_TEMPLATE_INDEX[template.id];
       assert.ok(resolved, `missing template ${template.id}`);
       assert.equal(resolved?.id, template.id);
     }
   });
 
   it("extracts allowed component types from the runtime model main region", async () => {
-    const result = await resolveBuilderTemplateRuntimeModel("modern-business");
+    const result = await resolveBuilderTemplateRuntimeModel("corporate-business");
     assert.equal(result.ok, true);
     if (!result.ok) return;
 

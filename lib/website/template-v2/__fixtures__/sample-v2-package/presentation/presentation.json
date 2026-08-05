@@ -1,0 +1,37 @@
+{
+  "packageId": "sample-v2-package",
+  "templateIntelligenceHint": "ti-corporate-trust",
+  "layout": {
+    "defaultLayoutId": "default",
+    "regions": {
+      "header": { "role": "header", "sticky": true },
+      "main": { "role": "main" },
+      "footer": { "role": "footer" }
+    }
+  },
+  "navigation": {
+    "componentId": "nav-primary",
+    "variant": "corporate"
+  },
+  "hero": {
+    "componentId": "hero-primary",
+    "region": "main"
+  },
+  "footer": {
+    "componentId": "footer-primary",
+    "region": "footer"
+  },
+  "homeFlow": {
+    "regions": {
+      "main": ["hero-primary", "features-primary", "cta-primary"]
+    }
+  },
+  "sectionShell": {
+    "strategy": "package",
+    "componentId": "section-shell"
+  },
+  "aiGeneration": {
+    "contentProfile": "corporate-trust",
+    "suggestedPages": ["about", "services", "contact"]
+  }
+}

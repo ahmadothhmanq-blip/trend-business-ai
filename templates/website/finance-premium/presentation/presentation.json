@@ -1,0 +1,51 @@
+{
+  "packageId": "finance-premium",
+  "templateIntelligenceHint": "ti-finance-ledger",
+  "layout": {
+    "defaultLayoutId": "default",
+    "regions": {
+      "header": { "role": "header", "sticky": true },
+      "main": { "role": "main" },
+      "utility": { "role": "utility" },
+      "footer": { "role": "footer" },
+      "overlay": { "role": "overlay" }
+    }
+  },
+  "navigation": {
+    "componentId": "finance-premium-nav",
+    "variant": "executive-glass"
+  },
+  "hero": {
+    "componentId": "finance-premium-hero",
+    "region": "main"
+  },
+  "footer": {
+    "componentId": "finance-premium-footer",
+    "region": "footer"
+  },
+  "homeFlow": {
+    "regions": {
+      "main": [
+        "finance-premium-hero",
+        "finance-premium-features",
+        "finance-premium-about",
+        "finance-premium-stats",
+        "finance-premium-portfolio",
+        "finance-premium-testimonials",
+        "finance-premium-pricing",
+        "finance-premium-faq",
+        "finance-premium-contact"
+      ],
+      "utility": ["finance-premium-utility-band"],
+      "overlay": ["finance-premium-floating-cta"]
+    }
+  },
+  "sectionShell": {
+    "strategy": "package",
+    "componentId": "finance-premium-section-shell"
+  },
+  "aiGeneration": {
+    "contentProfile": "finance-premium-executive",
+    "suggestedPages": ["platform", "pricing", "customers"]
+  }
+}

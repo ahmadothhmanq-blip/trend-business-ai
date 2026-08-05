@@ -69,7 +69,22 @@ for (const id of ids) {
   else if (!preview.html.includes(\`data-template-id="\${id}"\`)) issues.push({ code: "preview.marker", message: "missing data-template-id in preview HTML" });
 
   try {
-    applyStructureTemplateToProject({ project: baseProject, templatePackageId: id, language: "English" });
+    const applied = await applyStructureTemplateToProject({ project: baseProject, templatePackageId: id, language: "English" });
+    if (id === "saas-enterprise") {
+      const page = applied.project.files?.find((f) => f.path === "app/page.tsx")?.content ?? "";
+      if (!page.includes("data-v2-package")) issues.push({ code: "v2.apply", message: "saas-enterprise V2 apply did not emit v2 page marker" });
+      if (page.includes("ThemeBold")) issues.push({ code: "v2.theme_leak", message: "saas-enterprise V2 page still references ThemeBold components" });
+    }
+    if (id === "restaurant-signature") {
+      const page = applied.project.files?.find((f) => f.path === "app/page.tsx")?.content ?? "";
+      if (!page.includes("data-v2-package")) issues.push({ code: "v2.apply", message: "restaurant-signature V2 apply did not emit v2 page marker" });
+      if (!page.includes("RestaurantSignatureHero")) issues.push({ code: "v2.components", message: "restaurant-signature missing V2 hero component" });
+      if (page.includes("ThemeEditorial") || page.includes("ThemeBold")) issues.push({ code: "v2.theme_leak", message: "restaurant-signature references shared theme components" });
+    }
+    if (id === "modern-business" || id === "ai-startup-signal") {
+      const page = applied.project.files?.find((f) => f.path === "app/page.tsx")?.content ?? "";
+      if (page.includes("data-v2-package")) issues.push({ code: "v1.v2_leak", message: id + " V1 template emitted V2 page marker" });
+    }
   } catch (error) {
     issues.push({ code: "apply.failed", message: error instanceof Error ? error.message : String(error) });
   }

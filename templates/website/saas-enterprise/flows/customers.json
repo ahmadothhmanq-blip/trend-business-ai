@@ -1,0 +1,7 @@
+{
+  "pageId": "customers",
+  "layoutId": "default",
+  "regions": {
+    "main": ["saas-enterprise-hero", "saas-enterprise-portfolio", "saas-enterprise-features"]
+  }
+}

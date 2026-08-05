@@ -1,0 +1,21 @@
+▶ AI Website Review Studio — Phase 1
+  ✔ exports review areas and constants (1.0129ms)
+  ✔ analyzes website structure (2.5101ms)
+  ✔ runs full website review (5.46ms)
+  ✔ categorizes improvements by priority (1.1942ms)
+  ✔ applies deterministic improvements and creates version 2 (2.0564ms)
+  ✔ supports version rollback (1.4585ms)
+  ✔ compares before and after quality scores (1.1893ms)
+  ✔ rejects targeted-regen without executor (0.8787ms)
+  ✔ fails on empty input (0.2019ms)
+  ✔ is provider and framework independent (1.9724ms)
+✔ AI Website Review Studio — Phase 1 (19.2555ms)
+ℹ tests 10
+ℹ suites 1
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 220.3744
+npm warn Unknown env config "devdir". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.

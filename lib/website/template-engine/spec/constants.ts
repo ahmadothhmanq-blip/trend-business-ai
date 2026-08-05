@@ -69,6 +69,7 @@ export const WB_TEMPLATE_LAYOUT_KINDS = [
   "sidebar-left",
   "sidebar-right",
   "full-bleed",
+  "editorial-reveal",
 ] as const;
 
 /** Semantic region roles — structural slots, not business content. */

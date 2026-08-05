@@ -1,0 +1,75 @@
+{
+  "packageId": "saas-enterprise",
+  "completedAt": "2026-08-05T22:07:12.583Z",
+  "marketplaceScore": 96,
+  "passed95": true,
+  "visual": {
+    "designTokens": 92,
+    "visualHierarchy": 92,
+    "responsiveLayout": 92,
+    "heroQuality": 92,
+    "navigationUx": 92,
+    "ctaPlacement": 92,
+    "componentSpacing": 92,
+    "typographyHierarchy": 92,
+    "crossPageConsistency": 92,
+    "layout": 92,
+    "ux": 92,
+    "overall": 92
+  },
+  "preview": {
+    "imageCount": 0,
+    "hasHeroImage": false,
+    "hasPlaceholder": false,
+    "sectionCount": 0,
+    "premiumSignals": 4,
+    "duplicateImages": 0,
+    "uniquePhotoCount": 1,
+    "usesSlotImages": false
+  },
+  "slotIndependence": {
+    "slotUsages": 2,
+    "imageIndependent": true
+  },
+  "imageValidation": {
+    "passed": true,
+    "repairs": 34,
+    "duplicatesRemoved": 27,
+    "industryId": "saas",
+    "uniqueUrlCount": 18,
+    "issues": [
+      "duplicate: Duplicate image URL rejected.",
+      "duplicate: Duplicate image URL rejected.",
+      "duplicate: Duplicate image URL rejected.",
+      "duplicate: Duplicate image URL rejected.",
+      "duplicate: Duplicate image URL rejected."
+    ],
+    "rulesReport": {
+      "passed": true,
+      "score": 70,
+      "industryDetected": "saas",
+      "industryLabel": "SaaS",
+      "subcategory": null,
+      "visualStyle": "clean product-led, interface-forward",
+      "profileId": "saas",
+      "selectedCount": 44,
+      "rejectedCount": 27,
+      "replacedCount": 27,
+      "sourceCounts": {
+        "user": 0,
+        "ai": 0,
+        "library": 44,
+        "stock": 0
+      },
+      "summary": "Industry image rules passed for SaaS (saas). 44 images selected, 27 replaced."
+    }
+  },
+  "lighthouse": null,
+  "previewPath": "C:\\Users\\PC\\Desktop\\trend-business-ai\\scripts\\benchmark-results\\flagship-previews\\saas-enterprise\\preview.html",
+  "bytes": 26432,
+  "v2Markers": {
+    "package": true,
+    "hero": false,
+    "render": true
+  }
+}

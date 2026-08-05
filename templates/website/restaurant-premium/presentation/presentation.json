@@ -1,0 +1,51 @@
+{
+  "packageId": "restaurant-premium",
+  "templateIntelligenceHint": "ti-restaurant-dining",
+  "layout": {
+    "defaultLayoutId": "sidebar-left",
+    "regions": {
+      "header": { "role": "header", "sticky": true },
+      "sidebar": { "role": "sidebar", "sticky": true, "collapseBelow": "lg" },
+      "main": { "role": "main" },
+      "footer": { "role": "footer" }
+    }
+  },
+  "navigation": {
+    "componentId": "restaurant-premium-nav",
+    "variant": "luxury-minimal"
+  },
+  "hero": {
+    "componentId": "restaurant-premium-hero",
+    "region": "main"
+  },
+  "footer": {
+    "componentId": "restaurant-premium-footer",
+    "region": "footer"
+  },
+  "homeFlow": {
+    "regions": {
+      "sidebar": ["restaurant-premium-sidebar-rail"],
+      "main": [
+        "restaurant-premium-hero",
+        "restaurant-premium-tasting-menu",
+        "restaurant-premium-chef-story",
+        "restaurant-premium-stats",
+        "restaurant-premium-signature-dishes",
+        "restaurant-premium-testimonials",
+        "restaurant-premium-atmosphere",
+        "restaurant-premium-gallery",
+        "restaurant-premium-faq",
+        "restaurant-premium-reservation-cta",
+        "restaurant-premium-contact"
+      ]
+    }
+  },
+  "sectionShell": {
+    "strategy": "package",
+    "componentId": "restaurant-premium-section-shell"
+  },
+  "aiGeneration": {
+    "contentProfile": "restaurant-premium-luxury",
+    "suggestedPages": ["menu", "gallery", "reserve"]
+  }
+}

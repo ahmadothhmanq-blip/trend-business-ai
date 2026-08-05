@@ -1,0 +1,26 @@
+▶ Global Language System (GLS)
+  ✔ exports phase constants (0.8359ms)
+  ✔ registers all world languages from platform i18n (0.3098ms)
+  ✔ registers all service products (0.1437ms)
+  ✔ resolves unified language context for English (2.1682ms)
+  ✔ resolves Arabic RTL with arabic typography profile (0.452ms)
+  ✔ resolves CJK typography for Japanese (0.3155ms)
+  ✔ resolves AI language with structured output only (0.2001ms)
+  ✔ resolves locale formatting with currency and pluralization (0.2077ms)
+  ✔ resolves SEO localization with hreflang (0.162ms)
+  ✔ emits direction CSS variables for RTL (0.2101ms)
+  ✔ bridges to TBDP language context without drift (0.4ms)
+  ✔ validates translation contracts and detects missing keys (0.3171ms)
+  ✔ exposes all typography profiles (0.137ms)
+  ✔ resolves typography fallback chain (0.0881ms)
+  ✔ flattens nested translation messages (0.1064ms)
+✔ Global Language System (GLS) (7.3636ms)
+ℹ tests 15
+ℹ suites 1
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 223.5292
+npm warn Unknown env config "devdir". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.

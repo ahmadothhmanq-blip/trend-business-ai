@@ -1,0 +1,51 @@
+{
+  "packageId": "saas-enterprise",
+  "templateIntelligenceHint": "ti-saas-growth",
+  "layout": {
+    "defaultLayoutId": "default",
+    "regions": {
+      "header": { "role": "header", "sticky": true },
+      "main": { "role": "main" },
+      "utility": { "role": "utility" },
+      "footer": { "role": "footer" },
+      "overlay": { "role": "overlay" }
+    }
+  },
+  "navigation": {
+    "componentId": "saas-enterprise-nav",
+    "variant": "enterprise-glass"
+  },
+  "hero": {
+    "componentId": "saas-enterprise-hero",
+    "region": "main"
+  },
+  "footer": {
+    "componentId": "saas-enterprise-footer",
+    "region": "footer"
+  },
+  "homeFlow": {
+    "regions": {
+      "main": [
+        "saas-enterprise-hero",
+        "saas-enterprise-features",
+        "saas-enterprise-integrations",
+        "saas-enterprise-about",
+        "saas-enterprise-stats",
+        "saas-enterprise-testimonials",
+        "saas-enterprise-pricing",
+        "saas-enterprise-faq",
+        "saas-enterprise-contact"
+      ],
+      "utility": ["saas-enterprise-utility-band"],
+      "overlay": ["saas-enterprise-floating-cta"]
+    }
+  },
+  "sectionShell": {
+    "strategy": "package",
+    "componentId": "saas-enterprise-section-shell"
+  },
+  "aiGeneration": {
+    "contentProfile": "saas-enterprise-gtm",
+    "suggestedPages": ["platform", "pricing", "customers"]
+  }
+}

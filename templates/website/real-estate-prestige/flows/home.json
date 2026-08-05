@@ -1,0 +1,16 @@
+{
+  "pageId": "home",
+  "layoutId": "sidebar-right",
+  "regions": {
+    "sidebar": ["real-estate-prestige-dossier-rail"],
+    "main": [
+      "real-estate-prestige-hero",
+      "real-estate-prestige-collection",
+      "real-estate-prestige-neighborhoods",
+      "real-estate-prestige-architecture",
+      "real-estate-prestige-advisors",
+      "real-estate-prestige-testimonials",
+      "real-estate-prestige-inquiry"
+    ]
+  }
+}

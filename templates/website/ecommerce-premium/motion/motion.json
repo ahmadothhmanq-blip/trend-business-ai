@@ -1,0 +1,6 @@
+{
+  "tbdpNative": true,
+  "sectorDnaId": "logistics",
+  "experienceProfiles": ["luxury", "editorial", "minimal"],
+  "presetBinding": "atelier-reveal"
+}

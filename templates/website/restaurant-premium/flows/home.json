@@ -1,0 +1,22 @@
+{
+  "pageId": "home",
+  "layoutId": "default",
+  "regions": {
+    "header": ["restaurant-premium-nav"],
+    "sidebar": ["restaurant-premium-sidebar-rail"],
+    "main": [
+      "restaurant-premium-hero",
+      "restaurant-premium-tasting-menu",
+      "restaurant-premium-chef-story",
+      "restaurant-premium-stats",
+      "restaurant-premium-signature-dishes",
+      "restaurant-premium-testimonials",
+      "restaurant-premium-atmosphere",
+      "restaurant-premium-gallery",
+      "restaurant-premium-faq",
+      "restaurant-premium-reservation-cta",
+      "restaurant-premium-contact"
+    ],
+    "footer": ["restaurant-premium-footer"]
+  }
+}

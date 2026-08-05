@@ -1,3 +1,4 @@
+import { resolveBuilderTemplatePackageId } from "@/lib/website/builder/resolve-builder-template-package-id";
 import type {
   WbTemplateId,
   WbTemplateListItem,
@@ -5,6 +6,10 @@ import type {
   WbTemplatePackage,
   WbTemplateRegistryEntry,
 } from "@/lib/website/template-engine/types";
+
+function resolveTemplateLookupId(id: WbTemplateId): WbTemplateId {
+  return resolveBuilderTemplatePackageId(id);
+}
 
 function toListItem(entry: WbTemplateRegistryEntry): WbTemplateListItem {
   const { manifest } = entry;
@@ -51,24 +56,29 @@ export class WbTemplateRegistry {
     return entry;
   }
 
+  /** Exact manifest id lookup — used by the loader for duplicate detection. */
+  hasExact(id: WbTemplateId): boolean {
+    return this.entries.has(id);
+  }
+
   unregister(id: WbTemplateId): boolean {
     return this.entries.delete(id);
   }
 
   has(id: WbTemplateId): boolean {
-    return this.entries.has(id);
+    return this.hasExact(id) || this.hasExact(resolveTemplateLookupId(id));
   }
 
   get(id: WbTemplateId): WbTemplateRegistryEntry | null {
-    return this.entries.get(id) ?? null;
+    return this.entries.get(id) ?? this.entries.get(resolveTemplateLookupId(id)) ?? null;
   }
 
   getManifest(id: WbTemplateId): WbTemplateManifest | null {
-    return this.entries.get(id)?.manifest ?? null;
+    return this.get(id)?.manifest ?? null;
   }
 
   getPackage(id: WbTemplateId): WbTemplatePackage | null {
-    return this.entries.get(id)?.package ?? null;
+    return this.get(id)?.package ?? null;
   }
 
   list(): WbTemplateListItem[] {

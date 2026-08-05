@@ -1,0 +1,12 @@
+{
+  "id": "gallery",
+  "title": "Gallery",
+  "path": "/gallery",
+  "layoutId": "default",
+  "regions": [
+    "header",
+    "sidebar",
+    "main",
+    "footer"
+  ]
+}

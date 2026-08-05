@@ -198,6 +198,8 @@ export type GeneratedWebsiteProject = {
   agencyContract?: import("@/lib/ai-core/agency-orchestrator").AgencyGenerationContract;
   platformRevision?: import("@/lib/website/platform/types").BlueprintPlatformRevision;
   waveGenerationState?: import("@/lib/website/wave-checkpoint-engine").WaveGenerationState;
+  /** Review Studio version history and snapshots (Phase 1 UI) */
+  reviewStudioState?: import("@/lib/website/review-studio/types").ReviewStudioPersistedState;
 };
 
 export type { GeneratedProjectFile };

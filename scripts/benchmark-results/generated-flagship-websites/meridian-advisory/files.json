@@ -1,0 +1,22 @@
+[
+  "lib/site-images.ts",
+  "app/layout.tsx",
+  "components/ui/motion.tsx",
+  "app/globals.css",
+  "components/corporate-business-nav.tsx",
+  "components/corporate-business-hero.tsx",
+  "components/corporate-business-features.tsx",
+  "components/corporate-business-about.tsx",
+  "components/corporate-business-stats.tsx",
+  "components/corporate-business-testimonials.tsx",
+  "components/corporate-business-pricing.tsx",
+  "components/corporate-business-faq.tsx",
+  "components/corporate-business-contact.tsx",
+  "components/corporate-business-footer.tsx",
+  "components/corporate-business-floating-cta.tsx",
+  "components/corporate-business-utility-band.tsx",
+  "components/corporate-business-section-shell.tsx",
+  "components/corporate-business-portfolio.tsx",
+  "components/corporate-business-integrations.tsx",
+  "app/page.tsx"
+]

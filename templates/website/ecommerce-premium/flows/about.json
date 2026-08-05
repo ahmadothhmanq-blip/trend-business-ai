@@ -1,0 +1,29 @@
+{
+  "pageId": "about",
+  "layoutId": "default",
+  "regions": {
+    "header": [
+      "ecommerce-premium-nav"
+    ],
+    "main": [
+      "ecommerce-premium-hero",
+      "ecommerce-premium-collections",
+      "ecommerce-premium-product-grid",
+      "ecommerce-premium-brand-story",
+      "ecommerce-premium-stats",
+      "ecommerce-premium-testimonials",
+      "ecommerce-premium-shipping",
+      "ecommerce-premium-faq",
+      "ecommerce-premium-contact"
+    ],
+    "utility": [
+      "ecommerce-premium-utility-band"
+    ],
+    "overlay": [
+      "ecommerce-premium-floating-cta"
+    ],
+    "footer": [
+      "ecommerce-premium-footer"
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "pageId": "home",
+  "layoutId": "default",
+  "regions": {
+    "header": ["saas-enterprise-nav"],
+    "main": [
+      "saas-enterprise-hero",
+      "saas-enterprise-features",
+      "saas-enterprise-about",
+      "saas-enterprise-stats",
+      "saas-enterprise-testimonials",
+      "saas-enterprise-pricing",
+      "saas-enterprise-faq",
+      "saas-enterprise-contact"
+    ],
+    "utility": ["saas-enterprise-utility-band"],
+    "overlay": ["saas-enterprise-floating-cta"],
+    "footer": ["saas-enterprise-footer"]
+  }
+}

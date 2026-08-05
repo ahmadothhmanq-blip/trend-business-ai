@@ -1,0 +1,22 @@
+{
+  "pageId": "home",
+  "layoutId": "default",
+  "regions": {
+    "header": ["hotel-resort-premium-nav"],
+    "sidebar": ["hotel-resort-premium-sidebar-rail"],
+    "main": [
+      "hotel-resort-premium-hero",
+      "hotel-resort-premium-tasting-menu",
+      "hotel-resort-premium-chef-story",
+      "hotel-resort-premium-stats",
+      "hotel-resort-premium-signature-dishes",
+      "hotel-resort-premium-testimonials",
+      "hotel-resort-premium-atmosphere",
+      "hotel-resort-premium-gallery",
+      "hotel-resort-premium-faq",
+      "hotel-resort-premium-reservation-cta",
+      "hotel-resort-premium-contact"
+    ],
+    "footer": ["hotel-resort-premium-footer"]
+  }
+}

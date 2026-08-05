@@ -1,0 +1,12 @@
+{
+  "pageId": "listings",
+  "layoutId": "sidebar-right",
+  "regions": {
+    "sidebar": ["real-estate-prestige-dossier-rail"],
+    "main": [
+      "real-estate-prestige-hero",
+      "real-estate-prestige-collection",
+      "real-estate-prestige-inquiry"
+    ]
+  }
+}

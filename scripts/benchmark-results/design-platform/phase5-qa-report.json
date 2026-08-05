@@ -1,0 +1,143 @@
+{
+  "passed": 34,
+  "total": 34,
+  "checks": [
+    {
+      "id": "integration.phase",
+      "ok": true
+    },
+    {
+      "id": "integration.version",
+      "ok": true
+    },
+    {
+      "id": "module.core",
+      "ok": true
+    },
+    {
+      "id": "module.bridges",
+      "ok": true
+    },
+    {
+      "id": "module.schema",
+      "ok": true
+    },
+    {
+      "id": "module.validation",
+      "ok": true
+    },
+    {
+      "id": "module.docs",
+      "ok": true
+    },
+    {
+      "id": "resolver.design-resolver",
+      "ok": true
+    },
+    {
+      "id": "resolver.template-resolver",
+      "ok": true
+    },
+    {
+      "id": "resolver.language-bridge",
+      "ok": true
+    },
+    {
+      "id": "resolver.theme-resolver",
+      "ok": true
+    },
+    {
+      "id": "resolver.industry-map",
+      "ok": true
+    },
+    {
+      "id": "resolver.lifecycle",
+      "ok": true
+    },
+    {
+      "id": "bridge.builder",
+      "ok": true
+    },
+    {
+      "id": "bridge.ai",
+      "ok": true
+    },
+    {
+      "id": "bridge.template",
+      "ok": true
+    },
+    {
+      "id": "design.context",
+      "ok": true
+    },
+    {
+      "id": "design.foundations",
+      "ok": true
+    },
+    {
+      "id": "design.experience",
+      "ok": true
+    },
+    {
+      "id": "builder.enrichment",
+      "ok": true
+    },
+    {
+      "id": "ai.components",
+      "ok": true
+    },
+    {
+      "id": "ai.deterministic",
+      "ok": true
+    },
+    {
+      "id": "template.bridge",
+      "ok": true
+    },
+    {
+      "id": "template.css",
+      "ok": true
+    },
+    {
+      "id": "docs.architecture",
+      "ok": true
+    },
+    {
+      "id": "docs.integration-diagram",
+      "ok": true
+    },
+    {
+      "id": "docs.lifecycle-diagram",
+      "ok": true
+    },
+    {
+      "id": "docs.backward-compatibility",
+      "ok": true
+    },
+    {
+      "id": "docs.bridges",
+      "ok": true
+    },
+    {
+      "id": "isolation.exists.apply-structure-template.ts",
+      "ok": true
+    },
+    {
+      "id": "isolation.exists.apply-v2-template.ts",
+      "ok": true
+    },
+    {
+      "id": "isolation.exists.website",
+      "ok": true
+    },
+    {
+      "id": "tsc.integration",
+      "ok": true
+    },
+    {
+      "id": "eslint.integration",
+      "ok": true
+    }
+  ],
+  "failed": []
+}

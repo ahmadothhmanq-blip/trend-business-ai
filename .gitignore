@@ -40,6 +40,7 @@ yarn-error.log*
 trend-business-ai.zip
 pnpm-lock.yaml
 pnpm-workspace.yaml
+scripts/qa-test-corp-extracted/
 
 # vercel
 .vercel

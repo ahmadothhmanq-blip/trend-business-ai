@@ -1,0 +1,20 @@
+{
+  "tbdpNative": true,
+  "sectorDnaId": "real-estate",
+  "experienceProfiles": ["luxury", "executive", "corporate"],
+  "structure": {
+    "regions": {
+      "header": { "sticky": true, "position": "top" },
+      "sidebar": { "sticky": true, "collapseBelow": "lg" },
+      "main": { "collapseBelow": "sm" }
+    },
+    "components": {
+      "real-estate-premium-hero": {
+        "layout": { "lg": "full-bleed-estate", "sm": "stacked" }
+      },
+      "real-estate-premium-collection": {
+        "layout": { "lg": "editorial-grid", "sm": "stacked" }
+      }
+    }
+  }
+}

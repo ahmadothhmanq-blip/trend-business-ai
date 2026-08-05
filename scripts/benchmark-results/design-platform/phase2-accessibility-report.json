@@ -1,0 +1,530 @@
+{
+  "wcagLevel": "AA",
+  "components": [
+    {
+      "id": "navbar",
+      "category": "navigation",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "mega-menu",
+      "category": "navigation",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "sidebar",
+      "category": "navigation",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "breadcrumb",
+      "category": "navigation",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "tabs",
+      "category": "navigation",
+      "client": true,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "pagination",
+      "category": "navigation",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "primary",
+      "category": "buttons",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "secondary",
+      "category": "buttons",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "ghost",
+      "category": "buttons",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "outline",
+      "category": "buttons",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "icon",
+      "category": "buttons",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "floating",
+      "category": "buttons",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "split-button",
+      "category": "buttons",
+      "client": true,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "input",
+      "category": "forms",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "textarea",
+      "category": "forms",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "select",
+      "category": "forms",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "multi-select",
+      "category": "forms",
+      "client": true,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "checkbox",
+      "category": "forms",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "radio",
+      "category": "forms",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "switch",
+      "category": "forms",
+      "client": true,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "slider",
+      "category": "forms",
+      "client": true,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "date-picker",
+      "category": "forms",
+      "client": true,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "otp",
+      "category": "forms",
+      "client": true,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "search",
+      "category": "forms",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "file-upload",
+      "category": "forms",
+      "client": true,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "alert",
+      "category": "feedback",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "toast",
+      "category": "feedback",
+      "client": true,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "notification",
+      "category": "feedback",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "banner",
+      "category": "feedback",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "empty-state",
+      "category": "feedback",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "error-state",
+      "category": "feedback",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "success-state",
+      "category": "feedback",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "loading-state",
+      "category": "feedback",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "skeleton",
+      "category": "feedback",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "feature-card",
+      "category": "cards",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "product-card",
+      "category": "cards",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "pricing-card",
+      "category": "cards",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "team-card",
+      "category": "cards",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "testimonial-card",
+      "category": "cards",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "dashboard-card",
+      "category": "cards",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "media-card",
+      "category": "cards",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "hero",
+      "category": "marketing",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "cta",
+      "category": "marketing",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "faq",
+      "category": "marketing",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "logo-cloud",
+      "category": "marketing",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "stats",
+      "category": "marketing",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "timeline",
+      "category": "marketing",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "feature-grid",
+      "category": "marketing",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "pricing-table",
+      "category": "marketing",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "comparison-table",
+      "category": "marketing",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "product-grid",
+      "category": "commerce",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "product-details",
+      "category": "commerce",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "checkout-summary",
+      "category": "commerce",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "order-status",
+      "category": "commerce",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "kpi-cards",
+      "category": "dashboard",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "tables",
+      "category": "dashboard",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "charts-wrapper",
+      "category": "dashboard",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "activity-feed",
+      "category": "dashboard",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "metric-blocks",
+      "category": "dashboard",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "modal",
+      "category": "dialogs",
+      "client": true,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "drawer",
+      "category": "dialogs",
+      "client": true,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "popover",
+      "category": "dialogs",
+      "client": true,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "tooltip",
+      "category": "dialogs",
+      "client": true,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "context-menu",
+      "category": "dialogs",
+      "client": true,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "avatar",
+      "category": "media",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "image",
+      "category": "media",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "gallery",
+      "category": "media",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "carousel",
+      "category": "media",
+      "client": true,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "video-player",
+      "category": "media",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "section",
+      "category": "layout",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "container",
+      "category": "layout",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "stack",
+      "category": "layout",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "grid",
+      "category": "layout",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "divider",
+      "category": "layout",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    },
+    {
+      "id": "spacer",
+      "category": "layout",
+      "client": false,
+      "rtl": true,
+      "dir": "ltr|rtl"
+    }
+  ]
+}

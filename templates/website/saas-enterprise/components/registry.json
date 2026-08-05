@@ -1,0 +1,81 @@
+{
+  "components": [
+    {
+      "id": "saas-enterprise-nav",
+      "role": "navigation",
+      "scaffold": "components/saas-enterprise-nav.tsx",
+      "slots": ["logo", "links", "cta"]
+    },
+    {
+      "id": "saas-enterprise-hero",
+      "role": "hero",
+      "scaffold": "components/saas-enterprise-hero.tsx",
+      "slots": ["headline", "metrics", "cta"]
+    },
+    {
+      "id": "saas-enterprise-features",
+      "role": "features",
+      "scaffold": "components/saas-enterprise-features.tsx"
+    },
+    {
+      "id": "saas-enterprise-about",
+      "role": "story",
+      "scaffold": "components/saas-enterprise-about.tsx"
+    },
+    {
+      "id": "saas-enterprise-stats",
+      "role": "custom",
+      "scaffold": "components/saas-enterprise-stats.tsx"
+    },
+    {
+      "id": "saas-enterprise-testimonials",
+      "role": "testimonials",
+      "scaffold": "components/saas-enterprise-testimonials.tsx"
+    },
+    {
+      "id": "saas-enterprise-pricing",
+      "role": "pricing",
+      "scaffold": "components/saas-enterprise-pricing.tsx"
+    },
+    {
+      "id": "saas-enterprise-faq",
+      "role": "faq",
+      "scaffold": "components/saas-enterprise-faq.tsx"
+    },
+    {
+      "id": "saas-enterprise-contact",
+      "role": "contact",
+      "scaffold": "components/saas-enterprise-contact.tsx"
+    },
+    {
+      "id": "saas-enterprise-footer",
+      "role": "footer",
+      "scaffold": "components/saas-enterprise-footer.tsx"
+    },
+    {
+      "id": "saas-enterprise-floating-cta",
+      "role": "cta",
+      "scaffold": "components/saas-enterprise-floating-cta.tsx"
+    },
+    {
+      "id": "saas-enterprise-utility-band",
+      "role": "cta",
+      "scaffold": "components/saas-enterprise-utility-band.tsx"
+    },
+    {
+      "id": "saas-enterprise-section-shell",
+      "role": "custom",
+      "scaffold": "components/saas-enterprise-section-shell.tsx"
+    },
+    {
+      "id": "saas-enterprise-portfolio",
+      "role": "custom",
+      "scaffold": "components/saas-enterprise-portfolio.tsx"
+    },
+    {
+      "id": "saas-enterprise-integrations",
+      "role": "custom",
+      "scaffold": "components/saas-enterprise-integrations.tsx"
+    }
+  ]
+}

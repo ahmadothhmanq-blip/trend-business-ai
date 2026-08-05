@@ -1,0 +1,14 @@
+{
+  "title": "Monolith Estate",
+  "fileCount": 16,
+  "settings": {
+    "templateIntelligenceId": "ti-real-estate-listings",
+    "templateIntelligenceCategory": "Real Estate",
+    "templateArchitectureVersion": "v2",
+    "templatePresentationHash": "6111e1eed4163e1c",
+    "templateComposerId": "region-grid",
+    "websiteStructureTemplateId": "real-estate-prestige",
+    "templatePackageId": "real-estate-prestige",
+    "selectedTemplateId": "real-estate-prestige"
+  }
+}

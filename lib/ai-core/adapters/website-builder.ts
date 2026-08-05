@@ -145,6 +145,12 @@ import { validateGeneratedProject } from "@/lib/ai/validator";
 import { normalizeWebsiteFeatureList } from "@/lib/website/builder/feature-registry";
 import { uploadWebsiteAsset } from "@/lib/website/assets-storage";
 import {
+  applyTbdpToDesignSystem,
+  isTbdpVisualAuthority,
+  resolveTbdpDesignContextFromBrief,
+  wireBriefMetadata,
+} from "@/lib/website/tbdp-wiring";
+import {
   buildGenerationRepairInstruction,
   validateWebsiteGeneration,
 } from "@/lib/ai-core/website-builder/generation-validation";
@@ -454,13 +460,7 @@ export function websiteInputToBrief(
 ): CoreBrief {
   const language = resolveWebsiteOutputLanguage(input.prompt, input.language);
   const locale = resolveLocaleFromLanguage(language);
-  return {
-    prompt: input.prompt,
-    productId: WEBSITE_BUILDER_PRODUCT_ID,
-    language,
-    theme: input.theme,
-    features: normalizeWebsiteFeatureList(input.features),
-    metadata: {
+  const baseMetadata = {
       [INPUT_META_KEY]: { ...input, language, locale: language },
       ...(input.templateId
         ? {
@@ -514,7 +514,24 @@ export function websiteInputToBrief(
       ...(input.designSystem
         ? { designSystemHints: input.designSystem }
         : {}),
-    },
+    };
+
+  return {
+    prompt: input.prompt,
+    productId: WEBSITE_BUILDER_PRODUCT_ID,
+    language,
+    theme: input.theme,
+    features: normalizeWebsiteFeatureList(input.features),
+    metadata: wireBriefMetadata(baseMetadata, {
+      prompt: input.prompt,
+      language,
+      industryId: input.industryId,
+      templateId: input.templateId ?? input.websiteStructureTemplateId,
+      websiteStructureTemplateId: input.websiteStructureTemplateId,
+      templateIntelligenceId: input.templateIntelligenceId,
+      components: input.components,
+      theme: input.theme,
+    }),
   };
 }
 
@@ -1061,6 +1078,20 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
       ctx.progress.emit(
         `[design-plan] ${designPlan.websiteStyle.layoutVariationId || designIntel.layoutVariationId} · ${designPlan.visualIdentity} · ${designPlan.websiteStyle.heroTreatment} · ${designPlan.typographySystem.displayFont}`,
       );
+
+      if (isTbdpVisualAuthority(brief.metadata)) {
+        const tbdpCtx = resolveTbdpDesignContextFromBrief(brief.metadata);
+        if (tbdpCtx) {
+          premiumDesign = applyTbdpToDesignSystem(
+            premiumDesign as import("@/lib/website/types").DesignSystem,
+            tbdpCtx,
+          ) as CoreDesignSystem;
+          ctx.progress.emit(
+            `[tbdp] Sector ${tbdpCtx.meta.sectorDnaId} · ${tbdpCtx.components.preferred.length} components · layout ${tbdpCtx.aiSelections.layoutId}`,
+          );
+        }
+      }
+
       brief.metadata = {
         ...(brief.metadata ?? {}),
         brandIdentity: brand || brandIdentity,

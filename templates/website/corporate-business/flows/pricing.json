@@ -1,0 +1,7 @@
+{
+  "pageId": "pricing",
+  "layoutId": "default",
+  "regions": {
+    "main": ["corporate-business-hero", "corporate-business-pricing", "corporate-business-faq"]
+  }
+}

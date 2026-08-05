@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Medical Premium — V2 Before/After</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 0; background: #0a0a0a; color: #eee; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #333; min-height: 100vh; }
+  .panel { background: #111; padding: 1rem; overflow: auto; }
+  h2 { margin: 0 0 0.75rem; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.12em; }
+  .bad { color: #f87171; }
+  .good { color: #4ade80; }
+  iframe { width: 100%; height: 70vh; border: 1px solid #333; background: #fff; }
+  pre { font-size: 0.75rem; color: #aaa; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<div class="grid">
+  <div class="panel">
+    <h2 class="bad">Before (V1 ThemeMinimal fallback)</h2>
+    <pre>ThemeMinimalNav, ThemeMinimalHero
+Generic minimal theme — no package components
+No full-bleed 5-region layout
+No mp-* design system</pre>
+  </div>
+  <div class="panel">
+    <h2 class="good">After (Serenity Clinical V2 rebuild)</h2>
+    <pre>Palette: #F7FAF9 pearl / #0F4C4C clinical teal
+Typography: Source Serif 4 + Inter (WCAG AA)
+Layout: full-bleed 5-region (overlay + utility + main)
+11 independent MedicalPremium* components</pre>
+    <iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot; data-v2-render=&quot;v2-files&quot; data-v2-package=&quot;medical-premium&quot; data-v2-layout=&quot;full-bleed&quot;>
+<head>
+  <meta charset=&quot;utf-8&quot; />
+  <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot; />
+  <title>Aether Medical — Live Preview</title>
+  <style>/* Template Architecture V2 — medical-premium · spec 2.0.0 */
+:root {
+  --v2-package: &quot;medical-premium&quot;;
+  --color-primary: #0F4C4C;
+  --color-secondary: #1A6B6B;
+  --color-accent: #C4706A;
+  --color-background: #F7FAF9;
+  --color-foreground: #0F2929;
+  --color-muted: rgba(15,41,41,0.58);
+  --color-surface: #E4F2EE;
+  --color-healing: #5B9A8B;
+  --color-pearl: #FDFEFE;
+  --color-sage: #D4E8E0;
+  --font-display: &quot;Source Serif 4&quot;, ui-sans-serif, system-ui, sans-serif;
+  --font-body: Inter, ui-sans-serif, system-ui, sans-serif;
+  --spacing-unit: 0.25rem;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --shadow-surface: 0 4px 24px rgba(15,76,76,0.08);
+  --shadow-glow: 0 0 60px rgba(91,154,139,0.12);
+  --shadow-card: 0 1px 3px rgba(15,41,41,0.04), 0 8px 24px rgba(15,76,76,0.06);
+  --border-default: rgba(15,41,41,0.08);
+  --border-healing: rgba(91,154,139,0.24);
+  --border-subtle: rgba(15,41,41,0.04);
+}
+
+/* V2 language profile — RTL typography adaptation */
+[dir=&quot;rtl&quot;] {
+  --font-display: &quot;El Messiri&quot;, ui-serif, Georgia, serif;
+  --font-body: &quot;Noto Sans Arabic&quot;, ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+@import url(&quot;https://fonts.googleapis.com/css2?family=El+Messiri:wght@500;600;700&family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;1,14..32,400&family=Noto+Sans+Arabic:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&display=swap&quot;);
+
+@keyframes mp-clinical-fade {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes mp-gentle-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes mp-scale-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes mp-pulse-calm {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mp-animate, [data-mp-motion] { animation: none !important; transition: none !important; }
+}
+
+.mp-font-display { font-family: var(--font-display), &quot;Source Serif 4&quot;, Georgia, serif; }
+.mp-font-body { font-family: var(--font-body), &quot;Inter&quot;, system-ui, sans-serif; }
+.mp-eyebrow {
+  font-family: var(--font-body), &quot;Inter&quot;, system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-healing, #5B9A8B);
+}
+.mp-headline {
+  font-family: var(--font-display), &quot;Source Serif 4&quot;, Georgia, serif;
+  font-size: clamp(2.25rem, 4.8vw, 3.75rem);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--color-foreground);
+}
+.mp-headline-sm {
+  font-family: var(--font-display), &quot;Source Serif 4&quot;, Georgia, serif;
+  font-size: clamp(1.625rem, 3vw, 2.5rem);
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--color-foreground);
+}
+.mp-body {
+  font-family: var(--font-body), &quot;Inter&quot;, system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--color-muted, rgba(15,41,41,0.58));
+}
+.mp-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.875rem 1.75rem;
+  font-family: var(--font-body), &quot;Inter&quot;, system-ui, sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--color-pearl, #FDFEFE);
+  background: var(--color-primary, #0F4C4C);
+  border-radius: var(--radius-md, 12px);
+  border: 2px solid transparent;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+.mp-btn-primary:hover { background: var(--color-secondary, #1A6B6B); box-shadow: var(--shadow-glow); }
+.mp-btn-primary:focus-visible { outline: 3px solid var(--color-healing); outline-offset: 2px; }
+.mp-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 3rem;
+  padding: 0.875rem 1.75rem;
+  font-family: var(--font-body), &quot;Inter&quot;, system-ui, sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--color-primary);
+  background: var(--color-surface);
+  border: 2px solid var(--border-healing, rgba(91,154,139,0.24));
+  border-radius: var(--radius-md, 12px);
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+.mp-btn-secondary:hover { border-color: var(--color-healing); background: var(--color-pearl); }
+.mp-btn-secondary:focus-visible { outline: 3px solid var(--color-healing); outline-offset: 2px; }
+.mp-section { padding-block: clamp(4rem, 10vw, 6rem); }
+.mp-card {
+  border: 1px solid var(--border-subtle);
+  background: var(--color-pearl);
+  border-radius: var(--radius-lg, 20px);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.35s ease, transform 0.35s ease;
+}
+.mp-card:hover { box-shadow: var(--shadow-surface); }
+.mp-focus-ring:focus-visible { outline: 3px solid var(--color-healing); outline-offset: 2px; }
+.mp-trust-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.875rem;
+  font-family: var(--font-body), &quot;Inter&quot;, system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-primary);
+  background: var(--color-surface);
+  border: 1px solid var(--border-healing);
+  border-radius: 9999px;
+}
+/* V2 sidebar-left layout */
+.v2-layout-sidebar-left .v2-sidebar-shell { gap: 0; align-items: flex-start; }
+.v2-sidebar-rail {
+  border-inline-end: 1px solid var(--border-subtle, rgba(244,237,228,0.06));
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-inline-end: clamp(1.25rem, 3vw, 2rem);
+}
+[dir='rtl'] .v2-sidebar-rail { border-inline-end: none; border-inline-start: 1px solid var(--border-subtle, rgba(244,237,228,0.06)); }
+.v2-main-canvas > [data-v2-component] + [data-v2-component] { margin-top: 0; }
+.v2-layout-sidebar-left .v2-main-canvas { padding-inline-start: 0; }
+@media (max-width: 1023px) {
+  .v2-sidebar-rail { display: none !important; }
+}
+
+/* V2 sidebar-right layout */
+.v2-layout-sidebar-right .v2-sidebar-shell { gap: 0; align-items: flex-start; }
+.v2-layout-sidebar-right .v2-sidebar-rail {
+  border-inline-start: 1px solid var(--border-subtle, rgba(28,25,23,0.06));
+  border-inline-end: none;
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-inline-start: clamp(1.25rem, 3vw, 2rem);
+}
+[dir='rtl'] .v2-layout-sidebar-right .v2-sidebar-rail {
+  border-inline-start: none;
+  border-inline-end: 1px solid var(--border-subtle, rgba(28,25,23,0.06));
+}
+
+/* V2 full-bleed layout */
+.v2-layout-full-bleed .v2-overlay-canvas { width: 100%; }
+.v2-layout-full-bleed .v2-main-canvas { width: 100%; max-width: var(--container-max, 76rem); margin-inline: auto; }
+
+:root {
+  --container-max: 76rem;
+  --font-body: Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-display: &quot;Source Serif 4&quot;, ui-sans-serif, system-ui, sans-serif;
+  --color-surface: #E4F2EE;
+  --color-foreground: #0F2929;
+  --color-background: #F7FAF9;
+  --color-accent: #C4706A;
+  --color-secondary: #1A6B6B; --color-primary: #0F4C4C; }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--color-background, #0f172a);
+      color: var(--color-foreground, #f8fafc);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .page { display: none; padding-bottom: 2rem; }
+    .page:target { display: block; }
+    body:not(:has(.page:target)) .page#home { display: block; }
+    img { max-width: 100%; height: auto; display: block; }
+    a { color: inherit; }
+  </style>
+  <script src=&quot;https://cdn.tailwindcss.com&quot;></script>
+</head>
+<body>
+  <div class=&quot;page&quot; id=&quot;home&quot;>
+    <div class=&quot;min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] antialiased v2-template v2-medical-premium v2-layout-full-bleed&quot; data-v2-package=&quot;medical-premium&quot; data-v2-composer=&quot;region-grid&quot; data-v2-layout=&quot;full-bleed&quot;><header data-v2-region=&quot;header&quot;><header data-v2-component=&quot;medical-premium-nav&quot; class=&quot;sticky top-0 z-50 border-b transition-all duration-300 border-transparent bg-[var(--color-pearl)]/80 backdrop-blur-sm&quot;><div class=&quot;mx-auto flex h-16 max-w-[76rem] items-center justify-between gap-4 px-5 sm:px-8 lg:h-[4.25rem]&quot;><a href=&quot;#top&quot; class=&quot;mp-font-display flex items-center gap-2.5 text-lg font-medium text-[var(--color-primary)] mp-focus-ring rounded-sm&quot;><span class=&quot;flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-surface)] text-sm text-[var(--color-healing)]&quot; aria-hidden=&quot;true&quot;>✦</span>Aether Medical</a><nav aria-label=&quot;Primary&quot; class=&quot;hidden items-center gap-8 lg:flex&quot;><a href=&quot;#services&quot; class=&quot;mp-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] mp-focus-ring rounded-sm&quot;>Services</a><a href=&quot;#features&quot; class=&quot;mp-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] mp-focus-ring rounded-sm&quot;>Why us</a><a href=&quot;#pricing&quot; class=&quot;mp-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] mp-focus-ring rounded-sm&quot;>Packages</a><a href=&quot;#testimonials&quot; class=&quot;mp-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] mp-focus-ring rounded-sm&quot;>Clients</a><a href=&quot;#contact&quot; class=&quot;mp-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] mp-focus-ring rounded-sm&quot;>Contact</a></nav><div class=&quot;flex items-center gap-3&quot;><a href=&quot;tel:911&quot; class=&quot;mp-font-body hidden text-sm font-semibold text-[var(--color-accent)] sm:inline-flex mp-focus-ring&quot; aria-label=&quot;Emergency: call 911&quot;>Emergency</a><a href=&quot;#appointments&quot; class=&quot;mp-btn-primary hidden text-sm sm:inline-flex&quot;>Get started</a><button type=&quot;button&quot; aria-expanded=&quot;false&quot; aria-controls=&quot;mp-mobile-nav&quot; aria-label=&quot;Open menu&quot; class=&quot;inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] lg:hidden mp-focus-ring&quot;><span class=&quot;sr-only&quot;>Menu</span><span aria-hidden=&quot;true&quot; class=&quot;text-lg&quot;>☰</span></button></div></div></header></header><div data-v2-region=&quot;overlay&quot; class=&quot;v2-overlay-canvas&quot;><section id=&quot;top&quot; data-v2-component=&quot;medical-premium-trust-hero&quot; aria-labelledby=&quot;mp-hero-title&quot; class=&quot;relative overflow-hidden bg-[var(--color-surface)]&quot;><div class=&quot;absolute inset-0&quot;><div class=&quot;absolute inset-0 bg-gradient-to-br from-[var(--color-surface)] via-[var(--color-pearl)] to-[var(--color-sage)]/40&quot;></div></div><div class=&quot;relative mx-auto max-w-[76rem] px-5 py-20 sm:px-8 sm:py-28 lg:py-32&quot;><div class=&quot;flex flex-wrap gap-2 motion-safe:animate-[mp-clinical-fade_0.8s_ease_both]&quot;><span class=&quot;mp-trust-badge&quot;><span class=&quot;h-1.5 w-1.5 rounded-full bg-[var(--color-healing)]&quot; aria-hidden=&quot;true&quot;></span>JCI Accredited</span><span class=&quot;mp-trust-badge&quot;><span class=&quot;h-1.5 w-1.5 rounded-full bg-[var(--color-healing)]&quot; aria-hidden=&quot;true&quot;></span>Board Certified</span><span class=&quot;mp-trust-badge&quot;><span class=&quot;h-1.5 w-1.5 rounded-full bg-[var(--color-healing)]&quot; aria-hidden=&quot;true&quot;></span>24/7 Care Line</span></div><p class=&quot;mp-eyebrow mt-8 mb-4 motion-safe:animate-[mp-gentle-rise_0.7s_ease_0.1s_both]&quot;>Professional presence</p><h1 id=&quot;mp-hero-title&quot; class=&quot;mp-headline max-w-3xl motion-safe:animate-[mp-clinical-fade_0.85s_ease_0.15s_both]&quot;>Aether Medical</h1><p class=&quot;mp-body mt-6 max-w-2xl motion-safe:animate-[mp-gentle-rise_0.8s_ease_0.25s_both]&quot;>Private healthcare network</p><div class=&quot;mt-10 flex flex-wrap gap-4 motion-safe:animate-[mp-gentle-rise_0.8s_ease_0.35s_both]&quot;><a href=&quot;#appointments&quot; class=&quot;mp-btn-primary&quot;>Get started</a><a href=&quot;#physicians&quot; class=&quot;mp-btn-secondary&quot;>Learn more</a></div></div></section></div><utility data-v2-region=&quot;utility&quot;><section id=&quot;appointments&quot; data-v2-component=&quot;medical-premium-appointment-band&quot; aria-labelledby=&quot;mp-appointment-title&quot; class=&quot;border-y border-[var(--border-healing)] bg-[var(--color-primary)] py-5 text-[var(--color-pearl)]&quot;><div class=&quot;mx-auto flex max-w-[76rem] flex-col items-start justify-between gap-4 px-5 sm:flex-row sm:items-center sm:px-8&quot;><div><h2 id=&quot;mp-appointment-title&quot; class=&quot;mp-font-display text-lg font-medium sm:text-xl&quot;>Ready to look established online?</h2><p class=&quot;mp-font-body mt-1 text-sm text-white/75&quot;>Share your goals — we will propose a clear path and timeline.</p></div><div class=&quot;flex flex-wrap items-center gap-3&quot;><a href=&quot;tel:18005550199&quot; class=&quot;mp-font-body text-sm font-semibold text-white/90 underline-offset-4 hover:underline mp-focus-ring&quot;>+1 (800) 555-0199</a><a href=&quot;#contact&quot; class=&quot;inline-flex min-h-[2.75rem] items-center rounded-[var(--radius-md)] bg-[var(--color-pearl)] px-5 text-sm font-semibold text-[var(--color-primary)] mp-focus-ring&quot;>Get started</a></div></div></section></utility><main data-v2-region=&quot;main&quot; class=&quot;v2-main-canvas&quot;><section id=&quot;specialties&quot; data-v2-component=&quot;medical-premium-specialties&quot; aria-labelledby=&quot;mp-specialties-title&quot; class=&quot;mp-section px-5 sm:px-8&quot;><header class=&quot;mx-auto mb-12 max-w-2xl&quot;><p class=&quot;mp-eyebrow mb-4&quot;>Services</p><h2 id=&quot;mp-specialties-title&quot; class=&quot;mp-headline-sm&quot;>What we deliver for clients</h2><p class=&quot;mp-body mt-4&quot;>Plain-language offerings with outcomes — ready for a premium business site.</p></header><div class=&quot;mx-auto grid max-w-[76rem] gap-4 sm:grid-cols-2 lg:grid-cols-3&quot;><article class=&quot;mp-card p-6 motion-safe:animate-[mp-scale-in_0.5s_ease_both]&quot; style=&quot;animation-delay:0s&quot;><span class=&quot;flex h-11 w-11 items-center justify-center rounded-full bg-[var(--color-surface)] text-lg text-[var(--color-healing)]&quot; aria-hidden=&quot;true&quot;>◆</span><h3 class=&quot;mp-font-display mt-4 text-xl text-[var(--color-foreground)]&quot;>Core services</h3><p class=&quot;mp-font-body mt-2 text-sm leading-relaxed text-[var(--color-muted)]&quot;></p></article><article class=&quot;mp-card p-6 motion-safe:animate-[mp-scale-in_0.5s_ease_both]&quot; style=&quot;animation-delay:0.06s&quot;><span class=&quot;flex h-11 w-11 items-center justify-center rounded-full bg-[var(--color-surface)] text-lg text-[var(--color-healing)]&quot; aria-hidden=&quot;true&quot;>◆</span><h3 class=&quot;mp-font-display mt-4 text-xl text-[var(--color-foreground)]&quot;>Proof &amp; process</h3><p class=&quot;mp-font-body mt-2 text-sm leading-relaxed text-[var(--color-muted)]&quot;></p></article><article class=&quot;mp-card p-6 motion-safe:animate-[mp-scale-in_0.5s_ease_both]&quot; style=&quot;animation-delay:0.12s&quot;><span class=&quot;flex h-11 w-11 items-center justify-center rounded-full bg-[var(--color-surface)] text-lg text-[var(--color-healing)]&quot; aria-hidden=&quot;true&quot;>◆</span><h3 class=&quot;mp-font-display mt-4 text-xl text-[var(--color-foreground)]&quot;>Responsive follow-up</h3><p class=&quot;mp-font-body mt-2 text-sm leading-relaxed text-[var(--color-muted)]&quot;></p></article></div></section><section id=&quot;physicians&quot; data-v2-component=&quot;medical-premium-physicians&quot; aria-labelledby=&quot;mp-physicians-title&quot; class=&quot;mp-section bg-[var(--color-surface)]/50 px-5 sm:px-8&quot;><header class=&quot;mx-auto mb-12 max-w-2xl&quot;><p class=&quot;mp-eyebrow mb-4&quot;>Our physicians</p><h2 id=&quot;mp-physicians-title&quot; class=&quot;mp-headline-sm&quot;>Ready to look established online?</h2><p class=&quot;mp-body mt-4&quot;>Share your goals — we will propose a clear path and timeline.</p></header><div class=&quot;mx-auto grid max-w-[76rem] gap-8 md:grid-cols-3&quot;><article class=&quot;mp-card overflow-hidden&quot;><figure><div class=&quot;aspect-[4/5] w-full bg-[var(--color-sage)]&quot;></div></figure><div class=&quot;p-6&quot;><h3 class=&quot;mp-font-display text-xl text-[var(--color-foreground)]&quot;>Dr. Elena Vasquez</h3><p class=&quot;mp-font-body mt-1 text-sm font-medium text-[var(--color-healing)]&quot;>Chief of Cardiology</p><p class=&quot;mp-font-body mt-2 text-xs text-[var(--color-muted)]&quot;>MD, FACC · Harvard Medical</p></div></article><article class=&quot;mp-card overflow-hidden&quot;><figure><div class=&quot;aspect-[4/5] w-full bg-[var(--color-sage)]&quot;></div></figure><div class=&quot;p-6&quot;><h3 class=&quot;mp-font-display text-xl text-[var(--color-foreground)]&quot;>Dr. James Okonkwo</h3><p class=&quot;mp-font-body mt-1 text-sm font-medium text-[var(--color-healing)]&quot;>Director of Oncology</p><p class=&quot;mp-font-body mt-2 text-xs text-[var(--color-muted)]&quot;>MD, PhD · Johns Hopkins</p></div></article><article class=&quot;mp-card overflow-hidden&quot;><figure><div class=&quot;aspect-[4/5] w-full bg-[var(--color-sage)]&quot;></div></figure><div class=&quot;p-6&quot;><h3 class=&quot;mp-font-display text-xl text-[var(--color-foreground)]&quot;>Dr. Sarah Lindqvist</h3><p class=&quot;mp-font-body mt-1 text-sm font-medium text-[var(--color-healing)]&quot;>Head of Neurology</p><p class=&quot;mp-font-body mt-2 text-xs text-[var(--color-muted)]&quot;>MD, FAAN · Karolinska Institute</p></div></article></div></section><section id=&quot;care&quot; data-v2-component=&quot;medical-premium-care-journey&quot; aria-labelledby=&quot;mp-care-title&quot; class=&quot;mp-section px-5 sm:px-8&quot;><header class=&quot;mx-auto mb-14 max-w-2xl text-center&quot;><p class=&quot;mp-eyebrow mb-4&quot;>Services</p><h2 id=&quot;mp-care-title&quot; class=&quot;mp-headline-sm&quot;>What we deliver for clients</h2><p class=&quot;mp-body mt-4&quot;>Plain-language offerings with outcomes — ready for a premium business site.</p></header><ol class=&quot;mx-auto grid max-w-[76rem] gap-6 sm:grid-cols-2 lg:grid-cols-4&quot;><li class=&quot;relative&quot;><span class=&quot;absolute end-0 top-8 hidden h-px w-full bg-[var(--border-healing)] lg:block&quot; aria-hidden=&quot;true&quot;></span><article class=&quot;mp-card relative z-10 h-full p-6&quot;><span class=&quot;mp-font-body text-xs font-semibold tracking-widest text-[var(--color-healing)]&quot;>01</span><h3 class=&quot;mp-font-display mt-3 text-xl text-[var(--color-foreground)]&quot;>Connect</h3><p class=&quot;mp-font-body mt-3 text-sm leading-relaxed text-[var(--color-muted)]&quot;>Speak with a care coordinator who listens to your needs and medical history.</p></article></li><li class=&quot;relative&quot;><span class=&quot;absolute end-0 top-8 hidden h-px w-full bg-[var(--border-healing)] lg:block&quot; aria-hidden=&quot;true&quot;></span><article class=&quot;mp-card relative z-10 h-full p-6&quot;><span class=&quot;mp-font-body text-xs font-semibold tracking-widest text-[var(--color-healing)]&quot;>02</span><h3 class=&quot;mp-font-display mt-3 text-xl text-[var(--color-foreground)]&quot;>Assess</h3><p class=&quot;mp-font-body mt-3 text-sm leading-relaxed text-[var(--color-muted)]&quot;>Comprehensive evaluation with the right specialist — often within the same week.</p></article></li><li class=&quot;relative&quot;><span class=&quot;absolute end-0 top-8 hidden h-px w-full bg-[var(--border-healing)] lg:block&quot; aria-hidden=&quot;true&quot;></span><article class=&quot;mp-card relative z-10 h-full p-6&quot;><span class=&quot;mp-font-body text-xs font-semibold tracking-widest text-[var(--color-healing)]&quot;>03</span><h3 class=&quot;mp-font-display mt-3 text-xl text-[var(--color-foreground)]&quot;>Treat</h3><p class=&quot;mp-font-body mt-3 text-sm leading-relaxed text-[var(--color-muted)]&quot;>Personalized treatment plan delivered with transparency at every step.</p></article></li><li class=&quot;relative&quot;><article class=&quot;mp-card relative z-10 h-full p-6&quot;><span class=&quot;mp-font-body text-xs font-semibold tracking-widest text-[var(--color-healing)]&quot;>04</span><h3 class=&quot;mp-font-display mt-3 text-xl text-[var(--color-foreground)]&quot;>Follow</h3><p class=&quot;mp-font-body mt-3 text-sm leading-relaxed text-[var(--color-muted)]&quot;>Ongoing monitoring and proactive follow-up to support long-term wellness.</p></article></li></ol></section><section data-v2-component=&quot;medical-premium-wellness&quot; aria-labelledby=&quot;mp-wellness-title&quot; class=&quot;mp-section bg-[var(--color-pearl)] px-5 sm:px-8&quot;><div class=&quot;mx-auto grid max-w-[76rem] items-center gap-12 lg:grid-cols-2&quot;><figure class=&quot;mp-card overflow-hidden&quot;><div class=&quot;aspect-[4/3] w-full bg-[var(--color-sage)]&quot;></div></figure><div><p class=&quot;mp-eyebrow mb-4&quot;>Why us</p><h2 id=&quot;mp-wellness-title&quot; class=&quot;mp-headline-sm&quot;>A presence that earns trust</h2><p class=&quot;mp-body mt-4&quot;>Webflow-caliber spacing, type, and hierarchy for serious brands.</p><ul class=&quot;mt-8 space-y-5&quot;><li class=&quot;border-s-3 border-[var(--color-healing)] ps-4&quot;><h3 class=&quot;mp-font-display text-lg text-[var(--color-foreground)]&quot;>Clear offer</h3><p class=&quot;mp-font-body mt-1 text-sm text-[var(--color-muted)]&quot;></p></li><li class=&quot;border-s-3 border-[var(--color-healing)] ps-4&quot;><h3 class=&quot;mp-font-display text-lg text-[var(--color-foreground)]&quot;>Premium presentation</h3><p class=&quot;mp-font-body mt-1 text-sm text-[var(--color-muted)]&quot;></p></li><li class=&quot;border-s-3 border-[var(--color-healing)] ps-4&quot;><h3 class=&quot;mp-font-display text-lg text-[var(--color-foreground)]&quot;>Conversion paths</h3><p class=&quot;mp-font-body mt-1 text-sm text-[var(--color-muted)]&quot;></p></li><li class=&quot;border-s-3 border-[var(--color-healing)] ps-4&quot;><h3 class=&quot;mp-font-display text-lg text-[var(--color-foreground)]&quot;>Trusted contact</h3><p class=&quot;mp-font-body mt-1 text-sm text-[var(--color-muted)]&quot;></p></li></ul></div></div></section><section data-v2-component=&quot;medical-premium-testimonials&quot; aria-labelledby=&quot;mp-testimonials-title&quot; class=&quot;mp-section px-5 sm:px-8&quot;><header class=&quot;mx-auto mb-12 max-w-2xl text-center&quot;><p class=&quot;mp-eyebrow mb-4&quot;>Clients</p><h2 id=&quot;mp-testimonials-title&quot; class=&quot;mp-headline-sm&quot;>Businesses that raised their standard</h2><p class=&quot;mp-body mt-4&quot;>Specific results from professional services teams.</p></header><div class=&quot;mx-auto grid max-w-[76rem] gap-6 md:grid-cols-2&quot;><blockquote class=&quot;mp-card p-8&quot; cite=&quot;&quot;><p class=&quot;mp-font-display mt-4 text-lg italic leading-relaxed text-[var(--color-foreground)]&quot;>“We finally look as professional as the work we deliver — working with Aether Medical.”</p><footer class=&quot;mp-font-body mt-6 text-sm font-medium text-[var(--color-muted)]&quot;>— </footer></blockquote><blockquote class=&quot;mp-card p-8&quot; cite=&quot;&quot;><p class=&quot;mp-font-display mt-4 text-lg italic leading-relaxed text-[var(--color-foreground)]&quot;>“Inquiries went up after the redesign — messaging is clearer.”</p><footer class=&quot;mp-font-body mt-6 text-sm font-medium text-[var(--color-muted)]&quot;>— </footer></blockquote><blockquote class=&quot;mp-card p-8&quot; cite=&quot;&quot;><p class=&quot;mp-font-display mt-4 text-lg italic leading-relaxed text-[var(--color-foreground)]&quot;>“Clients comment on the site before meetings now.”</p><footer class=&quot;mp-font-body mt-6 text-sm font-medium text-[var(--color-muted)]&quot;>— </footer></blockquote></div></section><section id=&quot;contact&quot; data-v2-component=&quot;medical-premium-contact&quot; aria-labelledby=&quot;mp-contact-title&quot; class=&quot;mp-section border-t border-[var(--border-subtle)] bg-[var(--color-surface)]/40 px-5 sm:px-8&quot;><div class=&quot;mx-auto grid max-w-[76rem] gap-12 lg:grid-cols-2&quot;><div><p class=&quot;mp-eyebrow mb-4&quot;>Contact</p><h2 id=&quot;mp-contact-title&quot; class=&quot;mp-headline-sm&quot;>Request a quote</h2><p class=&quot;mp-body mt-4&quot;>Tell us about your business and we will respond promptly.</p><dl class=&quot;mp-font-body mt-8 space-y-4 text-sm&quot;><div><dt class=&quot;font-semibold text-[var(--color-foreground)]&quot;>Care line</dt><dd><a href=&quot;tel:+18005550199&quot; class=&quot;text-[var(--color-primary)] underline mp-focus-ring&quot;>+1 (800) 555-0199</a></dd></div><div><dt class=&quot;font-semibold text-[var(--color-foreground)]&quot;>Hours</dt><dd class=&quot;text-[var(--color-muted)]&quot;>Mon–Fri 7am–8pm · Sat 8am–2pm</dd></div><div><dt class=&quot;font-semibold text-[var(--color-accent)]&quot;>Emergency</dt><dd><a href=&quot;tel:911&quot; class=&quot;font-semibold text-[var(--color-accent)] mp-focus-ring&quot;>Call 911</a></dd></div></dl></div><form class=&quot;mp-card bg-[var(--color-pearl)] p-6 sm:p-8&quot; aria-label=&quot;Consultation request&quot;><div class=&quot;grid gap-5&quot;><label class=&quot;block&quot;><span class=&quot;mp-font-body mb-2 block text-sm font-medium text-[var(--color-foreground)]&quot;>Full name <span class=&quot;text-[var(--color-accent)]&quot;>*</span></span><input required=&quot;&quot; type=&quot;text&quot; autoComplete=&quot;name&quot; class=&quot;w-full rounded-[var(--radius-md)] border border-[var(--border-default)] bg-white px-4 py-3 mp-font-body text-base focus:border-[var(--color-healing)] focus:outline-none focus:ring-2 focus:ring-[var(--color-healing)]&quot;/></label><label class=&quot;block&quot;><span class=&quot;mp-font-body mb-2 block text-sm font-medium text-[var(--color-foreground)]&quot;>Email <span class=&quot;text-[var(--color-accent)]&quot;>*</span></span><input required=&quot;&quot; type=&quot;email&quot; autoComplete=&quot;email&quot; class=&quot;w-full rounded-[var(--radius-md)] border border-[var(--border-default)] bg-white px-4 py-3 mp-font-body text-base focus:border-[var(--color-healing)] focus:outline-none focus:ring-2 focus:ring-[var(--color-healing)]&quot;/></label><label class=&quot;block&quot;><span class=&quot;mp-font-body mb-2 block text-sm font-medium text-[var(--color-foreground)]&quot;>Specialty of interest</span><select class=&quot;w-full rounded-[var(--radius-md)] border border-[var(--border-default)] bg-white px-4 py-3 mp-font-body text-base focus:border-[var(--color-healing)] focus:outline-none&quot;><option>General consultation</option><option>Cardiology</option><option>Oncology</option><option>Orthopedics</option><option>Executive health</option></select></label><label class=&quot;block&quot;><span class=&quot;mp-font-body mb-2 block text-sm font-medium text-[var(--color-foreground)]&quot;>Message</span><textarea rows=&quot;4&quot; class=&quot;w-full resize-none rounded-[var(--radius-md)] border border-[var(--border-default)] bg-white px-4 py-3 mp-font-body text-base focus:border-[var(--color-healing)] focus:outline-none focus:ring-2 focus:ring-[var(--color-healing)]&quot;></textarea></label><button type=&quot;submit&quot; class=&quot;mp-btn-primary w-full sm:w-auto&quot;>Get started</button></div></form></div></section></main><footer data-v2-region=&quot;footer&quot;><footer data-v2-component=&quot;medical-premium-footer&quot; class=&quot;border-t border-[var(--border-subtle)] bg-[var(--color-primary)] text-[var(--color-pearl)]&quot; role=&quot;contentinfo&quot;><div class=&quot;mx-auto max-w-[76rem] px-5 py-14 sm:px-8&quot;><div class=&quot;grid gap-10 md:grid-cols-[1.4fr_1fr]&quot;><div><p class=&quot;mp-font-display text-2xl&quot;>Aether Medical</p><p class=&quot;mp-font-body mt-3 text-sm text-white/65&quot;>Clear messaging and conversion-focused pages that earn trust quickly.</p><div class=&quot;mt-6 flex flex-wrap gap-2&quot;><span class=&quot;rounded-full border border-white/15 px-3 py-1 text-[0.6875rem] text-white/50&quot;>HIPAA Compliant</span><span class=&quot;rounded-full border border-white/15 px-3 py-1 text-[0.6875rem] text-white/50&quot;>JCI</span><span class=&quot;rounded-full border border-white/15 px-3 py-1 text-[0.6875rem] text-white/50&quot;>HIMSS</span></div></div><nav aria-label=&quot;Footer&quot;><p class=&quot;mp-eyebrow text-white/40&quot;>Explore</p><ul class=&quot;mt-4 space-y-2.5&quot;><li><a href=&quot;#specialties&quot; class=&quot;mp-font-body text-sm text-white/70 transition hover:text-white mp-focus-ring&quot;>Specialties</a></li><li><a href=&quot;#physicians&quot; class=&quot;mp-font-body text-sm text-white/70 transition hover:text-white mp-focus-ring&quot;>Physicians</a></li><li><a href=&quot;#appointments&quot; class=&quot;mp-font-body text-sm text-white/70 transition hover:text-white mp-focus-ring&quot;>Appointments</a></li><li><a href=&quot;#contact&quot; class=&quot;mp-font-body text-sm text-white/70 transition hover:text-white mp-focus-ring&quot;>Contact</a></li></ul></nav></div><p class=&quot;mp-font-body mt-10 border-t border-white/10 pt-6 text-xs text-white/40&quot;>© 2026 Aether Medical. This website does not provide medical advice. In an emergency, call 911.</p></div></footer></footer></div>
+  </div>
+  <section class=&quot;page v2-secondary-page&quot; id=&quot;services&quot;>
+  <div class=&quot;mx-auto max-w-3xl px-6 py-16&quot;>
+    <p class=&quot;text-xs uppercase tracking-widest text-[var(--color-foreground)]/50&quot;>services</p>
+    <pre class=&quot;mt-4 overflow-x-auto rounded border border-[var(--color-foreground)]/10 p-4 text-xs text-[var(--color-foreground)]/70&quot;>export default function Services(){return &lt;main&gt;Services&lt;/main&gt;}</pre>
+    <a class=&quot;mt-6 inline-block text-sm text-[var(--color-accent,#B87333)]&quot; href=&quot;#home&quot;>Back to home</a>
+  </div>
+</section>
+<section class=&quot;page v2-secondary-page&quot; id=&quot;physicians&quot;>
+  <div class=&quot;mx-auto max-w-3xl px-6 py-16&quot;>
+    <p class=&quot;text-xs uppercase tracking-widest text-[var(--color-foreground)]/50&quot;>physicians</p>
+    <h1 class=&quot;mt-4 text-3xl font-semibold text-[var(--color-foreground)]&quot;>physicians</h1>
+    <p class=&quot;mt-4 text-[var(--color-foreground)]/70&quot;>physicians — Aether Medical</p>
+    <a class=&quot;mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]&quot; href=&quot;#home&quot;>Back to home</a>
+  </div>
+</section>
+<section class=&quot;page v2-secondary-page&quot; id=&quot;appointments&quot;>
+  <div class=&quot;mx-auto max-w-3xl px-6 py-16&quot;>
+    <p class=&quot;text-xs uppercase tracking-widest text-[var(--color-foreground)]/50&quot;>appointments</p>
+    <h1 class=&quot;mt-4 text-3xl font-semibold text-[var(--color-foreground)]&quot;>appointments</h1>
+    <p class=&quot;mt-4 text-[var(--color-foreground)]/70&quot;>appointments — Aether Medical</p>
+    <a class=&quot;mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]&quot; href=&quot;#home&quot;>Back to home</a>
+  </div>
+</section>
+</body>
+</html>"></iframe>
+  </div>
+</div>
+</body>
+</html>

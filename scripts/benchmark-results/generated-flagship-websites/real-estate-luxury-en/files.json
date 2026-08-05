@@ -1,0 +1,18 @@
+[
+  "lib/site-images.ts",
+  "app/layout.tsx",
+  "components/ui/motion.tsx",
+  "app/globals.css",
+  "components/real-estate-premium-nav.tsx",
+  "components/real-estate-premium-dossier-rail.tsx",
+  "components/real-estate-premium-hero.tsx",
+  "components/real-estate-premium-collection.tsx",
+  "components/real-estate-premium-neighborhoods.tsx",
+  "components/real-estate-premium-architecture.tsx",
+  "components/real-estate-premium-advisors.tsx",
+  "components/real-estate-premium-testimonials.tsx",
+  "components/real-estate-premium-inquiry.tsx",
+  "components/real-estate-premium-footer.tsx",
+  "components/real-estate-premium-section-shell.tsx",
+  "app/page.tsx"
+]

@@ -1,0 +1,47 @@
+{
+  "packageId": "creative-agency-premium",
+  "templateIntelligenceHint": "ti-creative-studio",
+  "layout": {
+    "defaultLayoutId": "editorial-reveal",
+    "regions": {
+      "header": { "role": "header", "sticky": true },
+      "main": { "role": "main" },
+      "overlay": { "role": "overlay" },
+      "footer": { "role": "footer" }
+    }
+  },
+  "navigation": {
+    "componentId": "creative-agency-premium-nav",
+    "variant": "studio-transparent"
+  },
+  "hero": {
+    "componentId": "creative-agency-premium-hero",
+    "region": "main"
+  },
+  "footer": {
+    "componentId": "creative-agency-premium-footer",
+    "region": "footer"
+  },
+  "homeFlow": {
+    "regions": {
+      "main": [
+        "creative-agency-premium-hero",
+        "creative-agency-premium-selected-work",
+        "creative-agency-premium-case-grid",
+        "creative-agency-premium-manifesto",
+        "creative-agency-premium-capabilities",
+        "creative-agency-premium-process",
+        "creative-agency-premium-collaborate-cta"
+      ],
+      "overlay": ["creative-agency-premium-overlay-showcase"]
+    }
+  },
+  "sectionShell": {
+    "strategy": "package",
+    "componentId": "creative-agency-premium-section-shell"
+  },
+  "aiGeneration": {
+    "contentProfile": "creative-agency-premium-kinetic",
+    "suggestedPages": ["work", "studio", "contact"]
+  }
+}

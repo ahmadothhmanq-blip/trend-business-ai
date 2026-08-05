@@ -1,0 +1,22 @@
+{
+  "preset": "corporate-subtle",
+  "reducedMotion": "fade",
+  "entrances": {
+    "hero": {
+      "type": "fade-up",
+      "durationMs": 600,
+      "staggerMs": 80
+    },
+    "section": {
+      "type": "fade-in",
+      "durationMs": 400
+    }
+  },
+  "microInteractions": {
+    "button": {
+      "hover": "scale-102",
+      "active": "scale-98"
+    }
+  },
+  "imports": ["framer-motion"]
+}

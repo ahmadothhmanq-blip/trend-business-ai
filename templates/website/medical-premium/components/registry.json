@@ -1,0 +1,61 @@
+{
+  "components": [
+    {
+      "id": "medical-premium-nav",
+      "role": "navigation",
+      "scaffold": "components/medical-premium-nav.tsx",
+      "slots": ["logo", "links", "cta", "emergency"]
+    },
+    {
+      "id": "medical-premium-trust-hero",
+      "role": "hero",
+      "scaffold": "components/medical-premium-trust-hero.tsx",
+      "slots": ["headline", "trust-badges", "cta"]
+    },
+    {
+      "id": "medical-premium-appointment-band",
+      "role": "cta",
+      "scaffold": "components/medical-premium-appointment-band.tsx"
+    },
+    {
+      "id": "medical-premium-specialties",
+      "role": "services",
+      "scaffold": "components/medical-premium-specialties.tsx"
+    },
+    {
+      "id": "medical-premium-physicians",
+      "role": "custom",
+      "scaffold": "components/medical-premium-physicians.tsx"
+    },
+    {
+      "id": "medical-premium-care-journey",
+      "role": "process",
+      "scaffold": "components/medical-premium-care-journey.tsx"
+    },
+    {
+      "id": "medical-premium-wellness",
+      "role": "features",
+      "scaffold": "components/medical-premium-wellness.tsx"
+    },
+    {
+      "id": "medical-premium-testimonials",
+      "role": "testimonials",
+      "scaffold": "components/medical-premium-testimonials.tsx"
+    },
+    {
+      "id": "medical-premium-contact",
+      "role": "contact",
+      "scaffold": "components/medical-premium-contact.tsx"
+    },
+    {
+      "id": "medical-premium-footer",
+      "role": "footer",
+      "scaffold": "components/medical-premium-footer.tsx"
+    },
+    {
+      "id": "medical-premium-section-shell",
+      "role": "custom",
+      "scaffold": "components/medical-premium-section-shell.tsx"
+    }
+  ]
+}

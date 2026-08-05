@@ -1,0 +1,21 @@
+{
+  "tbdpNative": true,
+  "sectorDnaId": "logistics",
+  "experienceProfiles": ["luxury", "editorial", "minimal"],
+  "structure": {
+    "regions": {
+      "header": { "sticky": true, "position": "top" },
+      "utility": { "collapseBelow": "md", "collapseMode": "stack" },
+      "main": { "collapseBelow": "sm" },
+      "overlay": { "collapseBelow": "sm", "collapseMode": "fixed-bottom" }
+    },
+    "components": {
+      "ecommerce-premium-hero": {
+        "layout": { "lg": "editorial-split", "sm": "stacked" }
+      },
+      "ecommerce-premium-product-grid": {
+        "layout": { "lg": "masonry-catalog", "sm": "stacked" }
+      }
+    }
+  }
+}

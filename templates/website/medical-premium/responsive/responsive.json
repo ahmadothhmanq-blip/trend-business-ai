@@ -1,0 +1,21 @@
+{
+  "tbdpNative": true,
+  "sectorDnaId": "medical",
+  "experienceProfiles": ["healthcare", "corporate", "minimal"],
+  "structure": {
+    "regions": {
+      "header": { "sticky": true, "position": "top" },
+      "utility": { "collapseBelow": "md", "collapseMode": "stack" },
+      "overlay": { "collapseBelow": "sm" },
+      "main": { "collapseBelow": "sm" }
+    },
+    "components": {
+      "medical-premium-trust-hero": {
+        "layout": { "lg": "layered-trust", "sm": "stacked" }
+      },
+      "medical-premium-specialties": {
+        "layout": { "lg": "card-masonry", "sm": "stacked" }
+      }
+    }
+  }
+}

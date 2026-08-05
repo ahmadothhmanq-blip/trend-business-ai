@@ -1,0 +1,16 @@
+{
+  "pageId": "home",
+  "layoutId": "editorial-reveal",
+  "regions": {
+    "main": [
+      "creative-portfolio-hero",
+      "creative-portfolio-selected-work",
+      "creative-portfolio-case-grid",
+      "creative-portfolio-manifesto",
+      "creative-portfolio-capabilities",
+      "creative-portfolio-process",
+      "creative-portfolio-collaborate-cta"
+    ],
+    "overlay": ["creative-portfolio-overlay-showcase"]
+  }
+}

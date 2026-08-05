@@ -5,6 +5,7 @@ export type OutputTab =
   | "analytics"
   | "experiments"
   | "seo"
+  | "review"
   | "deploy"
   | "intelligence";
 

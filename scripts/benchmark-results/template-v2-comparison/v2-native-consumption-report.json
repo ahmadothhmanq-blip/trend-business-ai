@@ -1,0 +1,70 @@
+{
+  "generatedAt": "2026-08-03T20:50:31.737Z",
+  "summary": [
+    {
+      "packageId": "restaurant-signature",
+      "sectorDnaId": "restaurant",
+      "templateIdentity": "forest-table",
+      "experienceProfiles": [
+        "hospitality",
+        "luxury",
+        "editorial"
+      ],
+      "motionPreset": "forest-table-reveal",
+      "containerMaxWidth": "90rem",
+      "tbdpNative": true
+    },
+    {
+      "packageId": "saas-enterprise",
+      "sectorDnaId": "saas",
+      "templateIdentity": "nexus-command",
+      "experienceProfiles": [
+        "technical",
+        "corporate",
+        "executive"
+      ],
+      "motionPreset": "nexus-grid-reveal",
+      "containerMaxWidth": "82rem",
+      "tbdpNative": true
+    },
+    {
+      "packageId": "real-estate-prestige",
+      "sectorDnaId": "real-estate",
+      "templateIdentity": "monolith-estate",
+      "experienceProfiles": [
+        "luxury",
+        "executive",
+        "corporate"
+      ],
+      "motionPreset": "monolith-reveal",
+      "containerMaxWidth": "88rem",
+      "tbdpNative": true
+    },
+    {
+      "packageId": "medical-premium",
+      "sectorDnaId": "medical",
+      "templateIdentity": "serenity-clinical",
+      "experienceProfiles": [
+        "healthcare",
+        "corporate",
+        "minimal"
+      ],
+      "motionPreset": "serenity-fade",
+      "containerMaxWidth": "76rem",
+      "tbdpNative": true
+    },
+    {
+      "packageId": "creative-portfolio",
+      "sectorDnaId": "creative-studio",
+      "templateIdentity": "kinetic-atelier",
+      "experienceProfiles": [
+        "creative",
+        "editorial",
+        "playful"
+      ],
+      "motionPreset": "kinetic-spring-stagger",
+      "containerMaxWidth": "100%",
+      "tbdpNative": true
+    }
+  ]
+}

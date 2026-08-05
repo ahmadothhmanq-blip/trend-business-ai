@@ -1,0 +1,18 @@
+{
+  "breakpoints": [
+    { "name": "sm", "minWidth": 640 },
+    { "name": "md", "minWidth": 768 },
+    { "name": "lg", "minWidth": 1024 },
+    { "name": "xl", "minWidth": 1280 }
+  ],
+  "containerMaxWidth": "76rem",
+  "regions": {
+    "header": { "sticky": true, "position": "top" },
+    "main": { "collapseBelow": "md" }
+  },
+  "components": {
+    "hero-primary": {
+      "layout": { "md": "two-column", "sm": "stacked" }
+    }
+  }
+}

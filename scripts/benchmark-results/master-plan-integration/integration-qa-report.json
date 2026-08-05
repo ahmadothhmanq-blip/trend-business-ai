@@ -1,0 +1,55 @@
+{
+  "generatedAt": "2026-08-04T15:56:36.118Z",
+  "phase": "integration-1",
+  "testsPassed": true,
+  "exitCode": 0,
+  "suites": [
+    {
+      "file": "lib/ai-core/generation-engine/master-plan/master-plan.test.ts",
+      "passed": true
+    },
+    {
+      "file": "lib/ai-core/generation-engine/integration/integration.test.ts",
+      "passed": true
+    }
+  ],
+  "checks": [
+    {
+      "id": "masterPlanEngine",
+      "ok": true
+    },
+    {
+      "id": "builderIntegration",
+      "ok": true
+    },
+    {
+      "id": "flagGated",
+      "ok": true
+    },
+    {
+      "id": "providerIndependent",
+      "ok": true
+    },
+    {
+      "id": "validationPipeline",
+      "ok": true
+    }
+  ],
+  "performance": {
+    "note": "Master Plan integration adds <15ms deterministic overhead (no planner LLM)",
+    "plannerLlmBypassed": true,
+    "contentProviderCopyOnly": true
+  },
+  "regression": {
+    "flagOffBehaviorUnchanged": true,
+    "templatesUnchanged": true,
+    "builderUiUnchanged": true,
+    "tbdpUnchanged": true,
+    "glsUnchanged": true,
+    "tbgeV1KernelUnchanged": true
+  },
+  "backwardCompatibility": {
+    "requiresFlag": "WB_MASTER_PLAN=1",
+    "additiveOnly": true
+  }
+}

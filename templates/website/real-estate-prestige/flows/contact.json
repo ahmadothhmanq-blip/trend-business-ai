@@ -1,0 +1,12 @@
+{
+  "pageId": "contact",
+  "layoutId": "sidebar-right",
+  "regions": {
+    "sidebar": ["real-estate-prestige-dossier-rail"],
+    "main": [
+      "real-estate-prestige-hero",
+      "real-estate-prestige-inquiry",
+      "real-estate-prestige-advisors"
+    ]
+  }
+}

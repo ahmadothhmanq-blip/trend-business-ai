@@ -104,6 +104,11 @@ export function buildWbTemplateRenderStyles(
   grid-template-columns: minmax(0, 3fr) minmax(12rem, 1fr);
 }
 
+.wb-tpl-layout--full-bleed,
+.wb-tpl-layout--editorial-reveal {
+  grid-template-columns: 1fr;
+}
+
 .wb-tpl-region {
   border: 1px dashed var(--wb-tpl-border);
   border-radius: var(--wb-tpl-radius);
