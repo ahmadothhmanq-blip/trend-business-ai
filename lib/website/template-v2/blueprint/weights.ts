@@ -1,0 +1,3 @@
+export const BLUEPRINT_ENGINE_VERSION = "1.0.0";
+
+export const BLUEPRINT_SCHEMA_VERSION = "1.0.0";

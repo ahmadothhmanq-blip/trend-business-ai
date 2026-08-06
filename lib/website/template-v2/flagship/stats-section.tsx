@@ -36,10 +36,10 @@ export function FlagshipStatsSection({
       id={id}
       data-v2-component={componentId}
       aria-labelledby={`${id}-title`}
-      className={`${ui.section} se-section-glow relative overflow-hidden bg-[var(--color-background)]`}
+      className={`${ui.section} df-section-glow relative overflow-hidden bg-[var(--color-background)]`}
     >
-      <div className="se-glow-orb -start-24 top-0 h-64 w-64 bg-[var(--color-accent)]" aria-hidden />
-      <div className="se-glow-orb end-0 bottom-0 h-48 w-48 bg-[var(--color-primary)]" aria-hidden />
+      <div className="df-glow-orb -start-24 top-0 h-64 w-64 bg-[var(--color-accent)]" aria-hidden />
+      <div className="df-glow-orb end-0 bottom-0 h-48 w-48 bg-[var(--color-primary)]" aria-hidden />
       <div className={`${ui.container} relative`}>
         <FlagshipSectionHeader ui={ui} id={id} eyebrow={eyebrow} title={title} subtitle={subtitle} align="center" />
         <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

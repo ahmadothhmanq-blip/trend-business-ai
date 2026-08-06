@@ -56,7 +56,7 @@ export function FlagshipFaqSection({
       id={id}
       data-v2-component={componentId}
       aria-labelledby={`${id}-title`}
-      className={`${ui.section} se-section-alt bg-[var(--color-surface)]`}
+      className={`${ui.section} df-section-alt bg-[var(--color-surface)]`}
     >
       <div className={ui.container}>
         <div className="grid gap-12 lg:grid-cols-[1fr_1.4fr] lg:items-start">
@@ -93,7 +93,7 @@ export function FlagshipFaqSection({
                     role="region"
                     aria-labelledby={`${baseId}-trigger-${index}`}
                     hidden={!isOpen}
-                    className={`${ui.fontBody} border-t border-[var(--border-subtle,rgba(0,0,0,0.06))] px-5 py-4 text-sm leading-relaxed text-[var(--color-muted)] motion-safe:animate-[se-slide-up_0.35s_ease_both]`}
+                    className={`${ui.fontBody} border-t border-[var(--border-subtle,rgba(0,0,0,0.06))] px-5 py-4 text-sm leading-relaxed text-[var(--color-muted)] motion-safe:animate-[df-slide-up_0.35s_ease_both]`}
                   >
                     {item.answer}
                   </div>

@@ -904,6 +904,15 @@ export async function generateWebsite(
       language: generationInput.language,
     });
     validatedFiles = v2AppliedProject.files ?? validatedFiles;
+    const bp = (v2AppliedProject.settings as Record<string, unknown> | undefined)
+      ?.websiteBlueprintV2;
+    if (bp && typeof bp === "object" && "meta" in bp) {
+      const blueprintId = (bp as { meta?: { blueprintId?: string } }).meta
+        ?.blueprintId;
+      ctx.progress.emit(
+        `[v2] Production blueprint applied${blueprintId ? `: ${blueprintId}` : ""}`,
+      );
+    }
   }
 
   const v2Settings = (v2AppliedProject?.settings ?? {}) as Record<string, unknown>;

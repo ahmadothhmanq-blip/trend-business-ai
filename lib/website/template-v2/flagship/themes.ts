@@ -17,7 +17,7 @@ export type FlagshipUi = {
 
 export const SAAS_FLAGSHIP_UI: FlagshipUi = {
   section: "se-section",
-  container: "mx-auto max-w-[82rem] px-5 sm:px-8",
+  container: "df-container",
   eyebrow: "se-eyebrow",
   headline: "se-headline",
   headlineSm: "se-headline-sm",
@@ -33,7 +33,7 @@ export const SAAS_FLAGSHIP_UI: FlagshipUi = {
 
 export const CORPORATE_FLAGSHIP_UI: FlagshipUi = {
   section: "cb-section",
-  container: "cb-container",
+  container: "df-container",
   eyebrow: "cb-eyebrow",
   headline: "cb-headline",
   headlineSm: "cb-headline-sm",
@@ -49,7 +49,7 @@ export const CORPORATE_FLAGSHIP_UI: FlagshipUi = {
 
 export const ECOMMERCE_FLAGSHIP_UI: FlagshipUi = {
   section: "ec-section",
-  container: "mx-auto max-w-[82rem] px-5 sm:px-8",
+  container: "df-container",
   eyebrow: "ec-eyebrow",
   headline: "ec-headline",
   headlineSm: "ec-headline-sm",
@@ -65,7 +65,7 @@ export const ECOMMERCE_FLAGSHIP_UI: FlagshipUi = {
 
 export const FINANCE_FLAGSHIP_UI: FlagshipUi = {
   section: "fn-section",
-  container: "mx-auto max-w-[82rem] px-5 sm:px-8",
+  container: "df-container",
   eyebrow: "fn-eyebrow",
   headline: "fn-headline",
   headlineSm: "fn-headline-sm",
@@ -81,7 +81,7 @@ export const FINANCE_FLAGSHIP_UI: FlagshipUi = {
 
 export const EDUCATION_FLAGSHIP_UI: FlagshipUi = {
   section: "ed-section",
-  container: "mx-auto max-w-[82rem] px-5 sm:px-8",
+  container: "df-container",
   eyebrow: "ed-eyebrow",
   headline: "ed-headline",
   headlineSm: "ed-headline-sm",
@@ -97,7 +97,7 @@ export const EDUCATION_FLAGSHIP_UI: FlagshipUi = {
 
 export const RESTAURANT_FLAGSHIP_UI: FlagshipUi = {
   section: "rp-section",
-  container: "mx-auto max-w-[90rem] px-5 sm:px-8 lg:px-10",
+  container: "df-container df-container-wide",
   eyebrow: "rp-eyebrow",
   headline: "rp-headline",
   headlineSm: "rp-headline-sm",
@@ -113,7 +113,7 @@ export const RESTAURANT_FLAGSHIP_UI: FlagshipUi = {
 
 export const HOTEL_RESORT_FLAGSHIP_UI: FlagshipUi = {
   section: "hr-section",
-  container: "mx-auto max-w-[90rem] px-5 sm:px-8 lg:px-10",
+  container: "df-container df-container-wide",
   eyebrow: "hr-eyebrow",
   headline: "hr-headline",
   headlineSm: "hr-headline-sm",

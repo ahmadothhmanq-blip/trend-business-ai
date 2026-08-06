@@ -21,3 +21,9 @@ export const WB_TEMPLATE_PRESENTATION_HASH_SETTING = "templatePresentationHash";
 
 /** Project settings key — V2 composer id (P1+). */
 export const WB_TEMPLATE_COMPOSER_ID_SETTING = "templateComposerId";
+
+/** Project settings key — persisted Website Blueprint (production integration). */
+export const WB_WEBSITE_BLUEPRINT_SETTING = "websiteBlueprintV2";
+
+/** Project settings key — Design Director report from last generation. */
+export const WB_DESIGN_DIRECTOR_REPORT_SETTING = "designDirectorReportV2";

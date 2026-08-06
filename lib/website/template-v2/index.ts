@@ -6,6 +6,8 @@ export {
   WB_TEMPLATE_ARCHITECTURE_VERSION_SETTING,
   WB_TEMPLATE_COMPOSER_ID_SETTING,
   WB_TEMPLATE_PRESENTATION_HASH_SETTING,
+  WB_WEBSITE_BLUEPRINT_SETTING,
+  WB_DESIGN_DIRECTOR_REPORT_SETTING,
   WB_TEMPLATE_V2_ARCHITECTURE_VERSIONS,
   WB_TEMPLATE_V2_DEFAULT_COMPOSER,
   WB_TEMPLATE_V2_SDK_VERSION,
@@ -23,4 +25,8 @@ export { applyTemplateV2ToProject } from "@/lib/website/template-v2/apply/apply-
 export { composeRegionGridPage } from "@/lib/website/template-v2/composer/region-grid-composer";
 export { injectV2TemplatePipeline } from "@/lib/website/template-v2/inject/inject-v2-pipeline";
 export * from "@/lib/website/template-v2/generation/v2-generation-bridge";
+export * from "@/lib/website/template-v2/variants";
+export * from "@/lib/website/template-v2/blueprint";
+export * from "@/lib/website/template-v2/design-director";
+export * from "@/lib/website/template-v2/integration";
 export * from "@/lib/website/template-v2/tbdp";

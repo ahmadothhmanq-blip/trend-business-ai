@@ -1,6 +1,7 @@
 import type { GeneratedProjectFile } from "@/lib/ai/types";
 import type { TemplateV2DesignTokens } from "@/lib/website/template-v2/contracts/tokens";
 import type { TemplateV2PackageBundle } from "@/lib/website/template-v2/contracts/package";
+import { buildDesignFoundationCss } from "@/lib/website/template-v2/foundation";
 import { buildTbdpNativeAuthorityCss } from "@/lib/website/template-v2/tbdp";
 import { buildCorporateBusinessGlobalCss } from "@/lib/website/template-v2/tokens/corporate-business-global-css";
 
@@ -22,7 +23,11 @@ export function buildV2DesignTokenCss(
   tokens: TemplateV2DesignTokens,
   bundle: Pick<
     TemplateV2PackageBundle,
-    "packageId" | "manifest" | "tbdpNative" | "tbdpDesignContext"
+    | "packageId"
+    | "manifest"
+    | "tbdpNative"
+    | "tbdpDesignContext"
+    | "responsive"
   >,
 ): string {
   const lines = [
@@ -73,6 +78,14 @@ export function buildV2DesignTokenCss(
       "}",
     );
   }
+
+  lines.push(
+    buildDesignFoundationCss({
+      packageId: bundle.packageId,
+      tokens,
+      responsive: bundle.responsive,
+    }),
+  );
 
   if (bundle.packageId === "restaurant-signature") {
     lines.push(buildRestaurantSignatureGlobalCss());

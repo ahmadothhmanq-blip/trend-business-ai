@@ -12,10 +12,16 @@ import {
 import type { GeneratedProjectFile } from "@/lib/ai/types";
 import type { GeneratedWebsiteProject } from "@/plugins/website/types";
 import {
+  WB_DESIGN_DIRECTOR_REPORT_SETTING,
   WB_TEMPLATE_ARCHITECTURE_VERSION_SETTING,
   WB_TEMPLATE_COMPOSER_ID_SETTING,
   WB_TEMPLATE_PRESENTATION_HASH_SETTING,
+  WB_WEBSITE_BLUEPRINT_SETTING,
 } from "@/lib/website/template-v2/constants";
+import {
+  WB_PRODUCTION_INTEGRATION_VERSION_SETTING,
+} from "@/lib/website/template-v2/integration/constants";
+import { resolveProductionBlueprint } from "@/lib/website/template-v2/integration/production-pipeline";
 import { injectV2TemplatePipeline } from "@/lib/website/template-v2/inject/inject-v2-pipeline";
 import { loadTemplateV2Package } from "@/lib/website/template-v2/loader/load-v2-package";
 import { hashPresentationProfile } from "@/lib/website/template-v2/loader/presentation-hash";
@@ -44,6 +50,8 @@ export type ApplyV2TemplateParams = {
   project: GeneratedWebsiteProject;
   templatePackageId: string;
   language?: string | null;
+  /** Skip production blueprint pipeline (legacy fallback). */
+  forceBlueprintFallback?: boolean;
 };
 
 /**
@@ -80,6 +88,15 @@ export async function applyTemplateV2ToProject(
   const brandName = profile?.projectName || identity.title || "Brand";
   const productionContent = identity.productionContent;
 
+  const productionPipeline = resolveProductionBlueprint({
+    project: params.project,
+    templatePackageId,
+    language: params.language,
+    forceFallback: params.forceBlueprintFallback,
+  });
+
+  const websiteBlueprint = productionPipeline?.optimizedBlueprint ?? null;
+
   let files: GeneratedProjectFile[] = await injectV2TemplatePipeline({
     files: preserved,
     bundle,
@@ -94,6 +111,7 @@ export async function applyTemplateV2ToProject(
     content: productionContent,
     language: params.language,
     forceDesignRebuild: true,
+    websiteBlueprint,
   });
 
   for (const file of preserved) {
@@ -121,6 +139,14 @@ export async function applyTemplateV2ToProject(
     template,
   );
 
+  if (productionPipeline) {
+    notes.push(
+      `Production blueprint: ${websiteBlueprint!.meta.blueprintId} · score ${productionPipeline.directorResult.finalScore}`,
+    );
+  } else {
+    notes.push("Production blueprint: legacy presentation fallback");
+  }
+
   const designSettings = {
     templateIntelligenceId: template.id,
     templateIntelligenceCategory: template.category,
@@ -130,6 +156,15 @@ export async function applyTemplateV2ToProject(
     websiteStructureTemplateId: templatePackageId,
     templatePackageId,
     selectedTemplateId: templatePackageId,
+    ...(websiteBlueprint
+      ? {
+          [WB_WEBSITE_BLUEPRINT_SETTING]: websiteBlueprint,
+          [WB_DESIGN_DIRECTOR_REPORT_SETTING]:
+            productionPipeline!.directorResult.report,
+          [WB_PRODUCTION_INTEGRATION_VERSION_SETTING]:
+            productionPipeline!.integrationVersion,
+        }
+      : {}),
   };
 
   const project = applyBusinessIdentityToProject(
@@ -137,18 +172,32 @@ export async function applyTemplateV2ToProject(
       ...params.project,
       files,
       designSystem,
-      colorPalette: [
-        bundle.tokens.colors.primary,
-        bundle.tokens.colors.secondary ?? bundle.tokens.colors.primary,
-        bundle.tokens.colors.accent,
-        bundle.tokens.colors.background,
-        bundle.tokens.colors.foreground,
-        bundle.tokens.colors.surface ?? "#FFFFFF",
-      ],
-      typography: [
-        bundle.tokens.typography.display,
-        bundle.tokens.typography.body,
-      ],
+      colorPalette: websiteBlueprint
+        ? [
+            websiteBlueprint.colorPalette.colors.primary,
+            websiteBlueprint.colorPalette.colors.secondary,
+            websiteBlueprint.colorPalette.colors.accent,
+            websiteBlueprint.colorPalette.colors.background,
+            websiteBlueprint.colorPalette.colors.foreground,
+            websiteBlueprint.colorPalette.colors.surface,
+          ]
+        : [
+            bundle.tokens.colors.primary,
+            bundle.tokens.colors.secondary ?? bundle.tokens.colors.primary,
+            bundle.tokens.colors.accent,
+            bundle.tokens.colors.background,
+            bundle.tokens.colors.foreground,
+            bundle.tokens.colors.surface ?? "#FFFFFF",
+          ],
+      typography: websiteBlueprint
+        ? [
+            websiteBlueprint.typographyProfile.display,
+            websiteBlueprint.typographyProfile.body,
+          ]
+        : [
+            bundle.tokens.typography.display,
+            bundle.tokens.typography.body,
+          ],
       components: componentIds,
       sections: componentIds,
     },

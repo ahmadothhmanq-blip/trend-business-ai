@@ -36,7 +36,7 @@ export function FlagshipContactSection({
       id={id}
       data-v2-component={componentId}
       aria-labelledby={`${id}-title`}
-      className={`${ui.section} se-section-glow relative bg-[var(--color-background)]`}
+      className={`${ui.section} df-section-glow relative bg-[var(--color-background)]`}
     >
       <div className={ui.container}>
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
@@ -92,7 +92,7 @@ export function FlagshipContactSection({
                     type="text"
                     required
                     autoComplete="name"
-                    className={`se-input ${ui.focusRing}`}
+                    className={`df-input ${ui.focusRing}`}
                   />
                 </div>
                 <div>
@@ -105,7 +105,7 @@ export function FlagshipContactSection({
                     type="email"
                     required
                     autoComplete="email"
-                    className={`se-input ${ui.focusRing}`}
+                    className={`df-input ${ui.focusRing}`}
                   />
                 </div>
                 <div>
@@ -117,7 +117,7 @@ export function FlagshipContactSection({
                     name="message"
                     rows={4}
                     required
-                    className={`se-textarea resize-y ${ui.focusRing}`}
+                    className={`df-textarea resize-y ${ui.focusRing}`}
                   />
                 </div>
                 <button type="submit" className={`${ui.btnPrimary} w-full sm:w-auto ${ui.focusRing}`}>

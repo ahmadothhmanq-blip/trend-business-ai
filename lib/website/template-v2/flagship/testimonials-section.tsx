@@ -76,7 +76,7 @@ export function FlagshipTestimonialsSection({
       id={id}
       data-v2-component={componentId}
       aria-labelledby={`${id}-title`}
-      className={`${ui.section} se-section-alt bg-[var(--color-surface)]`}
+      className={`${ui.section} df-section-alt bg-[var(--color-surface)]`}
     >
       <div className={ui.container}>
         <FlagshipSectionHeader ui={ui} id={id} eyebrow={eyebrow} title={title} subtitle={subtitle} align="center" />
@@ -90,14 +90,14 @@ export function FlagshipTestimonialsSection({
                 className={[
                   ui.card,
                   "relative flex flex-col p-7 sm:p-8",
-                  featured ? "se-card-featured md:-translate-y-1 lg:col-span-1" : "",
+                  featured ? "df-card-featured md:-translate-y-1 lg:col-span-1" : "",
                 ].join(" ")}
               >
-                <span className="se-quote-mark absolute end-6 top-4 select-none" aria-hidden>
+                <span className="df-quote-mark absolute end-6 top-4 select-none" aria-hidden>
                   &ldquo;
                 </span>
                 {item.rating ? (
-                  <StarRating count={item.rating} className={`${ui.fontBody} se-star text-sm`} />
+                  <StarRating count={item.rating} className={`${ui.fontBody} df-star text-sm`} />
                 ) : null}
                 <blockquote className={`${ui.body} relative z-[1] mt-4 flex-1 text-base leading-relaxed`}>
                   {item.quote}

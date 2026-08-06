@@ -3,6 +3,12 @@ import type { ProductionContentPack } from "@/lib/ai-core/content/production-con
 import { usesLlmLocalizedWebsiteCopy } from "@/lib/ai-core/content/content-language";
 import type { TemplateV2PackageBundle } from "@/lib/website/template-v2/contracts/package";
 import { composeRegionGridPage } from "@/lib/website/template-v2/composer/region-grid-composer";
+import type { WebsiteBlueprint } from "@/lib/website/template-v2/blueprint/types";
+import {
+  applyBlueprintToBundle,
+  buildBlueprintDesignCss,
+} from "@/lib/website/template-v2/integration/apply-blueprint-design";
+import { resolveBlueprintRegionPlan } from "@/lib/website/template-v2/integration/section-component-map";
 import { readPackageComponentScaffold } from "@/lib/website/template-v2/loader/read-package-scaffold";
 import { buildV2MotionSource, V2_MOTION_PATH } from "@/lib/website/template-v2/motion/emit-motion";
 import { buildV2ResponsiveCss } from "@/lib/website/template-v2/responsive/emit-responsive-css";
@@ -63,6 +69,8 @@ export type InjectV2PipelineParams = {
   language?: string | null;
   flowKey?: string;
   forceDesignRebuild?: boolean;
+  /** Optimized Website Blueprint — single source of truth for composition. */
+  websiteBlueprint?: WebsiteBlueprint | null;
 };
 
 /**
@@ -74,6 +82,12 @@ export async function injectV2TemplatePipeline(
   const byPath = new Map(params.files.map((f) => [f.path, f]));
   const localizedCopy =
     usesLlmLocalizedWebsiteCopy(params.language) && !params.forceDesignRebuild;
+
+  let bundle = params.bundle;
+  const blueprint = params.websiteBlueprint ?? null;
+  if (blueprint) {
+    bundle = applyBlueprintToBundle(bundle, blueprint);
+  }
 
   if (!byPath.has("lib/site-images.ts")) {
     byPath.set("lib/site-images.ts", {
@@ -147,7 +161,7 @@ export async function injectV2TemplatePipeline(
   byPath.set("app/page.tsx", {
     path: "app/page.tsx",
     content: composeRegionGridPage({
-      bundle: params.bundle,
+      bundle,
       flowKey: params.flowKey ?? "home",
       brandName: params.brandName,
       pageTitle: params.pageTitle,
@@ -159,11 +173,30 @@ export async function injectV2TemplatePipeline(
       secondaryCta: params.secondaryCta,
       content: params.content,
       language: params.language,
+      websiteBlueprint: blueprint ?? undefined,
+      blueprintRegionPlan: blueprint
+        ? resolveBlueprintRegionPlan(blueprint, bundle)
+        : undefined,
     }),
     language: "tsx",
   });
 
   let files = Array.from(byPath.values());
-  files = applyV2DesignTokensToGlobals(files, params.bundle);
+  files = applyV2DesignTokensToGlobals(files, bundle);
+
+  if (blueprint) {
+    const blueprintCss = buildBlueprintDesignCss(blueprint);
+    const globalsIdx = files.findIndex((f) => f.path === "app/globals.css");
+    if (globalsIdx >= 0) {
+      const existing = files[globalsIdx]!;
+      if (!existing.content.includes("V2 Website Blueprint")) {
+        files[globalsIdx] = {
+          ...existing,
+          content: `${existing.content}\n${blueprintCss}\n`,
+        };
+      }
+    }
+  }
+
   return files;
 }

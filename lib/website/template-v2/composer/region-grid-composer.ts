@@ -2,6 +2,10 @@ import type { ProductionContentPack } from "@/lib/ai-core/content/production-con
 import type { TemplateV2ComponentDefinition } from "@/lib/website/template-v2/contracts/component-registry";
 import type { TemplateV2PackageBundle } from "@/lib/website/template-v2/contracts/package";
 import type { TemplateV2PresentationProfile } from "@/lib/website/template-v2/contracts/presentation";
+import type { BlueprintRegionPlan } from "@/lib/website/template-v2/integration/section-component-map";
+import { getVariantForComponent } from "@/lib/website/template-v2/integration/section-component-map";
+import type { WebsiteBlueprint } from "@/lib/website/template-v2/blueprint/types";
+import type { SectionKind } from "@/lib/website/template-v2/variants/types";
 import {
   componentIdToExportName,
   componentIdToProjectPath,
@@ -21,6 +25,10 @@ export type RegionGridComposeParams = {
   primaryCta?: string;
   secondaryCta?: string;
   language?: string | null;
+  /** Optimized Website Blueprint — drives section order and variants when set. */
+  websiteBlueprint?: WebsiteBlueprint;
+  /** Pre-resolved region plan from blueprint (optional). */
+  blueprintRegionPlan?: BlueprintRegionPlan;
 };
 
 const GENERIC_ENGLISH_CTAS = new Set([
@@ -387,6 +395,28 @@ function renderComponentJsx(
   return `      <${exportName}\n${props}      />`;
 }
 
+function wrapWithBlueprintVariant(
+  jsx: string,
+  sectionKind?: SectionKind,
+  variantId?: string,
+): string {
+  if (!jsx.trim() || !sectionKind || !variantId) return jsx;
+  return `      <div data-v2-section="${sectionKind}" data-v2-variant="${variantId}">\n${jsx}\n      </div>`;
+}
+
+function renderBlueprintComponentJsx(
+  componentId: string,
+  registry: TemplateV2ComponentDefinition[],
+  params: RegionGridComposeParams,
+  plan: BlueprintRegionPlan | undefined,
+  role?: string,
+): string {
+  const jsx = renderComponentJsx(componentId, registry, params, role);
+  if (!plan) return jsx;
+  const meta = getVariantForComponent(plan, componentId);
+  return wrapWithBlueprintVariant(jsx, meta?.sectionKind, meta?.variantId);
+}
+
 function collectImports(
   componentIds: string[],
   registry: TemplateV2ComponentDefinition[],
@@ -465,11 +495,34 @@ export function composeRegionGridPage(params: RegionGridComposeParams): string {
   const flowKey = params.flowKey ?? "home";
   const presentation = bundle.presentation;
   const registry = bundle.componentRegistry.components;
-  const regions = resolveFlowRegions(presentation, bundle, flowKey);
-  const sidebarLayout = usesSidebarLayout(presentation, regions);
-  const sidebarRight = isSidebarRightLayout(presentation);
-  const fullBleedLayout = isFullBleedLayout(presentation);
-  const editorialReveal = isEditorialRevealLayout(presentation);
+  const blueprintPlan = params.blueprintRegionPlan;
+
+  const baseRegions = resolveFlowRegions(presentation, bundle, flowKey);
+  const regions = blueprintPlan
+    ? {
+        ...baseRegions,
+        main: blueprintPlan.main,
+        utility: blueprintPlan.utility,
+        overlay: blueprintPlan.overlay,
+      }
+    : baseRegions;
+
+  const layoutId =
+    blueprintPlan?.layoutId ?? presentation.layout.defaultLayoutId;
+  const presentationForLayout = {
+    ...presentation,
+    layout: { ...presentation.layout, defaultLayoutId: layoutId },
+  };
+
+  const sidebarLayout = usesSidebarLayout(presentationForLayout, regions);
+  const sidebarRight = isSidebarRightLayout(presentationForLayout);
+  const fullBleedLayout = isFullBleedLayout(presentationForLayout);
+  const editorialReveal = isEditorialRevealLayout(presentationForLayout);
+
+  const renderComponent = (id: string, role?: string) =>
+    blueprintPlan
+      ? renderBlueprintComponentJsx(id, registry, params, blueprintPlan, role)
+      : renderComponentJsx(id, registry, params, role);
 
   const allComponentIds = new Set<string>();
   for (const ids of Object.values(regions)) {
@@ -483,40 +536,36 @@ export function composeRegionGridPage(params: RegionGridComposeParams): string {
   const title = params.pageTitle ?? params.brandName ?? "Home";
   const description = params.pageDescription ?? "";
 
-  const headerJsx = renderComponentJsx(
+  const headerJsx = renderComponent(
     presentation.navigation.componentId,
-    registry,
-    params,
     "navigation",
   );
-  const footerJsx = renderComponentJsx(
+  const footerJsx = renderComponent(
     presentation.footer.componentId,
-    registry,
-    params,
     "footer",
   );
 
   const sidebarIds = regions.sidebar ?? [];
   const sidebarJsx = sidebarIds
-    .map((id) => renderComponentJsx(id, registry, params))
+    .map((id) => renderComponent(id))
     .filter(Boolean)
     .join("\n");
 
   const mainIds = regions.main ?? regions[presentation.hero.region] ?? [];
   const mainJsx = mainIds
-    .map((id) => renderComponentJsx(id, registry, params))
+    .map((id) => renderComponent(id))
     .filter(Boolean)
     .join("\n");
 
   const utilityIds = regions.utility ?? [];
   const utilityJsx = utilityIds
-    .map((id) => renderComponentJsx(id, registry, params))
+    .map((id) => renderComponent(id))
     .filter(Boolean)
     .join("\n");
 
   const overlayIds = regions.overlay ?? [];
   const overlayJsx = overlayIds
-    .map((id) => renderComponentJsx(id, registry, params))
+    .map((id) => renderComponent(id))
     .filter(Boolean)
     .join("\n");
 
@@ -576,7 +625,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <div className=${JSON.stringify(layoutClass)} data-v2-package=${JSON.stringify(bundle.packageId)} data-v2-composer="region-grid" data-v2-layout=${JSON.stringify(presentation.layout.defaultLayoutId)}>
+    <div className=${JSON.stringify(layoutClass)} data-v2-package=${JSON.stringify(bundle.packageId)} data-v2-composer="region-grid" data-v2-layout=${JSON.stringify(layoutId)}${params.websiteBlueprint ? ` data-v2-blueprint=${JSON.stringify(params.websiteBlueprint.meta.blueprintId)}` : ""}>
 ${body}
     </div>
   );
