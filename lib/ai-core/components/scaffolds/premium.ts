@@ -294,7 +294,9 @@ export function ProductInteractive({
 import { Motion } from "@/components/ui/motion";
 ${img}
 
-const chapters = [
+type StoryItem = { title?: string; body?: string; eyebrow?: string };
+
+const defaultChapters: StoryItem[] = [
   {
     eyebrow: "Chapter 01",
     title: "The problem, felt",
@@ -312,15 +314,34 @@ const chapters = [
   },
 ];
 
-export function FeatureStorytelling() {
+type FeatureStorytellingProps = {
+  eyebrow?: string;
+  title?: string;
+  subtitle?: string;
+  items?: StoryItem[];
+  features?: StoryItem[];
+};
+
+export function FeatureStorytelling({
+  eyebrow = "Feature storytelling",
+  title = "A narrative, not a feature dump",
+  subtitle = "Alternating story bands create editorial rhythm — premium composition without card fatigue.",
+  items,
+  features,
+}: FeatureStorytellingProps) {
+  const chapters = (items?.length ? items : features?.length ? features : defaultChapters).map((item, i) => ({
+    eyebrow: item.eyebrow || \`Chapter \${String(i + 1).padStart(2, "0")}\`,
+    title: item.title || "Chapter",
+    body: item.body || "",
+  }));
   return (
-    <SectionShell id="features" eyebrow="Feature storytelling" title="A narrative, not a feature dump" subtitle="Alternating story bands create editorial rhythm — premium composition without card fatigue." className="!py-0" tone="default">
+    <SectionShell id="features" eyebrow={eyebrow} title={title} subtitle={subtitle} className="!py-0" tone="default">
       <div className="space-y-0">
         {chapters.map((c, i) => {
           const src = resolveSiteImage(SECTION_IMAGES[i] || GALLERY_IMAGES[i] || SERVICE_IMAGE || PRODUCT_IMAGE || HERO_IMAGE, i);
           const reverse = i % 2 === 1;
           return (
-            <Motion key={c.title} delayMs={i * 90} variant="slow-reveal" className="border-t border-[var(--color-foreground)]/8 py-14 sm:py-20">
+            <Motion key={c.title + String(i)} delayMs={i * 90} variant="slow-reveal" className="border-t border-[var(--color-foreground)]/8 py-14 sm:py-20">
               <div className={["grid items-center gap-10 lg:grid-cols-2 lg:gap-16", reverse ? "lg:[&>*:first-child]:order-2" : ""].join(" ")}>
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--color-accent,var(--color-primary))]">{c.eyebrow}</p>

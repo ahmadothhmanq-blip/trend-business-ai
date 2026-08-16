@@ -2,7 +2,12 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { executeWithUpstashFallback, getUpstashRedis, isUpstashRedisConfigured } from "@/lib/api/upstash-redis";
 export { isUpstashRedisConfigured, pingUpstashRedis } from "@/lib/api/upstash-redis";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { consumeCreditsForUsage } from "@/lib/billing/credits";
+import {
+  authorizeAiUsageCredits,
+  type AiUsageLease,
+  type BeginAiUsageResult,
+} from "@/lib/billing/ai-usage-settlement";
+export type { AiUsageLease, BeginAiUsageResult } from "@/lib/billing/ai-usage-settlement";
 import { withTiming } from "@/lib/perf/timing";
 import { NextResponse } from "next/server";
 
@@ -176,32 +181,38 @@ export async function enforceAiRateLimit(
 }
 
 /**
- * Rate limit + usage-based credit deduction for AI generation routes.
+ * Rate limit + credit *authorization* for AI generation routes.
+ *
+ * Does NOT deduct credits. Call `lease.settle()` only after the required
+ * generation result succeeds. Call `lease.release()` on failure paths
+ * (idempotent no-op when nothing was settled; refunds if already settled).
+ */
+export async function beginAiUsage(
+  supabase: SupabaseClient,
+  userId: string,
+  resource: AiRateLimitResource,
+): Promise<BeginAiUsageResult> {
+  return withTiming(`ai.usage.${resource}`, async () => {
+    const rateLimited = await enforceAiRateLimit(userId, resource);
+    if (rateLimited) return { ok: false, response: rateLimited };
+
+    return authorizeAiUsageCredits(supabase, userId, resource);
+  });
+}
+
+/**
+ * @deprecated Prefer `beginAiUsage` + `lease.settle()` / `lease.release()`.
+ * Kept as a rate-limit + soft credit check that does not charge.
+ * Routes that still call this without settling will not consume credits —
+ * migrate to beginAiUsage and settle on success.
  */
 export async function enforceAiUsage(
   supabase: SupabaseClient,
   userId: string,
   resource: AiRateLimitResource,
 ): Promise<NextResponse | null> {
-  return withTiming(`ai.usage.${resource}`, async () => {
-    const rateLimited = await enforceAiRateLimit(userId, resource);
-    if (rateLimited) return rateLimited;
-
-    const credits = await consumeCreditsForUsage(supabase, userId, resource, 1);
-    if (!credits.ok) {
-      const status = credits.code === "INSUFFICIENT_CREDITS" ? 402 : 503;
-      return NextResponse.json(
-        {
-          error: credits.error,
-          code: credits.code,
-          balance: credits.balance.balance,
-        },
-        { status },
-      );
-    }
-
-    return null;
-  });
+  const gate = await beginAiUsage(supabase, userId, resource);
+  return gate.ok ? null : gate.response;
 }
 
 const MUTATION_RATE = { requests: 30, window: "1 m" as const };

@@ -183,6 +183,86 @@ function injectProductionScaffolds(
   return merged;
 }
 
+/**
+ * Compose always passes eyebrow/title/subtitle/items/etc. Zero-arg scaffolds
+ * must accept those props or exported `next build` fails typecheck.
+ */
+function acceptComposableSectionProps(source: string): string {
+  return source.replace(
+    /export function ([A-Za-z0-9_]+)\(\) \{/g,
+    `export function $1(_props?: {
+  eyebrow?: string;
+  title?: string;
+  subtitle?: string;
+  items?: unknown;
+  features?: unknown;
+  plans?: unknown;
+  quotes?: unknown;
+  faqs?: unknown;
+  primaryCta?: string;
+  secondaryCta?: string;
+  ctaLabel?: string;
+  bullets?: unknown;
+  imageUrl?: string | null;
+  [key: string]: unknown;
+}) {`,
+  );
+}
+
+/**
+ * Overwrite known professional component scaffolds with the current platform
+ * source so export builds stay in sync with compose-generated props (e.g. eyebrow).
+ */
+function refreshProfessionalScaffolds(
+  files: GeneratedProjectFile[],
+  fixes: string[],
+): GeneratedProjectFile[] {
+  return files.map((file) => {
+    const path = file.path.replaceAll("\\", "/");
+    const fresh = getProfessionalScaffoldByPath(path);
+    if (fresh) {
+      const next = acceptComposableSectionProps(fresh);
+      if (next !== file.content) {
+        fixes.push(`Refreshed production scaffold: ${path}`);
+        return { ...file, content: next, language: file.language || "tsx" };
+      }
+      return file;
+    }
+    if (!/\.(tsx|jsx)$/.test(path)) return file;
+    const loosened = acceptComposableSectionProps(file.content);
+    if (loosened === file.content) return file;
+    fixes.push(`Accepted composable props on: ${path}`);
+    return { ...file, content: loosened };
+  });
+}
+
+const EXPORT_BUILD_CONFIG_PATHS = new Set([
+  "next.config.ts",
+  ".eslintrc.json",
+]);
+
+/** Force-refresh build config so exported projects inherit current lint/build policy. */
+function refreshExportBuildConfigs(
+  files: GeneratedProjectFile[],
+  fixes: string[],
+): GeneratedProjectFile[] {
+  const projectName = resolveProjectNameFromFiles(files);
+  const scaffolds = buildWebsiteScaffold(projectName);
+  const byPath = new Map(
+    files.map((file) => [file.path.replaceAll("\\", "/"), { ...file }]),
+  );
+  for (const scaffold of scaffolds) {
+    const path = scaffold.path.replaceAll("\\", "/");
+    if (!EXPORT_BUILD_CONFIG_PATHS.has(path)) continue;
+    const existing = byPath.get(path);
+    if (!existing || existing.content !== scaffold.content) {
+      byPath.set(path, { ...scaffold, path });
+      fixes.push(`Refreshed export build config: ${path}`);
+    }
+  }
+  return [...byPath.values()];
+}
+
 function classifyExportIssues(issues: string[]): {
   blocking: string[];
   warnings: string[];
@@ -236,11 +316,15 @@ export function prepareWebsiteProjectForExport(
     );
   }
   current = injectProductionScaffolds(current, fixesApplied);
+  current = refreshProfessionalScaffolds(current, fixesApplied);
+  current = refreshExportBuildConfigs(current, fixesApplied);
   current = injectMissingScaffolds(current, fixesApplied);
   current = stripUnresolvedImports(current, fixesApplied);
   current = syncPackageJsonDependencies(current);
   current = injectMissingScaffolds(current, fixesApplied);
   current = injectProductionScaffolds(current, fixesApplied);
+  current = refreshProfessionalScaffolds(current, fixesApplied);
+  current = refreshExportBuildConfigs(current, fixesApplied);
   current = syncPackageJsonDependencies(current);
 
   const validation = validateGeneratedProject(current, EXPORT_FLAGS);

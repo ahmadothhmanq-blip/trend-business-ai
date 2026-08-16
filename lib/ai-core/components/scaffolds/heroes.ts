@@ -117,6 +117,7 @@ ${img}
 type HeroVideoProps = {
   title?: string;
   subtitle?: string;
+  eyebrow?: string;
   primaryCta?: string;
   posterUrl?: string | null;
   videoUrl?: string;
@@ -125,6 +126,7 @@ type HeroVideoProps = {
 export function HeroVideo({
   title = "Experience the story in motion",
   subtitle = "Cinematic storytelling that puts your brand at the center of the frame.",
+  eyebrow = "In motion",
   primaryCta = "Watch & explore",
   posterUrl,
   videoUrl,
@@ -146,6 +148,9 @@ export function HeroVideo({
         <div className="absolute inset-0 bg-black/50" />
       </div>
       <div className="relative mx-auto flex min-h-[85vh] max-w-[var(--container-max,72rem)] flex-col items-start justify-center px-4 py-24 sm:px-6 lg:px-8">
+        <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-white/70 animate-[fadeUp_0.55s_ease_both]">
+          {eyebrow}
+        </p>
         <h1 className="max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl animate-[fadeUp_0.7s_ease_both]">
           {title}
         </h1>
@@ -166,6 +171,7 @@ ${img}
 type HeroSplitProps = {
   title?: string;
   subtitle?: string;
+  eyebrow?: string;
   primaryCta?: string;
   secondaryCta?: string;
   imageUrl?: string | null;
@@ -174,6 +180,7 @@ type HeroSplitProps = {
 export function HeroSplit({
   title = "Built for modern professionals",
   subtitle = "Clear value, premium craft, and a conversion path that feels effortless.",
+  eyebrow = "Professional",
   primaryCta = "Get started",
   secondaryCta = "See how it works",
   imageUrl,
@@ -184,7 +191,7 @@ export function HeroSplit({
       <div className="mx-auto grid min-h-[80vh] max-w-[var(--container-max,72rem)] items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:px-8 lg:py-24">
         <div className="animate-[fadeUp_0.7s_var(--ease-premium,ease)_both]">
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-accent,var(--color-primary))]">
-            Professional
+            {eyebrow}
           </p>
           <h1 className="text-4xl font-semibold tracking-[-0.03em] sm:text-5xl">{title}</h1>
           <p className="mt-5 max-w-lg text-base leading-relaxed text-[var(--color-foreground)]/70">{subtitle}</p>
@@ -218,6 +225,7 @@ ${img}
 type HeroImageProps = {
   title?: string;
   subtitle?: string;
+  eyebrow?: string;
   primaryCta?: string;
   imageUrl?: string | null;
 };
@@ -225,6 +233,7 @@ type HeroImageProps = {
 export function HeroImage({
   title = "Make the first impression unforgettable",
   subtitle = "Image-led storytelling with crisp hierarchy and a clear next step.",
+  eyebrow = "Featured story",
   primaryCta = "Discover more",
   imageUrl,
 }: HeroImageProps) {
@@ -241,6 +250,9 @@ export function HeroImage({
         <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/20" />
       </div>
       <div className="relative mx-auto flex min-h-[82vh] max-w-[var(--container-max,72rem)] flex-col justify-end px-4 pb-16 sm:px-6 lg:px-8">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-white/70 animate-[fadeUp_0.55s_ease_both]">
+          {eyebrow}
+        </p>
         <h1 className="max-w-3xl text-4xl font-semibold text-white sm:text-5xl lg:text-6xl animate-[fadeUp_0.7s_ease_both]">{title}</h1>
         <p className="mt-4 max-w-xl text-lg text-white/80 animate-[fadeUp_0.85s_ease_both]">{subtitle}</p>
         <a href="#services" className="mt-8 inline-flex w-fit rounded-[var(--radius-md,0.75rem)] bg-white px-5 py-3 text-sm font-semibold text-black animate-[fadeUp_1s_ease_both]">
@@ -259,6 +271,7 @@ ${img}
 type HeroProductProps = {
   title?: string;
   subtitle?: string;
+  eyebrow?: string;
   primaryCta?: string;
   secondaryCta?: string;
   imageUrl?: string | null;
@@ -267,6 +280,7 @@ type HeroProductProps = {
 export function HeroProduct({
   title = "The product your team will actually love",
   subtitle = "Ship faster with a clear value proposition, crisp visuals, and trial-ready CTAs.",
+  eyebrow = "Product",
   primaryCta = "Start free trial",
   secondaryCta = "Book a demo",
   imageUrl,
@@ -276,6 +290,9 @@ export function HeroProduct({
     <section className="bg-[var(--color-background)] py-16 lg:py-24">
       <div className="mx-auto grid max-w-[var(--container-max,72rem)] items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
         <div>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-accent,var(--color-primary))]">
+            {eyebrow}
+          </p>
           <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">{title}</h1>
           <p className="mt-5 text-lg text-[var(--color-foreground)]/70">{subtitle}</p>
           <div className="mt-8 flex flex-wrap gap-3">
@@ -304,6 +321,7 @@ ${img}
 type HeroFullBleedProps = {
   title?: string;
   subtitle?: string;
+  eyebrow?: string;
   primaryCta?: string;
   imageUrl?: string | null;
 };
@@ -311,6 +329,7 @@ type HeroFullBleedProps = {
 export function HeroFullBleed({
   title = "Go further than you imagined",
   subtitle = "Full-bleed cinematic storytelling for brands that lead with atmosphere.",
+  eyebrow = "Featured",
   primaryCta = "Explore now",
   imageUrl,
 }: HeroFullBleedProps) {
@@ -328,6 +347,7 @@ export function HeroFullBleed({
       </div>
       <div className="relative mx-auto flex min-h-screen max-w-[var(--container-max,72rem)] items-center px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl text-white">
+          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-white/70">{eyebrow}</p>
           <h1 className="text-5xl font-semibold tracking-tight sm:text-6xl">{title}</h1>
           <p className="mt-5 text-lg text-white/80">{subtitle}</p>
           <a href="#contact" className="mt-8 inline-flex rounded-[var(--radius-md,0.75rem)] bg-white px-6 py-3 text-sm font-semibold text-black">{primaryCta}</a>

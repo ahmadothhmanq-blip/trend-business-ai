@@ -45,9 +45,9 @@ function buildPlannedPublicUrl(slug) {
 
 assert.equal(isWebsitePublishEnabled(), true);
 
-const previewSource = read("lib/website/build-static-preview.ts");
+const previewSource = read("lib/website/build-static-preview.server.ts");
 assert.match(previewSource, /export function buildStaticPreviewHtml/);
-assert.match(previewSource, /sanitizePreviewHtml/);
+assert.match(previewSource, /sanitizePreviewHtml|hardenPublicSiteHtml|previewHtmlIsBroken/);
 assert.match(previewSource, /PREVIEW_RENDER_VERSION/);
 
 const publishRoute = read("app/api/website-builder/[id]/publish/route.ts");

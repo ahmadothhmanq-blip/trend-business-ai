@@ -1,6 +1,7 @@
 import { requireUser, parseJsonBody, parseUuidParam } from "@/lib/api/helpers";
 import { apiValidationError } from "@/lib/i18n/api-errors";
-import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { beginAiUsage } from "@/lib/api/rate-limit";
+import type { AiUsageLease } from "@/lib/billing/ai-usage-settlement";
 import { createSseStreamHelpers } from "@/lib/api/sse-stream";
 import {
   composePlan,
@@ -73,13 +74,15 @@ export async function POST(request: Request, context: RouteContext) {
     parsed.data.applyAi !== false &&
     capabilityRequiresAi(resolved.match.uri);
 
+  let creditLease: AiUsageLease | null = null;
   if (needsAi) {
-    const rateLimited = await enforceAiUsage(
+    const usage = await beginAiUsage(
       auth.supabase,
       auth.user!.id,
       "website-builder",
     );
-    if (rateLimited) return rateLimited;
+    if (!usage.ok) return usage.response;
+    creditLease = usage.lease;
   }
 
   const stream = new ReadableStream({
@@ -100,7 +103,9 @@ export async function POST(request: Request, context: RouteContext) {
           },
           send: (event, data) => send(event, data),
         });
+        if (creditLease) await creditLease.settle(auth.supabase);
       } catch (err) {
+        if (creditLease) await creditLease.release(auth.supabase);
         send("error", {
           error:
             err instanceof Error

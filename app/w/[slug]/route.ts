@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { isWebsitePublishEnabled } from "@/lib/website/publish-config";
 import {
+  applyHtmlLangAttribute,
   publicSiteResponseHeaders,
   sanitizePublicHtml,
 } from "@/lib/website/public-site";
@@ -42,7 +43,13 @@ export async function GET(_request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Published website not found." }, { status: 404 });
   }
 
-  return new NextResponse(sanitizePublicHtml(data.preview_html), {
+  const sanitized = sanitizePublicHtml(data.preview_html);
+  // Preserve the language baked into preview_html at publish time — never
+  // force "en" over Arabic/other generated sites.
+  const langMatch = sanitized.match(/<html[^>]*\slang=["']([^"']+)["']/i);
+  const lang = (langMatch?.[1] ?? "en").trim().toLowerCase().slice(0, 2) || "en";
+
+  return new NextResponse(applyHtmlLangAttribute(sanitized, lang), {
     status: 200,
     headers: publicSiteResponseHeaders({ indexable: true }),
   });

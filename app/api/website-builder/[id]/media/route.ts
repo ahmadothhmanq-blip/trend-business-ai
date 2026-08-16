@@ -5,7 +5,7 @@ import { requireUser, parseUuidParam, parseJsonBody } from "@/lib/api/helpers";
 import { serverErrorResponse } from "@/lib/api/errors";
 import { enforceWebsiteUserMutationRateLimit } from "@/lib/website/public-endpoints";
 import { assertBuilderAccess } from "@/lib/website/builder/access";
-import { uploadWebsiteAsset } from "@/lib/website/assets-storage";
+import { uploadWebsiteAsset, assertWebsiteAssetMime } from "@/lib/website/assets-storage";
 import {
   listMediaAssets,
   upsertMediaAsset,
@@ -88,22 +88,28 @@ export async function POST(request: Request, { params }: Params) {
       return apiValidationError("File exceeds the 12MB upload limit.");
     }
 
+    const mimeError = assertWebsiteAssetMime(file.type || "");
+    if (mimeError) {
+      return apiValidationError(mimeError);
+    }
+
     const folder = String(form.get("folder") || "uploads").slice(0, 80);
     const alt = String(form.get("alt") || "").slice(0, 200);
     const bytes = Buffer.from(await file.arrayBuffer());
     const assetId = randomUUID();
+    const contentType = (file.type || "image/png").toLowerCase().split(";")[0]!.trim();
 
     const uploaded = await uploadWebsiteAsset({
       userId: auth.user!.id,
       generationKey: parsedId.id,
       assetId,
       bytes,
-      contentType: file.type || "application/octet-stream",
+      contentType,
     });
 
     const url =
       uploaded?.publicUrl ||
-      `data:${file.type};base64,${bytes.toString("base64")}`;
+      `data:${contentType};base64,${bytes.toString("base64")}`;
 
     const asset = await upsertMediaAsset(
       {
@@ -112,7 +118,7 @@ export async function POST(request: Request, { params }: Params) {
         id: assetId,
         filename: file.name,
         url,
-        mime: file.type || "application/octet-stream",
+        mime: contentType,
         size: file.size,
         folder,
         alt: alt || undefined,

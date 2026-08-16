@@ -3,6 +3,12 @@ import type { CreditBalance, CreditLedgerReason } from "@/types/billing";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { logger } from "@/lib/logger";
 import { isProductionRuntime } from "@/lib/seo/site";
+import {
+  getMemoryCreditBalance,
+  isMemoryCreditHarnessEnabled,
+  memoryConsumeCredits,
+  memoryRefundCredits,
+} from "@/lib/billing/credit-ledger-memory";
 
 const DEFAULT_FREE_CREDITS = 50;
 /** Development-only balance surfaced when real credits are depleted or unavailable. */
@@ -11,6 +17,15 @@ const DEV_FALLBACK_CREDIT_BALANCE = 1_000_000;
 /** Local/test runs only — production always uses real billing. */
 export function isDevelopmentCreditsFallback(): boolean {
   return process.env.NODE_ENV !== "production";
+}
+
+/**
+ * When true, skip real credit writes (local DX).
+ * Test harness forces real settlement semantics via in-memory ledger.
+ */
+export function shouldBypassCreditAccounting(): boolean {
+  if (isMemoryCreditHarnessEnabled()) return false;
+  return isDevelopmentCreditsFallback();
 }
 
 function developmentCreditBalance(userId: string): CreditBalance {
@@ -200,17 +215,91 @@ export type ConsumeCreditsResult =
   | { ok: true; balance: CreditBalance; skipped?: boolean }
   | { ok: false; balance: CreditBalance; error: string; code: "INSUFFICIENT_CREDITS" | "UNAVAILABLE" };
 
+export type RefundCreditsResult =
+  | { ok: true; balance: CreditBalance; skipped?: boolean }
+  | { ok: false; balance: CreditBalance; error: string; code: "UNAVAILABLE" };
+
+function insufficientResult(
+  userId: string,
+  balance: CreditBalance,
+): ConsumeCreditsResult {
+  return {
+    ok: false,
+    balance,
+    error: "Insufficient credits. Purchase credits or upgrade your plan.",
+    code: "INSUFFICIENT_CREDITS",
+  };
+}
+
 /**
- * Usage-based credit update via SECURITY DEFINER RPC when available.
- * Fails closed in production when billing is misconfigured.
+ * Soft balance check — does not write the ledger.
+ * Used to authorize AI work before generation; settlement happens only on success.
+ */
+export async function assertSufficientCredits(
+  supabase: SupabaseClient,
+  userId: string,
+  amount = 1,
+): Promise<ConsumeCreditsResult> {
+  if (isMemoryCreditHarnessEnabled()) {
+    const balance = getMemoryCreditBalance(userId);
+    if (balance.balance < amount) return insufficientResult(userId, balance);
+    return { ok: true, balance };
+  }
+
+  if (shouldBypassCreditAccounting()) {
+    return {
+      ok: true,
+      skipped: true,
+      balance: developmentCreditBalance(userId),
+    };
+  }
+
+  try {
+    const balance = await ensureCreditBalance(supabase, userId);
+    if (balance.balance < amount) {
+      return insufficientResult(userId, balance);
+    }
+    return { ok: true, balance };
+  } catch (error) {
+    logger.error("Credit balance check failed", "billing.credits", { userId }, error);
+    return {
+      ok: false,
+      balance: {
+        user_id: userId,
+        balance: 0,
+        lifetime_purchased: 0,
+        lifetime_used: 0,
+        updated_at: new Date().toISOString(),
+      },
+      error: "Credits unavailable.",
+      code: "UNAVAILABLE",
+    };
+  }
+}
+
+/**
+ * Final usage settlement. Idempotent when `referenceId` is provided:
+ * repeating the same reference never double-charges.
  */
 export async function consumeCreditsForUsage(
   supabase: SupabaseClient,
   userId: string,
   resource: string,
   amount = 1,
+  referenceId: string | null = null,
 ): Promise<ConsumeCreditsResult> {
-  if (isDevelopmentCreditsFallback()) {
+  if (isMemoryCreditHarnessEnabled()) {
+    const result = memoryConsumeCredits({
+      userId,
+      amount,
+      resource,
+      referenceId,
+    });
+    if (!result.ok) return insufficientResult(userId, result.balance);
+    return { ok: true, balance: result.balance };
+  }
+
+  if (shouldBypassCreditAccounting()) {
     return {
       ok: true,
       skipped: true,
@@ -224,7 +313,7 @@ export async function consumeCreditsForUsage(
       p_user_id: userId,
       p_amount: amount,
       p_resource: resource,
-      p_reference_id: null,
+      p_reference_id: referenceId,
     });
 
     if (!error && data) {
@@ -243,7 +332,7 @@ export async function consumeCreditsForUsage(
 
     const message = String(error?.message ?? "");
     if (message.includes("INSUFFICIENT_CREDITS")) {
-      if (isDevelopmentCreditsFallback()) {
+      if (shouldBypassCreditAccounting()) {
         return {
           ok: true,
           skipped: true,
@@ -257,15 +346,10 @@ export async function consumeCreditsForUsage(
         lifetime_used: 0,
         updated_at: new Date().toISOString(),
       }));
-      return {
-        ok: false,
-        balance,
-        error: "Insufficient credits. Purchase credits or upgrade your plan.",
-        code: "INSUFFICIENT_CREDITS",
-      };
+      return insufficientResult(userId, balance);
     }
 
-    // RPC missing — fall back carefully
+    // RPC missing — fall back carefully (still idempotent when referenceId set)
     if (error && (isMissingTable(error) || error.code === "PGRST202" || message.includes("consume_credits"))) {
       if (!billingOptional()) {
         return {
@@ -282,30 +366,41 @@ export async function consumeCreditsForUsage(
         };
       }
 
+      if (referenceId) {
+        const writer = writeClient(supabase) ?? supabase;
+        const { data: existing } = await writer
+          .from("credit_ledger")
+          .select("id")
+          .eq("user_id", userId)
+          .eq("reference_id", referenceId)
+          .eq("reason", "usage")
+          .maybeSingle();
+        if (existing) {
+          const balance = await ensureCreditBalance(supabase, userId);
+          return { ok: true, balance, skipped: true };
+        }
+      }
+
       const balance = await ensureCreditBalance(supabase, userId);
       if (balance.balance < amount) {
-        if (isDevelopmentCreditsFallback()) {
+        if (shouldBypassCreditAccounting()) {
           return {
             ok: true,
             skipped: true,
             balance: developmentCreditBalance(userId),
           };
         }
-        return {
-          ok: false,
-          balance,
-          error: "Insufficient credits. Purchase credits or upgrade your plan.",
-          code: "INSUFFICIENT_CREDITS",
-        };
+        return insufficientResult(userId, balance);
       }
       const next = await applyCreditDelta(supabase, {
         userId,
         delta: -amount,
         reason: "usage",
         resource,
-        metadata: { amount },
+        referenceId: referenceId ?? undefined,
+        metadata: { amount, settlement: "final" },
       });
-      return { ok: true, balance: next, skipped: true };
+      return { ok: true, balance: next };
     }
 
     throw error;
@@ -325,6 +420,153 @@ export async function consumeCreditsForUsage(
       };
     }
     logger.error("Credit consumption failed", "billing.credits", { userId, resource }, error);
+    return {
+      ok: false,
+      balance: {
+        user_id: userId,
+        balance: 0,
+        lifetime_purchased: 0,
+        lifetime_used: 0,
+        updated_at: new Date().toISOString(),
+      },
+      error: "Credits unavailable.",
+      code: "UNAVAILABLE",
+    };
+  }
+}
+
+/**
+ * Refund a previously settled usage reference.
+ * Idempotent: repeating the same reference never double-refunds.
+ * No-op (ok, skipped) when no usage row exists for the reference.
+ */
+export async function refundCreditsForUsage(
+  supabase: SupabaseClient,
+  userId: string,
+  resource: string,
+  amount = 1,
+  referenceId: string,
+): Promise<RefundCreditsResult> {
+  const ref = referenceId.trim();
+  if (!ref) {
+    return {
+      ok: false,
+      balance: {
+        user_id: userId,
+        balance: 0,
+        lifetime_purchased: 0,
+        lifetime_used: 0,
+        updated_at: new Date().toISOString(),
+      },
+      error: "Refund reference_id required.",
+      code: "UNAVAILABLE",
+    };
+  }
+
+  if (isMemoryCreditHarnessEnabled()) {
+    const result = memoryRefundCredits({
+      userId,
+      amount,
+      resource,
+      referenceId: ref,
+    });
+    return { ok: true, balance: result.balance, skipped: result.skipped };
+  }
+
+  if (shouldBypassCreditAccounting()) {
+    return {
+      ok: true,
+      skipped: true,
+      balance: developmentCreditBalance(userId),
+    };
+  }
+
+  try {
+    const rpcClient = writeClient(supabase) ?? supabase;
+    const { data, error } = await rpcClient.rpc("refund_credits", {
+      p_user_id: userId,
+      p_amount: amount,
+      p_resource: resource,
+      p_reference_id: ref,
+    });
+
+    if (!error && data) {
+      const row = Array.isArray(data) ? data[0] : data;
+      return {
+        ok: true,
+        balance: {
+          user_id: userId,
+          balance: Number(row?.balance ?? 0),
+          lifetime_purchased: 0,
+          lifetime_used: Number(row?.lifetime_used ?? 0),
+          updated_at: new Date().toISOString(),
+        },
+      };
+    }
+
+    const message = String(error?.message ?? "");
+    if (error && (isMissingTable(error) || error.code === "PGRST202" || message.includes("refund_credits"))) {
+      if (!billingOptional()) {
+        return {
+          ok: false,
+          balance: {
+            user_id: userId,
+            balance: 0,
+            lifetime_purchased: 0,
+            lifetime_used: 0,
+            updated_at: new Date().toISOString(),
+          },
+          error: "Credits unavailable.",
+          code: "UNAVAILABLE",
+        };
+      }
+
+      const writer = writeClient(supabase) ?? supabase;
+      const { data: existingRefund } = await writer
+        .from("credit_ledger")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("reference_id", ref)
+        .eq("reason", "refund")
+        .maybeSingle();
+      if (existingRefund) {
+        const balance = await ensureCreditBalance(supabase, userId);
+        return { ok: true, balance, skipped: true };
+      }
+
+      const { data: usageRow } = await writer
+        .from("credit_ledger")
+        .select("delta")
+        .eq("user_id", userId)
+        .eq("reference_id", ref)
+        .eq("reason", "usage")
+        .maybeSingle();
+
+      if (!usageRow) {
+        const balance = await ensureCreditBalance(supabase, userId);
+        return { ok: true, balance, skipped: true };
+      }
+
+      const usageDelta = Number((usageRow as { delta?: number }).delta ?? 0);
+      const refundAmount = Math.min(amount, Math.abs(usageDelta));
+      const next = await applyCreditDelta(supabase, {
+        userId,
+        delta: refundAmount,
+        reason: "refund",
+        resource,
+        referenceId: ref,
+        metadata: {
+          amount: refundAmount,
+          settlement: "refund",
+          usage_delta: usageDelta,
+        },
+      });
+      return { ok: true, balance: next };
+    }
+
+    throw error;
+  } catch (error) {
+    logger.error("Credit refund failed", "billing.credits", { userId, resource, referenceId: ref }, error);
     return {
       ok: false,
       balance: {

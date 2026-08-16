@@ -98,14 +98,17 @@ export async function verifyWebsiteDomain(params: {
   }
 
   if (tokenFound || (params.forceSimulate && process.env.NODE_ENV !== "production")) {
+    // DNS ownership is verified here. SSL certificates are issued by the
+    // hosting platform (e.g. Vercel custom domains), not by this app — never
+    // claim sslStatus=active until a real certificate has been issued.
     return updateDomainCheck(
       {
         domainId: domain.id,
         status: "active",
-        sslStatus: "active",
+        sslStatus: "pending",
         message: tokenFound
-          ? `Verified TXT record${cnameOk ? " and CNAME" : ""}. SSL certificate ready.`
-          : "Simulated verification (non-production). SSL marked ready — confirm DNS before go-live.",
+          ? `Verified TXT record${cnameOk ? " and CNAME" : ""}. DNS ownership confirmed. SSL remains pending until the hosting platform issues a certificate.`
+          : "Simulated DNS verification (non-production). SSL remains pending until the hosting platform issues a certificate.",
         verified: true,
       },
       params.client,

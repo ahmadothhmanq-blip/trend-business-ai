@@ -217,6 +217,32 @@ if (dbUrl) {
     if (rpc.rowCount) pass("RPC consume_credits", "exists");
     else fail("RPC consume_credits", "missing — credits/generation will fail closed in production");
 
+    const refundRpc = await client.query(
+      `select 1 from pg_proc p
+       join pg_namespace n on n.oid = p.pronamespace
+       where n.nspname = 'public' and p.proname = 'refund_credits' limit 1`,
+    );
+    if (refundRpc.rowCount) pass("RPC refund_credits", "exists (migration 088)");
+    else fail("RPC refund_credits", "missing — apply supabase/migrations/088_credit_usage_settlement.sql");
+
+    const mig088 = await client.query(
+      `select 1 from public.schema_migrations where id = '088_credit_usage_settlement' limit 1`,
+    );
+    if (mig088.rowCount) pass("migration 088_credit_usage_settlement", "applied");
+    else fail("migration 088_credit_usage_settlement", "not in schema_migrations — run npm run db:apply");
+
+    const idempotentIdx = await client.query(
+      `select 1 from pg_indexes where schemaname = 'public' and indexname = 'idx_credit_ledger_user_reference_reason' limit 1`,
+    );
+    if (idempotentIdx.rowCount) {
+      pass("index idx_credit_ledger_user_reference_reason", "exists (idempotent settle/refund)");
+    } else {
+      fail(
+        "index idx_credit_ledger_user_reference_reason",
+        "missing — double-charge protection not enforced by DB",
+      );
+    }
+
     const { rows: viewRows } = await client.query(
       `select to_regclass('public.website_active_domains_public') as reg`,
     );

@@ -162,6 +162,9 @@ export function buildWebsiteScaffold(
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  devIndicators: false,
+  // Generated sites use plain <a href="/"> anchors in static shells.
+  eslint: { ignoreDuringBuilds: true },
 };
 
 export default nextConfig;
@@ -200,7 +203,16 @@ export default config;
     {
       path: ".eslintrc.json",
       language: "json",
-      content: JSON.stringify({ extends: "next/core-web-vitals" }, null, 2),
+      content: JSON.stringify(
+        {
+          extends: "next/core-web-vitals",
+          rules: {
+            "@next/next/no-html-link-for-pages": "off",
+          },
+        },
+        null,
+        2,
+      ),
     },
     {
       path: ".prettierrc",

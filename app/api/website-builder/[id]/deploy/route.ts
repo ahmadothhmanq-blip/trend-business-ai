@@ -17,10 +17,18 @@ import {
   publishSuccessMessage,
 } from "@/lib/website/publish-quality";
 import { requireWebsiteGenerationAccess } from "@/lib/website/builder/route-access";
+import { seoPackageFromGeneration } from "@/lib/website/public-site";
 
 export const dynamic = "force-dynamic";
 
 type Params = { params: Promise<{ id: string }> };
+
+function deploymentCapabilityFlags(generation: WebsiteGeneration, publication: { status?: string } | null) {
+  return {
+    hasAnalytics: publication?.status === "published",
+    hasSeoAgent: Boolean(seoPackageFromGeneration(generation)),
+  };
+}
 
 function userHandleFromAuth(user: {
   email?: string | null;
@@ -64,14 +72,15 @@ export async function GET(_request: Request, { params }: Params) {
   });
 
   const handle = userHandleFromAuth(auth.user!);
+  const capabilities = deploymentCapabilityFlags(generation, publication);
   const dashboard = await buildDeploymentDashboard({
     generationId: parsedId.id,
     projectName: generation.project_name,
     publication,
     userId: auth.user!.id,
     userHandle: handle,
-    hasAnalytics: true,
-    hasSeoAgent: true,
+    hasAnalytics: capabilities.hasAnalytics,
+    hasSeoAgent: capabilities.hasSeoAgent,
     client: auth.supabase,
   });
 
@@ -183,8 +192,7 @@ export async function POST(request: Request, { params }: Params) {
     publication: result.publication,
     userId: auth.user!.id,
     userHandle: handle,
-    hasAnalytics: true,
-    hasSeoAgent: true,
+    ...deploymentCapabilityFlags(generation, result.publication),
     client: auth.supabase,
   });
 
