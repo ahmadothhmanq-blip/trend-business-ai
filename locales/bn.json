@@ -3263,7 +3263,11 @@
         "chooseVideoType": "অথবা একটি ভিডিও টাইপ চয়ন করুন",
         "productionOptions": "উৎপাদন বিকল্প",
         "numberOfScenes": "দৃশ্যের সংখ্যা",
-        "generateVideoProject": "ভিডিও প্রজেক্ট তৈরি করুন"
+        "generateVideoProject": "ভিডিও প্রজেক্ট তৈরি করুন",
+        "outputLanguage": "Output language",
+        "sourceImages": "Source images *",
+        "sourceImagesHint": "Upload one or more stills. Director will animate them into a storyboard, then Production Studio can render the motion video.",
+        "addImages": "Add images"
       },
       "placeholders": {
         "videoBrief": "আপনার ভিডিও বর্ণনা করুন — ধারণা, গল্প, মূল দৃশ্য, বার্তা, ভিজ্যুয়াল দিকনির্দেশনা...",
@@ -3271,7 +3275,8 @@
         "searchVideos": "ভিডিও অনুসন্ধান করুন...",
         "searchTemplates": "টেমপ্লেট অনুসন্ধান করুন...",
         "batchBrief": "TikTok-এর জন্য ২০টি অনুপ্রেরণামূলক ভিডিও তৈরি করুন...",
-        "batchExample": "উদাহরণ: শৃঙ্খলা এবং সকালের রুটিন সম্পর্কে ২০টি অনুপ্রেরণামূলক ভিডিও তৈরি করুন"
+        "batchExample": "উদাহরণ: শৃঙ্খলা এবং সকালের রুটিন সম্পর্কে ২০টি অনুপ্রেরণামূলক ভিডিও তৈরি করুন",
+        "imageToVideoBrief": "Describe the motion: camera path, product turn, atmosphere. Keep the subject in the uploaded stills."
       },
       "preview": {
         "noProject": "প্রিভিউ করার জন্য কোনো ভিডিও প্রকল্প নেই",
@@ -3312,7 +3317,10 @@
         "enterBatchBrief": "একটি ব্যাচ ব্রিফ লিখুন (যেমন: ২০টি অনুপ্রেরণামূলক ভিডিও তৈরি করুন)।",
         "batchFailed": "ব্যাচ ব্যর্থ হয়েছে",
         "batchRequestFailed": "ব্যাচ অনুরোধ ব্যর্থ হয়েছে",
-        "enterIdeaVideo": "একটি ভিডিও ধারণা জেনারেট করতে আপনার আইডিয়া লিখুন।"
+        "enterIdeaVideo": "একটি ভিডিও ধারণা জেনারেট করতে আপনার আইডিয়া লিখুন।",
+        "imageToVideoRequiresImage": "Add at least one source image for Image to Video.",
+        "invalidSourceImage": "Use PNG, JPEG, or WebP images under 8 MB.",
+        "tooManySourceImages": "You can attach up to 8 source images."
       },
       "providerStatus": {
         "title": "প্রোডাকশন প্রদানকারী অবস্থা",

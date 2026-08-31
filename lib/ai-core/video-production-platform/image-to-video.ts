@@ -5,6 +5,69 @@
 import type { VideoPluginInput } from "@/plugins/video-studio/types";
 import type { VideoProductionModel } from "@/lib/ai-core/video-production-platform/types";
 import { matchVideoTemplate } from "@/lib/ai-core/video-production-platform/templates";
+import { uploadVideoStudioMedia } from "@/lib/ai-core/video-production-platform/media-storage";
+import { validateVideoStudioUpload } from "@/lib/ai-core/video-production-platform/upload-validation";
+import { assertSafeRemoteFetchUrl } from "@/lib/website/url-safety";
+
+export const MAX_VIDEO_STUDIO_SOURCE_IMAGES = 8;
+
+export type VideoStudioSourceImageUpload = {
+  filename: string;
+  mimeType: string;
+  base64: string;
+};
+
+export function collectDirectorSourceImageUrls(input: {
+  productImageUrl?: string | null;
+  sourceImageUrls?: string[] | null;
+}): string[] {
+  return [
+    ...new Set(
+      [...(input.sourceImageUrls ?? []), input.productImageUrl].filter(
+        (url): url is string => Boolean(url?.trim()),
+      ),
+    ),
+  ].slice(0, MAX_VIDEO_STUDIO_SOURCE_IMAGES);
+}
+
+export async function ingestDirectorSourceImages(params: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any;
+  userId: string;
+  generationId: string;
+  uploads?: VideoStudioSourceImageUpload[];
+  urls?: string[];
+}): Promise<string[]> {
+  const urls: string[] = [];
+  for (const upload of (params.uploads ?? []).slice(0, MAX_VIDEO_STUDIO_SOURCE_IMAGES)) {
+    const bytes = Buffer.from(upload.base64, "base64");
+    validateVideoStudioUpload({
+      bytes,
+      declaredMime: upload.mimeType,
+      filename: upload.filename,
+    });
+    const stored = await uploadVideoStudioMedia({
+      supabase: params.supabase,
+      userId: params.userId,
+      generationId: params.generationId,
+      kind: "source-image",
+      bytes,
+      mimeType: upload.mimeType,
+      filename: upload.filename,
+      provider: "upload",
+    });
+    const url = stored.asset.url;
+    if (!url || !/^https?:\/\//i.test(url)) {
+      throw new Error("Source image uploaded but a signed URL was not issued.");
+    }
+    urls.push(url);
+  }
+  for (const url of (params.urls ?? []).slice(0, MAX_VIDEO_STUDIO_SOURCE_IMAGES - urls.length)) {
+    await assertSafeRemoteFetchUrl(url);
+    urls.push(url);
+  }
+  return [...new Set(urls)].slice(0, MAX_VIDEO_STUDIO_SOURCE_IMAGES);
+}
 
 export type ImageToVideoInput = {
   imageUrl: string;
@@ -15,6 +78,7 @@ export type ImageToVideoInput = {
   aspectRatio?: string;
   kind?: "product" | "person" | "scene";
   intensity?: "subtle" | "medium" | "dynamic";
+  language?: string;
 };
 
 const KIND_MOTION: Record<NonNullable<ImageToVideoInput["kind"]>, string> = {
@@ -85,6 +149,7 @@ export function buildImageToVideoBrief(
         intensity,
       ],
       sceneCount: 1,
+      language: input.language,
     },
   };
 }

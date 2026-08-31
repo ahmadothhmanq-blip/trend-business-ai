@@ -3263,7 +3263,11 @@
         "chooseVideoType": "Tai valitse videotyyppi",
         "productionOptions": "Tuotantovaihtoehdot",
         "numberOfScenes": "Kohtausten määrä",
-        "generateVideoProject": "Luo videoprojekti"
+        "generateVideoProject": "Luo videoprojekti",
+        "outputLanguage": "Output language",
+        "sourceImages": "Source images *",
+        "sourceImagesHint": "Upload one or more stills. Director will animate them into a storyboard, then Production Studio can render the motion video.",
+        "addImages": "Add images"
       },
       "placeholders": {
         "videoBrief": "Kuvaile videosi — konsepti, tarina, keskeiset kohtaukset, viestintä, visuaalinen suunta...",
@@ -3271,7 +3275,8 @@
         "searchVideos": "Hae videoita...",
         "searchTemplates": "Hae malleja...",
         "batchBrief": "Luo 20 motivoivaa videota TikTokiin...",
-        "batchExample": "Esimerkki: Luo 20 motivoivaa videota kurinalaisuudesta ja aamurutiineista"
+        "batchExample": "Esimerkki: Luo 20 motivoivaa videota kurinalaisuudesta ja aamurutiineista",
+        "imageToVideoBrief": "Describe the motion: camera path, product turn, atmosphere. Keep the subject in the uploaded stills."
       },
       "preview": {
         "noProject": "Ei esikatseltavaa videoprojektia",
@@ -3312,7 +3317,10 @@
         "enterBatchBrief": "Syötä eräohje (esim. Luo 20 motivoivaa videota).",
         "batchFailed": "Erä epäonnistui",
         "batchRequestFailed": "Eräpyyntö epäonnistui",
-        "enterIdeaVideo": "Syötä ideasi videokonseptin luomiseksi."
+        "enterIdeaVideo": "Syötä ideasi videokonseptin luomiseksi.",
+        "imageToVideoRequiresImage": "Add at least one source image for Image to Video.",
+        "invalidSourceImage": "Use PNG, JPEG, or WebP images under 8 MB.",
+        "tooManySourceImages": "You can attach up to 8 source images."
       },
       "providerStatus": {
         "title": "Tuotantotarjoajan tila",

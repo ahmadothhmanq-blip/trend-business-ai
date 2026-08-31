@@ -3263,7 +3263,11 @@
         "chooseVideoType": "या एक वीडियो प्रकार चुनें",
         "productionOptions": "उत्पादन विकल्प",
         "numberOfScenes": "दृश्यों की संख्या",
-        "generateVideoProject": "वीडियो प्रोजेक्ट जनरेट करें"
+        "generateVideoProject": "वीडियो प्रोजेक्ट जनरेट करें",
+        "outputLanguage": "Output language",
+        "sourceImages": "Source images *",
+        "sourceImagesHint": "Upload one or more stills. Director will animate them into a storyboard, then Production Studio can render the motion video.",
+        "addImages": "Add images"
       },
       "placeholders": {
         "videoBrief": "अपने वीडियो का वर्णन करें — अवधारणा, कहानी, मुख्य दृश्य, संदेश, विज़ुअल दिशा...",
@@ -3271,7 +3275,8 @@
         "searchVideos": "वीडियो खोजें...",
         "searchTemplates": "टेम्पलेट खोजें...",
         "batchBrief": "TikTok के लिए 20 प्रेरक वीडियो बनाएं...",
-        "batchExample": "उदाहरण: अनुशासन और सुबह की दिनचर्या पर 20 प्रेरक वीडियो बनाएं"
+        "batchExample": "उदाहरण: अनुशासन और सुबह की दिनचर्या पर 20 प्रेरक वीडियो बनाएं",
+        "imageToVideoBrief": "Describe the motion: camera path, product turn, atmosphere. Keep the subject in the uploaded stills."
       },
       "preview": {
         "noProject": "पूर्वावलोकन के लिए कोई वीडियो प्रोजेक्ट नहीं",
@@ -3312,7 +3317,10 @@
         "enterBatchBrief": "एक बैच ब्रीफ दर्ज करें (जैसे, 20 प्रेरक वीडियो बनाएं)।",
         "batchFailed": "बैच विफल हुआ",
         "batchRequestFailed": "बैच अनुरोध विफल हुआ",
-        "enterIdeaVideo": "वीडियो कॉन्सेप्ट जनरेट करने के लिए अपना विचार दर्ज करें।"
+        "enterIdeaVideo": "वीडियो कॉन्सेप्ट जनरेट करने के लिए अपना विचार दर्ज करें।",
+        "imageToVideoRequiresImage": "Add at least one source image for Image to Video.",
+        "invalidSourceImage": "Use PNG, JPEG, or WebP images under 8 MB.",
+        "tooManySourceImages": "You can attach up to 8 source images."
       },
       "providerStatus": {
         "title": "प्रोडक्शन प्रदाता स्थिति",

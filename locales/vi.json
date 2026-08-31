@@ -3263,7 +3263,11 @@
         "chooseVideoType": "Hoặc chọn loại video",
         "productionOptions": "Tùy chọn Sản xuất",
         "numberOfScenes": "Số cảnh",
-        "generateVideoProject": "Tạo Dự án Video"
+        "generateVideoProject": "Tạo Dự án Video",
+        "outputLanguage": "Output language",
+        "sourceImages": "Source images *",
+        "sourceImagesHint": "Upload one or more stills. Director will animate them into a storyboard, then Production Studio can render the motion video.",
+        "addImages": "Add images"
       },
       "placeholders": {
         "videoBrief": "Mô tả video của bạn — ý tưởng, câu chuyện, cảnh chính, thông điệp, định hướng hình ảnh...",
@@ -3271,7 +3275,8 @@
         "searchVideos": "Tìm kiếm video...",
         "searchTemplates": "Tìm kiếm mẫu…",
         "batchBrief": "Tạo 20 video tạo động lực cho TikTok...",
-        "batchExample": "Ví dụ: Tạo 20 video tạo động lực về kỷ luật và thói quen buổi sáng"
+        "batchExample": "Ví dụ: Tạo 20 video tạo động lực về kỷ luật và thói quen buổi sáng",
+        "imageToVideoBrief": "Describe the motion: camera path, product turn, atmosphere. Keep the subject in the uploaded stills."
       },
       "preview": {
         "noProject": "Không có dự án video nào để xem trước",
@@ -3312,7 +3317,10 @@
         "enterBatchBrief": "Nhập tóm tắt hàng loạt (ví dụ: Tạo 20 video động lực).",
         "batchFailed": "Hàng loạt thất bại",
         "batchRequestFailed": "Yêu cầu hàng loạt thất bại",
-        "enterIdeaVideo": "Nhập ý tưởng của bạn để tạo ý tưởng video."
+        "enterIdeaVideo": "Nhập ý tưởng của bạn để tạo ý tưởng video.",
+        "imageToVideoRequiresImage": "Add at least one source image for Image to Video.",
+        "invalidSourceImage": "Use PNG, JPEG, or WebP images under 8 MB.",
+        "tooManySourceImages": "You can attach up to 8 source images."
       },
       "providerStatus": {
         "title": "Trạng thái nhà cung cấp sản xuất",

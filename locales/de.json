@@ -3263,7 +3263,11 @@
         "chooseVideoType": "Oder wählen Sie einen Videotyp",
         "productionOptions": "Produktionsoptionen",
         "numberOfScenes": "Anzahl der Szenen",
-        "generateVideoProject": "Videoprojekt generieren"
+        "generateVideoProject": "Videoprojekt generieren",
+        "outputLanguage": "Output language",
+        "sourceImages": "Source images *",
+        "sourceImagesHint": "Upload one or more stills. Director will animate them into a storyboard, then Production Studio can render the motion video.",
+        "addImages": "Add images"
       },
       "placeholders": {
         "videoBrief": "Beschreiben Sie Ihr Video – Konzept, Geschichte, Schlüsselszenen, Botschaft, visuelle Ausrichtung...",
@@ -3271,7 +3275,8 @@
         "searchVideos": "Videos durchsuchen...",
         "searchTemplates": "Vorlagen durchsuchen…",
         "batchBrief": "Erstelle 20 Motivationsvideos für TikTok...",
-        "batchExample": "Beispiel: Erstelle 20 Motivationsvideos über Disziplin und Morgenroutinen"
+        "batchExample": "Beispiel: Erstelle 20 Motivationsvideos über Disziplin und Morgenroutinen",
+        "imageToVideoBrief": "Describe the motion: camera path, product turn, atmosphere. Keep the subject in the uploaded stills."
       },
       "preview": {
         "noProject": "Kein Videoprojekt zur Vorschau",
@@ -3312,7 +3317,10 @@
         "enterBatchBrief": "Geben Sie eine Stapelanweisung ein (z. B. Erstellen Sie 20 Motivationsvideos).",
         "batchFailed": "Stapelverarbeitung fehlgeschlagen",
         "batchRequestFailed": "Stapelanfrage fehlgeschlagen",
-        "enterIdeaVideo": "Geben Sie Ihre Idee ein, um ein Videokonzept zu generieren."
+        "enterIdeaVideo": "Geben Sie Ihre Idee ein, um ein Videokonzept zu generieren.",
+        "imageToVideoRequiresImage": "Add at least one source image for Image to Video.",
+        "invalidSourceImage": "Use PNG, JPEG, or WebP images under 8 MB.",
+        "tooManySourceImages": "You can attach up to 8 source images."
       },
       "providerStatus": {
         "title": "Produktionsanbieter-Status",

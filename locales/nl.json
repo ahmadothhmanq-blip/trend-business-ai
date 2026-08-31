@@ -3263,7 +3263,11 @@
         "chooseVideoType": "Of kies een videotype",
         "productionOptions": "Productie-opties",
         "numberOfScenes": "Aantal scènes",
-        "generateVideoProject": "Videoproject genereren"
+        "generateVideoProject": "Videoproject genereren",
+        "outputLanguage": "Output language",
+        "sourceImages": "Source images *",
+        "sourceImagesHint": "Upload one or more stills. Director will animate them into a storyboard, then Production Studio can render the motion video.",
+        "addImages": "Add images"
       },
       "placeholders": {
         "videoBrief": "Beschrijf je video — concept, verhaal, belangrijkste scènes, boodschap, visuele richting...",
@@ -3271,7 +3275,8 @@
         "searchVideos": "Video's zoeken...",
         "searchTemplates": "Sjablonen zoeken…",
         "batchBrief": "Maak 20 motiverende video's voor TikTok...",
-        "batchExample": "Voorbeeld: Maak 20 motiverende video's over discipline en ochtendroutines"
+        "batchExample": "Voorbeeld: Maak 20 motiverende video's over discipline en ochtendroutines",
+        "imageToVideoBrief": "Describe the motion: camera path, product turn, atmosphere. Keep the subject in the uploaded stills."
       },
       "preview": {
         "noProject": "Geen videoproject om te bekijken",
@@ -3312,7 +3317,10 @@
         "enterBatchBrief": "Voer een batch-brief in (bijv. Maak 20 motiverende video's).",
         "batchFailed": "Batch mislukt",
         "batchRequestFailed": "Batch-aanvraag mislukt",
-        "enterIdeaVideo": "Voer je idee in om een videoconcept te genereren."
+        "enterIdeaVideo": "Voer je idee in om een videoconcept te genereren.",
+        "imageToVideoRequiresImage": "Add at least one source image for Image to Video.",
+        "invalidSourceImage": "Use PNG, JPEG, or WebP images under 8 MB.",
+        "tooManySourceImages": "You can attach up to 8 source images."
       },
       "providerStatus": {
         "title": "Productieproviderstatus",

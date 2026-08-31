@@ -3263,7 +3263,11 @@
         "chooseVideoType": "Ou choisissez un type de vidéo",
         "productionOptions": "Options de production",
         "numberOfScenes": "Nombre de scènes",
-        "generateVideoProject": "Générer le projet vidéo"
+        "generateVideoProject": "Générer le projet vidéo",
+        "outputLanguage": "Output language",
+        "sourceImages": "Source images *",
+        "sourceImagesHint": "Upload one or more stills. Director will animate them into a storyboard, then Production Studio can render the motion video.",
+        "addImages": "Add images"
       },
       "placeholders": {
         "videoBrief": "Décrivez votre vidéo — concept, histoire, scènes clés, message, direction visuelle...",
@@ -3271,7 +3275,8 @@
         "searchVideos": "Rechercher des vidéos...",
         "searchTemplates": "Rechercher des modèles…",
         "batchBrief": "Créez 20 vidéos motivantes pour TikTok...",
-        "batchExample": "Exemple : Créez 20 vidéos motivantes sur la discipline et les routines matinales"
+        "batchExample": "Exemple : Créez 20 vidéos motivantes sur la discipline et les routines matinales",
+        "imageToVideoBrief": "Describe the motion: camera path, product turn, atmosphere. Keep the subject in the uploaded stills."
       },
       "preview": {
         "noProject": "Aucun projet vidéo à prévisualiser",
@@ -3312,7 +3317,10 @@
         "enterBatchBrief": "Saisissez un brief par lot (ex. Créez 20 vidéos motivantes).",
         "batchFailed": "Échec du lot",
         "batchRequestFailed": "Échec de la requête par lot",
-        "enterIdeaVideo": "Saisissez votre idée pour générer un concept vidéo."
+        "enterIdeaVideo": "Saisissez votre idée pour générer un concept vidéo.",
+        "imageToVideoRequiresImage": "Add at least one source image for Image to Video.",
+        "invalidSourceImage": "Use PNG, JPEG, or WebP images under 8 MB.",
+        "tooManySourceImages": "You can attach up to 8 source images."
       },
       "providerStatus": {
         "title": "Statut du fournisseur de production",

@@ -3263,7 +3263,11 @@
         "chooseVideoType": "Veya bir video türü seçin",
         "productionOptions": "Üretim Seçenekleri",
         "numberOfScenes": "Sahne sayısı",
-        "generateVideoProject": "Video Projesi Oluştur"
+        "generateVideoProject": "Video Projesi Oluştur",
+        "outputLanguage": "Output language",
+        "sourceImages": "Source images *",
+        "sourceImagesHint": "Upload one or more stills. Director will animate them into a storyboard, then Production Studio can render the motion video.",
+        "addImages": "Add images"
       },
       "placeholders": {
         "videoBrief": "Videonuzu tanımlayın — konsept, hikaye, önemli sahneler, mesajlar, görsel yön...",
@@ -3271,7 +3275,8 @@
         "searchVideos": "Videoları ara...",
         "searchTemplates": "Şablonları ara…",
         "batchBrief": "TikTok için 20 motivasyon videosu oluştur...",
-        "batchExample": "Örnek: Disiplin ve sabah rutinleri hakkında 20 motivasyon videosu oluştur"
+        "batchExample": "Örnek: Disiplin ve sabah rutinleri hakkında 20 motivasyon videosu oluştur",
+        "imageToVideoBrief": "Describe the motion: camera path, product turn, atmosphere. Keep the subject in the uploaded stills."
       },
       "preview": {
         "noProject": "Önizlenecek video projesi yok",
@@ -3312,7 +3317,10 @@
         "enterBatchBrief": "Bir toplu özet girin (ör. 20 motivasyon videosu oluştur).",
         "batchFailed": "Toplu işlem başarısız",
         "batchRequestFailed": "Toplu işlem isteği başarısız",
-        "enterIdeaVideo": "Bir video konsepti oluşturmak için fikrinizi girin."
+        "enterIdeaVideo": "Bir video konsepti oluşturmak için fikrinizi girin.",
+        "imageToVideoRequiresImage": "Add at least one source image for Image to Video.",
+        "invalidSourceImage": "Use PNG, JPEG, or WebP images under 8 MB.",
+        "tooManySourceImages": "You can attach up to 8 source images."
       },
       "providerStatus": {
         "title": "Prodüksiyon sağlayıcı durumu",

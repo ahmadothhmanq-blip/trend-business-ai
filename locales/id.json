@@ -3263,7 +3263,11 @@
         "chooseVideoType": "Atau pilih jenis video",
         "productionOptions": "Opsi Produksi",
         "numberOfScenes": "Jumlah adegan",
-        "generateVideoProject": "Hasilkan Proyek Video"
+        "generateVideoProject": "Hasilkan Proyek Video",
+        "outputLanguage": "Output language",
+        "sourceImages": "Source images *",
+        "sourceImagesHint": "Upload one or more stills. Director will animate them into a storyboard, then Production Studio can render the motion video.",
+        "addImages": "Add images"
       },
       "placeholders": {
         "videoBrief": "Deskripsikan video Anda — konsep, cerita, adegan kunci, pesan, arah visual...",
@@ -3271,7 +3275,8 @@
         "searchVideos": "Cari video...",
         "searchTemplates": "Cari templat…",
         "batchBrief": "Buat 20 video motivasi untuk TikTok...",
-        "batchExample": "Contoh: Buat 20 video motivasi tentang disiplin dan rutinitas pagi"
+        "batchExample": "Contoh: Buat 20 video motivasi tentang disiplin dan rutinitas pagi",
+        "imageToVideoBrief": "Describe the motion: camera path, product turn, atmosphere. Keep the subject in the uploaded stills."
       },
       "preview": {
         "noProject": "Tidak ada proyek video untuk pratinjau",
@@ -3312,7 +3317,10 @@
         "enterBatchBrief": "Masukkan ringkasan batch (mis. Buat 20 video motivasi).",
         "batchFailed": "Batch gagal",
         "batchRequestFailed": "Permintaan batch gagal",
-        "enterIdeaVideo": "Masukkan ide Anda untuk menghasilkan konsep video."
+        "enterIdeaVideo": "Masukkan ide Anda untuk menghasilkan konsep video.",
+        "imageToVideoRequiresImage": "Add at least one source image for Image to Video.",
+        "invalidSourceImage": "Use PNG, JPEG, or WebP images under 8 MB.",
+        "tooManySourceImages": "You can attach up to 8 source images."
       },
       "providerStatus": {
         "title": "Status penyedia produksi",

@@ -3263,7 +3263,11 @@
         "chooseVideoType": "Sau alege un tip de videoclip",
         "productionOptions": "Opțiuni de producție",
         "numberOfScenes": "Număr de scene",
-        "generateVideoProject": "Generează proiect video"
+        "generateVideoProject": "Generează proiect video",
+        "outputLanguage": "Output language",
+        "sourceImages": "Source images *",
+        "sourceImagesHint": "Upload one or more stills. Director will animate them into a storyboard, then Production Studio can render the motion video.",
+        "addImages": "Add images"
       },
       "placeholders": {
         "videoBrief": "Descrie videoclipul tău — concept, poveste, scene cheie, mesaje, direcție vizuală...",
@@ -3271,7 +3275,8 @@
         "searchVideos": "Caută videoclipuri...",
         "searchTemplates": "Caută șabloane...",
         "batchBrief": "Creează 20 de videoclipuri motivaționale pentru TikTok...",
-        "batchExample": "Exemplu: Creează 20 de videoclipuri motivaționale despre disciplină și rutine de dimineață"
+        "batchExample": "Exemplu: Creează 20 de videoclipuri motivaționale despre disciplină și rutine de dimineață",
+        "imageToVideoBrief": "Describe the motion: camera path, product turn, atmosphere. Keep the subject in the uploaded stills."
       },
       "preview": {
         "noProject": "Niciun proiect video de previzualizat",
@@ -3312,7 +3317,10 @@
         "enterBatchBrief": "Introdu un brief de lot (de ex., Creează 20 de videoclipuri motivaționale).",
         "batchFailed": "Lot eșuat",
         "batchRequestFailed": "Cererea lotului a eșuat",
-        "enterIdeaVideo": "Introdu ideea ta pentru a genera un concept video."
+        "enterIdeaVideo": "Introdu ideea ta pentru a genera un concept video.",
+        "imageToVideoRequiresImage": "Add at least one source image for Image to Video.",
+        "invalidSourceImage": "Use PNG, JPEG, or WebP images under 8 MB.",
+        "tooManySourceImages": "You can attach up to 8 source images."
       },
       "providerStatus": {
         "title": "Starea furnizorului de producție",

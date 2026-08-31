@@ -3510,7 +3510,11 @@
         "chooseVideoType": "Or choose a video type",
         "productionOptions": "Production Options",
         "numberOfScenes": "Number of scenes",
-        "generateVideoProject": "Generate Video Project"
+        "generateVideoProject": "Generate Video Project",
+        "outputLanguage": "Output language",
+        "sourceImages": "Source images *",
+        "sourceImagesHint": "Upload one or more stills. Director will animate them into a storyboard, then Production Studio can render the motion video.",
+        "addImages": "Add images"
       },
       "placeholders": {
         "videoBrief": "Describe your video — concept, story, key scenes, messaging, visual direction...",
@@ -3518,7 +3522,8 @@
         "searchVideos": "Search videos...",
         "searchTemplates": "Search templates…",
         "batchBrief": "Create 20 motivational videos for TikTok...",
-        "batchExample": "Example: Create 20 motivational videos about discipline and morning routines"
+        "batchExample": "Example: Create 20 motivational videos about discipline and morning routines",
+        "imageToVideoBrief": "Describe the motion: camera path, product turn, atmosphere. Keep the subject in the uploaded stills."
       },
       "preview": {
         "noProject": "No video project to preview",
@@ -3559,7 +3564,10 @@
         "enterBatchBrief": "Enter a batch brief (e.g. Create 20 motivational videos).",
         "batchFailed": "Batch failed",
         "batchRequestFailed": "Batch request failed",
-        "enterIdeaVideo": "Enter your idea to generate a video concept."
+        "enterIdeaVideo": "Enter your idea to generate a video concept.",
+        "imageToVideoRequiresImage": "Add at least one source image for Image to Video.",
+        "invalidSourceImage": "Use PNG, JPEG, or WebP images under 8 MB.",
+        "tooManySourceImages": "You can attach up to 8 source images."
       },
       "providerStatus": {
         "title": "Production provider status",

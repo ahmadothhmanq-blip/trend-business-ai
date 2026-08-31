@@ -41,13 +41,18 @@ import {
   OnePromptExperience,
   type ProjectHistoryItem,
 } from "@/components/dashboard/builder-shared";
+import { GlsGenerationLanguageSelect } from "@/components/dashboard/language/gls-generation-language-select";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n/client";
-import { getLocaleDefinition } from "@/lib/i18n/config";
+import { getInitialGlsGenerationLanguage, glsGenerationLanguagePayload } from "@/lib/language-platform/generation/service";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
-import { getOnePromptProduct } from "@/lib/constants/one-prompt-products";
 import { VideoStudioProviderStatus } from "@/components/dashboard/video-studio/video-studio-provider-status";
+import {
+  SourceImageField,
+  fileToSourceImagePayload,
+} from "@/components/dashboard/video-studio/source-image-field";
 import { useIdeaQueryParam } from "@/lib/hooks/use-idea-query-param";
+import { getOnePromptProduct } from "@/lib/constants/one-prompt-products";
 import {
   VIDEO_TYPES,
   VIDEO_STYLES,
@@ -61,8 +66,6 @@ import {
 import type { VideoGeneration } from "@/types/video";
 
 type Props = { initialGenerations?: VideoGeneration[] };
-
-// SvgPreview imported from builder-shared (centralized with SVG sanitization)
 
 type PreviewTab = "storyboard" | "script" | "audio" | "subtitles" | "thumbnail" | "files";
 
@@ -90,9 +93,8 @@ function VideoPreview({
   onRegenerate?: () => void;
   onContinue?: () => void;
 }) {
-  const { t, locale } = useTranslation();
+  const { t } = useTranslation();
   const p = useProductT("videoStudio");
-  const aiLanguage = getLocaleDefinition(locale).aiLanguage;
   const bp = gen.blueprint;
   const [tab, setTab] = useState<PreviewTab>("storyboard");
 
@@ -281,7 +283,9 @@ function toHistoryItem(gen: VideoGeneration): ProjectHistoryItem {
 export function VideoStudioTool({ initialGenerations }: Props) {
   const { t, locale } = useTranslation();
   const p = useProductT("videoStudio");
-  const aiLanguage = getLocaleDefinition(locale).aiLanguage;
+  const [generationLanguage, setGenerationLanguage] = useState(() =>
+    getInitialGlsGenerationLanguage({ fallback: "ui-locale", uiLocale: locale }),
+  );
   const onePrompt = getOnePromptProduct("video-studio");
   const [step, setStep] = useState<"type" | "config" | "history" | "generating" | "preview">("type");
   const [selectedType, setSelectedType] = useState("");
@@ -293,6 +297,7 @@ export function VideoStudioTool({ initialGenerations }: Props) {
   const [cameraMove, setCameraMove] = useState("Static");
   const [options, setOptions] = useState<string[]>([]);
   const [sceneCount, setSceneCount] = useState(3);
+  const [sourceImageFiles, setSourceImageFiles] = useState<File[]>([]);
   const [progressEvents, setProgressEvents] = useState<string[]>([]);
 
   const [generations, setGenerations] = useState<VideoGeneration[]>(initialGenerations ?? []);
@@ -384,7 +389,7 @@ export function VideoStudioTool({ initialGenerations }: Props) {
           prompt: idea,
           count: batchCount,
           durationSec: Number.parseInt(duration, 10) || 30,
-          language: aiLanguage,
+          ...glsGenerationLanguagePayload(generationLanguage),
           style,
           platform: aspectRatio === "9:16" ? "TikTok" : "YouTube",
           videoType: selectedType || "social-video",
@@ -435,6 +440,7 @@ export function VideoStudioTool({ initialGenerations }: Props) {
     setSelectedType(id);
     const def = getVideoType(id);
     if (def) setOptions([...def.defaultOptions]);
+    if (id === "image-to-video") setSceneCount(1);
   };
 
   const handleGenerate = async (
@@ -460,6 +466,10 @@ export function VideoStudioTool({ initialGenerations }: Props) {
       );
       return;
     }
+    if (videoType === "image-to-video" && sourceImageFiles.length < 1 && mode === "generate" && !parentGenerationId) {
+      toast.error(p("errors.imageToVideoRequiresImage"));
+      return;
+    }
     if (overridePrompt) setPrompt(overridePrompt);
     setStep("generating");
     setProgressEvents([
@@ -467,14 +477,19 @@ export function VideoStudioTool({ initialGenerations }: Props) {
       "[strategy] Building narrative direction...",
     ]);
     try {
+      const sourceImages =
+        videoType === "image-to-video"
+          ? await Promise.all(sourceImageFiles.map((file) => fileToSourceImagePayload(file)))
+          : undefined;
       const res = await fetch("/api/video-studio", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prompt: idea, videoType, style, aspectRatio, duration,
           mood, cameraMove, options: videoOptions, sceneCount, mode, parentGenerationId,
-          language: aiLanguage,
+          ...glsGenerationLanguagePayload(generationLanguage),
           continueInstruction: mode === "continue" ? idea : undefined,
+          sourceImages,
         }),
       });
       const d = await res.json();
@@ -773,11 +788,41 @@ export function VideoStudioTool({ initialGenerations }: Props) {
                 <Textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder={parentId ? p("placeholders.editExample") : p("placeholders.videoBrief")}
+                  placeholder={
+                    parentId
+                      ? p("placeholders.editExample")
+                      : selectedType === "image-to-video"
+                        ? p("placeholders.imageToVideoBrief")
+                        : p("placeholders.videoBrief")
+                  }
                   rows={4}
                   className={cn(dashboardInputClass, "min-h-[100px] resize-none")}
                 />
               </div>
+
+              <div className="max-w-md">
+                <label className="mb-1.5 block text-xs font-medium text-white/60">
+                  {p("steps.outputLanguage", { defaultValue: "Output language" })}
+                </label>
+                <GlsGenerationLanguageSelect
+                  serviceId="video-studio"
+                  value={generationLanguage}
+                  onChange={setGenerationLanguage}
+                />
+              </div>
+
+              {selectedType === "image-to-video" ? (
+                <SourceImageField
+                  files={sourceImageFiles}
+                  onChange={setSourceImageFiles}
+                  title={p("steps.sourceImages")}
+                  hint={p("steps.sourceImagesHint")}
+                  addLabel={p("steps.addImages")}
+                  invalidTypeMessage={p("errors.invalidSourceImage")}
+                  tooManyMessage={p("errors.tooManySourceImages")}
+                  onError={(message) => toast.error(message)}
+                />
+              ) : null}
 
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <div>
@@ -858,7 +903,7 @@ export function VideoStudioTool({ initialGenerations }: Props) {
                     <Sparkles className="size-4" /> {p("actions.improveWithAi")}
                   </Button>
                 ) : (
-                  <Button onClick={() => void handleGenerate()} disabled={!prompt.trim()} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">
+                  <Button onClick={() => void handleGenerate()} disabled={!prompt.trim() || (selectedType === "image-to-video" && sourceImageFiles.length < 1)} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">
                     <Sparkles className="size-4" /> {p("steps.generateVideoProject")}
                   </Button>
                 )}

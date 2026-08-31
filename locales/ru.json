@@ -3263,7 +3263,11 @@
         "chooseVideoType": "Или выберите тип видео",
         "productionOptions": "Параметры производства",
         "numberOfScenes": "Количество сцен",
-        "generateVideoProject": "Создать видеопроект"
+        "generateVideoProject": "Создать видеопроект",
+        "outputLanguage": "Output language",
+        "sourceImages": "Source images *",
+        "sourceImagesHint": "Upload one or more stills. Director will animate them into a storyboard, then Production Studio can render the motion video.",
+        "addImages": "Add images"
       },
       "placeholders": {
         "videoBrief": "Опишите ваше видео — концепцию, сюжет, ключевые сцены, сообщения, визуальное направление...",
@@ -3271,7 +3275,8 @@
         "searchVideos": "Поиск видео...",
         "searchTemplates": "Поиск шаблонов…",
         "batchBrief": "Создать 20 мотивационных видео для TikTok...",
-        "batchExample": "Пример: Создать 20 мотивационных видео о дисциплине и утренних ритуалах"
+        "batchExample": "Пример: Создать 20 мотивационных видео о дисциплине и утренних ритуалах",
+        "imageToVideoBrief": "Describe the motion: camera path, product turn, atmosphere. Keep the subject in the uploaded stills."
       },
       "preview": {
         "noProject": "Нет видео-проекта для предпросмотра",
@@ -3312,7 +3317,10 @@
         "enterBatchBrief": "Введите краткое описание пакета (например, «Создать 20 мотивационных видео»).",
         "batchFailed": "Пакетная операция не удалась",
         "batchRequestFailed": "Пакетный запрос не удался",
-        "enterIdeaVideo": "Введите свою идею для генерации концепции видео."
+        "enterIdeaVideo": "Введите свою идею для генерации концепции видео.",
+        "imageToVideoRequiresImage": "Add at least one source image for Image to Video.",
+        "invalidSourceImage": "Use PNG, JPEG, or WebP images under 8 MB.",
+        "tooManySourceImages": "You can attach up to 8 source images."
       },
       "providerStatus": {
         "title": "Статус провайдера производства",

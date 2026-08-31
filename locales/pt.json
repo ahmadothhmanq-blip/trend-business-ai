@@ -3263,7 +3263,11 @@
         "chooseVideoType": "Ou escolha um tipo de vídeo",
         "productionOptions": "Opções de Produção",
         "numberOfScenes": "Número de cenas",
-        "generateVideoProject": "Gerar Projeto de Vídeo"
+        "generateVideoProject": "Gerar Projeto de Vídeo",
+        "outputLanguage": "Output language",
+        "sourceImages": "Source images *",
+        "sourceImagesHint": "Upload one or more stills. Director will animate them into a storyboard, then Production Studio can render the motion video.",
+        "addImages": "Add images"
       },
       "placeholders": {
         "videoBrief": "Descreva seu vídeo — conceito, história, cenas principais, mensagem, direção visual...",
@@ -3271,7 +3275,8 @@
         "searchVideos": "Pesquisar vídeos...",
         "searchTemplates": "Pesquisar modelos…",
         "batchBrief": "Criar 20 vídeos motivacionais para o TikTok...",
-        "batchExample": "Exemplo: Criar 20 vídeos motivacionais sobre disciplina e rotinas matinais"
+        "batchExample": "Exemplo: Criar 20 vídeos motivacionais sobre disciplina e rotinas matinais",
+        "imageToVideoBrief": "Describe the motion: camera path, product turn, atmosphere. Keep the subject in the uploaded stills."
       },
       "preview": {
         "noProject": "Nenhum projeto de vídeo para pré-visualizar",
@@ -3312,7 +3317,10 @@
         "enterBatchBrief": "Insira um resumo do lote (ex.: Criar 20 vídeos motivacionais).",
         "batchFailed": "Falha no lote",
         "batchRequestFailed": "Falha na solicitação em lote",
-        "enterIdeaVideo": "Insira sua ideia para gerar um conceito de vídeo."
+        "enterIdeaVideo": "Insira sua ideia para gerar um conceito de vídeo.",
+        "imageToVideoRequiresImage": "Add at least one source image for Image to Video.",
+        "invalidSourceImage": "Use PNG, JPEG, or WebP images under 8 MB.",
+        "tooManySourceImages": "You can attach up to 8 source images."
       },
       "providerStatus": {
         "title": "Status do provedor de produção",

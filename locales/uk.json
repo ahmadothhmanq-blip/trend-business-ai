@@ -3263,7 +3263,11 @@
         "chooseVideoType": "Або оберіть тип відео",
         "productionOptions": "Параметри виробництва",
         "numberOfScenes": "Кількість сцен",
-        "generateVideoProject": "Створити відеопроєкт"
+        "generateVideoProject": "Створити відеопроєкт",
+        "outputLanguage": "Output language",
+        "sourceImages": "Source images *",
+        "sourceImagesHint": "Upload one or more stills. Director will animate them into a storyboard, then Production Studio can render the motion video.",
+        "addImages": "Add images"
       },
       "placeholders": {
         "videoBrief": "Опишіть ваше відео — концепцію, сюжет, ключові сцени, повідомлення, візуальний напрямок...",
@@ -3271,7 +3275,8 @@
         "searchVideos": "Пошук відео...",
         "searchTemplates": "Пошук шаблонів…",
         "batchBrief": "Створіть 20 мотиваційних відео для TikTok...",
-        "batchExample": "Приклад: Створіть 20 мотиваційних відео про дисципліну та ранкові рутини"
+        "batchExample": "Приклад: Створіть 20 мотиваційних відео про дисципліну та ранкові рутини",
+        "imageToVideoBrief": "Describe the motion: camera path, product turn, atmosphere. Keep the subject in the uploaded stills."
       },
       "preview": {
         "noProject": "Немає відеопроєкту для попереднього перегляду",
@@ -3312,7 +3317,10 @@
         "enterBatchBrief": "Введіть пакетне завдання (наприклад, Створіть 20 мотиваційних відео).",
         "batchFailed": "Пакет не вдався",
         "batchRequestFailed": "Пакетний запит не вдався",
-        "enterIdeaVideo": "Введіть свою ідею для створення концепції відео."
+        "enterIdeaVideo": "Введіть свою ідею для створення концепції відео.",
+        "imageToVideoRequiresImage": "Add at least one source image for Image to Video.",
+        "invalidSourceImage": "Use PNG, JPEG, or WebP images under 8 MB.",
+        "tooManySourceImages": "You can attach up to 8 source images."
       },
       "providerStatus": {
         "title": "Статус провайдера виробництва",
