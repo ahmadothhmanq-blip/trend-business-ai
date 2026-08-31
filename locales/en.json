@@ -3591,6 +3591,108 @@
         "strictOff": "VIDEO_PROVIDER_STRICT unset — stubs allowed on errors.",
         "fullRenderBlocked": "Full render requires KLING_API_KEY. Preview mode still works."
       },
+      "editor": {
+        "loading": "Loading editor…",
+        "errors": {
+          "loadFailed": "Failed to load editor.",
+          "noActivePlan": "This project has no active plan to edit.",
+          "saveFailed": "Save failed.",
+          "undoFailed": "Undo failed.",
+          "redoFailed": "Redo failed.",
+          "regenerationFailed": "Regeneration failed.",
+          "requestFailed": "Request failed ({status})"
+        },
+        "tabs": {
+          "inspector": "Inspector",
+          "audio": "Audio",
+          "text": "Text"
+        },
+        "saveStatus": {
+          "saving": "Saving",
+          "unsaved": "Unsaved changes",
+          "error": "Save failed",
+          "saved": "Saved"
+        },
+        "actions": {
+          "trimStart": "Trim start",
+          "trimEnd": "Trim end",
+          "split": "Split",
+          "regenerateScene": "Regenerate Scene",
+          "production": "Production"
+        },
+        "inspector": {
+          "selectScene": "Select a scene to inspect.",
+          "durationSec": "Duration (sec)",
+          "cameraMove": "Camera move",
+          "visualStyle": "Visual style",
+          "transition": "Transition",
+          "dialogue": "Dialogue",
+          "voiceRequired": "Voice required",
+          "providerPreference": "Provider preference",
+          "fallbackProvider": "Fallback provider",
+          "none": "None",
+          "characters": "Characters",
+          "products": "Products",
+          "referencesUri": "References (uri)"
+        },
+        "captions": {
+          "selectScene": "Select a scene to edit captions.",
+          "captionsEnabled": "Captions enabled",
+          "alignLeft": "Left",
+          "alignCenter": "Center",
+          "alignRight": "Right",
+          "overlayOn": "On",
+          "defaultCaption": "Caption",
+          "addTextOverlay": "Add text overlay"
+        },
+        "audio": {
+          "tts": "TTS",
+          "ttsReady": "TTS ready",
+          "ttsUnavailable": "TTS unavailable",
+          "voice": "Voice",
+          "narration": "Narration",
+          "noVoiceTrack": "No voice track on the audio plan yet.",
+          "music": "Music",
+          "score": "Score",
+          "noMusic": "No music ingested.",
+          "sfx": "SFX",
+          "cue": "Cue",
+          "noSfx": "No SFX ingested.",
+          "muteVoice": "Mute voice",
+          "muteMusic": "Mute music",
+          "voiceLevel": "Voice level",
+          "musicLevel": "Music level",
+          "muteSfx": "Mute SFX",
+          "sfxLevel": "SFX level",
+          "footerNote": "Audio is displayed from the existing Audio Engine. This panel does not generate TTS.",
+          "trackVoice": "{speaker} · {status} · {startSec}s",
+          "trackMusic": "{mood} · {status}",
+          "trackSfx": "{cue} @ {timestampSec}s"
+        },
+        "preview": {
+          "title": "Scene preview",
+          "storyboardFallback": "Storyboard",
+          "emptyPrompt": "Select a scene to preview its storyboard. SVG is not treated as video.",
+          "timeDisplay": "{current}s / {total}s"
+        },
+        "scenes": {
+          "sceneLabel": "Scene {index}",
+          "playableClip": "Playable clip",
+          "storyboardOnly": "Storyboard only"
+        },
+        "timeline": {
+          "label": "Timeline · {duration}s",
+          "zoom": "Zoom",
+          "blockLabel": "S{index}"
+        },
+        "regeneration": {
+          "label": "Regeneration: {status}",
+          "attempt": " · attempt {attempt}",
+          "previous": " · previous {id}",
+          "active": " · active {id}",
+          "errorSuffix": " · {error}"
+        }
+      },
       "management": {
         "loading": "Loading video production studio…",
         "backToStudio": "Back to Video Studio",

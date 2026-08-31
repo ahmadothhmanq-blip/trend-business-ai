@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Pause, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useVideoEditorT } from "@/components/dashboard/video-studio/editor/use-video-editor-t";
 import type { Scene } from "@/lib/ai-core/video-production-platform/domain/contracts";
 import type { EditorScenePreview } from "@/lib/ai-core/video-production-platform/editor-mvp/contracts";
 import { overlaysOf } from "@/lib/ai-core/video-production-platform/editor-mvp/contracts";
@@ -25,6 +26,7 @@ export function EditorPreview({
   playhead: number;
   onPlayhead: (sec: number) => void;
 }) {
+  const { et } = useVideoEditorT();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [playing, setPlaying] = useState(false);
   const playableUrl =
@@ -39,6 +41,8 @@ export function EditorPreview({
     if (!el) return;
     if (Math.abs(el.currentTime - playhead) > 0.35) el.currentTime = playhead;
   }, [playhead, playableUrl]);
+
+  const totalDuration = preview?.durationSec || scene?.duration || 0;
 
   return (
     <section className="flex min-h-[280px] flex-1 flex-col bg-black/40">
@@ -75,10 +79,10 @@ export function EditorPreview({
           </>
         ) : (
           <div className="max-w-xl px-6 text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-premium-gold/80">Scene preview</p>
-            <h3 className="mt-3 text-xl font-semibold text-white">{scene?.visualStyle || "Storyboard"}</h3>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-premium-gold/80">{et("preview.title")}</p>
+            <h3 className="mt-3 text-xl font-semibold text-white">{scene?.visualStyle || et("preview.storyboardFallback")}</h3>
             <p className="mt-2 text-sm leading-relaxed text-white/70">
-              {scene?.prompt || "Select a scene to preview its storyboard. SVG is not treated as video."}
+              {scene?.prompt || et("preview.emptyPrompt")}
             </p>
             <p className="mt-4 text-xs text-white/40">
               {scene?.camera.move} · {scene?.duration.toFixed(1)}s · {scene?.status}
@@ -116,7 +120,7 @@ export function EditorPreview({
           className="flex-1 accent-premium-gold"
         />
         <span className="w-24 text-right text-xs tabular-nums text-white/60">
-          {playhead.toFixed(1)}s / {(preview?.durationSec || scene?.duration || 0).toFixed(1)}s
+          {et("preview.timeDisplay", { current: playhead.toFixed(1), total: totalDuration.toFixed(1) })}
         </span>
       </div>
     </section>

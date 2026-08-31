@@ -2043,6 +2043,7 @@
         "renameDescriptionWorkspace": "Päivitä tallennettu projektinimi työtilahistoriassasi.",
         "deleteTitle": "Poista projekti?",
         "deleteDescription": "Tätä toimintoa ei voi peruuttaa.",
+        "unsavedEditorWarning": "You have unsaved changes in the Visual Editor. Leave without saving?",
         "confirm": "Vahvista",
         "cancel": "Peruuta"
       },
@@ -2165,6 +2166,10 @@
         "applied": "Visuaalinen malli käytetty — sisältö ja kuvat säilytetty.",
         "usingTemplate": "Käytetään mallia: {name}",
         "intelligenceApplied": "Mallitekoäly: {name}",
+        "structureApplied": "Structure template: {name}",
+        "structureRedesigned": "Redesigned with {name} — your content and images preserved",
+        "themeRedesigned": "Theme applied: {name} — content preserved, design rebuilt",
+        "themeApplied": "Theme selected: {name}",
         "clearSelection": "Tyhjennä mallivalinta"
       },
       "favorites": {
@@ -2185,6 +2190,7 @@
         "createOrSelectFirst": "Luo tai valitse ensin verkkosivusto.",
         "editThenImprove": "Muokkaa ohjetta ja napsauta Paranna AI:lla.",
         "seoFixApplied": "SEO-korjaus käytetty.",
+        "reviewImprovementApplied": "Website improvements applied.",
         "websiteCreated": "Verkkosivusto luotu ja tallennettu. Tarkista esikatselu ja paranna tekoälyllä.",
         "projectDuplicated": "Projekti kopioitu",
         "projectDeleted": "Projekti poistettu",
@@ -2280,9 +2286,66 @@
         "experiments": "Kokeilut",
         "intelligence": "Älykkyys",
         "seoAgent": "SEO-agentti",
+        "reviewStudio": "Website Review",
         "publish": "Julkaise",
         "openEditorHint": "Luo ensin verkkosivusto avataksesi visuaalisen editorin.",
         "createPreviewHint": "Luo verkkosivusto avataksesi live-esikatselun alustan sisällä."
+      },
+      "reviewStudio": {
+        "badge": "AI Review Studio",
+        "title": "{name} — Quality Review",
+        "running": "Running website quality review…",
+        "failedLoad": "Failed to load website review",
+        "applyFailed": "Failed to apply improvements",
+        "rollbackFailed": "Failed to rollback version",
+        "selectWebsite": "Generate or select a website to open the Review Studio.",
+        "strengths": "Strengths",
+        "weaknesses": "Weaknesses",
+        "estimatedGain": "Estimated Quality Gain",
+        "noStrengths": "No major strengths detected yet.",
+        "apply": "Apply",
+        "selected": "Selected",
+        "applySelected": "Apply selected improvements",
+        "selectedCount": "{count} selected",
+        "quality": "quality",
+        "conversion": "conversion",
+        "risk": "Risk",
+        "targetedRegenHint": "Requires AI executor — use deterministic improvements in Phase 1",
+        "version": "Version",
+        "rollback": "Rollback",
+        "noVersions": "No version history yet. Apply improvements to create versions.",
+        "noComparison": "Apply improvements to see before/after comparison.",
+        "points": "points",
+        "appliedChanges": "Applied changes",
+        "tabs": {
+          "dashboard": "Dashboard",
+          "improvements": "Improvements",
+          "versions": "Versions",
+          "compare": "Compare",
+          "reports": "Reports"
+        },
+        "scores": {
+          "overall": "Overall",
+          "design": "Design",
+          "ux": "UX",
+          "business": "Business",
+          "seo": "SEO",
+          "performance": "Performance",
+          "accessibility": "Accessibility",
+          "content": "Content",
+          "localization": "Localization"
+        },
+        "reports": {
+          "executive": "Executive Report",
+          "technical": "Technical Report",
+          "developer": "Developer Report",
+          "benchmark": "Benchmark Report",
+          "priorityActions": "Priority actions",
+          "technicalInsights": "Technical insights",
+          "designInsights": "Design insights",
+          "businessInsights": "Business insights",
+          "noFiles": "No specific files"
+        }
       },
       "workspace": {
         "title": "AI-projektityötila",
@@ -2305,6 +2368,310 @@
         "linkedVersion": "linkitetty versio",
         "pipelineHint": "AI-ydinputki: Idea → Strategia → Suunnittelu → Resurssit → Luonti → Laatu → Valmis",
         "viewGeneratedInside": "Katso luotu verkkosivusto alustan sisällä."
+      },
+      "builder": {
+        "toolRail": {
+          "structure": "Structure",
+          "design": "Design",
+          "blocks": "Blocks",
+          "media": "Media",
+          "ai": "AI",
+          "professional": "Pro",
+          "business": "Business",
+          "publish": "Publish",
+          "enterprise": "Enterprise"
+        },
+        "workspace": {
+          "title": "Website Builder",
+          "autosavePending": "Unsaved changes…",
+          "autosaveSaving": "Autosaving…",
+          "autosaveSaved": "All changes saved",
+          "autosaveError": "Autosave failed",
+          "versions": "Versions",
+          "openManagementHint": "Open Site Management to edit this page.",
+          "restored": "Restored {label}",
+          "backupSaved": "Server backup saved.",
+          "backupFailed": "Could not save server backup."
+        },
+        "pages": {
+          "title": "Pages",
+          "manage": "Manage",
+          "editInManagement": "Edit in site management"
+        },
+        "sections": {
+          "title": "Sections"
+        },
+        "blocks": {
+          "searchPlaceholder": "Search blocks…",
+          "insert": "Insert block",
+          "categories": {
+            "all": "All",
+            "hero": "Hero",
+            "section": "Sections",
+            "cta": "CTA",
+            "proof": "Proof",
+            "media": "Media",
+            "layout": "Layout"
+          }
+        },
+        "design": {
+          "themePresets": "Theme presets",
+          "responsive": "Responsive",
+          "colors": "Colors",
+          "primary": "Primary",
+          "secondary": "Secondary",
+          "accent": "Accent",
+          "background": "Background",
+          "foreground": "Foreground",
+          "typography": "Typography",
+          "headingFont": "Heading font",
+          "bodyFont": "Body font",
+          "spacing": "Spacing",
+          "compact": "Compact",
+          "balanced": "Balanced",
+          "airy": "Airy"
+        },
+        "ai": {
+          "title": "AI website actions",
+          "subtitle": "Unified with Website Copilot — streaming, memory, selection context, and review.",
+          "fullModernize": {
+            "label": "Modernize design",
+            "description": "Refresh the overall visual style"
+          },
+          "pageAbout": {
+            "label": "Add About page",
+            "description": "Generate a new About page"
+          },
+          "sectionTestimonials": {
+            "label": "Add testimonials",
+            "description": "Insert a social proof section"
+          },
+          "sectionHero": {
+            "label": "Regenerate hero",
+            "description": "Rewrite the hero for higher conversion"
+          },
+          "contentHome": {
+            "label": "Rewrite homepage copy",
+            "description": "Improve homepage messaging"
+          },
+          "imagesFresh": {
+            "label": "Refresh images",
+            "description": "Replace images with new photography"
+          },
+          "seoImprove": {
+            "label": "Improve SEO",
+            "description": "Apply SEO recommendations"
+          }
+        },
+        "copilot": {
+          "title": "Website Copilot",
+          "subtitle": "Natural-language commands for quick site edits",
+          "selectionFocus": "Selection: {label}",
+          "runCommand": "Run command",
+          "conversation": "Conversation",
+          "you": "You",
+          "assistant": "Copilot",
+          "placeholder": "Describe a change…",
+          "undo": "Undo",
+          "history": "History",
+          "noHistory": "No commands yet.",
+          "costFree": "Free",
+          "costAi": "1 credit",
+          "quickEdits": "Quick edits",
+          "conversationView": "Conversation",
+          "placeholderLong": "Describe a change to your website…",
+          "undoTitle": "Undo last Copilot change"
+        },
+        "professional": {
+          "title": "Professional features",
+          "openManagement": "Open in management",
+          "runCopilot": "Run with Copilot"
+        },
+        "business": {
+          "title": "Business hub",
+          "openTab": "Open {tab}",
+          "manage": "Manage",
+          "copilot": "Copilot"
+        },
+        "publishing": {
+          "title": "Publishing & performance",
+          "required": "required",
+          "accessibility": "Accessibility ({count})",
+          "noA11yIssues": "No basic accessibility issues detected.",
+          "openDeploy": "Open publish dashboard",
+          "backup": "Save server backup",
+          "backingUp": "Saving backup…"
+        },
+        "enterprise": {
+          "title": "Enterprise",
+          "teamMembers": "Team members",
+          "inviteCollaborator": "Invite collaborator",
+          "emailPlaceholder": "collaborator@email.com",
+          "noMembers": "No collaborators yet.",
+          "pending": "pending",
+          "emailStatus": "email {status}",
+          "resend": "Resend",
+          "remove": "Remove",
+          "accept": "Accept",
+          "pendingInvites": "Pending invitations",
+          "inviteSent": "Invitation sent.",
+          "inviteFailed": "Could not send invitation.",
+          "inviteRemoved": "Collaborator removed.",
+          "removeFailed": "Remove failed.",
+          "resendSent": "Invitation email sent.",
+          "resendSkipped": "Invite saved (email provider not configured).",
+          "resendFailed": "Resend failed.",
+          "loadFailed": "Failed to load team.",
+          "capabilities": {
+            "teams": {
+              "label": "Team access",
+              "description": "Invite collaborators to a website generation"
+            },
+            "roles": {
+              "label": "Roles & permissions",
+              "description": "Owner, editor, and viewer access levels"
+            },
+            "marketplace": {
+              "label": "Template marketplace",
+              "description": "Browse and apply premium templates"
+            },
+            "plugins": {
+              "label": "Plugin architecture",
+              "description": "Website plugin pipeline (generate, plan, validate)"
+            },
+            "api": {
+              "label": "Public API",
+              "description": "Design platform, marketplace, and builder APIs"
+            },
+            "white-label": {
+              "label": "White label",
+              "description": "Custom branding via organization settings (foundation)"
+            }
+          }
+        },
+        "media": {
+          "title": "Media library",
+          "searchPlaceholder": "Search media…",
+          "upload": "Upload",
+          "uploading": "Uploading…",
+          "empty": "No media uploaded yet.",
+          "delete": "Delete",
+          "loadFailed": "Failed to load media."
+        },
+        "themes": {
+          "luxuryGold": {
+            "label": "Luxury Gold",
+            "description": "Premium dark with gold accents"
+          },
+          "modernMinimal": {
+            "label": "Modern Minimal",
+            "description": "Clean light SaaS aesthetic"
+          },
+          "boldStartup": {
+            "label": "Bold Startup",
+            "description": "High-contrast conversion-focused"
+          }
+        },
+        "publishingItems": {
+          "quality": {
+            "label": "Quality gates",
+            "description": "Pre-publish quality control passed"
+          },
+          "seo": {
+            "label": "SEO metadata",
+            "description": "Titles, descriptions, and sitemap ready"
+          },
+          "ssl": {
+            "label": "SSL",
+            "description": "HTTPS enabled on publish URL"
+          },
+          "cdn": {
+            "label": "CDN delivery",
+            "description": "Static assets served via platform CDN path"
+          },
+          "backup": {
+            "label": "Backup snapshot",
+            "description": "Server-side blueprint snapshot stored"
+          },
+          "performance": {
+            "label": "Performance",
+            "description": "Core Web Vitals heuristics within targets"
+          },
+          "accessibility": {
+            "label": "Accessibility",
+            "description": "Basic a11y checks on generated markup"
+          }
+        },
+        "features": {
+          "templates": {
+            "label": "Templates",
+            "description": "Apply industry templates and layouts"
+          },
+          "blog": {
+            "label": "Blog & CMS",
+            "description": "Manage posts, categories, and content"
+          },
+          "forms": {
+            "label": "Forms & leads",
+            "description": "Capture leads and contact submissions"
+          },
+          "booking": {
+            "label": "Booking",
+            "description": "Add appointment booking flows"
+          },
+          "portfolio": {
+            "label": "Portfolio",
+            "description": "Showcase projects and case studies"
+          },
+          "pricing": {
+            "label": "Pricing tables",
+            "description": "Display plans and packages"
+          },
+          "testimonials": {
+            "label": "Testimonials",
+            "description": "Social proof and reviews"
+          },
+          "faq": {
+            "label": "FAQ",
+            "description": "Answer common customer questions"
+          },
+          "navigation": {
+            "label": "Navigation",
+            "description": "Edit header and footer links"
+          },
+          "contact": {
+            "label": "Contact",
+            "description": "Contact forms and business details"
+          },
+          "analytics": {
+            "label": "Analytics",
+            "description": "Traffic, engagement, and conversion metrics"
+          },
+          "experiments": {
+            "label": "A/B experiments",
+            "description": "Test headlines, CTAs, and layouts"
+          },
+          "leads": {
+            "label": "Lead collection",
+            "description": "Form submissions and CRM export"
+          },
+          "ecommerce": {
+            "label": "E-commerce catalog",
+            "description": "Products, services, and catalog management"
+          },
+          "membership": {
+            "label": "Membership foundation",
+            "description": "Gated content and member areas (foundation)"
+          },
+          "marketing": {
+            "label": "Marketing tools",
+            "description": "Conversion tracking and campaign hooks"
+          },
+          "crm": {
+            "label": "CRM integration",
+            "description": "Webhook and lead routing integrations"
+          }
+        }
       },
       "management": {
         "backToBuilder": "Takaisin verkkosivuston rakentajaan",
@@ -2397,6 +2764,8 @@
         "favorites": "Suosikit",
         "generationHistory": "Luontihistoria",
         "generationHistoryDescription": "Avaa uudelleen aiemmat projektit päättyötilasta esikatselua, AI-parannusta, julkaisua, ZIP-vientiä, nimeämistä, poistamista ja suosikkeja varten.",
+        "openEditor": "Open editor",
+        "openManagement": "Open management",
         "filesCount": "{count} tiedostoa",
         "noProjectsTitle": "Ei vielä luotuja projekteja",
         "noProjectsDescription": "Luo projekti täyttääksesi työtilan asetukset ja historian."
@@ -2576,6 +2945,14 @@
         "failedToAnalyze": "Analyysi epäonnistui",
         "templateIntelligenceTitle": "Mallipohjan älykkyys",
         "templateIntelligenceSubtitle": "AI valitsee parhaan ulkoasun — tai voit valita itse milloin tahansa",
+        "themesTitle": "Themes",
+        "themesSubtitle": "Complete design redesign — layout, hero, navigation, sections, and UI. Your business content stays the same.",
+        "structureTemplatesTitle": "Templates",
+        "structureTemplatesSubtitle": "Complete website redesign — layout, hero, navigation, sections. Your business content stays the same.",
+        "applyTheme": "Apply theme",
+        "useTheme": "Use theme",
+        "failedApplyTheme": "Failed to apply theme",
+        "appliedThemeRedesigned": "Redesigned with {name} — same business, new design",
         "autoSelect": "Automaattinen valinta",
         "all": "Kaikki",
         "loadingVisualTemplates": "Ladataan visuaalisia mallipohjia…",
@@ -2632,7 +3009,12 @@
         "qa": "QA-testaus",
         "improveStrategyHint": "Tarkenna sijoitusta, sivustokarttaa ja konversio-CTAt korkeampien konversioiden saavuttamiseksi.",
         "improveDesignHint": "Päivitä värijärjestelmä, typografia ja asettelusäännöt saadaksesi premium-ulkoasun.",
-        "improveAssetsHint": "Luo uudelleen hero- ja osiovisuaalit vastaamaan paremmin brändiä ja yleisöä."
+        "improveAssetsHint": "Luo uudelleen hero- ja osiovisuaalit vastaamaan paremmin brändiä ja yleisöä.",
+        "improvingStrategy": "Analyzing strategy…",
+        "improvingDesign": "Improving design…",
+        "improvingAssets": "Generating better assets…",
+        "layerImproveComplete": "Optimization completed successfully.",
+        "generateBeforeLayerImprove": "Generate the website first, then use Improve strategy, design, or assets."
       },
       "previewExport": {
         "openLivePreview": "Avaa live-esikatselu",
@@ -2870,6 +3252,18 @@
         "versionHistory": "Versiohistoria",
         "noVersions": "Ei vielä versioita",
         "restore": "Palauta",
+        "noBrandVoice": "Ei brändiääntä",
+        "selectDocument": "Valitse tai luo asiakirja aloittaaksesi kirjoittamisen",
+        "newDocument": "Uusi asiakirja",
+        "untitledDocument": "Nimetön asiakirja",
+        "folderNamePrompt": "Kansion nimi",
+        "projectNamePrompt": "Projektin nimi",
+        "filterAll": "kaikki",
+        "filterFavorites": "suosikit",
+        "filterRecent": "viimeisimmät",
+        "loadingWorkspace": "Ladataan työtilaa…",
+        "loadingStudio": "Ladataan studiota…",
+        "loadingCalendar": "Ladataan kalenteria…",
         "publishTitle": "Publish to web",
         "publishDescription": "Share a public HTML5 page with a copyable link and embed snippet.",
         "publishedStatus": "Published",
@@ -2890,19 +3284,7 @@
         "embedPlaceholder": "Publish to generate an embed snippet.",
         "copyEmbed": "Copy embed",
         "embedCopied": "Embed code copied",
-        "hydrating": "Loading publication…",
-        "noBrandVoice": "Ei brändiääntä",
-        "selectDocument": "Valitse tai luo asiakirja aloittaaksesi kirjoittamisen",
-        "newDocument": "Uusi asiakirja",
-        "untitledDocument": "Nimetön asiakirja",
-        "folderNamePrompt": "Kansion nimi",
-        "projectNamePrompt": "Projektin nimi",
-        "filterAll": "kaikki",
-        "filterFavorites": "suosikit",
-        "filterRecent": "viimeisimmät",
-        "loadingWorkspace": "Ladataan työtilaa…",
-        "loadingStudio": "Ladataan studiota…",
-        "loadingCalendar": "Ladataan kalenteria…"
+        "hydrating": "Loading publication…"
       },
       "editor": {
         "improve": "Paranna",
@@ -3365,6 +3747,108 @@
         "strictOff": "VIDEO_PROVIDER_STRICT ei asetettu — stubit sallittu virheiden yhteydessä.",
         "fullRenderBlocked": "Täysi renderöinti vaatii KLING_API_KEY:n. Esikatselutila toimii edelleen."
       },
+      "editor": {
+        "loading": "Loading editor…",
+        "errors": {
+          "loadFailed": "Failed to load editor.",
+          "noActivePlan": "This project has no active plan to edit.",
+          "saveFailed": "Save failed.",
+          "undoFailed": "Undo failed.",
+          "redoFailed": "Redo failed.",
+          "regenerationFailed": "Regeneration failed.",
+          "requestFailed": "Request failed ({status})"
+        },
+        "tabs": {
+          "inspector": "Inspector",
+          "audio": "Audio",
+          "text": "Text"
+        },
+        "saveStatus": {
+          "saving": "Saving",
+          "unsaved": "Unsaved changes",
+          "error": "Save failed",
+          "saved": "Saved"
+        },
+        "actions": {
+          "trimStart": "Trim start",
+          "trimEnd": "Trim end",
+          "split": "Split",
+          "regenerateScene": "Regenerate Scene",
+          "production": "Production"
+        },
+        "inspector": {
+          "selectScene": "Select a scene to inspect.",
+          "durationSec": "Duration (sec)",
+          "cameraMove": "Camera move",
+          "visualStyle": "Visual style",
+          "transition": "Transition",
+          "dialogue": "Dialogue",
+          "voiceRequired": "Voice required",
+          "providerPreference": "Provider preference",
+          "fallbackProvider": "Fallback provider",
+          "none": "None",
+          "characters": "Characters",
+          "products": "Products",
+          "referencesUri": "References (uri)"
+        },
+        "captions": {
+          "selectScene": "Select a scene to edit captions.",
+          "captionsEnabled": "Captions enabled",
+          "alignLeft": "Left",
+          "alignCenter": "Center",
+          "alignRight": "Right",
+          "overlayOn": "On",
+          "defaultCaption": "Caption",
+          "addTextOverlay": "Add text overlay"
+        },
+        "audio": {
+          "tts": "TTS",
+          "ttsReady": "TTS ready",
+          "ttsUnavailable": "TTS unavailable",
+          "voice": "Voice",
+          "narration": "Narration",
+          "noVoiceTrack": "No voice track on the audio plan yet.",
+          "music": "Music",
+          "score": "Score",
+          "noMusic": "No music ingested.",
+          "sfx": "SFX",
+          "cue": "Cue",
+          "noSfx": "No SFX ingested.",
+          "muteVoice": "Mute voice",
+          "muteMusic": "Mute music",
+          "voiceLevel": "Voice level",
+          "musicLevel": "Music level",
+          "muteSfx": "Mute SFX",
+          "sfxLevel": "SFX level",
+          "footerNote": "Audio is displayed from the existing Audio Engine. This panel does not generate TTS.",
+          "trackVoice": "{speaker} · {status} · {startSec}s",
+          "trackMusic": "{mood} · {status}",
+          "trackSfx": "{cue} @ {timestampSec}s"
+        },
+        "preview": {
+          "title": "Scene preview",
+          "storyboardFallback": "Storyboard",
+          "emptyPrompt": "Select a scene to preview its storyboard. SVG is not treated as video.",
+          "timeDisplay": "{current}s / {total}s"
+        },
+        "scenes": {
+          "sceneLabel": "Scene {index}",
+          "playableClip": "Playable clip",
+          "storyboardOnly": "Storyboard only"
+        },
+        "timeline": {
+          "label": "Timeline · {duration}s",
+          "zoom": "Zoom",
+          "blockLabel": "S{index}"
+        },
+        "regeneration": {
+          "label": "Regeneration: {status}",
+          "attempt": " · attempt {attempt}",
+          "previous": " · previous {id}",
+          "active": " · active {id}",
+          "errorSuffix": " · {error}"
+        }
+      },
       "management": {
         "loading": "Ladataan videotuotantostudiota…",
         "backToStudio": "Takaisin videostudioon",
@@ -3477,7 +3961,28 @@
         "saveSubtitleCues": "Tallenna tekstitysvihjeet",
         "cueLinesPlaceholder": "Vihjerivit…",
         "applyBrand": "Käytä brändiä",
-        "restore": "Palauta"
+        "restore": "Palauta",
+        "publishTitle": "Publish to web",
+        "publishDescription": "Share a public HTML5 page with a copyable link and embed snippet.",
+        "publishedStatus": "Published",
+        "notPublished": "Not published",
+        "publishRequiresRender": "Run a full MP4 render before publishing.",
+        "publishing": "Publishing…",
+        "published": "Video published.",
+        "publishFailed": "Publish failed.",
+        "unpublishing": "Unpublishing…",
+        "unpublishAction": "Unpublish",
+        "unpublished": "Video unpublished.",
+        "unpublishFailed": "Unpublish failed.",
+        "previewPublic": "Preview public page",
+        "publicLink": "Public link",
+        "copyPublicLink": "Copy link",
+        "linkCopied": "Public link copied",
+        "embedCode": "Embed code",
+        "embedPlaceholder": "Publish to generate an embed snippet.",
+        "copyEmbed": "Copy embed",
+        "embedCopied": "Embed code copied",
+        "hydrating": "Loading publication…"
       },
       "history": {
         "count": "{count} videota",
@@ -4953,6 +5458,280 @@
         "allIndustries": "Kaikki toimialat",
         "allStyles": "Kaikki tyylit",
         "resultsHint": "{count} komponenttia · vedä kankaalle tai napsauta lisätäksesi"
+      },
+      "buttonEditor": {
+        "title": "Button properties",
+        "preview": "Live preview",
+        "text": "Text",
+        "labelPlaceholder": "Button label",
+        "link": {
+          "type": "Link type",
+          "internal": "Internal page",
+          "external": "External URL",
+          "email": "Email",
+          "phone": "Phone",
+          "anchor": "Anchor (#section)",
+          "placeholder": "Enter link value"
+        },
+        "target": "Open in",
+        "targetSame": "Same tab",
+        "targetNew": "New tab",
+        "style": "Style",
+        "styles": {
+          "primary": "Primary",
+          "secondary": "Secondary",
+          "outline": "Outline",
+          "ghost": "Ghost",
+          "text": "Text"
+        },
+        "size": "Size",
+        "sizes": {
+          "sm": "Small",
+          "md": "Medium",
+          "lg": "Large"
+        },
+        "width": "Width",
+        "widthAuto": "Auto",
+        "widthFull": "Full width",
+        "radius": "Border radius",
+        "radiusSquare": "Square",
+        "radiusRounded": "Rounded",
+        "radiusPill": "Pill",
+        "radiusCustom": "Custom",
+        "radiusCustomPx": "Custom radius (px)",
+        "colors": "Colors",
+        "colorBackground": "Background",
+        "colorText": "Text",
+        "colorBorder": "Border",
+        "colorHoverBackground": "Hover background",
+        "colorHoverText": "Hover text",
+        "typography": "Typography",
+        "fontSize": "Font size",
+        "letterSpacing": "Letter spacing",
+        "spacing": "Spacing",
+        "padding": "Padding",
+        "margin": "Margin",
+        "icon": "Icon",
+        "iconNone": "None",
+        "iconLeft": "Left icon",
+        "iconRight": "Right icon",
+        "iconRemove": "Remove icon",
+        "accessibility": "Accessibility",
+        "disabledState": "Disabled",
+        "states": {
+          "normal": "Normal",
+          "hover": "Hover",
+          "disabled": "Disabled"
+        },
+        "history": "Edit button"
+      },
+      "linkEditor": {
+        "title": "Link properties",
+        "preview": "Live preview",
+        "label": "Label",
+        "labelPlaceholder": "Link label",
+        "linkType": "Link type",
+        "hrefPlaceholder": "Enter link value",
+        "target": "Open in",
+        "targetSame": "Same tab",
+        "targetNew": "New tab",
+        "rel": "Link rel attributes",
+        "history": "Edit link",
+        "validationBlocked": "Fix invalid links before saving",
+        "types": {
+          "internal": "Internal page",
+          "external": "External URL",
+          "email": "Email",
+          "phone": "Phone",
+          "whatsapp": "WhatsApp",
+          "telegram": "Telegram",
+          "anchor": "Anchor (#section)",
+          "download": "File download"
+        }
+      },
+      "iconEditor": {
+        "title": "Icon properties",
+        "preview": "Live preview",
+        "library": "Icon library",
+        "position": "Position",
+        "positionNone": "None",
+        "positionLeft": "Left",
+        "positionRight": "Right",
+        "positionTop": "Top",
+        "positionBottom": "Bottom",
+        "variant": "Style",
+        "variantOutline": "Outline",
+        "variantFilled": "Filled",
+        "variantDuotone": "Duotone",
+        "size": "Size",
+        "sizeCustom": "Custom",
+        "customSizePx": "Custom size (px)",
+        "colors": "Colors",
+        "colorNormal": "Normal",
+        "colorHover": "Hover",
+        "colorDisabled": "Disabled",
+        "background": "Background",
+        "backgroundNone": "None",
+        "backgroundCircle": "Circle",
+        "backgroundRounded": "Rounded square",
+        "backgroundSquare": "Square",
+        "backgroundColor": "Background color",
+        "border": "Border",
+        "borderWidth": "Width",
+        "borderColor": "Color",
+        "borderRadius": "Radius",
+        "spacing": "Spacing",
+        "margin": "Margin",
+        "padding": "Padding",
+        "rotation": "Rotation",
+        "rotationCustom": "Custom",
+        "customRotationDeg": "Custom degrees",
+        "accessibility": "Accessibility",
+        "decorative": "Decorative icon (hide from screen readers)",
+        "history": "Edit icon",
+        "states": {
+          "normal": "Normal",
+          "hover": "Hover",
+          "disabled": "Disabled"
+        }
+      },
+      "sectionEditor": {
+        "title": "Section",
+        "preview": "Live preview",
+        "position": "Position",
+        "hiddenOnViewport": "Hidden on this viewport",
+        "operations": "Section actions",
+        "insertBefore": "Insert before",
+        "insertAfter": "Insert after",
+        "insertAtEnd": "Insert at end",
+        "fromTemplates": "From templates",
+        "duplicate": "Duplicate",
+        "delete": "Delete",
+        "deleteTitle": "Delete section?",
+        "deleteBody": "This removes the section from the page. You can undo with Ctrl+Z before saving.",
+        "deleted": "Section removed — undo to restore",
+        "cancel": "Cancel",
+        "move": "Move",
+        "moveUp": "Move up",
+        "moveDown": "Move down",
+        "visibility": "Visibility",
+        "visibilityShow": "Show",
+        "visibilityHide": "Hide",
+        "visibilityDesktop": "Desktop only",
+        "visibilityTablet": "Tablet only",
+        "visibilityMobile": "Mobile only",
+        "layout": "Layout",
+        "widthFull": "Full width",
+        "widthBoxed": "Boxed",
+        "widthContainer": "Container",
+        "alignLeft": "Left",
+        "alignCenter": "Center",
+        "alignRight": "Right",
+        "alignStretch": "Stretch",
+        "columns": "Columns",
+        "gap": "Gap",
+        "settings": "Section settings",
+        "htmlId": "HTML ID",
+        "anchor": "Anchor",
+        "cssClasses": "CSS classes",
+        "customAttributes": "Custom attributes",
+        "styling": "Styling",
+        "padding": "Padding",
+        "margin": "Margin",
+        "borderWidth": "Border width",
+        "borderColor": "Border color",
+        "radius": "Radius",
+        "shadow": "Shadow",
+        "opacity": "Opacity",
+        "zIndex": "Z-index",
+        "overflowVisible": "Visible",
+        "overflowHidden": "Hidden",
+        "overflowAuto": "Auto",
+        "overflowScroll": "Scroll",
+        "animation": "Animation",
+        "animNone": "None",
+        "animFade": "Fade",
+        "animSlide": "Slide",
+        "animZoom": "Zoom",
+        "duration": "Duration (ms)",
+        "delay": "Delay (ms)",
+        "background": "Background",
+        "ai": "AI actions",
+        "aiImprove": "Improve",
+        "aiRegenerate": "Regenerate",
+        "aiRewrite": "Rewrite",
+        "aiMoreItems": "More items",
+        "aiQueued": "Queue AI section edit",
+        "aiQueuedHint": "AI action queued — save to apply",
+        "history": "Edit section",
+        "historyMove": "Move section"
+      },
+      "backgroundEditor": {
+        "title": "Background image",
+        "preview": "Live preview",
+        "source": "Background source",
+        "upload": "Upload",
+        "mediaLibrary": "Media library",
+        "aiGenerate": "AI image",
+        "aiHint": "Pick an AI-generated image from the media library",
+        "remove": "Remove",
+        "urlPlaceholder": "Image URL",
+        "displayMode": "Display mode",
+        "position": "Position",
+        "positionX": "Custom X",
+        "positionY": "Custom Y",
+        "overlay": "Overlay",
+        "overlayEnabled": "Enable overlay",
+        "overlaySolid": "Solid",
+        "overlayGradient": "Gradient",
+        "overlayNone": "None",
+        "overlayColor": "Overlay color",
+        "overlayOpacity": "Opacity %",
+        "overlayGradientValue": "Gradient CSS",
+        "overlayBlur": "Overlay blur (px)",
+        "effects": "Effects",
+        "brightness": "Brightness",
+        "contrast": "Contrast",
+        "saturation": "Saturation",
+        "grayscale": "Grayscale",
+        "blur": "Blur",
+        "parallax": "Parallax",
+        "parallaxOn": "Enable parallax",
+        "borderRadius": "Border radius",
+        "sectionHeight": "Section height",
+        "customHeightPx": "Custom height (px)",
+        "mobile": "Mobile settings",
+        "hideOnMobile": "Hide background on mobile",
+        "mobileUrlPlaceholder": "Mobile image URL (optional)",
+        "accessibility": "Accessibility",
+        "decorative": "Decorative background",
+        "altPlaceholder": "Alt text",
+        "history": "Edit background",
+        "modes": {
+          "cover": "Cover",
+          "contain": "Contain",
+          "fill": "Fill",
+          "fitWidth": "Fit width",
+          "fitHeight": "Fit height",
+          "repeat": "Repeat",
+          "noRepeat": "No repeat"
+        },
+        "positions": {
+          "center": "Center",
+          "top": "Top",
+          "bottom": "Bottom",
+          "left": "Left",
+          "right": "Right",
+          "custom": "Custom"
+        },
+        "heights": {
+          "auto": "Auto",
+          "sm": "Small",
+          "md": "Medium",
+          "lg": "Large",
+          "fullscreen": "Full screen",
+          "custom": "Custom"
+        }
       }
     },
     "creatorMarketplace": {
@@ -5047,22 +5826,31 @@
       "openWebsiteBuilder": "Avaa verkkosivurakentaja",
       "searchPlaceholder": "Hae ravintolat, SaaS, rahoitus…",
       "allCategories": "Kaikki kategoriat",
-      "allStyles": "Kaikki tyylit",
-      "aiRecommendations": "AI-mallipohjasuositukset",
-      "aiRecommendationsDescription": "Analysoi toimiala, liiketoimintatavoite ja yleisö — valitse sitten paras aloitusmallipohja ennen generointia.",
-      "industryPlaceholder": "Toimiala (esim. ravintola)",
-      "goalPlaceholder": "Liiketoimintatavoite (liidit, varaukset…)",
-      "audiencePlaceholder": "Yleisö",
-      "recommend": "Suosittele",
-      "briefPlaceholder": "Valinnainen liiketoiminnan yhteenveto älykkäämpään yhteensovittamiseen…",
+      "allAvailability": "All templates",
+      "installedOnly": "Installed only",
+      "remoteOnlyFilter": "Remote only",
+      "tagsFilter": "Tags",
+      "featured": "Featured",
+      "featuredSection": "Featured templates",
+      "installed": "Installed",
+      "remote": "Remote",
+      "remoteOnly": "Remote only",
+      "remoteOnlyHint": "Install this template in Website Builder to use it. Remote downloads are not available yet.",
       "popular": "Suosittu",
       "library": "Kirjasto",
       "loading": "Ladataan markkinapaikkaa…",
       "noResults": "Mikään mallipohja ei vastaa näitä suodattimia.",
+      "createFirst": "Create First Template",
+      "createUnavailable": "Template creation is not available yet.",
       "previewTitle": "Mallipohjan esikatselu",
       "previewDescription": "Elävä rakenteellinen esikatselu ennen generointia.",
       "previewUnavailable": "Esikatselu ei saatavilla",
       "previewIframe": "Mallipohjan esikatselu",
+      "details": "Details",
+      "metadataSection": "Author & tags",
+      "categoryLabel": "Category · {category}",
+      "authorLabel": "Author · {author}",
+      "regionsPages": "{regions} regions · {pages} pages",
       "intelligence": "Älykkyys",
       "industry": "Toimiala",
       "style": "Tyyli",
@@ -5072,11 +5860,25 @@
       "pipelineHint": "Yhdistää Design · Brand · Assets · Editor · Quality",
       "useThisTemplate": "Käytä tätä mallipohjaa",
       "preview": "Esikatselu",
+      "close": "Close",
       "use": "Käytä",
+      "install": "Install",
+      "installToUse": "Install this template to enable Use",
+      "installSuccess": "{name} installed — ready to use",
+      "installAlreadyDone": "{name} is already installed",
+      "installComingSoon": "Installation coming soon",
+      "notInstalled": "Not installed",
       "layoutLabel": "Asettelu · {type}",
       "audienceLabel": "Yleisö · {audience}",
       "featuresLabel": "Ominaisuudet · {features}",
       "badgeScore": "{score}% – {reason}",
+      "sort": {
+        "featured": "Featured first",
+        "name-asc": "Name (A–Z)",
+        "name-desc": "Name (Z–A)",
+        "released-desc": "Newest",
+        "category-asc": "Category"
+      },
       "viewports": {
         "desktop": "Työpöytä",
         "tablet": "Tabletti",
@@ -5085,8 +5887,17 @@
       "errors": {
         "loadFailed": "Markkinapaikan lataus epäonnistui",
         "previewFailed": "Esikatselu epäonnistui",
-        "recommendFailed": "Suositus epäonnistui"
-      }
+        "recommendFailed": "Suositus epäonnistui",
+        "installFailed": "Template installation failed"
+      },
+      "allStyles": "Kaikki tyylit",
+      "aiRecommendations": "AI-mallipohjasuositukset",
+      "aiRecommendationsDescription": "Analysoi toimiala, liiketoimintatavoite ja yleisö — valitse sitten paras aloitusmallipohja ennen generointia.",
+      "industryPlaceholder": "Toimiala (esim. ravintola)",
+      "goalPlaceholder": "Liiketoimintatavoite (liidit, varaukset…)",
+      "audiencePlaceholder": "Yleisö",
+      "recommend": "Suosittele",
+      "briefPlaceholder": "Valinnainen liiketoiminnan yhteenveto älykkäämpään yhteensovittamiseen…"
     }
   },
   "contentStudio": {
@@ -5874,6 +6685,13 @@
         "admin": "Ylläpitäjä"
       },
       "webhookEvents": {
+        "generation.completed": "Generation Completed",
+        "generation.failed": "Generation Failed",
+        "member.invited": "Member Invited",
+        "member.joined": "Member Joined",
+        "member.removed": "Member Removed",
+        "api_key.created": "API Key Created",
+        "export.completed": "Export Completed",
         "generation": {
           "completed": "Luonti valmis",
           "failed": "Luonti epäonnistui"
@@ -6844,6 +7662,9 @@
         "commerce": "Kauppa",
         "planning": "Suunnittelu"
       },
+      "templateCategories": {},
+      "platforms": {},
+      "calendarCategories": {},
       "calendarStatuses": {
         "draft": "Luonnos",
         "scheduled": "Ajoitettu",

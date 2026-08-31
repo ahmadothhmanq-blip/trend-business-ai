@@ -2043,6 +2043,7 @@
         "renameDescriptionWorkspace": "Ενημερώστε το αποθηκευμένο όνομα έργου στο ιστορικό του χώρου εργασίας σας.",
         "deleteTitle": "Διαγραφή έργου;",
         "deleteDescription": "Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.",
+        "unsavedEditorWarning": "You have unsaved changes in the Visual Editor. Leave without saving?",
         "confirm": "Επιβεβαίωση",
         "cancel": "Ακύρωση"
       },
@@ -2165,6 +2166,10 @@
         "applied": "Το οπτικό πρότυπο εφαρμόστηκε — περιεχόμενο και εικόνες διατηρήθηκαν.",
         "usingTemplate": "Χρήση προτύπου: {name}",
         "intelligenceApplied": "Ευφυΐα Προτύπων: {name}",
+        "structureApplied": "Structure template: {name}",
+        "structureRedesigned": "Redesigned with {name} — your content and images preserved",
+        "themeRedesigned": "Theme applied: {name} — content preserved, design rebuilt",
+        "themeApplied": "Theme selected: {name}",
         "clearSelection": "Αφαίρεση επιλογής προτύπου"
       },
       "favorites": {
@@ -2185,6 +2190,7 @@
         "createOrSelectFirst": "Δημιουργήστε ή επιλέξτε πρώτα έναν ιστότοπο.",
         "editThenImprove": "Επεξεργαστείτε την οδηγία, μετά κάντε κλικ στο Βελτίωση με AI.",
         "seoFixApplied": "Εφαρμογή διόρθωσης SEO.",
+        "reviewImprovementApplied": "Website improvements applied.",
         "websiteCreated": "Ο ιστότοπος δημιουργήθηκε και αποθηκεύτηκε. Εξετάστε την προεπισκόπηση και βελτιώστε με AI.",
         "projectDuplicated": "Το έργο αντιγράφηκε",
         "projectDeleted": "Το έργο διαγράφηκε",
@@ -2280,9 +2286,66 @@
         "experiments": "Πειράματα",
         "intelligence": "Νοημοσύνη",
         "seoAgent": "Πράκτορας SEO",
+        "reviewStudio": "Website Review",
         "publish": "Δημοσίευση",
         "openEditorHint": "Δημιουργήστε πρώτα έναν ιστότοπο για να ανοίξετε τον οπτικό επεξεργαστή.",
         "createPreviewHint": "Δημιουργήστε έναν ιστότοπο για να ανοίξετε ζωντανή προεπισκόπηση εντός της πλατφόρμας."
+      },
+      "reviewStudio": {
+        "badge": "AI Review Studio",
+        "title": "{name} — Quality Review",
+        "running": "Running website quality review…",
+        "failedLoad": "Failed to load website review",
+        "applyFailed": "Failed to apply improvements",
+        "rollbackFailed": "Failed to rollback version",
+        "selectWebsite": "Generate or select a website to open the Review Studio.",
+        "strengths": "Strengths",
+        "weaknesses": "Weaknesses",
+        "estimatedGain": "Estimated Quality Gain",
+        "noStrengths": "No major strengths detected yet.",
+        "apply": "Apply",
+        "selected": "Selected",
+        "applySelected": "Apply selected improvements",
+        "selectedCount": "{count} selected",
+        "quality": "quality",
+        "conversion": "conversion",
+        "risk": "Risk",
+        "targetedRegenHint": "Requires AI executor — use deterministic improvements in Phase 1",
+        "version": "Version",
+        "rollback": "Rollback",
+        "noVersions": "No version history yet. Apply improvements to create versions.",
+        "noComparison": "Apply improvements to see before/after comparison.",
+        "points": "points",
+        "appliedChanges": "Applied changes",
+        "tabs": {
+          "dashboard": "Dashboard",
+          "improvements": "Improvements",
+          "versions": "Versions",
+          "compare": "Compare",
+          "reports": "Reports"
+        },
+        "scores": {
+          "overall": "Overall",
+          "design": "Design",
+          "ux": "UX",
+          "business": "Business",
+          "seo": "SEO",
+          "performance": "Performance",
+          "accessibility": "Accessibility",
+          "content": "Content",
+          "localization": "Localization"
+        },
+        "reports": {
+          "executive": "Executive Report",
+          "technical": "Technical Report",
+          "developer": "Developer Report",
+          "benchmark": "Benchmark Report",
+          "priorityActions": "Priority actions",
+          "technicalInsights": "Technical insights",
+          "designInsights": "Design insights",
+          "businessInsights": "Business insights",
+          "noFiles": "No specific files"
+        }
       },
       "workspace": {
         "title": "Χώρος εργασίας έργου AI",
@@ -2305,6 +2368,310 @@
         "linkedVersion": "συνδεδεμένη έκδοση",
         "pipelineHint": "Αγωγός AI Core: Ιδέα → Στρατηγική → Σχεδιασμός → Πόροι → Δημιουργία → Ποιότητα → Έτοιμο",
         "viewGeneratedInside": "Δείτε τον ιστότοπό σας που δημιουργήθηκε μέσα στην πλατφόρμα."
+      },
+      "builder": {
+        "toolRail": {
+          "structure": "Structure",
+          "design": "Design",
+          "blocks": "Blocks",
+          "media": "Media",
+          "ai": "AI",
+          "professional": "Pro",
+          "business": "Business",
+          "publish": "Publish",
+          "enterprise": "Enterprise"
+        },
+        "workspace": {
+          "title": "Website Builder",
+          "autosavePending": "Unsaved changes…",
+          "autosaveSaving": "Autosaving…",
+          "autosaveSaved": "All changes saved",
+          "autosaveError": "Autosave failed",
+          "versions": "Versions",
+          "openManagementHint": "Open Site Management to edit this page.",
+          "restored": "Restored {label}",
+          "backupSaved": "Server backup saved.",
+          "backupFailed": "Could not save server backup."
+        },
+        "pages": {
+          "title": "Pages",
+          "manage": "Manage",
+          "editInManagement": "Edit in site management"
+        },
+        "sections": {
+          "title": "Sections"
+        },
+        "blocks": {
+          "searchPlaceholder": "Search blocks…",
+          "insert": "Insert block",
+          "categories": {
+            "all": "All",
+            "hero": "Hero",
+            "section": "Sections",
+            "cta": "CTA",
+            "proof": "Proof",
+            "media": "Media",
+            "layout": "Layout"
+          }
+        },
+        "design": {
+          "themePresets": "Theme presets",
+          "responsive": "Responsive",
+          "colors": "Colors",
+          "primary": "Primary",
+          "secondary": "Secondary",
+          "accent": "Accent",
+          "background": "Background",
+          "foreground": "Foreground",
+          "typography": "Typography",
+          "headingFont": "Heading font",
+          "bodyFont": "Body font",
+          "spacing": "Spacing",
+          "compact": "Compact",
+          "balanced": "Balanced",
+          "airy": "Airy"
+        },
+        "ai": {
+          "title": "AI website actions",
+          "subtitle": "Unified with Website Copilot — streaming, memory, selection context, and review.",
+          "fullModernize": {
+            "label": "Modernize design",
+            "description": "Refresh the overall visual style"
+          },
+          "pageAbout": {
+            "label": "Add About page",
+            "description": "Generate a new About page"
+          },
+          "sectionTestimonials": {
+            "label": "Add testimonials",
+            "description": "Insert a social proof section"
+          },
+          "sectionHero": {
+            "label": "Regenerate hero",
+            "description": "Rewrite the hero for higher conversion"
+          },
+          "contentHome": {
+            "label": "Rewrite homepage copy",
+            "description": "Improve homepage messaging"
+          },
+          "imagesFresh": {
+            "label": "Refresh images",
+            "description": "Replace images with new photography"
+          },
+          "seoImprove": {
+            "label": "Improve SEO",
+            "description": "Apply SEO recommendations"
+          }
+        },
+        "copilot": {
+          "title": "Website Copilot",
+          "subtitle": "Natural-language commands for quick site edits",
+          "selectionFocus": "Selection: {label}",
+          "runCommand": "Run command",
+          "conversation": "Conversation",
+          "you": "You",
+          "assistant": "Copilot",
+          "placeholder": "Describe a change…",
+          "undo": "Undo",
+          "history": "History",
+          "noHistory": "No commands yet.",
+          "costFree": "Free",
+          "costAi": "1 credit",
+          "quickEdits": "Quick edits",
+          "conversationView": "Conversation",
+          "placeholderLong": "Describe a change to your website…",
+          "undoTitle": "Undo last Copilot change"
+        },
+        "professional": {
+          "title": "Professional features",
+          "openManagement": "Open in management",
+          "runCopilot": "Run with Copilot"
+        },
+        "business": {
+          "title": "Business hub",
+          "openTab": "Open {tab}",
+          "manage": "Manage",
+          "copilot": "Copilot"
+        },
+        "publishing": {
+          "title": "Publishing & performance",
+          "required": "required",
+          "accessibility": "Accessibility ({count})",
+          "noA11yIssues": "No basic accessibility issues detected.",
+          "openDeploy": "Open publish dashboard",
+          "backup": "Save server backup",
+          "backingUp": "Saving backup…"
+        },
+        "enterprise": {
+          "title": "Enterprise",
+          "teamMembers": "Team members",
+          "inviteCollaborator": "Invite collaborator",
+          "emailPlaceholder": "collaborator@email.com",
+          "noMembers": "No collaborators yet.",
+          "pending": "pending",
+          "emailStatus": "email {status}",
+          "resend": "Resend",
+          "remove": "Remove",
+          "accept": "Accept",
+          "pendingInvites": "Pending invitations",
+          "inviteSent": "Invitation sent.",
+          "inviteFailed": "Could not send invitation.",
+          "inviteRemoved": "Collaborator removed.",
+          "removeFailed": "Remove failed.",
+          "resendSent": "Invitation email sent.",
+          "resendSkipped": "Invite saved (email provider not configured).",
+          "resendFailed": "Resend failed.",
+          "loadFailed": "Failed to load team.",
+          "capabilities": {
+            "teams": {
+              "label": "Team access",
+              "description": "Invite collaborators to a website generation"
+            },
+            "roles": {
+              "label": "Roles & permissions",
+              "description": "Owner, editor, and viewer access levels"
+            },
+            "marketplace": {
+              "label": "Template marketplace",
+              "description": "Browse and apply premium templates"
+            },
+            "plugins": {
+              "label": "Plugin architecture",
+              "description": "Website plugin pipeline (generate, plan, validate)"
+            },
+            "api": {
+              "label": "Public API",
+              "description": "Design platform, marketplace, and builder APIs"
+            },
+            "white-label": {
+              "label": "White label",
+              "description": "Custom branding via organization settings (foundation)"
+            }
+          }
+        },
+        "media": {
+          "title": "Media library",
+          "searchPlaceholder": "Search media…",
+          "upload": "Upload",
+          "uploading": "Uploading…",
+          "empty": "No media uploaded yet.",
+          "delete": "Delete",
+          "loadFailed": "Failed to load media."
+        },
+        "themes": {
+          "luxuryGold": {
+            "label": "Luxury Gold",
+            "description": "Premium dark with gold accents"
+          },
+          "modernMinimal": {
+            "label": "Modern Minimal",
+            "description": "Clean light SaaS aesthetic"
+          },
+          "boldStartup": {
+            "label": "Bold Startup",
+            "description": "High-contrast conversion-focused"
+          }
+        },
+        "publishingItems": {
+          "quality": {
+            "label": "Quality gates",
+            "description": "Pre-publish quality control passed"
+          },
+          "seo": {
+            "label": "SEO metadata",
+            "description": "Titles, descriptions, and sitemap ready"
+          },
+          "ssl": {
+            "label": "SSL",
+            "description": "HTTPS enabled on publish URL"
+          },
+          "cdn": {
+            "label": "CDN delivery",
+            "description": "Static assets served via platform CDN path"
+          },
+          "backup": {
+            "label": "Backup snapshot",
+            "description": "Server-side blueprint snapshot stored"
+          },
+          "performance": {
+            "label": "Performance",
+            "description": "Core Web Vitals heuristics within targets"
+          },
+          "accessibility": {
+            "label": "Accessibility",
+            "description": "Basic a11y checks on generated markup"
+          }
+        },
+        "features": {
+          "templates": {
+            "label": "Templates",
+            "description": "Apply industry templates and layouts"
+          },
+          "blog": {
+            "label": "Blog & CMS",
+            "description": "Manage posts, categories, and content"
+          },
+          "forms": {
+            "label": "Forms & leads",
+            "description": "Capture leads and contact submissions"
+          },
+          "booking": {
+            "label": "Booking",
+            "description": "Add appointment booking flows"
+          },
+          "portfolio": {
+            "label": "Portfolio",
+            "description": "Showcase projects and case studies"
+          },
+          "pricing": {
+            "label": "Pricing tables",
+            "description": "Display plans and packages"
+          },
+          "testimonials": {
+            "label": "Testimonials",
+            "description": "Social proof and reviews"
+          },
+          "faq": {
+            "label": "FAQ",
+            "description": "Answer common customer questions"
+          },
+          "navigation": {
+            "label": "Navigation",
+            "description": "Edit header and footer links"
+          },
+          "contact": {
+            "label": "Contact",
+            "description": "Contact forms and business details"
+          },
+          "analytics": {
+            "label": "Analytics",
+            "description": "Traffic, engagement, and conversion metrics"
+          },
+          "experiments": {
+            "label": "A/B experiments",
+            "description": "Test headlines, CTAs, and layouts"
+          },
+          "leads": {
+            "label": "Lead collection",
+            "description": "Form submissions and CRM export"
+          },
+          "ecommerce": {
+            "label": "E-commerce catalog",
+            "description": "Products, services, and catalog management"
+          },
+          "membership": {
+            "label": "Membership foundation",
+            "description": "Gated content and member areas (foundation)"
+          },
+          "marketing": {
+            "label": "Marketing tools",
+            "description": "Conversion tracking and campaign hooks"
+          },
+          "crm": {
+            "label": "CRM integration",
+            "description": "Webhook and lead routing integrations"
+          }
+        }
       },
       "management": {
         "backToBuilder": "Επιστροφή στο Website Builder",
@@ -2397,6 +2764,8 @@
         "favorites": "Αγαπημένα",
         "generationHistory": "Ιστορικό Δημιουργίας",
         "generationHistoryDescription": "Ανοίξτε ξανά προηγούμενα έργα από τον κύριο χώρο εργασίας για προεπισκόπηση, βελτίωση AI, δημοσίευση, εξαγωγή ZIP, μετονομασία, διαγραφή και αγαπημένα.",
+        "openEditor": "Open editor",
+        "openManagement": "Open management",
         "filesCount": "{count} αρχεία",
         "noProjectsTitle": "Δεν υπάρχουν ακόμη δημιουργημένα έργα",
         "noProjectsDescription": "Δημιουργήστε ένα έργο για να συμπληρώσετε τις ρυθμίσεις χώρου εργασίας και το ιστορικό."
@@ -2576,6 +2945,14 @@
         "failedToAnalyze": "Αποτυχία ανάλυσης",
         "templateIntelligenceTitle": "Ευφυΐα Προτύπου",
         "templateIntelligenceSubtitle": "Η AI επιλέγει την καλύτερη εμφάνιση — ή επιλέξτε μία οποιαδήποτε στιγμή",
+        "themesTitle": "Themes",
+        "themesSubtitle": "Complete design redesign — layout, hero, navigation, sections, and UI. Your business content stays the same.",
+        "structureTemplatesTitle": "Templates",
+        "structureTemplatesSubtitle": "Complete website redesign — layout, hero, navigation, sections. Your business content stays the same.",
+        "applyTheme": "Apply theme",
+        "useTheme": "Use theme",
+        "failedApplyTheme": "Failed to apply theme",
+        "appliedThemeRedesigned": "Redesigned with {name} — same business, new design",
         "autoSelect": "Αυτόματη επιλογή",
         "all": "Όλα",
         "loadingVisualTemplates": "Φόρτωση οπτικών προτύπων…",
@@ -2632,7 +3009,12 @@
         "qa": "Διασφάλιση Ποιότητας",
         "improveStrategyHint": "Βελτιώστε την τοποθέτηση, τον χάρτη ιστότοπου και τα CTA μετατροπής για υψηλότερες μετατροπές.",
         "improveDesignHint": "Ανανεώστε το σύστημα χρωμάτων, την τυπογραφία και τους κανόνες διάταξης για μια πιο premium εμφάνιση.",
-        "improveAssetsHint": "Αναδημιουργήστε τα οπτικά του hero και των τμημάτων για καλύτερη αντιστοίχιση με την επωνυμία και το κοινό."
+        "improveAssetsHint": "Αναδημιουργήστε τα οπτικά του hero και των τμημάτων για καλύτερη αντιστοίχιση με την επωνυμία και το κοινό.",
+        "improvingStrategy": "Analyzing strategy…",
+        "improvingDesign": "Improving design…",
+        "improvingAssets": "Generating better assets…",
+        "layerImproveComplete": "Optimization completed successfully.",
+        "generateBeforeLayerImprove": "Generate the website first, then use Improve strategy, design, or assets."
       },
       "previewExport": {
         "openLivePreview": "Άνοιγμα ζωντανής προεπισκόπησης",
@@ -2870,6 +3252,18 @@
         "versionHistory": "Ιστορικό εκδόσεων",
         "noVersions": "Δεν υπάρχουν ακόμη εκδόσεις",
         "restore": "Επαναφορά",
+        "noBrandVoice": "Καμία φωνή επωνυμίας",
+        "selectDocument": "Επιλέξτε ή δημιουργήστε ένα έγγραφο για να ξεκινήσετε να γράφετε",
+        "newDocument": "Νέο έγγραφο",
+        "untitledDocument": "Έγγραφο χωρίς τίτλο",
+        "folderNamePrompt": "Όνομα φακέλου",
+        "projectNamePrompt": "Όνομα έργου",
+        "filterAll": "all",
+        "filterFavorites": "favorites",
+        "filterRecent": "recent",
+        "loadingWorkspace": "Φόρτωση workspace…",
+        "loadingStudio": "Φόρτωση studio…",
+        "loadingCalendar": "Φόρτωση ημερολογίου…",
         "publishTitle": "Publish to web",
         "publishDescription": "Share a public HTML5 page with a copyable link and embed snippet.",
         "publishedStatus": "Published",
@@ -2890,19 +3284,7 @@
         "embedPlaceholder": "Publish to generate an embed snippet.",
         "copyEmbed": "Copy embed",
         "embedCopied": "Embed code copied",
-        "hydrating": "Loading publication…",
-        "noBrandVoice": "Καμία φωνή επωνυμίας",
-        "selectDocument": "Επιλέξτε ή δημιουργήστε ένα έγγραφο για να ξεκινήσετε να γράφετε",
-        "newDocument": "Νέο έγγραφο",
-        "untitledDocument": "Έγγραφο χωρίς τίτλο",
-        "folderNamePrompt": "Όνομα φακέλου",
-        "projectNamePrompt": "Όνομα έργου",
-        "filterAll": "all",
-        "filterFavorites": "favorites",
-        "filterRecent": "recent",
-        "loadingWorkspace": "Φόρτωση workspace…",
-        "loadingStudio": "Φόρτωση studio…",
-        "loadingCalendar": "Φόρτωση ημερολογίου…"
+        "hydrating": "Loading publication…"
       },
       "editor": {
         "improve": "Βελτίωση",
@@ -3365,6 +3747,108 @@
         "strictOff": "VIDEO_PROVIDER_STRICT δεν έχει οριστεί — επιτρέπονται stub σε σφάλματα.",
         "fullRenderBlocked": "Η πλήρης απόδοση απαιτεί KLING_API_KEY. Η λειτουργία προεπισκόπησης εξακολουθεί να λειτουργεί."
       },
+      "editor": {
+        "loading": "Loading editor…",
+        "errors": {
+          "loadFailed": "Failed to load editor.",
+          "noActivePlan": "This project has no active plan to edit.",
+          "saveFailed": "Save failed.",
+          "undoFailed": "Undo failed.",
+          "redoFailed": "Redo failed.",
+          "regenerationFailed": "Regeneration failed.",
+          "requestFailed": "Request failed ({status})"
+        },
+        "tabs": {
+          "inspector": "Inspector",
+          "audio": "Audio",
+          "text": "Text"
+        },
+        "saveStatus": {
+          "saving": "Saving",
+          "unsaved": "Unsaved changes",
+          "error": "Save failed",
+          "saved": "Saved"
+        },
+        "actions": {
+          "trimStart": "Trim start",
+          "trimEnd": "Trim end",
+          "split": "Split",
+          "regenerateScene": "Regenerate Scene",
+          "production": "Production"
+        },
+        "inspector": {
+          "selectScene": "Select a scene to inspect.",
+          "durationSec": "Duration (sec)",
+          "cameraMove": "Camera move",
+          "visualStyle": "Visual style",
+          "transition": "Transition",
+          "dialogue": "Dialogue",
+          "voiceRequired": "Voice required",
+          "providerPreference": "Provider preference",
+          "fallbackProvider": "Fallback provider",
+          "none": "None",
+          "characters": "Characters",
+          "products": "Products",
+          "referencesUri": "References (uri)"
+        },
+        "captions": {
+          "selectScene": "Select a scene to edit captions.",
+          "captionsEnabled": "Captions enabled",
+          "alignLeft": "Left",
+          "alignCenter": "Center",
+          "alignRight": "Right",
+          "overlayOn": "On",
+          "defaultCaption": "Caption",
+          "addTextOverlay": "Add text overlay"
+        },
+        "audio": {
+          "tts": "TTS",
+          "ttsReady": "TTS ready",
+          "ttsUnavailable": "TTS unavailable",
+          "voice": "Voice",
+          "narration": "Narration",
+          "noVoiceTrack": "No voice track on the audio plan yet.",
+          "music": "Music",
+          "score": "Score",
+          "noMusic": "No music ingested.",
+          "sfx": "SFX",
+          "cue": "Cue",
+          "noSfx": "No SFX ingested.",
+          "muteVoice": "Mute voice",
+          "muteMusic": "Mute music",
+          "voiceLevel": "Voice level",
+          "musicLevel": "Music level",
+          "muteSfx": "Mute SFX",
+          "sfxLevel": "SFX level",
+          "footerNote": "Audio is displayed from the existing Audio Engine. This panel does not generate TTS.",
+          "trackVoice": "{speaker} · {status} · {startSec}s",
+          "trackMusic": "{mood} · {status}",
+          "trackSfx": "{cue} @ {timestampSec}s"
+        },
+        "preview": {
+          "title": "Scene preview",
+          "storyboardFallback": "Storyboard",
+          "emptyPrompt": "Select a scene to preview its storyboard. SVG is not treated as video.",
+          "timeDisplay": "{current}s / {total}s"
+        },
+        "scenes": {
+          "sceneLabel": "Scene {index}",
+          "playableClip": "Playable clip",
+          "storyboardOnly": "Storyboard only"
+        },
+        "timeline": {
+          "label": "Timeline · {duration}s",
+          "zoom": "Zoom",
+          "blockLabel": "S{index}"
+        },
+        "regeneration": {
+          "label": "Regeneration: {status}",
+          "attempt": " · attempt {attempt}",
+          "previous": " · previous {id}",
+          "active": " · active {id}",
+          "errorSuffix": " · {error}"
+        }
+      },
       "management": {
         "loading": "Φόρτωση στούντιο παραγωγής βίντεο…",
         "backToStudio": "Επιστροφή στο Video Studio",
@@ -3477,7 +3961,28 @@
         "saveSubtitleCues": "Αποθήκευση ενδείξεων υποτίτλων",
         "cueLinesPlaceholder": "Γραμμές ενδείξεων…",
         "applyBrand": "Εφαρμογή επωνυμίας",
-        "restore": "Επαναφορά"
+        "restore": "Επαναφορά",
+        "publishTitle": "Publish to web",
+        "publishDescription": "Share a public HTML5 page with a copyable link and embed snippet.",
+        "publishedStatus": "Published",
+        "notPublished": "Not published",
+        "publishRequiresRender": "Run a full MP4 render before publishing.",
+        "publishing": "Publishing…",
+        "published": "Video published.",
+        "publishFailed": "Publish failed.",
+        "unpublishing": "Unpublishing…",
+        "unpublishAction": "Unpublish",
+        "unpublished": "Video unpublished.",
+        "unpublishFailed": "Unpublish failed.",
+        "previewPublic": "Preview public page",
+        "publicLink": "Public link",
+        "copyPublicLink": "Copy link",
+        "linkCopied": "Public link copied",
+        "embedCode": "Embed code",
+        "embedPlaceholder": "Publish to generate an embed snippet.",
+        "copyEmbed": "Copy embed",
+        "embedCopied": "Embed code copied",
+        "hydrating": "Loading publication…"
       },
       "history": {
         "count": "{count} βίντεο",
@@ -4953,6 +5458,280 @@
         "allIndustries": "Όλοι οι κλάδοι",
         "allStyles": "Όλα τα στυλ",
         "resultsHint": "{count} στοιχεία · σύρετε στον καμβά ή κάντε κλικ για εισαγωγή"
+      },
+      "buttonEditor": {
+        "title": "Button properties",
+        "preview": "Live preview",
+        "text": "Text",
+        "labelPlaceholder": "Button label",
+        "link": {
+          "type": "Link type",
+          "internal": "Internal page",
+          "external": "External URL",
+          "email": "Email",
+          "phone": "Phone",
+          "anchor": "Anchor (#section)",
+          "placeholder": "Enter link value"
+        },
+        "target": "Open in",
+        "targetSame": "Same tab",
+        "targetNew": "New tab",
+        "style": "Style",
+        "styles": {
+          "primary": "Primary",
+          "secondary": "Secondary",
+          "outline": "Outline",
+          "ghost": "Ghost",
+          "text": "Text"
+        },
+        "size": "Size",
+        "sizes": {
+          "sm": "Small",
+          "md": "Medium",
+          "lg": "Large"
+        },
+        "width": "Width",
+        "widthAuto": "Auto",
+        "widthFull": "Full width",
+        "radius": "Border radius",
+        "radiusSquare": "Square",
+        "radiusRounded": "Rounded",
+        "radiusPill": "Pill",
+        "radiusCustom": "Custom",
+        "radiusCustomPx": "Custom radius (px)",
+        "colors": "Colors",
+        "colorBackground": "Background",
+        "colorText": "Text",
+        "colorBorder": "Border",
+        "colorHoverBackground": "Hover background",
+        "colorHoverText": "Hover text",
+        "typography": "Typography",
+        "fontSize": "Font size",
+        "letterSpacing": "Letter spacing",
+        "spacing": "Spacing",
+        "padding": "Padding",
+        "margin": "Margin",
+        "icon": "Icon",
+        "iconNone": "None",
+        "iconLeft": "Left icon",
+        "iconRight": "Right icon",
+        "iconRemove": "Remove icon",
+        "accessibility": "Accessibility",
+        "disabledState": "Disabled",
+        "states": {
+          "normal": "Normal",
+          "hover": "Hover",
+          "disabled": "Disabled"
+        },
+        "history": "Edit button"
+      },
+      "linkEditor": {
+        "title": "Link properties",
+        "preview": "Live preview",
+        "label": "Label",
+        "labelPlaceholder": "Link label",
+        "linkType": "Link type",
+        "hrefPlaceholder": "Enter link value",
+        "target": "Open in",
+        "targetSame": "Same tab",
+        "targetNew": "New tab",
+        "rel": "Link rel attributes",
+        "history": "Edit link",
+        "validationBlocked": "Fix invalid links before saving",
+        "types": {
+          "internal": "Internal page",
+          "external": "External URL",
+          "email": "Email",
+          "phone": "Phone",
+          "whatsapp": "WhatsApp",
+          "telegram": "Telegram",
+          "anchor": "Anchor (#section)",
+          "download": "File download"
+        }
+      },
+      "iconEditor": {
+        "title": "Icon properties",
+        "preview": "Live preview",
+        "library": "Icon library",
+        "position": "Position",
+        "positionNone": "None",
+        "positionLeft": "Left",
+        "positionRight": "Right",
+        "positionTop": "Top",
+        "positionBottom": "Bottom",
+        "variant": "Style",
+        "variantOutline": "Outline",
+        "variantFilled": "Filled",
+        "variantDuotone": "Duotone",
+        "size": "Size",
+        "sizeCustom": "Custom",
+        "customSizePx": "Custom size (px)",
+        "colors": "Colors",
+        "colorNormal": "Normal",
+        "colorHover": "Hover",
+        "colorDisabled": "Disabled",
+        "background": "Background",
+        "backgroundNone": "None",
+        "backgroundCircle": "Circle",
+        "backgroundRounded": "Rounded square",
+        "backgroundSquare": "Square",
+        "backgroundColor": "Background color",
+        "border": "Border",
+        "borderWidth": "Width",
+        "borderColor": "Color",
+        "borderRadius": "Radius",
+        "spacing": "Spacing",
+        "margin": "Margin",
+        "padding": "Padding",
+        "rotation": "Rotation",
+        "rotationCustom": "Custom",
+        "customRotationDeg": "Custom degrees",
+        "accessibility": "Accessibility",
+        "decorative": "Decorative icon (hide from screen readers)",
+        "history": "Edit icon",
+        "states": {
+          "normal": "Normal",
+          "hover": "Hover",
+          "disabled": "Disabled"
+        }
+      },
+      "sectionEditor": {
+        "title": "Section",
+        "preview": "Live preview",
+        "position": "Position",
+        "hiddenOnViewport": "Hidden on this viewport",
+        "operations": "Section actions",
+        "insertBefore": "Insert before",
+        "insertAfter": "Insert after",
+        "insertAtEnd": "Insert at end",
+        "fromTemplates": "From templates",
+        "duplicate": "Duplicate",
+        "delete": "Delete",
+        "deleteTitle": "Delete section?",
+        "deleteBody": "This removes the section from the page. You can undo with Ctrl+Z before saving.",
+        "deleted": "Section removed — undo to restore",
+        "cancel": "Cancel",
+        "move": "Move",
+        "moveUp": "Move up",
+        "moveDown": "Move down",
+        "visibility": "Visibility",
+        "visibilityShow": "Show",
+        "visibilityHide": "Hide",
+        "visibilityDesktop": "Desktop only",
+        "visibilityTablet": "Tablet only",
+        "visibilityMobile": "Mobile only",
+        "layout": "Layout",
+        "widthFull": "Full width",
+        "widthBoxed": "Boxed",
+        "widthContainer": "Container",
+        "alignLeft": "Left",
+        "alignCenter": "Center",
+        "alignRight": "Right",
+        "alignStretch": "Stretch",
+        "columns": "Columns",
+        "gap": "Gap",
+        "settings": "Section settings",
+        "htmlId": "HTML ID",
+        "anchor": "Anchor",
+        "cssClasses": "CSS classes",
+        "customAttributes": "Custom attributes",
+        "styling": "Styling",
+        "padding": "Padding",
+        "margin": "Margin",
+        "borderWidth": "Border width",
+        "borderColor": "Border color",
+        "radius": "Radius",
+        "shadow": "Shadow",
+        "opacity": "Opacity",
+        "zIndex": "Z-index",
+        "overflowVisible": "Visible",
+        "overflowHidden": "Hidden",
+        "overflowAuto": "Auto",
+        "overflowScroll": "Scroll",
+        "animation": "Animation",
+        "animNone": "None",
+        "animFade": "Fade",
+        "animSlide": "Slide",
+        "animZoom": "Zoom",
+        "duration": "Duration (ms)",
+        "delay": "Delay (ms)",
+        "background": "Background",
+        "ai": "AI actions",
+        "aiImprove": "Improve",
+        "aiRegenerate": "Regenerate",
+        "aiRewrite": "Rewrite",
+        "aiMoreItems": "More items",
+        "aiQueued": "Queue AI section edit",
+        "aiQueuedHint": "AI action queued — save to apply",
+        "history": "Edit section",
+        "historyMove": "Move section"
+      },
+      "backgroundEditor": {
+        "title": "Background image",
+        "preview": "Live preview",
+        "source": "Background source",
+        "upload": "Upload",
+        "mediaLibrary": "Media library",
+        "aiGenerate": "AI image",
+        "aiHint": "Pick an AI-generated image from the media library",
+        "remove": "Remove",
+        "urlPlaceholder": "Image URL",
+        "displayMode": "Display mode",
+        "position": "Position",
+        "positionX": "Custom X",
+        "positionY": "Custom Y",
+        "overlay": "Overlay",
+        "overlayEnabled": "Enable overlay",
+        "overlaySolid": "Solid",
+        "overlayGradient": "Gradient",
+        "overlayNone": "None",
+        "overlayColor": "Overlay color",
+        "overlayOpacity": "Opacity %",
+        "overlayGradientValue": "Gradient CSS",
+        "overlayBlur": "Overlay blur (px)",
+        "effects": "Effects",
+        "brightness": "Brightness",
+        "contrast": "Contrast",
+        "saturation": "Saturation",
+        "grayscale": "Grayscale",
+        "blur": "Blur",
+        "parallax": "Parallax",
+        "parallaxOn": "Enable parallax",
+        "borderRadius": "Border radius",
+        "sectionHeight": "Section height",
+        "customHeightPx": "Custom height (px)",
+        "mobile": "Mobile settings",
+        "hideOnMobile": "Hide background on mobile",
+        "mobileUrlPlaceholder": "Mobile image URL (optional)",
+        "accessibility": "Accessibility",
+        "decorative": "Decorative background",
+        "altPlaceholder": "Alt text",
+        "history": "Edit background",
+        "modes": {
+          "cover": "Cover",
+          "contain": "Contain",
+          "fill": "Fill",
+          "fitWidth": "Fit width",
+          "fitHeight": "Fit height",
+          "repeat": "Repeat",
+          "noRepeat": "No repeat"
+        },
+        "positions": {
+          "center": "Center",
+          "top": "Top",
+          "bottom": "Bottom",
+          "left": "Left",
+          "right": "Right",
+          "custom": "Custom"
+        },
+        "heights": {
+          "auto": "Auto",
+          "sm": "Small",
+          "md": "Medium",
+          "lg": "Large",
+          "fullscreen": "Full screen",
+          "custom": "Custom"
+        }
       }
     },
     "creatorMarketplace": {
@@ -5047,22 +5826,31 @@
       "openWebsiteBuilder": "Άνοιγμα Website Builder",
       "searchPlaceholder": "Αναζήτηση εστιατορίων, SaaS, χρηματοοικονομικών…",
       "allCategories": "Όλες οι κατηγορίες",
-      "allStyles": "Όλα τα στυλ",
-      "aiRecommendations": "Προτάσεις προτύπων AI",
-      "aiRecommendationsDescription": "Αναλύστε τον κλάδο, τον επιχειρηματικό στόχο και το κοινό — στη συνέχεια επιλέξτε το καλύτερο αρχικό πρότυπο πριν από τη δημιουργία.",
-      "industryPlaceholder": "Κλάδος (π.χ. εστιατόριο)",
-      "goalPlaceholder": "Επιχειρηματικός στόχος (δυνητικοί πελάτες, κρατήσεις…)",
-      "audiencePlaceholder": "Κοινό",
-      "recommend": "Πρόταση",
-      "briefPlaceholder": "Προαιρετική επιχειρηματική περίληψη για εξυπνότερη αντιστοίχιση…",
+      "allAvailability": "All templates",
+      "installedOnly": "Installed only",
+      "remoteOnlyFilter": "Remote only",
+      "tagsFilter": "Tags",
+      "featured": "Featured",
+      "featuredSection": "Featured templates",
+      "installed": "Installed",
+      "remote": "Remote",
+      "remoteOnly": "Remote only",
+      "remoteOnlyHint": "Install this template in Website Builder to use it. Remote downloads are not available yet.",
       "popular": "Δημοφιλή",
       "library": "Βιβλιοθήκη",
       "loading": "Φόρτωση αγοράς…",
       "noResults": "Κανένα πρότυπο δεν ταιριάζει με αυτά τα φίλτρα.",
+      "createFirst": "Create First Template",
+      "createUnavailable": "Template creation is not available yet.",
       "previewTitle": "Προεπισκόπηση προτύπου",
       "previewDescription": "Ζωντανή δομική προεπισκόπηση πριν δημιουργήσετε.",
       "previewUnavailable": "Η προεπισκόπηση δεν είναι διαθέσιμη",
       "previewIframe": "Προεπισκόπηση προτύπου",
+      "details": "Details",
+      "metadataSection": "Author & tags",
+      "categoryLabel": "Category · {category}",
+      "authorLabel": "Author · {author}",
+      "regionsPages": "{regions} regions · {pages} pages",
       "intelligence": "Νοημοσύνη",
       "industry": "Κλάδος",
       "style": "Στυλ",
@@ -5072,11 +5860,25 @@
       "pipelineHint": "Συνδέει Design · Brand · Assets · Editor · Quality",
       "useThisTemplate": "Χρησιμοποιήστε αυτό το πρότυπο",
       "preview": "Προεπισκόπηση",
+      "close": "Close",
       "use": "Χρήση",
+      "install": "Install",
+      "installToUse": "Install this template to enable Use",
+      "installSuccess": "{name} installed — ready to use",
+      "installAlreadyDone": "{name} is already installed",
+      "installComingSoon": "Installation coming soon",
+      "notInstalled": "Not installed",
       "layoutLabel": "Διάταξη · {type}",
       "audienceLabel": "Κοινό · {audience}",
       "featuresLabel": "Χαρακτηριστικά · {features}",
       "badgeScore": "Βαθμολογία {score}% · {reason}",
+      "sort": {
+        "featured": "Featured first",
+        "name-asc": "Name (A–Z)",
+        "name-desc": "Name (Z–A)",
+        "released-desc": "Newest",
+        "category-asc": "Category"
+      },
       "viewports": {
         "desktop": "Επιτραπέζιος υπολογιστής",
         "tablet": "Ταμπλέτα",
@@ -5085,8 +5887,17 @@
       "errors": {
         "loadFailed": "Αποτυχία φόρτωσης της αγοράς",
         "previewFailed": "Αποτυχία προεπισκόπησης",
-        "recommendFailed": "Αποτυχία πρότασης"
-      }
+        "recommendFailed": "Αποτυχία πρότασης",
+        "installFailed": "Template installation failed"
+      },
+      "allStyles": "Όλα τα στυλ",
+      "aiRecommendations": "Προτάσεις προτύπων AI",
+      "aiRecommendationsDescription": "Αναλύστε τον κλάδο, τον επιχειρηματικό στόχο και το κοινό — στη συνέχεια επιλέξτε το καλύτερο αρχικό πρότυπο πριν από τη δημιουργία.",
+      "industryPlaceholder": "Κλάδος (π.χ. εστιατόριο)",
+      "goalPlaceholder": "Επιχειρηματικός στόχος (δυνητικοί πελάτες, κρατήσεις…)",
+      "audiencePlaceholder": "Κοινό",
+      "recommend": "Πρόταση",
+      "briefPlaceholder": "Προαιρετική επιχειρηματική περίληψη για εξυπνότερη αντιστοίχιση…"
     }
   },
   "contentStudio": {
@@ -5874,6 +6685,13 @@
         "admin": "Διαχειριστής"
       },
       "webhookEvents": {
+        "generation.completed": "Generation Completed",
+        "generation.failed": "Generation Failed",
+        "member.invited": "Member Invited",
+        "member.joined": "Member Joined",
+        "member.removed": "Member Removed",
+        "api_key.created": "API Key Created",
+        "export.completed": "Export Completed",
         "generation": {
           "completed": "Η δημιουργία ολοκληρώθηκε",
           "failed": "Η δημιουργία απέτυχε"
@@ -6844,6 +7662,9 @@
         "commerce": "Εμπόριο",
         "planning": "Σχεδιασμός"
       },
+      "templateCategories": {},
+      "platforms": {},
+      "calendarCategories": {},
       "calendarStatuses": {
         "draft": "Πρόχειρο",
         "scheduled": "Προγραμματισμένο",

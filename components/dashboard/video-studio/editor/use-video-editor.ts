@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 import type { Scene } from "@/lib/ai-core/video-production-platform/domain/contracts";
 import type { EditorDocument, EditorScenePreview, ScenePatch } from "@/lib/ai-core/video-production-platform/editor-mvp/contracts";
 import {
@@ -13,13 +14,23 @@ import { editorStateOf } from "@/lib/ai-core/video-production-platform/editor-mv
 
 type SaveStatus = "saved" | "saving" | "unsaved" | "error";
 
-async function parseJson(res: Response) {
-  const json = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(json.error || json.message || `Request failed (${res.status})`);
-  return json;
-}
-
 export function useVideoEditor(projectId: string) {
+  const p = useProductT("videoStudio");
+  const et = useCallback(
+    (key: string, values?: Record<string, string | number>) => p(`editor.${key}`, values),
+    [p],
+  );
+
+  const parseJson = useCallback(
+    async (res: Response) => {
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(json.error || json.message || et("errors.requestFailed", { status: res.status }));
+      }
+      return json;
+    },
+    [et],
+  );
   const [doc, setDoc] = useState<EditorDocument | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [preview, setPreview] = useState<EditorScenePreview | null>(null);
@@ -54,11 +65,11 @@ export function useVideoEditor(projectId: string) {
       setSaveStatus("saved");
       setDirty(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load editor.");
+      setError(err instanceof Error ? err.message : et("errors.loadFailed"));
     } finally {
       setLoading(false);
     }
-  }, [projectId]);
+  }, [projectId, parseJson, et]);
 
   useEffect(() => {
     void load();
@@ -73,7 +84,7 @@ export function useVideoEditor(projectId: string) {
         setPreview({ sceneId, artifactId: null, hasPlayable: false });
       }
     },
-    [projectId],
+    [projectId, parseJson],
   );
 
   useEffect(() => {
@@ -114,7 +125,7 @@ export function useVideoEditor(projectId: string) {
     };
     const fail = (err: unknown) => {
       setSaveStatus("error");
-      setError(err instanceof Error ? err.message : "Save failed.");
+      setError(err instanceof Error ? err.message : et("errors.saveFailed"));
     };
     if (immediate) {
       if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -317,7 +328,7 @@ export function useVideoEditor(projectId: string) {
         setSelectedId(command.scene.id);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Undo failed.");
+      setError(err instanceof Error ? err.message : et("errors.undoFailed"));
     }
   };
 
@@ -347,7 +358,7 @@ export function useVideoEditor(projectId: string) {
         setSelectedId(json.scenes[Math.max(0, command.index - 1)]?.id || json.scenes[0]?.id || null);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Redo failed.");
+      setError(err instanceof Error ? err.message : et("errors.redoFailed"));
     }
   };
 
@@ -381,7 +392,7 @@ export function useVideoEditor(projectId: string) {
         status: "failed",
         oldArtifactId: selected.artifactId || null,
         newArtifactId: selected.artifactId || null,
-        error: err instanceof Error ? err.message : "Regeneration failed.",
+        error: err instanceof Error ? err.message : et("errors.regenerationFailed"),
       });
     }
   };

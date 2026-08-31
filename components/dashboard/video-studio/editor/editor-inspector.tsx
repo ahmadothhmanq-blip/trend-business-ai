@@ -1,6 +1,7 @@
 "use client";
 
 import { dashboardInputClass, dashboardTextareaClass, dashboardSelectClass } from "@/components/dashboard/ui/dashboard-styles";
+import { useVideoEditorT } from "@/components/dashboard/video-studio/editor/use-video-editor-t";
 import type { Scene } from "@/lib/ai-core/video-production-platform/domain/contracts";
 import type { ScenePatch } from "@/lib/ai-core/video-production-platform/editor-mvp/contracts";
 
@@ -11,19 +12,21 @@ export function EditorInspector({
   scene: Scene | null;
   onChange: (patch: ScenePatch, kind?: "text" | "duration" | "immediate") => void;
 }) {
+  const { p, et } = useVideoEditorT();
+
   if (!scene) {
-    return <div className="p-4 text-sm text-white/50">Select a scene to inspect.</div>;
+    return <div className="p-4 text-sm text-white/50">{et("inspector.selectScene")}</div>;
   }
   return (
     <div className="space-y-3 overflow-auto p-3 text-sm">
-      <label className="block text-xs text-white/50">Prompt</label>
+      <label className="block text-xs text-white/50">{p("labels.prompt")}</label>
       <textarea
         className={dashboardTextareaClass}
         rows={4}
         value={scene.prompt}
         onChange={(event) => onChange({ prompt: event.target.value }, "text")}
       />
-      <label className="block text-xs text-white/50">Duration (sec)</label>
+      <label className="block text-xs text-white/50">{et("inspector.durationSec")}</label>
       <input
         className={dashboardInputClass}
         type="number"
@@ -32,25 +35,25 @@ export function EditorInspector({
         value={scene.duration}
         onChange={(event) => onChange({ duration: Number(event.target.value) }, "duration")}
       />
-      <label className="block text-xs text-white/50">Camera move</label>
+      <label className="block text-xs text-white/50">{et("inspector.cameraMove")}</label>
       <input
         className={dashboardInputClass}
         value={scene.camera.move}
         onChange={(event) => onChange({ camera: { ...scene.camera, move: event.target.value } }, "text")}
       />
-      <label className="block text-xs text-white/50">Visual style</label>
+      <label className="block text-xs text-white/50">{et("inspector.visualStyle")}</label>
       <input
         className={dashboardInputClass}
         value={scene.visualStyle}
         onChange={(event) => onChange({ visualStyle: event.target.value }, "text")}
       />
-      <label className="block text-xs text-white/50">Transition</label>
+      <label className="block text-xs text-white/50">{et("inspector.transition")}</label>
       <input
         className={dashboardInputClass}
         value={scene.transition}
         onChange={(event) => onChange({ transition: event.target.value }, "text")}
       />
-      <label className="block text-xs text-white/50">Dialogue</label>
+      <label className="block text-xs text-white/50">{et("inspector.dialogue")}</label>
       <textarea
         className={dashboardTextareaClass}
         rows={3}
@@ -63,9 +66,9 @@ export function EditorInspector({
           checked={Boolean(scene.voiceRequired || scene.audio.voiceRequired)}
           onChange={(event) => onChange({ voiceRequired: event.target.checked }, "immediate")}
         />
-        Voice required
+        {et("inspector.voiceRequired")}
       </label>
-      <label className="block text-xs text-white/50">Provider preference</label>
+      <label className="block text-xs text-white/50">{et("inspector.providerPreference")}</label>
       <select
         className={dashboardSelectClass}
         value={scene.providerPreference === "omni_flash" ? "auto" : scene.providerPreference}
@@ -79,7 +82,7 @@ export function EditorInspector({
           </option>
         ))}
       </select>
-      <label className="block text-xs text-white/50">Fallback provider</label>
+      <label className="block text-xs text-white/50">{et("inspector.fallbackProvider")}</label>
       <select
         className={dashboardSelectClass}
         value={scene.fallbackProvider || ""}
@@ -87,14 +90,14 @@ export function EditorInspector({
           onChange({ fallbackProvider: (event.target.value || null) as Scene["fallbackProvider"] }, "immediate")
         }
       >
-        <option value="">None</option>
+        <option value="">{et("inspector.none")}</option>
         {["veo", "kling", "runway", "heygen", "external"].map((id) => (
           <option key={id} value={id}>
             {id}
           </option>
         ))}
       </select>
-      <label className="block text-xs text-white/50">Characters</label>
+      <label className="block text-xs text-white/50">{et("inspector.characters")}</label>
       <input
         className={dashboardInputClass}
         value={scene.characters.join(", ")}
@@ -102,7 +105,7 @@ export function EditorInspector({
           onChange({ characters: event.target.value.split(",").map((item) => item.trim()).filter(Boolean) }, "text")
         }
       />
-      <label className="block text-xs text-white/50">Products</label>
+      <label className="block text-xs text-white/50">{et("inspector.products")}</label>
       <input
         className={dashboardInputClass}
         value={scene.products.join(", ")}
@@ -110,7 +113,7 @@ export function EditorInspector({
           onChange({ products: event.target.value.split(",").map((item) => item.trim()).filter(Boolean) }, "text")
         }
       />
-      <label className="block text-xs text-white/50">References (uri)</label>
+      <label className="block text-xs text-white/50">{et("inspector.referencesUri")}</label>
       <input
         className={dashboardInputClass}
         value={scene.references.map((item) => item.uri).join(", ")}

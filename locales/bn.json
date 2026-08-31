@@ -2043,6 +2043,7 @@
         "renameDescriptionWorkspace": "আপনার ওয়ার্কস্পেস ইতিহাসে সংরক্ষিত প্রকল্প নাম আপডেট করুন।",
         "deleteTitle": "প্রকল্প মুছবেন?",
         "deleteDescription": "এই কাজটি পূর্বাবস্থায় ফিরিয়ে আনা যাবে না।",
+        "unsavedEditorWarning": "You have unsaved changes in the Visual Editor. Leave without saving?",
         "confirm": "নিশ্চিত করুন",
         "cancel": "বাতিল করুন"
       },
@@ -2165,6 +2166,10 @@
         "applied": "ভিজ্যুয়াল টেমপ্লেট প্রয়োগ করা হয়েছে — বিষয়বস্তু এবং ছবি সংরক্ষিত।",
         "usingTemplate": "টেমপ্লেট ব্যবহার করা হচ্ছে: {name}",
         "intelligenceApplied": "টেমপ্লেট ইন্টেলিজেন্স: {name}",
+        "structureApplied": "Structure template: {name}",
+        "structureRedesigned": "Redesigned with {name} — your content and images preserved",
+        "themeRedesigned": "Theme applied: {name} — content preserved, design rebuilt",
+        "themeApplied": "Theme selected: {name}",
         "clearSelection": "টেমপ্লেট নির্বাচন সরান"
       },
       "favorites": {
@@ -2185,6 +2190,7 @@
         "createOrSelectFirst": "প্রথমে একটি ওয়েবসাইট তৈরি বা নির্বাচন করুন।",
         "editThenImprove": "নির্দেশনা সম্পাদনা করুন, তারপর AI দিয়ে উন্নত করুন-এ ক্লিক করুন।",
         "seoFixApplied": "SEO ফিক্স প্রয়োগ করা হয়েছে।",
+        "reviewImprovementApplied": "Website improvements applied.",
         "websiteCreated": "ওয়েবসাইট তৈরি ও সংরক্ষিত হয়েছে। পূর্বরূপ পর্যালোচনা করুন, তারপর AI দিয়ে উন্নত করুন।",
         "projectDuplicated": "প্রকল্প নকল করা হয়েছে",
         "projectDeleted": "প্রকল্প মুছে ফেলা হয়েছে",
@@ -2280,9 +2286,66 @@
         "experiments": "পরীক্ষা",
         "intelligence": "ইন্টেলিজেন্স",
         "seoAgent": "SEO এজেন্ট",
+        "reviewStudio": "Website Review",
         "publish": "প্রকাশ করুন",
         "openEditorHint": "ভিজুয়াল এডিটর খুলতে প্রথমে একটি ওয়েবসাইট জেনারেট করুন।",
         "createPreviewHint": "প্ল্যাটফর্মের ভিতরে লাইভ প্রিভিউ খুলতে একটি ওয়েবসাইট তৈরি করুন।"
+      },
+      "reviewStudio": {
+        "badge": "AI Review Studio",
+        "title": "{name} — Quality Review",
+        "running": "Running website quality review…",
+        "failedLoad": "Failed to load website review",
+        "applyFailed": "Failed to apply improvements",
+        "rollbackFailed": "Failed to rollback version",
+        "selectWebsite": "Generate or select a website to open the Review Studio.",
+        "strengths": "Strengths",
+        "weaknesses": "Weaknesses",
+        "estimatedGain": "Estimated Quality Gain",
+        "noStrengths": "No major strengths detected yet.",
+        "apply": "Apply",
+        "selected": "Selected",
+        "applySelected": "Apply selected improvements",
+        "selectedCount": "{count} selected",
+        "quality": "quality",
+        "conversion": "conversion",
+        "risk": "Risk",
+        "targetedRegenHint": "Requires AI executor — use deterministic improvements in Phase 1",
+        "version": "Version",
+        "rollback": "Rollback",
+        "noVersions": "No version history yet. Apply improvements to create versions.",
+        "noComparison": "Apply improvements to see before/after comparison.",
+        "points": "points",
+        "appliedChanges": "Applied changes",
+        "tabs": {
+          "dashboard": "Dashboard",
+          "improvements": "Improvements",
+          "versions": "Versions",
+          "compare": "Compare",
+          "reports": "Reports"
+        },
+        "scores": {
+          "overall": "Overall",
+          "design": "Design",
+          "ux": "UX",
+          "business": "Business",
+          "seo": "SEO",
+          "performance": "Performance",
+          "accessibility": "Accessibility",
+          "content": "Content",
+          "localization": "Localization"
+        },
+        "reports": {
+          "executive": "Executive Report",
+          "technical": "Technical Report",
+          "developer": "Developer Report",
+          "benchmark": "Benchmark Report",
+          "priorityActions": "Priority actions",
+          "technicalInsights": "Technical insights",
+          "designInsights": "Design insights",
+          "businessInsights": "Business insights",
+          "noFiles": "No specific files"
+        }
       },
       "workspace": {
         "title": "AI প্রকল্প কর্মক্ষেত্র",
@@ -2305,6 +2368,310 @@
         "linkedVersion": "লিঙ্কযুক্ত সংস্করণ",
         "pipelineHint": "AI কোর পাইপলাইন: আইডিয়া → কৌশল → ডিজাইন → সম্পদ → জেনারেশন → গুণমান → প্রস্তুত",
         "viewGeneratedInside": "আপনার তৈরি ওয়েবসাইট প্ল্যাটফর্মের ভিতরে দেখুন।"
+      },
+      "builder": {
+        "toolRail": {
+          "structure": "Structure",
+          "design": "Design",
+          "blocks": "Blocks",
+          "media": "Media",
+          "ai": "AI",
+          "professional": "Pro",
+          "business": "Business",
+          "publish": "Publish",
+          "enterprise": "Enterprise"
+        },
+        "workspace": {
+          "title": "Website Builder",
+          "autosavePending": "Unsaved changes…",
+          "autosaveSaving": "Autosaving…",
+          "autosaveSaved": "All changes saved",
+          "autosaveError": "Autosave failed",
+          "versions": "Versions",
+          "openManagementHint": "Open Site Management to edit this page.",
+          "restored": "Restored {label}",
+          "backupSaved": "Server backup saved.",
+          "backupFailed": "Could not save server backup."
+        },
+        "pages": {
+          "title": "Pages",
+          "manage": "Manage",
+          "editInManagement": "Edit in site management"
+        },
+        "sections": {
+          "title": "Sections"
+        },
+        "blocks": {
+          "searchPlaceholder": "Search blocks…",
+          "insert": "Insert block",
+          "categories": {
+            "all": "All",
+            "hero": "Hero",
+            "section": "Sections",
+            "cta": "CTA",
+            "proof": "Proof",
+            "media": "Media",
+            "layout": "Layout"
+          }
+        },
+        "design": {
+          "themePresets": "Theme presets",
+          "responsive": "Responsive",
+          "colors": "Colors",
+          "primary": "Primary",
+          "secondary": "Secondary",
+          "accent": "Accent",
+          "background": "Background",
+          "foreground": "Foreground",
+          "typography": "Typography",
+          "headingFont": "Heading font",
+          "bodyFont": "Body font",
+          "spacing": "Spacing",
+          "compact": "Compact",
+          "balanced": "Balanced",
+          "airy": "Airy"
+        },
+        "ai": {
+          "title": "AI website actions",
+          "subtitle": "Unified with Website Copilot — streaming, memory, selection context, and review.",
+          "fullModernize": {
+            "label": "Modernize design",
+            "description": "Refresh the overall visual style"
+          },
+          "pageAbout": {
+            "label": "Add About page",
+            "description": "Generate a new About page"
+          },
+          "sectionTestimonials": {
+            "label": "Add testimonials",
+            "description": "Insert a social proof section"
+          },
+          "sectionHero": {
+            "label": "Regenerate hero",
+            "description": "Rewrite the hero for higher conversion"
+          },
+          "contentHome": {
+            "label": "Rewrite homepage copy",
+            "description": "Improve homepage messaging"
+          },
+          "imagesFresh": {
+            "label": "Refresh images",
+            "description": "Replace images with new photography"
+          },
+          "seoImprove": {
+            "label": "Improve SEO",
+            "description": "Apply SEO recommendations"
+          }
+        },
+        "copilot": {
+          "title": "Website Copilot",
+          "subtitle": "Natural-language commands for quick site edits",
+          "selectionFocus": "Selection: {label}",
+          "runCommand": "Run command",
+          "conversation": "Conversation",
+          "you": "You",
+          "assistant": "Copilot",
+          "placeholder": "Describe a change…",
+          "undo": "Undo",
+          "history": "History",
+          "noHistory": "No commands yet.",
+          "costFree": "Free",
+          "costAi": "1 credit",
+          "quickEdits": "Quick edits",
+          "conversationView": "Conversation",
+          "placeholderLong": "Describe a change to your website…",
+          "undoTitle": "Undo last Copilot change"
+        },
+        "professional": {
+          "title": "Professional features",
+          "openManagement": "Open in management",
+          "runCopilot": "Run with Copilot"
+        },
+        "business": {
+          "title": "Business hub",
+          "openTab": "Open {tab}",
+          "manage": "Manage",
+          "copilot": "Copilot"
+        },
+        "publishing": {
+          "title": "Publishing & performance",
+          "required": "required",
+          "accessibility": "Accessibility ({count})",
+          "noA11yIssues": "No basic accessibility issues detected.",
+          "openDeploy": "Open publish dashboard",
+          "backup": "Save server backup",
+          "backingUp": "Saving backup…"
+        },
+        "enterprise": {
+          "title": "Enterprise",
+          "teamMembers": "Team members",
+          "inviteCollaborator": "Invite collaborator",
+          "emailPlaceholder": "collaborator@email.com",
+          "noMembers": "No collaborators yet.",
+          "pending": "pending",
+          "emailStatus": "email {status}",
+          "resend": "Resend",
+          "remove": "Remove",
+          "accept": "Accept",
+          "pendingInvites": "Pending invitations",
+          "inviteSent": "Invitation sent.",
+          "inviteFailed": "Could not send invitation.",
+          "inviteRemoved": "Collaborator removed.",
+          "removeFailed": "Remove failed.",
+          "resendSent": "Invitation email sent.",
+          "resendSkipped": "Invite saved (email provider not configured).",
+          "resendFailed": "Resend failed.",
+          "loadFailed": "Failed to load team.",
+          "capabilities": {
+            "teams": {
+              "label": "Team access",
+              "description": "Invite collaborators to a website generation"
+            },
+            "roles": {
+              "label": "Roles & permissions",
+              "description": "Owner, editor, and viewer access levels"
+            },
+            "marketplace": {
+              "label": "Template marketplace",
+              "description": "Browse and apply premium templates"
+            },
+            "plugins": {
+              "label": "Plugin architecture",
+              "description": "Website plugin pipeline (generate, plan, validate)"
+            },
+            "api": {
+              "label": "Public API",
+              "description": "Design platform, marketplace, and builder APIs"
+            },
+            "white-label": {
+              "label": "White label",
+              "description": "Custom branding via organization settings (foundation)"
+            }
+          }
+        },
+        "media": {
+          "title": "Media library",
+          "searchPlaceholder": "Search media…",
+          "upload": "Upload",
+          "uploading": "Uploading…",
+          "empty": "No media uploaded yet.",
+          "delete": "Delete",
+          "loadFailed": "Failed to load media."
+        },
+        "themes": {
+          "luxuryGold": {
+            "label": "Luxury Gold",
+            "description": "Premium dark with gold accents"
+          },
+          "modernMinimal": {
+            "label": "Modern Minimal",
+            "description": "Clean light SaaS aesthetic"
+          },
+          "boldStartup": {
+            "label": "Bold Startup",
+            "description": "High-contrast conversion-focused"
+          }
+        },
+        "publishingItems": {
+          "quality": {
+            "label": "Quality gates",
+            "description": "Pre-publish quality control passed"
+          },
+          "seo": {
+            "label": "SEO metadata",
+            "description": "Titles, descriptions, and sitemap ready"
+          },
+          "ssl": {
+            "label": "SSL",
+            "description": "HTTPS enabled on publish URL"
+          },
+          "cdn": {
+            "label": "CDN delivery",
+            "description": "Static assets served via platform CDN path"
+          },
+          "backup": {
+            "label": "Backup snapshot",
+            "description": "Server-side blueprint snapshot stored"
+          },
+          "performance": {
+            "label": "Performance",
+            "description": "Core Web Vitals heuristics within targets"
+          },
+          "accessibility": {
+            "label": "Accessibility",
+            "description": "Basic a11y checks on generated markup"
+          }
+        },
+        "features": {
+          "templates": {
+            "label": "Templates",
+            "description": "Apply industry templates and layouts"
+          },
+          "blog": {
+            "label": "Blog & CMS",
+            "description": "Manage posts, categories, and content"
+          },
+          "forms": {
+            "label": "Forms & leads",
+            "description": "Capture leads and contact submissions"
+          },
+          "booking": {
+            "label": "Booking",
+            "description": "Add appointment booking flows"
+          },
+          "portfolio": {
+            "label": "Portfolio",
+            "description": "Showcase projects and case studies"
+          },
+          "pricing": {
+            "label": "Pricing tables",
+            "description": "Display plans and packages"
+          },
+          "testimonials": {
+            "label": "Testimonials",
+            "description": "Social proof and reviews"
+          },
+          "faq": {
+            "label": "FAQ",
+            "description": "Answer common customer questions"
+          },
+          "navigation": {
+            "label": "Navigation",
+            "description": "Edit header and footer links"
+          },
+          "contact": {
+            "label": "Contact",
+            "description": "Contact forms and business details"
+          },
+          "analytics": {
+            "label": "Analytics",
+            "description": "Traffic, engagement, and conversion metrics"
+          },
+          "experiments": {
+            "label": "A/B experiments",
+            "description": "Test headlines, CTAs, and layouts"
+          },
+          "leads": {
+            "label": "Lead collection",
+            "description": "Form submissions and CRM export"
+          },
+          "ecommerce": {
+            "label": "E-commerce catalog",
+            "description": "Products, services, and catalog management"
+          },
+          "membership": {
+            "label": "Membership foundation",
+            "description": "Gated content and member areas (foundation)"
+          },
+          "marketing": {
+            "label": "Marketing tools",
+            "description": "Conversion tracking and campaign hooks"
+          },
+          "crm": {
+            "label": "CRM integration",
+            "description": "Webhook and lead routing integrations"
+          }
+        }
       },
       "management": {
         "backToBuilder": "ওয়েবসাইট বিল্ডারে ফিরে যান",
@@ -2397,6 +2764,8 @@
         "favorites": "পছন্দসমূহ",
         "generationHistory": "জেনারেশন ইতিহাস",
         "generationHistoryDescription": "প্রিভিউ, AI উন্নতি, প্রকাশনা, ZIP এক্সপোর্ট, নাম পরিবর্তন, মুছুন এবং পছন্দের জন্য মূল ওয়ার্কস্পেস থেকে পূর্ববর্তী প্রকল্পগুলি পুনরায় খুলুন।",
+        "openEditor": "Open editor",
+        "openManagement": "Open management",
         "filesCount": "{count} ফাইল",
         "noProjectsTitle": "এখনো কোনো প্রকল্প তৈরি হয়নি",
         "noProjectsDescription": "ওয়ার্কস্পেস সেটিংস এবং ইতিহাস পপুলেট করতে একটি প্রকল্প তৈরি করুন।"
@@ -2576,6 +2945,14 @@
         "failedToAnalyze": "বিশ্লেষণ করতে ব্যর্থ হয়েছে",
         "templateIntelligenceTitle": "টেমপ্লেট বুদ্ধিমত্তা",
         "templateIntelligenceSubtitle": "AI সেরা চেহারা নির্বাচন করে — বা যেকোনো সময় একটি বেছে নিন",
+        "themesTitle": "Themes",
+        "themesSubtitle": "Complete design redesign — layout, hero, navigation, sections, and UI. Your business content stays the same.",
+        "structureTemplatesTitle": "Templates",
+        "structureTemplatesSubtitle": "Complete website redesign — layout, hero, navigation, sections. Your business content stays the same.",
+        "applyTheme": "Apply theme",
+        "useTheme": "Use theme",
+        "failedApplyTheme": "Failed to apply theme",
+        "appliedThemeRedesigned": "Redesigned with {name} — same business, new design",
         "autoSelect": "স্বয়ংক্রিয়-নির্বাচন",
         "all": "সব",
         "loadingVisualTemplates": "ভিজুয়াল টেমপ্লেট লোড হচ্ছে…",
@@ -2632,7 +3009,12 @@
         "qa": "কিউএ",
         "improveStrategyHint": "উচ্চতর কনভার্সনের জন্য পজিশনিং, সাইটম্যাপ এবং কনভার্সন CTA পুনর্বিন্যাস করুন।",
         "improveDesignHint": "আরও প্রিমিয়াম লুকের জন্য রঙ সিস্টেম, টাইপোগ্রাফি এবং লেআউট নিয়মগুলি রিফ্রেশ করুন।",
-        "improveAssetsHint": "ব্র্যান্ড এবং শ্রোতার সাথে আরও ভালোভাবে মেলাতে হিরো এবং সেকশন ভিজুয়াল পুনরায় জেনারেট করুন।"
+        "improveAssetsHint": "ব্র্যান্ড এবং শ্রোতার সাথে আরও ভালোভাবে মেলাতে হিরো এবং সেকশন ভিজুয়াল পুনরায় জেনারেট করুন।",
+        "improvingStrategy": "Analyzing strategy…",
+        "improvingDesign": "Improving design…",
+        "improvingAssets": "Generating better assets…",
+        "layerImproveComplete": "Optimization completed successfully.",
+        "generateBeforeLayerImprove": "Generate the website first, then use Improve strategy, design, or assets."
       },
       "previewExport": {
         "openLivePreview": "লাইভ প্রিভিউ খুলুন",
@@ -2870,6 +3252,18 @@
         "versionHistory": "সংস্করণ ইতিহাস",
         "noVersions": "এখনো কোন সংস্করণ নেই",
         "restore": "পুনরুদ্ধার করুন",
+        "noBrandVoice": "কোন ব্র্যান্ড ভয়েস নেই",
+        "selectDocument": "লেখা শুরু করতে একটি ডকুমেন্ট নির্বাচন বা তৈরি করুন",
+        "newDocument": "নতুন ডকুমেন্ট",
+        "untitledDocument": "শিরোনামহীন ডকুমেন্ট",
+        "folderNamePrompt": "ফোল্ডারের নাম",
+        "projectNamePrompt": "প্রকল্পের নাম",
+        "filterAll": "all",
+        "filterFavorites": "favorites",
+        "filterRecent": "recent",
+        "loadingWorkspace": "ওয়ার্কস্পেস লোড হচ্ছে…",
+        "loadingStudio": "স্টুডিও লোড হচ্ছে…",
+        "loadingCalendar": "ক্যালেন্ডার লোড হচ্ছে…",
         "publishTitle": "Publish to web",
         "publishDescription": "Share a public HTML5 page with a copyable link and embed snippet.",
         "publishedStatus": "Published",
@@ -2890,19 +3284,7 @@
         "embedPlaceholder": "Publish to generate an embed snippet.",
         "copyEmbed": "Copy embed",
         "embedCopied": "Embed code copied",
-        "hydrating": "Loading publication…",
-        "noBrandVoice": "কোন ব্র্যান্ড ভয়েস নেই",
-        "selectDocument": "লেখা শুরু করতে একটি ডকুমেন্ট নির্বাচন বা তৈরি করুন",
-        "newDocument": "নতুন ডকুমেন্ট",
-        "untitledDocument": "শিরোনামহীন ডকুমেন্ট",
-        "folderNamePrompt": "ফোল্ডারের নাম",
-        "projectNamePrompt": "প্রকল্পের নাম",
-        "filterAll": "all",
-        "filterFavorites": "favorites",
-        "filterRecent": "recent",
-        "loadingWorkspace": "ওয়ার্কস্পেস লোড হচ্ছে…",
-        "loadingStudio": "স্টুডিও লোড হচ্ছে…",
-        "loadingCalendar": "ক্যালেন্ডার লোড হচ্ছে…"
+        "hydrating": "Loading publication…"
       },
       "editor": {
         "improve": "উন্নত করুন",
@@ -3365,6 +3747,108 @@
         "strictOff": "VIDEO_PROVIDER_STRICT সেট করা নেই — ত্রুটিতে স্টাব অনুমোদিত।",
         "fullRenderBlocked": "পূর্ণ রেন্ডারের জন্য KLING_API_KEY প্রয়োজন। প্রিভিউ মোড এখনও কাজ করে।"
       },
+      "editor": {
+        "loading": "Loading editor…",
+        "errors": {
+          "loadFailed": "Failed to load editor.",
+          "noActivePlan": "This project has no active plan to edit.",
+          "saveFailed": "Save failed.",
+          "undoFailed": "Undo failed.",
+          "redoFailed": "Redo failed.",
+          "regenerationFailed": "Regeneration failed.",
+          "requestFailed": "Request failed ({status})"
+        },
+        "tabs": {
+          "inspector": "Inspector",
+          "audio": "Audio",
+          "text": "Text"
+        },
+        "saveStatus": {
+          "saving": "Saving",
+          "unsaved": "Unsaved changes",
+          "error": "Save failed",
+          "saved": "Saved"
+        },
+        "actions": {
+          "trimStart": "Trim start",
+          "trimEnd": "Trim end",
+          "split": "Split",
+          "regenerateScene": "Regenerate Scene",
+          "production": "Production"
+        },
+        "inspector": {
+          "selectScene": "Select a scene to inspect.",
+          "durationSec": "Duration (sec)",
+          "cameraMove": "Camera move",
+          "visualStyle": "Visual style",
+          "transition": "Transition",
+          "dialogue": "Dialogue",
+          "voiceRequired": "Voice required",
+          "providerPreference": "Provider preference",
+          "fallbackProvider": "Fallback provider",
+          "none": "None",
+          "characters": "Characters",
+          "products": "Products",
+          "referencesUri": "References (uri)"
+        },
+        "captions": {
+          "selectScene": "Select a scene to edit captions.",
+          "captionsEnabled": "Captions enabled",
+          "alignLeft": "Left",
+          "alignCenter": "Center",
+          "alignRight": "Right",
+          "overlayOn": "On",
+          "defaultCaption": "Caption",
+          "addTextOverlay": "Add text overlay"
+        },
+        "audio": {
+          "tts": "TTS",
+          "ttsReady": "TTS ready",
+          "ttsUnavailable": "TTS unavailable",
+          "voice": "Voice",
+          "narration": "Narration",
+          "noVoiceTrack": "No voice track on the audio plan yet.",
+          "music": "Music",
+          "score": "Score",
+          "noMusic": "No music ingested.",
+          "sfx": "SFX",
+          "cue": "Cue",
+          "noSfx": "No SFX ingested.",
+          "muteVoice": "Mute voice",
+          "muteMusic": "Mute music",
+          "voiceLevel": "Voice level",
+          "musicLevel": "Music level",
+          "muteSfx": "Mute SFX",
+          "sfxLevel": "SFX level",
+          "footerNote": "Audio is displayed from the existing Audio Engine. This panel does not generate TTS.",
+          "trackVoice": "{speaker} · {status} · {startSec}s",
+          "trackMusic": "{mood} · {status}",
+          "trackSfx": "{cue} @ {timestampSec}s"
+        },
+        "preview": {
+          "title": "Scene preview",
+          "storyboardFallback": "Storyboard",
+          "emptyPrompt": "Select a scene to preview its storyboard. SVG is not treated as video.",
+          "timeDisplay": "{current}s / {total}s"
+        },
+        "scenes": {
+          "sceneLabel": "Scene {index}",
+          "playableClip": "Playable clip",
+          "storyboardOnly": "Storyboard only"
+        },
+        "timeline": {
+          "label": "Timeline · {duration}s",
+          "zoom": "Zoom",
+          "blockLabel": "S{index}"
+        },
+        "regeneration": {
+          "label": "Regeneration: {status}",
+          "attempt": " · attempt {attempt}",
+          "previous": " · previous {id}",
+          "active": " · active {id}",
+          "errorSuffix": " · {error}"
+        }
+      },
       "management": {
         "loading": "ভিডিও প্রোডাকশন স্টুডিও লোড হচ্ছে…",
         "backToStudio": "ভিডিও স্টুডিওতে ফিরে যান",
@@ -3477,7 +3961,28 @@
         "saveSubtitleCues": "সাবটাইটেল কিউ সংরক্ষণ",
         "cueLinesPlaceholder": "কিউ লাইন…",
         "applyBrand": "ব্র্যান্ড প্রয়োগ করুন",
-        "restore": "পুনরুদ্ধার"
+        "restore": "পুনরুদ্ধার",
+        "publishTitle": "Publish to web",
+        "publishDescription": "Share a public HTML5 page with a copyable link and embed snippet.",
+        "publishedStatus": "Published",
+        "notPublished": "Not published",
+        "publishRequiresRender": "Run a full MP4 render before publishing.",
+        "publishing": "Publishing…",
+        "published": "Video published.",
+        "publishFailed": "Publish failed.",
+        "unpublishing": "Unpublishing…",
+        "unpublishAction": "Unpublish",
+        "unpublished": "Video unpublished.",
+        "unpublishFailed": "Unpublish failed.",
+        "previewPublic": "Preview public page",
+        "publicLink": "Public link",
+        "copyPublicLink": "Copy link",
+        "linkCopied": "Public link copied",
+        "embedCode": "Embed code",
+        "embedPlaceholder": "Publish to generate an embed snippet.",
+        "copyEmbed": "Copy embed",
+        "embedCopied": "Embed code copied",
+        "hydrating": "Loading publication…"
       },
       "history": {
         "count": "{count} ভিডিও",
@@ -4953,6 +5458,280 @@
         "allIndustries": "সব শিল্প",
         "allStyles": "সব শৈলী",
         "resultsHint": "{count}টি কম্পোনেন্ট · ক্যানভাসে টেনে আনুন বা ঢোকাতে ক্লিক করুন"
+      },
+      "buttonEditor": {
+        "title": "Button properties",
+        "preview": "Live preview",
+        "text": "Text",
+        "labelPlaceholder": "Button label",
+        "link": {
+          "type": "Link type",
+          "internal": "Internal page",
+          "external": "External URL",
+          "email": "Email",
+          "phone": "Phone",
+          "anchor": "Anchor (#section)",
+          "placeholder": "Enter link value"
+        },
+        "target": "Open in",
+        "targetSame": "Same tab",
+        "targetNew": "New tab",
+        "style": "Style",
+        "styles": {
+          "primary": "Primary",
+          "secondary": "Secondary",
+          "outline": "Outline",
+          "ghost": "Ghost",
+          "text": "Text"
+        },
+        "size": "Size",
+        "sizes": {
+          "sm": "Small",
+          "md": "Medium",
+          "lg": "Large"
+        },
+        "width": "Width",
+        "widthAuto": "Auto",
+        "widthFull": "Full width",
+        "radius": "Border radius",
+        "radiusSquare": "Square",
+        "radiusRounded": "Rounded",
+        "radiusPill": "Pill",
+        "radiusCustom": "Custom",
+        "radiusCustomPx": "Custom radius (px)",
+        "colors": "Colors",
+        "colorBackground": "Background",
+        "colorText": "Text",
+        "colorBorder": "Border",
+        "colorHoverBackground": "Hover background",
+        "colorHoverText": "Hover text",
+        "typography": "Typography",
+        "fontSize": "Font size",
+        "letterSpacing": "Letter spacing",
+        "spacing": "Spacing",
+        "padding": "Padding",
+        "margin": "Margin",
+        "icon": "Icon",
+        "iconNone": "None",
+        "iconLeft": "Left icon",
+        "iconRight": "Right icon",
+        "iconRemove": "Remove icon",
+        "accessibility": "Accessibility",
+        "disabledState": "Disabled",
+        "states": {
+          "normal": "Normal",
+          "hover": "Hover",
+          "disabled": "Disabled"
+        },
+        "history": "Edit button"
+      },
+      "linkEditor": {
+        "title": "Link properties",
+        "preview": "Live preview",
+        "label": "Label",
+        "labelPlaceholder": "Link label",
+        "linkType": "Link type",
+        "hrefPlaceholder": "Enter link value",
+        "target": "Open in",
+        "targetSame": "Same tab",
+        "targetNew": "New tab",
+        "rel": "Link rel attributes",
+        "history": "Edit link",
+        "validationBlocked": "Fix invalid links before saving",
+        "types": {
+          "internal": "Internal page",
+          "external": "External URL",
+          "email": "Email",
+          "phone": "Phone",
+          "whatsapp": "WhatsApp",
+          "telegram": "Telegram",
+          "anchor": "Anchor (#section)",
+          "download": "File download"
+        }
+      },
+      "iconEditor": {
+        "title": "Icon properties",
+        "preview": "Live preview",
+        "library": "Icon library",
+        "position": "Position",
+        "positionNone": "None",
+        "positionLeft": "Left",
+        "positionRight": "Right",
+        "positionTop": "Top",
+        "positionBottom": "Bottom",
+        "variant": "Style",
+        "variantOutline": "Outline",
+        "variantFilled": "Filled",
+        "variantDuotone": "Duotone",
+        "size": "Size",
+        "sizeCustom": "Custom",
+        "customSizePx": "Custom size (px)",
+        "colors": "Colors",
+        "colorNormal": "Normal",
+        "colorHover": "Hover",
+        "colorDisabled": "Disabled",
+        "background": "Background",
+        "backgroundNone": "None",
+        "backgroundCircle": "Circle",
+        "backgroundRounded": "Rounded square",
+        "backgroundSquare": "Square",
+        "backgroundColor": "Background color",
+        "border": "Border",
+        "borderWidth": "Width",
+        "borderColor": "Color",
+        "borderRadius": "Radius",
+        "spacing": "Spacing",
+        "margin": "Margin",
+        "padding": "Padding",
+        "rotation": "Rotation",
+        "rotationCustom": "Custom",
+        "customRotationDeg": "Custom degrees",
+        "accessibility": "Accessibility",
+        "decorative": "Decorative icon (hide from screen readers)",
+        "history": "Edit icon",
+        "states": {
+          "normal": "Normal",
+          "hover": "Hover",
+          "disabled": "Disabled"
+        }
+      },
+      "sectionEditor": {
+        "title": "Section",
+        "preview": "Live preview",
+        "position": "Position",
+        "hiddenOnViewport": "Hidden on this viewport",
+        "operations": "Section actions",
+        "insertBefore": "Insert before",
+        "insertAfter": "Insert after",
+        "insertAtEnd": "Insert at end",
+        "fromTemplates": "From templates",
+        "duplicate": "Duplicate",
+        "delete": "Delete",
+        "deleteTitle": "Delete section?",
+        "deleteBody": "This removes the section from the page. You can undo with Ctrl+Z before saving.",
+        "deleted": "Section removed — undo to restore",
+        "cancel": "Cancel",
+        "move": "Move",
+        "moveUp": "Move up",
+        "moveDown": "Move down",
+        "visibility": "Visibility",
+        "visibilityShow": "Show",
+        "visibilityHide": "Hide",
+        "visibilityDesktop": "Desktop only",
+        "visibilityTablet": "Tablet only",
+        "visibilityMobile": "Mobile only",
+        "layout": "Layout",
+        "widthFull": "Full width",
+        "widthBoxed": "Boxed",
+        "widthContainer": "Container",
+        "alignLeft": "Left",
+        "alignCenter": "Center",
+        "alignRight": "Right",
+        "alignStretch": "Stretch",
+        "columns": "Columns",
+        "gap": "Gap",
+        "settings": "Section settings",
+        "htmlId": "HTML ID",
+        "anchor": "Anchor",
+        "cssClasses": "CSS classes",
+        "customAttributes": "Custom attributes",
+        "styling": "Styling",
+        "padding": "Padding",
+        "margin": "Margin",
+        "borderWidth": "Border width",
+        "borderColor": "Border color",
+        "radius": "Radius",
+        "shadow": "Shadow",
+        "opacity": "Opacity",
+        "zIndex": "Z-index",
+        "overflowVisible": "Visible",
+        "overflowHidden": "Hidden",
+        "overflowAuto": "Auto",
+        "overflowScroll": "Scroll",
+        "animation": "Animation",
+        "animNone": "None",
+        "animFade": "Fade",
+        "animSlide": "Slide",
+        "animZoom": "Zoom",
+        "duration": "Duration (ms)",
+        "delay": "Delay (ms)",
+        "background": "Background",
+        "ai": "AI actions",
+        "aiImprove": "Improve",
+        "aiRegenerate": "Regenerate",
+        "aiRewrite": "Rewrite",
+        "aiMoreItems": "More items",
+        "aiQueued": "Queue AI section edit",
+        "aiQueuedHint": "AI action queued — save to apply",
+        "history": "Edit section",
+        "historyMove": "Move section"
+      },
+      "backgroundEditor": {
+        "title": "Background image",
+        "preview": "Live preview",
+        "source": "Background source",
+        "upload": "Upload",
+        "mediaLibrary": "Media library",
+        "aiGenerate": "AI image",
+        "aiHint": "Pick an AI-generated image from the media library",
+        "remove": "Remove",
+        "urlPlaceholder": "Image URL",
+        "displayMode": "Display mode",
+        "position": "Position",
+        "positionX": "Custom X",
+        "positionY": "Custom Y",
+        "overlay": "Overlay",
+        "overlayEnabled": "Enable overlay",
+        "overlaySolid": "Solid",
+        "overlayGradient": "Gradient",
+        "overlayNone": "None",
+        "overlayColor": "Overlay color",
+        "overlayOpacity": "Opacity %",
+        "overlayGradientValue": "Gradient CSS",
+        "overlayBlur": "Overlay blur (px)",
+        "effects": "Effects",
+        "brightness": "Brightness",
+        "contrast": "Contrast",
+        "saturation": "Saturation",
+        "grayscale": "Grayscale",
+        "blur": "Blur",
+        "parallax": "Parallax",
+        "parallaxOn": "Enable parallax",
+        "borderRadius": "Border radius",
+        "sectionHeight": "Section height",
+        "customHeightPx": "Custom height (px)",
+        "mobile": "Mobile settings",
+        "hideOnMobile": "Hide background on mobile",
+        "mobileUrlPlaceholder": "Mobile image URL (optional)",
+        "accessibility": "Accessibility",
+        "decorative": "Decorative background",
+        "altPlaceholder": "Alt text",
+        "history": "Edit background",
+        "modes": {
+          "cover": "Cover",
+          "contain": "Contain",
+          "fill": "Fill",
+          "fitWidth": "Fit width",
+          "fitHeight": "Fit height",
+          "repeat": "Repeat",
+          "noRepeat": "No repeat"
+        },
+        "positions": {
+          "center": "Center",
+          "top": "Top",
+          "bottom": "Bottom",
+          "left": "Left",
+          "right": "Right",
+          "custom": "Custom"
+        },
+        "heights": {
+          "auto": "Auto",
+          "sm": "Small",
+          "md": "Medium",
+          "lg": "Large",
+          "fullscreen": "Full screen",
+          "custom": "Custom"
+        }
       }
     },
     "creatorMarketplace": {
@@ -5047,22 +5826,31 @@
       "openWebsiteBuilder": "ওয়েবসাইট বিল্ডার খুলুন",
       "searchPlaceholder": "রেস্তোরাঁ, SaaS, ফাইন্যান্স অনুসন্ধান করুন…",
       "allCategories": "সব বিভাগ",
-      "allStyles": "সব শৈলী",
-      "aiRecommendations": "AI টেমপ্লেট সুপারিশ",
-      "aiRecommendationsDescription": "শিল্প, ব্যবসায়িক লক্ষ্য এবং দর্শক বিশ্লেষণ করুন — তারপর জেনারেশনের আগে সেরা প্রারম্ভিক টেমপ্লেট নির্বাচন করুন।",
-      "industryPlaceholder": "শিল্প (যেমন: রেস্তোরাঁ)",
-      "goalPlaceholder": "ব্যবসায়িক লক্ষ্য (লিড, বুকিং…)",
-      "audiencePlaceholder": "দর্শক",
-      "recommend": "সুপারিশ",
-      "briefPlaceholder": "বুদ্ধিমান ম্যাচিংয়ের জন্য ঐচ্ছিক ব্যবসায়িক সারাংশ…",
+      "allAvailability": "All templates",
+      "installedOnly": "Installed only",
+      "remoteOnlyFilter": "Remote only",
+      "tagsFilter": "Tags",
+      "featured": "Featured",
+      "featuredSection": "Featured templates",
+      "installed": "Installed",
+      "remote": "Remote",
+      "remoteOnly": "Remote only",
+      "remoteOnlyHint": "Install this template in Website Builder to use it. Remote downloads are not available yet.",
       "popular": "জনপ্রিয়",
       "library": "লাইব্রেরি",
       "loading": "মার্কেটপ্লেস লোড হচ্ছে…",
       "noResults": "এই ফিল্টারের সাথে মিলে এমন কোনো টেমপ্লেট নেই।",
+      "createFirst": "Create First Template",
+      "createUnavailable": "Template creation is not available yet.",
       "previewTitle": "টেমপ্লেট প্রিভিউ",
       "previewDescription": "জেনারেশনের আগে লাইভ স্ট্রাকচারাল প্রিভিউ।",
       "previewUnavailable": "প্রিভিউ পাওয়া যায়নি",
       "previewIframe": "টেমপ্লেট প্রিভিউ",
+      "details": "Details",
+      "metadataSection": "Author & tags",
+      "categoryLabel": "Category · {category}",
+      "authorLabel": "Author · {author}",
+      "regionsPages": "{regions} regions · {pages} pages",
       "intelligence": "বুদ্ধিমত্তা",
       "industry": "শিল্প",
       "style": "শৈলী",
@@ -5072,11 +5860,25 @@
       "pipelineHint": "ডিজাইন · ব্র্যান্ড · অ্যাসেট · এডিটর · কোয়ালিটি সংযুক্ত করে",
       "useThisTemplate": "এই টেমপ্লেটটি ব্যবহার করুন",
       "preview": "প্রিভিউ",
+      "close": "Close",
       "use": "ব্যবহার করুন",
+      "install": "Install",
+      "installToUse": "Install this template to enable Use",
+      "installSuccess": "{name} installed — ready to use",
+      "installAlreadyDone": "{name} is already installed",
+      "installComingSoon": "Installation coming soon",
+      "notInstalled": "Not installed",
       "layoutLabel": "লেআউট · {type}",
       "audienceLabel": "দর্শক · {audience}",
       "featuresLabel": "বৈশিষ্ট্য · {features}",
       "badgeScore": "{score} শতাংশ · {reason}",
+      "sort": {
+        "featured": "Featured first",
+        "name-asc": "Name (A–Z)",
+        "name-desc": "Name (Z–A)",
+        "released-desc": "Newest",
+        "category-asc": "Category"
+      },
       "viewports": {
         "desktop": "ডেস্কটপ",
         "tablet": "ট্যাবলেট",
@@ -5085,8 +5887,17 @@
       "errors": {
         "loadFailed": "মার্কেটপ্লেস লোড করতে ব্যর্থ",
         "previewFailed": "প্রিভিউ ব্যর্থ হয়েছে",
-        "recommendFailed": "সুপারিশ ব্যর্থ হয়েছে"
-      }
+        "recommendFailed": "সুপারিশ ব্যর্থ হয়েছে",
+        "installFailed": "Template installation failed"
+      },
+      "allStyles": "সব শৈলী",
+      "aiRecommendations": "AI টেমপ্লেট সুপারিশ",
+      "aiRecommendationsDescription": "শিল্প, ব্যবসায়িক লক্ষ্য এবং দর্শক বিশ্লেষণ করুন — তারপর জেনারেশনের আগে সেরা প্রারম্ভিক টেমপ্লেট নির্বাচন করুন।",
+      "industryPlaceholder": "শিল্প (যেমন: রেস্তোরাঁ)",
+      "goalPlaceholder": "ব্যবসায়িক লক্ষ্য (লিড, বুকিং…)",
+      "audiencePlaceholder": "দর্শক",
+      "recommend": "সুপারিশ",
+      "briefPlaceholder": "বুদ্ধিমান ম্যাচিংয়ের জন্য ঐচ্ছিক ব্যবসায়িক সারাংশ…"
     }
   },
   "contentStudio": {
@@ -5874,6 +6685,13 @@
         "admin": "অ্যাডমিন"
       },
       "webhookEvents": {
+        "generation.completed": "Generation Completed",
+        "generation.failed": "Generation Failed",
+        "member.invited": "Member Invited",
+        "member.joined": "Member Joined",
+        "member.removed": "Member Removed",
+        "api_key.created": "API Key Created",
+        "export.completed": "Export Completed",
         "generation": {
           "completed": "জেনারেশন সম্পন্ন হয়েছে",
           "failed": "জেনারেশন ব্যর্থ হয়েছে"
@@ -6844,6 +7662,9 @@
         "commerce": "বাণিজ্য",
         "planning": "পরিকল্পনা"
       },
+      "templateCategories": {},
+      "platforms": {},
+      "calendarCategories": {},
       "calendarStatuses": {
         "draft": "খসড়া",
         "scheduled": "নির্ধারিত",

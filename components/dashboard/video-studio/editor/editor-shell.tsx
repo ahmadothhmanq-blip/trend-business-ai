@@ -8,9 +8,11 @@ import { EditorInspector } from "@/components/dashboard/video-studio/editor/edit
 import { EditorPreview } from "@/components/dashboard/video-studio/editor/editor-preview";
 import { EditorSceneList } from "@/components/dashboard/video-studio/editor/editor-scene-list";
 import { EditorTimeline } from "@/components/dashboard/video-studio/editor/editor-timeline";
+import { useVideoEditorT } from "@/components/dashboard/video-studio/editor/use-video-editor-t";
 import { useVideoEditor } from "@/components/dashboard/video-studio/editor/use-video-editor";
 
 export function VideoEditorWorkspace({ generationId }: { generationId: string }) {
+  const { et } = useVideoEditorT();
   const editor = useVideoEditor(generationId);
   const [rightTab, setRightTab] = useState<"inspect" | "audio" | "captions">("inspect");
   const saveRef = useRef(editor.save);
@@ -39,12 +41,12 @@ export function VideoEditorWorkspace({ generationId }: { generationId: string })
   }, []);
 
   if (editor.loading) {
-    return <div className="rounded-2xl border border-white/10 bg-black/30 p-8 text-sm text-white/60">Loading editor…</div>;
+    return <div className="rounded-2xl border border-white/10 bg-black/30 p-8 text-sm text-white/60">{et("loading")}</div>;
   }
   if (editor.error || !editor.doc) {
     return (
       <div className="rounded-2xl border border-white/10 bg-black/30 p-8 text-sm text-amber-200">
-        {editor.error || "This project has no active plan to edit."}
+        {editor.error || et("errors.noActivePlan")}
       </div>
     );
   }
@@ -88,11 +90,15 @@ export function VideoEditorWorkspace({ generationId }: { generationId: string })
           />
           {editor.regen ? (
             <div className="border-t border-white/10 px-3 py-2 text-xs text-white/70">
-              Regeneration: {editor.regen.status}
-              {editor.regen.attempt != null ? ` · attempt ${editor.regen.attempt}` : ""}
-              {editor.regen.oldArtifactId ? ` · previous ${editor.regen.oldArtifactId.slice(0, 8)}` : ""}
-              {editor.regen.newArtifactId ? ` · active ${editor.regen.newArtifactId.slice(0, 8)}` : ""}
-              {editor.regen.error ? ` · ${editor.regen.error}` : ""}
+              {et("regeneration.label", { status: editor.regen.status })}
+              {editor.regen.attempt != null ? et("regeneration.attempt", { attempt: editor.regen.attempt }) : ""}
+              {editor.regen.oldArtifactId
+                ? et("regeneration.previous", { id: editor.regen.oldArtifactId.slice(0, 8) })
+                : ""}
+              {editor.regen.newArtifactId
+                ? et("regeneration.active", { id: editor.regen.newArtifactId.slice(0, 8) })
+                : ""}
+              {editor.regen.error ? et("regeneration.errorSuffix", { error: editor.regen.error }) : ""}
             </div>
           ) : null}
         </div>
@@ -105,7 +111,7 @@ export function VideoEditorWorkspace({ generationId }: { generationId: string })
                 className={`flex-1 px-2 py-2 capitalize ${rightTab === tab ? "bg-premium-gold/10 text-premium-gold" : "text-white/50"}`}
                 onClick={() => setRightTab(tab)}
               >
-                {tab === "inspect" ? "Inspector" : tab === "audio" ? "Audio" : "Text"}
+                {tab === "inspect" ? et("tabs.inspector") : tab === "audio" ? et("tabs.audio") : et("tabs.text")}
               </button>
             ))}
           </div>

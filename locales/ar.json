@@ -2166,6 +2166,10 @@
         "applied": "تم تطبيق القالب المرئي — تم الحفاظ على المحتوى والصور.",
         "usingTemplate": "استخدام القالب: {name}",
         "intelligenceApplied": "ذكاء القالب: {name}",
+        "structureApplied": "Structure template: {name}",
+        "structureRedesigned": "Redesigned with {name} — your content and images preserved",
+        "themeRedesigned": "Theme applied: {name} — content preserved, design rebuilt",
+        "themeApplied": "Theme selected: {name}",
         "clearSelection": "مسح اختيار القالب"
       },
       "favorites": {
@@ -2186,6 +2190,7 @@
         "createOrSelectFirst": "أنشئ موقعًا أو اختره أولاً.",
         "editThenImprove": "حرّر التعليمات، ثم انقر تحسين بالذكاء الاصطناعي.",
         "seoFixApplied": "تم تطبيق إصلاح تحسين محركات البحث.",
+        "reviewImprovementApplied": "Website improvements applied.",
         "websiteCreated": "تم إنشاء الموقع وحفظه. راجع المعاينة، ثم حسّنه بالذكاء الاصطناعي.",
         "projectDuplicated": "تم نسخ المشروع",
         "projectDeleted": "تم حذف المشروع",
@@ -2281,9 +2286,66 @@
         "experiments": "التجارب",
         "intelligence": "الذكاء",
         "seoAgent": "وكيل تحسين محركات البحث",
+        "reviewStudio": "Website Review",
         "publish": "النشر",
         "openEditorHint": "أنشئ موقعًا أولاً لفتح المحرر المرئي.",
         "createPreviewHint": "أنشئ موقعًا لفتح المعاينة المباشرة داخل المنصة."
+      },
+      "reviewStudio": {
+        "badge": "AI Review Studio",
+        "title": "{name} — Quality Review",
+        "running": "Running website quality review…",
+        "failedLoad": "Failed to load website review",
+        "applyFailed": "Failed to apply improvements",
+        "rollbackFailed": "Failed to rollback version",
+        "selectWebsite": "Generate or select a website to open the Review Studio.",
+        "strengths": "Strengths",
+        "weaknesses": "Weaknesses",
+        "estimatedGain": "Estimated Quality Gain",
+        "noStrengths": "No major strengths detected yet.",
+        "apply": "Apply",
+        "selected": "Selected",
+        "applySelected": "Apply selected improvements",
+        "selectedCount": "{count} selected",
+        "quality": "quality",
+        "conversion": "conversion",
+        "risk": "Risk",
+        "targetedRegenHint": "Requires AI executor — use deterministic improvements in Phase 1",
+        "version": "Version",
+        "rollback": "Rollback",
+        "noVersions": "No version history yet. Apply improvements to create versions.",
+        "noComparison": "Apply improvements to see before/after comparison.",
+        "points": "points",
+        "appliedChanges": "Applied changes",
+        "tabs": {
+          "dashboard": "Dashboard",
+          "improvements": "Improvements",
+          "versions": "Versions",
+          "compare": "Compare",
+          "reports": "Reports"
+        },
+        "scores": {
+          "overall": "Overall",
+          "design": "Design",
+          "ux": "UX",
+          "business": "Business",
+          "seo": "SEO",
+          "performance": "Performance",
+          "accessibility": "Accessibility",
+          "content": "Content",
+          "localization": "Localization"
+        },
+        "reports": {
+          "executive": "Executive Report",
+          "technical": "Technical Report",
+          "developer": "Developer Report",
+          "benchmark": "Benchmark Report",
+          "priorityActions": "Priority actions",
+          "technicalInsights": "Technical insights",
+          "designInsights": "Design insights",
+          "businessInsights": "Business insights",
+          "noFiles": "No specific files"
+        }
       },
       "workspace": {
         "title": "مساحة عمل المشروع بالذكاء الاصطناعي",
@@ -2312,6 +2374,7 @@
           "structure": "الهيكل",
           "design": "التصميم",
           "blocks": "الكتل",
+          "media": "Media",
           "ai": "الذكاء الاصطناعي",
           "professional": "احترافي",
           "business": "الأعمال",
@@ -2325,11 +2388,11 @@
           "autosaveSaved": "تم حفظ جميع التغييرات",
           "autosaveError": "فشل الحفظ التلقائي",
           "versions": "الإصدارات",
-          "publish": "Publish",
           "openManagementHint": "افتح إدارة الموقع لتحرير هذه الصفحة.",
           "restored": "تمت استعادة {label}",
           "backupSaved": "تم حفظ النسخة الاحتياطية على الخادم.",
-          "backupFailed": "تعذر حفظ النسخة الاحتياطية على الخادم."
+          "backupFailed": "تعذر حفظ النسخة الاحتياطية على الخادم.",
+          "publish": "Publish"
         },
         "pages": {
           "title": "الصفحات",
@@ -2372,13 +2435,34 @@
         "ai": {
           "title": "إجراءات الموقع بالذكاء الاصطناعي",
           "subtitle": "موحّد مع مساعد الموقع — بث، ذاكرة، سياق التحديد، ومراجعة.",
-          "fullModernize": { "label": "تحديث التصميم", "description": "تحديث الأسلوب البصري العام" },
-          "pageAbout": { "label": "إضافة صفحة من نحن", "description": "إنشاء صفحة من نحن جديدة" },
-          "sectionTestimonials": { "label": "إضافة شهادات", "description": "إدراج قسم إثبات اجتماعي" },
-          "sectionHero": { "label": "إعادة توليد البطل", "description": "إعادة كتابة قسم البطل لتحسين التحويل" },
-          "contentHome": { "label": "إعادة كتابة الصفحة الرئيسية", "description": "تحسين رسائل الصفحة الرئيسية" },
-          "imagesFresh": { "label": "تحديث الصور", "description": "استبدال الصور بصور جديدة" },
-          "seoImprove": { "label": "تحسين SEO", "description": "تطبيق توصيات تحسين محركات البحث" }
+          "fullModernize": {
+            "label": "تحديث التصميم",
+            "description": "تحديث الأسلوب البصري العام"
+          },
+          "pageAbout": {
+            "label": "إضافة صفحة من نحن",
+            "description": "إنشاء صفحة من نحن جديدة"
+          },
+          "sectionTestimonials": {
+            "label": "إضافة شهادات",
+            "description": "إدراج قسم إثبات اجتماعي"
+          },
+          "sectionHero": {
+            "label": "إعادة توليد البطل",
+            "description": "إعادة كتابة قسم البطل لتحسين التحويل"
+          },
+          "contentHome": {
+            "label": "إعادة كتابة الصفحة الرئيسية",
+            "description": "تحسين رسائل الصفحة الرئيسية"
+          },
+          "imagesFresh": {
+            "label": "تحديث الصور",
+            "description": "استبدال الصور بصور جديدة"
+          },
+          "seoImprove": {
+            "label": "تحسين SEO",
+            "description": "تطبيق توصيات تحسين محركات البحث"
+          }
         },
         "copilot": {
           "title": "مساعد الموقع",
@@ -2440,12 +2524,30 @@
           "resendFailed": "فشلت إعادة الإرسال.",
           "loadFailed": "فشل تحميل الفريق.",
           "capabilities": {
-            "teams": { "label": "وصول الفريق", "description": "دعوة متعاونين لمشروع موقع" },
-            "roles": { "label": "الأدوار والصلاحيات", "description": "مستويات المالك والمحرر والمشاهد" },
-            "marketplace": { "label": "سوق القوالب", "description": "تصفح وتطبيق قوالب مميزة" },
-            "plugins": { "label": "بنية الإضافات", "description": "خط أنابيب إضافات الموقع (إنشاء، تخطيط، تحقق)" },
-            "api": { "label": "واجهة API عامة", "description": "منصة التصميم والسوق وواجهات المنشئ" },
-            "white-label": { "label": "علامة بيضاء", "description": "علامة تجارية مخصصة عبر إعدادات المؤسسة (أساس)" }
+            "teams": {
+              "label": "وصول الفريق",
+              "description": "دعوة متعاونين لمشروع موقع"
+            },
+            "roles": {
+              "label": "الأدوار والصلاحيات",
+              "description": "مستويات المالك والمحرر والمشاهد"
+            },
+            "marketplace": {
+              "label": "سوق القوالب",
+              "description": "تصفح وتطبيق قوالب مميزة"
+            },
+            "plugins": {
+              "label": "بنية الإضافات",
+              "description": "خط أنابيب إضافات الموقع (إنشاء، تخطيط، تحقق)"
+            },
+            "api": {
+              "label": "واجهة API عامة",
+              "description": "منصة التصميم والسوق وواجهات المنشئ"
+            },
+            "white-label": {
+              "label": "علامة بيضاء",
+              "description": "علامة تجارية مخصصة عبر إعدادات المؤسسة (أساس)"
+            }
           }
         },
         "media": {
@@ -2458,37 +2560,118 @@
           "loadFailed": "فشل تحميل الوسائط."
         },
         "themes": {
-          "luxuryGold": { "label": "ذهبي فاخر", "description": "داكن فاخر بلمسات ذهبية" },
-          "modernMinimal": { "label": "حديث بسيط", "description": "جمالية SaaS فاتحة ونظيفة" },
-          "boldStartup": { "label": "شركة ناشئة جريئة", "description": "تباين عالٍ يركز على التحويل" }
+          "luxuryGold": {
+            "label": "ذهبي فاخر",
+            "description": "داكن فاخر بلمسات ذهبية"
+          },
+          "modernMinimal": {
+            "label": "حديث بسيط",
+            "description": "جمالية SaaS فاتحة ونظيفة"
+          },
+          "boldStartup": {
+            "label": "شركة ناشئة جريئة",
+            "description": "تباين عالٍ يركز على التحويل"
+          }
         },
         "publishingItems": {
-          "quality": { "label": "بوابات الجودة", "description": "اجتياز مراقبة الجودة قبل النشر" },
-          "seo": { "label": "بيانات SEO", "description": "العناوين والأوصاف وخريطة الموقع جاهزة" },
-          "ssl": { "label": "SSL", "description": "HTTPS مفعّل على رابط النشر" },
-          "cdn": { "label": "توصيل CDN", "description": "الأصول الثابتة عبر مسار CDN للمنصة" },
-          "backup": { "label": "لقطة احتياطية", "description": "لقطة مخطط مخزّنة على الخادم" },
-          "performance": { "label": "الأداء", "description": "مؤشرات Core Web Vitals ضمن الأهداف" },
-          "accessibility": { "label": "إمكانية الوصول", "description": "فحوصات أساسية على العلامات المُنشأة" }
+          "quality": {
+            "label": "بوابات الجودة",
+            "description": "اجتياز مراقبة الجودة قبل النشر"
+          },
+          "seo": {
+            "label": "بيانات SEO",
+            "description": "العناوين والأوصاف وخريطة الموقع جاهزة"
+          },
+          "ssl": {
+            "label": "SSL",
+            "description": "HTTPS مفعّل على رابط النشر"
+          },
+          "cdn": {
+            "label": "توصيل CDN",
+            "description": "الأصول الثابتة عبر مسار CDN للمنصة"
+          },
+          "backup": {
+            "label": "لقطة احتياطية",
+            "description": "لقطة مخطط مخزّنة على الخادم"
+          },
+          "performance": {
+            "label": "الأداء",
+            "description": "مؤشرات Core Web Vitals ضمن الأهداف"
+          },
+          "accessibility": {
+            "label": "إمكانية الوصول",
+            "description": "فحوصات أساسية على العلامات المُنشأة"
+          }
         },
         "features": {
-          "templates": { "label": "القوالب", "description": "تطبيق قوالب وتخطيطات صناعية" },
-          "blog": { "label": "المدونة ونظام المحتوى", "description": "إدارة المنشورات والفئات والمحتوى" },
-          "forms": { "label": "النماذج والعملاء المحتملون", "description": "التقاط العملاء المحتملين والرسائل" },
-          "booking": { "label": "الحجز", "description": "إضافة تدفقات حجز المواعيد" },
-          "portfolio": { "label": "معرض الأعمال", "description": "عرض المشاريع ودراسات الحالة" },
-          "pricing": { "label": "جداول الأسعار", "description": "عرض الخطط والباقات" },
-          "testimonials": { "label": "الشهادات", "description": "إثبات اجتماعي ومراجعات" },
-          "faq": { "label": "الأسئلة الشائعة", "description": "الإجابة على أسئلة العملاء الشائعة" },
-          "navigation": { "label": "التنقل", "description": "تحرير روابط الرأس والتذييل" },
-          "contact": { "label": "اتصل بنا", "description": "نماذج الاتصال وتفاصيل العمل" },
-          "analytics": { "label": "التحليلات", "description": "الزيارات والتفاعل ومقاييس التحويل" },
-          "experiments": { "label": "تجارب A/B", "description": "اختبار العناوين ودعوات الإجراء والتخطيطات" },
-          "leads": { "label": "جمع العملاء المحتملين", "description": "إرسال النماذج وتصدير CRM" },
-          "ecommerce": { "label": "كتالوج التجارة الإلكترونية", "description": "المنتجات والخدمات وإدارة الكتالوج" },
-          "membership": { "label": "أساس العضوية", "description": "محتوى مقيّد ومناطق الأعضاء (أساس)" },
-          "marketing": { "label": "أدوات التسويق", "description": "تتبع التحويل وربط الحملات" },
-          "crm": { "label": "تكامل CRM", "description": "Webhook وتوجيه العملاء المحتملين" }
+          "templates": {
+            "label": "القوالب",
+            "description": "تطبيق قوالب وتخطيطات صناعية"
+          },
+          "blog": {
+            "label": "المدونة ونظام المحتوى",
+            "description": "إدارة المنشورات والفئات والمحتوى"
+          },
+          "forms": {
+            "label": "النماذج والعملاء المحتملون",
+            "description": "التقاط العملاء المحتملين والرسائل"
+          },
+          "booking": {
+            "label": "الحجز",
+            "description": "إضافة تدفقات حجز المواعيد"
+          },
+          "portfolio": {
+            "label": "معرض الأعمال",
+            "description": "عرض المشاريع ودراسات الحالة"
+          },
+          "pricing": {
+            "label": "جداول الأسعار",
+            "description": "عرض الخطط والباقات"
+          },
+          "testimonials": {
+            "label": "الشهادات",
+            "description": "إثبات اجتماعي ومراجعات"
+          },
+          "faq": {
+            "label": "الأسئلة الشائعة",
+            "description": "الإجابة على أسئلة العملاء الشائعة"
+          },
+          "navigation": {
+            "label": "التنقل",
+            "description": "تحرير روابط الرأس والتذييل"
+          },
+          "contact": {
+            "label": "اتصل بنا",
+            "description": "نماذج الاتصال وتفاصيل العمل"
+          },
+          "analytics": {
+            "label": "التحليلات",
+            "description": "الزيارات والتفاعل ومقاييس التحويل"
+          },
+          "experiments": {
+            "label": "تجارب A/B",
+            "description": "اختبار العناوين ودعوات الإجراء والتخطيطات"
+          },
+          "leads": {
+            "label": "جمع العملاء المحتملين",
+            "description": "إرسال النماذج وتصدير CRM"
+          },
+          "ecommerce": {
+            "label": "كتالوج التجارة الإلكترونية",
+            "description": "المنتجات والخدمات وإدارة الكتالوج"
+          },
+          "membership": {
+            "label": "أساس العضوية",
+            "description": "محتوى مقيّد ومناطق الأعضاء (أساس)"
+          },
+          "marketing": {
+            "label": "أدوات التسويق",
+            "description": "تتبع التحويل وربط الحملات"
+          },
+          "crm": {
+            "label": "تكامل CRM",
+            "description": "Webhook وتوجيه العملاء المحتملين"
+          }
         }
       },
       "management": {
@@ -2763,6 +2946,14 @@
         "failedToAnalyze": "فشل التحليل",
         "templateIntelligenceTitle": "ذكاء القالب",
         "templateIntelligenceSubtitle": "يختار الذكاء الاصطناعي أفضل مظهر — أو اختر واحدًا في أي وقت",
+        "themesTitle": "Themes",
+        "themesSubtitle": "Complete design redesign — layout, hero, navigation, sections, and UI. Your business content stays the same.",
+        "structureTemplatesTitle": "Templates",
+        "structureTemplatesSubtitle": "Complete website redesign — layout, hero, navigation, sections. Your business content stays the same.",
+        "applyTheme": "Apply theme",
+        "useTheme": "Use theme",
+        "failedApplyTheme": "Failed to apply theme",
+        "appliedThemeRedesigned": "Redesigned with {name} — same business, new design",
         "autoSelect": "اختيار تلقائي",
         "all": "الكل",
         "loadingVisualTemplates": "جارٍ تحميل القوالب المرئية…",
@@ -2819,7 +3010,12 @@
         "qa": "ضمان الجودة",
         "improveStrategyHint": "حسّن التموضع وخريطة الموقع ودعوات الإجراء لتحويلات أعلى.",
         "improveDesignHint": "حدّث نظام الألوان والخطوط وقواعد التخطيط لمظهر أكثر تميزًا.",
-        "improveAssetsHint": "أعد إنشاء صور البطل والأقسام لتناسب العلامة والجمهور."
+        "improveAssetsHint": "أعد إنشاء صور البطل والأقسام لتناسب العلامة والجمهور.",
+        "improvingStrategy": "Analyzing strategy…",
+        "improvingDesign": "Improving design…",
+        "improvingAssets": "Generating better assets…",
+        "layerImproveComplete": "Optimization completed successfully.",
+        "generateBeforeLayerImprove": "Generate the website first, then use Improve strategy, design, or assets."
       },
       "previewExport": {
         "openLivePreview": "فتح المعاينة المباشرة",
@@ -3057,6 +3253,18 @@
         "versionHistory": "سجل الإصدارات",
         "noVersions": "لا توجد إصدارات بعد",
         "restore": "استعادة",
+        "noBrandVoice": "لا يوجد صوت علامة تجارية",
+        "selectDocument": "حدد أو أنشئ مستنداً لبدء الكتابة",
+        "newDocument": "مستند جديد",
+        "untitledDocument": "مستند بدون عنوان",
+        "folderNamePrompt": "اسم المجلد",
+        "projectNamePrompt": "اسم المشروع",
+        "filterAll": "الكل",
+        "filterFavorites": "المفضلة",
+        "filterRecent": "الأخيرة",
+        "loadingWorkspace": "جارٍ تحميل مساحة العمل…",
+        "loadingStudio": "جارٍ تحميل الاستوديو…",
+        "loadingCalendar": "جارٍ تحميل التقويم…",
         "publishTitle": "Publish to web",
         "publishDescription": "Share a public HTML5 page with a copyable link and embed snippet.",
         "publishedStatus": "Published",
@@ -3077,19 +3285,7 @@
         "embedPlaceholder": "Publish to generate an embed snippet.",
         "copyEmbed": "Copy embed",
         "embedCopied": "Embed code copied",
-        "hydrating": "Loading publication…",
-        "noBrandVoice": "لا يوجد صوت علامة تجارية",
-        "selectDocument": "حدد أو أنشئ مستنداً لبدء الكتابة",
-        "newDocument": "مستند جديد",
-        "untitledDocument": "مستند بدون عنوان",
-        "folderNamePrompt": "اسم المجلد",
-        "projectNamePrompt": "اسم المشروع",
-        "filterAll": "الكل",
-        "filterFavorites": "المفضلة",
-        "filterRecent": "الأخيرة",
-        "loadingWorkspace": "جارٍ تحميل مساحة العمل…",
-        "loadingStudio": "جارٍ تحميل الاستوديو…",
-        "loadingCalendar": "جارٍ تحميل التقويم…"
+        "hydrating": "Loading publication…"
       },
       "editor": {
         "improve": "تحسين",
@@ -3552,6 +3748,108 @@
         "strictOff": "لم يتم تعيين VIDEO_PROVIDER_STRICT — يُسمح بالبدائل عند الأخطاء.",
         "fullRenderBlocked": "العرض الكامل يتطلب KLING_API_KEY. وضع المعاينة لا يزال يعمل."
       },
+      "editor": {
+        "loading": "Loading editor…",
+        "errors": {
+          "loadFailed": "Failed to load editor.",
+          "noActivePlan": "This project has no active plan to edit.",
+          "saveFailed": "Save failed.",
+          "undoFailed": "Undo failed.",
+          "redoFailed": "Redo failed.",
+          "regenerationFailed": "Regeneration failed.",
+          "requestFailed": "Request failed ({status})"
+        },
+        "tabs": {
+          "inspector": "Inspector",
+          "audio": "Audio",
+          "text": "Text"
+        },
+        "saveStatus": {
+          "saving": "Saving",
+          "unsaved": "Unsaved changes",
+          "error": "Save failed",
+          "saved": "Saved"
+        },
+        "actions": {
+          "trimStart": "Trim start",
+          "trimEnd": "Trim end",
+          "split": "Split",
+          "regenerateScene": "Regenerate Scene",
+          "production": "Production"
+        },
+        "inspector": {
+          "selectScene": "Select a scene to inspect.",
+          "durationSec": "Duration (sec)",
+          "cameraMove": "Camera move",
+          "visualStyle": "Visual style",
+          "transition": "Transition",
+          "dialogue": "Dialogue",
+          "voiceRequired": "Voice required",
+          "providerPreference": "Provider preference",
+          "fallbackProvider": "Fallback provider",
+          "none": "None",
+          "characters": "Characters",
+          "products": "Products",
+          "referencesUri": "References (uri)"
+        },
+        "captions": {
+          "selectScene": "Select a scene to edit captions.",
+          "captionsEnabled": "Captions enabled",
+          "alignLeft": "Left",
+          "alignCenter": "Center",
+          "alignRight": "Right",
+          "overlayOn": "On",
+          "defaultCaption": "Caption",
+          "addTextOverlay": "Add text overlay"
+        },
+        "audio": {
+          "tts": "TTS",
+          "ttsReady": "TTS ready",
+          "ttsUnavailable": "TTS unavailable",
+          "voice": "Voice",
+          "narration": "Narration",
+          "noVoiceTrack": "No voice track on the audio plan yet.",
+          "music": "Music",
+          "score": "Score",
+          "noMusic": "No music ingested.",
+          "sfx": "SFX",
+          "cue": "Cue",
+          "noSfx": "No SFX ingested.",
+          "muteVoice": "Mute voice",
+          "muteMusic": "Mute music",
+          "voiceLevel": "Voice level",
+          "musicLevel": "Music level",
+          "muteSfx": "Mute SFX",
+          "sfxLevel": "SFX level",
+          "footerNote": "Audio is displayed from the existing Audio Engine. This panel does not generate TTS.",
+          "trackVoice": "{speaker} · {status} · {startSec}s",
+          "trackMusic": "{mood} · {status}",
+          "trackSfx": "{cue} @ {timestampSec}s"
+        },
+        "preview": {
+          "title": "Scene preview",
+          "storyboardFallback": "Storyboard",
+          "emptyPrompt": "Select a scene to preview its storyboard. SVG is not treated as video.",
+          "timeDisplay": "{current}s / {total}s"
+        },
+        "scenes": {
+          "sceneLabel": "Scene {index}",
+          "playableClip": "Playable clip",
+          "storyboardOnly": "Storyboard only"
+        },
+        "timeline": {
+          "label": "Timeline · {duration}s",
+          "zoom": "Zoom",
+          "blockLabel": "S{index}"
+        },
+        "regeneration": {
+          "label": "Regeneration: {status}",
+          "attempt": " · attempt {attempt}",
+          "previous": " · previous {id}",
+          "active": " · active {id}",
+          "errorSuffix": " · {error}"
+        }
+      },
       "management": {
         "loading": "جارٍ تحميل استوديو إنتاج الفيديو...",
         "backToStudio": "العودة إلى Video Studio",
@@ -3565,7 +3863,8 @@
           "export": "تصدير اجتماعي",
           "media": "وسائط",
           "quality": "الجودة",
-          "versions": "الإصدارات"
+          "versions": "الإصدارات",
+          "publish": "Publish"
         },
         "productionModel": "نموذج الإنتاج",
         "productionDescription": "مشروع فيديو منظم — قابل للتعديل دون إعادة إنشاء من الصفر",
@@ -3663,7 +3962,28 @@
         "saveSubtitleCues": "حفظ إشارات الترجمة",
         "cueLinesPlaceholder": "أسطر الإشارات…",
         "applyBrand": "تطبيق العلامة التجارية",
-        "restore": "استعادة"
+        "restore": "استعادة",
+        "publishTitle": "Publish to web",
+        "publishDescription": "Share a public HTML5 page with a copyable link and embed snippet.",
+        "publishedStatus": "Published",
+        "notPublished": "Not published",
+        "publishRequiresRender": "Run a full MP4 render before publishing.",
+        "publishing": "Publishing…",
+        "published": "Video published.",
+        "publishFailed": "Publish failed.",
+        "unpublishing": "Unpublishing…",
+        "unpublishAction": "Unpublish",
+        "unpublished": "Video unpublished.",
+        "unpublishFailed": "Unpublish failed.",
+        "previewPublic": "Preview public page",
+        "publicLink": "Public link",
+        "copyPublicLink": "Copy link",
+        "linkCopied": "Public link copied",
+        "embedCode": "Embed code",
+        "embedPlaceholder": "Publish to generate an embed snippet.",
+        "copyEmbed": "Copy embed",
+        "embedCopied": "Embed code copied",
+        "hydrating": "Loading publication…"
       },
       "history": {
         "count": "{count} فيديو",
@@ -5139,6 +5459,280 @@
         "allIndustries": "جميع الصناعات",
         "allStyles": "جميع الأنماط",
         "resultsHint": "{count} مكونات · اسحب إلى اللوحة أو انقر للإدراج"
+      },
+      "buttonEditor": {
+        "title": "Button properties",
+        "preview": "Live preview",
+        "text": "Text",
+        "labelPlaceholder": "Button label",
+        "link": {
+          "type": "Link type",
+          "internal": "Internal page",
+          "external": "External URL",
+          "email": "Email",
+          "phone": "Phone",
+          "anchor": "Anchor (#section)",
+          "placeholder": "Enter link value"
+        },
+        "target": "Open in",
+        "targetSame": "Same tab",
+        "targetNew": "New tab",
+        "style": "Style",
+        "styles": {
+          "primary": "Primary",
+          "secondary": "Secondary",
+          "outline": "Outline",
+          "ghost": "Ghost",
+          "text": "Text"
+        },
+        "size": "Size",
+        "sizes": {
+          "sm": "Small",
+          "md": "Medium",
+          "lg": "Large"
+        },
+        "width": "Width",
+        "widthAuto": "Auto",
+        "widthFull": "Full width",
+        "radius": "Border radius",
+        "radiusSquare": "Square",
+        "radiusRounded": "Rounded",
+        "radiusPill": "Pill",
+        "radiusCustom": "Custom",
+        "radiusCustomPx": "Custom radius (px)",
+        "colors": "Colors",
+        "colorBackground": "Background",
+        "colorText": "Text",
+        "colorBorder": "Border",
+        "colorHoverBackground": "Hover background",
+        "colorHoverText": "Hover text",
+        "typography": "Typography",
+        "fontSize": "Font size",
+        "letterSpacing": "Letter spacing",
+        "spacing": "Spacing",
+        "padding": "Padding",
+        "margin": "Margin",
+        "icon": "Icon",
+        "iconNone": "None",
+        "iconLeft": "Left icon",
+        "iconRight": "Right icon",
+        "iconRemove": "Remove icon",
+        "accessibility": "Accessibility",
+        "disabledState": "Disabled",
+        "states": {
+          "normal": "Normal",
+          "hover": "Hover",
+          "disabled": "Disabled"
+        },
+        "history": "Edit button"
+      },
+      "linkEditor": {
+        "title": "Link properties",
+        "preview": "Live preview",
+        "label": "Label",
+        "labelPlaceholder": "Link label",
+        "linkType": "Link type",
+        "hrefPlaceholder": "Enter link value",
+        "target": "Open in",
+        "targetSame": "Same tab",
+        "targetNew": "New tab",
+        "rel": "Link rel attributes",
+        "history": "Edit link",
+        "validationBlocked": "Fix invalid links before saving",
+        "types": {
+          "internal": "Internal page",
+          "external": "External URL",
+          "email": "Email",
+          "phone": "Phone",
+          "whatsapp": "WhatsApp",
+          "telegram": "Telegram",
+          "anchor": "Anchor (#section)",
+          "download": "File download"
+        }
+      },
+      "iconEditor": {
+        "title": "Icon properties",
+        "preview": "Live preview",
+        "library": "Icon library",
+        "position": "Position",
+        "positionNone": "None",
+        "positionLeft": "Left",
+        "positionRight": "Right",
+        "positionTop": "Top",
+        "positionBottom": "Bottom",
+        "variant": "Style",
+        "variantOutline": "Outline",
+        "variantFilled": "Filled",
+        "variantDuotone": "Duotone",
+        "size": "Size",
+        "sizeCustom": "Custom",
+        "customSizePx": "Custom size (px)",
+        "colors": "Colors",
+        "colorNormal": "Normal",
+        "colorHover": "Hover",
+        "colorDisabled": "Disabled",
+        "background": "Background",
+        "backgroundNone": "None",
+        "backgroundCircle": "Circle",
+        "backgroundRounded": "Rounded square",
+        "backgroundSquare": "Square",
+        "backgroundColor": "Background color",
+        "border": "Border",
+        "borderWidth": "Width",
+        "borderColor": "Color",
+        "borderRadius": "Radius",
+        "spacing": "Spacing",
+        "margin": "Margin",
+        "padding": "Padding",
+        "rotation": "Rotation",
+        "rotationCustom": "Custom",
+        "customRotationDeg": "Custom degrees",
+        "accessibility": "Accessibility",
+        "decorative": "Decorative icon (hide from screen readers)",
+        "history": "Edit icon",
+        "states": {
+          "normal": "Normal",
+          "hover": "Hover",
+          "disabled": "Disabled"
+        }
+      },
+      "sectionEditor": {
+        "title": "Section",
+        "preview": "Live preview",
+        "position": "Position",
+        "hiddenOnViewport": "Hidden on this viewport",
+        "operations": "Section actions",
+        "insertBefore": "Insert before",
+        "insertAfter": "Insert after",
+        "insertAtEnd": "Insert at end",
+        "fromTemplates": "From templates",
+        "duplicate": "Duplicate",
+        "delete": "Delete",
+        "deleteTitle": "Delete section?",
+        "deleteBody": "This removes the section from the page. You can undo with Ctrl+Z before saving.",
+        "deleted": "Section removed — undo to restore",
+        "cancel": "Cancel",
+        "move": "Move",
+        "moveUp": "Move up",
+        "moveDown": "Move down",
+        "visibility": "Visibility",
+        "visibilityShow": "Show",
+        "visibilityHide": "Hide",
+        "visibilityDesktop": "Desktop only",
+        "visibilityTablet": "Tablet only",
+        "visibilityMobile": "Mobile only",
+        "layout": "Layout",
+        "widthFull": "Full width",
+        "widthBoxed": "Boxed",
+        "widthContainer": "Container",
+        "alignLeft": "Left",
+        "alignCenter": "Center",
+        "alignRight": "Right",
+        "alignStretch": "Stretch",
+        "columns": "Columns",
+        "gap": "Gap",
+        "settings": "Section settings",
+        "htmlId": "HTML ID",
+        "anchor": "Anchor",
+        "cssClasses": "CSS classes",
+        "customAttributes": "Custom attributes",
+        "styling": "Styling",
+        "padding": "Padding",
+        "margin": "Margin",
+        "borderWidth": "Border width",
+        "borderColor": "Border color",
+        "radius": "Radius",
+        "shadow": "Shadow",
+        "opacity": "Opacity",
+        "zIndex": "Z-index",
+        "overflowVisible": "Visible",
+        "overflowHidden": "Hidden",
+        "overflowAuto": "Auto",
+        "overflowScroll": "Scroll",
+        "animation": "Animation",
+        "animNone": "None",
+        "animFade": "Fade",
+        "animSlide": "Slide",
+        "animZoom": "Zoom",
+        "duration": "Duration (ms)",
+        "delay": "Delay (ms)",
+        "background": "Background",
+        "ai": "AI actions",
+        "aiImprove": "Improve",
+        "aiRegenerate": "Regenerate",
+        "aiRewrite": "Rewrite",
+        "aiMoreItems": "More items",
+        "aiQueued": "Queue AI section edit",
+        "aiQueuedHint": "AI action queued — save to apply",
+        "history": "Edit section",
+        "historyMove": "Move section"
+      },
+      "backgroundEditor": {
+        "title": "Background image",
+        "preview": "Live preview",
+        "source": "Background source",
+        "upload": "Upload",
+        "mediaLibrary": "Media library",
+        "aiGenerate": "AI image",
+        "aiHint": "Pick an AI-generated image from the media library",
+        "remove": "Remove",
+        "urlPlaceholder": "Image URL",
+        "displayMode": "Display mode",
+        "position": "Position",
+        "positionX": "Custom X",
+        "positionY": "Custom Y",
+        "overlay": "Overlay",
+        "overlayEnabled": "Enable overlay",
+        "overlaySolid": "Solid",
+        "overlayGradient": "Gradient",
+        "overlayNone": "None",
+        "overlayColor": "Overlay color",
+        "overlayOpacity": "Opacity %",
+        "overlayGradientValue": "Gradient CSS",
+        "overlayBlur": "Overlay blur (px)",
+        "effects": "Effects",
+        "brightness": "Brightness",
+        "contrast": "Contrast",
+        "saturation": "Saturation",
+        "grayscale": "Grayscale",
+        "blur": "Blur",
+        "parallax": "Parallax",
+        "parallaxOn": "Enable parallax",
+        "borderRadius": "Border radius",
+        "sectionHeight": "Section height",
+        "customHeightPx": "Custom height (px)",
+        "mobile": "Mobile settings",
+        "hideOnMobile": "Hide background on mobile",
+        "mobileUrlPlaceholder": "Mobile image URL (optional)",
+        "accessibility": "Accessibility",
+        "decorative": "Decorative background",
+        "altPlaceholder": "Alt text",
+        "history": "Edit background",
+        "modes": {
+          "cover": "Cover",
+          "contain": "Contain",
+          "fill": "Fill",
+          "fitWidth": "Fit width",
+          "fitHeight": "Fit height",
+          "repeat": "Repeat",
+          "noRepeat": "No repeat"
+        },
+        "positions": {
+          "center": "Center",
+          "top": "Top",
+          "bottom": "Bottom",
+          "left": "Left",
+          "right": "Right",
+          "custom": "Custom"
+        },
+        "heights": {
+          "auto": "Auto",
+          "sm": "Small",
+          "md": "Medium",
+          "lg": "Large",
+          "fullscreen": "Full screen",
+          "custom": "Custom"
+        }
       }
     },
     "creatorMarketplace": {
@@ -5233,22 +5827,31 @@
       "openWebsiteBuilder": "فتح منشئ المواقع",
       "searchPlaceholder": "ابحث عن مطاعم، SaaS، مالية...",
       "allCategories": "جميع الفئات",
-      "allStyles": "جميع الأنماط",
-      "aiRecommendations": "توصيات القوالب بالذكاء الاصطناعي",
-      "aiRecommendationsDescription": "تحليل الصناعة، الهدف التجاري، والجمهور — ثم اختر أفضل قالب بداية قبل التوليد.",
-      "industryPlaceholder": "الصناعة (مثل: مطعم)",
-      "goalPlaceholder": "الهدف التجاري (عملاء محتملون، حجوزات...)",
-      "audiencePlaceholder": "الجمهور",
-      "recommend": "توصية",
-      "briefPlaceholder": "موجز تجاري اختياري لمطابقة أكثر ذكاءً...",
+      "allAvailability": "All templates",
+      "installedOnly": "Installed only",
+      "remoteOnlyFilter": "Remote only",
+      "tagsFilter": "Tags",
+      "featured": "Featured",
+      "featuredSection": "Featured templates",
+      "installed": "Installed",
+      "remote": "Remote",
+      "remoteOnly": "Remote only",
+      "remoteOnlyHint": "Install this template in Website Builder to use it. Remote downloads are not available yet.",
       "popular": "شائع",
       "library": "المكتبة",
       "loading": "جارٍ تحميل السوق...",
       "noResults": "لا توجد قوالب تطابق هذه الفلاتر.",
+      "createFirst": "Create First Template",
+      "createUnavailable": "Template creation is not available yet.",
       "previewTitle": "معاينة القالب",
       "previewDescription": "معاينة هيكلية حية قبل الإنشاء.",
       "previewUnavailable": "المعاينة غير متاحة",
       "previewIframe": "معاينة القالب",
+      "details": "Details",
+      "metadataSection": "Author & tags",
+      "categoryLabel": "Category · {category}",
+      "authorLabel": "Author · {author}",
+      "regionsPages": "{regions} regions · {pages} pages",
       "intelligence": "الذكاء",
       "industry": "الصناعة",
       "style": "النمط",
@@ -5258,11 +5861,25 @@
       "pipelineHint": "يربط التصميم · العلامة التجارية · الأصول · المحرر · الجودة",
       "useThisTemplate": "استخدم هذا القالب",
       "preview": "معاينة",
+      "close": "Close",
       "use": "استخدام",
+      "install": "Install",
+      "installToUse": "Install this template to enable Use",
+      "installSuccess": "{name} installed — ready to use",
+      "installAlreadyDone": "{name} is already installed",
+      "installComingSoon": "Installation coming soon",
+      "notInstalled": "Not installed",
       "layoutLabel": "تخطيط · {type}",
       "audienceLabel": "جمهور · {audience}",
       "featuresLabel": "ميزات · {features}",
       "badgeScore": "{score}% : {reason}",
+      "sort": {
+        "featured": "Featured first",
+        "name-asc": "Name (A–Z)",
+        "name-desc": "Name (Z–A)",
+        "released-desc": "Newest",
+        "category-asc": "Category"
+      },
       "viewports": {
         "desktop": "سطح المكتب",
         "tablet": "الجهاز اللوحي",
@@ -5271,8 +5888,17 @@
       "errors": {
         "loadFailed": "فشل تحميل السوق",
         "previewFailed": "فشلت المعاينة",
-        "recommendFailed": "فشلت التوصية"
-      }
+        "recommendFailed": "فشلت التوصية",
+        "installFailed": "Template installation failed"
+      },
+      "allStyles": "جميع الأنماط",
+      "aiRecommendations": "توصيات القوالب بالذكاء الاصطناعي",
+      "aiRecommendationsDescription": "تحليل الصناعة، الهدف التجاري، والجمهور — ثم اختر أفضل قالب بداية قبل التوليد.",
+      "industryPlaceholder": "الصناعة (مثل: مطعم)",
+      "goalPlaceholder": "الهدف التجاري (عملاء محتملون، حجوزات...)",
+      "audiencePlaceholder": "الجمهور",
+      "recommend": "توصية",
+      "briefPlaceholder": "موجز تجاري اختياري لمطابقة أكثر ذكاءً..."
     }
   },
   "contentStudio": {
@@ -6060,6 +6686,13 @@
         "admin": "مسؤول"
       },
       "webhookEvents": {
+        "generation.completed": "Generation Completed",
+        "generation.failed": "Generation Failed",
+        "member.invited": "Member Invited",
+        "member.joined": "Member Joined",
+        "member.removed": "Member Removed",
+        "api_key.created": "API Key Created",
+        "export.completed": "Export Completed",
         "generation": {
           "completed": "اكتمل التوليد",
           "failed": "فشل التوليد"
@@ -7030,6 +7663,9 @@
         "commerce": "التجارة",
         "planning": "التخطيط"
       },
+      "templateCategories": {},
+      "platforms": {},
+      "calendarCategories": {},
       "calendarStatuses": {
         "draft": "مسودة",
         "scheduled": "مجدول",

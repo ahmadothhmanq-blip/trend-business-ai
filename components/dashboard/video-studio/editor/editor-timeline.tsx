@@ -1,5 +1,6 @@
 "use client";
 
+import { useVideoEditorT } from "@/components/dashboard/video-studio/editor/use-video-editor-t";
 import { cn } from "@/lib/utils";
 import type { Scene } from "@/lib/ai-core/video-production-platform/domain/contracts";
 
@@ -22,6 +23,7 @@ export function EditorTimeline({
   onReorder: (orderedIds: string[]) => void;
   onZoom: (zoom: number) => void;
 }) {
+  const { et } = useVideoEditorT();
   const total = Math.max(1, scenes.reduce((sum, scene) => sum + scene.duration, 0));
   const blocks = scenes.reduce<Array<{ scene: Scene; start: number; end: number }>>(
     (acc, scene) => {
@@ -35,9 +37,9 @@ export function EditorTimeline({
   return (
     <section className="border-t border-white/10 bg-black/30 p-3">
       <div className="mb-2 flex items-center justify-between gap-2 text-xs text-white/50">
-        <span>Timeline · {total.toFixed(1)}s</span>
+        <span>{et("timeline.label", { duration: total.toFixed(1) })}</span>
         <label className="flex items-center gap-2">
-          Zoom
+          {et("timeline.zoom")}
           <input
             type="range"
             min={0.6}
@@ -89,7 +91,7 @@ export function EditorTimeline({
               width: `${(block.scene.duration / total) * 100}%`,
             }}
           >
-            <span className="block truncate px-2 pt-1 font-semibold">S{index + 1}</span>
+            <span className="block truncate px-2 pt-1 font-semibold">{et("timeline.blockLabel", { index: index + 1 })}</span>
             <span className="block px-2 text-white/60">{block.scene.duration.toFixed(1)}s</span>
           </button>
         ))}
