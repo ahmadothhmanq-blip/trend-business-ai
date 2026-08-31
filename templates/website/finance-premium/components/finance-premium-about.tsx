@@ -1,8 +1,12 @@
 "use client";
 
-import { SlotImage } from "@/lib/website/template-v2/slots";
+const HIGHLIGHTS = [
+  "Founded in 1987 — four decades of fiduciary counsel",
+  "Serving family offices, endowments, and sovereign institutions",
+  "Independent advice with no proprietary product conflicts",
+];
 
-type Props = {
+type FinancePremiumAboutProps = {
   eyebrow?: string;
   title?: string;
   subtitle?: string;
@@ -13,75 +17,44 @@ type Props = {
 };
 
 export function FinancePremiumAbout({
-  eyebrow = "Our philosophy",
-  title = "Discipline, discretion, and generational thinking",
-  subtitle,
-  body = "For over a century, Meridian Capital has served as steward to families and institutions — combining institutional rigor with the personal attention only a private partnership can offer.",
-  imageUrl,
-  highlights = [
-    "SEC-registered investment adviser",
-    "Offices across North America, Europe, and Asia",
-    "Fiduciary standard across all engagements",
-  ],
+  eyebrow = "The firm",
+  title = "Capital stewardship across generations",
+  subtitle = "Independent advisory for those who measure success in decades, not quarters.",
+  body = "Ledger was built on a single principle: institutional discipline should be accessible to families and organizations navigating complex global markets. Our partners combine portfolio construction, tax-aware planning, and governance — without the conflicts of a balance-sheet bank.",
+  imageUrl = null,
+  highlights = HIGHLIGHTS,
   primaryCta = "Meet our partners",
-}: Props) {
+}: FinancePremiumAboutProps) {
   return (
-    <section
-      id="about"
-      data-v2-component="finance-premium-about"
-      aria-labelledby="about-title"
-      className="fn-section bg-[var(--color-background)]"
-    >
-      <div className="mx-auto max-w-[82rem] px-5 sm:px-8">
-        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
-          <div>
-            <p className="fn-eyebrow mb-3">{eyebrow}</p>
-            <h2 id="about-title" className="fn-headline-sm">
-              {title}
-            </h2>
-            <div className="fn-accent-line mt-4" aria-hidden />
-            {subtitle ? <p className="fn-body text-muted-foreground mt-4">{subtitle}</p> : null}
-            <p className="fn-body text-muted-foreground mt-6">{body}</p>
-            {highlights.length > 0 ? (
-              <ul className="mt-8 grid gap-3 sm:grid-cols-2" role="list">
-                {highlights.map((item) => (
-                  <li
-                    key={item}
-                    className="fn-font-body flex gap-3 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-foreground)]"
-                  >
-                    <span
-                      className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-[0.625rem] font-bold text-[var(--color-signal)]"
-                      aria-hidden
-                    >
-                      ✓
-                    </span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-            <a href="#contact" className="fn-btn-primary fn-focus-ring mt-8 inline-flex">
-              {primaryCta}
-            </a>
-          </div>
+    <section id="about" data-v2-component="finance-premium-about" aria-labelledby="fn-about-title" className="df-reveal fn-section py-20 sm:py-28">
+      <div className="df-reveal-stagger mx-auto grid max-w-[82rem] items-center gap-12 px-5 lg:grid-cols-2 sm:px-8">
+        <div className="min-w-0">
+          <p className="fn-eyebrow">{eyebrow}</p>
+          <h2 id="fn-about-title" className="fn-headline-sm mt-3 text-balance">{title}</h2>
+          <p className="fn-body mt-4 text-[var(--color-muted)]">{subtitle}</p>
+          <p className="fn-body mt-6 leading-relaxed">{body}</p>
+          <ul className="mt-8 space-y-3">
+            {highlights.map((h) => (
+              <li key={h} className="flex gap-3 text-sm">
+                <span className="shrink-0 text-[var(--color-accent)]" aria-hidden>—</span>
+                <span>{h}</span>
+              </li>
+            ))}
+          </ul>
+          <a href="#contact" className="fn-btn-primary fn-focus-ring mt-10 inline-flex">{primaryCta}</a>
+        </div>
+        <div className="relative min-h-[18rem] overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--color-primary)] p-8 text-white lg:min-h-[24rem]">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_100%_0%,color-mix(in_srgb,var(--color-accent)_25%,transparent),transparent)]" aria-hidden />
           <div className="relative">
-            <div className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-accent)] bg-[var(--color-ink)] p-1.5 shadow-[var(--shadow-surface)]">
-              <div className="fn-gold-rule mb-1 opacity-50" aria-hidden />
-              <SlotImage
-                slot="about"
-                index={0}
-                preferred={imageUrl}
-                alt="Meridian Capital partners in a private consultation"
-                className="aspect-[4/3] w-full rounded-[calc(var(--radius-lg)-4px)] object-cover"
-                loading="lazy"
-              />
+            <p className="fn-font-mono text-[0.6875rem] uppercase tracking-[0.2em] text-[var(--color-accent)]">Since 1987</p>
+            <p className="fn-font-display mt-6 text-4xl font-semibold leading-none">40+</p>
+            <p className="mt-2 text-sm text-white/70">Years advising across market cycles</p>
+            <div className="mt-10 space-y-4 border-t border-white/15 pt-8 text-sm text-white/80">
+              <p>New York · London · Singapore · Zurich</p>
+              <p>SEC Registered · FCA Authorized</p>
             </div>
-            <p
-              className="fn-font-body absolute -bottom-4 start-6 max-w-[14rem] rounded-[var(--radius-sm)] border border-[var(--border-accent)] bg-[var(--color-surface)] px-4 py-3 text-xs font-semibold text-[var(--color-foreground)] shadow-[var(--shadow-card)]"
-            >
-              Est. 1884 · New York
-            </p>
           </div>
+          {imageUrl ? <img src={imageUrl} alt="" className="sr-only" aria-hidden /> : null}
         </div>
       </div>
     </section>

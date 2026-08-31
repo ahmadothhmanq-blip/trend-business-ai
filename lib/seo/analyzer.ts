@@ -6,6 +6,7 @@ import {
   generateDynamicDescription,
   generateDynamicTitle,
 } from "@/lib/seo/dynamic-engine";
+import { aiOutputLanguageDirective } from "@/lib/ai/prompts/language-directive.server";
 
 export type SeoIssueSeverity = "critical" | "warning" | "info";
 
@@ -327,6 +328,8 @@ export const seoAnalyzeBodySchema = z.object({
   internalLinkCount: z.number().int().min(0).max(500).optional(),
   imageAltMissing: z.number().int().min(0).max(100).optional(),
   useAi: z.boolean().optional(),
+  language: z.string().trim().optional(),
+  country: z.string().trim().optional(),
 });
 
 export type SeoAnalyzeBody = z.infer<typeof seoAnalyzeBodySchema>;
@@ -335,6 +338,7 @@ export type SeoAnalyzeBody = z.infer<typeof seoAnalyzeBodySchema>;
 export async function enrichSeoAnalysisWithAi(
   result: SeoAnalyzeResult,
   input: SeoAnalyzeInput,
+  language?: string,
 ): Promise<SeoAnalyzeResult> {
   try {
     const { providerManager } = await import("@/lib/ai/provider-manager");
@@ -356,7 +360,7 @@ Top issues: ${result.issues
           .join("; ")}
 Content excerpt: ${(input.content ?? "").slice(0, 800)}
 
-Provide prioritized SEO improvements for this page.`,
+Provide prioritized SEO improvements for this page.${aiOutputLanguageDirective(language, "marketing")}`,
         temperature: 0.4,
       },
       providerName,

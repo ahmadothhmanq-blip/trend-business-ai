@@ -189,7 +189,7 @@ export function resolveMotionStrategy(
     reducedMotionFallback: "fade",
     heroEntrance: intensity === "expressive" ? "slide-up" : "fade",
     sectionEntrance: "slide-up",
-    microInteractions: intensity !== "none",
+    microInteractions: true,
     parallax: style === "cinematic" && a11y === "standard",
   };
 }

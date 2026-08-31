@@ -2,6 +2,15 @@ import type { WebsiteBlueprint } from "@/lib/website/template-v2/blueprint/types
 import type { TemplateV2MotionConfig } from "@/lib/website/template-v2/contracts/motion";
 import type { TemplateV2PackageBundle } from "@/lib/website/template-v2/contracts/package";
 import type { TemplateV2DesignTokens } from "@/lib/website/template-v2/contracts/tokens";
+import { isVisualSkinV2PackageId } from "@/lib/website/visual-skin/theme-bridge";
+
+/** Flagship / TBDP-native packages ship curated colors and typography — blueprint must not replace them. */
+export function shouldPreservePackageVisualIdentity(
+  bundle: Pick<TemplateV2PackageBundle, "packageId" | "tbdpNative">,
+): boolean {
+  if (bundle.tbdpNative?.enabled) return true;
+  return isVisualSkinV2PackageId(bundle.packageId);
+}
 
 /**
  * Merge optimized blueprint design decisions into the V2 package bundle.
@@ -11,25 +20,30 @@ export function applyBlueprintToBundle(
   bundle: TemplateV2PackageBundle,
   blueprint: WebsiteBlueprint,
 ): TemplateV2PackageBundle {
+  const preserveVisual = shouldPreservePackageVisualIdentity(bundle);
   const colors = blueprint.colorPalette.colors;
   const tokens: TemplateV2DesignTokens = {
     ...bundle.tokens,
-    colors: {
-      ...bundle.tokens.colors,
-      primary: colors.primary,
-      secondary: colors.secondary,
-      accent: colors.accent,
-      background: colors.background,
-      foreground: colors.foreground,
-      muted: colors.muted,
-      surface: colors.surface,
-      signal: colors.signal,
-    },
-    typography: {
-      ...bundle.tokens.typography,
-      display: blueprint.typographyProfile.display,
-      body: blueprint.typographyProfile.body,
-    },
+    colors: preserveVisual
+      ? bundle.tokens.colors
+      : {
+          ...bundle.tokens.colors,
+          primary: colors.primary,
+          secondary: colors.secondary,
+          accent: colors.accent,
+          background: colors.background,
+          foreground: colors.foreground,
+          muted: colors.muted,
+          surface: colors.surface,
+          signal: colors.signal,
+        },
+    typography: preserveVisual
+      ? bundle.tokens.typography
+      : {
+          ...bundle.tokens.typography,
+          display: blueprint.typographyProfile.display,
+          body: blueprint.typographyProfile.body,
+        },
     languageProfile: blueprint.accessibilityProfile.rtlSupport
       ? {
           ...bundle.tokens.languageProfile,

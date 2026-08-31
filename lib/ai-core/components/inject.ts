@@ -66,12 +66,19 @@ export function injectProfessionalComponents(params: {
   floatingCta?: boolean;
   /** When true, rebuild home page design even for localized LLM copy projects. */
   forceDesignRebuild?: boolean;
+  /** Visual skin id — adds page-level skin class hooks. */
+  visualSkinId?: string | null;
+  /** Hero layoutMode for theme-scoped hero scaffolds. */
+  heroLayoutMode?: string | null;
 }): GeneratedProjectFile[] {
   const paths = new Set<string>([
     SECTION_SHELL_PATH,
     MOTION_PATH,
     ...(params.componentPaths ?? []),
-    ...listProfessionalScaffoldPaths(params.componentIds ?? []),
+    ...listProfessionalScaffoldPaths([
+      ...(params.componentIds ?? []),
+      ...(params.homeComponentOrder ?? []),
+    ]),
   ]);
 
   const byPath = new Map(params.files.map((f) => [f.path, f]));
@@ -135,6 +142,9 @@ export function injectProfessionalComponents(params: {
         websiteThemeId: params.websiteThemeId,
         pageTopology: params.pageTopology,
         floatingCta: params.floatingCta,
+        forceDesignRebuild: params.forceDesignRebuild,
+        visualSkinId: params.visualSkinId,
+        heroLayoutMode: params.heroLayoutMode,
       }),
       language: "tsx",
     });

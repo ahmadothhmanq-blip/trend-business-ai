@@ -1,7 +1,7 @@
 {
   "tbdpNative": true,
-  "sectorDnaId": "logistics",
-  "experienceProfiles": ["luxury", "editorial", "minimal"],
+  "sectorDnaId": "saas",
+  "experienceProfiles": ["technical", "corporate", "executive"],
   "structure": {
     "regions": {
       "header": { "sticky": true, "position": "top" },
@@ -11,10 +11,10 @@
     },
     "components": {
       "ecommerce-premium-hero": {
-        "layout": { "lg": "editorial-split", "sm": "stacked" }
+        "layout": { "lg": "bento-command", "sm": "stacked" }
       },
-      "ecommerce-premium-product-grid": {
-        "layout": { "lg": "masonry-catalog", "sm": "stacked" }
+      "ecommerce-premium-features": {
+        "layout": { "lg": "bento-asymmetric", "sm": "stacked" }
       }
     }
   }

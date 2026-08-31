@@ -40,6 +40,8 @@ import {
   OnePromptExperience,
   type ProjectHistoryItem,
 } from "@/components/dashboard/builder-shared";
+import { GlsGenerationLanguageSelect } from "@/components/dashboard/language/gls-generation-language-select";
+import { getInitialGlsGenerationLanguage, glsGenerationLanguagePayload } from "@/lib/language-platform/generation/service";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n/client";
 import { translateOption } from "@/lib/i18n/product-options";
@@ -50,7 +52,6 @@ import {
   CONTENT_TOOLS,
   CONTENT_TONES,
   CONTENT_AUDIENCES,
-  CONTENT_LANGUAGES,
   WRITING_STYLES,
   CREATIVITY_LEVELS,
   CONTENT_OPTION_LIST,
@@ -356,7 +357,7 @@ export function ContentStudioTool({ initialGenerations }: Props) {
   const [prompt, setPrompt] = useState("");
   const [tone, setTone] = useState("Professional");
   const [audience, setAudience] = useState("General");
-  const [language, setLanguage] = useState("English");
+  const [language, setLanguage] = useState(() => getInitialGlsGenerationLanguage());
   const [brandVoice, setBrandVoice] = useState("");
   const [brandIdentityId, setBrandIdentityId] = useState("");
   const [brandOptions, setBrandOptions] = useState<{ id: string; brand_name: string }[]>([]);
@@ -460,7 +461,7 @@ export function ContentStudioTool({ initialGenerations }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prompt: idea, contentTool, contentType,
-          tone, audience, language, brandVoice, writingStyle,
+          tone, audience, ...glsGenerationLanguagePayload(language), brandVoice, writingStyle,
           creativityLevel, options: contentOptions, seoKeywords, mode, parentGenerationId,
           brandIdentityId: brandIdentityId || undefined,
           continueInstruction: mode === "continue" ? idea : undefined,
@@ -483,7 +484,7 @@ export function ContentStudioTool({ initialGenerations }: Props) {
     setSelectedType(gen.content_type);
     setTone(gen.tone);
     setAudience(gen.audience);
-    setLanguage(gen.language);
+    setLanguage(gen.language || "English");
     setBrandVoice(gen.brand_voice);
     setWritingStyle(gen.writing_style);
     setCreativityLevel(gen.creativity_level);
@@ -658,9 +659,7 @@ export function ContentStudioTool({ initialGenerations }: Props) {
                 </div>
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-white/60">{p("labels.language")}</label>
-                  <select value={language} onChange={(e) => setLanguage(e.target.value)} className={dashboardSelectClass}>
-                    {CONTENT_LANGUAGES.map((lang) => <option key={lang} value={lang}>{translateOption(t, "constants.contentStudio.languages", lang)}</option>)}
-                  </select>
+                  <GlsGenerationLanguageSelect serviceId="content-studio" value={language} onChange={setLanguage} />
                 </div>
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.writingStyle")}</label>

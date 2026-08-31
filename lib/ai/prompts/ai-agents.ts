@@ -1,5 +1,6 @@
 import { AGENT_TOOLS } from "@/lib/constants/ai-agents";
 import { sanitizePromptInput } from "@/lib/ai/sanitize";
+import { aiOutputLanguageDirective } from "@/lib/ai/prompts/language-directive.server";
 
 export function agentAnalyzePrompt(input: {
   task: string;
@@ -7,6 +8,7 @@ export function agentAnalyzePrompt(input: {
   systemPrompt: string;
   tools: string[];
   context?: string;
+  language?: string;
 }): string {
   const task = sanitizePromptInput(input.task);
   const sysPrompt = sanitizePromptInput(input.systemPrompt);
@@ -35,7 +37,7 @@ Analyze this task and produce a JSON response:
   "clarifications": []
 }
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(input.language, "agent")}`;
 }
 
 export function agentPlanPrompt(input: {
@@ -44,6 +46,7 @@ export function agentPlanPrompt(input: {
   systemPrompt: string;
   tools: string[];
   analysis: { taskSummary: string; requiredSteps: string[]; toolsNeeded: string[] };
+  language?: string;
 }): string {
   return `You are an AI agent of type "${input.agentType}".
 
@@ -75,7 +78,7 @@ Create a detailed execution plan as JSON:
   "successCriteria": ["criterion 1"]
 }
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(input.language, "agent")}`;
 }
 
 export function agentExecutePrompt(input: {
@@ -85,6 +88,7 @@ export function agentExecutePrompt(input: {
   step: { name: string; description: string; action: string; tool: string | null };
   previousOutputs: Record<string, unknown>;
   memory?: string[];
+  language?: string;
 }): string {
   const prev = Object.keys(input.previousOutputs).length > 0
     ? `\nPREVIOUS STEP OUTPUTS:\n${JSON.stringify(input.previousOutputs, null, 2)}`
@@ -115,13 +119,14 @@ Execute this step and produce a detailed JSON response:
   "notes": ["any relevant notes"]
 }
 
-Be thorough and produce actionable results. Return ONLY valid JSON.`;
+Be thorough and produce actionable results. Return ONLY valid JSON.${aiOutputLanguageDirective(input.language, "agent")}`;
 }
 
 export function agentSummarizePrompt(input: {
   task: string;
   agentType: string;
   stepResults: { name: string; result: string }[];
+  language?: string;
 }): string {
   const results = input.stepResults.map((s, i) => `${i + 1}. ${s.name}: ${s.result}`).join("\n");
 
@@ -150,5 +155,5 @@ Create a comprehensive final summary as JSON:
   }
 }
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(input.language, "agent")}`;
 }

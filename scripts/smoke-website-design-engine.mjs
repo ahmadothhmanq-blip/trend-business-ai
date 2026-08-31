@@ -12,7 +12,7 @@ const required = [
   "plugins/website/layers/business-idea.ts",
   "plugins/website/layers/strategy.ts",
   "plugins/website/layers/design-engine.ts",
-  "plugins/website/layers/assets.ts",
+  "lib/ai-core/image-engine/engine.ts",
   "plugins/website/layers/quality.ts",
   "lib/website/assets-storage.ts",
   "lib/ai/prompts/website-layers.ts",

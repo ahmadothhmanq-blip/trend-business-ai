@@ -12,14 +12,14 @@ import {
 import { resolveStructureTemplateForIndustry } from "@/lib/website/builder/structure-templates";
 
 describe("EDS-001 industry structure routing", () => {
-  it("maps furniture to modern-business structure package", () => {
+  it("maps furniture to corporate-business structure package", () => {
     assert.equal(normalizeRoutingIndustryId("Furniture Showroom"), "furniture");
     assert.equal(
       resolveStructureTemplateIdForIndustry("furniture"),
-      "modern-business",
+      "corporate-business",
     );
     const structure = resolveStructureTemplateForIndustry("furniture");
-    assert.equal(structure.id, "modern-business");
+    assert.equal(structure.id, "corporate-business");
     assert.equal(structure.templateIntelligenceId, "ti-corporate-trust");
   });
 
@@ -55,20 +55,26 @@ describe("EDS-001 industry structure routing", () => {
     );
   });
 
-  it("maps tourism to modern-business", () => {
+  it("maps tourism to hotel-resort-premium", () => {
     assert.equal(
       resolveStructureTemplateIdForIndustry("tourism"),
-      "modern-business",
+      "hotel-resort-premium",
     );
   });
 
-  it("maps technology to ai-startup-signal", () => {
+  it("maps technology to saas-enterprise", () => {
     assert.equal(
       resolveStructureTemplateIdForIndustry("technology"),
-      "ai-startup-signal",
+      "saas-enterprise",
     );
     const structure = resolveStructureTemplateForIndustry("technology");
-    assert.equal(structure.id, "ai-startup-signal");
-    assert.equal(structure.templateIntelligenceId, "ti-ai-company-signal");
+    assert.equal(structure.id, "saas-enterprise");
+  });
+
+  it("maps gaming to saas-enterprise", () => {
+    assert.equal(
+      resolveStructureTemplateIdForIndustry("gaming"),
+      "saas-enterprise",
+    );
   });
 });

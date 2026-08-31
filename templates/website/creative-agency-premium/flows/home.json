@@ -1,16 +1,21 @@
 {
   "pageId": "home",
-  "layoutId": "editorial-reveal",
+  "layoutId": "default",
   "regions": {
+    "header": ["creative-agency-premium-nav"],
     "main": [
       "creative-agency-premium-hero",
-      "creative-agency-premium-selected-work",
-      "creative-agency-premium-case-grid",
-      "creative-agency-premium-manifesto",
-      "creative-agency-premium-capabilities",
-      "creative-agency-premium-process",
-      "creative-agency-premium-collaborate-cta"
+      "creative-agency-premium-features",
+      "creative-agency-premium-integrations",
+      "creative-agency-premium-about",
+      "creative-agency-premium-stats",
+      "creative-agency-premium-testimonials",
+      "creative-agency-premium-pricing",
+      "creative-agency-premium-faq",
+      "creative-agency-premium-contact"
     ],
-    "overlay": ["creative-agency-premium-overlay-showcase"]
+    "utility": ["creative-agency-premium-utility-band"],
+    "overlay": ["creative-agency-premium-floating-cta"],
+    "footer": ["creative-agency-premium-footer"]
   }
 }

@@ -1,16 +1,20 @@
 {
   "pageId": "home",
-  "layoutId": "sidebar-right",
+  "layoutId": "default",
   "regions": {
-    "sidebar": ["real-estate-premium-dossier-rail"],
+    "header": ["real-estate-premium-nav"],
     "main": [
       "real-estate-premium-hero",
-      "real-estate-premium-collection",
-      "real-estate-premium-neighborhoods",
-      "real-estate-premium-architecture",
-      "real-estate-premium-advisors",
+      "real-estate-premium-features",
+      "real-estate-premium-portfolio",
+      "real-estate-premium-about",
+      "real-estate-premium-stats",
       "real-estate-premium-testimonials",
-      "real-estate-premium-inquiry"
-    ]
+      "real-estate-premium-pricing",
+      "real-estate-premium-contact"
+    ],
+    "utility": [],
+    "overlay": [],
+    "footer": ["real-estate-premium-footer"]
   }
 }

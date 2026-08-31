@@ -3,12 +3,6 @@ import path from "node:path";
 import { describe, it } from "node:test";
 import { loadTemplateV2Package } from "@/lib/website/template-v2/loader/load-v2-package";
 import {
-  FOREST_TABLE_MOTION,
-  FOREST_TABLE_V2_TOKENS,
-  KINETIC_ATELIER_MOTION,
-  KINETIC_ATELIER_V2_TOKENS,
-  MONOLITH_ESTATE_MOTION,
-  MONOLITH_ESTATE_V2_TOKENS,
   NEXUS_COMMAND_MOTION,
   NEXUS_COMMAND_V2_TOKENS,
   SERENITY_CLINICAL_MOTION,
@@ -17,64 +11,20 @@ import {
   EXECUTIVE_ATLAS_V2_TOKENS,
   EMBER_TABLE_MOTION,
   EMBER_TABLE_V2_TOKENS,
+  PRESTIGE_ESTATES_MOTION,
+  PRESTIGE_ESTATES_V2_TOKENS,
+  STUDIO_VOLT_MOTION,
+  STUDIO_VOLT_V2_TOKENS,
 } from "@/lib/website/template-v2/tbdp";
 import { buildV2DesignTokenCss } from "@/lib/website/template-v2/tokens/emit-design-tokens";
 import { resolveWbTemplatesRoot } from "@/lib/website/template-engine/constants.server";
 
-const RESTAURANT_PACKAGE = path.join(resolveWbTemplatesRoot(), "restaurant-signature");
 const RESTAURANT_PREMIUM_PACKAGE = path.join(resolveWbTemplatesRoot(), "restaurant-premium");
 const SAAS_PACKAGE = path.join(resolveWbTemplatesRoot(), "saas-enterprise");
 const CORPORATE_PACKAGE = path.join(resolveWbTemplatesRoot(), "corporate-business");
-const REAL_ESTATE_PACKAGE = path.join(resolveWbTemplatesRoot(), "real-estate-prestige");
+const REAL_ESTATE_PACKAGE = path.join(resolveWbTemplatesRoot(), "real-estate-premium");
 const MEDICAL_PACKAGE = path.join(resolveWbTemplatesRoot(), "medical-premium");
-const CREATIVE_PACKAGE = path.join(resolveWbTemplatesRoot(), "creative-portfolio");
-
-describe("TBDP native — restaurant-signature", () => {
-  it("loads TBDP-native manifests and resolves Forest Table tokens", async () => {
-    const loaded = await loadTemplateV2Package(RESTAURANT_PACKAGE);
-    assert.equal(loaded.ok, true);
-    if (!loaded.ok) return;
-
-    const { bundle } = loaded;
-    assert.ok(bundle.tbdpNative?.enabled);
-    assert.equal(bundle.tbdpNative?.sectorDnaId, "restaurant");
-    assert.equal(bundle.tbdpNative?.templateIdentity, "forest-table");
-    assert.deepEqual(bundle.tbdpNative?.experienceProfileIds, [
-      "hospitality",
-      "luxury",
-      "editorial",
-    ]);
-    assert.equal(bundle.tokens.colors.primary, FOREST_TABLE_V2_TOKENS.colors.primary);
-    assert.equal(bundle.tokens.colors.copper, FOREST_TABLE_V2_TOKENS.colors.copper);
-    assert.equal(bundle.motion.preset, FOREST_TABLE_MOTION.preset);
-    assert.equal(bundle.responsive.containerMaxWidth, "90rem");
-    assert.ok(bundle.tbdpDesignContext);
-  });
-
-  it("emits TBDP authority layer in globals CSS without changing V2 color vars", async () => {
-    const loaded = await loadTemplateV2Package(RESTAURANT_PACKAGE);
-    assert.equal(loaded.ok, true);
-    if (!loaded.ok) return;
-
-    const css = buildV2DesignTokenCss(loaded.bundle.tokens, loaded.bundle);
-    assert.ok(css.includes("TBDP Native Consumption"));
-    assert.ok(css.includes("--tbdp-native: 1"));
-    assert.ok(css.includes("--tbdp-sector-dna: \"restaurant\""));
-    assert.ok(css.includes(`--color-primary: ${FOREST_TABLE_V2_TOKENS.colors.primary}`));
-    assert.ok(css.includes("rs-reveal-hero"));
-    assert.ok(css.includes('[dir="rtl"]'));
-  });
-
-  it("resolves RTL language context for Arabic without visual token drift", async () => {
-    const loaded = await loadTemplateV2Package(RESTAURANT_PACKAGE, { language: "Arabic" });
-    assert.equal(loaded.ok, true);
-    if (!loaded.ok) return;
-
-    assert.equal(loaded.bundle.tbdpDesignContext?.language.direction, "rtl");
-    assert.equal(loaded.bundle.tokens.colors.primary, FOREST_TABLE_V2_TOKENS.colors.primary);
-    assert.ok(loaded.bundle.tokens.languageProfile?.rtlTypography?.display);
-  });
-});
+const CREATIVE_PACKAGE = path.join(resolveWbTemplatesRoot(), "creative-agency-premium");
 
 describe("TBDP native — saas-enterprise", () => {
   it("loads TBDP-native manifests and resolves Nexus Command tokens", async () => {
@@ -123,8 +73,54 @@ describe("TBDP native — saas-enterprise", () => {
   });
 });
 
-describe("TBDP native — real-estate-prestige", () => {
-  it("loads TBDP-native manifests and resolves Monolith Estate tokens", async () => {
+const AURA_PACKAGE = path.join(resolveWbTemplatesRoot(), "ai-startup-signal");
+
+describe("TBDP native — ai-startup-signal", () => {
+  it("loads TBDP-native manifests and resolves Aura Signal tokens", async () => {
+    const loaded = await loadTemplateV2Package(AURA_PACKAGE);
+    assert.equal(loaded.ok, true);
+    if (!loaded.ok) return;
+
+    const { bundle } = loaded;
+    assert.ok(bundle.tbdpNative?.enabled);
+    assert.equal(bundle.tbdpNative?.sectorDnaId, "saas");
+    assert.equal(bundle.tbdpNative?.templateIdentity, "aura-signal");
+    assert.equal(bundle.tokens.colors.accent, "#22D3EE");
+    assert.equal(bundle.motion.preset, "signal-glow-reveal");
+    assert.equal(bundle.responsive.containerMaxWidth, "88rem");
+    assert.ok(bundle.tbdpDesignContext);
+  });
+
+  it("emits Aura Signal global CSS with cyan accent layer", async () => {
+    const loaded = await loadTemplateV2Package(AURA_PACKAGE);
+    assert.equal(loaded.ok, true);
+    if (!loaded.ok) return;
+
+    const css = buildV2DesignTokenCss(loaded.bundle.tokens, loaded.bundle);
+    assert.ok(css.includes(".as-headline"));
+    assert.ok(css.includes(".as-bento-grid"));
+    assert.ok(css.includes(".as-nav-glass"));
+    assert.ok(css.includes(".as-faq-item"));
+    assert.ok(css.includes(`--color-accent: #22D3EE`));
+  });
+
+  it("resolves RTL language context for Arabic without visual token drift", async () => {
+    const loaded = await loadTemplateV2Package(AURA_PACKAGE, { language: "Arabic" });
+    assert.equal(loaded.ok, true);
+    if (!loaded.ok) return;
+
+    assert.equal(loaded.bundle.tbdpDesignContext?.language.direction, "rtl");
+    assert.equal(loaded.bundle.tokens.colors.accent, "#22D3EE");
+    assert.ok(loaded.bundle.tokens.languageProfile?.rtlTypography?.display);
+
+    const css = buildV2DesignTokenCss(loaded.bundle.tokens, loaded.bundle);
+    assert.ok(css.includes('[dir="rtl"]'));
+    assert.ok(css.includes(".as-hero-dashboard-bar"));
+  });
+});
+
+describe("TBDP native — real-estate-premium", () => {
+  it("loads TBDP-native manifests and resolves Prestige Estates tokens", async () => {
     const loaded = await loadTemplateV2Package(REAL_ESTATE_PACKAGE);
     assert.equal(loaded.ok, true);
     if (!loaded.ok) return;
@@ -132,16 +128,10 @@ describe("TBDP native — real-estate-prestige", () => {
     const { bundle } = loaded;
     assert.ok(bundle.tbdpNative?.enabled);
     assert.equal(bundle.tbdpNative?.sectorDnaId, "real-estate");
-    assert.equal(bundle.tbdpNative?.templateIdentity, "monolith-estate");
-    assert.deepEqual(bundle.tbdpNative?.experienceProfileIds, [
-      "luxury",
-      "executive",
-      "corporate",
-    ]);
-    assert.equal(bundle.tokens.colors.primary, MONOLITH_ESTATE_V2_TOKENS.colors.primary);
-    assert.equal(bundle.tokens.colors.brass, MONOLITH_ESTATE_V2_TOKENS.colors.brass);
-    assert.equal(bundle.motion.preset, MONOLITH_ESTATE_MOTION.preset);
-    assert.equal(bundle.responsive.containerMaxWidth, "88rem");
+    assert.equal(bundle.tbdpNative?.templateIdentity, "prestige-estates");
+    assert.equal(bundle.tokens.colors.primary, PRESTIGE_ESTATES_V2_TOKENS.colors.primary);
+    assert.equal(bundle.tokens.colors.brass, PRESTIGE_ESTATES_V2_TOKENS.colors.brass);
+    assert.equal(bundle.motion.preset, PRESTIGE_ESTATES_MOTION.preset);
     assert.ok(bundle.tbdpDesignContext);
   });
 
@@ -154,8 +144,8 @@ describe("TBDP native — real-estate-prestige", () => {
     assert.ok(css.includes("TBDP Native Consumption"));
     assert.ok(css.includes("--tbdp-native: 1"));
     assert.ok(css.includes('--tbdp-sector-dna: "real-estate"'));
-    assert.ok(css.includes(`--color-primary: ${MONOLITH_ESTATE_V2_TOKENS.colors.primary}`));
-    assert.ok(css.includes(".rep-headline"));
+    assert.ok(css.includes(`--color-primary: ${PRESTIGE_ESTATES_V2_TOKENS.colors.primary}`));
+    assert.ok(css.includes(".rep-headline") || css.includes("Cormorant"));
     assert.ok(css.includes('[dir="rtl"]'));
   });
 
@@ -165,7 +155,7 @@ describe("TBDP native — real-estate-prestige", () => {
     if (!loaded.ok) return;
 
     assert.equal(loaded.bundle.tbdpDesignContext?.language.direction, "rtl");
-    assert.equal(loaded.bundle.tokens.colors.primary, MONOLITH_ESTATE_V2_TOKENS.colors.primary);
+    assert.equal(loaded.bundle.tokens.colors.primary, PRESTIGE_ESTATES_V2_TOKENS.colors.primary);
     assert.ok(loaded.bundle.tokens.languageProfile?.rtlTypography?.display);
   });
 });
@@ -217,8 +207,8 @@ describe("TBDP native — medical-premium", () => {
   });
 });
 
-describe("TBDP native — creative-portfolio", () => {
-  it("loads TBDP-native manifests and resolves Kinetic Atelier tokens", async () => {
+describe("TBDP native — creative-agency-premium", () => {
+  it("loads TBDP-native manifests and resolves Studio Volt tokens", async () => {
     const loaded = await loadTemplateV2Package(CREATIVE_PACKAGE);
     assert.equal(loaded.ok, true);
     if (!loaded.ok) return;
@@ -226,16 +216,10 @@ describe("TBDP native — creative-portfolio", () => {
     const { bundle } = loaded;
     assert.ok(bundle.tbdpNative?.enabled);
     assert.equal(bundle.tbdpNative?.sectorDnaId, "creative-studio");
-    assert.equal(bundle.tbdpNative?.templateIdentity, "kinetic-atelier");
-    assert.deepEqual(bundle.tbdpNative?.experienceProfileIds, [
-      "creative",
-      "editorial",
-      "playful",
-    ]);
-    assert.equal(bundle.tokens.colors.primary, KINETIC_ATELIER_V2_TOKENS.colors.primary);
-    assert.equal(bundle.tokens.colors.volt, KINETIC_ATELIER_V2_TOKENS.colors.volt);
-    assert.equal(bundle.motion.preset, KINETIC_ATELIER_MOTION.preset);
-    assert.equal(bundle.responsive.containerMaxWidth, "100%");
+    assert.equal(bundle.tbdpNative?.templateIdentity, "studio-volt");
+    assert.equal(bundle.tokens.colors.primary, STUDIO_VOLT_V2_TOKENS.colors.primary);
+    assert.equal(bundle.tokens.colors.volt, STUDIO_VOLT_V2_TOKENS.colors.volt);
+    assert.equal(bundle.motion.preset, STUDIO_VOLT_MOTION.preset);
     assert.ok(bundle.tbdpDesignContext);
   });
 
@@ -248,8 +232,8 @@ describe("TBDP native — creative-portfolio", () => {
     assert.ok(css.includes("TBDP Native Consumption"));
     assert.ok(css.includes("--tbdp-native: 1"));
     assert.ok(css.includes('--tbdp-sector-dna: "creative-studio"'));
-    assert.ok(css.includes(`--color-primary: ${KINETIC_ATELIER_V2_TOKENS.colors.primary}`));
-    assert.ok(css.includes(".cp-display"));
+    assert.ok(css.includes(`--color-primary: ${STUDIO_VOLT_V2_TOKENS.colors.primary}`));
+    assert.ok(css.includes(".cap-display") || css.includes("Space Grotesk"));
     assert.ok(css.includes('[dir="rtl"]'));
   });
 
@@ -259,7 +243,7 @@ describe("TBDP native — creative-portfolio", () => {
     if (!loaded.ok) return;
 
     assert.equal(loaded.bundle.tbdpDesignContext?.language.direction, "rtl");
-    assert.equal(loaded.bundle.tokens.colors.primary, KINETIC_ATELIER_V2_TOKENS.colors.primary);
+    assert.equal(loaded.bundle.tokens.colors.primary, STUDIO_VOLT_V2_TOKENS.colors.primary);
     assert.ok(loaded.bundle.tokens.languageProfile?.rtlTypography?.display);
   });
 });

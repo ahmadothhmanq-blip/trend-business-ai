@@ -23,10 +23,23 @@ import {
 } from "@/lib/website/template-v2/integration/constants";
 import { resolveProductionBlueprint } from "@/lib/website/template-v2/integration/production-pipeline";
 import { injectV2TemplatePipeline } from "@/lib/website/template-v2/inject/inject-v2-pipeline";
+import { refreshCapabilities } from "@/lib/website/builder/capabilities";
+import { seedFeaturesFromCapabilityManifest } from "@/lib/website/builder/capabilities/seed-from-manifest";
+import { applyFinalImageInjectionToProject } from "@/lib/ai-core/image-engine/inject";
+import { createCapabilityService } from "@/lib/website/builder/capabilities/service";
+import { isStructureFirstEnabled } from "@/lib/website/generation-flags";
+import {
+  assertStructurePreserved,
+  captureStructureSnapshot,
+} from "@/lib/website/template-v2/validation/structure-purity";
 import { loadTemplateV2Package } from "@/lib/website/template-v2/loader/load-v2-package";
 import { hashPresentationProfile } from "@/lib/website/template-v2/loader/presentation-hash";
 import { resolveWbTemplatesRoot } from "@/lib/website/template-engine/constants.server";
+import {
+  resolveInstalledBuilderTemplatePackageId,
+} from "@/lib/website/builder/resolve-builder-template-package-id";
 import path from "node:path";
+import { isVisualSkinV2PackageId } from "@/lib/website/visual-skin/theme-bridge";
 
 const PRESERVE_PATH_PREFIXES = [
   "lib/site-images",
@@ -50,9 +63,31 @@ export type ApplyV2TemplateParams = {
   project: GeneratedWebsiteProject;
   templatePackageId: string;
   language?: string | null;
-  /** Skip production blueprint pipeline (legacy fallback). */
+  /** Skip with WB_PRODUCTION_BLUEPRINT=0 */
   forceBlueprintFallback?: boolean;
+  /** When true, use templatePackageId as-is (visual skins / flagship apply). */
+  directPackageId?: boolean;
+  /**
+   * When set, overrides structure-first skin-only CSS path.
+   * Visual skins force false for full flagship component inject.
+   */
+  skinOnlyOverride?: boolean;
 };
+
+function shouldUseFlagshipPackageDefaults(
+  _project: GeneratedWebsiteProject,
+  templatePackageId: string,
+  directPackageId?: boolean,
+): boolean {
+  if (!directPackageId || !isVisualSkinV2PackageId(templatePackageId)) {
+    return false;
+  }
+  // Keep package DEFAULT_* chrome (metrics, trust rails, footer groups, etc.)
+  // so flagship skins like Signal — Aura match their authored design.
+  // Brand name / CTAs / nav still overlay via buildComponentProps identity
+  // bindings when real business values are present (stub brands are ignored).
+  return true;
+}
 
 /**
  * Apply a V2 template package — preserves business identity, rebuilds presentation via V2 pipeline.
@@ -60,7 +95,10 @@ export type ApplyV2TemplateParams = {
 export async function applyTemplateV2ToProject(
   params: ApplyV2TemplateParams,
 ): Promise<RethemeResult> {
-  const templatePackageId = params.templatePackageId.trim();
+  const requestedPackageId = params.templatePackageId.trim();
+  const templatePackageId = params.directPackageId
+    ? requestedPackageId
+    : resolveInstalledBuilderTemplatePackageId(requestedPackageId);
   const packageDirectory = path.join(resolveWbTemplatesRoot(), templatePackageId);
   const loaded = await loadTemplateV2Package(packageDirectory, {
     language: params.language,
@@ -79,17 +117,49 @@ export async function applyTemplateV2ToProject(
 
   const notes: string[] = [];
   const locale = resolveLocaleFromLanguage(params.language);
-  const identity = extractBusinessIdentity(params.project, params.language);
-  const originalFiles = params.project.files ?? [];
-  const preserved = originalFiles.filter((f) => shouldPreserveFile(f.path));
-  notes.push(`V2 apply: preserved ${preserved.length} business asset and route files`);
+  const structureFirst = isStructureFirstEnabled();
+  const generationFast = Boolean(params.forceBlueprintFallback);
+  const preservedSeedFeatures = seedFeaturesFromCapabilityManifest(params.project);
+  const projectForApply =
+    structureFirst && !generationFast
+      ? refreshCapabilities(params.project, {
+          files: params.project.files ?? undefined,
+          force: true,
+          seedFeatures: preservedSeedFeatures,
+        }).project
+      : params.project;
+  const identity = extractBusinessIdentity(projectForApply, params.language);
+  const originalFiles = projectForApply.files ?? [];
+  const preserved = structureFirst
+    ? originalFiles
+    : originalFiles.filter((f) => shouldPreserveFile(f.path));
+  notes.push(
+    structureFirst
+      ? `V2 skin-only apply: preserving ${preserved.length} generated files`
+      : `V2 apply: preserved ${preserved.length} business asset and route files`,
+  );
 
   const profile = identity.businessProfile;
   const brandName = profile?.projectName || identity.title || "Brand";
-  const productionContent = identity.productionContent;
+  const usePackageDefaults = shouldUseFlagshipPackageDefaults(
+    projectForApply,
+    templatePackageId,
+    params.directPackageId,
+  );
+  const productionContent = usePackageDefaults ? null : identity.productionContent;
+  const beforeStructure =
+    structureFirst && !generationFast
+      ? captureStructureSnapshot(
+          projectForApply,
+          createCapabilityService(
+            projectForApply,
+            projectForApply.files ?? undefined,
+          ).getActiveCapabilities(),
+        )
+      : null;
 
   const productionPipeline = resolveProductionBlueprint({
-    project: params.project,
+    project: projectForApply,
     templatePackageId,
     language: params.language,
     forceFallback: params.forceBlueprintFallback,
@@ -103,15 +173,19 @@ export async function applyTemplateV2ToProject(
     brandName,
     pageTitle: identity.title,
     pageDescription: identity.description,
-    heroHeadline: productionContent.heroHeadline,
-    heroSubheadline: productionContent.heroSubheadline,
-    primaryCta: productionContent.primaryCta,
-    secondaryCta: productionContent.secondaryCta,
-    heroEyebrow: productionContent.heroEyebrow,
+    heroHeadline: productionContent?.heroHeadline,
+    heroSubheadline: productionContent?.heroSubheadline,
+    primaryCta: productionContent?.primaryCta,
+    secondaryCta: productionContent?.secondaryCta,
+    heroEyebrow: productionContent?.heroEyebrow,
     content: productionContent,
     language: params.language,
     forceDesignRebuild: true,
+    strategy: projectForApply.strategy,
     websiteBlueprint,
+    skinOnly: params.skinOnlyOverride ?? (structureFirst && !generationFast),
+    skipSecondaryPages: generationFast && structureFirst,
+    usePackageDefaults,
   });
 
   for (const file of preserved) {
@@ -125,7 +199,9 @@ export async function applyTemplateV2ToProject(
     notes.push("Applied Arabic/RTL locale to layout and styles");
   }
 
-  const componentIds = bundle.componentRegistry.components.map((c) => c.id);
+  const componentIds = structureFirst
+    ? (projectForApply.components ?? [])
+    : bundle.componentRegistry.components.map((c) => c.id);
   const presentationHash = hashPresentationProfile(bundle.presentation);
   const composerId = bundle.manifest.architecture?.composer ?? "region-grid";
 
@@ -135,7 +211,7 @@ export async function applyTemplateV2ToProject(
   notes.push(`V2 package applied: ${templatePackageId} → ${template.name}`);
 
   const designSystem = patchDesignSystemVisualOnly(
-    params.project.designSystem,
+    projectForApply.designSystem,
     template,
   );
 
@@ -153,9 +229,9 @@ export async function applyTemplateV2ToProject(
     [WB_TEMPLATE_ARCHITECTURE_VERSION_SETTING]: "v2" as const,
     [WB_TEMPLATE_PRESENTATION_HASH_SETTING]: presentationHash,
     [WB_TEMPLATE_COMPOSER_ID_SETTING]: composerId,
-    websiteStructureTemplateId: templatePackageId,
+    websiteStructureTemplateId: requestedPackageId,
     templatePackageId,
-    selectedTemplateId: templatePackageId,
+    selectedTemplateId: requestedPackageId,
     ...(websiteBlueprint
       ? {
           [WB_WEBSITE_BLUEPRINT_SETTING]: websiteBlueprint,
@@ -167,9 +243,15 @@ export async function applyTemplateV2ToProject(
       : {}),
   };
 
+  const structuralSections = structureFirst
+    ? (projectForApply.strategy?.sectionPlan ?? []).map(
+        (section) => `${section.page}: ${section.name}`,
+      )
+    : componentIds;
+
   const project = applyBusinessIdentityToProject(
     {
-      ...params.project,
+      ...projectForApply,
       files,
       designSystem,
       colorPalette: websiteBlueprint
@@ -199,11 +281,32 @@ export async function applyTemplateV2ToProject(
             bundle.tokens.typography.body,
           ],
       components: componentIds,
-      sections: componentIds,
+      sections: structuralSections,
     },
     identity,
     designSettings,
   );
 
-  return { project, template, notes };
+  const { project: capabilityProject } = generationFast
+    ? { project }
+    : refreshCapabilities(project, {
+        files,
+        force: !structureFirst,
+        seedFeatures: preservedSeedFeatures,
+      });
+
+  const projectWithImages = params.forceBlueprintFallback
+    ? capabilityProject
+    : applyFinalImageInjectionToProject(capabilityProject);
+
+  if (structureFirst && beforeStructure && !generationFast) {
+    const afterStructure = captureStructureSnapshot(
+      projectWithImages,
+      createCapabilityService(projectWithImages, files).getActiveCapabilities(),
+    );
+    assertStructurePreserved(beforeStructure, afterStructure);
+    notes.push("Structure-first: skin applied without structural mutation");
+  }
+
+  return { project: projectWithImages, template, notes };
 }

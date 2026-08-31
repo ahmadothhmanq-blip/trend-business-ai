@@ -1,0 +1,7 @@
+{
+  "pageId": "customers",
+  "layoutId": "default",
+  "regions": {
+    "main": ["ai-startup-signal-hero", "ai-startup-signal-portfolio", "ai-startup-signal-features"]
+  }
+}

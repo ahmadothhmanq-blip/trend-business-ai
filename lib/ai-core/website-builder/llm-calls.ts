@@ -2,7 +2,7 @@ import type { AIProvider } from "@/lib/ai/types";
 import { generateJsonWithValidation } from "@/lib/ai/generator";
 import {
   buildWebsiteLanguageDirective,
-} from "@/lib/ai-core/website-builder/language-directive";
+} from "@/lib/ai-core/website-builder/language-directive.server";
 import {
   languageMismatchRepairHint,
   validateWebsiteLlmOutputLanguage,

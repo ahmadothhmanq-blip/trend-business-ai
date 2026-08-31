@@ -26,6 +26,7 @@ import {
   VideoStudioProviderStatus,
   useVideoStudioFullRenderReady,
 } from "@/components/dashboard/video-studio/video-studio-provider-status";
+import { VideoPublishPanel } from "@/components/dashboard/video-studio/video-publish-panel";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n/client";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
@@ -41,11 +42,18 @@ type Tab =
   | "brand"
   | "audio"
   | "export"
+  | "publish"
   | "media"
   | "quality"
   | "versions";
 
 type ManagePayload = {
+  generation?: {
+    id: string;
+    domain_state?: string | null;
+    status?: string;
+    video_name?: string;
+  };
   model: VideoProductionModel;
   history: VideoVersionHistory;
   quality: VideoQualityReport;
@@ -80,6 +88,7 @@ type ManagePayload = {
   job?: {
     id: string;
     message: string;
+    provider?: string;
     status?: string;
     progress?: number;
     costCreditsSpent?: number;
@@ -272,7 +281,14 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
     );
   }
 
-  const { model, quality, timeline, assembly, latestJob, job, history } = data;
+  const { model, quality, timeline, assembly, latestJob, job, history, generation } = data;
+  const domainState = generation?.domain_state ?? null;
+  const hasPlayableComposite = Boolean(
+    (job?.compositeAsset?.url &&
+      job.compositeAsset.mimeType?.startsWith("video/") &&
+      !job.compositeAsset.mimeType.includes("svg")) ||
+      media.some((row) => row.kind === "composite" && row.mime_type?.startsWith("video/")),
+  );
   const tabs: Array<{ id: Tab; label: string }> = [
     { id: "overview", label: p("management.tabs.overview") },
     { id: "timeline", label: p("management.tabs.timeline") },
@@ -281,6 +297,7 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
     { id: "brand", label: p("management.tabs.brand") },
     { id: "audio", label: p("management.tabs.audio") },
     { id: "export", label: p("management.tabs.export") },
+    { id: "publish", label: p("management.tabs.publish") },
     { id: "media", label: p("management.tabs.media") },
     { id: "quality", label: p("management.tabs.quality") },
     { id: "versions", label: p("management.tabs.versions") },
@@ -746,8 +763,9 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
               />
             )}
             {job?.compositeAsset?.url &&
-            (/\.(mp4|webm)(\?|$)/i.test(job.compositeAsset.url) ||
-              job.compositeAsset.mimeType?.includes("video")) ? (
+            job.provider !== "preview" &&
+            job.compositeAsset.mimeType?.startsWith("video/") &&
+            !job.compositeAsset.mimeType.includes("svg") ? (
               <video
                 src={job.compositeAsset.url}
                 controls
@@ -915,6 +933,16 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
             )}
           </DashboardCardContent>
         </DashboardCard>
+      )}
+
+      {tab === "publish" && (
+        <VideoPublishPanel
+          generationId={generationId}
+          title={model.title}
+          domainState={domainState}
+          hasPlayableComposite={hasPlayableComposite}
+          onPublicationChange={() => void load()}
+        />
       )}
 
       {tab === "media" && (
@@ -1157,11 +1185,16 @@ export function VideoManagementDashboard({ generationId }: { generationId: strin
                 key={c.id}
                 className={cn(
                   "rounded-xl px-3 py-2 text-xs",
-                  c.passed ? "bg-emerald-500/10 text-emerald-200/80" : "bg-amber-500/10 text-amber-100/80",
+                  c.severity === "info"
+                    ? "bg-white/5 text-white/70"
+                    : c.passed
+                      ? "bg-emerald-500/10 text-emerald-200/80"
+                      : "bg-amber-500/10 text-amber-100/80",
                 )}
               >
                 <div className="font-medium">
-                  {c.passed ? "✓" : "!"} {c.label}
+                  {c.severity === "info" ? "i" : c.passed ? "✓" : "!"} {c.label}
+                  {c.severity === "info" ? " · unavailable" : ""}
                 </div>
                 <div className="opacity-80">{c.detail}</div>
               </div>

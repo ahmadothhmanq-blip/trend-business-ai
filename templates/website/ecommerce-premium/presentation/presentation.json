@@ -6,7 +6,7 @@
     "regions": {
       "header": {
         "role": "header",
-        "sticky": true
+        "sticky": false
       },
       "main": {
         "role": "main"
@@ -24,7 +24,7 @@
   },
   "navigation": {
     "componentId": "ecommerce-premium-nav",
-    "variant": "atelier-glass"
+    "variant": "minimal-wordmark"
   },
   "hero": {
     "componentId": "ecommerce-premium-hero",
@@ -38,21 +38,16 @@
     "regions": {
       "main": [
         "ecommerce-premium-hero",
-        "ecommerce-premium-collections",
-        "ecommerce-premium-product-grid",
-        "ecommerce-premium-brand-story",
-        "ecommerce-premium-stats",
+        "ecommerce-premium-features",
+        "ecommerce-premium-portfolio",
+        "ecommerce-premium-about",
         "ecommerce-premium-testimonials",
-        "ecommerce-premium-shipping",
+        "ecommerce-premium-pricing",
         "ecommerce-premium-faq",
         "ecommerce-premium-contact"
       ],
-      "utility": [
-        "ecommerce-premium-utility-band"
-      ],
-      "overlay": [
-        "ecommerce-premium-floating-cta"
-      ]
+      "utility": [],
+      "overlay": []
     }
   },
   "sectionShell": {
@@ -60,11 +55,11 @@
     "componentId": "ecommerce-premium-section-shell"
   },
   "aiGeneration": {
-    "contentProfile": "ecommerce-premium-atelier",
-    "suggestedPages": [
-      "shop",
-      "collections",
-      "about"
-    ]
+    "contentProfile": "ecommerce-premium-gtm",
+    "suggestedPages": ["platform", "pricing", "customers"]
+  },
+  "dna": {
+    "id": "atelier",
+    "architecture": "product-runway"
   }
 }

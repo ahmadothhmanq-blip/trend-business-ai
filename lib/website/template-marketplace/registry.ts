@@ -3,8 +3,11 @@ import {
   WB_TEMPLATE_MARKETPLACE_VERSION,
 } from "@/lib/website/template-marketplace/constants";
 import {
+  buildSupersessionAliasListing,
   mapInstalledRegistryEntryToMarketplaceListing,
+  mapStructureTemplateToMarketplaceListing,
 } from "@/lib/website/template-marketplace/adapters";
+import { WEBSITE_STRUCTURE_TEMPLATES } from "@/lib/website/builder/unified-template-registry";
 import {
   getRemoteMarketplaceListing,
   listRemoteMarketplaceListings,
@@ -17,19 +20,91 @@ import {
   getWbTemplateRegistry,
   initializeWbTemplateEngine,
 } from "@/lib/website/template-engine/index.server";
+import { PACKAGE_SUPERSESSION_ALIASES } from "@/lib/website/builder/package-supersession-aliases";
+import { promises as fs } from "node:fs";
+import { resolveRegistryPackageDir } from "@/lib/website/template-marketplace/install.server";
 
-const FEATURED_INSTALLED_RANKS: Record<string, number> = {
-  "corporate-business": 1,
-  "saas-enterprise": 2,
-  "restaurant-premium": 3,
-  "ai-startup-signal": 4,
-  "real-estate-prestige": 5,
-  "medical-premium": 6,
-  "creative-portfolio": 7,
-  "ecommerce-premium": 4,
-  "modern-business": 8,
-  "restaurant-signature": 9,
-};
+const FEATURED_INSTALLED_RANKS: Record<string, number> = {};
+
+async function registryPackageExists(templateId: string): Promise<boolean> {
+  try {
+    await fs.access(resolveRegistryPackageDir(templateId));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Alias ids that keep marketplace featured visibility (distinct product brands). */
+const FEATURED_ALIAS_IDS = new Set<string>();
+
+async function applySupersessionAliasListings(
+  listings: Map<string, WbTemplateMarketplaceListing>,
+): Promise<void> {
+  for (const [aliasId, targetId] of Object.entries(PACKAGE_SUPERSESSION_ALIASES)) {
+    const target = listings.get(targetId);
+    if (target?.availability !== "installed") continue;
+
+    const remoteSeed = getRemoteMarketplaceListing(aliasId);
+    // Without its own marketplace identity an alias would duplicate the target card.
+    if (!remoteSeed) continue;
+
+    listings.set(
+      aliasId,
+      buildSupersessionAliasListing(
+        aliasId,
+        target,
+        remoteSeed,
+        FEATURED_INSTALLED_RANKS[aliasId],
+      ),
+    );
+    const aliasListing = listings.get(aliasId);
+    if (aliasListing) {
+      listings.set(aliasId, {
+        ...aliasListing,
+        featured: FEATURED_ALIAS_IDS.has(aliasId) ? aliasListing.featured : false,
+      });
+    }
+  }
+}
+
+function mergeUnifiedStructureTemplateListings(
+  listings: Map<string, WbTemplateMarketplaceListing>,
+  installedAt: string,
+): void {
+  for (const template of WEBSITE_STRUCTURE_TEMPLATES) {
+    if (listings.has(template.id)) {
+      continue;
+    }
+
+    const featuredRank = FEATURED_INSTALLED_RANKS[template.id];
+    listings.set(
+      template.id,
+      mapStructureTemplateToMarketplaceListing(template, {
+        installedAt,
+        featured: featuredRank !== undefined,
+        featuredRank,
+      }),
+    );
+  }
+}
+
+async function markUnavailableRemoteListings(
+  listings: Map<string, WbTemplateMarketplaceListing>,
+): Promise<void> {
+  for (const [id, listing] of listings.entries()) {
+    if (listing.availability !== "remote") continue;
+
+    const registryId = listing.remote?.registryId?.trim() || id;
+    if (await registryPackageExists(registryId)) continue;
+
+    listings.set(id, {
+      ...listing,
+      availability: "unavailable",
+      featured: false,
+    });
+  }
+}
 
 /**
  * In-memory marketplace registry.
@@ -42,13 +117,29 @@ export class WbTemplateMarketplaceRegistry {
   async refresh(): Promise<void> {
     await initializeWbTemplateEngine();
     const engineRegistry = getWbTemplateRegistry();
+
+    // Installed packages on disk are the catalog source of truth; the unified
+    // structure registry only adds legacy V1 presets when it is populated.
+    const publicTemplateIds = new Set([
+      ...engineRegistry.list().map((item) => item.id),
+      ...WEBSITE_STRUCTURE_TEMPLATES.map((template) => template.id),
+    ]);
+
+    if (publicTemplateIds.size === 0) {
+      this.listings = new Map();
+      this.lastRefreshedAt = new Date().toISOString();
+      return;
+    }
+
     const next = new Map<string, WbTemplateMarketplaceListing>();
 
     for (const remote of listRemoteMarketplaceListings()) {
+      if (!publicTemplateIds.has(remote.id)) continue;
       next.set(remote.id, remote);
     }
 
     for (const item of engineRegistry.list()) {
+      if (!publicTemplateIds.has(item.id)) continue;
       const entry = engineRegistry.get(item.id);
       if (!entry) continue;
 
@@ -62,6 +153,13 @@ export class WbTemplateMarketplaceRegistry {
       });
       next.set(installed.id, installed);
     }
+
+    await applySupersessionAliasListings(next);
+    mergeUnifiedStructureTemplateListings(
+      next,
+      this.lastRefreshedAt ?? new Date().toISOString(),
+    );
+    await markUnavailableRemoteListings(next);
 
     this.listings = next;
     this.lastRefreshedAt = new Date().toISOString();
@@ -89,11 +187,15 @@ export class WbTemplateMarketplaceRegistry {
     const remoteCount = listings.filter(
       (listing) => listing.availability === "remote",
     ).length;
+    const unavailableCount = listings.filter(
+      (listing) => listing.availability === "unavailable",
+    ).length;
 
     return {
       marketplaceVersion: WB_TEMPLATE_MARKETPLACE_VERSION,
       installedCount,
       remoteCount,
+      unavailableCount,
       listingCount: listings.length,
       featuredCount: listings.filter((listing) => listing.featured).length,
       lastRefreshedAt: this.lastRefreshedAt,

@@ -1,9 +1,7 @@
-/** Instruction appended to AI generation prompts for localized text output. */
-export function aiOutputLanguageDirective(language?: string): string {
-  const normalized = language?.trim();
-  if (!normalized) return "";
-  return `\nRespond entirely in ${normalized}.`;
-}
+export {
+  aiOutputLanguageDirective,
+  type GlsOutputSurface,
+} from "@/lib/ai/prompts/language-directive";
 
 export const COMPLEXITY_GUIDE = `
 Estimate project size and file count from the blueprint.
@@ -39,11 +37,17 @@ Rules:
 - No placeholders, no TODOs, no fake content, no lorem ipsum.
 - Use realistic business copy aligned with the project prompt.
 - Import only from files that exist in the project tree or standard npm packages declared in package.json.
+- The generated project is a standalone Next.js app. Never import files from the host platform, parent repo, or Trend Business AI.
+- Never import @/lib/supabase/proxy, @/lib/ai-core, @/lib/i18n/paths, @/plugins, or any path that leaves this project (no ../../ into the parent).
+- Generate every required module inside this app. Do not copy host proxy.ts, middleware from the parent, or platform path aliases.
 - Reuse components/ui and lib/utils — never duplicate utilities or UI primitives.
 - TypeScript React function components for TSX files.
 - app/layout.tsx must export metadata for SEO.
 - app/loading.tsx and app/error.tsx must be functional UI.
 - package.json must include next, react, react-dom, typescript, tailwindcss, eslint, prettier and scripts: dev, build, start, lint.
+- If prisma/schema.prisma exists, package.json scripts must include postinstall: "prisma generate" and build: "prisma generate && next build".
+- Never set typedRoutes or experimental.typedRoutes to true.
+- Do not emit two App Router pages that resolve to the same URL (for example app/page.tsx and app/(dashboard)/page.tsx both own "/").
 - The project must run immediately after npm install and npm run dev.
 - Config files must be valid for Next.js App Router and Tailwind CSS 4.
 `;

@@ -1,0 +1,7 @@
+{
+  "pageId": "customers",
+  "layoutId": "default",
+  "regions": {
+    "main": ["medical-premium-hero", "medical-premium-portfolio", "medical-premium-features"]
+  }
+}

@@ -9,25 +9,28 @@ import type { TemplateV2ResponsiveRules } from "@/lib/website/template-v2/contra
 export const STUDIO_VOLT_V2_TOKENS: TemplateV2DesignTokens = {
   colors: {
     primary: "#0A0A0B",
-    secondary: "#1A1A1D",
+    secondary: "#121214",
     accent: "#D4FF00",
     background: "#0A0A0B",
     foreground: "#F4F4F0",
-    muted: "rgba(244,244,240,0.55)",
-    surface: "#121214",
+    muted: "rgba(244,244,240,0.62)",
+    surface: "#0e0e10",
+    signal: "#D4FF00",
+    grid: "rgba(212,255,0,0.08)",
+    ink: "#0A0A0B",
     volt: "#D4FF00",
     ghost: "#F4F4F0",
-    zinc: "#6B6B70",
+    zinc: "rgba(244,244,240,0.62)",
   },
   typography: {
     display: "Space Grotesk",
     body: "Inter",
     scale: {
-      sm: "0.8125rem",
+      sm: "0.875rem",
       base: "1rem",
       lg: "1.125rem",
-      xl: "4.5rem",
-      display: "clamp(3.25rem, 10vw, 8rem)",
+      xl: "1.75rem",
+      display: "clamp(2rem, 4vw, 3rem)",
     },
   },
   languageProfile: {
@@ -51,14 +54,14 @@ export const STUDIO_VOLT_V2_TOKENS: TemplateV2DesignTokens = {
     lg: "0",
   },
   shadows: {
-    surface: "0 32px 96px rgba(0,0,0,0.55)",
-    glow: "0 0 140px rgba(212,255,0,0.12)",
-    volt: "0 0 80px rgba(212,255,0,0.28)",
+    surface: "0 12px 40px rgba(0,0,0,0.28)",
+    glow: "0 0 96px rgba(212,255,0,0.22)",
+    card: "0 0 0 1px rgba(244,244,240,0.08), 0 16px 48px rgba(0,0,0,0.32)",
   },
   borders: {
-    default: "rgba(244,244,240,0.1)",
-    volt: "rgba(212,255,0,0.45)",
-    subtle: "rgba(244,244,240,0.05)",
+    default: "rgba(244,244,240,0.12)",
+    accent: "rgba(212,255,0,0.38)",
+    subtle: "rgba(244,244,240,0.06)",
   },
 };
 

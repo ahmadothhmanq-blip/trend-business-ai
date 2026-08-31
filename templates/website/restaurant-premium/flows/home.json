@@ -3,20 +3,20 @@
   "layoutId": "default",
   "regions": {
     "header": ["restaurant-premium-nav"],
-    "sidebar": ["restaurant-premium-sidebar-rail"],
     "main": [
       "restaurant-premium-hero",
-      "restaurant-premium-tasting-menu",
-      "restaurant-premium-chef-story",
       "restaurant-premium-stats",
-      "restaurant-premium-signature-dishes",
+      "restaurant-premium-features",
+      "restaurant-premium-integrations",
+      "restaurant-premium-about",
       "restaurant-premium-testimonials",
-      "restaurant-premium-atmosphere",
-      "restaurant-premium-gallery",
+      "restaurant-premium-portfolio",
+      "restaurant-premium-pricing",
       "restaurant-premium-faq",
-      "restaurant-premium-reservation-cta",
       "restaurant-premium-contact"
     ],
+    "utility": ["restaurant-premium-utility-band"],
+    "overlay": ["restaurant-premium-floating-cta"],
     "footer": ["restaurant-premium-footer"]
   }
 }

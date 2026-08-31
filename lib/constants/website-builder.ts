@@ -1,3 +1,5 @@
+import { getGlsGenerationLanguageValues } from "@/lib/language-platform/generation/options";
+
 export const WEBSITE_TYPE_KEYS: Record<string, string> = {
   Business: "business",
   Portfolio: "portfolio",
@@ -16,16 +18,10 @@ export const WEBSITE_TYPES = [
   "Landing Page",
 ] as const;
 
-export const WEBSITE_LANGUAGES = [
-  "English",
-  "Arabic",
-  "Bilingual",
-  "Spanish",
-  "French",
-  "German",
-  "Portuguese",
-  "Italian",
-] as const;
+/** GLS world languages + Bilingual for website generation. */
+export const WEBSITE_LANGUAGES = getGlsGenerationLanguageValues(
+  "website-builder",
+) as readonly string[];
 
 export const WEBSITE_COLOR_STYLE_KEYS: Record<string, string> = {
   "Black & Gold (Premium)": "black_gold_premium",

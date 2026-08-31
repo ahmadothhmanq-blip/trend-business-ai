@@ -7,7 +7,8 @@ export type OutputTab =
   | "seo"
   | "review"
   | "deploy"
-  | "intelligence";
+  | "intelligence"
+  | "pro";
 
 export type WorkspaceProject = {
   id: string;

@@ -1,0 +1,71 @@
+{
+  "packageId": "prism-aurora",
+  "templateIntelligenceHint": "ti-software-studio",
+  "layout": {
+    "defaultLayoutId": "default",
+    "regions": {
+      "header": {
+        "role": "header",
+        "sticky": true
+      },
+      "main": {
+        "role": "main"
+      },
+      "utility": {
+        "role": "utility"
+      },
+      "footer": {
+        "role": "footer"
+      },
+      "overlay": {
+        "role": "overlay"
+      }
+    }
+  },
+  "navigation": {
+    "componentId": "prism-aurora-nav",
+    "variant": "enterprise-glass"
+  },
+  "hero": {
+    "componentId": "prism-aurora-hero",
+    "region": "main"
+  },
+  "footer": {
+    "componentId": "prism-aurora-footer",
+    "region": "footer"
+  },
+  "homeFlow": {
+    "regions": {
+      "main": [
+        "prism-aurora-hero",
+        "prism-aurora-features",
+        "prism-aurora-integrations",
+        "prism-aurora-about",
+        "prism-aurora-stats",
+        "prism-aurora-testimonials",
+        "prism-aurora-portfolio",
+        "prism-aurora-pricing",
+        "prism-aurora-faq",
+        "prism-aurora-contact"
+      ],
+      "utility": [
+        "prism-aurora-utility-band"
+      ],
+      "overlay": [
+        "prism-aurora-floating-cta"
+      ]
+    }
+  },
+  "sectionShell": {
+    "strategy": "package",
+    "componentId": "prism-aurora-section-shell"
+  },
+  "aiGeneration": {
+    "contentProfile": "prism-aurora-gtm",
+    "suggestedPages": [
+      "platform",
+      "pricing",
+      "customers"
+    ]
+  }
+}

@@ -1,4 +1,4 @@
-import { buildWebsiteLanguageDirective } from "@/lib/ai-core/website-builder/language-directive";
+import { buildWebsiteLanguageDirective } from "@/lib/ai-core/website-builder/language-directive.server";
 
 type BriefInput = {
   prompt: string;

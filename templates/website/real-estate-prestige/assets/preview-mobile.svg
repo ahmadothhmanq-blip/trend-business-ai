@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="844" viewBox="0 0 390 844" role="img" aria-label="Monolith Mobile preview">
+  <defs>
+    <linearGradient id="gold-390" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C8A951"/>
+      <stop offset="100%" stop-color="#9A7B3A"/>
+    </linearGradient>
+  </defs>
+  <rect width="390" height="844" fill="#0B0A09"/>
+  <rect width="390" height="64" fill="#100F0D"/>
+  <rect x="20" y="24" width="64" height="16" rx="2" fill="url(#gold-390)" opacity="0.9"/>
+  <rect x="20" y="96" width="80" height="6" rx="2" fill="#C8A951" opacity="0.65"/>
+  <rect x="20" y="116" width="300" height="28" rx="4" fill="#F2EBE0" opacity="0.14"/>
+  <rect x="20" y="156" width="260" height="12" rx="4" fill="#F2EBE0" opacity="0.08"/>
+  <rect x="20" y="192" width="110" height="32" rx="2" fill="url(#gold-390)"/>
+  <rect x="142" y="192" width="110" height="32" rx="2" fill="none" stroke="#C8A951" stroke-width="1.5"/>
+  <rect x="20" y="260" width="350" height="120" rx="8" fill="#13110F" stroke="rgba(200,169,81,0.28)" stroke-width="1"/>
+  <rect x="20" y="408" width="350" height="1" fill="rgba(200,169,81,0.2)"/>
+  <rect x="20" y="432" width="32" height="32" rx="2" fill="none" stroke="#C8A951" stroke-width="1" opacity="0.5"/>
+  <rect x="64" y="442" width="200" height="10" rx="2" fill="#F2EBE0" opacity="0.12"/>
+  <rect x="20" y="492" width="350" height="1" fill="rgba(200,169,81,0.15)"/>
+  <rect x="20" y="516" width="32" height="32" rx="2" fill="none" stroke="#C8A951" stroke-width="1" opacity="0.5"/>
+  <rect x="64" y="526" width="180" height="10" rx="2" fill="#F2EBE0" opacity="0.12"/>
+  <rect x="20" y="580" width="350" height="100" rx="8" fill="#13110F" stroke="rgba(200,169,81,0.2)" stroke-width="1"/>
+  <rect x="20" y="700" width="350" height="100" rx="8" fill="#13110F" stroke="rgba(200,169,81,0.35)" stroke-width="1.5"/>
+</svg>

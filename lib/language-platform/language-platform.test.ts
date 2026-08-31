@@ -35,7 +35,7 @@ describe("Global Language System (GLS)", () => {
   });
 
   it("registers all service products", () => {
-    assert.equal(GLS_SERVICE_REGISTRY.length, 10);
+    assert.equal(GLS_SERVICE_REGISTRY.length, 14);
     assert.ok(GLS_SERVICE_REGISTRY.every((s) => s.supportsIndependentLanguage));
   });
 

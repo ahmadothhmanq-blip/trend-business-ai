@@ -59,6 +59,24 @@ export async function probeHealth(baseUrl, timeoutMs = 3000) {
   }
 }
 
+/** Nested App Router API routes can go stale while /api/health still passes. */
+export async function probeWebsiteBuilderApiRouting(baseUrl, timeoutMs = 3000) {
+  const url = `${String(baseUrl).replace(/\/+$/, "")}/api/website-builder/00000000-0000-4000-8000-000000000001/review`;
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: { Accept: "application/json" },
+    });
+    clearTimeout(timer);
+    const contentType = res.headers.get("content-type") ?? "";
+    return res.status === 401 && contentType.includes("application/json");
+  } catch {
+    return false;
+  }
+}
+
 function normalizeBase(url) {
   return String(url || "").replace(/\/+$/, "");
 }
@@ -82,11 +100,33 @@ export async function findActiveDevServer() {
   const lockBase = lock?.appUrl ? normalizeBase(lock.appUrl) : null;
 
   if (await probeHealth(expectedBase)) {
-    return { baseUrl: expectedBase, lock, healthy: true, source: "expected" };
+    const routingOk = await probeWebsiteBuilderApiRouting(expectedBase);
+    if (routingOk) {
+      return { baseUrl: expectedBase, lock, healthy: true, source: "expected" };
+    }
+    if (lock?.pid && isPidAlive(lock.pid)) {
+      return {
+        baseUrl: expectedBase,
+        lock,
+        healthy: false,
+        source: "stale-api-routing",
+      };
+    }
   }
 
   if (lockBase && lockBase !== expectedBase && (await probeHealth(lockBase))) {
-    return { baseUrl: lockBase, lock, healthy: true, source: "lockfile-url" };
+    const routingOk = await probeWebsiteBuilderApiRouting(lockBase);
+    if (routingOk) {
+      return { baseUrl: lockBase, lock, healthy: true, source: "lockfile-url" };
+    }
+    if (lock?.pid && isPidAlive(lock.pid)) {
+      return {
+        baseUrl: lockBase,
+        lock,
+        healthy: false,
+        source: "stale-api-routing",
+      };
+    }
   }
 
   if (lock?.pid && isPidAlive(lock.pid)) {
@@ -121,14 +161,63 @@ function stopProcessTree(pid) {
   if (!isPidAlive(pid)) return true;
   try {
     if (process.platform === "win32") {
-      execSync(`taskkill /PID ${pid} /T`, { stdio: "ignore" });
+      // Next.js dev on Windows often ignores a non-forced taskkill.
+      execSync(`taskkill /PID ${pid} /T /F`, { stdio: "ignore" });
     } else {
       process.kill(pid, "SIGTERM");
     }
   } catch {
     /* may already be gone */
   }
+
+  if (process.platform !== "win32" && isPidAlive(pid)) {
+    try {
+      process.kill(pid, "SIGKILL");
+    } catch {
+      /* ignore */
+    }
+  }
+
   return !isPidAlive(pid);
+}
+
+function killProcessListeningOnPort(port) {
+  if (!port || !Number.isFinite(port)) return false;
+  try {
+    if (process.platform === "win32") {
+      const output = execSync(`netstat -ano | findstr :${port}`, {
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "ignore"],
+      });
+      const pids = new Set(
+        output
+          .split(/\r?\n/)
+          .map((line) => line.trim())
+          .filter((line) => line.includes("LISTENING"))
+          .map((line) => Number.parseInt(line.split(/\s+/).pop() ?? "", 10))
+          .filter((pid) => Number.isFinite(pid) && pid > 0),
+      );
+      for (const pid of pids) {
+        stopProcessTree(pid);
+      }
+      return pids.size > 0;
+    }
+
+    const output = execSync(`lsof -ti tcp:${port}`, {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    });
+    const pids = output
+      .split(/\s+/)
+      .map((value) => Number.parseInt(value, 10))
+      .filter((pid) => Number.isFinite(pid) && pid > 0);
+    for (const pid of pids) {
+      stopProcessTree(pid);
+    }
+    return pids.length > 0;
+  } catch {
+    return false;
+  }
 }
 
 export async function stopDevServer({ waitMs = 10_000 } = {}) {
@@ -150,7 +239,13 @@ export async function stopDevServer({ waitMs = 10_000 } = {}) {
     await new Promise((r) => setTimeout(r, 200));
   }
 
-  const alive = isPidAlive(lock.pid);
+  let alive = isPidAlive(lock.pid);
+  if (alive && lock.port) {
+    killProcessListeningOnPort(Number(lock.port));
+    await new Promise((r) => setTimeout(r, 400));
+    alive = isPidAlive(lock.pid);
+  }
+
   if (!alive) {
     clearStaleLock();
     clearHarnessMarker();
@@ -271,7 +366,13 @@ export async function startDevServerForeground() {
   }
 
   if (active && !active.healthy) {
-    console.log("[dev] Stopping unhealthy dev server…");
+    if (active.source === "stale-api-routing") {
+      console.log(
+        "[dev] Stale API routing detected — nested routes (e.g. /api/website-builder/*) may return 404. Restarting…",
+      );
+    } else {
+      console.log("[dev] Stopping unhealthy dev server…");
+    }
     await stopDevServer();
   }
   clearStaleLock();

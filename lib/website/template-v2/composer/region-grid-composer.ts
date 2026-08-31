@@ -1,4 +1,5 @@
 import type { ProductionContentPack } from "@/lib/ai-core/content/production-content";
+import { usesLlmLocalizedWebsiteCopy } from "@/lib/ai-core/content/content-language";
 import type { TemplateV2ComponentDefinition } from "@/lib/website/template-v2/contracts/component-registry";
 import type { TemplateV2PackageBundle } from "@/lib/website/template-v2/contracts/package";
 import type { TemplateV2PresentationProfile } from "@/lib/website/template-v2/contracts/presentation";
@@ -10,11 +11,15 @@ import {
   componentIdToExportName,
   componentIdToProjectPath,
 } from "@/lib/website/template-v2/utils/component-naming";
-import { getComposeUiFallbacks } from "@/lib/ai-core/content/content-language";
+import {
+  buildComponentProps,
+  propsToJsx,
+} from "@/lib/website/template-v2/composer/business-bindings";
 
 export type RegionGridComposeParams = {
   bundle: TemplateV2PackageBundle;
   flowKey?: string;
+  exportName?: string;
   brandName?: string;
   pageTitle?: string;
   pageDescription?: string;
@@ -29,202 +34,29 @@ export type RegionGridComposeParams = {
   websiteBlueprint?: WebsiteBlueprint;
   /** Pre-resolved region plan from blueprint (optional). */
   blueprintRegionPlan?: BlueprintRegionPlan;
+  /** Use flagship component scaffold defaults instead of generic production copy. */
+  usePackageDefaults?: boolean;
 };
-
-const GENERIC_ENGLISH_CTAS = new Set([
-  "get started",
-  "learn more",
-  "contact us",
-  "book a demo",
-  "schedule consultation",
-]);
 
 /** Screen-reader-only page title class — works without Tailwind in static previews. */
 function visuallyHiddenPageTitle(title: string): string {
-  return `<h1 className="v2-sr-only">${title}</h1>`;
+  return `<h1 className="v2-sr-only text-4xl">${title}</h1>`;
 }
 
-const PACKAGE_CTA_DEFAULTS: Record<string, { primary: string; secondary: string }> = {
-  "corporate-business": { primary: "Schedule consultation", secondary: "Our capabilities" },
-  "saas-enterprise": { primary: "Book a demo", secondary: "View platform tour" },
-  "restaurant-premium": { primary: "Reserve your table", secondary: "View tasting menu" },
-  "ecommerce-premium": { primary: "Shop collection", secondary: "Our story" },
-  "medical-premium": { primary: "Book appointment", secondary: "Our specialties" },
-  "real-estate-premium": { primary: "Schedule viewing", secondary: "View collection" },
-  "creative-agency-premium": { primary: "Start a project", secondary: "View work" },
-  "education-premium": { primary: "Apply now", secondary: "Explore programs" },
-  "finance-premium": { primary: "Speak with an advisor", secondary: "Our services" },
-  "hotel-resort-premium": { primary: "Book your stay", secondary: "Explore suites" },
-};
-
-function packageCtaDefaults(
-  packageId: string,
-  language: string | null | undefined,
-): { primary: string; secondary: string } {
-  const branded = PACKAGE_CTA_DEFAULTS[packageId];
-  if (branded) return branded;
-  const ui = getComposeUiFallbacks(language);
-  return { primary: ui.primaryCta, secondary: ui.learnMore };
-}
-
-function coerceCta(
-  value: string | undefined,
-  packageId: string,
-  language: string | null | undefined,
-  kind: "primary" | "secondary",
-): string {
-  const defaults = packageCtaDefaults(packageId, language);
-  if (!value?.trim()) {
-    return kind === "primary" ? defaults.primary : defaults.secondary;
-  }
-  const normalized = value.trim().toLowerCase();
-  if (GENERIC_ENGLISH_CTAS.has(normalized)) {
-    return kind === "primary" ? defaults.primary : defaults.secondary;
-  }
-  return value.trim();
-}
-
-function isGenericHeroSubtitle(
-  subtitle: string | undefined,
-  brand: string,
-): boolean {
-  if (!subtitle?.trim()) return true;
-  const s = subtitle.trim();
-  if (s === brand) return true;
-  return s.length < 72;
-}
-
-function jsxProp(name: string, value: unknown): string {
-  if (value === undefined || value === null || value === "") return "";
-  if (Array.isArray(value) && value.length === 0) return "";
-  if (typeof value === "string") {
-    return `        ${name}={${JSON.stringify(value)}}\n`;
-  }
-  if (Array.isArray(value)) {
-    return `        ${name}={${JSON.stringify(value)}}\n`;
-  }
-  return `        ${name}={${JSON.stringify(value)}}\n`;
-}
-
-function defaultNavLinks(packageId: string, language?: string | null) {
-  const ui = getComposeUiFallbacks(language);
-  if (packageId === "restaurant-signature" || packageId === "restaurant-premium" || packageId === "hotel-resort-premium") {
-    if (language && !/english|^en$/i.test(language)) {
-      return [
-        { href: "#menu", label: ui.navServices },
-        { href: "#chef", label: ui.navFeatures },
-        { href: "#gallery", label: ui.navPricing },
-        { href: "#reservation", label: ui.navContact },
-      ];
-    }
-    return [
-      { href: "#menu", label: "Menu" },
-      { href: "#chef", label: "Chef" },
-      { href: "#gallery", label: "Gallery" },
-      { href: "#reservation", label: "Reserve" },
-    ];
-  }
-  if (packageId === "corporate-business") {
-    if (language && !/english|^en$/i.test(language)) {
-      return [
-        { href: "#about", label: ui.navServices },
-        { href: "#features", label: ui.navFeatures },
-        { href: "#customers", label: ui.navPricing },
-        { href: "#contact", label: ui.navContact },
-      ];
-    }
-    return [
-      { href: "#about", label: "About" },
-      { href: "#features", label: "Capabilities" },
-      { href: "#customers", label: "Outcomes" },
-      { href: "#contact", label: "Contact" },
-    ];
-  }
-  if (packageId === "real-estate-prestige" || packageId === "real-estate-premium") {
-    return [
-      { href: "#collection", label: "Collection" },
-      { href: "#neighborhoods", label: "Neighborhoods" },
-      { href: "#advisors", label: "Advisors" },
-      { href: "#inquire", label: "Inquire" },
-    ];
-  }
-  if (packageId === "medical-premium") {
-    return [
-      { href: "#specialties", label: "Specialties" },
-      { href: "#physicians", label: "Physicians" },
-      { href: "#care", label: "Care journey" },
-      { href: "#appointments", label: "Appointments" },
-    ];
-  }
-  if (packageId === "creative-portfolio" || packageId === "creative-agency-premium") {
-    return [
-      { href: "#work", label: "Work" },
-      { href: "#studio", label: "Studio" },
-      { href: "#process", label: "Process" },
-      { href: "#contact", label: "Contact" },
-    ];
-  }
-  if (packageId === "ecommerce-premium") {
-    return [
-      { href: "#shop", label: language && !/english|^en$/i.test(language) ? ui.navServices : "Shop" },
-      { href: "#collections", label: "Collections" },
-      { href: "#story", label: "About" },
-      { href: "#contact", label: language && !/english|^en$/i.test(language) ? ui.navContact : "Contact" },
-    ];
-  }
-  if (packageId === "education-premium") {
-    return [
-      { href: "#academics", label: "Academics" },
-      { href: "#admissions", label: "Admissions" },
-      { href: "#campus", label: "Campus" },
-      { href: "#contact", label: "Contact" },
-    ];
-  }
-  if (packageId === "finance-premium") {
-    return [
-      { href: "#services", label: "Services" },
-      { href: "#approach", label: "Approach" },
-      { href: "#insights", label: "Insights" },
-      { href: "#contact", label: "Contact" },
-    ];
-  }
-  return [
-    { href: "#features", label: language && !/english|^en$/i.test(language) ? ui.navFeatures : "Platform" },
-    { href: "#platform", label: language && !/english|^en$/i.test(language) ? ui.navServices : "Integrations" },
-    { href: "#pricing", label: language && !/english|^en$/i.test(language) ? ui.navPricing : "Pricing" },
-    { href: "#contact", label: language && !/english|^en$/i.test(language) ? ui.navContact : "Contact" },
-  ];
-}
-
-const FLAGSHIP_PACKAGE_IDS = new Set([
-  "saas-enterprise",
-  "corporate-business",
-  "restaurant-premium",
-  "ecommerce-premium",
-  "medical-premium",
-  "real-estate-premium",
-  "creative-agency-premium",
-  "education-premium",
-  "finance-premium",
-  "hotel-resort-premium",
-]);
-
-function isGenericBusinessContent(
-  content: ProductionContentPack | null | undefined,
-): boolean {
-  if (!content) return true;
-  return (
-    content.heroEyebrow === "Professional presence" ||
-    content.featuresSubtitle?.includes("Webflow-caliber") === true ||
-    content.servicesTitle === "What we deliver for clients"
-  );
-}
-
-function useFlagshipComponentDefaults(
-  packageId: string,
-  content?: ProductionContentPack | null,
-): boolean {
-  return FLAGSHIP_PACKAGE_IDS.has(packageId) && isGenericBusinessContent(content);
+function bindingContext(params: RegionGridComposeParams) {
+  return {
+    brandName: params.brandName ?? params.pageTitle ?? "Brand",
+    packageId: params.bundle.packageId,
+    content: params.content,
+    language: params.language,
+    heroHeadline: params.heroHeadline,
+    heroSubheadline: params.heroSubheadline,
+    heroEyebrow: params.heroEyebrow,
+    pageDescription: params.pageDescription,
+    primaryCta: params.primaryCta,
+    secondaryCta: params.secondaryCta,
+    usePackageDefaults: params.usePackageDefaults,
+  };
 }
 
 function findComponent(
@@ -243,156 +75,19 @@ function renderComponentJsx(
   const component = findComponent(registry, componentId);
   if (!component) return "";
   const exportName = componentIdToExportName(componentId);
-  const content = params.content;
-  const brand = params.brandName ?? "Brand";
-  const language = params.language;
-  const primaryCta = coerceCta(
-    params.primaryCta ?? content?.primaryCta,
-    params.bundle.packageId,
-    language,
-    "primary",
-  );
-  const secondaryCta = coerceCta(
-    params.secondaryCta ?? content?.secondaryCta,
-    params.bundle.packageId,
-    language,
-    "secondary",
-  );
-  const flagshipDefaults = useFlagshipComponentDefaults(
-    params.bundle.packageId,
-    content,
-  );
-  const rawNavLinks = content?.navLinks
-    ?.filter((l) => l.href?.trim() && l.label?.trim())
-    .map((l) => ({ href: l.href, label: l.label }));
-  const navLinks =
-    flagshipDefaults || !rawNavLinks?.length
-      ? defaultNavLinks(params.bundle.packageId, language)
-      : rawNavLinks;
-
-  let props = "";
-  if (role === "navigation" || component.role === "navigation") {
-    props =
-      jsxProp("brandName", brand) +
-      jsxProp("ctaLabel", primaryCta) +
-      jsxProp("links", navLinks);
-  } else if (flagshipDefaults) {
-    if (role === "footer" || component.role === "footer") {
-      props = jsxProp("brandName", brand) + jsxProp("links", navLinks);
-    } else if (role === "hero" || component.role === "hero") {
-      const headline =
-        params.heroHeadline ?? content?.heroHeadline ?? params.pageTitle;
-      const subtitleRaw =
-        params.heroSubheadline ??
-        content?.heroSubheadline ??
-        params.pageDescription;
-      const subtitle = isGenericHeroSubtitle(subtitleRaw, brand)
-        ? undefined
-        : subtitleRaw;
-      const eyebrow = params.heroEyebrow ?? content?.heroEyebrow;
-      const safeEyebrow =
-        eyebrow && eyebrow !== "Professional presence" ? eyebrow : undefined;
-      const useCustomHero =
-        Boolean(headline && headline !== brand) ||
-        Boolean(subtitle && subtitle !== headline);
-      props =
-        jsxProp("primaryCta", primaryCta) +
-        jsxProp("secondaryCta", secondaryCta);
-      if (useCustomHero) {
-        props +=
-          jsxProp("title", headline !== brand ? headline : undefined) +
-          jsxProp("subtitle", subtitle) +
-          jsxProp("eyebrow", safeEyebrow);
-      }
-    }
-  } else if (role === "hero" || component.role === "hero") {
-    const headline = params.heroHeadline ?? content?.heroHeadline;
-    const subtitleRaw = params.heroSubheadline ?? content?.heroSubheadline ?? params.pageDescription;
-    const subtitle = isGenericHeroSubtitle(subtitleRaw, brand) ? undefined : subtitleRaw;
-    const eyebrowRaw = params.heroEyebrow ?? content?.heroEyebrow;
-    const eyebrow =
-      eyebrowRaw && eyebrowRaw !== "Professional presence" ? eyebrowRaw : undefined;
-    props =
-      jsxProp(
-        "title",
-        headline && headline !== brand ? headline : undefined,
-      ) +
-      jsxProp("subtitle", subtitle ?? params.pageDescription) +
-      jsxProp("eyebrow", eyebrow) +
-      jsxProp("primaryCta", primaryCta) +
-      jsxProp("secondaryCta", secondaryCta);
-  } else if (role === "footer" || component.role === "footer") {
-    props =
-      jsxProp("brandName", brand) +
-      jsxProp("tagline", content?.brandTagline ?? params.pageDescription) +
-      jsxProp("links", navLinks);
-  } else if (component.role === "faq" && content?.faqs?.length) {
-    props =
-      jsxProp("eyebrow", content.faqEyebrow) +
-      jsxProp("title", content.faqTitle) +
-      jsxProp("subtitle", content.faqSubtitle) +
-      jsxProp("items", content.faqs);
-  } else if (component.role === "pricing" && content) {
-    props =
-      jsxProp("eyebrow", content.pricingEyebrow) +
-      jsxProp("title", content.pricingTitle) +
-      jsxProp("subtitle", content.pricingSubtitle);
-  } else if (component.role === "features" && content?.features?.length) {
-    props =
-      jsxProp("eyebrow", content.featuresEyebrow) +
-      jsxProp("title", content.featuresTitle) +
-      jsxProp("subtitle", content.featuresSubtitle) +
-      jsxProp("items", content.features);
-  } else if (component.role === "gallery") {
-    props =
-      jsxProp("eyebrow", content?.galleryEyebrow) +
-      jsxProp("title", content?.galleryTitle ?? "Gallery") +
-      jsxProp("subtitle", content?.gallerySubtitle);
-  } else if (component.role === "story") {
-    props =
-      jsxProp("eyebrow", content?.servicesEyebrow ?? "Our chef") +
-      jsxProp("title", content?.servicesTitle ?? "A story of fire and season") +
-      jsxProp("subtitle", content?.servicesSubtitle);
-  } else if (component.role === "services" && content?.services?.length) {
-    props =
-      jsxProp("eyebrow", content.servicesEyebrow) +
-      jsxProp("title", content.servicesTitle ?? "Tasting menu") +
-      jsxProp("subtitle", content.servicesSubtitle) +
-      jsxProp("items", content.services);
-  } else if (component.role === "contact") {
-    props =
-      jsxProp("title", content?.contactTitle ?? "Reserve your table") +
-      jsxProp("subtitle", content?.contactSubtitle) +
-      jsxProp("ctaLabel", primaryCta);
-  } else if (component.role === "integrations") {
-    props = jsxProp("title", content?.featuresTitle ?? "Integrations");
-  } else if (component.role === "portfolio") {
-    props = jsxProp("title", content?.galleryTitle ?? "Signature dishes");
-  } else if (component.role === "testimonials" && content?.testimonials?.length) {
-    props =
-      jsxProp("eyebrow", content.testimonialsEyebrow) +
-      jsxProp("title", content.testimonialsTitle) +
-      jsxProp("subtitle", content.testimonialsSubtitle) +
-      jsxProp("items", content.testimonials);
-  } else if (component.role === "process") {
-    props =
-      jsxProp("eyebrow", content?.servicesEyebrow ?? "Your care journey") +
-      jsxProp("title", content?.servicesTitle ?? "From first call to follow-up") +
-      jsxProp("subtitle", content?.servicesSubtitle);
-  } else if (component.role === "team") {
-    props =
-      jsxProp("eyebrow", content?.servicesEyebrow ?? "Advisors") +
-      jsxProp("title", content?.servicesTitle ?? "Your private advisory team") +
-      jsxProp("subtitle", content?.servicesSubtitle);
-  } else if (component.role === "cta" || component.role === "custom") {
-    props =
-      jsxProp("primaryCta", primaryCta) +
-      jsxProp("secondaryCta", secondaryCta) +
-      jsxProp("title", content?.ctaTitle) +
-      jsxProp("subtitle", content?.ctaBody);
+  const props = buildComponentProps({
+    componentId,
+    role: role ?? component.role,
+    packageId: params.bundle.packageId,
+    ctx: bindingContext(params),
+  });
+  const jsxProps = propsToJsx(props, {
+    localizedCopy: usesLlmLocalizedWebsiteCopy(params.language),
+  });
+  if (!jsxProps.trim()) {
+    return `      <${exportName} />`;
   }
-
-  return `      <${exportName}\n${props}      />`;
+  return `      <${exportName}\n${jsxProps}      />`;
 }
 
 function wrapWithBlueprintVariant(
@@ -439,10 +134,13 @@ function resolveFlowRegions(
   flowKey: string,
 ): Record<string, string[]> {
   if (flowKey === "home") {
-    return presentation.homeFlow.regions;
+    return presentation.homeFlow?.regions ?? { main: [], utility: [], overlay: [] };
   }
   const flow = bundle.flows[flowKey];
-  return flow?.regions ?? presentation.homeFlow.regions;
+  return (
+    flow?.regions ??
+    presentation.homeFlow?.regions ?? { main: [], utility: [], overlay: [] }
+  );
 }
 
 function renderRegionBlock(
@@ -458,7 +156,8 @@ function renderRegionBlock(
       : regionName === "overlay"
         ? "div"
         : regionName;
-  return `      <${tag} data-v2-region="${regionName}"${cls}>\n${jsx}\n      </${tag}>`;
+  const idAttr = regionName === "main" ? ' id="main-content"' : "";
+  return `      <${tag}${idAttr} data-v2-region="${regionName}"${cls}>\n${jsx}\n      </${tag}>`;
 }
 
 function usesSidebarLayout(
@@ -505,7 +204,7 @@ export function composeRegionGridPage(params: RegionGridComposeParams): string {
         utility: blueprintPlan.utility,
         overlay: blueprintPlan.overlay,
       }
-    : baseRegions;
+    : (baseRegions ?? { main: [], utility: [], overlay: [] });
 
   const layoutId =
     blueprintPlan?.layoutId ?? presentation.layout.defaultLayoutId;
@@ -535,6 +234,7 @@ export function composeRegionGridPage(params: RegionGridComposeParams): string {
   const imports = collectImports([...allComponentIds], registry, bundle.packageId);
   const title = params.pageTitle ?? params.brandName ?? "Home";
   const description = params.pageDescription ?? "";
+  const exportName = params.exportName ?? "HomePage";
 
   const headerJsx = renderComponent(
     presentation.navigation.componentId,
@@ -556,6 +256,7 @@ export function composeRegionGridPage(params: RegionGridComposeParams): string {
     .map((id) => renderComponent(id))
     .filter(Boolean)
     .join("\n");
+  const pageTitleMarkup = `        ${visuallyHiddenPageTitle(title)}\n`;
 
   const utilityIds = regions.utility ?? [];
   const utilityJsx = utilityIds
@@ -598,18 +299,18 @@ ${renderRegionBlock("footer", footerJsx)}
 ${overlayJsx ? `      <div data-v2-region="overlay" className="pointer-events-none fixed inset-x-0 bottom-0 z-50">\n${overlayJsx}\n      </div>` : ""}`;
   } else if (editorialReveal) {
     body = `${renderRegionBlock("header", headerJsx)}
-${renderRegionBlock("main", `${mainJsx ? `        ${visuallyHiddenPageTitle(title)}\n${mainJsx}` : `        ${visuallyHiddenPageTitle(title)}`}`, "v2-main-canvas flex flex-col")}
+${renderRegionBlock("main", `${mainJsx ? `${pageTitleMarkup}${mainJsx}` : `        ${visuallyHiddenPageTitle(title)}`}`, "v2-main-canvas flex flex-col")}
 ${overlayJsx ? renderRegionBlock("overlay", overlayJsx, "v2-overlay-reveal") : ""}
 ${renderRegionBlock("footer", footerJsx)}`;
   } else if (fullBleedLayout) {
     body = `${renderRegionBlock("header", headerJsx)}
 ${overlayJsx ? renderRegionBlock("overlay", overlayJsx, "v2-overlay-canvas") : ""}
 ${utilityJsx ? renderRegionBlock("utility", utilityJsx) : ""}
-${renderRegionBlock("main", `${mainJsx ? `        ${visuallyHiddenPageTitle(title)}\n${mainJsx}` : `        ${visuallyHiddenPageTitle(title)}`}`, "v2-main-canvas flex flex-col")}
+${renderRegionBlock("main", `${mainJsx ? `${pageTitleMarkup}${mainJsx}` : `        ${visuallyHiddenPageTitle(title)}`}`, "v2-main-canvas flex flex-col")}
 ${renderRegionBlock("footer", footerJsx)}`;
   } else {
     body = `${renderRegionBlock("header", headerJsx)}
-${renderRegionBlock("main", `${mainJsx ? `        ${visuallyHiddenPageTitle(title)}\n${mainJsx}` : `        ${visuallyHiddenPageTitle(title)}`}`, "v2-region-grid flex flex-col")}
+${renderRegionBlock("main", `${mainJsx ? `${pageTitleMarkup}${mainJsx}` : `        ${visuallyHiddenPageTitle(title)}`}`, "v2-region-grid flex flex-col")}
 ${utilityJsx ? renderRegionBlock("utility", utilityJsx) : ""}
 ${renderRegionBlock("footer", footerJsx)}
 ${overlayJsx ? `      <div data-v2-region="overlay" className="pointer-events-none fixed inset-x-0 bottom-0 z-50">\n${overlayJsx}\n      </div>` : ""}`;
@@ -623,7 +324,7 @@ export const metadata: Metadata = {
   description: ${JSON.stringify(description)},
 };
 
-export default function HomePage() {
+export default function ${exportName}() {
   return (
     <div className=${JSON.stringify(layoutClass)} data-v2-package=${JSON.stringify(bundle.packageId)} data-v2-composer="region-grid" data-v2-layout=${JSON.stringify(layoutId)}${params.websiteBlueprint ? ` data-v2-blueprint=${JSON.stringify(params.websiteBlueprint.meta.blueprintId)}` : ""}>
 ${body}

@@ -36,6 +36,7 @@ export {
   mapInstalledRegistryEntryToMarketplaceListing,
   mapMarketplaceListingToListItem,
   canSelectMarketplaceListing,
+  canInstallMarketplaceListing,
   mapRemoteSeedToMarketplaceListing,
 } from "@/lib/website/template-marketplace/adapters";
 

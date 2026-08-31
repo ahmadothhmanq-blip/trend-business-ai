@@ -1,9 +1,10 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
 import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
-import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { beginAiUsage } from "@/lib/api/rate-limit";
 import { generateWorkspaceProject } from "@/lib/workspace/service";
 import { getWorkspaceDefinition } from "@/lib/workspace/registry";
 import { isWorkspaceType } from "@/lib/workspace/types";
+import { getRequestAiLanguage } from "@/lib/i18n/api";
 import { ensureProjectForGeneration } from "@/lib/workspace/projects";
 import {
   appendPromptVersion,
@@ -27,8 +28,9 @@ export async function POST(request: Request, context: RouteContext) {
     return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Unknown workspace type.");
   }
 
-  const rateLimited = await enforceAiUsage(auth.supabase, auth.user!.id, "workspace");
-  if (rateLimited) return rateLimited;
+  const usage = await beginAiUsage(auth.supabase, auth.user!.id, "workspace");
+  if (!usage.ok) return usage.response;
+  const creditLease = usage.lease;
 
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
@@ -40,6 +42,7 @@ export async function POST(request: Request, context: RouteContext) {
 
   const mode = parsed.data.mode ?? "generate";
   const encoder = new TextEncoder();
+  const aiLanguage = getRequestAiLanguage(request, parsed.data.language, parsed.data.country);
 
   let previousOutput = undefined as WorkspaceGeneration["output"] | undefined;
   let parentPromptVersions = undefined as WorkspaceGeneration["prompt_versions"];
@@ -74,6 +77,7 @@ export async function POST(request: Request, context: RouteContext) {
             type,
             {
               ...parsed.data,
+              language: aiLanguage,
               mode,
               previousOutput,
             },
@@ -122,7 +126,7 @@ export async function POST(request: Request, context: RouteContext) {
           title: savedOutput.title,
           brief: parsed.data.prompt,
           template: parsed.data.template ?? null,
-          language: parsed.data.language ?? "English",
+          language: aiLanguage,
           theme: parsed.data.theme ?? "Gold",
           features,
           output: savedOutput,
@@ -144,11 +148,13 @@ export async function POST(request: Request, context: RouteContext) {
         });
 
         if (error) {
+          await creditLease.release(auth.supabase);
           send("error", { error: error.message });
           controller.close();
           return;
         }
 
+        await creditLease.settle(auth.supabase);
         send("complete", {
           generation: data as WorkspaceGeneration,
           output: savedOutput,
@@ -159,6 +165,7 @@ export async function POST(request: Request, context: RouteContext) {
               : "Workspace project generated and saved.",
         });
       } catch (error) {
+        await creditLease.release(auth.supabase);
         const message =
           error instanceof Error ? error.message : "Unable to generate workspace project.";
 
@@ -169,7 +176,7 @@ export async function POST(request: Request, context: RouteContext) {
             title: "Failed generation",
             brief: parsed.data.prompt,
             template: parsed.data.template ?? null,
-            language: parsed.data.language ?? "English",
+            language: aiLanguage,
             theme: parsed.data.theme ?? "Gold",
             features: parsed.data.features ?? [],
             output: {

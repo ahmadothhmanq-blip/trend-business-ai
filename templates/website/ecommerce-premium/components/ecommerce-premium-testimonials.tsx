@@ -1,60 +1,74 @@
 "use client";
 
-import {
-  FlagshipTestimonialsSection,
-  type FlagshipTestimonial,
-} from "@/lib/website/template-v2/flagship/testimonials-section";
-import { ECOMMERCE_FLAGSHIP_UI } from "@/lib/website/template-v2/flagship/themes";
-
-const DEFAULT_ITEMS: FlagshipTestimonial[] = [
+const DEFAULT_ITEMS = [
   {
-    quote:
-      "Every piece feels considered — from the unboxing to the object itself. This is how luxury e-commerce should feel.",
-    name: "Elena Vasquez",
-    role: "Interior designer",
-    company: "Studio Vasquez",
-    rating: 5,
-  },
-  {
-    quote:
-      "I've built my entire home collection through Atelier. The provenance notes and maker stories make each purchase meaningful.",
-    name: "James Okonkwo",
+    quote: "The pieces arrived like a private viewing — quiet packaging, exact craft, nothing loud.",
+    name: "Amelia Cho",
     role: "Collector",
-    company: "London",
-    rating: 5,
+    company: "Seoul",
   },
   {
-    quote:
-      "The concierge team helped me source a one-of-a-kind ceramic piece for a client project. Impeccable service.",
-    name: "Sophie Laurent",
-    role: "Creative director",
-    company: "Maison Laurent",
-    rating: 5,
+    quote: "Finally a shop that treats materials with the same seriousness as a gallery.",
+    name: "Jonas Berg",
+    role: "Interior director",
+    company: "Copenhagen",
+  },
+  {
+    quote: "Limited, honest, and finished by hand. We reorder every season.",
+    name: "Mira Solène",
+    role: "Boutique owner",
+    company: "Lyon",
   },
 ];
 
-type Props = {
+type Testimonial = { quote: string; name: string; role: string; company?: string };
+
+type EcommercePremiumTestimonialsProps = {
   eyebrow?: string;
   title?: string;
   subtitle?: string;
-  items?: FlagshipTestimonial[];
+  items?: Testimonial[];
 };
 
 export function EcommercePremiumTestimonials({
-  eyebrow = "Collector voices",
-  title = "Loved by those who value craft",
-  subtitle = "From interior designers to discerning collectors — hear from our community.",
+  eyebrow = "Clientele",
+  title = "Worn & kept",
+  subtitle = "Notes from collectors and rooms that hold our work.",
   items = DEFAULT_ITEMS,
-}: Props) {
+}: EcommercePremiumTestimonialsProps) {
+  if (!items.length) return null;
   return (
-    <FlagshipTestimonialsSection
-      ui={ECOMMERCE_FLAGSHIP_UI}
-      componentId="ecommerce-premium-testimonials"
+    <section
       id="testimonials"
-      eyebrow={eyebrow}
-      title={title}
-      subtitle={subtitle}
-      items={items}
-    />
+      data-v2-component="ecommerce-premium-testimonials"
+      aria-labelledby="ec-testimonials-title"
+      className="ec-voices ec-reveal"
+    >
+      <div className="ec-voices-inner">
+        <header className="ec-section-head">
+          <p className="ec-eyebrow">{eyebrow}</p>
+          <h2 id="ec-testimonials-title" className="ec-headline-sm ec-font-display">
+            {title}
+          </h2>
+          <p className="ec-body">{subtitle}</p>
+        </header>
+        <div className="ec-voices-strip ec-reveal-stagger">
+          {items.map((item) => (
+            <figure key={item.name} className="ec-voice">
+              <blockquote>
+                <p>&ldquo;{item.quote}&rdquo;</p>
+              </blockquote>
+              <figcaption>
+                <span>{item.name}</span>
+                <span>
+                  {item.role}
+                  {item.company ? ` · ${item.company}` : ""}
+                </span>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }

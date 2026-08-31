@@ -178,7 +178,7 @@ const CORE_LANDING = PALETTE_LANDING;
 export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   {
     id: "ti-luxury-noir",
-    name: "Luxury Noir",
+    name: "Timeless",
     tagline: "Dark editorial luxury with gold restraint",
     description:
       "Cinematic full-bleed layouts, museum spacing, and premium serif display type.",
@@ -245,7 +245,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-modern-clean",
-    name: "Modern Clean",
+    name: "Sophisticated",
     tagline: "Bright product clarity with crisp hierarchy",
     description:
       "Balanced SaaS-friendly sections, strong CTAs, and contemporary sans typography.",
@@ -311,7 +311,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-minimal-white",
-    name: "Minimal White",
+    name: "Prestige",
     tagline: "Quiet space, decisive type, almost no chrome",
     description:
       "Ultra-light surfaces, generous whitespace, and a focused conversion path.",
@@ -377,7 +377,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-corporate-trust",
-    name: "Corporate Trust",
+    name: "Elegant",
     tagline: "Institutional clarity for serious buyers",
     description:
       "Process-forward layouts, proof bands, and trustworthy navy/teal systems.",
@@ -444,7 +444,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-creative-studio",
-    name: "Creative Studio",
+    name: "Refined",
     tagline: "Portfolio energy with cinematic frames",
     description:
       "Asymmetric galleries, case-study storytelling, and expressive motion.",
@@ -511,7 +511,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-red-premium",
-    name: "Red Premium",
+    name: "Distinctive",
     tagline: "Bold red luxury with high-contrast drama",
     description:
       "Premium red palette with editorial hero, gallery showcase, and conversion-focused CTA bands.",
@@ -577,7 +577,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-technology-dark",
-    name: "Technology Dark",
+    name: "Elite",
     tagline: "Product frames on luminous technical surfaces",
     description:
       "Dark glass UI, geometric clarity, and product-led storytelling.",
@@ -609,7 +609,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-saas-growth",
-    name: "SaaS Growth",
+    name: "Global",
     tagline: "Conversion-ready product marketing",
     description:
       "Feature grids, pricing clarity, proof, and demo-first CTAs.",
@@ -641,7 +641,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-automotive-showroom",
-    name: "Automotive Showroom",
+    name: "Clean",
     tagline: "Luxury vehicle stage with inventory & finance",
     description:
       "Dark showroom hero, vehicle cards, filters, calculator, and appointments.",
@@ -673,7 +673,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-automotive-luxury",
-    name: "Automotive Luxury",
+    name: "Dynamic",
     tagline: "Fullscreen hero · museum spacing · concierge CTAs",
     description:
       "Luxury vehicle stage with full-bleed photography, heritage storytelling, and premium concierge booking.",
@@ -705,7 +705,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-automotive-corporate",
-    name: "Automotive Corporate",
+    name: "Balanced",
     tagline: "Split hero · trust blocks · financing & dealer network",
     description:
       "Professional dealership site with service cards, comparison blocks, financing, and dealer locator.",
@@ -737,7 +737,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-automotive-modern",
-    name: "Automotive Modern",
+    name: "Stylish",
     tagline: "Center hero · dynamic grids · reviews & test drive",
     description:
       "Modern inventory-first dealership with product comparison, dynamic features, and appointment booking.",
@@ -769,7 +769,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-automotive-technology",
-    name: "Automotive Technology",
+    name: "Iconic",
     tagline: "Futuristic hero · glass UI · AI & connected features",
     description:
       "Technology-forward auto brand with interactive hero, AI feature blocks, timeline, and dashboard-style sections.",
@@ -801,7 +801,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-restaurant-dining",
-    name: "Restaurant Dining",
+    name: "Classic",
     tagline: "Atmospheric fine dining with reservation flow",
     description:
       "Cinematic food photography, menu highlights, and booking-first CTAs.",
@@ -833,7 +833,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-real-estate-listings",
-    name: "Real Estate Listings",
+    name: "Luxury",
     tagline: "Property-forward trust and inquiry paths",
     description:
       "Listing grids, neighborhood proof, and clean inquire/schedule flows.",
@@ -865,7 +865,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-luxury-brands-atelier",
-    name: "Luxury Brands Atelier",
+    name: "Visionary",
     tagline: "Couture stillness for premium product houses",
     description:
       "Full-bleed product storytelling, restrained type, and museum spacing for luxury brands.",
@@ -897,7 +897,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-ai-company-signal",
-    name: "AI Company Signal",
+    name: "Bold",
     tagline: "Dark technical clarity for AI platforms",
     description:
       "Product-led hero, capability grids, and high-contrast tech motion for AI companies.",
@@ -929,7 +929,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-software-studio",
-    name: "Software Studio",
+    name: "Polished",
     tagline: "Clean product narrative for software companies",
     description:
       "Split hero, feature storytelling, pricing, and FAQ tuned for software businesses.",
@@ -961,7 +961,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-consulting-clarity",
-    name: "Consulting Clarity",
+    name: "Exclusive",
     tagline: "Trust-first layouts for advisory firms",
     description:
       "Corporate rhythm with process steps, proof, and calm inquiry CTAs for consulting.",
@@ -993,7 +993,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-finance-ledger",
-    name: "Finance Ledger",
+    name: "Contemporary",
     tagline: "Precise, calm systems for financial services",
     description:
       "Structured sections, credibility bands, and clear CTAs for finance brands.",
@@ -1024,7 +1024,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-agency-portfolio",
-    name: "Agency Portfolio",
+    name: "Pure",
     tagline: "Work-first creative studio systems",
     description:
       "Case-led layouts, expressive type, and studio contact flows for agencies.",
@@ -1056,7 +1056,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-hotel-sanctuary",
-    name: "Hotel Sanctuary",
+    name: "Premium",
     tagline: "Atmospheric hospitality for hotels & resorts",
     description:
       "Cinematic stays, amenity storytelling, gallery rhythm, and booking CTAs.",
@@ -1088,7 +1088,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-travel-horizon",
-    name: "Travel Horizon",
+    name: "Essential",
     tagline: "Destination-led journeys for travel brands",
     description:
       "Immersive destination hero, itinerary sections, and booking-forward CTAs.",
@@ -1120,7 +1120,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-ecommerce-atelier",
-    name: "Ecommerce Atelier",
+    name: "Professional",
     tagline: "Product-first commerce for modern brands",
     description:
       "Collection hero, product grids, brand story, and conversion CTAs for ecommerce.",
@@ -1152,7 +1152,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-medical-care",
-    name: "Medical Care",
+    name: "Modern",
     tagline: "Calm clinical trust with appointment-first flows",
     description:
       "Healthcare hero, departments, doctor profiles, and emergency pathways.",
@@ -1184,7 +1184,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-law-firm",
-    name: "Law Firm",
+    name: "Dramatic",
     tagline: "Dark luxury authority for legal practices",
     description:
       "Practice areas, attorney profiles, case proof, and consultation CTAs.",
@@ -1216,7 +1216,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-education-campus",
-    name: "Education Campus",
+    name: "Vibrant",
     tagline: "Programs, teachers, and admissions-forward learning brands",
     description:
       "Campus hero, courses, events, certificates, and enrollment CTAs.",
@@ -1248,7 +1248,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-blog-editorial",
-    name: "Blog Editorial",
+    name: "Sleek",
     tagline: "Readable editorial layouts for publishers and writers",
     description:
       "Featured articles, categories, authors, and newsletter conversion.",
@@ -1280,7 +1280,7 @@ export const TEMPLATE_INTELLIGENCE_CATALOG: TemplateIntelligenceDefinition[] = [
   },
   {
     id: "ti-landing-conversion",
-    name: "Landing Conversion",
+    name: "Authentic",
     tagline: "High-conversion product and campaign landing pages",
     description:
       "Benefits, features, pricing, social proof, and sticky CTAs.",

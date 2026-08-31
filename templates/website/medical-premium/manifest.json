@@ -2,16 +2,16 @@
   "specVersion": "2.0.0",
   "id": "medical-premium",
   "version": "2.0.0",
-  "name": "Medical Premium",
-  "description": "Swiss clinical clarity — layered trust hero, sage surfaces, appointment-first utility flow, and accessible calm.",
+  "name": "Serenity",
+  "description": "رعاية صحية عالمية — sage ناعم، أبيض دافئ، هدوء سريري. للعيادات والمستشفيات ومراكز العافية.",
   "metadata": {
-    "category": "healthcare",
-    "industry": "Healthcare",
+    "category": "medical",
+    "industry": "Medical",
     "tags": [
       "medical",
-      "healthcare",
-      "clinic",
-      "wellness"
+      "premium",
+      "global",
+      "flagship"
     ],
     "author": {
       "name": "Trend Business AI",
@@ -19,18 +19,20 @@
     },
     "license": "MIT",
     "keywords": [
-      "medical",
-      "healthcare",
-      "clinic",
-      "appointments"
+      "saas",
+      "enterprise",
+      "platform",
+      "revenue"
     ],
     "templateIntelligenceId": "ti-medical-care",
     "premium": true,
     "tier": "agency"
   },
   "media": {
-    "thumbnail": "assets/thumbnail.png",
-    "preview": "assets/preview.png"
+    "thumbnail": "assets/thumbnail.svg",
+    "preview": "assets/preview.svg",
+    "previewTablet": "assets/preview-tablet.svg",
+    "previewMobile": "assets/preview-mobile.svg"
   },
   "compatibility": {
     "engineVersion": ">=1.0.0",
@@ -44,7 +46,7 @@
   },
   "update": {
     "channel": "stable",
-    "releasedAt": "2026-08-03T16:09:45.094Z"
+    "releasedAt": "2026-08-03T16:09:45.050Z"
   },
   "responsive": {
     "breakpoints": [
@@ -69,7 +71,7 @@
         "minWidth": 1536
       }
     ],
-    "containerMaxWidth": "76rem",
+    "containerMaxWidth": "82rem",
     "fluidTypography": true
   },
   "canvas": {
@@ -82,9 +84,9 @@
     {
       "id": "default",
       "file": "layouts/default.json",
-      "kind": "full-bleed",
+      "kind": "single-column",
       "label": "Default",
-      "description": "Premium full-bleed layout for Healthcare."
+      "description": "Premium single-column layout for SaaS."
     }
   ],
   "regions": [
@@ -93,35 +95,28 @@
       "file": "regions/header.json",
       "role": "header",
       "label": "Header Region",
-      "description": "Premium header region for Medical Premium."
-    },
-    {
-      "id": "overlay",
-      "file": "regions/overlay.json",
-      "role": "overlay",
-      "label": "Overlay Region",
-      "description": "Premium overlay region for Medical Premium."
-    },
-    {
-      "id": "utility",
-      "file": "regions/utility.json",
-      "role": "utility",
-      "label": "Utility Region",
-      "description": "Premium utility region for Medical Premium."
+      "description": "Premium header region for SaaS Enterprise."
     },
     {
       "id": "main",
       "file": "regions/main.json",
       "role": "main",
       "label": "Main Region",
-      "description": "Premium main region for Medical Premium."
+      "description": "Premium main region for SaaS Enterprise."
+    },
+    {
+      "id": "utility",
+      "file": "regions/utility.json",
+      "role": "utility",
+      "label": "Utility Region",
+      "description": "Premium utility region for SaaS Enterprise."
     },
     {
       "id": "footer",
       "file": "regions/footer.json",
       "role": "footer",
       "label": "Footer Region",
-      "description": "Premium footer region for Medical Premium."
+      "description": "Premium footer region for SaaS Enterprise."
     }
   ],
   "pages": [
@@ -131,31 +126,31 @@
       "path": "/",
       "layoutId": "default",
       "file": "pages/home.json",
-      "description": "Home — premium Healthcare page blueprint."
+      "description": "Home — premium SaaS page blueprint."
     },
     {
-      "id": "services",
-      "title": "Services",
-      "path": "/services",
+      "id": "platform",
+      "title": "Platform",
+      "path": "/platform",
       "layoutId": "default",
-      "file": "pages/services.json",
-      "description": "Services — premium Healthcare page blueprint."
+      "file": "pages/platform.json",
+      "description": "Platform — premium SaaS page blueprint."
     },
     {
-      "id": "physicians",
-      "title": "Physicians",
-      "path": "/physicians",
+      "id": "pricing",
+      "title": "Pricing",
+      "path": "/pricing",
       "layoutId": "default",
-      "file": "pages/physicians.json",
-      "description": "Physicians — premium Healthcare page blueprint."
+      "file": "pages/pricing.json",
+      "description": "Pricing — premium SaaS page blueprint."
     },
     {
-      "id": "appointments",
-      "title": "Appointments",
-      "path": "/appointments",
+      "id": "customers",
+      "title": "Customers",
+      "path": "/customers",
       "layoutId": "default",
-      "file": "pages/appointments.json",
-      "description": "Appointments — premium Healthcare page blueprint."
+      "file": "pages/customers.json",
+      "description": "Customers — premium SaaS page blueprint."
     }
   ],
   "entry": "package.entry.json",
@@ -164,18 +159,26 @@
     "composer": "region-grid",
     "sdkVersion": "1.0.0"
   },
-  "presentation": { "file": "presentation/presentation.json" },
-  "tokens": { "file": "tokens/tokens.json" },
-  "motion": { "file": "motion/motion.json" },
-  "responsiveConfig": { "file": "responsive/responsive.json" },
+  "presentation": {
+    "file": "presentation/presentation.json"
+  },
+  "tokens": {
+    "file": "tokens/tokens.json"
+  },
+  "motion": {
+    "file": "motion/motion.json"
+  },
+  "responsiveConfig": {
+    "file": "responsive/responsive.json"
+  },
   "componentLibrary": {
     "file": "components/registry.json",
     "root": "components"
   },
   "pageFlows": {
     "home": "flows/home.json",
-    "services": "flows/services.json",
-    "physicians": "flows/physicians.json",
-    "appointments": "flows/appointments.json"
+    "platform": "flows/platform.json",
+    "pricing": "flows/pricing.json",
+    "customers": "flows/customers.json"
   }
 }

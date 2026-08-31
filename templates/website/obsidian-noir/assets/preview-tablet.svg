@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="768" height="1024" viewBox="0 0 768 1024" role="img" aria-label="SaaS Enterprise Tablet preview">
+  <defs>
+    <linearGradient id="g-obsidian-noir-768" x1="0" y1="0" x2="1" y2="0.6">
+      <stop offset="0%" stop-color="#1D4ED8"/>
+      <stop offset="100%" stop-color="#3B82F6"/>
+    </linearGradient>
+  </defs>
+  <rect width="768" height="1024" fill="#F8FAFC"/>
+  <rect width="768" height="82" fill="#1D4ED8"/>
+  <circle cx="52" cy="41" r="10" fill="#3B82F6"/>
+  <rect x="70" y="35" width="115" height="12" rx="4" fill="#fff" opacity="0.85"/>
+  <rect x="592" y="31" width="138" height="20" rx="10" fill="url(#g-obsidian-noir-768)"/>
+  <rect x="38" y="90" width="56" height="803" rx="6" fill="#FFFFFF" opacity="0.95"/>
+       <rect x="48" y="110" width="36" height="4" rx="2" fill="#3B82F6" opacity="0.5"/>
+       <rect x="48" y="126" width="32" height="3" rx="1.5" fill="rgba(15,23,42,0.12)"/>
+       <rect x="48" y="138" width="40" height="3" rx="1.5" fill="rgba(15,23,42,0.12)"/>
+  <rect x="106" y="98" width="218" height="10" rx="4" fill="#3B82F6" opacity="0.6"/>
+  <rect x="106" y="118" width="468" height="63" rx="8" fill="#0F172A" opacity="0.16"/>
+  <rect x="106" y="198" width="343" height="40" rx="6" fill="#0F172A" opacity="0.09"/>
+  <rect x="106" y="289" width="175" height="32" rx="16" fill="url(#g-obsidian-noir-768)"/>
+  <rect x="106" y="430" width="306" height="123" rx="10" fill="#FFFFFF" stroke="rgba(15,23,42,0.12)" stroke-width="1"/>
+      <rect x="120" y="446" width="153" height="8" rx="4" fill="#0F172A" opacity="0.15"/>
+      <rect x="120" y="464" width="214" height="6" rx="3" fill="#0F172A" opacity="0.08"/>
+  <rect x="424" y="430" width="306" height="123" rx="10" fill="#FFFFFF" stroke="rgba(15,23,42,0.12)" stroke-width="1"/>
+      <rect x="438" y="446" width="153" height="8" rx="4" fill="#0F172A" opacity="0.15"/>
+      <rect x="438" y="464" width="214" height="6" rx="3" fill="#0F172A" opacity="0.08"/>
+  <rect x="38" y="922" width="692" height="1" fill="rgba(15,23,42,0.12)"/>
+  <text x="38" y="53" fill="#fff" font-family="system-ui,sans-serif" font-size="17" font-weight="600">SaaS Enterprise · Tablet</text>
+</svg>

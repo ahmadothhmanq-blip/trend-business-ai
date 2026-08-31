@@ -151,9 +151,7 @@ export function processRenderJob(
     progress: 100,
     clips,
     compositeAsset: composite,
-    message: isExternalVideoProviderConfigured()
-      ? "Render completed via external provider."
-      : "Preview render completed. Clips use storyboard/poster frames until a video provider is connected.",
+    message: "Storyboard preview completed (SVG posters). This is not a playable video file.",
     updatedAt,
     completedAt: updatedAt,
   };

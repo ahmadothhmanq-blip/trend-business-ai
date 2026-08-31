@@ -2,16 +2,16 @@
   "specVersion": "2.0.0",
   "id": "ecommerce-premium",
   "version": "2.0.0",
-  "name": "E-commerce Premium",
-  "description": "Atelier commerce — editorial product curation — contained split hero, bottom conversion utility band, and enterprise GTM architecture.",
+  "name": "Atelier",
+  "description": "تجارة فاخرة عالمية — عاجي، حبر، ذهب شامبانيا. للمتاجر الراقية والعلامات التجارية الفاخرة.",
   "metadata": {
-    "category": "ecommerce",
-    "industry": "E-commerce",
+    "category": "logistics",
+    "industry": "Logistics",
     "tags": [
-      "ecommerce",
-      "retail",
-      "luxury",
-      "editorial"
+      "logistics",
+      "premium",
+      "global",
+      "flagship"
     ],
     "author": {
       "name": "Trend Business AI",
@@ -19,10 +19,10 @@
     },
     "license": "MIT",
     "keywords": [
-      "ecommerce",
-      "shop",
-      "store",
-      "catalog"
+      "saas",
+      "enterprise",
+      "platform",
+      "revenue"
     ],
     "templateIntelligenceId": "ti-ecommerce-atelier",
     "premium": true,
@@ -95,28 +95,28 @@
       "file": "regions/header.json",
       "role": "header",
       "label": "Header Region",
-      "description": "Premium header region for E-commerce Premium."
+      "description": "Premium header region for SaaS Enterprise."
     },
     {
       "id": "main",
       "file": "regions/main.json",
       "role": "main",
       "label": "Main Region",
-      "description": "Premium main region for E-commerce Premium."
+      "description": "Premium main region for SaaS Enterprise."
     },
     {
       "id": "utility",
       "file": "regions/utility.json",
       "role": "utility",
       "label": "Utility Region",
-      "description": "Premium utility region for E-commerce Premium."
+      "description": "Premium utility region for SaaS Enterprise."
     },
     {
       "id": "footer",
       "file": "regions/footer.json",
       "role": "footer",
       "label": "Footer Region",
-      "description": "Premium footer region for E-commerce Premium."
+      "description": "Premium footer region for SaaS Enterprise."
     }
   ],
   "pages": [
@@ -126,31 +126,31 @@
       "path": "/",
       "layoutId": "default",
       "file": "pages/home.json",
-      "description": "Home — premium e-commerce page blueprint."
+      "description": "Home — premium SaaS page blueprint."
     },
     {
-      "id": "shop",
-      "title": "Shop",
-      "path": "/shop",
+      "id": "platform",
+      "title": "Platform",
+      "path": "/platform",
       "layoutId": "default",
-      "file": "pages/shop.json",
-      "description": "Shop — premium e-commerce page blueprint."
+      "file": "pages/platform.json",
+      "description": "Platform — premium SaaS page blueprint."
     },
     {
-      "id": "collections",
-      "title": "Collections",
-      "path": "/collections",
+      "id": "pricing",
+      "title": "Pricing",
+      "path": "/pricing",
       "layoutId": "default",
-      "file": "pages/collections.json",
-      "description": "Collections — premium e-commerce page blueprint."
+      "file": "pages/pricing.json",
+      "description": "Pricing — premium SaaS page blueprint."
     },
     {
-      "id": "about",
-      "title": "About",
-      "path": "/about",
+      "id": "customers",
+      "title": "Customers",
+      "path": "/customers",
       "layoutId": "default",
-      "file": "pages/about.json",
-      "description": "About — premium e-commerce page blueprint."
+      "file": "pages/customers.json",
+      "description": "Customers — premium SaaS page blueprint."
     }
   ],
   "entry": "package.entry.json",
@@ -177,8 +177,8 @@
   },
   "pageFlows": {
     "home": "flows/home.json",
-    "shop": "flows/shop.json",
-    "collections": "flows/collections.json",
-    "about": "flows/about.json"
+    "platform": "flows/platform.json",
+    "pricing": "flows/pricing.json",
+    "customers": "flows/customers.json"
   }
 }

@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
+import { apiValidationError } from "@/lib/i18n/api-errors";
 import { z } from "zod";
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
-import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { beginAiUsage } from "@/lib/api/rate-limit";
 import {
   analyzeAeo,
   enrichAeoWithAi,
@@ -19,6 +19,7 @@ import {
   enrichContentOptimizeWithAi,
   contentOptimizeBodySchema,
 } from "@/lib/ai-search/content-optimizer";
+import { getRequestAiLanguage } from "@/lib/i18n/api";
 
 const analyzeBodySchema = z.discriminatedUnion("mode", [
   aeoAnalyzeBodySchema.extend({ mode: z.literal("aeo") }),
@@ -42,25 +43,39 @@ export async function POST(request: Request) {
   const data = parsed.data;
 
   if (data.mode === "aeo") {
-    const { mode: _ignoredMode, useAi, ...input } = data;
+    const { mode: _ignoredMode, useAi, language, country, ...input } = data;
     void _ignoredMode;
     let result = analyzeAeo(input);
     if (useAi) {
-      const limited = await enforceAiUsage(auth.supabase, auth.user!.id, "seo-analyzer");
-      if (limited) return limited;
-      result = await enrichAeoWithAi(result, input);
+      const usage = await beginAiUsage(auth.supabase, auth.user!.id, "seo-analyzer");
+      if (!usage.ok) return usage.response;
+      try {
+        const aiLanguage = getRequestAiLanguage(request, language, country);
+        result = await enrichAeoWithAi(result, input, aiLanguage);
+        await usage.lease.settle(auth.supabase);
+      } catch (error) {
+        await usage.lease.release(auth.supabase);
+        throw error;
+      }
     }
     return NextResponse.json({ mode: "aeo", result });
   }
 
   if (data.mode === "geo") {
-    const { mode: _ignoredMode, useAi, ...input } = data;
+    const { mode: _ignoredMode, useAi, language, country, ...input } = data;
     void _ignoredMode;
     let result = analyzeGeo(input);
     if (useAi) {
-      const limited = await enforceAiUsage(auth.supabase, auth.user!.id, "seo-analyzer");
-      if (limited) return limited;
-      result = await enrichGeoWithAi(result, input);
+      const usage = await beginAiUsage(auth.supabase, auth.user!.id, "seo-analyzer");
+      if (!usage.ok) return usage.response;
+      try {
+        const aiLanguage = getRequestAiLanguage(request, language, country);
+        result = await enrichGeoWithAi(result, input, aiLanguage);
+        await usage.lease.settle(auth.supabase);
+      } catch (error) {
+        await usage.lease.release(auth.supabase);
+        throw error;
+      }
     }
     return NextResponse.json({ mode: "geo", result });
   }
@@ -72,13 +87,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ mode: "schema", result });
   }
 
-  const { mode: _ignoredMode, useAi, ...input } = data;
+  const { mode: _ignoredMode, useAi, language, country, ...input } = data;
   void _ignoredMode;
   let result = optimizeContent(input);
   if (useAi) {
-    const limited = await enforceAiUsage(auth.supabase, auth.user!.id, "seo-analyzer");
-    if (limited) return limited;
-    result = await enrichContentOptimizeWithAi(result, input);
+    const usage = await beginAiUsage(auth.supabase, auth.user!.id, "seo-analyzer");
+    if (!usage.ok) return usage.response;
+    try {
+      const aiLanguage = getRequestAiLanguage(request, language, country);
+      result = await enrichContentOptimizeWithAi(result, input, aiLanguage);
+      await usage.lease.settle(auth.supabase);
+    } catch (error) {
+      await usage.lease.release(auth.supabase);
+      throw error;
+    }
   }
   return NextResponse.json({ mode: "optimize", result });
 }

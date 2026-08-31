@@ -1,13 +1,9 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
 import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
-import { enforceAiUsage } from "@/lib/api/rate-limit";
-import {
-  generateCampaign,
-  generatedCampaignToRow,
-  createCampaign,
-  listCampaigns,
-} from "@/lib/marketing";
+import { beginAiUsage } from "@/lib/api/rate-limit";
+import { generateCampaign, generatedCampaignToRow, createCampaign, listCampaigns } from "@/lib/marketing";
+import { resolveRequestLanguage } from "@/lib/i18n/api";
 import type { MarketingCampaign } from "@/types/marketing";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -23,6 +19,8 @@ const createSchema = z.object({
   brief: z.string().trim().min(3).optional(),
   generate: z.boolean().default(false),
   tone: z.string().optional(),
+  language: z.string().trim().optional(),
+  country: z.string().trim().optional(),
 });
 
 export async function GET(request: Request) {
@@ -56,14 +54,16 @@ export async function POST(request: Request) {
   }
 
   if (parsed.data.generate && parsed.data.brief) {
-    const rateLimited = await enforceAiUsage(auth.supabase, auth.user!.id, "workspace");
-    if (rateLimited) return rateLimited;
+    const usage = await beginAiUsage(auth.supabase, auth.user!.id, "workspace");
+    if (!usage.ok) return usage.response;
+    const creditLease = usage.lease;
 
     const generated = await generateCampaign({
       brief: parsed.data.brief,
       objective: parsed.data.objective,
       budget: parsed.data.budget ?? undefined,
       tone: parsed.data.tone,
+      language: resolveRequestLanguage(request, parsed.data.language, parsed.data.country),
     });
 
     const { data, error } = await createCampaign(
@@ -71,6 +71,7 @@ export async function POST(request: Request) {
       generatedCampaignToRow(auth.user!.id, generated, parsed.data.brief) as Parameters<typeof createCampaign>[1],
     );
     if (error) return databaseErrorResponse("marketing.campaigns.insert", error);
+    await creditLease.settle(auth.supabase);
     return NextResponse.json({ campaign: data, generated });
   }
 

@@ -125,6 +125,14 @@ const THEME_SHELLS: Record<WebsiteThemePresetId, string> = {
     "mb-3 text-[10px] font-bold uppercase tracking-[0.28em] text-[var(--color-foreground)]/35",
     "mx-auto mt-5 max-w-xl text-sm leading-relaxed text-[var(--color-foreground)]/55",
   ),
+  global: shell(
+    "relative bg-[var(--color-background)] py-20 sm:py-28 lg:py-32 theme-global-section",
+    "mx-auto max-w-[76rem] px-5 sm:px-8",
+    "mb-12 max-w-2xl",
+    "text-[clamp(1.75rem,3.5vw,2.75rem)] font-semibold leading-[1.12] tracking-[-0.035em]",
+    "mb-3 text-[11px] font-medium uppercase tracking-[0.28em] text-[var(--color-accent)]",
+    "mt-4 text-base leading-relaxed text-[var(--color-foreground)]/50",
+  ),
 };
 
 export function resolveThemeSectionShellSource(

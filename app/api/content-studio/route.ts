@@ -1,7 +1,7 @@
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
 import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
-import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { beginAiUsage } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import { generateContent } from "@/lib/content-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
@@ -20,6 +20,7 @@ const requestSchema = z.object({
   tone: z.string().trim().default("Professional"),
   audience: z.string().trim().default("General"),
   language: z.string().trim().default("English"),
+  country: z.string().trim().optional(),
   brandVoice: z.string().trim().default(""),
   writingStyle: z.string().trim().default("Standard"),
   creativityLevel: z.string().trim().default("Balanced"),
@@ -77,8 +78,9 @@ export async function POST(request: Request) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  const rateLimited = await enforceAiUsage(auth.supabase, auth.user!.id, "content-studio");
-  if (rateLimited) return rateLimited;
+  const usage = await beginAiUsage(auth.supabase, auth.user!.id, "content-studio");
+  if (!usage.ok) return usage.response;
+  const creditLease = usage.lease;
 
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
@@ -89,7 +91,7 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data;
-  const aiLanguage = getRequestAiLanguage(request, input.language);
+  const aiLanguage = getRequestAiLanguage(request, input.language, input.country);
   let stage = "generateContent";
 
   try {
@@ -189,6 +191,7 @@ export async function POST(request: Request) {
       return databaseErrorResponse("content-studio.insert", error);
     }
 
+    await creditLease.settle(auth.supabase);
     return NextResponse.json({ generation: data as ContentGeneration, message: "Content generated and saved." });
   } catch (error) {
     logError(stage, error);

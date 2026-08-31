@@ -2,16 +2,16 @@
   "specVersion": "2.0.0",
   "id": "restaurant-signature",
   "version": "2.0.0",
-  "name": "Restaurant Signature",
-  "description": "Forest-table hospitality — sidebar menu rail, copper accents, and gallery-led fine dining storytelling.",
+  "name": "Forest",
+  "description": "مطعم طبيعي فاخر — أخضر غابة، نحاس، أجواء organic. للمطاعم المستوحاة من الطبيعة.",
   "metadata": {
     "category": "restaurant",
     "industry": "Restaurant",
     "tags": [
       "restaurant",
-      "fine-dining",
-      "hospitality",
-      "reservations"
+      "premium",
+      "global",
+      "flagship"
     ],
     "author": {
       "name": "Trend Business AI",
@@ -19,18 +19,20 @@
     },
     "license": "MIT",
     "keywords": [
-      "restaurant",
-      "dining",
-      "chef",
-      "reservation"
+      "saas",
+      "enterprise",
+      "platform",
+      "revenue"
     ],
     "templateIntelligenceId": "ti-restaurant-dining",
     "premium": true,
     "tier": "agency"
   },
   "media": {
-    "thumbnail": "assets/thumbnail.png",
-    "preview": "assets/preview.png"
+    "thumbnail": "assets/thumbnail.svg",
+    "preview": "assets/preview.svg",
+    "previewTablet": "assets/preview-tablet.svg",
+    "previewMobile": "assets/preview-mobile.svg"
   },
   "compatibility": {
     "engineVersion": ">=1.0.0",
@@ -44,7 +46,7 @@
   },
   "update": {
     "channel": "stable",
-    "releasedAt": "2026-08-03T16:09:45.065Z"
+    "releasedAt": "2026-08-03T16:09:45.050Z"
   },
   "responsive": {
     "breakpoints": [
@@ -69,7 +71,7 @@
         "minWidth": 1536
       }
     ],
-    "containerMaxWidth": "74rem",
+    "containerMaxWidth": "82rem",
     "fluidTypography": true
   },
   "canvas": {
@@ -82,9 +84,9 @@
     {
       "id": "default",
       "file": "layouts/default.json",
-      "kind": "sidebar-left",
+      "kind": "single-column",
       "label": "Default",
-      "description": "Premium sidebar-left layout for Restaurant."
+      "description": "Premium single-column layout for SaaS."
     }
   ],
   "regions": [
@@ -93,28 +95,28 @@
       "file": "regions/header.json",
       "role": "header",
       "label": "Header Region",
-      "description": "Premium header region for Restaurant Signature."
-    },
-    {
-      "id": "sidebar",
-      "file": "regions/sidebar.json",
-      "role": "sidebar",
-      "label": "Sidebar Region",
-      "description": "Premium sidebar region for Restaurant Signature."
+      "description": "Premium header region for SaaS Enterprise."
     },
     {
       "id": "main",
       "file": "regions/main.json",
       "role": "main",
       "label": "Main Region",
-      "description": "Premium main region for Restaurant Signature."
+      "description": "Premium main region for SaaS Enterprise."
+    },
+    {
+      "id": "utility",
+      "file": "regions/utility.json",
+      "role": "utility",
+      "label": "Utility Region",
+      "description": "Premium utility region for SaaS Enterprise."
     },
     {
       "id": "footer",
       "file": "regions/footer.json",
       "role": "footer",
       "label": "Footer Region",
-      "description": "Premium footer region for Restaurant Signature."
+      "description": "Premium footer region for SaaS Enterprise."
     }
   ],
   "pages": [
@@ -124,31 +126,31 @@
       "path": "/",
       "layoutId": "default",
       "file": "pages/home.json",
-      "description": "Home — premium Restaurant page blueprint."
+      "description": "Home — premium SaaS page blueprint."
     },
     {
-      "id": "menu",
-      "title": "Menu",
-      "path": "/menu",
+      "id": "platform",
+      "title": "Platform",
+      "path": "/platform",
       "layoutId": "default",
-      "file": "pages/menu.json",
-      "description": "Menu — premium Restaurant page blueprint."
+      "file": "pages/platform.json",
+      "description": "Platform — premium SaaS page blueprint."
     },
     {
-      "id": "gallery",
-      "title": "Gallery",
-      "path": "/gallery",
+      "id": "pricing",
+      "title": "Pricing",
+      "path": "/pricing",
       "layoutId": "default",
-      "file": "pages/gallery.json",
-      "description": "Gallery — premium Restaurant page blueprint."
+      "file": "pages/pricing.json",
+      "description": "Pricing — premium SaaS page blueprint."
     },
     {
-      "id": "reserve",
-      "title": "Reserve",
-      "path": "/reserve",
+      "id": "customers",
+      "title": "Customers",
+      "path": "/customers",
       "layoutId": "default",
-      "file": "pages/reserve.json",
-      "description": "Reserve — premium Restaurant page blueprint."
+      "file": "pages/customers.json",
+      "description": "Customers — premium SaaS page blueprint."
     }
   ],
   "entry": "package.entry.json",
@@ -157,18 +159,26 @@
     "composer": "region-grid",
     "sdkVersion": "1.0.0"
   },
-  "presentation": { "file": "presentation/presentation.json" },
-  "tokens": { "file": "tokens/tokens.json" },
-  "motion": { "file": "motion/motion.json" },
-  "responsiveConfig": { "file": "responsive/responsive.json" },
+  "presentation": {
+    "file": "presentation/presentation.json"
+  },
+  "tokens": {
+    "file": "tokens/tokens.json"
+  },
+  "motion": {
+    "file": "motion/motion.json"
+  },
+  "responsiveConfig": {
+    "file": "responsive/responsive.json"
+  },
   "componentLibrary": {
     "file": "components/registry.json",
     "root": "components"
   },
   "pageFlows": {
     "home": "flows/home.json",
-    "menu": "flows/menu.json",
-    "gallery": "flows/gallery.json",
-    "reserve": "flows/reserve.json"
+    "platform": "flows/platform.json",
+    "pricing": "flows/pricing.json",
+    "customers": "flows/customers.json"
   }
 }

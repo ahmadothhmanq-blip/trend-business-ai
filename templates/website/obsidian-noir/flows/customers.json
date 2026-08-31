@@ -1,0 +1,7 @@
+{
+  "pageId": "customers",
+  "layoutId": "default",
+  "regions": {
+    "main": ["obsidian-noir-hero", "obsidian-noir-portfolio", "obsidian-noir-features"]
+  }
+}

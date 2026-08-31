@@ -12,5 +12,7 @@ export const reportInputSchema = z.object({
   topic: z.string().trim().min(1).max(300),
   reportType: z.enum(REPORT_TYPES),
   timeframe: z.string().trim().min(1).max(100),
+  language: z.string().trim().optional(),
+  country: z.string().trim().optional(),
 });
 

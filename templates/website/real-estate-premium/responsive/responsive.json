@@ -1,19 +1,20 @@
 {
   "tbdpNative": true,
-  "sectorDnaId": "real-estate",
-  "experienceProfiles": ["luxury", "executive", "corporate"],
+  "sectorDnaId": "saas",
+  "experienceProfiles": ["technical", "corporate", "executive"],
   "structure": {
     "regions": {
       "header": { "sticky": true, "position": "top" },
-      "sidebar": { "sticky": true, "collapseBelow": "lg" },
-      "main": { "collapseBelow": "sm" }
+      "utility": { "collapseBelow": "md", "collapseMode": "stack" },
+      "main": { "collapseBelow": "sm" },
+      "overlay": { "collapseBelow": "sm", "collapseMode": "fixed-bottom" }
     },
     "components": {
       "real-estate-premium-hero": {
-        "layout": { "lg": "full-bleed-estate", "sm": "stacked" }
+        "layout": { "lg": "bento-command", "sm": "stacked" }
       },
-      "real-estate-premium-collection": {
-        "layout": { "lg": "editorial-grid", "sm": "stacked" }
+      "real-estate-premium-features": {
+        "layout": { "lg": "bento-asymmetric", "sm": "stacked" }
       }
     }
   }

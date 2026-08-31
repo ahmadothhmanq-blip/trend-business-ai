@@ -13,16 +13,25 @@ describe("resolveTemplateArchitecture", () => {
     const result = await resolveTemplateArchitecture({
       manifest: {
         specVersion: "2.0.0",
-        id: "modern-business",
-        version: "2.0.0",
-        name: "Corporate Command",
+        id: "sample-v1-package",
+        version: "1.0.0",
+        name: "Legacy Package",
         description: "V1 package",
       },
     });
 
     assert.equal(result.architectureVersion, "v1");
-    assert.equal(result.packageId, "modern-business");
+    assert.equal(result.packageId, "sample-v1-package");
     assert.match(result.reason, /default v1/);
+  });
+
+  it("resolves superseded modern-business id to corporate-business v2 from disk", async () => {
+    const result = await resolveTemplateArchitecture({
+      packageId: "modern-business",
+    });
+
+    assert.equal(result.architectureVersion, "v2");
+    assert.equal(result.packageId, "corporate-business");
   });
 
   it("routes to v2 when manifest declares architecture.version v2", async () => {

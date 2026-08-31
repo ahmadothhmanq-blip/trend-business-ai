@@ -1,0 +1,62 @@
+{
+  "id": "canvas",
+  "grid": {
+    "columns": 12,
+    "gutter": "1.5rem",
+    "margin": "1.25rem",
+    "maxWidth": "82rem"
+  },
+  "spacing": {
+    "unit": "rem",
+    "scale": ["0.5", "1", "1.5", "2", "3", "4", "5", "6", "8", "10", "12"]
+  },
+  "visualIdentity": {
+    "colors": {
+      "primary": "#4F46E5",
+      "secondary": "#0F172A",
+      "accent": "#818CF8",
+      "background": "#F9FAFB",
+      "foreground": "#0B1120",
+      "muted": "rgba(11,17,32,0.55)",
+      "surface": "#FFFFFF",
+      "signal": "#10B981",
+      "grid": "rgba(79,70,229,0.06)",
+      "ink": "#030712"
+    },
+    "typography": {
+      "display": "Syne, ui-sans-serif, system-ui, sans-serif",
+      "body": "DM Sans, ui-sans-serif, system-ui, sans-serif",
+      "mono": "JetBrains Mono, ui-monospace, monospace",
+      "scale": {
+        "sm": "0.875rem",
+        "base": "1rem",
+        "lg": "1.125rem",
+        "xl": "1.625rem",
+        "display": "clamp(1.875rem, 3vw, 2.5rem)"
+      }
+    },
+    "radius": {
+      "sm": "8px",
+      "md": "12px",
+      "lg": "18px",
+      "xl": "28px"
+    },
+    "shadows": {
+      "surface": "0 2px 8px rgba(11,17,32,0.04), 0 20px 48px rgba(79,70,229,0.08)",
+      "glow": "0 0 96px rgba(79,70,229,0.2)",
+      "card": "0 0 0 1px rgba(11,17,32,0.04), 0 6px 28px rgba(11,17,32,0.05)"
+    },
+    "borders": {
+      "default": "rgba(11,17,32,0.08)",
+      "accent": "rgba(79,70,229,0.28)",
+      "subtle": "rgba(11,17,32,0.04)"
+    },
+    "animation": "nexus-grid-reveal"
+  },
+  "designSystem": {
+    "tier": "premium",
+    "industry": "SaaS",
+    "layoutKind": "single-column",
+    "templateIntelligenceId": "ti-sapu-growth"
+  }
+}

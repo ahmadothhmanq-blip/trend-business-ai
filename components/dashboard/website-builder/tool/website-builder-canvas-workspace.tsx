@@ -9,6 +9,7 @@ import type { GeneratedProjectFile } from "@/lib/ai/types";
 import type { GeneratedWebsiteProject } from "@/plugins/website/types";
 import type { WebsiteGeneration } from "@/types/database";
 import type { OutputTab } from "@/components/dashboard/website-builder/tool/types";
+import type { WebsiteStructureTemplateChoice } from "@/components/dashboard/website-builder/templates-panel";
 
 const BuilderWorkspace = dynamic(
   () =>
@@ -37,6 +38,7 @@ type WebsiteBuilderCanvasWorkspaceProps = {
   onSelectionChange?: (selection: CopilotSelectionContext | null) => void;
   onAiCommand?: (command: string, useStream?: boolean) => void;
   onOpenWorkspaceTab?: (tab: OutputTab) => void;
+  onTemplateSelect?: (choice: WebsiteStructureTemplateChoice) => void;
   onSaved: (payload: {
     project: GeneratedWebsiteProject;
     generation: WebsiteGeneration;
@@ -55,6 +57,7 @@ export function WebsiteBuilderCanvasWorkspace({
   onSelectionChange,
   onAiCommand,
   onOpenWorkspaceTab,
+  onTemplateSelect,
   onSaved,
 }: WebsiteBuilderCanvasWorkspaceProps) {
   const copilotControl = useCopilotCommand({
@@ -110,6 +113,7 @@ export function WebsiteBuilderCanvasWorkspace({
         void copilotControl.submit(command, { forceStream: useStream });
       }}
       onOpenWorkspaceTab={handleOpenTab}
+      onTemplateSelect={onTemplateSelect}
       onSaved={onSaved}
     />
   );

@@ -102,9 +102,10 @@ export function buildLogoVariants(
 export async function generateBrandLogos(params: {
   model: BrandIdentityModel;
   conceptCount?: number;
+  language?: string;
   onProgress?: (msg: string) => void;
 }): Promise<{ concepts: BrandLogoConcept[]; variants: BrandLogoVariant[]; guidelines: string }> {
-  const { model, conceptCount = 3, onProgress } = params;
+  const { model, conceptCount = 3, language, onProgress } = params;
   const primary = model.tokens.primary;
   const secondary = model.tokens.secondary;
   const colorPalette = model.colors.map((c) => `${c.name}: ${c.hex}`).join(", ");
@@ -123,6 +124,7 @@ export async function generateBrandLogos(params: {
       typography: model.typography.primary,
       personality: model.strategy.personality,
       options: ["svg", "variations", "guidelines"],
+      language,
       onProgress,
     });
 

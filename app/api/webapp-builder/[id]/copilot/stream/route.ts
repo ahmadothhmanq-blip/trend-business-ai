@@ -1,6 +1,7 @@
 import { requireUser, parseJsonBody, parseUuidParam } from "@/lib/api/helpers";
 import { apiValidationError } from "@/lib/i18n/api-errors";
-import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { beginAiUsage } from "@/lib/api/rate-limit";
+import type { AiUsageLease } from "@/lib/billing/ai-usage-settlement";
 import { createSseStreamHelpers } from "@/lib/api/sse-stream";
 import {
   composeAppPlan,
@@ -8,6 +9,7 @@ import {
   resolveAppCopilotRoute,
   runAppCopilotCommandStream,
 } from "@/lib/ai-core/app-copilot";
+import { getRequestAiLanguage } from "@/lib/i18n/api";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -37,6 +39,8 @@ const streamBodySchema = z.object({
   useMemory: z.boolean().optional(),
   includeReview: z.boolean().optional(),
   linkedWebsiteGenerationId: z.string().uuid().optional(),
+  language: z.string().trim().optional(),
+  country: z.string().trim().optional(),
 });
 
 /**
@@ -59,6 +63,7 @@ export async function POST(request: Request, context: RouteContext) {
   if (!parsed.success) {
     return apiValidationError(parsed.error.issues[0]?.message);
   }
+  getRequestAiLanguage(request, parsed.data.language, parsed.data.country);
 
   const useClassifier = parsed.data.useClassifier !== false;
   const resolved = await resolveAppCopilotRoute({
@@ -73,13 +78,15 @@ export async function POST(request: Request, context: RouteContext) {
     parsed.data.applyAi !== false &&
     appCapabilityRequiresAi(resolved.match.uri);
 
+  let creditLease: AiUsageLease | null = null;
   if (needsAi) {
-    const rateLimited = await enforceAiUsage(
+    const usage = await beginAiUsage(
       auth.supabase,
       auth.user!.id,
       "webapp-builder",
     );
-    if (rateLimited) return rateLimited;
+    if (!usage.ok) return usage.response;
+    creditLease = usage.lease;
   }
 
   const stream = new ReadableStream({
@@ -97,7 +104,9 @@ export async function POST(request: Request, context: RouteContext) {
           request: { ...parsed.data, useClassifier },
           send: (event, data) => send(event, data),
         });
+        if (creditLease) await creditLease.settle(auth.supabase);
       } catch (err) {
+        if (creditLease) await creditLease.release(auth.supabase);
         send("error", {
           error:
             err instanceof Error

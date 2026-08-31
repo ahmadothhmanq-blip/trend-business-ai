@@ -10,19 +10,8 @@ export const WEBSITE_BUILDER_V1_FROZEN_AT = "2026-08-05" as const;
 export const WEBSITE_BUILDER_V1_MIN_MARKETPLACE_SCORE = 95;
 export const WEBSITE_BUILDER_V1_MIN_VISUAL_OVERALL = 90;
 
-/** Ten flagship V2 template packages — frozen at v1. */
-export const FROZEN_FLAGSHIP_PACKAGE_IDS = [
-  "saas-enterprise",
-  "corporate-business",
-  "restaurant-premium",
-  "ecommerce-premium",
-  "medical-premium",
-  "real-estate-premium",
-  "creative-agency-premium",
-  "education-premium",
-  "finance-premium",
-  "hotel-resort-premium",
-] as const;
+/** No frozen flagship packages — user-facing catalog is empty. */
+export const FROZEN_FLAGSHIP_PACKAGE_IDS = [] as const;
 
 export type FrozenFlagshipPackageId = (typeof FROZEN_FLAGSHIP_PACKAGE_IDS)[number];
 

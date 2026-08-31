@@ -191,12 +191,13 @@ export async function beginAiUsage(
   supabase: SupabaseClient,
   userId: string,
   resource: AiRateLimitResource,
+  operationId?: string,
 ): Promise<BeginAiUsageResult> {
   return withTiming(`ai.usage.${resource}`, async () => {
     const rateLimited = await enforceAiRateLimit(userId, resource);
     if (rateLimited) return { ok: false, response: rateLimited };
 
-    return authorizeAiUsageCredits(supabase, userId, resource);
+    return authorizeAiUsageCredits(supabase, userId, resource, undefined, operationId);
   });
 }
 

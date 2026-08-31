@@ -1,7 +1,7 @@
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
 import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
-import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { beginAiUsage } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import { generateLogo } from "@/lib/logo-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
@@ -26,6 +26,8 @@ const requestSchema = z.object({
   parentGenerationId: z.string().uuid().optional(),
   continueInstruction: z.string().trim().max(4000).optional(),
   projectId: z.string().uuid().optional(),
+  language: z.string().trim().optional(),
+  country: z.string().trim().optional(),
 });
 
 function logError(stage: string, error: unknown) {
@@ -74,8 +76,9 @@ export async function POST(request: Request) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  const rateLimited = await enforceAiUsage(auth.supabase, auth.user!.id, "logo-designer");
-  if (rateLimited) return rateLimited;
+  const usage = await beginAiUsage(auth.supabase, auth.user!.id, "logo-designer");
+  if (!usage.ok) return usage.response;
+  const creditLease = usage.lease;
 
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
@@ -86,7 +89,7 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data;
-  const aiLanguage = resolveRequestLanguage(request);
+  const aiLanguage = resolveRequestLanguage(request, input.language, input.country);
   const styleLabel = getLogoStyleLabel(input.logoStyle);
   let stage = "generateLogo";
 
@@ -169,11 +172,13 @@ export async function POST(request: Request) {
       return databaseErrorResponse("logo-designer.insert", error);
     }
 
+    await creditLease.settle(auth.supabase);
     return NextResponse.json({
       generation: data as LogoGeneration,
       message: "Logo designed and saved.",
     });
   } catch (error) {
+    await creditLease.release(auth.supabase);
     logError(stage, error);
     return serverErrorResponse(stage, error, "Unable to generate logo.");
   }

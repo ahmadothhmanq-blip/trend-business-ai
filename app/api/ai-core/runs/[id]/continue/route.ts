@@ -1,8 +1,9 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
 import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
-import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { beginAiUsage } from "@/lib/api/rate-limit";
 import { continueAiCoreRun } from "@/lib/ai-core/runs/service";
 import { aiCoreRunContinueSchema } from "@/lib/ai-core/validations";
+import { getRequestAiLanguage } from "@/lib/i18n/api";
 import { NextResponse } from "next/server";
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -14,12 +15,13 @@ export async function POST(request: Request, context: RouteContext) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  const rateLimited = await enforceAiUsage(
+  const usage = await beginAiUsage(
     auth.supabase,
     auth.user!.id,
     "ai-core",
   );
-  if (rateLimited) return rateLimited;
+  if (!usage.ok) return usage.response;
+  const creditLease = usage.lease;
 
   const { id } = await context.params;
   if (!id) {
@@ -34,6 +36,8 @@ export async function POST(request: Request, context: RouteContext) {
     return apiValidationError(parsed.error.issues[0]?.message);
   }
 
+  getRequestAiLanguage(request, parsed.data.language, parsed.data.country);
+
   const result = await continueAiCoreRun({
     supabase: auth.supabase,
     userId: auth.user!.id,
@@ -46,6 +50,7 @@ export async function POST(request: Request, context: RouteContext) {
     return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, result.status, result.error);
   }
 
+  await creditLease.settle(auth.supabase);
   return NextResponse.json({
     run: result.result.run,
     output: result.result.output,

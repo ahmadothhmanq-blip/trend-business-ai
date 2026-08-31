@@ -2,29 +2,29 @@
 
 const DEFAULT_FEATURES = [
   {
-    title: "Private wealth management",
-    description: "Bespoke portfolio construction, tax-aware strategies, and multi-generational planning for ultra-high-net-worth families.",
-    icon: "01",
-    span: "lg:col-span-2",
+    "title": "Portfolio strategy",
+    "description": "Multi-asset allocation with scenario modeling and disciplined rebalancing.",
+    "icon": "01",
+    "span": "hero"
   },
   {
-    title: "Institutional advisory",
-    description: "Board-level counsel on capital allocation, risk governance, and fiduciary oversight for endowments and enterprises.",
-    icon: "02",
-    span: "",
+    "title": "Risk governance",
+    "description": "Institutional-grade controls with fiduciary oversight on every mandate.",
+    "icon": "02",
+    "span": "tall"
   },
   {
-    title: "Trust & estate services",
-    description: "Succession architecture, trust administration, and philanthropic structures aligned with your family's legacy.",
-    icon: "03",
-    span: "",
+    "title": "Global coverage",
+    "description": "Advisory desks across major financial centers with cross-border expertise.",
+    "icon": "03",
+    "span": "compact"
   },
   {
-    title: "Global markets access",
-    description: "Direct access to private markets, alternative investments, and cross-border structuring through our global network.",
-    icon: "04",
-    span: "lg:col-span-2",
-  },
+    "title": "Wealth architecture",
+    "description": "Generational planning, trust structures, and philanthropic advisory.",
+    "icon": "04",
+    "span": "wide"
+  }
 ];
 
 type FinancePremiumFeaturesProps = {
@@ -35,56 +35,29 @@ type FinancePremiumFeaturesProps = {
 };
 
 export function FinancePremiumFeatures({
-  eyebrow = "Capabilities",
-  title = "Integrated wealth stewardship",
-  subtitle = "A unified private banking platform — investment management, fiduciary advisory, and capital strategy delivered by senior partners.",
+  eyebrow = "Advisory capabilities",
+  title = "Institutional strength across markets",
+  subtitle = "Portfolio strategy, risk governance, and wealth architecture for families and institutions.",
   items = DEFAULT_FEATURES,
 }: FinancePremiumFeaturesProps) {
   return (
-    <section
-      id="features"
-      data-v2-component="finance-premium-features"
-      aria-labelledby="fn-features-title"
-      className="fn-section fn-section-alt"
-    >
+    <section id="features" data-v2-component="finance-premium-features" aria-labelledby="fn-features-title" className="df-reveal fn-section bg-[var(--color-background)] py-20 sm:py-28 lg:py-32">
       <div className="mx-auto max-w-[82rem] px-5 sm:px-8">
-        <header className="mb-14 max-w-2xl">
-          <p className="fn-eyebrow mb-3">{eyebrow}</p>
-          <h2 id="fn-features-title" className="fn-headline-sm">
-            {title}
-          </h2>
-          <div className="fn-accent-line mt-4" aria-hidden />
-          <p className="fn-body text-muted-foreground mt-5">{subtitle}</p>
+        <header className="mb-12 border-b border-[var(--border-default)] pb-8">
+          <p className="fn-eyebrow">{eyebrow}</p>
+          <h2 className="fn-headline-sm mt-2">{title}</h2>
         </header>
-
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
-          {items.map((item, index) => (
-            <article
-              key={item.title}
-              className={`fn-card group relative overflow-hidden p-7 sm:p-8 ${item.span ?? ""}`}
-            >
-              <div
-                className="pointer-events-none absolute -end-8 -top-8 h-32 w-32 rounded-full bg-[color-mix(in_srgb,var(--color-signal)_8%,transparent)] blur-2xl transition group-hover:bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)]"
-                aria-hidden
-              />
-              <div className="relative mb-5 flex items-center gap-4">
-                <span className="fn-font-mono flex h-11 w-11 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--border-accent)] bg-[color-mix(in_srgb,var(--color-primary)_6%,transparent)] text-xs font-semibold text-[var(--color-signal)]">
-                  {item.icon ?? String(index + 1).padStart(2, "0")}
-                </span>
-                <span
-                  className="h-px flex-1 bg-gradient-to-r from-[var(--border-default)] to-transparent transition group-hover:from-[var(--color-signal)]"
-                  aria-hidden
-                />
+        <ol className="space-y-0">
+          {items.map((item, i) => (
+            <li key={item.title} className="df-reveal-stagger grid gap-6 border-b border-[var(--border-subtle)] py-10 lg:grid-cols-12 lg:items-start">
+              <span className="fn-font-mono text-4xl font-light text-[var(--color-accent)] lg:col-span-2">{String(i + 1).padStart(2, "0")}</span>
+              <div className="lg:col-span-10">
+                <h3 className="text-xl font-bold">{item.title}</h3>
+                <p className="mt-3 max-w-2xl text-[var(--color-muted)]">{item.description}</p>
               </div>
-              <h3 className="fn-font-display relative text-lg font-semibold text-[var(--color-foreground)]">
-                {item.title}
-              </h3>
-              <p className="fn-font-body relative mt-3 text-sm leading-relaxed text-[var(--color-muted)]">
-                {item.description}
-              </p>
-            </article>
+            </li>
           ))}
-        </div>
+        </ol>
       </div>
     </section>
   );

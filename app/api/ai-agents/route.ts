@@ -1,11 +1,12 @@
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
 import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
-import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { beginAiUsage } from "@/lib/api/rate-limit";
 import { enforceMutationRateLimit } from "@/lib/api/rate-limit";
 import { runAgent } from "@/lib/agent-runner";
 import { logAgentAudit } from "@/lib/agents/audit";
 import { getRequestAiLanguage } from "@/lib/i18n/api";
+import { aiOutputLanguageDirective } from "@/lib/ai/prompts/language-directive.server";
 import type { Agent, AgentExecution } from "@/types/agents";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -56,6 +57,8 @@ const runAgentSchema = z.object({
   task: z.string().trim().min(1).max(5000),
   context: z.string().max(10000).optional(),
   maxSteps: z.number().int().min(1).max(12).default(6),
+  language: z.string().trim().optional(),
+  country: z.string().trim().optional(),
 });
 
 export async function POST(request: Request) {
@@ -100,8 +103,9 @@ export async function POST(request: Request) {
   const parsed = runAgentSchema.safeParse(body);
   if (!parsed.success) return apiValidationError(parsed.error.issues[0]?.message);
 
-  const rateLimited = await enforceAiUsage(auth.supabase, auth.user!.id, "ai-agents");
-  if (rateLimited) return rateLimited;
+  const usage = await beginAiUsage(auth.supabase, auth.user!.id, "ai-agents");
+  if (!usage.ok) return usage.response;
+  const creditLease = usage.lease;
 
   let agent: Agent | null = null;
   if (parsed.data.agentId) {
@@ -110,8 +114,8 @@ export async function POST(request: Request) {
   }
 
   const systemPrompt = agent?.system_prompt ?? "You are a helpful AI agent. Complete the user's task thoroughly.";
-  const aiLanguage = getRequestAiLanguage(request);
-  const localizedSystemPrompt = `${systemPrompt}\n\nAlways respond in ${aiLanguage}.`;
+  const aiLanguage = getRequestAiLanguage(request, parsed.data.language, parsed.data.country);
+  const localizedSystemPrompt = `${systemPrompt}${aiOutputLanguageDirective(aiLanguage, "agent")}`;
   const tools = (agent?.tools ?? []) as string[];
   const agentType = agent?.agent_type ?? "custom";
 
@@ -124,6 +128,7 @@ export async function POST(request: Request) {
       tools,
       context: parsed.data.context,
       maxSteps: parsed.data.maxSteps,
+      language: aiLanguage,
       supabase: auth.supabase,
       userId: auth.user!.id,
       agentId: parsed.data.agentId,
@@ -145,6 +150,7 @@ export async function POST(request: Request) {
 
     const { data: exec, error: execErr } = await auth.supabase.from("agent_executions").insert(execData).select("*").single();
     if (execErr && execErr.code !== "42P01") {
+      await creditLease.settle(auth.supabase);
       return NextResponse.json({ execution: execData, output: result.output, message: "Execution completed (not persisted)." });
     }
 
@@ -156,6 +162,7 @@ export async function POST(request: Request) {
       }).eq("id", agent.id);
     }
 
+    await creditLease.settle(auth.supabase);
     return NextResponse.json({ execution: exec as AgentExecution, output: result.output, message: "Agent task completed." });
   } catch (err) {
     const errMsg = err instanceof Error ? err.message : "Unknown error";

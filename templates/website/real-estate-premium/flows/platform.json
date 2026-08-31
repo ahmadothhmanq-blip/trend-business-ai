@@ -1,0 +1,7 @@
+{
+  "pageId": "platform",
+  "layoutId": "default",
+  "regions": {
+    "main": ["real-estate-premium-hero", "real-estate-premium-features", "real-estate-premium-integrations"]
+  }
+}

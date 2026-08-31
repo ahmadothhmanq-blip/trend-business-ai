@@ -1,5 +1,5 @@
 import { generateCoreAssets } from "@/lib/ai-core/assets/generate";
-import { getDefaultImageSettings } from "@/lib/ai-core/assets/settings";
+import { getDefaultImageSettings, resolveImageGenerationQuality } from "@/lib/ai-core/assets/settings";
 import type { CoreAssetPlanItem } from "@/lib/ai-core/assets/types";
 import type { BrandIdentityBrief } from "@/lib/ai-core/brand-identity/types";
 import type { DesignSystemSpec } from "@/lib/ai-core/design-intelligence/die-types";
@@ -24,9 +24,10 @@ import {
 } from "@/lib/ai-core/image-engine/prompt-cache";
 import {
   improvePromptForScore,
-  PROMPT_QUALITY_THRESHOLD,
+  resolvePromptQualityThreshold,
   scoreImagePrompt,
 } from "@/lib/ai-core/image-engine/prompt-scoring";
+import { sanitizePromptForIndustryGate } from "@/lib/ai-core/image-engine/industry-gate";
 import { preferAiImages } from "@/lib/ai-core/image-engine/prefer";
 import { ensureRequiredPhotoAssets } from "@/lib/ai-core/image-engine/inject";
 import { enrichManifestWithProfileSlots } from "@/lib/ai-core/image-engine/profile-engine";
@@ -103,6 +104,8 @@ export async function runAiImageEngine(params: {
   brief?: CoreBrief | null;
   /** Pre-computed IIE result — skips re-running image intelligence. */
   imageIntelligence?: ImageIntelligenceEngineResult | null;
+  generationProfile?: "fast" | "professional" | "ultra";
+  siteArchetypeId?: string | null;
 }): Promise<CoreAssetManifest & { imageIntelligence?: ImageIntelligenceEngineResult }> {
   const maxImages = params.maxImages ?? 14;
 
@@ -221,12 +224,17 @@ export async function runAiImageEngine(params: {
     intel,
     params.onProgress,
     params.businessProfile,
+    params.generationProfile,
+    params.siteArchetypeId ??
+      params.templateSelection?.industryId ??
+      params.profile?.industry,
   );
   planned = await refinePromptsWithDeepSeek(planned, intel, params.onProgress);
 
   const defaultSettings = getDefaultImageSettings({
     style: intel.imageStyle,
     aspectRatio: "16:9",
+    quality: resolveImageGenerationQuality(params.generationProfile),
   });
 
   const coreItems: CoreAssetPlanItem[] = planned.map((item) => ({
@@ -256,7 +264,7 @@ export async function runAiImageEngine(params: {
       return {
         ...item,
         prompt: [
-          "Award-winning commercial photography, premium lighting, ultra sharp.",
+          "Award-winning commercial photography, premium lighting, ultra sharp, tack-sharp focus, high resolution.",
           item.prompt,
           art ? `Art direction: ${art.promptFragment}.` : "",
           `Style: ${intel.imageStyle}.`,
@@ -327,11 +335,13 @@ export async function runAiImageEngine(params: {
   const preferred = preferAiImages(withMeta);
   const stockIndustry =
     params.businessProfile?.routingIndustryId ||
+    params.siteArchetypeId ||
     params.templateSelection?.industryId ||
     params.profile?.industry ||
     intel.industry;
   const complete = ensureRequiredPhotoAssets(preferred, stockIndustry, {
-    routingIndustryId: params.businessProfile?.routingIndustryId,
+    routingIndustryId:
+      params.businessProfile?.routingIndustryId || params.siteArchetypeId,
     imageSystemSpec: iieResult.spec,
   });
   const slotted = enrichManifestWithProfileSlots(
@@ -384,21 +394,36 @@ function scoreAndImprovePlannedPrompts(
   intel: ReturnType<typeof buildImageIntelligence>,
   onProgress?: (message: string) => void,
   businessProfile?: BusinessIntelligenceProfile | null,
+  generationProfile?: "fast" | "professional" | "ultra",
+  archetypeOrIndustry?: string | null,
 ): ImageEnginePlanItem[] {
+  const threshold = resolvePromptQualityThreshold(generationProfile);
   let improved = 0;
   const result = planned.map((item) => {
-    const score = scoreImagePrompt({
+    const gatedPrompt = sanitizePromptForIndustryGate({
       prompt: item.prompt,
+      archetypeOrIndustry,
+    });
+    const score = scoreImagePrompt({
+      prompt: gatedPrompt,
       purpose: item.metadata.purpose,
       ctx: intel,
       sectionName: item.metadata.section,
       shotBrief: item.metadata.artDirection,
+      threshold,
     });
 
-    if (score.passed) return item;
+    if (score.passed) {
+      if (gatedPrompt === item.prompt) return item;
+      return {
+        ...item,
+        prompt: gatedPrompt,
+        metadata: { ...item.metadata, prompt: gatedPrompt },
+      };
+    }
 
     const betterPrompt = improvePromptForScore({
-      prompt: item.prompt,
+      prompt: gatedPrompt,
       purpose: item.metadata.purpose,
       ctx: intel,
       sectionName: item.metadata.section,
@@ -414,7 +439,7 @@ function scoreAndImprovePlannedPrompts(
 
   if (improved > 0) {
     onProgress?.(
-      `AI Assets Engine: improved ${improved} prompt(s) below quality threshold (${PROMPT_QUALITY_THRESHOLD}/100)…`,
+      `AI Assets Engine: improved ${improved} prompt(s) below quality threshold (${threshold}/100)…`,
     );
   }
 
@@ -467,7 +492,7 @@ async function refinePromptsWithDeepSeek(
     const enrichment = await providerManager.generateJson<PromptEnrichment>(
       {
         system:
-          "You write concise photorealistic commercial image prompts for premium agency websites. Each section must have a DISTINCT subject — never reuse hero wording for other sections. No text overlays, logos, or watermarks. Return JSON only.",
+          "You write concise photorealistic commercial image prompts for premium agency websites. Each section must have a DISTINCT subject — never reuse hero wording for other sections. No text overlays, logos, or watermarks. CRITICAL: The visual subject MUST strictly match the 'Industry' and 'Business type'. Ignore template styling if it conflicts with the industry. Do NOT generate tech, software, or generic corporate images unless explicitly demanded by the industry. Return JSON only.",
         prompt: `Business: ${intel.projectName}
 Industry: ${intel.industry}
 Business type: ${intel.businessType}

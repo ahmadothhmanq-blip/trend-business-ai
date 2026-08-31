@@ -1,0 +1,7 @@
+{
+  "pageId": "platform",
+  "layoutId": "default",
+  "regions": {
+    "main": ["creative-agency-premium-hero", "creative-agency-premium-features", "creative-agency-premium-integrations"]
+  }
+}

@@ -74,8 +74,15 @@ export function syncAppModelToFiles(
 
   for (const screen of model.screens) {
     const routePath = screen.path === "/" ? "app/page.tsx" : `app${screen.path}/page.tsx`;
-    next = upsertFile(next, routePath, screenPageContent(screen, model), "typescript");
-    updatedPaths.push(routePath);
+    const exists = next.some(
+      (f) => f.path.replaceAll("\\", "/") === routePath,
+    );
+    // Keep previously generated pages when deploying, to avoid overwriting
+    // App Builder's compiled page implementations with preview stubs.
+    if (!exists) {
+      next = upsertFile(next, routePath, screenPageContent(screen, model), "typescript");
+      updatedPaths.push(routePath);
+    }
   }
 
   const catalogJson = JSON.stringify(model.catalog, null, 2);

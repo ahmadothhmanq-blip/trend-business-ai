@@ -43,6 +43,10 @@ const GOAL_INFERENCE: Partial<
   Record<string, { goal: WebsiteGoal; audience: TargetAudience; model: BusinessModel }>
 > = {
   saas: { goal: "saas", audience: "b2b", model: "product" },
+  gaming: { goal: "saas", audience: "b2c", model: "product" },
+  technology: { goal: "saas", audience: "b2b", model: "product" },
+  tech: { goal: "saas", audience: "b2b", model: "product" },
+  esports: { goal: "saas", audience: "b2c", model: "product" },
   corporate: { goal: "trust", audience: "b2b", model: "service" },
   "creative-agency": { goal: "portfolio", audience: "b2c", model: "service" },
   "real-estate": { goal: "lead-generation", audience: "luxury", model: "service" },
@@ -61,6 +65,10 @@ const PERSONALITY_BY_INDUSTRY: Partial<Record<string, BrandPersonality>> = {
   "real-estate": "luxury",
   "creative-agency": "bold",
   saas: "technical",
+  gaming: "technical",
+  technology: "technical",
+  tech: "technical",
+  esports: "bold",
   restaurant: "warm",
 };
 

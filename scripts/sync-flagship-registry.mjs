@@ -5,7 +5,7 @@
  * Run: node scripts/sync-flagship-registry.mjs
  * Check: node scripts/sync-flagship-registry.mjs --check
  */
-import { cp, mkdir, readFile } from "node:fs/promises";
+import { cp, mkdir, readFile, readdir, rm } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -27,6 +27,7 @@ const FLAGSHIPS = [
   "education-premium",
   "finance-premium",
   "hotel-resort-premium",
+  "ai-startup-signal",
 ];
 
 const STRUCTURE_PATHS = [
@@ -94,5 +95,16 @@ if (checkOnly) {
   for (const id of FLAGSHIPS) {
     await syncPackage(id);
   }
+
+  const entries = await readdir(registryRoot, { withFileTypes: true });
+  const allowed = new Set(FLAGSHIPS);
+  for (const entry of entries) {
+    if (!entry.isDirectory() || entry.name.startsWith(".")) continue;
+    if (!allowed.has(entry.name)) {
+      await rm(path.join(registryRoot, entry.name), { recursive: true, force: true });
+      console.log(`pruned legacy registry package: ${entry.name}`);
+    }
+  }
+
   console.log("flagship registry sync complete:", FLAGSHIPS.join(", "));
 }

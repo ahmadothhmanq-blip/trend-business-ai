@@ -101,7 +101,7 @@ for (const rel of [
   else fail(`${rel}: missing requireUser`);
 }
 const main = readFileSync(join(root, "app/api/ai-agents/route.ts"), "utf8");
-if (main.includes("enforceAiUsage")) ok("run: credits");
+if (main.includes("beginAiUsage")) ok("run: credits");
 if (main.includes("enforceMutationRateLimit")) ok("create: rate limit");
 
 console.log("\n[6] Legacy preservation");

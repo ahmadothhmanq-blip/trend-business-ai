@@ -174,6 +174,51 @@ const RULES: Record<IndustryId, IndustryConversionRule> = {
       "Objection handling",
     ],
   },
+  gaming: {
+    industryId: "gaming",
+    label: "Gaming & Esports",
+    defaultGoal: "leads",
+    requiredElements: [
+      "game",
+      "community",
+      "tournament",
+      "testimonial",
+      "trailer",
+      "cta",
+    ],
+    sectionOrder: [
+      "Hero",
+      "Games",
+      "Features",
+      "Community",
+      "Testimonials",
+      "Tournaments",
+      "CTA",
+    ],
+    heroGuidance:
+      "Cinematic game-world hero with Play now / Join community dual CTAs and franchise energy.",
+    ctaGuidance:
+      "Primary CTA: Play / Pre-order / Join beta. Repeat after featured games and community proof.",
+    trustElements: [
+      "Player counts",
+      "Streamer endorsements",
+      "Award badges",
+      "Press quotes",
+    ],
+    journeySteps: [
+      "Hook with trailer",
+      "Explore games",
+      "See community",
+      "Build hype",
+      "Convert to play",
+    ],
+    contentStructure: [
+      "Franchise story",
+      "Gameplay highlights",
+      "Community proof",
+      "Download path",
+    ],
+  },
   technology: {
     industryId: "technology",
     label: "Technology",

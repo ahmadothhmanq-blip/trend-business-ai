@@ -5,6 +5,8 @@ export const ideaInputSchema = z.object({
   skills: z.string().trim().min(1).max(500),
   budget: z.string().trim().min(1).max(200),
   industry: z.string().trim().max(200).optional(),
+  language: z.string().trim().optional(),
+  country: z.string().trim().optional(),
 });
 
 export const ideaUpdateSchema = z.object({

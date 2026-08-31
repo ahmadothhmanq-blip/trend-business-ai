@@ -115,7 +115,7 @@ for (const rel of protectedRoutes) {
   else fail(`${rel}: missing requireUser`);
 }
 const gen = readFileSync(join(root, "app/api/marketing/generate/route.ts"), "utf8");
-if (gen.includes("enforceAiUsage")) ok("generate: credits");
+if (gen.includes("beginAiUsage")) ok("generate: credits");
 else fail("generate: missing credits");
 
 const integrations = readFileSync(join(root, "app/api/marketing/integrations/route.ts"), "utf8");

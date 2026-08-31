@@ -5,13 +5,14 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { brandNameFor } from "./template-brand-names.mjs";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 const FLAGSHIPS = [
   {
     id: "ecommerce-premium",
-    label: "E-commerce Premium",
+    label: brandNameFor("ecommerce-premium"),
     primary: "#18181B",
     accent: "#BE123C",
     bg: "#FAFAF9",
@@ -21,7 +22,7 @@ const FLAGSHIPS = [
   },
   {
     id: "medical-premium",
-    label: "Medical Premium",
+    label: brandNameFor("medical-premium"),
     primary: "#0F4C4C",
     accent: "#5B9A8B",
     bg: "#F7FAF9",
@@ -31,7 +32,7 @@ const FLAGSHIPS = [
   },
   {
     id: "saas-enterprise",
-    label: "SaaS Enterprise",
+    label: brandNameFor("saas-enterprise"),
     primary: "#1D4ED8",
     accent: "#3B82F6",
     bg: "#F8FAFC",
@@ -40,8 +41,18 @@ const FLAGSHIPS = [
     layout: "single",
   },
   {
+    id: "ai-startup-signal",
+    label: brandNameFor("ai-startup-signal"),
+    primary: "#020617",
+    accent: "#22D3EE",
+    bg: "#030712",
+    surface: "#0F172A",
+    muted: "rgba(240,249,255,0.12)",
+    layout: "single",
+  },
+  {
     id: "corporate-business",
-    label: "Corporate Business",
+    label: brandNameFor("corporate-business"),
     primary: "#0F2B46",
     accent: "#C5A572",
     bg: "#FFFFFF",
@@ -51,7 +62,7 @@ const FLAGSHIPS = [
   },
   {
     id: "restaurant-premium",
-    label: "Restaurant Premium",
+    label: brandNameFor("restaurant-premium"),
     primary: "#1B3D2F",
     accent: "#D4A574",
     bg: "#0A1210",

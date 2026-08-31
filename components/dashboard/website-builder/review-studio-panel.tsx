@@ -25,6 +25,8 @@ import {
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import { cn } from "@/lib/utils";
 import { useBuilderLocale } from "@/lib/website/builder/use-builder-locale";
+import { readWebsiteBuilderApiJson } from "@/lib/website/builder/client-api-error";
+import { useTranslation } from "@/lib/i18n/client";
 import type { ReviewStudioResult, VersionComparison } from "@/lib/website/review-studio";
 import type { GeneratedWebsiteProject } from "@/plugins/website/types";
 import type { WebsiteGeneration } from "@/types/database";
@@ -103,6 +105,7 @@ export function ReviewStudioPanel(props: {
   }) => void;
 }) {
   const { wb, dir } = useBuilderLocale();
+  const { t } = useTranslation();
   const [data, setData] = useState<ReviewResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -123,19 +126,27 @@ export function ReviewStudioPanel(props: {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/website-builder/${props.generationId}/review`);
-      if (!res.ok) {
-        const body = (await res.json()) as { error?: string };
-        throw new Error(body.error || wb("reviewStudio.failedLoad"));
-      }
-      setData((await res.json()) as ReviewResponse);
+      const res = await fetch(
+        `/api/website-builder/${props.generationId}/review`,
+        {
+          method: "GET",
+          headers: { Accept: "application/json" },
+          cache: "no-store",
+        },
+      );
+      const body = await readWebsiteBuilderApiJson<ReviewResponse>(res, {
+        t,
+        wb,
+        nonJsonMessage: wb("reviewStudio.apiEndpointError"),
+      });
+      setData(body);
     } catch (err) {
       setError(err instanceof Error ? err.message : wb("reviewStudio.failedLoad"));
       setData(null);
     } finally {
       setLoading(false);
     }
-  }, [props.generationId, wb]);
+  }, [props.generationId, t, wb]);
 
   useEffect(() => {
     void load();
@@ -179,18 +190,20 @@ export function ReviewStudioPanel(props: {
         `/api/website-builder/${props.generationId}/review/apply`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({ improvementIds: [...selectedIds] }),
         },
       );
-      const body = (await res.json()) as {
+      const body = await readWebsiteBuilderApiJson<{
         error?: string;
         review?: ReviewStudioResult;
         comparison?: VersionComparison;
         project?: GeneratedWebsiteProject;
         generation?: WebsiteGeneration;
-      };
-      if (!res.ok) throw new Error(body.error || wb("reviewStudio.applyFailed"));
+      }>(res, { t, wb, nonJsonMessage: wb("reviewStudio.apiEndpointError") });
       if (body.review) setData({ review: body.review, projectName: data?.projectName });
       if (body.comparison) {
         setComparison(body.comparison);
@@ -215,17 +228,19 @@ export function ReviewStudioPanel(props: {
         `/api/website-builder/${props.generationId}/review/rollback`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({ versionId }),
         },
       );
-      const body = (await res.json()) as {
+      const body = await readWebsiteBuilderApiJson<{
         error?: string;
         review?: ReviewStudioResult;
         project?: GeneratedWebsiteProject;
         generation?: WebsiteGeneration;
-      };
-      if (!res.ok) throw new Error(body.error || wb("reviewStudio.rollbackFailed"));
+      }>(res, { t, wb, nonJsonMessage: wb("reviewStudio.apiEndpointError") });
       if (body.review) setData({ review: body.review, projectName: data?.projectName });
       if (body.project && body.generation && props.onApplied) {
         props.onApplied({ project: body.project, generation: body.generation });

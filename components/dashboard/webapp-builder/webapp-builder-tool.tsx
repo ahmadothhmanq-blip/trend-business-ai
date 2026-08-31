@@ -25,12 +25,13 @@ import {
   OnePromptExperience,
   type ProjectHistoryItem,
 } from "@/components/dashboard/builder-shared";
+import { GlsGenerationLanguageSelect } from "@/components/dashboard/language/gls-generation-language-select";
+import { getInitialGlsGenerationLanguage, glsGenerationLanguagePayload } from "@/lib/language-platform/generation/service";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n/client";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
 import {
   WEBAPP_TYPES,
-  WEBAPP_LANGUAGES,
   WEBAPP_DESIGN_STYLES,
   WEBAPP_COLOR_STYLES,
   WEBAPP_FEATURE_OPTIONS,
@@ -64,7 +65,7 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
   const [step, setStep] = useState<"type" | "config" | "history" | "generating" | "preview">("type");
   const [selectedType, setSelectedType] = useState("");
   const [prompt, setPrompt] = useState("");
-  const [language, setLanguage] = useState("English");
+  const [language, setLanguage] = useState(() => getInitialGlsGenerationLanguage());
   const [designStyle, setDesignStyle] = useState("Modern");
   const [colorStyle, setColorStyle] = useState("Dark Minimal");
   const [features, setFeatures] = useState<string[]>([]);
@@ -144,7 +145,7 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
         body: JSON.stringify({
           prompt: idea,
           appType,
-          language,
+          ...glsGenerationLanguagePayload(language),
           designStyle,
           colorStyle,
           features: appFeatures,
@@ -167,7 +168,7 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
 
   const loadGenerationConfig = (gen: WebAppGeneration) => {
     setSelectedType(gen.app_type);
-    setLanguage(gen.language);
+    setLanguage(gen.language || "English");
     setDesignStyle(gen.design_style);
     setColorStyle(gen.color_style);
     setFeatures(gen.features ?? []);
@@ -315,7 +316,7 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
                 />
               </div>
               <div className="grid gap-4 sm:grid-cols-3">
-                <div><label className="mb-1.5 block text-xs font-medium text-white/60">{p("labels.language")}</label><select value={language} onChange={(e) => setLanguage(e.target.value)} className={dashboardSelectClass}>{WEBAPP_LANGUAGES.map((l) => <option key={l} value={l}>{l}</option>)}</select></div>
+                <div><label className="mb-1.5 block text-xs font-medium text-white/60">{p("labels.language")}</label><GlsGenerationLanguageSelect serviceId="app-builder" value={language} onChange={setLanguage} /></div>
                 <div><label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.designStyle")}</label><select value={designStyle} onChange={(e) => setDesignStyle(e.target.value)} className={dashboardSelectClass}>{WEBAPP_DESIGN_STYLES.map((s) => <option key={s} value={s}>{s}</option>)}</select></div>
                 <div><label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.colorStyle")}</label><select value={colorStyle} onChange={(e) => setColorStyle(e.target.value)} className={dashboardSelectClass}>{WEBAPP_COLOR_STYLES.map((c) => <option key={c} value={c}>{c}</option>)}</select></div>
               </div>

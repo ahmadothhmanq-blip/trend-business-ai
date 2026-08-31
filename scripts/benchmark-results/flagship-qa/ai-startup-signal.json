@@ -1,0 +1,75 @@
+{
+  "packageId": "ai-startup-signal",
+  "completedAt": "2026-08-07T20:53:46.390Z",
+  "marketplaceScore": 97,
+  "passed95": true,
+  "visual": {
+    "designTokens": 92,
+    "visualHierarchy": 92,
+    "responsiveLayout": 92,
+    "heroQuality": 92,
+    "navigationUx": 92,
+    "ctaPlacement": 92,
+    "componentSpacing": 85,
+    "typographyHierarchy": 92,
+    "crossPageConsistency": 92,
+    "layout": 90,
+    "ux": 92,
+    "overall": 91
+  },
+  "preview": {
+    "imageCount": 0,
+    "hasHeroImage": true,
+    "hasPlaceholder": true,
+    "sectionCount": 8,
+    "premiumSignals": 6,
+    "duplicateImages": 0,
+    "uniquePhotoCount": 1,
+    "usesSlotImages": true
+  },
+  "slotIndependence": {
+    "slotUsages": 2,
+    "imageIndependent": true
+  },
+  "imageValidation": {
+    "passed": true,
+    "repairs": 0,
+    "duplicatesRemoved": 0,
+    "industryId": "saas",
+    "uniqueUrlCount": 0,
+    "issues": [
+      "duplicate: Duplicate image URL rejected.",
+      "duplicate: Duplicate image URL rejected.",
+      "duplicate: Duplicate image URL rejected.",
+      "duplicate: Duplicate image URL rejected.",
+      "duplicate: Duplicate image URL rejected."
+    ],
+    "rulesReport": {
+      "passed": true,
+      "score": 70,
+      "industryDetected": "saas",
+      "industryLabel": "SaaS",
+      "subcategory": null,
+      "visualStyle": "clean product-led, interface-forward",
+      "profileId": "saas",
+      "selectedCount": 44,
+      "rejectedCount": 27,
+      "replacedCount": 27,
+      "sourceCounts": {
+        "user": 0,
+        "ai": 0,
+        "library": 44,
+        "stock": 0
+      },
+      "summary": "Image validation passed with 0 filled slot(s); blank slots preserved."
+    }
+  },
+  "lighthouse": null,
+  "previewPath": "C:\\Users\\PC\\Desktop\\trend-business-ai\\scripts\\benchmark-results\\flagship-previews\\ai-startup-signal\\preview.html",
+  "bytes": 95377,
+  "v2Markers": {
+    "package": true,
+    "hero": true,
+    "render": false
+  }
+}

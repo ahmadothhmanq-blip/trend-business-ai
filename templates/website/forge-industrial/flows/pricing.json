@@ -1,0 +1,7 @@
+{
+  "pageId": "pricing",
+  "layoutId": "default",
+  "regions": {
+    "main": ["forge-industrial-hero", "forge-industrial-pricing", "forge-industrial-faq"]
+  }
+}

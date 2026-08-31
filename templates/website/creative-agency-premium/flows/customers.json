@@ -1,0 +1,7 @@
+{
+  "pageId": "customers",
+  "layoutId": "default",
+  "regions": {
+    "main": ["creative-agency-premium-hero", "creative-agency-premium-portfolio", "creative-agency-premium-features"]
+  }
+}

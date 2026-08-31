@@ -1,6 +1,6 @@
 {
   "tbdpNative": true,
-  "sectorDnaId": "medical",
-  "experienceProfiles": ["healthcare", "corporate", "minimal"],
-  "presetBinding": "serenity-fade"
+  "sectorDnaId": "saas",
+  "experienceProfiles": ["technical", "corporate", "executive"],
+  "presetBinding": "nexus-grid-reveal"
 }

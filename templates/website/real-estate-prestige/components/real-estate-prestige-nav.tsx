@@ -2,66 +2,65 @@
 
 import { useEffect, useState } from "react";
 
-const DEFAULT_LINKS = [
-  { href: "#collection", label: "Collection" },
-  { href: "#neighborhoods", label: "Neighborhoods" },
-  { href: "#advisors", label: "Advisors" },
-  { href: "#inquire", label: "Inquire" },
+const DEFAULT_NAV_LINKS = [
+  { href: "#features", label: "Features" },
+  { href: "#about", label: "About" },
+  { href: "#contact", label: "Contact" },
 ];
+
+type NavLink = { href: string; label: string };
 
 type RealEstatePrestigeNavProps = {
   brandName?: string;
   ctaLabel?: string;
-  links?: Array<{ href: string; label: string }>;
+  links?: NavLink[];
 };
 
 export function RealEstatePrestigeNav({
-  brandName = "Monolith Estate",
-  ctaLabel = "Private showing",
-  links = DEFAULT_LINKS,
+  brandName = "Brand",
+  ctaLabel = "Get started",
+  links = DEFAULT_NAV_LINKS,
 }: RealEstatePrestigeNavProps) {
-  const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 48);
+    const onScroll = () => setScrolled(window.scrollY > 16);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [open]);
+
   return (
     <header
       data-v2-component="real-estate-prestige-nav"
-      className={[
-        "fixed inset-x-0 top-0 z-[60] transition-all duration-500",
-        scrolled
-          ? "border-b border-[var(--border-subtle)] bg-[var(--color-background)]/94 backdrop-blur-xl"
-          : "border-b border-transparent bg-transparent",
-      ].join(" ")}
+      className={`rep-nav ${scrolled ? "rep-nav--scrolled" : ""}`.trim()}
     >
-      <div className="mx-auto flex h-[4.75rem] max-w-[88rem] items-center justify-between gap-6 px-5 sm:px-8 lg:px-10">
-        <a
-          href="#top"
-          className="rep-font-display text-lg tracking-[0.04em] text-[var(--color-foreground)] transition hover:text-[var(--color-brass)] rep-focus-ring"
-        >
+      <a href="#main-content" className="df-skip-link">
+        Skip to main content
+      </a>
+      <div className="mx-auto flex h-20 max-w-[88rem] items-center justify-between px-5 sm:px-8">
+        <a href="#top" className="rep-brand">
           {brandName}
         </a>
-
-        <nav aria-label="Primary" className="hidden items-center gap-10 lg:flex">
+        <nav aria-label="Primary" className="hidden items-center lg:flex lg:gap-10">
           {links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="rep-font-body text-[0.6875rem] font-medium uppercase tracking-[0.28em] text-[var(--color-muted)] transition hover:text-[var(--color-foreground)] rep-focus-ring"
-            >
+            <a key={link.href} href={link.href} className="rep-nav-link">
               {link.label}
             </a>
           ))}
         </nav>
-
-        <div className="flex items-center gap-3">
-          <a href="#inquire" className="rep-btn-primary hidden sm:inline-flex">
+        <div className="flex gap-2">
+          <a href="#contact" className="rep-btn-secondary hidden sm:inline-flex">
             {ctaLabel}
           </a>
           <button
@@ -69,39 +68,30 @@ export function RealEstatePrestigeNav({
             aria-expanded={open}
             aria-controls="rep-mobile-nav"
             aria-label={open ? "Close menu" : "Open menu"}
-            onClick={() => setOpen((v) => !v)}
-            className="inline-flex h-11 w-11 items-center justify-center border border-[var(--border-default)] lg:hidden rep-focus-ring"
+            onClick={() => setOpen((value) => !value)}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] lg:hidden rep-focus-ring"
           >
             <span className="sr-only">Menu</span>
-            <span aria-hidden className="flex flex-col gap-1.5">
-              <span className={`block h-px w-5 bg-current transition ${open ? "translate-y-[7px] rotate-45" : ""}`} />
-              <span className={`block h-px w-5 bg-current transition ${open ? "opacity-0" : ""}`} />
-              <span className={`block h-px w-5 bg-current transition ${open ? "-translate-y-[7px] -rotate-45" : ""}`} />
+            <span aria-hidden className="flex flex-col gap-1">
+              <span className={`block h-0.5 w-5 bg-current transition ${open ? "translate-y-[5px] rotate-45" : ""}`} />
+              <span className={`block h-0.5 w-5 bg-current transition ${open ? "opacity-0" : ""}`} />
+              <span className={`block h-0.5 w-5 bg-current transition ${open ? "-translate-y-[5px] -rotate-45" : ""}`} />
             </span>
           </button>
         </div>
       </div>
-
       {open ? (
-        <nav
-          id="rep-mobile-nav"
-          aria-label="Mobile"
-          className="border-t border-[var(--border-subtle)] bg-[var(--color-background)]/98 px-5 py-6 lg:hidden"
-        >
-          <ul className="flex flex-col gap-4">
+        <nav id="rep-mobile-nav" aria-label="Mobile" className="border-t border-[var(--border-default)] bg-[var(--color-surface)] px-5 py-4 lg:hidden">
+          <ul className="flex flex-col gap-3">
             {links.map((link) => (
               <li key={link.href}>
-                <a
-                  href={link.href}
-                  onClick={() => setOpen(false)}
-                  className="rep-font-body block text-sm uppercase tracking-[0.24em] text-[var(--color-foreground)]/80"
-                >
+                <a href={link.href} onClick={() => setOpen(false)} className="rep-nav-link block py-1">
                   {link.label}
                 </a>
               </li>
             ))}
             <li className="pt-2">
-              <a href="#inquire" onClick={() => setOpen(false)} className="rep-btn-primary w-full">
+              <a href="#contact" onClick={() => setOpen(false)} className="rep-btn-primary w-full">
                 {ctaLabel}
               </a>
             </li>

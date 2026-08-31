@@ -1,19 +1,30 @@
 {
   "packageId": "education-premium",
-  "templateIntelligenceHint": "ti-university-heritage",
+  "templateIntelligenceHint": "ti-education-campus",
   "layout": {
     "defaultLayoutId": "default",
     "regions": {
-      "header": { "role": "header", "sticky": true },
-      "main": { "role": "main" },
-      "utility": { "role": "utility" },
-      "footer": { "role": "footer" },
-      "overlay": { "role": "overlay" }
+      "header": {
+        "role": "header",
+        "sticky": false
+      },
+      "main": {
+        "role": "main"
+      },
+      "utility": {
+        "role": "utility"
+      },
+      "footer": {
+        "role": "footer"
+      },
+      "overlay": {
+        "role": "overlay"
+      }
     }
   },
   "navigation": {
     "componentId": "education-premium-nav",
-    "variant": "executive-glass"
+    "variant": "magazine-masthead"
   },
   "hero": {
     "componentId": "education-premium-hero",
@@ -30,14 +41,14 @@
         "education-premium-features",
         "education-premium-about",
         "education-premium-stats",
-        "education-premium-portfolio",
         "education-premium-testimonials",
+        "education-premium-portfolio",
         "education-premium-pricing",
         "education-premium-faq",
         "education-premium-contact"
       ],
       "utility": ["education-premium-utility-band"],
-      "overlay": ["education-premium-floating-cta"]
+      "overlay": []
     }
   },
   "sectionShell": {
@@ -45,7 +56,11 @@
     "componentId": "education-premium-section-shell"
   },
   "aiGeneration": {
-    "contentProfile": "education-premium-heritage",
-    "suggestedPages": ["academics", "admissions", "campus"]
+    "contentProfile": "education-premium-gtm",
+    "suggestedPages": ["platform", "pricing", "customers"]
+  },
+  "dna": {
+    "id": "heritage",
+    "architecture": "editorial-magazine"
   }
 }

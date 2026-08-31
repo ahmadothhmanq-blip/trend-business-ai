@@ -7,52 +7,45 @@
       "slots": ["logo", "links", "cta"]
     },
     {
-      "id": "restaurant-signature-sidebar-rail",
-      "role": "navigation",
-      "scaffold": "components/restaurant-signature-sidebar-rail.tsx",
-      "slots": ["links", "hours"]
-    },
-    {
       "id": "restaurant-signature-hero",
       "role": "hero",
       "scaffold": "components/restaurant-signature-hero.tsx",
-      "slots": ["headline", "subheadline", "cta", "scroll-cue"]
+      "slots": ["headline", "metrics", "cta"]
     },
     {
-      "id": "restaurant-signature-reservation",
-      "role": "contact",
-      "scaffold": "components/restaurant-signature-reservation.tsx",
-      "slots": ["steps", "cta"]
+      "id": "restaurant-signature-features",
+      "role": "features",
+      "scaffold": "components/restaurant-signature-features.tsx"
     },
     {
-      "id": "restaurant-signature-chef-story",
+      "id": "restaurant-signature-about",
       "role": "story",
-      "scaffold": "components/restaurant-signature-chef-story.tsx"
+      "scaffold": "components/restaurant-signature-about.tsx"
     },
     {
-      "id": "restaurant-signature-tasting-menu",
-      "role": "services",
-      "scaffold": "components/restaurant-signature-tasting-menu.tsx"
-    },
-    {
-      "id": "restaurant-signature-signature-dishes",
-      "role": "portfolio",
-      "scaffold": "components/restaurant-signature-signature-dishes.tsx"
-    },
-    {
-      "id": "restaurant-signature-atmosphere",
+      "id": "restaurant-signature-stats",
       "role": "custom",
-      "scaffold": "components/restaurant-signature-atmosphere.tsx"
+      "scaffold": "components/restaurant-signature-stats.tsx"
     },
     {
-      "id": "restaurant-signature-gallery",
-      "role": "gallery",
-      "scaffold": "components/restaurant-signature-gallery.tsx"
+      "id": "restaurant-signature-testimonials",
+      "role": "testimonials",
+      "scaffold": "components/restaurant-signature-testimonials.tsx"
     },
     {
-      "id": "restaurant-signature-reservation-cta",
-      "role": "cta",
-      "scaffold": "components/restaurant-signature-reservation-cta.tsx"
+      "id": "restaurant-signature-pricing",
+      "role": "pricing",
+      "scaffold": "components/restaurant-signature-pricing.tsx"
+    },
+    {
+      "id": "restaurant-signature-faq",
+      "role": "faq",
+      "scaffold": "components/restaurant-signature-faq.tsx"
+    },
+    {
+      "id": "restaurant-signature-contact",
+      "role": "contact",
+      "scaffold": "components/restaurant-signature-contact.tsx"
     },
     {
       "id": "restaurant-signature-footer",
@@ -60,9 +53,29 @@
       "scaffold": "components/restaurant-signature-footer.tsx"
     },
     {
+      "id": "restaurant-signature-floating-cta",
+      "role": "cta",
+      "scaffold": "components/restaurant-signature-floating-cta.tsx"
+    },
+    {
+      "id": "restaurant-signature-utility-band",
+      "role": "cta",
+      "scaffold": "components/restaurant-signature-utility-band.tsx"
+    },
+    {
       "id": "restaurant-signature-section-shell",
       "role": "custom",
       "scaffold": "components/restaurant-signature-section-shell.tsx"
+    },
+    {
+      "id": "restaurant-signature-portfolio",
+      "role": "custom",
+      "scaffold": "components/restaurant-signature-portfolio.tsx"
+    },
+    {
+      "id": "restaurant-signature-integrations",
+      "role": "custom",
+      "scaffold": "components/restaurant-signature-integrations.tsx"
     }
   ]
 }

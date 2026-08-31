@@ -2,17 +2,18 @@
   "packageId": "creative-agency-premium",
   "templateIntelligenceHint": "ti-creative-studio",
   "layout": {
-    "defaultLayoutId": "editorial-reveal",
+    "defaultLayoutId": "default",
     "regions": {
       "header": { "role": "header", "sticky": true },
       "main": { "role": "main" },
-      "overlay": { "role": "overlay" },
-      "footer": { "role": "footer" }
+      "utility": { "role": "utility" },
+      "footer": { "role": "footer" },
+      "overlay": { "role": "overlay" }
     }
   },
   "navigation": {
     "componentId": "creative-agency-premium-nav",
-    "variant": "studio-transparent"
+    "variant": "enterprise-glass"
   },
   "hero": {
     "componentId": "creative-agency-premium-hero",
@@ -26,14 +27,18 @@
     "regions": {
       "main": [
         "creative-agency-premium-hero",
-        "creative-agency-premium-selected-work",
-        "creative-agency-premium-case-grid",
-        "creative-agency-premium-manifesto",
-        "creative-agency-premium-capabilities",
-        "creative-agency-premium-process",
-        "creative-agency-premium-collaborate-cta"
+        "creative-agency-premium-features",
+        "creative-agency-premium-portfolio",
+        "creative-agency-premium-integrations",
+        "creative-agency-premium-about",
+        "creative-agency-premium-stats",
+        "creative-agency-premium-testimonials",
+        "creative-agency-premium-pricing",
+        "creative-agency-premium-faq",
+        "creative-agency-premium-contact"
       ],
-      "overlay": ["creative-agency-premium-overlay-showcase"]
+      "utility": ["creative-agency-premium-utility-band"],
+      "overlay": ["creative-agency-premium-floating-cta"]
     }
   },
   "sectionShell": {
@@ -41,7 +46,7 @@
     "componentId": "creative-agency-premium-section-shell"
   },
   "aiGeneration": {
-    "contentProfile": "creative-agency-premium-kinetic",
-    "suggestedPages": ["work", "studio", "contact"]
+    "contentProfile": "creative-agency-premium-gtm",
+    "suggestedPages": ["platform", "pricing", "customers"]
   }
 }

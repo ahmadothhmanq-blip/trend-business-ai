@@ -1,6 +1,11 @@
 import type { StaticPreviewInput } from "@/lib/website/preview-input";
 import { tbdpBuilderLifecycle } from "@/lib/design-platform/integration";
-import { resolveBuilderTemplatePackageId } from "@/lib/website/builder/resolve-builder-template-package-id";
+import {
+  resolveInstalledBuilderTemplatePackageId,
+} from "@/lib/website/builder/resolve-builder-template-package-id";
+import {
+  hasExplicitPreviewTemplateChoice,
+} from "@/lib/website/template-v2/preview/v2-preview-input";
 import {
   readStoredContextFromSettings,
   resolveDesignContextFromSettings,
@@ -21,7 +26,7 @@ export function wirePreviewContext(
       ? input.settings.templatePackageId
       : "");
   const templateId = rawTemplateId
-    ? resolveBuilderTemplatePackageId(rawTemplateId)
+    ? resolveInstalledBuilderTemplatePackageId(rawTemplateId)
     : undefined;
 
   tbdpBuilderLifecycle.preview({
@@ -68,7 +73,9 @@ export function previewInputFromTbdpSettings(
     ...input,
     industryId: input.industryId ?? stored.sectorDnaId,
     components:
-      input.components?.length ? input.components : stored.componentIds,
+      hasExplicitPreviewTemplateChoice(input) && !input.components?.length
+        ? stored.componentIds
+        : input.components,
   };
 }
 

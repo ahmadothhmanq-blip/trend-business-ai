@@ -12,7 +12,8 @@ export type WebsiteThemePresetId =
   | "creative"
   | "technology"
   | "editorial"
-  | "bold";
+  | "bold"
+  | "global";
 
 export const WEBSITE_THEME_PRESET_IDS: readonly WebsiteThemePresetId[] = [
   "luxury",
@@ -23,6 +24,7 @@ export const WEBSITE_THEME_PRESET_IDS: readonly WebsiteThemePresetId[] = [
   "technology",
   "editorial",
   "bold",
+  "global",
 ] as const;
 
 export function isWebsiteThemePresetId(

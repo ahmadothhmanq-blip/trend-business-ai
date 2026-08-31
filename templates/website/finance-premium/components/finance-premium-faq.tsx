@@ -2,107 +2,56 @@
 
 import { useState } from "react";
 
-const DEFAULT_FAQ = [
+const FAQ = [
   {
-    question: "How do client relationships typically begin?",
-    answer:
-      "We begin with a confidential discovery conversation — understanding your family's or institution's objectives, existing structures, and priorities. A tailored advisory proposal follows within two weeks.",
+    question: "What is the minimum relationship size?",
+    answer: "Private wealth engagements typically begin at $25M in investable assets. Institutional mandates are scoped individually based on complexity and governance requirements.",
   },
   {
-    question: "What is your minimum relationship size?",
-    answer:
-      "Our private wealth practice typically serves families with investable assets above $10 million. Institutional engagements are evaluated on scope and fiduciary fit rather than a fixed threshold.",
+    question: "Are you a fiduciary?",
+    answer: "Yes. Ledger operates under a fiduciary standard as a registered investment adviser. We do not sell proprietary products or earn commissions on third-party placements.",
   },
   {
-    question: "How do you measure stewardship success?",
-    answer:
-      "We define outcome metrics collaboratively — risk-adjusted returns, tax efficiency, governance standards, and generational preparedness — with quarterly partner reviews and annual board-level reporting.",
+    question: "Which jurisdictions do you serve?",
+    answer: "We advise clients across the US, UK, EU, and Asia-Pacific, with licensed entities in New York, London, Singapore, and Zurich.",
   },
   {
-    question: "Do you operate as a fiduciary?",
-    answer:
-      "Yes. Meridian Capital Advisors is a registered investment adviser operating under a fiduciary standard across all wealth management and institutional advisory engagements.",
+    question: "How are fees structured?",
+    answer: "Fees are asset-based or retainer-based depending on program. All costs are disclosed in your advisory agreement before engagement.",
   },
 ];
 
-type FinancePremiumFaqProps = {
-  eyebrow?: string;
-  title?: string;
-  subtitle?: string;
-  items?: Array<{ question: string; answer: string }>;
-};
-
-export function FinancePremiumFaq({
-  eyebrow = "FAQ",
-  title = "Questions from prospective clients",
-  subtitle = "What families and institutional leaders ask before entrusting us with their capital.",
-  items = DEFAULT_FAQ,
-}: FinancePremiumFaqProps) {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+export function FinancePremiumFaq() {
+  const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section
-      id="faq"
-      data-v2-component="finance-premium-faq"
-      aria-labelledby="fn-faq-title"
-      className="fn-section fn-section-alt"
-    >
-      <div className="mx-auto max-w-[82rem] px-5 sm:px-8">
-        <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
-          <header className="lg:sticky lg:top-28">
-            <p className="fn-eyebrow mb-3">{eyebrow}</p>
-            <h2 id="fn-faq-title" className="fn-headline-sm">
-              {title}
-            </h2>
-            <div className="fn-accent-line mt-4" aria-hidden />
-            <p className="fn-body text-muted-foreground mt-5">{subtitle}</p>
-          </header>
-
-          <div className="space-y-3">
-            {items.map((item, index) => {
-              const open = openIndex === index;
-              const panelId = `fn-faq-panel-${index}`;
-              return (
-                <div
-                  key={`faq-${index}-${item.question}`}
-                  className={`fn-card overflow-hidden transition-shadow duration-300 ${open ? "shadow-[var(--shadow-surface)]" : ""}`}
+    <section id="faq" data-v2-component="finance-premium-faq" aria-labelledby="fn-faq-title" className="df-reveal fn-section py-20 sm:py-28">
+      <div className="df-reveal-stagger mx-auto grid max-w-[82rem] gap-12 px-5 lg:grid-cols-[0.85fr_1.15fr] sm:px-8">
+        <header className="lg:sticky lg:top-28">
+          <p className="fn-eyebrow">FAQ</p>
+          <h2 id="fn-faq-title" className="fn-headline-sm mt-2">Before we begin</h2>
+          <p className="fn-body mt-4 text-[var(--color-muted)]">Common questions from principals, trustees, and investment committees.</p>
+        </header>
+        <dl className="min-w-0">
+          {FAQ.map((item, i) => (
+            <div key={item.question} className="border-b border-[var(--border-subtle)]">
+              <dt>
+                <button
+                  type="button"
+                  className="fn-focus-ring flex w-full items-start justify-between gap-4 py-5 text-start text-base font-semibold"
+                  aria-expanded={open === i}
+                  onClick={() => setOpen(open === i ? null : i)}
                 >
-                  <h3>
-                    <button
-                      type="button"
-                      id={`fn-faq-trigger-${index}`}
-                      aria-expanded={open}
-                      aria-controls={panelId}
-                      className="flex w-full items-center justify-between gap-4 px-5 py-4 text-start fn-focus-ring transition-colors hover:text-[var(--color-primary)]"
-                      onClick={() => setOpenIndex(open ? null : index)}
-                    >
-                      <span className="fn-font-display text-sm font-semibold text-[var(--color-foreground)]">
-                        {item.question}
-                      </span>
-                      <span
-                        className={`fn-font-mono flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-xs text-[var(--color-signal)] transition-all duration-300 ${open ? "rotate-180 bg-[color-mix(in_srgb,var(--color-signal)_10%,transparent)]" : ""}`}
-                        aria-hidden
-                      >
-                        {open ? "−" : "+"}
-                      </span>
-                    </button>
-                  </h3>
-                  <div
-                    id={panelId}
-                    role="region"
-                    aria-labelledby={`fn-faq-trigger-${index}`}
-                    hidden={!open}
-                    className="border-t border-[var(--border-subtle)] px-5 py-4 motion-safe:animate-[fn-slide-up_0.35s_ease_both]"
-                  >
-                    <p className="fn-font-body text-sm leading-relaxed text-[var(--color-muted)]">
-                      {item.answer}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+                  <span className="text-balance">{item.question}</span>
+                  <span className="shrink-0 text-[var(--color-accent)]">{open === i ? "−" : "+"}</span>
+                </button>
+              </dt>
+              {open === i ? (
+                <dd className="pb-5 text-sm leading-relaxed text-[var(--color-muted)]">{item.answer}</dd>
+              ) : null}
+            </div>
+          ))}
+        </dl>
       </div>
     </section>
   );

@@ -151,4 +151,97 @@ describe("Production Integration", () => {
       true,
     );
   });
+
+  it("merges ai-startup-signal homeFlow with blueprint sections", async () => {
+    const packageId = "ai-startup-signal";
+    const pipeline = runProductionDesignPipeline({
+      project: baseProject(packageId, {
+        businessProfile: {
+          projectName: "Aura Signal",
+          industry: "saas",
+          targetAudience: "Startups",
+          businessGoals: ["Grow MRR"],
+          offer: "AI operations platform",
+          tone: "confident",
+          geography: "Global",
+          competitors: [],
+          kpis: [],
+          summary: "Signal-grade AI ops",
+          requiredSections: ["hero", "pricing", "faq", "contact"],
+        },
+      }),
+      templatePackageId: packageId,
+      seed: "integration-aura-homeflow",
+    });
+
+    const loaded = await loadTemplateV2Package(
+      path.join(resolveWbTemplatesRoot(), packageId),
+    );
+    assert.equal(loaded.ok, true);
+    if (!loaded.ok) return;
+
+    const plan = resolveBlueprintRegionPlan(
+      pipeline.optimizedBlueprint,
+      loaded.bundle,
+      { structureFirst: false },
+    );
+
+    const expectedMain = loaded.bundle.presentation.homeFlow.regions.main ?? [];
+    for (const componentId of expectedMain) {
+      assert.ok(
+        plan.main.includes(componentId),
+        `missing homeFlow main section: ${componentId}`,
+      );
+    }
+
+    assert.ok(plan.utility.includes("ai-startup-signal-utility-band"));
+    assert.ok(plan.overlay.includes("ai-startup-signal-floating-cta"));
+  });
+
+  it("keeps full presentation homeFlow for all templates when structure-first is enabled", async () => {
+    const packageId = "real-estate-prestige";
+    const pipeline = runProductionDesignPipeline({
+      project: baseProject(packageId, {
+        businessProfile: {
+          projectName: "Monolith Demo",
+          industry: "professional-services",
+          targetAudience: "Clients",
+          businessGoals: ["Grow"],
+          offer: "Consulting",
+          tone: "premium",
+          geography: "Global",
+          competitors: [],
+          kpis: [],
+          summary: "Premium services",
+          requiredSections: ["hero", "features", "contact"],
+        },
+      }),
+      templatePackageId: packageId,
+      seed: "integration-monolith-full-home",
+    });
+
+    const loaded = await loadTemplateV2Package(
+      path.join(resolveWbTemplatesRoot(), packageId),
+    );
+    assert.equal(loaded.ok, true);
+    if (!loaded.ok) return;
+
+    const plan = resolveBlueprintRegionPlan(
+      pipeline.optimizedBlueprint,
+      loaded.bundle,
+      { structureFirst: true },
+    );
+
+    const expectedMain = loaded.bundle.presentation.homeFlow.regions.main ?? [];
+    assert.equal(plan.main.length, expectedMain.length);
+    for (const componentId of expectedMain) {
+      assert.ok(
+        plan.main.includes(componentId),
+        `missing monolith homeFlow section: ${componentId}`,
+      );
+    }
+
+    assert.ok(plan.utility.includes("real-estate-prestige-utility-band"));
+    assert.ok(plan.overlay.includes("real-estate-prestige-floating-cta"));
+  });
 });

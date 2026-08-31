@@ -6,7 +6,7 @@
  * Templates must use semantic slots only — no cross-slot fallbacks in resolveSlotImage.
  */
 import { buildSlotsFromProfile } from "@/lib/ai-core/image-engine/profile-engine";
-import { optimizeImageUrl } from "@/lib/ai-core/image-engine/optimize";
+import { optimizeImageUrl, optimizePhotoUrlForRole } from "@/lib/ai-core/image-engine/optimize";
 import { slotUrls, type ImageSlotKind } from "@/lib/ai-core/image-engine/slots";
 
 export type { ImageSlotKind } from "@/lib/ai-core/image-engine/slots";
@@ -112,10 +112,12 @@ export function resolveSlotImage(
   index = 0,
   preferred?: string | null,
 ): string {
-  if (preferred?.trim()) return optimizeImageUrl(preferred.trim());
+  if (preferred?.trim()) {
+    return optimizePhotoUrlForRole(preferred.trim(), kind);
+  }
   const images = slotImages(kind).filter(Boolean);
   const url = images[index];
-  return url ? optimizeImageUrl(url) : "";
+  return url ? optimizePhotoUrlForRole(url, kind) : "";
 }
 
 /** Legacy pool resolver — prefer resolveSlotImage for templates. */
@@ -123,10 +125,12 @@ export function resolveSiteImage(
   preferred?: string | null,
   index = 0,
 ): string {
-  if (preferred?.trim()) return optimizeImageUrl(preferred.trim());
+  if (preferred?.trim()) {
+    return optimizePhotoUrlForRole(preferred.trim(), index === 0 ? "hero" : "section");
+  }
   const pool = siteImagePool();
   if (!pool.length) return "";
-  return optimizeImageUrl(pool[index % pool.length]!);
+  return optimizePhotoUrlForRole(pool[index % pool.length]!, "section");
 }
 
 export { optimizeImageUrl };

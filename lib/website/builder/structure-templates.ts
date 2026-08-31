@@ -22,24 +22,9 @@ export type {
 
 export { WEBSITE_STRUCTURE_TEMPLATES };
 
-/**
- * Internal generation fallback when no template package is installed or selected.
- * Not listed in WEBSITE_STRUCTURE_TEMPLATES and not shown in the builder UI.
- */
-const INTERNAL_GENERATION_STRUCTURE_FALLBACK: WebsiteStructureTemplate = {
-  id: "_generation-default",
-  label: "Default",
-  description: "Internal generation fallback",
-  industry: "business",
-  layoutType: "corporate-trust",
-  heroType: "split corporate hero",
-  navigationType: "corporate topbar",
-  footerType: "enterprise links",
-  sections: [],
-  templateIntelligenceId: "ti-corporate-trust",
-  marketplaceTemplateId: "",
-  premiumTemplateId: "luxury-business",
-};
+import { INTERNAL_GENERATION_STRUCTURE_FALLBACK } from "@/lib/website/builder/generation-structure-fallback";
+
+export { INTERNAL_GENERATION_STRUCTURE_FALLBACK } from "@/lib/website/builder/generation-structure-fallback";
 
 export function getWebsiteStructureTemplate(
   id: string,

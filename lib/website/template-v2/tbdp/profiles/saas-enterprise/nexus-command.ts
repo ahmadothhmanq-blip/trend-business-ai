@@ -8,26 +8,26 @@ import type { TemplateV2ResponsiveRules } from "@/lib/website/template-v2/contra
  */
 export const NEXUS_COMMAND_V2_TOKENS: TemplateV2DesignTokens = {
   colors: {
-    primary: "#4F46E5",
-    secondary: "#0F172A",
+    primary: "#4338CA",
+    secondary: "#1E1B4B",
     accent: "#818CF8",
-    background: "#F9FAFB",
-    foreground: "#0B1120",
-    muted: "rgba(11,17,32,0.55)",
+    background: "#F8F9FC",
+    foreground: "#0F172A",
+    muted: "rgba(15,23,42,0.56)",
     surface: "#FFFFFF",
-    signal: "#10B981",
-    grid: "rgba(79,70,229,0.06)",
-    ink: "#030712",
+    signal: "#818CF8",
+    grid: "rgba(67,56,202,0.05)",
+    ink: "#4338CA",
   },
   typography: {
     display: "Syne",
     body: "DM Sans",
     scale: {
-      sm: "0.8125rem",
+      sm: "0.875rem",
       base: "1rem",
-      lg: "1.3125rem",
-      xl: "3.125rem",
-      display: "clamp(2.625rem, 5.2vw, 4rem)",
+      lg: "1.125rem",
+      xl: "1.625rem",
+      display: "clamp(1.875rem, 3vw, 2.5rem)",
     },
   },
   languageProfile: {
@@ -52,14 +52,14 @@ export const NEXUS_COMMAND_V2_TOKENS: TemplateV2DesignTokens = {
     xl: "28px",
   },
   shadows: {
-    surface: "0 2px 8px rgba(11,17,32,0.04), 0 20px 48px rgba(79,70,229,0.08)",
-    glow: "0 0 96px rgba(79,70,229,0.2)",
-    card: "0 0 0 1px rgba(11,17,32,0.04), 0 6px 28px rgba(11,17,32,0.05)",
+    surface: "0 20px 60px rgba(67,56,202,0.07), 0 2px 8px rgba(67,56,202,0.03)",
+    glow: "0 0 64px rgba(129,140,248,0.18)",
+    card: "0 0 0 1px rgba(67,56,202,0.05), 0 8px 32px rgba(67,56,202,0.06)",
   },
   borders: {
-    default: "rgba(11,17,32,0.08)",
-    accent: "rgba(79,70,229,0.28)",
-    subtle: "rgba(11,17,32,0.04)",
+    default: "rgba(67,56,202,0.09)",
+    accent: "rgba(129,140,248,0.32)",
+    subtle: "rgba(67,56,202,0.05)",
   },
 };
 

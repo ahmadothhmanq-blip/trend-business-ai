@@ -1,7 +1,7 @@
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
 import { API_ERROR_CODES, apiErrorResponse, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
-import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { beginAiUsage } from "@/lib/api/rate-limit";
 import { WEBSITE_LIST_COLUMNS } from "@/lib/api/list-selects";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import { generateWebsite } from "@/lib/website-generator";
@@ -19,6 +19,7 @@ import {
 import { loadWebsiteParentContext } from "@/plugins/website/iteration";
 import { persistWebsiteGeneration } from "@/lib/website/save-generation";
 import { getRequestAiLanguage } from "@/lib/i18n/api";
+import { resolveWebsitePlannerIntegration } from "@/lib/website/universal-planner-integration";
 import type { WebsiteGeneration } from "@/types/database";
 import { NextResponse } from "next/server";
 
@@ -94,8 +95,9 @@ export async function POST(request: Request) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  const rateLimited = await enforceAiUsage(auth.supabase, auth.user!.id, "website-builder");
-  if (rateLimited) return rateLimited;
+  const usage = await beginAiUsage(auth.supabase, auth.user!.id, "website-builder");
+  if (!usage.ok) return usage.response;
+  const creditLease = usage.lease;
 
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
@@ -106,7 +108,7 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data;
-  const aiLanguage = getRequestAiLanguage(request, input.language);
+  const aiLanguage = getRequestAiLanguage(request, input.language, input.country);
   const projectKind = detectWebsiteProjectKind(input);
   const settings = await providerManager.loadUserSettings(
     asSupabaseSingleClient(auth.supabase),
@@ -121,11 +123,23 @@ export async function POST(request: Request) {
   let stage = "generateWebsite";
 
   try {
+    stage = "universalPlanner";
+    const plannerIntegration = await resolveWebsitePlannerIntegration({
+      input: {
+        ...input,
+        language: aiLanguage,
+        locale: aiLanguage,
+        projectKind,
+      },
+    });
+
+    stage = "generateWebsite";
     const project = await generateWebsite({
       ...input,
       language: aiLanguage,
       locale: aiLanguage,
       projectKind,
+      ...(plannerIntegration.inputPatch ?? {}),
       ...parentContext,
       userId: auth.user!.id,
       preferredProvider: settings?.default_provider as AIProviderName | undefined,
@@ -152,7 +166,16 @@ export async function POST(request: Request) {
     });
 
     if (!saved.ok) {
+      await creditLease.release(auth.supabase);
       return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, saved.error);
+    }
+
+    const settled = await creditLease.settle(auth.supabase);
+    if (!settled.ok) {
+      logWebsiteBuilderError(
+        "credit.settle",
+        new Error(`${settled.code}: ${settled.error}`),
+      );
     }
 
     return NextResponse.json({
@@ -161,6 +184,7 @@ export async function POST(request: Request) {
       message: "Website saved to your workspace.",
     });
   } catch (error) {
+    await creditLease.release(auth.supabase);
     logWebsiteBuilderError(stage, error);
     return serverErrorResponse(
       stage,

@@ -1,92 +1,104 @@
 "use client";
 
 import { SlotImage } from "@/lib/website/template-v2/slots";
+import { hasSlotImage } from "@/lib/website/template-v2/slots/slot-layout";
 
-const DEFAULT_STATS = [
-  { label: "Bedrooms", value: "5–7" },
-  { label: "Interior", value: "8,400 sf" },
-  { label: "Terrace", value: "2,100 sf" },
+const FEATURED_FILTERS = ["Waterfront", "Vineyard", "Penthouse", "Historic"];
+
+const FEATURED_SPECS = [
+  { term: "Reference", value: "EST-2048" },
+  { term: "Beds", value: "5" },
+  { term: "Baths", value: "6" },
+  { term: "Interior", value: "6,400 sq ft" },
+  { term: "Tenure", value: "Freehold" },
+  { term: "Guide", value: "Upon request" },
 ];
 
 type RealEstatePremiumHeroProps = {
-  eyebrow?: string;
   title?: string;
   subtitle?: string;
+  eyebrow?: string;
   primaryCta?: string;
   secondaryCta?: string;
   imageUrl?: string | null;
 };
 
 export function RealEstatePremiumHero({
-  eyebrow = "Private collection",
-  title = "Residences of enduring distinction",
-  subtitle = "Architecturally significant homes for discerning collectors — where limestone light, bronze detail, and horizon views compose a life of rare proportion.",
-  primaryCta = "Schedule a private showing",
-  secondaryCta = "Explore collection",
-  imageUrl,
+  title = "Harbour House, No. 12",
+  subtitle = "Waterfront residence with private quay access, gallery-level interiors, and white-glove conveyance.",
+  eyebrow = "Featured dossier",
+  primaryCta = "Search listings",
+  secondaryCta = "Open full sheet",
+  imageUrl = null,
 }: RealEstatePremiumHeroProps) {
+  const hasVisual = hasSlotImage("hero", 0, imageUrl);
+
   return (
     <section
       id="top"
       data-v2-component="real-estate-premium-hero"
       aria-labelledby="rep-hero-title"
-      className="relative min-h-[95svh] overflow-hidden bg-[var(--color-background)]"
+      className="rep-dossier-opener"
     >
-      <div className="grid min-h-[95svh] lg:grid-cols-[1fr_1.15fr]">
-        <div className="relative z-10 flex flex-col justify-end px-5 pb-14 pt-32 sm:px-8 lg:px-12 lg:pb-20 lg:pt-40">
-          <p className="rep-eyebrow mb-7 motion-safe:animate-[rep-stone-rise_0.9s_ease_0.1s_both]">
-            {eyebrow}
-          </p>
-          <h1
-            id="rep-hero-title"
-            className="rep-headline-lg motion-safe:animate-[rep-parallax-lift_1s_ease_0.2s_both]"
-          >
-            {title}
-          </h1>
-          <div className="rep-brass-rule-lg my-8 motion-safe:animate-[rep-brass-draw_0.8s_ease_0.45s_both]" />
-          <p className="rep-body max-w-md motion-safe:animate-[rep-stone-rise_0.9s_ease_0.5s_both]">
-            {subtitle}
-          </p>
-          <div className="mt-11 flex flex-wrap gap-4 motion-safe:animate-[rep-stone-rise_0.9s_ease_0.6s_both]">
-            <a href="#inquire" className="rep-btn-primary">
-              {primaryCta}
-            </a>
-            <a href="#collection" className="rep-btn-ghost">
-              {secondaryCta}
-            </a>
-          </div>
+      <aside className="rep-dossier-search" aria-label="Property search">
+        <p className="rep-dossier-search-label">Search utility</p>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+          }}
+        >
+          <label className="sr-only" htmlFor="rep-search-q">
+            Location or reference
+          </label>
+          <input id="rep-search-q" type="search" name="q" placeholder="Location, neighborhood, or ref." />
+          <label className="sr-only" htmlFor="rep-search-type">
+            Property type
+          </label>
+          <select id="rep-search-type" name="type" defaultValue="residence">
+            <option value="residence">Residence</option>
+            <option value="estate">Estate</option>
+            <option value="penthouse">Penthouse</option>
+            <option value="investment">Investment</option>
+          </select>
+          <button type="submit" className="rep-btn-primary rep-focus-ring">
+            {primaryCta}
+          </button>
+        </form>
+        <div className="rep-dossier-filters" role="group" aria-label="Quick filters">
+          {FEATURED_FILTERS.map((loc) => (
+            <button key={loc} type="button">
+              {loc}
+            </button>
+          ))}
+        </div>
+      </aside>
 
-          <dl className="mt-16 grid grid-cols-3 gap-6 border-t border-[var(--border-subtle)] pt-8 motion-safe:animate-[rep-stone-rise_1s_ease_0.75s_both]">
-            {DEFAULT_STATS.map((stat) => (
-              <div key={stat.label}>
-                <dt className="rep-font-body text-[0.625rem] font-medium uppercase tracking-[0.26em] text-[var(--color-muted)]">
-                  {stat.label}
-                </dt>
-                <dd className="rep-font-display mt-1.5 text-2xl text-[var(--color-foreground)]">
-                  {stat.value}
-                </dd>
+      <div className="rep-dossier-featured">
+        <div className="rep-dossier-featured-visual">
+          {hasVisual ? (
+            <SlotImage slot="hero" index={0} preferred={imageUrl} alt="" className="h-full w-full object-cover" priority />
+          ) : (
+            <div className="rep-dossier-featured-visual-empty" aria-hidden>
+              Dossier
+            </div>
+          )}
+        </div>
+        <article className="rep-dossier-sheet">
+          <p className="rep-dossier-sheet-ref">{eyebrow}</p>
+          <h1 id="rep-hero-title">{title}</h1>
+          <p className="rep-dossier-sheet-deck">{subtitle}</p>
+          <dl className="rep-spec-list">
+            {FEATURED_SPECS.map((spec) => (
+              <div key={spec.term}>
+                <dt>{spec.term}</dt>
+                <dd>{spec.value}</dd>
               </div>
             ))}
           </dl>
-        </div>
-
-        <div className="relative min-h-[50svh] lg:min-h-0 rep-grain" aria-hidden>
-          <SlotImage
-            slot="hero"
-            index={0}
-            preferred={imageUrl}
-            alt="Luxury residence with architectural distinction and horizon views"
-            className="absolute inset-0 h-full w-full object-cover motion-safe:animate-[rep-ken-burns_16s_ease-out_both]"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-l from-transparent via-[var(--color-background)]/10 to-[var(--color-background)]/70 lg:bg-gradient-to-r lg:from-[var(--color-background)]/60 lg:via-transparent lg:to-transparent" />
-          <div className="absolute bottom-8 right-8 hidden border border-[var(--border-brass)] bg-[var(--color-primary)]/90 px-6 py-4 backdrop-blur-sm lg:block">
-            <p className="rep-eyebrow text-[var(--color-linen)]/60">Featured</p>
-            <p className="rep-font-display mt-1 text-xl text-[var(--color-linen)]">
-              The Whitmore Penthouse
-            </p>
-          </div>
-        </div>
+          <a href="#portfolio" className="rep-btn-secondary rep-focus-ring mt-5 inline-flex">
+            {secondaryCta}
+          </a>
+        </article>
       </div>
     </section>
   );

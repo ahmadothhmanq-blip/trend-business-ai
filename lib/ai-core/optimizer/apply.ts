@@ -5,7 +5,7 @@
 import { getDefaultTextProvider } from "@/lib/ai/provider-config";
 import { providerManager } from "@/lib/ai/provider-manager";
 import type { GeneratedProjectFile } from "@/lib/ai/types";
-import { buildWebsiteLanguageDirective } from "@/lib/ai-core/website-builder/language-directive";
+import { buildWebsiteLanguageDirective } from "@/lib/ai-core/website-builder/language-directive.server";
 import {
   countArabicCharacters,
   extractUserFacingCopyFromSource,

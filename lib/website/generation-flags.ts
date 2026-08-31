@@ -18,6 +18,13 @@
  *   WB_PROMPT_OPTIMIZATION=1         — compact file-generation metadata (Phase 2.6)
  *   WB_LLM_CONCURRENCY=4           — global LLM cap for W2 parallel pool (default 4)
  *   WB_WAVE_STRICT_CONTEXT=1       — disable W2 snapshot context; full serial context
+ *   WB_STRUCTURE_FIRST=1           — strategy-driven structure; templates are skin-only
+ *   WB_SITE_PLAN_V1=1              — attach unified SitePlan to generated projects
+ *   WB_PRO_WORKSPACE=1             — enable pro workspace features (UI later)
+ *   WB_PUBLISH_GATE=1              — enforce publish gate checks
+ *   WB_VISUAL_SKIN_V1=1            — force visual skins on (default on when catalog has skins)
+ *   WB_VISUAL_SKIN_V1=0            — disable visual skins
+ *   WB_LOCALE_LLM=1                — LLM visitor locale translation at publish (default on when provider configured)
  *
  * Client (incremental preview iframe during streaming):
  *   NEXT_PUBLIC_WB_INCREMENTAL_PREVIEW=1
@@ -25,6 +32,7 @@
 
 import type { WebsiteGenerationInput } from "@/plugins/website/types";
 import { isPaidWebsitePlan } from "@/lib/ai-core/quality-authority/billing";
+import { hasPublishedVisualSkins } from "@/lib/website/visual-skin/registry";
 
 export type WebsiteGenerationProfile = "fast" | "professional" | "ultra";
 
@@ -49,7 +57,51 @@ export const websiteGenerationFlags = {
   fastGenerationDefault: envTruthy("WB_FAST_GENERATION"),
   /** Ultra fast generation — essential files only, skip plan/optimizer LLM passes. */
   ultraFastGeneration: envTruthy("WB_ULTRA_FAST_GENERATION"),
+  /** Strategy + capabilities own structure; templates apply visual skin only. */
+  structureFirst: envTruthy("WB_STRUCTURE_FIRST"),
+  /** Unified SitePlan layer on generated projects. */
+  sitePlanV1: envTruthy("WB_SITE_PLAN_V1"),
+  /** Pro workspace shell (IDE) — gated until UI ships. */
+  proWorkspace: envTruthy("WB_PRO_WORKSPACE"),
+  /** Publish gate before go-live. */
+  publishGate: envTruthy("WB_PUBLISH_GATE"),
+  /** Visual skin application after SitePlan. */
+  visualSkinV1: envTruthy("WB_VISUAL_SKIN_V1"),
 } as const;
+
+/** True when WB_SITE_PLAN_V1=1 — derive and persist SitePlan on projects. */
+export function isSitePlanV1Enabled(): boolean {
+  return envTruthy("WB_SITE_PLAN_V1");
+}
+
+/** True when WB_PRO_WORKSPACE=1 — pro IDE workspace features. */
+export function isProWorkspaceEnabled(): boolean {
+  return envTruthy("WB_PRO_WORKSPACE");
+}
+
+/** Client mirror for pro workspace UI (NEXT_PUBLIC_WB_PRO_WORKSPACE). */
+export function isProWorkspaceClientEnabled(): boolean {
+  const value = process.env.NEXT_PUBLIC_WB_PRO_WORKSPACE;
+  return value === "true" || value === "1";
+}
+
+/** True when WB_PUBLISH_GATE=1 — block/warn on publish failures. */
+export function isPublishGateEnabled(): boolean {
+  return envTruthy("WB_PUBLISH_GATE");
+}
+
+/** Apply visual skins when published, unless explicitly disabled (WB_VISUAL_SKIN_V1=0). */
+export function isVisualSkinV1Enabled(): boolean {
+  const raw = process.env.WB_VISUAL_SKIN_V1;
+  if (raw === "0" || raw === "false") return false;
+  if (raw === "1" || raw === "true") return true;
+  return hasPublishedVisualSkins();
+}
+
+/** True when WB_STRUCTURE_FIRST=1 — templates must not mutate pages/sections/nav. */
+export function isStructureFirstEnabled(): boolean {
+  return envTruthy("WB_STRUCTURE_FIRST");
+}
 
 /**
  * Resolve generation profile.

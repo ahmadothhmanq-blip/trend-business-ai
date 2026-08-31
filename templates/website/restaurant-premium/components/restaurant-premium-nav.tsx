@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 
 const DEFAULT_LINKS = [
-  { href: "#menu", label: "Menu" },
-  { href: "#chef", label: "Chef" },
-  { href: "#gallery", label: "Gallery" },
-  { href: "#reservation", label: "Reserve" },
+  { href: "#features", label: "Capabilities" },
+  { href: "#about", label: "About" },
+  { href: "#portfolio", label: "Work" },
+  { href: "#pricing", label: "Engagement" },
+  { href: "#contact", label: "Contact" },
 ];
 
 type RestaurantPremiumNavProps = {
@@ -16,15 +17,15 @@ type RestaurantPremiumNavProps = {
 };
 
 export function RestaurantPremiumNav({
-  brandName = "Ember Table",
-  ctaLabel = "Reserve",
+  brandName = "Ember",
+  ctaLabel = "Speak with us",
   links = DEFAULT_LINKS,
 }: RestaurantPremiumNavProps) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 64);
+    const onScroll = () => setScrolled(window.scrollY > 24);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -32,85 +33,65 @@ export function RestaurantPremiumNav({
 
   useEffect(() => {
     if (!open) return;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
     };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
   }, [open]);
 
   return (
     <header
       data-v2-component="restaurant-premium-nav"
-      className={[
-        "fixed inset-x-0 top-0 z-[60] transition-all duration-500",
-        scrolled
-          ? "border-b border-[var(--border-subtle)] bg-[var(--color-background)]/92 backdrop-blur-xl"
-          : "border-b border-transparent bg-transparent",
-      ].join(" ")}
+      className={`rp-topnav ${scrolled ? "rp-topnav--solid" : ""}`}
     >
-      <div className="mx-auto flex h-[4.5rem] max-w-[90rem] items-center justify-between gap-6 px-5 sm:px-8 lg:px-10">
-        <a
-          href="#top"
-          className="rp-font-display text-lg tracking-[0.06em] text-[var(--color-foreground)] transition hover:text-[var(--color-copper)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-copper)]"
-        >
+      <a href="#main-content" className="df-skip-link">
+        Skip to main content
+      </a>
+      <div className="rp-shell rp-topnav-inner df-animate-nav">
+        <a href="#top" className="rp-brand rp-focus-ring">
           {brandName}
         </a>
-
-        <nav aria-label="Primary" className="hidden items-center gap-10 lg:flex">
+        <nav aria-label="Primary" className="rp-topnav-links hidden lg:flex">
           {links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="rp-font-body text-[0.625rem] font-medium uppercase tracking-[0.32em] text-[var(--color-muted)] transition hover:text-[var(--color-copper)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-copper)]"
-            >
+            <a key={link.href} href={link.href} className="rp-topnav-link rp-focus-ring">
               {link.label}
             </a>
           ))}
         </nav>
-
-        <div className="flex items-center gap-3">
-          <a href="#reservation" className="rp-btn-primary hidden sm:inline-flex">
+        <div className="rp-topnav-actions">
+          <a href="#contact" className="rp-btn-primary hidden sm:inline-flex">
             {ctaLabel}
           </a>
           <button
             type="button"
+            className="rp-menu-btn lg:hidden rp-focus-ring"
             aria-expanded={open}
             aria-controls="rp-mobile-nav"
             aria-label={open ? "Close menu" : "Open menu"}
             onClick={() => setOpen((v) => !v)}
-            className="inline-flex h-11 w-11 items-center justify-center border border-[var(--border-subtle)] text-[var(--color-foreground)] lg:hidden rp-focus-ring"
           >
-            <span className="sr-only">Menu</span>
-            <span aria-hidden className="flex flex-col gap-1.5">
-              <span className={`block h-px w-5 bg-current transition ${open ? "translate-y-[7px] rotate-45" : ""}`} />
-              <span className={`block h-px w-5 bg-current transition ${open ? "opacity-0" : ""}`} />
-              <span className={`block h-px w-5 bg-current transition ${open ? "-translate-y-[7px] -rotate-45" : ""}`} />
-            </span>
+            {open ? "Close" : "Menu"}
           </button>
         </div>
       </div>
-
       {open ? (
-        <nav
-          id="rp-mobile-nav"
-          aria-label="Mobile"
-          className="border-t border-[var(--border-subtle)] bg-[var(--color-background)]/98 px-5 py-6 lg:hidden"
-        >
-          <ul className="flex flex-col gap-4">
+        <nav id="rp-mobile-nav" aria-label="Mobile" className="rp-mobile-panel lg:hidden">
+          <ul>
             {links.map((link) => (
               <li key={link.href}>
-                <a
-                  href={link.href}
-                  onClick={() => setOpen(false)}
-                  className="rp-font-body block text-sm uppercase tracking-[0.28em] text-[var(--color-foreground)]/80"
-                >
+                <a href={link.href} onClick={() => setOpen(false)}>
                   {link.label}
                 </a>
               </li>
             ))}
-            <li className="pt-2">
-              <a href="#reservation" onClick={() => setOpen(false)} className="rp-btn-primary w-full">
+            <li>
+              <a href="#contact" className="rp-btn-primary" onClick={() => setOpen(false)}>
                 {ctaLabel}
               </a>
             </li>

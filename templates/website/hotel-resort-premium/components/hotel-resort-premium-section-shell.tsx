@@ -38,16 +38,16 @@ export function HotelResortPremiumSectionShell({
       <div className="mx-auto max-w-[90rem] px-5 sm:px-8 lg:px-10">
         {(eyebrow || title || subtitle) && (
           <header className="mb-12 max-w-2xl">
-            {eyebrow && <p className="hr-eyebrow mb-5">{eyebrow}</p>}
+            {eyebrow && <p className="hr-eyebrow mb-4">{eyebrow}</p>}
             {title && (
               <h2
                 id={`${id ?? "section"}-title`}
-                className="hr-headline text-[clamp(2rem,4vw,3rem)]"
+                className="hr-headline-sm"
               >
                 {title}
               </h2>
             )}
-            {title && <div className="hr-azure-rule my-6" />}
+            {title && <div className="hr-azure-rule my-5" />}
             {subtitle && <p className="hr-body">{subtitle}</p>}
           </header>
         )}

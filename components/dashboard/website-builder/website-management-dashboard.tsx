@@ -1,20 +1,27 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import {
   ArrowLeft,
+  Bell,
+  Calendar,
+  CreditCard,
   FileText,
+  Globe,
   ImageIcon,
   LayoutGrid,
   Loader2,
+  MessageCircle,
   MessageSquare,
   Navigation,
   Package,
   Palette,
   ShieldCheck,
   Sparkles,
+  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,8 +51,37 @@ type Tab =
   | "media"
   | "brand"
   | "leads"
+  | "booking"
+  | "payments"
+  | "chat"
+  | "notifications"
+  | "users"
+  | "localization"
   | "assistant"
   | "quality";
+
+const MANAGEMENT_TABS: Tab[] = [
+  "overview",
+  "pages",
+  "navigation",
+  "catalog",
+  "cms",
+  "media",
+  "brand",
+  "leads",
+  "booking",
+  "payments",
+  "chat",
+  "notifications",
+  "users",
+  "localization",
+  "assistant",
+  "quality",
+];
+
+function isManagementTab(value: string | null): value is Tab {
+  return Boolean(value && MANAGEMENT_TABS.includes(value as Tab));
+}
 
 export function WebsiteManagementDashboard({
   generationId,
@@ -54,6 +90,8 @@ export function WebsiteManagementDashboard({
 }) {
   const wb = useProductT("websiteBuilder");
   const { t } = useTranslation();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [tab, setTab] = useState<Tab>("overview");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -139,6 +177,29 @@ export function WebsiteManagementDashboard({
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    const tabParam = searchParams.get("tab");
+    if (isManagementTab(tabParam)) {
+      setTab(tabParam);
+    }
+  }, [searchParams]);
+
+  const bookingLeads = useMemo(
+    () =>
+      (data?.leads || []).filter((lead) =>
+        /book|reserv|appointment/i.test(lead.formType),
+      ),
+    [data?.leads],
+  );
+
+  const selectTab = useCallback(
+    (nextTab: Tab) => {
+      setTab(nextTab);
+      router.replace(`?tab=${nextTab}`, { scroll: false });
+    },
+    [router],
+  );
 
   async function runCopilotAssistant(message: string) {
     setSaving(true);
@@ -229,6 +290,12 @@ export function WebsiteManagementDashboard({
     { id: "media", labelKey: "builder.media.title", icon: ImageIcon },
     { id: "brand", labelKey: "management.tabs.brand", icon: Palette },
     { id: "leads", labelKey: "management.tabs.leads", icon: MessageSquare },
+    { id: "booking", labelKey: "management.tabs.booking", icon: Calendar },
+    { id: "payments", labelKey: "management.tabs.payments", icon: CreditCard },
+    { id: "chat", labelKey: "management.tabs.chat", icon: MessageCircle },
+    { id: "notifications", labelKey: "management.tabs.notifications", icon: Bell },
+    { id: "users", labelKey: "management.tabs.users", icon: Users },
+    { id: "localization", labelKey: "management.tabs.localization", icon: Globe },
     { id: "assistant", labelKey: "management.tabs.assistant", icon: Sparkles },
     { id: "quality", labelKey: "management.tabs.quality", icon: ShieldCheck },
   ];
@@ -281,7 +348,7 @@ export function WebsiteManagementDashboard({
           <button
             key={tabItem.id}
             type="button"
-            onClick={() => setTab(tabItem.id)}
+            onClick={() => selectTab(tabItem.id)}
             className={cn(
               "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] transition",
               tab === tabItem.id
@@ -821,6 +888,134 @@ export function WebsiteManagementDashboard({
               ))}
             </div>
           )}
+        </DashboardPanel>
+      ) : null}
+
+      {tab === "booking" ? (
+        <DashboardPanel>
+          <p className="mb-3 text-[12px] font-semibold uppercase tracking-wide text-white/40">
+            {wb("management.tabs.booking")}
+          </p>
+          <p className="mb-4 text-sm text-white/45">{wb("management.booking.description")}</p>
+          {bookingLeads.length === 0 ? (
+            <p className="text-sm text-white/40">{wb("management.booking.empty")}</p>
+          ) : (
+            <div className="space-y-2">
+              {bookingLeads.map((lead) => (
+                <div
+                  key={lead.id}
+                  className="rounded-xl border border-white/[0.08] px-3 py-2 text-sm"
+                >
+                  <p className="text-white">{lead.formType}</p>
+                  <p className="text-[11px] text-white/40">{lead.createdAt}</p>
+                  <pre className="mt-2 overflow-auto text-[11px] text-white/55">
+                    {JSON.stringify(lead.fields, null, 2)}
+                  </pre>
+                </div>
+              ))}
+            </div>
+          )}
+          <Button
+            className="mt-4 bg-premium-gold text-black"
+            disabled={saving}
+            onClick={() =>
+              void runCopilotAssistant(
+                "Add an appointment booking section with date and time selection",
+              )
+            }
+          >
+            <Sparkles className="size-4" />
+            {wb("management.booking.addFlow")}
+          </Button>
+        </DashboardPanel>
+      ) : null}
+
+      {tab === "payments" ? (
+        <DashboardPanel className="space-y-3">
+          <p className="text-[12px] font-semibold uppercase tracking-wide text-white/40">
+            {wb("management.tabs.payments")}
+          </p>
+          <p className="text-sm text-white/45">{wb("management.payments.description")}</p>
+          <Button
+            className="bg-premium-gold text-black"
+            disabled={saving}
+            onClick={() =>
+              void runCopilotAssistant(
+                "Add secure checkout and payment buttons with Stripe-ready placeholders",
+              )
+            }
+          >
+            <Sparkles className="size-4" />
+            {wb("management.payments.setup")}
+          </Button>
+        </DashboardPanel>
+      ) : null}
+
+      {tab === "chat" ? (
+        <DashboardPanel className="space-y-3">
+          <p className="text-[12px] font-semibold uppercase tracking-wide text-white/40">
+            {wb("management.tabs.chat")}
+          </p>
+          <p className="text-sm text-white/45">{wb("management.chat.description")}</p>
+          <Button
+            className="bg-premium-gold text-black"
+            disabled={saving}
+            onClick={() =>
+              void runCopilotAssistant("Add a live chat widget and support contact CTA")
+            }
+          >
+            <Sparkles className="size-4" />
+            {wb("management.chat.enable")}
+          </Button>
+        </DashboardPanel>
+      ) : null}
+
+      {tab === "notifications" ? (
+        <DashboardPanel className="space-y-3">
+          <p className="text-[12px] font-semibold uppercase tracking-wide text-white/40">
+            {wb("management.tabs.notifications")}
+          </p>
+          <p className="text-sm text-white/45">{wb("management.notifications.description")}</p>
+          <ul className="space-y-2 text-sm text-white/60">
+            <li>• {wb("management.notifications.leadAlerts")}</li>
+            <li>• {wb("management.notifications.bookingAlerts")}</li>
+            <li>• {wb("management.notifications.publishAlerts")}</li>
+          </ul>
+        </DashboardPanel>
+      ) : null}
+
+      {tab === "users" ? (
+        <DashboardPanel className="space-y-3">
+          <p className="text-[12px] font-semibold uppercase tracking-wide text-white/40">
+            {wb("management.tabs.users")}
+          </p>
+          <p className="text-sm text-white/45">{wb("management.users.description")}</p>
+          <Link href={`/dashboard/website-builder?generation=${generationId}`}>
+            <Button variant="outline" className="border-white/15 text-white">
+              {wb("management.users.openEditor")}
+            </Button>
+          </Link>
+        </DashboardPanel>
+      ) : null}
+
+      {tab === "localization" ? (
+        <DashboardPanel className="space-y-3">
+          <p className="text-[12px] font-semibold uppercase tracking-wide text-white/40">
+            {wb("management.tabs.localization")}
+          </p>
+          <p className="text-sm text-white/45">{wb("management.localization.description")}</p>
+          <Button
+            className="bg-premium-gold text-black"
+            disabled={saving}
+            onClick={() =>
+              void runCopilotAssistant(
+                "Add bilingual Arabic and English content with RTL support and language switcher",
+              )
+            }
+          >
+            <Sparkles className="size-4" />
+            {wb("management.localization.enable")}
+          </Button>
         </DashboardPanel>
       ) : null}
 

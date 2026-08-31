@@ -18,6 +18,7 @@ const packages = [
   "education-premium",
   "finance-premium",
   "hotel-resort-premium",
+  "ai-startup-signal",
 ];
 
 const skipLh = process.argv.includes("--skip-lighthouse");

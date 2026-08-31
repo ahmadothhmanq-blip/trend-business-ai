@@ -21,6 +21,16 @@ export type {
 export {
   SECTION_DEFAULT_VARIANTS,
   SECTION_VARIANT_REGISTRY,
+  HERO_DEFAULT_VARIANT,
+  FEATURES_DEFAULT_VARIANT,
+  ABOUT_DEFAULT_VARIANT,
+  SERVICES_DEFAULT_VARIANT,
+  PORTFOLIO_DEFAULT_VARIANT,
+  PRICING_DEFAULT_VARIANT,
+  TESTIMONIALS_DEFAULT_VARIANT,
+  CTA_DEFAULT_VARIANT,
+  CONTACT_DEFAULT_VARIANT,
+  FOOTER_DEFAULT_VARIANT,
   getDefaultVariantId,
   getVariantDefinition,
   listSectionVariants,
@@ -34,13 +44,6 @@ export {
   type SectionVariantContentMap,
   type SectionVariantIdMap,
 } from "@/lib/website/template-v2/variants/resolve";
-
-export {
-  SectionVariantRenderer,
-  type SectionVariantRendererProps,
-} from "@/lib/website/template-v2/variants/render";
-
-export { SectionVariantShell } from "@/lib/website/template-v2/variants/shell";
 
 export type {
   SectionKind,
@@ -60,16 +63,5 @@ export type {
 } from "@/lib/website/template-v2/variants/types";
 
 export { SECTION_VARIANT_COUNTS } from "@/lib/website/template-v2/variants/types";
-
-export { renderHeroVariant, HERO_DEFAULT_VARIANT } from "@/lib/website/template-v2/variants/sections/hero";
-export { renderFeaturesVariant, FEATURES_DEFAULT_VARIANT } from "@/lib/website/template-v2/variants/sections/features";
-export { renderAboutVariant, ABOUT_DEFAULT_VARIANT } from "@/lib/website/template-v2/variants/sections/about";
-export { renderServicesVariant, SERVICES_DEFAULT_VARIANT } from "@/lib/website/template-v2/variants/sections/services";
-export { renderPortfolioVariant, PORTFOLIO_DEFAULT_VARIANT } from "@/lib/website/template-v2/variants/sections/portfolio";
-export { renderPricingVariant, PRICING_DEFAULT_VARIANT } from "@/lib/website/template-v2/variants/sections/pricing";
-export { renderTestimonialsVariant, TESTIMONIALS_DEFAULT_VARIANT } from "@/lib/website/template-v2/variants/sections/testimonials";
-export { renderCtaVariant, CTA_DEFAULT_VARIANT } from "@/lib/website/template-v2/variants/sections/cta";
-export { renderContactVariant, CONTACT_DEFAULT_VARIANT } from "@/lib/website/template-v2/variants/sections/contact";
-export { renderFooterVariant, FOOTER_DEFAULT_VARIANT } from "@/lib/website/template-v2/variants/sections/footer";
 
 export * from "@/lib/website/template-v2/variants/decision";

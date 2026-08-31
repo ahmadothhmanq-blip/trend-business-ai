@@ -1,0 +1,81 @@
+{
+  "components": [
+    {
+      "id": "obsidian-noir-nav",
+      "role": "navigation",
+      "scaffold": "components/obsidian-noir-nav.tsx",
+      "slots": ["logo", "links", "cta"]
+    },
+    {
+      "id": "obsidian-noir-hero",
+      "role": "hero",
+      "scaffold": "components/obsidian-noir-hero.tsx",
+      "slots": ["headline", "metrics", "cta"]
+    },
+    {
+      "id": "obsidian-noir-features",
+      "role": "features",
+      "scaffold": "components/obsidian-noir-features.tsx"
+    },
+    {
+      "id": "obsidian-noir-about",
+      "role": "story",
+      "scaffold": "components/obsidian-noir-about.tsx"
+    },
+    {
+      "id": "obsidian-noir-stats",
+      "role": "custom",
+      "scaffold": "components/obsidian-noir-stats.tsx"
+    },
+    {
+      "id": "obsidian-noir-testimonials",
+      "role": "testimonials",
+      "scaffold": "components/obsidian-noir-testimonials.tsx"
+    },
+    {
+      "id": "obsidian-noir-pricing",
+      "role": "pricing",
+      "scaffold": "components/obsidian-noir-pricing.tsx"
+    },
+    {
+      "id": "obsidian-noir-faq",
+      "role": "faq",
+      "scaffold": "components/obsidian-noir-faq.tsx"
+    },
+    {
+      "id": "obsidian-noir-contact",
+      "role": "contact",
+      "scaffold": "components/obsidian-noir-contact.tsx"
+    },
+    {
+      "id": "obsidian-noir-footer",
+      "role": "footer",
+      "scaffold": "components/obsidian-noir-footer.tsx"
+    },
+    {
+      "id": "obsidian-noir-floating-cta",
+      "role": "cta",
+      "scaffold": "components/obsidian-noir-floating-cta.tsx"
+    },
+    {
+      "id": "obsidian-noir-utility-band",
+      "role": "cta",
+      "scaffold": "components/obsidian-noir-utility-band.tsx"
+    },
+    {
+      "id": "obsidian-noir-section-shell",
+      "role": "custom",
+      "scaffold": "components/obsidian-noir-section-shell.tsx"
+    },
+    {
+      "id": "obsidian-noir-portfolio",
+      "role": "custom",
+      "scaffold": "components/obsidian-noir-portfolio.tsx"
+    },
+    {
+      "id": "obsidian-noir-integrations",
+      "role": "custom",
+      "scaffold": "components/obsidian-noir-integrations.tsx"
+    }
+  ]
+}

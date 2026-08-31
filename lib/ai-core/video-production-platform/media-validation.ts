@@ -13,6 +13,12 @@ import {
   isStubVideoBytes,
 } from "@/lib/ai-core/video-production-platform/providers/types";
 
+export function isPlayableVideoMime(mime?: string | null): boolean {
+  if (!mime) return false;
+  const normalized = mime.split(";")[0].trim().toLowerCase();
+  return normalized === "video/mp4" || normalized === "video/webm";
+}
+
 export function isProductionRenderMode(mode: VideoRenderJob["mode"]): boolean {
   return (
     mode === "full" ||
@@ -20,6 +26,11 @@ export function isProductionRenderMode(mode: VideoRenderJob["mode"]): boolean {
     mode === "image-to-video" ||
     mode === "batch-item"
   );
+}
+
+/** Paid / production renders may only complete via FFmpeg assembly, never first-clip or manifest-only. */
+export function isFfmpegAssemblyMethod(method?: string | null): boolean {
+  return method === "ffmpeg";
 }
 
 export function validateClipMediaForRender(params: {

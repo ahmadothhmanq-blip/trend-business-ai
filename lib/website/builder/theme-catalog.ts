@@ -150,6 +150,14 @@ export const WEBSITE_THEME_CATALOG: WebsiteThemeCatalogEntry[] = [
     templateIntelligenceId: "ti-saas-growth",
     ...dnaPreview("ti-saas-growth", "bold"),
   },
+  {
+    id: "global",
+    label: "Global Enterprise",
+    description: "Refined dark SaaS — split hero, product showcase, enterprise contact",
+    designPreset: "premium-brand",
+    templateIntelligenceId: "ti-saas-growth",
+    ...dnaPreview("ti-saas-growth", "global"),
+  },
 ];
 
 export function getWebsiteThemeEntry(

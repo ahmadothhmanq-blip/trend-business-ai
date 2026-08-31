@@ -67,8 +67,8 @@ console.log("\n[3] API route markers");
 const mainRoute = readFileSync(join(root, "app/api/content-studio/route.ts"), "utf8");
 if (mainRoute.includes("requireUser")) ok("main route: requireUser");
 else fail("main route missing requireUser");
-if (mainRoute.includes("enforceAiUsage")) ok("main route: enforceAiUsage / credits");
-else fail("main route missing enforceAiUsage");
+if (mainRoute.includes("beginAiUsage")) ok("main route: beginAiUsage / credits");
+else fail("main route missing beginAiUsage");
 if (mainRoute.includes('"continue"')) ok("main route: continue mode in schema");
 else fail("main route missing continue mode");
 

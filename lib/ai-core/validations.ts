@@ -11,6 +11,7 @@ export const aiCoreRunCreateSchema = z.object({
     .optional()
     .default("generate"),
   language: z.string().trim().optional(),
+  country: z.string().trim().optional(),
   theme: z.string().trim().optional(),
   features: z.array(z.string().trim()).optional(),
   industry: z.string().trim().optional(),
@@ -27,4 +28,6 @@ export const aiCoreRunContinueSchema = z.object({
     .min(3, "Continue instruction must be at least 3 characters.")
     .max(4000),
   provider: z.string().trim().optional(),
+  language: z.string().trim().optional(),
+  country: z.string().trim().optional(),
 });

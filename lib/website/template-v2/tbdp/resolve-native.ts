@@ -79,6 +79,48 @@ import {
   NEXUS_COMMAND_RESPONSIVE_STRUCTURE,
   NEXUS_COMMAND_V2_TOKENS,
 } from "@/lib/website/template-v2/tbdp/profiles/saas-enterprise/nexus-command";
+import {
+  AURA_SIGNAL_MOTION,
+  AURA_SIGNAL_RESPONSIVE_BASE,
+  AURA_SIGNAL_RESPONSIVE_STRUCTURE,
+  AURA_SIGNAL_V2_TOKENS,
+} from "@/lib/website/template-v2/tbdp/profiles/ai-startup-signal/aura-signal";
+import {
+  AURORA_PRISM_MOTION,
+  AURORA_PRISM_RESPONSIVE_BASE,
+  AURORA_PRISM_RESPONSIVE_STRUCTURE,
+  AURORA_PRISM_V2_TOKENS,
+} from "@/lib/website/template-v2/tbdp/profiles/prism-aurora/aurora-prism";
+import {
+  NOIR_OBSIDIAN_MOTION,
+  NOIR_OBSIDIAN_RESPONSIVE_BASE,
+  NOIR_OBSIDIAN_RESPONSIVE_STRUCTURE,
+  NOIR_OBSIDIAN_V2_TOKENS,
+} from "@/lib/website/template-v2/tbdp/profiles/obsidian-noir/noir-obsidian";
+import {
+  NEON_PULSE_MOTION,
+  NEON_PULSE_RESPONSIVE_BASE,
+  NEON_PULSE_RESPONSIVE_STRUCTURE,
+  NEON_PULSE_V2_TOKENS,
+} from "@/lib/website/template-v2/tbdp/profiles/pulse-fintech/neon-pulse";
+import {
+  INDUSTRIAL_FORGE_MOTION,
+  INDUSTRIAL_FORGE_RESPONSIVE_BASE,
+  INDUSTRIAL_FORGE_RESPONSIVE_STRUCTURE,
+  INDUSTRIAL_FORGE_V2_TOKENS,
+} from "@/lib/website/template-v2/tbdp/profiles/forge-industrial/industrial-forge";
+import {
+  TRUST_CITADEL_MOTION,
+  TRUST_CITADEL_RESPONSIVE_BASE,
+  TRUST_CITADEL_RESPONSIVE_STRUCTURE,
+  TRUST_CITADEL_V2_TOKENS,
+} from "@/lib/website/template-v2/tbdp/profiles/citadel-trust/trust-citadel";
+import {
+  GLOW_LUMINA_MOTION,
+  GLOW_LUMINA_RESPONSIVE_BASE,
+  GLOW_LUMINA_RESPONSIVE_STRUCTURE,
+  GLOW_LUMINA_V2_TOKENS,
+} from "@/lib/website/template-v2/tbdp/profiles/lumina-wellness/glow-lumina";
 import type {
   TbdpNativeResolveInput,
   TbdpNativeResolveResult,
@@ -123,6 +165,13 @@ const NATIVE_BINDINGS: Record<string, NativeBinding> = {
     responsiveBase: NEXUS_COMMAND_RESPONSIVE_BASE,
     responsiveStructure: NEXUS_COMMAND_RESPONSIVE_STRUCTURE,
     motionPresetBinding: "nexus-grid-reveal",
+  },
+  "ai-startup-signal:aura-signal": {
+    tokens: AURA_SIGNAL_V2_TOKENS,
+    motion: AURA_SIGNAL_MOTION,
+    responsiveBase: AURA_SIGNAL_RESPONSIVE_BASE,
+    responsiveStructure: AURA_SIGNAL_RESPONSIVE_STRUCTURE,
+    motionPresetBinding: "signal-glow-reveal",
   },
   "corporate-business:executive-atlas": {
     tokens: EXECUTIVE_ATLAS_V2_TOKENS,
@@ -200,6 +249,48 @@ const NATIVE_BINDINGS: Record<string, NativeBinding> = {
     responsiveBase: AZURE_HAVEN_RESPONSIVE_BASE,
     responsiveStructure: AZURE_HAVEN_RESPONSIVE_STRUCTURE,
     motionPresetBinding: "haven-reveal",
+  },
+  "prism-aurora:aurora-prism": {
+    tokens: AURORA_PRISM_V2_TOKENS,
+    motion: AURORA_PRISM_MOTION,
+    responsiveBase: AURORA_PRISM_RESPONSIVE_BASE,
+    responsiveStructure: AURORA_PRISM_RESPONSIVE_STRUCTURE,
+    motionPresetBinding: "prism-aurora-reveal",
+  },
+  "obsidian-noir:noir-obsidian": {
+    tokens: NOIR_OBSIDIAN_V2_TOKENS,
+    motion: NOIR_OBSIDIAN_MOTION,
+    responsiveBase: NOIR_OBSIDIAN_RESPONSIVE_BASE,
+    responsiveStructure: NOIR_OBSIDIAN_RESPONSIVE_STRUCTURE,
+    motionPresetBinding: "obsidian-noir-reveal",
+  },
+  "pulse-fintech:neon-pulse": {
+    tokens: NEON_PULSE_V2_TOKENS,
+    motion: NEON_PULSE_MOTION,
+    responsiveBase: NEON_PULSE_RESPONSIVE_BASE,
+    responsiveStructure: NEON_PULSE_RESPONSIVE_STRUCTURE,
+    motionPresetBinding: "pulse-fintech-reveal",
+  },
+  "forge-industrial:industrial-forge": {
+    tokens: INDUSTRIAL_FORGE_V2_TOKENS,
+    motion: INDUSTRIAL_FORGE_MOTION,
+    responsiveBase: INDUSTRIAL_FORGE_RESPONSIVE_BASE,
+    responsiveStructure: INDUSTRIAL_FORGE_RESPONSIVE_STRUCTURE,
+    motionPresetBinding: "forge-industrial-reveal",
+  },
+  "citadel-trust:trust-citadel": {
+    tokens: TRUST_CITADEL_V2_TOKENS,
+    motion: TRUST_CITADEL_MOTION,
+    responsiveBase: TRUST_CITADEL_RESPONSIVE_BASE,
+    responsiveStructure: TRUST_CITADEL_RESPONSIVE_STRUCTURE,
+    motionPresetBinding: "citadel-trust-reveal",
+  },
+  "lumina-wellness:glow-lumina": {
+    tokens: GLOW_LUMINA_V2_TOKENS,
+    motion: GLOW_LUMINA_MOTION,
+    responsiveBase: GLOW_LUMINA_RESPONSIVE_BASE,
+    responsiveStructure: GLOW_LUMINA_RESPONSIVE_STRUCTURE,
+    motionPresetBinding: "lumina-wellness-reveal",
   },
 };
 

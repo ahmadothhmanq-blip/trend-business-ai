@@ -107,6 +107,7 @@ async function executeAgent(input: AgentPluginInput, analysis: AgentAnalysis, pl
       task: input.task,
       agentType: input.agentType,
       stepResults: stepResults.map((s) => ({ name: s.stepName, result: s.result })),
+      language: input.language,
     }),
     schema: agentSummarySchema,
   });

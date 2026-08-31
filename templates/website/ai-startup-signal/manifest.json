@@ -2,16 +2,17 @@
   "specVersion": "2.0.0",
   "id": "ai-startup-signal",
   "version": "2.0.0",
-  "name": "AI Signal",
-  "description": "Futuristic AI startup with cinematic full-bleed hero, glass bento panels, and signal-grade dark mode aesthetics.",
+  "name": "Aura Signal",
+  "description": "Global dark AI platform — glass control plane, cyan signal glow, and enterprise-grade product architecture.",
   "metadata": {
-    "category": "ai-startup",
-    "industry": "AI Startup",
+    "category": "saas",
+    "industry": "AI / SaaS",
     "tags": [
       "ai",
-      "startup",
-      "ml",
-      "futuristic"
+      "saas",
+      "dark",
+      "global",
+      "platform"
     ],
     "author": {
       "name": "Trend Business AI",
@@ -19,18 +20,20 @@
     },
     "license": "MIT",
     "keywords": [
-      "ai",
-      "machine learning",
-      "startup",
-      "signal"
+      "saas",
+      "enterprise",
+      "platform",
+      "revenue"
     ],
     "templateIntelligenceId": "ti-ai-company-signal",
     "premium": true,
     "tier": "agency"
   },
   "media": {
-    "thumbnail": "assets/thumbnail.png",
-    "preview": "assets/preview.png"
+    "thumbnail": "assets/thumbnail.svg",
+    "preview": "assets/preview.svg",
+    "previewTablet": "assets/preview-tablet.svg",
+    "previewMobile": "assets/preview-mobile.svg"
   },
   "compatibility": {
     "engineVersion": ">=1.0.0",
@@ -44,7 +47,7 @@
   },
   "update": {
     "channel": "stable",
-    "releasedAt": "2026-07-30T17:52:37.475Z"
+    "releasedAt": "2026-08-03T16:09:45.050Z"
   },
   "responsive": {
     "breakpoints": [
@@ -69,7 +72,7 @@
         "minWidth": 1536
       }
     ],
-    "containerMaxWidth": "100%",
+    "containerMaxWidth": "82rem",
     "fluidTypography": true
   },
   "canvas": {
@@ -82,9 +85,9 @@
     {
       "id": "default",
       "file": "layouts/default.json",
-      "kind": "full-bleed",
+      "kind": "single-column",
       "label": "Default",
-      "description": "Premium full-bleed layout for AI Startup."
+      "description": "Premium single-column layout for SaaS."
     }
   ],
   "regions": [
@@ -93,28 +96,28 @@
       "file": "regions/header.json",
       "role": "header",
       "label": "Header Region",
-      "description": "Premium header region for AI Signal."
+      "description": "Premium header region for SaaS Enterprise."
     },
     {
       "id": "main",
       "file": "regions/main.json",
       "role": "main",
       "label": "Main Region",
-      "description": "Premium main region for AI Signal."
+      "description": "Premium main region for SaaS Enterprise."
     },
     {
-      "id": "overlay",
-      "file": "regions/overlay.json",
-      "role": "overlay",
-      "label": "Overlay Region",
-      "description": "Premium overlay region for AI Signal."
+      "id": "utility",
+      "file": "regions/utility.json",
+      "role": "utility",
+      "label": "Utility Region",
+      "description": "Premium utility region for SaaS Enterprise."
     },
     {
       "id": "footer",
       "file": "regions/footer.json",
       "role": "footer",
       "label": "Footer Region",
-      "description": "Premium footer region for AI Signal."
+      "description": "Premium footer region for SaaS Enterprise."
     }
   ],
   "pages": [
@@ -124,7 +127,7 @@
       "path": "/",
       "layoutId": "default",
       "file": "pages/home.json",
-      "description": "Home — premium AI Startup page blueprint."
+      "description": "Home — premium SaaS page blueprint."
     },
     {
       "id": "platform",
@@ -132,24 +135,43 @@
       "path": "/platform",
       "layoutId": "default",
       "file": "pages/platform.json",
-      "description": "Platform — premium AI Startup page blueprint."
+      "description": "Platform — premium SaaS page blueprint."
     },
     {
-      "id": "research",
-      "title": "Research",
-      "path": "/research",
+      "id": "pricing",
+      "title": "Pricing",
+      "path": "/pricing",
       "layoutId": "default",
-      "file": "pages/research.json",
-      "description": "Research — premium AI Startup page blueprint."
+      "file": "pages/pricing.json",
+      "description": "Pricing — premium SaaS page blueprint."
     },
     {
-      "id": "careers",
-      "title": "Careers",
-      "path": "/careers",
+      "id": "customers",
+      "title": "Customers",
+      "path": "/customers",
       "layoutId": "default",
-      "file": "pages/careers.json",
-      "description": "Careers — premium AI Startup page blueprint."
+      "file": "pages/customers.json",
+      "description": "Customers — premium SaaS page blueprint."
     }
   ],
-  "entry": "package.entry.json"
+  "entry": "package.entry.json",
+  "architecture": {
+    "version": "v2",
+    "composer": "region-grid",
+    "sdkVersion": "1.0.0"
+  },
+  "presentation": { "file": "presentation/presentation.json" },
+  "tokens": { "file": "tokens/tokens.json" },
+  "motion": { "file": "motion/motion.json" },
+  "responsiveConfig": { "file": "responsive/responsive.json" },
+  "componentLibrary": {
+    "file": "components/registry.json",
+    "root": "components"
+  },
+  "pageFlows": {
+    "home": "flows/home.json",
+    "platform": "flows/platform.json",
+    "pricing": "flows/pricing.json",
+    "customers": "flows/customers.json"
+  }
 }

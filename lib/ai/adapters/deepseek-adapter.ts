@@ -16,6 +16,12 @@ import { getDeepSeekTimeoutMs } from "@/lib/ai/timeouts";
 import { logLlmRawResponse, logLlmRequest } from "@/lib/ai/llm-audit";
 import { logger } from "@/lib/logger";
 import { withTiming } from "@/lib/perf/timing";
+import {
+  appBuilderTimingMarkFirstResponse,
+  appBuilderTimingMarkLlmSent,
+  appBuilderTimingSetWaiting,
+  getActiveAppBuilderTiming,
+} from "@/lib/webapp/stage-timing-context";
 
 const DEEPSEEK_RETRY_DELAYS_MS = [2000, 4000, 8000, 12000] as const;
 const DEFAULT_MODEL = "deepseek-v4-flash";
@@ -87,10 +93,20 @@ export class DeepSeekAdapter implements AIProvider {
   async generateJson<T>(request: JsonGenerationRequest): Promise<T> {
     const client = await this.getClient();
     const reqId = `json-${Date.now().toString(36)}`;
+    const appTimingActive = Boolean(getActiveAppBuilderTiming());
+    let attempt = 0;
 
     return withTiming("deepseek.generateJson", () =>
       withRetry(
         async () => {
+          attempt += 1;
+          if (appTimingActive && attempt > 1) {
+            appBuilderTimingSetWaiting(
+              "retry",
+              `deepseek.generateJson attempt ${attempt}`,
+            );
+          }
+
           const schemaHint = request.schema
             ? `\n\nRespond with JSON matching this schema:\n${JSON.stringify(request.schema, null, 2)}`
             : "";
@@ -106,8 +122,15 @@ export class DeepSeekAdapter implements AIProvider {
             mode: "generateJson",
             model: this.model,
             timeoutMs: getDeepSeekTimeoutMs(),
+            attempt,
             ...summarizePrompt(request.prompt),
           });
+
+          if (appTimingActive) {
+            appBuilderTimingMarkLlmSent(
+              `deepseek.generateJson reqId=${reqId} attempt=${attempt} promptChars=${request.prompt.length}`,
+            );
+          }
 
           let response;
           try {
@@ -130,6 +153,7 @@ export class DeepSeekAdapter implements AIProvider {
               {
                 reqId,
                 mode: "generateJson",
+                attempt,
                 disconnect: isStreamDisconnectError(error),
               },
               error,
@@ -142,10 +166,22 @@ export class DeepSeekAdapter implements AIProvider {
           logger.info("DeepSeek response received", DS_LOG, {
             reqId,
             mode: "generateJson",
+            attempt,
             contentChars: content?.length ?? 0,
             finishReason: response.choices[0]?.finish_reason ?? null,
             usage: response.usage ?? null,
           });
+
+          if (appTimingActive) {
+            appBuilderTimingMarkFirstResponse(
+              `deepseek.generateJson reqId=${reqId} chars=${content?.length ?? 0}`,
+            );
+            appBuilderTimingSetWaiting(
+              "json_validation",
+              `parseJsonResponse reqId=${reqId}`,
+            );
+          }
+
           if (!content) {
             throw new Error("DeepSeek returned an empty response.");
           }
@@ -157,7 +193,11 @@ export class DeepSeekAdapter implements AIProvider {
             );
           }
 
-          return parseJsonResponse<T>(content);
+          const parsed = parseJsonResponse<T>(content);
+          if (appTimingActive) {
+            appBuilderTimingSetWaiting("idle", "json parse complete");
+          }
+          return parsed;
         },
         { delaysMs: DEEPSEEK_RETRY_DELAYS_MS },
       ),
@@ -252,6 +292,10 @@ export class DeepSeekAdapter implements AIProvider {
               ...summarizePrompt(request.prompt),
             });
 
+            if (getActiveAppBuilderTiming()) {
+              appBuilderTimingMarkLlmSent(`deepseek.streamText reqId=${reqId}`);
+            }
+
             const stream = await client.chat.completions.create({
               model: this.model,
               temperature: request.temperature ?? 0.7,
@@ -278,6 +322,13 @@ export class DeepSeekAdapter implements AIProvider {
               if (delta) {
                 text += delta;
                 chunkCount += 1;
+                if (chunkCount === 1) {
+                  if (getActiveAppBuilderTiming()) {
+                    appBuilderTimingMarkFirstResponse(
+                      `deepseek.streamText first token reqId=${reqId}`,
+                    );
+                  }
+                }
                 if (chunkCount === 1 || chunkCount % 25 === 0) {
                   logger.info("DeepSeek stream chunks received", DS_LOG, {
                     reqId,

@@ -10,10 +10,12 @@ import {
   usesLlmLocalizedWebsiteCopy,
 } from "@/lib/ai-core/content/content-language";
 import type { IndustryCopyPack } from "@/lib/ai-core/content/industry-copy";
+import type { WebsiteStrategy } from "@/lib/website/types/layers";
 
 export type ContentCard = {
   title: string;
   body: string;
+  description?: string;
   cta?: string;
 };
 
@@ -34,6 +36,7 @@ export type PricingPlan = {
   blurb: string;
   features: string[];
   featured?: boolean;
+  badge?: string;
 };
 
 export type GalleryItem = {
@@ -80,6 +83,7 @@ export type ProductionContentPack = IndustryCopyPack & {
   contactSubtitle: string;
   navLinks: NavLink[];
   showcaseBullets: string[];
+  serviceHours?: string;
 };
 
 export type IndustryExtras = {
@@ -1299,6 +1303,183 @@ function getExtras(
     return getArabicExtras(industryId);
   }
   return EXTRAS[industryId] ?? EXTRAS.business;
+}
+
+export type StrategyHydrationInput = {
+  strategy?: WebsiteStrategy;
+  language?: string | null;
+  industryId: string;
+  blocks: string[];
+  primaryCta: string;
+  secondaryCta?: string;
+  brandName?: string | null;
+  profile?: { industry?: string; summary?: string };
+};
+
+function fillLocalizedArraysFromExtras(
+  pack: ProductionContentPack,
+  input: StrategyHydrationInput,
+): void {
+  const extras = getExtras(input.industryId, input.language);
+  const ui = getComposeUiFallbacks(input.language);
+  const brand = input.brandName?.trim() || (resolveContentLanguage(input.language) === "ar" ? "العلامة" : "Brand");
+  const ctas = [input.primaryCta, ui.learnMore, input.secondaryCta ?? ui.secondaryCta];
+
+  if (!pack.services.length) {
+    pack.services = extras.serviceTitles.map((title, i) => ({
+      title,
+      body:
+        pack.serviceDescriptions?.[i] ||
+        extras.featureBodies[i] ||
+        pack.trustLine ||
+        "",
+      cta: ctas[i] || input.primaryCta,
+    }));
+  }
+
+  if (!pack.features.length) {
+    pack.features = extras.featureTitles.map((title, i) => ({
+      title,
+      body: extras.featureBodies[i],
+    }));
+  }
+
+  if (!pack.testimonials.length) {
+    const lang = resolveContentLanguage(input.language);
+    pack.testimonials = extras.testimonials.map((t, i) =>
+      i === 0
+        ? {
+            ...t,
+            quote: t.quote.includes(brand)
+              ? t.quote
+              : lang === "ar"
+                ? `${t.quote.replace(/\.$/, "")} — بالتعاون مع ${brand}.`
+                : t.quote.replace(/\.$/, ` — working with ${brand}.`),
+          }
+        : t,
+    );
+  }
+
+  if (!pack.faqs.length) pack.faqs = extras.faqs;
+  if (!pack.pricing.length) pack.pricing = extras.pricing;
+  if (!pack.galleryItems.length) pack.galleryItems = extras.galleryItems;
+  if (!pack.showcaseBullets.length) pack.showcaseBullets = [...extras.showcaseBullets];
+  if (!pack.navLinks.length) pack.navLinks = [...extras.navLinks];
+}
+
+/**
+ * Ensure section arrays are populated from strategy (and localized extras when needed)
+ * so V2 components do not return null before LLM copy is applied.
+ */
+export function hydrateProductionContentFromStrategy(
+  pack: ProductionContentPack,
+  input: StrategyHydrationInput,
+): ProductionContentPack {
+  const {
+    strategy,
+    language,
+    industryId,
+    blocks,
+    primaryCta,
+    profile,
+  } = input;
+  const localized = usesLlmLocalizedWebsiteCopy(language);
+  const ui = getComposeUiFallbacks(language);
+
+  if (strategy?.sectionPlan?.length) {
+    if (!pack.services.length) {
+      const services = strategy.sectionPlan
+        .filter((s) => /service|menu|care|package|offering/i.test(s.name))
+        .slice(0, 6)
+        .map((s, i) => ({
+          title: s.name,
+          body: s.contentNotes || s.goal || blocks[i + 2] || "",
+          cta: primaryCta,
+        }));
+      if (services.length) pack.services = services;
+    }
+
+    if (!pack.features.length) {
+      const features = strategy.sectionPlan
+        .filter((s) =>
+          /feature|benefit|integration|security|stat|about|why|highlight/i.test(
+            s.name,
+          ),
+        )
+        .slice(0, 6)
+        .map((s, i) => ({
+          title: s.name,
+          body: s.contentNotes || s.goal || blocks[i + 3] || "",
+        }));
+      if (features.length) pack.features = features;
+    }
+
+    if (!pack.testimonials.length) {
+      const testimonials = strategy.sectionPlan
+        .filter((s) => /testimonial|review|proof|trust/i.test(s.name))
+        .slice(0, 4)
+        .map((s, i) => ({
+          quote: s.contentNotes || s.goal,
+          name: `Client ${i + 1}`,
+          role: profile?.industry?.replace(/-/g, " ") || "Customer",
+        }));
+      if (testimonials.length) pack.testimonials = testimonials;
+    }
+
+    if (!pack.pricing.length) {
+      const pricingSections = strategy.sectionPlan
+        .filter((s) => /pricing|plan|tier|package/i.test(s.name))
+        .slice(0, 3);
+      if (pricingSections.length) {
+        pack.pricing = pricingSections.map((s, i) => ({
+          name: s.name,
+          price: "—",
+          blurb: s.goal || "",
+          features: [s.contentNotes || s.goal].filter(Boolean),
+          featured: i === 1,
+        }));
+      }
+    }
+
+    if (!pack.faqs.length) {
+      const faqSections = strategy.sectionPlan
+        .filter((s) => /faq|question/i.test(s.name))
+        .slice(0, 6);
+      if (faqSections.length) {
+        pack.faqs = faqSections.map((s) => ({
+          q: s.name,
+          a: s.contentNotes || s.goal,
+        }));
+      }
+    }
+  }
+
+  if (!pack.showcaseBullets.length && strategy?.contentStrategy?.proofPoints?.length) {
+    pack.showcaseBullets = strategy.contentStrategy.proofPoints.slice(0, 6);
+  }
+
+  if (!pack.faqs.length && strategy?.contentStrategy?.objectionHandlers?.length) {
+    const proof = strategy.contentStrategy.proofPoints ?? [];
+    pack.faqs = strategy.contentStrategy.objectionHandlers.slice(0, 6).map((q, i) => ({
+      q,
+      a: proof[i] || blocks[i + 1] || "",
+    }));
+  }
+
+  if (!pack.navLinks.length) {
+    pack.navLinks = [
+      { href: "#features", label: ui.navFeatures },
+      { href: "#services", label: ui.navServices },
+      { href: "#pricing", label: ui.navPricing },
+      { href: "#contact", label: ui.navContact },
+    ];
+  }
+
+  if (localized) {
+    fillLocalizedArraysFromExtras(pack, input);
+  }
+
+  return pack;
 }
 
 /**

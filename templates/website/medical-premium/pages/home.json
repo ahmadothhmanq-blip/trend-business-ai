@@ -5,9 +5,8 @@
   "layoutId": "default",
   "regions": [
     "header",
-    "overlay",
-    "utility",
     "main",
+    "utility",
     "footer"
   ]
 }

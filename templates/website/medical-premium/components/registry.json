@@ -4,43 +4,43 @@
       "id": "medical-premium-nav",
       "role": "navigation",
       "scaffold": "components/medical-premium-nav.tsx",
-      "slots": ["logo", "links", "cta", "emergency"]
+      "slots": ["logo", "links", "cta"]
     },
     {
-      "id": "medical-premium-trust-hero",
+      "id": "medical-premium-hero",
       "role": "hero",
-      "scaffold": "components/medical-premium-trust-hero.tsx",
-      "slots": ["headline", "trust-badges", "cta"]
+      "scaffold": "components/medical-premium-hero.tsx",
+      "slots": ["headline", "metrics", "cta"]
     },
     {
-      "id": "medical-premium-appointment-band",
-      "role": "cta",
-      "scaffold": "components/medical-premium-appointment-band.tsx"
-    },
-    {
-      "id": "medical-premium-specialties",
-      "role": "services",
-      "scaffold": "components/medical-premium-specialties.tsx"
-    },
-    {
-      "id": "medical-premium-physicians",
-      "role": "custom",
-      "scaffold": "components/medical-premium-physicians.tsx"
-    },
-    {
-      "id": "medical-premium-care-journey",
-      "role": "process",
-      "scaffold": "components/medical-premium-care-journey.tsx"
-    },
-    {
-      "id": "medical-premium-wellness",
+      "id": "medical-premium-features",
       "role": "features",
-      "scaffold": "components/medical-premium-wellness.tsx"
+      "scaffold": "components/medical-premium-features.tsx"
+    },
+    {
+      "id": "medical-premium-about",
+      "role": "story",
+      "scaffold": "components/medical-premium-about.tsx"
+    },
+    {
+      "id": "medical-premium-stats",
+      "role": "custom",
+      "scaffold": "components/medical-premium-stats.tsx"
     },
     {
       "id": "medical-premium-testimonials",
       "role": "testimonials",
       "scaffold": "components/medical-premium-testimonials.tsx"
+    },
+    {
+      "id": "medical-premium-pricing",
+      "role": "pricing",
+      "scaffold": "components/medical-premium-pricing.tsx"
+    },
+    {
+      "id": "medical-premium-faq",
+      "role": "faq",
+      "scaffold": "components/medical-premium-faq.tsx"
     },
     {
       "id": "medical-premium-contact",
@@ -53,9 +53,29 @@
       "scaffold": "components/medical-premium-footer.tsx"
     },
     {
+      "id": "medical-premium-floating-cta",
+      "role": "cta",
+      "scaffold": "components/medical-premium-floating-cta.tsx"
+    },
+    {
+      "id": "medical-premium-utility-band",
+      "role": "cta",
+      "scaffold": "components/medical-premium-utility-band.tsx"
+    },
+    {
       "id": "medical-premium-section-shell",
       "role": "custom",
       "scaffold": "components/medical-premium-section-shell.tsx"
+    },
+    {
+      "id": "medical-premium-portfolio",
+      "role": "custom",
+      "scaffold": "components/medical-premium-portfolio.tsx"
+    },
+    {
+      "id": "medical-premium-integrations",
+      "role": "custom",
+      "scaffold": "components/medical-premium-integrations.tsx"
     }
   ]
 }

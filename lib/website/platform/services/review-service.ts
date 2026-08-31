@@ -15,6 +15,7 @@ import {
   listVersions,
   getSession,
 } from "@/lib/website/review-studio";
+import { createCapabilityService } from "@/lib/website/builder/capabilities/service";
 import type {
   ReviewStudioPersistedState,
   ReviewStudioResult,
@@ -139,6 +140,7 @@ export async function loadWebsiteReview(params: {
     strategy: project.strategy,
     designSystem: project.designSystem,
     upstreamContext: buildUpstreamContext(project),
+    activeCapabilityIds: createCapabilityService(project, files).getActiveCapabilities(),
   });
 
   if (!review.ok) {

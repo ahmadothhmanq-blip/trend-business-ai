@@ -1,7 +1,7 @@
 {
   "tbdpNative": true,
-  "sectorDnaId": "law-firm",
-  "experienceProfiles": ["corporate", "executive", "trust"],
+  "sectorDnaId": "saas",
+  "experienceProfiles": ["technical", "corporate", "executive"],
   "structure": {
     "regions": {
       "header": { "sticky": true, "position": "top" },
@@ -11,10 +11,10 @@
     },
     "components": {
       "finance-premium-hero": {
-        "layout": { "lg": "split-trust", "sm": "stacked" }
+        "layout": { "lg": "bento-command", "sm": "stacked" }
       },
       "finance-premium-features": {
-        "layout": { "lg": "grid-3", "sm": "stacked" }
+        "layout": { "lg": "bento-asymmetric", "sm": "stacked" }
       }
     }
   }

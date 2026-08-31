@@ -14,7 +14,11 @@ import { resolveWbTemplatesRoot } from "@/lib/website/template-engine/constants.
 import {
   wireTemplateApply,
 } from "@/lib/website/tbdp-wiring";
-import { resolveBuilderTemplatePackageId } from "@/lib/website/builder/resolve-builder-template-package-id";
+import {
+  resolveInstalledBuilderTemplatePackageId,
+} from "@/lib/website/builder/resolve-builder-template-package-id";
+import { getVisualSkinV2ApplyPipelineOptions } from "@/lib/website/visual-skin/apply-pipeline-options";
+import { isVisualSkinV2PackageId } from "@/lib/website/visual-skin/theme-bridge";
 import path from "node:path";
 
 export type ApplyStructureTemplateParams = {
@@ -51,7 +55,7 @@ function stampStructureTemplateSettings(
 export async function applyStructureTemplateToProject(
   params: ApplyStructureTemplateParams,
 ): Promise<RethemeResult> {
-  const templatePackageId = resolveBuilderTemplatePackageId(
+  const templatePackageId = resolveInstalledBuilderTemplatePackageId(
     params.templatePackageId.trim(),
   );
   if (!templatePackageId) {
@@ -78,10 +82,14 @@ export async function applyStructureTemplateToProject(
     : { architectureVersion: "v1" as const, packageId: templatePackageId, reason: "manifest unavailable" };
 
   if (shouldUseV2Apply(architecture.architectureVersion)) {
+    const pipeline = isVisualSkinV2PackageId(templatePackageId)
+      ? getVisualSkinV2ApplyPipelineOptions()
+      : { directPackageId: true as const };
     const result = await applyTemplateV2ToProject({
       project: params.project,
       templatePackageId,
       language: params.language,
+      ...pipeline,
     });
 
     return {

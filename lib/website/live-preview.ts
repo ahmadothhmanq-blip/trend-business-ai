@@ -1,3 +1,4 @@
+import { isGeneratingWebsitePlaceholderTitle } from "@/lib/ai-core/content/content-language";
 import { normalizePremiumStockUrl } from "@/lib/ai-core/image-engine/stock";
 import type { StaticPreviewInput } from "@/lib/website/preview-input";
 import { parseSiteImagesModule, findSiteImagesSource } from "@/lib/website/site-images-parser";
@@ -28,7 +29,7 @@ function extractHeroImageUrl(
 
   if (!siteImagesContent) return null;
   const match = siteImagesContent.match(
-    /export const HERO_IMAGE = ("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|null)/,
+    /export const HERO_IMAGE(?:\s*:\s*[\w<>,\s|]+)?\s*=\s*("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|null)/,
   );
   if (!match?.[1] || match[1] === "null") return null;
   try {
@@ -45,9 +46,22 @@ export function previewInputFromGeneration(
     ? generation.blueprint
     : null;
 
+  const blueprintTitle = blueprint?.title?.trim() || "";
+  const projectTitle = generation.project_name?.trim() || "";
+  const title = isGeneratingWebsitePlaceholderTitle(blueprintTitle)
+    ? projectTitle || blueprintTitle
+    : blueprintTitle || projectTitle;
+
+  const rawDescription =
+    blueprint?.description?.trim() || generation.business_description?.trim() || "";
+  const description =
+    rawDescription && !/^create a website for\b/i.test(rawDescription)
+      ? rawDescription
+      : blueprint?.description;
+
   return {
-    title: blueprint?.title || generation.project_name,
-    description: blueprint?.description || generation.business_description,
+    title,
+    description,
     pages: blueprint?.pages,
     sections: blueprint?.sections,
     colorPalette: blueprint?.colorPalette,
@@ -75,5 +89,7 @@ export function previewInputFromGeneration(
         ?.tbdpSectorDnaId ??
       (blueprint?.settings as { industryId?: string } | undefined)?.industryId ??
       null,
+    strategy: blueprint?.strategy,
+    businessProfile: blueprint?.businessProfile,
   };
 }

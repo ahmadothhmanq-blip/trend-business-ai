@@ -1,8 +1,11 @@
 import type { DesignFoundationInput } from "@/lib/website/template-v2/foundation/types";
+import { buildFlagshipSemanticThemeCss } from "@/lib/website/template-v2/flagship/themes";
+import { buildFoundationColorConsistencyCss } from "@/lib/website/template-v2/foundation/color-consistency";
 import { buildFoundationCompatCss } from "@/lib/website/template-v2/foundation/compat";
 import { buildFoundationMotionCss } from "@/lib/website/template-v2/foundation/motion";
 import { buildFoundationPrimitivesCss } from "@/lib/website/template-v2/foundation/primitives";
 import { buildFoundationResponsiveCss } from "@/lib/website/template-v2/foundation/responsive";
+import { buildFoundationRtlCss } from "@/lib/website/template-v2/foundation/rtl-overrides";
 import { buildFoundationTokenScaleCss } from "@/lib/website/template-v2/foundation/token-scale";
 
 export { FOUNDATION_UI } from "@/lib/website/template-v2/foundation/compat";
@@ -15,8 +18,11 @@ export type { DesignFoundationInput, FoundationUi } from "@/lib/website/template
 export function buildDesignFoundationCss(input: DesignFoundationInput): string {
   return [
     buildFoundationTokenScaleCss(input.tokens),
+    buildFlagshipSemanticThemeCss(input.packageId),
     buildFoundationMotionCss(),
+    buildFoundationColorConsistencyCss(),
     buildFoundationPrimitivesCss(),
+    buildFoundationRtlCss(),
     buildFoundationResponsiveCss(input.responsive),
     buildFoundationCompatCss(),
   ].join("\n\n");

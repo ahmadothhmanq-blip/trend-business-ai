@@ -12,6 +12,7 @@ import {
   type WorkspaceLanguage,
   type WorkspaceTheme,
 } from "@/lib/workspace/metadata";
+import { getInitialGlsGenerationLanguage, glsGenerationLanguagePayload } from "@/lib/language-platform/generation/service";
 import {
   copyWorkspaceSummary,
   downloadWorkspaceProject,
@@ -130,7 +131,9 @@ export function useWorkspaceTool({
 
   const [prompt, setPrompt] = useState("");
   const [selectedTemplate, setSelectedTemplate] = useState(metadata.templates[0] ?? "");
-  const [language, setLanguage] = useState<WorkspaceLanguage>("English");
+  const [language, setLanguage] = useState<WorkspaceLanguage>(() =>
+    getInitialGlsGenerationLanguage(),
+  );
   const [theme, setTheme] = useState<WorkspaceTheme>("Gold");
   const [depth, setDepth] = useState<GenerationDepth>("standard");
   const [selectedOutputs, setSelectedOutputs] = useState<string[]>(
@@ -283,7 +286,7 @@ export function useWorkspaceTool({
     const payload = {
       prompt: brief,
       template: selectedTemplate,
-      language,
+      ...glsGenerationLanguagePayload(language),
       theme,
       features,
       productId,

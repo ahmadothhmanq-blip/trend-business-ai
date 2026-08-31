@@ -1,15 +1,20 @@
 "use client";
 
-import { SlotImage } from "@/lib/website/template-v2/slots";
-
-const DEFAULT_METRICS = [
-  { value: "38%", label: "Pipeline velocity", trend: "+12% QoQ" },
-  { value: "$2.4M", label: "ARR unlocked", trend: "avg. deal" },
-  { value: "14d", label: "Time to value", trend: "median" },
-  { value: "99.9%", label: "Uptime SLA", trend: "FY25" },
+const SIDEBAR_ITEMS = [
+  { label: "Overview", active: true },
+  { label: "Pipeline", active: false },
+  { label: "Accounts", active: false },
+  { label: "Forecast", active: false },
+  { label: "Playbooks", active: false },
+  { label: "Settings", active: false },
 ];
 
-const TRUST_BRANDS = ["Vercel", "Linear", "Stripe", "Notion", "Figma", "Ramp"];
+const TABLE_ROWS = [
+  { account: "Northwind Labs", stage: "Expand", value: "$182k", health: "Strong" },
+  { account: "Helix Group", stage: "Negotiate", value: "$96k", health: "Watch" },
+  { account: "Axiom Systems", stage: "Discover", value: "$64k", health: "Strong" },
+  { account: "Vertex Retail", stage: "Commit", value: "$210k", health: "Critical" },
+];
 
 type SaasEnterpriseHeroProps = {
   title?: string;
@@ -18,118 +23,121 @@ type SaasEnterpriseHeroProps = {
   primaryCta?: string;
   secondaryCta?: string;
   imageUrl?: string | null;
-  metrics?: Array<{ value: string; label: string; trend?: string }>;
+  brandName?: string;
 };
 
 export function SaasEnterpriseHero({
-  title = "Command your revenue operations at enterprise scale",
-  subtitle = "Unify pipeline intelligence, forecast accuracy, and account expansion in one platform built for high-growth GTM teams.",
-  eyebrow = "Revenue command platform",
-  primaryCta = "Book a demo",
-  secondaryCta = "View platform tour",
-  imageUrl,
-  metrics = DEFAULT_METRICS,
+  title = "Revenue workspace for enterprise GTM teams",
+  subtitle = "Pipeline, forecast, and expansion signals in one product surface — not a brochure hero.",
+  eyebrow = "Nexus Command",
+  primaryCta = "Open workspace",
+  secondaryCta = "Browse modules",
+  imageUrl = null,
+  brandName = "Nexus",
 }: SaasEnterpriseHeroProps) {
   return (
     <section
       id="top"
       data-v2-component="saas-enterprise-hero"
       aria-labelledby="se-hero-title"
-      className="se-section relative min-h-[min(94vh,58rem)] overflow-hidden bg-[var(--color-background)] pb-12 pt-14 sm:pt-18 lg:pb-16 lg:pt-20"
+      className="se-appshell"
     >
-      <div className="se-grid-bg pointer-events-none absolute inset-0 opacity-60" aria-hidden />
-      <div
-        className="se-glow-orb pointer-events-none absolute start-1/4 top-0 h-80 w-80 bg-[var(--color-primary)]"
-        aria-hidden
-      />
-      <div
-        className="se-glow-orb pointer-events-none absolute end-0 top-1/4 h-64 w-64 bg-[var(--color-signal)] opacity-30"
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--border-accent)] to-transparent"
-        aria-hidden
-      />
+      <div className="se-appshell-frame">
+        <aside className="se-appshell-sidebar" aria-label="Product navigation">
+          <p className="se-appshell-side-brand se-font-display">{brandName}</p>
+          <nav className="se-appshell-side-nav">
+            {SIDEBAR_ITEMS.map((item) => (
+              <a
+                key={item.label}
+                href={item.active ? "#features" : "#pricing"}
+                className={item.active ? "is-active" : undefined}
+                aria-current={item.active ? "page" : undefined}
+              >
+                {item.label}
+              </a>
+            ))}
+          </nav>
+          <div className="se-appshell-side-meta">
+            <p>Org · Acme Global</p>
+            <p>Role · RevOps admin</p>
+          </div>
+        </aside>
 
-      <div className="relative mx-auto max-w-[82rem] px-5 sm:px-8">
-        <div className="grid items-center gap-14 lg:grid-cols-12 lg:gap-12">
-          <div className="lg:col-span-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border-accent)] bg-[var(--color-surface)] px-3 py-1.5 motion-safe:animate-[se-slide-up_0.6s_ease_both]">
-              <span
-                className="h-1.5 w-1.5 rounded-full bg-[var(--color-signal)] motion-safe:animate-[se-pulse-dot_2s_ease-in-out_infinite]"
-                aria-hidden
-              />
-              <span className="se-eyebrow !text-[0.625rem] !tracking-[0.12em]">{eyebrow}</span>
+        <div className="se-appshell-canvas">
+          <header className="se-appshell-canvas-head">
+            <div>
+              <p className="se-eyebrow">{eyebrow}</p>
+              <h1 id="se-hero-title" className="se-appshell-title se-font-display">
+                {title}
+              </h1>
+              <p className="se-appshell-deck">{subtitle}</p>
             </div>
-
-            <h1
-              id="se-hero-title"
-              className="se-headline mt-6 max-w-[13ch] motion-safe:animate-[se-slide-up_0.65s_ease_0.08s_both]"
-            >
-              {title}
-            </h1>
-            <p className="se-body mt-6 max-w-lg motion-safe:animate-[se-slide-up_0.65s_ease_0.16s_both]">
-              {subtitle}
-            </p>
-            <div className="mt-9 flex flex-wrap gap-3 motion-safe:animate-[se-slide-up_0.65s_ease_0.24s_both]">
+            <div className="se-appshell-actions">
               <a href="#contact" className="se-btn-primary se-focus-ring">
                 {primaryCta}
               </a>
-              <a href="/platform" className="se-btn-secondary se-focus-ring">
+              <a href="#features" className="se-btn-secondary se-focus-ring">
                 {secondaryCta}
               </a>
             </div>
+          </header>
 
-            <div className="mt-12 border-t border-[var(--border-subtle)] pt-8 motion-safe:animate-[se-slide-up_0.65s_ease_0.32s_both]">
-              <p className="se-font-body mb-4 text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-[var(--color-muted)]">
-                Trusted by GTM teams at
-              </p>
-              <div className="flex flex-wrap gap-x-8 gap-y-3" aria-label="Trusted by leading companies">
-                {TRUST_BRANDS.map((brand) => (
-                  <span key={brand} className="se-trust-logo">
-                    {brand}
-                  </span>
+          <div className="se-appshell-panels">
+            <div className="se-panel se-panel-chart" aria-hidden>
+              <div className="se-panel-chrome">
+                <span>Forecast</span>
+                <span>Q3</span>
+              </div>
+              <div className="se-chart-bars">
+                <span style={{ height: "42%" }} />
+                <span style={{ height: "58%" }} />
+                <span style={{ height: "71%" }} />
+                <span style={{ height: "63%" }} />
+                <span style={{ height: "88%" }} />
+                <span style={{ height: "76%" }} />
+              </div>
+            </div>
+
+            <div className="se-panel se-panel-kpi" aria-hidden>
+              <div className="se-panel-chrome">
+                <span>Health</span>
+                <span>Live</span>
+              </div>
+              <p className="se-kpi-value">94.2%</p>
+              <p className="se-kpi-label">Pipeline coverage</p>
+            </div>
+          </div>
+
+          <div className="se-panel se-panel-table" role="region" aria-label="Sample accounts table">
+            <div className="se-panel-chrome">
+              <span>Accounts</span>
+              <span>Sorted by value</span>
+            </div>
+            <table className="se-table">
+              <thead>
+                <tr>
+                  <th scope="col">Account</th>
+                  <th scope="col">Stage</th>
+                  <th scope="col">Value</th>
+                  <th scope="col">Health</th>
+                </tr>
+              </thead>
+              <tbody>
+                {TABLE_ROWS.map((row) => (
+                  <tr key={row.account}>
+                    <td>{row.account}</td>
+                    <td>{row.stage}</td>
+                    <td>{row.value}</td>
+                    <td>
+                      <span className={`se-pill se-pill-${row.health.toLowerCase()}`}>{row.health}</span>
+                    </td>
+                  </tr>
                 ))}
-              </div>
-            </div>
+              </tbody>
+            </table>
           </div>
 
-          <div className="lg:col-span-6 motion-safe:animate-[se-grid-reveal_0.85s_ease_0.15s_both]">
-            <div className="se-browser-frame relative">
-              <div className="se-browser-chrome" aria-hidden>
-                <span className="se-browser-dot bg-red-400/60" />
-                <span className="se-browser-dot bg-amber-400/60" />
-                <span className="se-browser-dot bg-emerald-400/60" />
-                <span className="se-font-mono ms-2 flex-1 rounded-md bg-[var(--color-background)] px-2 py-0.5 text-center text-[0.5625rem] text-[var(--color-muted)]">
-                  app.northline.io/dashboard
-                </span>
-              </div>
-              <SlotImage
-                slot="hero"
-                index={0}
-                preferred={imageUrl}
-                alt="Northline revenue command dashboard with pipeline analytics and forecast charts"
-                className="aspect-[16/10] w-full object-cover object-top"
-                priority
-              />
-            </div>
-
-            <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {metrics.map((metric, i) => (
-                <div
-                  key={metric.label}
-                  className="se-card p-4 motion-safe:animate-[se-grid-reveal_0.6s_ease_both]"
-                  style={{ animationDelay: `${0.35 + i * 0.07}s` }}
-                >
-                  <dt className="se-metric text-2xl">{metric.value}</dt>
-                  <dd className="se-font-body mt-1 text-[0.6875rem] text-[var(--color-muted)]">{metric.label}</dd>
-                  {metric.trend ? (
-                    <dd className="se-font-mono mt-0.5 text-[0.5625rem] text-[var(--color-signal)]">{metric.trend}</dd>
-                  ) : null}
-                </div>
-              ))}
-            </dl>
-          </div>
+          {imageUrl ? <img src={imageUrl} alt="" className="sr-only" /> : null}
         </div>
       </div>
     </section>

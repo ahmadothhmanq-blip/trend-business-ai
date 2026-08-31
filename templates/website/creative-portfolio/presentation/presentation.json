@@ -1,18 +1,30 @@
 {
   "packageId": "creative-portfolio",
-  "templateIntelligenceHint": "ti-creative-studio",
+  "templateIntelligenceHint": "ti-agency-portfolio",
   "layout": {
-    "defaultLayoutId": "editorial-reveal",
+    "defaultLayoutId": "default",
     "regions": {
-      "header": { "role": "header", "sticky": true },
-      "main": { "role": "main" },
-      "overlay": { "role": "overlay" },
-      "footer": { "role": "footer" }
+      "header": {
+        "role": "header",
+        "sticky": true
+      },
+      "main": {
+        "role": "main"
+      },
+      "utility": {
+        "role": "utility"
+      },
+      "footer": {
+        "role": "footer"
+      },
+      "overlay": {
+        "role": "overlay"
+      }
     }
   },
   "navigation": {
     "componentId": "creative-portfolio-nav",
-    "variant": "studio-transparent"
+    "variant": "enterprise-glass"
   },
   "hero": {
     "componentId": "creative-portfolio-hero",
@@ -26,14 +38,22 @@
     "regions": {
       "main": [
         "creative-portfolio-hero",
-        "creative-portfolio-selected-work",
-        "creative-portfolio-case-grid",
-        "creative-portfolio-manifesto",
-        "creative-portfolio-capabilities",
-        "creative-portfolio-process",
-        "creative-portfolio-collaborate-cta"
+        "creative-portfolio-features",
+        "creative-portfolio-portfolio",
+        "creative-portfolio-integrations",
+        "creative-portfolio-about",
+        "creative-portfolio-stats",
+        "creative-portfolio-testimonials",
+        "creative-portfolio-pricing",
+        "creative-portfolio-faq",
+        "creative-portfolio-contact"
       ],
-      "overlay": ["creative-portfolio-overlay-showcase"]
+      "utility": [
+        "creative-portfolio-utility-band"
+      ],
+      "overlay": [
+        "creative-portfolio-floating-cta"
+      ]
     }
   },
   "sectionShell": {
@@ -41,7 +61,11 @@
     "componentId": "creative-portfolio-section-shell"
   },
   "aiGeneration": {
-    "contentProfile": "creative-portfolio-kinetic",
-    "suggestedPages": ["work", "studio", "contact"]
+    "contentProfile": "creative-portfolio-gtm",
+    "suggestedPages": [
+      "platform",
+      "pricing",
+      "customers"
+    ]
   }
 }

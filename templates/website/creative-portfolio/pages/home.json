@@ -6,7 +6,7 @@
   "regions": [
     "header",
     "main",
-    "overlay",
+    "utility",
     "footer"
   ]
 }

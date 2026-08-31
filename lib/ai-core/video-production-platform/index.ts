@@ -50,15 +50,19 @@ export {
 } from "@/lib/ai-core/video-production-platform/providers";
 
 export { runFullRenderPipeline, resumeRenderJob, retryFailedClips, processPendingRenderJobs, processVideoStudioBackgroundQueue } from "@/lib/ai-core/video-production-platform/generation-pipeline";
+export { processDueProviderJobs } from "@/lib/ai-core/video-production-platform/runtime/provider-job-worker";
 
 export {
   uploadVideoStudioMedia,
   fetchRemoteToBytes,
+  fetchRemoteVideoToBytes,
   listVideoStudioMedia,
   getVideoStudioMediaPreview,
   deleteVideoStudioMedia,
   purgeGenerationMedia,
+  probeVideoStudioStorage,
   VIDEO_STUDIO_BUCKET,
+  VIDEO_STUDIO_SIGNED_URL_TTL_SEC,
 } from "@/lib/ai-core/video-production-platform/media-storage";
 
 export {
@@ -122,6 +126,7 @@ export {
   batchItemToPluginInput,
   createBatchProgress,
   updateBatchProgressPercent,
+  resolveBatchCreditLeaseAction,
   BATCH_PLAN_MAX,
   BATCH_GENERATE_MAX,
   type BatchProgressSnapshot,
@@ -167,7 +172,11 @@ export {
 export {
   buildImageToVideoBrief,
   attachSourceImageToModel,
+  ingestDirectorSourceImages,
+  collectDirectorSourceImageUrls,
+  MAX_VIDEO_STUDIO_SOURCE_IMAGES,
   type ImageToVideoInput,
+  type VideoStudioSourceImageUpload,
 } from "@/lib/ai-core/video-production-platform/image-to-video";
 
 export {
@@ -179,6 +188,16 @@ export {
   persistSocialExportAssets,
   reencodeForSocialPreset,
 } from "@/lib/ai-core/video-production-platform/social-export";
+export {
+  ProductionExportError,
+  exportProductionForSocialPreset,
+  verifyPlayableCompositeBytes,
+  sniffPlayableVideoMime,
+} from "@/lib/ai-core/video-production-platform/export-production";
+export type {
+  VerifiedCompositeArtifact,
+  ProductionExportResult,
+} from "@/lib/ai-core/video-production-platform/export-production";
 
 export {
   requestAvatarPresenterClip,
@@ -189,7 +208,10 @@ export {
   getVideoStudioEnvCatalog,
   validateVideoStudioProductionEnv,
   isVideoProviderKeyConfigured,
+  isFullRenderProviderConfigured,
   isFfmpegPathConfigured,
+  isVideoStudioStrictModeConfigured,
+  videoStudioProductionRenderBlockReason,
   VIDEO_STUDIO_ENV_DOCS,
 } from "@/lib/ai-core/video-production-platform/env-config";
 
@@ -199,5 +221,151 @@ export {
   validateClipMediaForRender,
   filterClipsForProductionAssembly,
   isProductionRenderMode,
+  isFfmpegAssemblyMethod,
   isRealProductionClipAsset,
+  isPlayableVideoMime,
 } from "@/lib/ai-core/video-production-platform/media-validation";
+export {
+  generationStatusAfterStoryboard,
+  generationStatusAfterRenderJob,
+  storyboardGeneratedMessage,
+  videoRenderedMessage,
+} from "@/lib/ai-core/video-production-platform/generation-status";
+export {
+  VIDEO_PROJECT_STATES,
+  PLAYABLE_VIDEO_MIME_TYPES,
+  DomainValidationError,
+  isValidVideoArtifact,
+  canTransition,
+  assertValidScene,
+  assertValidVideoArtifact,
+  assertValidProviderJob,
+  assertWritableProjectState,
+  isWritableProjectState,
+  readProjectFromGeneration,
+  readScenesFromBlueprint,
+  toWritableGenerationStatus,
+  type VideoProject,
+  type VideoPlan,
+  type Scene,
+  type ProviderJob,
+  type RenderJob,
+  type VideoArtifact,
+  type QualityReport,
+  type QualityVerdict,
+  type PublishTarget,
+  type AudioPlan,
+} from "@/lib/ai-core/video-production-platform/domain";
+export {
+  VideoPublishError,
+  publishVideoProject,
+  unpublishVideoProject,
+  loadPublicVideoPage,
+  buildPublicVideoHtml,
+  publicVideoPath,
+} from "@/lib/ai-core/video-production-platform/publish";
+export {
+  produceAudio,
+  resolveTtsProvider,
+  mixAudio,
+  mixPcmWav,
+  AudioEngineError,
+  audioProductionPlanFromSource,
+  toLegacyAudioPlan,
+  isNarrationRequired,
+  produceRenderAudio,
+} from "@/lib/ai-core/video-production-platform/audio-engine";
+export type {
+  VoiceTrack,
+  MusicTrack,
+  SFXTrack,
+  AudioArtifact,
+  AudioMixJob,
+  AudioProductionPlan,
+  TtsProvider,
+} from "@/lib/ai-core/video-production-platform/audio-engine";
+export {
+  runLipSync,
+  resolveLipSyncProvider,
+  heygenLipSyncProvider,
+  LipSyncError,
+} from "@/lib/ai-core/video-production-platform/lip-sync";
+export type { LipSyncProvider, RunLipSyncResult } from "@/lib/ai-core/video-production-platform/lip-sync";
+export {
+  inspectArtifactQuality,
+  canAssembleAfterQuality,
+} from "@/lib/ai-core/video-production-platform/quality-control";
+export type { ArtifactQualityReport } from "@/lib/ai-core/video-production-platform/quality-control";
+export {
+  assertTransition,
+  persistTransition,
+  transition,
+} from "@/lib/ai-core/video-production-platform/state-machine";
+export {
+  runDomainRenderPipeline,
+  retryDomainRender,
+  resumeDomainRender,
+  seedDomainProject,
+} from "@/lib/ai-core/video-production-platform/runtime";
+export {
+  ProviderRouterError,
+  createMemoryProviderJobStore,
+  createProviderRegistry,
+  persistRoutedProviderJob,
+  routeModel,
+  type ModelRouterDecision,
+  type ModelRouterInput,
+  type VideoProviderV2,
+} from "@/lib/ai-core/video-production-platform/provider-router";
+export {
+  assertCanPersistArtifact,
+  assertCanPersistProjectState,
+  buildProviderIdempotencyKey,
+  insertPlayableArtifact,
+  insertProviderJob,
+  insertQualityReport,
+  insertVideoPlan,
+  insertVideoScenes,
+  readProjectWithSceneRows,
+  readProjectWithScenes,
+  reorderVideoScenes,
+  scenesFromDomainOrLegacy,
+} from "@/lib/ai-core/video-production-platform/persistence";
+export {
+  validateVideoStudioUpload,
+  VideoStudioUploadError,
+  VIDEO_STUDIO_STILL_MAX_BYTES,
+  VIDEO_STUDIO_VIDEO_MAX_BYTES,
+  VIDEO_STUDIO_UPLOAD_MAX_BYTES,
+} from "@/lib/ai-core/video-production-platform/upload-validation";
+export {
+  activatePlan,
+  archivePlan,
+  listProjectPlanVersions,
+  loadActivePlanScenes,
+  PlanVersioningError,
+} from "@/lib/ai-core/video-production-platform/plan-versioning";
+export type { ActivatePlanResult, PlanVersion } from "@/lib/ai-core/video-production-platform/plan-versioning";
+export {
+  regenerateScene,
+  SceneRegenerationError,
+  type RegenerateSceneOptions,
+  type RegenerateSceneResult,
+} from "@/lib/ai-core/video-production-platform/scene-regeneration";
+export {
+  runDirector,
+  projectDirectorBlueprint,
+  directorInputFromGenerateRequest,
+  assertDirectorInput,
+  assertDirectorPlan,
+  hydrateDirectorPlan,
+  DirectorError,
+  DIRECTOR_ASPECT_RATIOS,
+  DIRECTOR_SPEC_VERSION,
+} from "@/lib/ai-core/video-production-platform/director";
+export type {
+  DirectorInput,
+  DirectorVideoPlan,
+  DirectorScene,
+  DirectorResult,
+} from "@/lib/ai-core/video-production-platform/director";

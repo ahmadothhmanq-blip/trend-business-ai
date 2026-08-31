@@ -9,7 +9,9 @@ import {
   isThemeFloatingCtaComponent,
   isThemeFooterComponent,
   isThemeNavComponent,
+  resolveThemeIdFromComponent,
 } from "@/lib/website/builder/theme-component-registry";
+import { remapHomeComponentOrder } from "@/lib/website/visual-skin/remap-home-to-theme";
 
 /** Explicit home component trees — nav/footer/floating-cta preserved, body sections uniquely ordered. */
 const HOME_COMPONENT_ORDERS: Record<string, DesignRendererComponentId[]> = {
@@ -34,15 +36,17 @@ const HOME_COMPONENT_ORDERS: Record<string, DesignRendererComponentId[]> = {
     "ThemeCorporateFooter",
   ],
   "ti-saas-growth": [
-    "ThemeBoldNav",
-    "ThemeBoldHero",
-    "ThemeBoldPortfolio",
-    "ThemeBoldIntegrations",
-    "ThemeBoldFeatures",
-    "ThemeBoldFaq",
-    "ThemeBoldPricing",
-    "ThemeBoldFooter",
-    "ThemeBoldFloatingCta",
+    "ThemeGlobalNav",
+    "ThemeGlobalHero",
+    "ThemeGlobalShowcase",
+    "ThemeGlobalIntegrations",
+    "ThemeGlobalFeatures",
+    "ThemeGlobalTestimonials",
+    "ThemeGlobalFaq",
+    "ThemeGlobalPricing",
+    "ThemeGlobalContact",
+    "ThemeGlobalFooter",
+    "ThemeGlobalFloatingCta",
   ],
   "ti-ai-company-signal": [
     "ThemeTechNav",
@@ -221,6 +225,15 @@ const HOME_COMPONENT_ORDERS: Record<string, DesignRendererComponentId[]> = {
     "ThemeEditorialGallery",
     "ThemeEditorialFooter",
   ],
+  "ti-red-premium": [
+    "ThemeEditorialNav",
+    "ThemeEditorialHero",
+    "ThemeEditorialMagazine",
+    "ThemeEditorialStory",
+    "ThemeEditorialGallery",
+    "ThemeEditorialTimeline",
+    "ThemeEditorialFooter",
+  ],
   "ti-ecommerce-atelier": [
     "ThemeMinimalNav",
     "ThemeMinimalHero",
@@ -233,10 +246,10 @@ const HOME_COMPONENT_ORDERS: Record<string, DesignRendererComponentId[]> = {
   "ti-luxury-brands-atelier": [
     "ThemeLuxuryNav",
     "ThemeLuxuryHero",
-    "ThemeLuxuryGallery",
-    "ThemeLuxuryCta",
     "ThemeLuxuryStory",
+    "ThemeLuxuryGallery",
     "ThemeLuxuryTestimonials",
+    "ThemeLuxuryCta",
     "ThemeLuxuryFooter",
   ],
   "ti-beauty-glow": [
@@ -326,10 +339,29 @@ export function getIndustryHomeComponents(
   templateIntelligenceId: string,
   themeId: WebsiteThemePresetId,
 ): DesignRendererComponentId[] {
+  return getIndustryHomeComponentsForTheme(templateIntelligenceId, themeId);
+}
+
+/**
+ * Industry section plan → target theme component library.
+ * When the industry TI uses a different theme, roles are remapped (industry preserved, frame swapped).
+ */
+export function getIndustryHomeComponentsForTheme(
+  templateIntelligenceId: string,
+  targetThemeId: WebsiteThemePresetId,
+): DesignRendererComponentId[] {
   const order = HOME_COMPONENT_ORDERS[templateIntelligenceId];
-  if (!order) return getThemeComponentIds(themeId);
-  assertValidOrder(templateIntelligenceId, themeId, order);
-  return order;
+  if (!order) return getThemeComponentIds(targetThemeId);
+
+  const sourceThemeId = resolveThemeIdFromComponent(order[0] ?? "");
+  if (sourceThemeId === targetThemeId) {
+    assertValidOrder(templateIntelligenceId, targetThemeId, order);
+    return order;
+  }
+
+  const remapped = remapHomeComponentOrder(order, targetThemeId);
+  assertValidOrder(templateIntelligenceId, targetThemeId, remapped);
+  return remapped;
 }
 
 /** Layout signature for uniqueness validation — body section order only. */

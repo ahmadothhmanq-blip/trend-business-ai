@@ -80,7 +80,7 @@ export function VideoStudioProviderStatus({ className, compact }: Props) {
       icon: Sparkles,
       label: p("providerStatus.fullRender"),
       value: health.fullRenderProvider || "preview",
-      ok: klingReady || health.fullRenderProvider === "kling",
+      ok: Boolean(klingReady),
       hint: klingReady
         ? p("providerStatus.klingReady")
         : p("providerStatus.klingMissing"),

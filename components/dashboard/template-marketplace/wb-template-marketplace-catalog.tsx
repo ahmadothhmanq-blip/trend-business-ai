@@ -15,13 +15,16 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
+import { useTranslation } from "@/lib/i18n/client";
 import type { WbTemplateMarketplaceListing } from "@/lib/website/template-marketplace/types";
+import { resolveTemplateListingDisplayName } from "@/lib/website/template-marketplace/display-name";
 import type {
   WbTemplateMarketplaceSortDirection,
   WbTemplateMarketplaceSortField,
 } from "@/lib/website/template-marketplace/types";
 import {
   canSelectMarketplaceListing,
+  canInstallMarketplaceListing,
   mapMarketplaceListingToListItem,
 } from "@/lib/website/template-marketplace";
 import {
@@ -78,6 +81,7 @@ export function WbTemplateMarketplaceCatalog({
 }: WbTemplateMarketplaceCatalogProps) {
   const pt = useProductT("templateMarketplace");
   const wb = useProductT("websiteBuilder");
+  const { locale } = useTranslation();
 
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
@@ -188,8 +192,12 @@ export function WbTemplateMarketplaceCatalog({
 
       toast.success(
         result.alreadyInstalled
-          ? pt("installAlreadyDone", { name: result.listing.name })
-          : pt("installSuccess", { name: result.listing.name }),
+          ? pt("installAlreadyDone", {
+              name: resolveTemplateListingDisplayName(result.listing, locale),
+            })
+          : pt("installSuccess", {
+              name: resolveTemplateListingDisplayName(result.listing, locale),
+            }),
       );
       await loadCatalog();
 
@@ -492,7 +500,11 @@ function ListingPreviewDialog({
   installingId?: string | null;
 }) {
   const pt = useProductT("templateMarketplace");
+  const { locale } = useTranslation();
   const open = Boolean(listing);
+  const displayName = listing
+    ? resolveTemplateListingDisplayName(listing, locale)
+    : "";
   const thumbnail = listing ? resolveMarketplaceListingThumbnail(listing) : null;
   const gradient = listing
     ? (CATEGORY_GRADIENTS[listing.category] ?? CATEGORY_GRADIENTS.other)
@@ -504,7 +516,7 @@ function ListingPreviewDialog({
         {listing ? (
           <>
             <DialogHeader>
-              <DialogTitle>{listing.name}</DialogTitle>
+              <DialogTitle>{displayName}</DialogTitle>
               <DialogDescription className="text-white/45">
                 {listing.description}
               </DialogDescription>
@@ -514,7 +526,7 @@ function ListingPreviewDialog({
               {thumbnail ? (
                 <Image
                   src={thumbnail}
-                  alt={listing.name}
+                  alt={displayName}
                   fill
                   unoptimized
                   className="object-cover"
@@ -586,6 +598,20 @@ function ListingPreviewDialog({
                   {pt("close")}
                 </Button>
               </div>
+            ) : listing.availability === "unavailable" ? (
+              <div className="space-y-3">
+                <p className="text-center text-[12px] font-medium text-amber-200/90">
+                  {pt("installComingSoon")}
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full gap-1.5 border-white/20 bg-white/5 text-white hover:bg-white/10"
+                  onClick={() => onOpenChange(false)}
+                >
+                  {pt("close")}
+                </Button>
+              </div>
             ) : (
               <div className="space-y-3">
                 <p className="text-center text-[12px] font-medium text-amber-200/90">
@@ -596,7 +622,11 @@ function ListingPreviewDialog({
                     type="button"
                     size="sm"
                     variant="secondary"
-                    disabled={!onInstallListing || installingId === listing.id}
+                    disabled={
+                      !onInstallListing ||
+                      installingId === listing.id ||
+                      !canInstallMarketplaceListing(listing)
+                    }
                     className="flex-1 gap-1.5 border border-dashed border-white/20 bg-white/[0.06] font-semibold text-white opacity-100 disabled:opacity-70"
                     onClick={() => onInstallListing?.(listing)}
                   >

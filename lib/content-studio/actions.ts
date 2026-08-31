@@ -4,6 +4,7 @@
 
 import { getDefaultTextProvider } from "@/lib/ai/provider-config";
 import { providerManager } from "@/lib/ai/provider-manager";
+import { aiOutputLanguageDirective } from "@/lib/ai/prompts/language-directive.server";
 import type { ContentActionType, BrandVoiceContext } from "@/types/content";
 import { brandVoiceToPromptContext } from "@/lib/content-studio/brand-voice";
 
@@ -43,8 +44,8 @@ function buildActionPrompt(input: ContentActionInput): { system: string; prompt:
   const extras: string[] = [];
   if (input.tone) extras.push(`Target tone: ${input.tone}`);
   if (input.style) extras.push(`Target style: ${input.style}`);
-  if (input.targetLanguage) extras.push(`Target language: ${input.targetLanguage}`);
-  else if (input.outputLanguage) extras.push(`Respond entirely in ${input.outputLanguage}`);
+  if (input.targetLanguage) extras.push(aiOutputLanguageDirective(input.targetLanguage, "content").trim());
+  else if (input.outputLanguage) extras.push(aiOutputLanguageDirective(input.outputLanguage, "content").trim());
   if (input.instruction) extras.push(`Additional instruction: ${input.instruction}`);
 
   const system = [

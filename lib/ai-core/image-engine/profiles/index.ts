@@ -49,6 +49,9 @@ export function resolveImageProfile(
       if (profile.aliases.some((alias) => alias === candidate)) {
         return { profile, matchedBy: "alias", confidence: 0.95 };
       }
+      if (profile.aliases.some((alias) => candidate.includes(alias) && alias.length > 2)) {
+        return { profile, matchedBy: "alias", confidence: 0.9 };
+      }
       if (
         profile.subcategories?.some(
           (sub) => sub === candidate || candidate.includes(sub),
@@ -69,6 +72,7 @@ export function resolveImageProfile(
         ...(profile.subcategories ?? []),
       ];
       const score = tokens.reduce((sum, token) => {
+        if (!token) return sum;
         if (haystack.includes(token)) return sum + token.length;
         return sum;
       }, 0);

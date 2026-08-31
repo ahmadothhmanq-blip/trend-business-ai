@@ -1,23 +1,22 @@
 {
   "id": "default",
-  "kind": "full-bleed",
+  "kind": "single-column",
   "label": "Default Layout",
   "regionOrder": [
     "header",
-    "overlay",
-    "utility",
     "main",
+    "utility",
     "footer"
   ],
   "rules": {
     "gap": "0",
-    "regionGap": "0",
-    "minHeight": "100vh"
+    "regionGap": "1rem",
+    "minHeight": "auto"
   },
   "grid": {
-    "templateAreas": "\"header\" \"utility\" \"overlay\" \"main\" \"footer\"",
+    "templateAreas": "\"header\" \"main\" \"utility\" \"footer\"",
     "columns": "1fr",
-    "rows": "auto auto auto auto auto",
+    "rows": "repeat(4, auto)",
     "gap": "0"
   }
 }

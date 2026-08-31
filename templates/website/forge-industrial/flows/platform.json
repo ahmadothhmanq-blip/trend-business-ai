@@ -1,0 +1,7 @@
+{
+  "pageId": "platform",
+  "layoutId": "default",
+  "regions": {
+    "main": ["forge-industrial-hero", "forge-industrial-features", "forge-industrial-integrations"]
+  }
+}

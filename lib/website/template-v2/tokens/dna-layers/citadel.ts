@@ -1,0 +1,322 @@
+/** Auto-generated from scripts/_skin-css/citadel.css — do not hand-edit */
+export function buildCitadelDnaCss(): string {
+  return `/* Citadel Trust — SEAL / TRUST STACK DNA (.ct-*) */
+
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+@keyframes ct-reveal-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes ct-seal-settle {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ct-reveal, .ct-reveal-stagger > *, .ct-btn-primary, .ct-btn-secondary, .ct-seal {
+    animation: none !important;
+    transition: none !important;
+  }
+  .ct-reveal, .ct-reveal-stagger > *, .ct-seal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+.ct-font-display { font-family: "Cormorant Garamond", var(--font-display), Georgia, serif; }
+.ct-font-body { font-family: "Source Sans 3", var(--font-body), system-ui, sans-serif; }
+.ct-font-mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+
+.ct-eyebrow {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-accent, #B45309);
+}
+
+.ct-headline {
+  font-family: "Cormorant Garamond", var(--font-display), Georgia, serif;
+  font-size: clamp(2.5rem, 6vw, 4.25rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.02;
+  color: var(--color-foreground);
+  text-wrap: balance;
+}
+
+.ct-headline-sm {
+  font-family: "Cormorant Garamond", var(--font-display), Georgia, serif;
+  font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.1;
+  color: var(--color-foreground);
+}
+
+.ct-body {
+  font-family: "Source Sans 3", var(--font-body), system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--color-muted);
+}
+
+.ct-btn-primary,
+.ct-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.875rem;
+  padding: 0.75rem 1.5rem;
+  font-family: "Source Sans 3", var(--font-body), system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 0;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+.ct-btn-primary {
+  color: #fff;
+  background: var(--color-primary, #1C1917);
+  border: 1px solid var(--color-primary, #1C1917);
+}
+.ct-btn-primary:hover {
+  background: color-mix(in srgb, var(--color-primary) 85%, #fff);
+}
+
+.ct-btn-secondary {
+  color: var(--color-foreground);
+  background: transparent;
+  border: 1px solid var(--border-default);
+}
+.ct-btn-secondary:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.ct-focus-ring:focus-visible {
+  outline: 2px solid var(--color-accent, #B45309);
+  outline-offset: 3px;
+}
+
+.ct-section { padding-block: clamp(4rem, 9vw, 6.5rem); }
+.ct-section-alt {
+  background: color-mix(in srgb, var(--color-surface) 92%, var(--color-background));
+}
+
+.ct-dossier {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 96%, #d6d3d1) 0%, var(--color-background) 100%);
+}
+
+.ct-seal {
+  width: 7.5rem;
+  height: 7.5rem;
+  border-radius: 50%;
+  border: 2px solid var(--color-accent, #B45309);
+  display: grid;
+  place-items: center;
+  margin-inline: auto;
+  background:
+    radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--color-accent) 18%, transparent), transparent 62%),
+    var(--color-surface);
+  box-shadow: inset 0 0 0 6px color-mix(in srgb, var(--color-accent) 22%, transparent);
+  animation: ct-seal-settle 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.ct-seal-inner {
+  width: 5.25rem;
+  height: 5.25rem;
+  border-radius: 50%;
+  border: 1px dashed var(--color-accent, #B45309);
+  display: grid;
+  place-items: center;
+  text-align: center;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-primary, #1C1917);
+  line-height: 1.15;
+}
+
+.ct-credential {
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  font-size: 0.9375rem;
+  letter-spacing: 0.02em;
+  color: var(--color-muted);
+  text-wrap: balance;
+}
+
+/* Stacked credential documents */
+.ct-doc {
+  position: relative;
+  border: 1px solid var(--border-default);
+  background: var(--color-surface);
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, var(--color-foreground) 6%, transparent),
+    0 18px 40px -28px color-mix(in srgb, var(--color-foreground) 35%, transparent);
+}
+.ct-doc + .ct-doc {
+  margin-top: 1.25rem;
+}
+.ct-doc-ribbon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+.ct-doc-seal-mark {
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 25%, transparent);
+}
+
+.ct-article {
+  border-top: 1px solid var(--border-subtle);
+  padding-block: 1.35rem;
+}
+.ct-article:first-of-type { border-top: 0; padding-top: 0; }
+.ct-article-num {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+.ct-article-title {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 0.35rem;
+  color: var(--color-foreground);
+}
+
+.ct-attestation {
+  border: 1px solid var(--border-default);
+  background: var(--color-background);
+  padding: 1.5rem 1.35rem;
+}
+.ct-attestation-seal {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-accent);
+  display: grid;
+  place-items: center;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  margin-bottom: 1rem;
+}
+
+.ct-letter {
+  border: 1px solid var(--border-default);
+  background: var(--color-surface);
+  padding: 1.75rem 1.5rem;
+}
+.ct-letter-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.ct-reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1); }
+.ct-reveal.df-is-visible,
+.ct-reveal.ct-is-visible,
+.ct-reveal.is-visible { opacity: 1; transform: none; }
+.ct-reveal-stagger > * { opacity: 0; transform: translateY(14px); transition: opacity 0.6s cubic-bezier(0.22,1,0.36,1), transform 0.6s cubic-bezier(0.22,1,0.36,1); }
+.ct-reveal-stagger.df-is-visible > *,
+.ct-reveal-stagger.ct-is-visible > *,
+.ct-reveal-stagger.is-visible > *,
+.ct-reveal.df-is-visible .ct-reveal-stagger > * { opacity: 1; transform: none; }
+.ct-reveal-stagger > *:nth-child(1) { transition-delay: 0.05s; }
+.ct-reveal-stagger > *:nth-child(2) { transition-delay: 0.12s; }
+.ct-reveal-stagger > *:nth-child(3) { transition-delay: 0.19s; }
+.ct-reveal-stagger > *:nth-child(4) { transition-delay: 0.26s; }
+.ct-reveal-stagger > *:nth-child(5) { transition-delay: 0.33s; }
+.ct-reveal-stagger > *:nth-child(6) { transition-delay: 0.4s; }
+
+.ct-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid var(--border-default);
+  background: color-mix(in srgb, var(--color-surface) 94%, transparent);
+  backdrop-filter: blur(10px);
+}
+.ct-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  max-width: 88rem;
+  margin-inline: auto;
+  min-height: 4rem;
+  padding-inline: 1.25rem;
+}
+@media (min-width: 640px) {
+  .ct-nav-inner { padding-inline: 2rem; }
+}
+.ct-nav-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: var(--color-foreground);
+}
+.ct-nav-crest {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-accent);
+  display: grid;
+  place-items: center;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+.ct-nav-name {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.ct-nav-links {
+  display: none;
+  gap: 1.75rem;
+}
+@media (min-width: 1024px) {
+  .ct-nav-links { display: flex; }
+}
+.ct-nav-links a {
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  font-size: 0.875rem;
+  text-decoration: none;
+  color: var(--color-muted);
+}
+.ct-nav-links a:hover { color: var(--color-foreground); }
+`;
+}

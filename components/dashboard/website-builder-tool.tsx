@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
@@ -8,11 +8,12 @@ import { isWebsiteIncrementalPreviewEnabled } from "@/lib/website/generation-fla
 import { recoverAfterIncompleteSse } from "@/lib/website/post-stream-handoff-recovery";
 import { tryRecoverCompletedWebsiteGeneration } from "@/lib/website/stream-recovery";
 import { getClientStreamRecoveryPollMs } from "@/lib/website/stream-limits";
-import { upsertRecentProject } from "@/lib/website/recent-projects";
+import { mergeRecentProjectsList, upsertRecentProject } from "@/lib/website/recent-projects";
 import { MAX_RECENT_PROJECTS } from "@/lib/website/constants";
 import { prepareWebsiteProjectForExport } from "@/lib/website/prepare-export";
 import { useTranslation } from "@/lib/i18n/client";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
+import { isGeneratingWebsitePlaceholderTitle } from "@/lib/ai-core/content/content-language";
 import { inferWebsiteOnboardingDefaults } from "@/lib/ai-core/website-builder/onboarding-inference";
 import {
   BUILDER_PANEL_FEATURES,
@@ -21,6 +22,10 @@ import {
   hydrateBuilderPanelFeatures,
   type BuilderPanelFeatureLabel,
 } from "@/lib/website/builder/feature-registry";
+import {
+  resolveDesignEngineAssetManifest,
+  resolveDesignEngineStrategy,
+} from "@/lib/website/builder/design-engine-view";
 import { CoreProgressStepper } from "@/components/dashboard/one-prompt";
 import { useCoreProgress } from "@/components/dashboard/one-prompt/use-core-progress";
 import { getOnePromptProduct } from "@/lib/constants/one-prompt-products";
@@ -86,33 +91,44 @@ import { DeploymentDashboardPanel } from "@/components/dashboard/website-builder
 import {
   type TemplateUsePayload,
 } from "@/components/dashboard/website-builder/template-selection-panel";
+import type { WebsiteThemeChoice } from "@/components/dashboard/website-builder/theme-selection-panel";
+import { VisualSkinCatalogPanel } from "@/components/dashboard/website-builder/visual-skin-catalog-panel";
 import {
-  ThemeSelectionPanel,
-  type WebsiteThemeChoice,
-} from "@/components/dashboard/website-builder/theme-selection-panel";
-import {
-  isLegacyMarketplaceStructureTemplate,
   type WebsiteStructureTemplateChoice,
-} from "@/lib/website/builder/template-catalog";
-import { getWebsiteStructureTemplate } from "@/lib/website/builder/structure-templates";
-import {
-  WebsiteStructureTemplatesPanel,
-  WebsiteStructureTemplatesRail,
 } from "@/components/dashboard/website-builder/website-structure-templates-panel";
 import { WebsiteIntelligencePanel } from "@/components/dashboard/website-builder/website-intelligence-panel";
 import { BrandKitPanel } from "@/components/dashboard/website-builder/brand-kit-panel";
 import { WebsiteBuilderCanvasWorkspace } from "@/components/dashboard/website-builder/tool/website-builder-canvas-workspace";
 import type { OutputTab } from "@/components/dashboard/website-builder/tool/types";
+import { WebsiteBuilderProjectsProvider, useWebsiteBuilderProjects } from "@/components/dashboard/website-builder/workspace-projects-context";
+import {
+  RecentProjectsGrid,
+  RecentProjectsHistory,
+} from "@/components/dashboard/website-builder/recent-projects-panel";
 import { readWebsiteBuilderApiError, formatWebsiteBuilderApiError } from "@/lib/website/builder/client-api-error";
 import { useBuilderTemplateRuntime } from "@/lib/website/builder/use-template-runtime";
 import { resolveTemplateIntelligenceForMarketplace } from "@/lib/ai-core/template-intelligence/resolve-marketplace";
 import { resolveGenerationPrompt } from "@/lib/website/builder/resolve-generation-prompt";
 import { resolveBuilderTemplatePackageId } from "@/lib/website/builder/resolve-builder-template-package-id";
 import {
-  buildBriefFromStructureTemplate,
   buildBriefFromTemplatePayload,
   resolveEffectiveProjectBrief,
 } from "@/lib/website/builder/resolve-effective-project-brief";
+import { GlsGenerationLanguageSelect } from "@/components/dashboard/language/gls-generation-language-select";
+import { SiteImageStrategySelect } from "@/components/dashboard/website-builder/site-image-strategy-select";
+import { ProWorkspaceShell } from "@/components/dashboard/website-builder/pro-workspace-shell";
+import { DEFAULT_VISUAL_SKIN_ID } from "@/lib/website/visual-skin/catalog";
+import {
+  getVisualSkin,
+  hasPublishedVisualSkins,
+} from "@/lib/website/visual-skin/registry";
+import { isProWorkspaceClientEnabled } from "@/lib/website/generation-flags";
+import type { SiteImageStrategyMode } from "@/lib/website/site-plan/image-strategy";
+import {
+  isGlsGenerationLanguage,
+  normalizeGlsGenerationLanguage,
+} from "@/lib/language-platform/generation/options";
+import { getInitialGlsGenerationLanguage, glsGenerationLanguagePayload } from "@/lib/language-platform/generation/service";
 
 type WebsiteBuilderToolProps = {
   /** Serializable product id only — never pass ProductDefinition (contains LucideIcon). */
@@ -141,33 +157,20 @@ type WorkspaceProject = {
   promptVersions?: PromptVersion[];
 };
 
+/** Minimal project identity for ZIP export (full workspace or recent-projects list). */
+type DownloadableProject = Pick<WorkspaceProject, "id" | "title">;
+
+function isWorkspaceProject(
+  project: DownloadableProject | WorkspaceProject,
+): project is WorkspaceProject {
+  return "style" in project;
+}
+
 type PreviewBuildState = {
   status: "idle" | "building" | "success" | "error";
   previewUrl?: string;
   buildOutput?: string;
   error?: string;
-};
-
-const LANGUAGES = [
-  "English",
-  "Arabic",
-  "Bilingual",
-  "Spanish",
-  "French",
-  "German",
-  "Portuguese",
-  "Italian",
-] as const;
-
-const LANGUAGE_KEYS: Record<(typeof LANGUAGES)[number], string> = {
-  English: "english",
-  Arabic: "arabic",
-  Bilingual: "bilingual",
-  Spanish: "spanish",
-  French: "french",
-  German: "german",
-  Portuguese: "portuguese",
-  Italian: "italian",
 };
 
 const PAGES = ["Home", "About", "Services", "Pricing", "Dashboard", "Admin", "Contact"];
@@ -286,9 +289,15 @@ function toProject(generation: WebsiteGeneration): WorkspaceProject {
     ? generation.blueprint
     : undefined;
 
+  const blueprintTitle = generatedProject?.title?.trim() || "";
+  const projectName = generation.project_name?.trim() || "";
+  const title = isGeneratingWebsitePlaceholderTitle(blueprintTitle)
+    ? projectName || blueprintTitle
+    : blueprintTitle || projectName;
+
   return {
     id: generation.id,
-    title: generation.project_name,
+    title,
     type: generation.website_type,
     style: generation.design_style,
     theme: generation.color_style,
@@ -333,7 +342,7 @@ export function WebsiteBuilderTool({
   const onePrompt = getOnePromptProduct("website-builder");
   const applyIdea = useCallback((idea: string) => {
     setProjectBrief(idea);
-  }, []);
+  }, [setProjectBrief]);
   useIdeaQueryParam(applyIdea);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [marketplaceTemplateId, setMarketplaceTemplateId] = useState<string | null>(
@@ -363,19 +372,28 @@ export function WebsiteBuilderTool({
     loading: templateRuntimeLoading,
   } = useBuilderTemplateRuntime(builderTemplatePackageId);
   const templateRuntimeModelRef = useRef(templateRuntimeModel);
-  templateRuntimeModelRef.current = templateRuntimeModel;
+  useEffect(() => {
+    templateRuntimeModelRef.current = templateRuntimeModel;
+  }, [templateRuntimeModel]);
   void templateRuntimeError;
   void templateRuntimeLoading;
   const [websiteThemeId, setWebsiteThemeId] = useState<string | null>(null);
   const [brandIdentityId, setBrandIdentityId] = useState<string | null>(null);
-  const [autoDesignHint, setAutoDesignHint] = useState<string | null>(null);
-  const [language, setLanguage] = useState<(typeof LANGUAGES)[number]>("English");
+  const [language, setLanguage] = useState(() => getInitialGlsGenerationLanguage());
+  const [imageStrategyMode, setImageStrategyMode] =
+    useState<SiteImageStrategyMode>("with-images");
+  const [visualSkinId, setVisualSkinId] = useState<string | null>(
+    DEFAULT_VISUAL_SKIN_ID,
+  );
+  const visualSkinsPublished = hasPublishedVisualSkins();
+  const proWorkspaceEnabled = isProWorkspaceClientEnabled();
   const [features, setFeatures] = useState<BuilderPanelFeatureLabel[]>([
     ...DEFAULT_BUILDER_PANEL_FEATURES,
   ]);
 
   // Template Marketplace handoff: ?templateId=&applyTemplate=1&generation=
   const pendingStructureTemplateApplyRef = useRef<string | null>(null);
+  const [streamStatus, setStreamStatus] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -404,12 +422,10 @@ export function WebsiteBuilderTool({
       );
     }
   }, []);
-  const [advancedOpen, setAdvancedOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isApplyingTemplate, setIsApplyingTemplate] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
-  const [streamStatus, setStreamStatus] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [selectedFilePath, setSelectedFilePath] = useState<string>("");
   const [outputTab, setOutputTab] = useState<OutputTab>(
@@ -424,14 +440,22 @@ export function WebsiteBuilderTool({
   const [isDeleting, setIsDeleting] = useState(false);
   const [visualEditorDirty, setVisualEditorDirty] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
-  const [projects, setProjects] = useState<WorkspaceProject[]>(
+  const [projects, setProjects] = useState<WorkspaceProject[]>(() =>
     initialGenerations.map(toProject),
   );
-  const [activeProject, setActiveProject] = useState<WorkspaceProject | null>(
+  const [activeProject, setActiveProject] = useState<WorkspaceProject | null>(() =>
     initialGenerations[0] ? toProject(initialGenerations[0]) : null,
   );
 
-  /** Authoritative Recent Projects + active workspace sync. */
+  useEffect(() => {
+    const savedSkinId =
+      activeProject?.generatedProject?.settings?.visualSkinId?.trim() || null;
+    if (savedSkinId && getVisualSkin(savedSkinId)) {
+      setVisualSkinId(savedSkinId);
+    }
+  }, [activeProject?.generatedProject?.settings?.visualSkinId]);
+
+  /** Optimistic Recent Projects + active workspace sync (instant UI update). */
   const commitWorkspaceProject = useCallback(
     (project: WorkspaceProject, options?: { activate?: boolean }) => {
       setProjects((items) => upsertRecentProject(items, project));
@@ -444,6 +468,68 @@ export function WebsiteBuilderTool({
       }
     },
     [],
+  );
+
+  const refetchRecentProjects = useCallback(
+    async (options?: {
+      expectedId?: string;
+      ensureProject?: WorkspaceProject;
+    }) => {
+      const expectedId = options?.expectedId;
+      const ensureProject = options?.ensureProject;
+
+      const loadList = async (): Promise<WebsiteGeneration[]> => {
+        const url = new URL("/api/website-builder", window.location.origin);
+        url.searchParams.set("limit", String(MAX_RECENT_PROJECTS));
+        url.searchParams.set("page", "1");
+        url.searchParams.set("_", String(Date.now()));
+
+        const response = await fetch(url.toString(), {
+          method: "GET",
+          cache: "no-store",
+          headers: {
+            Accept: "application/json",
+            "Cache-Control": "no-cache",
+            Pragma: "no-cache",
+          },
+        });
+        if (!response.ok) return [];
+        const data = (await response.json()) as {
+          generations?: WebsiteGeneration[];
+        };
+        return data.generations ?? [];
+      };
+
+      try {
+        let rows = await loadList();
+        if (expectedId && !rows.some((row) => row.id === expectedId)) {
+          await new Promise((resolve) => window.setTimeout(resolve, 600));
+          rows = await loadList();
+        }
+
+        const pinned =
+          options?.ensureProject ?? activeProject ?? undefined;
+        const preserveLocalIds = pinned ? [pinned.id] : [];
+
+        setProjects((current) =>
+          mergeRecentProjectsList(
+            current,
+            rows.map(toProject),
+            {
+              ensureProject: pinned,
+              preserveLocalIds,
+            },
+          ),
+        );
+      } catch {
+        const pinned =
+          options?.ensureProject ?? activeProject ?? undefined;
+        if (pinned) {
+          setProjects((items) => upsertRecentProject(items, pinned));
+        }
+      }
+    },
+    [activeProject],
   );
 
   const upsertProjectInList = useCallback((project: WorkspaceProject) => {
@@ -460,6 +546,11 @@ export function WebsiteBuilderTool({
 
   const streamAbortRef = useRef<AbortController | null>(null);
   const activeStreamSessionRef = useRef<string | null>(null);
+
+  const workspaceProjectsValue = useMemo(
+    () => ({ projects, activeProject }),
+    [projects, activeProject],
+  );
   const progressStep = useCoreProgress({
     events: streamStatus ? [`[generation] ${streamStatus}`] : [],
     active: isGenerating,
@@ -510,7 +601,7 @@ export function WebsiteBuilderTool({
         toast.error(wb("errors.api"));
       }
     },
-    [visualEditorDirty, outputTab, wb, commitWorkspaceProject],
+    [visualEditorDirty, outputTab, wb, commitWorkspaceProject, setVisualEditorDirty, setSelectedFilePath, setFileSearch, setEditMode, setOutputTab],
   );
 
   useGenerationQueryParam(openGenerationFromQuery, () => {
@@ -589,9 +680,7 @@ export function WebsiteBuilderTool({
     return () => {
       cancelled = true;
     };
-    // Only hydrate once on mount when SSR stub is empty.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [activeProject?.id, commitWorkspaceProject]);
 
   useEffect(() => {
     if (!isWebsiteIncrementalPreviewEnabled() || !isGenerating) return;
@@ -608,9 +697,26 @@ export function WebsiteBuilderTool({
         const hydrated = toProject(data.generation);
         if (cancelled || !isGenerating) return;
         upsertProjectInList(hydrated);
-        setActiveProject((current) =>
-          current?.id === hydrated.id ? hydrated : current,
-        );
+        setActiveProject((current) => {
+          if (current?.id !== hydrated.id) return current;
+          const currentProject = current.generatedProject;
+          const nextProject = hydrated.generatedProject;
+          const currentFiles = currentProject?.files?.length ?? 0;
+          const nextFiles = nextProject?.files?.length ?? 0;
+          const currentAssets =
+            currentProject?.assetManifest?.items?.filter((item) => item.url?.trim())
+              .length ?? 0;
+          const nextAssets =
+            nextProject?.assetManifest?.items?.filter((item) => item.url?.trim())
+              .length ?? 0;
+          if (
+            nextFiles < currentFiles ||
+            (currentAssets > 0 && nextAssets < currentAssets)
+          ) {
+            return current;
+          }
+          return hydrated;
+        });
         if (hydrated.generatedProject?.files?.length) {
           setSelectedFilePath((current) =>
             current && hydrated.generatedProject?.files.some((f) => f.path === current)
@@ -659,11 +765,10 @@ export function WebsiteBuilderTool({
           if (data.generation) {
             const hydrated = toProject(data.generation);
             commitWorkspaceProject(hydrated);
-            if (
-              hydrated.language &&
-              (LANGUAGES as readonly string[]).includes(hydrated.language)
-            ) {
-              setLanguage(hydrated.language as (typeof LANGUAGES)[number]);
+            if (hydrated.language && isGlsGenerationLanguage(hydrated.language)) {
+              setLanguage(normalizeGlsGenerationLanguage(hydrated.language));
+            } else if (!hydrated.language) {
+              setLanguage("English");
             }
             if (hydrated.features?.length) {
               setFeatures(hydrateBuilderPanelFeatures(hydrated.features));
@@ -688,11 +793,10 @@ export function WebsiteBuilderTool({
       }
     }
     setActiveProject(project);
-    if (
-      project.language &&
-      (LANGUAGES as readonly string[]).includes(project.language)
-    ) {
-      setLanguage(project.language as (typeof LANGUAGES)[number]);
+    if (project.language && isGlsGenerationLanguage(project.language)) {
+      setLanguage(normalizeGlsGenerationLanguage(project.language));
+    } else if (!project.language) {
+      setLanguage("English");
     }
     if (project.features?.length) {
       setFeatures(hydrateBuilderPanelFeatures(project.features));
@@ -806,7 +910,6 @@ export function WebsiteBuilderTool({
         templateRuntimeModelRef.current?.template.id ?? websiteStructureTemplateId,
       templateIndustry,
       templateComponents,
-      autoDesignHint,
       templateRuntimeModel: templateRuntimeModelRef.current,
       placeholderFallback: product?.promptPlaceholder ?? onePrompt.placeholder,
     });
@@ -879,70 +982,11 @@ export function WebsiteBuilderTool({
     setApiError(null);
     setOutputTab("preview");
 
-    let autoTiId = templateIntelligenceId;
-    let autoTiCategory = templateIntelligenceCategory;
-    let autoPreset = resolvedPreset;
-    let autoComponents = resolvedComponents;
-    let autoTemplateId = resolvedTemplateId;
-    let autoHint: string | null = autoDesignHint;
-
-    // Phase 1 — Auto Design when no explicit template chosen
-    if (
-      !tpl &&
-      !templateIntelligenceId &&
-      mode === "generate" &&
-      !options?.resume &&
-      !options?.optimize
-    ) {
-      try {
-        setStreamStatus(
-          wb("stream.aiAutoDesign"),
-        );
-        const autoRes = await fetch("/api/website-builder/design-platform", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            prompt: apiPrompt,
-            language: resolvedLanguage,
-            brandStyle: inferred.designStyle,
-            industry: templateIndustry || inferred.industryId || undefined,
-          }),
-        });
-        if (autoRes.ok) {
-          const autoData = (await autoRes.json()) as {
-            decision?: {
-              templateIntelligenceId: string;
-              vertical: string;
-              family: string;
-              reason: string;
-              designPreset: string;
-              components: string[];
-              premiumTemplateId?: string;
-            };
-          };
-          if (autoData.decision) {
-            autoTiId = autoData.decision.templateIntelligenceId;
-            autoTiCategory = autoData.decision.family;
-            autoPreset = autoData.decision.designPreset || autoPreset;
-            if (autoData.decision.components?.length) {
-              autoComponents = autoData.decision.components;
-            }
-            if (autoData.decision.premiumTemplateId) {
-              autoTemplateId = autoData.decision.premiumTemplateId;
-            }
-            autoHint = `${autoData.decision.vertical} · ${autoData.decision.family} — ${autoData.decision.reason}`;
-            setTemplateIntelligenceId(autoTiId);
-            setTemplateIntelligenceCategory(autoTiCategory);
-            if (autoPreset) setDesignPreset(autoPreset);
-            if (autoComponents.length) setTemplateComponents(autoComponents);
-            if (autoTemplateId) setSelectedTemplateId(autoTemplateId);
-            setAutoDesignHint(autoHint);
-          }
-        }
-      } catch {
-        // Runner still auto-designs server-side
-      }
-    }
+    const autoTiId = templateIntelligenceId;
+    const autoTiCategory = templateIntelligenceCategory;
+    const autoPreset = resolvedPreset;
+    const autoComponents = resolvedComponents;
+    const autoTemplateId = resolvedTemplateId;
 
     setStreamStatus(
       options?.layerImprove === "strategy"
@@ -957,7 +1001,7 @@ export function WebsiteBuilderTool({
                 ? wb("stream.resuming")
                 : tpl
                   ? `Creating website from template: ${tpl.name}…`
-                  : autoHint || wb("stream.connecting"),
+                  : wb("stream.connecting"),
     );
 
     const mergedDesignSystem = {
@@ -968,7 +1012,7 @@ export function WebsiteBuilderTool({
     const requestBody = {
       prompt: apiPrompt,
       projectType: resolvedProjectType,
-      language: resolvedLanguage,
+      ...glsGenerationLanguagePayload(resolvedLanguage),
       theme: `${inferredTheme}${resolvedThemeStyle}`,
       features: [
         ...features,
@@ -1016,18 +1060,27 @@ export function WebsiteBuilderTool({
               projectBrief.trim() ||
               (options?.optimize ? optimizeInstruction : undefined),
       optimizeWithAi: Boolean(options?.optimize),
+      imageStrategyMode,
+      ...(visualSkinId ? { visualSkinId } : {}),
     };
 
     const applySavedGeneration = (
       generatedProject: GeneratedWebsiteProject,
       generation: WebsiteGeneration,
     ) => {
+      generationAppliedToWorkspace = true;
       const nextProject = toProject({
         ...generation,
         blueprint: generatedProject as unknown as WebsiteGeneration["blueprint"],
       });
 
+      // 1) Optimistic — show in Recent Projects + activate immediately.
       commitWorkspaceProject(nextProject);
+      // 2) Background sync — merge API list without wiping the optimistic row.
+      void refetchRecentProjects({
+        expectedId: nextProject.id,
+        ensureProject: nextProject,
+      });
       setSelectedFilePath(
         generatedProject.files.find((f) => f.path.includes("preview/"))?.path ||
           generatedProject.files[0]?.path ||
@@ -1083,8 +1136,10 @@ export function WebsiteBuilderTool({
     streamAbortRef.current = streamAbort;
     activeStreamSessionRef.current = null;
 
+    let sessionGenerationId: string | null = null;
+    let generationAppliedToWorkspace = false;
+
     try {
-      let sessionGenerationId: string | null = null;
       const streamResponse = await fetch("/api/website-builder/stream", {
         method: "POST",
         headers: {
@@ -1180,6 +1235,14 @@ export function WebsiteBuilderTool({
               applySavedGeneration(payload.project, payload.generation);
               setPreviewRevision((n) => n + 1);
               return;
+            }
+
+            if (payload.summary?.title) {
+              setActiveProject((current) => {
+                if (!current?.id) return current;
+                if (!isGeneratingWebsitePlaceholderTitle(current.title)) return current;
+                return { ...current, title: payload.summary!.title! };
+              });
             }
 
             const generationId =
@@ -1304,6 +1367,16 @@ export function WebsiteBuilderTool({
         streamAbortRef.current = null;
       }
       setIsGenerating(false);
+      if (
+        !generationAppliedToWorkspace &&
+        (sessionGenerationId || activeStreamSessionRef.current)
+      ) {
+        void refetchRecentProjects({
+          expectedId:
+            sessionGenerationId ?? activeStreamSessionRef.current ?? undefined,
+          ensureProject: activeProject ?? undefined,
+        });
+      }
       window.setTimeout(() => setStreamStatus(null), 1200);
     }
   }
@@ -1321,7 +1394,7 @@ export function WebsiteBuilderTool({
     setWebsiteStructureTemplateId(null);
     setWebsiteThemeId(null);
     setBrandIdentityId(null);
-    setAutoDesignHint(null);
+    setVisualSkinId(DEFAULT_VISUAL_SKIN_ID);
     setStreamStatus(null);
   }
 
@@ -1339,48 +1412,56 @@ export function WebsiteBuilderTool({
     });
   }
 
-  function handleStructureTemplateSelect(
-    choice: WebsiteStructureTemplateChoice,
-  ) {
-    setWebsiteStructureTemplateId(choice.templatePackageId);
-    setTemplateIntelligenceId(choice.templateIntelligenceId);
-    setTemplateIndustry(choice.industry);
-    setMarketplaceTemplateId(choice.marketplaceTemplateId);
-    setSelectedTemplateId(choice.premiumTemplateId);
-    if (choice.components.length) {
-      setTemplateComponents(choice.components);
-    }
+  async function handleVisualSkinSelect(skinId: string) {
+    const skin = getVisualSkin(skinId);
+    if (!skin) return;
+    setVisualSkinId(skinId);
     if (!activeProject?.id) {
-      setProjectBrief(
-        buildBriefFromStructureTemplate(choice, language, {
-          components: choice.components,
-        }),
-      );
-      toast.success(wb("templates.structureApplied", { name: choice.label }));
       return;
     }
     if (
-      isLegacyMarketplaceStructureTemplate(choice) &&
-      choice.templateIntelligenceId
+      activeProject.generatedProject?.settings?.visualSkinId === skinId
     ) {
-      void applyTemplateIntelligenceToActiveProject(
-        choice.templateIntelligenceId,
-      ).then((ok) => {
-        if (ok) {
-          toast.success(
-            wb("templates.structureRedesigned", { name: choice.label }),
-          );
-        }
-      });
       return;
     }
-    void applyStructureTemplateToActiveProject(choice).then((ok) => {
-      if (ok) {
-        toast.success(
-          wb("templates.structureRedesigned", { name: choice.label }),
-        );
+    setIsApplyingTemplate(true);
+    try {
+      const res = await fetch(
+        `/api/website-builder/${activeProject.id}/visual-skin`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ visualSkinId: skinId }),
+        },
+      );
+      const data = (await res.json()) as {
+        error?: string;
+        project?: GeneratedWebsiteProject;
+      };
+      if (!res.ok) {
+        throw new Error(data.error ?? wb("panels.failedApplyTemplate"));
       }
-    });
+      if (data.project && activeProject) {
+        commitWorkspaceProject({
+          ...activeProject,
+          generatedProject: data.project,
+        });
+        setPreviewRevision((n) => n + 1);
+      }
+      toast.success(wb("templates.structureRedesigned", { name: skin.label }));
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : wb("panels.failedApplyTemplate"),
+      );
+    } finally {
+      setIsApplyingTemplate(false);
+    }
+  }
+
+  function handleStructureTemplateSelect(
+    choice: WebsiteStructureTemplateChoice,
+  ) {
+    void handleVisualSkinSelect(choice.skinId);
   }
 
   function handleThemeSelect(choice: WebsiteThemeChoice) {
@@ -1392,63 +1473,10 @@ export function WebsiteBuilderTool({
   }
 
   async function applyStructureTemplateToActiveProject(
-    choice: Pick<WebsiteStructureTemplateChoice, "templatePackageId" | "label">,
+    choice: WebsiteStructureTemplateChoice,
   ): Promise<boolean> {
-    if (!activeProject?.id) return false;
-    setIsApplyingTemplate(true);
-    setApiError(null);
-    setStreamStatus(wb("stream.applyingEdit"));
-    try {
-      const res = await fetch(
-        `/api/website-builder/${activeProject.id}/template`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            templatePackageId: choice.templatePackageId,
-          }),
-        },
-      );
-      const data = (await res.json()) as {
-        error?: string;
-        generation?: unknown;
-        project?: unknown;
-        structureTemplateId?: string | null;
-        template?: {
-          id: string;
-          name: string;
-          category: string;
-          designPreset: string;
-          designStyle: string;
-          premiumTemplateId?: string;
-          components: string[];
-        };
-      };
-      if (!res.ok) {
-        throw new Error(data.error || wb("panels.failedApplyTemplate"));
-      }
-      if (data.structureTemplateId) {
-        setWebsiteStructureTemplateId(data.structureTemplateId);
-        setSelectedTemplateId(data.structureTemplateId);
-      }
-      if (data.generation && data.project) {
-        handleTemplateIntelligenceApplied({
-          generation: data.generation,
-          project: data.project,
-          template: data.template,
-        });
-      }
-      return true;
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : wb("errors.generic");
-      setApiError(message);
-      toast.error(message);
-      return false;
-    } finally {
-      setIsApplyingTemplate(false);
-      window.setTimeout(() => setStreamStatus(null), 800);
-    }
+    await handleVisualSkinSelect(choice.skinId);
+    return true;
   }
 
   async function applyTemplateIntelligenceToActiveProject(
@@ -1625,11 +1653,7 @@ export function WebsiteBuilderTool({
       `${url.pathname}${url.search}${url.hash}`,
     );
 
-    const template = getWebsiteStructureTemplate(pendingId);
-    void applyStructureTemplateToActiveProject({
-      templatePackageId: pendingId,
-      label: template?.label ?? pendingId,
-    });
+    void handleVisualSkinSelect(pendingId);
   }, [activeProject?.id, isApplyingTemplate]);
 
   async function handleUseTemplate(payload: TemplateUsePayload) {
@@ -1645,25 +1669,7 @@ export function WebsiteBuilderTool({
     setOutputTab("preview");
 
     if (activeProject?.id) {
-      const structureTemplate = getWebsiteStructureTemplate(resolvedTemplateId);
-      if (structureTemplate) {
-        const applied = await applyStructureTemplateToActiveProject({
-          templatePackageId: resolvedTemplateId,
-          label: payload.name,
-        });
-        if (applied) return;
-      }
-
-      const templateIntelligenceId = resolveTemplateIntelligenceForMarketplace({
-        style: payload.style,
-        designPreset: payload.designPreset,
-        marketplaceTemplateId: payload.marketplaceTemplateId,
-      });
-      if (!templateIntelligenceId) {
-        toast.error(wb("panels.failedApplyTemplate"));
-        return;
-      }
-      await applyTemplateIntelligenceToActiveProject(templateIntelligenceId);
+      await handleVisualSkinSelect(resolvedTemplateId);
       return;
     }
 
@@ -1846,13 +1852,18 @@ export function WebsiteBuilderTool({
     toast.success(wb("toasts.fileCopied"));
   }
 
-  async function downloadProject(project = activeProject) {
-    if (!project?.id) return;
+  async function downloadProject(
+    input: DownloadableProject | WorkspaceProject | null | undefined = activeProject,
+  ) {
+    if (!input?.id) return;
+    let workspaceProject: WorkspaceProject | null = isWorkspaceProject(input)
+      ? input
+      : null;
 
     try {
       // Prefer server export — always hydrates full blueprint from DB.
       const exportResponse = await fetch(
-        `/api/website-builder/${project.id}/export`,
+        `/api/website-builder/${input.id}/export`,
       );
 
       if (exportResponse.ok) {
@@ -1861,7 +1872,7 @@ export function WebsiteBuilderTool({
         const match = disposition?.match(/filename="([^"]+)"/);
         const filename =
           match?.[1] ??
-          `${project.title.toLowerCase().replace(/[^a-z0-9]+/g, "-") || "website-project"}.zip`;
+          `${input.title.toLowerCase().replace(/[^a-z0-9]+/g, "-") || "website-project"}.zip`;
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
@@ -1874,16 +1885,16 @@ export function WebsiteBuilderTool({
 
       if (exportResponse.status === 409 || exportResponse.status === 422) {
         // Hydrate client copy, then fall back to prepared client ZIP if files appear.
-        const detail = await fetch(`/api/website-builder/${project.id}`);
+        const detail = await fetch(`/api/website-builder/${input.id}`);
         if (detail.ok) {
           const data = (await detail.json()) as {
             generation?: WebsiteGeneration;
           };
           if (data.generation) {
-            patchProject(project.id, data.generation);
+            patchProject(input.id, data.generation);
             const hydrated = toProject(data.generation);
             if (hydrated.generatedProject?.files?.length) {
-              project = hydrated;
+              workspaceProject = hydrated;
             }
           }
         }
@@ -1894,7 +1905,7 @@ export function WebsiteBuilderTool({
         throw new Error(data?.error ?? wb("errors.download"));
       }
 
-      const rawFiles = project.generatedProject?.files ?? [];
+      const rawFiles = workspaceProject?.generatedProject?.files ?? [];
       if (!rawFiles.length) {
         toast.error(
           wb("errors.download"),
@@ -1926,7 +1937,7 @@ export function WebsiteBuilderTool({
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `${project.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.zip`;
+      link.download = `${input.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.zip`;
       link.click();
       URL.revokeObjectURL(url);
       toast.success(
@@ -1970,6 +1981,10 @@ export function WebsiteBuilderTool({
   }
 
   return (
+    <WebsiteBuilderProjectsProvider
+      projects={workspaceProjectsValue.projects}
+      activeProject={workspaceProjectsValue.activeProject}
+    >
     <div className="space-y-7 lg:space-y-9">
       <DashboardPanel gold className="relative overflow-hidden p-6 sm:p-8 lg:p-10">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_0%_0%,rgb(212_175_55/0.16),transparent_55%),radial-gradient(ellipse_45%_45%_at_100%_10%,rgb(255_215_0/0.1),transparent_58%)]" />
@@ -2041,39 +2056,6 @@ export function WebsiteBuilderTool({
                 {wb("editMode.historyNote")} {wb("editMode.exampleInline")}
               </div>
             ) : null}
-            {!editMode && autoDesignHint ? (
-              <div className="mt-4 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-100">
-                <p className="font-semibold text-white">{wb("hints.aiAutoDesignReady")}</p>
-                <p className="text-[12px] text-white/55">{autoDesignHint}</p>
-              </div>
-            ) : null}
-            {!editMode && templateIntelligenceId ? (
-              <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-premium-gold/25 bg-premium-gold/10 px-4 py-3 text-sm text-premium-gold-light">
-                <div>
-                  <p className="font-semibold text-white">
-                    {wb("hints.templateIntelligenceSelected")}
-                  </p>
-                  <p className="text-[12px] text-white/55">
-                    {templateIntelligenceId}
-                    {templateIntelligenceCategory
-                      ? ` · ${templateIntelligenceCategory}`
-                      : ""}
-                    {" · "}{wb("hints.autoLayoutTheme")}
-                  </p>
-                </div>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="border-white/15 text-white"
-                  onClick={() => {
-                    setTemplateIntelligenceId(null);
-                    setTemplateIntelligenceCategory(null);
-                  }}
-                >
-                  {wb("labels.clear")}
-                </Button>
-              </div>
-            ) : null}
             <Textarea
               value={projectBrief}
               onChange={(event) => setProjectBrief(event.target.value)}
@@ -2113,38 +2095,7 @@ export function WebsiteBuilderTool({
                   }}
                 />
               </div>
-              <div>
-                <WebsiteStructureTemplatesPanel
-                  selectedId={websiteStructureTemplateId}
-                  disabled={isGenerating || isApplyingTemplate}
-                  onSelect={handleStructureTemplateSelect}
-                />
-              </div>
-              <div>
-                <ThemeSelectionPanel
-                  selectedId={websiteThemeId}
-                  disabled={isGenerating || isApplyingTemplate}
-                  activeGenerationId={activeProject?.id || null}
-                  onSelect={handleThemeSelect}
-                  onApplied={handleThemeApplied}
-                />
-              </div>
             </div>
-            ) : activeProject?.id ? (
-              <div className="mt-5 space-y-6">
-                <WebsiteStructureTemplatesPanel
-                  selectedId={websiteStructureTemplateId}
-                  disabled={isGenerating || isApplyingTemplate}
-                  onSelect={handleStructureTemplateSelect}
-                />
-                <ThemeSelectionPanel
-                  selectedId={websiteThemeId}
-                  disabled={isGenerating || isApplyingTemplate}
-                  activeGenerationId={activeProject.id}
-                  onSelect={handleThemeSelect}
-                  onApplied={handleThemeApplied}
-                />
-              </div>
             ) : null}
             {apiError && (
               <div
@@ -2180,64 +2131,72 @@ export function WebsiteBuilderTool({
             )}
           </DashboardPanel>
 
+          {!editMode && visualSkinsPublished ? (
+            <DashboardPanel data-onboarding="website-visual-skin">
+              <SectionHeader
+                icon={Palette}
+                title={wb("sections.visualSkin")}
+                description={wb("sectionDescriptions.templates")}
+              />
+              <div className="mt-5">
+                <VisualSkinCatalogPanel
+                  selectedId={visualSkinId}
+                  disabled={isGenerating || isApplyingTemplate}
+                  onSelect={(skinId) => void handleVisualSkinSelect(skinId)}
+                />
+              </div>
+            </DashboardPanel>
+          ) : null}
+
           <DashboardPanel data-onboarding="website-language">
             <SectionHeader
               icon={FileStack}
               title={wb("sections.outputLanguage")}
               description={wb("sectionDescriptions.language")}
             />
-            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {LANGUAGES.map((item) => (
-                <ChoiceCard
-                  key={item}
-                  label={wb(`languages.${LANGUAGE_KEYS[item]}`)}
-                  active={language === item}
-                  onClick={() => setLanguage(item)}
-                  compact
-                />
-              ))}
+            <div className="mt-5 max-w-md">
+              <GlsGenerationLanguageSelect
+                serviceId="website-builder"
+                value={language}
+                onChange={setLanguage}
+              />
             </div>
           </DashboardPanel>
 
-          <Button
-            type="button"
-            onClick={() => setAdvancedOpen((open) => !open)}
-            variant="outline"
-            className="btn-ghost-gold h-12 w-full rounded-2xl"
-          >
-            <Settings className="size-4" />
-            {advancedOpen ? wb("labels.hideAdvanced") : wb("labels.showAdvanced")}
-          </Button>
-
-          {advancedOpen ? (
-            <DashboardPanel data-onboarding="website-features">
-              <SectionHeader icon={LayoutDashboard} title={wb("sections.features")} description={wb("sectionDescriptions.features")} />
-              <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {BUILDER_PANEL_FEATURES.map((feature) => {
-                  const checked = features.includes(feature);
-                  return (
-                    <label
-                      key={feature}
-                      className={cn(
-                        "flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 text-sm transition-all duration-200",
-                        checked
-                          ? "border-premium-gold/35 bg-premium-gold/10 text-premium-gold-light shadow-[0_12px_36px_rgb(212_175_55/0.08)]"
-                          : "border-white/[0.08] bg-white/[0.025] text-white/55 hover:border-premium-gold/20 hover:text-white/80",
-                      )}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        onChange={() => toggleFeature(feature)}
-                        className="size-4 rounded border-white/20 accent-[#d4af37]"
-                      />
-                      {wb(`features.${BUILDER_PANEL_FEATURE_I18N[feature]}`)}
-                    </label>
-                  );
-                })}
-              </div>
-            </DashboardPanel>
-          ) : null}
+          <DashboardPanel data-onboarding="website-features">
+            <SectionHeader icon={LayoutDashboard} title={wb("sections.features")} description={wb("sectionDescriptions.features")} />
+            <div className="mt-5 max-w-md">
+              <p className="mb-2 text-xs font-medium text-white/55">Image strategy</p>
+              <SiteImageStrategySelect
+                value={imageStrategyMode}
+                onChange={setImageStrategyMode}
+              />
+            </div>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {BUILDER_PANEL_FEATURES.map((feature) => {
+                const checked = features.includes(feature);
+                return (
+                  <label
+                    key={feature}
+                    className={cn(
+                      "flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 text-sm transition-all duration-200",
+                      checked
+                        ? "border-premium-gold/35 bg-premium-gold/10 text-premium-gold-light shadow-[0_12px_36px_rgb(212_175_55/0.08)]"
+                        : "border-white/[0.08] bg-white/[0.025] text-white/55 hover:border-premium-gold/20 hover:text-white/80",
+                    )}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => toggleFeature(feature)}
+                      className="size-4 rounded border-white/20 accent-[#d4af37]"
+                    />
+                    {wb(`features.${BUILDER_PANEL_FEATURE_I18N[feature]}`)}
+                  </label>
+                );
+              })}
+            </div>
+          </DashboardPanel>
 
           {(isGenerating || streamStatus) && (
             <div className="space-y-4 rounded-2xl border border-premium-gold/20 bg-premium-gold/5 p-4">
@@ -2429,8 +2388,9 @@ export function WebsiteBuilderTool({
         onSelectFile={setSelectedFilePath}
         fileSearch={fileSearch}
         onFileSearch={setFileSearch}
-        projects={projects}
-        onSelectProject={async (project) => {
+        onSelectProject={async (projectId) => {
+          const project = projects.find((item) => item.id === projectId);
+          if (!project) return;
           setEditMode(false);
           const selected = await selectProject(project);
           if (selected) setOutputTab("preview");
@@ -2499,6 +2459,17 @@ export function WebsiteBuilderTool({
             generationId: activeProject.id,
             command,
           });
+        }}
+        onTemplateSelect={handleStructureTemplateSelect}
+        proWorkspaceEnabled={proWorkspaceEnabled}
+        onProProjectChange={(savedProject) => {
+          if (!activeProject) return;
+          const nextProject = {
+            ...activeProject,
+            generatedProject: savedProject,
+          };
+          commitWorkspaceProject(nextProject);
+          setPreviewRevision((n) => n + 1);
         }}
         onFavorite={() => {
           if (activeProject) void toggleFavorite(activeProject.id);
@@ -2576,19 +2547,21 @@ export function WebsiteBuilderTool({
       </Dialog>
 
       <BottomWorkspace
-        projects={projects}
-        websiteStructureTemplateId={websiteStructureTemplateId}
-        isGenerating={isGenerating}
-        onStructureSelect={handleStructureTemplateSelect}
-        activeProject={activeProject}
-        onSelect={(project) => void selectProject(project)}
+        onSelectProject={(projectId) => {
+          const project = projects.find((item) => item.id === projectId);
+          if (project) void selectProject(project);
+        }}
         onFavorite={toggleFavorite}
-        onDuplicate={duplicateProject}
+        onDuplicate={(projectId) => {
+          const project = projects.find((item) => item.id === projectId);
+          if (project) void duplicateProject(project);
+        }}
         onDelete={requestDelete}
         onDownload={downloadProject}
       />
 
     </div>
+    </WebsiteBuilderProjectsProvider>
   );
 }
 
@@ -2710,11 +2683,13 @@ function DesignEnginePanels({
   onApplyEditorSuggestion?: (command: string, suggestionId?: string) => void;
 }) {
   const wb = useProductT("websiteBuilder");
-  const strategy = project?.strategy;
-  const design = project?.designSystem;
-  const assets = project?.assetManifest?.items ?? [];
-  const profile = project?.businessProfile;
   if (!project) return null;
+
+  const strategy = resolveDesignEngineStrategy(project);
+  const design = project.designSystem;
+  const assetManifest = resolveDesignEngineAssetManifest(project);
+  const assets = assetManifest?.items ?? [];
+  const profile = project.businessProfile;
 
   const quality = project.qualityReport;
   const scores = project.optimizationReport?.scores;
@@ -2953,8 +2928,8 @@ function DesignEnginePanels({
           icon={FileStack}
           title={wb("labels.assets")}
           description={
-            project.assetManifest?.provider
-              ? `${wb("designEngine.provider")}: ${project.assetManifest.provider}`
+            assetManifest?.provider
+              ? `${wb("designEngine.provider")}: ${assetManifest.provider}`
               : wb("labels.heroVisuals")
           }
         />
@@ -3019,7 +2994,7 @@ function PreviewAndExportPanel({
 }: {
   activeProject: WorkspaceProject | null;
   previewRevision?: number;
-  onDownload: (project?: WorkspaceProject | null) => void;
+  onDownload: (project?: DownloadableProject | WorkspaceProject | null) => void;
   onImport?: (file: File) => void;
   onImprove: () => void;
   onGoToDeploy: () => void;
@@ -3274,7 +3249,6 @@ function OutputWorkspace({
   onSelectFile,
   fileSearch,
   onFileSearch,
-  projects,
   onSelectProject,
   onDownload,
   onCopy,
@@ -3289,6 +3263,9 @@ function OutputWorkspace({
   onIntelligenceApply,
   generationStreamMessage,
   onCanvasAiCommand,
+  onTemplateSelect,
+  proWorkspaceEnabled = false,
+  onProProjectChange,
 }: {
   activeProject: WorkspaceProject | null;
   outputTab: OutputTab;
@@ -3300,9 +3277,8 @@ function OutputWorkspace({
   onSelectFile: (path: string) => void;
   fileSearch: string;
   onFileSearch: (value: string) => void;
-  projects: WorkspaceProject[];
-  onSelectProject: (project: WorkspaceProject) => void;
-  onDownload: (project?: WorkspaceProject | null) => void;
+  onSelectProject: (projectId: string) => void;
+  onDownload: (project?: DownloadableProject | WorkspaceProject | null) => void;
   onCopy: () => void;
   onRename: () => void;
   onDelete: () => void;
@@ -3324,6 +3300,9 @@ function OutputWorkspace({
   onIntelligenceApply?: (command: string) => void;
   generationStreamMessage?: string | null;
   onCanvasAiCommand?: (command: string, useStream?: boolean) => void;
+  onTemplateSelect?: (choice: WebsiteStructureTemplateChoice) => void;
+  proWorkspaceEnabled?: boolean;
+  onProProjectChange?: (project: GeneratedWebsiteProject) => void;
 }) {
   const wb = useProductT("websiteBuilder");
   const filteredFiles = files.filter((file) =>
@@ -3451,6 +3430,20 @@ function OutputWorkspace({
         >
           {wb("outputTabs.publish")}
         </button>
+        {proWorkspaceEnabled ? (
+          <button
+            type="button"
+            onClick={() => onOutputTabChange("pro")}
+            className={cn(
+              "rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors",
+              outputTab === "pro"
+                ? "bg-cyan-400/15 text-cyan-300"
+                : "text-white/45 hover:text-white/75",
+            )}
+          >
+            Pro IDE
+          </button>
+        ) : null}
       </div>
       {outputTab === "canvas" ? (
         <div className="min-h-[760px]">
@@ -3466,6 +3459,7 @@ function OutputWorkspace({
               onAiCommand={onCanvasAiCommand}
               onDirtyChange={onVisualEditorDirtyChange}
               onOpenWorkspaceTab={onOutputTabChange}
+              onTemplateSelect={onTemplateSelect}
               onSaved={onVisualEditorSaved}
             />
           ) : (
@@ -3509,6 +3503,16 @@ function OutputWorkspace({
         <div className="min-h-[760px] overflow-y-auto">
           <DeploymentDashboardPanel
             generationId={activeProject?.id ?? null}
+            project={activeProject?.generatedProject ?? null}
+            onProjectChange={onProProjectChange}
+          />
+        </div>
+      ) : outputTab === "pro" && proWorkspaceEnabled && activeProject?.generatedProject ? (
+        <div className="min-h-[760px] overflow-y-auto p-4">
+          <ProWorkspaceShell
+            generationId={activeProject.id}
+            project={activeProject.generatedProject}
+            onProjectChange={onProProjectChange}
           />
         </div>
       ) : (
@@ -3521,7 +3525,6 @@ function OutputWorkspace({
           onSelectFile={onSelectFile}
           fileSearch={fileSearch}
           onFileSearch={onFileSearch}
-          projects={projects}
           onSelectProject={onSelectProject}
         />
         <div className="min-w-0 border-x border-white/[0.08] bg-[#050505]">
@@ -3567,7 +3570,7 @@ function ProjectToolbar({
 }: {
   activeProject: WorkspaceProject | null;
   selectedFile: GeneratedProjectFile | null;
-  onDownload: (project?: WorkspaceProject | null) => void;
+  onDownload: (project?: DownloadableProject | WorkspaceProject | null) => void;
   onCopy: () => void;
   onRename: () => void;
   onDelete: () => void;
@@ -3645,7 +3648,6 @@ function ProjectLeftSidebar({
   onSelectFile,
   fileSearch,
   onFileSearch,
-  projects,
   onSelectProject,
 }: {
   activeProject: WorkspaceProject | null;
@@ -3655,8 +3657,7 @@ function ProjectLeftSidebar({
   onSelectFile: (path: string) => void;
   fileSearch: string;
   onFileSearch: (value: string) => void;
-  projects: WorkspaceProject[];
-  onSelectProject: (project: WorkspaceProject) => void;
+  onSelectProject: (projectId: string) => void;
 }) {
   const wb = useProductT("websiteBuilder");
   return (
@@ -3706,40 +3707,7 @@ function ProjectLeftSidebar({
         <p className="mt-3 text-[12px] text-premium-gold-light">{wb("workspace.fileCount", { count: allFileCount })}</p>
       </div>
 
-      <div>
-        <div className="mb-3 flex items-center gap-2 text-sm font-bold text-white">
-          <History className="size-4 text-premium-gold" />
-          {wb("workspace.history")}
-        </div>
-        <div className="max-h-[260px] space-y-2 overflow-auto">
-          {projects.map((project) => (
-            <button
-              key={project.id}
-              type="button"
-              onClick={() => onSelectProject(project)}
-              className={cn(
-                "w-full rounded-xl border p-3 text-left transition-all",
-                activeProject?.id === project.id
-                  ? "border-premium-gold/30 bg-premium-gold/10"
-                  : "border-white/[0.08] bg-white/[0.02] hover:border-premium-gold/20",
-              )}
-            >
-              <div className="flex items-start justify-between gap-2">
-                <p className="truncate text-sm font-semibold text-white">{project.title}</p>
-                {project.mode && project.mode !== "generate" ? (
-                  <span className="shrink-0 rounded-full border border-premium-gold/25 bg-premium-gold/10 px-2 py-0.5 text-[10px] text-premium-gold-light">
-                    {project.mode}
-                  </span>
-                ) : null}
-              </div>
-              <p className="mt-1 text-[11px] text-white/35">
-                {project.createdAt}
-                {project.parentGenerationId ? ` · ${wb("workspace.linkedVersion")}` : ""}
-              </p>
-            </button>
-          ))}
-        </div>
-      </div>
+      <RecentProjectsHistory onSelect={onSelectProject} />
     </aside>
   );
 }
@@ -3814,7 +3782,7 @@ function ProjectRightSidebar({
 }: {
   activeProject: WorkspaceProject | null;
   selectedFile: GeneratedProjectFile | null;
-  onDownload: (project?: WorkspaceProject | null) => void;
+  onDownload: (project?: DownloadableProject | WorkspaceProject | null) => void;
   onFavorite: () => void;
   onRename: () => void;
 }) {
@@ -3894,34 +3862,24 @@ function ProjectRightSidebar({
 }
 
 function BottomWorkspace({
-  projects,
-  websiteStructureTemplateId,
-  isGenerating,
-  onStructureSelect,
-  activeProject,
-  onSelect,
+  onSelectProject,
   onFavorite,
   onDuplicate,
   onDelete,
   onDownload,
 }: {
-  projects: WorkspaceProject[];
-  websiteStructureTemplateId?: string | null;
-  isGenerating?: boolean;
-  onStructureSelect: (choice: WebsiteStructureTemplateChoice) => void;
-  activeProject: WorkspaceProject | null;
-  onSelect: (project: WorkspaceProject) => void;
+  onSelectProject: (projectId: string) => void;
   onFavorite: (id: string) => void;
-  onDuplicate: (project: WorkspaceProject) => void;
+  onDuplicate: (projectId: string) => void;
   onDelete: (id: string) => void;
-  onDownload: (project?: WorkspaceProject | null) => void;
+  onDownload: (project?: DownloadableProject | WorkspaceProject | null) => void;
 }) {
   const { t } = useTranslation();
   const wb = useProductT("websiteBuilder");
-  const favorites = projects.filter((project) => project.favorite);
+  const { projects, activeProject } = useWebsiteBuilderProjects();
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+    <div className="grid gap-6">
       <DashboardPanel>
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <SectionHeader icon={History} title={wb("sections.recentProjects")} description={wb("sectionDescriptions.recentProjects")} />
@@ -3949,83 +3907,17 @@ function BottomWorkspace({
           </div>
         </div>
 
-        {projects.length > 0 ? (
-          <div className="grid gap-3 md:grid-cols-2">
-            {projects.map((project) => (
-              <article
-                key={project.id}
-                className={cn(
-                  "rounded-2xl border bg-black/20 p-4 transition-all duration-300 hover:border-premium-gold/25",
-                  activeProject?.id === project.id
-                    ? "border-premium-gold/35"
-                    : "border-white/[0.08]",
-                )}
-              >
-                <button type="button" className="block w-full text-left" onClick={() => onSelect(project)}>
-                  <p className="truncate font-semibold text-white">{project.title}</p>
-                  <p className="mt-1 line-clamp-2 text-[13px] leading-relaxed text-white/40">
-                    {project.description}
-                  </p>
-                  <p className="mt-3 text-[12px] text-premium-gold-light/80">
-                    {project.type} · {project.createdAt}
-                  </p>
-                </button>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <IconAction icon={Star} label={wb("labels.favorite")} active={project.favorite} onClick={() => onFavorite(project.id)} />
-                  <IconAction icon={Copy} label={wb("labels.duplicate")} onClick={() => onDuplicate(project)} />
-                  <IconAction icon={Download} label={wb("labels.downloadZip")} onClick={() => onDownload(project)} />
-                  <IconAction icon={Trash2} label={wb("labels.delete")} danger onClick={() => onDelete(project.id)} />
-                </div>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-3xl border border-dashed border-white/[0.1] p-8 text-center">
-            <Globe2 className="mx-auto size-10 text-premium-gold" />
-            <p className="mt-4 font-bold text-white">{wb("emptyStates.noRecentProjects")}</p>
-            <p className="mt-2 text-sm text-white/40">
-              Generate an interface concept to populate your recent projects, favorites and history.
-            </p>
-          </div>
-        )}
+        <RecentProjectsGrid
+          onSelect={onSelectProject}
+          onFavorite={onFavorite}
+          onDuplicate={onDuplicate}
+          onDelete={onDelete}
+          onDownload={(projectId) => {
+            const project = projects.find((item) => item.id === projectId);
+            onDownload(project ?? null);
+          }}
+        />
       </DashboardPanel>
-
-      <div className="space-y-6">
-        <DashboardPanel>
-          <SectionHeader
-            icon={LayoutDashboard}
-            title={wb("labels.templates")}
-            description={wb("sectionDescriptions.templates")}
-          />
-          <WebsiteStructureTemplatesRail
-            selectedId={websiteStructureTemplateId}
-            disabled={isGenerating}
-            onSelect={onStructureSelect}
-          />
-        </DashboardPanel>
-
-        <DashboardPanel>
-          <SectionHeader icon={Star} title={wb("labels.favorites")} description={wb("sectionDescriptions.favorites")} />
-          <div className="mt-5 space-y-3">
-            {favorites.length > 0 ? (
-              favorites.map((project) => (
-                <button
-                  key={project.id}
-                  type="button"
-                  onClick={() => onSelect(project)}
-                  className="w-full rounded-2xl border border-premium-gold/20 bg-premium-gold/[0.06] p-3 text-left text-sm font-semibold text-premium-gold-light"
-                >
-                  {project.title}
-                </button>
-              ))
-            ) : (
-              <p className="rounded-2xl border border-white/[0.08] bg-black/20 p-4 text-sm text-white/40">
-                {wb("emptyStates.favoriteProjectsHere")}
-              </p>
-            )}
-          </div>
-        </DashboardPanel>
-      </div>
     </div>
   );
 }

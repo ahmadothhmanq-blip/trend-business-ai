@@ -75,7 +75,7 @@ export function buildFoundationCompatCss(): string {
         "rs-section-alt",
         "rp-section-alt",
       ],
-      rules: "background: var(--color-surface, #fff);",
+      rules: "background: var(--color-surface-elevated, var(--color-surface, #fff));",
     },
     {
       selectors: [

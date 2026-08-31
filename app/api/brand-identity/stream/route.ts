@@ -1,6 +1,6 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
 import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
-import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { beginAiUsage } from "@/lib/api/rate-limit";
 import { serverErrorResponse } from "@/lib/api/errors";
 import { resolveIteratedPrompt } from "@/lib/ai/iteration";
 import { getActiveProvider } from "@/lib/ai/provider-config";
@@ -26,6 +26,8 @@ const requestSchema = z.object({
   continueInstruction: z.string().trim().max(4000).optional(),
   projectId: z.string().uuid().optional(),
   templateId: z.string().optional(),
+  language: z.string().trim().optional(),
+  country: z.string().trim().optional(),
 });
 
 function sseEncode(event: string, data: unknown): string {
@@ -36,8 +38,9 @@ export async function POST(request: Request) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  const rateLimited = await enforceAiUsage(auth.supabase, auth.user!.id, "brand-identity");
-  if (rateLimited) return rateLimited;
+  const usage = await beginAiUsage(auth.supabase, auth.user!.id, "brand-identity");
+  if (!usage.ok) return usage.response;
+  const creditLease = usage.lease;
 
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
@@ -48,7 +51,7 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data;
-  const aiLanguage = resolveRequestLanguage(request);
+  const aiLanguage = resolveRequestLanguage(request, input.language, input.country);
   const template = input.templateId ? getBrandTemplate(input.templateId) : undefined;
   const deliverables = template?.deliverables.length
     ? template.deliverables
@@ -132,11 +135,13 @@ export async function POST(request: Request) {
           .single();
 
         if (error) {
+          await creditLease.release(auth.supabase);
           send("error", { error: error.message });
           controller.close();
           return;
         }
 
+        await creditLease.settle(auth.supabase);
         send("complete", {
           generation: data as BrandIdentityGeneration,
           model: result.model,
@@ -144,6 +149,7 @@ export async function POST(request: Request) {
         });
         controller.close();
       } catch (error) {
+        await creditLease.release(auth.supabase);
         send("error", {
           error: error instanceof Error ? error.message : "Generation failed",
         });

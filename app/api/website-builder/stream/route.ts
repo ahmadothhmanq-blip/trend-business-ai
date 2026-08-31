@@ -1,6 +1,6 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
 import { apiValidationError } from "@/lib/i18n/api-errors";
-import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { beginAiUsage } from "@/lib/api/rate-limit";
 import { generateWebsite } from "@/lib/website-generator";
 import { providerManager } from "@/lib/ai/provider-manager";
 import type { AIProviderName } from "@/lib/ai/types";
@@ -29,6 +29,7 @@ import { isRetryableError, isStreamDisconnectError, withRetry } from "@/lib/ai/r
 import { clampWebsitePrompt } from "@/lib/ai/timeouts";
 import { resolveRequestLanguage } from "@/lib/i18n/api";
 import { logger } from "@/lib/logger";
+import { resolveWebsitePlannerIntegration } from "@/lib/website/universal-planner-integration";
 import {
   isWebsiteIncrementalPreviewEnabled,
   isUltraFastWebsiteGenerationEnabled,
@@ -70,8 +71,9 @@ export async function POST(request: Request) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  const rateLimited = await enforceAiUsage(auth.supabase, auth.user!.id, "website-builder");
-  if (rateLimited) return rateLimited;
+  const usage = await beginAiUsage(auth.supabase, auth.user!.id, "website-builder");
+  if (!usage.ok) return usage.response;
+  const creditLease = usage.lease;
 
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
@@ -89,7 +91,7 @@ export async function POST(request: Request) {
       ? clampWebsitePrompt(parsed.data.continueInstruction, 6000)
       : parsed.data.continueInstruction,
   };
-  const aiLanguage = resolveRequestLanguage(request, input.language);
+  const aiLanguage = resolveRequestLanguage(request, input.language, input.country);
   const localizedInput = { ...input, language: aiLanguage };
   const projectKind = detectWebsiteProjectKind(localizedInput);
   const runId = `wb-${Date.now().toString(36)}`;
@@ -126,10 +128,21 @@ export async function POST(request: Request) {
     });
   }
 
-  const generationInput = {
+  let generationInput = {
     ...localizedInput,
     hasPaidPlan: isPaidWebsitePlan(billingPlanId),
     billingPlanId,
+  };
+
+  const plannerIntegration = await resolveWebsitePlannerIntegration({
+    input: {
+      ...generationInput,
+      projectKind,
+    },
+  });
+  generationInput = {
+    ...generationInput,
+    ...(plannerIntegration.inputPatch ?? {}),
   };
 
   const stream = new ReadableStream({
@@ -422,8 +435,23 @@ export async function POST(request: Request) {
               files: project.files,
             });
           }
+          await creditLease.release(auth.supabase);
           send("error", { error: saved.error, generationId: sessionId });
           return;
+        }
+
+        const settled = await creditLease.settle(auth.supabase);
+        if (!settled.ok) {
+          logger.error(
+            "Credit settle failed after successful website save",
+            WB_STREAM_LOG,
+            {
+              runId,
+              generationId: saved.generation.id,
+              code: settled.code,
+              operationId: creditLease.operationId,
+            },
+          );
         }
 
         logger.info("Final database save ok", WB_STREAM_LOG, {
@@ -445,6 +473,8 @@ export async function POST(request: Request) {
 
         const completeDelivered = send("complete", {
           generationId: saved.generation.id,
+          project: saved.project,
+          generation: saved.generation,
           summary: {
             title: saved.project.title,
             fileCount: saved.project.files?.length ?? 0,
@@ -514,6 +544,7 @@ export async function POST(request: Request) {
             files: lastFiles,
           });
         }
+        await creditLease.release(auth.supabase);
         send(
           "error",
           architectureFailure

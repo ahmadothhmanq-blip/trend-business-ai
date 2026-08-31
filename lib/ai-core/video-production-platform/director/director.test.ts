@@ -13,6 +13,8 @@ import { hydrateDirectorPlan } from "@/lib/ai-core/video-production-platform/dir
 import { runDirector } from "@/lib/ai-core/video-production-platform/director/service";
 import { assertDirectorInput, assertDirectorPlan } from "@/lib/ai-core/video-production-platform/director/validation";
 import type { VideoPlanRecord } from "@/lib/ai-core/video-production-platform/persistence/mappers";
+import type { MemoryQueryBuilder } from "@/lib/ai-core/video-production-platform/test/memory-query-builder";
+import type { DirectorLlmClient } from "@/lib/ai-core/video-production-platform/director/llm";
 
 const USER = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 
@@ -65,7 +67,7 @@ function createMemorySupabase() {
             error = { code: "23505", message: "duplicate idempotency_key" };
             break;
           }
-          const row = {
+          const row: Record<string, unknown> = {
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
             ...raw,
@@ -108,7 +110,7 @@ function createMemorySupabase() {
       return { data, error: null };
     }
 
-    const api: Record<string, unknown> = {
+    const api: MemoryQueryBuilder = {
       insert(row: unknown) {
         state.action = "insert";
         state.payload = row;
@@ -137,7 +139,7 @@ function createMemorySupabase() {
       },
       maybeSingle: () => execute("maybe"),
       single: () => execute("single"),
-      then(resolve: (value: unknown) => unknown, reject: (reason: unknown) => unknown) {
+      then(resolve, reject?) {
         return execute("many").then(resolve, reject);
       },
     };
@@ -249,14 +251,14 @@ function ugcDraft(): DirectorLlmDraft {
   };
 }
 
-function llm(draft: DirectorLlmDraft | (() => DirectorLlmDraft) | Array<DirectorLlmDraft | Error>) {
+function llm(draft: DirectorLlmDraft | (() => DirectorLlmDraft) | Array<DirectorLlmDraft | Error>): DirectorLlmClient {
   const queue = Array.isArray(draft) ? [...draft] : [draft];
   return {
-    async generateJson() {
+    async generateJson<T>() {
       const next = queue.length > 1 ? queue.shift() : queue[0];
       const value = typeof next === "function" ? next() : next;
       if (value instanceof Error) throw value;
-      return value as DirectorLlmDraft;
+      return value as T;
     },
   };
 }
@@ -646,6 +648,10 @@ test("persisted plan and scenes round-trip the Director contract", async () => {
       userId: USER,
       spec: storedPlan?.spec as Record<string, unknown>,
       idempotencyKey: String(storedPlan?.idempotency_key),
+      status: "active" as const,
+      isActive: Boolean(storedPlan?.is_active ?? true),
+      sourcePrompt: storedPlan?.source_prompt != null ? String(storedPlan.source_prompt) : null,
+      sourceHash: storedPlan?.source_hash != null ? String(storedPlan.source_hash) : null,
     },
     plan.scenes,
   );

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { z } from "zod";
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
-import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { beginAiUsage } from "@/lib/api/rate-limit";
 import { serverErrorResponse } from "@/lib/api/errors";
 import { generateVideo } from "@/lib/video-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
@@ -13,8 +13,17 @@ import {
   runFullRenderPipeline,
   withProductionModel,
   attachSourceImageToModel,
+  ProviderNotConfiguredError,
 } from "@/lib/ai-core/video-production-platform";
 import type { VideoBlueprint, VideoGeneration } from "@/types/video";
+import {
+  generationStatusAfterStoryboard,
+  generationStatusAfterRenderJob,
+  storyboardGeneratedMessage,
+  videoRenderedMessage,
+} from "@/lib/ai-core/video-production-platform/generation-status";
+import { assertSafeRemoteFetchUrl, UnsafeRemoteUrlError } from "@/lib/website/url-safety";
+import { resolveRequestLanguage } from "@/lib/i18n/api";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -29,6 +38,7 @@ const productSchema = z.object({
     .enum(["clothing", "electronics", "cars", "beauty", "food", "other"])
     .optional(),
   language: z.string().optional(),
+  country: z.string().optional(),
   duration: z.string().optional(),
   brandName: z.string().optional(),
   brandPrimary: z.string().optional(),
@@ -43,6 +53,7 @@ const eduSchema = z.object({
   content: z.string().trim().min(20),
   sourceKind: z.enum(["text", "pdf", "document"]).optional(),
   language: z.string().optional(),
+  country: z.string().optional(),
   duration: z.string().optional(),
   audience: z.string().optional(),
   fullRender: z.boolean().optional().default(false),
@@ -54,12 +65,13 @@ export async function POST(request: Request) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  const rateLimited = await enforceAiUsage(
+  const usage = await beginAiUsage(
     auth.supabase,
     auth.user!.id,
     "video-studio",
   );
-  if (rateLimited) return rateLimited;
+  if (!usage.ok) return usage.response;
+  const creditLease = usage.lease;
 
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
@@ -68,8 +80,20 @@ export async function POST(request: Request) {
   if (!parsed.success) {
     return apiValidationError(parsed.error.issues[0]?.message);
   }
+  const aiLanguage = resolveRequestLanguage(request, parsed.data.language, parsed.data.country);
 
   try {
+    if (parsed.data.mode === "product") {
+      try {
+        await assertSafeRemoteFetchUrl(parsed.data.productImageUrl);
+      } catch (error) {
+        const message =
+          error instanceof UnsafeRemoteUrlError
+            ? error.message
+            : "Invalid product image URL.";
+        return apiValidationError(message);
+      }
+    }
     const input =
       parsed.data.mode === "product"
         ? buildProductPresenterBrief({
@@ -77,7 +101,7 @@ export async function POST(request: Request) {
             productDescription: parsed.data.productDescription,
             productImageUrl: parsed.data.productImageUrl,
             category: parsed.data.category,
-            language: parsed.data.language,
+            language: aiLanguage,
             duration: parsed.data.duration,
             brand: parsed.data.brandName
               ? {
@@ -90,7 +114,7 @@ export async function POST(request: Request) {
             topic: parsed.data.topic,
             content: parsed.data.content,
             sourceKind: parsed.data.sourceKind,
-            language: parsed.data.language,
+            language: aiLanguage,
             duration: parsed.data.duration,
             audience: parsed.data.audience,
           }).pluginInput;
@@ -160,7 +184,7 @@ export async function POST(request: Request) {
         options: input.options,
         prompt: input.prompt,
         blueprint,
-        status: "completed",
+        status: generationStatusAfterStoryboard(),
         mode: "generate",
         provider: result.provider ?? getActiveProvider(),
         token_usage: result.usage,
@@ -179,46 +203,72 @@ export async function POST(request: Request) {
     >["job"] | null;
 
     if (parsed.data.fullRender && productionModel) {
-      const rendered = await runFullRenderPipeline({
-        model: productionModel,
-        supabase: auth.supabase,
-        userId: auth.user!.id,
-        generationId: generation.id,
-        mode: parsed.data.mode === "product" ? "full" : "full",
-        sourceImageUrl:
-          parsed.data.mode === "product"
-            ? parsed.data.productImageUrl
-            : undefined,
-        useAvatar:
-          parsed.data.mode === "product" ? parsed.data.useAvatar : false,
-      });
-      productionModel = rendered.model;
-      job = rendered.job;
-      const nextBp = withProductionModel(
-        blueprint,
-        productionModel,
-        result.versionHistory,
-      ) as VideoBlueprint;
-      const { data: updated } = await auth.supabase
-        .from("video_generations")
-        .update({ blueprint: nextBp })
-        .eq("id", generation.id)
-        .select("*")
-        .single();
-      if (updated) generation = updated as VideoGeneration;
+      try {
+        const rendered = await runFullRenderPipeline({
+          model: productionModel,
+          supabase: auth.supabase,
+          userId: auth.user!.id,
+          generationId: generation.id,
+          mode: parsed.data.mode === "product" ? "full" : "full",
+          sourceImageUrl:
+            parsed.data.mode === "product"
+              ? parsed.data.productImageUrl
+              : undefined,
+          useAvatar:
+            parsed.data.mode === "product" ? parsed.data.useAvatar : false,
+        });
+        productionModel = rendered.model;
+        job = rendered.job;
+        const nextBp = withProductionModel(
+          blueprint,
+          productionModel,
+          result.versionHistory,
+        ) as VideoBlueprint;
+        const nextStatus = generationStatusAfterRenderJob({
+          mode: job.mode,
+          status: job.status,
+          provider: job.provider,
+          composite: job.compositeAsset,
+          clips: (job.clips || []).map((c) => ({
+            mimeType: c.asset?.mimeType,
+            url: c.asset?.url,
+            isStub: c.asset?.provider === "preview",
+            durationSec: c.asset?.durationSec,
+          })),
+        });
+        const { data: updated } = await auth.supabase
+          .from("video_generations")
+          .update({
+            blueprint: nextBp,
+            status: nextStatus,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", generation.id)
+          .select("*")
+          .single();
+        if (updated) generation = updated as VideoGeneration;
+      } catch (renderError) {
+        if (!(renderError instanceof ProviderNotConfiguredError)) {
+          throw renderError;
+        }
+        job = null;
+      }
     }
 
+    const playableVideo = generation.status === "video_rendered";
+    await creditLease.settle(auth.supabase);
     return NextResponse.json({
       generation,
       job,
-      message:
-        parsed.data.mode === "product"
-          ? parsed.data.fullRender
-            ? "Product presenter video rendered (script, voice, scenes, branding)."
-            : "Product presenter video package created."
-          : parsed.data.fullRender
-            ? "Educational video rendered."
-            : "Educational video package created.",
+      outputKind: playableVideo ? "video" : "storyboard",
+      playableVideo,
+      message: playableVideo
+        ? videoRenderedMessage()
+        : parsed.data.fullRender && !job
+          ? `${storyboardGeneratedMessage()} Full render blocked: video provider is not configured.`
+          : job && job.status === "failed"
+            ? `Storyboard saved. Render failed: ${job.message}`
+            : storyboardGeneratedMessage(),
       mode: parsed.data.mode,
     });
   } catch (error) {

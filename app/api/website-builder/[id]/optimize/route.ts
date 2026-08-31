@@ -1,6 +1,6 @@
 import { requireUser, parseJsonBody, parseUuidParam } from "@/lib/api/helpers";
 import { API_ERROR_CODES, apiErrorResponse, apiValidationError } from "@/lib/i18n/api-errors";
-import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { beginAiUsage } from "@/lib/api/rate-limit";
 import { serverErrorResponse } from "@/lib/api/errors";
 import { generateWebsite } from "@/lib/website-generator";
 import { providerManager } from "@/lib/ai/provider-manager";
@@ -15,6 +15,7 @@ import type { WebsiteGeneration } from "@/types/database";
 import { requireWebsiteGenerationAccess } from "@/lib/website/builder/route-access";
 import { z } from "zod";
 import { NextResponse } from "next/server";
+import { getRequestAiLanguage } from "@/lib/i18n/api";
 
 export const runtime = "nodejs";
 /** Long Website Builder optimize / continue generations. */
@@ -24,6 +25,8 @@ type RouteContext = { params: Promise<{ id: string }> };
 
 const optimizeBodySchema = z.object({
   instruction: z.string().trim().max(4000).optional(),
+  language: z.string().trim().optional(),
+  country: z.string().trim().optional(),
 });
 
 /**
@@ -39,12 +42,13 @@ export async function POST(request: Request, context: RouteContext) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  const rateLimited = await enforceAiUsage(
+  const usage = await beginAiUsage(
     auth.supabase,
     auth.user!.id,
     "website-builder",
   );
-  if (rateLimited) return rateLimited;
+  if (!usage.ok) return usage.response;
+  const creditLease = usage.lease;
 
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
@@ -83,7 +87,11 @@ export async function POST(request: Request, context: RouteContext) {
     id,
   );
 
-  const websiteLanguage = generation.language || "English";
+  const websiteLanguage = getRequestAiLanguage(
+    request,
+    parsed.data.language || generation.language || "English",
+    parsed.data.country,
+  );
   const preservedFeatures = generation.features ?? [];
 
   try {
@@ -130,6 +138,7 @@ export async function POST(request: Request, context: RouteContext) {
       return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, saved.error);
     }
 
+    await creditLease.settle(auth.supabase);
     return NextResponse.json({
       project: saved.project,
       generation: saved.generation,

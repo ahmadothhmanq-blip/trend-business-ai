@@ -1,0 +1,7 @@
+{
+  "pageId": "pricing",
+  "layoutId": "default",
+  "regions": {
+    "main": ["pulse-fintech-hero", "pulse-fintech-pricing", "pulse-fintech-faq"]
+  }
+}

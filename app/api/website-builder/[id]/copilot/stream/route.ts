@@ -9,6 +9,7 @@ import {
   resolveCopilotRoute,
   runCopilotCommandStream,
 } from "@/lib/ai-core/website-copilot";
+import { getRequestAiLanguage } from "@/lib/i18n/api";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -38,6 +39,8 @@ const streamBodySchema = z.object({
   useMemory: z.boolean().optional(),
   includeReview: z.boolean().optional(),
   linkedAppGenerationId: z.string().uuid().optional(),
+  language: z.string().trim().optional(),
+  country: z.string().trim().optional(),
 });
 
 /**
@@ -60,6 +63,7 @@ export async function POST(request: Request, context: RouteContext) {
   if (!parsed.success) {
     return apiValidationError(parsed.error.issues[0]?.message);
   }
+  getRequestAiLanguage(request, parsed.data.language, parsed.data.country);
 
   const useClassifier = parsed.data.useClassifier !== false;
   const resolved = await resolveCopilotRoute({

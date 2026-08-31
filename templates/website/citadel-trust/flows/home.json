@@ -1,0 +1,20 @@
+{
+  "pageId": "home",
+  "layoutId": "default",
+  "regions": {
+    "header": ["citadel-trust-nav"],
+    "main": [
+      "citadel-trust-hero",
+      "citadel-trust-features",
+      "citadel-trust-about",
+      "citadel-trust-testimonials",
+      "citadel-trust-portfolio",
+      "citadel-trust-pricing",
+      "citadel-trust-faq",
+      "citadel-trust-contact"
+    ],
+    "utility": [],
+    "overlay": [],
+    "footer": ["citadel-trust-footer"]
+  }
+}

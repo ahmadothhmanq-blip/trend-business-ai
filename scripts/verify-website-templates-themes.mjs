@@ -55,12 +55,13 @@ assert.ok(
   "catalog mapping helpers required",
 );
 assert.ok(
-  packageIndex.includes('"modern-business"') || packageIndex.includes("modern-business"),
-  "modern-business package must be indexed",
+  structure.includes("INTERNAL_GENERATION_STRUCTURE_FALLBACK") ||
+    structure.includes("generation-structure-fallback"),
+  "internal generation fallback required",
 );
 assert.ok(
-  structure.includes("INTERNAL_GENERATION_STRUCTURE_FALLBACK"),
-  "internal generation fallback required",
+  packageIndex.includes("WEBSITE_STRUCTURE_TEMPLATES"),
+  "package index must export the user-facing structure catalog",
 );
 assert.ok(
   templateCatalog.includes("isLegacyMarketplaceStructureTemplate"),
@@ -194,7 +195,18 @@ assert.ok(
   "design sidebar must not duplicate theme presets",
 );
 
-assert.ok(tool.includes("WebsiteStructureTemplatesPanel"), "tool must render structure panel");
+const professionalPanel = readFileSync(
+  join(root, "components/dashboard/website-builder/professional-panel.tsx"),
+  "utf8",
+);
+assert.ok(
+  professionalPanel.includes("browseTemplates"),
+  "professional panel must expose optional templates dialog",
+);
+assert.ok(
+  !tool.includes("WebsiteStructureTemplatesPanel"),
+  "create flow must not render structure template picker",
+);
 assert.ok(tool.includes("ThemeSelectionPanel"), "tool must render themes panel");
 assert.ok(
   !tool.includes("TemplateSelectionPanel"),

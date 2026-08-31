@@ -1,6 +1,6 @@
 "use client";
 
-import { resolveSlotImageStrict } from "@/lib/website/template-v2/slots";
+import { SlotImage, resolveSlotImageStrict } from "@/lib/website/template-v2/slots";
 import { FlagshipSectionHeader } from "@/lib/website/template-v2/flagship/section-header";
 import type { FlagshipUi } from "@/lib/website/template-v2/flagship/themes";
 
@@ -23,33 +23,6 @@ export type FlagshipTestimonialsProps = {
   items?: FlagshipTestimonial[];
 };
 
-const DEFAULT_ITEMS: FlagshipTestimonial[] = [
-  {
-    quote:
-      "The platform transformed how our teams collaborate — we cut reporting time in half and finally have one source of truth.",
-    name: "Elena Vasquez",
-    role: "Chief Revenue Officer",
-    company: "Meridian Systems",
-    rating: 5,
-  },
-  {
-    quote:
-      "Implementation was seamless. Within six weeks we had executive dashboards our board actually trusts.",
-    name: "James Okonkwo",
-    role: "VP Operations",
-    company: "Northbridge Capital",
-    rating: 5,
-  },
-  {
-    quote:
-      "Best investment we made this year. The ROI was visible in the first quarter.",
-    name: "Sophie Laurent",
-    role: "Managing Director",
-    company: "Atlas Partners",
-    rating: 5,
-  },
-];
-
 function StarRating({ count, className }: { count: number; className?: string }) {
   return (
     <span className={className} aria-label={`${count} out of 5 stars`}>
@@ -65,21 +38,24 @@ function StarRating({ count, className }: { count: number; className?: string })
 export function FlagshipTestimonialsSection({
   ui,
   componentId,
-  id = "testimonials",
-  eyebrow = "Testimonials",
-  title = "Trusted by leaders worldwide",
+  id,
+  eyebrow,
+  title,
   subtitle,
-  items = DEFAULT_ITEMS,
+  items,
 }: FlagshipTestimonialsProps) {
+  if (!items?.length) return null;
+  const sectionId = id ?? "testimonials";
+
   return (
     <section
-      id={id}
+      id={sectionId}
       data-v2-component={componentId}
-      aria-labelledby={`${id}-title`}
+      aria-labelledby={`${sectionId}-title`}
       className={`${ui.section} df-section-alt bg-[var(--color-surface)]`}
     >
       <div className={ui.container}>
-        <FlagshipSectionHeader ui={ui} id={id} eyebrow={eyebrow} title={title} subtitle={subtitle} align="center" />
+        <FlagshipSectionHeader ui={ui} id={sectionId} eyebrow={eyebrow} title={title} subtitle={subtitle} align="center" />
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-6">
           {items.map((item, index) => {
             const featured = index === 1 && items.length >= 3;
@@ -104,11 +80,13 @@ export function FlagshipTestimonialsSection({
                 </blockquote>
                 <figcaption className="mt-8 flex items-center gap-3 border-t border-[var(--border-default,rgba(0,0,0,0.08))] pt-5">
                   {avatar ? (
-                    <img
-                      src={avatar}
+                    <SlotImage
+                      slot="testimonials"
+                      index={index}
+                      preferred={item.imageUrl}
                       alt=""
                       className="h-11 w-11 rounded-full object-cover ring-2 ring-[var(--color-surface)]"
-                      loading="lazy"
+                      containerClassName="h-11 w-11 rounded-full ring-2 ring-[var(--color-surface)]"
                       width={44}
                       height={44}
                     />

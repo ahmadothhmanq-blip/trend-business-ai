@@ -1,0 +1,18 @@
+{
+  "pageId": "home",
+  "layoutId": "default",
+  "regions": {
+    "header": ["prism-aurora-nav"],
+    "main": [
+      "prism-aurora-hero",
+      "prism-aurora-about",
+      "prism-aurora-portfolio",
+      "prism-aurora-testimonials",
+      "prism-aurora-pricing",
+      "prism-aurora-contact"
+    ],
+    "utility": [],
+    "overlay": [],
+    "footer": ["prism-aurora-footer"]
+  }
+}

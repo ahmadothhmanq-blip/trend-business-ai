@@ -1,8 +1,8 @@
 import { getAIProvider, resolveAvailableProvider } from "@/lib/ai/adapters";
 import { generateJsonWithValidation } from "@/lib/ai/generator";
 import type { AIProvider } from "@/lib/ai/types";
-import { aiOutputLanguageDirective } from "@/lib/ai/prompts/shared";
-import { getGcriContext } from "@/lib/language-platform/gcri/context";
+import { aiOutputLanguageDirective } from "@/lib/ai/prompts/language-directive.server";
+import { getGcriContext } from "@/lib/language-platform/gcri/context.server";
 import type { DirectorInput, DirectorVideoPlan } from "@/lib/ai-core/video-production-platform/director/contracts";
 import { MAX_DIRECTOR_SCENES } from "@/lib/ai-core/video-production-platform/director/contracts";
 import { DirectorError } from "@/lib/ai-core/video-production-platform/director/errors";

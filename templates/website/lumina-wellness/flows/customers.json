@@ -1,0 +1,7 @@
+{
+  "pageId": "customers",
+  "layoutId": "default",
+  "regions": {
+    "main": ["lumina-wellness-hero", "lumina-wellness-portfolio", "lumina-wellness-features"]
+  }
+}

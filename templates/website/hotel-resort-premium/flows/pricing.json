@@ -1,0 +1,7 @@
+{
+  "pageId": "pricing",
+  "layoutId": "default",
+  "regions": {
+    "main": ["hotel-resort-premium-hero", "hotel-resort-premium-pricing", "hotel-resort-premium-faq"]
+  }
+}

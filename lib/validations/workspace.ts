@@ -14,6 +14,7 @@ export const workspaceInputSchema = z.object({
   prompt: z.string().trim().min(10, "Describe your project in at least 10 characters."),
   template: z.string().trim().optional(),
   language: z.string().trim().min(1).default("English"),
+  country: z.string().trim().optional(),
   theme: z.string().trim().min(1).default("Gold"),
   features: z.array(z.string().trim()).default([]),
   /** Product engine id — stored on the generation for user/workspace/project scoping. */

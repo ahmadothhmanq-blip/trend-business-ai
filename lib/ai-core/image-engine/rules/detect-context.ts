@@ -54,6 +54,7 @@ export const PACKAGE_INDUSTRY_MAP: Record<string, string> = {
   "finance-premium": "finance",
   "education-premium": "education",
   "ecommerce-premium": "ecommerce",
+  "ai-startup-signal": "saas",
 };
 
 export function contextFromPackage(

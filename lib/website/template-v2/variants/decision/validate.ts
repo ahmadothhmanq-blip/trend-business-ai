@@ -10,7 +10,7 @@ import {
   getVariantDefinition,
   validateVariantRegistry,
 } from "@/lib/website/template-v2/variants/registry";
-import type { SectionKind } from "@/lib/website/template-v2/variants/types";
+import type { SectionKind, SectionVariantId } from "@/lib/website/template-v2/variants/types";
 import { VARIANT_DECISION_PROFILES } from "@/lib/website/template-v2/variants/decision/profiles";
 
 export function validateDecisionContext(
@@ -64,7 +64,7 @@ export function validateDecisionPlan(
       continue;
     }
 
-    const def = getVariantDefinition(sectionKind, selection.variantId);
+    const def = getVariantDefinition(sectionKind, selection.variantId as SectionVariantId);
     if (!def) {
       errors.push(`Invalid variant ${selection.variantId} for ${sectionKind}`);
     }

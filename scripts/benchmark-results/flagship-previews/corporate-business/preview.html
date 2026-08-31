@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-v2-render="v2-files" data-v2-package="corporate-business" data-v2-layout="default">
+<html lang="en" data-v2-render="v2-files-3" data-v2-package="corporate-business" data-v2-layout="default">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -17,7 +17,7 @@
   --color-signal: #C4A574;
   --color-grid: rgba(8,14,24,0.04);
   --color-ink: #080E18;
-  --font-display: "Cormorant Garamond", ui-sans-serif, system-ui, sans-serif;
+  --font-display: Inter, ui-sans-serif, system-ui, sans-serif;
   --font-body: Inter, ui-sans-serif, system-ui, sans-serif;
   --spacing-unit: 0.25rem;
   --radius-sm: 4px;
@@ -37,6 +37,1017 @@
   --font-display: Amiri, ui-serif, Georgia, serif;
   --font-body: "Noto Sans Arabic", ui-sans-serif, system-ui, sans-serif;
   letter-spacing: 0.01em;
+  line-height: 1.75;
+}
+[dir="rtl"] .df-headline, [dir="rtl"] .df-headline-sm {
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+/* Design Foundation — token scale */
+:root {
+  --df-space-0: 0;
+  --df-space-1: calc(0.25rem * 1);
+  --df-space-2: calc(0.25rem * 2);
+  --df-space-3: calc(0.25rem * 3);
+  --df-space-4: calc(0.25rem * 4);
+  --df-space-5: calc(0.25rem * 6);
+  --df-space-6: calc(0.25rem * 8);
+  --df-space-7: calc(0.25rem * 12);
+  --df-space-8: calc(0.25rem * 16);
+  --df-space-9: calc(0.25rem * 20);
+  --df-space-10: calc(0.25rem * 24);
+  --df-space-11: calc(0.25rem * 32);
+  --df-space-12: calc(0.25rem * 40);
+  --df-space-13: calc(0.25rem * 48);
+  --df-space-14: calc(0.25rem * 64);
+  --df-text-xs: 0.75rem;
+  --df-text-sm: 0.875rem;
+  --df-text-base: 1rem;
+  --df-text-lg: 1.375rem;
+  --df-text-xl: 3.25rem;
+  --df-text-2xl: clamp(1.625rem, 2.6vw, 2.125rem);
+  --df-text-3xl: clamp(2.125rem, 3.8vw, 3rem);
+  --df-text-display: clamp(3.25rem, 7.5vw, 5.75rem);
+  --df-leading-tight: 1.12;
+  --df-leading-display: 1.12;
+  --df-leading-stacked: 1.05;
+  --df-leading-snug: 1.32;
+  --df-leading-normal: 1.58;
+  --df-leading-relaxed: 1.72;
+  --df-stack-word-gap: 0.06em;
+  --df-tracking-tight: -0.028em;
+  --df-tracking-wide: 0.1em;
+  --df-tracking-wider: 0.2em;
+  --df-radius-sm: 6px;
+  --df-radius-md: 10px;
+  --df-radius-lg: 16px;
+  --df-radius-xl: 24px;
+  --df-radius-pill: 9999px;
+  --df-grid-columns: 12;
+  --df-grid-gutter: clamp(1.125rem, 2.8vw, 2rem);
+  --df-container-padding: clamp(1.25rem, 4.2vw, 2.75rem);
+  --df-section-y: clamp(5.75rem, 12.5vw, 9.5rem);
+  --df-section-y-tight: clamp(4.25rem, 8.5vw, 6.75rem);
+  --cb-section-y: clamp(6.75rem, 14.5vw, 10.5rem);
+  --se-section-y: clamp(4.25rem, 10.5vw, 7rem);
+  --as-section-y: clamp(4.5rem, 12vw, 7.5rem);
+  --ed-section-y: clamp(5.25rem, 11.5vw, 8rem);
+  --fn-section-y: clamp(5.25rem, 11.5vw, 8rem);
+  --mp-section-y: clamp(4.75rem, 11.5vw, 7.25rem);
+  --sv-section-y: clamp(4.75rem, 13.5vw, 8.5rem);
+  --ec-section-y: clamp(4.25rem, 8.5vw, 6.75rem);
+  --rp-section-y: clamp(5.25rem, 12.5vw, 8.5rem);
+  --hr-section-y: clamp(5.25rem, 12.5vw, 8.5rem);
+  --rep-section-y: clamp(5.75rem, 12.5vw, 8.75rem);
+  --df-stack-gap: clamp(1rem, 2.4vw, 1.625rem);
+  --df-shadow-ambient: 0 1px 2px color-mix(in srgb, var(--color-foreground) 4%, transparent);
+  --df-shadow-card: 0 10px 36px color-mix(in srgb, var(--color-foreground) 5%, transparent), 0 2px 8px color-mix(in srgb, var(--color-foreground) 3%, transparent);
+  --df-shadow-elevated: 0 28px 72px color-mix(in srgb, var(--color-foreground) 8%, transparent), 0 8px 24px color-mix(in srgb, var(--color-foreground) 4%, transparent);
+  --df-shadow-inset: inset 0 1px 0 color-mix(in srgb, #fff 22%, transparent);
+  --df-motion-fast: 180ms;
+  --df-motion-base: 380ms;
+  --df-motion-slow: 640ms;
+  --df-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --df-motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --df-focus-width: 2px;
+  --df-focus-offset: 3px;
+  --df-focus-color: color-mix(in srgb, var(--color-accent, var(--color-signal)) 72%, transparent);
+  --df-border-width: 1px;
+  --df-nav-height: 4.5rem;
+  --df-footer-gap: clamp(2.25rem, 5.5vw, 3.75rem);
+}
+
+/* Flagship semantic theme — visual identity layer */
+:root, .v2-template {
+  --df-theme-mode: light;
+  --color-surface-elevated: color-mix(in srgb, var(--color-surface, #fff) 94%, var(--color-primary) 6%);
+  --color-surface-inset: color-mix(in srgb, var(--color-background) 96%, var(--color-foreground) 4%);
+  --df-border-subtle: color-mix(in srgb, var(--color-foreground) 6%, transparent);
+  --df-border-default: color-mix(in srgb, var(--color-foreground) 11%, transparent);
+  --df-border-accent: color-mix(in srgb, var(--color-accent, var(--color-signal)) 34%, transparent);
+  --df-foreground-muted: color-mix(in srgb, var(--color-foreground) 54%, transparent);
+  --df-accent-glow: color-mix(in srgb, var(--color-signal, var(--color-accent)) 18%, transparent);
+  --df-headline-tracking: -0.025em;
+}
+.v2-template { color-scheme: light; }
+
+/* Design Foundation — motion */
+@keyframes df-reveal-up {
+  from { opacity: 0; transform: translateY(24px); filter: blur(4px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+@keyframes df-reveal-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes df-slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes df-scale-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes df-draw-line {
+  from { transform: scaleX(0); opacity: 0; }
+  to { transform: scaleX(1); opacity: 1; }
+}
+
+.v2-motion[data-entrance="slide-up"],
+.v2-motion[data-entrance="fade-in"] {
+  animation-duration: var(--df-motion-base);
+  animation-timing-function: var(--df-motion-ease);
+  animation-fill-mode: both;
+}
+.v2-motion[data-entrance="slide-up"] { animation-name: df-reveal-up; }
+.v2-motion[data-entrance="fade-in"] { animation-name: df-reveal-fade; }
+
+.df-animate-reveal {
+  animation: df-reveal-up var(--df-motion-slow) var(--df-motion-ease) both;
+}
+.df-animate-slide-up {
+  animation: df-slide-up var(--df-motion-base) var(--df-motion-ease) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v2-motion, [data-v2-motion], .df-animate-reveal, .df-animate-slide-up {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Design Foundation — primitives */
+.v2-template {
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-base);
+  line-height: var(--df-leading-normal);
+  color: var(--color-foreground);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography */
+.df-font-display { font-family: var(--font-display), ui-serif, Georgia, serif; }
+.df-font-body { font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif; }
+.df-eyebrow {
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-xs);
+  font-weight: 500;
+  letter-spacing: var(--df-tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-signal, var(--color-accent));
+}
+.df-headline {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+  font-size: var(--df-text-display);
+  font-weight: 500;
+  line-height: var(--df-leading-tight);
+  letter-spacing: var(--df-headline-tracking, var(--df-tracking-tight));
+  color: var(--color-foreground);
+  text-wrap: balance;
+}
+.df-headline-sm {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+  font-size: clamp(1.875rem, 3.5vw, 2.75rem);
+  font-weight: 500;
+  line-height: var(--df-leading-snug);
+  letter-spacing: var(--df-tracking-tight);
+  color: var(--color-foreground);
+  text-wrap: balance;
+}
+.df-body {
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-lg);
+  line-height: var(--df-leading-relaxed);
+  color: var(--df-foreground-muted, var(--color-muted, color-mix(in srgb, var(--color-foreground) 58%, transparent)));
+  max-width: 38rem;
+}
+.df-prose {
+  font-size: var(--df-text-base);
+  line-height: var(--df-leading-relaxed);
+  color: var(--color-muted, color-mix(in srgb, var(--color-foreground) 62%, transparent));
+  max-width: 36rem;
+}
+.df-caption {
+  font-size: var(--df-text-sm);
+  line-height: var(--df-leading-normal);
+  color: var(--color-muted, color-mix(in srgb, var(--color-foreground) 55%, transparent));
+}
+
+/* Layout — sections, grid, containers */
+.df-section { padding-block: var(--df-section-y); }
+.df-section-tight { padding-block: var(--df-section-y-tight); }
+.df-section-alt {
+  background: var(--color-surface-elevated, var(--color-surface, #fff));
+}
+.df-section-glow {
+  position: relative;
+  overflow: hidden;
+}
+.df-section-glow::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 72% 58% at 14% 0%, var(--df-accent-glow, color-mix(in srgb, var(--color-accent, var(--color-signal)) 10%, transparent)), transparent 62%),
+    radial-gradient(ellipse 58% 48% at 92% 100%, color-mix(in srgb, var(--color-primary) 7%, transparent), transparent 58%);
+}
+.df-container {
+  margin-inline: auto;
+  width: 100%;
+  max-width: var(--container-max, 82rem);
+  padding-inline: var(--df-container-padding);
+}
+.df-container-narrow { max-width: min(var(--container-max, 82rem), 48rem); }
+.df-container-wide { max-width: min(calc(var(--container-max, 82rem) + 6rem), 96rem); }
+.df-grid-12 {
+  display: grid;
+  grid-template-columns: repeat(var(--df-grid-columns), minmax(0, 1fr));
+  gap: var(--df-grid-gutter);
+}
+.df-stack { display: flex; flex-direction: column; gap: var(--df-stack-gap); }
+.df-divider {
+  height: var(--df-border-width);
+  width: 100%;
+  background: var(--df-border-subtle, var(--border-subtle, color-mix(in srgb, var(--color-foreground) 8%, transparent)));
+}
+
+/* Cards */
+.df-card {
+  border: var(--df-border-width) solid var(--df-border-subtle, var(--border-subtle, color-mix(in srgb, var(--color-foreground) 8%, transparent)));
+  background: var(--color-surface-elevated, var(--color-surface, #fff));
+  border-radius: var(--radius-lg, var(--df-radius-lg, 16px));
+  box-shadow: var(--shadow-card, var(--df-shadow-card));
+  transition:
+    box-shadow var(--df-motion-base) var(--df-motion-ease),
+    transform var(--df-motion-base) var(--df-motion-ease),
+    border-color var(--df-motion-fast) ease;
+}
+.df-card:hover {
+  border-color: var(--df-border-accent, var(--border-accent, color-mix(in srgb, var(--color-accent) 28%, transparent)));
+  box-shadow: var(--shadow-surface, var(--df-shadow-elevated));
+  transform: translateY(-2px);
+}
+.df-card-featured {
+  border-color: color-mix(in srgb, var(--color-signal, var(--color-accent)) 28%, var(--border-subtle, transparent));
+  background: linear-gradient(
+    155deg,
+    var(--color-primary) 0%,
+    color-mix(in srgb, var(--color-primary) 88%, var(--color-secondary, var(--color-primary))) 100%
+  );
+  color: #fff;
+  box-shadow: var(--shadow-surface);
+}
+.df-card-glass {
+  background: color-mix(in srgb, var(--color-surface-elevated, var(--color-surface, #fff)) 78%, transparent);
+  backdrop-filter: blur(22px) saturate(1.15);
+  border: var(--df-border-width) solid color-mix(in srgb, #fff 55%, var(--df-border-subtle, transparent));
+  border-radius: var(--radius-lg, var(--df-radius-lg, 16px));
+  box-shadow: var(--shadow-card, var(--df-shadow-card));
+}
+.df-card-interactive { cursor: pointer; }
+.df-card-interactive:focus-visible { outline: var(--df-focus-width) solid var(--df-focus-color); outline-offset: var(--df-focus-offset); }
+
+/* Buttons */
+.df-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0 1.625rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  color: var(--color-background, #fff);
+  background: var(--color-primary);
+  border: var(--df-border-width) solid color-mix(in srgb, var(--color-primary) 78%, #000);
+  border-radius: var(--df-radius-pill, 9999px);
+  box-shadow: var(--shadow-card, var(--df-shadow-card));
+  transition:
+    transform var(--df-motion-fast) var(--df-motion-ease),
+    box-shadow var(--df-motion-base) var(--df-motion-ease),
+    filter var(--df-motion-fast) ease;
+}
+.df-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-surface, var(--df-shadow-elevated));
+  filter: brightness(1.05);
+}
+.df-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0 1.625rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  color: var(--color-foreground);
+  background: var(--color-surface-elevated, var(--color-surface, #fff));
+  border: var(--df-border-width) solid var(--df-border-default, var(--border-default, color-mix(in srgb, var(--color-foreground) 12%, transparent)));
+  border-radius: var(--df-radius-pill, 9999px);
+  transition:
+    border-color var(--df-motion-fast) ease,
+    background var(--df-motion-fast) ease,
+    transform var(--df-motion-fast) var(--df-motion-ease);
+}
+.df-btn-secondary:hover {
+  border-color: var(--df-border-accent, color-mix(in srgb, var(--color-foreground) 18%, var(--border-default, transparent)));
+  background: var(--color-surface-elevated, color-mix(in srgb, var(--color-surface, #fff) 96%, var(--color-background)));
+  transform: translateY(-1px);
+}
+.df-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  font-weight: 500;
+  color: var(--color-signal, var(--color-accent));
+  text-decoration: none;
+  transition: gap var(--df-motion-fast) ease, opacity var(--df-motion-fast) ease;
+}
+.df-btn-ghost:hover { gap: 0.625rem; opacity: 0.85; }
+.df-btn-link {
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  font-weight: 500;
+  color: var(--color-accent, var(--color-signal));
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  transition: opacity var(--df-motion-fast) ease;
+}
+.df-btn-link:hover { opacity: 0.8; }
+
+/* Forms */
+.df-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  font-weight: 500;
+  color: var(--color-foreground);
+}
+.df-input,
+.df-textarea,
+.df-select {
+  width: 100%;
+  border-radius: var(--radius-md, var(--df-radius-md, 10px));
+  border: var(--df-border-width) solid var(--df-border-default, var(--border-default, color-mix(in srgb, var(--color-foreground) 12%, transparent)));
+  background: var(--color-surface-elevated, var(--color-surface, var(--color-background)));
+  padding: 0.75rem 1rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  color: var(--color-foreground);
+  transition:
+    border-color var(--df-motion-fast) ease,
+    box-shadow var(--df-motion-fast) ease;
+}
+.df-textarea { min-height: 7rem; resize: vertical; }
+.df-input::placeholder,
+.df-textarea::placeholder {
+  color: color-mix(in srgb, var(--color-muted, var(--color-foreground)) 70%, transparent);
+}
+.df-input:focus-visible,
+.df-textarea:focus-visible,
+.df-select:focus-visible {
+  outline: none;
+  border-color: var(--color-signal, var(--color-accent));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-signal, var(--color-accent)) 14%, transparent);
+}
+.df-field { display: flex; flex-direction: column; gap: 0.375rem; }
+.df-form-group { display: flex; flex-direction: column; gap: var(--df-stack-gap); }
+
+/* Navigation */
+.df-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  min-height: var(--df-nav-height);
+}
+.df-nav-link {
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  font-weight: 500;
+  color: color-mix(in srgb, var(--color-foreground) 72%, transparent);
+  text-decoration: none;
+  transition: color var(--df-motion-fast) ease;
+}
+.df-nav-link:hover { color: var(--color-foreground); }
+.df-nav-link-active {
+  color: var(--color-foreground);
+  font-weight: 600;
+}
+
+/* Footer */
+.df-footer {
+  padding-block: var(--df-footer-gap);
+  border-top: var(--df-border-width) solid var(--df-border-subtle, var(--border-subtle, color-mix(in srgb, var(--color-foreground) 8%, transparent)));
+  background: var(--color-surface-inset, var(--color-surface, var(--color-background)));
+}
+.df-footer-grid {
+  display: grid;
+  gap: var(--df-stack-gap);
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+}
+.df-footer-col { display: flex; flex-direction: column; gap: 0.75rem; }
+.df-footer-link {
+  font-size: var(--df-text-sm);
+  color: var(--color-muted, color-mix(in srgb, var(--color-foreground) 58%, transparent));
+  text-decoration: none;
+  transition: color var(--df-motion-fast) ease;
+}
+.df-footer-link:hover { color: var(--color-foreground); }
+
+/* Effects & utilities */
+.df-focus-ring:focus-visible {
+  outline: var(--df-focus-width) solid var(--df-focus-color);
+  outline-offset: var(--df-focus-offset);
+}
+.df-accent-line {
+  height: var(--df-border-width);
+  width: 3.5rem;
+  background: linear-gradient(
+    to inline-end,
+    var(--color-signal, var(--color-accent)),
+    transparent
+  );
+}
+
+/* Typography-forward hero when image slots are empty — legacy fallback */
+.df-hero-editorial {
+  margin-inline: auto;
+  width: 100%;
+  max-width: min(44rem, 100%);
+  text-align: center;
+}
+.df-hero-editorial-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: min(88vh, 52rem);
+  padding-block: clamp(4.5rem, 12vh, 8rem);
+}
+.df-hero-editorial .df-accent-line,
+.df-hero-editorial [class*="-rule"],
+.df-hero-editorial [class*="-copper-rule"],
+.df-hero-editorial [class*="-brass-rule"],
+.df-hero-editorial [class*="-azure-rule"],
+.df-hero-editorial [class*="-gold-rule"],
+.df-hero-editorial [class*="-sage-rule"] {
+  margin-inline: auto;
+}
+.df-hero-editorial .df-body,
+.df-hero-editorial [class*="-body"] {
+  margin-inline: auto;
+}
+
+/* Sector-specific empty-hero profiles */
+.df-hero-split-empty-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: min(94vh, 58rem);
+  padding-block: clamp(4rem, 10vh, 7rem);
+}
+.df-hero-split-empty-copy {
+  text-align: start;
+  max-width: none;
+}
+@media (min-width: 1024px) {
+  .df-hero-split-empty-copy { grid-column: span 5 / span 5; }
+  .df-hero-split-empty-visual { grid-column: span 7 / span 7; }
+}
+.df-hero-split-empty-visual {
+  position: relative;
+  min-height: clamp(18rem, 42vh, 28rem);
+}
+
+.df-hero-bleed-empty-section {
+  position: relative;
+  min-height: min(100svh, 56rem);
+  overflow: hidden;
+}
+.df-hero-bleed-empty-backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 90% 70% at 18% 85%, color-mix(in srgb, var(--color-primary) 22%, transparent), transparent 58%),
+    radial-gradient(ellipse 60% 50% at 82% 18%, color-mix(in srgb, var(--color-accent, var(--color-signal)) 14%, transparent), transparent 52%),
+    linear-gradient(168deg, var(--color-background) 0%, color-mix(in srgb, var(--color-surface) 88%, var(--color-background)) 48%, var(--color-background) 100%);
+}
+.df-hero-bleed-empty-content { text-align: start; }
+.df-hero-bleed-empty-copy { text-align: start; }
+.df-hero-bleed-empty-copy [class*="-rule"],
+.df-hero-bleed-empty-copy [class*="-copper-rule"],
+.df-hero-bleed-empty-copy [class*="-brass-rule"],
+.df-hero-bleed-empty-copy [class*="-azure-rule"] {
+  margin-inline: 0;
+}
+
+.df-hero-trust-empty-section {
+  min-height: min(88vh, 52rem);
+  padding-block: clamp(3.5rem, 8vh, 6rem);
+}
+.df-hero-trust-empty-copy { text-align: start; max-width: none; }
+
+.df-hero-type-empty-section {
+  min-height: min(94vh, 58rem);
+  border-bottom: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 12%, transparent));
+}
+.df-hero-type-empty { text-align: start; }
+
+/* Hero collision guards — fluid/smaller viewports */
+[data-v2-component$="-hero"] {
+  isolation: isolate;
+}
+[data-v2-component$="-hero"] h1,
+[data-v2-component$="-hero"] [id$="-hero-title"],
+[data-v2-component$="-hero"] .df-hero-bleed-empty-copy,
+[data-v2-component$="-hero"] [class*="-headline"],
+[data-v2-component$="-hero"] [class*="-display"] {
+  position: relative;
+  z-index: 2;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+/* Typography collision guards — headlines, grids, stacked words */
+.v2-template h1,
+.v2-template h2,
+.v2-template h3,
+.v2-template [class*="-headline"],
+.v2-template [class*="-display"] {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  text-wrap: balance;
+  max-width: 100%;
+}
+.v2-template [class*="-display"] > span,
+.v2-template .df-headline-stack > * {
+  display: block;
+  line-height: var(--df-leading-stacked, 1.05);
+  padding-block: var(--df-stack-word-gap, 0.06em);
+}
+.v2-template [class*="-quote-mark"] {
+  display: block;
+  line-height: 1;
+  height: 0.62em;
+  margin-block-end: 0.2em;
+  overflow: visible;
+}
+.v2-template .grid > *,
+.v2-template [class*="grid-cols"] > *,
+.v2-template .df-grid-12 > * {
+  min-width: 0;
+}
+.v2-template [class*="-metric"],
+.v2-template [class*="-stat-value"] {
+  line-height: var(--df-leading-tight, 1.12);
+}
+.df-hero-type-empty > *,
+.df-hero-split-empty > *,
+.df-hero-estate-empty > *,
+.df-hero-frame-empty > *,
+.df-hero-trust-empty > * {
+  min-width: 0;
+}
+@media (max-width: 1023px) {
+  .df-hero-type-empty {
+    min-height: auto;
+    padding-block: clamp(3rem, 9vh, 5.5rem);
+  }
+  .df-hero-split-empty-section {
+    min-height: auto;
+    padding-block: clamp(3.5rem, 10vh, 6rem);
+  }
+  .df-hero-bleed-empty-content {
+    min-height: min(88svh, 52rem);
+    padding-top: clamp(5rem, 14vh, 8rem);
+  }
+  .df-hero-type-empty [class*="-index-num"] {
+    font-size: clamp(3rem, 12vw, 5rem) !important;
+    line-height: 1 !important;
+  }
+}
+
+.df-hero-estate-empty-section { min-height: min(95svh, 58rem); }
+.df-hero-estate-empty-copy { text-align: start; }
+.df-hero-estate-empty-visual {
+  position: relative;
+  min-height: clamp(20rem, 48vh, 32rem);
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--color-primary) 18%, var(--color-background)), var(--color-background)),
+    radial-gradient(ellipse 70% 60% at 70% 30%, color-mix(in srgb, var(--color-accent, var(--color-signal)) 12%, transparent), transparent 60%);
+}
+
+.df-hero-frame-empty-section { min-height: min(88svh, 54rem); }
+.df-hero-frame-empty-copy { text-align: start; }
+.df-hero-frame-empty-visual {
+  position: relative;
+  min-height: clamp(16rem, 38vh, 24rem);
+}
+.df-hero-scrim {
+  background: linear-gradient(
+    to inline-end,
+    color-mix(in srgb, var(--color-primary) 90%, transparent) 0%,
+    color-mix(in srgb, var(--color-primary) 70%, transparent) 45%,
+    transparent 100%
+  );
+}
+.df-scrim-inline {
+  background: linear-gradient(
+    to inline-end,
+    color-mix(in srgb, var(--color-background) 90%, transparent) 0%,
+    color-mix(in srgb, var(--color-background) 35%, transparent) 52%,
+    transparent 100%
+  );
+}
+
+/* Premium empty image slots — intentional editorial negative space */
+.df-slot-empty {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  min-height: var(--df-slot-min-h, 11rem);
+  background:
+    radial-gradient(
+      ellipse 90% 65% at 50% -10%,
+      color-mix(in srgb, var(--color-accent, var(--color-primary)) 7%, transparent),
+      transparent 68%
+    ),
+    linear-gradient(
+      168deg,
+      color-mix(in srgb, var(--color-surface, #fff) 94%, var(--color-primary)) 0%,
+      color-mix(in srgb, var(--color-background) 97%, var(--color-primary)) 100%
+    );
+  border: 1px solid color-mix(in srgb, var(--color-foreground) 7%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 40%, transparent);
+}
+.df-slot-empty::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(
+      color-mix(in srgb, var(--color-foreground) 4%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-foreground) 4%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 3.5rem 3.5rem;
+  opacity: 0.45;
+  mask-image: radial-gradient(ellipse 75% 75% at 50% 45%, #000 20%, transparent 72%);
+}
+.df-slot-empty::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: auto 12% 14%;
+  height: 1px;
+  background: linear-gradient(
+    to inline-end,
+    transparent,
+    color-mix(in srgb, var(--color-accent, var(--color-primary)) 35%, transparent),
+    transparent
+  );
+  opacity: 0.65;
+}
+[data-slot-empty="hero"].df-slot-empty {
+  min-height: var(--df-slot-min-h-hero, 18rem);
+}
+[data-slot-empty="gallery"].df-slot-empty,
+[data-slot-empty="products"].df-slot-empty {
+  min-height: var(--df-slot-min-h-media, 14rem);
+}
+.df-glow-orb {
+  pointer-events: none;
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(64px);
+  opacity: 0.35;
+}
+.df-quote-mark {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+  font-size: 3.5rem;
+  line-height: 1;
+  color: color-mix(in srgb, var(--color-signal, var(--color-accent)) 28%, transparent);
+}
+.df-star { color: var(--color-signal, var(--color-accent)); letter-spacing: 0.1em; }
+.df-metric {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 500;
+  letter-spacing: var(--df-tracking-tight);
+  color: var(--color-foreground);
+  line-height: var(--df-leading-tight, 1.12);
+}
+.df-grid-bg {
+  background-image:
+    linear-gradient(var(--color-grid, color-mix(in srgb, var(--color-foreground) 4%, transparent)) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid, color-mix(in srgb, var(--color-foreground) 4%, transparent)) 1px, transparent 1px);
+  background-size: 72px 72px;
+}
+
+/* Design Foundation — RTL & Arabic typography */
+[dir="rtl"] .v2-template,
+[dir="rtl"] .v2-template * {
+  letter-spacing: 0.01em;
+}
+
+[dir="rtl"] .v2-template {
+  line-height: 1.75;
+}
+
+[dir="rtl"] .df-eyebrow {
+  letter-spacing: 0.06em;
+}
+
+[dir="rtl"] .df-headline,
+[dir="rtl"] .df-headline-sm,
+[dir="rtl"] [class*="-headline"],
+[dir="rtl"] [class*="-display"] {
+  line-height: 1.28;
+  letter-spacing: 0;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+  text-transform: none;
+}
+
+[dir="rtl"] [class*="-display"] > span,
+[dir="rtl"] .df-headline-stack > * {
+  line-height: 1.22;
+  padding-block: 0.08em;
+}
+
+[dir="rtl"] .df-body,
+[dir="rtl"] .df-prose {
+  line-height: 1.85;
+  max-width: 42rem;
+}
+
+[dir="rtl"] .df-container,
+[dir="rtl"] .df-stack,
+[dir="rtl"] .df-card,
+[dir="rtl"] section {
+  text-align: start;
+}
+
+[dir="rtl"] .text-center {
+  text-align: center;
+}
+
+[dir="rtl"] .df-accent-line,
+[dir="rtl"] [class*="-rule"],
+[dir="rtl"] [class*="-accent-line"],
+[dir="rtl"] [class*="-gold-rule"],
+[dir="rtl"] [class*="-sage-rule"],
+[dir="rtl"] [class*="-volt-line"],
+[dir="rtl"] [class*="-brass-rule"],
+[dir="rtl"] [class*="-copper-rule"],
+[dir="rtl"] [class*="-azure-rule"] {
+  transform-origin: inline-end;
+}
+
+[dir="rtl"] [class*="marquee-track"] {
+  animation-direction: reverse;
+}
+
+[dir="rtl"] .df-hero-scrim {
+  background: linear-gradient(
+    to inline-start,
+    color-mix(in srgb, var(--color-primary) 90%, transparent) 0%,
+    color-mix(in srgb, var(--color-primary) 70%, transparent) 45%,
+    transparent 100%
+  );
+}
+
+[dir="rtl"] .v2-sidebar-shell {
+  flex-direction: row-reverse;
+}
+
+/* Design Foundation — responsive */
+.v2-template .df-container {
+  max-width: var(--container-max, 80rem);
+}
+
+@media (max-width: 767px) {
+  .v2-template .df-nav {
+    flex-wrap: wrap;
+    min-height: auto;
+    padding-block: 0.75rem;
+  }
+  .v2-template .df-footer-grid {
+    grid-template-columns: 1fr;
+  }
+  .v2-template .df-grid-12 {
+    grid-template-columns: 1fr;
+  }
+  .v2-template .df-headline {
+    font-size: clamp(2rem, 8vw, 2.75rem);
+    line-height: var(--df-leading-display, 1.12);
+  }
+  .v2-template [class*="-display"] {
+    font-size: clamp(2rem, 10vw, 3.5rem);
+    line-height: var(--df-leading-stacked, 1.05);
+  }
+  .v2-template [class*="-headline"]:not([class*="-headline-sm"]):not([class*="-headline-lg"]) {
+    font-size: clamp(1.875rem, 8vw, 2.75rem);
+    line-height: var(--df-leading-display, 1.12);
+  }
+  .v2-template [class*="-headline-lg"] {
+    font-size: clamp(2rem, 9vw, 3.25rem);
+    line-height: var(--df-leading-display, 1.12);
+  }
+  .v2-template .df-btn-primary,
+  .v2-template .df-btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (min-width: 768px) {
+  .v2-template .df-grid-12[data-cols="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .v2-template .df-grid-12[data-cols="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1024px) {
+  .v2-template .df-grid-12[data-cols="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .v2-template [data-v2-region="overlay"] {
+    padding-inline: var(--df-container-padding);
+  }
+}
+
+@media (max-width: 1023px) {
+  .v2-template [data-v2-region="header"] {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(12px);
+    background: color-mix(in srgb, var(--color-background) 88%, transparent);
+  }
+}
+
+/* Design Foundation — backward-compatible aliases */
+.df-section-glow,
+.se-section-glow,
+.cb-section-glow,
+.ec-section-glow,
+.mp-section-glow,
+.fn-section-glow,
+.ed-section-glow,
+.hr-section-glow,
+.rep-section-glow,
+.sv-section-glow,
+.cp-section-glow,
+.rs-section-glow,
+.rp-section-glow {
+position: relative; overflow: hidden;
+}
+.df-glow-orb,
+.se-glow-orb,
+.ec-glow-orb,
+.cb-glow-orb {
+pointer-events: none; position: absolute; border-radius: 9999px; filter: blur(64px); opacity: 0.35;
+}
+.df-section-alt,
+.se-section-alt,
+.ec-section-alt,
+.cb-section-alt,
+.mp-section-alt,
+.fn-section-alt,
+.ed-section-alt,
+.hr-section-alt,
+.rep-section-alt,
+.sv-section-alt,
+.cp-section-alt,
+.rs-section-alt,
+.rp-section-alt {
+background: var(--color-surface-elevated, var(--color-surface, #fff));
+}
+.df-card-featured,
+.se-card-featured,
+.cb-card-featured,
+.ec-card-featured {
+border-color: color-mix(in srgb, var(--color-signal, var(--color-accent)) 28%, var(--border-subtle, transparent));
+        background: linear-gradient(155deg, var(--color-primary) 0%, color-mix(in srgb, var(--color-primary) 88%, var(--color-secondary, var(--color-primary))) 100%);
+        color: #fff;
+        box-shadow: var(--shadow-surface);
+}
+.df-quote-mark,
+.se-quote-mark,
+.ec-quote-mark,
+.cb-quote-mark,
+.fn-quote-mark {
+font-family: var(--font-display), ui-serif, Georgia, serif;
+        font-size: 3.5rem;
+        line-height: 1;
+        color: color-mix(in srgb, var(--color-signal, var(--color-accent)) 28%, transparent);
+}
+.df-star,
+.se-star,
+.ec-star,
+.fn-star {
+color: var(--color-signal, var(--color-accent)); letter-spacing: 0.1em;
+}
+.df-input,
+.se-input,
+.ec-input,
+.cb-input,
+.fn-input,
+.mp-input,
+.ed-input,
+.hr-input,
+.rep-input,
+.sv-input,
+.cp-input,
+.rs-input,
+.rp-input {
+width: 100%;
+        border-radius: var(--radius-md, 8px);
+        border: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 12%, transparent));
+        background: var(--color-surface, var(--color-background));
+        padding: 0.75rem 1rem;
+        font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+        font-size: var(--df-text-sm, 0.875rem);
+        color: var(--color-foreground);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.df-textarea,
+.se-textarea,
+.ec-textarea,
+.cb-textarea,
+.fn-textarea,
+.mp-textarea {
+width: 100%;
+        min-height: 7rem;
+        resize: vertical;
+        border-radius: var(--radius-md, 8px);
+        border: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 12%, transparent));
+        background: var(--color-surface, var(--color-background));
+        padding: 0.75rem 1rem;
+        font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+        font-size: var(--df-text-sm, 0.875rem);
+        color: var(--color-foreground);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.df-container,
+.cb-container {
+margin-inline: auto;
+        width: 100%;
+        max-width: var(--container-max, 82rem);
+        padding-inline: var(--df-container-padding, clamp(1.25rem, 4vw, 2.5rem));
+}
+
+.df-section-glow::before,
+.se-section-glow::before,
+.cb-section-glow::before,
+.ec-section-glow::before,
+.mp-section-glow::before,
+.fn-section-glow::before,
+.ed-section-glow::before,
+.hr-section-glow::before,
+.rep-section-glow::before,
+.sv-section-glow::before,
+.cp-section-glow::before,
+.rs-section-glow::before,
+.rp-section-glow::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 55% at 15% 0%, color-mix(in srgb, var(--color-accent, var(--color-signal)) 8%, transparent), transparent 60%),
+    radial-gradient(ellipse 55% 45% at 90% 100%, color-mix(in srgb, var(--color-primary) 6%, transparent), transparent 55%);
+}
+
+.df-input:focus-visible, .se-input:focus-visible, .ec-input:focus-visible, .cb-input:focus-visible, .fn-input:focus-visible,
+.df-textarea:focus-visible, .se-textarea:focus-visible, .ec-textarea:focus-visible, .cb-textarea:focus-visible, .fn-textarea:focus-visible {
+  outline: none;
+  border-color: var(--color-signal, var(--color-accent));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-signal, var(--color-accent)) 14%, transparent);
+}
+
+@keyframes df-slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes se-slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Mono:ital@0;1&family=Inter:wght@300;400;500;600&family=Noto+Sans+Arabic:wght@400;500;600&display=swap");
@@ -58,14 +1069,16 @@
 }
 .cb-headline {
   font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
-  font-size: clamp(3.25rem, 7.5vw, 5.75rem);
-  font-weight: 500; line-height: 0.98; letter-spacing: -0.035em;
+  font-size: var(--df-text-display, clamp(3.25rem, 7.5vw, 5.75rem));
+  font-weight: 500; line-height: var(--df-leading-display, 1.12);
+  letter-spacing: var(--df-headline-tracking, -0.035em);
   color: var(--color-foreground); text-wrap: balance;
 }
 .cb-headline-sm {
   font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
-  font-size: clamp(2rem, 4vw, 3.25rem);
-  font-weight: 500; line-height: 1.06; letter-spacing: -0.028em;
+  font-size: var(--df-text-2xl, clamp(2rem, 4vw, 3.25rem));
+  font-weight: 500; line-height: 1.06;
+  letter-spacing: var(--df-headline-tracking, -0.028em);
   color: var(--color-foreground); text-wrap: balance;
 }
 .cb-body {
@@ -78,6 +1091,18 @@
 .cb-section { padding-block: clamp(6.5rem, 14vw, 10rem); }
 .cb-section-tight { padding-block: clamp(5rem, 10vw, 7rem); }
 .cb-section-alt { background: var(--color-surface-elevated, #FDFCF9); }
+.cb-section-glow {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.cb-section-glow::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 88% 58% at 18% -8%, var(--df-accent-glow, color-mix(in srgb, var(--color-signal) 14%, transparent)), transparent 68%);
+}
 .cb-section-ink { background: var(--color-ink); color: #fff; }
 .cb-divider { height: 1px; background: var(--border-subtle); width: 100%; }
 .cb-container { margin-inline: auto; max-width: 88rem; padding-inline: clamp(1.25rem, 4vw, 2.5rem); }
@@ -95,15 +1120,15 @@
   box-shadow: var(--shadow-surface);
 }
 .cb-card {
-  border: 1px solid var(--border-subtle);
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
+  border: 1px solid var(--df-border-subtle, var(--border-subtle));
+  background: var(--color-surface-elevated, var(--color-surface));
+  border-radius: var(--df-radius-lg, var(--radius-lg));
+  box-shadow: var(--df-shadow-card, var(--shadow-card));
   transition: box-shadow 0.5s cubic-bezier(0.22,1,0.36,1), transform 0.5s cubic-bezier(0.22,1,0.36,1), border-color 0.4s ease;
 }
 .cb-card:hover {
-  box-shadow: var(--shadow-surface);
-  border-color: var(--border-accent);
+  box-shadow: var(--df-shadow-elevated, var(--shadow-surface));
+  border-color: var(--df-border-accent, var(--border-accent));
   transform: translateY(-2px);
 }
 .cb-card-featured, .se-card-featured {
@@ -112,11 +1137,17 @@
   color: #fff; box-shadow: var(--shadow-surface);
 }
 .cb-card-glass {
-  background: color-mix(in srgb, var(--color-surface) 82%, transparent);
-  backdrop-filter: blur(20px);
-  border: 1px solid color-mix(in srgb, #fff 60%, var(--border-subtle));
-  border-radius: var(--radius-lg);
-  box-shadow: 0 8px 32px rgba(8,14,24,0.06);
+  background: color-mix(in srgb, var(--color-surface-elevated, var(--color-surface)) 82%, transparent);
+  backdrop-filter: blur(20px) saturate(1.1);
+  border: 1px solid var(--df-border-subtle, color-mix(in srgb, #fff 60%, var(--border-subtle)));
+  border-radius: var(--df-radius-lg, var(--radius-lg));
+  box-shadow: var(--df-shadow-card, 0 8px 32px rgba(8,14,24,0.06));
+  transition: box-shadow 0.4s ease, border-color 0.35s ease, transform 0.4s cubic-bezier(0.22,1,0.36,1);
+}
+.cb-card-glass:hover {
+  border-color: var(--df-border-accent, var(--border-accent));
+  box-shadow: var(--df-shadow-elevated, var(--shadow-surface));
+  transform: translateY(-1px);
 }
 
 .cb-btn-primary {
@@ -165,8 +1196,9 @@
 
 .cb-metric {
   font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
-  font-size: clamp(2rem, 3.5vw, 2.75rem);
-  font-weight: 500; letter-spacing: -0.03em;
+  font-size: var(--df-text-3xl, clamp(2rem, 3.5vw, 2.75rem));
+  font-weight: 500;
+  letter-spacing: var(--df-headline-tracking, -0.03em);
   color: var(--color-foreground); line-height: 1;
 }
 .cb-metric-label {
@@ -183,7 +1215,7 @@
 .cb-hero-atmosphere {
   pointer-events: none; position: absolute; inset: 0;
   background:
-    radial-gradient(ellipse 90% 70% at 85% 15%, color-mix(in srgb, var(--color-signal) 9%, transparent), transparent 55%),
+    radial-gradient(ellipse 90% 70% at 85% 15%, var(--df-accent-glow, color-mix(in srgb, var(--color-signal) 9%, transparent)), transparent 55%),
     radial-gradient(ellipse 60% 50% at 10% 80%, color-mix(in srgb, var(--color-primary) 6%, transparent), transparent 50%),
     linear-gradient(180deg, var(--color-background) 0%, color-mix(in srgb, var(--color-surface-elevated, #FDFCF9) 40%, var(--color-background)) 100%);
 }
@@ -260,7 +1292,7 @@
 
 .cb-quote-mark {
   font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
-  font-size: 5rem; line-height: 0.8; color: color-mix(in srgb, var(--color-signal) 22%, transparent);
+  font-size: 5rem; line-height: 1; color: color-mix(in srgb, var(--color-signal) 22%, transparent);
 }
 .cb-star { color: var(--color-signal); letter-spacing: 0.14em; }
 
@@ -287,7 +1319,7 @@
   background: radial-gradient(ellipse 80% 50% at 50% -10%, color-mix(in srgb, var(--color-signal) 6%, transparent), transparent 70%);
 }
 .se-eyebrow { font-family: var(--font-body), "Inter", system-ui, sans-serif; font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: var(--color-signal); }
-.se-headline { font-family: var(--font-display), "Cormorant Garamond", Georgia, serif; font-size: clamp(3.25rem, 7.5vw, 5.75rem); font-weight: 500; line-height: 0.98; letter-spacing: -0.035em; color: var(--color-foreground); text-wrap: balance; }
+.se-headline { font-family: var(--font-display), "Cormorant Garamond", Georgia, serif; font-size: clamp(3.25rem, 7.5vw, 5.75rem); font-weight: 500; line-height: var(--df-leading-display, 1.12); letter-spacing: var(--df-headline-tracking, -0.035em); color: var(--color-foreground); text-wrap: balance; }
 .se-headline-sm { font-family: var(--font-display), "Cormorant Garamond", Georgia, serif; font-size: clamp(2rem, 4vw, 3.25rem); font-weight: 500; line-height: 1.06; letter-spacing: -0.028em; color: var(--color-foreground); text-wrap: balance; }
 .se-body { font-family: var(--font-body), "Inter", system-ui, sans-serif; font-size: 1.125rem; line-height: 1.8; color: var(--color-muted); font-weight: 400; }
 .se-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 3.125rem; padding: 0 1.75rem; font-family: var(--font-body), "Inter", system-ui, sans-serif; font-size: 0.9375rem; font-weight: 500; letter-spacing: -0.01em; text-decoration: none; color: var(--color-ink); background: linear-gradient(180deg, color-mix(in srgb, var(--color-signal) 95%, #fff), var(--color-signal)); border: 1px solid color-mix(in srgb, var(--color-signal) 70%, #000); border-radius: 9999px; box-shadow: 0 1px 2px rgba(8,14,24,0.06), 0 8px 24px color-mix(in srgb, var(--color-signal) 25%, transparent); transition: transform 0.25s ease, box-shadow 0.35s ease, filter 0.25s ease; }
@@ -296,13 +1328,13 @@
 .se-btn-secondary:hover { border-color: color-mix(in srgb, var(--color-foreground) 18%, var(--border-default)); background: var(--color-surface-elevated, #FDFCF9); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(8,14,24,0.06); }
 .se-card { border: 1px solid var(--border-subtle); background: var(--color-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); transition: box-shadow 0.5s cubic-bezier(0.22,1,0.36,1), transform 0.5s cubic-bezier(0.22,1,0.36,1), border-color 0.4s ease; }
 .se-card:hover { box-shadow: var(--shadow-surface); border-color: var(--border-accent); transform: translateY(-2px); }
-.se-metric { font-family: var(--font-display), "Cormorant Garamond", Georgia, serif; font-size: clamp(2rem, 3.5vw, 2.75rem); font-weight: 500; letter-spacing: -0.03em; color: var(--color-foreground); line-height: 1; }
+.se-metric { font-family: var(--font-display), "Cormorant Garamond", Georgia, serif; font-size: clamp(2rem, 3.5vw, 2.75rem); font-weight: 500; letter-spacing: -0.03em; color: var(--color-foreground); line-height: var(--df-leading-tight, 1.12); }
 .se-focus-ring:focus-visible { outline: 2px solid var(--color-signal); outline-offset: 3px; }
 .se-font-display { font-family: var(--font-display), "Cormorant Garamond", Georgia, serif; }
 .se-font-body { font-family: var(--font-body), "Inter", system-ui, sans-serif; }
 .se-font-mono { font-family: "DM Mono", ui-monospace, monospace; }
 .se-star { color: var(--color-signal); letter-spacing: 0.14em; }
-.se-quote-mark { font-family: var(--font-display), "Cormorant Garamond", Georgia, serif; font-size: 5rem; line-height: 0.8; color: color-mix(in srgb, var(--color-signal) 22%, transparent); }
+.se-quote-mark { font-family: var(--font-display), "Cormorant Garamond", Georgia, serif; font-size: 5rem; line-height: 1; color: color-mix(in srgb, var(--color-signal) 22%, transparent); }
 .se-trust-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 1.5rem 2rem; }
 .se-trust-badge { display: inline-flex; align-items: center; gap: 0.375rem; border-radius: 9999px; border: 1px solid var(--border-default); background: var(--color-surface); padding: 0.35rem 0.875rem; font-family: var(--font-body), "Inter", system-ui, sans-serif; font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-muted); }
 .se-card-featured { border-color: color-mix(in srgb, var(--color-signal) 28%, var(--border-subtle)); background: linear-gradient(155deg, var(--color-ink) 0%, color-mix(in srgb, var(--color-ink) 88%, var(--color-primary)) 100%); color: #fff; box-shadow: var(--shadow-surface); }
@@ -523,14 +1555,28 @@
 .v2-layout-editorial-reveal .v2-overlay-reveal { width: 100%; }
 
 :root {
-  --container-max: 88rem;
+  --container-max: 80rem;
   --font-body: Inter, ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Cormorant Garamond", ui-sans-serif, system-ui, sans-serif;
+  --font-display: Inter, ui-sans-serif, system-ui, sans-serif;
   --color-surface: #FFFFFF;
   --color-foreground: #080E18;
   --color-background: #F7F6F3;
   --color-accent: #C4A574;
   --color-secondary: #152238; --color-primary: #080E18; }
+
+/* V2 Website Blueprint — design director output */
+:root {
+  --bp-blueprint-id: "bp-corporate-business-general";
+  --bp-container-narrow: 40rem;
+  --bp-container-default: 80rem;
+  --bp-container-wide: 88rem;
+  --bp-grid-columns: 12;
+  --bp-grid-gutter: 1.5rem;
+  --bp-grid-rhythm: balanced;
+  --bp-motion-intensity: subtle;
+  --bp-cta-emphasis: standard;
+  --container-max: 80rem;
+}
 
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
@@ -559,6 +1605,30 @@
     body:not(:has(.page:target)) .page#home { display: block; }
     img { max-width: 100%; height: auto; display: block; }
     a { color: inherit; }
+    .v2-preview-error {
+      margin: 2rem auto;
+      max-width: 36rem;
+      padding: 1.5rem 1.75rem;
+      border: 1px solid color-mix(in srgb, var(--color-foreground, #f8fafc) 12%, transparent);
+      border-radius: 0.75rem;
+      background: color-mix(in srgb, var(--color-surface, #1e293b) 88%, transparent);
+      text-align: center;
+    }
+    .v2-preview-error-title {
+      margin: 0 0 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--color-foreground, #f8fafc);
+    }
+    .v2-preview-error-detail {
+      margin: 0;
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      color: color-mix(in srgb, var(--color-foreground, #f8fafc) 72%, transparent);
+      word-break: break-word;
+    }
   </style>
   <script src="https://cdn.tailwindcss.com"></script>
 <style id="tbdp-wiring-layer">
@@ -730,7 +1800,7 @@
 </head>
 <body>
   <div class="page" id="home">
-    <link rel="preload" as="image" href="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" fetchPriority="high"/><div class="flex min-h-screen flex-col bg-[var(--color-background)] text-[var(--color-foreground)] antialiased v2-template v2-corporate-business" data-v2-package="corporate-business" data-v2-composer="region-grid" data-v2-layout="default"><header data-v2-region="header"><header data-v2-component="corporate-business-nav" class="sticky top-0 z-50 transition-all duration-500 border-b border-transparent bg-transparent"><div class="cb-container flex h-[4.5rem] items-center justify-between gap-8 lg:h-[5rem]"><a href="#top" class="cb-font-display group flex items-center gap-3.5 text-[1.125rem] font-medium tracking-tight text-[var(--color-foreground)] cb-focus-ring"><span class="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border-accent)] bg-[var(--color-ink)] text-sm font-medium text-[var(--color-signal)] transition group-hover:border-[var(--color-signal)]" aria-hidden="true">M</span><span class="hidden sm:inline">Meridian Advisory</span></a><nav aria-label="Primary" class="hidden items-center gap-11 lg:flex"><a href="#about" class="cb-nav-link cb-focus-ring">About</a><a href="#features" class="cb-nav-link cb-focus-ring">Capabilities</a><a href="#customers" class="cb-nav-link cb-focus-ring">Outcomes</a><a href="#contact" class="cb-nav-link cb-focus-ring">Contact</a></nav><div class="flex items-center gap-3"><a href="#contact" class="cb-btn-primary hidden sm:inline-flex">Schedule consultation</a><button type="button" aria-expanded="false" aria-controls="cb-mobile-nav" aria-label="Open menu" class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border-default)] bg-[var(--color-surface)] lg:hidden cb-focus-ring"><span class="sr-only">Menu</span><span aria-hidden="true" class="flex flex-col gap-1.5"><span class="block h-px w-5 bg-current transition "></span><span class="block h-px w-5 bg-current transition "></span><span class="block h-px w-5 bg-current transition "></span></span></button></div></div></header></header><main data-v2-region="main" class="v2-region-grid flex flex-col"><h1 class="v2-sr-only">Meridian Advisory</h1><section id="top" data-v2-component="corporate-business-hero" aria-labelledby="cb-hero-title" class="relative min-h-[100svh] overflow-hidden bg-[var(--color-background)]"><div class="cb-hero-atmosphere" aria-hidden="true"></div><div class="cb-hero-grid" aria-hidden="true"></div><div class="cb-paper-grain pointer-events-none absolute inset-0" aria-hidden="true"></div><div class="cb-container relative flex min-h-[calc(100svh-5rem)] flex-col justify-center py-20 lg:py-28"><div class="grid items-center gap-16 lg:grid-cols-12 lg:gap-20"><div class="lg:col-span-6 xl:col-span-5"><p class="cb-eyebrow mb-7">Corporate advisory</p><h1 id="cb-hero-title" class="cb-headline max-w-[11ch]">Strategy and execution for the enterprise</h1><p class="cb-body mt-10">We help global organizations modernize operations, strengthen governance, and deliver lasting stakeholder value — with board-ready counsel and measurable outcomes.</p><div class="mt-12 flex flex-wrap items-center gap-4"><a href="#contact" class="cb-btn-primary cb-focus-ring">Schedule consultation</a><a href="#features" class="cb-btn-secondary cb-focus-ring">Our capabilities</a></div><div class="mt-20"><p class="cb-font-body mb-6 text-[0.6875rem] font-medium uppercase tracking-[0.2em] text-[var(--color-muted)]">Advising leaders at</p><div class="cb-trust-fade overflow-hidden" aria-label="Trusted by leading organizations"><div class="cb-marquee-track flex w-max gap-14"><span class="cb-trust-logo">Goldman Sachs</span><span class="cb-trust-logo">Siemens</span><span class="cb-trust-logo">Deloitte</span><span class="cb-trust-logo">McKinsey</span><span class="cb-trust-logo">Accenture</span><span class="cb-trust-logo">Blackstone</span><span class="cb-trust-logo">JPMorgan</span><span class="cb-trust-logo">Goldman Sachs</span><span class="cb-trust-logo">Siemens</span><span class="cb-trust-logo">Deloitte</span><span class="cb-trust-logo">McKinsey</span><span class="cb-trust-logo">Accenture</span><span class="cb-trust-logo">Blackstone</span><span class="cb-trust-logo">JPMorgan</span></div></div></div></div><div class="relative lg:col-span-6 xl:col-span-7"><div class="cb-hero-visual-glow" aria-hidden="true"></div><div class="relative ms-auto aspect-[4/5] max-w-[36rem] sm:aspect-[5/6]"><div class="absolute inset-0 overflow-hidden rounded-[var(--radius-xl,20px)] border border-[var(--border-subtle)] bg-[var(--color-ink)] shadow-[var(--shadow-surface)]" aria-hidden="true"><div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_70%_20%,rgba(196,165,116,0.22),transparent_55%),radial-gradient(ellipse_50%_40%_at_20%_80%,rgba(255,255,255,0.06),transparent_50%),linear-gradient(165deg,#0a1220_0%,#080e18_45%,#121c2e_100%)]"></div><div class="absolute inset-0 opacity-[0.18]" style="background-image:linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px);background-size:48px 48px"></div><div class="absolute -end-8 top-[18%] h-40 w-40 rounded-full bg-[radial-gradient(circle,rgba(196,165,116,0.35),transparent_68%)] blur-2xl"></div><div class="absolute start-[12%] top-[58%] h-px w-[76%] bg-gradient-to-r from-transparent via-[var(--color-signal)]/50 to-transparent"></div><div class="absolute start-[12%] top-[68%] h-px w-[52%] bg-gradient-to-r from-transparent via-white/20 to-transparent"></div><div class="absolute inset-0 opacity-[0.14] mix-blend-overlay"><img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="" class="h-full w-full scale-110 object-cover object-center saturate-0 contrast-125" loading="eager" fetchPriority="high"/></div><div class="absolute inset-x-8 top-8 flex items-center justify-between"><span class="cb-font-mono text-[0.5625rem] uppercase tracking-[0.18em] text-white/35">Meridian Atlas</span><span class="h-2 w-2 rounded-full bg-[var(--color-signal)] shadow-[0_0_16px_rgba(196,165,116,0.8)]"></span></div><div class="absolute inset-x-8 bottom-8 rounded-[var(--radius-lg)] border border-white/10 bg-white/5 p-6 backdrop-blur-md"><p class="cb-font-display text-[clamp(1.5rem,2.5vw,2rem)] font-medium leading-tight text-white">Board-ready counsel for global enterprises</p><p class="cb-font-body mt-3 text-sm leading-relaxed text-white/55">Strategy, governance, and transformation under one senior partner team.</p></div></div><div class="absolute -start-4 top-10 z-10 hidden rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--color-surface)] px-5 py-4 shadow-[var(--shadow-surface)] sm:block lg:-start-8"><p class="cb-metric text-3xl">40yr</p><p class="cb-metric-label mt-1">Partner tenure</p></div><div class="absolute -end-3 bottom-24 z-10 hidden rounded-[var(--radius-lg)] border border-white/10 bg-[var(--color-ink)] px-5 py-4 shadow-[var(--shadow-surface)] sm:block lg:-end-6"><p class="cb-font-mono text-[0.5625rem] uppercase tracking-[0.14em] text-[var(--color-signal)]">Retention</p><p class="cb-font-display mt-1 text-3xl font-medium text-white">97%</p></div></div><div class="mt-6 grid grid-cols-3 gap-3 sm:gap-4"><div class="cb-card-glass px-4 py-5 sm:px-5 sm:py-6"><p class="cb-metric text-[clamp(1.5rem,2.5vw,2rem)]">500+</p><p class="cb-metric-label mt-2">Enterprise clients</p><p class="cb-metric-detail mt-1.5">Global footprint</p></div><div class="cb-card-glass px-4 py-5 sm:px-5 sm:py-6"><p class="cb-metric text-[clamp(1.5rem,2.5vw,2rem)]">28</p><p class="cb-metric-label mt-2">Countries served</p><p class="cb-metric-detail mt-1.5">Active markets</p></div><div class="cb-card-glass px-4 py-5 sm:px-5 sm:py-6"><p class="cb-metric text-[clamp(1.5rem,2.5vw,2rem)]">97%</p><p class="cb-metric-label mt-2">Client retention</p><p class="cb-metric-detail mt-1.5">3-year average</p></div></div></div></div></div></section><section id="features" data-v2-component="corporate-business-features" aria-labelledby="cb-features-title" class="cb-section cb-section-alt"><div class="cb-container"><div class="mb-20 grid gap-10 lg:grid-cols-2 lg:items-end"><header><p class="cb-eyebrow mb-6">Capabilities</p><h2 id="cb-features-title" class="cb-headline-sm max-w-[14ch]">Advisory built for enterprise complexity</h2><div class="cb-accent-line mt-8" aria-hidden="true"></div></header><p class="cb-prose lg:justify-self-end lg:text-end">Integrated practices across strategy, operations, and governance — delivered by senior partners with sector depth.</p></div><div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-12"><article class="group relative flex flex-col justify-between overflow-hidden p-9 sm:p-10 cb-card-featured min-h-[22rem] lg:min-h-[24rem] lg:col-span-7 lg:row-span-2"><div><span class="cb-font-mono text-[0.625rem] tracking-[0.18em] text-[var(--color-signal)]">01</span><h3 class="cb-font-display mt-8 text-[clamp(1.375rem,2vw,1.75rem)] font-medium leading-tight text-white">Strategic advisory</h3><p class="cb-font-body mt-5 max-w-md text-[0.9375rem] leading-[1.75] text-white/68">Board-level counsel on market entry, portfolio optimization, and long-range capital allocation.</p></div><a href="#contact" class="cb-btn-ghost mt-10 text-[var(--color-signal)]">Learn more <span aria-hidden="true">→</span></a></article><article class="group relative flex flex-col justify-between overflow-hidden p-9 sm:p-10 cb-card lg:col-span-5"><div><span class="cb-font-mono text-[0.625rem] tracking-[0.18em] text-[var(--color-signal)]">02</span><h3 class="cb-font-display mt-8 text-[clamp(1.375rem,2vw,1.75rem)] font-medium leading-tight text-[var(--color-foreground)]">Operational excellence</h3><p class="cb-font-body mt-5 max-w-md text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Lean operating models, supply-chain resilience, and performance management at scale.</p></div><a href="#contact" class="cb-btn-ghost mt-10 ">Learn more <span aria-hidden="true">→</span></a></article><article class="group relative flex flex-col justify-between overflow-hidden p-9 sm:p-10 cb-card lg:col-span-5"><div><span class="cb-font-mono text-[0.625rem] tracking-[0.18em] text-[var(--color-signal)]">03</span><h3 class="cb-font-display mt-8 text-[clamp(1.375rem,2vw,1.75rem)] font-medium leading-tight text-[var(--color-foreground)]">Governance &amp; risk</h3><p class="cb-font-body mt-5 max-w-md text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Enterprise risk frameworks, compliance programs, and stakeholder reporting you can defend.</p></div><a href="#contact" class="cb-btn-ghost mt-10 ">Learn more <span aria-hidden="true">→</span></a></article><article class="group relative flex flex-col justify-between overflow-hidden p-9 sm:p-10 cb-card lg:col-span-12"><div><span class="cb-font-mono text-[0.625rem] tracking-[0.18em] text-[var(--color-signal)]">04</span><h3 class="cb-font-display mt-8 text-[clamp(1.375rem,2vw,1.75rem)] font-medium leading-tight text-[var(--color-foreground)]">Transformation delivery</h3><p class="cb-font-body mt-5 max-w-md text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">End-to-end program leadership from discovery through change management and measurable outcomes.</p></div><a href="#contact" class="cb-btn-ghost mt-10 ">Learn more <span aria-hidden="true">→</span></a></article></div></div></section><section id="about" data-v2-component="corporate-business-about" aria-labelledby="cb-about-title" class="cb-section"><div class="cb-container"><div class="grid items-center gap-16 lg:grid-cols-12 lg:gap-20"><div class="relative lg:col-span-6"><div class="absolute -start-4 -top-4 h-24 w-24 border border-[var(--border-accent)]/50" aria-hidden="true"></div><div class="cb-hero-frame relative aspect-[4/5] max-w-md"><img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="Meridian Advisory leadership team" class="h-full w-full object-cover object-center saturate-[0.9]" loading="lazy"/></div><div class="cb-card-glass absolute -bottom-6 -end-4 max-w-[14rem] px-5 py-4 sm:-end-8"><p class="cb-metric text-3xl">40yr</p><p class="cb-metric-label mt-1">Combined partner tenure</p></div></div><div class="lg:col-span-6 lg:ps-8"><p class="cb-eyebrow mb-6">About Meridian</p><p class="cb-font-body mb-4 text-sm text-[var(--color-signal)]">Four decades of board-level counsel</p><h2 id="cb-about-title" class="cb-headline-sm max-w-[16ch]">Trusted leadership for complex organizations</h2><div class="cb-accent-line mt-8" aria-hidden="true"></div><p class="cb-prose mt-8">For over twenty years we have partnered with global enterprises to deliver strategy, transformation, and measurable outcomes — with integrity at the center of every engagement.</p><ul class="mt-10 space-y-4"><li class="flex gap-4"><span class="mt-1.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-[0.625rem] text-[var(--color-signal)]" aria-hidden="true">✓</span><span class="cb-font-body text-sm leading-relaxed text-[var(--color-foreground)]">Fortune 500 advisory experience across financial services and industrials</span></li><li class="flex gap-4"><span class="mt-1.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-[0.625rem] text-[var(--color-signal)]" aria-hidden="true">✓</span><span class="cb-font-body text-sm leading-relaxed text-[var(--color-foreground)]">Offices across North America, Europe, and MENA with local partner coverage</span></li><li class="flex gap-4"><span class="mt-1.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-[0.625rem] text-[var(--color-signal)]" aria-hidden="true">✓</span><span class="cb-font-body text-sm leading-relaxed text-[var(--color-foreground)]">ISO-certified governance frameworks and independent ethics review</span></li></ul><a href="#contact" class="cb-btn-primary cb-focus-ring mt-12 inline-flex">Speak with an advisor</a></div></div></div></section><section id="stats" data-v2-component="corporate-business-stats" aria-labelledby="cb-stats-title" class="cb-section-tight cb-section-ink relative overflow-hidden"><div class="cb-grid-bg pointer-events-none absolute inset-0 opacity-[0.05]" aria-hidden="true"></div><div class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--color-signal)]/25 to-transparent" aria-hidden="true"></div><div class="cb-container relative"><div class="mb-14 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between"><div><p class="cb-eyebrow text-[var(--color-signal)]/80">Track record</p><h2 id="cb-stats-title" class="cb-headline-sm mt-4 max-w-[14ch] text-white">Outcomes our clients measure</h2></div><p class="cb-font-body max-w-sm text-sm leading-relaxed text-white/50 lg:text-end">Representative results from recent advisory and transformation engagements.</p></div><div class="grid gap-px overflow-hidden rounded-[var(--radius-xl,20px)] border border-white/8 bg-white/8 sm:grid-cols-2 lg:grid-cols-4"><div class="bg-[color-mix(in_srgb,var(--color-ink)_92%,var(--color-primary))] px-8 py-10 sm:px-10 sm:py-12"><p class="cb-font-mono text-[0.5625rem] uppercase tracking-[0.16em] text-[var(--color-signal)]/70">01</p><p class="cb-font-display mt-4 text-[clamp(2.25rem,4vw,3rem)] font-medium leading-none text-white">40yr</p><p class="cb-font-body mt-3 text-sm text-white/70">Combined partner tenure</p><p class="cb-font-mono mt-2 text-[0.625rem] uppercase tracking-[0.1em] text-white/35">Senior leadership</p></div><div class="bg-[color-mix(in_srgb,var(--color-ink)_92%,var(--color-primary))] px-8 py-10 sm:px-10 sm:py-12"><p class="cb-font-mono text-[0.5625rem] uppercase tracking-[0.16em] text-[var(--color-signal)]/70">02</p><p class="cb-font-display mt-4 text-[clamp(2.25rem,4vw,3rem)] font-medium leading-none text-white">28</p><p class="cb-font-body mt-3 text-sm text-white/70">Countries served</p><p class="cb-font-mono mt-2 text-[0.625rem] uppercase tracking-[0.1em] text-white/35">Global delivery</p></div><div class="bg-[color-mix(in_srgb,var(--color-ink)_92%,var(--color-primary))] px-8 py-10 sm:px-10 sm:py-12"><p class="cb-font-mono text-[0.5625rem] uppercase tracking-[0.16em] text-[var(--color-signal)]/70">03</p><p class="cb-font-display mt-4 text-[clamp(2.25rem,4vw,3rem)] font-medium leading-none text-white">97%</p><p class="cb-font-body mt-3 text-sm text-white/70">Client retention</p><p class="cb-font-mono mt-2 text-[0.625rem] uppercase tracking-[0.1em] text-white/35">Three-year average</p></div><div class="bg-[color-mix(in_srgb,var(--color-ink)_92%,var(--color-primary))] px-8 py-10 sm:px-10 sm:py-12"><p class="cb-font-mono text-[0.5625rem] uppercase tracking-[0.16em] text-[var(--color-signal)]/70">04</p><p class="cb-font-display mt-4 text-[clamp(2.25rem,4vw,3rem)] font-medium leading-none text-white">14wk</p><p class="cb-font-body mt-3 text-sm text-white/70">Discovery to roadmap</p><p class="cb-font-mono mt-2 text-[0.625rem] uppercase tracking-[0.1em] text-white/35">Typical engagement</p></div></div></div></section><section id="customers" data-v2-component="corporate-business-portfolio" aria-labelledby="cb-portfolio-title" class="cb-section"><div class="cb-container"><div class="mb-16 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between"><header class="max-w-xl"><p class="cb-eyebrow mb-6">Client outcomes</p><h2 id="cb-portfolio-title" class="cb-headline-sm">Boards trust Meridian Advisory</h2></header><p class="cb-prose lg:max-w-md lg:text-end">Executive teams navigate transformation, governance, and global expansion with measurable strategic impact.</p></div><div class="space-y-6"><article class="cb-card group grid overflow-hidden lg:grid-cols-12"><div class="relative aspect-[16/9] overflow-hidden lg:col-span-5 lg:aspect-auto lg:min-h-[16rem]"><img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="Apex Holdings engagement" class="h-full w-full object-cover saturate-[0.88] transition-transform duration-700 group-hover:scale-[1.03]" loading="lazy"/><div class="absolute inset-0 bg-gradient-to-r from-[var(--color-ink)]/40 to-transparent lg:bg-gradient-to-t lg:from-[var(--color-ink)]/50"></div><div class="absolute bottom-6 start-6"><p class="cb-font-mono text-[0.5625rem] uppercase tracking-[0.14em] text-white/60">Case study 01</p><p class="cb-font-display mt-1 text-xl font-medium text-white">Apex Holdings</p></div></div><div class="flex flex-col justify-center p-8 sm:p-10 lg:col-span-7"><p class="cb-font-mono text-[0.625rem] uppercase tracking-[0.12em] text-[var(--color-muted)]">Private Equity</p><div class="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-1"><span class="cb-metric">3.2×</span><span class="cb-font-body text-sm text-[var(--color-muted)]">portfolio value uplift</span></div><p class="cb-font-body mt-6 max-w-lg text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Restructured operating model across 4 portfolio companies within 18 months.</p><a href="#contact" class="cb-btn-ghost mt-8">Discuss a similar engagement <span aria-hidden="true">→</span></a></div></article><article class="cb-card group grid overflow-hidden lg:grid-cols-12"><div class="relative aspect-[16/9] overflow-hidden lg:col-span-5 lg:aspect-auto lg:min-h-[16rem]"><img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="Northgate Financial engagement" class="h-full w-full object-cover saturate-[0.88] transition-transform duration-700 group-hover:scale-[1.03]" loading="lazy"/><div class="absolute inset-0 bg-gradient-to-r from-[var(--color-ink)]/40 to-transparent lg:bg-gradient-to-t lg:from-[var(--color-ink)]/50"></div><div class="absolute bottom-6 start-6"><p class="cb-font-mono text-[0.5625rem] uppercase tracking-[0.14em] text-white/60">Case study 02</p><p class="cb-font-display mt-1 text-xl font-medium text-white">Northgate Financial</p></div></div><div class="flex flex-col justify-center p-8 sm:p-10 lg:col-span-7"><p class="cb-font-mono text-[0.625rem] uppercase tracking-[0.12em] text-[var(--color-muted)]">Banking</p><div class="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-1"><span class="cb-metric">$840M</span><span class="cb-font-body text-sm text-[var(--color-muted)]">risk exposure reduced</span></div><p class="cb-font-body mt-6 max-w-lg text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Board-level governance framework aligned regulatory compliance with growth strategy.</p><a href="#contact" class="cb-btn-ghost mt-8">Discuss a similar engagement <span aria-hidden="true">→</span></a></div></article><article class="cb-card group grid overflow-hidden lg:grid-cols-12"><div class="relative aspect-[16/9] overflow-hidden lg:col-span-5 lg:aspect-auto lg:min-h-[16rem]"><img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&amp;fit=crop&amp;w=1600&amp;q=82" alt="Helix Manufacturing engagement" class="h-full w-full object-cover saturate-[0.88] transition-transform duration-700 group-hover:scale-[1.03]" loading="lazy"/><div class="absolute inset-0 bg-gradient-to-r from-[var(--color-ink)]/40 to-transparent lg:bg-gradient-to-t lg:from-[var(--color-ink)]/50"></div><div class="absolute bottom-6 start-6"><p class="cb-font-mono text-[0.5625rem] uppercase tracking-[0.14em] text-white/60">Case study 03</p><p class="cb-font-display mt-1 text-xl font-medium text-white">Helix Manufacturing</p></div></div><div class="flex flex-col justify-center p-8 sm:p-10 lg:col-span-7"><p class="cb-font-mono text-[0.625rem] uppercase tracking-[0.12em] text-[var(--color-muted)]">Industrial</p><div class="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-1"><span class="cb-metric">28%</span><span class="cb-font-body text-sm text-[var(--color-muted)]">margin improvement</span></div><p class="cb-font-body mt-6 max-w-lg text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Supply chain optimization and leadership succession planning across 3 regions.</p><a href="#contact" class="cb-btn-ghost mt-8">Discuss a similar engagement <span aria-hidden="true">→</span></a></div></article></div></div></section><section id="testimonials" data-v2-component="corporate-business-testimonials" aria-labelledby="cb-testimonials-title" class="cb-section cb-section-alt"><div class="cb-container"><header class="mb-16 max-w-2xl"><p class="cb-eyebrow mb-5">Client stories</p><h2 id="cb-testimonials-title" class="cb-headline-sm">Trusted by executive sponsors</h2><p class="cb-prose mt-6">Leaders who partner with Meridian for strategy, transformation, and governance.</p></header><div class="grid gap-6 lg:grid-cols-12 lg:gap-8"><article class="cb-card-featured relative flex flex-col justify-between p-10 sm:p-12 lg:col-span-7 lg:row-span-2 lg:min-h-[24rem]"><div><span class="cb-quote-mark" aria-hidden="true">&quot;</span><blockquote class="cb-font-display -mt-6 text-[clamp(1.375rem,2.5vw,1.75rem)] font-medium leading-[1.45] text-white/92">Meridian brought board-level clarity to a complex transformation — our operating model is stronger and our stakeholders finally align on priorities.</blockquote></div><footer class="mt-10 border-t border-white/10 pt-8"><p class="cb-font-body text-sm font-medium text-white">Catherine Holt</p><p class="cb-font-body mt-1 text-sm text-white/55">Chief Operating Officer, Axiom Industrial Group</p><p class="cb-star mt-4 text-sm" aria-label="5 out of 5 stars">★★★★★</p></footer></article><article class="cb-card flex flex-col justify-between p-8 lg:col-span-5"><blockquote class="cb-font-body text-[0.9375rem] leading-[1.75] text-[var(--color-foreground)]">&quot;Their partners embedded with our leadership team and delivered measurable EBITDA impact within the first two quarters.&quot;</blockquote><footer class="mt-8 border-t border-[var(--border-subtle)] pt-6"><p class="cb-font-body text-sm font-medium text-[var(--color-foreground)]">Raj Mehta</p><p class="cb-font-body mt-1 text-xs text-[var(--color-muted)]">Managing Director, Harbor Capital Partners</p></footer></article><article class="cb-card flex flex-col justify-between p-8 lg:col-span-5"><blockquote class="cb-font-body text-[0.9375rem] leading-[1.75] text-[var(--color-foreground)]">&quot;The most rigorous advisory relationship we have had — governance, risk, and execution under one disciplined program.&quot;</blockquote><footer class="mt-8 border-t border-[var(--border-subtle)] pt-6"><p class="cb-font-body text-sm font-medium text-[var(--color-foreground)]">Elena Brandt</p><p class="cb-font-body mt-1 text-xs text-[var(--color-muted)]">General Counsel, Northgate Financial</p></footer></article></div></div></section><section id="pricing" data-v2-component="corporate-business-pricing" aria-labelledby="cb-pricing-title" class="cb-section cb-section-alt relative"><div class="cb-container"><header class="mx-auto mb-16 max-w-2xl text-center"><p class="cb-eyebrow mb-6">Engagements</p><h2 id="cb-pricing-title" class="cb-headline-sm">Partnership models that scale with ambition</h2><p class="cb-prose mx-auto mt-6">Transparent engagement structures. Retained partnerships receive preferred rates and dedicated partner coverage.</p></header><div class="grid items-stretch gap-6 lg:grid-cols-3"><article class="relative flex flex-col p-9 sm:p-10 cb-card"><h3 class="cb-font-display text-xl font-medium text-[var(--color-foreground)]">Advisory</h3><p class="cb-font-body mt-3 text-sm leading-relaxed text-[var(--color-muted)]">Focused strategic counsel for leadership teams navigating priority initiatives.</p><p class="mt-10 border-b border-[var(--border-subtle)] pb-8"><span class="cb-metric text-4xl ">From $18k</span><span class="cb-font-body text-sm text-[var(--color-muted)]">/month</span></p><ul class="mt-8 flex-1 space-y-4"><li class="flex gap-3 cb-font-body text-sm text-[var(--color-foreground)]"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Executive workshops</li><li class="flex gap-3 cb-font-body text-sm text-[var(--color-foreground)]"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Market &amp; competitive analysis</li><li class="flex gap-3 cb-font-body text-sm text-[var(--color-foreground)]"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Quarterly board briefings</li><li class="flex gap-3 cb-font-body text-sm text-[var(--color-foreground)]"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Dedicated partner access</li></ul><a href="#contact" class="cb-btn-secondary cb-focus-ring mt-10 w-full">Request proposal</a></article><article class="relative flex flex-col p-9 sm:p-10 cb-card-featured lg:-translate-y-2"><span class="cb-font-mono absolute -top-3 start-1/2 -translate-x-1/2 rounded-full border border-white/15 bg-[var(--color-ink)] px-4 py-1.5 text-[0.5625rem] uppercase tracking-[0.14em] text-[var(--color-signal)]">Most popular</span><h3 class="cb-font-display text-xl font-medium text-white">Transformation</h3><p class="cb-font-body mt-3 text-sm leading-relaxed text-white/60">Full-program leadership for enterprise change with measurable operational outcomes.</p><p class="mt-10 border-b border-[var(--border-subtle)] pb-8"><span class="cb-metric text-4xl text-white">From $45k</span><span class="cb-font-body text-sm text-white/50">/month</span></p><ul class="mt-8 flex-1 space-y-4"><li class="flex gap-3 cb-font-body text-sm text-white/85"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Everything in Advisory</li><li class="flex gap-3 cb-font-body text-sm text-white/85"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Program management office</li><li class="flex gap-3 cb-font-body text-sm text-white/85"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Change &amp; communications</li><li class="flex gap-3 cb-font-body text-sm text-white/85"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>KPI dashboards &amp; reporting</li><li class="flex gap-3 cb-font-body text-sm text-white/85"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>On-site leadership support</li></ul><a href="#contact" class="cb-btn-primary cb-focus-ring mt-10 w-full">Schedule consultation</a></article><article class="relative flex flex-col p-9 sm:p-10 cb-card"><h3 class="cb-font-display text-xl font-medium text-[var(--color-foreground)]">Enterprise</h3><p class="cb-font-body mt-3 text-sm leading-relaxed text-[var(--color-muted)]">Multi-region engagements with retained senior partners and bespoke governance models.</p><p class="mt-10 border-b border-[var(--border-subtle)] pb-8"><span class="cb-metric text-4xl ">Custom</span></p><ul class="mt-8 flex-1 space-y-4"><li class="flex gap-3 cb-font-body text-sm text-[var(--color-foreground)]"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Everything in Transformation</li><li class="flex gap-3 cb-font-body text-sm text-[var(--color-foreground)]"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Global delivery teams</li><li class="flex gap-3 cb-font-body text-sm text-[var(--color-foreground)]"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Board &amp; investor relations</li><li class="flex gap-3 cb-font-body text-sm text-[var(--color-foreground)]"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>24/7 executive escalation</li><li class="flex gap-3 cb-font-body text-sm text-[var(--color-foreground)]"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Multi-year partnership terms</li></ul><a href="#contact" class="cb-btn-secondary cb-focus-ring mt-10 w-full">Contact partners</a></article></div></div></section><section id="faq" data-v2-component="corporate-business-faq" aria-labelledby="cb-faq-title" class="cb-section"><div class="cb-container"><div class="grid gap-16 lg:grid-cols-[0.85fr_1.15fr] lg:items-start"><header class="lg:sticky lg:top-28"><p class="cb-eyebrow mb-6">FAQ</p><h2 id="cb-faq-title" class="cb-headline-sm max-w-[12ch]">Answers for executive sponsors</h2><div class="cb-accent-line mt-8" aria-hidden="true"></div><p class="cb-prose mt-8">What leadership teams ask before engaging a strategic advisory partner.</p></header><div class="divide-y divide-[var(--border-subtle)] border-y border-[var(--border-subtle)]"><div><h3><button type="button" id="cb-faq-trigger-0" aria-expanded="true" aria-controls="cb-faq-panel-0" class="flex w-full items-center justify-between gap-6 py-6 text-start cb-focus-ring"><span class="cb-font-display text-[1.0625rem] font-medium text-[var(--color-foreground)]">How do engagements typically begin?</span><span class="cb-font-mono flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-sm transition-all duration-300 rotate-45 border-[var(--color-signal)] bg-[color-mix(in_srgb,var(--color-signal)_10%,transparent)] text-[var(--color-signal)]" aria-hidden="true">+</span></button></h3><div id="cb-faq-panel-0" role="region" aria-labelledby="cb-faq-trigger-0" class="pb-6"><p class="cb-font-body max-w-prose text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">We start with a confidential discovery phase — stakeholder interviews, data review, and a prioritized opportunity map — usually completed within two weeks.</p></div></div><div><h3><button type="button" id="cb-faq-trigger-1" aria-expanded="false" aria-controls="cb-faq-panel-1" class="flex w-full items-center justify-between gap-6 py-6 text-start cb-focus-ring"><span class="cb-font-display text-[1.0625rem] font-medium text-[var(--color-foreground)]">Which industries do you serve?</span><span class="cb-font-mono flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-sm transition-all duration-300 border-[var(--border-default)] text-[var(--color-muted)]" aria-hidden="true">+</span></button></h3><div id="cb-faq-panel-1" role="region" aria-labelledby="cb-faq-trigger-1" hidden="" class="pb-6"><p class="cb-font-body max-w-prose text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Our partners have deep experience across financial services, healthcare, industrials, technology, and public sector organizations globally.</p></div></div><div><h3><button type="button" id="cb-faq-trigger-2" aria-expanded="false" aria-controls="cb-faq-panel-2" class="flex w-full items-center justify-between gap-6 py-6 text-start cb-focus-ring"><span class="cb-font-display text-[1.0625rem] font-medium text-[var(--color-foreground)]">How do you measure success?</span><span class="cb-font-mono flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-sm transition-all duration-300 border-[var(--border-default)] text-[var(--color-muted)]" aria-hidden="true">+</span></button></h3><div id="cb-faq-panel-2" role="region" aria-labelledby="cb-faq-trigger-2" hidden="" class="pb-6"><p class="cb-font-body max-w-prose text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Every engagement defines outcome metrics upfront — EBITDA impact, cycle-time reduction, risk exposure, or stakeholder satisfaction — with quarterly executive reviews.</p></div></div><div><h3><button type="button" id="cb-faq-trigger-3" aria-expanded="false" aria-controls="cb-faq-panel-3" class="flex w-full items-center justify-between gap-6 py-6 text-start cb-focus-ring"><span class="cb-font-display text-[1.0625rem] font-medium text-[var(--color-foreground)]">Can you work alongside our internal teams?</span><span class="cb-font-mono flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-sm transition-all duration-300 border-[var(--border-default)] text-[var(--color-muted)]" aria-hidden="true">+</span></button></h3><div id="cb-faq-panel-3" role="region" aria-labelledby="cb-faq-trigger-3" hidden="" class="pb-6"><p class="cb-font-body max-w-prose text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Yes. We embed with leadership and delivery teams, transfer capabilities, and leave behind playbooks so improvements sustain after our engagement ends.</p></div></div></div></div></div></section><section id="contact" data-v2-component="corporate-business-contact" aria-labelledby="cb-contact-title" class="cb-section relative"><div class="cb-container"><div class="cb-surface-elevated overflow-hidden"><div class="grid lg:grid-cols-2"><div class="border-b border-[var(--border-subtle)] p-10 sm:p-12 lg:border-b-0 lg:border-e"><p class="cb-eyebrow mb-5">Contact</p><h2 id="cb-contact-title" class="cb-headline-sm max-w-[14ch]">Speak with a senior partner</h2><p class="cb-prose mt-6">Share your priorities and we will assemble the right advisory team for a confidential consultation.</p><dl class="mt-12 space-y-6"><div><dt class="cb-font-mono text-[0.625rem] uppercase tracking-[0.14em] text-[var(--color-muted)]">Email</dt><dd class="cb-font-body mt-2"><a href="mailto:partners@meridianadvisory.com" class="text-[var(--color-foreground)] hover:text-[var(--color-signal)] cb-focus-ring">partners@meridianadvisory.com</a></dd></div><div><dt class="cb-font-mono text-[0.625rem] uppercase tracking-[0.14em] text-[var(--color-muted)]">Phone</dt><dd class="cb-font-body mt-2 text-[var(--color-foreground)]">+1 (212) 555-0180</dd></div><div><dt class="cb-font-mono text-[0.625rem] uppercase tracking-[0.14em] text-[var(--color-muted)]">Headquarters</dt><dd class="cb-font-body mt-2 text-[var(--color-foreground)]">200 Park Avenue, New York, NY</dd></div></dl></div><div class="bg-[var(--color-surface)] p-10 sm:p-12"><form class="space-y-5"><div class="grid gap-5 sm:grid-cols-2"><div><label for="cb-first" class="cb-font-body mb-2 block text-xs font-medium text-[var(--color-muted)]">First name</label><input id="cb-first" required="" class="cb-input cb-focus-ring" name="firstName"/></div><div><label for="cb-last" class="cb-font-body mb-2 block text-xs font-medium text-[var(--color-muted)]">Last name</label><input id="cb-last" required="" class="cb-input cb-focus-ring" name="lastName"/></div></div><div><label for="cb-email" class="cb-font-body mb-2 block text-xs font-medium text-[var(--color-muted)]">Work email</label><input id="cb-email" type="email" required="" class="cb-input cb-focus-ring" name="email"/></div><div><label for="cb-company" class="cb-font-body mb-2 block text-xs font-medium text-[var(--color-muted)]">Company</label><input id="cb-company" class="cb-input cb-focus-ring" name="company"/></div><div><label for="cb-message" class="cb-font-body mb-2 block text-xs font-medium text-[var(--color-muted)]">How can we help?</label><textarea id="cb-message" name="message" rows="4" class="cb-textarea cb-focus-ring"></textarea></div><button type="submit" class="cb-btn-primary cb-focus-ring w-full sm:w-auto">Request consultation</button></form></div></div></div></div></section></main><utility data-v2-region="utility"><section id="cta-band" data-v2-component="corporate-business-utility-band" aria-labelledby="cb-utility-title" class="relative overflow-hidden bg-[var(--color-ink)] py-20 sm:py-24"><div class="cb-grid-bg pointer-events-none absolute inset-0 opacity-[0.06]" aria-hidden="true"></div><div class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_20%_50%,rgba(196,165,116,0.12),transparent_55%)]" aria-hidden="true"></div><div class="cb-container relative flex flex-col items-start justify-between gap-12 lg:flex-row lg:items-center"><div class="max-w-xl"><p class="cb-eyebrow text-[var(--color-signal)]/80">Partner with us</p><h2 id="cb-utility-title" class="cb-font-display mt-5 text-[clamp(2rem,4vw,3rem)] font-medium leading-[1.08] text-white text-wrap-balance">Ready to move from strategy to results?</h2><p class="cb-font-body mt-5 text-base leading-relaxed text-white/55">Join 500+ organizations that rely on Meridian for board-ready counsel and transformation delivery.</p><div class="mt-8 flex flex-wrap gap-3"><span class="rounded-full border border-white/12 bg-white/5 px-4 py-2 text-[0.6875rem] font-medium text-white/70">Fortune 500</span><span class="rounded-full border border-white/12 bg-white/5 px-4 py-2 text-[0.6875rem] font-medium text-white/70">40+ countries</span><span class="rounded-full border border-white/12 bg-white/5 px-4 py-2 text-[0.6875rem] font-medium text-white/70">Senior partners</span></div></div><div class="flex w-full flex-col gap-4 sm:w-auto sm:flex-row"><a href="#contact" class="inline-flex min-h-[3.125rem] items-center justify-center rounded-full bg-white px-7 text-[0.9375rem] font-medium text-[var(--color-ink)] shadow-[0_8px_32px_rgba(0,0,0,0.2)] transition hover:-translate-y-0.5 cb-focus-ring">Schedule consultation</a><a href="#about" class="inline-flex min-h-[3.125rem] items-center justify-center rounded-full border border-white/25 px-7 text-[0.9375rem] font-medium text-white transition hover:border-white/45 hover:bg-white/5 cb-focus-ring">Download capabilities brief</a></div></div></section></utility><footer data-v2-region="footer"><footer data-v2-component="corporate-business-footer" class="cb-section-ink relative overflow-hidden" role="contentinfo"><div class="cb-grid-bg pointer-events-none absolute inset-0 opacity-[0.04]" aria-hidden="true"></div><div class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--color-signal)]/30 to-transparent" aria-hidden="true"></div><div class="cb-container relative"><div class="grid gap-16 border-b border-white/8 pb-16 lg:grid-cols-12 lg:gap-12"><div class="lg:col-span-4"><a href="#top" class="cb-font-display inline-flex items-center gap-3.5 text-2xl font-medium text-white cb-focus-ring"><span class="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--color-signal)]/40 text-sm text-[var(--color-signal)]" aria-hidden="true">M</span>Meridian Advisory</a><p class="cb-font-body mt-6 max-w-xs text-sm leading-[1.75] text-white/50">Executive advisory for organizations navigating transformation, governance, and global growth.</p><div class="mt-8 flex flex-wrap gap-2"><span class="cb-font-mono rounded-full border border-white/10 px-3 py-1.5 text-[0.5625rem] uppercase tracking-[0.14em] text-white/40">ISO 9001</span><span class="cb-font-mono rounded-full border border-white/10 px-3 py-1.5 text-[0.5625rem] uppercase tracking-[0.14em] text-white/40">GDPR</span><span class="cb-font-mono rounded-full border border-white/10 px-3 py-1.5 text-[0.5625rem] uppercase tracking-[0.14em] text-white/40">SOC 2</span></div></div><nav aria-label="Explore" class="lg:col-span-2 lg:col-start-6"><p class="cb-font-body text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-white/35">Explore</p><ul class="mt-5 space-y-3.5"><li><a href="#features" class="cb-font-body text-sm text-white/55 transition hover:text-[var(--color-signal)] cb-focus-ring">Capabilities</a></li><li><a href="#about" class="cb-font-body text-sm text-white/55 transition hover:text-[var(--color-signal)] cb-focus-ring">About</a></li><li><a href="#customers" class="cb-font-body text-sm text-white/55 transition hover:text-[var(--color-signal)] cb-focus-ring">Outcomes</a></li><li><a href="#pricing" class="cb-font-body text-sm text-white/55 transition hover:text-[var(--color-signal)] cb-focus-ring">Engagements</a></li><li><a href="#contact" class="cb-font-body text-sm text-white/55 transition hover:text-[var(--color-signal)] cb-focus-ring">Contact</a></li></ul></nav><div class="lg:col-span-2"><p class="cb-font-body text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-white/35">Offices</p><ul class="cb-font-body mt-5 space-y-3 text-sm text-white/50"><li><span class="block text-white/70">New York</span>200 Park Avenue</li><li><span class="block text-white/70">London</span>30 St Mary Axe</li><li><span class="block text-white/70">Dubai</span>DIFC Gate Village</li></ul></div><div class="lg:col-span-3"><p class="cb-font-body text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-white/35">Insights</p><p class="cb-font-body mt-5 text-sm leading-relaxed text-white/50">Quarterly perspectives on governance, transformation, and global markets.</p><form class="mt-6 flex gap-2"><label for="cb-footer-email" class="sr-only">Email address</label><input id="cb-footer-email" type="email" placeholder="Work email" class="cb-input flex-1 border-white/10 bg-white/5 text-white placeholder:text-white/30"/><button type="submit" class="cb-btn-primary shrink-0 px-5 text-sm">Subscribe</button></form></div></div><div class="flex flex-col gap-6 py-10 sm:flex-row sm:items-center sm:justify-between"><p class="cb-font-body text-xs text-white/30">© 2026 Meridian Advisory. All rights reserved.</p><nav aria-label="Legal" class="flex flex-wrap gap-6"><a href="#privacy" class="cb-font-body text-xs text-white/30 transition hover:text-white/55 cb-focus-ring">Privacy</a><a href="#terms" class="cb-font-body text-xs text-white/30 transition hover:text-white/55 cb-focus-ring">Terms</a><a href="#cookies" class="cb-font-body text-xs text-white/30 transition hover:text-white/55 cb-focus-ring">Cookies</a></nav></div></div></footer></footer><div data-v2-region="overlay" class="pointer-events-none fixed inset-x-0 bottom-0 z-50"></div></div>
+    <div class="flex min-h-screen flex-col bg-[var(--color-background)] text-[var(--color-foreground)] antialiased v2-template v2-corporate-business" data-v2-package="corporate-business" data-v2-composer="region-grid" data-v2-layout="default" data-v2-blueprint="bp-corporate-business-general"><header data-v2-region="header"><header data-v2-component="corporate-business-nav" class="sticky top-0 z-50 transition-all duration-500 border-b border-transparent bg-transparent"><div class="df-container flex h-[4.5rem] items-center justify-between gap-8 lg:h-[5rem]"><a href="#top" class="cb-font-display group flex items-center gap-3.5 text-[1.125rem] font-medium tracking-tight text-[var(--color-foreground)] cb-focus-ring"><span class="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border-accent)] bg-[var(--color-ink)] text-sm font-medium text-[var(--color-signal)] transition group-hover:border-[var(--color-signal)]" aria-hidden="true">M</span><span class="hidden sm:inline">Meridian Advisory</span></a><nav aria-label="Primary" class="hidden items-center gap-11 lg:flex"><a href="#services" class="cb-nav-link cb-focus-ring">Services</a><a href="#features" class="cb-nav-link cb-focus-ring">Why us</a><a href="#pricing" class="cb-nav-link cb-focus-ring">Packages</a><a href="#testimonials" class="cb-nav-link cb-focus-ring">Clients</a><a href="#contact" class="cb-nav-link cb-focus-ring">Contact</a></nav><div class="flex items-center gap-3"><a href="#contact" class="cb-btn-primary hidden sm:inline-flex">Get started</a><button type="button" aria-expanded="false" aria-controls="corporate-business-nav-mobile" aria-label="Open menu" class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border-default)] bg-[var(--color-surface)] lg:hidden cb-focus-ring"><span class="sr-only">Menu</span><span aria-hidden="true" class="flex flex-col gap-1.5"><span class="block h-px w-5 bg-current transition "></span><span class="block h-px w-5 bg-current transition "></span><span class="block h-px w-5 bg-current transition "></span></span></button></div></div></header></header><main data-v2-region="main" class="v2-region-grid flex flex-col"><h1 class="v2-sr-only text-4xl">Meridian Advisory</h1><div data-v2-section="hero" data-v2-variant="split-trust"><section id="top" data-v2-component="corporate-business-hero" aria-labelledby="cb-hero-title" class="relative overflow-hidden bg-[var(--color-background)] df-hero-split-empty-section df-section-glow"><div class="cb-hero-atmosphere" aria-hidden="true"></div><div class="cb-hero-grid" aria-hidden="true"></div><div class="cb-paper-grain pointer-events-none absolute inset-0" aria-hidden="true"></div><div class="df-container relative flex flex-col justify-center py-20 lg:py-28 "><div class="df-hero-split-empty grid items-start gap-10 lg:grid-cols-12 lg:items-center lg:gap-16 xl:gap-20"><div class="df-hero-split-empty-copy "><p class="cb-eyebrow mb-7">Professional presence</p><h1 id="cb-hero-title" class="cb-headline max-w-[11ch]">Meridian Advisory</h1><p class="cb-body mt-10">Executive corporate advisory</p><div class="mt-12 flex flex-wrap items-center gap-4 "><a href="#contact" class="cb-btn-primary cb-focus-ring">Get started</a><a href="#features" class="cb-btn-secondary cb-focus-ring">Learn more</a></div></div><div class="df-hero-split-empty-visual "><div class="cb-hero-visual-glow" aria-hidden="true"></div><div class="relative ms-auto aspect-[4/5] max-w-[36rem] sm:aspect-[5/6]"><div class="absolute inset-0 overflow-hidden rounded-[var(--df-radius-xl,var(--radius-xl,20px))] border border-[var(--df-border-subtle,var(--border-subtle))] bg-[var(--color-ink)] shadow-[var(--df-shadow-elevated,var(--shadow-surface))]" aria-hidden="true"><div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_70%_20%,rgba(196,165,116,0.22),transparent_55%),radial-gradient(ellipse_50%_40%_at_20%_80%,rgba(255,255,255,0.06),transparent_50%),linear-gradient(165deg,#0a1220_0%,#080e18_45%,#121c2e_100%)]"></div><div class="absolute inset-0 opacity-[0.18]" style="background-image:linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px);background-size:48px 48px"></div><div class="absolute -end-8 top-[18%] h-40 w-40 rounded-full bg-[radial-gradient(circle,rgba(196,165,116,0.35),transparent_68%)] blur-2xl"></div><div class="absolute start-[12%] top-[58%] h-px w-[76%] bg-gradient-to-r from-transparent via-[var(--color-signal)]/50 to-transparent"></div><div class="absolute start-[12%] top-[68%] h-px w-[52%] bg-gradient-to-r from-transparent via-white/20 to-transparent"></div></div></div></div></div></div></section></div><div data-v2-section="features" data-v2-variant="spotlight-list"><section id="features" data-v2-component="corporate-business-features" aria-labelledby="cb-features-title" class="cb-section cb-section-alt cb-section-glow df-section-glow relative"><div class="df-container"><div class="mb-20 grid gap-10 lg:grid-cols-2 lg:items-end"><header><p class="cb-eyebrow mb-6">Why us</p><h2 id="cb-features-title" class="cb-headline-sm max-w-[14ch]">A presence that earns trust</h2><div class="cb-accent-line mt-8" aria-hidden="true"></div></header><p class="cb-prose lg:justify-self-end lg:text-end">Webflow-caliber spacing, type, and hierarchy for serious brands.</p></div><div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-12"><article class="group relative flex flex-col justify-between overflow-hidden p-9 sm:p-10 cb-card df-card "><div><span class="cb-font-mono text-[0.625rem] tracking-[0.18em] text-[var(--color-signal)]">01</span><h3 class="cb-font-display mt-8 text-[clamp(1.375rem,2vw,1.75rem)] font-medium leading-tight text-[var(--color-foreground)]">Clear offer</h3><p class="cb-font-body mt-5 max-w-md text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Explain what you do and who you help without jargon.</p></div><a href="#contact" class="cb-btn-ghost mt-10 ">Learn more <span aria-hidden="true">→</span></a></article><article class="group relative flex flex-col justify-between overflow-hidden p-9 sm:p-10 cb-card df-card "><div><span class="cb-font-mono text-[0.625rem] tracking-[0.18em] text-[var(--color-signal)]">02</span><h3 class="cb-font-display mt-8 text-[clamp(1.375rem,2vw,1.75rem)] font-medium leading-tight text-[var(--color-foreground)]">Premium presentation</h3><p class="cb-font-body mt-5 max-w-md text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Typography, spacing, and imagery that feel established.</p></div><a href="#contact" class="cb-btn-ghost mt-10 ">Learn more <span aria-hidden="true">→</span></a></article><article class="group relative flex flex-col justify-between overflow-hidden p-9 sm:p-10 cb-card df-card "><div><span class="cb-font-mono text-[0.625rem] tracking-[0.18em] text-[var(--color-signal)]">03</span><h3 class="cb-font-display mt-8 text-[clamp(1.375rem,2vw,1.75rem)] font-medium leading-tight text-[var(--color-foreground)]">Conversion paths</h3><p class="cb-font-body mt-5 max-w-md text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">CTAs that guide visitors to the next decisive step.</p></div><a href="#contact" class="cb-btn-ghost mt-10 ">Learn more <span aria-hidden="true">→</span></a></article><article class="group relative flex flex-col justify-between overflow-hidden p-9 sm:p-10 cb-card df-card "><div><span class="cb-font-mono text-[0.625rem] tracking-[0.18em] text-[var(--color-signal)]">04</span><h3 class="cb-font-display mt-8 text-[clamp(1.375rem,2vw,1.75rem)] font-medium leading-tight text-[var(--color-foreground)]">Trusted contact</h3><p class="cb-font-body mt-5 max-w-md text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Forms and contact paths that get answered.</p></div><a href="#contact" class="cb-btn-ghost mt-10 ">Learn more <span aria-hidden="true">→</span></a></article></div></div></section></div><div data-v2-section="about" data-v2-variant="timeline-story"><section id="about" data-v2-component="corporate-business-about" aria-labelledby="cb-about-title" class="cb-section"><div class="cb-container"><div class="grid items-center gap-16 lg:grid-cols-12 lg:gap-20"><div class="relative lg:col-span-6"><div class="absolute -start-4 -top-4 h-24 w-24 border border-[var(--border-accent)]/50" aria-hidden="true"></div><div class="cb-hero-frame relative aspect-[4/5] max-w-md"></div></div><div class="lg:col-span-6 lg:ps-8"><p class="cb-eyebrow mb-6">Services</p><p class="cb-font-body mb-4 text-sm text-[var(--color-signal)]">Plain-language offerings with outcomes — ready for a premium business site.</p><h2 id="cb-about-title" class="cb-headline-sm max-w-[16ch]">What we deliver for clients</h2><div class="cb-accent-line mt-8" aria-hidden="true"></div><p class="cb-prose mt-8">Plain-language offerings with outcomes — ready for a premium business site.</p><ul class="mt-10 space-y-4"><li class="flex gap-4"><span class="mt-1.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-[0.625rem] text-[var(--color-signal)]" aria-hidden="true">✓</span><span class="cb-font-body text-sm leading-relaxed text-[var(--color-foreground)]">Services explained with outcomes, not jargon</span></li><li class="flex gap-4"><span class="mt-1.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-[0.625rem] text-[var(--color-signal)]" aria-hidden="true">✓</span><span class="cb-font-body text-sm leading-relaxed text-[var(--color-foreground)]">Proof points that reduce hesitation for new clients</span></li><li class="flex gap-4"><span class="mt-1.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-[0.625rem] text-[var(--color-signal)]" aria-hidden="true">✓</span><span class="cb-font-body text-sm leading-relaxed text-[var(--color-foreground)]">Contact paths designed for fast follow-up</span></li></ul><a href="#contact" class="cb-btn-primary cb-focus-ring mt-12 inline-flex">Get started</a></div></div></div></section></div><div data-v2-section="services" data-v2-variant="process-rail"><section id="stats" data-v2-component="corporate-business-stats" aria-labelledby="cb-stats-title" class="cb-section-tight cb-section-ink cb-section-glow df-section-glow relative overflow-hidden"><div class="cb-grid-bg pointer-events-none absolute inset-0 opacity-[0.05]" aria-hidden="true"></div><div class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--color-signal)]/25 to-transparent" aria-hidden="true"></div><div class="df-container relative"><div class="mb-14 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between"><div><p class="cb-eyebrow text-[var(--color-signal)]/80">Why us</p><h2 id="cb-stats-title" class="cb-headline-sm mt-4 max-w-[14ch] text-white">A presence that earns trust</h2></div><p class="cb-font-body max-w-sm text-sm leading-relaxed text-white/50 lg:text-end">Webflow-caliber spacing, type, and hierarchy for serious brands.</p></div><div class="grid gap-px overflow-hidden rounded-[var(--df-radius-xl,var(--radius-xl,20px))] border border-[var(--df-border-subtle,color-mix(in_srgb,#fff_8%,transparent))] bg-[var(--df-border-subtle,color-mix(in_srgb,#fff_8%,transparent))] sm:grid-cols-2 lg:grid-cols-4"><div class="bg-[color-mix(in_srgb,var(--color-ink)_92%,var(--color-primary))] px-8 py-10 transition-colors duration-300 hover:bg-[color-mix(in_srgb,var(--color-ink)_88%,var(--color-primary))] sm:px-10 sm:py-12"><p class="cb-font-mono text-[0.5625rem] uppercase tracking-[0.16em] text-[var(--color-signal)]/70">01</p><p class="cb-metric mt-4 text-[var(--df-text-3xl,clamp(2.25rem,4vw,3rem))] text-white">1</p><p class="cb-font-body mt-3 text-sm text-white/70">Services explained with outcomes, not jargon</p></div><div class="bg-[color-mix(in_srgb,var(--color-ink)_92%,var(--color-primary))] px-8 py-10 transition-colors duration-300 hover:bg-[color-mix(in_srgb,var(--color-ink)_88%,var(--color-primary))] sm:px-10 sm:py-12"><p class="cb-font-mono text-[0.5625rem] uppercase tracking-[0.16em] text-[var(--color-signal)]/70">02</p><p class="cb-metric mt-4 text-[var(--df-text-3xl,clamp(2.25rem,4vw,3rem))] text-white">2</p><p class="cb-font-body mt-3 text-sm text-white/70">Proof points that reduce hesitation for new clients</p></div><div class="bg-[color-mix(in_srgb,var(--color-ink)_92%,var(--color-primary))] px-8 py-10 transition-colors duration-300 hover:bg-[color-mix(in_srgb,var(--color-ink)_88%,var(--color-primary))] sm:px-10 sm:py-12"><p class="cb-font-mono text-[0.5625rem] uppercase tracking-[0.16em] text-[var(--color-signal)]/70">03</p><p class="cb-metric mt-4 text-[var(--df-text-3xl,clamp(2.25rem,4vw,3rem))] text-white">3</p><p class="cb-font-body mt-3 text-sm text-white/70">Contact paths designed for fast follow-up</p></div></div></div></section></div><section id="customers" data-v2-component="corporate-business-portfolio" aria-labelledby="cb-portfolio-title" class="cb-section"><div class="cb-container"><div class="mb-16 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between"><header class="max-w-xl"><p class="cb-eyebrow mb-6">Studio</p><h2 id="cb-portfolio-title" class="cb-headline-sm">Moments from the work</h2></header><p class="cb-prose lg:max-w-md lg:text-end">Visual proof that feels editorial and intentional.</p></div><div class="space-y-6"><article class="cb-card group grid overflow-hidden lg:grid-cols-12"><div class="relative aspect-[16/9] overflow-hidden lg:col-span-5 lg:aspect-auto lg:min-h-[16rem]"><div class="absolute inset-0 bg-gradient-to-r from-[var(--color-ink)]/40 to-transparent lg:bg-gradient-to-t lg:from-[var(--color-ink)]/50"></div><div class="absolute bottom-6 start-6"><p class="cb-font-mono text-[0.5625rem] uppercase tracking-[0.14em] text-white/60">Case study 01</p><p class="cb-font-display mt-1 text-xl font-medium text-white">Brand moment</p></div></div><div class="flex flex-col justify-center p-8 sm:p-10 lg:col-span-7"><p class="cb-font-mono text-[0.625rem] uppercase tracking-[0.12em] text-[var(--color-muted)]">Identity</p><div class="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-1"><span class="cb-metric">Identity</span><span class="cb-font-body text-sm text-[var(--color-muted)]">Identity</span></div><p class="cb-font-body mt-6 max-w-lg text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Brand moment</p><a href="#contact" class="cb-btn-ghost mt-8">Discuss a similar engagement <span aria-hidden="true">→</span></a></div></article><article class="cb-card group grid overflow-hidden lg:grid-cols-12"><div class="relative aspect-[16/9] overflow-hidden lg:col-span-5 lg:aspect-auto lg:min-h-[16rem]"><div class="absolute inset-0 bg-gradient-to-r from-[var(--color-ink)]/40 to-transparent lg:bg-gradient-to-t lg:from-[var(--color-ink)]/50"></div><div class="absolute bottom-6 start-6"><p class="cb-font-mono text-[0.5625rem] uppercase tracking-[0.14em] text-white/60">Case study 02</p><p class="cb-font-display mt-1 text-xl font-medium text-white">Service story</p></div></div><div class="flex flex-col justify-center p-8 sm:p-10 lg:col-span-7"><p class="cb-font-mono text-[0.625rem] uppercase tracking-[0.12em] text-[var(--color-muted)]">Offer</p><div class="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-1"><span class="cb-metric">Offer</span><span class="cb-font-body text-sm text-[var(--color-muted)]">Offer</span></div><p class="cb-font-body mt-6 max-w-lg text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Service story</p><a href="#contact" class="cb-btn-ghost mt-8">Discuss a similar engagement <span aria-hidden="true">→</span></a></div></article><article class="cb-card group grid overflow-hidden lg:grid-cols-12"><div class="relative aspect-[16/9] overflow-hidden lg:col-span-5 lg:aspect-auto lg:min-h-[16rem]"><div class="absolute inset-0 bg-gradient-to-r from-[var(--color-ink)]/40 to-transparent lg:bg-gradient-to-t lg:from-[var(--color-ink)]/50"></div><div class="absolute bottom-6 start-6"><p class="cb-font-mono text-[0.5625rem] uppercase tracking-[0.14em] text-white/60">Case study 03</p><p class="cb-font-display mt-1 text-xl font-medium text-white">Team</p></div></div><div class="flex flex-col justify-center p-8 sm:p-10 lg:col-span-7"><p class="cb-font-mono text-[0.625rem] uppercase tracking-[0.12em] text-[var(--color-muted)]">People</p><div class="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-1"><span class="cb-metric">People</span><span class="cb-font-body text-sm text-[var(--color-muted)]">People</span></div><p class="cb-font-body mt-6 max-w-lg text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Team</p><a href="#contact" class="cb-btn-ghost mt-8">Discuss a similar engagement <span aria-hidden="true">→</span></a></div></article><article class="cb-card group grid overflow-hidden lg:grid-cols-12"><div class="relative aspect-[16/9] overflow-hidden lg:col-span-5 lg:aspect-auto lg:min-h-[16rem]"><div class="absolute inset-0 bg-gradient-to-r from-[var(--color-ink)]/40 to-transparent lg:bg-gradient-to-t lg:from-[var(--color-ink)]/50"></div><div class="absolute bottom-6 start-6"><p class="cb-font-mono text-[0.5625rem] uppercase tracking-[0.14em] text-white/60">Case study 04</p><p class="cb-font-display mt-1 text-xl font-medium text-white">Process</p></div></div><div class="flex flex-col justify-center p-8 sm:p-10 lg:col-span-7"><p class="cb-font-mono text-[0.625rem] uppercase tracking-[0.12em] text-[var(--color-muted)]">Delivery</p><div class="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-1"><span class="cb-metric">Delivery</span><span class="cb-font-body text-sm text-[var(--color-muted)]">Delivery</span></div><p class="cb-font-body mt-6 max-w-lg text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Process</p><a href="#contact" class="cb-btn-ghost mt-8">Discuss a similar engagement <span aria-hidden="true">→</span></a></div></article><article class="cb-card group grid overflow-hidden lg:grid-cols-12"><div class="relative aspect-[16/9] overflow-hidden lg:col-span-5 lg:aspect-auto lg:min-h-[16rem]"><div class="absolute inset-0 bg-gradient-to-r from-[var(--color-ink)]/40 to-transparent lg:bg-gradient-to-t lg:from-[var(--color-ink)]/50"></div><div class="absolute bottom-6 start-6"><p class="cb-font-mono text-[0.5625rem] uppercase tracking-[0.14em] text-white/60">Case study 05</p><p class="cb-font-display mt-1 text-xl font-medium text-white">Results</p></div></div><div class="flex flex-col justify-center p-8 sm:p-10 lg:col-span-7"><p class="cb-font-mono text-[0.625rem] uppercase tracking-[0.12em] text-[var(--color-muted)]">Proof</p><div class="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-1"><span class="cb-metric">Proof</span><span class="cb-font-body text-sm text-[var(--color-muted)]">Proof</span></div><p class="cb-font-body mt-6 max-w-lg text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Results</p><a href="#contact" class="cb-btn-ghost mt-8">Discuss a similar engagement <span aria-hidden="true">→</span></a></div></article><article class="cb-card group grid overflow-hidden lg:grid-cols-12"><div class="relative aspect-[16/9] overflow-hidden lg:col-span-5 lg:aspect-auto lg:min-h-[16rem]"><div class="absolute inset-0 bg-gradient-to-r from-[var(--color-ink)]/40 to-transparent lg:bg-gradient-to-t lg:from-[var(--color-ink)]/50"></div><div class="absolute bottom-6 start-6"><p class="cb-font-mono text-[0.5625rem] uppercase tracking-[0.14em] text-white/60">Case study 06</p><p class="cb-font-display mt-1 text-xl font-medium text-white">Contact</p></div></div><div class="flex flex-col justify-center p-8 sm:p-10 lg:col-span-7"><p class="cb-font-mono text-[0.625rem] uppercase tracking-[0.12em] text-[var(--color-muted)]">Next step</p><div class="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-1"><span class="cb-metric">Next step</span><span class="cb-font-body text-sm text-[var(--color-muted)]">Next step</span></div><p class="cb-font-body mt-6 max-w-lg text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Contact</p><a href="#contact" class="cb-btn-ghost mt-8">Discuss a similar engagement <span aria-hidden="true">→</span></a></div></article></div></div></section><div data-v2-section="testimonials" data-v2-variant="logo-wall"><section id="testimonials" data-v2-component="corporate-business-testimonials" aria-labelledby="cb-testimonials-title" class="cb-section cb-section-alt"><div class="cb-container"><header class="mb-16 max-w-2xl"><p class="cb-eyebrow mb-5">Clients</p><h2 id="cb-testimonials-title" class="cb-headline-sm">Businesses that raised their standard</h2><p class="cb-prose mt-6">Specific results from professional services teams.</p></header><div class="grid gap-6 lg:grid-cols-12 lg:gap-8"><article class="cb-card-featured relative flex flex-col justify-between p-10 sm:p-12 lg:col-span-7 lg:row-span-2 lg:min-h-[24rem]"><div><span class="cb-quote-mark" aria-hidden="true">&quot;</span><blockquote class="cb-font-display -mt-6 text-[clamp(1.375rem,2.5vw,1.75rem)] font-medium leading-[1.45] text-white/92">We finally look as professional as the work we deliver — working with Meridian Advisory.</blockquote></div><footer class="mt-10 border-t border-white/10 pt-8"><p class="cb-font-body text-sm font-medium text-white">Andrea Wells</p><p class="cb-font-body mt-1 text-sm text-white/55">Owner, Wells Advisory, </p><p class="cb-star mt-4 text-sm" aria-label="5 out of 5 stars">★★★★★</p></footer></article><article class="cb-card flex flex-col justify-between p-8 lg:col-span-5"><blockquote class="cb-font-body text-[0.9375rem] leading-[1.75] text-[var(--color-foreground)]">&quot;Inquiries went up after the redesign — messaging is clearer.&quot;</blockquote><footer class="mt-8 border-t border-[var(--border-subtle)] pt-6"><p class="cb-font-body text-sm font-medium text-[var(--color-foreground)]">Kevin Zhao</p><p class="cb-font-body mt-1 text-xs text-[var(--color-muted)]">Managing Partner, </p></footer></article><article class="cb-card flex flex-col justify-between p-8 lg:col-span-5"><blockquote class="cb-font-body text-[0.9375rem] leading-[1.75] text-[var(--color-foreground)]">&quot;Clients comment on the site before meetings now.&quot;</blockquote><footer class="mt-8 border-t border-[var(--border-subtle)] pt-6"><p class="cb-font-body text-sm font-medium text-[var(--color-foreground)]">Ruth Okonkwo</p><p class="cb-font-body mt-1 text-xs text-[var(--color-muted)]">Consultant, </p></footer></article></div></div></section></div><section id="pricing" data-v2-component="corporate-business-pricing" aria-labelledby="cb-pricing-title" class="cb-section cb-section-alt cb-section-glow df-section-glow relative"><div class="df-container"><header class="mx-auto mb-16 max-w-2xl text-center"><p class="cb-eyebrow mb-6">Packages</p><h2 id="cb-pricing-title" class="cb-headline-sm">Simple engagement options</h2><p class="cb-prose mx-auto mt-6">Start lean or go deeper — both look premium.</p></header><div class="grid items-stretch gap-6 lg:grid-cols-3"><article class="relative flex flex-col p-9 sm:p-10 cb-card df-card"><h3 class="cb-font-display text-xl font-medium text-[var(--color-foreground)]">Essential</h3><p class="cb-font-body mt-3 text-sm leading-relaxed text-[var(--color-muted)]">Launch ready</p><p class="mt-10 border-b border-[var(--df-border-subtle,var(--border-subtle))] pb-8"><span class="cb-metric text-4xl ">$1,200</span></p><ul class="mt-8 flex-1 space-y-4"><li class="flex gap-3 cb-font-body text-sm text-[var(--color-foreground)]"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Core pages</li><li class="flex gap-3 cb-font-body text-sm text-[var(--color-foreground)]"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Contact path</li><li class="flex gap-3 cb-font-body text-sm text-[var(--color-foreground)]"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Mobile polish</li></ul><a href="#contact" class="cb-btn-secondary cb-focus-ring mt-10 w-full">Get started</a></article><article class="relative flex flex-col p-9 sm:p-10 cb-card-featured df-card-featured lg:-translate-y-2"><span class="cb-font-mono absolute -top-3 start-1/2 -translate-x-1/2 rounded-full border border-white/15 bg-[var(--color-ink)] px-4 py-1.5 text-[0.5625rem] uppercase tracking-[0.14em] text-[var(--color-signal)]">Most popular</span><h3 class="cb-font-display text-xl font-medium text-white">Growth</h3><p class="cb-font-body mt-3 text-sm leading-relaxed text-white/60">Recommended</p><p class="mt-10 border-b border-[var(--df-border-subtle,var(--border-subtle))] pb-8"><span class="cb-metric text-4xl text-white">$2,800</span></p><ul class="mt-8 flex-1 space-y-4"><li class="flex gap-3 cb-font-body text-sm text-white/85"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Expanded sections</li><li class="flex gap-3 cb-font-body text-sm text-white/85"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Proof blocks</li><li class="flex gap-3 cb-font-body text-sm text-white/85"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>CTA system</li></ul><a href="#contact" class="cb-btn-primary cb-focus-ring mt-10 w-full">Get started</a></article><article class="relative flex flex-col p-9 sm:p-10 cb-card df-card"><h3 class="cb-font-display text-xl font-medium text-[var(--color-foreground)]">Custom</h3><p class="cb-font-body mt-3 text-sm leading-relaxed text-[var(--color-muted)]">Complex needs</p><p class="mt-10 border-b border-[var(--df-border-subtle,var(--border-subtle))] pb-8"><span class="cb-metric text-4xl ">Quote</span></p><ul class="mt-8 flex-1 space-y-4"><li class="flex gap-3 cb-font-body text-sm text-[var(--color-foreground)]"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Custom components</li><li class="flex gap-3 cb-font-body text-sm text-[var(--color-foreground)]"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Integrations</li><li class="flex gap-3 cb-font-body text-sm text-[var(--color-foreground)]"><span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_14%,transparent)] text-xs text-[var(--color-signal)]" aria-hidden="true">✓</span>Ongoing support</li></ul><a href="#contact" class="cb-btn-secondary cb-focus-ring mt-10 w-full">Get started</a></article></div></div></section><section id="faq" data-v2-component="corporate-business-faq" aria-labelledby="cb-faq-title" class="cb-section"><div class="cb-container"><div class="grid gap-16 lg:grid-cols-[0.85fr_1.15fr] lg:items-start"><header class="lg:sticky lg:top-28"><p class="cb-eyebrow mb-6">FAQ</p><h2 id="cb-faq-title" class="cb-headline-sm max-w-[12ch]">Common questions</h2><div class="cb-accent-line mt-8" aria-hidden="true"></div><p class="cb-prose mt-8">Launch timing, edits, and languages.</p></header><div class="divide-y divide-[var(--border-subtle)] border-y border-[var(--border-subtle)]"><div><h3><button type="button" id="cb-faq-trigger-0" aria-expanded="true" aria-controls="cb-faq-panel-0" class="flex w-full items-center justify-between gap-6 py-6 text-start cb-focus-ring"><span class="cb-font-display text-[1.0625rem] font-medium text-[var(--color-foreground)]">How soon can we launch?</span><span class="cb-font-mono flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-sm transition-all duration-300 rotate-45 border-[var(--color-signal)] bg-[color-mix(in_srgb,var(--color-signal)_10%,transparent)] text-[var(--color-signal)]" aria-hidden="true">+</span></button></h3><div id="cb-faq-panel-0" role="region" aria-labelledby="cb-faq-trigger-0" class="pb-6"><p class="cb-font-body max-w-prose text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Most first versions ship quickly once messaging and assets are aligned.</p></div></div><div><h3><button type="button" id="cb-faq-trigger-1" aria-expanded="false" aria-controls="cb-faq-panel-1" class="flex w-full items-center justify-between gap-6 py-6 text-start cb-focus-ring"><span class="cb-font-display text-[1.0625rem] font-medium text-[var(--color-foreground)]">Can we update content ourselves?</span><span class="cb-font-mono flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-sm transition-all duration-300 border-[var(--border-default)] text-[var(--color-muted)]" aria-hidden="true">+</span></button></h3><div id="cb-faq-panel-1" role="region" aria-labelledby="cb-faq-trigger-1" hidden="" class="pb-6"><p class="cb-font-body max-w-prose text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Yes — structured sections make ongoing edits straightforward.</p></div></div><div><h3><button type="button" id="cb-faq-trigger-2" aria-expanded="false" aria-controls="cb-faq-panel-2" class="flex w-full items-center justify-between gap-6 py-6 text-start cb-focus-ring"><span class="cb-font-display text-[1.0625rem] font-medium text-[var(--color-foreground)]">Do you support bilingual sites?</span><span class="cb-font-mono flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-sm transition-all duration-300 border-[var(--border-default)] text-[var(--color-muted)]" aria-hidden="true">+</span></button></h3><div id="cb-faq-panel-2" role="region" aria-labelledby="cb-faq-trigger-2" hidden="" class="pb-6"><p class="cb-font-body max-w-prose text-[0.9375rem] leading-[1.75] text-[var(--color-muted)]">Language options can be configured during generation and refinement.</p></div></div></div></div></div></section><div data-v2-section="contact" data-v2-variant="dark-panel"><section id="contact" data-v2-component="corporate-business-contact" aria-labelledby="cb-contact-title" class="cb-section relative"><div class="cb-container"><div class="cb-surface-elevated overflow-hidden"><div class="grid lg:grid-cols-2"><div class="border-b border-[var(--border-subtle)] p-10 sm:p-12 lg:border-b-0 lg:border-e"><p class="cb-eyebrow mb-5">Next step</p><h2 id="cb-contact-title" class="cb-headline-sm max-w-[14ch]">Request a quote</h2><p class="cb-prose mt-6">Tell us about your business and we will respond promptly.</p><dl class="mt-12 space-y-6"><div><dt class="cb-font-mono text-[0.625rem] uppercase tracking-[0.14em] text-[var(--color-muted)]">Email</dt><dd class="cb-font-body mt-2"><a href="mailto:undefined" class="text-[var(--color-foreground)] hover:text-[var(--color-signal)] cb-focus-ring"></a></dd></div><div><dt class="cb-font-mono text-[0.625rem] uppercase tracking-[0.14em] text-[var(--color-muted)]">Phone</dt><dd class="cb-font-body mt-2 text-[var(--color-foreground)]"></dd></div><div><dt class="cb-font-mono text-[0.625rem] uppercase tracking-[0.14em] text-[var(--color-muted)]">Headquarters</dt><dd class="cb-font-body mt-2 text-[var(--color-foreground)]"></dd></div></dl></div><div class="bg-[var(--color-surface)] p-10 sm:p-12"><form class="space-y-5"><div class="grid gap-5 sm:grid-cols-2"><div><label for="cb-first" class="cb-font-body mb-2 block text-xs font-medium text-[var(--color-muted)]">First name</label><input id="cb-first" required="" class="cb-input cb-focus-ring" name="firstName"/></div><div><label for="cb-last" class="cb-font-body mb-2 block text-xs font-medium text-[var(--color-muted)]">Last name</label><input id="cb-last" required="" class="cb-input cb-focus-ring" name="lastName"/></div></div><div><label for="cb-email" class="cb-font-body mb-2 block text-xs font-medium text-[var(--color-muted)]">Work email</label><input id="cb-email" type="email" required="" class="cb-input cb-focus-ring" name="email"/></div><div><label for="cb-company" class="cb-font-body mb-2 block text-xs font-medium text-[var(--color-muted)]">Company</label><input id="cb-company" class="cb-input cb-focus-ring" name="company"/></div><div><label for="cb-message" class="cb-font-body mb-2 block text-xs font-medium text-[var(--color-muted)]">How can we help?</label><textarea id="cb-message" name="message" rows="4" class="cb-textarea cb-focus-ring"></textarea></div><button type="submit" class="cb-btn-primary cb-focus-ring w-full sm:w-auto">Get started</button></form></div></div></div></div></section></div></main><utility data-v2-region="utility"><section id="cta-band" data-v2-component="corporate-business-utility-band" aria-labelledby="cb-utility-title" class="relative overflow-hidden bg-[var(--color-ink)] py-20 sm:py-24"><div class="cb-grid-bg pointer-events-none absolute inset-0 opacity-[0.06]" aria-hidden="true"></div><div class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_20%_50%,var(--df-accent-glow,color-mix(in_srgb,var(--color-signal)_12%,transparent)),transparent_55%)]" aria-hidden="true"></div><div class="df-container relative flex flex-col items-start justify-between gap-12 lg:flex-row lg:items-center"><div class="max-w-xl"><p class="cb-eyebrow text-[var(--color-signal)]/80">Next step</p><h2 id="cb-utility-title" class="cb-font-display mt-5 text-[clamp(2rem,4vw,3rem)] font-medium leading-[1.08] text-white text-wrap-balance">Ready to look established online?</h2><p class="cb-font-body mt-5 text-base leading-relaxed text-white/55">Share your goals — we will propose a clear path and timeline.</p><div class="mt-8 flex flex-wrap gap-3"><span class="rounded-full border border-white/12 bg-white/5 px-4 py-2 text-[0.6875rem] font-medium text-white/70">Fortune 500</span><span class="rounded-full border border-white/12 bg-white/5 px-4 py-2 text-[0.6875rem] font-medium text-white/70">40+ countries</span><span class="rounded-full border border-white/12 bg-white/5 px-4 py-2 text-[0.6875rem] font-medium text-white/70">Senior partners</span></div></div><div class="flex w-full flex-col gap-4 sm:w-auto sm:flex-row"><a href="#contact" class="inline-flex min-h-[3.125rem] items-center justify-center rounded-full bg-white px-7 text-[0.9375rem] font-medium text-[var(--color-ink)] shadow-[0_8px_32px_rgba(0,0,0,0.2)] transition hover:-translate-y-0.5 cb-focus-ring">Get started</a><a href="#about" class="inline-flex min-h-[3.125rem] items-center justify-center rounded-full border border-white/25 px-7 text-[0.9375rem] font-medium text-white transition hover:border-white/45 hover:bg-white/5 cb-focus-ring">Learn more</a></div></div></section></utility><footer data-v2-region="footer"><footer data-v2-component="corporate-business-footer" class="cb-section-ink relative overflow-hidden" role="contentinfo"><div class="cb-grid-bg pointer-events-none absolute inset-0 opacity-[0.04]" aria-hidden="true"></div><div class="df-container relative grid gap-16 border-b border-white/8 pb-16 lg:grid-cols-12"><div class="lg:col-span-4"><p class="cb-font-display text-2xl font-medium text-white">Meridian Advisory</p><p class="cb-font-body mt-6 max-w-xs text-sm text-white/50">Clear messaging and conversion-focused pages that earn trust quickly.</p></div><nav aria-label="Explore" class="lg:col-span-3 lg:col-start-6"><p class="cb-font-body text-[0.6875rem] uppercase tracking-[0.18em] text-white/35">Explore</p><ul class="mt-5 space-y-3"><li><a href="#services" class="cb-font-body text-sm text-white/55 hover:text-[var(--color-signal)] cb-focus-ring">Services</a></li><li><a href="#features" class="cb-font-body text-sm text-white/55 hover:text-[var(--color-signal)] cb-focus-ring">Why us</a></li><li><a href="#pricing" class="cb-font-body text-sm text-white/55 hover:text-[var(--color-signal)] cb-focus-ring">Packages</a></li><li><a href="#testimonials" class="cb-font-body text-sm text-white/55 hover:text-[var(--color-signal)] cb-focus-ring">Clients</a></li><li><a href="#contact" class="cb-font-body text-sm text-white/55 hover:text-[var(--color-signal)] cb-focus-ring">Contact</a></li></ul></nav><div class="lg:col-span-3"><p class="cb-font-body text-[0.6875rem] uppercase tracking-[0.18em] text-white/35">Insights</p><p class="cb-font-body mt-5 text-sm text-white/50">Quarterly perspectives on governance and markets.</p></div></div><div class="df-container flex flex-col gap-6 py-10 sm:flex-row sm:items-center sm:justify-between"><p class="cb-font-body text-xs text-white/30">© 2026 Meridian Advisory</p><nav aria-label="Legal" class="flex flex-wrap gap-6"></nav></div></footer></footer><div data-v2-region="overlay" class="pointer-events-none fixed inset-x-0 bottom-0 z-50"><div data-v2-section="cta" data-v2-variant="minimal-line"></div></div></div>
   </div>
   
 </body>

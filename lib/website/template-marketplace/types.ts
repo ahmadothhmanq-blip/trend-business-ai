@@ -36,6 +36,8 @@ export type WbTemplateMarketplaceMetadata = {
   compatibility?: WbTemplateCompatibility;
   templateIntelligenceId?: string;
   premium?: boolean;
+  /** Locale-specific display names (e.g. ar for Arabic UI). */
+  localizedNames?: Record<string, string>;
 };
 
 /**
@@ -131,6 +133,7 @@ export type WbTemplateMarketplaceRegistryStatus = {
   marketplaceVersion: string;
   installedCount: number;
   remoteCount: number;
+  unavailableCount?: number;
   listingCount: number;
   featuredCount: number;
   lastRefreshedAt: string | null;

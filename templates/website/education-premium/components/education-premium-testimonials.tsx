@@ -1,57 +1,76 @@
 "use client";
 
-import {
-  FlagshipTestimonialsSection,
-  type FlagshipTestimonial,
-} from "@/lib/website/template-v2/flagship/testimonials-section";
-import { EDUCATION_FLAGSHIP_UI } from "@/lib/website/template-v2/flagship/themes";
-
-const EDUCATION_TESTIMONIALS: FlagshipTestimonial[] = [
+const DEFAULT_ITEMS = [
   {
-    quote:
-      "Scholar's Hall gave me the intellectual foundation and research experience to pursue my PhD at Oxford. The faculty genuinely invested in my growth as a scholar.",
-    name: "Elena Vasquez",
-    role: "Class of 2024",
-    company: "Rhodes Scholar",
-  },
-  {
-    quote:
-      "The interdisciplinary approach here prepared me to lead a team at a Fortune 500 company. I learned to think critically and communicate with precision.",
-    name: "James Okonkwo",
-    role: "MBA Graduate",
-    company: "McKinsey & Company",
-  },
-  {
-    quote:
-      "As a first-generation student, the mentorship and financial aid I received transformed my life. This university believes in every student's potential.",
+    quote: "The seminar table taught me to argue with care — and to change my mind when the evidence asked for it.",
     name: "Sarah Chen",
-    role: "Class of 2023",
-    company: "Fulbright Fellow",
+    role: "Class of 2014",
+    company: "Public policy",
+  },
+  {
+    quote: "Research here is not a performance. It is a conversation with mentors who expect rigor and originality.",
+    name: "Marcus Webb",
+    role: "Alumni fellow",
+    company: "Life sciences",
+  },
+  {
+    quote: "I left with a network that spans continents and a habit of reading the world closely.",
+    name: "Elena Vasquez",
+    role: "Graduate 2019",
+    company: "Arts & letters",
   },
 ];
 
-type Props = {
+type Testimonial = { quote: string; name: string; role: string; company?: string };
+
+type EducationPremiumTestimonialsProps = {
   eyebrow?: string;
   title?: string;
   subtitle?: string;
-  items?: FlagshipTestimonial[];
+  items?: Testimonial[];
 };
 
 export function EducationPremiumTestimonials({
-  eyebrow = "Student voices",
-  title = "Stories from our scholars",
-  subtitle = "Alumni and current students share how Scholar's Hall shaped their academic journey and career path.",
-  items = EDUCATION_TESTIMONIALS,
-}: Props) {
+  eyebrow = "Voices",
+  title = "Pull quotes",
+  subtitle = "Lines from alumni letters and commencement addresses.",
+  items = DEFAULT_ITEMS,
+}: EducationPremiumTestimonialsProps) {
+  if (!items.length) return null;
+
   return (
-    <FlagshipTestimonialsSection
-      ui={EDUCATION_FLAGSHIP_UI}
-      componentId="education-premium-testimonials"
+    <section
       id="testimonials"
-      eyebrow={eyebrow}
-      title={title}
-      subtitle={subtitle}
-      items={items}
-    />
+      data-v2-component="education-premium-testimonials"
+      aria-labelledby="ed-testimonials-title"
+      className="ed-pullquotes ed-paper ed-reveal"
+    >
+      <div className="ed-pullquotes-inner">
+        <header className="ed-section-head">
+          <p className="ed-eyebrow">{eyebrow}</p>
+          <h2 id="ed-testimonials-title" className="ed-headline-sm ed-font-display">
+            {title}
+          </h2>
+          <p className="ed-body">{subtitle}</p>
+        </header>
+
+        <div className="ed-pullquotes-stack ed-reveal-stagger">
+          {items.map((item) => (
+            <figure key={item.name} className="ed-pullquote">
+              <blockquote>
+                <p>&ldquo;{item.quote}&rdquo;</p>
+              </blockquote>
+              <figcaption>
+                <span className="ed-pullquote-name">{item.name}</span>
+                <span className="ed-pullquote-meta">
+                  {item.role}
+                  {item.company ? ` · ${item.company}` : ""}
+                </span>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }

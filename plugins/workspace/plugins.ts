@@ -15,79 +15,79 @@ import { createTextPlugin } from "@/plugins/types";
 export const brandPlugin = createTextPlugin({
   id: "brand",
   name: "Brand Designer",
-  analyzePrompt: (input) => brandAnalyzePrompt(input.prompt),
+  analyzePrompt: (input) => brandAnalyzePrompt(input.prompt, input.language),
   planPrompt: (input, analysis) =>
-    servicePlanPrompt("brand identity", input.prompt, analysis),
+    servicePlanPrompt("brand identity", input.prompt, analysis, input.language),
   generatePrompt: (input, analysis, plan) =>
-    serviceGeneratePrompt("brand identity kit", input.prompt, analysis, plan),
+    serviceGeneratePrompt("brand identity kit", input.prompt, analysis, plan, input.language),
 });
 
 export const contentPlugin = createTextPlugin({
   id: "content",
   name: "Content Studio",
-  analyzePrompt: (input) => contentAnalyzePrompt(input.prompt),
+  analyzePrompt: (input) => contentAnalyzePrompt(input.prompt, input.language),
   planPrompt: (input, analysis) =>
-    servicePlanPrompt("content", input.prompt, analysis),
+    servicePlanPrompt("content", input.prompt, analysis, input.language),
   generatePrompt: (input, analysis, plan) =>
-    serviceGeneratePrompt("content package", input.prompt, analysis, plan),
+    serviceGeneratePrompt("content package", input.prompt, analysis, plan, input.language),
 });
 
 export const creativePlugin = createTextPlugin({
   id: "creative",
   name: "Creative Studio",
-  analyzePrompt: (input) => creativeAnalyzePrompt(input.prompt),
+  analyzePrompt: (input) => creativeAnalyzePrompt(input.prompt, input.language),
   planPrompt: (input, analysis) =>
-    servicePlanPrompt("creative production", input.prompt, analysis),
+    servicePlanPrompt("creative production", input.prompt, analysis, input.language),
   generatePrompt: (input, analysis, plan) =>
-    serviceGeneratePrompt("creative direction package", input.prompt, analysis, plan),
+    serviceGeneratePrompt("creative direction package", input.prompt, analysis, plan, input.language),
 });
 
 export const marketingPlugin = createTextPlugin({
   id: "marketing",
   name: "Marketing",
-  analyzePrompt: (input) => marketingAnalyzePrompt(input.prompt),
+  analyzePrompt: (input) => marketingAnalyzePrompt(input.prompt, input.language),
   planPrompt: (input, analysis) =>
-    servicePlanPrompt("marketing campaign", input.prompt, analysis),
+    servicePlanPrompt("marketing campaign", input.prompt, analysis, input.language),
   generatePrompt: (input, analysis, plan) =>
-    serviceGeneratePrompt("marketing campaign package", input.prompt, analysis, plan),
+    serviceGeneratePrompt("marketing campaign package", input.prompt, analysis, plan, input.language),
 });
 
 export const businessPlugin = createTextPlugin({
   id: "business",
   name: "Business Intelligence",
-  analyzePrompt: (input) => businessAnalyzePrompt(input.prompt),
+  analyzePrompt: (input) => businessAnalyzePrompt(input.prompt, input.language),
   planPrompt: (input, analysis) =>
-    servicePlanPrompt("business intelligence", input.prompt, analysis),
+    servicePlanPrompt("business intelligence", input.prompt, analysis, input.language),
   generatePrompt: (input, analysis, plan) =>
-    serviceGeneratePrompt("business intelligence report", input.prompt, analysis, plan),
+    serviceGeneratePrompt("business intelligence report", input.prompt, analysis, plan, input.language),
 });
 
 export const managerPlugin = createTextPlugin({
   id: "manager",
   name: "Business Manager",
-  analyzePrompt: (input) => managerAnalyzePrompt(input.prompt),
+  analyzePrompt: (input) => managerAnalyzePrompt(input.prompt, input.language),
   planPrompt: (input, analysis) =>
-    servicePlanPrompt("business management", input.prompt, analysis),
+    servicePlanPrompt("business management", input.prompt, analysis, input.language),
   generatePrompt: (input, analysis, plan) =>
-    serviceGeneratePrompt("business execution roadmap", input.prompt, analysis, plan),
+    serviceGeneratePrompt("business execution roadmap", input.prompt, analysis, plan, input.language),
 });
 
 export const auditPlugin = createTextPlugin({
   id: "audit",
   name: "Business Audit",
-  analyzePrompt: (input) => auditAnalyzePrompt(input.prompt),
+  analyzePrompt: (input) => auditAnalyzePrompt(input.prompt, input.language),
   planPrompt: (input, analysis) =>
-    servicePlanPrompt("business audit", input.prompt, analysis),
+    servicePlanPrompt("business audit", input.prompt, analysis, input.language),
   generatePrompt: (input, analysis, plan) =>
-    serviceGeneratePrompt("business audit report", input.prompt, analysis, plan),
+    serviceGeneratePrompt("business audit report", input.prompt, analysis, plan, input.language),
 });
 
 export const socialPlugin = createTextPlugin({
   id: "social",
   name: "Social Media",
-  analyzePrompt: (input) => socialAnalyzePrompt(input.prompt),
+  analyzePrompt: (input) => socialAnalyzePrompt(input.prompt, input.language),
   planPrompt: (input, analysis) =>
-    servicePlanPrompt("social media growth", input.prompt, analysis),
+    servicePlanPrompt("social media growth", input.prompt, analysis, input.language),
   generatePrompt: (input, analysis, plan) =>
-    serviceGeneratePrompt("social media growth plan", input.prompt, analysis, plan),
+    serviceGeneratePrompt("social media growth plan", input.prompt, analysis, plan, input.language),
 });

@@ -1,0 +1,71 @@
+{
+  "packageId": "forge-industrial",
+  "templateIntelligenceHint": "ti-consulting-clarity",
+  "layout": {
+    "defaultLayoutId": "default",
+    "regions": {
+      "header": {
+        "role": "header",
+        "sticky": true
+      },
+      "main": {
+        "role": "main"
+      },
+      "utility": {
+        "role": "utility"
+      },
+      "footer": {
+        "role": "footer"
+      },
+      "overlay": {
+        "role": "overlay"
+      }
+    }
+  },
+  "navigation": {
+    "componentId": "forge-industrial-nav",
+    "variant": "enterprise-glass"
+  },
+  "hero": {
+    "componentId": "forge-industrial-hero",
+    "region": "main"
+  },
+  "footer": {
+    "componentId": "forge-industrial-footer",
+    "region": "footer"
+  },
+  "homeFlow": {
+    "regions": {
+      "main": [
+        "forge-industrial-hero",
+        "forge-industrial-features",
+        "forge-industrial-integrations",
+        "forge-industrial-about",
+        "forge-industrial-stats",
+        "forge-industrial-testimonials",
+        "forge-industrial-portfolio",
+        "forge-industrial-pricing",
+        "forge-industrial-faq",
+        "forge-industrial-contact"
+      ],
+      "utility": [
+        "forge-industrial-utility-band"
+      ],
+      "overlay": [
+        "forge-industrial-floating-cta"
+      ]
+    }
+  },
+  "sectionShell": {
+    "strategy": "package",
+    "componentId": "forge-industrial-section-shell"
+  },
+  "aiGeneration": {
+    "contentProfile": "forge-industrial-gtm",
+    "suggestedPages": [
+      "platform",
+      "pricing",
+      "customers"
+    ]
+  }
+}

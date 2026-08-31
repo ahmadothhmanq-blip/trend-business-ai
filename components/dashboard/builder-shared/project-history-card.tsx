@@ -19,9 +19,9 @@ export type ProjectHistoryItem = {
 };
 
 function getStatusColor(status: string) {
-  if (status === "completed") return "text-emerald-400";
+  if (status === "completed" || status === "video_rendered") return "text-emerald-400";
   if (status === "failed") return "text-red-400";
-  if (status === "generating") return "text-amber-400";
+  if (status === "generating" || status === "storyboard_ready") return "text-amber-400";
   return "text-white/40";
 }
 
@@ -44,10 +44,15 @@ export function ProjectHistoryCard({
   onContinue?: () => void;
 }) {
   const { t } = useTranslation();
-  const statusLabel =
-    item.status === "completed" || item.status === "failed" || item.status === "generating"
-      ? t(`dashboard.builderShared.statuses.${item.status}`)
-      : item.status.charAt(0).toUpperCase() + item.status.slice(1);
+  const known =
+    item.status === "completed" ||
+    item.status === "failed" ||
+    item.status === "generating" ||
+    item.status === "storyboard_ready" ||
+    item.status === "video_rendered";
+  const statusLabel = known
+    ? t(`dashboard.builderShared.statuses.${item.status}`)
+    : item.status.charAt(0).toUpperCase() + item.status.slice(1);
 
   return (
     <DashboardPanel className="flex flex-col gap-3">

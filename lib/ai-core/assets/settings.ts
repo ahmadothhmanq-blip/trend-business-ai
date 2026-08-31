@@ -124,3 +124,14 @@ export function normalizeImageStyle(value?: string | null): ImageStylePreset {
   }
   return "modern";
 }
+
+/** HD for professional quality; standard for fast/ultra throughput modes. */
+export function resolveImageGenerationQuality(
+  profile?: "fast" | "professional" | "ultra",
+): ImageQuality {
+  if (profile === "fast" || profile === "ultra") return "standard";
+  if (process.env.IMAGE_QUALITY?.trim().toLowerCase() === "standard") {
+    return "standard";
+  }
+  return "hd";
+}

@@ -5,6 +5,7 @@ import type { DesignDNAPrinciples } from "@/lib/ai-core/design-dna/types";
 import type { AgencyBrandKit } from "@/lib/ai-core/agency-brand-kit/types";
 import { buildBrandGuidelines } from "@/lib/ai-core/agency-brand-kit/guidelines";
 import { generateBrandLogoAssets } from "@/lib/ai-core/agency-brand-kit/logo-svg";
+import { buildWebsiteLanguageDirective } from "@/lib/ai-core/website-builder/language-directive.server";
 
 type BrandKitPayload = Partial<AgencyBrandKit>;
 
@@ -197,6 +198,7 @@ Visual style: ${params.profile.visualStyle.join(", ")}
 Design benchmark: ${params.designDNA.label}
 User request: ${params.prompt.slice(0, 400)}
 Language: ${params.language ?? "en"}
+${buildWebsiteLanguageDirective({ language: params.language ?? "English", prompt: params.prompt })}
 
 Return JSON:
 {

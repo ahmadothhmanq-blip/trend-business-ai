@@ -3,13 +3,15 @@
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  PUBLISHING_CHECKLIST,
+  resolvePublishingChecklist,
   runBuilderAccessibilityHeuristics,
 } from "@/lib/website/builder";
+import type { WebsiteCapabilityService } from "@/lib/website/builder/capabilities/service";
 import type { GeneratedProjectFile } from "@/lib/ai/types";
 import { useBuilderLocale } from "@/lib/website/builder/use-builder-locale";
 
 type PublishingHubPanelProps = {
+  capabilityService: WebsiteCapabilityService;
   files: GeneratedProjectFile[];
   disabled?: boolean;
   onOpenDeploy?: () => void;
@@ -18,6 +20,7 @@ type PublishingHubPanelProps = {
 };
 
 export function PublishingHubPanel({
+  capabilityService,
   files,
   disabled,
   onOpenDeploy,
@@ -30,13 +33,18 @@ export function PublishingHubPanel({
     [files],
   );
 
+  const checklist = useMemo(
+    () => resolvePublishingChecklist(capabilityService),
+    [capabilityService],
+  );
+
   return (
     <div className="flex h-full flex-col gap-3 overflow-y-auto p-3">
       <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/35">
         {wb("builder.publishing.title")}
       </p>
       <ul className="space-y-2">
-        {PUBLISHING_CHECKLIST.map((item) => (
+        {checklist.map((item) => (
           <li
             key={item.id}
             className="rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2"

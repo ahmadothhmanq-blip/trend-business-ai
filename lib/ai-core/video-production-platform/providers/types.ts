@@ -2,7 +2,14 @@
  * Pluggable video generation providers (Video Studio only).
  */
 
-export type VideoProviderId = "preview" | "kling" | "runway" | "heygen" | "external";
+export type VideoProviderId =
+  | "preview"
+  | "veo"
+  | "omni_flash"
+  | "kling"
+  | "runway"
+  | "heygen"
+  | "external";
 
 /** Render modes that influence provider routing (mirrors VideoRenderJob.mode). */
 export type VideoProviderRenderMode =
@@ -43,6 +50,8 @@ export type VideoProviderClipResult = {
   mimeType: "video/mp4" | "video/webm";
   posterUrl?: string;
   error?: string;
+  errorCode?: string;
+  httpStatus?: number;
   message: string;
 };
 
@@ -107,26 +116,20 @@ export function softFallbackClip(
   label: string,
   httpDetail: string,
 ): VideoProviderClipResult {
-  if (isStrictVideoProviderMode()) {
-    return {
-      provider,
-      status: "failed",
-      mimeType: "video/mp4",
-      error: httpDetail.slice(0, 500),
-      message: `${provider} error (strict mode)`,
-    };
-  }
+  void label;
   return {
     provider,
-    status: "completed",
-    bytes: minimalMp4Bytes(label),
+    status: "failed",
     mimeType: "video/mp4",
-    message: `${provider} fallback stub MP4. ${httpDetail.slice(0, 120)}`,
+    error: httpDetail.slice(0, 500),
+    message: `${provider} failed. Stub MP4 fallbacks are disabled.`,
   };
 }
 
 export function envProviderFlags() {
   return {
+    veo: Boolean(process.env.VEO_API_KEY || process.env.GEMINI_API_KEY),
+    omni_flash: Boolean(process.env.GEMINI_API_KEY),
     runway: Boolean(process.env.RUNWAY_API_KEY),
     kling: Boolean(process.env.KLING_API_KEY),
     heygen: Boolean(process.env.HEYGEN_API_KEY),
@@ -141,6 +144,8 @@ export function envProviderFlags() {
  */
 export function resolvePreferredProviderId(): VideoProviderId {
   const f = envProviderFlags();
+  if (f.veo) return "veo";
+  if (f.omni_flash) return "omni_flash";
   if (f.kling) return "kling";
   if (f.runway) return "runway";
   if (f.external) return "external";
@@ -160,6 +165,7 @@ export function resolveVideoProviderForMode(
 ): VideoProviderResolution {
   const validIds: VideoProviderId[] = [
     "preview",
+    "veo",
     "kling",
     "runway",
     "heygen",
@@ -168,9 +174,17 @@ export function resolveVideoProviderForMode(
 
   if (explicitId && validIds.includes(explicitId as VideoProviderId)) {
     const id = explicitId as VideoProviderId;
-    if (id === "preview") return { providerId: "preview" };
+    if (id === "preview") {
+      if (mode === "preview") return { providerId: "preview" };
+      return {
+        providerId: "preview",
+        error:
+          "Preview provider cannot be used for production video. Configure KLING_API_KEY or RUNWAY_API_KEY.",
+      };
+    }
     const configured = envProviderFlags();
     const isConfigured =
+      (id === "veo" && configured.veo) ||
       (id === "kling" && configured.kling) ||
       (id === "runway" && configured.runway) ||
       (id === "heygen" && configured.heygen) ||
@@ -199,19 +213,16 @@ export function resolveVideoProviderForMode(
     };
   }
 
-  // full, image-to-video, batch-item — Kling primary
+  // full, image-to-video, batch-item — Veo/Runway/Kling priority. Never fall back to preview.
   const f = envProviderFlags();
+  if (f.veo) return { providerId: "veo" };
   if (f.kling) return { providerId: "kling" };
   if (f.runway) return { providerId: "runway" };
   if (f.external) return { providerId: "external" };
 
-  if (isStrictVideoProviderMode()) {
-    return {
-      providerId: "preview",
-      error:
-        "Full render requires KLING_API_KEY (recommended) or RUNWAY_API_KEY / external video provider. Preview stubs are disabled when VIDEO_PROVIDER_STRICT=1.",
-    };
-  }
-
-  return { providerId: "preview" };
+  return {
+    providerId: "runway",
+    error:
+      "Full render requires GEMINI_API_KEY/VEO_API_KEY, KLING_API_KEY, or RUNWAY_API_KEY. Preview stubs cannot be used for production video.",
+  };
 }

@@ -6,7 +6,8 @@ import {
   WEBSITE_STRUCTURE_TEMPLATE_INDEX,
   WEBSITE_STRUCTURE_TEMPLATES,
 } from "@/lib/website/builder/template-package-index";
-import type { WebsiteStructureTemplate } from "@/lib/website/builder/structure-templates";
+import { INTERNAL_GENERATION_STRUCTURE_FALLBACK } from "@/lib/website/builder/generation-structure-fallback";
+import type { WebsiteStructureTemplate } from "@/lib/website/contracts/structure";
 import {
   DEFAULT_STRUCTURE_TEMPLATE_ID,
   normalizeRoutingIndustryId,
@@ -28,6 +29,7 @@ export function resolveStructureTemplateForIndustry(
   return (
     WEBSITE_STRUCTURE_TEMPLATE_INDEX[id] ??
     WEBSITE_STRUCTURE_TEMPLATE_INDEX[DEFAULT_STRUCTURE_TEMPLATE_ID] ??
-    WEBSITE_STRUCTURE_TEMPLATES[0]!
+    WEBSITE_STRUCTURE_TEMPLATES[0] ??
+    INTERNAL_GENERATION_STRUCTURE_FALLBACK
   );
 }

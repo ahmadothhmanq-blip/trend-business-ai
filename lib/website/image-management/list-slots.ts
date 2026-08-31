@@ -1,9 +1,36 @@
 import type { ImageSlotKind } from "@/lib/ai-core/image-engine/slots";
-import { IMAGE_SLOT_KINDS } from "@/lib/ai-core/image-engine/slots";
+import { IMAGE_SLOT_KINDS, roleToSlotKind } from "@/lib/ai-core/image-engine/slots";
 import type { GeneratedProjectFile } from "@/lib/ai/types";
+import type { AssetItem } from "@/lib/website/types/layers";
 import type { ManagedSiteImage } from "@/lib/website/image-management/operations";
 
 const SITE_IMAGES_PATH = "lib/site-images.ts";
+
+type SiteImageMetaLike = Partial<ManagedSiteImage> & { role?: string };
+
+function resolveManagedImageSlot(input: SiteImageMetaLike): ImageSlotKind {
+  if (input.slot && (IMAGE_SLOT_KINDS as readonly string[]).includes(input.slot)) {
+    return input.slot;
+  }
+  if (input.role?.trim()) {
+    return roleToSlotKind(input.role.trim());
+  }
+  return "gallery";
+}
+
+function normalizeSiteImageMeta(meta: SiteImageMetaLike): ManagedSiteImage {
+  return {
+    id: meta.id ?? `meta-${meta.role ?? "image"}`,
+    slot: resolveManagedImageSlot(meta),
+    url: meta.url ?? null,
+    alt: meta.alt ?? "Site image",
+    objectPosition: meta.objectPosition,
+    crop: meta.crop,
+    isUserOverride: meta.isUserOverride,
+    provider: meta.provider ?? "image-engine",
+    status: meta.status ?? "generated",
+  };
+}
 
 const SLOT_EXPORT_MAP: Array<{
   kind: ImageSlotKind;
@@ -60,11 +87,57 @@ function parseSiteImagesMeta(source: string): ManagedSiteImage[] {
   const match = source.match(/export const SITE_IMAGES[^=]*=\s*(\[[\s\S]*?\]);/);
   if (!match?.[1]) return [];
   try {
-    const parsed = JSON.parse(match[1]) as ManagedSiteImage[];
-    return Array.isArray(parsed) ? parsed : [];
+    const parsed = JSON.parse(match[1]) as SiteImageMetaLike[];
+    return Array.isArray(parsed) ? parsed.map(normalizeSiteImageMeta) : [];
   } catch {
     return [];
   }
+}
+
+function mapAssetRoleToSlot(role: AssetItem["role"]): ImageSlotKind {
+  switch (role) {
+    case "hero":
+      return "hero";
+    case "product":
+      return "products";
+    case "gallery":
+      return "gallery";
+    case "testimonial":
+      return "testimonials";
+    case "background":
+      return "backgrounds";
+    case "section":
+    case "service":
+      return "about";
+    default:
+      return "gallery";
+  }
+}
+
+export function managedImagesFromAssetManifest(
+  items: AssetItem[] | undefined,
+): ManagedSiteImage[] {
+  const seen = new Set<string>();
+  const inventory: ManagedSiteImage[] = [];
+
+  for (const item of items ?? []) {
+    const url = item.url?.trim();
+    if (!url || seen.has(url)) continue;
+    seen.add(url);
+    inventory.push({
+      id: item.id || `asset-${inventory.length + 1}`,
+      slot: mapAssetRoleToSlot(item.role),
+      url,
+      alt: item.alt || item.name || "Site image",
+      objectPosition: undefined,
+      crop: undefined,
+      isUserOverride: false,
+      provider: item.metadata?.provider ?? "asset-manifest",
+      status: item.status === "failed" ? "failed" : "generated",
+    });
+  }
+
+  return inventory;
 }
 
 /**
@@ -72,6 +145,7 @@ function parseSiteImagesMeta(source: string): ManagedSiteImage[] {
  */
 export function buildSiteImageSlotInventory(
   files: GeneratedProjectFile[],
+  assetManifestItems?: AssetItem[],
 ): ManagedSiteImage[] {
   const source = findSiteImagesSource(files);
   if (!source) return [];
@@ -110,8 +184,12 @@ export function buildSiteImageSlotInventory(
 
   for (const meta of metaById.values()) {
     if (!inventory.some((img) => img.id === meta.id)) {
-      inventory.push(meta);
+      inventory.push(normalizeSiteImageMeta(meta));
     }
+  }
+
+  if (!inventory.length && assetManifestItems?.length) {
+    return managedImagesFromAssetManifest(assetManifestItems);
   }
 
   return inventory.sort((a, b) => {

@@ -2,6 +2,7 @@
  * Social Media AI prompts.
  */
 
+import { aiOutputLanguageDirective } from "@/lib/ai/prompts/language-directive";
 import type { SocialPostPlatform, SocialTone } from "@/types/social-media";
 
 const PLATFORM_GUIDANCE: Record<SocialPostPlatform, string> = {
@@ -25,7 +26,8 @@ export function buildPostGenerationPrompt(args: {
     "You are an expert social media copywriter for Trend Business AI Social Media Manager.",
     "Return ONLY valid JSON with keys: title, postText, caption, hashtags (array), cta, contentAngle, recommendedPostTime.",
     `Platform: ${args.platform}. ${PLATFORM_GUIDANCE[args.platform]}`,
-    `Tone: ${args.tone}. Language: ${args.language}.`,
+    `Tone: ${args.tone}.`,
+    aiOutputLanguageDirective(args.language, "social").trim(),
     args.audience ? `Audience: ${args.audience}` : "",
     args.brandContext ? `Brand guidelines:\n${args.brandContext}` : "",
     "recommendedPostTime should be a human-readable suggestion like 'Tuesday 10:00 AM' or 'Weekday evenings'.",
@@ -46,6 +48,7 @@ export function buildPostActionPrompt(args: {
   text: string;
   platform: SocialPostPlatform;
   tone?: string;
+  language?: string;
   targetLanguage?: string;
   instruction?: string;
 }): { system: string; prompt: string } {
@@ -54,7 +57,7 @@ export function buildPostActionPrompt(args: {
     `Platform: ${args.platform}. ${PLATFORM_GUIDANCE[args.platform]}`,
     `Action: ${args.action}`,
     args.tone ? `Tone: ${args.tone}` : "",
-    args.targetLanguage ? `Target language: ${args.targetLanguage}` : "",
+    aiOutputLanguageDirective(args.targetLanguage || args.language, "social").trim(),
     args.instruction ? `Instruction: ${args.instruction}` : "",
   ]
     .filter(Boolean)

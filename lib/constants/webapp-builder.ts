@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react";
+import { getGlsGenerationLanguageValues } from "@/lib/language-platform/generation/options";
 import {
   Building2,
   CalendarCheck,
@@ -105,16 +106,9 @@ export const WEBAPP_TYPES: WebAppTypeDefinition[] = [
   },
 ];
 
-export const WEBAPP_LANGUAGES = [
-  "English",
-  "Spanish",
-  "French",
-  "German",
-  "Portuguese",
-  "Arabic",
-  "Chinese",
-  "Japanese",
-] as const;
+export const WEBAPP_LANGUAGES = getGlsGenerationLanguageValues(
+  "app-builder",
+) as readonly string[];
 
 export const WEBAPP_DESIGN_STYLES = [
   "Modern",
@@ -160,6 +154,6 @@ export function getWebAppTypeLabel(id: string): string {
   return WEBAPP_TYPES.find((t) => t.id === id)?.label ?? id;
 }
 
-export type WebAppLanguage = (typeof WEBAPP_LANGUAGES)[number];
+export type WebAppLanguage = string;
 export type WebAppDesignStyle = (typeof WEBAPP_DESIGN_STYLES)[number];
 export type WebAppColorStyle = (typeof WEBAPP_COLOR_STYLES)[number];

@@ -50,6 +50,11 @@ export {
 } from "@/lib/website/builder/structure-templates";
 
 export {
+  ACTIVE_STRUCTURE_TEMPLATES,
+  listV2StructureTemplates,
+} from "@/lib/website/builder/unified-template-registry";
+
+export {
   mapListItemToStructureTemplate,
   mapListItemToStructureTemplateChoice,
   isLegacyMarketplaceStructureTemplate,
@@ -86,6 +91,7 @@ export {
 export {
   AI_BUILDER_ACTIONS,
   getAiBuilderAction,
+  listAiBuilderActionsForCapabilities,
   type AiBuilderAction,
 } from "@/lib/website/builder/ai-builder";
 
@@ -116,6 +122,7 @@ export {
 
 export {
   PUBLISHING_CHECKLIST,
+  resolvePublishingChecklist,
   runBuilderAccessibilityHeuristics,
   type PublishingChecklistItem,
   type BuilderAccessibilityIssue,
@@ -142,6 +149,37 @@ export {
   formatWebsiteBuilderApiError,
   readWebsiteBuilderApiError,
 } from "@/lib/website/builder/client-api-error";
+
+export {
+  WB_WEBSITE_CAPABILITY_MANIFEST_SETTING,
+  CAPABILITY_ANALYZER_SET_VERSION,
+  CAPABILITY_MANIFEST_SPEC_VERSION,
+  isCapabilityToolbarEnabled,
+  WebsiteCapabilityService,
+  createCapabilityService,
+  refreshCapabilities,
+  projectCapabilityFlags,
+  filterItemsByCapabilities,
+  getCapabilityDependencyReport,
+  formatCapabilityDependencyReport,
+  projectCapabilityFlagsFromManifest,
+  registerCapabilityAnalyzer,
+  registerCapabilityConsumer,
+  type WebsiteCapabilityManifest,
+  type WebsiteCapabilityId,
+  type CapabilityDefinition,
+  type RefreshCapabilitiesOptions,
+  type RefreshCapabilitiesResult,
+} from "@/lib/website/builder/capabilities";
+
+export {
+  resolveBuilderToolbar,
+  getLegacyBuilderTools,
+  BUILDER_TOOL_REGISTRY,
+  resolveBuilderToolbarFromProject,
+  type ResolvedBuilderToolbar,
+  type ResolvedBuilderTool,
+} from "@/lib/website/builder/tools";
 
 export type {
   BuilderTemplateRuntimeFailure,

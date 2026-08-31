@@ -3,28 +3,31 @@ import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError
 import { createAdminClient } from "@/lib/supabase/admin";
 import { serverErrorResponse } from "@/lib/api/errors";
 import { processVideoStudioBackgroundQueue } from "@/lib/ai-core/video-production-platform";
+import { authorizeVideoStudioCron } from "@/lib/ai-core/video-production-platform/runtime/cron-auth";
+import { validateVideoStudioProductionEnv } from "@/lib/ai-core/video-production-platform/env-config";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
-function authorizeCron(request: Request): boolean {
-  const secret = process.env.VIDEO_STUDIO_CRON_SECRET?.trim();
-  if (!secret) return false;
-  const auth = request.headers.get("authorization") || "";
-  const bearer = auth.startsWith("Bearer ") ? auth.slice(7).trim() : "";
-  const header = request.headers.get("x-video-studio-cron-secret")?.trim() || "";
-  return bearer === secret || header === secret;
-}
-
 /**
- * GET/POST — Video Studio background worker (cron).
- * Auth: Authorization: Bearer VIDEO_STUDIO_CRON_SECRET
- * Requires SUPABASE_SERVICE_ROLE_KEY for cross-user job processing.
+ * Platform worker: processes due jobs across tenants using the service role.
+ * Authenticated dashboard users must use `/api/video-studio/jobs`, which is
+ * always scoped to the caller. This route is not a tenant session.
  */
 async function runWorker(request: Request) {
-  if (!authorizeCron(request)) {
+  if (!authorizeVideoStudioCron(request)) {
     return apiErrorResponse(API_ERROR_CODES.UNAUTHORIZED, 401, "Unauthorized. Set VIDEO_STUDIO_CRON_SECRET and pass Bearer token.");
+  }
+
+  const productionEnv = validateVideoStudioProductionEnv();
+  if (productionEnv.production && !productionEnv.ok) {
+    return apiErrorResponse(
+      API_ERROR_CODES.PROVIDER_UNAVAILABLE,
+      503,
+      productionEnv.blockers[0] || "Video Studio production configuration is incomplete.",
+      productionEnv.blockers.join(" "),
+    );
   }
 
   const admin = createAdminClient();

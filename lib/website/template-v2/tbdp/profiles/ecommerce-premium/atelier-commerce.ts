@@ -8,17 +8,19 @@ import type { TemplateV2ResponsiveRules } from "@/lib/website/template-v2/contra
  * TBDP sector DNA: logistics (e-commerce operators) + luxury/editorial/minimal profiles.
  */
 export const ATELIER_COMMERCE_V2_TOKENS: TemplateV2DesignTokens = {
-  colors: {
-    primary: "#12100E",
-    secondary: "#2A2724",
-    accent: "#C9A962",
-    background: "#FAF8F5",
-    foreground: "#12100E",
-    muted: "rgba(18,16,14,0.58)",
-    surface: "#FFFFFF",
-    linen: "#F3EFE8",
-    champagne: "#C9A962",
-    ink: "#12100E",
+  colors: {
+    primary: "#12100E",
+    secondary: "#2A2724",
+    accent: "#C9A962",
+    background: "#FAF8F5",
+    foreground: "#12100E",
+    muted: "rgba(18,16,14,0.56)",
+    surface: "#FFFFFF",
+    signal: "#C9A962",
+    grid: "rgba(18,16,14,0.05)",
+    ink: "#12100E",
+    linen: "#faf8f5",
+    champagne: "#C9A962",
   },
   typography: {
     display: "Playfair Display",
@@ -52,15 +54,15 @@ export const ATELIER_COMMERCE_V2_TOKENS: TemplateV2DesignTokens = {
     lg: "8px",
     xl: "12px",
   },
-  shadows: {
-    surface: "0 24px 64px rgba(18,16,14,0.08)",
-    glow: "0 0 80px rgba(201,169,98,0.16)",
-    card: "0 1px 2px rgba(18,16,14,0.04), 0 16px 48px rgba(18,16,14,0.06)",
+  shadows: {
+    surface: "0 20px 60px rgba(18,16,14,0.07), 0 2px 8px rgba(18,16,14,0.03)",
+    glow: "0 0 64px rgba(201,169,98,0.18)",
+    card: "0 0 0 1px rgba(18,16,14,0.05), 0 8px 32px rgba(18,16,14,0.06)",
   },
-  borders: {
-    default: "rgba(18,16,14,0.1)",
-    accent: "rgba(201,169,98,0.32)",
-    subtle: "rgba(18,16,14,0.05)",
+  borders: {
+    default: "rgba(18,16,14,0.09)",
+    accent: "rgba(201,169,98,0.32)",
+    subtle: "rgba(18,16,14,0.05)",
   },
 };
 

@@ -3,13 +3,17 @@
  * Website Builder template package ids (V2 structure packages).
  */
 
-import { resolveStructureTemplateIdForIndustry } from "@/lib/website/builder/industry-structure-routing";
 import {
   getKnowledgeEntry,
   getKnowledgeRegistry,
   normalizeRoutingIndustryId,
 } from "@/lib/ai-core/architecture-knowledge-base";
+import { resolveStructureTemplatePackageForIndustry } from "@/lib/website/template-v2/composer/package-sector";
+import { PACKAGE_SUPERSESSION_ALIASES } from "@/lib/website/builder/package-supersession-aliases";
 import { isKnownStructureTemplateId } from "@/lib/website/contracts/structure-registry";
+import { isVisualSkinV2PackageId } from "@/lib/website/visual-skin/theme-bridge";
+
+export { PACKAGE_SUPERSESSION_ALIASES } from "@/lib/website/builder/package-supersession-aliases";
 
 function isKnownRoutingIndustryId(industryId: string): boolean {
   const registry = getKnowledgeRegistry();
@@ -18,35 +22,30 @@ function isKnownRoutingIndustryId(industryId: string): boolean {
   return entry?.kind === "industry";
 }
 
-/**
- * Explicit legacy premium / alias → installed package map.
- * Each legacy id maps to exactly one package (no duplicates, no last-write wins).
- */
-export const LEGACY_BUILDER_TEMPLATE_PACKAGE_MAP: Record<string, string> = {
-  "luxury-business": "corporate-business",
-  saas: "saas-enterprise",
-  restaurant: "restaurant-premium",
-  "real-estate": "real-estate-premium",
-  healthcare: "medical-premium",
-  medical: "medical-premium",
-  agency: "creative-agency-premium",
-  creative: "creative-agency-premium",
-  ecommerce: "ecommerce-premium",
-  hotel: "hotel-resort-premium",
-  tourism: "hotel-resort-premium",
-  hospitality: "hotel-resort-premium",
-  resort: "hotel-resort-premium",
-};
+const INTERNAL_GENERATION_PACKAGE_ID = "_generation-default";
 
 /**
- * Installed package ids superseded by flagship V2 replacements.
- * Checked before direct index lookup so legacy ids route to current flagships.
+ * Explicit legacy premium / alias → internal generation fallback map.
+ * Visual-skin V2 package ids must NEVER appear here — they resolve to themselves.
  */
-export const PACKAGE_SUPERSESSION_ALIASES: Record<string, string> = {
-  "modern-business": "corporate-business",
-  "restaurant-signature": "restaurant-premium",
-  "real-estate-prestige": "real-estate-premium",
-  "creative-portfolio": "creative-agency-premium",
+export const LEGACY_BUILDER_TEMPLATE_PACKAGE_MAP: Record<string, string> = {
+  "luxury-business": INTERNAL_GENERATION_PACKAGE_ID,
+  saas: INTERNAL_GENERATION_PACKAGE_ID,
+  gaming: INTERNAL_GENERATION_PACKAGE_ID,
+  esports: INTERNAL_GENERATION_PACKAGE_ID,
+  technology: INTERNAL_GENERATION_PACKAGE_ID,
+  tech: INTERNAL_GENERATION_PACKAGE_ID,
+  restaurant: INTERNAL_GENERATION_PACKAGE_ID,
+  "real-estate": INTERNAL_GENERATION_PACKAGE_ID,
+  healthcare: INTERNAL_GENERATION_PACKAGE_ID,
+  medical: INTERNAL_GENERATION_PACKAGE_ID,
+  agency: INTERNAL_GENERATION_PACKAGE_ID,
+  creative: INTERNAL_GENERATION_PACKAGE_ID,
+  ecommerce: INTERNAL_GENERATION_PACKAGE_ID,
+  hotel: INTERNAL_GENERATION_PACKAGE_ID,
+  tourism: INTERNAL_GENERATION_PACKAGE_ID,
+  hospitality: INTERNAL_GENERATION_PACKAGE_ID,
+  resort: INTERNAL_GENERATION_PACKAGE_ID,
 };
 
 let legacyMapValidated = false;
@@ -59,7 +58,13 @@ function ensureLegacyMapConsistency(): void {
   if (new Set(legacyIds).size !== legacyIds.length) {
     throw new Error("LEGACY_BUILDER_TEMPLATE_PACKAGE_MAP contains duplicate legacy keys");
   }
+
   for (const [legacyId, packageId] of Object.entries(LEGACY_BUILDER_TEMPLATE_PACKAGE_MAP)) {
+    if (isVisualSkinV2PackageId(legacyId)) {
+      throw new Error(
+        `LEGACY_BUILDER_TEMPLATE_PACKAGE_MAP must not remap visual-skin package "${legacyId}"`,
+      );
+    }
     if (!isKnownStructureTemplateId(packageId)) {
       throw new Error(
         `LEGACY_BUILDER_TEMPLATE_PACKAGE_MAP maps "${legacyId}" to unknown package "${packageId}"`,
@@ -68,7 +73,6 @@ function ensureLegacyMapConsistency(): void {
   }
 }
 
-/** Read-only view of legacy mappings — for audits and tests. */
 export function getLegacyBuilderTemplatePackageMap(): Readonly<Record<string, string>> {
   ensureLegacyMapConsistency();
   return LEGACY_BUILDER_TEMPLATE_PACKAGE_MAP;
@@ -77,10 +81,6 @@ export function getLegacyBuilderTemplatePackageMap(): Readonly<Record<string, st
 /** @deprecated No-op — legacy map is static. Kept for existing tests. */
 export function resetLegacyPremiumTemplatePackageMapForTests(): void {}
 
-/**
- * Normalize any builder-facing template id to an installed package id.
- * Legacy premium ids (e.g. `restaurant`) resolve to V2 packages (`restaurant-signature`).
- */
 export function resolveBuilderTemplatePackageId(rawId: string): string {
   ensureLegacyMapConsistency();
 
@@ -90,6 +90,12 @@ export function resolveBuilderTemplatePackageId(rawId: string): string {
   const superseded = PACKAGE_SUPERSESSION_ALIASES[id];
   if (superseded) {
     return superseded;
+  }
+
+  // Visual-skin flagship packages always resolve to themselves — never
+  // `_generation-default`, even when absent from the structure index.
+  if (isVisualSkinV2PackageId(id)) {
+    return id;
   }
 
   if (isKnownStructureTemplateId(id)) {
@@ -102,11 +108,25 @@ export function resolveBuilderTemplatePackageId(rawId: string): string {
   }
 
   const industryPackageId = isKnownRoutingIndustryId(id)
-    ? resolveStructureTemplateIdForIndustry(id)
+    ? resolveStructureTemplatePackageForIndustry(id)
     : id;
-  if (industryPackageId !== id && isKnownStructureTemplateId(industryPackageId)) {
-    return industryPackageId;
+  return id;
+}
+
+/**
+ * Resolve to an on-disk installed template package id.
+ * Flagship V2 skins and superseded aliases bypass the generation fallback remap.
+ */
+export function resolveInstalledBuilderTemplatePackageId(rawId: string): string {
+  const id = rawId.trim();
+  if (!id) return id;
+
+  const superseded = PACKAGE_SUPERSESSION_ALIASES[id];
+  const normalized = superseded ?? id;
+
+  if (isVisualSkinV2PackageId(normalized)) {
+    return normalized;
   }
 
-  return id;
+  return resolveBuilderTemplatePackageId(id);
 }

@@ -10,22 +10,17 @@
       "id": "ecommerce-premium-hero",
       "role": "hero",
       "scaffold": "components/ecommerce-premium-hero.tsx",
-      "slots": ["headline", "cta", "image"]
+      "slots": ["headline", "metrics", "cta"]
     },
     {
-      "id": "ecommerce-premium-collections",
+      "id": "ecommerce-premium-features",
       "role": "features",
-      "scaffold": "components/ecommerce-premium-collections.tsx"
+      "scaffold": "components/ecommerce-premium-features.tsx"
     },
     {
-      "id": "ecommerce-premium-product-grid",
-      "role": "gallery",
-      "scaffold": "components/ecommerce-premium-product-grid.tsx"
-    },
-    {
-      "id": "ecommerce-premium-brand-story",
+      "id": "ecommerce-premium-about",
       "role": "story",
-      "scaffold": "components/ecommerce-premium-brand-story.tsx"
+      "scaffold": "components/ecommerce-premium-about.tsx"
     },
     {
       "id": "ecommerce-premium-stats",
@@ -38,9 +33,9 @@
       "scaffold": "components/ecommerce-premium-testimonials.tsx"
     },
     {
-      "id": "ecommerce-premium-shipping",
-      "role": "custom",
-      "scaffold": "components/ecommerce-premium-shipping.tsx"
+      "id": "ecommerce-premium-pricing",
+      "role": "pricing",
+      "scaffold": "components/ecommerce-premium-pricing.tsx"
     },
     {
       "id": "ecommerce-premium-faq",
@@ -71,6 +66,16 @@
       "id": "ecommerce-premium-section-shell",
       "role": "custom",
       "scaffold": "components/ecommerce-premium-section-shell.tsx"
+    },
+    {
+      "id": "ecommerce-premium-portfolio",
+      "role": "custom",
+      "scaffold": "components/ecommerce-premium-portfolio.tsx"
+    },
+    {
+      "id": "ecommerce-premium-integrations",
+      "role": "custom",
+      "scaffold": "components/ecommerce-premium-integrations.tsx"
     }
   ]
 }

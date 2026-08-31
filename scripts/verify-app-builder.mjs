@@ -30,6 +30,11 @@ const APP_BUILDER_FILES = [
   "app/api/webapp-builder/[id]/deploy/route.ts",
   "app/api/webapp-builder/health/route.ts",
   "supabase/migrations/046_webapp_deployments.sql",
+  "supabase/migrations/097_webapp_publications.sql",
+  "app/w/app/[slug]/route.ts",
+  "lib/ai/webapp-readiness.ts",
+  "lib/ai/webapp-auth-scaffold.ts",
+  "lib/ai/webapp-project-verify.ts",
   "components/dashboard/webapp-builder/app-management-dashboard.tsx",
 ];
 
@@ -76,6 +81,8 @@ const dashboard = readFileSync(
 );
 if (dashboard.includes("/live-preview")) ok("management dashboard iframe");
 else fail("management dashboard missing live-preview iframe");
+if (dashboard.includes("/w/app/")) ok("management dashboard public host copy");
+else fail("management dashboard missing /w/app host copy");
 
 const tool = readFileSync(
   join(root, "components/dashboard/webapp-builder/webapp-builder-tool.tsx"),
@@ -91,6 +98,19 @@ if (nextConfig.includes("/api/webapp-builder/:id/live-preview")) {
 } else {
   fail("next.config missing webapp live-preview headers");
 }
+
+console.log("\n[6] Honest deploy markers");
+const deploy = readFileSync(
+  join(root, "lib/ai-core/app-design-platform/deploy.ts"),
+  "utf8",
+);
+if (deploy.includes("live-preview") && deploy.includes("public-host")) {
+  ok("deploy kinds: live-preview + public-host");
+} else {
+  fail("deploy.ts missing honest deploy kinds");
+}
+if (!deploy.includes("/apps/")) ok("no fake /apps/ deploy URLs");
+else fail("deploy.ts still references fake /apps/ URLs");
 
 console.log(failed ? `\nApp Builder verify: ${failed} issue(s)\n` : "\nApp Builder verify: PASS\n");
 process.exit(failed ? 1 : 0);

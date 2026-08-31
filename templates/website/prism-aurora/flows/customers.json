@@ -1,0 +1,7 @@
+{
+  "pageId": "customers",
+  "layoutId": "default",
+  "regions": {
+    "main": ["prism-aurora-hero", "prism-aurora-portfolio", "prism-aurora-features"]
+  }
+}

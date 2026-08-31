@@ -84,7 +84,7 @@ const energeticPulse: TemplateAnimationProfile = {
 export const PREMIUM_INDUSTRY_TEMPLATE_INTELLIGENCE = [
     {
       id: "ti-cafe-artisan",
-      name: "Cafe Artisan",
+      name: "Powerful",
       tagline: "Neighborhood craft coffee with warmth and ritual",
       description:
         "Morning-light hero, roast story, menu cards, and community booking flows.",
@@ -116,7 +116,7 @@ export const PREMIUM_INDUSTRY_TEMPLATE_INTELLIGENCE = [
     },
     {
       id: "ti-architecture-monograph",
-      name: "Architecture Monograph",
+      name: "Graceful",
       tagline: "Monographic project storytelling for studios",
       description:
         "Magazine grids, project folios, process essays, and inquiry-led CTAs.",
@@ -148,7 +148,7 @@ export const PREMIUM_INDUSTRY_TEMPLATE_INTELLIGENCE = [
     },
     {
       id: "ti-construction-industrial",
-      name: "Construction Industrial",
+      name: "Innovative",
       tagline: "Heavy-duty credibility for builders and contractors",
       description:
         "Safety-first hero, capability grids, project timelines, and bid CTAs.",
@@ -180,7 +180,7 @@ export const PREMIUM_INDUSTRY_TEMPLATE_INTELLIGENCE = [
     },
     {
       id: "ti-dental-smile",
-      name: "Dental Smile",
+      name: "Strategic",
       tagline: "Clinical calm with premium patient reassurance",
       description:
         "Bright trust hero, treatment cards, doctor profiles, and booking.",
@@ -212,7 +212,7 @@ export const PREMIUM_INDUSTRY_TEMPLATE_INTELLIGENCE = [
     },
     {
       id: "ti-pharmacy-wellness",
-      name: "Pharmacy Wellness",
+      name: "Luxury Modern",
       tagline: "Accessible care with product clarity",
       description:
         "Wellness hero, service lanes, pharmacist trust, and refill CTAs.",
@@ -244,7 +244,7 @@ export const PREMIUM_INDUSTRY_TEMPLATE_INTELLIGENCE = [
     },
     {
       id: "ti-insurance-shield",
-      name: "Insurance Shield",
+      name: "Classic Premium",
       tagline: "Trust architecture for coverage and claims",
       description:
         "Assurance hero, plan comparison, advisor profiles, and quote flows.",
@@ -276,7 +276,7 @@ export const PREMIUM_INDUSTRY_TEMPLATE_INTELLIGENCE = [
     },
     {
       id: "ti-university-heritage",
-      name: "University Heritage",
+      name: "Minimal",
       tagline: "Scholarly gravitas with modern admissions",
       description:
         "Campus cinematic hero, schools grid, research highlights, and apply CTAs.",
@@ -308,7 +308,7 @@ export const PREMIUM_INDUSTRY_TEMPLATE_INTELLIGENCE = [
     },
     {
       id: "ti-beauty-glow",
-      name: "Beauty Glow",
+      name: "Global Elite",
       tagline: "Luminous editorial beauty and spa experiences",
       description:
         "Soft cinematic hero, treatment rituals, product stories, and booking.",
@@ -340,7 +340,7 @@ export const PREMIUM_INDUSTRY_TEMPLATE_INTELLIGENCE = [
     },
     {
       id: "ti-fitness-pulse",
-      name: "Fitness Pulse",
+      name: "Modern Prestige",
       tagline: "High-energy training brands with momentum",
       description:
         "Dynamic hero, program cards, trainer roster, and membership CTAs.",
@@ -372,7 +372,7 @@ export const PREMIUM_INDUSTRY_TEMPLATE_INTELLIGENCE = [
     },
     {
       id: "ti-logistics-freight",
-      name: "Logistics Freight",
+      name: "Elegant Signature",
       tagline: "Global freight with operational clarity",
       description:
         "Route hero, fleet capabilities, tracking proof, and quote requests.",
@@ -404,7 +404,7 @@ export const PREMIUM_INDUSTRY_TEMPLATE_INTELLIGENCE = [
     },
     {
       id: "ti-manufacturing-precision",
-      name: "Manufacturing Precision",
+      name: "Bold Vision",
       tagline: "Engineering excellence for industrial leaders",
       description:
         "Precision hero, capability matrix, quality certifications, and RFQ flows.",
@@ -436,7 +436,7 @@ export const PREMIUM_INDUSTRY_TEMPLATE_INTELLIGENCE = [
     },
     {
       id: "ti-nonprofit-impact",
-      name: "Nonprofit Impact",
+      name: "Pure Minimal",
       tagline: "Human-centered storytelling that drives action",
       description:
         "Mission hero, impact metrics, volunteer paths, and donation CTAs.",

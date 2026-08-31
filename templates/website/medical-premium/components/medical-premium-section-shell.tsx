@@ -9,8 +9,19 @@ type MedicalPremiumSectionShellProps = {
   subtitle?: string;
   children?: ReactNode;
   className?: string;
-  centered?: boolean;
 };
+
+function SectionHeader({ p, id, eyebrow, title, subtitle, headerClass = "mb-9 max-w-2xl" }: { p: string; id?: string; eyebrow?: string; title?: string; subtitle?: string; headerClass?: string }) {
+  if (!eyebrow && !title && !subtitle) return null;
+  const titleId = `${id ?? "section"}-title`;
+  return (
+    <header className={headerClass}>
+      {eyebrow ? <p className={`${p}-eyebrow mb-3`}>{eyebrow}</p> : null}
+      {title ? <h2 id={titleId} className={`${p}-headline-sm`}>{title}</h2> : null}
+      {subtitle ? <p className={`${p}-body mt-4 text-[var(--color-muted)]`}>{subtitle}</p> : null}
+    </header>
+  );
+}
 
 export function MedicalPremiumSectionShell({
   id,
@@ -19,31 +30,17 @@ export function MedicalPremiumSectionShell({
   subtitle,
   children,
   className = "",
-  centered = false,
 }: MedicalPremiumSectionShellProps) {
   return (
-    <section
-      id={id}
-      data-v2-component="medical-premium-section-shell"
-      className={`mp-section px-5 sm:px-8 ${className}`.trim()}
-      aria-labelledby={title ? `${id ?? "section"}-title` : undefined}
-    >
-      {(eyebrow || title || subtitle) && (
-        <header className={`mx-auto mb-12 max-w-2xl ${centered ? "text-center" : ""}`.trim()}>
-          {eyebrow && <p className="mp-eyebrow mb-4">{eyebrow}</p>}
-          {title && (
-            <>
-              <div className={`mp-sage-rule mb-5 ${centered ? "mx-auto" : ""}`.trim()} aria-hidden />
-              <h2 id={`${id ?? "section"}-title`} className="mp-headline-sm">
-                {title}
-              </h2>
-            </>
-          )}
-          {subtitle && (
-            <p className="mp-body text-muted-foreground mt-4 text-base leading-relaxed">{subtitle}</p>
-          )}
+    <section id={id} data-v2-component="medical-premium-section-shell" className={`px-5 py-20 sm:py-28 sm:px-8 ${className}`.trim()} aria-labelledby={title ? `${id ?? "section"}-title` : undefined}>
+      {(eyebrow || title || subtitle) ? (
+        <header className="mx-auto mb-12 max-w-2xl text-center">
+          {eyebrow ? <p className="mp-eyebrow mb-4">{eyebrow}</p> : null}
+          {title ? <div className="mx-auto mb-5 h-px w-12 bg-[var(--color-accent)]" aria-hidden /> : null}
+          {title ? <h2 id={`${id ?? "section"}-title`} className="mp-headline-sm">{title}</h2> : null}
+          {subtitle ? <p className="mp-body mt-4 text-[var(--color-muted)]">{subtitle}</p> : null}
         </header>
-      )}
+      ) : null}
       {children}
     </section>
   );

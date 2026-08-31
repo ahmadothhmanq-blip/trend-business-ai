@@ -1,11 +1,13 @@
 import type { GlsLocaleFormatting } from "@/lib/language-platform/core/types";
 import { resolveGlsWorldLanguage } from "@/lib/language-platform/registry/languages";
+import { resolveGcriProfile } from "@/lib/language-platform/gcri/resolve";
 
 export type GlsLocaleResolveOptions = {
   localeCode?: string;
   timezone?: string;
   currencyCode?: string;
   calendar?: GlsLocaleFormatting["calendar"];
+  countryCode?: string;
 };
 
 /** Locale engine — numbers, dates, currencies, units, timezone, calendars, pluralization. */
@@ -17,6 +19,9 @@ export function resolveLocaleFormatting(
   const htmlLang = world.htmlLang;
   const numberLocale = htmlLang;
   const dateLocale = htmlLang;
+  const gcri = options.countryCode
+    ? resolveGcriProfile({ language: world.aiLanguage, country: options.countryCode })
+    : null;
 
   let pluralRules = "cardinal";
   try {
@@ -28,11 +33,11 @@ export function resolveLocaleFormatting(
   return {
     localeCode: world.code,
     htmlLang,
-    numberLocale,
-    dateLocale,
-    currencyCode: options.currencyCode ?? world.defaultCurrency,
-    unitSystem: world.code === "en" ? "imperial" : "metric",
-    timezone: options.timezone ?? "UTC",
+    numberLocale: gcri?.locale ?? numberLocale,
+    dateLocale: gcri?.locale ?? dateLocale,
+    currencyCode: options.currencyCode ?? gcri?.currencyCode ?? world.defaultCurrency,
+    unitSystem: gcri?.measurementSystem ?? (world.code === "en" ? "imperial" : "metric"),
+    timezone: options.timezone ?? gcri?.timezone ?? "UTC",
     calendar: options.calendar ?? "gregory",
     pluralRules,
   };

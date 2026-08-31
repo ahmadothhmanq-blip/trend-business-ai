@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { listCmsEntries } from "@/lib/ai-core/website-management/cms/store";
 import { slugify } from "@/lib/website/preview-shared";
-import { resolveProductionPublishHtml } from "@/lib/website/public-site.server";
+import { resolveProductionPublishHtmlAsync, buildPublishedSeoJson } from "@/lib/website/public-site.server";
 import {
   buildPlannedPublicUrl,
   isWebsitePublishEnabled,
@@ -51,7 +51,7 @@ async function allocationFor(
   const cms = supabase
     ? await listCmsEntries(generation.id, supabase)
     : [];
-  const produced = resolveProductionPublishHtml(
+  const produced = await resolveProductionPublishHtmlAsync(
     generation,
     absoluteUrl,
     cms,
@@ -64,7 +64,7 @@ async function allocationFor(
     html: produced.html,
     robotsTxt: produced.robotsTxt,
     sitemapXml: produced.sitemapXml,
-    seoJson: produced.seoPackage,
+    seoJson: buildPublishedSeoJson(produced),
   };
 }
 

@@ -105,7 +105,7 @@ const tool = readFileSync(
 for (const [label, source, needle] of [
   ["website-builder-tool", tool, "WebsiteBuilderTool"],
   ["website-builder-tool", tool, "BrandKitPanel"],
-  ["website-builder-tool", tool, "WebsiteStructureTemplatesPanel"],
+  ["website-builder-tool", tool, "onTemplateSelect"],
   ["builder-workspace", workspace, "VisualWebsiteEditor"],
 ]) {
   if (!source.includes(needle)) fail(`${label}: ${needle}`, "missing");

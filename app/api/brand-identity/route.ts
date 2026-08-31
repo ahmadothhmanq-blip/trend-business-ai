@@ -1,7 +1,7 @@
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
 import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
-import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { beginAiUsage } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import { generateBrandIdentity, modelToBlueprint } from "@/lib/brand-identity-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
@@ -26,6 +26,8 @@ const requestSchema = z.object({
   continueInstruction: z.string().trim().max(4000).optional(),
   projectId: z.string().uuid().optional(),
   templateId: z.string().optional(),
+  language: z.string().trim().optional(),
+  country: z.string().trim().optional(),
 });
 
 function logError(stage: string, error: unknown) {
@@ -74,8 +76,9 @@ export async function POST(request: Request) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  const rateLimited = await enforceAiUsage(auth.supabase, auth.user!.id, "brand-identity");
-  if (rateLimited) return rateLimited;
+  const usage = await beginAiUsage(auth.supabase, auth.user!.id, "brand-identity");
+  if (!usage.ok) return usage.response;
+  const creditLease = usage.lease;
 
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
@@ -86,7 +89,7 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data;
-  const aiLanguage = resolveRequestLanguage(request);
+  const aiLanguage = resolveRequestLanguage(request, input.language, input.country);
   const template = input.templateId ? getBrandTemplate(input.templateId) : undefined;
   const typeLabel = getBrandTypeLabel(input.brandType);
   let stage = "generateBrandIdentity";
@@ -179,6 +182,7 @@ export async function POST(request: Request) {
       return databaseErrorResponse("brand-identity.insert", error);
     }
 
+    await creditLease.settle(auth.supabase);
     return NextResponse.json({
       generation: data as BrandIdentityGeneration,
       message: "Brand identity designed and saved.",

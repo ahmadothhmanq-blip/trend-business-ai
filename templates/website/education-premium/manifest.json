@@ -2,16 +2,16 @@
   "specVersion": "2.0.0",
   "id": "education-premium",
   "version": "2.0.0",
-  "name": "Education Premium",
-  "description": "Heritage Academy — scholarly trust hierarchy, admissions-first conversion, and campus excellence storytelling.",
+  "name": "Heritage",
+  "description": "تعليم عالمي — كحلي أكاديمي، ذهب كلاسيكي، إحساس جامعي راقٍ. للجامعات والمدارس والمؤسسات التعليمية.",
   "metadata": {
     "category": "education",
     "industry": "Education",
     "tags": [
       "education",
-      "university",
-      "academy",
-      "admissions"
+      "premium",
+      "global",
+      "flagship"
     ],
     "author": {
       "name": "Trend Business AI",
@@ -19,12 +19,12 @@
     },
     "license": "MIT",
     "keywords": [
-      "corporate",
-      "executive",
-      "boardroom",
-      "trust"
+      "saas",
+      "enterprise",
+      "platform",
+      "revenue"
     ],
-    "templateIntelligenceId": "ti-university-heritage",
+    "templateIntelligenceId": "ti-education-campus",
     "premium": true,
     "tier": "agency"
   },
@@ -86,7 +86,7 @@
       "file": "layouts/default.json",
       "kind": "single-column",
       "label": "Default",
-      "description": "Premium single-column layout for Corporate Business."
+      "description": "Premium single-column layout for SaaS."
     }
   ],
   "regions": [
@@ -95,28 +95,28 @@
       "file": "regions/header.json",
       "role": "header",
       "label": "Header Region",
-      "description": "Premium header region for Corporate Business."
+      "description": "Premium header region for SaaS Enterprise."
     },
     {
       "id": "main",
       "file": "regions/main.json",
       "role": "main",
       "label": "Main Region",
-      "description": "Premium main region for Corporate Business."
+      "description": "Premium main region for SaaS Enterprise."
     },
     {
       "id": "utility",
       "file": "regions/utility.json",
       "role": "utility",
       "label": "Utility Region",
-      "description": "Premium utility region for Corporate Business."
+      "description": "Premium utility region for SaaS Enterprise."
     },
     {
       "id": "footer",
       "file": "regions/footer.json",
       "role": "footer",
       "label": "Footer Region",
-      "description": "Premium footer region for Corporate Business."
+      "description": "Premium footer region for SaaS Enterprise."
     }
   ],
   "pages": [
@@ -126,7 +126,7 @@
       "path": "/",
       "layoutId": "default",
       "file": "pages/home.json",
-      "description": "Home — premium corporate page blueprint."
+      "description": "Home — premium SaaS page blueprint."
     },
     {
       "id": "platform",

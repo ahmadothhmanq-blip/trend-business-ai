@@ -1,0 +1,21 @@
+{
+  "tbdpNative": true,
+  "sectorDnaId": "saas",
+  "experienceProfiles": ["technical", "corporate", "executive"],
+  "structure": {
+    "regions": {
+      "header": { "sticky": true, "position": "top" },
+      "utility": { "collapseBelow": "md", "collapseMode": "stack" },
+      "main": { "collapseBelow": "sm" },
+      "overlay": { "collapseBelow": "sm", "collapseMode": "fixed-bottom" }
+    },
+    "components": {
+      "ai-startup-signal-hero": {
+        "layout": { "lg": "bento-command", "sm": "stacked" }
+      },
+      "ai-startup-signal-features": {
+        "layout": { "lg": "bento-asymmetric", "sm": "stacked" }
+      }
+    }
+  }
+}

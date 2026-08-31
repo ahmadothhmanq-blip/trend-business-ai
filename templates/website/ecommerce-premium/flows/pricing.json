@@ -1,0 +1,7 @@
+{
+  "pageId": "pricing",
+  "layoutId": "default",
+  "regions": {
+    "main": ["ecommerce-premium-hero", "ecommerce-premium-pricing", "ecommerce-premium-faq"]
+  }
+}

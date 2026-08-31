@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react";
+import { getGlsGenerationLanguageValues } from "@/lib/language-platform/generation/options";
 import {
   Building2,
   CalendarDays,
@@ -129,9 +130,9 @@ export const LANDING_PAGE_TYPES: LandingPageTypeDefinition[] = [
   },
 ];
 
-export const LP_LANGUAGES = [
-  "English", "Spanish", "French", "German", "Portuguese", "Arabic", "Chinese", "Japanese",
-] as const;
+export const LP_LANGUAGES = getGlsGenerationLanguageValues(
+  "landing-builder",
+) as readonly string[];
 
 export const LP_DESIGN_STYLES = [
   "Modern", "Minimal", "Bold", "Elegant", "Playful", "Corporate",

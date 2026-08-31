@@ -1,0 +1,7 @@
+{
+  "pageId": "customers",
+  "layoutId": "default",
+  "regions": {
+    "main": ["ecommerce-premium-hero", "ecommerce-premium-portfolio", "ecommerce-premium-features"]
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "pageId": "customers",
+  "layoutId": "default",
+  "regions": {
+    "main": ["creative-portfolio-hero", "creative-portfolio-portfolio", "creative-portfolio-features"]
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "packageId": "lumina-wellness",
+  "templateIntelligenceHint": "ti-modern-clean",
+  "layout": {
+    "defaultLayoutId": "default",
+    "regions": {
+      "header": {
+        "role": "header",
+        "sticky": true
+      },
+      "main": {
+        "role": "main"
+      },
+      "utility": {
+        "role": "utility"
+      },
+      "footer": {
+        "role": "footer"
+      },
+      "overlay": {
+        "role": "overlay"
+      }
+    }
+  },
+  "navigation": {
+    "componentId": "lumina-wellness-nav",
+    "variant": "enterprise-glass"
+  },
+  "hero": {
+    "componentId": "lumina-wellness-hero",
+    "region": "main"
+  },
+  "footer": {
+    "componentId": "lumina-wellness-footer",
+    "region": "footer"
+  },
+  "homeFlow": {
+    "regions": {
+      "main": [
+        "lumina-wellness-hero",
+        "lumina-wellness-features",
+        "lumina-wellness-integrations",
+        "lumina-wellness-about",
+        "lumina-wellness-stats",
+        "lumina-wellness-testimonials",
+        "lumina-wellness-portfolio",
+        "lumina-wellness-pricing",
+        "lumina-wellness-faq",
+        "lumina-wellness-contact"
+      ],
+      "utility": [
+        "lumina-wellness-utility-band"
+      ],
+      "overlay": [
+        "lumina-wellness-floating-cta"
+      ]
+    }
+  },
+  "sectionShell": {
+    "strategy": "package",
+    "componentId": "lumina-wellness-section-shell"
+  },
+  "aiGeneration": {
+    "contentProfile": "lumina-wellness-gtm",
+    "suggestedPages": [
+      "platform",
+      "pricing",
+      "customers"
+    ]
+  }
+}

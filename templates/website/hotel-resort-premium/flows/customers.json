@@ -1,0 +1,7 @@
+{
+  "pageId": "customers",
+  "layoutId": "default",
+  "regions": {
+    "main": ["hotel-resort-premium-hero", "hotel-resort-premium-portfolio", "hotel-resort-premium-features"]
+  }
+}

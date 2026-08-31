@@ -2,6 +2,7 @@
  * Marketing AI prompts.
  */
 
+import { aiOutputLanguageDirective } from "@/lib/ai/prompts/language-directive";
 import type { MarketingAssistantAction } from "@/types/marketing";
 
 export const MARKETING_CHANNELS = [
@@ -18,6 +19,7 @@ export function buildCampaignGenerationPrompt(input: {
   budget?: number;
   channels?: string[];
   tone?: string;
+  language?: string;
 }) {
   return `You are a senior marketing strategist. Generate a complete marketing campaign as JSON with:
 name, objective, goals[], audience, offer, messaging, channels[{type,label,enabled,budget,notes}],
@@ -27,28 +29,30 @@ Brief: ${input.brief}
 ${input.objective ? `Objective: ${input.objective}` : ""}
 ${input.budget ? `Budget: $${input.budget}` : ""}
 ${input.channels?.length ? `Channels: ${input.channels.join(", ")}` : ""}
-Tone: ${input.tone ?? "Professional"}`;
+Tone: ${input.tone ?? "Professional"}${aiOutputLanguageDirective(input.language, "marketing")}`;
 }
 
 export function buildPersonaGenerationPrompt(input: {
   brief: string;
   industry?: string;
   product?: string;
+  language?: string;
 }) {
   return `Generate a detailed customer persona as JSON with:
 name, title, summary, demographics{age,location,income,role}, painPoints[], behaviors[], motivations[], buyingTriggers[]
 
 Context: ${input.brief}
 ${input.industry ? `Industry: ${input.industry}` : ""}
-${input.product ? `Product: ${input.product}` : ""}`;
+${input.product ? `Product: ${input.product}` : ""}${aiOutputLanguageDirective(input.language, "marketing")}`;
 }
 
 export function buildAssistantPrompt(action: MarketingAssistantAction, input: {
   text: string;
   campaignContext?: string;
   instruction?: string;
+  language?: string;
 }) {
-  const base = `Campaign context:\n${input.campaignContext ?? "N/A"}\n\nContent:\n${input.text}`;
+  const base = `Campaign context:\n${input.campaignContext ?? "N/A"}\n\nContent:\n${input.text}${aiOutputLanguageDirective(input.language, "marketing")}`;
   switch (action) {
     case "improve_campaign":
       return `${base}\n\nImprove this marketing campaign. Return JSON: {improved: string, changes: string[], recommendations: string[]}`;

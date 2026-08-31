@@ -1,16 +1,21 @@
 {
   "pageId": "home",
-  "layoutId": "full-bleed",
+  "layoutId": "default",
   "regions": {
-    "overlay": ["medical-premium-trust-hero"],
-    "utility": ["medical-premium-appointment-band"],
+    "header": ["medical-premium-nav"],
     "main": [
-      "medical-premium-specialties",
-      "medical-premium-physicians",
-      "medical-premium-care-journey",
-      "medical-premium-wellness",
+      "medical-premium-hero",
+      "medical-premium-features",
+      "medical-premium-integrations",
+      "medical-premium-about",
+      "medical-premium-stats",
       "medical-premium-testimonials",
+      "medical-premium-pricing",
+      "medical-premium-faq",
       "medical-premium-contact"
-    ]
+    ],
+    "utility": ["medical-premium-utility-band"],
+    "overlay": ["medical-premium-floating-cta"],
+    "footer": ["medical-premium-footer"]
   }
 }

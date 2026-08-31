@@ -69,6 +69,7 @@ describe("runTbgeWebsiteGeneration", () => {
               completionTokens: 0,
               totalTokens: 0,
             }),
+            getModelName: () => "deepseek-v4-flash",
           }) as AIProvider,
       },
     });

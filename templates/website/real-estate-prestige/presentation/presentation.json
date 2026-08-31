@@ -2,17 +2,29 @@
   "packageId": "real-estate-prestige",
   "templateIntelligenceHint": "ti-real-estate-listings",
   "layout": {
-    "defaultLayoutId": "sidebar-right",
+    "defaultLayoutId": "default",
     "regions": {
-      "header": { "role": "header", "sticky": true },
-      "sidebar": { "role": "sidebar", "sticky": true, "collapseBelow": "lg" },
-      "main": { "role": "main" },
-      "footer": { "role": "footer" }
+      "header": {
+        "role": "header",
+        "sticky": true
+      },
+      "main": {
+        "role": "main"
+      },
+      "utility": {
+        "role": "utility"
+      },
+      "footer": {
+        "role": "footer"
+      },
+      "overlay": {
+        "role": "overlay"
+      }
     }
   },
   "navigation": {
     "componentId": "real-estate-prestige-nav",
-    "variant": "estate-minimal"
+    "variant": "enterprise-glass"
   },
   "hero": {
     "componentId": "real-estate-prestige-hero",
@@ -24,15 +36,23 @@
   },
   "homeFlow": {
     "regions": {
-      "sidebar": ["real-estate-prestige-dossier-rail"],
       "main": [
         "real-estate-prestige-hero",
-        "real-estate-prestige-collection",
-        "real-estate-prestige-neighborhoods",
-        "real-estate-prestige-architecture",
-        "real-estate-prestige-advisors",
+        "real-estate-prestige-features",
+        "real-estate-prestige-integrations",
+        "real-estate-prestige-about",
+        "real-estate-prestige-stats",
         "real-estate-prestige-testimonials",
-        "real-estate-prestige-inquiry"
+        "real-estate-prestige-portfolio",
+        "real-estate-prestige-pricing",
+        "real-estate-prestige-faq",
+        "real-estate-prestige-contact"
+      ],
+      "utility": [
+        "real-estate-prestige-utility-band"
+      ],
+      "overlay": [
+        "real-estate-prestige-floating-cta"
       ]
     }
   },
@@ -41,7 +61,11 @@
     "componentId": "real-estate-prestige-section-shell"
   },
   "aiGeneration": {
-    "contentProfile": "real-estate-prestige-luxury",
-    "suggestedPages": ["listings", "neighborhoods", "contact"]
+    "contentProfile": "real-estate-prestige-gtm",
+    "suggestedPages": [
+      "platform",
+      "pricing",
+      "customers"
+    ]
   }
 }

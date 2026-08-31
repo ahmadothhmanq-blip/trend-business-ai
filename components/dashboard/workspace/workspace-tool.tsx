@@ -23,6 +23,7 @@ import { getProductDefinition } from "@/lib/products/registry";
 import type { ProductId } from "@/lib/products/types";
 import { getWorkspaceDefinition } from "@/lib/workspace/registry";
 import type { WorkspaceType } from "@/lib/workspace/types";
+import { glsServiceIdForWorkspaceType } from "@/lib/language-platform/generation/service";
 import type { WorkspaceGeneration } from "@/types/database";
 import { useTranslation } from "@/lib/i18n/client";
 
@@ -85,6 +86,7 @@ export function WorkspaceTool({
           onTemplateChange={tool.setSelectedTemplate}
           language={tool.language}
           onLanguageChange={tool.setLanguage}
+          serviceId={glsServiceIdForWorkspaceType(workspaceType)}
           theme={tool.theme}
           onThemeChange={tool.setTheme}
           depth={tool.depth}

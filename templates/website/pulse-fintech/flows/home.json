@@ -1,0 +1,20 @@
+{
+  "pageId": "home",
+  "layoutId": "default",
+  "regions": {
+    "header": ["pulse-fintech-nav"],
+    "main": [
+      "pulse-fintech-hero",
+      "pulse-fintech-stats",
+      "pulse-fintech-features",
+      "pulse-fintech-portfolio",
+      "pulse-fintech-about",
+      "pulse-fintech-pricing",
+      "pulse-fintech-faq",
+      "pulse-fintech-contact"
+    ],
+    "utility": [],
+    "overlay": [],
+    "footer": ["pulse-fintech-footer"]
+  }
+}

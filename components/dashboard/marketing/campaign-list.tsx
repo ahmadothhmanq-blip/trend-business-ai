@@ -9,6 +9,12 @@ import { Textarea } from "@/components/ui/textarea";
 import type { MarketingCampaign } from "@/types/marketing";
 import { CampaignEditor } from "@/components/dashboard/marketing/campaign-editor";
 import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
+import { useTranslation } from "@/lib/i18n/client";
+import { GlsGenerationLanguageSelect } from "@/components/dashboard/language/gls-generation-language-select";
+import {
+  getInitialGlsGenerationLanguage,
+  glsGenerationLanguagePayload,
+} from "@/lib/language-platform/generation/service";
 
 type Props = {
   campaigns: MarketingCampaign[];
@@ -19,7 +25,11 @@ type Props = {
 
 export function CampaignList({ campaigns, onCampaignsChange, selectedId, onSelect }: Props) {
   const wt = useWorkspaceT("marketing");
+  const { t, locale } = useTranslation();
   const [brief, setBrief] = useState("");
+  const [language, setLanguage] = useState(() =>
+    getInitialGlsGenerationLanguage({ fallback: "ui-locale", uiLocale: locale }),
+  );
   const [generating, setGenerating] = useState(false);
 
   const generate = async () => {
@@ -32,7 +42,7 @@ export function CampaignList({ campaigns, onCampaignsChange, selectedId, onSelec
       const res = await fetch("/api/marketing/campaigns", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ brief, generate: true }),
+        body: JSON.stringify({ brief, generate: true, ...glsGenerationLanguagePayload(language) }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? wt("campaignList.failed"));
@@ -61,6 +71,10 @@ export function CampaignList({ campaigns, onCampaignsChange, selectedId, onSelec
             rows={4}
             className="border-white/10 bg-white/5 text-white"
           />
+          <div className="mt-2">
+            <label className="mb-1.5 block text-xs font-medium text-white/60">{t("common.language")}</label>
+            <GlsGenerationLanguageSelect serviceId="marketing-ai" value={language} onChange={setLanguage} />
+          </div>
           <Button className="mt-2 w-full rounded-lg" onClick={() => void generate()} disabled={generating}>
             <Sparkles className="mr-2 size-4" />
             {generating ? wt("campaignList.generating") : wt("campaignList.generateCampaign")}

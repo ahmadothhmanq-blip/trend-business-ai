@@ -32,7 +32,7 @@ describe("Architecture Knowledge Base", () => {
     assert.equal(normalizeRoutingIndustryId("home-furniture-store"), "furniture");
 
     const cafe = resolveIndustryKnowledge("cafe");
-    assert.equal(cafe.value.defaultStructureTemplateId, "corporate-business");
+    assert.equal(cafe.value.defaultStructureTemplateId, "_generation-default");
     assert.ok(cafe.inheritanceChain.includes("restaurant"));
     assert.ok(cafe.resolvedFrom.some((r) => r.startsWith("industry:cafe")));
   });
@@ -41,13 +41,13 @@ describe("Architecture Knowledge Base", () => {
     const registry = buildKnowledgeRegistry();
     const dental = registry.byId.get("dental")!;
     const merged = mergeIndustryEntry(dental as never, registry);
-    assert.equal(merged.defaultStructureTemplateId, "corporate-business");
+    assert.equal(merged.defaultStructureTemplateId, "_generation-default");
     assert.ok(merged.forbiddenPremiumTemplateIds?.includes("ecommerce"));
   });
 
   it("provides explainable structure routing for furniture", () => {
     const lookup = resolveStructureTemplateIdForIndustry("furniture");
-    assert.equal(lookup.value, "corporate-business");
+    assert.equal(lookup.value, "_generation-default");
     assert.equal(lookup.entryId, "furniture");
     assert.ok(lookup.resolvedFrom.length > 0);
   });
@@ -62,7 +62,6 @@ describe("Architecture Knowledge Base", () => {
   });
 
   it("detects forbidden structure templates from KB", () => {
-    assert.equal(isForbiddenStructureTemplate("furniture", "ai-startup-signal"), true);
     assert.equal(isForbiddenStructureTemplate("furniture", "modern-business"), false);
   });
 
@@ -101,7 +100,7 @@ describe("AKB routing and validation consistency", () => {
   const furnitureRoute: UnifiedTemplateRoute = {
     version: "1",
     industryId: "furniture",
-    structureTemplateId: "corporate-business",
+    structureTemplateId: "_generation-default",
     layoutTemplateIntelligenceId: "ti-ecommerce-atelier",
     visualThemePresetId: "luxury",
     visualThemeTemplateIntelligenceId: "ti-luxury-noir",

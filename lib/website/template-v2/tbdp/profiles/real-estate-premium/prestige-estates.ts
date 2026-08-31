@@ -9,16 +9,19 @@ import type { TemplateV2ResponsiveRules } from "@/lib/website/template-v2/contra
  */
 export const PRESTIGE_ESTATES_V2_TOKENS: TemplateV2DesignTokens = {
   colors: {
-    primary: "#1C1C1E",
-    secondary: "#3A3A3C",
-    accent: "#A67C52",
-    background: "#F5F0EB",
-    foreground: "#1C1C1E",
-    muted: "rgba(28,28,30,0.58)",
-    surface: "#FDFBF8",
-    stone: "#E5DFD8",
-    brass: "#A67C52",
-    linen: "#FAF7F3",
+    primary: "#1C1917",
+    secondary: "#3D3834",
+    accent: "#B8956B",
+    background: "#FAF7F2",
+    foreground: "#1C1917",
+    muted: "rgba(28,25,23,0.56)",
+    surface: "#FFFFFF",
+    signal: "#B8956B",
+    grid: "rgba(28,25,23,0.05)",
+    ink: "#1C1917",
+    stone: "rgba(28,25,23,0.12)",
+    brass: "#B8956B",
+    linen: "#faf7f2",
   },
   typography: {
     display: "Cormorant",
@@ -52,14 +55,14 @@ export const PRESTIGE_ESTATES_V2_TOKENS: TemplateV2DesignTokens = {
     lg: "4px",
   },
   shadows: {
-    surface: "0 28px 72px rgba(28,28,30,0.14)",
-    glow: "0 0 96px rgba(166,124,82,0.16)",
-    inset: "inset 0 1px 0 rgba(253,251,248,0.85)",
+    surface: "0 20px 60px rgba(28,25,23,0.07), 0 2px 8px rgba(28,25,23,0.03)",
+    glow: "0 0 64px rgba(184,149,107,0.18)",
+    card: "0 0 0 1px rgba(28,25,23,0.05), 0 8px 32px rgba(28,25,23,0.06)",
   },
   borders: {
-    default: "rgba(28,28,30,0.1)",
-    brass: "rgba(166,124,82,0.35)",
-    subtle: "rgba(28,28,30,0.05)",
+    default: "rgba(28,25,23,0.09)",
+    accent: "rgba(184,149,107,0.32)",
+    subtle: "rgba(28,25,23,0.05)",
   },
 };
 

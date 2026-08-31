@@ -4,9 +4,12 @@ import Link from "next/link";
 import { ExternalLink, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BUSINESS_FEATURES } from "@/lib/website/builder";
+import { filterItemsByCapabilities } from "@/lib/website/builder/capabilities/service";
+import type { WebsiteCapabilityService } from "@/lib/website/builder/capabilities/service";
 import { useBuilderLocale } from "@/lib/website/builder/use-builder-locale";
 
 type BusinessHubPanelProps = {
+  capabilityService: WebsiteCapabilityService;
   managementHref: string;
   disabled?: boolean;
   onOpenWorkspaceTab?: (tab: "analytics" | "experiments" | "deploy") => void;
@@ -14,12 +17,14 @@ type BusinessHubPanelProps = {
 };
 
 export function BusinessHubPanel({
+  capabilityService,
   managementHref,
   disabled,
   onOpenWorkspaceTab,
   onCopilotCommand,
 }: BusinessHubPanelProps) {
   const { wb } = useBuilderLocale();
+  const features = filterItemsByCapabilities(BUSINESS_FEATURES, capabilityService);
 
   return (
     <div className="flex h-full flex-col gap-2 overflow-y-auto p-3">
@@ -27,7 +32,7 @@ export function BusinessHubPanel({
         {wb("builder.business.title")}
       </p>
       <ul className="space-y-2">
-        {BUSINESS_FEATURES.map((feature) => (
+        {features.map((feature) => (
           <li
             key={feature.id}
             className="rounded-xl border border-white/10 bg-white/[0.03] p-3"

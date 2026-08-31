@@ -46,20 +46,29 @@ export function applyLocaleToWebsiteFiles(
 /* Design Platform RTL + Arabic typography */
 html[dir="rtl"] {
   direction: rtl;
-  text-align: right;
 }
 html[dir="rtl"] body {
-  font-family: ${locale.fontHint || "Tajawal, Noto Naskh Arabic, system-ui"}, var(--font-body, system-ui);
+  text-align: start;
+  font-family: var(--font-body, ${locale.fontHint || "Noto Sans Arabic, system-ui"});
+  line-height: 1.75;
+  letter-spacing: 0.01em;
 }
-html[dir="rtl"] .site-nav,
-html[dir="rtl"] header nav,
-html[dir="rtl"] nav {
-  flex-direction: row-reverse;
+html[dir="rtl"] h1,
+html[dir="rtl"] h2,
+html[dir="rtl"] h3 {
+  line-height: 1.3;
+  letter-spacing: 0;
+  text-wrap: pretty;
+}
+html[dir="rtl"] p,
+html[dir="rtl"] .df-body,
+html[dir="rtl"] .df-prose {
+  line-height: 1.85;
 }
 html[dir="rtl"] button,
 html[dir="rtl"] input,
 html[dir="rtl"] textarea {
-  text-align: right;
+  text-align: start;
 }
 `;
       }

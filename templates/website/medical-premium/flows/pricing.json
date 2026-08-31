@@ -1,0 +1,7 @@
+{
+  "pageId": "pricing",
+  "layoutId": "default",
+  "regions": {
+    "main": ["medical-premium-hero", "medical-premium-pricing", "medical-premium-faq"]
+  }
+}

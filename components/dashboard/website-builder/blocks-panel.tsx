@@ -9,6 +9,7 @@ import {
   type BuilderBlockCategory,
   type BuilderBlockView,
 } from "@/lib/website/builder";
+import type { WebsiteCapabilityService } from "@/lib/website/builder/capabilities/service";
 import { cn } from "@/lib/utils";
 import { useBuilderLocale } from "@/lib/website/builder/use-builder-locale";
 
@@ -24,17 +25,18 @@ const CATEGORIES: BuilderBlockCategory[] = [
 
 type BlocksPanelProps = {
   disabled?: boolean;
+  capabilityService: WebsiteCapabilityService;
   onInsert: (block: BuilderBlockView) => void;
 };
 
-export function BlocksPanel({ disabled, onInsert }: BlocksPanelProps) {
+export function BlocksPanel({ disabled, capabilityService, onInsert }: BlocksPanelProps) {
   const { wb } = useBuilderLocale();
   const [category, setCategory] = useState<BuilderBlockCategory>("all");
   const [query, setQuery] = useState("");
 
   const blocks = useMemo(
-    () => listBuilderBlocks({ category, query }),
-    [category, query],
+    () => listBuilderBlocks({ category, query, capabilityService }),
+    [category, query, capabilityService],
   );
 
   return (

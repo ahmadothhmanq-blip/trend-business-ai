@@ -13,6 +13,7 @@ export type RunAgentInput = {
   context?: string;
   memory?: string[];
   maxSteps?: number;
+  language?: string;
   supabase?: import("@supabase/supabase-js").SupabaseClient;
   userId?: string;
   agentId?: string;
@@ -39,6 +40,7 @@ export async function runAgent(input: RunAgentInput): Promise<AgentRunResult> {
       context: input.context,
       memory: input.memory,
       maxSteps: input.maxSteps,
+      language: input.language,
     });
     return {
       output: result.output,
@@ -56,6 +58,7 @@ export async function runAgent(input: RunAgentInput): Promise<AgentRunResult> {
     context: input.context,
     memory: input.memory,
     maxSteps: input.maxSteps,
+    language: input.language,
   };
 
   const result = await providerManager.runPlugin(aiAgentPlugin, pluginInput, {

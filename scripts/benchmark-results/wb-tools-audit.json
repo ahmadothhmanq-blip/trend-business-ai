@@ -1,0 +1,84 @@
+{
+  "templates": {
+    "total": 45,
+    "v1": 30,
+    "v2": 15,
+    "realEstate": [
+      {
+        "id": "real-estate-premium",
+        "name": "Real Estate Premium",
+        "availability": "installed"
+      },
+      {
+        "id": "real-estate-prestige",
+        "name": "Vista Prestige",
+        "availability": "installed"
+      }
+    ]
+  },
+  "editorToolbar": {
+    "visible": [
+      "structure",
+      "design",
+      "blocks",
+      "media",
+      "ai",
+      "professional",
+      "business",
+      "publish",
+      "enterprise"
+    ],
+    "hidden": []
+  },
+  "professionalPanel": {
+    "visible": [
+      "templates",
+      "blog",
+      "forms",
+      "booking",
+      "testimonials",
+      "navigation",
+      "contact"
+    ],
+    "hidden": [
+      "portfolio",
+      "pricing",
+      "faq"
+    ]
+  },
+  "businessPanel": {
+    "visible": [
+      "analytics",
+      "experiments",
+      "leads",
+      "marketing",
+      "crm"
+    ],
+    "hidden": [
+      "ecommerce",
+      "membership"
+    ]
+  },
+  "aiActions": [
+    "full-modernize",
+    "page-about",
+    "section-testimonials",
+    "section-hero",
+    "content-home",
+    "images-fresh",
+    "seo-improve"
+  ],
+  "activeCapabilities": [
+    "forms",
+    "booking",
+    "analytics",
+    "seo",
+    "multi-language",
+    "gallery",
+    "testimonials",
+    "maps",
+    "blog",
+    "payments",
+    "chat"
+  ]
+}

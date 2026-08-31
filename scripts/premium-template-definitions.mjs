@@ -2,13 +2,15 @@
  * Premium template library — installed Website Builder structure packages.
  */
 
+import { brandNameFor } from "./template-brand-names.mjs";
+
 /** @typedef {import('./generate-premium-template-library.mjs').PremiumTemplateConfig} PremiumTemplateConfig */
 
 /** @type {PremiumTemplateConfig[]} */
 export const PREMIUM_TEMPLATE_LIBRARY = [
   {
     id: "modern-business",
-    name: "Corporate Command",
+    name: brandNameFor("modern-business"),
     description:
       "Executive-grade corporate presence with trust-first hierarchy, boardroom typography, and measured conversion paths.",
     category: "corporate",
@@ -53,7 +55,7 @@ export const PREMIUM_TEMPLATE_LIBRARY = [
   },
   {
     id: "ai-startup-signal",
-    name: "AI Signal",
+    name: brandNameFor("ai-startup-signal"),
     description:
       "Futuristic AI startup with cinematic full-bleed hero, glass bento panels, and signal-grade dark mode aesthetics.",
     category: "ai-startup",
@@ -105,7 +107,7 @@ export const PREMIUM_TEMPLATE_LIBRARY = [
   },
   {
     id: "saas-enterprise",
-    name: "SaaS Enterprise",
+    name: brandNameFor("saas-enterprise"),
     description:
       "Northline product systems — contained split hero, bottom conversion utility band, and enterprise GTM architecture.",
     category: "saas",
@@ -153,7 +155,7 @@ export const PREMIUM_TEMPLATE_LIBRARY = [
   },
   {
     id: "restaurant-signature",
-    name: "Restaurant Signature",
+    name: brandNameFor("restaurant-signature"),
     description:
       "Forest-table hospitality — sidebar menu rail, copper accents, and gallery-led fine dining storytelling.",
     category: "restaurant",
@@ -198,7 +200,7 @@ export const PREMIUM_TEMPLATE_LIBRARY = [
   },
   {
     id: "real-estate-prestige",
-    name: "Real Estate Prestige",
+    name: brandNameFor("real-estate-prestige"),
     description:
       "Brokerage intelligence rail — sidebar-right dossier, navy-champagne palette, and testimonial-led property trust.",
     category: "real-estate",
@@ -243,7 +245,7 @@ export const PREMIUM_TEMPLATE_LIBRARY = [
   },
   {
     id: "medical-premium",
-    name: "Medical Premium",
+    name: brandNameFor("medical-premium"),
     description:
       "Swiss clinical clarity — layered trust hero, sage surfaces, appointment-first utility flow, and accessible calm.",
     category: "healthcare",
@@ -295,7 +297,7 @@ export const PREMIUM_TEMPLATE_LIBRARY = [
   },
   {
     id: "creative-portfolio",
-    name: "Creative Portfolio",
+    name: brandNameFor("creative-portfolio"),
     description:
       "Kinetic culture studio — post-scroll overlay showcase, electric lime accents, and case-study-first portfolio energy.",
     category: "portfolio",

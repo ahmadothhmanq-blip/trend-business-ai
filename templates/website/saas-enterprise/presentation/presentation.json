@@ -4,16 +4,27 @@
   "layout": {
     "defaultLayoutId": "default",
     "regions": {
-      "header": { "role": "header", "sticky": true },
-      "main": { "role": "main" },
-      "utility": { "role": "utility" },
-      "footer": { "role": "footer" },
-      "overlay": { "role": "overlay" }
+      "header": {
+        "role": "header",
+        "sticky": true
+      },
+      "main": {
+        "role": "main"
+      },
+      "utility": {
+        "role": "utility"
+      },
+      "footer": {
+        "role": "footer"
+      },
+      "overlay": {
+        "role": "overlay"
+      }
     }
   },
   "navigation": {
     "componentId": "saas-enterprise-nav",
-    "variant": "enterprise-glass"
+    "variant": "app-topbar"
   },
   "hero": {
     "componentId": "saas-enterprise-hero",
@@ -31,13 +42,14 @@
         "saas-enterprise-integrations",
         "saas-enterprise-about",
         "saas-enterprise-stats",
+        "saas-enterprise-portfolio",
         "saas-enterprise-testimonials",
         "saas-enterprise-pricing",
         "saas-enterprise-faq",
         "saas-enterprise-contact"
       ],
       "utility": ["saas-enterprise-utility-band"],
-      "overlay": ["saas-enterprise-floating-cta"]
+      "overlay": []
     }
   },
   "sectionShell": {
@@ -47,5 +59,9 @@
   "aiGeneration": {
     "contentProfile": "saas-enterprise-gtm",
     "suggestedPages": ["platform", "pricing", "customers"]
+  },
+  "dna": {
+    "id": "nexus",
+    "architecture": "app-shell"
   }
 }

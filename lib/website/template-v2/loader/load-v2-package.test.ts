@@ -11,7 +11,7 @@ import {
   hashTemplateV2PackageBundle,
 } from "@/lib/website/template-v2/loader/presentation-hash";
 import { resolveWbTemplatesRoot } from "@/lib/website/template-engine/constants.server";
-import { SAMPLE_V2_PACKAGE_DIR } from "@/lib/website/template-v2/test-fixtures";
+import { SAMPLE_V1_PACKAGE_DIR, SAMPLE_V2_PACKAGE_DIR } from "@/lib/website/template-v2/test-fixtures";
 
 describe("loadTemplateV2Package", () => {
   it("loads a valid V2 fixture package", async () => {
@@ -27,9 +27,8 @@ describe("loadTemplateV2Package", () => {
     assert.equal(result.bundle.componentRegistry.components.length, 6);
   });
 
-  it("rejects V1 installed packages", async () => {
-    const templatesRoot = resolveWbTemplatesRoot();
-    const result = await loadTemplateV2Package(path.join(templatesRoot, "modern-business"));
+  it("rejects V1 packages", async () => {
+    const result = await loadTemplateV2Package(SAMPLE_V1_PACKAGE_DIR);
 
     assert.equal(result.ok, false);
     if (result.ok) return;
@@ -46,12 +45,9 @@ describe("loadTemplateV2Package", () => {
     const v2 = await inspectTemplatePackageArchitecture(SAMPLE_V2_PACKAGE_DIR);
     assert.equal(v2.architectureVersion, "v2");
 
-    const templatesRoot = resolveWbTemplatesRoot();
-    const v1 = await inspectTemplatePackageArchitecture(
-      path.join(templatesRoot, "modern-business"),
-    );
+    const v1 = await inspectTemplatePackageArchitecture(SAMPLE_V1_PACKAGE_DIR);
     assert.equal(v1.architectureVersion, "v1");
-    assert.equal(v1.packageId, "modern-business");
+    assert.equal(v1.packageId, "sample-v1-package");
   });
 
   it("produces stable presentation hashes", async () => {

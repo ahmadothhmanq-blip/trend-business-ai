@@ -4,11 +4,22 @@
   "layout": {
     "defaultLayoutId": "default",
     "regions": {
-      "header": { "role": "header", "sticky": true },
-      "main": { "role": "main" },
-      "utility": { "role": "utility" },
-      "footer": { "role": "footer" },
-      "overlay": { "role": "overlay" }
+      "header": {
+        "role": "header",
+        "sticky": true
+      },
+      "main": {
+        "role": "main"
+      },
+      "utility": {
+        "role": "utility"
+      },
+      "footer": {
+        "role": "footer"
+      },
+      "overlay": {
+        "role": "overlay"
+      }
     }
   },
   "navigation": {
@@ -28,6 +39,7 @@
       "main": [
         "corporate-business-hero",
         "corporate-business-features",
+        "corporate-business-integrations",
         "corporate-business-about",
         "corporate-business-stats",
         "corporate-business-portfolio",
@@ -36,8 +48,12 @@
         "corporate-business-faq",
         "corporate-business-contact"
       ],
-      "utility": ["corporate-business-utility-band"],
-      "overlay": ["corporate-business-floating-cta"]
+      "utility": [
+        "corporate-business-utility-band"
+      ],
+      "overlay": [
+        "corporate-business-floating-cta"
+      ]
     }
   },
   "sectionShell": {
@@ -46,6 +62,10 @@
   },
   "aiGeneration": {
     "contentProfile": "corporate-business-executive",
-    "suggestedPages": ["platform", "pricing", "customers"]
+    "suggestedPages": [
+      "platform",
+      "pricing",
+      "customers"
+    ]
   }
 }

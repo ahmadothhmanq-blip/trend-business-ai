@@ -1153,6 +1153,23 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
 
       const assetProfile = resolveWebsiteGenerationProfile(input);
       const businessIntel = getBusinessIntelligenceFromBrief(brief);
+      const imageRouting = (
+        await import("@/lib/website/site-plan/resolve-image-routing")
+      ).resolveImageRoutingFromContext({
+        prompt: input.prompt,
+        industryId: input.industryId,
+      });
+      const enrichedBusinessProfile = businessIntel?.profile
+        ? {
+            ...businessIntel.profile,
+            routingIndustryId:
+              imageRouting.routingIndustryId ||
+              businessIntel.profile.routingIndustryId,
+            photographyStyle: imageRouting.imageHints.length
+              ? imageRouting.imageHints
+              : businessIntel.profile.photographyStyle,
+          }
+        : null;
       const manifest = await runAiImageEngine({
         strategy: artifacts.strategy!,
         designSystem: artifacts.designSystem!,
@@ -1167,7 +1184,8 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
             | import("@/lib/ai-core/design-intelligence/die-types").DesignSystemSpec
             | undefined) ??
           null,
-        businessProfile: businessIntel?.profile ?? null,
+        businessProfile: enrichedBusinessProfile,
+        siteArchetypeId: imageRouting.archetypeId,
         brief,
         preferredStyle: planImageStyle,
         designPlanImageRequirements: designPlan?.imageRequirements?.map(
@@ -1313,7 +1331,6 @@ export function createWebsiteBuilderAdapter(): ProductEngineAdapter<
         ctx,
         {
         assetManifest: artifacts.assetManifest as AssetManifest,
-        skipAssetGeneration: true,
         skipQuality: true,
         generationProfile,
       });

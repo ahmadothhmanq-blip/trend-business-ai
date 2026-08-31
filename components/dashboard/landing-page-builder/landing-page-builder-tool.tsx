@@ -25,6 +25,8 @@ import {
   OnePromptExperience,
   type ProjectHistoryItem,
 } from "@/components/dashboard/builder-shared";
+import { GlsGenerationLanguageSelect } from "@/components/dashboard/language/gls-generation-language-select";
+import { getInitialGlsGenerationLanguage, glsGenerationLanguagePayload } from "@/lib/language-platform/generation/service";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n/client";
 import { translateOption } from "@/lib/i18n/product-options";
@@ -32,7 +34,6 @@ import { resolveLabel } from "@/lib/i18n/resolve-constant-label";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
 import {
   LANDING_PAGE_TYPES,
-  LP_LANGUAGES,
   LP_DESIGN_STYLES,
   LP_COLOR_STYLES,
   LP_SECTION_OPTIONS,
@@ -65,7 +66,7 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
   const [step, setStep] = useState<"type" | "config" | "history" | "generating" | "preview">("type");
   const [selectedType, setSelectedType] = useState("");
   const [prompt, setPrompt] = useState("");
-  const [language, setLanguage] = useState("English");
+  const [language, setLanguage] = useState(() => getInitialGlsGenerationLanguage());
   const [designStyle, setDesignStyle] = useState("Modern");
   const [colorStyle, setColorStyle] = useState("Dark Minimal");
   const [sections, setSections] = useState<string[]>([]);
@@ -145,7 +146,7 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
         body: JSON.stringify({
           prompt: idea,
           pageType,
-          language,
+          ...glsGenerationLanguagePayload(language),
           designStyle,
           colorStyle,
           sections: pageSections,
@@ -168,7 +169,7 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
 
   const loadGenerationConfig = (gen: LandingPageGeneration) => {
     setSelectedType(gen.page_type);
-    setLanguage(gen.language);
+    setLanguage(gen.language || "English");
     setDesignStyle(gen.design_style);
     setColorStyle(gen.color_style);
     setSections(gen.sections ?? []);
@@ -286,7 +287,7 @@ export function LandingPageBuilderTool({ initialGenerations }: LPBuilderToolProp
                 />
               </div>
               <div className="grid gap-4 sm:grid-cols-3">
-                <div><label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.language")}</label><select value={language} onChange={(e) => setLanguage(e.target.value)} className={dashboardSelectClass}>{LP_LANGUAGES.map((l) => <option key={l} value={l}>{translateOption(t, "constants.contentStudio.languages", l)}</option>)}</select></div>
+                <div><label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.language")}</label><GlsGenerationLanguageSelect serviceId="landing-builder" value={language} onChange={setLanguage} /></div>
                 <div><label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.designStyle")}</label><select value={designStyle} onChange={(e) => setDesignStyle(e.target.value)} className={dashboardSelectClass}>{LP_DESIGN_STYLES.map((s) => <option key={s} value={s}>{translateOption(t, "constants.landingPageBuilder.designStyles", s)}</option>)}</select></div>
                 <div><label className="mb-1.5 block text-xs font-medium text-white/60">{p("steps.colorStyle")}</label><select value={colorStyle} onChange={(e) => setColorStyle(e.target.value)} className={dashboardSelectClass}>{LP_COLOR_STYLES.map((c) => <option key={c} value={c}>{translateOption(t, "constants.landingPageBuilder.colorStyles", c)}</option>)}</select></div>
               </div>

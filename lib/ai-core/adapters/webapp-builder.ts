@@ -98,13 +98,33 @@ export function createWebappBuilderAdapter(): ProductEngineAdapter<
         throw new Error("Web App Builder adapter: strategy requires idea analysis.");
       }
       // Existing plugin plan = product strategy + file blueprint for this product.
+      // Stage 2 issues exactly ONE DeepSeek planning request (unified).
       plan = await planWebApp(input, analysis, ctx);
+      if (plan.refinedAnalysis) {
+        analysis = plan.refinedAnalysis;
+      }
+      const strategyPages =
+        plan.unifiedPlanning?.strategy.pages?.length
+          ? plan.unifiedPlanning.strategy.pages
+          : plan.blueprint.pages.length
+            ? plan.blueprint.pages
+            : analysis.pages;
       return deriveStrategyFromPages({
-        positioning: plan.blueprint.description || analysis.appName,
-        pages: plan.blueprint.pages.length ? plan.blueprint.pages : analysis.pages,
-        sections: plan.blueprint.sections,
-        ctas: ["Get started", "Open dashboard"],
-        seoFocus: plan.blueprint.roadmap?.slice(0, 4),
+        positioning:
+          plan.unifiedPlanning?.strategy.positioning ||
+          plan.blueprint.description ||
+          analysis.appName,
+        pages: strategyPages,
+        sections:
+          plan.unifiedPlanning?.strategy.sections?.length
+            ? plan.unifiedPlanning.strategy.sections
+            : plan.blueprint.sections,
+        ctas: plan.unifiedPlanning?.strategy.ctas?.length
+          ? plan.unifiedPlanning.strategy.ctas
+          : ["Get started", "Open dashboard"],
+        seoFocus: plan.unifiedPlanning?.strategy.seoFocus?.length
+          ? plan.unifiedPlanning.strategy.seoFocus
+          : plan.blueprint.roadmap?.slice(0, 4),
       });
     },
 

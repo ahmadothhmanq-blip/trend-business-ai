@@ -9,6 +9,12 @@ import type {
   UnifiedQualityReport,
 } from "@/lib/ai-core/quality-platform/types";
 import type { WebsiteGeneration } from "@/types/database";
+import { isPublishGateEnabled } from "@/lib/website/generation-flags";
+import {
+  evaluateContentQualityGate,
+  evaluateIndustryImageQualityGate,
+  evaluatePerformanceBudgetGate,
+} from "@/lib/website/publish-gate/evaluate";
 
 function loadProject(generation: WebsiteGeneration): GeneratedWebsiteProject | null {
   const raw = generation.blueprint;
@@ -26,13 +32,29 @@ export function evaluateUnifiedPublishGates(
   const project = loadProject(generation);
   const unified = project?.unifiedQualityReport as UnifiedQualityReport | undefined;
 
-  const blockers = dedupeStrings([...legacy.blockers]);
-  const warnings = dedupeStrings([
+  let blockers = dedupeStrings([...legacy.blockers]);
+  let warnings = dedupeStrings([
     ...legacy.warnings,
     ...(unified?.issues
       .filter((i) => i.severity === "warning")
       .map((i) => i.message) ?? []),
   ]);
+
+  if (isPublishGateEnabled() && project) {
+    const extraChecks = [
+      ...evaluateContentQualityGate(project),
+      ...evaluatePerformanceBudgetGate(project),
+      ...evaluateIndustryImageQualityGate(project),
+    ];
+    for (const check of extraChecks) {
+      if (!check.passed) {
+        if (check.severity === "blocker") blockers.push(check.message);
+        else warnings.push(check.message);
+      }
+    }
+    blockers = dedupeStrings(blockers);
+    warnings = dedupeStrings(warnings);
+  }
 
   const scores = { ...legacy.scores };
   if (unified?.scores) {
@@ -42,7 +64,10 @@ export function evaluateUnifiedPublishGates(
     scores.design = unified.scores.ui;
   }
 
-  const publishReady = legacy.publishReady && (unified?.publishReady ?? true);
+  const publishReady =
+    legacy.publishReady &&
+    (unified?.publishReady ?? true) &&
+    (!isPublishGateEnabled() || blockers.length === 0);
 
   return {
     publishReady,

@@ -3,6 +3,10 @@
 export type BusinessProfile = {
   projectName: string;
   industry: string;
+  /** Industry routing id used by image and template pipelines. */
+  routingIndustryId?: string;
+  industryId?: string;
+  businessType?: string;
   targetAudience: string;
   businessGoals: string[];
   offer: string;
@@ -29,6 +33,7 @@ export type StrategySection = {
   name: string;
   goal: string;
   contentNotes: string;
+  kind?: string;
 };
 
 export type ContentStrategy = {

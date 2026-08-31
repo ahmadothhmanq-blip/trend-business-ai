@@ -44,6 +44,11 @@ import {
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n/client";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
+import { GlsGenerationLanguageSelect } from "@/components/dashboard/language/gls-generation-language-select";
+import {
+  getInitialGlsGenerationLanguage,
+  glsGenerationLanguagePayload,
+} from "@/lib/language-platform/generation/service";
 import { sanitizeSvgContent, safeMarkdownToHtml } from "@/lib/ai/sanitize";
 import {
   BRAND_TYPES,
@@ -378,13 +383,16 @@ function toHistoryItem(gen: BrandIdentityGeneration): ProjectHistoryItem {
 /* ------------------------------------------------------------------ */
 
 export function BrandIdentityTool({ initialGenerations }: Props) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const p = useProductT("brandIdentity");
   const onePrompt = getOnePromptProduct("brand-designer");
   const [step, setStep] = useState<"type" | "config" | "history" | "generating" | "preview">("type");
   const [selectedType, setSelectedType] = useState("");
   const [brandName, setBrandName] = useState("");
   const [prompt, setPrompt] = useState("");
+  const [language, setLanguage] = useState(() =>
+    getInitialGlsGenerationLanguage({ fallback: "ui-locale", uiLocale: locale }),
+  );
   const [industry, setIndustry] = useState("");
   const [targetAudience, setTargetAudience] = useState("");
   const [personality, setPersonality] = useState("Professional");
@@ -495,6 +503,7 @@ export function BrandIdentityTool({ initialGenerations }: Props) {
           brandPersonality: personality, deliverables: brandDeliverables, mode, parentGenerationId,
           continueInstruction: mode === "continue" ? idea : undefined,
           templateId: selectedTemplate || undefined,
+          ...glsGenerationLanguagePayload(language),
         }),
       });
       const d = await res.json();
@@ -673,6 +682,11 @@ export function BrandIdentityTool({ initialGenerations }: Props) {
                     {BRAND_INDUSTRIES.map((i) => <option key={i} value={i}>{i}</option>)}
                   </select>
                 </div>
+              </div>
+
+              <div className="max-w-md">
+                <label className="mb-1.5 block text-xs font-medium text-white/60">{t("common.language")}</label>
+                <GlsGenerationLanguageSelect serviceId="brand-designer" value={language} onChange={setLanguage} />
               </div>
 
               {/* Target audience + Personality */}

@@ -4,6 +4,10 @@
  */
 
 import type { PlannedFileLike, ProjectCapabilityFlags } from "@/lib/ai/validator";
+import {
+  projectCapabilityFlagsFromManifest,
+  seedManifestFromFeatures,
+} from "@/lib/website/builder/capabilities";
 import type { WebsiteFeatureId } from "@/lib/constants/website-builder";
 import { WEBSITE_FEATURE_IDS } from "@/lib/constants/website-builder";
 import type {
@@ -784,12 +788,26 @@ export const BUILDER_PANEL_FEATURES = [
   "Dashboard",
   "CMS",
   "Blog",
+  "Contact Forms",
   "Payments",
   "Booking",
+  "E-commerce",
   "Chat",
   "Notifications",
   "Analytics",
   "CRM",
+  "Newsletter",
+  "Search",
+  "Testimonials",
+  "Gallery",
+  "Portfolio",
+  "FAQ",
+  "Pricing",
+  "Maps",
+  "SEO",
+  "Localization",
+  "Membership",
+  "File Uploads",
   "Admin Panel",
 ] as const;
 
@@ -800,12 +818,26 @@ export const BUILDER_PANEL_FEATURE_I18N: Record<BuilderPanelFeatureLabel, string
   Dashboard: "dashboard",
   CMS: "cms",
   Blog: "blog",
+  "Contact Forms": "contact",
   Payments: "payments",
   Booking: "booking",
+  "E-commerce": "ecommerce",
   Chat: "chat",
   Notifications: "notifications",
   Analytics: "analytics",
   CRM: "crm",
+  Newsletter: "newsletter",
+  Search: "search",
+  Testimonials: "testimonials",
+  Gallery: "gallery",
+  Portfolio: "portfolio",
+  FAQ: "faq",
+  Pricing: "pricing",
+  Maps: "maps",
+  SEO: "seo",
+  Localization: "localization",
+  Membership: "membership",
+  "File Uploads": "uploads",
   "Admin Panel": "adminPanel",
 };
 
@@ -816,12 +848,26 @@ const REGISTRY_ID_TO_PANEL_LABEL: Partial<
   dashboard: "Dashboard",
   cms: "CMS",
   blog: "Blog",
+  contact: "Contact Forms",
   payment: "Payments",
   booking: "Booking",
+  ecommerce: "E-commerce",
   chat: "Chat",
   notifications: "Notifications",
   analytics: "Analytics",
   crm: "CRM",
+  newsletter: "Newsletter",
+  search: "Search",
+  testimonials: "Testimonials",
+  gallery: "Gallery",
+  portfolio: "Portfolio",
+  faq: "FAQ",
+  pricing: "Pricing",
+  maps: "Maps",
+  seo: "SEO",
+  localization: "Localization",
+  membership: "Membership",
+  uploads: "File Uploads",
 };
 
 /**
@@ -869,17 +915,19 @@ export function applyFeaturesToCapabilityFlags(
   base: ProjectCapabilityFlags,
   resolved: ResolvedWebsiteFeatures,
 ): ProjectCapabilityFlags {
+  const manifest = seedManifestFromFeatures(resolved.ids);
+  const fromManifest = projectCapabilityFlagsFromManifest(manifest);
   return {
     ...base,
-    requiresAuth: base.requiresAuth || Boolean(resolved.capabilityFlags.requiresAuth),
-    requiresDashboard:
-      base.requiresDashboard || Boolean(resolved.capabilityFlags.requiresDashboard),
-    requiresDatabase:
-      base.requiresDatabase || Boolean(resolved.capabilityFlags.requiresDatabase),
-    isEcommerce: base.isEcommerce || Boolean(resolved.capabilityFlags.isEcommerce),
-    isSaas: base.isSaas || Boolean(resolved.capabilityFlags.isSaas),
+    requiresAuth: base.requiresAuth || fromManifest.requiresAuth,
+    requiresDashboard: base.requiresDashboard || fromManifest.requiresDashboard,
+    requiresDatabase: base.requiresDatabase || fromManifest.requiresDatabase,
+    isEcommerce: base.isEcommerce || fromManifest.isEcommerce,
+    isSaas: base.isSaas || fromManifest.isSaas,
     databaseProvider:
-      resolved.capabilityFlags.databaseProvider || base.databaseProvider,
+      fromManifest.databaseProvider !== "none"
+        ? fromManifest.databaseProvider
+        : base.databaseProvider,
   };
 }
 

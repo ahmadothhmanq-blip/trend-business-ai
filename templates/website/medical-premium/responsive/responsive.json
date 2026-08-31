@@ -1,20 +1,20 @@
 {
   "tbdpNative": true,
-  "sectorDnaId": "medical",
-  "experienceProfiles": ["healthcare", "corporate", "minimal"],
+  "sectorDnaId": "saas",
+  "experienceProfiles": ["technical", "corporate", "executive"],
   "structure": {
     "regions": {
       "header": { "sticky": true, "position": "top" },
       "utility": { "collapseBelow": "md", "collapseMode": "stack" },
-      "overlay": { "collapseBelow": "sm" },
-      "main": { "collapseBelow": "sm" }
+      "main": { "collapseBelow": "sm" },
+      "overlay": { "collapseBelow": "sm", "collapseMode": "fixed-bottom" }
     },
     "components": {
-      "medical-premium-trust-hero": {
-        "layout": { "lg": "layered-trust", "sm": "stacked" }
+      "medical-premium-hero": {
+        "layout": { "lg": "bento-command", "sm": "stacked" }
       },
-      "medical-premium-specialties": {
-        "layout": { "lg": "card-masonry", "sm": "stacked" }
+      "medical-premium-features": {
+        "layout": { "lg": "bento-asymmetric", "sm": "stacked" }
       }
     }
   }

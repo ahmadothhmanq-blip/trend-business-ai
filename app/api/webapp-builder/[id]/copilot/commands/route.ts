@@ -4,7 +4,7 @@ import {
   apiErrorResponse,
   apiValidationError,
 } from "@/lib/i18n/api-errors";
-import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { beginAiUsage, type AiUsageLease } from "@/lib/api/rate-limit";
 import { serverErrorResponse } from "@/lib/api/errors";
 import {
   composeAppPlan,
@@ -13,6 +13,7 @@ import {
   appCapabilityRequiresAi,
   resolveAppCopilotRoute,
 } from "@/lib/ai-core/app-copilot";
+import { getRequestAiLanguage } from "@/lib/i18n/api";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -42,6 +43,8 @@ const commandBodySchema = z.object({
   useMemory: z.boolean().optional(),
   includeReview: z.boolean().optional(),
   linkedWebsiteGenerationId: z.string().uuid().optional(),
+  language: z.string().trim().optional(),
+  country: z.string().trim().optional(),
 });
 
 /**
@@ -64,6 +67,7 @@ export async function POST(request: Request, context: RouteContext) {
   if (!parsed.success) {
     return apiValidationError(parsed.error.issues[0]?.message);
   }
+  getRequestAiLanguage(request, parsed.data.language, parsed.data.country);
 
   const useClassifier = parsed.data.useClassifier === true;
   const resolved = useClassifier
@@ -84,13 +88,16 @@ export async function POST(request: Request, context: RouteContext) {
     parsed.data.applyAi !== false &&
     appCapabilityRequiresAi(resolved.match.uri);
 
+  let creditLease: AiUsageLease | null = null;
+
   if (needsAi) {
-    const rateLimited = await enforceAiUsage(
+    const usage = await beginAiUsage(
       auth.supabase,
       auth.user!.id,
       "webapp-builder",
     );
-    if (rateLimited) return rateLimited;
+    if (!usage.ok) return usage.response;
+    creditLease = usage.lease;
   }
 
   try {
@@ -102,6 +109,7 @@ export async function POST(request: Request, context: RouteContext) {
     });
 
     if (!result.ok) {
+      await creditLease?.release(auth.supabase);
       if (result.code === "NOT_FOUND") {
         return apiErrorResponse(API_ERROR_CODES.GENERATION_NOT_FOUND, 404);
       }
@@ -121,8 +129,10 @@ export async function POST(request: Request, context: RouteContext) {
       return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, 500, result.error);
     }
 
+    await creditLease?.settle(auth.supabase);
     return NextResponse.json(result);
   } catch (err) {
+    await creditLease?.release(auth.supabase);
     return serverErrorResponse(
       "webapp-builder.copilot.commands",
       err,

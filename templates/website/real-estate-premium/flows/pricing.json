@@ -1,0 +1,7 @@
+{
+  "pageId": "pricing",
+  "layoutId": "default",
+  "regions": {
+    "main": ["real-estate-premium-hero", "real-estate-premium-pricing", "real-estate-premium-faq"]
+  }
+}

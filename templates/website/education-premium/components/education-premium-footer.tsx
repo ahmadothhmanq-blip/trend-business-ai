@@ -1,12 +1,15 @@
 "use client";
 
+import { FlagshipRevealInit } from "@/lib/website/template-v2/motion/flagship-reveal-init";
+
 const DEFAULT_LINKS = [
-  { href: "#features", label: "Academics" },
-  { href: "#about", label: "About" },
-  { href: "#pricing", label: "Tuition" },
-  { href: "#contact", label: "Admissions" },
-  { href: "#privacy", label: "Privacy" },
-  { href: "#terms", label: "Terms" },
+  { href: "#features", label: "Departments" },
+  { href: "#about", label: "Essay" },
+  { href: "#portfolio", label: "Campus notes" },
+  { href: "#pricing", label: "Programs" },
+  { href: "#contact", label: "Letters" },
+  { href: "/privacy", label: "Privacy" },
+  { href: "/terms", label: "Terms" },
 ];
 
 type EducationPremiumFooterProps = {
@@ -16,60 +19,32 @@ type EducationPremiumFooterProps = {
 };
 
 export function EducationPremiumFooter({
-  brandName = "Scholar's Hall",
-  tagline = "A premier research university where academic excellence, intellectual curiosity, and global citizenship shape tomorrow's leaders.",
+  brandName = "Heritage",
+  tagline = "A journal of learning, research, and campus life.",
   links = DEFAULT_LINKS,
 }: EducationPremiumFooterProps) {
   const year = new Date().getFullYear();
-
   return (
-    <footer
-      data-v2-component="education-premium-footer"
-      className="border-t border-[var(--border-default)] bg-[var(--color-ink,#0F1829)] text-white"
-      role="contentinfo"
-    >
-      <div className="mx-auto max-w-[82rem] px-5 py-14 sm:px-8 sm:py-16">
-        <div className="grid gap-10 md:grid-cols-[1.4fr_1fr]">
-          <div>
-            <p className="ed-font-display text-xl font-semibold">{brandName}</p>
-            <p className="ed-font-body mt-3 max-w-sm text-sm leading-relaxed text-white/60">
-              {tagline}
-            </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              {["AACSB", "ABET", "Fulbright"].map((badge) => (
-                <span
-                  key={badge}
-                  className="ed-font-mono rounded-[var(--radius-sm)] border border-white/10 px-2.5 py-1 text-[0.625rem] text-white/50"
-                >
-                  {badge}
-                </span>
-              ))}
-            </div>
+    <>
+      <FlagshipRevealInit />
+      <footer data-v2-component="education-premium-footer" role="contentinfo" className="ed-footer ed-paper">
+        <div className="ed-footer-inner">
+          <div className="ed-footer-brand">
+            <p className="ed-font-display ed-footer-title">{brandName}</p>
+            <p className="ed-footer-tagline">{tagline}</p>
           </div>
-
-          <nav aria-label="Footer">
-            <p className="ed-eyebrow text-white/40">Explore</p>
-            <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2.5">
-              {links.map((link) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    className="ed-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] ed-focus-ring rounded-sm"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
+          <nav aria-label="Footer" className="ed-footer-nav">
+            {links.map((l) => (
+              <a key={l.href} href={l.href}>
+                {l.label}
+              </a>
+            ))}
           </nav>
-        </div>
-
-        <div className="mt-12 border-t border-white/10 pt-6">
-          <p className="ed-font-body text-xs text-white/40">
-            © {year} {brandName}. All rights reserved.
+          <p className="ed-footer-copy">
+            © {year} {brandName}. Printed for the community.
           </p>
         </div>
-      </div>
-    </footer>
+      </footer>
+    </>
   );
 }

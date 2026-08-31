@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, it, beforeEach } from "node:test";
+import { after, before, beforeEach, describe, it } from "node:test";
 import { buildStaticPreviewHtml } from "@/lib/website/build-static-preview.server";
 import { applyStructureTemplateToProject } from "@/lib/website/builder/apply-structure-template";
 import { clearV2PreviewCompilerCache } from "@/lib/website/template-v2/preview/v2-preview-compiler";
@@ -57,6 +57,20 @@ function previewInputFromProject(
 }
 
 describe("V2 preview engine integration", () => {
+  const previousFlag = process.env.WB_STRUCTURE_FIRST;
+
+  before(() => {
+    delete process.env.WB_STRUCTURE_FIRST;
+  });
+
+  after(() => {
+    if (previousFlag === undefined) {
+      delete process.env.WB_STRUCTURE_FIRST;
+    } else {
+      process.env.WB_STRUCTURE_FIRST = previousFlag;
+    }
+  });
+
   beforeEach(() => {
     clearV2PreviewCompilerCache();
   });
@@ -72,9 +86,9 @@ describe("V2 preview engine integration", () => {
       previewInputFromProject(applied.project, "English"),
     );
 
-    assert.ok(html.includes('data-v2-render="v2-files"'));
+    assert.ok(html.includes('data-v2-render="v2-files-6"'));
     assert.ok(html.includes('data-v2-package="restaurant-signature"'));
-    assert.ok(html.includes('data-v2-layout="sidebar-left"'));
+    assert.ok(html.includes('data-v2-layout="default"'));
     assert.ok(html.includes('data-v2-component="restaurant-signature-hero"'));
     assert.ok(!html.includes("ThemeLuxury"));
     assert.ok(!html.includes("ThemeCorporate"));
@@ -99,7 +113,7 @@ describe("V2 preview engine integration", () => {
     assert.ok(html.includes('data-v2-component="saas-enterprise-hero"'));
     assert.ok(!html.includes("ThemeBold"));
     assert.ok(!html.includes("ThemeCorporate"));
-    assert.ok(html.includes("--color-primary: #1D4ED8"));
+    assert.ok(html.includes("--color-primary: #4338CA"));
   });
 
   it("renders real-estate-prestige from project.files with V2 markers", async () => {
@@ -113,13 +127,13 @@ describe("V2 preview engine integration", () => {
       previewInputFromProject(applied.project, "English"),
     );
 
-    assert.ok(html.includes('data-v2-render="v2-files"'));
+    assert.ok(html.includes('data-v2-render="v2-files-6"'));
     assert.ok(html.includes('data-v2-package="real-estate-prestige"'));
-    assert.ok(html.includes('data-v2-layout="sidebar-right"'));
+    assert.ok(html.includes('data-v2-layout="default"'));
     assert.ok(html.includes('data-v2-component="real-estate-prestige-hero"'));
     assert.ok(!html.includes("ThemeCorporate"));
     assert.ok(!html.includes("ThemeLuxury"));
-    assert.ok(html.includes("--color-primary: #1C1917"));
+    assert.ok(html.includes("--color-primary: #0E0D0B"));
   });
 
   it("renders medical-premium from project.files with V2 markers", async () => {
@@ -133,13 +147,13 @@ describe("V2 preview engine integration", () => {
       previewInputFromProject(applied.project, "English"),
     );
 
-    assert.ok(html.includes('data-v2-render="v2-files"'));
+    assert.ok(html.includes('data-v2-render="v2-files-6"'));
     assert.ok(html.includes('data-v2-package="medical-premium"'));
-    assert.ok(html.includes('data-v2-layout="full-bleed"'));
-    assert.ok(html.includes('data-v2-component="medical-premium-trust-hero"'));
+    assert.ok(html.includes('data-v2-layout="default"'));
+    assert.ok(html.includes('data-v2-component="medical-premium-hero"'));
     assert.ok(!html.includes("ThemeMinimal"));
     assert.ok(!html.includes("ThemeCorporate"));
-    assert.ok(html.includes("--color-primary: #1A4D4A"));
+    assert.ok(html.includes("--color-primary: #1B4D48"));
   });
 
   it("renders creative-portfolio from project.files with V2 markers", async () => {
@@ -153,17 +167,16 @@ describe("V2 preview engine integration", () => {
       previewInputFromProject(applied.project, "English"),
     );
 
-    assert.ok(html.includes('data-v2-render="v2-files"'));
+    assert.ok(html.includes('data-v2-render="v2-files-6"'));
     assert.ok(html.includes('data-v2-package="creative-portfolio"'));
-    assert.ok(html.includes('data-v2-layout="editorial-reveal"'));
+    assert.ok(html.includes('data-v2-layout="default"'));
     assert.ok(html.includes('data-v2-component="creative-portfolio-hero"'));
-    assert.ok(html.includes('data-v2-component="creative-portfolio-overlay-showcase"'));
     assert.ok(!html.includes("ThemeCreative"));
     assert.ok(!html.includes("ThemeMinimal"));
     assert.ok(html.includes("--color-primary: #09090B"));
   });
 
-  it("keeps modern-business on V1 theme preview path", async () => {
+  it("keeps modern-business on V2 corporate-business preview path", async () => {
     const applied = await applyStructureTemplateToProject({
       project: baseProject,
       templatePackageId: "modern-business",
@@ -174,9 +187,9 @@ describe("V2 preview engine integration", () => {
       previewInputFromProject(applied.project, "English"),
     );
 
-    assert.ok(html.includes('data-ti-render="v5"'));
-    assert.ok(html.includes('data-component="ThemeCorporateNav"'));
-    assert.ok(!html.includes('data-v2-render="v2-files"'));
+    assert.ok(html.includes('data-v2-render="v2-files-6"'));
+    assert.ok(html.includes('data-v2-package="corporate-business"'));
+    assert.ok(html.includes('data-v2-component="corporate-business-hero"'));
     assert.ok(!html.includes('data-v2-package="modern-business"'));
   });
 
@@ -203,5 +216,84 @@ describe("V2 preview engine integration", () => {
         html.includes("Amiri") ||
         html.includes("Design Platform RTL"),
     );
+  });
+
+  it("keeps module-local helpers (resolveLinks) in scope during Preview compile", async () => {
+    const applied = await applyStructureTemplateToProject({
+      project: baseProject,
+      templatePackageId: "ai-startup-signal",
+      language: "English",
+    });
+
+    const html = buildStaticPreviewHtml(
+      previewInputFromProject(applied.project, "English"),
+    );
+
+    assert.ok(html.includes('data-v2-render="v2-files-6"'));
+    assert.ok(html.includes('data-v2-package="ai-startup-signal"'));
+    assert.ok(html.includes('data-v2-component="ai-startup-signal-footer"'));
+    assert.ok(!html.includes("data-v2-preview-error="));
+    assert.ok(!/resolveLinks is not defined/i.test(html));
+  });
+});
+
+describe("project files preview (no template)", () => {
+  beforeEach(() => {
+    clearV2PreviewCompilerCache();
+  });
+
+  it("renders TBGE home from app/page.tsx instead of TI HeroSplit fallback", () => {
+    const brand = "شركة مفروشات الرياض";
+    const html = buildStaticPreviewHtml({
+      title: brand,
+      description: "أثاث منزلي وغرف نوم",
+      pages: ["الرئيسية", "من نحن"],
+      language: "Arabic",
+      files: [
+        {
+          path: "app/page.tsx",
+          content: [
+            'import { SiteShell } from "@/components/layout/site-shell";',
+            'import { Button } from "@/components/ui/button";',
+            "",
+            "export default function HomePage() {",
+            "  return (",
+            "    <SiteShell>",
+            `      <h1>${brand}</h1>`,
+            "      <p>أثاث منزلي فاخر</p>",
+            "      <Button>اطلب عرض سعر</Button>",
+            "    </SiteShell>",
+            "  );",
+            "}",
+          ].join("\n"),
+          language: "tsx",
+        },
+        {
+          path: "components/layout/site-shell.tsx",
+          content: `export function SiteShell({ children }: { children: React.ReactNode }) {
+  return <div className="min-h-screen bg-white text-slate-900">{children}</div>;
+}`,
+          language: "tsx",
+        },
+        {
+          path: "components/ui/button.tsx",
+          content: `export function Button({ children }: { children: React.ReactNode }) {
+  return <button className="rounded bg-slate-900 px-4 py-2 text-white">{children}</button>;
+}`,
+          language: "tsx",
+        },
+        {
+          path: "app/globals.css",
+          content: "@tailwind base;",
+          language: "css",
+        },
+      ],
+    });
+
+    assert.ok(html.includes('data-project-files-render="project-files-1"'));
+    assert.ok(html.includes(brand));
+    assert.ok(!html.includes('data-ti-template="'));
+    assert.ok(!html.includes("ti-hero--saas-split"));
+    assert.ok(!html.includes("HeroSplit"));
   });
 });

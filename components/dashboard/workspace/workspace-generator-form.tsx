@@ -17,12 +17,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import type { WorkspaceMetadata } from "@/lib/workspace/metadata";
 import {
-  WORKSPACE_LANGUAGES,
   WORKSPACE_THEMES,
   type WorkspaceLanguage,
   type WorkspaceTheme,
 } from "@/lib/workspace/metadata";
 import type { GenerationDepth } from "@/lib/hooks/use-workspace-tool";
+import { GlsGenerationLanguageSelect } from "@/components/dashboard/language/gls-generation-language-select";
+import type { GlsServiceId } from "@/lib/language-platform/core/types";
 import type { GenerationAttachmentMeta, PromptVersion } from "@/types/database";
 import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
@@ -57,6 +58,7 @@ type WorkspaceGeneratorFormProps = {
   promptVersions?: PromptVersion[];
   onRestorePromptVersion?: (version: PromptVersion) => void;
   autosaveState?: "idle" | "saving" | "saved";
+  serviceId?: GlsServiceId;
 };
 
 const DEPTH_VALUES: GenerationDepth[] = ["focused", "standard", "deep"];
@@ -91,6 +93,7 @@ export function WorkspaceGeneratorForm({
   promptVersions = [],
   onRestorePromptVersion,
   autosaveState = "idle",
+  serviceId = "content-studio",
 }: WorkspaceGeneratorFormProps) {
   const { t } = useTranslation();
   const depthOptions = DEPTH_VALUES.map((value) => ({
@@ -285,19 +288,12 @@ export function WorkspaceGeneratorForm({
                 <span className="mb-2 block text-[12px] font-semibold tracking-wide text-white/45 uppercase">
                   {t("dashboard.workspaceGenerator.language")}
                 </span>
-                <select
+                <GlsGenerationLanguageSelect
+                  serviceId={serviceId}
                   value={language}
-                  onChange={(event) =>
-                    onLanguageChange(event.target.value as WorkspaceLanguage)
-                  }
+                  onChange={(value) => onLanguageChange(value as WorkspaceLanguage)}
                   className="h-12 w-full rounded-2xl border border-white/[0.08] bg-white/[0.035] px-4 text-white"
-                >
-                  {WORKSPACE_LANGUAGES.map((option) => (
-                    <option key={option} value={option} className="bg-luxury-black">
-                      {option}
-                    </option>
-                  ))}
-                </select>
+                />
               </label>
               <label className="block">
                 <span className="mb-2 block text-[12px] font-semibold tracking-wide text-white/45 uppercase">

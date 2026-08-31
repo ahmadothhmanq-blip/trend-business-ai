@@ -49,21 +49,22 @@ export async function buildProviderHealthReport(): Promise<ProviderHealthReport>
   const warnings: string[] = [];
 
   if (fullResolution.error) {
-    if (strictMode) blockers.push(fullResolution.error);
-    else warnings.push(fullResolution.error);
+    warnings.push(fullResolution.error);
   }
   if (avatarResolution.error) {
     warnings.push(avatarResolution.error);
   }
 
-  if (!klingConfigured) {
-    warnings.push("KLING_API_KEY unset — full renders use preview stubs or fallback providers.");
+  if (!flags.veo && !klingConfigured && !flags.runway && !flags.external) {
+    warnings.push("No full-render provider — set GEMINI_API_KEY/VEO_API_KEY, KLING_API_KEY, RUNWAY_API_KEY, or VIDEO_PROVIDER_API_KEY.");
+  } else if (!klingConfigured) {
+    warnings.push("KLING_API_KEY unset — full render needs Kling, Veo, Runway, or an external video provider.");
   }
   if (!ttsConfigured) {
-    warnings.push("No TTS key — full renders use silent preview WAV.");
+    warnings.push("No TTS key — set ELEVENLABS_API_KEY or OPENAI_API_KEY.");
   }
   if (!strictMode) {
-    warnings.push("VIDEO_PROVIDER_STRICT unset — provider errors may return stub MP4 clips.");
+    warnings.push("VIDEO_PROVIDER_STRICT must be 1 in production.");
   }
 
   const ffmpeg = await probeFfmpegHealth();
@@ -79,6 +80,16 @@ export async function buildProviderHealthReport(): Promise<ProviderHealthReport>
       configured: true,
       ready: true,
       message: "Available for storyboard / poster preview renders.",
+    },
+    {
+      id: "veo",
+      label: "Veo",
+      role: "full-render",
+      configured: flags.veo,
+      ready: flags.veo && fullResolution.providerId === "veo",
+      message: flags.veo
+        ? "Veo/Gemini full-render provider."
+        : "Set GEMINI_API_KEY or VEO_API_KEY for Veo.",
     },
     {
       id: "kling",
@@ -128,9 +139,7 @@ export async function buildProviderHealthReport(): Promise<ProviderHealthReport>
     avatarProvider: avatarResolution.providerId,
     previewProvider: previewResolution.providerId,
     fullRenderReady:
-      klingConfigured &&
-      fullResolution.providerId === "kling" &&
-      !fullResolution.error,
+      !fullResolution.error && fullResolution.providerId !== "preview",
     avatarRenderReady: flags.heygen && !avatarResolution.error,
     klingConfigured,
     strictMode,

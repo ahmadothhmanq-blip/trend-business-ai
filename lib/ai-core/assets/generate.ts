@@ -70,8 +70,8 @@ export async function generateCoreAssets(
       : settings;
 
     const enrichedPrompt = planned.realistic
-      ? `Photorealistic, high detail. ${planned.prompt}. Brand colors roughly ${params.colors.primary} and ${params.colors.secondary}.`
-      : `${planned.prompt}. Brand colors roughly ${params.colors.primary} and ${params.colors.secondary}.`;
+      ? `Photorealistic, ultra sharp, high detail, tack-sharp focus. ${planned.prompt}. Brand colors roughly ${params.colors.primary} and ${params.colors.secondary}.`
+      : `Sharp, high-resolution photography. ${planned.prompt}. Brand colors roughly ${params.colors.primary} and ${params.colors.secondary}.`;
 
     // Retry once on provider failure before falling back to premium stock.
     let generated = await generateRealisticImage(enrichedPrompt, {

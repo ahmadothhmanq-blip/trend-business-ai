@@ -47,6 +47,11 @@ import {
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n/client";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
+import { GlsGenerationLanguageSelect } from "@/components/dashboard/language/gls-generation-language-select";
+import {
+  getInitialGlsGenerationLanguage,
+  glsGenerationLanguagePayload,
+} from "@/lib/language-platform/generation/service";
 import {
   IMAGE_TYPES,
   IMAGE_STYLES,
@@ -307,11 +312,14 @@ function toHistoryItem(gen: ImageGeneration): ProjectHistoryItem {
 /* ------------------------------------------------------------------ */
 
 export function ImageGeneratorTool({ initialGenerations }: Props) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const p = useProductT("imageGenerator");
   const [step, setStep] = useState<"type" | "config" | "history" | "generating" | "preview">("type");
   const [selectedType, setSelectedType] = useState("");
   const [prompt, setPrompt] = useState("");
+  const [language, setLanguage] = useState(() =>
+    getInitialGlsGenerationLanguage({ fallback: "ui-locale", uiLocale: locale }),
+  );
   const [negativePrompt, setNegativePrompt] = useState("");
   const [style, setStyle] = useState("Photorealistic");
   const [aspectRatio, setAspectRatio] = useState("1:1");
@@ -416,6 +424,7 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
           templateId: selectedTemplate || undefined,
           quality,
           brandIdentity: useBrand ? brandIdentity : undefined,
+          ...glsGenerationLanguagePayload(language),
         }),
       });
       const d = await res.json();
@@ -591,6 +600,11 @@ export function ImageGeneratorTool({ initialGenerations }: Props) {
                     </button>
                   ))}
                 </div>
+              </div>
+
+              <div className="max-w-md">
+                <label className="mb-1.5 block text-xs font-medium text-white/60">{t("common.language")}</label>
+                <GlsGenerationLanguageSelect serviceId="image-generator" value={language} onChange={setLanguage} />
               </div>
 
               {/* Style, Aspect Ratio, Mood */}

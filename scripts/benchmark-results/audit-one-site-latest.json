@@ -1,0 +1,91 @@
+{
+  "timestamp": "2026-08-09T00:07:54.648Z",
+  "generationId": "3c0690dc-24d0-41e2-ab42-6646ee97ff5e",
+  "findings": [
+    {
+      "level": "ok",
+      "msg": "login",
+      "detail": "wb.journey.1784316846782@gmail.com"
+    },
+    {
+      "level": "ok",
+      "msg": "generation",
+      "detail": "3c0690dc-24d0-41e2-ab42-6646ee97ff5e"
+    },
+    {
+      "level": "ok",
+      "msg": "project files",
+      "detail": "11 files"
+    },
+    {
+      "level": "ok",
+      "msg": "SitePlan",
+      "detail": "electronics-retail"
+    },
+    {
+      "level": "ok",
+      "msg": "visualSkinId",
+      "detail": "apex"
+    },
+    {
+      "level": "ok",
+      "msg": "skin CSS layer",
+      "detail": "tb-visual-skin in globals.css"
+    },
+    {
+      "level": "ok",
+      "msg": "image treatment vars",
+      "detail": "present"
+    },
+    {
+      "level": "ok",
+      "msg": "app/page.tsx",
+      "detail": "present"
+    },
+    {
+      "level": "ok",
+      "msg": "skin reapply API",
+      "detail": "vault"
+    },
+    {
+      "level": "ok",
+      "msg": "project files",
+      "detail": "11 files"
+    },
+    {
+      "level": "ok",
+      "msg": "SitePlan",
+      "detail": "electronics-retail"
+    },
+    {
+      "level": "ok",
+      "msg": "visualSkinId",
+      "detail": "vault"
+    },
+    {
+      "level": "ok",
+      "msg": "skin CSS layer",
+      "detail": "tb-visual-skin in globals.css"
+    },
+    {
+      "level": "ok",
+      "msg": "image treatment vars",
+      "detail": "present"
+    },
+    {
+      "level": "ok",
+      "msg": "app/page.tsx",
+      "detail": "present"
+    },
+    {
+      "level": "ok",
+      "msg": "publish prepare",
+      "detail": ""
+    }
+  ],
+  "summary": {
+    "ok": 16,
+    "warn": 0,
+    "fail": 0
+  }
+}

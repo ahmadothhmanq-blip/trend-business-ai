@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { History, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -27,7 +27,10 @@ import { AiBuilderPanel } from "@/components/dashboard/website-builder/ai-builde
 import { ProfessionalPanel } from "@/components/dashboard/website-builder/professional-panel";
 import { BusinessHubPanel } from "@/components/dashboard/website-builder/business-hub-panel";
 import { PublishingHubPanel } from "@/components/dashboard/website-builder/publishing-hub-panel";
+import { EnterprisePanel } from "@/components/dashboard/website-builder/enterprise-panel";
 import { SiteImageManagerPanel } from "@/components/dashboard/website-builder/site-image-manager-panel";
+import { LockedToolGate } from "@/components/dashboard/website-builder/locked-tool-gate";
+import type { WebsiteStructureTemplateChoice } from "@/components/dashboard/website-builder/templates-panel";
 import type { GeneratedProjectFile } from "@/lib/ai/types";
 import type { GeneratedWebsiteProject } from "@/plugins/website/types";
 import type { WebsiteGeneration } from "@/types/database";
@@ -43,6 +46,10 @@ import {
   type BuilderVersionSnapshot,
 } from "@/lib/website/builder";
 import { useBuilderLocale } from "@/lib/website/builder/use-builder-locale";
+import { refreshCapabilities } from "@/lib/website/builder/capabilities/service";
+import { resolveBuilderToolbar } from "@/lib/website/builder/tools/resolve";
+import { VisualSkinCatalogPanel } from "@/components/dashboard/website-builder/visual-skin-catalog-panel";
+import { hasPublishedVisualSkins, getVisualSkin } from "@/lib/website/visual-skin/registry";
 
 type BuilderWorkspaceProps = {
   generationId: string;
@@ -63,6 +70,7 @@ type BuilderWorkspaceProps = {
   } | null) => void;
   onAiCommand?: (command: string, useStream?: boolean) => void;
   onOpenWorkspaceTab?: (tab: "analytics" | "experiments" | "deploy") => void;
+  onTemplateSelect?: (choice: WebsiteStructureTemplateChoice) => void;
   onSaved: (payload: {
     project: GeneratedWebsiteProject;
     generation: WebsiteGeneration;
@@ -83,6 +91,7 @@ export function BuilderWorkspace({
   onSelectionChange,
   onAiCommand,
   onOpenWorkspaceTab,
+  onTemplateSelect,
   onSaved,
 }: BuilderWorkspaceProps) {
   const { wb, dir } = useBuilderLocale();
@@ -105,6 +114,22 @@ export function BuilderWorkspace({
     promptHint,
     selectedPageRoute,
   });
+
+  const capabilityContext = useMemo(
+    () => refreshCapabilities(project, { files }),
+    [project, files],
+  );
+  const capabilityService = capabilityContext.service;
+
+  const resolvedToolbar = useMemo(
+    () => resolveBuilderToolbar(capabilityService),
+    [capabilityService],
+  );
+
+  const activeResolvedTool = useMemo(
+    () => resolvedToolbar.tools.find((tool) => tool.id === activeTool),
+    [resolvedToolbar.tools, activeTool],
+  );
 
   useEffect(() => {
     setVersions(listBuilderVersionSnapshots(generationId));
@@ -224,6 +249,20 @@ export function BuilderWorkspace({
   }, []);
 
   const renderLeftPanel = () => {
+    if (activeResolvedTool && !activeResolvedTool.enabled) {
+      return (
+        <LockedToolGate
+          tool={activeResolvedTool}
+          disabled={disabled}
+          onEnable={() => {
+            if (activeResolvedTool.unlockCopilotCommand) {
+              onAiCommand?.(activeResolvedTool.unlockCopilotCommand, true);
+            }
+          }}
+        />
+      );
+    }
+
     if (activeTool === "design") {
       return (
         <DesignSystemPanel
@@ -239,6 +278,7 @@ export function BuilderWorkspace({
       return (
         <BlocksPanel
           disabled={disabled}
+          capabilityService={capabilityService}
           onInsert={handleInsertBlock}
         />
       );
@@ -261,6 +301,7 @@ export function BuilderWorkspace({
     if (activeTool === "ai") {
       return (
         <AiBuilderPanel
+          capabilityService={capabilityService}
           disabled={disabled}
           loading={aiLoading}
           streamMessage={aiStreamMessage}
@@ -271,15 +312,19 @@ export function BuilderWorkspace({
     if (activeTool === "professional") {
       return (
         <ProfessionalPanel
+          capabilityService={capabilityService}
           managementHref={managementHref}
           disabled={disabled}
+          selectedVisualSkinId={project.settings?.visualSkinId}
           onCopilotCommand={(command) => onAiCommand?.(command, true)}
+          onTemplateSelect={onTemplateSelect}
         />
       );
     }
     if (activeTool === "business") {
       return (
         <BusinessHubPanel
+          capabilityService={capabilityService}
           managementHref={managementHref}
           disabled={disabled}
           onOpenWorkspaceTab={onOpenWorkspaceTab}
@@ -290,6 +335,7 @@ export function BuilderWorkspace({
     if (activeTool === "publish") {
       return (
         <PublishingHubPanel
+          capabilityService={capabilityService}
           files={files}
           disabled={disabled}
           onOpenDeploy={() => onOpenWorkspaceTab?.("deploy")}
@@ -370,7 +416,30 @@ export function BuilderWorkspace({
         ) : null}
       </div>
 
-      <BuilderToolRail active={activeTool} onChange={setActiveTool} />
+      <BuilderToolRail
+        active={activeTool}
+        onChange={setActiveTool}
+        tools={resolvedToolbar.tools}
+      />
+
+      {hasPublishedVisualSkins() && onTemplateSelect ? (
+        <div className="border-b border-white/[0.08] px-3 py-2">
+          <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/35">
+            {wb("sections.visualSkin")}
+          </p>
+          <VisualSkinCatalogPanel
+            compact
+            disabled={disabled}
+            selectedId={project.settings?.visualSkinId}
+            onSelect={(skinId) => {
+              onTemplateSelect?.({
+                skinId,
+                label: getVisualSkin(skinId)?.label ?? skinId,
+              });
+            }}
+          />
+        </div>
+      ) : null}
 
       <div
         className={cn(

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   CheckCircle2,
   ExternalLink,
@@ -27,9 +27,14 @@ import { useProductT } from "@/lib/i18n/use-scoped-t";
 import type { DeploymentDashboard } from "@/lib/ai-core/deployment";
 import type { WebsiteDomain } from "@/lib/ai-core/domains";
 import { useWebsitePublish } from "@/lib/hooks/use-website-publish";
+import { buildReferralSharePayload } from "@/lib/website/growth/referral";
+import { VisualSkinEditor } from "@/components/dashboard/website-builder/visual-skin-editor";
+import type { GeneratedWebsiteProject } from "@/lib/website/types/generation";
 
 export function DeploymentDashboardPanel(props: {
   generationId: string | null;
+  project?: GeneratedWebsiteProject | null;
+  onProjectChange?: (project: GeneratedWebsiteProject) => void;
 }) {
   const wb = useProductT("websiteBuilder");
   const [dashboard, setDashboard] = useState<DeploymentDashboard | null>(null);
@@ -170,6 +175,16 @@ export function DeploymentDashboardPanel(props: {
 
   const actionBusy = publish.isBusy || Boolean(domainBusy);
 
+  const referral = useMemo(() => {
+    if (!props.generationId || !dashboard?.publishing.publicUrl) return null;
+    return buildReferralSharePayload({
+      publicUrl: dashboard.publishing.publicUrl,
+      userId: props.generationId,
+      generationId: props.generationId,
+      title: dashboard.projectName ?? undefined,
+    });
+  }, [props.generationId, dashboard]);
+
   if (!props.generationId) {
     return (
       <div className="flex h-[420px] items-center justify-center text-sm text-white/40">
@@ -243,6 +258,14 @@ export function DeploymentDashboardPanel(props: {
           </Button>
         </div>
       </div>
+
+      {props.project && props.generationId ? (
+        <VisualSkinEditor
+          generationId={props.generationId}
+          project={props.project}
+          onApplied={props.onProjectChange}
+        />
+      ) : null}
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatTile
@@ -326,6 +349,31 @@ export function DeploymentDashboardPanel(props: {
             >
               {wb("panels.archive")}
             </Button>
+            {referral ? (
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-premium-gold/25 text-premium-gold-light"
+                  onClick={() => {
+                    void navigator.clipboard.writeText(referral.referralUrl);
+                    toast.success("Referral link copied");
+                  }}
+                >
+                  Copy referral link
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-white/15 text-white"
+                  asChild
+                >
+                  <a href={referral.twitterIntentUrl} target="_blank" rel="noreferrer">
+                    Share on X
+                  </a>
+                </Button>
+              </>
+            ) : null}
           </div>
         ) : null}
       </DashboardPanel>

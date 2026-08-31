@@ -5,7 +5,7 @@
   "layout": {
     "width": "contained",
     "alignment": "center",
-    "maxWidth": "100%",
+    "maxWidth": "78rem",
     "padding": "1.75rem"
   },
   "placement": {

@@ -473,3 +473,8 @@ html[dir="rtl"] .space-x-3 > :not([hidden]) ~ :not([hidden]),
 html[dir="rtl"] .space-x-4 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-x-reverse: 1;
 }
+
+/* Next.js dev badge (N) — platform chrome only, not part of website templates */
+nextjs-portal {
+  display: none !important;
+}

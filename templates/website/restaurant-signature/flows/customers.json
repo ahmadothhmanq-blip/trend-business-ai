@@ -1,0 +1,7 @@
+{
+  "pageId": "customers",
+  "layoutId": "default",
+  "regions": {
+    "main": ["restaurant-signature-hero", "restaurant-signature-portfolio", "restaurant-signature-features"]
+  }
+}

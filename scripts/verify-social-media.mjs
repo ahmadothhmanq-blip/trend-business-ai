@@ -78,7 +78,7 @@ for (const rel of protectedRoutes) {
   else fail(`${rel}: missing requireUser`);
 }
 const gen = readFileSync(join(root, "app/api/social-media/generate/route.ts"), "utf8");
-if (gen.includes("enforceAiUsage")) ok("generate: credits");
+if (gen.includes("beginAiUsage")) ok("generate: credits");
 else fail("generate: missing credits");
 const accounts = readFileSync(join(root, "app/api/social-media/accounts/route.ts"), "utf8");
 if (accounts.includes("SAFE_ACCOUNT_SELECT") && !accounts.match(/\.select\([^)]*access_token_encrypted/)) ok("accounts: token not exposed in list");

@@ -162,7 +162,7 @@ export function applySectionBackgroundToSectionSource(
   if (!bg.url && bg.source === "none") {
     const match = sectionSource.match(SECTION_ROOT_RE);
     if (!match) return sectionSource;
-    let inner = stripExistingBgLayer(match[3] ?? "");
+    const inner = stripExistingBgLayer(match[3] ?? "");
     const attrs = (match[2] ?? "")
       .replace(new RegExp(`${WB_SECTION_BG_CONFIG_ATTR}\\s*=\\s*("([^"]*)"|'([^']*)')`, "gi"), "")
       .replace(new RegExp(`${WB_SECTION_BG_ID_ATTR}\\s*=\\s*("([^"]*)"|'([^']*)')`, "gi"), "")

@@ -4,12 +4,16 @@
  */
 
 import type { WebsiteFeatureId } from "@/lib/constants/website-builder";
+import type { WebsiteCapabilityId } from "@/lib/website/builder/capabilities/types";
 
 export type BusinessFeature = {
   id: string;
   label: string;
   description: string;
   registryFeatureId?: WebsiteFeatureId;
+  capabilityId?: WebsiteCapabilityId;
+  requiresAnyCapability?: WebsiteCapabilityId[];
+  alwaysVisible?: boolean;
   workspaceTab?: "analytics" | "experiments" | "deploy";
   href?: string;
   copilotCommand?: string;
@@ -21,18 +25,21 @@ export const BUSINESS_FEATURES: BusinessFeature[] = [
     label: "Analytics",
     description: "Traffic, engagement, and conversion metrics",
     registryFeatureId: "analytics",
+    capabilityId: "analytics",
     workspaceTab: "analytics",
   },
   {
     id: "experiments",
     label: "A/B experiments",
     description: "Test headlines, CTAs, and layouts",
+    requiresAnyCapability: ["analytics", "products", "forms"],
     workspaceTab: "experiments",
   },
   {
     id: "leads",
     label: "Lead collection",
     description: "Form submissions and CRM export",
+    capabilityId: "forms",
     href: "management:leads",
   },
   {
@@ -40,6 +47,7 @@ export const BUSINESS_FEATURES: BusinessFeature[] = [
     label: "E-commerce catalog",
     description: "Products, services, and catalog management",
     registryFeatureId: "ecommerce",
+    capabilityId: "products",
     href: "management:catalog",
   },
   {
@@ -47,12 +55,14 @@ export const BUSINESS_FEATURES: BusinessFeature[] = [
     label: "Membership foundation",
     description: "Gated content and member areas (foundation)",
     registryFeatureId: "membership",
+    capabilityId: "authentication",
     copilotCommand: "Add a members-only area section",
   },
   {
     id: "marketing",
     label: "Marketing tools",
     description: "Conversion tracking and campaign hooks",
+    requiresAnyCapability: ["analytics", "newsletter", "forms"],
     workspaceTab: "analytics",
   },
   {
@@ -60,6 +70,7 @@ export const BUSINESS_FEATURES: BusinessFeature[] = [
     label: "CRM integration",
     description: "Webhook and lead routing integrations",
     registryFeatureId: "crm",
+    capabilityId: "forms",
     href: "management:leads",
   },
 ];

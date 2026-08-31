@@ -16,51 +16,31 @@ export type FlagshipFaqProps = {
   items?: FlagshipFaqItem[];
 };
 
-const DEFAULT_FAQ: FlagshipFaqItem[] = [
-  {
-    question: "How quickly can we get started?",
-    answer:
-      "Most teams launch their first workspace within two weeks. Our onboarding specialists guide you through data migration, integrations, and team training.",
-  },
-  {
-    question: "Do you support enterprise security requirements?",
-    answer:
-      "Yes. We offer SSO, role-based access, audit logs, and compliance certifications including SOC 2 Type II and GDPR alignment.",
-  },
-  {
-    question: "Can we customize workflows for our industry?",
-    answer:
-      "Absolutely. Templates adapt to your sector, and our visual builder lets you tailor pages, sections, and automations without code.",
-  },
-  {
-    question: "What kind of support is included?",
-    answer:
-      "All plans include email support. Enterprise customers receive a dedicated success manager, SLA-backed response times, and quarterly business reviews.",
-  },
-];
-
 export function FlagshipFaqSection({
   ui,
   componentId,
-  id = "faq",
-  eyebrow = "FAQ",
-  title = "Answers before you ask",
+  id,
+  eyebrow,
+  title,
   subtitle,
-  items = DEFAULT_FAQ,
+  items,
 }: FlagshipFaqProps) {
+  const sectionId = id ?? "faq";
   const baseId = useId();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
+  if (!items?.length) return null;
+
   return (
     <section
-      id={id}
+      id={sectionId}
       data-v2-component={componentId}
-      aria-labelledby={`${id}-title`}
+      aria-labelledby={`${sectionId}-title`}
       className={`${ui.section} df-section-alt bg-[var(--color-surface)]`}
     >
       <div className={ui.container}>
         <div className="grid gap-12 lg:grid-cols-[1fr_1.4fr] lg:items-start">
-          <FlagshipSectionHeader ui={ui} id={id} eyebrow={eyebrow} title={title} subtitle={subtitle} />
+          <FlagshipSectionHeader ui={ui} id={sectionId} eyebrow={eyebrow} title={title} subtitle={subtitle} />
           <div className="space-y-3">
             {items.map((item, index) => {
               const panelId = `${baseId}-panel-${index}`;

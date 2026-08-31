@@ -6,6 +6,7 @@ export type AgentPluginInput = {
   context?: string;
   memory?: string[];
   maxSteps?: number;
+  language?: string;
 };
 
 export type AgentAnalysis = {

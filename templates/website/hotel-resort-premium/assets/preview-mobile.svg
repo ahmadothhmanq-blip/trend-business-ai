@@ -1,23 +1,26 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="390" height="844" viewBox="0 0 390 844" role="img" aria-label="Restaurant Premium Mobile preview">
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="844" viewBox="0 0 390 844" role="img" aria-label="Haven Mobile preview">
   <defs>
-    <linearGradient id="g-restaurant-premium-390" x1="0" y1="0" x2="1" y2="0.6">
-      <stop offset="0%" stop-color="#1B3D2F"/>
-      <stop offset="100%" stop-color="#D4A574"/>
+    <linearGradient id="plum-m" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2A2340"/>
+      <stop offset="100%" stop-color="#4E3D6B"/>
+    </linearGradient>
+    <linearGradient id="img-m" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#E8E0F8"/>
+      <stop offset="100%" stop-color="#D8CFE8"/>
     </linearGradient>
   </defs>
-  <rect width="390" height="844" fill="#0A1210"/>
-  <rect width="390" height="68" fill="#1B3D2F"/>
-  <circle cx="34" cy="34" r="10" fill="#D4A574"/>
-  <rect x="52" y="28" width="59" height="12" rx="4" fill="#fff" opacity="0.85"/>
-  <rect x="300" y="24" width="70" height="20" rx="10" fill="url(#g-restaurant-premium-390)"/>
-  
-  <rect x="20" y="84" width="122" height="10" rx="4" fill="#D4A574" opacity="0.6"/>
-  <rect x="20" y="104" width="263" height="52" rx="8" fill="#F4EDE4" opacity="0.16"/>
-  <rect x="20" y="170" width="193" height="33" rx="6" fill="#F4EDE4" opacity="0.09"/>
-  <rect x="20" y="238" width="98" height="32" rx="16" fill="url(#g-restaurant-premium-390)"/>
-  <rect x="20" y="355" width="350" height="101" rx="10" fill="#121F1A" stroke="rgba(244,237,228,0.08)" stroke-width="1"/>
-      <rect x="34" y="371" width="175" height="8" rx="4" fill="#F4EDE4" opacity="0.15"/>
-      <rect x="34" y="389" width="245" height="6" rx="3" fill="#F4EDE4" opacity="0.08"/>
-  <rect x="20" y="760" width="350" height="1" fill="rgba(244,237,228,0.08)"/>
-  <text x="20" y="44" fill="#fff" font-family="system-ui,sans-serif" font-size="11" font-weight="600">Restaurant Premium · Mobile</text>
+  <rect width="390" height="844" fill="#E6E0F5"/>
+  <rect x="16" y="16" width="358" height="48" rx="24" fill="#F9F7FD" stroke="rgba(78,61,107,0.12)" stroke-width="1"/>
+  <rect x="32" y="34" width="64" height="10" rx="3" fill="#1A1228" opacity="0.85"/>
+  <rect x="300" y="28" width="58" height="24" rx="12" fill="url(#plum-m)"/>
+  <rect x="24" y="88" width="64" height="6" rx="3" fill="#4E3D6B"/>
+  <rect x="24" y="104" width="240" height="30" rx="5" fill="#1A1228" opacity="0.1"/>
+  <rect x="24" y="148" width="24" height="3" rx="1.5" fill="#FF5C8A"/>
+  <rect x="24" y="164" width="200" height="10" rx="3" fill="#1A1228" opacity="0.07"/>
+  <rect x="24" y="192" width="76" height="28" rx="14" fill="url(#plum-m)"/>
+  <rect x="24" y="260" width="342" height="200" rx="16" fill="url(#img-m)" stroke="rgba(78,61,107,0.1)" stroke-width="1"/>
+  <rect x="24" y="488" width="342" height="120" rx="12" fill="#D8CFE8"/>
+  <rect x="40" y="504" width="148" height="88" rx="10" fill="#F9F7FD"/>
+  <rect x="202" y="504" width="148" height="88" rx="10" fill="#F9F7FD"/>
+  <rect x="24" y="640" width="342" height="44" rx="20" fill="url(#plum-m)"/>
 </svg>

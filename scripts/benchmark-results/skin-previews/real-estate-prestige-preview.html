@@ -1,0 +1,2237 @@
+<!DOCTYPE html>
+<html lang="en" data-v2-render="v2-files-3" data-v2-package="real-estate-prestige" data-v2-layout="default">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Monolith — Live Preview</title>
+  <style>/* Template Architecture V2 — real-estate-prestige · spec 2.0.0 */
+:root {
+  --v2-package: "real-estate-prestige";
+  --color-primary: #0E0D0B;
+  --color-secondary: #16130F;
+  --color-accent: #C9AE72;
+  --color-background: #090807;
+  --color-foreground: #F4EDE3;
+  --color-muted: rgba(228, 212, 188, 0.62);
+  --color-surface: #12100D;
+  --color-surface-elevated: #1A1612;
+  --color-signal: #C9AE72;
+  --color-grid: rgba(201, 174, 114, 0.075);
+  --color-ink: #090807;
+  --color-stone: rgba(244, 237, 227, 0.10);
+  --color-brass: #C9AE72;
+  --color-brass-light: #DCC894;
+  --color-brass-deep: #9E8248;
+  --color-linen: #15120E;
+  --font-display: Fraunces, ui-sans-serif, system-ui, sans-serif;
+  --font-body: Outfit, ui-sans-serif, system-ui, sans-serif;
+  --spacing-unit: 0.25rem;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --shadow-surface: 0 16px 48px rgba(0,0,0,0.48);
+  --shadow-glow: 0 0 88px rgba(201, 174, 114, 0.20), 0 0 24px rgba(201, 174, 114, 0.08);
+  --shadow-card: 0 0 0 1px rgba(201, 174, 114, 0.14), 0 24px 56px rgba(0,0,0,0.42);
+  --border-default: rgba(201, 174, 114, 0.16);
+  --border-accent: rgba(201, 174, 114, 0.44);
+  --border-subtle: rgba(244, 237, 227, 0.06);
+}
+
+/* V2 language profile — RTL typography adaptation */
+[dir="rtl"] {
+  --font-display: Tajawal, ui-serif, Georgia, serif;
+  --font-body: "Noto Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
+/* Design Foundation — token scale */
+:root {
+  --df-space-0: 0;
+  --df-space-1: calc(0.25rem * 1);
+  --df-space-2: calc(0.25rem * 2);
+  --df-space-3: calc(0.25rem * 4);
+  --df-space-4: calc(0.25rem * 6);
+  --df-space-5: calc(0.25rem * 8);
+  --df-space-6: calc(0.25rem * 12);
+  --df-space-7: calc(0.25rem * 16);
+  --df-space-8: calc(0.25rem * 20);
+  --df-space-9: calc(0.25rem * 24);
+  --df-space-10: calc(0.25rem * 32);
+  --df-space-11: calc(0.25rem * 40);
+  --df-space-12: calc(0.25rem * 48);
+  --df-space-13: calc(0.25rem * 64);
+  --df-space-14: calc(0.25rem * 80);
+  --df-text-xs: 0.75rem;
+  --df-text-sm: 0.8125rem;
+  --df-text-base: 1.0625rem;
+  --df-text-lg: 1.375rem;
+  --df-text-xl: 3.25rem;
+  --df-text-2xl: clamp(1.3125rem, 2vw, 1.75rem);
+  --df-text-3xl: clamp(1.5rem, 2.4vw, 2rem);
+  --df-text-caption: 0.6875rem;
+  --df-text-label: 0.75rem;
+  --df-text-display: clamp(2.75rem, 6vw, 4.5rem);
+  --df-leading-tight: 1.1;
+  --df-leading-display: 1.1;
+  --df-leading-stacked: 1.05;
+  --df-leading-snug: 1.32;
+  --df-leading-normal: 1.65;
+  --df-leading-relaxed: 1.72;
+  --df-stack-word-gap: 0.06em;
+  --df-tracking-tight: -0.028em;
+  --df-tracking-wide: 0.1em;
+  --df-tracking-wider: 0.2em;
+  --df-radius-sm: 6px;
+  --df-radius-md: 10px;
+  --df-radius-lg: 16px;
+  --df-radius-xl: 24px;
+  --df-radius-pill: 9999px;
+  --df-grid-columns: 12;
+  --df-grid-gutter: clamp(1.125rem, 2.8vw, 2rem);
+  --df-container-padding: clamp(1.25rem, 4.2vw, 2.75rem);
+  --df-section-y: clamp(4.25rem, 9vw, 7rem);
+  --df-section-y-tight: clamp(3.25rem, 6.5vw, 5rem);
+  --cb-section-y: clamp(4.5rem, 9.5vw, 7.25rem);
+  --se-section-y: clamp(3.75rem, 8.5vw, 6rem);
+  --as-section-y: clamp(4.5rem, 12vw, 7.5rem);
+  --ed-section-y: clamp(5.25rem, 11.5vw, 8rem);
+  --fn-section-y: clamp(5.25rem, 11.5vw, 8rem);
+  --mp-section-y: clamp(4.75rem, 11.5vw, 7.25rem);
+  --sv-section-y: clamp(4.75rem, 13.5vw, 8.5rem);
+  --ec-section-y: clamp(4.25rem, 8.5vw, 6.75rem);
+  --rp-section-y: clamp(5.25rem, 12.5vw, 8.5rem);
+  --hr-section-y: clamp(5.25rem, 12.5vw, 8.5rem);
+  --rep-section-y: clamp(5.75rem, 12.5vw, 8.75rem);
+  --df-stack-gap: clamp(1rem, 2.4vw, 1.625rem);
+  --df-shadow-ambient: 0 1px 2px color-mix(in srgb, var(--color-foreground) 4%, transparent);
+  --df-shadow-card: 0 10px 36px color-mix(in srgb, var(--color-foreground) 5%, transparent), 0 2px 8px color-mix(in srgb, var(--color-foreground) 3%, transparent);
+  --df-shadow-elevated: 0 28px 72px color-mix(in srgb, var(--color-foreground) 8%, transparent), 0 8px 24px color-mix(in srgb, var(--color-foreground) 4%, transparent);
+  --df-shadow-inset: inset 0 1px 0 color-mix(in srgb, #fff 22%, transparent);
+  --df-motion-fast: 180ms;
+  --df-motion-base: 380ms;
+  --df-motion-slow: 640ms;
+  --df-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --df-motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --df-focus-width: 2px;
+  --df-focus-offset: 3px;
+  --df-focus-color: color-mix(in srgb, var(--color-accent, var(--color-signal)) 72%, transparent);
+  --df-border-width: 1px;
+  --df-nav-height: 4.5rem;
+  --df-footer-gap: clamp(2.25rem, 5.5vw, 3.75rem);
+}
+
+/* Flagship semantic theme — visual identity layer */
+:root, .v2-template {
+  --df-theme-mode: dark;
+  --color-surface-elevated: color-mix(in srgb, var(--color-surface, var(--color-background)) 90%, #fff 10%);
+  --color-surface-inset: color-mix(in srgb, var(--color-background) 86%, #000 14%);
+  --df-border-subtle: color-mix(in srgb, var(--color-foreground) 8%, transparent);
+  --df-border-default: color-mix(in srgb, var(--color-foreground) 14%, transparent);
+  --df-border-accent: color-mix(in srgb, var(--color-accent, var(--color-signal)) 42%, transparent);
+  --df-foreground-muted: color-mix(in srgb, var(--color-foreground) 60%, transparent);
+  --df-accent-glow: color-mix(in srgb, var(--color-signal, var(--color-accent)) 24%, transparent);
+  --df-headline-tracking: -0.03em;
+}
+.v2-template { color-scheme: dark; }
+
+/* Design Foundation — motion */
+@keyframes df-reveal-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes df-reveal-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes df-slide-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes df-scale-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes df-draw-line {
+  from { transform: scaleX(0); opacity: 0; }
+  to { transform: scaleX(1); opacity: 1; }
+}
+@keyframes df-float-soft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes df-nav-enter {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes df-cta-pulse {
+  0%, 100% { box-shadow: 0 8px 28px color-mix(in srgb, var(--color-primary) 18%, transparent); }
+  50% { box-shadow: 0 12px 36px color-mix(in srgb, var(--color-accent, var(--color-signal)) 24%, transparent); }
+}
+
+.v2-motion[data-entrance="slide-up"],
+.v2-motion[data-entrance="fade-in"] {
+  animation-duration: var(--df-motion-base);
+  animation-timing-function: var(--df-motion-ease);
+  animation-fill-mode: both;
+}
+.v2-motion[data-entrance="slide-up"] { animation-name: df-reveal-up; }
+.v2-motion[data-entrance="fade-in"] { animation-name: df-reveal-fade; }
+
+.df-animate-reveal {
+  animation: df-reveal-up var(--df-motion-slow) var(--df-motion-ease) both;
+}
+.df-animate-slide-up {
+  animation: df-slide-up var(--df-motion-base) var(--df-motion-ease) both;
+}
+.df-animate-nav {
+  animation: df-nav-enter 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.df-animate-float {
+  animation: df-float-soft 6s ease-in-out infinite;
+}
+
+.df-reveal,
+.hr-reveal,
+.mp-reveal,
+.rep-reveal,
+.as-reveal,
+.se-reveal,
+.cb-reveal,
+.fn-reveal,
+.ec-reveal,
+.ed-reveal,
+.sv-reveal,
+.cp-reveal,
+.rs-reveal,
+.rp-reveal,
+.ct-reveal,
+.pr-reveal,
+.ob-reveal,
+.pu-reveal,
+.fg-reveal,
+.lu-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.df-reveal.df-is-visible, .df-reveal.df-is-visible,
+.hr-reveal.hr-is-visible, .hr-reveal.df-is-visible,
+.mp-reveal.mp-is-visible, .mp-reveal.df-is-visible,
+.rep-reveal.rep-is-visible, .rep-reveal.df-is-visible,
+.as-reveal.as-is-visible, .as-reveal.df-is-visible,
+.se-reveal.se-is-visible, .se-reveal.df-is-visible,
+.cb-reveal.cb-is-visible, .cb-reveal.df-is-visible,
+.fn-reveal.fn-is-visible, .fn-reveal.df-is-visible,
+.ec-reveal.ec-is-visible, .ec-reveal.df-is-visible,
+.ed-reveal.ed-is-visible, .ed-reveal.df-is-visible,
+.sv-reveal.sv-is-visible, .sv-reveal.df-is-visible,
+.cp-reveal.cp-is-visible, .cp-reveal.df-is-visible,
+.rs-reveal.rs-is-visible, .rs-reveal.df-is-visible,
+.rp-reveal.rp-is-visible, .rp-reveal.df-is-visible,
+.ct-reveal.ct-is-visible, .ct-reveal.df-is-visible,
+.pr-reveal.pr-is-visible, .pr-reveal.df-is-visible,
+.ob-reveal.ob-is-visible, .ob-reveal.df-is-visible,
+.pu-reveal.pu-is-visible, .pu-reveal.df-is-visible,
+.fg-reveal.fg-is-visible, .fg-reveal.df-is-visible,
+.lu-reveal.lu-is-visible, .lu-reveal.df-is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.df-reveal-stagger > *,
+.hr-reveal-stagger > *,
+.mp-reveal-stagger > *,
+.rep-reveal-stagger > *,
+.as-reveal-stagger > *,
+.se-reveal-stagger > *,
+.cb-reveal-stagger > *,
+.fn-reveal-stagger > *,
+.ec-reveal-stagger > *,
+.ed-reveal-stagger > *,
+.sv-reveal-stagger > *,
+.cp-reveal-stagger > *,
+.rs-reveal-stagger > *,
+.rp-reveal-stagger > *,
+.ct-reveal-stagger > *,
+.pr-reveal-stagger > *,
+.ob-reveal-stagger > *,
+.pu-reveal-stagger > *,
+.fg-reveal-stagger > *,
+.lu-reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1), transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.df-reveal-stagger.df-is-visible > *,
+.df-reveal-stagger.df-is-visible > *,
+.df-reveal.df-is-visible .df-reveal-stagger > *,
+.df-reveal.df-is-visible .df-reveal-stagger > *,
+.hr-reveal-stagger.hr-is-visible > *,
+.hr-reveal-stagger.df-is-visible > *,
+.hr-reveal.hr-is-visible .hr-reveal-stagger > *,
+.hr-reveal.df-is-visible .hr-reveal-stagger > *,
+.mp-reveal-stagger.mp-is-visible > *,
+.mp-reveal-stagger.df-is-visible > *,
+.mp-reveal.mp-is-visible .mp-reveal-stagger > *,
+.mp-reveal.df-is-visible .mp-reveal-stagger > *,
+.rep-reveal-stagger.rep-is-visible > *,
+.rep-reveal-stagger.df-is-visible > *,
+.rep-reveal.rep-is-visible .rep-reveal-stagger > *,
+.rep-reveal.df-is-visible .rep-reveal-stagger > *,
+.as-reveal-stagger.as-is-visible > *,
+.as-reveal-stagger.df-is-visible > *,
+.as-reveal.as-is-visible .as-reveal-stagger > *,
+.as-reveal.df-is-visible .as-reveal-stagger > *,
+.se-reveal-stagger.se-is-visible > *,
+.se-reveal-stagger.df-is-visible > *,
+.se-reveal.se-is-visible .se-reveal-stagger > *,
+.se-reveal.df-is-visible .se-reveal-stagger > *,
+.cb-reveal-stagger.cb-is-visible > *,
+.cb-reveal-stagger.df-is-visible > *,
+.cb-reveal.cb-is-visible .cb-reveal-stagger > *,
+.cb-reveal.df-is-visible .cb-reveal-stagger > *,
+.fn-reveal-stagger.fn-is-visible > *,
+.fn-reveal-stagger.df-is-visible > *,
+.fn-reveal.fn-is-visible .fn-reveal-stagger > *,
+.fn-reveal.df-is-visible .fn-reveal-stagger > *,
+.ec-reveal-stagger.ec-is-visible > *,
+.ec-reveal-stagger.df-is-visible > *,
+.ec-reveal.ec-is-visible .ec-reveal-stagger > *,
+.ec-reveal.df-is-visible .ec-reveal-stagger > *,
+.ed-reveal-stagger.ed-is-visible > *,
+.ed-reveal-stagger.df-is-visible > *,
+.ed-reveal.ed-is-visible .ed-reveal-stagger > *,
+.ed-reveal.df-is-visible .ed-reveal-stagger > *,
+.sv-reveal-stagger.sv-is-visible > *,
+.sv-reveal-stagger.df-is-visible > *,
+.sv-reveal.sv-is-visible .sv-reveal-stagger > *,
+.sv-reveal.df-is-visible .sv-reveal-stagger > *,
+.cp-reveal-stagger.cp-is-visible > *,
+.cp-reveal-stagger.df-is-visible > *,
+.cp-reveal.cp-is-visible .cp-reveal-stagger > *,
+.cp-reveal.df-is-visible .cp-reveal-stagger > *,
+.rs-reveal-stagger.rs-is-visible > *,
+.rs-reveal-stagger.df-is-visible > *,
+.rs-reveal.rs-is-visible .rs-reveal-stagger > *,
+.rs-reveal.df-is-visible .rs-reveal-stagger > *,
+.rp-reveal-stagger.rp-is-visible > *,
+.rp-reveal-stagger.df-is-visible > *,
+.rp-reveal.rp-is-visible .rp-reveal-stagger > *,
+.rp-reveal.df-is-visible .rp-reveal-stagger > *,
+.ct-reveal-stagger.ct-is-visible > *,
+.ct-reveal-stagger.df-is-visible > *,
+.ct-reveal.ct-is-visible .ct-reveal-stagger > *,
+.ct-reveal.df-is-visible .ct-reveal-stagger > *,
+.pr-reveal-stagger.pr-is-visible > *,
+.pr-reveal-stagger.df-is-visible > *,
+.pr-reveal.pr-is-visible .pr-reveal-stagger > *,
+.pr-reveal.df-is-visible .pr-reveal-stagger > *,
+.ob-reveal-stagger.ob-is-visible > *,
+.ob-reveal-stagger.df-is-visible > *,
+.ob-reveal.ob-is-visible .ob-reveal-stagger > *,
+.ob-reveal.df-is-visible .ob-reveal-stagger > *,
+.pu-reveal-stagger.pu-is-visible > *,
+.pu-reveal-stagger.df-is-visible > *,
+.pu-reveal.pu-is-visible .pu-reveal-stagger > *,
+.pu-reveal.df-is-visible .pu-reveal-stagger > *,
+.fg-reveal-stagger.fg-is-visible > *,
+.fg-reveal-stagger.df-is-visible > *,
+.fg-reveal.fg-is-visible .fg-reveal-stagger > *,
+.fg-reveal.df-is-visible .fg-reveal-stagger > *,
+.lu-reveal-stagger.lu-is-visible > *,
+.lu-reveal-stagger.df-is-visible > *,
+.lu-reveal.lu-is-visible .lu-reveal-stagger > *,
+.lu-reveal.df-is-visible .lu-reveal-stagger > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+.df-reveal-stagger > *:nth-child(1), .hr-reveal-stagger > *:nth-child(1), .mp-reveal-stagger > *:nth-child(1), .rep-reveal-stagger > *:nth-child(1),
+.se-reveal-stagger > *:nth-child(1), .cb-reveal-stagger > *:nth-child(1), .fn-reveal-stagger > *:nth-child(1), .as-reveal-stagger > *:nth-child(1) { transition-delay: 0.05s; }
+.df-reveal-stagger > *:nth-child(2), .hr-reveal-stagger > *:nth-child(2), .mp-reveal-stagger > *:nth-child(2), .rep-reveal-stagger > *:nth-child(2),
+.se-reveal-stagger > *:nth-child(2), .cb-reveal-stagger > *:nth-child(2), .fn-reveal-stagger > *:nth-child(2), .as-reveal-stagger > *:nth-child(2) { transition-delay: 0.1s; }
+.df-reveal-stagger > *:nth-child(3), .hr-reveal-stagger > *:nth-child(3), .mp-reveal-stagger > *:nth-child(3), .rep-reveal-stagger > *:nth-child(3),
+.se-reveal-stagger > *:nth-child(3), .cb-reveal-stagger > *:nth-child(3), .fn-reveal-stagger > *:nth-child(3), .as-reveal-stagger > *:nth-child(3) { transition-delay: 0.15s; }
+.df-reveal-stagger > *:nth-child(4), .hr-reveal-stagger > *:nth-child(4), .mp-reveal-stagger > *:nth-child(4), .rep-reveal-stagger > *:nth-child(4),
+.se-reveal-stagger > *:nth-child(4), .cb-reveal-stagger > *:nth-child(4), .fn-reveal-stagger > *:nth-child(4), .as-reveal-stagger > *:nth-child(4) { transition-delay: 0.2s; }
+.df-reveal-stagger > *:nth-child(5), .hr-reveal-stagger > *:nth-child(5), .mp-reveal-stagger > *:nth-child(5), .rep-reveal-stagger > *:nth-child(5) { transition-delay: 0.25s; }
+.df-reveal-stagger > *:nth-child(6), .hr-reveal-stagger > *:nth-child(6), .mp-reveal-stagger > *:nth-child(6), .rep-reveal-stagger > *:nth-child(6) { transition-delay: 0.3s; }
+
+.df-hero-stagger > * {
+  opacity: 0;
+  animation: df-reveal-up 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.df-hero-stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.df-hero-stagger > *:nth-child(2) { animation-delay: 0.12s; }
+.df-hero-stagger > *:nth-child(3) { animation-delay: 0.2s; }
+.df-hero-stagger > *:nth-child(4) { animation-delay: 0.28s; }
+.df-hero-stagger > *:nth-child(5) { animation-delay: 0.36s; }
+.df-hero-stagger > *:nth-child(6) { animation-delay: 0.44s; }
+
+.df-card, .se-card, .cb-card, .fn-card, .mp-card, .ec-card, .ed-card, .hr-card, .rep-card,
+.sv-card, .cp-card, .rs-card, .rp-card, .ct-card, .pr-card, .fg-card, .lu-card, .as-card {
+  transition: border-color 0.3s ease, box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1), transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.df-card:hover, .se-card:hover, .cb-card:hover, .fn-card:hover, .mp-card:hover, .ec-card:hover,
+.hr-card:hover, .rep-card:hover, .sv-card:hover, .cp-card:hover, .rs-card:hover, .ct-card:hover,
+.pr-card:hover, .fg-card:hover, .lu-card:hover, .as-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card, var(--shadow-surface));
+  border-color: color-mix(in srgb, var(--color-accent, var(--color-signal)) 28%, var(--border-subtle, transparent));
+}
+
+.df-floating-cta a, .se-floating-cta a, .fn-floating-cta a, .cb-floating-cta a, .ct-floating-cta a {
+  animation: df-cta-pulse 3.5s ease-in-out 1s infinite;
+}
+
+.df-accent-rule, .se-accent-rule, .cb-accent-rule, .fn-accent-rule, .mp-accent-rule, .rep-accent-rule,
+.hr-azure-rule, .as-accent-rule, .ct-accent-rule {
+  transform-origin: left;
+  animation: df-draw-line 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+}
+[dir="rtl"] .df-accent-rule, [dir="rtl"] .hr-azure-rule, [dir="rtl"] .rep-accent-rule { transform-origin: right; }
+
+@supports (animation-timeline: view()) {
+  .df-reveal:not(.df-reveal-js), .hr-reveal:not(.df-reveal-js), .mp-reveal:not(.df-reveal-js), .rep-reveal:not(.df-reveal-js),
+  .se-reveal:not(.df-reveal-js), .cb-reveal:not(.df-reveal-js), .fn-reveal:not(.df-reveal-js), .as-reveal:not(.df-reveal-js) {
+    animation: df-slide-up linear both;
+    animation-timeline: view();
+    animation-range: entry 5% cover 28%;
+  }
+  .df-reveal-stagger:not(.df-reveal-js) > *, .hr-reveal-stagger:not(.df-reveal-js) > *, .mp-reveal-stagger:not(.df-reveal-js) > *,
+  .rep-reveal-stagger:not(.df-reveal-js) > *, .se-reveal-stagger:not(.df-reveal-js) > *, .cb-reveal-stagger:not(.df-reveal-js) > * {
+    animation: df-slide-up linear both;
+    animation-timeline: view();
+    animation-range: entry 8% cover 32%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v2-motion, [data-v2-motion], .df-animate-reveal, .df-animate-slide-up, .df-animate-nav, .df-animate-float {
+    animation: none !important;
+    transition: none !important;
+  }
+  .df-reveal,
+.hr-reveal,
+.mp-reveal,
+.rep-reveal,
+.as-reveal,
+.se-reveal,
+.cb-reveal,
+.fn-reveal,
+.ec-reveal,
+.ed-reveal,
+.sv-reveal,
+.cp-reveal,
+.rs-reveal,
+.rp-reveal,
+.ct-reveal,
+.pr-reveal,
+.ob-reveal,
+.pu-reveal,
+.fg-reveal,
+.lu-reveal, .df-reveal-stagger > *,
+.hr-reveal-stagger > *,
+.mp-reveal-stagger > *,
+.rep-reveal-stagger > *,
+.as-reveal-stagger > *,
+.se-reveal-stagger > *,
+.cb-reveal-stagger > *,
+.fn-reveal-stagger > *,
+.ec-reveal-stagger > *,
+.ed-reveal-stagger > *,
+.sv-reveal-stagger > *,
+.cp-reveal-stagger > *,
+.rs-reveal-stagger > *,
+.rp-reveal-stagger > *,
+.ct-reveal-stagger > *,
+.pr-reveal-stagger > *,
+.ob-reveal-stagger > *,
+.pu-reveal-stagger > *,
+.fg-reveal-stagger > *,
+.lu-reveal-stagger > * {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+  .df-hero-stagger > * { opacity: 1 !important; animation: none !important; }
+  .df-card:hover, .se-card:hover, .cb-card:hover, .fn-card:hover, .hr-card:hover, .rep-card:hover, .mp-card:hover {
+    transform: none !important;
+  }
+  .df-floating-cta a, .se-floating-cta a, .fn-floating-cta a { animation: none !important; }
+  .df-accent-rule, .hr-azure-rule { animation: none !important; }
+}
+
+/* Design Foundation — per-package color consistency */
+[data-v2-package="saas-enterprise"] .df-section-glow::before,
+[data-v2-package="saas-enterprise"] .se-section-glow::before,
+[data-v2-package="saas-enterprise"] .cb-section-glow::before,
+[data-v2-package="saas-enterprise"] .ec-section-glow::before,
+[data-v2-package="saas-enterprise"] .mp-section-glow::before,
+[data-v2-package="saas-enterprise"] .fn-section-glow::before,
+[data-v2-package="saas-enterprise"] .ed-section-glow::before,
+[data-v2-package="saas-enterprise"] .hr-section-glow::before,
+[data-v2-package="saas-enterprise"] .rep-section-glow::before,
+[data-v2-package="saas-enterprise"] .pr-section-glow::before,
+[data-v2-package="saas-enterprise"] .fg-section-glow::before,
+[data-v2-package="saas-enterprise"] .lu-section-glow::before,
+[data-v2-package="corporate-business"] .df-section-glow::before,
+[data-v2-package="corporate-business"] .se-section-glow::before,
+[data-v2-package="corporate-business"] .cb-section-glow::before,
+[data-v2-package="corporate-business"] .ec-section-glow::before,
+[data-v2-package="corporate-business"] .mp-section-glow::before,
+[data-v2-package="corporate-business"] .fn-section-glow::before,
+[data-v2-package="corporate-business"] .ed-section-glow::before,
+[data-v2-package="corporate-business"] .hr-section-glow::before,
+[data-v2-package="corporate-business"] .rep-section-glow::before,
+[data-v2-package="corporate-business"] .pr-section-glow::before,
+[data-v2-package="corporate-business"] .fg-section-glow::before,
+[data-v2-package="corporate-business"] .lu-section-glow::before,
+[data-v2-package="finance-premium"] .df-section-glow::before,
+[data-v2-package="finance-premium"] .se-section-glow::before,
+[data-v2-package="finance-premium"] .cb-section-glow::before,
+[data-v2-package="finance-premium"] .ec-section-glow::before,
+[data-v2-package="finance-premium"] .mp-section-glow::before,
+[data-v2-package="finance-premium"] .fn-section-glow::before,
+[data-v2-package="finance-premium"] .ed-section-glow::before,
+[data-v2-package="finance-premium"] .hr-section-glow::before,
+[data-v2-package="finance-premium"] .rep-section-glow::before,
+[data-v2-package="finance-premium"] .pr-section-glow::before,
+[data-v2-package="finance-premium"] .fg-section-glow::before,
+[data-v2-package="finance-premium"] .lu-section-glow::before,
+[data-v2-package="education-premium"] .df-section-glow::before,
+[data-v2-package="education-premium"] .se-section-glow::before,
+[data-v2-package="education-premium"] .cb-section-glow::before,
+[data-v2-package="education-premium"] .ec-section-glow::before,
+[data-v2-package="education-premium"] .mp-section-glow::before,
+[data-v2-package="education-premium"] .fn-section-glow::before,
+[data-v2-package="education-premium"] .ed-section-glow::before,
+[data-v2-package="education-premium"] .hr-section-glow::before,
+[data-v2-package="education-premium"] .rep-section-glow::before,
+[data-v2-package="education-premium"] .pr-section-glow::before,
+[data-v2-package="education-premium"] .fg-section-glow::before,
+[data-v2-package="education-premium"] .lu-section-glow::before,
+[data-v2-package="medical-premium"] .df-section-glow::before,
+[data-v2-package="medical-premium"] .se-section-glow::before,
+[data-v2-package="medical-premium"] .cb-section-glow::before,
+[data-v2-package="medical-premium"] .ec-section-glow::before,
+[data-v2-package="medical-premium"] .mp-section-glow::before,
+[data-v2-package="medical-premium"] .fn-section-glow::before,
+[data-v2-package="medical-premium"] .ed-section-glow::before,
+[data-v2-package="medical-premium"] .hr-section-glow::before,
+[data-v2-package="medical-premium"] .rep-section-glow::before,
+[data-v2-package="medical-premium"] .pr-section-glow::before,
+[data-v2-package="medical-premium"] .fg-section-glow::before,
+[data-v2-package="medical-premium"] .lu-section-glow::before,
+[data-v2-package="real-estate-premium"] .df-section-glow::before,
+[data-v2-package="real-estate-premium"] .se-section-glow::before,
+[data-v2-package="real-estate-premium"] .cb-section-glow::before,
+[data-v2-package="real-estate-premium"] .ec-section-glow::before,
+[data-v2-package="real-estate-premium"] .mp-section-glow::before,
+[data-v2-package="real-estate-premium"] .fn-section-glow::before,
+[data-v2-package="real-estate-premium"] .ed-section-glow::before,
+[data-v2-package="real-estate-premium"] .hr-section-glow::before,
+[data-v2-package="real-estate-premium"] .rep-section-glow::before,
+[data-v2-package="real-estate-premium"] .pr-section-glow::before,
+[data-v2-package="real-estate-premium"] .fg-section-glow::before,
+[data-v2-package="real-estate-premium"] .lu-section-glow::before,
+[data-v2-package="ecommerce-premium"] .df-section-glow::before,
+[data-v2-package="ecommerce-premium"] .se-section-glow::before,
+[data-v2-package="ecommerce-premium"] .cb-section-glow::before,
+[data-v2-package="ecommerce-premium"] .ec-section-glow::before,
+[data-v2-package="ecommerce-premium"] .mp-section-glow::before,
+[data-v2-package="ecommerce-premium"] .fn-section-glow::before,
+[data-v2-package="ecommerce-premium"] .ed-section-glow::before,
+[data-v2-package="ecommerce-premium"] .hr-section-glow::before,
+[data-v2-package="ecommerce-premium"] .rep-section-glow::before,
+[data-v2-package="ecommerce-premium"] .pr-section-glow::before,
+[data-v2-package="ecommerce-premium"] .fg-section-glow::before,
+[data-v2-package="ecommerce-premium"] .lu-section-glow::before,
+[data-v2-package="prism-aurora"] .df-section-glow::before,
+[data-v2-package="prism-aurora"] .se-section-glow::before,
+[data-v2-package="prism-aurora"] .cb-section-glow::before,
+[data-v2-package="prism-aurora"] .ec-section-glow::before,
+[data-v2-package="prism-aurora"] .mp-section-glow::before,
+[data-v2-package="prism-aurora"] .fn-section-glow::before,
+[data-v2-package="prism-aurora"] .ed-section-glow::before,
+[data-v2-package="prism-aurora"] .hr-section-glow::before,
+[data-v2-package="prism-aurora"] .rep-section-glow::before,
+[data-v2-package="prism-aurora"] .pr-section-glow::before,
+[data-v2-package="prism-aurora"] .fg-section-glow::before,
+[data-v2-package="prism-aurora"] .lu-section-glow::before,
+[data-v2-package="forge-industrial"] .df-section-glow::before,
+[data-v2-package="forge-industrial"] .se-section-glow::before,
+[data-v2-package="forge-industrial"] .cb-section-glow::before,
+[data-v2-package="forge-industrial"] .ec-section-glow::before,
+[data-v2-package="forge-industrial"] .mp-section-glow::before,
+[data-v2-package="forge-industrial"] .fn-section-glow::before,
+[data-v2-package="forge-industrial"] .ed-section-glow::before,
+[data-v2-package="forge-industrial"] .hr-section-glow::before,
+[data-v2-package="forge-industrial"] .rep-section-glow::before,
+[data-v2-package="forge-industrial"] .pr-section-glow::before,
+[data-v2-package="forge-industrial"] .fg-section-glow::before,
+[data-v2-package="forge-industrial"] .lu-section-glow::before,
+[data-v2-package="lumina-wellness"] .df-section-glow::before,
+[data-v2-package="lumina-wellness"] .se-section-glow::before,
+[data-v2-package="lumina-wellness"] .cb-section-glow::before,
+[data-v2-package="lumina-wellness"] .ec-section-glow::before,
+[data-v2-package="lumina-wellness"] .mp-section-glow::before,
+[data-v2-package="lumina-wellness"] .fn-section-glow::before,
+[data-v2-package="lumina-wellness"] .ed-section-glow::before,
+[data-v2-package="lumina-wellness"] .hr-section-glow::before,
+[data-v2-package="lumina-wellness"] .rep-section-glow::before,
+[data-v2-package="lumina-wellness"] .pr-section-glow::before,
+[data-v2-package="lumina-wellness"] .fg-section-glow::before,
+[data-v2-package="lumina-wellness"] .lu-section-glow::before,
+[data-v2-package="hotel-resort-premium"] .df-section-glow::before,
+[data-v2-package="hotel-resort-premium"] .se-section-glow::before,
+[data-v2-package="hotel-resort-premium"] .cb-section-glow::before,
+[data-v2-package="hotel-resort-premium"] .ec-section-glow::before,
+[data-v2-package="hotel-resort-premium"] .mp-section-glow::before,
+[data-v2-package="hotel-resort-premium"] .fn-section-glow::before,
+[data-v2-package="hotel-resort-premium"] .ed-section-glow::before,
+[data-v2-package="hotel-resort-premium"] .hr-section-glow::before,
+[data-v2-package="hotel-resort-premium"] .rep-section-glow::before,
+[data-v2-package="hotel-resort-premium"] .pr-section-glow::before,
+[data-v2-package="hotel-resort-premium"] .fg-section-glow::before,
+[data-v2-package="hotel-resort-premium"] .lu-section-glow::before {
+  background: radial-gradient(
+    ellipse 78% 52% at 18% 0%,
+    color-mix(in srgb, var(--color-accent, var(--color-signal)) 6%, transparent),
+    transparent 68%
+  );
+}
+
+[data-v2-package="saas-enterprise"] .df-card-featured,
+[data-v2-package="saas-enterprise"] .se-card-featured,
+[data-v2-package="saas-enterprise"] .cb-card-featured,
+[data-v2-package="saas-enterprise"] .fn-card-featured,
+[data-v2-package="saas-enterprise"] .mp-card-featured,
+[data-v2-package="saas-enterprise"] .ed-card-featured,
+[data-v2-package="saas-enterprise"] .ec-card-featured,
+[data-v2-package="saas-enterprise"] .rep-card-featured,
+[data-v2-package="saas-enterprise"] .pr-card-featured,
+[data-v2-package="saas-enterprise"] .fg-card-featured,
+[data-v2-package="saas-enterprise"] .lu-card-featured,
+[data-v2-package="corporate-business"] .df-card-featured,
+[data-v2-package="corporate-business"] .se-card-featured,
+[data-v2-package="corporate-business"] .cb-card-featured,
+[data-v2-package="corporate-business"] .fn-card-featured,
+[data-v2-package="corporate-business"] .mp-card-featured,
+[data-v2-package="corporate-business"] .ed-card-featured,
+[data-v2-package="corporate-business"] .ec-card-featured,
+[data-v2-package="corporate-business"] .rep-card-featured,
+[data-v2-package="corporate-business"] .pr-card-featured,
+[data-v2-package="corporate-business"] .fg-card-featured,
+[data-v2-package="corporate-business"] .lu-card-featured,
+[data-v2-package="finance-premium"] .df-card-featured,
+[data-v2-package="finance-premium"] .se-card-featured,
+[data-v2-package="finance-premium"] .cb-card-featured,
+[data-v2-package="finance-premium"] .fn-card-featured,
+[data-v2-package="finance-premium"] .mp-card-featured,
+[data-v2-package="finance-premium"] .ed-card-featured,
+[data-v2-package="finance-premium"] .ec-card-featured,
+[data-v2-package="finance-premium"] .rep-card-featured,
+[data-v2-package="finance-premium"] .pr-card-featured,
+[data-v2-package="finance-premium"] .fg-card-featured,
+[data-v2-package="finance-premium"] .lu-card-featured,
+[data-v2-package="education-premium"] .df-card-featured,
+[data-v2-package="education-premium"] .se-card-featured,
+[data-v2-package="education-premium"] .cb-card-featured,
+[data-v2-package="education-premium"] .fn-card-featured,
+[data-v2-package="education-premium"] .mp-card-featured,
+[data-v2-package="education-premium"] .ed-card-featured,
+[data-v2-package="education-premium"] .ec-card-featured,
+[data-v2-package="education-premium"] .rep-card-featured,
+[data-v2-package="education-premium"] .pr-card-featured,
+[data-v2-package="education-premium"] .fg-card-featured,
+[data-v2-package="education-premium"] .lu-card-featured,
+[data-v2-package="medical-premium"] .df-card-featured,
+[data-v2-package="medical-premium"] .se-card-featured,
+[data-v2-package="medical-premium"] .cb-card-featured,
+[data-v2-package="medical-premium"] .fn-card-featured,
+[data-v2-package="medical-premium"] .mp-card-featured,
+[data-v2-package="medical-premium"] .ed-card-featured,
+[data-v2-package="medical-premium"] .ec-card-featured,
+[data-v2-package="medical-premium"] .rep-card-featured,
+[data-v2-package="medical-premium"] .pr-card-featured,
+[data-v2-package="medical-premium"] .fg-card-featured,
+[data-v2-package="medical-premium"] .lu-card-featured,
+[data-v2-package="real-estate-premium"] .df-card-featured,
+[data-v2-package="real-estate-premium"] .se-card-featured,
+[data-v2-package="real-estate-premium"] .cb-card-featured,
+[data-v2-package="real-estate-premium"] .fn-card-featured,
+[data-v2-package="real-estate-premium"] .mp-card-featured,
+[data-v2-package="real-estate-premium"] .ed-card-featured,
+[data-v2-package="real-estate-premium"] .ec-card-featured,
+[data-v2-package="real-estate-premium"] .rep-card-featured,
+[data-v2-package="real-estate-premium"] .pr-card-featured,
+[data-v2-package="real-estate-premium"] .fg-card-featured,
+[data-v2-package="real-estate-premium"] .lu-card-featured,
+[data-v2-package="ecommerce-premium"] .df-card-featured,
+[data-v2-package="ecommerce-premium"] .se-card-featured,
+[data-v2-package="ecommerce-premium"] .cb-card-featured,
+[data-v2-package="ecommerce-premium"] .fn-card-featured,
+[data-v2-package="ecommerce-premium"] .mp-card-featured,
+[data-v2-package="ecommerce-premium"] .ed-card-featured,
+[data-v2-package="ecommerce-premium"] .ec-card-featured,
+[data-v2-package="ecommerce-premium"] .rep-card-featured,
+[data-v2-package="ecommerce-premium"] .pr-card-featured,
+[data-v2-package="ecommerce-premium"] .fg-card-featured,
+[data-v2-package="ecommerce-premium"] .lu-card-featured,
+[data-v2-package="prism-aurora"] .df-card-featured,
+[data-v2-package="prism-aurora"] .se-card-featured,
+[data-v2-package="prism-aurora"] .cb-card-featured,
+[data-v2-package="prism-aurora"] .fn-card-featured,
+[data-v2-package="prism-aurora"] .mp-card-featured,
+[data-v2-package="prism-aurora"] .ed-card-featured,
+[data-v2-package="prism-aurora"] .ec-card-featured,
+[data-v2-package="prism-aurora"] .rep-card-featured,
+[data-v2-package="prism-aurora"] .pr-card-featured,
+[data-v2-package="prism-aurora"] .fg-card-featured,
+[data-v2-package="prism-aurora"] .lu-card-featured,
+[data-v2-package="forge-industrial"] .df-card-featured,
+[data-v2-package="forge-industrial"] .se-card-featured,
+[data-v2-package="forge-industrial"] .cb-card-featured,
+[data-v2-package="forge-industrial"] .fn-card-featured,
+[data-v2-package="forge-industrial"] .mp-card-featured,
+[data-v2-package="forge-industrial"] .ed-card-featured,
+[data-v2-package="forge-industrial"] .ec-card-featured,
+[data-v2-package="forge-industrial"] .rep-card-featured,
+[data-v2-package="forge-industrial"] .pr-card-featured,
+[data-v2-package="forge-industrial"] .fg-card-featured,
+[data-v2-package="forge-industrial"] .lu-card-featured,
+[data-v2-package="lumina-wellness"] .df-card-featured,
+[data-v2-package="lumina-wellness"] .se-card-featured,
+[data-v2-package="lumina-wellness"] .cb-card-featured,
+[data-v2-package="lumina-wellness"] .fn-card-featured,
+[data-v2-package="lumina-wellness"] .mp-card-featured,
+[data-v2-package="lumina-wellness"] .ed-card-featured,
+[data-v2-package="lumina-wellness"] .ec-card-featured,
+[data-v2-package="lumina-wellness"] .rep-card-featured,
+[data-v2-package="lumina-wellness"] .pr-card-featured,
+[data-v2-package="lumina-wellness"] .fg-card-featured,
+[data-v2-package="lumina-wellness"] .lu-card-featured,
+[data-v2-package="hotel-resort-premium"] .df-card-featured,
+[data-v2-package="hotel-resort-premium"] .se-card-featured,
+[data-v2-package="hotel-resort-premium"] .cb-card-featured,
+[data-v2-package="hotel-resort-premium"] .fn-card-featured,
+[data-v2-package="hotel-resort-premium"] .mp-card-featured,
+[data-v2-package="hotel-resort-premium"] .ed-card-featured,
+[data-v2-package="hotel-resort-premium"] .ec-card-featured,
+[data-v2-package="hotel-resort-premium"] .rep-card-featured,
+[data-v2-package="hotel-resort-premium"] .pr-card-featured,
+[data-v2-package="hotel-resort-premium"] .fg-card-featured,
+[data-v2-package="hotel-resort-premium"] .lu-card-featured {
+  background: var(--color-surface-elevated, var(--color-surface));
+  color: var(--color-foreground);
+  border-color: color-mix(in srgb, var(--color-accent, var(--color-signal)) 32%, var(--border-subtle, transparent));
+  box-shadow: var(--shadow-card, var(--shadow-surface));
+}
+
+[data-v2-package="hotel-resort-premium"] .df-section-glow::before,
+[data-v2-package="hotel-resort-premium"] .hr-section-glow::before {
+  display: none;
+}
+
+/* Design Foundation — primitives */
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+.v2-template {
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-base);
+  line-height: var(--df-leading-normal);
+  color: var(--color-foreground);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.v2-template section[id],
+.v2-template [data-v2-region="main"] {
+  scroll-margin-top: 5.5rem;
+}
+
+.df-skip-link {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.df-skip-link:focus {
+  position: fixed;
+  top: 0.75rem;
+  inset-inline-start: 0.75rem;
+  z-index: 100;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 0.75rem 1.25rem;
+  clip: auto;
+  overflow: visible;
+  white-space: normal;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  font-weight: 500;
+  color: var(--color-foreground);
+  background: var(--color-surface-elevated, var(--color-surface));
+  border: var(--df-border-width) solid var(--df-border-default, var(--border-default));
+  border-radius: var(--radius-md, var(--df-radius-md, 10px));
+  box-shadow: var(--shadow-surface, var(--df-shadow-elevated));
+}
+
+/* Typography */
+.df-font-display { font-family: var(--font-display), ui-serif, Georgia, serif; }
+.df-font-body { font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif; }
+.df-eyebrow {
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-xs);
+  font-weight: 500;
+  letter-spacing: var(--df-tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-signal, var(--color-accent));
+}
+.df-headline {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+  font-size: var(--df-text-display);
+  font-weight: 500;
+  line-height: var(--df-leading-tight);
+  letter-spacing: var(--df-headline-tracking, var(--df-tracking-tight));
+  color: var(--color-foreground);
+  text-wrap: balance;
+}
+.df-headline-sm {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+  font-size: clamp(1.875rem, 3.5vw, 2.75rem);
+  font-weight: 500;
+  line-height: var(--df-leading-snug);
+  letter-spacing: var(--df-tracking-tight);
+  color: var(--color-foreground);
+  text-wrap: balance;
+}
+.df-body {
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-lg);
+  line-height: var(--df-leading-relaxed);
+  color: var(--df-foreground-muted, var(--color-muted, color-mix(in srgb, var(--color-foreground) 58%, transparent)));
+  max-width: 38rem;
+}
+.df-prose {
+  font-size: var(--df-text-base);
+  line-height: var(--df-leading-relaxed);
+  color: var(--color-muted, color-mix(in srgb, var(--color-foreground) 62%, transparent));
+  max-width: 36rem;
+}
+.df-caption {
+  font-size: var(--df-text-sm);
+  line-height: var(--df-leading-normal);
+  color: var(--color-muted, color-mix(in srgb, var(--color-foreground) 55%, transparent));
+}
+
+/* Layout — sections, grid, containers */
+.df-section { padding-block: var(--df-section-y); }
+.df-section-tight { padding-block: var(--df-section-y-tight); }
+.df-section-alt {
+  background: var(--color-surface-elevated, var(--color-surface, #fff));
+}
+.df-section-glow {
+  position: relative;
+  overflow: hidden;
+}
+.df-section-glow::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 72% 58% at 14% 0%, var(--df-accent-glow, color-mix(in srgb, var(--color-accent, var(--color-signal)) 10%, transparent)), transparent 62%),
+    radial-gradient(ellipse 58% 48% at 92% 100%, color-mix(in srgb, var(--color-primary) 7%, transparent), transparent 58%);
+}
+.df-container {
+  margin-inline: auto;
+  width: 100%;
+  max-width: var(--container-max, 82rem);
+  padding-inline: var(--df-container-padding);
+}
+.df-container-narrow { max-width: min(var(--container-max, 82rem), 48rem); }
+.df-container-wide { max-width: min(calc(var(--container-max, 82rem) + 6rem), 96rem); }
+.df-grid-12 {
+  display: grid;
+  grid-template-columns: repeat(var(--df-grid-columns), minmax(0, 1fr));
+  gap: var(--df-grid-gutter);
+}
+.df-stack { display: flex; flex-direction: column; gap: var(--df-stack-gap); }
+.df-divider {
+  height: var(--df-border-width);
+  width: 100%;
+  background: var(--df-border-subtle, var(--border-subtle, color-mix(in srgb, var(--color-foreground) 8%, transparent)));
+}
+
+/* Cards */
+.df-card {
+  border: var(--df-border-width) solid var(--df-border-subtle, var(--border-subtle, color-mix(in srgb, var(--color-foreground) 8%, transparent)));
+  background: var(--color-surface-elevated, var(--color-surface, #fff));
+  border-radius: var(--radius-lg, var(--df-radius-lg, 16px));
+  box-shadow: var(--shadow-card, var(--df-shadow-card));
+  transition:
+    box-shadow var(--df-motion-base) var(--df-motion-ease),
+    transform var(--df-motion-base) var(--df-motion-ease),
+    border-color var(--df-motion-fast) ease;
+}
+.df-card:hover {
+  border-color: var(--df-border-accent, var(--border-accent, color-mix(in srgb, var(--color-accent) 28%, transparent)));
+  box-shadow: var(--shadow-surface, var(--df-shadow-elevated));
+  transform: translateY(-2px);
+}
+.df-card-featured {
+  border-color: color-mix(in srgb, var(--color-signal, var(--color-accent)) 28%, var(--border-subtle, transparent));
+  background: linear-gradient(
+    155deg,
+    var(--color-primary) 0%,
+    color-mix(in srgb, var(--color-primary) 88%, var(--color-secondary, var(--color-primary))) 100%
+  );
+  color: #fff;
+  box-shadow: var(--shadow-surface);
+}
+.df-card-glass {
+  background: color-mix(in srgb, var(--color-surface-elevated, var(--color-surface, #fff)) 78%, transparent);
+  backdrop-filter: blur(22px) saturate(1.15);
+  border: var(--df-border-width) solid color-mix(in srgb, #fff 55%, var(--df-border-subtle, transparent));
+  border-radius: var(--radius-lg, var(--df-radius-lg, 16px));
+  box-shadow: var(--shadow-card, var(--df-shadow-card));
+}
+.df-card-interactive { cursor: pointer; }
+.df-card-interactive:focus-visible { outline: var(--df-focus-width) solid var(--df-focus-color); outline-offset: var(--df-focus-offset); }
+
+/* Buttons */
+.df-btn-primary {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0 1.625rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  color: var(--color-background, #fff);
+  background: var(--color-primary);
+  border: var(--df-border-width) solid color-mix(in srgb, var(--color-primary) 78%, #000);
+  border-radius: var(--df-radius-pill, 9999px);
+  box-shadow: var(--shadow-card, var(--df-shadow-card));
+  transition:
+    transform var(--df-motion-fast) var(--df-motion-ease),
+    box-shadow var(--df-motion-base) var(--df-motion-ease),
+    filter var(--df-motion-fast) ease;
+}
+.df-btn-primary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 42%, color-mix(in srgb, #fff 22%, transparent) 50%, transparent 58%);
+  transform: translateX(-120%);
+  transition: transform 0.55s ease;
+  pointer-events: none;
+}
+.df-btn-primary:hover::after {
+  transform: translateX(120%);
+}
+.df-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-surface, var(--df-shadow-elevated));
+  filter: brightness(1.05);
+}
+.df-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0 1.625rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  color: var(--color-foreground);
+  background: var(--color-surface-elevated, var(--color-surface, #fff));
+  border: var(--df-border-width) solid var(--df-border-default, var(--border-default, color-mix(in srgb, var(--color-foreground) 12%, transparent)));
+  border-radius: var(--df-radius-pill, 9999px);
+  transition:
+    border-color var(--df-motion-fast) ease,
+    background var(--df-motion-fast) ease,
+    transform var(--df-motion-fast) var(--df-motion-ease);
+}
+.df-btn-secondary:hover {
+  border-color: var(--df-border-accent, color-mix(in srgb, var(--color-foreground) 18%, var(--border-default, transparent)));
+  background: var(--color-surface-elevated, color-mix(in srgb, var(--color-surface, #fff) 96%, var(--color-background)));
+  transform: translateY(-1px);
+}
+.df-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  font-weight: 500;
+  color: var(--color-signal, var(--color-accent));
+  text-decoration: none;
+  transition: gap var(--df-motion-fast) ease, opacity var(--df-motion-fast) ease;
+}
+.df-btn-ghost:hover { gap: 0.625rem; opacity: 0.85; }
+.df-btn-link {
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  font-weight: 500;
+  color: var(--color-accent, var(--color-signal));
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  transition: opacity var(--df-motion-fast) ease;
+}
+.df-btn-link:hover { opacity: 0.8; }
+
+/* Forms */
+.df-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  font-weight: 500;
+  color: var(--color-foreground);
+}
+.df-input,
+.df-textarea,
+.df-select {
+  width: 100%;
+  border-radius: var(--radius-md, var(--df-radius-md, 10px));
+  border: var(--df-border-width) solid var(--df-border-default, var(--border-default, color-mix(in srgb, var(--color-foreground) 12%, transparent)));
+  background: var(--color-surface-elevated, var(--color-surface, var(--color-background)));
+  padding: 0.75rem 1rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  color: var(--color-foreground);
+  transition:
+    border-color var(--df-motion-fast) ease,
+    box-shadow var(--df-motion-fast) ease;
+}
+.df-textarea { min-height: 7rem; resize: vertical; }
+.df-input::placeholder,
+.df-textarea::placeholder {
+  color: color-mix(in srgb, var(--color-muted, var(--color-foreground)) 70%, transparent);
+}
+.df-input:focus-visible,
+.df-textarea:focus-visible,
+.df-select:focus-visible {
+  outline: none;
+  border-color: var(--color-signal, var(--color-accent));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-signal, var(--color-accent)) 14%, transparent);
+}
+.df-field { display: flex; flex-direction: column; gap: 0.375rem; }
+.df-form-group { display: flex; flex-direction: column; gap: var(--df-stack-gap); }
+
+/* Navigation */
+.df-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  min-height: var(--df-nav-height);
+}
+.df-nav-link {
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  font-weight: 500;
+  color: color-mix(in srgb, var(--color-foreground) 72%, transparent);
+  text-decoration: none;
+  transition: color var(--df-motion-fast) ease;
+}
+.df-nav-link:hover { color: var(--color-foreground); }
+.df-nav-link-active {
+  color: var(--color-foreground);
+  font-weight: 600;
+}
+
+/* Footer */
+.df-footer {
+  padding-block: var(--df-footer-gap);
+  border-top: var(--df-border-width) solid var(--df-border-subtle, var(--border-subtle, color-mix(in srgb, var(--color-foreground) 8%, transparent)));
+  background: var(--color-surface-inset, var(--color-surface, var(--color-background)));
+}
+.df-footer-grid {
+  display: grid;
+  gap: var(--df-stack-gap);
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+}
+.df-footer-col { display: flex; flex-direction: column; gap: 0.75rem; }
+.df-footer-link {
+  font-size: var(--df-text-sm);
+  color: var(--color-muted, color-mix(in srgb, var(--color-foreground) 58%, transparent));
+  text-decoration: none;
+  transition: color var(--df-motion-fast) ease;
+}
+.df-footer-link:hover { color: var(--color-foreground); }
+
+/* Effects & utilities */
+.df-focus-ring:focus-visible {
+  outline: var(--df-focus-width) solid var(--df-focus-color);
+  outline-offset: var(--df-focus-offset);
+}
+.df-accent-line {
+  height: var(--df-border-width);
+  width: 3.5rem;
+  background: linear-gradient(
+    to inline-end,
+    var(--color-signal, var(--color-accent)),
+    transparent
+  );
+}
+
+/* Typography-forward hero when image slots are empty — legacy fallback */
+.df-hero-editorial {
+  margin-inline: auto;
+  width: 100%;
+  max-width: min(44rem, 100%);
+  text-align: center;
+}
+.df-hero-editorial-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: min(88vh, 52rem);
+  padding-block: clamp(4.5rem, 12vh, 8rem);
+}
+.df-hero-editorial .df-accent-line,
+.df-hero-editorial [class*="-rule"],
+.df-hero-editorial [class*="-copper-rule"],
+.df-hero-editorial [class*="-brass-rule"],
+.df-hero-editorial [class*="-azure-rule"],
+.df-hero-editorial [class*="-gold-rule"],
+.df-hero-editorial [class*="-sage-rule"] {
+  margin-inline: auto;
+}
+.df-hero-editorial .df-body,
+.df-hero-editorial [class*="-body"] {
+  margin-inline: auto;
+}
+
+/* Sector-specific empty-hero profiles */
+.df-hero-split-empty-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: min(94vh, 58rem);
+  padding-block: clamp(4rem, 10vh, 7rem);
+}
+.df-hero-split-empty-copy {
+  text-align: start;
+  max-width: none;
+}
+@media (min-width: 1024px) {
+  .df-hero-split-empty-copy { grid-column: span 5 / span 5; }
+  .df-hero-split-empty-visual { grid-column: span 7 / span 7; }
+}
+.df-hero-split-empty-visual {
+  position: relative;
+  min-height: clamp(18rem, 42vh, 28rem);
+}
+
+.df-hero-bleed-empty-section {
+  position: relative;
+  min-height: min(100svh, 56rem);
+  overflow: hidden;
+}
+.df-hero-bleed-empty-backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 90% 70% at 18% 85%, color-mix(in srgb, var(--color-primary) 22%, transparent), transparent 58%),
+    radial-gradient(ellipse 60% 50% at 82% 18%, color-mix(in srgb, var(--color-accent, var(--color-signal)) 14%, transparent), transparent 52%),
+    linear-gradient(168deg, var(--color-background) 0%, color-mix(in srgb, var(--color-surface) 88%, var(--color-background)) 48%, var(--color-background) 100%);
+}
+.df-hero-bleed-empty-content { text-align: start; }
+.df-hero-bleed-empty-copy { text-align: start; }
+.df-hero-bleed-empty-copy [class*="-rule"],
+.df-hero-bleed-empty-copy [class*="-copper-rule"],
+.df-hero-bleed-empty-copy [class*="-brass-rule"],
+.df-hero-bleed-empty-copy [class*="-azure-rule"] {
+  margin-inline: 0;
+}
+
+.df-hero-trust-empty-section {
+  min-height: min(88vh, 52rem);
+  padding-block: clamp(3.5rem, 8vh, 6rem);
+}
+.df-hero-trust-empty-copy { text-align: start; max-width: none; }
+
+.df-hero-type-empty-section {
+  min-height: min(94vh, 58rem);
+  border-bottom: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 12%, transparent));
+}
+.df-hero-type-empty { text-align: start; }
+
+/* Hero collision guards — fluid/smaller viewports */
+[data-v2-component$="-hero"] {
+  isolation: isolate;
+}
+[data-v2-component$="-hero"] h1,
+[data-v2-component$="-hero"] [id$="-hero-title"],
+[data-v2-component$="-hero"] .df-hero-bleed-empty-copy,
+[data-v2-component$="-hero"] [class*="-headline"],
+[data-v2-component$="-hero"] [class*="-display"] {
+  position: relative;
+  z-index: 2;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+/* Typography collision guards — headlines, grids, stacked words */
+.v2-template h1,
+.v2-template h2,
+.v2-template h3,
+.v2-template [class*="-headline"],
+.v2-template [class*="-display"] {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  text-wrap: balance;
+  max-width: 100%;
+}
+.v2-template [class*="-display"] > span,
+.v2-template .df-headline-stack > * {
+  display: block;
+  line-height: var(--df-leading-stacked, 1.05);
+  padding-block: var(--df-stack-word-gap, 0.06em);
+}
+.v2-template [class*="-quote-mark"] {
+  display: block;
+  line-height: 1;
+  height: 0.62em;
+  margin-block-end: 0.2em;
+  overflow: visible;
+}
+.v2-template .grid > *,
+.v2-template [class*="grid-cols"] > *,
+.v2-template .df-grid-12 > * {
+  min-width: 0;
+}
+.v2-template [class*="-metric"],
+.v2-template [class*="-stat-value"] {
+  line-height: var(--df-leading-tight, 1.12);
+}
+.df-hero-type-empty > *,
+.df-hero-split-empty > *,
+.df-hero-estate-empty > *,
+.df-hero-frame-empty > *,
+.df-hero-trust-empty > * {
+  min-width: 0;
+}
+@media (max-width: 1023px) {
+  .df-hero-type-empty {
+    min-height: auto;
+    padding-block: clamp(3rem, 9vh, 5.5rem);
+  }
+  .df-hero-split-empty-section {
+    min-height: auto;
+    padding-block: clamp(3.5rem, 10vh, 6rem);
+  }
+  .df-hero-bleed-empty-content {
+    min-height: min(88svh, 52rem);
+    padding-top: clamp(5rem, 14vh, 8rem);
+  }
+  .df-hero-type-empty [class*="-index-num"] {
+    font-size: clamp(3rem, 12vw, 5rem) !important;
+    line-height: 1 !important;
+  }
+}
+
+.df-hero-estate-empty-section { min-height: min(95svh, 58rem); }
+.df-hero-estate-empty-copy { text-align: start; }
+.df-hero-estate-empty-visual {
+  position: relative;
+  min-height: clamp(20rem, 48vh, 32rem);
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--color-primary) 18%, var(--color-background)), var(--color-background)),
+    radial-gradient(ellipse 70% 60% at 70% 30%, color-mix(in srgb, var(--color-accent, var(--color-signal)) 12%, transparent), transparent 60%);
+}
+
+.df-hero-frame-empty-section { min-height: min(88svh, 54rem); }
+.df-hero-frame-empty-copy { text-align: start; }
+.df-hero-frame-empty-visual {
+  position: relative;
+  min-height: clamp(16rem, 38vh, 24rem);
+}
+.df-hero-scrim {
+  background: linear-gradient(
+    to inline-end,
+    color-mix(in srgb, var(--color-primary) 90%, transparent) 0%,
+    color-mix(in srgb, var(--color-primary) 70%, transparent) 45%,
+    transparent 100%
+  );
+}
+.df-scrim-inline {
+  background: linear-gradient(
+    to inline-end,
+    color-mix(in srgb, var(--color-background) 90%, transparent) 0%,
+    color-mix(in srgb, var(--color-background) 35%, transparent) 52%,
+    transparent 100%
+  );
+}
+
+/* Premium empty image slots — intentional editorial negative space */
+.df-slot-empty {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  min-height: var(--df-slot-min-h, 11rem);
+  background:
+    radial-gradient(
+      ellipse 90% 65% at 50% -10%,
+      color-mix(in srgb, var(--color-accent, var(--color-primary)) 7%, transparent),
+      transparent 68%
+    ),
+    linear-gradient(
+      168deg,
+      color-mix(in srgb, var(--color-surface, #fff) 94%, var(--color-primary)) 0%,
+      color-mix(in srgb, var(--color-background) 97%, var(--color-primary)) 100%
+    );
+  border: 1px solid color-mix(in srgb, var(--color-foreground) 7%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 40%, transparent);
+}
+.df-slot-empty::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(
+      color-mix(in srgb, var(--color-foreground) 4%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-foreground) 4%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 3.5rem 3.5rem;
+  opacity: 0.45;
+  mask-image: radial-gradient(ellipse 75% 75% at 50% 45%, #000 20%, transparent 72%);
+}
+.df-slot-empty::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: auto 12% 14%;
+  height: 1px;
+  background: linear-gradient(
+    to inline-end,
+    transparent,
+    color-mix(in srgb, var(--color-accent, var(--color-primary)) 35%, transparent),
+    transparent
+  );
+  opacity: 0.65;
+}
+[data-slot-empty="hero"].df-slot-empty {
+  min-height: var(--df-slot-min-h-hero, 18rem);
+}
+[data-slot-empty="gallery"].df-slot-empty,
+[data-slot-empty="products"].df-slot-empty {
+  min-height: var(--df-slot-min-h-media, 14rem);
+}
+.df-glow-orb {
+  pointer-events: none;
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(64px);
+  opacity: 0.35;
+}
+.df-quote-mark {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+  font-size: 3.5rem;
+  line-height: 1;
+  color: color-mix(in srgb, var(--color-signal, var(--color-accent)) 28%, transparent);
+}
+.df-star { color: var(--color-signal, var(--color-accent)); letter-spacing: 0.1em; }
+.df-metric {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 500;
+  letter-spacing: var(--df-tracking-tight);
+  color: var(--color-foreground);
+  line-height: var(--df-leading-tight, 1.12);
+}
+.df-grid-bg {
+  background-image:
+    linear-gradient(var(--color-grid, color-mix(in srgb, var(--color-foreground) 4%, transparent)) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid, color-mix(in srgb, var(--color-foreground) 4%, transparent)) 1px, transparent 1px);
+  background-size: 72px 72px;
+}
+.v2-template [id] { scroll-margin-top: 5.5rem; }
+.v2-template ::selection {
+  background: color-mix(in srgb, var(--color-accent, var(--color-signal)) 22%, transparent);
+  color: var(--color-foreground);
+}
+@media (prefers-reduced-motion: reduce) {
+  .df-btn-primary::after { display: none; }
+}
+
+/* Design Foundation — RTL & Arabic typography */
+[dir="rtl"] .v2-template,
+[dir="rtl"] .v2-template * {
+  letter-spacing: 0.01em;
+}
+
+[dir="rtl"] .v2-template {
+  line-height: 1.75;
+}
+
+[dir="rtl"] .df-eyebrow {
+  letter-spacing: 0.06em;
+}
+
+[dir="rtl"] .df-headline,
+[dir="rtl"] .df-headline-sm,
+[dir="rtl"] [class*="-headline"],
+[dir="rtl"] [class*="-display"] {
+  line-height: 1.28;
+  letter-spacing: 0;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+  text-transform: none;
+}
+
+[dir="rtl"] [class*="-display"] > span,
+[dir="rtl"] .df-headline-stack > * {
+  line-height: 1.22;
+  padding-block: 0.08em;
+}
+
+[dir="rtl"] .df-body,
+[dir="rtl"] .df-prose {
+  line-height: 1.85;
+  max-width: 42rem;
+}
+
+[dir="rtl"] .df-container,
+[dir="rtl"] .df-stack,
+[dir="rtl"] .df-card,
+[dir="rtl"] section {
+  text-align: start;
+}
+
+[dir="rtl"] .text-center {
+  text-align: center;
+}
+
+[dir="rtl"] .df-accent-line,
+[dir="rtl"] [class*="-rule"],
+[dir="rtl"] [class*="-accent-line"],
+[dir="rtl"] [class*="-gold-rule"],
+[dir="rtl"] [class*="-sage-rule"],
+[dir="rtl"] [class*="-volt-line"],
+[dir="rtl"] [class*="-brass-rule"],
+[dir="rtl"] [class*="-copper-rule"],
+[dir="rtl"] [class*="-azure-rule"] {
+  transform-origin: inline-end;
+}
+
+[dir="rtl"] [class*="marquee-track"] {
+  animation-direction: reverse;
+}
+
+[dir="rtl"] .df-hero-scrim {
+  background: linear-gradient(
+    to inline-start,
+    color-mix(in srgb, var(--color-primary) 90%, transparent) 0%,
+    color-mix(in srgb, var(--color-primary) 70%, transparent) 45%,
+    transparent 100%
+  );
+}
+
+[dir="rtl"] .v2-sidebar-shell {
+  flex-direction: row-reverse;
+}
+
+/* Design Foundation — responsive */
+.v2-template .df-container {
+  max-width: var(--container-max, 72rem);
+}
+
+@media (max-width: 767px) {
+  .v2-template .df-nav {
+    flex-wrap: wrap;
+    min-height: auto;
+    padding-block: 0.75rem;
+  }
+  .v2-template .df-footer-grid {
+    grid-template-columns: 1fr;
+  }
+  .v2-template .df-grid-12 {
+    grid-template-columns: 1fr;
+  }
+  .v2-template .df-headline {
+    font-size: clamp(2rem, 8vw, 2.75rem);
+  }
+  .v2-template .df-btn-primary,
+  .v2-template .df-btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (min-width: 768px) {
+  .v2-template .df-grid-12[data-cols="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .v2-template .df-grid-12[data-cols="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1024px) {
+  .v2-template .df-grid-12[data-cols="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .v2-template [data-v2-region="overlay"] {
+    padding-inline: var(--df-container-padding);
+  }
+}
+
+@media (max-width: 1023px) {
+  .v2-template [data-v2-region="header"] {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(12px);
+    background: color-mix(in srgb, var(--color-background) 88%, transparent);
+  }
+}
+
+/* Design Foundation — backward-compatible aliases */
+.df-section-glow,
+.se-section-glow,
+.cb-section-glow,
+.ec-section-glow,
+.mp-section-glow,
+.fn-section-glow,
+.ed-section-glow,
+.hr-section-glow,
+.rep-section-glow,
+.sv-section-glow,
+.cp-section-glow,
+.rs-section-glow,
+.rp-section-glow {
+position: relative; overflow: hidden;
+}
+.df-glow-orb,
+.se-glow-orb,
+.ec-glow-orb,
+.cb-glow-orb {
+pointer-events: none; position: absolute; border-radius: 9999px; filter: blur(64px); opacity: 0.35;
+}
+.df-section-alt,
+.se-section-alt,
+.ec-section-alt,
+.cb-section-alt,
+.mp-section-alt,
+.fn-section-alt,
+.ed-section-alt,
+.hr-section-alt,
+.rep-section-alt,
+.sv-section-alt,
+.cp-section-alt,
+.rs-section-alt,
+.rp-section-alt {
+background: var(--color-surface-elevated, var(--color-surface, #fff));
+}
+.df-card-featured,
+.se-card-featured,
+.cb-card-featured,
+.ec-card-featured {
+border-color: color-mix(in srgb, var(--color-signal, var(--color-accent)) 28%, var(--border-subtle, transparent));
+        background: linear-gradient(155deg, var(--color-primary) 0%, color-mix(in srgb, var(--color-primary) 88%, var(--color-secondary, var(--color-primary))) 100%);
+        color: #fff;
+        box-shadow: var(--shadow-surface);
+}
+.df-quote-mark,
+.se-quote-mark,
+.ec-quote-mark,
+.cb-quote-mark,
+.fn-quote-mark {
+font-family: var(--font-display), ui-serif, Georgia, serif;
+        font-size: 3.5rem;
+        line-height: 1;
+        color: color-mix(in srgb, var(--color-signal, var(--color-accent)) 28%, transparent);
+}
+.df-star,
+.se-star,
+.ec-star,
+.fn-star {
+color: var(--color-signal, var(--color-accent)); letter-spacing: 0.1em;
+}
+.df-input,
+.se-input,
+.ec-input,
+.cb-input,
+.fn-input,
+.mp-input,
+.ed-input,
+.hr-input,
+.rep-input,
+.sv-input,
+.cp-input,
+.rs-input,
+.rp-input {
+width: 100%;
+        border-radius: var(--radius-md, 8px);
+        border: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 12%, transparent));
+        background: var(--color-surface, var(--color-background));
+        padding: 0.75rem 1rem;
+        font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+        font-size: var(--df-text-sm, 0.875rem);
+        color: var(--color-foreground);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.df-textarea,
+.se-textarea,
+.ec-textarea,
+.cb-textarea,
+.fn-textarea,
+.mp-textarea {
+width: 100%;
+        min-height: 7rem;
+        resize: vertical;
+        border-radius: var(--radius-md, 8px);
+        border: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 12%, transparent));
+        background: var(--color-surface, var(--color-background));
+        padding: 0.75rem 1rem;
+        font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+        font-size: var(--df-text-sm, 0.875rem);
+        color: var(--color-foreground);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.df-container,
+.cb-container {
+margin-inline: auto;
+        width: 100%;
+        max-width: var(--container-max, 82rem);
+        padding-inline: var(--df-container-padding, clamp(1.25rem, 4vw, 2.5rem));
+}
+
+.df-section-glow::before,
+.se-section-glow::before,
+.cb-section-glow::before,
+.ec-section-glow::before,
+.mp-section-glow::before,
+.fn-section-glow::before,
+.ed-section-glow::before,
+.hr-section-glow::before,
+.rep-section-glow::before,
+.sv-section-glow::before,
+.cp-section-glow::before,
+.rs-section-glow::before,
+.rp-section-glow::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 55% at 15% 0%, color-mix(in srgb, var(--color-accent, var(--color-signal)) 8%, transparent), transparent 60%),
+    radial-gradient(ellipse 55% 45% at 90% 100%, color-mix(in srgb, var(--color-primary) 6%, transparent), transparent 55%);
+}
+
+.df-input:focus-visible, .se-input:focus-visible, .ec-input:focus-visible, .cb-input:focus-visible, .fn-input:focus-visible,
+.df-textarea:focus-visible, .se-textarea:focus-visible, .ec-textarea:focus-visible, .cb-textarea:focus-visible, .fn-textarea:focus-visible {
+  outline: none;
+  border-color: var(--color-signal, var(--color-accent));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-signal, var(--color-accent)) 14%, transparent);
+}
+
+@keyframes df-slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes se-slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Noto+Sans+Arabic:wght@400;500;600&family=Outfit:wght@300;400;500;600&family=Tajawal:wght@500;600;700&display=swap");
+
+@keyframes rep-parallax-lift {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes rep-stone-rise {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes rep-brass-draw {
+  from { transform: scaleX(0); opacity: 0; }
+  to { transform: scaleX(1); opacity: 1; }
+}
+@keyframes rep-ken-burns {
+  from { transform: scale(1.03); }
+  to { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rep-animate, [data-rep-motion] { animation: none !important; transition: none !important; }
+}
+
+.rep-font-display { font-family: var(--font-display), "Fraunces", Georgia, serif; }
+.rep-font-body { font-family: var(--font-body), "Outfit", system-ui, sans-serif; }
+.rep-eyebrow {
+  font-family: var(--font-body), "Outfit", system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--color-brass, #B8956B);
+}
+.rep-headline {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-size: clamp(2.5rem, 5.5vw, 4.5rem);
+  font-weight: 400;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  color: var(--color-foreground);
+}
+.rep-headline-sm {
+  font-family: var(--font-display), "Fraunces", Georgia, serif;
+  font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  color: var(--color-foreground);
+}
+.rep-body {
+  font-family: var(--font-body), "Outfit", system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.72;
+  color: var(--color-muted, rgba(28,25,23,0.58));
+}
+.rep-brass-rule {
+  height: 1px;
+  width: 3.5rem;
+  background: linear-gradient(90deg, var(--color-brass, #B8956B), transparent);
+  transform-origin: left;
+}
+[dir="rtl"] .rep-brass-rule { transform-origin: right; }
+.rep-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.875rem;
+  padding: 0.875rem 2rem;
+  font-family: var(--font-body), "Outfit", system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-linen, #FAF8F5);
+  background: var(--color-primary, #1C1917);
+  border: 1px solid var(--border-brass, rgba(184,149,107,0.32));
+  transition: background 0.4s ease, box-shadow 0.4s ease;
+}
+.rep-btn-primary:hover {
+  background: var(--color-secondary, #3D3A36);
+  box-shadow: var(--shadow-glow);
+}
+.rep-btn-primary:focus-visible { outline: 2px solid var(--color-brass); outline-offset: 3px; }
+.rep-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.875rem;
+  padding: 0.875rem 1.75rem;
+  font-family: var(--font-body), "Outfit", system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-foreground);
+  border: 1px solid var(--border-default, rgba(28,25,23,0.1));
+  background: transparent;
+  transition: border-color 0.35s ease, color 0.35s ease;
+}
+.rep-btn-ghost:hover { border-color: var(--color-brass); color: var(--color-brass); }
+.rep-btn-ghost:focus-visible { outline: 2px solid var(--color-brass); outline-offset: 3px; }
+.rep-section { padding-block: clamp(5rem, 11vw, 7.5rem); }
+.rep-card {
+  border: 1px solid var(--border-subtle);
+  background: var(--color-surface);
+  transition: box-shadow 0.5s ease, transform 0.5s ease;
+}
+.rep-card:hover { box-shadow: var(--shadow-surface); transform: translateY(-2px); }
+.rep-focus-ring:focus-visible { outline: 2px solid var(--color-brass); outline-offset: 2px; }
+
+/* TBDP Native Consumption — real-estate-prestige
+   sector:real-estate · experience:luxury, executive, corporate
+   identity:monolith-estate · context:09b8ba0dc171ca5c
+   integration:5.0.0 · consumption:1.0.0 */
+:root {
+  --tbdp-native: 1;
+  --tbdp-native-package: "real-estate-prestige";
+  --tbdp-sector-dna: "real-estate";
+  --tbdp-template-identity: "monolith-estate";
+  --tbdp-experience-primary: "luxury";
+  --tbdp-context-hash: "09b8ba0dc171ca5c";
+  --tbdp-theme-mode: "light";
+  --tbdp-direction: "ltr";
+}
+
+/* TBDP Foundations — official design authority (scoped vars) */
+/* Trend Business AI Design Platform · 1.0.0 · foundations-1 */
+:root {
+  --tbdp-color-primary: #0047E6;
+  --tbdp-color-secondary: #334155;
+  --tbdp-color-accent: #4D85FF;
+  --tbdp-color-success: #10B981;
+  --tbdp-color-warning: #F59E0B;
+  --tbdp-color-danger: #EF4444;
+  --tbdp-color-info: #3B82F6;
+  --tbdp-color-surface-base: #FFFFFF;
+  --tbdp-color-surface-raised: #F8FAFC;
+  --tbdp-color-surface-overlay: #FFFFFF;
+  --tbdp-color-surface-sunken: #F1F5F9;
+  --tbdp-color-surface-inverse: #0F172A;
+  --tbdp-color-background-canvas: #F8FAFC;
+  --tbdp-color-background-subtle: #F1F5F9;
+  --tbdp-color-background-emphasis: #FFFFFF;
+  --tbdp-color-background-inverse: #020617;
+  --tbdp-color-text-primary: #0F172A;
+  --tbdp-color-text-secondary: #475569;
+  --tbdp-color-text-tertiary: #64748B;
+  --tbdp-color-text-disabled: #94A3B8;
+  --tbdp-color-text-inverse: #FFFFFF;
+  --tbdp-color-text-link: #0047E6;
+  --tbdp-color-text-linkHover: #0038B8;
+  --tbdp-color-border-default: #E2E8F0;
+  --tbdp-color-border-subtle: #F1F5F9;
+  --tbdp-color-border-strong: #CBD5E1;
+  --tbdp-color-border-focus: #1A5CFF;
+  --tbdp-color-border-inverse: rgba(255, 255, 255, 0.16);
+  --tbdp-color-overlay-scrim: rgba(2, 6, 23, 0.4);
+  --tbdp-color-overlay-scrimStrong: rgba(2, 6, 23, 0.64);
+  --tbdp-color-overlay-backdrop: rgba(2, 6, 23, 0.24);
+  --tbdp-color-overlay-highlight: rgba(26, 92, 255, 0.12);
+  --tbdp-opacity-transparent: 0;
+  --tbdp-opacity-subtle: 0.04;
+  --tbdp-opacity-muted: 0.08;
+  --tbdp-opacity-soft: 0.12;
+  --tbdp-opacity-medium: 0.24;
+  --tbdp-opacity-strong: 0.48;
+  --tbdp-opacity-opaque: 1;
+  --tbdp-spacing-micro: 0.125rem;
+  --tbdp-spacing-xs: 0.25rem;
+  --tbdp-spacing-sm: 0.5rem;
+  --tbdp-spacing-md: 1rem;
+  --tbdp-spacing-lg: 1.5rem;
+  --tbdp-spacing-xl: 2rem;
+  --tbdp-spacing-2xl: 3rem;
+  --tbdp-spacing-3xl: 4rem;
+  --tbdp-spacing-4xl: 6rem;
+  --tbdp-radius-sharp: 0;
+  --tbdp-radius-sm: 0.25rem;
+  --tbdp-radius-md: 0.5rem;
+  --tbdp-radius-lg: 0.75rem;
+  --tbdp-radius-pill: 9999px;
+  --tbdp-radius-circle: 50%;
+  --tbdp-shadow-0: none;
+  --tbdp-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-2: 0 2px 8px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-3: 0 8px 24px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);
+  --tbdp-shadow-4: 0 16px 48px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.08);
+  --tbdp-shadow-5: 0 24px 64px rgba(15, 23, 42, 0.18), 0 8px 24px rgba(15, 23, 42, 0.1);
+  --tbdp-container-sm: 640px;
+  --tbdp-container-md: 768px;
+  --tbdp-container-lg: 1024px;
+  --tbdp-container-xl: 1280px;
+  --tbdp-container-2xl: 1440px;
+  --tbdp-container-full: 100%;
+  --tbdp-font-display: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --tbdp-font-body: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --tbdp-font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", monospace;
+}
+
+/* TBDP Experience — motion, interaction, RTL, accessibility */
+/* TBDP Phase 3 — Motion System · tbdp-xp */
+
+@keyframes tbdp-xp-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes tbdp-xp-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes tbdp-xp-rise {
+  from { opacity: 0; transform: translateY(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tbdp-xp-rise-rtl {
+  from { opacity: 0; transform: translateX(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes tbdp-xp-slide-end {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-slide-start {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(calc(var(--tbdp-spacing-sm) * -1)); }
+  40%, 80% { transform: translateX(var(--tbdp-spacing-sm)); }
+}
+
+@keyframes tbdp-xp-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@keyframes tbdp-xp-lift {
+  to { transform: translateY(calc(var(--tbdp-spacing-sm) * -1)); box-shadow: var(--tbdp-shadow-2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp-motion] { animation: none !important; transition: none !important; }
+}
+
+[data-tbdp-xp-motion] { will-change: transform, opacity; }
+[data-tbdp-xp-motion="page-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="page-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="section-reveal"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-headline"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-media"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="card-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="grid-stagger"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="modal-enter"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="modal-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="drawer-slide"] { animation-name: tbdp-xp-slide-end; }
+[data-tbdp-xp-motion="toast-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="toast-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="tooltip-fade"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="scroll-reveal-up"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="stagger-children"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hover-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="focus-ring"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="success-pulse"] { animation-name: tbdp-xp-pulse; }
+[data-tbdp-xp-motion="error-shake"] { animation-name: tbdp-xp-shake; }
+
+/* TBDP Experience — interaction utilities */
+[data-tbdp-xp] { --tbdp-xp-focus: var(--tbdp-color-border-focus); }
+[data-tbdp-xp-feedback="loading"] { cursor: wait; }
+[data-tbdp-xp-feedback="error"] { border-color: var(--tbdp-color-danger); }
+[data-tbdp-xp-feedback="success"] { border-color: var(--tbdp-color-success); }
+[data-tbdp-xp-touch="true"] { min-height: var(--tbdp-spacing-2xl); min-width: var(--tbdp-spacing-2xl); }
+[data-tbdp-xp-gpu] { transform: translateZ(0); backface-visibility: hidden; }
+[data-tbdp-xp-contain] { content-visibility: auto; contain-intrinsic-size: auto 500px; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp], [data-tbdp-xp-motion] { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+/* V2 sidebar-left layout */
+.v2-layout-sidebar-left .v2-sidebar-shell { gap: 0; align-items: flex-start; }
+.v2-sidebar-rail {
+  border-inline-end: 1px solid var(--border-subtle, rgba(244,237,228,0.06));
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-inline-end: clamp(1.25rem, 3vw, 2rem);
+}
+[dir='rtl'] .v2-sidebar-rail { border-inline-end: none; border-inline-start: 1px solid var(--border-subtle, rgba(244,237,228,0.06)); }
+.v2-main-canvas > [data-v2-component] + [data-v2-component] { margin-top: 0; }
+.v2-layout-sidebar-left .v2-main-canvas { padding-inline-start: 0; }
+@media (max-width: 1023px) {
+  .v2-sidebar-rail { display: none !important; }
+}
+
+/* V2 sidebar-right layout */
+.v2-layout-sidebar-right .v2-sidebar-shell { gap: 0; align-items: flex-start; }
+.v2-layout-sidebar-right .v2-sidebar-rail {
+  border-inline-start: 1px solid var(--border-subtle, rgba(28,25,23,0.06));
+  border-inline-end: none;
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-inline-start: clamp(1.25rem, 3vw, 2rem);
+}
+[dir='rtl'] .v2-layout-sidebar-right .v2-sidebar-rail {
+  border-inline-start: none;
+  border-inline-end: 1px solid var(--border-subtle, rgba(28,25,23,0.06));
+}
+
+/* V2 full-bleed layout */
+.v2-layout-full-bleed .v2-overlay-canvas { width: 100%; }
+.v2-layout-full-bleed .v2-main-canvas { width: 100%; max-width: var(--container-max, 76rem); margin-inline: auto; }
+
+/* V2 editorial-reveal layout (creative portfolio) */
+.v2-layout-editorial-reveal .v2-main-canvas { width: 100%; }
+.v2-layout-editorial-reveal .v2-overlay-reveal { width: 100%; }
+
+:root {
+  --container-max: 72rem;
+  --font-body: Outfit, ui-sans-serif, system-ui, sans-serif;
+  --font-display: Fraunces, ui-sans-serif, system-ui, sans-serif;
+  --color-surface: #12100D;
+  --color-foreground: #F4EDE3;
+  --color-background: #090807;
+  --color-accent: #C9AE72;
+  --color-secondary: #16130F; --color-primary: #0E0D0B; }
+
+/* V2 Website Blueprint — design director output */
+:root {
+  --bp-blueprint-id: "bp-real-estate-prestige-general";
+  --bp-container-narrow: 36rem;
+  --bp-container-default: 72rem;
+  --bp-container-wide: 80rem;
+  --bp-grid-columns: 12;
+  --bp-grid-gutter: 1.5rem;
+  --bp-grid-rhythm: balanced;
+  --bp-motion-intensity: moderate;
+  --bp-cta-emphasis: bold;
+  --container-max: 72rem;
+}
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    .sr-only, .v2-sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    [class*="animate-"] { animation-fill-mode: both; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--color-background, #0f172a);
+      color: var(--color-foreground, #f8fafc);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .page { display: none; padding-bottom: 2rem; }
+    .page:target { display: block; }
+    body:not(:has(.page:target)) .page#home { display: block; }
+    img { max-width: 100%; height: auto; display: block; }
+    a { color: inherit; }
+    .v2-preview-error {
+      margin: 2rem auto;
+      max-width: 36rem;
+      padding: 1.5rem 1.75rem;
+      border: 1px solid color-mix(in srgb, var(--color-foreground, #f8fafc) 12%, transparent);
+      border-radius: 0.75rem;
+      background: color-mix(in srgb, var(--color-surface, #1e293b) 88%, transparent);
+      text-align: center;
+    }
+    .v2-preview-error-title {
+      margin: 0 0 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--color-foreground, #f8fafc);
+    }
+    .v2-preview-error-detail {
+      margin: 0;
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      color: color-mix(in srgb, var(--color-foreground, #f8fafc) 72%, transparent);
+      word-break: break-word;
+    }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+<style id="tbdp-wiring-layer">
+/* TBDP Integration Layer — advisory token layer */
+
+/* Trend Business AI Design Platform · 1.0.0 · foundations-1 */
+:root {
+  --tbdp-color-primary: #0047E6;
+  --tbdp-color-secondary: #334155;
+  --tbdp-color-accent: #4D85FF;
+  --tbdp-color-success: #10B981;
+  --tbdp-color-warning: #F59E0B;
+  --tbdp-color-danger: #EF4444;
+  --tbdp-color-info: #3B82F6;
+  --tbdp-color-surface-base: #FFFFFF;
+  --tbdp-color-surface-raised: #F8FAFC;
+  --tbdp-color-surface-overlay: #FFFFFF;
+  --tbdp-color-surface-sunken: #F1F5F9;
+  --tbdp-color-surface-inverse: #0F172A;
+  --tbdp-color-background-canvas: #F8FAFC;
+  --tbdp-color-background-subtle: #F1F5F9;
+  --tbdp-color-background-emphasis: #FFFFFF;
+  --tbdp-color-background-inverse: #020617;
+  --tbdp-color-text-primary: #0F172A;
+  --tbdp-color-text-secondary: #475569;
+  --tbdp-color-text-tertiary: #64748B;
+  --tbdp-color-text-disabled: #94A3B8;
+  --tbdp-color-text-inverse: #FFFFFF;
+  --tbdp-color-text-link: #0047E6;
+  --tbdp-color-text-linkHover: #0038B8;
+  --tbdp-color-border-default: #E2E8F0;
+  --tbdp-color-border-subtle: #F1F5F9;
+  --tbdp-color-border-strong: #CBD5E1;
+  --tbdp-color-border-focus: #1A5CFF;
+  --tbdp-color-border-inverse: rgba(255, 255, 255, 0.16);
+  --tbdp-color-overlay-scrim: rgba(2, 6, 23, 0.4);
+  --tbdp-color-overlay-scrimStrong: rgba(2, 6, 23, 0.64);
+  --tbdp-color-overlay-backdrop: rgba(2, 6, 23, 0.24);
+  --tbdp-color-overlay-highlight: rgba(26, 92, 255, 0.12);
+  --tbdp-opacity-transparent: 0;
+  --tbdp-opacity-subtle: 0.04;
+  --tbdp-opacity-muted: 0.08;
+  --tbdp-opacity-soft: 0.12;
+  --tbdp-opacity-medium: 0.24;
+  --tbdp-opacity-strong: 0.48;
+  --tbdp-opacity-opaque: 1;
+  --tbdp-spacing-micro: 0.125rem;
+  --tbdp-spacing-xs: 0.25rem;
+  --tbdp-spacing-sm: 0.5rem;
+  --tbdp-spacing-md: 1rem;
+  --tbdp-spacing-lg: 1.5rem;
+  --tbdp-spacing-xl: 2rem;
+  --tbdp-spacing-2xl: 3rem;
+  --tbdp-spacing-3xl: 4rem;
+  --tbdp-spacing-4xl: 6rem;
+  --tbdp-radius-sharp: 0;
+  --tbdp-radius-sm: 0.25rem;
+  --tbdp-radius-md: 0.5rem;
+  --tbdp-radius-lg: 0.75rem;
+  --tbdp-radius-pill: 9999px;
+  --tbdp-radius-circle: 50%;
+  --tbdp-shadow-0: none;
+  --tbdp-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-2: 0 2px 8px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-3: 0 8px 24px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);
+  --tbdp-shadow-4: 0 16px 48px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.08);
+  --tbdp-shadow-5: 0 24px 64px rgba(15, 23, 42, 0.18), 0 8px 24px rgba(15, 23, 42, 0.1);
+  --tbdp-container-sm: 640px;
+  --tbdp-container-md: 768px;
+  --tbdp-container-lg: 1024px;
+  --tbdp-container-xl: 1280px;
+  --tbdp-container-2xl: 1440px;
+  --tbdp-container-full: 100%;
+  --tbdp-font-display: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --tbdp-font-body: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --tbdp-font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", monospace;
+}
+
+/* TBDP Phase 3 — Motion System · tbdp-xp */
+
+@keyframes tbdp-xp-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes tbdp-xp-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes tbdp-xp-rise {
+  from { opacity: 0; transform: translateY(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tbdp-xp-rise-rtl {
+  from { opacity: 0; transform: translateX(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes tbdp-xp-slide-end {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-slide-start {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(calc(var(--tbdp-spacing-sm) * -1)); }
+  40%, 80% { transform: translateX(var(--tbdp-spacing-sm)); }
+}
+
+@keyframes tbdp-xp-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@keyframes tbdp-xp-lift {
+  to { transform: translateY(calc(var(--tbdp-spacing-sm) * -1)); box-shadow: var(--tbdp-shadow-2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp-motion] { animation: none !important; transition: none !important; }
+}
+
+[data-tbdp-xp-motion] { will-change: transform, opacity; }
+[data-tbdp-xp-motion="page-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="page-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="section-reveal"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-headline"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-media"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="card-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="grid-stagger"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="modal-enter"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="modal-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="drawer-slide"] { animation-name: tbdp-xp-slide-end; }
+[data-tbdp-xp-motion="toast-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="toast-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="tooltip-fade"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="scroll-reveal-up"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="stagger-children"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hover-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="focus-ring"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="success-pulse"] { animation-name: tbdp-xp-pulse; }
+[data-tbdp-xp-motion="error-shake"] { animation-name: tbdp-xp-shake; }
+
+/* TBDP Experience — interaction utilities */
+[data-tbdp-xp] { --tbdp-xp-focus: var(--tbdp-color-border-focus); }
+[data-tbdp-xp-feedback="loading"] { cursor: wait; }
+[data-tbdp-xp-feedback="error"] { border-color: var(--tbdp-color-danger); }
+[data-tbdp-xp-feedback="success"] { border-color: var(--tbdp-color-success); }
+[data-tbdp-xp-touch="true"] { min-height: var(--tbdp-spacing-2xl); min-width: var(--tbdp-spacing-2xl); }
+[data-tbdp-xp-gpu] { transform: translateZ(0); backface-visibility: hidden; }
+[data-tbdp-xp-contain] { content-visibility: auto; contain-intrinsic-size: auto 500px; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp], [data-tbdp-xp-motion] { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+  <div class="page" id="home">
+    <div class="flex min-h-screen flex-col bg-[var(--color-background)] text-[var(--color-foreground)] antialiased v2-template v2-real-estate-prestige" data-v2-package="real-estate-prestige" data-v2-composer="region-grid" data-v2-layout="default" data-v2-blueprint="bp-real-estate-prestige-general"><header data-v2-region="header"><header data-v2-component="real-estate-prestige-nav" class="rep-nav"><a href="#main-content" class="df-skip-link">Skip to main content</a><div class="mx-auto flex h-20 max-w-[88rem] items-center justify-between px-5 sm:px-8"><a href="#top" class="rep-brand">Brand</a><nav aria-label="Primary" class="hidden items-center lg:flex lg:gap-10"><a href="#features" class="rep-nav-link">Features</a><a href="#about" class="rep-nav-link">About</a><a href="#contact" class="rep-nav-link">Contact</a></nav><div class="flex gap-2"><a href="#contact" class="rep-btn-secondary hidden sm:inline-flex">Get started</a><button type="button" aria-expanded="false" aria-controls="rep-mobile-nav" aria-label="Open menu" class="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] lg:hidden rep-focus-ring"><span class="sr-only">Menu</span><span aria-hidden="true" class="flex flex-col gap-1"><span class="block h-0.5 w-5 bg-current transition "></span><span class="block h-0.5 w-5 bg-current transition "></span><span class="block h-0.5 w-5 bg-current transition "></span></span></button></div></div></header></header><main id="main-content" data-v2-region="main" class="v2-region-grid flex flex-col"><h1 class="v2-sr-only text-4xl">Monolith</h1><div data-v2-section="hero" data-v2-variant="split-trust"><section id="top" data-v2-component="real-estate-prestige-hero" aria-labelledby="rep-hero-title" class="rep-hero rep-grain relative min-h-[100svh] overflow-hidden"><div class="absolute inset-0 bg-gradient-to-t from-[var(--color-background)] via-[color-mix(in_srgb,var(--color-background)_50%,transparent)] to-transparent" aria-hidden="true"></div><div class="rep-container relative w-full pb-20 pt-32 sm:pb-28"><div class="mx-auto grid max-w-[88rem] gap-12 lg:grid-cols-[1.12fr_0.88fr] lg:items-end"><div class="rep-hero-parallax rep-fade-up min-w-0"><p class="rep-eyebrow">Welcome</p><div class="rep-brass-rule mt-5" aria-hidden="true"></div><h1 id="rep-hero-title" class="rep-display mt-8 max-w-[18ch] text-balance">Build something remarkable</h1><p class="rep-lead mt-8 max-w-xl">A clear story, strong offer, and thoughtful design — presented with craft and consistency for your audience.</p><div class="mt-12 flex flex-wrap gap-4"><a href="#contact" class="rep-btn-primary rep-focus-ring">Get started</a><a href="#features" class="rep-btn-secondary rep-focus-ring">Learn more</a></div></div><aside class="rep-panel rep-hero-parallax-panel rep-fade-up-delay rounded-[var(--radius-lg)] p-6 sm:p-8"><p class="rep-label">At a glance</p><p class="rep-title-lg mt-4">Engagement snapshot</p><dl class="mt-6 grid grid-cols-2 gap-4"><div><dt class="rep-caption">Timeline</dt><dd class="rep-body-sm mt-1 font-medium text-[var(--color-foreground)]">4–8 weeks</dd></div><div><dt class="rep-caption">Team</dt><dd class="rep-body-sm mt-1 font-medium text-[var(--color-foreground)]">Dedicated lead</dd></div><div><dt class="rep-caption">Deliverables</dt><dd class="rep-body-sm mt-1 font-medium text-[var(--color-foreground)]">Scoped plan</dd></div><div><dt class="rep-caption">Support</dt><dd class="rep-body-sm mt-1 font-medium text-[var(--color-foreground)]">Included</dd></div></dl></aside></div><div class="mx-auto mt-16 flex max-w-[88rem] flex-wrap items-center gap-x-6 gap-y-2 border-t border-[var(--border-subtle)] pt-10"><span class="rep-label me-2">Highlights</span><span class="inline-flex items-center gap-6"><span class="rep-body-sm text-[var(--color-foreground)]/80">Strategy</span></span><span class="inline-flex items-center gap-6"><span class="text-[var(--color-brass)]/35" aria-hidden="true">·</span><span class="rep-body-sm text-[var(--color-foreground)]/80">Design</span></span><span class="inline-flex items-center gap-6"><span class="text-[var(--color-brass)]/35" aria-hidden="true">·</span><span class="rep-body-sm text-[var(--color-foreground)]/80">Delivery</span></span><span class="inline-flex items-center gap-6"><span class="text-[var(--color-brass)]/35" aria-hidden="true">·</span><span class="rep-body-sm text-[var(--color-foreground)]/80">Support</span></span></div></div></section></div><div data-v2-section="features" data-v2-variant="spotlight-list"><section id="features" data-v2-component="real-estate-prestige-features" aria-labelledby="rep-features-title" class="rep-reveal rep-section py-20 sm:py-28"><div class="rep-container"><header class="rep-section-header rep-section-header--rule"><p class="rep-eyebrow">What we offer</p><h2 id="rep-features-title" class="rep-headline-sm text-balance">Capabilities built around your goals</h2><p class="rep-body">Clear value propositions presented with structure and craft.</p></header><ul class="rep-reveal-stagger rep-editorial-list divide-y divide-[var(--border-default)]"><li class="df-reveal-stagger rep-list-row grid gap-6 py-10 lg:grid-cols-[4rem_1fr] lg:items-start"><span class="rep-index">01</span><div class="min-w-0"><h3 class="rep-title-lg">Core offering</h3><p class="rep-body-sm mt-3 max-w-2xl">The primary value you deliver — explained clearly and confidently.</p></div></li><li class="df-reveal-stagger rep-list-row grid gap-6 py-10 lg:grid-cols-[4rem_1fr] lg:items-start"><span class="rep-index">02</span><div class="min-w-0"><h3 class="rep-title-lg">Expert support</h3><p class="rep-body-sm mt-3 max-w-2xl">Guidance, onboarding, and partnership from first conversation onward.</p></div></li><li class="df-reveal-stagger rep-list-row grid gap-6 py-10 lg:grid-cols-[4rem_1fr] lg:items-start"><span class="rep-index">03</span><div class="min-w-0"><h3 class="rep-title-lg">Proven outcomes</h3><p class="rep-body-sm mt-3 max-w-2xl">Results your clients can measure and trust over time.</p></div></li><li class="df-reveal-stagger rep-list-row grid gap-6 py-10 lg:grid-cols-[4rem_1fr] lg:items-start"><span class="rep-index">04</span><div class="min-w-0"><h3 class="rep-title-lg">Flexible engagement</h3><p class="rep-body-sm mt-3 max-w-2xl">Options that adapt to scope, timeline, and budget.</p></div></li></ul></div></section></div><section id="platform" data-v2-component="real-estate-prestige-integrations" aria-labelledby="rep-platform-title" class="rep-reveal rep-section py-20 sm:py-28"><div class="rep-container"><header class="rep-section-header rep-section-header--rule"><p class="rep-eyebrow">Capabilities</p><h2 id="rep-platform-title" class="rep-headline-sm text-balance">What we bring to the table</h2><p class="rep-body">Core strengths and supporting services for your project.</p></header><div class="rep-capability-grid sm:grid-cols-2"><article class="rep-capability-card"><span class="rep-index">01</span><p class="rep-label mt-4">Foundation</p><h3 class="rep-title-lg mt-2">Strategy &amp; discovery</h3><p class="rep-body-sm mt-3 max-w-md">Align goals, audience, and scope before design or build begins.</p></article><article class="rep-capability-card"><span class="rep-index">02</span><p class="rep-label mt-4">Expression</p><h3 class="rep-title-lg mt-2">Design &amp; messaging</h3><p class="rep-body-sm mt-3 max-w-md">Clear narrative, visual system, and content structure that converts.</p></article><article class="rep-capability-card"><span class="rep-index">03</span><p class="rep-label mt-4">Delivery</p><h3 class="rep-title-lg mt-2">Build &amp; launch</h3><p class="rep-body-sm mt-3 max-w-md">Polished implementation with QA, performance, and handoff documentation.</p></article><article class="rep-capability-card"><span class="rep-index">04</span><p class="rep-label mt-4">Partnership</p><h3 class="rep-title-lg mt-2">Growth &amp; support</h3><p class="rep-body-sm mt-3 max-w-md">Iteration, optimization, and ongoing partnership as you scale.</p></article></div></div></section><div data-v2-section="services" data-v2-variant="process-rail"><section id="about" data-v2-component="real-estate-prestige-about" aria-labelledby="rep-about-title" class="rep-reveal rep-section-alt py-20 sm:py-28"><div class="df-reveal-stagger rep-container grid items-start gap-12 lg:grid-cols-2"><div class="min-w-0"><p class="rep-eyebrow">About</p><h2 id="rep-about-title" class="rep-headline-sm mt-3 text-balance">A partner focused on clarity and delivery</h2><p class="rep-body mt-6">We help organizations communicate their value, serve their audience, and grow with confidence — through thoughtful design and dependable execution.</p><ul class="mt-8 space-y-3"><li class="rep-body-sm flex gap-3"><span class="text-[var(--color-brass-light,var(--color-brass))]" aria-hidden="true">—</span>Experienced team focused on measurable outcomes</li><li class="rep-body-sm flex gap-3"><span class="text-[var(--color-brass-light,var(--color-brass))]" aria-hidden="true">—</span>Clear process from discovery through delivery</li><li class="rep-body-sm flex gap-3"><span class="text-[var(--color-brass-light,var(--color-brass))]" aria-hidden="true">—</span>Built for long-term partnerships</li></ul><a href="#contact" class="rep-btn-primary rep-focus-ring mt-10 inline-flex">Get in touch</a></div><div class="df-reveal-stagger grid gap-4 sm:grid-cols-2"><div class="rep-stat-tile rounded-[var(--radius-lg)]"><p class="rep-metric text-3xl">4–8 weeks</p><p class="rep-caption mt-2">Typical engagement</p></div><div class="rep-stat-tile rounded-[var(--radius-lg)]"><p class="rep-metric text-3xl">24 hours</p><p class="rep-caption mt-2">Response time</p></div><div class="rep-stat-tile rounded-[var(--radius-lg)]"><p class="rep-metric text-3xl">98%</p><p class="rep-caption mt-2">Client satisfaction</p></div><div class="rep-stat-tile rounded-[var(--radius-lg)]"><p class="rep-metric text-3xl">72%</p><p class="rep-caption mt-2">Repeat clients</p></div></div></div></section></div><section id="stats" data-v2-component="real-estate-prestige-stats" aria-labelledby="rep-stats-title" class="rep-reveal rep-section-band flex min-h-[50vh] items-center"><div class="rep-container"><h2 id="rep-stats-title" class="sr-only">Key metrics</h2><dl class="rep-reveal-stagger grid gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-0 lg:divide-x lg:divide-[var(--border-subtle)]"><div class="px-4 text-center lg:px-8"><dd class="rep-metric">10+</dd><dt class="rep-stat-label mt-3">Years experience</dt><p class="rep-caption mt-1">in the market</p></div><div class="px-4 text-center lg:px-8"><dd class="rep-metric">500+</dd><dt class="rep-stat-label mt-3">Clients served</dt><p class="rep-caption mt-1">and growing</p></div><div class="px-4 text-center lg:px-8"><dd class="rep-metric">98%</dd><dt class="rep-stat-label mt-3">Satisfaction</dt><p class="rep-caption mt-1">client feedback</p></div><div class="px-4 text-center lg:px-8"><dd class="rep-metric">24h</dd><dt class="rep-stat-label mt-3">Response time</dt><p class="rep-caption mt-1">business days</p></div></dl></div></section><div data-v2-section="testimonials" data-v2-variant="minimal-list"><section id="testimonials" data-v2-component="real-estate-prestige-testimonials" aria-labelledby="rep-testimonials-title" class="rep-reveal rep-section-alt py-20 sm:py-28"><div class="rep-container"><header class="rep-section-header rep-section-header--rule"><p class="rep-eyebrow">Testimonials</p><h2 id="rep-testimonials-title" class="rep-headline-sm text-balance">Trusted by clients</h2><p class="rep-body">Partnerships built on clarity, craft, and dependable delivery.</p></header><div class="df-reveal-stagger grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:gap-8"><figure class="rep-card rep-testimonial-featured relative rounded-[var(--radius-lg)] p-8 sm:p-10"><span class="rep-quote-mark absolute start-6 top-4 sm:start-8 sm:top-6" aria-hidden="true">“</span><blockquote class="rep-quote relative z-[1] pt-10 sm:pt-12">“Professional, responsive, and focused on results — exactly what we needed.”</blockquote><figcaption class="relative z-[1] mt-8 flex items-center gap-4 border-t border-[var(--border-subtle)] pt-8"><span class="rep-avatar rep-caption h-12 w-12 shrink-0">AM</span><div><p class="rep-title">Alex Morgan</p><p class="rep-body-sm">Director · Northwind Co.</p></div></figcaption></figure><div class="df-reveal-stagger grid gap-4 content-start"><figure class="rep-card rep-testimonial-support rounded-[var(--radius-lg)] p-6"><blockquote class="rep-quote-sm">“Clear communication and strong execution from start to finish.”</blockquote><figcaption class="mt-5 flex items-center gap-3"><span class="rep-avatar rep-caption h-9 w-9 shrink-0 text-[0.65rem]">SK</span><div><p class="rep-body-sm font-semibold text-[var(--color-foreground)]">Samira Khan</p><p class="rep-caption">Operations Lead · Helix Group</p></div></figcaption></figure><figure class="rep-card rep-testimonial-support rounded-[var(--radius-lg)] p-6"><blockquote class="rep-quote-sm">“They understood our goals quickly and delivered with consistency throughout.”</blockquote><figcaption class="mt-5 flex items-center gap-3"><span class="rep-avatar rep-caption h-9 w-9 shrink-0 text-[0.65rem]">JL</span><div><p class="rep-body-sm font-semibold text-[var(--color-foreground)]">Jordan Lee</p><p class="rep-caption">Founder · Aperture Studio</p></div></figcaption></figure></div></div></div></section></div><section id="portfolio" data-v2-component="real-estate-prestige-portfolio" aria-labelledby="rep-portfolio-title" class="rep-reveal rep-section py-20 sm:py-28"><div class="rep-container"><header class="rep-section-header rep-section-header--rule"><p class="rep-eyebrow">Work</p><h2 id="rep-portfolio-title" class="rep-headline-sm">Selected outcomes</h2><p class="rep-body">Representative results from recent engagements.</p></header><ul class="rep-reveal-stagger rep-editorial-list divide-y divide-[var(--border-default)]"><li class="df-reveal-stagger rep-list-row grid gap-4 py-10 lg:grid-cols-[auto_1fr_auto] lg:items-center"><span class="rep-index">01</span><div class="min-w-0"><p class="rep-label">Case study</p><h3 class="rep-title-lg mt-1">Project Alpha</h3><p class="rep-body-sm mt-2 max-w-2xl">A representative outcome from a recent engagement.</p></div><p class="rep-price lg:text-end">2×<span class="rep-caption mt-1 block font-normal">growth</span></p></li><li class="df-reveal-stagger rep-list-row grid gap-4 py-10 lg:grid-cols-[auto_1fr_auto] lg:items-center"><span class="rep-index">02</span><div class="min-w-0"><p class="rep-label">Case study</p><h3 class="rep-title-lg mt-1">Project Beta</h3><p class="rep-body-sm mt-2 max-w-2xl">Streamlined delivery with measurable impact.</p></div><p class="rep-price lg:text-end">40%<span class="rep-caption mt-1 block font-normal">efficiency</span></p></li><li class="df-reveal-stagger rep-list-row grid gap-4 py-10 lg:grid-cols-[auto_1fr_auto] lg:items-center"><span class="rep-index">03</span><div class="min-w-0"><p class="rep-label">Case study</p><h3 class="rep-title-lg mt-1">Project Gamma</h3><p class="rep-body-sm mt-2 max-w-2xl">Ongoing partnership with quarterly milestones.</p></div><p class="rep-price lg:text-end">12 mo<span class="rep-caption mt-1 block font-normal">retainer</span></p></li></ul></div></section><section id="pricing" data-v2-component="real-estate-prestige-pricing" aria-labelledby="rep-pricing-title" class="rep-reveal rep-section py-20 sm:py-28"><div class="rep-container"><header class="rep-section-header rep-section-header--rule"><p class="rep-eyebrow">Plans</p><h2 id="rep-pricing-title" class="rep-headline-sm">Options that fit your scope</h2><p class="rep-body">Transparent engagement models — tailored during discovery.</p></header><div class="rep-reveal-stagger grid gap-6 lg:grid-cols-3"><article class="rep-card flex flex-col p-8 "><h3 class="rep-title-lg">Starter</h3><p class="rep-price mt-2">Custom</p><p class="rep-body-sm mt-4">For teams getting started with the essentials.</p><ul class="mt-6 flex-1 space-y-2 rep-body-sm"><li>— Core scope</li><li>— Email support</li><li>— Standard onboarding</li></ul><a href="#contact" class="rep-btn-secondary rep-focus-ring mt-8 w-fit">Get started</a></article><article class="rep-card flex flex-col p-8 rep-pricing-featured relative"><span class="rep-label absolute -top-3 start-6 rounded-full border border-[var(--border-accent)] bg-[var(--color-surface)] px-3 py-1">Recommended</span><h3 class="rep-title-lg">Professional</h3><p class="rep-price mt-2">Custom</p><p class="rep-body-sm mt-4">Expanded scope for growing organizations.</p><ul class="mt-6 flex-1 space-y-2 rep-body-sm"><li>— Everything in Starter</li><li>— Priority support</li><li>— Dedicated contact</li></ul><a href="#contact" class="rep-btn-primary rep-focus-ring mt-8 w-fit">Contact us</a></article><article class="rep-card flex flex-col p-8 "><h3 class="rep-title-lg">Enterprise</h3><p class="rep-price mt-2">Custom</p><p class="rep-body-sm mt-4">Tailored programs with custom terms and SLAs.</p><ul class="mt-6 flex-1 space-y-2 rep-body-sm"><li>— Custom scope</li><li>— Account team</li><li>— Strategic reviews</li></ul><a href="#contact" class="rep-btn-secondary rep-focus-ring mt-8 w-fit">Talk to sales</a></article></div></div></section><section id="faq" data-v2-component="real-estate-prestige-faq" aria-labelledby="rep-faq-title" class="rep-reveal rep-section-alt py-20 sm:py-28"><div class="rep-container max-w-3xl"><header class="rep-section-header rep-section-header--rule"><p class="rep-eyebrow">FAQ</p><h2 id="rep-faq-title" class="rep-headline-sm">Common questions</h2></header><dl class="divide-y divide-[var(--border-default)] border-y border-[var(--border-default)]"><div class="rep-faq-item" data-open="true"><dt><button type="button" aria-expanded="true" class="rep-faq-question rep-focus-ring flex w-full items-center justify-between gap-4 px-1 py-5 text-start">How do we get started?<span aria-hidden="true" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-lg leading-none transition border-[var(--color-brass)] bg-[var(--color-brass)] text-[var(--color-background)]">−</span></button></dt><dd class="rep-faq-answer rep-body-sm px-1 pb-6 opacity-100">Reach out with your goals — we respond within one business day with next steps.</dd></div><div class="rep-faq-item" data-open="false"><dt><button type="button" aria-expanded="false" class="rep-faq-question rep-focus-ring flex w-full items-center justify-between gap-4 px-1 py-5 text-start">What does onboarding look like?<span aria-hidden="true" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-lg leading-none transition border-[var(--border-default)] text-[var(--color-brass)]">+</span></button></dt></div><div class="rep-faq-item" data-open="false"><dt><button type="button" aria-expanded="false" class="rep-faq-question rep-focus-ring flex w-full items-center justify-between gap-4 px-1 py-5 text-start">Can you adapt to our industry?<span aria-hidden="true" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-lg leading-none transition border-[var(--border-default)] text-[var(--color-brass)]">+</span></button></dt></div><div class="rep-faq-item" data-open="false"><dt><button type="button" aria-expanded="false" class="rep-faq-question rep-focus-ring flex w-full items-center justify-between gap-4 px-1 py-5 text-start">Do you offer ongoing support?<span aria-hidden="true" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-lg leading-none transition border-[var(--border-default)] text-[var(--color-brass)]">+</span></button></dt></div></dl></div></section><div data-v2-section="contact" data-v2-variant="cards-grid"><section id="contact" data-v2-component="real-estate-prestige-contact" aria-labelledby="rep-contact-title" class="rep-reveal rep-section-alt py-20 sm:py-28"><div class="df-reveal-stagger rep-container grid gap-12 lg:grid-cols-[0.9fr_1.1fr]"><div><p class="rep-eyebrow">Contact</p><h2 id="rep-contact-title" class="rep-headline-sm mt-4 text-balance">Let&#x27;s start a conversation</h2><p class="rep-body">Tell us about your goals — our team responds within one business day.</p></div><form class="rep-form-panel space-y-4 rounded-[var(--radius-lg)]"><div class="df-reveal-stagger grid gap-4 sm:grid-cols-2"><input type="text" placeholder="Full name" aria-label="Full name" class="df-input rounded-lg px-4 py-3 text-sm"/><input type="email" placeholder="Email" aria-label="Email" class="df-input rounded-lg px-4 py-3 text-sm"/></div><textarea placeholder="How can we help?" aria-label="Message" rows="4" class="df-textarea rounded-lg px-4 py-3 text-sm"></textarea><button type="submit" class="rep-btn-primary rep-focus-ring">Get started</button></form></div></section></div></main><utility data-v2-region="utility"><section id="cta-band" data-v2-component="real-estate-prestige-utility-band" aria-labelledby="rep-cta-title" class="rep-reveal rep-cta-band border-y border-[var(--border-subtle)] py-20 sm:py-28"><div class="rep-container text-center"><header class="rep-section-header mx-auto max-w-2xl text-center"><p class="rep-eyebrow">Next step</p><h2 id="rep-cta-title" class="rep-headline-sm text-balance">Ready to move forward?</h2><p class="rep-body">Speak with our team to scope your project and timeline.</p></header><div class="mt-10 flex flex-wrap justify-center gap-4"><a href="#contact" class="rep-btn-primary rep-focus-ring">Get started</a><a href="#features" class="rep-btn-secondary rep-focus-ring">Learn more</a></div></div></section></utility><footer data-v2-region="footer"><footer data-v2-component="real-estate-prestige-footer" role="contentinfo" class="bg-[var(--color-background)] py-20 sm:py-28"><div class="rep-container"><div class="flex flex-col items-start justify-between gap-8 border-t border-[var(--border-subtle)] pt-12 lg:flex-row lg:items-center"><div><p class="rep-brand">Brand</p><p class="rep-body-sm mt-3 max-w-md">Professional services with clarity, craft, and dependable delivery.</p></div><nav aria-label="Footer" class="flex flex-wrap gap-8"><a href="#features" class="rep-caption hover:text-[var(--color-foreground)]">Features</a><a href="#about" class="rep-caption hover:text-[var(--color-foreground)]">About</a><a href="#contact" class="rep-caption hover:text-[var(--color-foreground)]">Contact</a></nav></div><p class="rep-caption mt-10">© 2026 Brand. All rights reserved.</p></div></footer></footer><div data-v2-region="overlay" class="pointer-events-none fixed inset-x-0 bottom-0 z-50"></div></div>
+  </div>
+  
+</body>
+</html>

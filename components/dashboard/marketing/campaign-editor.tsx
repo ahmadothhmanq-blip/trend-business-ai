@@ -7,6 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
+import { useTranslation } from "@/lib/i18n/client";
+import { GlsGenerationLanguageSelect } from "@/components/dashboard/language/gls-generation-language-select";
+import {
+  getInitialGlsGenerationLanguage,
+  glsGenerationLanguagePayload,
+} from "@/lib/language-platform/generation/service";
 import { MARKETING_CHANNELS } from "@/lib/marketing/prompts";
 import type { MarketingCampaign, MarketingChannel } from "@/types/marketing";
 
@@ -17,6 +23,7 @@ type Props = {
 
 export function CampaignEditor({ campaign, onUpdated }: Props) {
   const wt = useWorkspaceT("marketing");
+  const { t, locale } = useTranslation();
   const [name, setName] = useState(campaign.name);
   const [objective, setObjective] = useState(campaign.objective);
   const [channels, setChannels] = useState<MarketingChannel[]>(
@@ -25,6 +32,9 @@ export function CampaignEditor({ campaign, onUpdated }: Props) {
       : MARKETING_CHANNELS.map((c) => ({ ...c, enabled: false })),
   );
   const [busy, setBusy] = useState(false);
+  const [language, setLanguage] = useState(() =>
+    getInitialGlsGenerationLanguage({ fallback: "ui-locale", uiLocale: locale }),
+  );
 
   const save = async () => {
     const res = await fetch(`/api/marketing/campaigns/${campaign.id}`, {
@@ -48,6 +58,7 @@ export function CampaignEditor({ campaign, onUpdated }: Props) {
           action,
           text: `${name}\n${objective}\n${JSON.stringify(campaign.strategy)}`,
           campaignContext: campaign.name,
+          ...glsGenerationLanguagePayload(language),
         }),
       });
       const data = await res.json();
@@ -125,6 +136,11 @@ export function CampaignEditor({ campaign, onUpdated }: Props) {
           ))}
         </div>
       )}
+
+      <div className="max-w-md">
+        <label className="mb-1.5 block text-xs font-medium text-white/60">{t("common.language")}</label>
+        <GlsGenerationLanguageSelect serviceId="marketing-ai" value={language} onChange={setLanguage} />
+      </div>
 
       <div className="flex flex-wrap gap-2">
         <Button onClick={() => void save()} className="rounded-lg">{wt("campaignEditor.save")}</Button>

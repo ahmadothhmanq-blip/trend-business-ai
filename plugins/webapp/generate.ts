@@ -3,16 +3,28 @@ import { type PlannedFile } from "@/lib/ai/planner";
 import { resolvePromptContext } from "@/lib/ai-core/context-engine";
 import { assemblePrompt } from "@/lib/ai-core/prompt-engine";
 import {
-  inferCategoryFromPath,
-  normalizeCategory,
-  sortFilesByDependency,
-} from "@/lib/ai/planner";
+  LlmConcurrencyGate,
+  resolveLlmConcurrencyCap,
+} from "@/lib/ai-core/file-generation";
 import { webappFilePrompt } from "@/lib/ai/prompts/webapp";
+import { validateGeneratedFileContent } from "@/lib/ai/validator";
+import { mergeWebAppProductionRequirements } from "@/lib/ai/webapp-requirements";
 import {
-  getProductionRequirements,
-  validateGeneratedFileContent,
-  validateGeneratedProject,
-} from "@/lib/ai/validator";
+  entityTablesFromAppModel,
+  resolveWebAppEntityTables,
+} from "@/lib/ai/webapp-entity-tables";
+import {
+  buildWebAppScaffold,
+  groupWebAppFilesIntoWaves,
+} from "@/lib/ai/webapp-scaffold";
+import { validateAndRepairWebAppProject } from "@/lib/ai/webapp-repair-pipeline";
+import {
+  getActiveAppBuilderPipelineProfiler,
+  timedHardener,
+} from "@/lib/webapp/pipeline-profiler";
+import { resetUiRepairMetrics } from "@/lib/webapp/ui-repair-metrics";
+import { hardenGeneratedWebApp } from "@/lib/ai/webapp-harden";
+import { isHostPlatformFilePath } from "@/lib/ai/webapp-isolation";
 import { sanitizeProjectPath } from "@/lib/ai/zipper";
 import { webappGeneratedFileSchema } from "@/plugins/webapp/schemas";
 import type {
@@ -29,7 +41,17 @@ import {
 import { runAppDesignEngine } from "@/lib/ai-core/app-design-platform/design-engine";
 
 const FILE_GENERATION_RETRIES = 3;
-const PROJECT_VALIDATION_ROUNDS = 2;
+
+function resolveGenerationEntityTables(
+  analysis: WebAppAnalysis,
+  plan: WebAppPlanResult,
+): string[] {
+  return resolveWebAppEntityTables({
+    analysisTables: analysis.databaseTables,
+    appModelTables: entityTablesFromAppModel(plan.appModel),
+    blueprintModels: plan.blueprint?.dataModels,
+  });
+}
 
 async function generateFileWithValidation(
   input: WebAppPluginInput,
@@ -83,6 +105,7 @@ async function generateFileWithValidation(
         projectTree: compacted.projectTree,
         existingFiles: promptFiles,
         validationReason: extraValidationReason,
+        unifiedPlanning: plan.unifiedPlanning,
       }),
   );
 
@@ -106,87 +129,45 @@ async function validateAndRepairProject(
   filePlans: PlannedFile[],
   files: GeneratedProjectFile[],
   ctx: GenerationContext,
+  aiFileCount: number,
 ) {
-  let currentFiles = [...files];
-  const planByPath = new Map(filePlans.map((entry) => [entry.path, entry]));
-
-  for (let round = 0; round < PROJECT_VALIDATION_ROUNDS; round += 1) {
-    const validation = validateGeneratedProject(currentFiles, plan.flags);
-    if (validation.valid) {
-      return currentFiles;
-    }
-
-    const targets = new Set(validation.filesToRegenerate);
-
-    for (const missingPath of validation.issues
-      .filter((issue) => issue.startsWith("Missing required production file:"))
-      .map((issue) => issue.replace("Missing required production file: ", ""))) {
-      targets.add(missingPath);
-      if (!planByPath.has(missingPath)) {
-        const requirement = getProductionRequirements(plan.flags).find(
-          (file) => file.path === missingPath,
-        );
-        if (requirement) {
-          const planned: PlannedFile = {
-            path: requirement.path,
-            purpose: requirement.purpose,
-            language: requirement.language,
-            category: normalizeCategory(
-              requirement.category || inferCategoryFromPath(requirement.path),
-            ),
-          };
-          planByPath.set(missingPath, planned);
-          filePlans.push(planned);
-        }
-      }
-    }
-
-    if (targets.size === 0) break;
-
-    const regenerated = new Map(currentFiles.map((file) => [file.path, file]));
-
-    for (const targetPath of targets) {
-      const filePlan = planByPath.get(targetPath);
-      if (!filePlan) continue;
-
-      const projectIssues = validation.issues
-        .filter(
-          (issue) =>
-            issue.startsWith(`${targetPath}:`) || issue.includes(targetPath),
-        )
-        .join("\n");
-
-      const existingWithoutTarget = currentFiles.filter(
-        (file) => file.path !== targetPath,
-      );
-
-      const repaired = await generateFileWithValidation(
-        input,
-        analysis,
-        plan,
-        sortFilesByDependency([...planByPath.values()]),
-        existingWithoutTarget,
-        filePlan,
-        ctx,
-        projectIssues,
-      );
-
-      regenerated.set(targetPath, repaired);
-    }
-
-    currentFiles = sortFilesByDependency([...planByPath.values()])
-      .map((entry) => regenerated.get(entry.path))
-      .filter((file): file is GeneratedProjectFile => Boolean(file));
-  }
-
-  const finalValidation = validateGeneratedProject(currentFiles, plan.flags);
-  if (!finalValidation.valid) {
-    throw new Error(
-      `Generated web app failed production validation:\n${finalValidation.issues.join("\n")}`,
-    );
-  }
-
-  return currentFiles;
+  const entityTables = resolveGenerationEntityTables(analysis, plan);
+  return validateAndRepairWebAppProject({
+    aiFileCount,
+    analysis,
+    plan,
+    filePlans,
+    files,
+    flags: plan.flags,
+    tablesForValidation: entityTables,
+    scaffoldOptions: {
+      projectName: plan.blueprint.title || analysis.appName,
+      requiresAuth: Boolean(analysis.requiresAuth),
+      requiresDatabase: Boolean(analysis.requiresDatabase),
+      requiresDashboard: Boolean(analysis.requiresDashboard),
+      tables: entityTables,
+      dataModels: plan.appModel?.dataModels,
+    },
+    repairFileWithLlm:
+      aiFileCount > 0
+        ? async ({
+            filePlan,
+            filePlans: repairPlans,
+            existingFilesWithoutTarget,
+            projectIssues,
+          }) =>
+            generateFileWithValidation(
+              input,
+              analysis,
+              plan,
+              repairPlans,
+              existingFilesWithoutTarget,
+              filePlan,
+              ctx,
+              projectIssues,
+            )
+        : undefined,
+  });
 }
 
 export async function generateWebApp(
@@ -195,34 +176,106 @@ export async function generateWebApp(
   plan: WebAppPlanResult,
   ctx: GenerationContext,
 ) {
+  resetUiRepairMetrics();
   ctx.progress.emit("Generating files...");
 
+  plan.filePlans = plan.filePlans.filter(
+    (filePlan) => !isHostPlatformFilePath(filePlan.path),
+  );
+
+  // Single source of truth: design/appModel tables must drive scaffold + validation.
+  const entityTables = resolveGenerationEntityTables(analysis, plan);
+  analysis.databaseTables = entityTables;
+  plan.filePlans = mergeWebAppProductionRequirements(
+    plan.filePlans,
+    plan.flags,
+    entityTables,
+  );
+
+  const scaffold = buildWebAppScaffold({
+    projectName: plan.blueprint.title || analysis.appName,
+    requiresAuth: Boolean(analysis.requiresAuth),
+    requiresDatabase: Boolean(analysis.requiresDatabase),
+    requiresDashboard: Boolean(analysis.requiresDashboard),
+    tables: entityTables,
+    dataModels: plan.appModel?.dataModels,
+  });
+  const scaffoldByPath = new Map(scaffold.map((file) => [file.path, file]));
+
   const files: GeneratedProjectFile[] = [];
-  for (const filePlan of plan.filePlans) {
-    ctx.progress.emit(`Generating ${filePlan.path}...`);
-    files.push(
-      await generateFileWithValidation(
-        input,
-        analysis,
-        plan,
-        plan.filePlans,
-        files,
-        filePlan,
-        ctx,
+  for (const planned of plan.filePlans) {
+    const scaffoldFile = scaffoldByPath.get(planned.path);
+    if (scaffoldFile) files.push(scaffoldFile);
+  }
+
+  // Always keep core toolchain scaffolds even if the planner omitted a path.
+  for (const scaffoldFile of scaffold) {
+    if (!files.some((file) => file.path === scaffoldFile.path)) {
+      files.push(scaffoldFile);
+    }
+  }
+
+  const aiFilePlans = plan.filePlans.filter(
+    (filePlan) => !scaffoldByPath.has(filePlan.path),
+  );
+
+  ctx.progress.emit(
+    `Scaffolded ${files.length} toolchain files · generating ${aiFilePlans.length} app files…`,
+  );
+
+  const pipeline = getActiveAppBuilderPipelineProfiler();
+  const fileGenStarted = Date.now();
+  pipeline?.start("file-generation", { aiFileCount: aiFilePlans.length });
+
+  const gate = new LlmConcurrencyGate({
+    maxConcurrency: resolveLlmConcurrencyCap(),
+  });
+  const waves = groupWebAppFilesIntoWaves(aiFilePlans);
+  let generatedCount = 0;
+
+  for (const wave of waves) {
+    const snapshot = [...files];
+    const waveResults = await Promise.all(
+      wave.map((filePlan) =>
+        gate.run(async () => {
+          generatedCount += 1;
+          pipeline?.markFileGenLlmCall();
+          ctx.progress.emit(
+            `Generating ${generatedCount}/${aiFilePlans.length}: ${filePlan.path}`,
+          );
+          return generateFileWithValidation(
+            input,
+            analysis,
+            plan,
+            plan.filePlans,
+            snapshot,
+            filePlan,
+            ctx,
+          );
+        }),
       ),
     );
+    files.push(...waveResults);
   }
+
+  pipeline?.end("file-generation", {
+    aiFileCount: aiFilePlans.length,
+    durationMs: Date.now() - fileGenStarted,
+  });
 
   ctx.progress.emit("Validating project...");
 
-  const validatedFiles = await validateAndRepairProject(
+  const repaired = await validateAndRepairProject(
     input,
     analysis,
     plan,
     plan.filePlans,
-    files,
+    timedHardener(() => hardenGeneratedWebApp(files)),
     ctx,
+    aiFilePlans.length,
   );
+  const validatedFiles = timedHardener(() => hardenGeneratedWebApp(repaired));
+  pipeline?.flushNestedPostGenerationStages();
 
   const pageList =
     plan.appModel?.screens.map((s) => ({
@@ -278,6 +331,9 @@ export async function generateWebApp(
       databaseProvider: plan.flags.databaseProvider,
       templateId: appModel.templateId,
       architecture: appModel.architecture,
+      trustReady: "true",
+      publicHostPath: "/w/app/[slug]",
+      livePreviewPath: "/api/webapp-builder/[id]/live-preview",
     },
     appModel,
     appDesign: plan.appDesign,

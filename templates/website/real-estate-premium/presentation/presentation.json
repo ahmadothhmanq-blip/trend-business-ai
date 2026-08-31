@@ -2,17 +2,29 @@
   "packageId": "real-estate-premium",
   "templateIntelligenceHint": "ti-real-estate-listings",
   "layout": {
-    "defaultLayoutId": "sidebar-right",
+    "defaultLayoutId": "default",
     "regions": {
-      "header": { "role": "header", "sticky": true },
-      "sidebar": { "role": "sidebar", "sticky": true, "collapseBelow": "lg" },
-      "main": { "role": "main" },
-      "footer": { "role": "footer" }
+      "header": {
+        "role": "header",
+        "sticky": true
+      },
+      "main": {
+        "role": "main"
+      },
+      "utility": {
+        "role": "utility"
+      },
+      "footer": {
+        "role": "footer"
+      },
+      "overlay": {
+        "role": "overlay"
+      }
     }
   },
   "navigation": {
     "componentId": "real-estate-premium-nav",
-    "variant": "estate-minimal"
+    "variant": "enterprise-glass"
   },
   "hero": {
     "componentId": "real-estate-premium-hero",
@@ -24,15 +36,23 @@
   },
   "homeFlow": {
     "regions": {
-      "sidebar": ["real-estate-premium-dossier-rail"],
       "main": [
         "real-estate-premium-hero",
-        "real-estate-premium-collection",
-        "real-estate-premium-neighborhoods",
-        "real-estate-premium-architecture",
-        "real-estate-premium-advisors",
+        "real-estate-premium-features",
+        "real-estate-premium-integrations",
+        "real-estate-premium-about",
+        "real-estate-premium-stats",
         "real-estate-premium-testimonials",
-        "real-estate-premium-inquiry"
+        "real-estate-premium-portfolio",
+        "real-estate-premium-pricing",
+        "real-estate-premium-faq",
+        "real-estate-premium-contact"
+      ],
+      "utility": [
+        "real-estate-premium-utility-band"
+      ],
+      "overlay": [
+        "real-estate-premium-floating-cta"
       ]
     }
   },
@@ -41,7 +61,11 @@
     "componentId": "real-estate-premium-section-shell"
   },
   "aiGeneration": {
-    "contentProfile": "real-estate-premium-luxury",
-    "suggestedPages": ["listings", "neighborhoods", "contact"]
+    "contentProfile": "real-estate-premium-gtm",
+    "suggestedPages": [
+      "platform",
+      "pricing",
+      "customers"
+    ]
   }
 }

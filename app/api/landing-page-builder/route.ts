@@ -1,7 +1,7 @@
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
 import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
-import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { beginAiUsage } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import { generateLandingPage } from "@/lib/landing-page-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
@@ -16,6 +16,7 @@ const lpRequestSchema = z.object({
   prompt: z.string().trim().min(10, "Describe your landing page in at least 10 characters."),
   pageType: z.string().trim().min(1, "Select a page type."),
   language: z.string().trim().min(1, "Select a language."),
+  country: z.string().trim().optional(),
   designStyle: z.string().trim().min(1, "Select a design style."),
   colorStyle: z.string().trim().min(1, "Select a color style."),
   sections: z.array(z.string().trim()).default([]),
@@ -73,8 +74,9 @@ export async function POST(request: Request) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  const rateLimited = await enforceAiUsage(auth.supabase, auth.user!.id, "landing-page-builder");
-  if (rateLimited) return rateLimited;
+  const usage = await beginAiUsage(auth.supabase, auth.user!.id, "landing-page-builder");
+  if (!usage.ok) return usage.response;
+  const creditLease = usage.lease;
 
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
@@ -85,7 +87,7 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data;
-  const aiLanguage = resolveRequestLanguage(request, input.language);
+  const aiLanguage = resolveRequestLanguage(request, input.language, input.country);
   const pageLabel = getLandingPageTypeLabel(input.pageType);
   let stage = "generateLandingPage";
 
@@ -156,6 +158,7 @@ export async function POST(request: Request) {
       return databaseErrorResponse("landing-page-builder.insert", error);
     }
 
+    await creditLease.settle(auth.supabase);
     return NextResponse.json({
       project: savedProject,
       generation: data as LandingPageGeneration,

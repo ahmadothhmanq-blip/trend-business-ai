@@ -1,90 +1,38 @@
 "use client";
 
-
-
 import {
+  VisualSkinCatalogPanel,
+  type VisualSkinCatalogPanelProps,
+} from "@/components/dashboard/website-builder/visual-skin-catalog-panel";
+import { getVisualSkin } from "@/lib/website/visual-skin/registry";
 
-  WbTemplateMarketplaceCatalog,
+/** @deprecated Use VisualSkinCatalogPanel — "templates" are visual skins only. */
+export type WebsiteStructureTemplateChoice = {
+  skinId: string;
+  label: string;
+};
 
-} from "@/components/dashboard/template-marketplace/wb-template-marketplace-catalog";
-
-import {
-
-  type WebsiteStructureTemplateChoice,
-
-} from "@/lib/website/builder/template-catalog";
-
-
-
-export type { WebsiteStructureTemplateChoice };
-
-
-
-export function TemplatesPanel(props?: {
-
-  selectedId?: string | null;
-
-  disabled?: boolean;
-
+export type TemplatesPanelProps = Omit<VisualSkinCatalogPanelProps, "onSelect"> & {
   onSelect?: (choice: WebsiteStructureTemplateChoice) => void;
+};
 
-}) {
-
+export function TemplatesPanel({
+  onSelect,
+  ...props
+}: TemplatesPanelProps) {
   return (
-
-    <WbTemplateMarketplaceCatalog
-
-      compact={false}
-
-      showHeader
-
-      showFilters
-
-      showFeaturedSection={false}
-
-      selectedId={props?.selectedId}
-
-      disabled={props?.disabled}
-
-      onSelect={props?.onSelect}
-
+    <VisualSkinCatalogPanel
+      {...props}
+      onSelect={(skinId) => {
+        onSelect?.({
+          skinId,
+          label: getVisualSkin(skinId)?.label ?? skinId,
+        });
+      }}
     />
-
   );
-
 }
 
-
-
-export function TemplatesRail(props?: {
-
-  selectedId?: string | null;
-
-  disabled?: boolean;
-
-  onSelect?: (choice: WebsiteStructureTemplateChoice) => void;
-
-}) {
-
-  return (
-
-    <WbTemplateMarketplaceCatalog
-
-      compact
-
-      showFilters={false}
-
-      showFeaturedSection={false}
-
-      selectedId={props?.selectedId}
-
-      disabled={props?.disabled}
-
-      onSelect={props?.onSelect}
-
-    />
-
-  );
-
+export function TemplatesRail(props?: TemplatesPanelProps) {
+  return <TemplatesPanel {...props} compact />;
 }
-

@@ -7,36 +7,25 @@
       "slots": ["logo", "links", "cta"]
     },
     {
-      "id": "real-estate-premium-dossier-rail",
-      "role": "navigation",
-      "scaffold": "components/real-estate-premium-dossier-rail.tsx",
-      "slots": ["property-intel", "links", "cta"]
-    },
-    {
       "id": "real-estate-premium-hero",
       "role": "hero",
       "scaffold": "components/real-estate-premium-hero.tsx",
-      "slots": ["headline", "subheadline", "cta", "property-stats"]
+      "slots": ["headline", "metrics", "cta"]
     },
     {
-      "id": "real-estate-premium-collection",
-      "role": "portfolio",
-      "scaffold": "components/real-estate-premium-collection.tsx"
+      "id": "real-estate-premium-features",
+      "role": "features",
+      "scaffold": "components/real-estate-premium-features.tsx"
     },
     {
-      "id": "real-estate-premium-neighborhoods",
-      "role": "gallery",
-      "scaffold": "components/real-estate-premium-neighborhoods.tsx"
-    },
-    {
-      "id": "real-estate-premium-architecture",
+      "id": "real-estate-premium-about",
       "role": "story",
-      "scaffold": "components/real-estate-premium-architecture.tsx"
+      "scaffold": "components/real-estate-premium-about.tsx"
     },
     {
-      "id": "real-estate-premium-advisors",
+      "id": "real-estate-premium-stats",
       "role": "custom",
-      "scaffold": "components/real-estate-premium-advisors.tsx"
+      "scaffold": "components/real-estate-premium-stats.tsx"
     },
     {
       "id": "real-estate-premium-testimonials",
@@ -44,9 +33,19 @@
       "scaffold": "components/real-estate-premium-testimonials.tsx"
     },
     {
-      "id": "real-estate-premium-inquiry",
+      "id": "real-estate-premium-pricing",
+      "role": "pricing",
+      "scaffold": "components/real-estate-premium-pricing.tsx"
+    },
+    {
+      "id": "real-estate-premium-faq",
+      "role": "faq",
+      "scaffold": "components/real-estate-premium-faq.tsx"
+    },
+    {
+      "id": "real-estate-premium-contact",
       "role": "contact",
-      "scaffold": "components/real-estate-premium-inquiry.tsx"
+      "scaffold": "components/real-estate-premium-contact.tsx"
     },
     {
       "id": "real-estate-premium-footer",
@@ -54,9 +53,29 @@
       "scaffold": "components/real-estate-premium-footer.tsx"
     },
     {
+      "id": "real-estate-premium-floating-cta",
+      "role": "cta",
+      "scaffold": "components/real-estate-premium-floating-cta.tsx"
+    },
+    {
+      "id": "real-estate-premium-utility-band",
+      "role": "cta",
+      "scaffold": "components/real-estate-premium-utility-band.tsx"
+    },
+    {
       "id": "real-estate-premium-section-shell",
       "role": "custom",
       "scaffold": "components/real-estate-premium-section-shell.tsx"
+    },
+    {
+      "id": "real-estate-premium-portfolio",
+      "role": "custom",
+      "scaffold": "components/real-estate-premium-portfolio.tsx"
+    },
+    {
+      "id": "real-estate-premium-integrations",
+      "role": "custom",
+      "scaffold": "components/real-estate-premium-integrations.tsx"
     }
   ]
 }

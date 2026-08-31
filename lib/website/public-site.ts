@@ -30,15 +30,81 @@ function isGeneratedWebsiteProject(
   );
 }
 
+/** Set or replace root `<html dir>` for RTL visitor locales. */
+export function applyHtmlDirAttribute(
+  html: string,
+  dir: "ltr" | "rtl",
+): string {
+  if (/<html[^>]*\sdir=/i.test(html)) {
+    return html.replace(
+      /<html([^>]*)\sdir=["'][^"']*["']/i,
+      `<html$1 dir="${dir}"`,
+    );
+  }
+  return html.replace(/<html/i, `<html dir="${dir}"`);
+}
+
+/** Set or replace the root `<html lang>` — primary public URLs use `en`. */
+export function applyHtmlLangAttribute(html: string, lang = "en"): string {
+  const code = lang.trim().toLowerCase().slice(0, 2) || "en";
+  if (/<html[^>]*lang=/i.test(html)) {
+    return html.replace(
+      /<html([^>]*)\slang=["'][^"']*["']/i,
+      `<html$1 lang="${code}"`,
+    );
+  }
+  return html.replace(/<html/i, `<html lang="${code}"`);
+}
+
 /** Strip executable scripts but keep JSON-LD for production SEO. */
 export function sanitizePublicHtml(html: string): string {
-  return html
+  const cleaned = html
     .replace(
       /<script\b(?![^>]*type\s*=\s*["']application\/ld\+json["'])[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
       "",
     )
     .replace(/\son\w+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, "")
     .replace(/javascript:/gi, "");
+  return hardenPublicSiteHtml(cleaned);
+}
+
+/**
+ * Public hosting strips all scripts (including V2 reveal boot). Inject CSS so
+ * reveal/motion sections and the home .page are never stuck invisible.
+ */
+export function hardenPublicSiteHtml(html: string): string {
+  if (html.includes("__V2_PUBLIC_REVEAL_HARDEN__")) return html;
+  const hardenCss = `<style id="v2-public-reveal-harden">
+/* __V2_PUBLIC_REVEAL_HARDEN__ */
+/* Public sites strip JS — never leave reveal/motion nodes invisible. */
+[class*="reveal"],
+[class*="reveal"] > *,
+[data-se-motion],
+[data-as-motion],
+[data-ct-motion],
+[data-df-motion] {
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+  animation: none !important;
+}
+.page { display: none !important; padding-bottom: 2rem; }
+.page:first-of-type,
+.page#home,
+.page[id="home"] { display: block !important; }
+.page:target { display: block !important; }
+@supports selector(body:has(.page:target)) {
+  body:has(.page:target) .page:first-of-type:not(:target),
+  body:has(.page:target) .page#home:not(:target) { display: none !important; }
+}
+</style>`;
+  if (/<\/head>/i.test(html)) {
+    return html.replace(/<\/head>/i, `${hardenCss}</head>`);
+  }
+  if (/<body\b/i.test(html)) {
+    return html.replace(/<body\b[^>]*>/i, (open) => `${open}${hardenCss}`);
+  }
+  return `${hardenCss}${html}`;
 }
 
 export function seoPackageFromGeneration(
@@ -59,8 +125,9 @@ export function applySeoToPublicHtml(params: {
   publicUrl: string;
   fallbackTitle?: string;
   fallbackDescription?: string;
+  hreflangLinkTags?: string[];
 }): string {
-  const { html, seoPackage, publicUrl } = params;
+  const { html, seoPackage, publicUrl, hreflangLinkTags = [] } = params;
   const title =
     seoPackage?.metadata.title?.trim() ||
     params.fallbackTitle?.trim() ||
@@ -105,6 +172,7 @@ export function applySeoToPublicHtml(params: {
     twitter.imageAlt
       ? `<meta name="twitter:image:alt" content="${escapeAttr(twitter.imageAlt)}" />`
       : "",
+    ...hreflangLinkTags,
   ]
     .filter(Boolean)
     .join("\n  ");
@@ -215,8 +283,10 @@ export function publicSiteResponseHeaders(options?: {
   return {
     "Content-Type": "text/html; charset=utf-8",
     "Cache-Control": "public, max-age=60, stale-while-revalidate=300",
+    // Scripts intentionally omitted (sanitizePublicHtml strips them). Styles may
+    // load Tailwind CDN CSS endpoints + Google Fonts @import from package CSS.
     "Content-Security-Policy":
-      "default-src 'none'; style-src 'unsafe-inline'; img-src data: https: blob:; font-src data:; base-uri 'none'; form-action 'none'; frame-ancestors 'self'",
+      "default-src 'none'; style-src 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src data: https: blob:; base-uri 'none'; form-action 'none'; frame-ancestors 'self'",
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "strict-origin-when-cross-origin",
     "X-Frame-Options": "SAMEORIGIN",

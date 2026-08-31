@@ -5,6 +5,7 @@ import {
   type LlmAuditContext,
 } from "@/lib/ai/llm-audit";
 import { getActiveWebsiteProfilerSlot } from "@/lib/ai/profiler-slot";
+import { appBuilderTimingSetWaiting } from "@/lib/webapp/stage-timing-context";
 import { performance } from "node:perf_hooks";
 
 export type GenerateJsonOptions<T> = {
@@ -31,6 +32,13 @@ export async function generateJsonWithValidation<T>(
   let validationReason = "";
 
   for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    if (attempt > 0) {
+      appBuilderTimingSetWaiting(
+        "repair",
+        `generateJsonWithValidation attempt ${attempt + 1}: ${validationReason.slice(0, 200)}`,
+      );
+    }
+
     const prompt = validationReason
       ? options.transformRetryPrompt
         ? options.transformRetryPrompt(options.prompt, validationReason)
@@ -47,6 +55,10 @@ export async function generateJsonWithValidation<T>(
 
     const profiler = getActiveWebsiteProfilerSlot();
     const llmStart = performance.now();
+    appBuilderTimingSetWaiting(
+      "llm_response",
+      `generateJsonWithValidation attempt ${attempt + 1}`,
+    );
     const result = await options.provider.generateJson<T>({
       prompt,
       schema: options.schema,
@@ -69,8 +81,13 @@ export async function generateJsonWithValidation<T>(
       logLlmParsedResult(audit, result);
     }
 
+    appBuilderTimingSetWaiting(
+      "json_validation",
+      `generateJsonWithValidation validate attempt ${attempt + 1}`,
+    );
     const validation = options.validate(result);
     if (validation.valid) {
+      appBuilderTimingSetWaiting("idle", "generateJsonWithValidation passed");
       return result;
     }
 

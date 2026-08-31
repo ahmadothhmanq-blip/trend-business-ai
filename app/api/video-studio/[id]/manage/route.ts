@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { requireUser, parseUuidParam, parseJsonBody } from "@/lib/api/helpers";
 import { serverErrorResponse } from "@/lib/api/errors";
+import { getRequestAiLanguage } from "@/lib/i18n/api";
 import type { VideoGeneration, VideoBlueprint } from "@/types/video";
 import {
   extractProductionModel,
@@ -26,24 +27,36 @@ import {
   getLatestJob,
   jobStatusSummary,
   rebuildSubtitlesFromScenes,
-  runFullRenderPipeline,
   synthesizeSpeech,
   uploadVideoStudioMedia,
   buildSocialExportPackage,
   requestAvatarPresenterClip,
   applyAvatarProfileToModel,
   listVideoProviders,
-  resumeRenderJob,
-  retryFailedClips,
   buildVisualTimeline,
   editorNudgeScene,
   persistSocialExportAssets,
   reencodeForSocialPreset,
-  fetchRemoteToBytes,
+  fetchRemoteVideoToBytes,
   trimClipWithFfmpeg,
   probeFfmpegHealth,
   ProviderNotConfiguredError,
 } from "@/lib/ai-core/video-production-platform";
+import { ProductionExportError } from "@/lib/ai-core/video-production-platform/export-production";
+import {
+  generationStatusAfterRenderJob,
+  STORYBOARD_READY_STATUS,
+} from "@/lib/ai-core/video-production-platform/generation-status";
+import {
+  resumeDomainRender,
+  retryDomainRender,
+  runDomainRenderPipeline,
+} from "@/lib/ai-core/video-production-platform/runtime";
+import { beginAiUsage } from "@/lib/api/rate-limit";
+import { listProviderJobsForProject } from "@/lib/ai-core/video-production-platform/persistence";
+import { videoStudioCreditOperationId } from "@/lib/ai-core/video-production-platform/runtime/video-credits";
+import { assertSafeRemoteFetchUrl, UnsafeRemoteUrlError } from "@/lib/website/url-safety";
+import type { VideoGenerationStatus } from "@/types/video";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -74,13 +87,14 @@ async function persist(
   userId: string,
   id: string,
   blueprint: VideoBlueprint,
-  extra?: { video_name?: string },
+  extra?: { video_name?: string; status?: VideoGenerationStatus },
 ) {
   const { data, error } = await supabase
     .from("video_generations")
     .update({
       blueprint,
       ...(extra?.video_name ? { video_name: extra.video_name } : {}),
+      ...(extra?.status ? { status: extra.status } : {}),
       updated_at: new Date().toISOString(),
     })
     .eq("id", id)
@@ -284,6 +298,8 @@ export async function POST(request: Request, { params }: Params) {
     return apiValidationError(parsed.error.issues[0]?.message);
   }
 
+  getRequestAiLanguage(request);
+
   try {
     const generation = await loadGeneration(
       auth.supabase,
@@ -303,6 +319,29 @@ export async function POST(request: Request, { params }: Params) {
     });
     let history = extractVideoVersionHistory(generation.blueprint);
     const action = parsed.data;
+    let creditAttempt: number | undefined;
+    if (action.action === "render" && action.mode !== "preview") {
+      const jobs = await listProviderJobsForProject(auth.supabase, parsedId.id);
+      creditAttempt = jobs.length ? Math.max(...jobs.map((job) => job.attempt || 1)) : 1;
+      const usage = await beginAiUsage(
+        auth.supabase,
+        auth.user!.id,
+        "video-studio",
+        videoStudioCreditOperationId({ kind: "render", projectId: parsedId.id, attempt: creditAttempt }),
+      );
+      if (!usage.ok) return usage.response;
+    } else if (action.action === "resume_render" || action.action === "retry_clips") {
+      const jobs = await listProviderJobsForProject(auth.supabase, parsedId.id);
+      const maxAttempt = jobs.length ? Math.max(...jobs.map((job) => job.attempt || 1)) : 1;
+      creditAttempt = action.action === "retry_clips" ? maxAttempt + 1 : maxAttempt;
+      const usage = await beginAiUsage(
+        auth.supabase,
+        auth.user!.id,
+        "video-studio",
+        videoStudioCreditOperationId({ kind: "render", projectId: parsedId.id, attempt: creditAttempt }),
+      );
+      if (!usage.ok) return usage.response;
+    }
     let message = "Updated.";
     let job = getLatestJob(model);
     let socialExport = undefined as ReturnType<typeof buildSocialExportPackage> | undefined;
@@ -311,21 +350,33 @@ export async function POST(request: Request, { params }: Params) {
 
     switch (action.action) {
       case "render": {
+        if (action.sourceImageUrl) {
+          try {
+            await assertSafeRemoteFetchUrl(action.sourceImageUrl);
+          } catch (error) {
+            const msg =
+              error instanceof UnsafeRemoteUrlError
+                ? error.message
+                : "Invalid source image URL.";
+            return apiValidationError(msg);
+          }
+        }
         if (action.mode === "preview") {
           const result = startAndProcessRender(model, "preview");
           model = result.model;
           job = result.job;
           message = result.job.message;
         } else {
-          const result = await runFullRenderPipeline({
+          const result = await runDomainRenderPipeline({
             model,
             supabase: auth.supabase,
             userId: auth.user!.id,
             generationId: parsedId.id,
-            mode: action.mode,
+            mode: action.mode === "avatar" || action.mode === "image-to-video" ? action.mode : "full",
             providerId: action.providerId,
             sourceImageUrl: action.sourceImageUrl,
             useAvatar: action.useAvatar || action.mode === "avatar",
+            creditAttempt,
           });
           model = result.model;
           job = result.job;
@@ -474,7 +525,7 @@ export async function POST(request: Request, { params }: Params) {
         });
         model = applyAvatarProfileToModel(model, avatarResult.profile);
         if (avatarResult.remoteUrl) {
-          const bytes = await fetchRemoteToBytes(avatarResult.remoteUrl);
+          const bytes = await fetchRemoteVideoToBytes(avatarResult.remoteUrl);
           if (bytes) {
             const uploaded = await uploadVideoStudioMedia({
               supabase: auth.supabase,
@@ -504,40 +555,33 @@ export async function POST(request: Request, { params }: Params) {
         message = "Voice style updated.";
         break;
       case "export_social": {
-        if (action.reencode !== false) {
-          const reencoded = await reencodeForSocialPreset({
-            supabase: auth.supabase,
-            userId: auth.user!.id,
-            generationId: parsedId.id,
-            model,
-            presetId: action.presetId,
-          });
-          socialExport = reencoded.package;
-          if (reencoded.reencoded && reencoded.videoUrl) {
-            model = {
-              ...model,
-              assets: [
-                ...model.assets,
-                {
-                  id: `export-${action.presetId}`,
-                  kind: "composite" as const,
-                  mimeType: "video/mp4",
-                  url: reencoded.videoUrl,
-                  durationSec: Math.min(
-                    model.targetDurationSec,
-                    socialExport.preset.maxDurationSec,
-                  ),
-                  provider: "external",
-                  createdAt: new Date().toISOString(),
-                },
-              ],
-            };
-          }
-          message = reencoded.message;
-        } else {
-          socialExport = buildSocialExportPackage(model, action.presetId);
-          message = `Export package ready for ${socialExport.preset.label}.`;
-        }
+        const exported = await reencodeForSocialPreset({
+          supabase: auth.supabase,
+          userId: auth.user!.id,
+          generationId: parsedId.id,
+          model,
+          presetId: action.presetId,
+          reencode: action.reencode !== false,
+        });
+        socialExport = exported.package;
+        model = {
+          ...model,
+          assets: [
+            ...model.assets,
+            {
+              id: exported.artifact.id || `export-${action.presetId}`,
+              kind: "composite" as const,
+              mimeType: exported.artifact.mimeType,
+              url: exported.videoUrl,
+              durationSec: exported.artifact.durationSec,
+              width: exported.artifact.width,
+              height: exported.artifact.height,
+              provider: "ffmpeg",
+              createdAt: new Date().toISOString(),
+            },
+          ],
+        };
+        message = exported.message;
         if (action.persistAssets !== false && socialExport) {
           const persisted = await persistSocialExportAssets({
             supabase: auth.supabase,
@@ -559,12 +603,14 @@ export async function POST(request: Request, { params }: Params) {
         if (!current) {
           return apiValidationError("No render job to resume.");
         }
-        const resumed = await resumeRenderJob({
+        const resumed = await resumeDomainRender({
           model,
-          job: current,
           supabase: auth.supabase,
           userId: auth.user!.id,
           generationId: parsedId.id,
+          mode: current.mode === "preview" ? "full" : current.mode,
+          providerId: current.provider,
+          creditAttempt,
         });
         model = resumed.model;
         job = resumed.job;
@@ -572,12 +618,13 @@ export async function POST(request: Request, { params }: Params) {
         break;
       }
       case "retry_clips": {
-        const retried = await retryFailedClips({
+        const retried = await retryDomainRender({
           model,
           supabase: auth.supabase,
           userId: auth.user!.id,
           generationId: parsedId.id,
           useAvatar: action.useAvatar,
+          creditAttempt,
         });
         model = retried.model;
         job = retried.job;
@@ -636,12 +683,30 @@ export async function POST(request: Request, { params }: Params) {
       history,
     ) as VideoBlueprint;
 
+    const persistStatus =
+      action.action === "render" && action.mode === "preview"
+        ? job
+          ? generationStatusAfterRenderJob({
+              mode: job.mode,
+              status: job.status,
+              provider: job.provider,
+              composite: job.compositeAsset,
+              clips: (job.clips || []).map((c) => ({
+                mimeType: c.asset?.mimeType,
+                url: c.asset?.url,
+                isStub: c.asset?.provider === "preview",
+                durationSec: c.asset?.durationSec,
+              })),
+            })
+          : STORYBOARD_READY_STATUS
+        : undefined;
+
     const saved = await persist(
       auth.supabase,
       auth.user!.id,
       parsedId.id,
       blueprint,
-      { video_name: model.title },
+      { video_name: model.title, status: persistStatus },
     );
 
     return NextResponse.json({
@@ -667,6 +732,9 @@ export async function POST(request: Request, { params }: Params) {
     });
   } catch (error) {
     if (error instanceof ProviderNotConfiguredError) {
+      return apiValidationError(error.message);
+    }
+    if (error instanceof ProductionExportError) {
       return apiValidationError(error.message);
     }
     return serverErrorResponse(

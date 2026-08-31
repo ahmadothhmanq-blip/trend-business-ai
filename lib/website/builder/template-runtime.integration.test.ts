@@ -16,36 +16,53 @@ import {
 import { isWbTemplateRuntimeModel } from "@/lib/website/template-renderer-contract/validation";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
+const FLAGSHIP_PACKAGE_ID = "corporate-business";
 
 describe("builder template runtime integration", () => {
   it("lists installed template package ids from the Template Engine", async () => {
     const ids = await listInstalledBuilderTemplatePackageIds();
-    assert.ok(ids.includes("modern-business"));
+    assert.ok(ids.includes(FLAGSHIP_PACKAGE_ID));
+    assert.ok(!ids.includes("modern-business"));
   });
 
-  it("loads and renders modern-business into a runtime model", async () => {
+  it("loads and renders corporate-business into a runtime model", async () => {
+    const result = await resolveBuilderTemplateRuntimeModel(FLAGSHIP_PACKAGE_ID);
+
+    assert.equal(result.ok, true);
+    if (!result.ok) return;
+
+    assert.equal(result.templateId, FLAGSHIP_PACKAGE_ID);
+    assert.equal(result.model.template.id, FLAGSHIP_PACKAGE_ID);
+    assert.equal(result.model.template.specVersion, "2.0.0");
+    assert.deepEqual(result.model.pages.home.regionIds, [
+      "header",
+      "main",
+      "utility",
+      "footer",
+    ]);
+    assert.equal(result.model.regions.header.placement.ordering, "horizontal");
+    assert.equal(isWbTemplateRuntimeModel(result.model), true);
+    assert.equal(result.meta.templateId, FLAGSHIP_PACKAGE_ID);
+  });
+
+  it("resolves modern-business legacy alias to corporate-business runtime", async () => {
     const result = await resolveBuilderTemplateRuntimeModel("modern-business");
 
     assert.equal(result.ok, true);
     if (!result.ok) return;
 
-    assert.equal(result.templateId, "modern-business");
-    assert.equal(result.model.template.id, "modern-business");
-    assert.equal(result.model.template.specVersion, "2.0.0");
-    assert.deepEqual(result.model.pages.home.regionIds, ["header", "main", "footer"]);
-    assert.equal(result.model.regions.header.placement.ordering, "horizontal");
-    assert.equal(isWbTemplateRuntimeModel(result.model), true);
-    assert.equal(result.meta.templateId, "modern-business");
+    assert.equal(result.templateId, FLAGSHIP_PACKAGE_ID);
+    assert.equal(result.model.template.id, FLAGSHIP_PACKAGE_ID);
   });
 
   it("preserves metadata, canvas, responsive config, and media references", async () => {
-    const result = await resolveBuilderTemplateRuntimeModel("modern-business");
+    const result = await resolveBuilderTemplateRuntimeModel(FLAGSHIP_PACKAGE_ID);
     assert.equal(result.ok, true);
     if (!result.ok) return;
 
     assert.equal(result.model.metadata.category, "corporate");
     assert.equal(result.model.canvas.id, "canvas");
-    assert.equal(result.model.responsive.containerMaxWidth, "76rem");
+    assert.equal(result.model.responsive.containerMaxWidth, "82rem");
     assert.ok(result.model.media.thumbnail.length > 0);
     assert.ok(result.model.media.preview.length > 0);
   });
@@ -71,8 +88,8 @@ describe("builder template runtime integration", () => {
   });
 
   it("supports optional page scope without changing the runtime model shape", async () => {
-    const full = await resolveBuilderTemplateRuntimeModel("modern-business");
-    const scoped = await resolveBuilderTemplateRuntimeModel("modern-business", {
+    const full = await resolveBuilderTemplateRuntimeModel(FLAGSHIP_PACKAGE_ID);
+    const scoped = await resolveBuilderTemplateRuntimeModel(FLAGSHIP_PACKAGE_ID, {
       pageId: "home",
     });
 
@@ -85,7 +102,7 @@ describe("builder template runtime integration", () => {
   });
 
   it("stores the latest resolved runtime model in an isolated session", async () => {
-    const result = await resolveBuilderTemplateRuntimeModel("modern-business");
+    const result = await resolveBuilderTemplateRuntimeModel(FLAGSHIP_PACKAGE_ID);
     assert.equal(result.ok, true);
     if (!result.ok) return;
 
@@ -96,7 +113,7 @@ describe("builder template runtime integration", () => {
       setActiveBuilderTemplateRuntime(result);
       assert.equal(
         getActiveBuilderTemplateRuntimeModel()?.template.id,
-        "modern-business",
+        FLAGSHIP_PACKAGE_ID,
       );
 
       clearActiveBuilderTemplateRuntime();
@@ -107,7 +124,7 @@ describe("builder template runtime integration", () => {
   });
 
   it("does not leak runtime models between isolated server sessions", async () => {
-    const result = await resolveBuilderTemplateRuntimeModel("modern-business");
+    const result = await resolveBuilderTemplateRuntimeModel(FLAGSHIP_PACKAGE_ID);
     assert.equal(result.ok, true);
     if (!result.ok) return;
 
@@ -115,7 +132,7 @@ describe("builder template runtime integration", () => {
       setActiveBuilderTemplateRuntime(result);
       assert.equal(
         getActiveBuilderTemplateRuntimeModel()?.template.id,
-        "modern-business",
+        FLAGSHIP_PACKAGE_ID,
       );
     });
 
@@ -124,14 +141,14 @@ describe("builder template runtime integration", () => {
     });
   });
 
-  it("loads the on-disk modern-business package from templates/website", async () => {
-    const packageDir = join(root, "templates/website/modern-business");
-    const result = await resolveBuilderTemplateRuntimeModel("modern-business");
+  it("loads the on-disk corporate-business package from templates/website", async () => {
+    const packageDir = join(root, "templates/website/corporate-business");
+    const result = await resolveBuilderTemplateRuntimeModel(FLAGSHIP_PACKAGE_ID);
 
     assert.equal(result.ok, true);
     if (!result.ok) return;
 
-    assert.ok(packageDir.includes("modern-business"));
+    assert.ok(packageDir.includes("corporate-business"));
     assert.equal(result.model.entry.defaultPageId, "home");
     assert.equal(result.model.entry.defaultLayoutId, "default");
   });

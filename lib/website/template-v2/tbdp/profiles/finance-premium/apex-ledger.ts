@@ -4,17 +4,17 @@ import type { TemplateV2ResponsiveRules } from "@/lib/website/template-v2/contra
 
 /** Meridian Capital — TBDP identity for finance-premium. */
 export const APEX_LEDGER_V2_TOKENS: TemplateV2DesignTokens = {
-  colors: {
-    primary: "#0D1B2A",
-    secondary: "#1A2D42",
-    accent: "#C9A227",
-    background: "#E8E6E1",
-    foreground: "#0D1B2A",
-    muted: "rgba(13,27,42,0.58)",
-    surface: "#F5F4F0",
-    signal: "#C9A227",
-    grid: "rgba(13,27,42,0.06)",
-    ink: "#0A1520",
+  colors: {
+    primary: "#0B1F33",
+    secondary: "#163352",
+    accent: "#C9A962",
+    background: "#EDEAE4",
+    foreground: "#0B1F33",
+    muted: "rgba(11,31,51,0.56)",
+    surface: "#FFFFFF",
+    signal: "#C9A962",
+    grid: "rgba(11,31,51,0.05)",
+    ink: "#0B1F33",
   },
   typography: {
     display: "Playfair Display",
@@ -37,15 +37,15 @@ export const APEX_LEDGER_V2_TOKENS: TemplateV2DesignTokens = {
     scale: ["0", "1", "2", "3", "4", "6", "8", "12", "16", "20", "24", "32", "40", "48", "64"],
   },
   radius: { sm: "2px", md: "4px", lg: "8px", xl: "12px" },
-  shadows: {
-    surface: "0 2px 8px rgba(10,21,32,0.08), 0 16px 48px rgba(10,21,32,0.1)",
-    glow: "0 0 72px rgba(201,162,39,0.2)",
-    card: "0 0 0 1px rgba(13,27,42,0.06), 0 4px 28px rgba(10,21,32,0.06)",
+  shadows: {
+    surface: "0 20px 60px rgba(11,31,51,0.07), 0 2px 8px rgba(11,31,51,0.03)",
+    glow: "0 0 64px rgba(201,169,98,0.18)",
+    card: "0 0 0 1px rgba(11,31,51,0.05), 0 8px 32px rgba(11,31,51,0.06)",
   },
-  borders: {
-    default: "rgba(13,27,42,0.1)",
-    accent: "rgba(201,162,39,0.32)",
-    subtle: "rgba(13,27,42,0.05)",
+  borders: {
+    default: "rgba(11,31,51,0.09)",
+    accent: "rgba(201,169,98,0.32)",
+    subtle: "rgba(11,31,51,0.05)",
   },
 };
 

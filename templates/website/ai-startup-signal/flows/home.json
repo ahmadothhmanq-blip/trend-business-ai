@@ -1,0 +1,21 @@
+{
+  "pageId": "home",
+  "layoutId": "default",
+  "regions": {
+    "header": ["ai-startup-signal-nav"],
+    "main": [
+      "ai-startup-signal-hero",
+      "ai-startup-signal-features",
+      "ai-startup-signal-integrations",
+      "ai-startup-signal-about",
+      "ai-startup-signal-stats",
+      "ai-startup-signal-testimonials",
+      "ai-startup-signal-pricing",
+      "ai-startup-signal-faq",
+      "ai-startup-signal-contact"
+    ],
+    "utility": ["ai-startup-signal-utility-band"],
+    "overlay": ["ai-startup-signal-floating-cta"],
+    "footer": ["ai-startup-signal-footer"]
+  }
+}

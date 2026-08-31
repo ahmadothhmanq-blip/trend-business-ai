@@ -84,6 +84,11 @@ export {
   upsertDeploymentState,
   updateDeploymentEnv,
   buildDeploymentUrl,
+  buildLivePreviewPath,
+  buildPublicAppPath,
+  evaluateDeploymentReadiness,
+  isWebAppDeployEnabled,
+  isWebAppPublicPublishEnabled,
   type AppDeploymentRecord,
   type AppDeploymentState,
 } from "@/lib/ai-core/app-design-platform/deploy";

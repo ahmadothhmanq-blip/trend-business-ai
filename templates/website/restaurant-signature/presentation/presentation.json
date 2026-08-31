@@ -2,17 +2,29 @@
   "packageId": "restaurant-signature",
   "templateIntelligenceHint": "ti-restaurant-dining",
   "layout": {
-    "defaultLayoutId": "sidebar-left",
+    "defaultLayoutId": "default",
     "regions": {
-      "header": { "role": "header", "sticky": true },
-      "sidebar": { "role": "sidebar", "sticky": true, "collapseBelow": "lg" },
-      "main": { "role": "main" },
-      "footer": { "role": "footer" }
+      "header": {
+        "role": "header",
+        "sticky": true
+      },
+      "main": {
+        "role": "main"
+      },
+      "utility": {
+        "role": "utility"
+      },
+      "footer": {
+        "role": "footer"
+      },
+      "overlay": {
+        "role": "overlay"
+      }
     }
   },
   "navigation": {
     "componentId": "restaurant-signature-nav",
-    "variant": "luxury-minimal"
+    "variant": "enterprise-glass"
   },
   "hero": {
     "componentId": "restaurant-signature-hero",
@@ -24,16 +36,23 @@
   },
   "homeFlow": {
     "regions": {
-      "sidebar": ["restaurant-signature-sidebar-rail"],
       "main": [
         "restaurant-signature-hero",
-        "restaurant-signature-reservation",
-        "restaurant-signature-chef-story",
-        "restaurant-signature-tasting-menu",
-        "restaurant-signature-signature-dishes",
-        "restaurant-signature-atmosphere",
-        "restaurant-signature-gallery",
-        "restaurant-signature-reservation-cta"
+        "restaurant-signature-features",
+        "restaurant-signature-integrations",
+        "restaurant-signature-about",
+        "restaurant-signature-stats",
+        "restaurant-signature-testimonials",
+        "restaurant-signature-portfolio",
+        "restaurant-signature-pricing",
+        "restaurant-signature-faq",
+        "restaurant-signature-contact"
+      ],
+      "utility": [
+        "restaurant-signature-utility-band"
+      ],
+      "overlay": [
+        "restaurant-signature-floating-cta"
       ]
     }
   },
@@ -42,7 +61,11 @@
     "componentId": "restaurant-signature-section-shell"
   },
   "aiGeneration": {
-    "contentProfile": "restaurant-signature-luxury",
-    "suggestedPages": ["menu", "gallery", "reserve"]
+    "contentProfile": "restaurant-signature-gtm",
+    "suggestedPages": [
+      "platform",
+      "pricing",
+      "customers"
+    ]
   }
 }

@@ -1,6 +1,6 @@
 {
   "tbdpNative": true,
-  "sectorDnaId": "hotel-resort",
-  "experienceProfiles": ["hospitality", "luxury", "editorial"],
-  "presetBinding": "haven-reveal"
+  "sectorDnaId": "saas",
+  "experienceProfiles": ["technical", "corporate", "executive"],
+  "presetBinding": "nexus-grid-reveal"
 }

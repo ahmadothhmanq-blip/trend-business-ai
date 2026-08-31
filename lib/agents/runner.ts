@@ -22,6 +22,7 @@ export type PlatformRunInput = {
   memory?: string[];
   maxSteps?: number;
   agentId?: string;
+  language?: string;
 };
 
 export type PlatformRunResult = {
@@ -79,6 +80,7 @@ export async function runPlatformAgent(input: PlatformRunInput): Promise<Platfor
     context: enrichedContext,
     memory,
     maxSteps: input.maxSteps,
+    language: input.language,
   };
 
   const start = Date.now();

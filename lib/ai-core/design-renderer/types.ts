@@ -143,7 +143,18 @@ export type DesignRendererComponentId =
   | "ThemeBoldIntegrations"
   | "ThemeBoldFaq"
   | "ThemeBoldFooter"
-  | "ThemeBoldFloatingCta";
+  | "ThemeBoldFloatingCta"
+  | "ThemeGlobalNav"
+  | "ThemeGlobalHero"
+  | "ThemeGlobalShowcase"
+  | "ThemeGlobalIntegrations"
+  | "ThemeGlobalFeatures"
+  | "ThemeGlobalFaq"
+  | "ThemeGlobalPricing"
+  | "ThemeGlobalTestimonials"
+  | "ThemeGlobalContact"
+  | "ThemeGlobalFooter"
+  | "ThemeGlobalFloatingCta";
 
 export type DesignRendererSection = {
   id: string;

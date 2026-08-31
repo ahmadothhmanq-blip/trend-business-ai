@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { isGeneratingWebsitePlaceholderTitle } from "@/lib/ai-core/content/content-language";
 import { getActiveProvider } from "@/lib/ai/provider-config";
 import { emptyTokenUsage } from "@/lib/ai/usage";
 import { appendPromptVersion } from "@/lib/workspace/persist";
@@ -238,8 +239,14 @@ async function persistWebsiteGenerationInner(args: PersistWebsiteGenerationArgs)
     {},
   );
 
+  const resolvedTitle = isGeneratingWebsitePlaceholderTitle(args.project.title)
+    ? productionContent.heroHeadline ||
+      args.project.businessProfile?.projectName ||
+      args.project.title
+    : args.project.title;
+
   const files = ensureStaticPreviewFile({
-    title: args.project.title || productionContent.heroHeadline,
+    title: resolvedTitle || productionContent.heroHeadline,
     description:
       args.project.description || productionContent.heroSubheadline,
     pages: args.project.pages,
@@ -294,6 +301,7 @@ async function persistWebsiteGenerationInner(args: PersistWebsiteGenerationArgs)
 
   const savedProject: GeneratedWebsiteProject = {
     ...args.project,
+    title: resolvedTitle || args.project.title,
     files,
     prompt: args.input.prompt,
     generatedAt: new Date().toISOString(),

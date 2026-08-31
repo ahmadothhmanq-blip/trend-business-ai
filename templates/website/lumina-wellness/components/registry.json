@@ -1,0 +1,81 @@
+{
+  "components": [
+    {
+      "id": "lumina-wellness-nav",
+      "role": "navigation",
+      "scaffold": "components/lumina-wellness-nav.tsx",
+      "slots": ["logo", "links", "cta"]
+    },
+    {
+      "id": "lumina-wellness-hero",
+      "role": "hero",
+      "scaffold": "components/lumina-wellness-hero.tsx",
+      "slots": ["headline", "metrics", "cta"]
+    },
+    {
+      "id": "lumina-wellness-features",
+      "role": "features",
+      "scaffold": "components/lumina-wellness-features.tsx"
+    },
+    {
+      "id": "lumina-wellness-about",
+      "role": "story",
+      "scaffold": "components/lumina-wellness-about.tsx"
+    },
+    {
+      "id": "lumina-wellness-stats",
+      "role": "custom",
+      "scaffold": "components/lumina-wellness-stats.tsx"
+    },
+    {
+      "id": "lumina-wellness-testimonials",
+      "role": "testimonials",
+      "scaffold": "components/lumina-wellness-testimonials.tsx"
+    },
+    {
+      "id": "lumina-wellness-pricing",
+      "role": "pricing",
+      "scaffold": "components/lumina-wellness-pricing.tsx"
+    },
+    {
+      "id": "lumina-wellness-faq",
+      "role": "faq",
+      "scaffold": "components/lumina-wellness-faq.tsx"
+    },
+    {
+      "id": "lumina-wellness-contact",
+      "role": "contact",
+      "scaffold": "components/lumina-wellness-contact.tsx"
+    },
+    {
+      "id": "lumina-wellness-footer",
+      "role": "footer",
+      "scaffold": "components/lumina-wellness-footer.tsx"
+    },
+    {
+      "id": "lumina-wellness-floating-cta",
+      "role": "cta",
+      "scaffold": "components/lumina-wellness-floating-cta.tsx"
+    },
+    {
+      "id": "lumina-wellness-utility-band",
+      "role": "cta",
+      "scaffold": "components/lumina-wellness-utility-band.tsx"
+    },
+    {
+      "id": "lumina-wellness-section-shell",
+      "role": "custom",
+      "scaffold": "components/lumina-wellness-section-shell.tsx"
+    },
+    {
+      "id": "lumina-wellness-portfolio",
+      "role": "custom",
+      "scaffold": "components/lumina-wellness-portfolio.tsx"
+    },
+    {
+      "id": "lumina-wellness-integrations",
+      "role": "custom",
+      "scaffold": "components/lumina-wellness-integrations.tsx"
+    }
+  ]
+}

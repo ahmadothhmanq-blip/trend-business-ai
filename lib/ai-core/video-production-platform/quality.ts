@@ -8,6 +8,7 @@ import type {
 } from "@/lib/ai-core/video-production-platform/types";
 import { getLatestJob } from "@/lib/ai-core/video-production-platform/render-engine";
 import { isStubVideoBytes } from "@/lib/ai-core/video-production-platform/providers/types";
+import { isPlayableVideoMime } from "@/lib/ai-core/video-production-platform/media-validation";
 
 export function runVideoQualityChecks(
   model: VideoProductionModel,
@@ -97,21 +98,21 @@ export function runVideoQualityChecks(
     detail: job?.clips.filter((c) => c.error).map((c) => c.error).join("; ") || "OK",
   });
 
-  const hasMp4 = model.assets.some(
+  const hasPlayableVideo = model.assets.some(
     (a) =>
-      a.mimeType.includes("mp4") ||
-      a.mimeType.includes("webm") ||
-      a.url.includes(".mp4") ||
-      a.storagePath?.includes(".mp4"),
+      isPlayableVideoMime(a.mimeType) &&
+      Boolean(a.url) &&
+      a.provider !== "preview" &&
+      a.provider !== "preview-stub",
   );
   checks.push({
     id: "file-validation",
-    label: "Video file assets",
-    passed: hasMp4 || job?.mode === "preview",
-    severity: hasMp4 ? "info" : "warning",
-    detail: hasMp4
+    label: "Playable video artifact",
+    passed: hasPlayableVideo,
+    severity: hasPlayableVideo ? "info" : "blocker",
+    detail: hasPlayableVideo
       ? `${model.assets.filter((a) => a.kind === "clip" || a.kind === "composite").length} media assets`
-      : "No MP4/WebM in storage yet — run full render",
+      : "No playable video/mp4 or video/webm — storyboard/SVG is not a rendered video",
   });
 
   const voiceDone = model.voiceTracks.some(
@@ -171,7 +172,7 @@ export function runVideoQualityChecks(
     checks.push({
       id: "assembly",
       label: "Final assembly",
-      passed: job.assemblyManifest.method === "ffmpeg" || job.assemblyManifest.method === "first-clip",
+      passed: job.assemblyManifest.method === "ffmpeg",
       severity: "info",
       detail: `${job.assemblyManifest.method}: ${job.assemblyManifest.note}`,
     });
@@ -188,19 +189,35 @@ export function runVideoQualityChecks(
     });
   }
 
-  // Scene consistency — visual prompts + durations
-  const inconsistent = model.scenes.filter(
+  // Scene prompt/duration completeness — not AI character/product consistency scoring
+  const incompleteScenes = model.scenes.filter(
     (s) => !s.visualPrompt || s.visualPrompt.length < 8 || s.durationSec < 1,
   );
   checks.push({
     id: "scene-consistency",
-    label: "Scene consistency",
-    passed: inconsistent.length === 0,
+    label: "Scene prompt and duration completeness",
+    passed: incompleteScenes.length === 0,
     severity: "warning",
     detail:
-      inconsistent.length === 0
-        ? "Scenes have prompts and valid durations"
-        : `${inconsistent.length} scene(s) need visual/duration fixes`,
+      incompleteScenes.length === 0
+        ? "Scenes have visual prompts and valid durations (structural check, not AI scoring)"
+        : `${incompleteScenes.length} scene(s) need visual/duration fixes`,
+  });
+
+  checks.push({
+    id: "prompt-adherence",
+    label: "Prompt adherence",
+    passed: true,
+    severity: "info",
+    detail: "Prompt-adherence scoring is unavailable — no visual QC provider is configured. Informational only, not a real score.",
+  });
+
+  checks.push({
+    id: "character-product-consistency",
+    label: "Character / product consistency",
+    passed: true,
+    severity: "info",
+    detail: "Consistency scoring is unavailable — capability is not configured. Informational only, not a real score.",
   });
 
   // Human realism for presenter-driven projects
@@ -258,14 +275,11 @@ export function runVideoQualityChecks(
   checks.push({
     id: "video-quality-signal",
     label: "Video quality signal",
-    passed:
-      Boolean(job?.compositeAsset?.url) ||
-      job?.clips.some((c) => c.status === "completed") ||
-      job?.mode === "preview",
-    severity: "info",
-    detail: job?.compositeAsset
-      ? `Composite ready (${job.assemblyManifest?.method || "asset"})`
-      : "Run full render for final quality assessment",
+    passed: hasPlayableVideo,
+    severity: hasPlayableVideo ? "info" : "warning",
+    detail: hasPlayableVideo
+      ? `Playable video present (${job?.assemblyManifest?.method || "clip"})`
+      : "Storyboard/preview only — no playable video artifact",
   });
 
   const stubAsset = model.assets.some((a) => {
@@ -299,21 +313,26 @@ export function runVideoQualityChecks(
     id: "ffmpeg-assembly",
     label: "FFmpeg final assembly",
     passed:
-      !job ||
-      job.mode === "preview" ||
-      job.assemblyManifest?.method === "ffmpeg" ||
-      job.status === "processing" ||
-      job.status === "queued",
+      Boolean(job) &&
+      job!.mode !== "preview" &&
+      (job!.assemblyManifest?.method === "ffmpeg" ||
+        job!.status === "processing" ||
+        job!.status === "queued"),
     severity: "warning",
-    detail: job?.assemblyManifest
-      ? `${job.assemblyManifest.method}: ${job.assemblyManifest.note}`
-      : "No assembly yet — install ffmpeg for multi-scene merge",
+    detail: job?.mode === "preview"
+      ? "Preview jobs do not produce assembled video"
+      : job?.assemblyManifest
+        ? `${job.assemblyManifest.method}: ${job.assemblyManifest.note}`
+        : "No assembly yet — install ffmpeg for multi-scene merge",
   });
 
   const blockers = checks.filter((c) => c.severity === "blocker" && !c.passed);
   const warnings = checks.filter((c) => c.severity === "warning" && !c.passed);
-  const passed = checks.filter((c) => c.passed).length;
-  const score = Math.round((passed / checks.length) * 100);
+  const scoredChecks = checks.filter(
+    (c) => c.id !== "prompt-adherence" && c.id !== "character-product-consistency",
+  );
+  const passed = scoredChecks.filter((c) => c.passed).length;
+  const score = Math.round((passed / scoredChecks.length) * 100);
 
   return {
     ready: blockers.length === 0,

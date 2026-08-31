@@ -1,0 +1,7 @@
+{
+  "pageId": "pricing",
+  "layoutId": "default",
+  "regions": {
+    "main": ["lumina-wellness-hero", "lumina-wellness-pricing", "lumina-wellness-faq"]
+  }
+}

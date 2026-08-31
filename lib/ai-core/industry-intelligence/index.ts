@@ -18,7 +18,10 @@ export {
   listPrimaryWebsiteIndustryIntelligence,
 } from "@/lib/ai-core/industry-intelligence/profiles";
 
-export { detectWebsiteIndustry } from "@/lib/ai-core/industry-intelligence/detect";
+export {
+  detectWebsiteIndustry,
+  detectWebsiteIndustrySync,
+} from "@/lib/ai-core/industry-intelligence/detect";
 
 export {
   applyIndustryIntelligenceToBrief,

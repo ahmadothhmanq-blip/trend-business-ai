@@ -26,6 +26,7 @@ export async function generateBusinessPlan(input: {
   industry?: string;
   teamSize?: string;
   timeline?: string;
+  language?: string;
 }): Promise<GeneratedBusinessPlan & { provider: string }> {
   const prompt = buildBusinessPlanPrompt(input);
   const data = await generateJson<Record<string, unknown>>(prompt);
@@ -45,7 +46,7 @@ export async function generateBusinessPlan(input: {
 
 export async function runBusinessAssistant(
   action: BusinessAssistantAction,
-  input: { text: string; context?: string; instruction?: string },
+  input: { text: string; context?: string; instruction?: string; language?: string },
 ) {
   const prompt = buildAssistantPrompt(action, input);
   return generateJson<Record<string, unknown>>(prompt);

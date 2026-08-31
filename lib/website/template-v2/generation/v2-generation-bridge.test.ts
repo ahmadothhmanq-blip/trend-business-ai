@@ -1,12 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { buildStaticPreviewHtml } from "@/lib/website/build-static-preview.server";
 import {
-  applyV2StructureDuringGeneration,
   FLAGSHIP_V2_PACKAGE_IDS,
   projectContainsThemeComponents,
-  projectUsesV2FlagshipComponents,
   resolveGenerationTemplatePackageId,
+  resolvePostGenerationTemplatePackageId,
   shouldUseV2StructureDuringGeneration,
   stripLegacyThemeScaffoldFiles,
 } from "@/lib/website/template-v2/generation/v2-generation-bridge";
@@ -69,72 +67,66 @@ export default function Page() { return <ThemeBoldHero />; }`,
 }
 
 describe("v2-generation-bridge", () => {
-  it("resolves structure package id from generation input", () => {
+  it("does not route visual skin to file-generation template resolution", () => {
     assert.equal(
       resolveGenerationTemplatePackageId({
-        websiteStructureTemplateId: "saas-enterprise",
+        visualSkinId: "sovereign",
+      }),
+      null,
+    );
+    assert.equal(
+      resolvePostGenerationTemplatePackageId({
+        visualSkinId: "sovereign",
       }),
       "saas-enterprise",
     );
     assert.equal(
-      resolveGenerationTemplatePackageId({
-        templateId: "modern-business",
+      resolvePostGenerationTemplatePackageId({
+        visualSkinId: "prestige",
       }),
       "corporate-business",
     );
   });
 
-  it("detects V2 architecture for flagship packages", async () => {
-    for (const id of FLAGSHIP_V2_PACKAGE_IDS) {
-      assert.equal(await shouldUseV2StructureDuringGeneration(id), true);
-    }
+  it("treats visual skin V2 packages as v2 during generation", async () => {
+    assert.equal(await shouldUseV2StructureDuringGeneration("saas-enterprise"), true);
+    assert.equal(await shouldUseV2StructureDuringGeneration("corporate-business"), true);
+  });
+
+  it("resolves removed structure ids to internal generation fallback", () => {
+    assert.equal(
+      resolveGenerationTemplatePackageId({
+        websiteStructureTemplateId: "ai-startup-signal",
+      }),
+      "_generation-default",
+    );
+    assert.equal(
+      resolveGenerationTemplatePackageId({
+        websiteStructureTemplateId: "saas-enterprise",
+      }),
+      "_generation-default",
+    );
+    assert.equal(
+      resolveGenerationTemplatePackageId({
+        templateId: "modern-business",
+      }),
+      "_generation-default",
+    );
+  });
+
+  it("has no flagship V2 packages while catalog is empty", () => {
+    assert.deepEqual([...FLAGSHIP_V2_PACKAGE_IDS], []);
+  });
+
+  it("does not use V2 structure path for legacy ids without installed packages", async () => {
     assert.equal(await shouldUseV2StructureDuringGeneration("modern-business"), false);
+    assert.equal(await shouldUseV2StructureDuringGeneration("_generation-default"), false);
   });
 
   it("strips Theme* scaffold files", () => {
     const stripped = stripLegacyThemeScaffoldFiles(baseProject().files ?? []);
     assert.equal(stripped.some((f) => f.path.includes("ThemeBold")), false);
     assert.equal(stripped.some((f) => f.path === "lib/site-images.ts"), true);
+    assert.equal(projectContainsThemeComponents(stripped), false);
   });
-
-  for (const packageId of FLAGSHIP_V2_PACKAGE_IDS) {
-    it(`applies ${packageId} during generation without Theme* components`, async () => {
-      const applied = await applyV2StructureDuringGeneration({
-        project: baseProject({ title: `${packageId} QA` }),
-        templatePackageId: packageId,
-        language: "English",
-      });
-
-      const settings = applied.settings as Record<string, unknown>;
-      assert.equal(settings.templateArchitectureVersion, "v2");
-      assert.equal(settings.templatePackageId, packageId);
-      assert.equal(settings.websiteStructureTemplateId, packageId);
-      assert.ok(typeof settings.templatePresentationHash === "string");
-      assert.ok((settings.templatePresentationHash as string).length > 0);
-
-      assert.equal(projectContainsThemeComponents(applied.files ?? []), false);
-      assert.equal(projectUsesV2FlagshipComponents(applied.files ?? [], packageId), true);
-
-      const html = buildStaticPreviewHtml({
-        title: applied.title,
-        description: applied.description,
-        pages: applied.pages,
-        sections: applied.sections,
-        colorPalette: applied.colorPalette,
-        typography: applied.typography,
-        content: applied.content,
-        components: applied.components,
-        files: applied.files,
-        templateArchitectureVersion: "v2",
-        templatePackageId: packageId,
-        settings,
-        language: "English",
-      });
-
-      assert.ok(html.includes('data-v2-render="v2-files"'));
-      assert.ok(html.includes(`data-v2-package="${packageId}"`));
-      assert.ok(!html.includes("ThemeBold"));
-      assert.ok(!html.includes('data-ti-render="v5"'));
-    });
-  }
 });

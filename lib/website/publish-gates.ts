@@ -17,6 +17,7 @@ import { runDesignCritic } from "@/lib/ai-core/design-critic";
 import { resolveSiteStructure, runPrePublishQualityControl } from "@/lib/ai-core/website-management";
 import type { AgencyGenerationContract } from "@/lib/ai-core/agency-orchestrator/types";
 import { runAgencyQualityGate } from "@/lib/ai-core/agency-quality";
+import { evaluateIndustryImageGate } from "@/lib/website/publish-gate/industry-images";
 
 export type PublishGateResult = {
   publishReady: boolean;
@@ -131,6 +132,12 @@ export function evaluatePublishGates(
     files: project.files,
     structure,
   });
+
+  for (const check of evaluateIndustryImageGate(project)) {
+    if (check.passed) continue;
+    if (check.severity === "blocker") blockers.push(check.message);
+    else warnings.push(check.message);
+  }
 
   const agencyContract = loadAgencyContract(generation);
   if (agencyContract) {

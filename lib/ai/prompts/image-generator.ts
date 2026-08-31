@@ -1,5 +1,5 @@
 import type { ImagePluginInput, ImageAnalysis, ImageConcept } from "@/plugins/image-generator/types";
-import { aiOutputLanguageDirective } from "@/lib/ai/prompts/shared";
+import { aiOutputLanguageDirective } from "@/lib/ai/prompts/language-directive.server";
 
 function getImageTypeContext(type: string): string {
   const ctx: Record<string, string> = {
@@ -45,7 +45,7 @@ Produce a JSON object with:
 - targetUse: where this image will be used
 - technicalRequirements: array of technical specs (resolution, format, etc.)
 
-Return ONLY valid JSON.${aiOutputLanguageDirective(input.language)}`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(input.language, "image")}`;
 }
 
 export function imagePlanPrompt(input: ImagePluginInput, analysis: ImageAnalysis): string {
@@ -74,7 +74,7 @@ Create a JSON object with:
 - outputFormats: recommended output formats (array of strings like "png", "svg", "jpg")
 - compositionApproach: overall composition strategy
 
-Return ONLY valid JSON.${aiOutputLanguageDirective(input.language)}`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(input.language, "image")}`;
 }
 
 export function imageConceptPrompt(
@@ -111,6 +111,7 @@ SVG REQUIREMENTS:
 - Create a professional, detailed illustration — not a placeholder.
 - Use shapes, paths, gradients, and patterns for visual richness.
 - For text elements, use generic fonts (Arial, Helvetica, sans-serif).
+- Any visible text inside the SVG (labels, titles, slogans, overlay copy) must be in ${input.language}.
 - No external images, links, or scripts.
 - No <image>, <foreignObject>, or external <use> references.
 - Center the composition within the viewBox.
@@ -128,7 +129,7 @@ Return a JSON object with:
 - style: "${analysis.style}"
 - svgConcept: complete SVG markup as a string
 
-Return ONLY valid JSON.${aiOutputLanguageDirective(input.language)}`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(input.language, "image")}`;
 }
 
 export function imagePromptLibraryPrompt(
@@ -159,5 +160,5 @@ Each entry should have:
 - negativePrompt: what to exclude
 - style: the style tag
 
-Return ONLY valid JSON with a "prompts" array.${aiOutputLanguageDirective(input.language)}`;
+Return ONLY valid JSON with a "prompts" array.${aiOutputLanguageDirective(input.language, "image")}`;
 }

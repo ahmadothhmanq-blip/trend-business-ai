@@ -1,6 +1,6 @@
 {
   "tbdpNative": true,
-  "sectorDnaId": "real-estate",
-  "experienceProfiles": ["luxury", "executive", "corporate"],
-  "presetBinding": "monolith-reveal"
+  "sectorDnaId": "saas",
+  "experienceProfiles": ["technical", "corporate", "executive"],
+  "presetBinding": "nexus-grid-reveal"
 }

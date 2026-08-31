@@ -134,6 +134,19 @@ export const THEME_COMPONENT_LIBRARIES: Record<
     spec("bold", "ThemeBoldFooter", "footer", "footer"),
     spec("bold", "ThemeBoldFloatingCta", "floating-cta", "floating-cta"),
   ],
+  global: [
+    spec("global", "ThemeGlobalNav", "nav", "nav"),
+    spec("global", "ThemeGlobalHero", "hero", "hero"),
+    spec("global", "ThemeGlobalShowcase", "portfolio", "showcase"),
+    spec("global", "ThemeGlobalIntegrations", "integrations", "integrations"),
+    spec("global", "ThemeGlobalFeatures", "features", "features"),
+    spec("global", "ThemeGlobalFaq", "faq", "faq"),
+    spec("global", "ThemeGlobalPricing", "pricing", "pricing"),
+    spec("global", "ThemeGlobalTestimonials", "testimonials", "testimonials"),
+    spec("global", "ThemeGlobalContact", "contact", "contact"),
+    spec("global", "ThemeGlobalFooter", "footer", "footer"),
+    spec("global", "ThemeGlobalFloatingCta", "floating-cta", "floating-cta"),
+  ],
 };
 
 const BY_ID = new Map<string, ThemeComponentSpec>();

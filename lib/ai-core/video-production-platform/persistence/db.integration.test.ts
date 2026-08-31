@@ -5,6 +5,9 @@ import { fileURLToPath } from "node:url";
 import { test } from "node:test";
 import pg from "pg";
 
+type PgClient = InstanceType<typeof pg.Client>;
+type PgQueryResultRow = Record<string, unknown>;
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "..");
 
 function loadEnv() {
@@ -37,7 +40,7 @@ function skipDb(): boolean {
 }
 
 async function expectSqlFailure(
-  client: pg.Client,
+  client: PgClient,
   fn: () => Promise<unknown>,
   pattern: RegExp,
 ): Promise<void> {
@@ -62,7 +65,7 @@ async function expectSqlFailure(
   }
 }
 
-async function withClient<T>(fn: (client: pg.Client) => Promise<T>): Promise<T> {
+async function withClient<T>(fn: (client: PgClient) => Promise<T>): Promise<T> {
   const client = new pg.Client({
     connectionString: dbUrl,
     ssl: { rejectUnauthorized: false },
@@ -111,11 +114,11 @@ test("db: foreign keys, indexes, unique, rls", async (t) => {
           'public.video_quality_reports', 'public.video_media', 'public.video_render_jobs'
         )
     `);
-    const names = fks.rows.map((r) => String(r.conname));
-    assert.ok(names.some((n) => n.includes("video_plans") && n.includes("project")));
-    assert.ok(names.some((n) => n.includes("video_scenes") && n.includes("project")));
-    assert.ok(names.some((n) => n.includes("provider_jobs")));
-    assert.ok(names.some((n) => n.includes("quality_reports")));
+    const names = fks.rows.map((r: PgQueryResultRow) => String(r.conname));
+    assert.ok(names.some((n: string) => n.includes("video_plans") && n.includes("project")));
+    assert.ok(names.some((n: string) => n.includes("video_scenes") && n.includes("project")));
+    assert.ok(names.some((n: string) => n.includes("provider_jobs")));
+    assert.ok(names.some((n: string) => n.includes("quality_reports")));
 
     const uniqueNames = [
       "video_provider_jobs_idempotency_key_key",
@@ -159,7 +162,7 @@ test("db: foreign keys, indexes, unique, rls", async (t) => {
         and c.relname in ('video_plans', 'video_scenes', 'video_provider_jobs', 'video_quality_reports', 'video_audio_plans', 'video_audio_tracks', 'video_audio_jobs')
     `);
     assert.equal(rls.rows.length, 7);
-    assert.ok(rls.rows.every((row) => row.relrowsecurity === true));
+    assert.ok(rls.rows.every((row: PgQueryResultRow) => row.relrowsecurity === true));
   });
 });
 
@@ -442,7 +445,7 @@ test("db: audio engine tables persist jobs and reject duplicate idempotency", as
       group by c.relname
     `);
     assert.equal(policies.rowCount, 3);
-    assert.ok(policies.rows.every((row) => Number(row.policies) >= 4));
+    assert.ok(policies.rows.every((row: PgQueryResultRow) => Number(row.policies) >= 4));
 
     await client.query("begin");
     try {

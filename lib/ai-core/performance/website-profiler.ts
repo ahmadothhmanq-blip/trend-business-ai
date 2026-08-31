@@ -400,7 +400,7 @@ function buildParallelAnalysis(
     items.push({
       observation: `Image generation (${imageStage.totalMs}ms) runs sequentially; multi-slot images could be requested in parallel.`,
       impact: "medium",
-      candidates: ["runAiImageEngine", "generateWebsiteAssets"],
+      candidates: ["runAiImageEngine"],
     });
   }
 

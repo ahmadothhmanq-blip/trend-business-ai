@@ -1,11 +1,11 @@
 {
   "packageId": "real-estate-premium",
-  "completedAt": "2026-08-05T22:07:28.105Z",
-  "marketplaceScore": 95,
+  "completedAt": "2026-08-07T19:08:23.751Z",
+  "marketplaceScore": 96,
   "passed95": true,
   "visual": {
     "designTokens": 92,
-    "visualHierarchy": 92,
+    "visualHierarchy": 85,
     "responsiveLayout": 92,
     "heroQuality": 92,
     "navigationUx": 92,
@@ -14,18 +14,18 @@
     "typographyHierarchy": 85,
     "crossPageConsistency": 92,
     "layout": 92,
-    "ux": 92,
-    "overall": 91
+    "ux": 91,
+    "overall": 90
   },
   "preview": {
     "imageCount": 0,
-    "hasHeroImage": false,
-    "hasPlaceholder": false,
-    "sectionCount": 0,
-    "premiumSignals": 4,
+    "hasHeroImage": true,
+    "hasPlaceholder": true,
+    "sectionCount": 7,
+    "premiumSignals": 6,
     "duplicateImages": 0,
     "uniquePhotoCount": 1,
-    "usesSlotImages": false
+    "usesSlotImages": true
   },
   "slotIndependence": {
     "slotUsages": 10,
@@ -33,10 +33,10 @@
   },
   "imageValidation": {
     "passed": true,
-    "repairs": 40,
-    "duplicatesRemoved": 32,
+    "repairs": 0,
+    "duplicatesRemoved": 0,
     "industryId": "real-estate",
-    "uniqueUrlCount": 12,
+    "uniqueUrlCount": 0,
     "issues": [
       "duplicate: Duplicate image URL rejected.",
       "duplicate: Duplicate image URL rejected.",
@@ -61,15 +61,15 @@
         "library": 44,
         "stock": 0
       },
-      "summary": "Industry image rules passed for Real Estate (real-estate). 44 images selected, 32 replaced."
+      "summary": "Image validation passed with 0 filled slot(s); blank slots preserved."
     }
   },
   "lighthouse": null,
   "previewPath": "C:\\Users\\PC\\Desktop\\trend-business-ai\\scripts\\benchmark-results\\flagship-previews\\real-estate-premium\\preview.html",
-  "bytes": 23551,
+  "bytes": 77826,
   "v2Markers": {
     "package": true,
-    "hero": false,
-    "render": true
+    "hero": true,
+    "render": false
   }
 }

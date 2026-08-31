@@ -13,6 +13,7 @@ import {
   getWbTemplateMarketplaceRegistry,
 } from "@/lib/website/template-marketplace/registry";
 import type { WbTemplateMarketplaceListing } from "@/lib/website/template-marketplace/types";
+import { PACKAGE_SUPERSESSION_ALIASES } from "@/lib/website/builder/package-supersession-aliases";
 
 export const WB_TEMPLATE_REGISTRY_RELATIVE_PATH = "templates/website-registry";
 
@@ -152,6 +153,7 @@ export async function installRemoteTemplatePackage(
   templateId: string,
 ): Promise<InstallRemoteTemplateResult | InstallRemoteTemplateError> {
   const normalizedId = templateId.trim();
+  const resolvedId = PACKAGE_SUPERSESSION_ALIASES[normalizedId] ?? normalizedId;
   if (!normalizedId) {
     return {
       ok: false,
@@ -161,20 +163,23 @@ export async function installRemoteTemplatePackage(
   }
 
   await initializeWbTemplateEngine();
-  const existing = await getTemplateMarketplaceRegistryListing(normalizedId);
+  const existing = await getTemplateMarketplaceRegistryListing(resolvedId);
   if (existing?.availability === "installed") {
     await registerInstalledPackage();
-    const listing = await getTemplateMarketplaceRegistryListing(normalizedId);
+    const listing = await getTemplateMarketplaceRegistryListing(resolvedId);
     if (!listing) {
       return {
         ok: false,
         code: "registry.missing",
-        message: `Installed template "${normalizedId}" could not be resolved after refresh`,
+        message: `Installed template "${resolvedId}" could not be resolved after refresh`,
       };
     }
     return {
       ok: true,
-      listing,
+      listing:
+        resolvedId === normalizedId
+          ? listing
+          : { ...listing, id: normalizedId },
       alreadyInstalled: true,
       packageId: listing.id,
       packageVersion: listing.version,
@@ -182,7 +187,8 @@ export async function installRemoteTemplatePackage(
   }
 
   const remote = getRemoteMarketplaceListing(normalizedId);
-  if (!remote) {
+  const registryListing = await getTemplateMarketplaceRegistryListing(normalizedId);
+  if (!remote && !registryListing) {
     return {
       ok: false,
       code: "listing.not_found",
@@ -190,7 +196,15 @@ export async function installRemoteTemplatePackage(
     };
   }
 
-  if (remote.availability !== "remote") {
+  if (registryListing?.availability === "unavailable") {
+    return {
+      ok: false,
+      code: "listing.unavailable",
+      message: `Template "${normalizedId}" is not available for installation yet`,
+    };
+  }
+
+  if (!remote) {
     return {
       ok: false,
       code: "listing.not_remote",
@@ -200,7 +214,7 @@ export async function installRemoteTemplatePackage(
 
   let sourceDir: string;
   try {
-    sourceDir = await resolvePackageSourceDir(normalizedId, remote);
+    sourceDir = await resolvePackageSourceDir(resolvedId, remote);
   } catch (error) {
     return {
       ok: false,
@@ -228,12 +242,12 @@ export async function installRemoteTemplatePackage(
     return {
       ok: false,
       code: "package.invalid",
-      message: `Template package "${normalizedId}" failed validation`,
+      message: `Template package "${resolvedId}" failed validation`,
       issues: sourceValidation.issues,
     };
   }
 
-  const targetDir = resolveInstalledPackageDir(normalizedId);
+  const targetDir = resolveInstalledPackageDir(resolvedId);
   try {
     await copyPackageDirectory(sourceDir, targetDir);
   } catch (error) {

@@ -1,0 +1,7 @@
+{
+  "pageId": "pricing",
+  "layoutId": "default",
+  "regions": {
+    "main": ["obsidian-noir-hero", "obsidian-noir-pricing", "obsidian-noir-faq"]
+  }
+}

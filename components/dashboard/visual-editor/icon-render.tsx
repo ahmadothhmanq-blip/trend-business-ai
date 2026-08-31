@@ -1,5 +1,6 @@
 "use client";
 
+import { createElement, type ComponentProps } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
   ArrowLeft,
@@ -78,4 +79,11 @@ export const LUCIDE_ICON_MAP: Record<string, LucideIcon> = {
 
 export function resolveLucideIcon(name: string): LucideIcon {
   return LUCIDE_ICON_MAP[name] ?? Sparkles;
+}
+
+export function LucideIconGlyph({
+  name,
+  ...props
+}: { name: string } & ComponentProps<LucideIcon>) {
+  return createElement(resolveLucideIcon(name), props);
 }

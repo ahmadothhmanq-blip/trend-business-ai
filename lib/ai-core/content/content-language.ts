@@ -289,6 +289,24 @@ export function getGeneratingWebsiteLabel(language?: string | null): string {
   return GENERATING_LABELS.en!;
 }
 
+/** True when title is the in-progress session placeholder (not a real brand name). */
+export function isGeneratingWebsitePlaceholderTitle(
+  title?: string | null,
+): boolean {
+  const normalized = title?.trim();
+  if (!normalized) return false;
+  const lower = normalized.toLowerCase().replace(/…/g, "...");
+  if (lower === "generating website..." || lower.includes("generating website")) {
+    return true;
+  }
+  if (lower.includes("جاري إنشاء")) return true;
+  return Object.values(GENERATING_LABELS).some((label) => {
+    if (!label?.trim()) return false;
+    const candidate = label.trim().toLowerCase().replace(/…/g, "...");
+    return candidate === lower;
+  });
+}
+
 export type PreviewBlockLabels = {
   features: string;
   services: string;

@@ -1,8 +1,0 @@
-{
-  "pageId": "menu",
-  "layoutId": "sidebar-left",
-  "regions": {
-    "sidebar": ["restaurant-signature-sidebar-rail"],
-    "main": ["restaurant-signature-tasting-menu", "restaurant-signature-signature-dishes"]
-  }
-}

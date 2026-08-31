@@ -68,6 +68,19 @@ export type WebsiteGenerationInput = {
   /** Server-resolved billing hint — professional default for paid users. */
   hasPaidPlan?: boolean;
   billingPlanId?: string;
+  /** Site image mode — with-images | without-images | user-adds-later */
+  imageStrategyMode?: import("@/lib/website/site-plan/image-strategy").SiteImageStrategyMode;
+  /** Visual skin id (dashboard only) */
+  visualSkinId?: string;
+  /** Request visitor-facing multi-language routes */
+  visitorLocales?: boolean;
+  /** Beginner UX — hide advanced panels (default true) */
+  beginnerMode?: boolean;
+  /** Universal Planner integration trace (server-populated, feature-flagged). */
+  universalPlannerEnabled?: boolean;
+  universalPlannerTraceRef?: string;
+  universalPlannerBlueprint?: import("@/lib/ai-core/universal-planner").UniversalBlueprint;
+  universalPlannerWebsitePlan?: import("@/lib/ai-core/universal-planner").UniversalServiceBlueprint;
   previousFiles?: GeneratedProjectFile[];
   previousTitle?: string;
   previousDescription?: string;
@@ -146,26 +159,46 @@ export type WebsitePlanResult = {
   designSystem: DesignSystem;
 };
 
+export type WebsiteProjectSettings = {
+  framework?: string;
+  styling?: string;
+  packageManager?: string;
+  deploymentTarget?: string;
+  complexity?: string;
+  estimatedFileCount?: string;
+  requiresAuth?: string;
+  requiresDatabase?: string;
+  requiresDashboard?: string;
+  isEcommerce?: string;
+  isSaas?: string;
+  databaseProvider?: "prisma" | "supabase" | "none";
+  templatePackageId?: string;
+  businessIndustry?: string;
+  sitePlanArchetype?: string;
+  sitePlanHash?: string;
+  prescriptiveCapabilities?: string;
+  visualSkinId?: string;
+  visitorLocales?: string;
+  templateIntelligenceId?: string;
+  websiteStructureTemplateId?: string;
+  websiteThemeId?: string;
+  templateArchitectureVersion?: string;
+  templatePresentationHash?: string;
+  templateComposerId?: string;
+  generationProfile?: "fast" | "professional" | "ultra";
+  websiteBlueprintV2?: unknown;
+  designDirectorReportV2?: unknown;
+  [key: string]: string | number | boolean | unknown | undefined;
+};
+
 export type GeneratedWebsiteProject = {
   projectKind: "website" | "web_application";
   title: string;
   description: string;
+  language?: string;
   prompt?: string;
   generatedAt?: string;
-  settings?: {
-    framework?: string;
-    styling?: string;
-    packageManager?: string;
-    deploymentTarget?: string;
-    complexity?: string;
-    estimatedFileCount?: string;
-    requiresAuth?: string;
-    requiresDatabase?: string;
-    requiresDashboard?: string;
-    isEcommerce?: string;
-    isSaas?: string;
-    databaseProvider?: "prisma" | "supabase" | "none";
-  };
+  settings?: WebsiteProjectSettings;
   progressEvents?: WebsiteGenerationProgressEvent[];
   pages: string[];
   sections: string[];
@@ -200,6 +233,8 @@ export type GeneratedWebsiteProject = {
   waveGenerationState?: import("@/lib/website/wave-checkpoint-engine").WaveGenerationState;
   /** Review Studio version history and snapshots (Phase 1 UI) */
   reviewStudioState?: import("@/lib/website/review-studio/types").ReviewStudioPersistedState;
+  /** Unified site structure plan (WB_SITE_PLAN_V1). */
+  sitePlan?: import("@/lib/website/site-plan/types").SitePlan;
 };
 
 export type { GeneratedProjectFile };

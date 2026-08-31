@@ -13,6 +13,9 @@ import {
   type ResolveBlueprintInputParams,
 } from "@/lib/website/template-v2/integration/blueprint-input";
 import type { GeneratedWebsiteProject } from "@/plugins/website/types";
+import { isStructureFirstEnabled } from "@/lib/website/generation-flags";
+import { refreshCapabilities } from "@/lib/website/builder/capabilities/service";
+import { resolveSectionOrderFromProject } from "@/lib/website/template-v2/integration/strategy-section-order";
 
 export type ProductionPipelineResult = {
   optimizedBlueprint: WebsiteBlueprint;
@@ -74,12 +77,33 @@ export function resolveProductionBlueprint(
   }
 
   try {
-    return runProductionDesignPipeline({
+    const capabilityService = isStructureFirstEnabled()
+      ? refreshCapabilities(params.project, {
+          files: params.project.files ?? undefined,
+        }).service
+      : null;
+    const strategySectionOrder = isStructureFirstEnabled()
+      ? resolveSectionOrderFromProject(params.project, capabilityService)
+      : null;
+
+    const result = runProductionDesignPipeline({
       project: params.project,
       templatePackageId: params.templatePackageId,
       language: params.language,
       seed: params.seed,
     });
+
+    if (!strategySectionOrder?.length) {
+      return result;
+    }
+
+    return {
+      ...result,
+      optimizedBlueprint: {
+        ...result.optimizedBlueprint,
+        sectionOrder: strategySectionOrder,
+      },
+    };
   } catch {
     return null;
   }

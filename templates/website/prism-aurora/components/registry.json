@@ -1,0 +1,81 @@
+{
+  "components": [
+    {
+      "id": "prism-aurora-nav",
+      "role": "navigation",
+      "scaffold": "components/prism-aurora-nav.tsx",
+      "slots": ["logo", "links", "cta"]
+    },
+    {
+      "id": "prism-aurora-hero",
+      "role": "hero",
+      "scaffold": "components/prism-aurora-hero.tsx",
+      "slots": ["headline", "metrics", "cta"]
+    },
+    {
+      "id": "prism-aurora-features",
+      "role": "features",
+      "scaffold": "components/prism-aurora-features.tsx"
+    },
+    {
+      "id": "prism-aurora-about",
+      "role": "story",
+      "scaffold": "components/prism-aurora-about.tsx"
+    },
+    {
+      "id": "prism-aurora-stats",
+      "role": "custom",
+      "scaffold": "components/prism-aurora-stats.tsx"
+    },
+    {
+      "id": "prism-aurora-testimonials",
+      "role": "testimonials",
+      "scaffold": "components/prism-aurora-testimonials.tsx"
+    },
+    {
+      "id": "prism-aurora-pricing",
+      "role": "pricing",
+      "scaffold": "components/prism-aurora-pricing.tsx"
+    },
+    {
+      "id": "prism-aurora-faq",
+      "role": "faq",
+      "scaffold": "components/prism-aurora-faq.tsx"
+    },
+    {
+      "id": "prism-aurora-contact",
+      "role": "contact",
+      "scaffold": "components/prism-aurora-contact.tsx"
+    },
+    {
+      "id": "prism-aurora-footer",
+      "role": "footer",
+      "scaffold": "components/prism-aurora-footer.tsx"
+    },
+    {
+      "id": "prism-aurora-floating-cta",
+      "role": "cta",
+      "scaffold": "components/prism-aurora-floating-cta.tsx"
+    },
+    {
+      "id": "prism-aurora-utility-band",
+      "role": "cta",
+      "scaffold": "components/prism-aurora-utility-band.tsx"
+    },
+    {
+      "id": "prism-aurora-section-shell",
+      "role": "custom",
+      "scaffold": "components/prism-aurora-section-shell.tsx"
+    },
+    {
+      "id": "prism-aurora-portfolio",
+      "role": "custom",
+      "scaffold": "components/prism-aurora-portfolio.tsx"
+    },
+    {
+      "id": "prism-aurora-integrations",
+      "role": "custom",
+      "scaffold": "components/prism-aurora-integrations.tsx"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "pageId": "customers",
+  "layoutId": "default",
+  "regions": {
+    "main": ["real-estate-premium-hero", "real-estate-premium-portfolio", "real-estate-premium-features"]
+  }
+}

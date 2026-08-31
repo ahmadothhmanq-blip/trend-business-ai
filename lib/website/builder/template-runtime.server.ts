@@ -1,4 +1,4 @@
-import { resolveBuilderTemplatePackageId } from "@/lib/website/builder/resolve-builder-template-package-id";
+import { resolveInstalledBuilderTemplatePackageId } from "@/lib/website/builder/resolve-builder-template-package-id";
 import { getWbTemplateRegistry, initializeWbTemplateEngine } from "@/lib/website/template-engine/index.server";
 import { renderWbTemplateFromResolvedPackage } from "@/lib/website/template-renderer";
 import type {
@@ -37,7 +37,7 @@ export async function resolveBuilderTemplateRuntimeModel(
   templateId: string,
   scope?: BuilderTemplateRuntimeScope,
 ): Promise<BuilderTemplateRuntimeResult> {
-  const normalizedId = resolveBuilderTemplatePackageId(templateId);
+  const normalizedId = resolveInstalledBuilderTemplatePackageId(templateId);
   if (!normalizedId) {
     return failure(
       "",

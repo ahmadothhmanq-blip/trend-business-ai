@@ -6,15 +6,17 @@
     "main": [
       "saas-enterprise-hero",
       "saas-enterprise-features",
+      "saas-enterprise-integrations",
       "saas-enterprise-about",
       "saas-enterprise-stats",
+      "saas-enterprise-portfolio",
       "saas-enterprise-testimonials",
       "saas-enterprise-pricing",
       "saas-enterprise-faq",
       "saas-enterprise-contact"
     ],
     "utility": ["saas-enterprise-utility-band"],
-    "overlay": ["saas-enterprise-floating-cta"],
+    "overlay": [],
     "footer": ["saas-enterprise-footer"]
   }
 }

@@ -22,7 +22,7 @@ export type SlotImageProps = {
 
 /**
  * Image-independent template image: resolves a semantic slot only.
- * Renders layout-preserving empty state when the slot is unfilled.
+ * Renders nothing in production when unfilled (parents collapse layout).
  * Shows a labeled placeholder in the Website Builder editor only.
  */
 export function SlotImage({
@@ -54,24 +54,31 @@ export function SlotImage({
   }
 
   const editor = isBuilderEditorContext();
+  if (!editor) {
+    return null;
+  }
+
+  const shellClass = [
+    containerClassName || className,
+    "df-slot-empty",
+    editor
+      ? "border border-dashed border-[color-mix(in_srgb,var(--color-primary)_22%,transparent)]"
+      : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <div
-      className={[
-        containerClassName || className,
-        "bg-[color-mix(in_srgb,var(--color-primary)_8%,var(--color-surface))]",
-        editor
-          ? "border border-dashed border-[color-mix(in_srgb,var(--color-primary)_25%,transparent)]"
-          : "",
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      className={shellClass}
       aria-hidden={!editor}
       data-slot-empty={slot}
       data-slot-index={index}
+      role={editor ? "img" : undefined}
+      aria-label={editor ? alt || SLOT_LABELS[slot] : undefined}
     >
       {editor ? (
-        <div className="flex h-full min-h-[inherit] w-full flex-col items-center justify-center gap-1 p-4 text-center">
+        <div className="relative z-[1] flex h-full min-h-[inherit] w-full flex-col items-center justify-center gap-1 p-4 text-center">
           <span className="text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-[var(--color-muted)]">
             {SLOT_LABELS[slot]}
           </span>

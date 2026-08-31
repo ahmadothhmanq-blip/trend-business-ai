@@ -2,16 +2,17 @@
   "specVersion": "2.0.0",
   "id": "creative-agency-premium",
   "version": "2.0.0",
-  "name": "Creative Agency Premium",
-  "description": "Studio Volt — post-scroll overlay showcase, electric lime accents, and portfolio-forward creative agency energy.",
+  "name": "Studio Volt",
+  "description": "Global creative agency — industrial black, electric volt accents, and bold editorial typography.",
   "metadata": {
-    "category": "portfolio",
+    "category": "agency",
     "industry": "Creative Agency",
     "tags": [
-      "portfolio",
-      "creative",
       "agency",
-      "design"
+      "creative",
+      "studio",
+      "global",
+      "brutalist"
     ],
     "author": {
       "name": "Trend Business AI",
@@ -19,18 +20,20 @@
     },
     "license": "MIT",
     "keywords": [
-      "portfolio",
-      "creative",
-      "agency",
-      "design"
+      "saas",
+      "enterprise",
+      "platform",
+      "revenue"
     ],
     "templateIntelligenceId": "ti-creative-studio",
     "premium": true,
     "tier": "agency"
   },
   "media": {
-    "thumbnail": "assets/thumbnail.png",
-    "preview": "assets/preview.png"
+    "thumbnail": "assets/thumbnail.svg",
+    "preview": "assets/preview.svg",
+    "previewTablet": "assets/preview-tablet.svg",
+    "previewMobile": "assets/preview-mobile.svg"
   },
   "compatibility": {
     "engineVersion": ">=1.0.0",
@@ -44,7 +47,7 @@
   },
   "update": {
     "channel": "stable",
-    "releasedAt": "2026-08-03T16:09:45.108Z"
+    "releasedAt": "2026-08-03T16:09:45.050Z"
   },
   "responsive": {
     "breakpoints": [
@@ -69,7 +72,7 @@
         "minWidth": 1536
       }
     ],
-    "containerMaxWidth": "100%",
+    "containerMaxWidth": "82rem",
     "fluidTypography": true
   },
   "canvas": {
@@ -82,9 +85,9 @@
     {
       "id": "default",
       "file": "layouts/default.json",
-      "kind": "editorial-reveal",
+      "kind": "single-column",
       "label": "Default",
-      "description": "Editorial reveal layout — main content then post-scroll overlay showcase."
+      "description": "Premium single-column layout for SaaS."
     }
   ],
   "regions": [
@@ -93,28 +96,28 @@
       "file": "regions/header.json",
       "role": "header",
       "label": "Header Region",
-      "description": "Premium header region for Creative Portfolio."
+      "description": "Premium header region for SaaS Enterprise."
     },
     {
       "id": "main",
       "file": "regions/main.json",
       "role": "main",
       "label": "Main Region",
-      "description": "Premium main region for Creative Portfolio."
+      "description": "Premium main region for SaaS Enterprise."
     },
     {
-      "id": "overlay",
-      "file": "regions/overlay.json",
-      "role": "overlay",
-      "label": "Overlay Region",
-      "description": "Premium overlay region for Creative Portfolio."
+      "id": "utility",
+      "file": "regions/utility.json",
+      "role": "utility",
+      "label": "Utility Region",
+      "description": "Premium utility region for SaaS Enterprise."
     },
     {
       "id": "footer",
       "file": "regions/footer.json",
       "role": "footer",
       "label": "Footer Region",
-      "description": "Premium footer region for Creative Portfolio."
+      "description": "Premium footer region for SaaS Enterprise."
     }
   ],
   "pages": [
@@ -124,31 +127,31 @@
       "path": "/",
       "layoutId": "default",
       "file": "pages/home.json",
-      "description": "Home — premium Creative Agency page blueprint."
+      "description": "Home — premium SaaS page blueprint."
     },
     {
-      "id": "work",
-      "title": "Work",
-      "path": "/work",
+      "id": "platform",
+      "title": "Platform",
+      "path": "/platform",
       "layoutId": "default",
-      "file": "pages/work.json",
-      "description": "Work — premium Creative Agency page blueprint."
+      "file": "pages/platform.json",
+      "description": "Platform — premium SaaS page blueprint."
     },
     {
-      "id": "studio",
-      "title": "Studio",
-      "path": "/studio",
+      "id": "pricing",
+      "title": "Pricing",
+      "path": "/pricing",
       "layoutId": "default",
-      "file": "pages/studio.json",
-      "description": "Studio — premium Creative Agency page blueprint."
+      "file": "pages/pricing.json",
+      "description": "Pricing — premium SaaS page blueprint."
     },
     {
-      "id": "contact",
-      "title": "Contact",
-      "path": "/contact",
+      "id": "customers",
+      "title": "Customers",
+      "path": "/customers",
       "layoutId": "default",
-      "file": "pages/contact.json",
-      "description": "Contact — premium Creative Agency page blueprint."
+      "file": "pages/customers.json",
+      "description": "Customers — premium SaaS page blueprint."
     }
   ],
   "entry": "package.entry.json",
@@ -167,8 +170,8 @@
   },
   "pageFlows": {
     "home": "flows/home.json",
-    "work": "flows/work.json",
-    "studio": "flows/studio.json",
-    "contact": "flows/contact.json"
+    "platform": "flows/platform.json",
+    "pricing": "flows/pricing.json",
+    "customers": "flows/customers.json"
   }
 }

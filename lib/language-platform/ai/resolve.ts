@@ -1,5 +1,6 @@
-import { isEnglishWebsiteLanguage, usesLlmLocalizedWebsiteCopy } from "@/lib/i18n/website-output-locale";
+import { usesLlmLocalizedWebsiteCopy } from "@/lib/i18n/website-output-locale";
 import type { GlsAiLanguageResolution } from "@/lib/language-platform/core/types";
+import { buildGlsOutputDirective } from "@/lib/language-platform/generation/directive";
 
 export type GlsAiLanguageResolverInput = {
   generationLanguage?: string | null;
@@ -33,8 +34,5 @@ export function resolveAiLanguage(input: GlsAiLanguageResolverInput = {}): GlsAi
 }
 
 export function buildAiLanguageDirective(language: string): string {
-  if (isEnglishWebsiteLanguage(language)) {
-    return "Write all visible UI copy in English.";
-  }
-  return `Write ALL visible UI copy, headings, buttons, labels, and navigation in ${language}. Do not use English for user-facing text.`;
+  return buildGlsOutputDirective(language, "website").trim();
 }

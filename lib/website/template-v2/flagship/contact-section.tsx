@@ -19,52 +19,67 @@ export type FlagshipContactProps = {
 export function FlagshipContactSection({
   ui,
   componentId,
-  id = "contact",
-  eyebrow = "Contact",
-  title = "Let's start a conversation",
-  subtitle = "Tell us about your goals. Our team responds within one business day.",
-  email = "hello@company.com",
-  phone = "+1 (555) 123-4567",
-  address = "100 Market Street, Suite 400",
-  submitLabel = "Send message",
+  id,
+  eyebrow,
+  title,
+  subtitle,
+  email,
+  phone,
+  address,
+  submitLabel,
 }: FlagshipContactProps) {
+  const sectionId = id ?? "contact";
   const formId = useId();
   const [submitted, setSubmitted] = useState(false);
 
+  if (!title && !subtitle && !eyebrow && !email && !phone && !address) return null;
+
   return (
     <section
-      id={id}
+      id={sectionId}
       data-v2-component={componentId}
-      aria-labelledby={`${id}-title`}
+      aria-labelledby={`${sectionId}-title`}
       className={`${ui.section} df-section-glow relative bg-[var(--color-background)]`}
     >
       <div className={ui.container}>
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
           <div>
-            <p className={`${ui.eyebrow} mb-3`}>{eyebrow}</p>
-            <h2 id={`${id}-title`} className={ui.headlineSm}>
-              {title}
-            </h2>
-            <div className="mt-4 h-px w-12 bg-gradient-to-r from-[var(--color-accent)] to-transparent" aria-hidden />
-            <p className={`${ui.body} mt-5`}>{subtitle}</p>
-            <address className={`${ui.fontBody} mt-8 space-y-4 text-sm not-italic`}>
-              <p className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] p-4">
-                <span className="block font-semibold text-[var(--color-foreground)]">Email</span>
-                <a href={`mailto:${email}`} className={`${ui.focusRing} mt-1 inline-block text-[var(--color-muted)] hover:text-[var(--color-accent)]`}>
-                  {email}
-                </a>
-              </p>
-              <p className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] p-4">
-                <span className="block font-semibold text-[var(--color-foreground)]">Phone</span>
-                <a href={`tel:${phone.replace(/\s/g, "")}`} className={`${ui.focusRing} mt-1 inline-block text-[var(--color-muted)] hover:text-[var(--color-accent)]`}>
-                  {phone}
-                </a>
-              </p>
-              <p className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] p-4">
-                <span className="block font-semibold text-[var(--color-foreground)]">Office</span>
-                <span className="mt-1 block text-[var(--color-muted)]">{address}</span>
-              </p>
-            </address>
+            {eyebrow ? <p className={`${ui.eyebrow} mb-3`}>{eyebrow}</p> : null}
+            {title ? (
+              <h2 id={`${sectionId}-title`} className={ui.headlineSm}>
+                {title}
+              </h2>
+            ) : null}
+            {title ? (
+              <div className="df-accent-line mt-4" aria-hidden />
+            ) : null}
+            {subtitle ? <p className={`${ui.body} mt-5`}>{subtitle}</p> : null}
+            {(email || phone || address) && (
+              <address className={`${ui.fontBody} mt-8 space-y-4 text-sm not-italic`}>
+                {email ? (
+                  <p className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] p-4">
+                    <span className="block font-semibold text-[var(--color-foreground)]">Email</span>
+                    <a href={`mailto:${email}`} className={`${ui.focusRing} mt-1 inline-block text-[var(--color-muted)] hover:text-[var(--color-accent)]`}>
+                      {email}
+                    </a>
+                  </p>
+                ) : null}
+                {phone ? (
+                  <p className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] p-4">
+                    <span className="block font-semibold text-[var(--color-foreground)]">Phone</span>
+                    <a href={`tel:${phone.replace(/\s/g, "")}`} className={`${ui.focusRing} mt-1 inline-block text-[var(--color-muted)] hover:text-[var(--color-accent)]`}>
+                      {phone}
+                    </a>
+                  </p>
+                ) : null}
+                {address ? (
+                  <p className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] p-4">
+                    <span className="block font-semibold text-[var(--color-foreground)]">Office</span>
+                    <span className="mt-1 block text-[var(--color-muted)]">{address}</span>
+                  </p>
+                ) : null}
+              </address>
+            )}
           </div>
 
           <form
@@ -120,9 +135,11 @@ export function FlagshipContactSection({
                     className={`df-textarea resize-y ${ui.focusRing}`}
                   />
                 </div>
-                <button type="submit" className={`${ui.btnPrimary} w-full sm:w-auto ${ui.focusRing}`}>
-                  {submitLabel}
-                </button>
+                {submitLabel ? (
+                  <button type="submit" className={`${ui.btnPrimary} w-full sm:w-auto ${ui.focusRing}`}>
+                    {submitLabel}
+                  </button>
+                ) : null}
               </div>
             )}
           </form>

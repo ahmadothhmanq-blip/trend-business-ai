@@ -1,9 +1,13 @@
 "use client";
 
-import { FlagshipStatsSection } from "@/lib/website/template-v2/flagship/stats-section";
-import { SAAS_FLAGSHIP_UI } from "@/lib/website/template-v2/flagship/themes";
+const DEFAULT_STATS = [
+  { value: "99.99%", label: "Uptime SLO", detail: "last 12 months" },
+  { value: "2.1s", label: "Time-to-insight", detail: "median board view" },
+  { value: "140+", label: "Enterprise orgs", detail: "global" },
+  { value: "38%", label: "Forecast lift", detail: "vs prior stack" },
+];
 
-type Props = {
+type SaasEnterpriseStatsProps = {
   eyebrow?: string;
   title?: string;
   subtitle?: string;
@@ -11,25 +15,36 @@ type Props = {
 };
 
 export function SaasEnterpriseStats({
-  eyebrow = "Platform impact",
-  title = "Numbers that move the needle",
-  subtitle = "Measured across our enterprise customer base in the last twelve months.",
-  stats = [
-    { value: "500+", label: "Enterprise customers", detail: "Across 28 countries" },
-    { value: "4.9/5", label: "G2 satisfaction", detail: "Verified reviews" },
-    { value: "2.1×", label: "Forecast accuracy", detail: "vs. prior stack" },
-    { value: "18mo", label: "Avg. retention", detail: "Enterprise cohort" },
-  ],
-}: Props) {
+  eyebrow = "Telemetry",
+  title = "Operational metrics",
+  subtitle = "Dense readouts — product docs style, not a marketing strip.",
+  stats = DEFAULT_STATS,
+}: SaasEnterpriseStatsProps) {
   return (
-    <FlagshipStatsSection
-      ui={SAAS_FLAGSHIP_UI}
-      componentId="saas-enterprise-stats"
+    <section
       id="stats"
-      eyebrow={eyebrow}
-      title={title}
-      subtitle={subtitle}
-      stats={stats}
-    />
+      data-v2-component="saas-enterprise-stats"
+      aria-labelledby="se-stats-title"
+      className="se-telemetry se-reveal"
+    >
+      <div className="se-docs-inner">
+        <header className="se-docs-head">
+          <p className="se-eyebrow">{eyebrow}</p>
+          <h2 id="se-stats-title" className="se-headline-sm se-font-display">
+            {title}
+          </h2>
+          <p className="se-body">{subtitle}</p>
+        </header>
+        <div className="se-telemetry-grid se-reveal-stagger">
+          {stats.map((s) => (
+            <div key={s.label} className="se-telemetry-cell">
+              <p className="se-metric">{s.value}</p>
+              <p className="se-telemetry-label">{s.label}</p>
+              {s.detail ? <p className="se-telemetry-detail">{s.detail}</p> : null}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }

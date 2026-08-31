@@ -1,6 +1,6 @@
 {
   "tbdpNative": true,
-  "sectorDnaId": "restaurant",
-  "experienceProfiles": ["hospitality", "luxury", "editorial"],
-  "presetBinding": "forest-table-reveal"
+  "sectorDnaId": "saas",
+  "experienceProfiles": ["technical", "corporate", "executive"],
+  "presetBinding": "nexus-grid-reveal"
 }

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" data-project-files-render="project-files-1">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Apex Motors — Live Preview</title>
+  <style>:root {
+  --color-primary: #2563EB;
+  --color-secondary: #0F172A;
+  --color-accent: #E11D48;
+  --color-background: #FFFFFF;
+  --color-foreground: #0F172A;
+}
+
+body {
+  margin: 0;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: system-ui, sans-serif;
+}
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    .sr-only, .v2-sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    [class*="animate-"] { animation-fill-mode: both; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--color-background, #0f172a);
+      color: var(--color-foreground, #f8fafc);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .page { display: none; padding-bottom: 2rem; }
+    .page:target { display: block; }
+    body:not(:has(.page:target)) .page#home { display: block; }
+    img { max-width: 100%; height: auto; display: block; }
+    a { color: inherit; }
+    .v2-preview-error {
+      margin: 2rem auto;
+      max-width: 36rem;
+      padding: 1.5rem 1.75rem;
+      border: 1px solid color-mix(in srgb, var(--color-foreground, #f8fafc) 12%, transparent);
+      border-radius: 0.75rem;
+      background: color-mix(in srgb, var(--color-surface, #1e293b) 88%, transparent);
+      text-align: center;
+    }
+    .v2-preview-error-title {
+      margin: 0 0 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--color-foreground, #f8fafc);
+    }
+    .v2-preview-error-detail {
+      margin: 0;
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      color: color-mix(in srgb, var(--color-foreground, #f8fafc) 72%, transparent);
+      word-break: break-word;
+    }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <div class="page" id="home">
+    <link rel="preload" as="image" href="https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&amp;fit=crop&amp;w=2400&amp;q=90"/><link rel="preload" as="image" href="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&amp;fit=crop&amp;w=1600&amp;q=88"/><link rel="preload" as="image" href="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&amp;fit=crop&amp;w=1600&amp;q=88"/><link rel="preload" as="image" href="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&amp;fit=crop&amp;w=960&amp;q=88"/><link rel="preload" as="image" href="https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&amp;fit=crop&amp;w=2400&amp;q=90"/><main class="min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] antialiased ti-topology-classic_stack"><header class="sticky top-0 z-50 border-b transition-all duration-300 border-transparent bg-[var(--color-background)]/70 backdrop-blur-md"><div class="mx-auto flex h-16 max-w-[var(--container-max,72rem)] items-center justify-between gap-4 px-4 sm:px-6 lg:h-[4.25rem] lg:px-8"><a href="/" class="text-sm font-semibold tracking-tight">Apex Motors</a><nav class="hidden items-center gap-7 md:flex"><a href="#product" class="text-sm text-[var(--color-foreground)]/65 transition hover:text-[var(--color-foreground)]">Inventory</a><a href="#services" class="text-sm text-[var(--color-foreground)]/65 transition hover:text-[var(--color-foreground)]">Services</a><a href="#gallery" class="text-sm text-[var(--color-foreground)]/65 transition hover:text-[var(--color-foreground)]">Gallery</a><a href="#contact" class="text-sm text-[var(--color-foreground)]/65 transition hover:text-[var(--color-foreground)]">Contact</a></nav><div class="flex items-center gap-2"><a href="#contact" class="hidden rounded-[var(--radius-md,0.75rem)] bg-[var(--color-primary)] px-3.5 py-2 text-xs font-semibold text-[var(--color-on-primary,white)] sm:inline-flex">View inventory</a><button type="button" aria-label="Toggle menu" class="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-md,0.75rem)] border border-[var(--color-foreground)]/15 md:hidden"><span class="text-lg leading-none">☰</span></button></div></div></header><section class="relative min-h-[100svh] overflow-hidden bg-black text-white"><div class="absolute inset-0"><img src="https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&amp;fit=crop&amp;w=2400&amp;q=90" alt="Drive the vehicle that fits your life" class="h-full w-full object-cover scale-[1.02]"/><div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div></div><div class="relative mx-auto flex min-h-[100svh] max-w-[var(--ti-container-max,var(--container-max,80rem))] flex-col justify-end px-6 pb-[var(--ti-section-y,6rem)] pt-32"><p class="mb-6 text-[0.7rem] font-medium uppercase tracking-[0.32em] text-white/60">Dealership experience</p><h1 class="max-w-4xl font-[family-name:var(--font-display,var(--font-heading,inherit))] text-[clamp(2.75rem,7vw,5.5rem)] font-light leading-[0.95] tracking-[-0.04em]">Drive the vehicle that fits your life</h1><p class="mt-8 max-w-lg text-base leading-relaxed text-white/75 sm:text-lg">High-performance vehicles with advanced technology and bold design. Browse inventory with transparent specs, book a test drive, and get financing guidance without the pressure.</p><div class="mt-12 flex flex-wrap gap-4"><a href="#contact" class="ti-btn-primary border-white bg-white text-black">View inventory</a><a href="#gallery" class="inline-flex items-center border-b border-white/50 pb-1 text-sm tracking-wide text-white/90">Book a test drive</a></div></div></section><section id="features" class="relative overflow-hidden py-[var(--section-y-mobile,4.25rem)] sm:py-[5rem] lg:py-[var(--section-y,7.5rem)] bg-[var(--color-background)] text-[var(--color-foreground)] !py-0"><div class="mx-auto w-full px-5 sm:px-6 lg:px-8 max-w-[var(--container-max,72rem)]"><div class="motion-safe mb-12 max-w-2xl sm:mb-14 lg:mb-[4.5rem]" style="animation:fadeUp 0.75s var(--ease-premium, cubic-bezier(0.22,1,0.36,1)) 0ms both"><p class="mb-3.5 text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--color-accent,var(--color-primary))] sm:text-xs">Feature storytelling</p><h2 class="font-[family-name:var(--font-heading,inherit)] text-[clamp(1.95rem,3.6vw,var(--text-h2,2.75rem))] font-semibold leading-[1.06] tracking-[-0.032em]">A narrative, not a feature dump</h2><p class="mt-5 max-w-xl text-[15px] leading-[1.75] text-[var(--color-foreground)]/68 sm:text-base sm:leading-[1.75]">Alternating story bands create editorial rhythm — premium composition without card fatigue.</p></div><div class="space-y-0"><div class="motion-safe border-t border-[var(--color-foreground)]/8 py-14 sm:py-20" style="animation:slowReveal 0.95s var(--ease-premium, cubic-bezier(0.22,1,0.36,1)) 0ms both"><div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16 "><div><p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--color-accent,var(--color-primary))]">Chapter 01</p><h3 class="mt-3 font-[family-name:var(--font-heading,inherit)] text-2xl font-semibold tracking-[-0.02em] sm:text-3xl">The problem, felt</h3><p class="mt-4 max-w-md text-base leading-relaxed text-[var(--color-foreground)]/68">Open with the tension your audience already knows — then make the stakes unmistakable.</p></div><div class="relative aspect-[16/11] overflow-hidden rounded-[var(--radius-xl,1.25rem)] bg-[var(--color-surface)]"><img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&amp;fit=crop&amp;w=1600&amp;q=88" alt="" class="h-full w-full object-cover"/></div></div></div><div class="motion-safe border-t border-[var(--color-foreground)]/8 py-14 sm:py-20" style="animation:slowReveal 0.95s var(--ease-premium, cubic-bezier(0.22,1,0.36,1)) 90ms both"><div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16 lg:[&amp;&gt;*:first-child]:order-2"><div><p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--color-accent,var(--color-primary))]">Chapter 02</p><h3 class="mt-3 font-[family-name:var(--font-heading,inherit)] text-2xl font-semibold tracking-[-0.02em] sm:text-3xl">The turning point</h3><p class="mt-4 max-w-md text-base leading-relaxed text-[var(--color-foreground)]/68">Introduce the approach as a narrative beat, not a bullet list of features.</p></div><div class="relative aspect-[16/11] overflow-hidden rounded-[var(--radius-xl,1.25rem)] bg-[var(--color-surface)]"><img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&amp;fit=crop&amp;w=1600&amp;q=88" alt="" class="h-full w-full object-cover"/></div></div></div><div class="motion-safe border-t border-[var(--color-foreground)]/8 py-14 sm:py-20" style="animation:slowReveal 0.95s var(--ease-premium, cubic-bezier(0.22,1,0.36,1)) 180ms both"><div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16 "><div><p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--color-accent,var(--color-primary))]">Chapter 03</p><h3 class="mt-3 font-[family-name:var(--font-heading,inherit)] text-2xl font-semibold tracking-[-0.02em] sm:text-3xl">The outcome</h3><p class="mt-4 max-w-md text-base leading-relaxed text-[var(--color-foreground)]/68">Close with the transformation — clear, visual, and emotionally earned.</p></div><div class="relative aspect-[16/11] overflow-hidden rounded-[var(--radius-xl,1.25rem)] bg-[var(--color-surface)]"><img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&amp;fit=crop&amp;w=1600&amp;q=88" alt="" class="h-full w-full object-cover"/></div></div></div></div></div></section><section id="features" class="relative overflow-hidden py-[var(--section-y-mobile,4.25rem)] sm:py-[5rem] lg:py-[var(--section-y,7.5rem)] bg-[var(--color-surface,var(--color-background))]"><div class="mx-auto w-full px-5 sm:px-6 lg:px-8 max-w-[var(--container-max,72rem)]"><div class="motion-safe mb-12 max-w-2xl sm:mb-14 lg:mb-[4.5rem]" style="animation:fadeUp 0.75s var(--ease-premium, cubic-bezier(0.22,1,0.36,1)) 0ms both"><p class="mb-3.5 text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--color-accent,var(--color-primary))] sm:text-xs">Why us</p><h2 class="font-[family-name:var(--font-heading,inherit)] text-[clamp(1.95rem,3.6vw,var(--text-h2,2.75rem))] font-semibold leading-[1.06] tracking-[-0.032em]">A modern buying experience</h2><p class="mt-5 max-w-xl text-[15px] leading-[1.75] text-[var(--color-foreground)]/68 sm:text-base sm:leading-[1.75]">Premium automotive storytelling with decisive next steps.</p></div><div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6"><article class="motion-safe overflow-hidden rounded-[var(--radius-lg,1rem)] border border-[var(--color-foreground)]/10 bg-[var(--color-background)] shadow-[var(--shadow-sm,0_8px_24px_rgba(0,0,0,0.04))]" style="animation:fadeUp 0.75s var(--ease-premium, cubic-bezier(0.22,1,0.36,1)) 0ms both"><div class="aspect-[16/10] overflow-hidden bg-[var(--color-surface)]"><img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&amp;fit=crop&amp;w=1600&amp;q=88" alt="Transparent specs" class="h-full w-full object-cover"/></div><div class="p-5 sm:p-6"><h3 class="text-base font-semibold tracking-tight">Transparent specs</h3><p class="mt-2.5 text-sm leading-relaxed text-[var(--color-foreground)]/65">Vehicle details presented clearly — trim, mileage, and history.</p></div></article><article class="motion-safe overflow-hidden rounded-[var(--radius-lg,1rem)] border border-[var(--color-foreground)]/10 bg-[var(--color-background)] shadow-[var(--shadow-sm,0_8px_24px_rgba(0,0,0,0.04))]" style="animation:fadeUp 0.75s var(--ease-premium, cubic-bezier(0.22,1,0.36,1)) 70ms both"><div class="aspect-[16/10] overflow-hidden bg-[var(--color-surface)]"><img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&amp;fit=crop&amp;w=1600&amp;q=88" alt="Honest pricing" class="h-full w-full object-cover"/></div><div class="p-5 sm:p-6"><h3 class="text-base font-semibold tracking-tight">Honest pricing</h3><p class="mt-2.5 text-sm leading-relaxed text-[var(--color-foreground)]/65">Pricing conversations grounded in listed offers, not surprises.</p></div></article><article class="motion-safe overflow-hidden rounded-[var(--radius-lg,1rem)] border border-[var(--color-foreground)]/10 bg-[var(--color-background)] shadow-[var(--shadow-sm,0_8px_24px_rgba(0,0,0,0.04))]" style="animation:fadeUp 0.75s var(--ease-premium, cubic-bezier(0.22,1,0.36,1)) 140ms both"><div class="aspect-[16/10] overflow-hidden bg-[var(--color-surface)]"><img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&amp;fit=crop&amp;w=1600&amp;q=88" alt="Flexible test drives" class="h-full w-full object-cover"/></div><div class="p-5 sm:p-6"><h3 class="text-base font-semibold tracking-tight">Flexible test drives</h3><p class="mt-2.5 text-sm leading-relaxed text-[var(--color-foreground)]/65">Book on-site or delivery test drives around your schedule.</p></div></article><article class="motion-safe overflow-hidden rounded-[var(--radius-lg,1rem)] border border-[var(--color-foreground)]/10 bg-[var(--color-background)] shadow-[var(--shadow-sm,0_8px_24px_rgba(0,0,0,0.04))]" style="animation:fadeUp 0.75s var(--ease-premium, cubic-bezier(0.22,1,0.36,1)) 210ms both"><div class="aspect-[16/10] overflow-hidden bg-[var(--color-surface)]"><img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&amp;fit=crop&amp;w=1600&amp;q=88" alt="Ownership care" class="h-full w-full object-cover"/></div><div class="p-5 sm:p-6"><h3 class="text-base font-semibold tracking-tight">Ownership care</h3><p class="mt-2.5 text-sm leading-relaxed text-[var(--color-foreground)]/65">Maintenance plans that keep ownership predictable.</p></div></article></div></div></section><section id="testimonials" class="relative overflow-hidden py-[var(--section-y-mobile,4.25rem)] sm:py-[5rem] lg:py-[var(--section-y,7.5rem)] bg-[var(--color-surface,var(--color-background))]"><div class="mx-auto w-full px-5 sm:px-6 lg:px-8 max-w-[var(--container-max,72rem)]"><div class="motion-safe mb-12 max-w-2xl sm:mb-14 lg:mb-[4.5rem]" style="animation:fadeUp 0.75s var(--ease-premium, cubic-bezier(0.22,1,0.36,1)) 0ms both"><p class="mb-3.5 text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--color-accent,var(--color-primary))] sm:text-xs">Owners</p><h2 class="font-[family-name:var(--font-heading,inherit)] text-[clamp(1.95rem,3.6vw,var(--text-h2,2.75rem))] font-semibold leading-[1.06] tracking-[-0.032em]">Drivers who appreciated the process</h2><p class="mt-5 max-w-xl text-[15px] leading-[1.75] text-[var(--color-foreground)]/68 sm:text-base sm:leading-[1.75]">Honest feedback from recent buyers.</p></div><div class="motion-safe grid overflow-hidden rounded-[var(--radius-xl,1.25rem)] border border-[var(--color-foreground)]/10 bg-[var(--color-background)] lg:grid-cols-[0.9fr_1.1fr]" style="animation:fadeUp 0.75s var(--ease-premium, cubic-bezier(0.22,1,0.36,1)) 0ms both"><div class="relative min-h-[240px] bg-[var(--color-surface)] lg:min-h-full"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&amp;fit=crop&amp;w=960&amp;q=88" alt="" class="absolute inset-0 h-full w-full object-cover"/></div><div class="flex flex-col justify-between p-7 sm:p-10"><blockquote><p class="font-[family-name:var(--font-heading,inherit)] text-2xl leading-relaxed tracking-tight sm:text-3xl">“No pressure sales — just clear inventory and a great drive — working with Apex Motors.”</p><footer class="mt-8"><p class="text-sm font-semibold">Marcus Reed</p><p class="mt-1 text-xs text-[var(--color-foreground)]/50">Buyer</p></footer></blockquote><div class="mt-10 flex items-center gap-3"><button type="button" aria-label="Previous testimonial" class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--color-foreground)]/15 text-lg">←</button><button type="button" aria-label="Next testimonial" class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--color-foreground)]/15 text-lg">→</button><div class="ml-2 flex gap-1.5"><button type="button" aria-label="Go to testimonial 1" class="h-1.5 rounded-full transition-all w-6 bg-[var(--color-primary)]"></button><button type="button" aria-label="Go to testimonial 2" class="h-1.5 rounded-full transition-all w-1.5 bg-[var(--color-foreground)]/25"></button><button type="button" aria-label="Go to testimonial 3" class="h-1.5 rounded-full transition-all w-1.5 bg-[var(--color-foreground)]/25"></button></div></div></div></div></div></section><section id="cta" class="relative overflow-hidden py-20 sm:py-24 lg:py-28"><img src="https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&amp;fit=crop&amp;w=2400&amp;q=90" alt="" class="absolute inset-0 h-full w-full object-cover"/><div class="absolute inset-0 bg-[var(--color-foreground)]/70"></div><div class="relative mx-auto max-w-[var(--container-max,72rem)] px-4 sm:px-6 lg:px-8"><div class="motion-safe grid overflow-hidden rounded-[var(--radius-xl,1.25rem)] border border-white/15 bg-black/30 backdrop-blur-md lg:grid-cols-2" style="animation:fadeUp 0.75s var(--ease-premium, cubic-bezier(0.22,1,0.36,1)) 0ms both"><div class="p-8 sm:p-10 lg:p-12"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">Visit</p><h2 class="mt-3 font-[family-name:var(--font-heading,inherit)] text-3xl font-semibold tracking-tight text-white sm:text-4xl">Book a test drive today</h2><p class="mt-4 max-w-md text-sm leading-relaxed text-white/75 sm:text-base">Choose a vehicle and time — we will confirm and prepare the keys.</p></div><div class="flex flex-col justify-center gap-3 bg-[var(--color-primary)]/95 p-8 text-[var(--color-on-primary,white)] sm:p-10 lg:p-12"><a href="#contact" class="inline-flex items-center justify-center rounded-[var(--radius-md,0.75rem)] bg-white px-5 py-3.5 text-sm font-semibold text-black">View inventory</a><a href="#pricing" class="inline-flex items-center justify-center rounded-[var(--radius-md,0.75rem)] border border-white/40 px-5 py-3.5 text-sm font-semibold">Book a test drive</a></div></div></div></section><footer class="border-t border-[var(--color-foreground)]/10 bg-[var(--color-surface,var(--color-background))] py-14 sm:py-16"><div class="mx-auto grid max-w-[var(--container-max,72rem)] gap-10 px-5 sm:grid-cols-3 sm:px-6 lg:px-8"><div><p class="text-sm font-semibold tracking-tight">Apex Motors</p><p class="mt-3 max-w-xs text-sm leading-relaxed text-[var(--color-foreground)]/60">Inventory, test drives, and ownership support without pressure.</p></div><div><p class="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-foreground)]/50">Explore</p><ul class="mt-4 space-y-2.5 text-sm text-[var(--color-foreground)]/70"><li><a href="#product">Inventory</a></li><li><a href="#services">Services</a></li><li><a href="#gallery">Gallery</a></li><li><a href="#contact">Contact</a></li></ul></div><div><p class="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-foreground)]/50">Legal</p><ul class="mt-4 space-y-2.5 text-sm text-[var(--color-foreground)]/70"><li>Privacy</li><li>Terms</li></ul></div></div></footer></main>
+  </div>
+  <section class="page v2-secondary-page" id="vehicles">
+  <div class="mx-auto max-w-3xl px-6 py-16">
+    <p class="text-xs uppercase tracking-widest text-[var(--color-foreground)]/50">Vehicles</p>
+    <h1 class="mt-4 text-3xl font-semibold text-[var(--color-foreground)]">Vehicles</h1>
+    <p class="mt-4 text-[var(--color-foreground)]/70">Vehicles — Apex Motors</p>
+    <a class="mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]" href="#home">Back to home</a>
+  </div>
+</section>
+<section class="page v2-secondary-page" id="about">
+  <div class="mx-auto max-w-3xl px-6 py-16">
+    <p class="text-xs uppercase tracking-widest text-[var(--color-foreground)]/50">About</p>
+    <pre class="mt-4 overflow-x-auto rounded border border-[var(--color-foreground)]/10 p-4 text-xs text-[var(--color-foreground)]/70">import { SiteShell } from &quot;@/components/layout/site-shell&quot;;
+import { buildPageTitle } from &quot;@/lib/seo&quot;;
+
+export const metadata = {
+  title: buildPageTitle(&quot;About&quot;),
+  description: &quot;Tell the Apex Motors brand story, mission, and values.&quot;,
+};
+
+export default function SecondaryPage() {
+  return (
+    &lt;SiteShell&gt;
+      &lt;h1&gt;About&lt;/h1&gt;
+      &lt;p&gt;Tell the Apex Motors brand story, mission, and values.&lt;/p&gt;
+      &lt;section&gt;&lt;h2&gt;story&lt;/h2&gt;&lt;/section&gt;
+      &lt;section&gt;&lt;h2&gt;values&lt;/h2&gt;&lt;/section&gt;
+      &lt;section&gt;&lt;h2&gt;leadership&lt;/h2&gt;&lt;/section&gt;
+      &lt;section&gt;&lt;h2&gt;facilities&lt;/h2&gt;&lt;/section&gt;
+      &lt;section&gt;&lt;h2&gt;cta&lt;/h2&gt;&lt;/section&gt;
+    &lt;/SiteShell&gt;
+  );
+}
+</pre>
+    <a class="mt-6 inline-block text-sm text-[var(--color-accent,#B87333)]" href="#home">Back to home</a>
+  </div>
+</section>
+<section class="page v2-secondary-page" id="contact">
+  <div class="mx-auto max-w-3xl px-6 py-16">
+    <p class="text-xs uppercase tracking-widest text-[var(--color-foreground)]/50">Contact</p>
+    <h1 class="mt-4 text-3xl font-semibold text-[var(--color-foreground)]">Contact</h1>
+    <p class="mt-4 text-[var(--color-foreground)]/70">Contact — Apex Motors</p>
+    <a class="mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]" href="#home">Back to home</a>
+  </div>
+</section>
+</body>
+</html>

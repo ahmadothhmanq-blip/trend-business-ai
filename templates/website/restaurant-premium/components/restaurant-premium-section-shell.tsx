@@ -9,8 +9,19 @@ type RestaurantPremiumSectionShellProps = {
   subtitle?: string;
   children?: ReactNode;
   className?: string;
-  variant?: "default" | "inset" | "full-bleed";
 };
+
+function SectionHeader({ p, id, eyebrow, title, subtitle, headerClass = "mb-9 max-w-2xl" }: { p: string; id?: string; eyebrow?: string; title?: string; subtitle?: string; headerClass?: string }) {
+  if (!eyebrow && !title && !subtitle) return null;
+  const titleId = `${id ?? "section"}-title`;
+  return (
+    <header className={headerClass}>
+      {eyebrow ? <p className={`${p}-eyebrow mb-3`}>{eyebrow}</p> : null}
+      {title ? <h2 id={titleId} className={`${p}-headline-sm`}>{title}</h2> : null}
+      {subtitle ? <p className={`${p}-body mt-4 text-[var(--color-muted)]`}>{subtitle}</p> : null}
+    </header>
+  );
+}
 
 export function RestaurantPremiumSectionShell({
   id,
@@ -19,38 +30,11 @@ export function RestaurantPremiumSectionShell({
   subtitle,
   children,
   className = "",
-  variant = "default",
 }: RestaurantPremiumSectionShellProps) {
-  const variantClass =
-    variant === "inset"
-      ? "bg-[var(--color-surface)]/30"
-      : variant === "full-bleed"
-        ? "px-0"
-        : "";
-
   return (
-    <section
-      id={id}
-      data-v2-component="restaurant-premium-section-shell"
-      className={`rp-section ${variantClass} ${className}`.trim()}
-      aria-labelledby={title ? `${id ?? "section"}-title` : undefined}
-    >
-      <div className="mx-auto max-w-[90rem] px-5 sm:px-8 lg:px-10">
-        {(eyebrow || title || subtitle) && (
-          <header className="mb-12 max-w-2xl">
-            {eyebrow && <p className="rp-eyebrow mb-5">{eyebrow}</p>}
-            {title && (
-              <h2
-                id={`${id ?? "section"}-title`}
-                className="rp-headline text-[clamp(2rem,4vw,3rem)]"
-              >
-                {title}
-              </h2>
-            )}
-            {title && <div className="rp-copper-rule my-6" />}
-            {subtitle && <p className="rp-body">{subtitle}</p>}
-          </header>
-        )}
+    <section id={id} data-v2-component="restaurant-premium-section-shell" className={`border-t-2 border-[var(--color-accent)]/25 bg-[var(--color-surface)] py-14 ${className}`.trim()} aria-labelledby={title ? `${id ?? "section"}-title` : undefined}>
+      <div className="mx-auto max-w-[82rem] px-5 sm:px-8">
+        <SectionHeader p="rp" id={id} eyebrow={eyebrow} title={title} subtitle={subtitle} />
         {children}
       </div>
     </section>

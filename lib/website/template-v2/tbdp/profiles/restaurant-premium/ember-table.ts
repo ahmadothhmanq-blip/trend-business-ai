@@ -5,16 +5,19 @@ import type { TemplateV2ResponsiveRules } from "@/lib/website/template-v2/contra
 /** Ember Table — TBDP identity for restaurant-premium. */
 export const EMBER_TABLE_V2_TOKENS: TemplateV2DesignTokens = {
   colors: {
-    primary: "#1B3D2F",
-    secondary: "#2D5A45",
-    accent: "#B87333",
-    background: "#0A1210",
-    foreground: "#F4EDE4",
-    muted: "rgba(244,237,228,0.58)",
-    surface: "#121F1A",
-    copper: "#D4A574",
-    ember: "#8B5A2B",
-    linen: "#FFFCF7",
+    primary: "#1A1410",
+    secondary: "#2A2118",
+    accent: "#D4844A",
+    background: "#0E0A08",
+    foreground: "#F7F0E8",
+    muted: "rgba(247,240,232,0.62)",
+    surface: "#1C1510",
+    signal: "#D4844A",
+    grid: "rgba(212,132,74,0.1)",
+    ink: "#0E0A08",
+    copper: "#e09a62",
+    ember: "#b56a38",
+    linen: "#f7f0e8",
   },
   typography: {
     display: "Fraunces",
@@ -38,14 +41,14 @@ export const EMBER_TABLE_V2_TOKENS: TemplateV2DesignTokens = {
   },
   radius: { sm: "2px", md: "4px", lg: "8px" },
   shadows: {
-    surface: "0 32px 80px rgba(0,0,0,0.55)",
-    glow: "0 0 100px rgba(212,165,116,0.14)",
-    inset: "inset 0 1px 0 rgba(244,237,228,0.06)",
+    surface: "0 12px 40px rgba(0,0,0,0.28)",
+    glow: "0 0 96px rgba(200,120,64,0.22)",
+    card: "0 0 0 1px rgba(245,237,228,0.08), 0 16px 48px rgba(0,0,0,0.32)",
   },
   borders: {
-    default: "rgba(244,237,228,0.1)",
-    copper: "rgba(212,165,116,0.32)",
-    subtle: "rgba(244,237,228,0.06)",
+    default: "rgba(245,237,228,0.12)",
+    accent: "rgba(200,120,64,0.38)",
+    subtle: "rgba(245,237,228,0.06)",
   },
 };
 

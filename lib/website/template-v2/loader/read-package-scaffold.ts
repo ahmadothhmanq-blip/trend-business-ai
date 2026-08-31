@@ -1,9 +1,8 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import type { TemplateV2ComponentDefinition } from "@/lib/website/template-v2/contracts/component-registry";
-import {
-  componentIdToProjectPath,
-} from "@/lib/website/template-v2/utils/component-naming";
+import { sanitizeDesignScaffold } from "@/lib/website/template-v2/loader/sanitize-design-scaffold";
+import { componentIdToProjectPath } from "@/lib/website/template-v2/utils/component-naming";
 
 async function pathExists(target: string): Promise<boolean> {
   try {
@@ -31,12 +30,16 @@ export async function readPackageComponentScaffold(
   packageDirectory: string,
   packageId: string,
   component: TemplateV2ComponentDefinition,
+  options?: { preserveDefaults?: boolean },
 ): Promise<{ path: string; content: string } | null> {
   const scaffoldPath = resolvePackagePath(packageDirectory, component.scaffold);
   if (!(await pathExists(scaffoldPath))) {
     return null;
   }
-  const content = await fs.readFile(scaffoldPath, "utf8");
+  const raw = await fs.readFile(scaffoldPath, "utf8");
+  const content = sanitizeDesignScaffold(raw, component.id, {
+    preserveDefaults: options?.preserveDefaults,
+  });
   return {
     path: componentIdToProjectPath(packageId, component.scaffold),
     content,

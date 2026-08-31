@@ -4,17 +4,17 @@ import type { TemplateV2ResponsiveRules } from "@/lib/website/template-v2/contra
 
 /** Scholar's Hall — TBDP identity for education-premium. */
 export const HERITAGE_ACADEMY_V2_TOKENS: TemplateV2DesignTokens = {
-  colors: {
-    primary: "#1B2A4A",
-    secondary: "#2A3F66",
-    accent: "#C5A572",
-    background: "#F7F3EC",
-    foreground: "#1B2A4A",
-    muted: "rgba(27,42,74,0.58)",
-    surface: "#FFFFFF",
-    signal: "#C5A572",
-    grid: "rgba(27,42,74,0.06)",
-    ink: "#0F1829",
+  colors: {
+    primary: "#1B2A4A",
+    secondary: "#2A3F66",
+    accent: "#C5A572",
+    background: "#F7F3EC",
+    foreground: "#1B2A4A",
+    muted: "rgba(27,42,74,0.56)",
+    surface: "#FFFFFF",
+    signal: "#C5A572",
+    grid: "rgba(27,42,74,0.05)",
+    ink: "#1B2A4A",
   },
   typography: {
     display: "EB Garamond",
@@ -37,15 +37,15 @@ export const HERITAGE_ACADEMY_V2_TOKENS: TemplateV2DesignTokens = {
     scale: ["0", "1", "2", "3", "4", "6", "8", "12", "16", "20", "24", "32", "40", "48", "64"],
   },
   radius: { sm: "4px", md: "8px", lg: "12px", xl: "16px" },
-  shadows: {
-    surface: "0 4px 32px rgba(27,42,74,0.08), 0 1px 3px rgba(27,42,74,0.04)",
-    glow: "0 0 72px rgba(197,165,114,0.16)",
-    card: "0 0 0 1px rgba(27,42,74,0.05), 0 6px 28px rgba(27,42,74,0.06)",
+  shadows: {
+    surface: "0 20px 60px rgba(27,42,74,0.07), 0 2px 8px rgba(27,42,74,0.03)",
+    glow: "0 0 64px rgba(197,165,114,0.18)",
+    card: "0 0 0 1px rgba(27,42,74,0.05), 0 8px 32px rgba(27,42,74,0.06)",
   },
-  borders: {
-    default: "rgba(27,42,74,0.1)",
-    accent: "rgba(197,165,114,0.28)",
-    subtle: "rgba(27,42,74,0.05)",
+  borders: {
+    default: "rgba(27,42,74,0.09)",
+    accent: "rgba(197,165,114,0.32)",
+    subtle: "rgba(27,42,74,0.05)",
   },
 };
 

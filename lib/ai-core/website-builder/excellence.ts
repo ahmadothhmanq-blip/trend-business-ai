@@ -58,6 +58,25 @@ function normalizePageBlob(page: CoreStrategyPage): string {
     .toLowerCase();
 }
 
+export function resolveComponentIdForStrategySection(
+  sectionName: string,
+  ctx: InnerPageSectionContext = {},
+): DesignRendererComponentId {
+  const lower = sectionName.trim().toLowerCase();
+  if (/\bhero\b/.test(lower)) {
+    const industry = String(ctx.industryId || "").toLowerCase();
+    if (industry === "restaurant") return "HeroFullBleed";
+    if (industry === "real-estate" || industry === "real_estate") {
+      return "HeroProperty";
+    }
+    if (industry === "tourism") return "HeroFullBleed";
+    if (industry === "saas") return "HeroProduct";
+    if (industry === "automotive") return "HeroLuxuryShowcase";
+    return "HeroSplit";
+  }
+  return componentForKeySection(sectionName, ctx);
+}
+
 function componentForKeySection(
   key: string,
   ctx: InnerPageSectionContext,
@@ -65,11 +84,22 @@ function componentForKeySection(
   const lower = key.toLowerCase();
   const industry = String(ctx.industryId || "").toLowerCase();
 
+  if (/featured\s*models?|model\s*lineup|vehicle\s*lineup/.test(lower)) {
+    return industry === "automotive" ? "InventoryGrid" : "ProductShowcase";
+  }
+  if (/trust\s*bar|trustbar/.test(lower)) return "BrandTrust";
+  if (/why\s*choose|whychoose/.test(lower)) return "FeatureStorytelling";
+  if (/test\s*drive|testdrive/.test(lower)) return "CtaBand";
   if (/contact|inquiry|reach|get in touch/.test(lower)) return "ContactSection";
   if (/testimonial|review|proof|social/.test(lower)) return "TestimonialsCarousel";
   if (/faq|question/.test(lower)) return "FaqAccordion";
   if (/cta|book|schedule|demo|get started/.test(lower)) return "CtaBand";
-  if (/map|location|branch|find us|address/.test(lower)) return "MapsSection";
+  if (/map|location|branch|find us|address|neighborhood/.test(lower)) {
+    return industry === "real-estate" ? "LocationSections" : "MapsSection";
+  }
+  if (/list|propert/.test(lower) && industry === "real-estate") {
+    return "PropertyListings";
+  }
   if (/book|reserv|appoint/.test(lower)) return "BookingForm";
   if (/pric|plan|tier|package/.test(lower)) return "PricingTable";
   if (/team|doctor|staff|expert|people|leadership/.test(lower)) {

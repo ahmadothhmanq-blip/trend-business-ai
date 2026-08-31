@@ -13,8 +13,8 @@ describe("createContentProviderFromAiProvider", () => {
 
     const provider: AIProvider = {
       name: "deepseek",
-      async generateJson() {
-        return {};
+      async generateJson<T>(): Promise<T> {
+        return {} as T;
       },
       async generateText(request) {
         capturedPrompt = request.prompt;

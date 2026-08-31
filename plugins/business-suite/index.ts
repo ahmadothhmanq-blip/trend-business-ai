@@ -95,7 +95,7 @@ async function generateBusinessDocument(
     ctx.progress.emit("Scoring business metrics...");
     try {
       scorecard = await ctx.provider.generateJson<BusinessScorecardResult>({
-        prompt: businessScorecardPrompt(body, input.businessType, input.industry),
+        prompt: businessScorecardPrompt(body, input.businessType, input.industry, input.language),
         schema: businessScorecardSchema,
       });
       ctx.usage.add(ctx.provider.getLastUsage?.());
@@ -111,7 +111,7 @@ async function generateBusinessDocument(
         risks: BusinessRiskResult[];
         opportunities: BusinessOpportunityResult[];
       }>({
-        prompt: businessRisksPrompt(body, input.businessType),
+        prompt: businessRisksPrompt(body, input.businessType, input.language),
         schema: businessRisksSchema,
       });
       ctx.usage.add(ctx.provider.getLastUsage?.());
@@ -133,7 +133,7 @@ async function generateBusinessDocument(
         recommendations: string[];
         improvements: string[];
       }>({
-        prompt: businessActionPlanPrompt(body, risksStr, oppsStr),
+        prompt: businessActionPlanPrompt(body, risksStr, oppsStr, input.language),
         schema: businessActionPlanSchema,
       });
       ctx.usage.add(ctx.provider.getLastUsage?.());

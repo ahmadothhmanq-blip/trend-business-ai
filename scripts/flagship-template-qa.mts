@@ -76,6 +76,12 @@ const TEMPLATE_SPECS: Record<string, TemplateSpec> = {
     description: "Enterprise SaaS platform",
     premiumClassRe: /se-eyebrow|se-headline|se-metric/,
   },
+  "ai-startup-signal": {
+    id: "ai-startup-signal",
+    title: "Aura",
+    description: "Signal-dark AI platform",
+    premiumClassRe: /as-eyebrow|as-headline|as-hero-dashboard/,
+  },
   "corporate-business": {
     id: "corporate-business",
     title: "Meridian Advisory",

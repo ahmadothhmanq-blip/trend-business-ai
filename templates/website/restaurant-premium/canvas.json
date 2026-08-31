@@ -12,48 +12,54 @@
   },
   "visualIdentity": {
     "colors": {
-      "primary": "#142820",
-      "secondary": "#1E3D32",
-      "accent": "#C4622D",
-      "background": "#080E0C",
-      "foreground": "#F6EFE6",
-      "muted": "rgba(246,239,230,0.55)",
-      "surface": "#101A16",
-      "copper": "#D9A86C",
-      "ember": "#9A4E28",
-      "linen": "#FFFCF8"
+      "primary": "#1A1410",
+      "secondary": "#2A2118",
+      "accent": "#C87840",
+      "background": "#110D0A",
+      "foreground": "#F5EDE4",
+      "muted": "rgba(245,237,228,0.62)",
+      "surface": "#1f1812",
+      "signal": "#C87840",
+      "grid": "rgba(200,120,64,0.08)",
+      "ink": "#110D0A",
+      "copper": "#cf8857",
+      "ember": "#a46234",
+      "linen": "#f5ede5"
     },
     "typography": {
       "display": "Fraunces, ui-serif, Georgia, serif",
       "body": "Literata, ui-serif, Georgia, serif",
+      "mono": "ui-monospace, monospace",
       "scale": {
         "sm": "0.8125rem",
         "base": "1.0625rem",
-        "lg": "1.4375rem",
-        "xl": "3.625rem",
-        "display": "clamp(3rem, 7vw, 5.25rem)"
+        "lg": "1.375rem",
+        "xl": "3.5rem",
+        "display": "clamp(2.875rem, 6.5vw, 5rem)"
       }
     },
     "radius": {
       "sm": "2px",
       "md": "4px",
-      "lg": "8px"
+      "lg": "8px",
+      "xl": "12px"
     },
     "shadows": {
-      "surface": "0 36px 88px rgba(0,0,0,0.62)",
-      "glow": "0 0 120px rgba(217,168,108,0.16)"
+      "surface": "0 12px 40px rgba(0,0,0,0.28)",
+      "glow": "0 0 96px rgba(200,120,64,0.22)",
+      "card": "0 0 0 1px rgba(245,237,228,0.08), 0 16px 48px rgba(0,0,0,0.32)"
     },
     "borders": {
-      "default": "rgba(246,239,230,0.1)",
-      "copper": "rgba(217,168,108,0.34)",
-      "subtle": "rgba(246,239,230,0.05)"
+      "default": "rgba(245,237,228,0.12)",
+      "accent": "rgba(200,120,64,0.38)",
+      "subtle": "rgba(245,237,228,0.06)"
     },
     "animation": "ember-table-reveal"
   },
   "designSystem": {
     "tier": "premium",
-    "industry": "Restaurant",
-    "layoutKind": "sidebar-left",
+    "industry": "luxury",
+    "layoutKind": "cinematic-fullbleed",
     "templateIntelligenceId": "ti-restaurant-dining"
   }
 }

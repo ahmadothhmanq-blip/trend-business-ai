@@ -1,16 +1,22 @@
 import path from "node:path";
+import {
+  resolveInstalledBuilderTemplatePackageId,
+} from "@/lib/website/builder/resolve-builder-template-package-id";
 import { resolveWbTemplatesRoot } from "@/lib/website/template-engine/constants.server";
 import type { TemplateArchitectureVersion } from "@/lib/website/template-v2/constants";
 import { readTemplateArchitectureFromSettings } from "@/lib/website/template-v2/contracts/settings";
 import type { TemplateV2RawManifest } from "@/lib/website/template-v2/contracts/package";
 import { readTemplatePackageManifestRaw } from "@/lib/website/template-v2/loader/load-v2-package";
 import { detectArchitectureVersionFromManifest } from "@/lib/website/template-v2/validation/validate-v2-package";
+import { isVisualSkinV2PackageId } from "@/lib/website/visual-skin/theme-bridge";
 
 export type ResolveTemplateArchitectureInput = {
   packageId?: string;
   manifest?: TemplateV2RawManifest;
   projectSettings?: Record<string, unknown> | null;
   templatesRoot?: string;
+  /** Skip legacy marketplace remap (visual skin / flagship direct apply). */
+  directPackageId?: boolean;
 };
 
 export type ResolveTemplateArchitectureResult = {
@@ -23,8 +29,9 @@ async function loadManifestForPackage(
   packageId: string,
   templatesRoot: string,
 ): Promise<TemplateV2RawManifest | null> {
+  const resolvedId = resolveInstalledBuilderTemplatePackageId(packageId);
   try {
-    const packageDirectory = path.join(templatesRoot, packageId);
+    const packageDirectory = path.join(templatesRoot, resolvedId);
     return await readTemplatePackageManifestRaw(packageDirectory);
   } catch {
     return null;
@@ -46,15 +53,20 @@ export async function resolveTemplateArchitecture(
   const templatesRoot = input.templatesRoot ?? resolveWbTemplatesRoot();
 
   let manifest = input.manifest ?? null;
-  let packageId = input.packageId?.trim() || manifest?.id || null;
+  const requestedPackageId = input.packageId?.trim() || manifest?.id || null;
+  const directPackage =
+    input.directPackageId || isVisualSkinV2PackageId(requestedPackageId ?? "");
+  const resolvedPackageId = requestedPackageId
+    ? directPackage
+      ? requestedPackageId
+      : resolveInstalledBuilderTemplatePackageId(requestedPackageId)
+    : null;
 
-  if (!manifest && packageId) {
-    manifest = await loadManifestForPackage(packageId, templatesRoot);
+  if (!manifest && resolvedPackageId) {
+    manifest = await loadManifestForPackage(resolvedPackageId, templatesRoot);
   }
 
-  if (!packageId && manifest?.id) {
-    packageId = manifest.id;
-  }
+  const packageId = resolvedPackageId ?? requestedPackageId;
 
   const packageArchitecture = manifest
     ? detectArchitectureVersionFromManifest(manifest)

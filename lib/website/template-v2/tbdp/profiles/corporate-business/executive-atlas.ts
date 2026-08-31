@@ -5,16 +5,16 @@ import type { TemplateV2ResponsiveRules } from "@/lib/website/template-v2/contra
 /** Executive Atlas — TBDP identity for corporate-business. */
 export const EXECUTIVE_ATLAS_V2_TOKENS: TemplateV2DesignTokens = {
   colors: {
-    primary: "#080E18",
+    primary: "#0A1628",
     secondary: "#152238",
-    accent: "#C4A574",
-    background: "#F7F6F3",
-    foreground: "#080E18",
-    muted: "rgba(8,14,24,0.58)",
+    accent: "#B89B6E",
+    background: "#F8F6F2",
+    foreground: "#0A1628",
+    muted: "rgba(10,22,40,0.56)",
     surface: "#FFFFFF",
-    signal: "#C4A574",
-    grid: "rgba(8,14,24,0.04)",
-    ink: "#080E18",
+    signal: "#B89B6E",
+    grid: "rgba(10,22,40,0.05)",
+    ink: "#0A1628",
   },
   typography: {
     display: "Cormorant Garamond",
@@ -22,9 +22,9 @@ export const EXECUTIVE_ATLAS_V2_TOKENS: TemplateV2DesignTokens = {
     scale: {
       sm: "0.875rem",
       base: "1rem",
-      lg: "1.375rem",
-      xl: "3.25rem",
-      display: "clamp(3.25rem, 7.5vw, 5.75rem)",
+      lg: "1.125rem",
+      xl: "1.625rem",
+      display: "clamp(1.875rem, 3vw, 2.5rem)",
     },
   },
   languageProfile: {
@@ -38,14 +38,14 @@ export const EXECUTIVE_ATLAS_V2_TOKENS: TemplateV2DesignTokens = {
   },
   radius: { sm: "4px", md: "8px", lg: "12px", xl: "20px" },
   shadows: {
-    surface: "0 20px 60px rgba(8,14,24,0.07), 0 2px 8px rgba(8,14,24,0.03)",
-    glow: "0 0 64px rgba(196,165,116,0.18)",
-    card: "0 0 0 1px rgba(8,14,24,0.04), 0 4px 24px rgba(8,14,24,0.04)",
+    surface: "0 20px 60px rgba(10,22,40,0.07), 0 2px 8px rgba(10,22,40,0.03)",
+    glow: "0 0 64px rgba(184,155,110,0.18)",
+    card: "0 0 0 1px rgba(10,22,40,0.05), 0 8px 32px rgba(10,22,40,0.06)",
   },
   borders: {
-    default: "rgba(8,14,24,0.08)",
-    accent: "rgba(196,165,116,0.32)",
-    subtle: "rgba(8,14,24,0.05)",
+    default: "rgba(10,22,40,0.09)",
+    accent: "rgba(184,155,110,0.32)",
+    subtle: "rgba(10,22,40,0.05)",
   },
 };
 

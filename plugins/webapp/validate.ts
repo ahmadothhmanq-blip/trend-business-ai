@@ -1,5 +1,5 @@
 import type { ProjectCapabilityFlags } from "@/lib/ai/validator";
-import { validateGeneratedProject } from "@/lib/ai/validator";
+import { validateWebAppProject } from "@/lib/ai/webapp-requirements";
 import type { WebAppOutput } from "@/plugins/webapp/types";
 import type { GenerationContext, ValidationResult } from "@/lib/ai/types";
 
@@ -20,7 +20,11 @@ export async function validateWebApp(
 ): Promise<ValidationResult> {
   ctx.progress.emit("Validating project...");
 
-  const result = validateGeneratedProject(output.files, flagsFromOutput(output));
+  const result = validateWebAppProject(
+    output.files,
+    flagsFromOutput(output),
+    output.appModel?.dataModels.map((model) => model.name) ?? [],
+  );
 
   return {
     valid: result.valid,

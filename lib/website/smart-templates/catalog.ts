@@ -164,7 +164,7 @@ export const SMART_TEMPLATE_CATALOG: Record<
   },
   "restaurant-premium": {
     id: "restaurant-premium",
-    name: "Restaurant Premium",
+    name: "Elegance",
     slug: "restaurant-premium",
     category: "Hospitality",
     description:

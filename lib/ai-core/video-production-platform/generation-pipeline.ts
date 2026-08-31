@@ -1,6 +1,6 @@
 /**
- * Real video generation pipeline — scenes → provider → storage → job states.
- * Supports sync render, poll/resume, retry, and final assembly.
+ * Real video generation pipeline — domain render facade + assembly helpers.
+ * Full/avatar/image-to-video/batch render is owned by runtime/render-pipeline.ts.
  */
 
 import type {
@@ -9,191 +9,51 @@ import type {
   VideoRenderClip,
   VideoRenderJob,
 } from "@/lib/ai-core/video-production-platform/types";
-import { nowIso, vid } from "@/lib/ai-core/video-production-platform/ids";
+import { nowIso } from "@/lib/ai-core/video-production-platform/ids";
+import type { VideoProviderId } from "@/lib/ai-core/video-production-platform/providers";
+import { uploadVideoStudioMedia } from "@/lib/ai-core/video-production-platform/media-storage";
 import {
-  getVideoProvider,
-  getVideoProviderForMode,
-  ProviderNotConfiguredError,
-  type VideoProviderId,
-  type VideoProviderRenderMode,
-} from "@/lib/ai-core/video-production-platform/providers";
+  assembleComposite,
+  probeMediaBytes,
+  resolveExportPreset,
+  type AssemblyResult,
+} from "@/lib/ai-core/video-production-platform/assemble";
 import {
-  fetchRemoteToBytes,
-  uploadVideoStudioMedia,
-} from "@/lib/ai-core/video-production-platform/media-storage";
-import { synthesizeSpeech } from "@/lib/ai-core/video-production-platform/tts";
-import { createRenderJobFromModel } from "@/lib/ai-core/video-production-platform/render-engine";
-import { assembleComposite, resolveExportPreset } from "@/lib/ai-core/video-production-platform/assemble";
-import {
-  validateClipMediaForRender,
   filterClipsForProductionAssembly,
+  isFfmpegAssemblyMethod,
+  isProductionRenderMode,
 } from "@/lib/ai-core/video-production-platform/media-validation";
+import { isStubVideoBytes } from "@/lib/ai-core/video-production-platform/providers/types";
+import { sha256Hex } from "@/lib/ai-core/video-production-platform/runtime/ingest";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnySupabase = any;
 
 const MAX_INLINE_POLLS = 8;
-const POLL_DELAY_MS = 1500;
+const MIN_PRODUCTION_COMPOSITE_BYTES = 1024;
 
-function sleep(ms: number) {
-  return new Promise((r) => setTimeout(r, ms));
-}
+export type AssembleAndUploadResult = {
+  compositeAsset?: VideoMediaAsset;
+  assemblyManifest: VideoRenderJob["assemblyManifest"];
+  assets: VideoMediaAsset[];
+  ok: boolean;
+  errorMessage?: string;
+};
 
-async function persistJob(
-  supabase: AnySupabase,
-  userId: string,
-  generationId: string,
-  job: VideoRenderJob,
-) {
-  try {
-    await supabase.from("video_render_jobs").upsert({
-      id: job.id,
-      user_id: userId,
-      generation_id: generationId,
-      status: job.status,
-      provider: job.provider,
-      mode: job.mode,
-      progress: job.progress,
-      payload: job,
-      updated_at: nowIso(),
-    });
-  } catch {
-    /* table may not exist yet */
-  }
-}
-
-async function finalizeClipFromResult(params: {
-  clip: VideoRenderClip;
-  result: {
-    status: string;
-    bytes?: Uint8Array;
-    remoteUrl?: string;
-    mimeType: string;
-    provider: string;
-    error?: string;
-    externalJobId?: string;
-    message?: string;
-  };
-  supabase: AnySupabase;
-  userId: string;
-  generationId: string;
-  sceneId?: string;
-  prompt: string;
-  durationSec: number;
-  index: number;
-  renderMode: VideoRenderJob["mode"];
-}): Promise<{ clip: VideoRenderClip; asset?: VideoMediaAsset }> {
-  const { result } = params;
-  if (result.status === "failed") {
-    return {
-      clip: {
-        ...params.clip,
-        status: "failed",
-        progress: 100,
-        error: result.error || result.message,
-        externalJobId: result.externalJobId || params.clip.externalJobId,
-        updatedAt: nowIso(),
-      },
-    };
-  }
-
-  if (result.status === "processing") {
-    return {
-      clip: {
-        ...params.clip,
-        status: "processing",
-        progress: 50,
-        externalJobId: result.externalJobId || params.clip.externalJobId,
-        updatedAt: nowIso(),
-      },
-    };
-  }
-
-  let bytes = result.bytes;
-  if (!bytes && result.remoteUrl) {
-    bytes = (await fetchRemoteToBytes(result.remoteUrl)) || undefined;
-  }
-
-  const mediaCheck = validateClipMediaForRender({
-    bytes,
-    provider: result.provider,
-    mimeType: result.mimeType,
-    mode: params.renderMode,
-  });
-  if (!mediaCheck.valid) {
-    return {
-      clip: {
-        ...params.clip,
-        status: "failed",
-        progress: 100,
-        error: mediaCheck.error,
-        externalJobId: result.externalJobId || params.clip.externalJobId,
-        updatedAt: nowIso(),
-      },
-    };
-  }
-
-  if (bytes) {
-    const uploaded = await uploadVideoStudioMedia({
-      supabase: params.supabase,
-      userId: params.userId,
-      generationId: params.generationId,
-      kind: "clip",
-      bytes,
-      mimeType: result.mimeType.includes("webm") ? "video/webm" : "video/mp4",
-      filename: `scene-${params.index + 1}.${result.mimeType.includes("webm") ? "webm" : "mp4"}`,
-      durationSec: params.durationSec,
-      provider: result.provider,
-      meta: { sceneId: params.sceneId, prompt: params.prompt },
-    });
-    return {
-      clip: {
-        ...params.clip,
-        status: "completed",
-        progress: 100,
-        asset: uploaded.asset,
-        externalJobId: result.externalJobId || params.clip.externalJobId,
-        updatedAt: nowIso(),
-      },
-      asset: uploaded.asset,
-    };
-  }
-
-  if (result.remoteUrl) {
-    const asset: VideoMediaAsset = {
-      id: vid("asset", `remote-${params.index}`, params.index),
-      kind: "clip",
-      mimeType: result.mimeType.includes("webm") ? "video/webm" : "video/mp4",
-      url: result.remoteUrl,
-      durationSec: params.durationSec,
-      provider: result.provider,
-      createdAt: nowIso(),
-    };
-    return {
-      clip: {
-        ...params.clip,
-        status: "completed",
-        progress: 100,
-        asset,
-        externalJobId: result.externalJobId || params.clip.externalJobId,
-        updatedAt: nowIso(),
-      },
-      asset,
-    };
-  }
-
+function productionAssemblyRejected(note: string, manifest?: VideoRenderJob["assemblyManifest"]): AssembleAndUploadResult {
   return {
-    clip: {
-      ...params.clip,
-      status: "failed",
-      progress: 100,
-      error: "No media returned",
-      updatedAt: nowIso(),
+    assets: [],
+    assemblyManifest: manifest || {
+      clipUrls: [],
+      method: "manifest-only",
+      note,
     },
+    ok: false,
+    errorMessage: note,
   };
 }
 
-async function assembleAndUpload(params: {
+export async function assembleAndUpload(params: {
   model: VideoProductionModel;
   job: VideoRenderJob;
   clips: VideoRenderClip[];
@@ -202,26 +62,28 @@ async function assembleAndUpload(params: {
   userId: string;
   generationId: string;
   assets: VideoMediaAsset[];
-}): Promise<{ compositeAsset?: VideoMediaAsset; assemblyManifest: VideoRenderJob["assemblyManifest"]; assets: VideoMediaAsset[] }> {
-  const { eligible, skipped, message: filterMessage } = filterClipsForProductionAssembly({
+  assemble?: typeof assembleComposite;
+}): Promise<AssembleAndUploadResult> {
+  const production = isProductionRenderMode(params.job.mode);
+  const assemble = params.assemble || assembleComposite;
+  const { eligible, message: filterMessage } = filterClipsForProductionAssembly({
     clips: params.clips,
     mode: params.job.mode,
   });
 
   if (!eligible.length) {
+    const note = filterMessage || "No clips to assemble.";
     return {
+      ...productionAssemblyRejected(note, {
+        clipUrls: [],
+        method: "manifest-only",
+        note,
+      }),
       assets: params.assets,
-      assemblyManifest: filterMessage
-        ? {
-            clipUrls: [],
-            method: "manifest-only",
-            note: filterMessage,
-          }
-        : undefined,
     };
   }
 
-  const assembled = await assembleComposite({
+  const assembled: AssemblyResult = await assemble({
     title: params.model.title,
     clips: eligible.map((c) => {
       const scene = params.model.scenes.find((s) => s.id === c.sceneId);
@@ -232,8 +94,9 @@ async function assembleAndUpload(params: {
       };
     }),
     audioUrl: params.audioAsset?.url,
-    musicUrl: params.model.audioBeds.find((b) => b.kind === "music" && b.asset?.url)?.asset
-      ?.url,
+    musicUrl: params.audioAsset
+      ? undefined
+      : params.model.audioBeds.find((b) => b.kind === "music" && b.asset?.url)?.asset?.url,
     subtitles: params.model.subtitles.map((s, i) => ({
       startSec: s.startSec ?? i * 3,
       endSec: s.endSec ?? (s.startSec ?? i * 3) + 3,
@@ -242,12 +105,48 @@ async function assembleAndUpload(params: {
     burnSubtitles: params.model.subtitles.length > 0,
     useTransitions: eligible.length > 1,
     exportPreset: resolveExportPreset(params.model.aspectRatio, "1080p"),
+    requireFfmpeg: production,
   });
+
+  const manifest: VideoRenderJob["assemblyManifest"] = filterMessage
+    ? { ...assembled.manifest, note: `${assembled.manifest.note} ${filterMessage}`.trim() }
+    : assembled.manifest;
+
+  if (production) {
+    const bytes = assembled.bytes;
+    const playable =
+      isFfmpegAssemblyMethod(assembled.method) &&
+      Boolean(bytes?.byteLength && bytes.byteLength >= MIN_PRODUCTION_COMPOSITE_BYTES) &&
+      !isStubVideoBytes(bytes!);
+    if (!playable) {
+      return {
+        assets: params.assets,
+        assemblyManifest: manifest,
+        ok: false,
+        errorMessage:
+          assembled.note ||
+          "FFmpeg did not produce a playable MP4. Production renders cannot finish as first-clip or manifest-only.",
+      };
+    }
+  }
 
   let compositeAsset = assembled.assetStub;
   const assets = [...params.assets];
 
-  if (assembled.bytes) {
+  if (assembled.bytes && (!production || isFfmpegAssemblyMethod(assembled.method))) {
+    const probed = await probeMediaBytes(assembled.bytes);
+    const checksum = sha256Hex(assembled.bytes);
+    const durationSec = probed.durationSec && probed.durationSec > 0 ? probed.durationSec : compositeAsset.durationSec;
+    if (production && !(durationSec > 0)) {
+      return {
+        assets: params.assets,
+        assemblyManifest: manifest,
+        ok: false,
+        errorMessage: "Assembled MP4 has no playable duration.",
+      };
+    }
+    const width = probed.width || compositeAsset.width;
+    const height = probed.height || compositeAsset.height;
     const uploaded = await uploadVideoStudioMedia({
       supabase: params.supabase,
       userId: params.userId,
@@ -256,12 +155,40 @@ async function assembleAndUpload(params: {
       bytes: assembled.bytes,
       mimeType: assembled.mimeType,
       filename: `final.${assembled.mimeType.includes("webm") ? "webm" : "mp4"}`,
-      durationSec: compositeAsset.durationSec,
+      durationSec,
       provider: assembled.method === "ffmpeg" ? "ffmpeg" : params.job.provider,
-      meta: { assembly: assembled.manifest },
+      meta: {
+        assembly: assembled.manifest,
+        sha256: checksum,
+        codec: probed.codec,
+        width,
+        height,
+      },
     });
-    compositeAsset = { ...uploaded.asset, kind: "composite" };
+    compositeAsset = {
+      ...uploaded.asset,
+      kind: "composite",
+      durationSec,
+      width: width || uploaded.asset.width,
+      height: height || uploaded.asset.height,
+    };
     assets.push(compositeAsset);
+    if (uploaded.record?.id) {
+      try {
+        await params.supabase
+          .from("video_media")
+          .update({
+            sha256: checksum,
+            width,
+            height,
+            codec: probed.codec,
+            duration_sec: durationSec,
+          })
+          .eq("id", uploaded.record.id);
+      } catch {
+        /* probe metadata is additive */
+      }
+    }
     try {
       const { recordMediaRevision } = await import(
         "@/lib/ai-core/video-production-platform/media-revisions"
@@ -279,20 +206,21 @@ async function assembleAndUpload(params: {
     } catch {
       /* revisions optional */
     }
-  } else if (compositeAsset.url) {
+  } else if (!production && compositeAsset.url) {
     assets.push(compositeAsset);
   }
 
+  const ok = !production || (isFfmpegAssemblyMethod(manifest?.method) && Boolean(compositeAsset.url));
   return {
-    compositeAsset,
-    assemblyManifest: filterMessage
-      ? { ...assembled.manifest, note: `${assembled.manifest.note} ${filterMessage}`.trim() }
-      : assembled.manifest,
-    assets,
+    compositeAsset: ok ? compositeAsset : undefined,
+    assemblyManifest: manifest,
+    assets: ok ? assets : params.assets,
+    ok,
+    errorMessage: ok ? undefined : assembled.note || "Production assembly did not produce a playable MP4.",
   };
 }
 
-function applyJobToModel(
+export function applyJobToModel(
   model: VideoProductionModel,
   job: VideoRenderJob,
   assets: VideoMediaAsset[],
@@ -330,185 +258,29 @@ export async function runFullRenderPipeline(params: {
   /** When true, poll processing provider jobs inline (bounded). */
   pollInline?: boolean;
 }): Promise<{ model: VideoProductionModel; job: VideoRenderJob }> {
-  const mode: VideoProviderRenderMode =
-    params.mode === "preview"
-      ? "preview"
-      : params.useAvatar || params.mode === "avatar"
-        ? "avatar"
-        : params.mode || "full";
-
-  const provider = getVideoProviderForMode(mode, params.providerId);
-  const jobMode: VideoRenderJob["mode"] =
-    mode === "preview" ? "preview" : mode;
-  let job = createRenderJobFromModel(params.model, jobMode);
-  job = {
-    ...job,
-    mode: jobMode,
-    provider: provider.id,
-    status: "processing",
-    progress: 5,
-    message: `Rendering with ${provider.label}…`,
-    costCreditsEstimate: Math.max(1, params.model.scenes.length),
-    costCreditsSpent: 0,
-    attemptCount: 1,
-    updatedAt: nowIso(),
-  };
-
-  const assets: VideoMediaAsset[] = [...params.model.assets];
-  const clips: VideoRenderClip[] = [];
-
-  // 1) TTS
-  const fullScript =
-    params.model.voiceTracks[0]?.script ||
-    params.model.scenes.map((s) => s.script).filter(Boolean).join("\n\n");
-  let audioAsset: VideoMediaAsset | undefined;
-  if (fullScript.trim() && mode !== "preview") {
-    const tts = await synthesizeSpeech({
-      text: fullScript,
-      voiceId: params.model.presenter?.voiceId,
-      language: params.model.language,
-      style: params.model.presenter?.voiceStyle,
-      emotion: params.model.presenter?.facialExpressionStyle,
-    });
-    if (tts.bytes) {
-      const uploaded = await uploadVideoStudioMedia({
-        supabase: params.supabase,
-        userId: params.userId,
-        generationId: params.generationId,
-        kind: "audio",
-        bytes: tts.bytes,
-        mimeType: tts.mimeType,
-        filename: `voice.${tts.mimeType.includes("mpeg") ? "mp3" : "wav"}`,
-        durationSec: tts.durationSecEstimate,
-        provider: tts.provider,
-        meta: { sync: "script-to-voice" },
-      });
-      audioAsset = uploaded.asset;
-      assets.push(uploaded.asset);
-    }
+  if (params.mode === "preview") {
+    const { startAndProcessRender } = await import(
+      "@/lib/ai-core/video-production-platform/render-engine"
+    );
+    return startAndProcessRender(params.model, "preview");
   }
-
-  // 2) Per-scene clips
-  for (let i = 0; i < job.clips.length; i++) {
-    const baseClip = job.clips[i]!;
-    const scene = params.model.scenes.find((s) => s.id === baseClip.sceneId);
-    const prompt = scene?.visualPrompt || baseClip.visualPrompt;
-    const durationSec = scene?.durationSec || 5;
-
-    let clip: VideoRenderClip = {
-      ...baseClip,
-      status: "processing",
-      progress: 20,
-      updatedAt: nowIso(),
-    };
-
-    let result = await provider.generateClip({
-      prompt,
-      durationSec,
-      aspectRatio: params.model.aspectRatio,
-      imageUrl: params.sourceImageUrl || params.model.productImageUrl,
-      avatar:
-        params.useAvatar || jobMode === "avatar"
-          ? {
-              personaId: params.model.presenter?.personaId || "business-expert",
-              script: scene?.script || prompt,
-              voiceId: params.model.presenter?.voiceId,
-            }
-          : undefined,
-    });
-
-    // Bounded inline poll for async providers
-    if (
-      (params.pollInline !== false) &&
-      result.status === "processing" &&
-      result.externalJobId &&
-      provider.pollJob
-    ) {
-      const poll = provider.pollJob.bind(provider);
-      const jobId = result.externalJobId;
-      for (let p = 0; p < MAX_INLINE_POLLS; p++) {
-        await sleep(POLL_DELAY_MS);
-        result = await poll(jobId);
-        if (result.status !== "processing") break;
-      }
-    }
-
-    const finalized = await finalizeClipFromResult({
-      clip,
-      result,
-      supabase: params.supabase,
-      userId: params.userId,
-      generationId: params.generationId,
-      sceneId: scene?.id,
-      prompt,
-      durationSec,
-      index: i,
-      renderMode: jobMode,
-    });
-    clip = finalized.clip;
-    if (finalized.asset) assets.push(finalized.asset);
-    if (clip.status === "completed") {
-      job = { ...job, costCreditsSpent: (job.costCreditsSpent || 0) + 1 };
-    }
-    clips.push(clip);
-  }
-
-  const completedClips = clips.filter((c) => c.status === "completed");
-  const failed = clips.filter((c) => c.status === "failed");
-  const processing = clips.filter((c) => c.status === "processing");
-
-  let compositeAsset: VideoMediaAsset | undefined;
-  let assemblyManifest: VideoRenderJob["assemblyManifest"];
-
-  if (!processing.length && completedClips.length) {
-    const assembled = await assembleAndUpload({
-      model: params.model,
-      job: { ...job, clips },
-      clips,
-      audioAsset,
-      supabase: params.supabase,
-      userId: params.userId,
-      generationId: params.generationId,
-      assets,
-    });
-    compositeAsset = assembled.compositeAsset;
-    assemblyManifest = assembled.assemblyManifest;
-    assets.length = 0;
-    assets.push(...assembled.assets);
-  }
-
-  const progress = Math.round(
-    (completedClips.length / Math.max(1, clips.length)) * 100,
+  const { runDomainRenderPipeline } = await import(
+    "@/lib/ai-core/video-production-platform/runtime/render-pipeline"
   );
-
-  const finalJob: VideoRenderJob = {
-    ...job,
-    clips,
-    audioAsset,
-    compositeAsset,
-    assemblyManifest,
-    progress: processing.length ? Math.min(90, progress) : progress,
-    status:
-      failed.length && !completedClips.length
-        ? "failed"
-        : processing.length
-          ? "processing"
-          : "completed",
-    message: processing.length
-      ? `Waiting on ${processing.length} provider job(s) — resume to continue.`
-      : failed.length
-        ? `Completed ${completedClips.length} clips, ${failed.length} failed.`
-        : `Rendered ${completedClips.length} clips via ${provider.label}${assemblyManifest ? ` · assembled (${assemblyManifest.method})` : ""}.`,
-    updatedAt: nowIso(),
-    completedAt: processing.length ? undefined : nowIso(),
-  };
-
-  await persistJob(params.supabase, params.userId, params.generationId, finalJob);
-
-  return {
-    model: applyJobToModel(params.model, finalJob, assets, audioAsset),
-    job: finalJob,
-  };
+  const result = await runDomainRenderPipeline({
+    model: params.model,
+    supabase: params.supabase,
+    userId: params.userId,
+    generationId: params.generationId,
+    mode: params.mode === "avatar" || params.mode === "image-to-video" || params.mode === "batch-item"
+      ? params.mode
+      : "full",
+    providerId: params.providerId,
+    sourceImageUrl: params.sourceImageUrl,
+    useAvatar: params.useAvatar || params.mode === "avatar",
+  });
+  void params.pollInline;
+  return { model: result.model, job: result.job };
 }
 
 /**
@@ -522,102 +294,19 @@ export async function resumeRenderJob(params: {
   generationId: string;
   pollRounds?: number;
 }): Promise<{ model: VideoProductionModel; job: VideoRenderJob }> {
-  const provider = getVideoProvider(params.job.provider);
-  const assets = [...params.model.assets];
-  const rounds = params.pollRounds ?? MAX_INLINE_POLLS;
-  let clips = [...params.job.clips];
-  const audioAsset = params.job.audioAsset;
-
-  for (let round = 0; round < rounds; round++) {
-    let anyProcessing = false;
-    const nextClips: VideoRenderClip[] = [];
-
-    for (let i = 0; i < clips.length; i++) {
-      const clip = clips[i]!;
-      if (clip.status !== "processing" || !clip.externalJobId || !provider.pollJob) {
-        nextClips.push(clip);
-        continue;
-      }
-      anyProcessing = true;
-      const result = await provider.pollJob(clip.externalJobId);
-      const scene = params.model.scenes.find((s) => s.id === clip.sceneId);
-      const finalized = await finalizeClipFromResult({
-        clip,
-        result,
-        supabase: params.supabase,
-        userId: params.userId,
-        generationId: params.generationId,
-        sceneId: scene?.id,
-        prompt: clip.visualPrompt,
-        durationSec: scene?.durationSec || 5,
-        index: i,
-        renderMode: params.job.mode,
-      });
-      if (finalized.asset) assets.push(finalized.asset);
-      nextClips.push(finalized.clip);
-    }
-
-    clips = nextClips;
-    if (!anyProcessing || !clips.some((c) => c.status === "processing")) break;
-    await sleep(POLL_DELAY_MS);
-  }
-
-  const completedClips = clips.filter((c) => c.status === "completed");
-  const failed = clips.filter((c) => c.status === "failed");
-  const processing = clips.filter((c) => c.status === "processing");
-
-  let compositeAsset = params.job.compositeAsset;
-  let assemblyManifest = params.job.assemblyManifest;
-  let nextAssets = assets;
-
-  if (!processing.length && completedClips.length) {
-    const assembled = await assembleAndUpload({
-      model: params.model,
-      job: { ...params.job, clips },
-      clips,
-      audioAsset,
-      supabase: params.supabase,
-      userId: params.userId,
-      generationId: params.generationId,
-      assets,
-    });
-    compositeAsset = assembled.compositeAsset;
-    assemblyManifest = assembled.assemblyManifest;
-    nextAssets = assembled.assets;
-  }
-
-  const progress = Math.round(
-    (completedClips.length / Math.max(1, clips.length)) * 100,
+  const { resumeDomainRender } = await import(
+    "@/lib/ai-core/video-production-platform/runtime/render-pipeline"
   );
-
-  const finalJob: VideoRenderJob = {
-    ...params.job,
-    clips,
-    audioAsset,
-    compositeAsset,
-    assemblyManifest,
-    progress: processing.length ? Math.min(95, Math.max(progress, 50)) : progress,
-    status:
-      failed.length && !completedClips.length
-        ? "failed"
-        : processing.length
-          ? "processing"
-          : "completed",
-    message: processing.length
-      ? `Still waiting on ${processing.length} provider job(s).`
-      : `Resumed — ${completedClips.length} clips ready.`,
-    costCreditsSpent:
-      (params.job.costCreditsSpent || 0) +
-      Math.max(0, completedClips.length - (params.job.clips.filter((c) => c.status === "completed").length)),
-    updatedAt: nowIso(),
-    completedAt: processing.length ? undefined : nowIso(),
-  };
-
-  await persistJob(params.supabase, params.userId, params.generationId, finalJob);
-  return {
-    model: applyJobToModel(params.model, finalJob, nextAssets, audioAsset),
-    job: finalJob,
-  };
+  const result = await resumeDomainRender({
+    model: params.model,
+    supabase: params.supabase,
+    userId: params.userId,
+    generationId: params.generationId,
+    mode: params.job.mode === "preview" ? "full" : params.job.mode,
+    providerId: params.job.provider,
+  });
+  void params.pollRounds;
+  return { model: result.model, job: result.job };
 }
 
 /**
@@ -632,125 +321,19 @@ export async function retryFailedClips(params: {
   sourceImageUrl?: string | null;
   useAvatar?: boolean;
 }): Promise<{ model: VideoProductionModel; job: VideoRenderJob }> {
-  const latest = params.model.jobs[params.model.jobs.length - 1];
-  if (!latest) {
-    return runFullRenderPipeline({
-      ...params,
-      mode: "full",
-      pollInline: true,
-    });
-  }
-
-  const provider = getVideoProvider(params.providerId || latest.provider);
-  const assets = [...params.model.assets];
-  const clips: VideoRenderClip[] = [];
-  let spent = latest.costCreditsSpent || 0;
-
-  for (let i = 0; i < latest.clips.length; i++) {
-    const existing = latest.clips[i]!;
-    if (existing.status === "completed" && existing.asset) {
-      clips.push(existing);
-      continue;
-    }
-
-    const scene = params.model.scenes.find((s) => s.id === existing.sceneId);
-    const prompt = scene?.visualPrompt || existing.visualPrompt;
-    const durationSec = scene?.durationSec || 5;
-
-    let result = await provider.generateClip({
-      prompt,
-      durationSec,
-      aspectRatio: params.model.aspectRatio,
-      imageUrl: params.sourceImageUrl || params.model.productImageUrl,
-      avatar: params.useAvatar
-        ? {
-            personaId: params.model.presenter?.personaId || "business-expert",
-            script: scene?.script || prompt,
-            voiceId: params.model.presenter?.voiceId,
-          }
-        : undefined,
-    });
-
-    if (result.status === "processing" && result.externalJobId && provider.pollJob) {
-      const poll = provider.pollJob.bind(provider);
-      const jobId = result.externalJobId;
-      for (let p = 0; p < MAX_INLINE_POLLS; p++) {
-        await sleep(POLL_DELAY_MS);
-        result = await poll(jobId);
-        if (result.status !== "processing") break;
-      }
-    }
-
-    const finalized = await finalizeClipFromResult({
-      clip: { ...existing, status: "processing", progress: 20, error: undefined },
-      result,
-      supabase: params.supabase,
-      userId: params.userId,
-      generationId: params.generationId,
-      sceneId: scene?.id,
-      prompt,
-      durationSec,
-      index: i,
-      renderMode: latest.mode,
-    });
-    if (finalized.asset) {
-      assets.push(finalized.asset);
-      spent += 1;
-    }
-    clips.push(finalized.clip);
-  }
-
-  const processing = clips.filter((c) => c.status === "processing");
-  const completedClips = clips.filter((c) => c.status === "completed");
-  const failed = clips.filter((c) => c.status === "failed");
-  const audioAsset = latest.audioAsset;
-
-  let compositeAsset = latest.compositeAsset;
-  let assemblyManifest = latest.assemblyManifest;
-  let nextAssets = assets;
-
-  if (!processing.length && completedClips.length) {
-    const assembled = await assembleAndUpload({
-      model: params.model,
-      job: { ...latest, clips },
-      clips,
-      audioAsset,
-      supabase: params.supabase,
-      userId: params.userId,
-      generationId: params.generationId,
-      assets,
-    });
-    compositeAsset = assembled.compositeAsset;
-    assemblyManifest = assembled.assemblyManifest;
-    nextAssets = assembled.assets;
-  }
-
-  const finalJob: VideoRenderJob = {
-    ...latest,
-    clips,
-    audioAsset,
-    compositeAsset,
-    assemblyManifest,
-    attemptCount: (latest.attemptCount || 1) + 1,
-    costCreditsSpent: spent,
-    progress: Math.round((completedClips.length / Math.max(1, clips.length)) * 100),
-    status:
-      failed.length && !completedClips.length
-        ? "failed"
-        : processing.length
-          ? "processing"
-          : "completed",
-    message: `Retry #${(latest.attemptCount || 1) + 1}: ${completedClips.length} ok, ${failed.length} failed.`,
-    provider: provider.id,
-    updatedAt: nowIso(),
-    completedAt: processing.length ? undefined : nowIso(),
-  };
-
-  await persistJob(params.supabase, params.userId, params.generationId, finalJob);
-  return {
-    model: applyJobToModel(params.model, finalJob, nextAssets, audioAsset),
-    job: finalJob,
-  };
+  const { retryDomainRender } = await import(
+    "@/lib/ai-core/video-production-platform/runtime/render-pipeline"
+  );
+  const result = await retryDomainRender({
+    model: params.model,
+    supabase: params.supabase,
+    userId: params.userId,
+    generationId: params.generationId,
+    providerId: params.providerId,
+    sourceImageUrl: params.sourceImageUrl,
+    useAvatar: params.useAvatar,
+  });
+  return { model: result.model, job: result.job };
 }
 
 /**
@@ -828,6 +411,7 @@ async function processRenderJobRow(params: {
 
 export async function processPendingRenderJobs(params: {
   supabase: AnySupabase;
+  /** Required for tenant HTTP callers. Omit only from the secret-gated cron worker. */
   userId?: string;
   limit?: number;
   pollRounds?: number;
@@ -856,6 +440,7 @@ export async function processPendingRenderJobs(params: {
     generation_id: string;
     payload: VideoRenderJob;
   }>) {
+    if (params.userId && row.user_id !== params.userId) continue;
     const result = await processRenderJobRow({
       supabase: params.supabase,
       row,
@@ -870,6 +455,8 @@ export async function processPendingRenderJobs(params: {
 
 /**
  * Background queue — resume async jobs and optionally retry recent failures.
+ * Pass `userId` for authenticated tenant requests. Omit only from `/api/video-studio/cron`
+ * (service-role + VIDEO_STUDIO_CRON_SECRET).
  */
 export async function processVideoStudioBackgroundQueue(params: {
   supabase: AnySupabase;
@@ -882,8 +469,17 @@ export async function processVideoStudioBackgroundQueue(params: {
   processed: number;
   resumed: number;
   retried: number;
+  providerJobs?: Awaited<ReturnType<typeof import("@/lib/ai-core/video-production-platform/runtime/provider-job-worker").processDueProviderJobs>>;
   results: Array<{ jobId: string; status: string; action: string }>;
 }> {
+  const { processDueProviderJobs } = await import(
+    "@/lib/ai-core/video-production-platform/runtime/provider-job-worker"
+  );
+  const providerJobs = await processDueProviderJobs({
+    supabase: params.supabase,
+    limit: params.limit ?? 10,
+    userId: params.userId,
+  });
   const limit = params.limit ?? 10;
   const maxAttempts = params.maxRetryAttempts ?? 3;
   const results: Array<{ jobId: string; status: string; action: string }> = [];
@@ -907,6 +503,7 @@ export async function processVideoStudioBackgroundQueue(params: {
     generation_id: string;
     payload: VideoRenderJob;
   }>) {
+    if (params.userId && row.user_id !== params.userId) continue;
     results.push(
       await processRenderJobRow({
         supabase: params.supabase,
@@ -938,6 +535,7 @@ export async function processVideoStudioBackgroundQueue(params: {
       generation_id: string;
       payload: VideoRenderJob;
     }>) {
+      if (params.userId && row.user_id !== params.userId) continue;
       const attempts = row.payload?.attemptCount ?? 1;
       if (attempts >= maxAttempts) continue;
       results.push(
@@ -953,9 +551,13 @@ export async function processVideoStudioBackgroundQueue(params: {
   }
 
   return {
-    processed: results.length,
+    processed: results.length + providerJobs.processed,
     resumed: results.filter((r) => r.action === "resume").length,
     retried,
-    results,
+    providerJobs,
+    results: [
+      ...providerJobs.results,
+      ...results,
+    ],
   };
 }

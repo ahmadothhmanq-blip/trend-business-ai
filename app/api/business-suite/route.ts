@@ -1,11 +1,12 @@
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
 import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
-import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { beginAiUsage } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import { generateBusiness } from "@/lib/business-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
 import { resolveIteratedPrompt } from "@/lib/ai/iteration";
+import { getRequestAiLanguage } from "@/lib/i18n/api";
 import { getBusinessToolLabel, getBusinessTypeLabel } from "@/lib/constants/business-suite";
 import type { BusinessGeneration, BusinessBlueprint } from "@/types/business";
 import { NextResponse } from "next/server";
@@ -23,6 +24,8 @@ const requestSchema = z.object({
   parentGenerationId: z.string().uuid().optional(),
   continueInstruction: z.string().trim().max(4000).optional(),
   projectId: z.string().uuid().optional(),
+  language: z.string().trim().optional(),
+  country: z.string().trim().optional(),
 });
 
 function logError(stage: string, error: unknown) {
@@ -68,8 +71,9 @@ export async function POST(request: Request) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  const rateLimited = await enforceAiUsage(auth.supabase, auth.user!.id, "business-suite");
-  if (rateLimited) return rateLimited;
+  const usage = await beginAiUsage(auth.supabase, auth.user!.id, "business-suite");
+  if (!usage.ok) return usage.response;
+  const creditLease = usage.lease;
 
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
@@ -105,6 +109,7 @@ export async function POST(request: Request) {
       companyStage: input.companyStage,
       targetMarket: input.targetMarket,
       options: input.options,
+      language: getRequestAiLanguage(request, input.language, input.country),
     });
 
     const blueprint: BusinessBlueprint = {
@@ -162,6 +167,7 @@ export async function POST(request: Request) {
       return databaseErrorResponse("business-suite.insert", error);
     }
 
+    await creditLease.settle(auth.supabase);
     return NextResponse.json({ generation: data as BusinessGeneration, message: "Business analysis generated and saved." });
   } catch (error) {
     logError(stage, error);

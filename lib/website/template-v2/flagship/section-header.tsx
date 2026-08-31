@@ -32,7 +32,7 @@ export function FlagshipSectionHeader({
       ) : null}
       {title ? (
         <div
-          className={`mt-4 h-px w-12 bg-gradient-to-r from-[var(--color-accent)] to-transparent ${align === "center" ? "mx-auto" : ""}`}
+          className={`df-accent-line mt-4 ${align === "center" ? "mx-auto" : ""}`}
           aria-hidden
         />
       ) : null}

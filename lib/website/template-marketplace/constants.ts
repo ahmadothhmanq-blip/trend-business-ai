@@ -26,6 +26,8 @@ export const WB_TEMPLATE_MARKETPLACE_CATEGORY_DEFINITIONS: Array<{
   { id: "agency", label: "Agency", description: "Creative and marketing agencies" },
   { id: "portfolio", label: "Portfolio", description: "Personal and studio portfolios" },
   { id: "education", label: "Education", description: "Courses and learning platforms" },
+  { id: "finance", label: "Finance", description: "Banking, fintech, and advisory firms" },
+  { id: "hotel", label: "Hotel", description: "Hotels, resorts, and hospitality" },
   { id: "nonprofit", label: "Nonprofit", description: "Mission-driven organizations" },
   { id: "legal", label: "Legal", description: "Law firms and compliance sites" },
   { id: "travel", label: "Travel", description: "Tourism and hospitality" },

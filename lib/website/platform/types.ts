@@ -24,7 +24,8 @@ export type WebsiteMutationOperation =
   | "website.seo.apply"
   | "website.review.apply"
   | "website.review.rollback"
-  | "website.generation.save";
+  | "website.generation.save"
+  | "website.pro.files";
 
 export type WebsiteCommitInput = {
   prompt: string;

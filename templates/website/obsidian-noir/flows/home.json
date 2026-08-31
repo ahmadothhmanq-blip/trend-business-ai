@@ -1,0 +1,17 @@
+{
+  "pageId": "home",
+  "layoutId": "default",
+  "regions": {
+    "header": ["obsidian-noir-nav"],
+    "main": [
+      "obsidian-noir-hero",
+      "obsidian-noir-features",
+      "obsidian-noir-about",
+      "obsidian-noir-testimonials",
+      "obsidian-noir-contact"
+    ],
+    "utility": [],
+    "overlay": [],
+    "footer": ["obsidian-noir-footer"]
+  }
+}

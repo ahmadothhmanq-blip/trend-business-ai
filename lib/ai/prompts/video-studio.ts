@@ -1,5 +1,5 @@
 import type { VideoPluginInput, VideoAnalysis, VideoScenePlan } from "@/plugins/video-studio/types";
-import { aiOutputLanguageDirective } from "@/lib/ai/prompts/shared";
+import { aiOutputLanguageDirective } from "@/lib/ai/prompts/language-directive.server";
 
 function getVideoTypeContext(type: string): string {
   const ctx: Record<string, string> = {
@@ -44,7 +44,7 @@ Produce a JSON object with:
 - visualTheme: description of the visual theme
 - pacing: pacing description (fast, medium, slow, dynamic)
 
-Return ONLY valid JSON.${aiOutputLanguageDirective(input.language)}`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(input.language, "video")}`;
 }
 
 export function videoPlanPrompt(input: VideoPluginInput, analysis: VideoAnalysis): string {
@@ -77,7 +77,7 @@ Create a JSON object with:
 - totalDuration: total video duration
 - narrativeArc: the story structure (e.g. "hook → problem → solution → CTA")
 
-Return ONLY valid JSON.${aiOutputLanguageDirective(input.language)}`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(input.language, "video")}`;
 }
 
 export function videoScenePrompt(
@@ -113,10 +113,10 @@ Create a JSON object with:
 - narration: voice-over narration text for this scene (or "" if none)
 - musicDirection: music cue for this scene
 - sfxNotes: sound effects description (or "" if none)
-- svgStoryboard: SVG storyboard frame (viewBox="0 0 ${w} ${h}"). Create a visual composition showing the scene layout, subject placement, and camera framing. Use shapes, text labels, and arrows to indicate motion. Include the scene's color palette. Use generic fonts. No external references.
+- svgStoryboard: SVG storyboard frame (viewBox="0 0 ${w} ${h}"). Create a visual composition showing the scene layout, subject placement, and camera framing. Use shapes, text labels, and arrows to indicate motion. Include the scene's color palette. Use generic fonts. No external references. All on-screen labels and titles in the SVG must be in the selected generation language.
 - visualPrompt: optimized text-to-video prompt for AI video generators (Runway, Kling, etc.) — detailed, comma-separated descriptors
 
-Return ONLY valid JSON.${aiOutputLanguageDirective(language)}`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(language, "video")}`;
 }
 
 export function videoScriptPrompt(
@@ -142,7 +142,7 @@ Write the script with:
 - Narration/dialogue in regular text
 - Music/SFX cues in (parentheses)
 
-Write 200-500 words. Professional, engaging. Return plain text — no JSON wrapper.${aiOutputLanguageDirective(language)}`;
+Write 200-500 words. Professional, engaging. Return plain text — no JSON wrapper.${aiOutputLanguageDirective(language, "video")}`;
 }
 
 export function videoThumbnailPrompt(
@@ -171,5 +171,5 @@ Requirements:
 Return a JSON object with:
 - svgCode: the complete SVG markup
 
-Return ONLY valid JSON.${aiOutputLanguageDirective(language)}`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(language, "video")}`;
 }

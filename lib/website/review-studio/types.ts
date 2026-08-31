@@ -37,6 +37,8 @@ export type ReviewStudioInput = {
     glsContextHash?: string;
     tbdpTemplateId?: string;
   };
+  /** Active website capabilities from WebsiteCapabilityService (scopes review checks). */
+  activeCapabilityIds?: string[];
 };
 
 export type AnalyzerDimensionResult = {

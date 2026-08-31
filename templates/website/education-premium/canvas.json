@@ -12,51 +12,51 @@
   },
   "visualIdentity": {
     "colors": {
-      "primary": "#1B2A4A",
-      "secondary": "#2A3F66",
-      "accent": "#C5A572",
-      "background": "#F7F3EC",
-      "foreground": "#1B2A4A",
-      "muted": "rgba(27,42,74,0.58)",
+      "primary": "#4F46E5",
+      "secondary": "#0F172A",
+      "accent": "#818CF8",
+      "background": "#F9FAFB",
+      "foreground": "#0B1120",
+      "muted": "rgba(11,17,32,0.55)",
       "surface": "#FFFFFF",
-      "signal": "#C5A572",
-      "grid": "rgba(27,42,74,0.06)",
-      "ink": "#0F1829"
+      "signal": "#10B981",
+      "grid": "rgba(79,70,229,0.06)",
+      "ink": "#030712"
     },
     "typography": {
-      "display": "EB Garamond, Georgia, serif",
-      "body": "Nunito Sans, ui-sans-serif, system-ui, sans-serif",
-      "mono": "DM Mono, ui-monospace, monospace",
+      "display": "Syne, ui-sans-serif, system-ui, sans-serif",
+      "body": "DM Sans, ui-sans-serif, system-ui, sans-serif",
+      "mono": "JetBrains Mono, ui-monospace, monospace",
       "scale": {
         "sm": "0.875rem",
-        "base": "1.0625rem",
-        "lg": "1.375rem",
-        "xl": "2.875rem",
-        "display": "clamp(2.5rem, 5.2vw, 4rem)"
+        "base": "1rem",
+        "lg": "1.125rem",
+        "xl": "1.625rem",
+        "display": "clamp(1.875rem, 3vw, 2.5rem)"
       }
     },
     "radius": {
-      "sm": "4px",
-      "md": "8px",
-      "lg": "12px",
-      "xl": "16px"
+      "sm": "8px",
+      "md": "12px",
+      "lg": "18px",
+      "xl": "28px"
     },
     "shadows": {
-      "surface": "0 4px 32px rgba(27,42,74,0.08), 0 1px 3px rgba(27,42,74,0.04)",
-      "glow": "0 0 72px rgba(197,165,114,0.16)",
-      "card": "0 0 0 1px rgba(27,42,74,0.05), 0 6px 28px rgba(27,42,74,0.06)"
+      "surface": "0 2px 8px rgba(11,17,32,0.04), 0 20px 48px rgba(79,70,229,0.08)",
+      "glow": "0 0 96px rgba(79,70,229,0.2)",
+      "card": "0 0 0 1px rgba(11,17,32,0.04), 0 6px 28px rgba(11,17,32,0.05)"
     },
     "borders": {
-      "default": "rgba(27,42,74,0.1)",
-      "accent": "rgba(197,165,114,0.28)",
-      "subtle": "rgba(27,42,74,0.05)"
+      "default": "rgba(11,17,32,0.08)",
+      "accent": "rgba(79,70,229,0.28)",
+      "subtle": "rgba(11,17,32,0.04)"
     },
-    "animation": "scholarly-reveal"
+    "animation": "nexus-grid-reveal"
   },
   "designSystem": {
     "tier": "premium",
-    "industry": "Education",
+    "industry": "SaaS",
     "layoutKind": "single-column",
-    "templateIntelligenceId": "ti-education-prestige"
+    "templateIntelligenceId": "ti-saed-growth"
   }
 }

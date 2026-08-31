@@ -1,106 +1,70 @@
 "use client";
 
-import { SlotImage } from "@/lib/website/template-v2/slots";
-
-type Testimonial = {
-  quote: string;
-  name: string;
-  role: string;
-  company?: string;
-};
-
-const DEFAULT_ITEMS: Testimonial[] = [
+const TESTIMONIALS = [
   {
-    quote:
-      "Meridian Capital has been our family's trusted steward for three generations — their discretion and rigor are unmatched in private wealth management.",
-    name: "Catherine Holt",
-    role: "Family Principal",
-    company: "Holt Family Office",
+    quote: "Ledger restructured our family portfolio across three jurisdictions — tax-efficient, transparent, and aligned with our governance charter.",
+    name: "Catherine Ashworth",
+    role: "Principal",
+    company: "Ashworth Family Office",
   },
   {
-    quote:
-      "Their partners understand institutional complexity. Our endowment portfolio has outperformed benchmarks while maintaining the governance standards our board demands.",
-    name: "Raj Mehta",
-    role: "Chief Investment Officer",
-    company: "Harbor Endowment",
+    quote: "Their institutional process gave our investment committee the rigor we needed without the bureaucracy of a bulge-bracket bank.",
+    name: "James Okonkwo",
+    role: "CIO",
+    company: "Meridian Endowment",
   },
   {
-    quote:
-      "The most disciplined advisory relationship we have — fiduciary integrity, global reach, and a team that treats our legacy as their own.",
-    name: "Elena Brandt",
-    role: "Managing Director",
-    company: "Northgate Private Bank",
+    quote: "Reporting clarity improved overnight. Our board finally has a single source of truth for performance and risk.",
+    name: "Elena Vasquez",
+    role: "Treasurer",
+    company: "Northwind Foundation",
   },
 ];
 
-type Props = {
-  eyebrow?: string;
-  title?: string;
-  subtitle?: string;
-  items?: Testimonial[];
-};
+function initials(name: string): string {
+  return name.split(" ").map((p) => p[0] ?? "").join("").slice(0, 2).toUpperCase();
+}
 
-export function FinancePremiumTestimonials({
-  eyebrow = "Client perspectives",
-  title = "Trusted across generations",
-  subtitle = "Families and institutions who entrust Meridian Capital with their most significant capital decisions.",
-  items = DEFAULT_ITEMS,
-}: Props) {
+export function FinancePremiumTestimonials() {
+  const featured = TESTIMONIALS[0];
+  const supporting = TESTIMONIALS.slice(1);
+
   return (
-    <section
-      id="testimonials"
-      data-v2-component="finance-premium-testimonials"
-      aria-labelledby="testimonials-title"
-      className="fn-section fn-section-alt"
-    >
+    <section id="testimonials" data-v2-component="finance-premium-testimonials" aria-labelledby="fn-testimonials-title" className="df-reveal fn-section-alt bg-[var(--color-surface)] py-20 sm:py-28">
       <div className="mx-auto max-w-[82rem] px-5 sm:px-8">
-        <header className="mb-12 text-center">
-          <p className="fn-eyebrow mb-3">{eyebrow}</p>
-          <h2 id="testimonials-title" className="fn-headline-sm">
-            {title}
-          </h2>
-          <div className="fn-accent-line mx-auto mt-4" aria-hidden />
-          {subtitle ? <p className="fn-body text-muted-foreground mx-auto mt-5 max-w-lg">{subtitle}</p> : null}
+        <header className="mb-12 max-w-2xl">
+          <p className="fn-eyebrow">Client counsel</p>
+          <h2 id="fn-testimonials-title" className="fn-headline-sm mt-2">Trusted by principals and fiduciaries</h2>
         </header>
-
-        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-6">
-          {items.map((item, index) => {
-            const featured = index === 1 && items.length >= 3;
-            return (
-              <figure
-                key={`${item.name}-${index}`}
-                className={[
-                  "fn-card relative flex flex-col p-7 sm:p-8",
-                  featured ? "fn-card-featured md:-translate-y-1" : "",
-                ].join(" ")}
-              >
-                <span className="fn-quote-mark absolute end-6 top-4 select-none" aria-hidden>
-                  &ldquo;
-                </span>
-                <blockquote className="fn-body relative z-[1] mt-2 flex-1 text-base leading-relaxed">
-                  {item.quote}
-                </blockquote>
-                <figcaption className="mt-8 flex items-center gap-3 border-t border-[var(--border-default)] pt-5">
-                  <SlotImage
-                    slot="testimonials"
-                    index={index}
-                    alt=""
-                    className="h-11 w-11 rounded-full object-cover ring-2 ring-[var(--color-surface)]"
-                    loading="lazy"
-                  />
-                  <div>
-                    <p className="fn-font-body text-sm font-semibold text-[var(--color-foreground)]">
-                      {item.name}
-                    </p>
-                    <p className="fn-font-body text-xs text-[var(--color-muted)]">
-                      {item.role}
-                      {item.company ? ` · ${item.company}` : ""}
-                    </p>
+        <div className="df-reveal-stagger grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+          <figure className="rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--color-background)] p-8 sm:p-10">
+            <blockquote className="fn-headline-sm text-balance leading-snug">&ldquo;{featured.quote}&rdquo;</blockquote>
+            <figcaption className="mt-8 flex items-center gap-4 border-t border-[var(--border-subtle)] pt-6">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-accent)_15%,transparent)] text-sm font-semibold text-[var(--color-accent)]" aria-hidden>
+                {initials(featured.name)}
+              </span>
+              <div className="min-w-0">
+                <p className="font-semibold">{featured.name}</p>
+                <p className="text-sm text-[var(--color-muted)]">{featured.role} · {featured.company}</p>
+              </div>
+            </figcaption>
+          </figure>
+          <div className="flex flex-col gap-6">
+            {supporting.map((item) => (
+              <figure key={item.name} className="flex-1 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--color-background)] p-6">
+                <blockquote className="text-sm leading-relaxed text-[var(--color-foreground)]">&ldquo;{item.quote}&rdquo;</blockquote>
+                <figcaption className="mt-5 flex items-center gap-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-accent)_12%,transparent)] text-xs font-semibold text-[var(--color-accent)]" aria-hidden>
+                    {initials(item.name)}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold">{item.name}</p>
+                    <p className="text-xs text-[var(--color-muted)]">{item.role}</p>
                   </div>
                 </figcaption>
               </figure>
-            );
-          })}
+            ))}
+          </div>
         </div>
       </div>
     </section>

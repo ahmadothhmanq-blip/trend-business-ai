@@ -1,4 +1,6 @@
 import type { GeneratedProjectFile } from "@/plugins/website/types";
+import type { BusinessProfile } from "@/lib/website/types/generation";
+import type { WebsiteStrategy } from "@/lib/website/types/layers";
 
 export type StaticPreviewInput = {
   title?: string;
@@ -23,4 +25,7 @@ export type StaticPreviewInput = {
   templatePackageId?: string | null;
   /** Raw project settings — used to detect V2 architecture when templateArchitectureVersion omitted. */
   settings?: Record<string, unknown> | null;
+  /** Strategy snapshot — enables structure-first home repair at preview time. */
+  strategy?: WebsiteStrategy;
+  businessProfile?: BusinessProfile;
 };

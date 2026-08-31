@@ -1,16 +1,18 @@
 {
   "pageId": "home",
-  "layoutId": "editorial-reveal",
+  "layoutId": "default",
   "regions": {
+    "header": ["creative-portfolio-nav"],
     "main": [
       "creative-portfolio-hero",
-      "creative-portfolio-selected-work",
-      "creative-portfolio-case-grid",
-      "creative-portfolio-manifesto",
-      "creative-portfolio-capabilities",
-      "creative-portfolio-process",
-      "creative-portfolio-collaborate-cta"
+      "creative-portfolio-features",
+      "creative-portfolio-portfolio",
+      "creative-portfolio-about",
+      "creative-portfolio-testimonials",
+      "creative-portfolio-contact"
     ],
-    "overlay": ["creative-portfolio-overlay-showcase"]
+    "utility": [],
+    "overlay": [],
+    "footer": ["creative-portfolio-footer"]
   }
 }

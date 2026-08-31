@@ -54,7 +54,7 @@ type LlmCallRecord = {
   index: number;
   method: "generateJson" | "generateText";
   label: string;
-  module: string;
+  callerModule: string;
   auditStage: string | null;
   promptChars: number;
   systemChars: number;
@@ -101,7 +101,7 @@ function wrapProvider(inner: AIProvider): AIProvider {
     getLastUsage: () => inner.getLastUsage?.() ?? null,
     async generateJson<T>(request: JsonGenerationRequest): Promise<T> {
       const index = llmCalls.length + 1;
-      const module = extractCaller();
+      const callerModule = extractCaller();
       const auditStage = request.audit?.stage ?? null;
       const promptChars = request.prompt.length;
       const systemChars = request.schema
@@ -120,7 +120,7 @@ function wrapProvider(inner: AIProvider): AIProvider {
         index,
         method: "generateJson",
         label: `DeepSeek Request #${index}`,
-        module,
+        callerModule,
         auditStage,
         promptChars,
         systemChars,
@@ -136,7 +136,7 @@ function wrapProvider(inner: AIProvider): AIProvider {
     },
     async generateText(request: TextGenerationRequest): Promise<string> {
       const index = llmCalls.length + 1;
-      const module = extractCaller();
+      const callerModule = extractCaller();
       const promptChars = request.prompt.length;
       const systemChars = request.system?.length ?? 0;
       const t0 = performance.now();
@@ -151,7 +151,7 @@ function wrapProvider(inner: AIProvider): AIProvider {
         index,
         method: "generateText",
         label: `DeepSeek Request #${index}`,
-        module,
+        callerModule,
         auditStage: null,
         promptChars,
         systemChars,
@@ -291,7 +291,7 @@ async function main() {
   for (const call of llmCalls) {
     const entry = byHash.get(call.promptHash) ?? { count: 0, stages: new Set<string>() };
     entry.count += 1;
-    entry.stages.add(call.auditStage ?? call.module);
+    entry.stages.add(call.auditStage ?? call.callerModule);
     byHash.set(call.promptHash, entry);
   }
   for (const [hash, entry] of byHash) {
@@ -315,7 +315,7 @@ async function main() {
     exceededTwoCalls: llmCalls.length > 2,
     modulesBeyondTwoCalls: llmCalls.length > 2 ? llmCalls.slice(2).map((c) => ({
       index: c.index,
-      module: c.module,
+      callerModule: c.callerModule,
       stage: c.auditStage,
       method: c.method,
       latencyMs: c.latencyMs,
@@ -339,11 +339,11 @@ async function main() {
 
   let fastestFix = "unknown";
   if (llmCalls.length > 2) {
-    const fileCalls = llmCalls.filter((c) => c.auditStage === "file-generation" || c.module.includes("generate.ts"));
+    const fileCalls = llmCalls.filter((c) => c.auditStage === "file-generation" || c.callerModule.includes("generate.ts"));
     if (fileCalls.length > 0) {
       fastestFix = `Legacy path fires ${llmCalls.length} LLM calls (${fileCalls.length} file-generation). Enable TBGE_ENABLED=1 + production pipeline to collapse to 1 Content Provider call.`;
     } else {
-      fastestFix = `Reduce ${llmCalls.length} calls — modules after #2: ${report.modulesBeyondTwoCalls.map((m) => m.module).join(", ")}`;
+      fastestFix = `Reduce ${llmCalls.length} calls — modules after #2: ${report.modulesBeyondTwoCalls.map((m) => m.callerModule).join(", ")}`;
     }
   } else if (biggestLlm && biggestLlm.latencyMs > wallMs * 0.5) {
     fastestFix = `Single Content Provider call is ${biggestLlm.latencyMs}ms (${Math.round((biggestLlm.latencyMs / wallMs) * 100)}% of total) — shrink copy task payload or split copyTasks batch.`;
@@ -365,7 +365,7 @@ async function main() {
         call.label,
         `method=${call.method}`,
         `stage=${call.auditStage ?? "n/a"}`,
-        `module=${call.module}`,
+        `module=${call.callerModule}`,
         `promptChars=${call.promptChars}`,
         `systemChars=${call.systemChars}`,
         `responseChars=${call.responseChars}`,
@@ -378,7 +378,7 @@ async function main() {
   if (llmCalls.length > 2) {
     console.log("\n=== STOP: >2 LLM CALLS ===");
     for (const m of report.modulesBeyondTwoCalls) {
-      console.log(`#${m.index} ${m.method} stage=${m.stage ?? "n/a"} module=${m.module} ${m.latencyMs}ms`);
+      console.log(`#${m.index} ${m.method} stage=${m.stage ?? "n/a"} module=${m.callerModule} ${m.latencyMs}ms`);
     }
   }
 
@@ -392,7 +392,7 @@ async function main() {
   console.log("\n=== BIGGEST BOTTLENECK ===");
   if (biggestLlm && biggestLlm.latencyMs >= (sortedStages[0]?.ms ?? 0)) {
     console.log(
-      `${biggestLlm.label} — ${biggestLlm.latencyMs}ms (${biggestLlm.auditStage ?? biggestLlm.module})`,
+      `${biggestLlm.label} — ${biggestLlm.latencyMs}ms (${biggestLlm.auditStage ?? biggestLlm.callerModule})`,
     );
   } else {
     console.log(`${biggestStage} — ${sortedStages[0]?.ms ?? 0}ms`);

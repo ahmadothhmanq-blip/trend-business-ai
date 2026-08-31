@@ -1,0 +1,52 @@
+---
+description: Platform brand, UI, imagery, and template standards for Professional Website Design & AI Website Builders
+alwaysApply: true
+---
+
+# Platform Design & Quality Standards
+
+This project is a **multi-service platform**. A core offering is **Professional Website Design & AI Website Builders**. All code, UI, copy, templates, and image choices must meet a **production-ready, scalable, high-performance** bar.
+
+## Visual Tone
+
+- Professional, modern, tech-forward, and trustworthy.
+- Premium corporate feel — never casual, gimmicky, or low-trust.
+
+## Image Selection (Strict)
+
+**Never use:**
+- Casual stock photos, generic high-fives, handshakes-in-office clichés, or unprofessional environments.
+
+**For web design / builder sections, prefer:**
+- UI/UX mockups and device frames
+- Clean code snippets on dark screens
+- Abstract wireframes and layout diagrams
+- Modern dashboards and analytics UIs
+- Professional server / cloud / infrastructure visuals
+
+When picking Unsplash (or similar) URLs, verify the subject matches the category above before using it.
+
+## Templates & Components
+
+- Build **reusable, modular** templates and sections — easy to swap for Corporate, E-commerce, and SaaS niches.
+- Use **Tailwind CSS**; keep layouts **responsive** and accessible.
+- Favor composition over one-off pages; extract shared primitives (hero, features, CTA, pricing, footer).
+- Web-design marketing copy should emphasize: **speed**, **SEO**, **responsive design**, and **modern UI/UX**.
+
+## Code & Performance
+
+- Ship production-quality code: typed where the stack expects it, minimal scope, no dead paths.
+- Prefer scalable patterns (clear module boundaries, shared design tokens, registry-driven variants).
+- Avoid unnecessary client weight; lazy-load heavy UI; do not block render on non-critical assets.
+- Match existing project conventions before introducing new abstractions.
+
+## AI Generation Checklist
+
+Before finishing any UI, template, or content change:
+
+1. Does it align with the visual tone and image rules above?
+2. Is the component/template modular and niche-agnostic enough to reuse?
+3. Is the implementation responsive, performant, and consistent with the codebase?
+4. Would this ship confidently to a paying business customer without a redesign pass?
+
+If any answer is no, revise before presenting the work.

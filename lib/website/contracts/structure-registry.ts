@@ -3,6 +3,8 @@
  * Architecture Knowledge Base and the generated template package catalog.
  */
 
+import { isKnownStructureTemplatePackage } from "@/lib/website/builder/template-package-ti-mapping";
+
 export type StructureTemplateIndex = Record<
   string,
   { id: string } | undefined
@@ -12,9 +14,8 @@ let cachedIndex: StructureTemplateIndex | null = null;
 
 export function getStructureTemplateIndex(): StructureTemplateIndex {
   if (cachedIndex) return cachedIndex;
-  // Dynamic import at call time avoids AKB ↔ template-package-index init cycle.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const mod = require("@/lib/website/builder/template-package-index") as {
+  const mod = require("@/lib/website/builder/unified-template-registry") as {
     WEBSITE_STRUCTURE_TEMPLATE_INDEX: StructureTemplateIndex;
   };
   cachedIndex = mod.WEBSITE_STRUCTURE_TEMPLATE_INDEX;
@@ -22,7 +23,13 @@ export function getStructureTemplateIndex(): StructureTemplateIndex {
 }
 
 export function isKnownStructureTemplateId(structureId: string): boolean {
-  return Boolean(getStructureTemplateIndex()[structureId]);
+  if (structureId === "_generation-default") {
+    return true;
+  }
+  if (getStructureTemplateIndex()[structureId]) {
+    return true;
+  }
+  return isKnownStructureTemplatePackage(structureId);
 }
 
 export function resetStructureTemplateIndexForTests(): void {

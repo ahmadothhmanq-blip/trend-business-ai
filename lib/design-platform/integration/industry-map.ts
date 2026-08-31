@@ -6,6 +6,10 @@ import type { TbdpSectorId } from "@/lib/design-platform/sector-dna";
  */
 const INDUSTRY_TO_SECTOR: Record<string, TbdpSectorId> = {
   saas: "saas",
+  gaming: "saas",
+  esports: "saas",
+  "game-studio": "saas",
+  entertainment: "saas",
   "software-as-a-service": "saas",
   "b2b-saas": "saas",
   "ai-startup": "saas",

@@ -1,0 +1,7 @@
+{
+  "pageId": "customers",
+  "layoutId": "default",
+  "regions": {
+    "main": ["forge-industrial-hero", "forge-industrial-portfolio", "forge-industrial-features"]
+  }
+}

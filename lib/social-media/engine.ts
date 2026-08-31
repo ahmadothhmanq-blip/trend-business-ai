@@ -29,6 +29,7 @@ type ActionInput = {
   text: string;
   platform: SocialPostPlatform;
   tone?: string;
+  language?: string;
   targetLanguage?: string;
   instruction?: string;
 };
@@ -94,6 +95,7 @@ export async function runSocialPostAction(
     text: input.text,
     platform: input.platform,
     tone: input.tone,
+    language: input.language,
     targetLanguage: input.targetLanguage,
     instruction: input.instruction,
   });

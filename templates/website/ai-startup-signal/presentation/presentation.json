@@ -1,0 +1,52 @@
+{
+  "packageId": "ai-startup-signal",
+  "templateIntelligenceHint": "ti-ai-company-signal",
+  "layout": {
+    "defaultLayoutId": "default",
+    "regions": {
+      "header": { "role": "header", "sticky": true },
+      "main": { "role": "main" },
+      "utility": { "role": "utility" },
+      "footer": { "role": "footer" },
+      "overlay": { "role": "overlay" }
+    }
+  },
+  "navigation": {
+    "componentId": "ai-startup-signal-nav",
+    "variant": "enterprise-glass"
+  },
+  "hero": {
+    "componentId": "ai-startup-signal-hero",
+    "region": "main"
+  },
+  "footer": {
+    "componentId": "ai-startup-signal-footer",
+    "region": "footer"
+  },
+  "homeFlow": {
+    "regions": {
+      "main": [
+        "ai-startup-signal-hero",
+        "ai-startup-signal-features",
+        "ai-startup-signal-integrations",
+        "ai-startup-signal-about",
+        "ai-startup-signal-stats",
+        "ai-startup-signal-testimonials",
+        "ai-startup-signal-portfolio",
+        "ai-startup-signal-pricing",
+        "ai-startup-signal-faq",
+        "ai-startup-signal-contact"
+      ],
+      "utility": ["ai-startup-signal-utility-band"],
+      "overlay": ["ai-startup-signal-floating-cta"]
+    }
+  },
+  "sectionShell": {
+    "strategy": "package",
+    "componentId": "ai-startup-signal-section-shell"
+  },
+  "aiGeneration": {
+    "contentProfile": "ai-startup-signal-gtm",
+    "suggestedPages": ["platform", "pricing", "customers"]
+  }
+}

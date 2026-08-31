@@ -7,26 +7,20 @@
       "slots": ["logo", "links", "cta"]
     },
     {
-      "id": "hotel-resort-premium-sidebar-rail",
-      "role": "navigation",
-      "scaffold": "components/hotel-resort-premium-sidebar-rail.tsx",
-      "slots": ["links", "hours"]
-    },
-    {
       "id": "hotel-resort-premium-hero",
       "role": "hero",
       "scaffold": "components/hotel-resort-premium-hero.tsx",
-      "slots": ["headline", "subheadline", "cta", "scroll-cue"]
+      "slots": ["headline", "metrics", "cta"]
     },
     {
-      "id": "hotel-resort-premium-tasting-menu",
-      "role": "services",
-      "scaffold": "components/hotel-resort-premium-tasting-menu.tsx"
+      "id": "hotel-resort-premium-features",
+      "role": "features",
+      "scaffold": "components/hotel-resort-premium-features.tsx"
     },
     {
-      "id": "hotel-resort-premium-chef-story",
+      "id": "hotel-resort-premium-about",
       "role": "story",
-      "scaffold": "components/hotel-resort-premium-chef-story.tsx"
+      "scaffold": "components/hotel-resort-premium-about.tsx"
     },
     {
       "id": "hotel-resort-premium-stats",
@@ -34,24 +28,14 @@
       "scaffold": "components/hotel-resort-premium-stats.tsx"
     },
     {
-      "id": "hotel-resort-premium-signature-dishes",
-      "role": "features",
-      "scaffold": "components/hotel-resort-premium-signature-dishes.tsx"
-    },
-    {
       "id": "hotel-resort-premium-testimonials",
       "role": "testimonials",
       "scaffold": "components/hotel-resort-premium-testimonials.tsx"
     },
     {
-      "id": "hotel-resort-premium-atmosphere",
-      "role": "custom",
-      "scaffold": "components/hotel-resort-premium-atmosphere.tsx"
-    },
-    {
-      "id": "hotel-resort-premium-gallery",
-      "role": "gallery",
-      "scaffold": "components/hotel-resort-premium-gallery.tsx"
+      "id": "hotel-resort-premium-pricing",
+      "role": "pricing",
+      "scaffold": "components/hotel-resort-premium-pricing.tsx"
     },
     {
       "id": "hotel-resort-premium-faq",
@@ -59,20 +43,9 @@
       "scaffold": "components/hotel-resort-premium-faq.tsx"
     },
     {
-      "id": "hotel-resort-premium-reservation-cta",
-      "role": "cta",
-      "scaffold": "components/hotel-resort-premium-reservation-cta.tsx"
-    },
-    {
       "id": "hotel-resort-premium-contact",
       "role": "contact",
       "scaffold": "components/hotel-resort-premium-contact.tsx"
-    },
-    {
-      "id": "hotel-resort-premium-reservation",
-      "role": "contact",
-      "scaffold": "components/hotel-resort-premium-reservation.tsx",
-      "slots": ["steps", "cta"]
     },
     {
       "id": "hotel-resort-premium-footer",
@@ -80,9 +53,29 @@
       "scaffold": "components/hotel-resort-premium-footer.tsx"
     },
     {
+      "id": "hotel-resort-premium-floating-cta",
+      "role": "cta",
+      "scaffold": "components/hotel-resort-premium-floating-cta.tsx"
+    },
+    {
+      "id": "hotel-resort-premium-utility-band",
+      "role": "cta",
+      "scaffold": "components/hotel-resort-premium-utility-band.tsx"
+    },
+    {
       "id": "hotel-resort-premium-section-shell",
       "role": "custom",
       "scaffold": "components/hotel-resort-premium-section-shell.tsx"
+    },
+    {
+      "id": "hotel-resort-premium-portfolio",
+      "role": "custom",
+      "scaffold": "components/hotel-resort-premium-portfolio.tsx"
+    },
+    {
+      "id": "hotel-resort-premium-integrations",
+      "role": "custom",
+      "scaffold": "components/hotel-resort-premium-integrations.tsx"
     }
   ]
 }

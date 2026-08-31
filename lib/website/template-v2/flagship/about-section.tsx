@@ -1,6 +1,6 @@
 "use client";
 
-import { SlotImage } from "@/lib/website/template-v2/slots";
+import { SlotImage, hasSlotImage, splitSectionGridClass } from "@/lib/website/template-v2/slots";
 import { FlagshipSectionHeader } from "@/lib/website/template-v2/flagship/section-header";
 import type { FlagshipUi } from "@/lib/website/template-v2/flagship/themes";
 
@@ -22,37 +22,42 @@ export type FlagshipAboutProps = {
 export function FlagshipAboutSection({
   ui,
   componentId,
-  id = "about",
-  eyebrow = "About us",
-  title = "A partner built for lasting impact",
+  id,
+  eyebrow,
+  title,
   subtitle,
-  body = "We combine deep industry expertise with a relentless focus on outcomes — helping organizations modernize, scale, and lead with confidence.",
+  body,
   imageUrl,
-  highlights = [],
+  highlights,
   primaryCta,
-  primaryCtaHref = "#contact",
+  primaryCtaHref,
   imageBadge,
 }: FlagshipAboutProps) {
+  if (!title && !subtitle && !body && !eyebrow && !imageUrl && !highlights?.length) return null;
+  const sectionId = id ?? "about";
+  const hasVisual = hasSlotImage("about", 0, imageUrl);
+
   return (
     <section
-      id={id}
+      id={sectionId}
       data-v2-component={componentId}
-      aria-labelledby={`${id}-title`}
+      aria-labelledby={`${sectionId}-title`}
       className={`${ui.section} bg-[var(--color-background)]`}
     >
       <div className={ui.container}>
-        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
-          <div>
+        <div className={splitSectionGridClass(hasVisual)}>
+          <div className={hasVisual ? undefined : "df-hero-editorial"}>
             <FlagshipSectionHeader
               ui={ui}
-              id={id}
+              id={sectionId}
               eyebrow={eyebrow}
               title={title}
               subtitle={subtitle}
               className="mb-0"
+              align={hasVisual ? "start" : "center"}
             />
-            <p className={`${ui.body} mt-6`}>{body}</p>
-            {highlights.length > 0 ? (
+            {body ? <p className={`${ui.body} mt-6`}>{body}</p> : null}
+            {highlights?.length ? (
               <ul className="mt-8 grid gap-3 sm:grid-cols-2" role="list">
                 {highlights.map((item) => (
                   <li
@@ -71,11 +76,12 @@ export function FlagshipAboutSection({
               </ul>
             ) : null}
             {primaryCta ? (
-              <a href={primaryCtaHref} className={`${ui.btnPrimary} mt-8 inline-flex ${ui.focusRing}`}>
+              <a href={primaryCtaHref ?? "#contact"} className={`${ui.btnPrimary} mt-8 inline-flex ${ui.focusRing} ${hasVisual ? "" : "mx-auto"}`}>
                 {primaryCta}
               </a>
             ) : null}
           </div>
+          {hasVisual ? (
           <div className="relative">
             <div
               className={`${ui.card} overflow-hidden p-1.5`}
@@ -89,7 +95,7 @@ export function FlagshipAboutSection({
                   slot="about"
                   index={0}
                   preferred={imageUrl}
-                  alt=""
+                  alt={title ?? ""}
                   className="aspect-[4/3] w-full object-cover"
                   loading="lazy"
                 />
@@ -103,6 +109,7 @@ export function FlagshipAboutSection({
               </p>
             ) : null}
           </div>
+          ) : null}
         </div>
       </div>
     </section>

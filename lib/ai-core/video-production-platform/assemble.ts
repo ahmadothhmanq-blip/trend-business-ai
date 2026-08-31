@@ -8,7 +8,11 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { VideoMediaAsset } from "@/lib/ai-core/video-production-platform/types";
 import { nowIso, vid } from "@/lib/ai-core/video-production-platform/ids";
-import { fetchRemoteToBytes } from "@/lib/ai-core/video-production-platform/media-storage";
+import {
+  fetchRemoteToBytes,
+  fetchRemoteVideoToBytes,
+} from "@/lib/ai-core/video-production-platform/media-storage";
+import { isFfmpegPathConfigured, isVideoStudioProductionRuntime } from "@/lib/ai-core/video-production-platform/env-config";
 
 export type AssemblyExportPreset = {
   aspectRatio: string;
@@ -34,6 +38,8 @@ export type AssemblyInput = {
   exportPreset?: AssemblyExportPreset;
   /** Prefer webm container when ffmpeg encodes */
   outputFormat?: "mp4" | "webm";
+  /** Production export: do not fall back to first-clip/stub passthrough. */
+  requireFfmpeg?: boolean;
 };
 
 export type AssemblyResult = {
@@ -62,12 +68,15 @@ function ffmpegBin(): string {
 function runFfmpeg(args: string[]): Promise<{ ok: boolean; stderr: string }> {
   return new Promise((resolve) => {
     const child = spawn(ffmpegBin(), args, { windowsHide: true });
-    let stderr = "";
+    let output = "";
+    child.stdout?.on("data", (d: Buffer) => {
+      output += d.toString();
+    });
     child.stderr?.on("data", (d: Buffer) => {
-      stderr += d.toString();
+      output += d.toString();
     });
     child.on("error", () => resolve({ ok: false, stderr: "ffmpeg not available" }));
-    child.on("close", (code) => resolve({ ok: code === 0, stderr }));
+    child.on("close", (code) => resolve({ ok: code === 0, stderr: output }));
   });
 }
 
@@ -96,6 +105,13 @@ export async function probeFfmpegHealth(): Promise<{
   message: string;
 }> {
   const path = ffmpegBin();
+  if (isVideoStudioProductionRuntime() && !isFfmpegPathConfigured()) {
+    return {
+      available: false,
+      path: "",
+      message: "FFMPEG_PATH is required in production. Set FFMPEG_PATH or FFMPEG_BINARY to the ffmpeg executable.",
+    };
+  }
   const result = await runFfmpeg(["-version"]);
   if (!result.ok) {
     return {
@@ -140,7 +156,8 @@ export async function probeFfmpegCapabilities(): Promise<FfmpegCapabilities> {
   }
 
   const filters = await runFfmpeg(["-hide_banner", "-filters"]);
-  const text = filters.stderr.toLowerCase();
+  const encoders = await runFfmpeg(["-hide_banner", "-encoders"]);
+  const text = `${filters.stderr}\n${encoders.stderr}`.toLowerCase();
   const has = (name: string) => text.includes(name);
 
   const merge = has("concat") || has("xfade");
@@ -171,7 +188,7 @@ export async function trimClipWithFfmpeg(
   sourceUrl: string,
   durationSec: number,
 ): Promise<Uint8Array | null> {
-  const bytes = await fetchRemoteToBytes(sourceUrl);
+  const bytes = await fetchRemoteVideoToBytes(sourceUrl);
   if (!bytes || bytes.byteLength < 32) return null;
   const dir = await mkdtemp(join(tmpdir(), "vs-trim-"));
   try {
@@ -213,10 +230,26 @@ export async function trimClipWithFfmpeg(
   }
 }
 
-/** Probe media duration via ffprobe when available. */
-export async function probeMediaDurationSec(url: string): Promise<number | null> {
-  const bytes = await fetchRemoteToBytes(url);
-  if (!bytes) return null;
+export type ProbedMediaInfo = {
+  durationSec: number | null;
+  width: number | null;
+  height: number | null;
+  codec: string | null;
+  hasAudio: boolean;
+  audioCodec: string | null;
+};
+
+/** Probe duration, dimensions, video codec, and audio presence from in-memory bytes. */
+export async function probeMediaBytes(bytes: Uint8Array): Promise<ProbedMediaInfo> {
+  const empty: ProbedMediaInfo = {
+    durationSec: null,
+    width: null,
+    height: null,
+    codec: null,
+    hasAudio: false,
+    audioCodec: null,
+  };
+  if (!bytes.byteLength) return empty;
   const dir = await mkdtemp(join(tmpdir(), "vs-probe-"));
   try {
     const path = join(dir, "media.bin");
@@ -225,19 +258,48 @@ export async function probeMediaDurationSec(url: string): Promise<number | null>
       "-v",
       "error",
       "-show_entries",
-      "format=duration",
+      "format=duration:stream=codec_type,codec_name,width,height",
       "-of",
-      "default=noprint_wrappers=1:nokey=1",
+      "json",
       path,
     ]);
-    if (!probe.ok) return null;
-    const n = Number.parseFloat(probe.stdout.trim());
-    return Number.isFinite(n) ? n : null;
+    if (!probe.ok || !probe.stdout.trim()) return empty;
+    const parsed = JSON.parse(probe.stdout) as {
+      format?: { duration?: string };
+      streams?: Array<{
+        codec_type?: string;
+        codec_name?: string;
+        width?: number;
+        height?: number;
+      }>;
+    };
+    const durationSec = Number.parseFloat(String(parsed.format?.duration ?? ""));
+    const streams = parsed.streams || [];
+    const video =
+      streams.find((stream) => stream.codec_type === "video") ||
+      streams.find((stream) => Number(stream.width) > 0) ||
+      streams[0];
+    const audio = streams.find((stream) => stream.codec_type === "audio");
+    return {
+      durationSec: Number.isFinite(durationSec) && durationSec > 0 ? durationSec : null,
+      width: video?.width && video.width > 0 ? video.width : null,
+      height: video?.height && video.height > 0 ? video.height : null,
+      codec: video?.codec_name?.trim() || null,
+      hasAudio: Boolean(audio?.codec_name?.trim()),
+      audioCodec: audio?.codec_name?.trim() || null,
+    };
   } catch {
-    return null;
+    return empty;
   } finally {
     await rm(dir, { recursive: true, force: true }).catch(() => undefined);
   }
+}
+
+/** Probe media duration via ffprobe when available. */
+export async function probeMediaDurationSec(url: string): Promise<number | null> {
+  const bytes = await fetchRemoteVideoToBytes(url);
+  if (!bytes) return null;
+  return (await probeMediaBytes(bytes)).durationSec;
 }
 
 function escapeAssText(text: string): string {
@@ -313,7 +375,7 @@ async function tryFfmpegAssemble(input: AssemblyInput): Promise<Uint8Array | nul
   try {
     const localClips: string[] = [];
     for (let i = 0; i < clips.length; i++) {
-      const bytes = await fetchRemoteToBytes(clips[i]!.url);
+      const bytes = await fetchRemoteVideoToBytes(clips[i]!.url);
       if (!bytes || bytes.byteLength < 32) return null;
       const path = join(dir, `clip-${i}.mp4`);
       await writeFile(path, bytes);
@@ -541,6 +603,31 @@ export async function assembleComposite(input: AssemblyInput): Promise<AssemblyR
   const ffmpegBytes = await tryFfmpegAssemble(input);
   const mimeType: "video/mp4" | "video/webm" =
     input.outputFormat === "webm" ? "video/webm" : "video/mp4";
+  if (!ffmpegBytes && input.requireFfmpeg) {
+    return {
+      method: "manifest-only",
+      mimeType,
+      note: "FFmpeg did not produce a playable export. Refusing unverified passthrough.",
+      manifest: {
+        clipUrls,
+        audioUrl: input.audioUrl || undefined,
+        musicUrl: input.musicUrl || undefined,
+        method: "manifest-only",
+        note: "FFmpeg write/verify did not complete.",
+        exportPreset: input.exportPreset,
+        outputFormat: input.outputFormat || "mp4",
+      },
+      assetStub: {
+        id: vid("composite", input.title, 0),
+        kind: "composite",
+        mimeType,
+        url: "",
+        durationSec: 0,
+        provider: "external",
+        createdAt: nowIso(),
+      },
+    };
+  }
   if (ffmpegBytes) {
     return {
       method: "ffmpeg",
@@ -572,7 +659,7 @@ export async function assembleComposite(input: AssemblyInput): Promise<AssemblyR
 
   let firstBytes: Uint8Array | undefined;
   try {
-    firstBytes = (await fetchRemoteToBytes(first.url)) || undefined;
+    firstBytes = (await fetchRemoteVideoToBytes(first.url)) || undefined;
   } catch {
     firstBytes = undefined;
   }

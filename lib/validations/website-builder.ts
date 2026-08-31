@@ -27,6 +27,7 @@ export const websiteGenerateRequestSchema = z
       ),
     projectType: z.string().trim().min(1).optional(),
     language: z.string().trim().min(1, "Select a language."),
+    country: z.string().trim().optional(),
     theme: z.string().trim().min(1).optional(),
     features: z.array(z.string().trim()).default([]),
     productId: z.string().trim().optional(),
@@ -82,6 +83,16 @@ export const websiteGenerateRequestSchema = z
     /** fast = minimal files, skip improve/repair/optimizer; professional = full pipeline. */
     generationProfile: z.enum(["fast", "professional", "ultra"]).optional(),
     projectId: z.string().uuid().optional(),
+    /** Site image strategy — with-images | without-images | user-adds-later */
+    imageStrategyMode: z
+      .enum(["with-images", "without-images", "user-adds-later"])
+      .optional(),
+    /** Visual skin id (appearance only) */
+    visualSkinId: z.string().trim().min(1).optional(),
+    /** Enable visitor-facing multi-language routes */
+    visitorLocales: z.boolean().optional(),
+    /** Beginner UX — smart defaults, hide advanced panels */
+    beginnerMode: z.boolean().optional(),
   })
   .transform((value) => {
     const clamped = {

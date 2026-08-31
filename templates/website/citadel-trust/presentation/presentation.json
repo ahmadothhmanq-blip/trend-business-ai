@@ -1,0 +1,71 @@
+{
+  "packageId": "citadel-trust",
+  "templateIntelligenceHint": "ti-law-firm",
+  "layout": {
+    "defaultLayoutId": "default",
+    "regions": {
+      "header": {
+        "role": "header",
+        "sticky": true
+      },
+      "main": {
+        "role": "main"
+      },
+      "utility": {
+        "role": "utility"
+      },
+      "footer": {
+        "role": "footer"
+      },
+      "overlay": {
+        "role": "overlay"
+      }
+    }
+  },
+  "navigation": {
+    "componentId": "citadel-trust-nav",
+    "variant": "executive-glass"
+  },
+  "hero": {
+    "componentId": "citadel-trust-hero",
+    "region": "main"
+  },
+  "footer": {
+    "componentId": "citadel-trust-footer",
+    "region": "footer"
+  },
+  "homeFlow": {
+    "regions": {
+      "main": [
+        "citadel-trust-hero",
+        "citadel-trust-features",
+        "citadel-trust-integrations",
+        "citadel-trust-about",
+        "citadel-trust-stats",
+        "citadel-trust-portfolio",
+        "citadel-trust-testimonials",
+        "citadel-trust-pricing",
+        "citadel-trust-faq",
+        "citadel-trust-contact"
+      ],
+      "utility": [
+        "citadel-trust-utility-band"
+      ],
+      "overlay": [
+        "citadel-trust-floating-cta"
+      ]
+    }
+  },
+  "sectionShell": {
+    "strategy": "package",
+    "componentId": "citadel-trust-section-shell"
+  },
+  "aiGeneration": {
+    "contentProfile": "citadel-trust-gtm",
+    "suggestedPages": [
+      "platform",
+      "pricing",
+      "customers"
+    ]
+  }
+}

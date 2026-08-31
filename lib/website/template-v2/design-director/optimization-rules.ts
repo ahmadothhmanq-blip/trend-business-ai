@@ -15,7 +15,7 @@ import type {
   DesignIssue,
 } from "@/lib/website/template-v2/design-director/types";
 import { getVariantDefinition } from "@/lib/website/template-v2/variants/registry";
-import type { SectionKind, VariantComposition } from "@/lib/website/template-v2/variants/types";
+import type { SectionKind, SectionVariantId, VariantComposition } from "@/lib/website/template-v2/variants/types";
 
 export type OptimizationResult = {
   blueprint: WebsiteBlueprint;
@@ -81,7 +81,7 @@ function findAlternativeComposition(
   if (selection?.runnerUp) {
     const runnerDef = getVariantDefinition(
       sectionKind,
-      selection.runnerUp.variantId,
+      selection.runnerUp.variantId as SectionVariantId,
     );
     if (runnerDef && runnerDef.composition !== avoid) {
       return {
@@ -95,7 +95,7 @@ function findAlternativeComposition(
   if (scored) {
     for (const entry of scored) {
       if (!entry.compatible) continue;
-      const def = getVariantDefinition(sectionKind, entry.variantId);
+      const def = getVariantDefinition(sectionKind, entry.variantId as SectionVariantId);
       if (def && def.composition !== avoid) {
         return { variantId: entry.variantId, composition: def.composition };
       }

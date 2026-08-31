@@ -132,8 +132,22 @@ function aliasToIndustryId(raw: string): IndustryId | null {
   ) {
     return "technology";
   }
-  if (normalized.includes("saas") || normalized.includes("software")) {
+  if (
+    normalized.includes("saas") ||
+    normalized.includes("software")
+  ) {
     return "saas";
+  }
+  if (
+    normalized.includes("gaming") ||
+    normalized.includes("esport") ||
+    normalized.includes("game-studio") ||
+    normalized.includes("video-game") ||
+    normalized.includes("ألعاب") ||
+    normalized.includes("العاب") ||
+    normalized.includes("جيمينج")
+  ) {
+    return "gaming";
   }
   if (normalized.includes("agency") || normalized.includes("studio")) {
     return "agency";
@@ -142,7 +156,14 @@ function aliasToIndustryId(raw: string): IndustryId | null {
     normalized.includes("law") ||
     normalized.includes("legal") ||
     normalized.includes("attorney") ||
-    normalized.includes("lawyer")
+    normalized.includes("lawyer") ||
+    normalized.includes("محاماة") ||
+    normalized.includes("محاماه") ||
+    normalized.includes("محامي") ||
+    normalized.includes("مكتب محاماة") ||
+    normalized.includes("قانوني") ||
+    normalized.includes("استشارات قانونية") ||
+    normalized.includes("القضايا التجارية")
   ) {
     return "law";
   }
@@ -221,11 +242,13 @@ function toResult(
 
 function selectByKeywords(brief: CoreBrief): IndustryDetectionResult {
   const haystack = normalizeHaystack(brief);
+  const gamingScore = scoreIndustry(haystack, "gaming");
   let bestId: IndustryId = "business";
   let bestScore = 0;
 
   for (const profile of listWebsiteIndustryIntelligence()) {
     if (profile.id === "business") continue;
+    if (profile.id === "restaurant" && gamingScore > 0) continue;
     const score = scoreIndustry(haystack, profile.id);
     if (score > bestScore) {
       bestScore = score;
@@ -291,6 +314,16 @@ export async function detectWebsiteIndustry(
     return toResult(explicit, 1, "Explicit industry override.", "explicit");
   }
 
+  const promptKeyword = detectIndustryFromPrompt(brief.prompt || "");
+  if (promptKeyword && promptKeyword.confidence >= 0.9) {
+    return toResult(
+      promptKeyword.industryId,
+      promptKeyword.confidence,
+      promptKeyword.reason,
+      "keyword",
+    );
+  }
+
   // Primary path: AI Business Intelligence before any keyword or asset logic.
   const businessIntel = await runBusinessIntelligenceAnalysis({ brief });
   const enriched = applyBusinessIntelligenceToBrief(brief, businessIntel);
@@ -346,6 +379,8 @@ Aliases:
 - healthcare / medical / clinic / dental → clinic
 - travel / tours / destinations → tourism
 - school / courses / academy → education
+- gaming / esports / game studio / video games → gaming
+- ألعاب / جيمينج / شركة ألعاب → gaming
 
 Return JSON:
 {
@@ -377,6 +412,56 @@ Return JSON:
     }
   } catch {
     // Fall through to keyword selection
+  }
+
+  return selectByKeywords(brief);
+}
+
+export type WebsiteIndustryTextInput = {
+  prompt?: string | null;
+  title?: string | null;
+  description?: string | null;
+  industryId?: string | null;
+  businessIndustry?: string | null;
+};
+
+/**
+ * Synchronous industry detection for image routing and site-plan wiring.
+ * Scores the full WEBSITE_INDUSTRY catalog — no per-vertical manual tables.
+ */
+export function detectWebsiteIndustrySync(
+  input: WebsiteIndustryTextInput,
+): IndustryDetectionResult {
+  const text = [input.prompt, input.title, input.description]
+    .filter(Boolean)
+    .join(" ");
+  const brief: CoreBrief = {
+    prompt: text,
+    productId: "website-builder",
+    theme: undefined,
+    features: [],
+    metadata: {
+      industryId: input.industryId ?? input.businessIndustry ?? undefined,
+      industry: input.businessIndustry ?? undefined,
+    },
+  };
+
+  const explicit =
+    explicitIndustry(brief) ??
+    (input.industryId ? aliasToIndustryId(input.industryId) : null) ??
+    (input.businessIndustry ? aliasToIndustryId(input.businessIndustry) : null);
+  if (explicit) {
+    return toResult(explicit, 1, "Explicit industry signal.", "explicit");
+  }
+
+  const promptKeyword = detectIndustryFromPrompt(text);
+  if (promptKeyword && promptKeyword.confidence >= 0.75) {
+    return toResult(
+      promptKeyword.industryId,
+      promptKeyword.confidence,
+      promptKeyword.reason,
+      "keyword",
+    );
   }
 
   return selectByKeywords(brief);

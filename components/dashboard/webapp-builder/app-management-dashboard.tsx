@@ -804,6 +804,11 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
               </Button>
             </div>
             <p className="text-xs text-white/40">
+              Preview uses the authenticated live sandbox. Production publishes a public HTML host at{" "}
+              <code className="text-white/60">/w/app/…</code>
+              {" "}(not a remote Node/Vercel build). Full Next.js runtime: download the project ZIP.
+            </p>
+            <p className="text-xs text-white/40">
               {p("management.livePreviewPath")} <code className="text-white/60">/api/webapp-builder/{generationId}/live-preview</code>
             </p>
           </DashboardCardContent>

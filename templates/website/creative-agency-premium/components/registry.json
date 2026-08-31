@@ -10,42 +10,42 @@
       "id": "creative-agency-premium-hero",
       "role": "hero",
       "scaffold": "components/creative-agency-premium-hero.tsx",
-      "slots": ["headline", "subheadline", "scroll-cue"]
+      "slots": ["headline", "metrics", "cta"]
     },
     {
-      "id": "creative-agency-premium-selected-work",
-      "role": "portfolio",
-      "scaffold": "components/creative-agency-premium-selected-work.tsx"
-    },
-    {
-      "id": "creative-agency-premium-case-grid",
-      "role": "gallery",
-      "scaffold": "components/creative-agency-premium-case-grid.tsx"
-    },
-    {
-      "id": "creative-agency-premium-manifesto",
-      "role": "story",
-      "scaffold": "components/creative-agency-premium-manifesto.tsx"
-    },
-    {
-      "id": "creative-agency-premium-capabilities",
+      "id": "creative-agency-premium-features",
       "role": "features",
-      "scaffold": "components/creative-agency-premium-capabilities.tsx"
+      "scaffold": "components/creative-agency-premium-features.tsx"
     },
     {
-      "id": "creative-agency-premium-process",
-      "role": "process",
-      "scaffold": "components/creative-agency-premium-process.tsx"
+      "id": "creative-agency-premium-about",
+      "role": "story",
+      "scaffold": "components/creative-agency-premium-about.tsx"
     },
     {
-      "id": "creative-agency-premium-collaborate-cta",
-      "role": "cta",
-      "scaffold": "components/creative-agency-premium-collaborate-cta.tsx"
-    },
-    {
-      "id": "creative-agency-premium-overlay-showcase",
+      "id": "creative-agency-premium-stats",
       "role": "custom",
-      "scaffold": "components/creative-agency-premium-overlay-showcase.tsx"
+      "scaffold": "components/creative-agency-premium-stats.tsx"
+    },
+    {
+      "id": "creative-agency-premium-testimonials",
+      "role": "testimonials",
+      "scaffold": "components/creative-agency-premium-testimonials.tsx"
+    },
+    {
+      "id": "creative-agency-premium-pricing",
+      "role": "pricing",
+      "scaffold": "components/creative-agency-premium-pricing.tsx"
+    },
+    {
+      "id": "creative-agency-premium-faq",
+      "role": "faq",
+      "scaffold": "components/creative-agency-premium-faq.tsx"
+    },
+    {
+      "id": "creative-agency-premium-contact",
+      "role": "contact",
+      "scaffold": "components/creative-agency-premium-contact.tsx"
     },
     {
       "id": "creative-agency-premium-footer",
@@ -53,9 +53,29 @@
       "scaffold": "components/creative-agency-premium-footer.tsx"
     },
     {
+      "id": "creative-agency-premium-floating-cta",
+      "role": "cta",
+      "scaffold": "components/creative-agency-premium-floating-cta.tsx"
+    },
+    {
+      "id": "creative-agency-premium-utility-band",
+      "role": "cta",
+      "scaffold": "components/creative-agency-premium-utility-band.tsx"
+    },
+    {
       "id": "creative-agency-premium-section-shell",
       "role": "custom",
       "scaffold": "components/creative-agency-premium-section-shell.tsx"
+    },
+    {
+      "id": "creative-agency-premium-portfolio",
+      "role": "custom",
+      "scaffold": "components/creative-agency-premium-portfolio.tsx"
+    },
+    {
+      "id": "creative-agency-premium-integrations",
+      "role": "custom",
+      "scaffold": "components/creative-agency-premium-integrations.tsx"
     }
   ]
 }

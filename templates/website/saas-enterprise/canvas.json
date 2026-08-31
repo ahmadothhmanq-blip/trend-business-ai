@@ -28,11 +28,11 @@
       "body": "DM Sans, ui-sans-serif, system-ui, sans-serif",
       "mono": "JetBrains Mono, ui-monospace, monospace",
       "scale": {
-        "sm": "0.8125rem",
+        "sm": "0.875rem",
         "base": "1rem",
-        "lg": "1.3125rem",
-        "xl": "3.125rem",
-        "display": "clamp(2.625rem, 5.2vw, 4rem)"
+        "lg": "1.125rem",
+        "xl": "1.625rem",
+        "display": "clamp(1.875rem, 3vw, 2.5rem)"
       }
     },
     "radius": {

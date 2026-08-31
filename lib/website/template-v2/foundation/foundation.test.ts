@@ -17,6 +17,7 @@ const FLAGSHIP_PACKAGES = [
   "education-premium",
   "finance-premium",
   "hotel-resort-premium",
+  "ai-startup-signal",
 ];
 
 describe("Design Foundation — shared layer", () => {
@@ -43,9 +44,25 @@ describe("Design Foundation — shared layer", () => {
 
     assert.ok(css.includes("Design Foundation — token scale"));
     assert.ok(css.includes("--df-text-display"));
+    assert.ok(css.includes("--df-text-2xl"));
+    assert.ok(css.includes("--df-radius-lg"));
+    assert.ok(css.includes("--df-shadow-elevated"));
+    assert.ok(css.includes("Flagship semantic theme"));
+    assert.ok(css.includes("--df-border-subtle"));
     assert.ok(css.includes("--df-container-padding"));
+    assert.ok(css.includes("--cb-section-y"));
+    assert.ok(css.includes("--sv-section-y"));
+    assert.ok(css.includes("--mp-section-y"));
     assert.ok(css.includes(".df-btn-primary"));
     assert.ok(css.includes(".df-card"));
+    assert.ok(css.includes(".df-slot-empty"));
+    assert.ok(css.includes(".df-hero-editorial"));
+    assert.ok(css.includes(".df-hero-split-empty"));
+    assert.ok(css.includes(".df-hero-bleed-empty-section"));
+    assert.ok(css.includes(".df-hero-trust-empty"));
+    assert.ok(css.includes("Hero collision guards"));
+    assert.ok(css.includes("Typography collision guards"));
+    assert.ok(css.includes("Design Foundation — RTL"));
     assert.ok(css.includes(".df-input"));
     assert.ok(css.includes(".df-nav"));
     assert.ok(css.includes(".df-footer"));

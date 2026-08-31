@@ -12,52 +12,51 @@
   },
   "visualIdentity": {
     "colors": {
-      "primary": "#12100E",
-      "secondary": "#2A2724",
-      "accent": "#C9A962",
-      "background": "#FAF8F5",
-      "foreground": "#12100E",
-      "muted": "rgba(18,16,14,0.58)",
+      "primary": "#4F46E5",
+      "secondary": "#0F172A",
+      "accent": "#818CF8",
+      "background": "#F9FAFB",
+      "foreground": "#0B1120",
+      "muted": "rgba(11,17,32,0.55)",
       "surface": "#FFFFFF",
-      "linen": "#F3EFE8",
-      "champagne": "#C9A962",
-      "ink": "#12100E",
-      "grid": "rgba(18,16,14,0.05)"
+      "signal": "#10B981",
+      "grid": "rgba(79,70,229,0.06)",
+      "ink": "#030712"
     },
     "typography": {
-      "display": "Playfair Display, Georgia, ui-serif, serif",
-      "body": "Manrope, ui-sans-serif, system-ui, sans-serif",
-      "mono": "Manrope, ui-sans-serif, system-ui, sans-serif",
+      "display": "Syne, ui-sans-serif, system-ui, sans-serif",
+      "body": "DM Sans, ui-sans-serif, system-ui, sans-serif",
+      "mono": "JetBrains Mono, ui-monospace, monospace",
       "scale": {
-        "sm": "0.8125rem",
-        "base": "1.0625rem",
-        "lg": "1.375rem",
-        "xl": "3.25rem",
-        "display": "clamp(2.75rem, 5.5vw, 4.5rem)"
+        "sm": "0.875rem",
+        "base": "1rem",
+        "lg": "1.125rem",
+        "xl": "1.625rem",
+        "display": "clamp(1.875rem, 3vw, 2.5rem)"
       }
     },
     "radius": {
-      "sm": "2px",
-      "md": "4px",
-      "lg": "8px",
-      "xl": "12px"
+      "sm": "8px",
+      "md": "12px",
+      "lg": "18px",
+      "xl": "28px"
     },
     "shadows": {
-      "surface": "0 24px 64px rgba(18,16,14,0.08)",
-      "glow": "0 0 80px rgba(201,169,98,0.16)",
-      "card": "0 1px 2px rgba(18,16,14,0.04), 0 16px 48px rgba(18,16,14,0.06)"
+      "surface": "0 2px 8px rgba(11,17,32,0.04), 0 20px 48px rgba(79,70,229,0.08)",
+      "glow": "0 0 96px rgba(79,70,229,0.2)",
+      "card": "0 0 0 1px rgba(11,17,32,0.04), 0 6px 28px rgba(11,17,32,0.05)"
     },
     "borders": {
-      "default": "rgba(18,16,14,0.1)",
-      "accent": "rgba(201,169,98,0.32)",
-      "subtle": "rgba(18,16,14,0.05)"
+      "default": "rgba(11,17,32,0.08)",
+      "accent": "rgba(79,70,229,0.28)",
+      "subtle": "rgba(11,17,32,0.04)"
     },
-    "animation": "atelier-reveal"
+    "animation": "nexus-grid-reveal"
   },
   "designSystem": {
     "tier": "premium",
-    "industry": "E-commerce",
+    "industry": "SaaS",
     "layoutKind": "single-column",
-    "templateIntelligenceId": "ti-ecommerce-atelier"
+    "templateIntelligenceId": "ti-saec-growth"
   }
 }

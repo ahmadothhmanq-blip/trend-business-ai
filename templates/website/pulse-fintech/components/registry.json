@@ -1,0 +1,81 @@
+{
+  "components": [
+    {
+      "id": "pulse-fintech-nav",
+      "role": "navigation",
+      "scaffold": "components/pulse-fintech-nav.tsx",
+      "slots": ["logo", "links", "cta"]
+    },
+    {
+      "id": "pulse-fintech-hero",
+      "role": "hero",
+      "scaffold": "components/pulse-fintech-hero.tsx",
+      "slots": ["headline", "metrics", "cta"]
+    },
+    {
+      "id": "pulse-fintech-features",
+      "role": "features",
+      "scaffold": "components/pulse-fintech-features.tsx"
+    },
+    {
+      "id": "pulse-fintech-about",
+      "role": "story",
+      "scaffold": "components/pulse-fintech-about.tsx"
+    },
+    {
+      "id": "pulse-fintech-stats",
+      "role": "custom",
+      "scaffold": "components/pulse-fintech-stats.tsx"
+    },
+    {
+      "id": "pulse-fintech-testimonials",
+      "role": "testimonials",
+      "scaffold": "components/pulse-fintech-testimonials.tsx"
+    },
+    {
+      "id": "pulse-fintech-pricing",
+      "role": "pricing",
+      "scaffold": "components/pulse-fintech-pricing.tsx"
+    },
+    {
+      "id": "pulse-fintech-faq",
+      "role": "faq",
+      "scaffold": "components/pulse-fintech-faq.tsx"
+    },
+    {
+      "id": "pulse-fintech-contact",
+      "role": "contact",
+      "scaffold": "components/pulse-fintech-contact.tsx"
+    },
+    {
+      "id": "pulse-fintech-footer",
+      "role": "footer",
+      "scaffold": "components/pulse-fintech-footer.tsx"
+    },
+    {
+      "id": "pulse-fintech-floating-cta",
+      "role": "cta",
+      "scaffold": "components/pulse-fintech-floating-cta.tsx"
+    },
+    {
+      "id": "pulse-fintech-utility-band",
+      "role": "cta",
+      "scaffold": "components/pulse-fintech-utility-band.tsx"
+    },
+    {
+      "id": "pulse-fintech-section-shell",
+      "role": "custom",
+      "scaffold": "components/pulse-fintech-section-shell.tsx"
+    },
+    {
+      "id": "pulse-fintech-portfolio",
+      "role": "custom",
+      "scaffold": "components/pulse-fintech-portfolio.tsx"
+    },
+    {
+      "id": "pulse-fintech-integrations",
+      "role": "custom",
+      "scaffold": "components/pulse-fintech-integrations.tsx"
+    }
+  ]
+}

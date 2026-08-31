@@ -35,9 +35,10 @@ export async function buildAppBuilderHealthReport(
   const admin = createAdminClient();
   const db = admin ?? userSupabase;
 
-  const [webappGenerations, webappDeployments] = await Promise.all([
+  const [webappGenerations, webappDeployments, webappPublications] = await Promise.all([
     checkTable(db, "webapp_generations"),
     checkTable(db, "webapp_deployments"),
+    checkTable(db, "webapp_publications"),
   ]);
 
   const providerName = getDefaultTextProvider();
@@ -55,6 +56,9 @@ export async function buildAppBuilderHealthReport(
   if (!webappDeployments) {
     warnings.push("Apply migration 046_webapp_deployments.sql for deployment tracking.");
   }
+  if (!webappPublications) {
+    warnings.push("Apply migration 097_webapp_publications.sql for public /w/app hosting.");
+  }
   if (!aiConfigured) {
     warnings.push("No AI provider configured — generation and assistant agent limited.");
   }
@@ -69,7 +73,9 @@ export async function buildAppBuilderHealthReport(
       webappDeployments,
       message: webappGenerations
         ? webappDeployments
-          ? "All App Builder tables reachable."
+          ? webappPublications
+            ? "All App Builder tables reachable."
+            : "Core + deployments OK; apply 097 for public hosts."
           : "Core table OK; optional deployments table missing."
         : "webapp_generations missing.",
     },

@@ -8,6 +8,9 @@ import type {
   BusinessIntelligenceResult,
 } from "@/lib/ai-core/business-intelligence/types";
 import { BUSINESS_INTELLIGENCE_KEY } from "@/lib/ai-core/business-intelligence/types";
+import { detectIndustryFromPrompt } from "@/lib/ai-core/website-builder/prompt-industry";
+import { buildWebsiteLanguageDirective } from "@/lib/ai-core/website-builder/language-directive.server";
+import type { IndustryId } from "@/lib/ai-core/templates/types";
 
 function hashPrompt(prompt: string): string {
   return createHash("sha256").update(prompt.trim()).digest("hex").slice(0, 16);
@@ -18,6 +21,34 @@ type AnalysisPayload = Partial<BusinessIntelligenceProfile>;
 function asStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
   return value.map((v) => String(v).trim()).filter(Boolean);
+}
+
+function resolveRoutingIndustryId(
+  raw: AnalysisPayload,
+  prompt: string,
+): string {
+  const promptMatch = detectIndustryFromPrompt(prompt);
+  if (promptMatch && promptMatch.confidence >= 0.9) {
+    return promptMatch.industryId;
+  }
+
+  const fromRaw =
+    typeof raw.routingIndustryId === "string" && raw.routingIndustryId.trim()
+      ? raw.routingIndustryId.trim().toLowerCase().replace(/\s+/g, "-")
+      : "";
+  if (fromRaw && WEBSITE_INDUSTRY_IDS.includes(fromRaw as IndustryId)) {
+    return fromRaw;
+  }
+
+  const industrySlug =
+    typeof raw.industry === "string" && raw.industry.trim()
+      ? raw.industry.trim().toLowerCase().replace(/\s+/g, "-")
+      : "";
+  if (industrySlug && WEBSITE_INDUSTRY_IDS.includes(industrySlug as IndustryId)) {
+    return industrySlug;
+  }
+
+  return fromRaw || industrySlug || "business";
 }
 
 function normalizeProfile(
@@ -84,10 +115,7 @@ function normalizeProfile(
           ? raw.designSystemHints.layoutApproach
           : "clear hierarchy with industry-specific sections",
     },
-    routingIndustryId:
-      typeof raw.routingIndustryId === "string" && raw.routingIndustryId.trim()
-        ? raw.routingIndustryId.trim().toLowerCase().replace(/\s+/g, "-")
-        : industry.toLowerCase().replace(/\s+/g, "-"),
+    routingIndustryId: resolveRoutingIndustryId(raw, prompt),
     confidence:
       typeof raw.confidence === "number"
         ? Math.min(1, Math.max(0.3, raw.confidence))
@@ -100,6 +128,51 @@ function normalizeProfile(
 }
 
 function fallbackProfile(prompt: string): BusinessIntelligenceProfile {
+  const promptMatch = detectIndustryFromPrompt(prompt);
+  if (promptMatch) {
+    return normalizeProfile(
+      {
+        industry: promptMatch.label,
+        subcategory: promptMatch.label,
+        audience: ["Gamers", "Community members", "Partners"],
+        tone: "Bold and immersive",
+        visualStyle: ["Neon", "Dark mode", "High energy"],
+        colorPalette: ["Electric purple", "Cyan", "Deep charcoal"],
+        typography: ["Modern", "Tech-forward"],
+        photographyStyle: [
+          "Neon gaming setups",
+          "Esports arenas",
+          "High-end PC hardware",
+          "VR headsets",
+        ],
+        forbiddenSubjects: [
+          "fine dining",
+          "restaurant food",
+          "corporate office clichés",
+        ],
+        heroMessaging: [prompt.trim().slice(0, 80) || "Premium gaming experience"],
+        recommendedSections: [
+          "Hero",
+          "Games",
+          "Esports",
+          "Community",
+          "Contact",
+        ],
+        primaryCta: "Play now",
+        secondaryCta: "Join community",
+        navigationStyle: "product-led",
+        designSystemHints: {
+          mood: "Immersive",
+          layoutApproach: "dark-mode product showcase",
+        },
+        routingIndustryId: promptMatch.industryId,
+        confidence: promptMatch.confidence,
+        reason: promptMatch.reason,
+      },
+      prompt,
+    );
+  }
+
   const trimmed = prompt.trim().slice(0, 200) || "Business website";
   return normalizeProfile(
     {
@@ -224,6 +297,10 @@ ${prompt}
 Theme: ${params.brief.theme ?? "n/a"}
 Features: ${(params.brief.features ?? []).join(", ") || "n/a"}
 Language: ${params.brief.language ?? "en"}
+${buildWebsiteLanguageDirective({
+  language: params.brief.language ?? "English",
+  prompt,
+})}
 
 Template routing catalog (pick routingIndustryId — closest internal match):
 ${JSON.stringify(routingCatalog, null, 2)}

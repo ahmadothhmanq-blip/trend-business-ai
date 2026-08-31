@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
 import { IconPicker } from "@/components/dashboard/visual-editor/icon-picker";
-import { resolveLucideIcon } from "@/components/dashboard/visual-editor/icon-render";
+import { LucideIconGlyph } from "@/components/dashboard/visual-editor/icon-render";
 import {
   ICON_SIZE_PX,
   type IconBackgroundShape,
@@ -83,7 +83,6 @@ export function IconPropertiesPanel({
 }: IconPropertiesPanelProps) {
   const pt = useProductT("visualEditor");
   const it = (key: string): string => pt(`iconEditor.${key}` as "iconEditor.title");
-  const PreviewIcon = resolveLucideIcon(icon.name);
   const previewStyle = resolveIconPreviewStyle(icon, previewState);
 
   const patchColors = (patch: Partial<VisualIcon["colors"]>) =>
@@ -99,7 +98,8 @@ export function IconPropertiesPanel({
         <p className="text-[10px] uppercase tracking-wider text-white/40">{it("preview")}</p>
         <div className="mt-2 flex items-center gap-2">
           <span style={previewStyle}>
-            <PreviewIcon
+            <LucideIconGlyph
+              name={icon.name}
               className={cn(
                 icon.variant === "filled" && "fill-current",
                 icon.variant === "duotone" && "opacity-80",

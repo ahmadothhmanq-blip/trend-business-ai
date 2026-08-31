@@ -23,19 +23,19 @@ export function SaasEnterpriseSectionShell({
     <section
       id={id}
       data-v2-component="saas-enterprise-section-shell"
-      className={`se-section bg-[var(--color-background)] ${className}`.trim()}
+      className={`se-section-shell se-reveal ${className}`.trim()}
       aria-labelledby={title ? `${id ?? "section"}-title` : undefined}
     >
-      <div className="mx-auto max-w-[82rem] px-5 sm:px-8">
+      <div className="se-docs-inner">
         {(eyebrow || title || subtitle) && (
-          <header className="mb-12 max-w-2xl">
-            {eyebrow && <p className="se-eyebrow mb-3">{eyebrow}</p>}
-            {title && (
-              <h2 id={`${id ?? "section"}-title`} className="se-headline-sm">
+          <header className="se-docs-head">
+            {eyebrow ? <p className="se-eyebrow">{eyebrow}</p> : null}
+            {title ? (
+              <h2 id={`${id ?? "section"}-title`} className="se-headline-sm se-font-display">
                 {title}
               </h2>
-            )}
-            {subtitle && <p className="se-body text-muted-foreground mt-4">{subtitle}</p>}
+            ) : null}
+            {subtitle ? <p className="se-body">{subtitle}</p> : null}
           </header>
         )}
         {children}

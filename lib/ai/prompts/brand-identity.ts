@@ -1,5 +1,5 @@
 import type { BrandIdentityPluginInput, BrandAnalysis, BrandPlanResult } from "@/plugins/brand-identity/types";
-import { aiOutputLanguageDirective } from "@/lib/ai/prompts/shared";
+import { aiOutputLanguageDirective } from "@/lib/ai/prompts/language-directive.server";
 
 function getBrandTypeContext(type: string): string {
   const ctx: Record<string, string> = {
@@ -44,7 +44,7 @@ Produce a JSON object with:
 - coreValues: array of 4-6 core brand values
 - emotionalAppeal: the emotional response the brand should evoke
 
-Return ONLY valid JSON.${aiOutputLanguageDirective(input.language)}`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(input.language, "brand")}`;
 }
 
 export function brandPlanPrompt(input: BrandIdentityPluginInput, analysis: BrandAnalysis): string {
@@ -85,7 +85,7 @@ Create a JSON object with:
 - deliverables: array of deliverable IDs to generate
 - brandArchetype: the brand archetype (e.g. "The Creator", "The Explorer", "The Hero")
 
-Return ONLY valid JSON.${aiOutputLanguageDirective(input.language)}`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(input.language, "brand")}`;
 }
 
 export function brandStrategyPrompt(
@@ -113,7 +113,7 @@ Cover:
 5. Value Proposition — what makes us unique
 6. Go-to-Market Messaging — key messages for different channels
 
-Write 400-600 words in professional markdown. No JSON wrapper — return plain text.${aiOutputLanguageDirective(language)}`;
+Write 400-600 words in professional markdown. No JSON wrapper — return plain text.${aiOutputLanguageDirective(language, "brand")}`;
 }
 
 export function brandStoryPrompt(
@@ -137,7 +137,7 @@ Write the brand story that:
 - Connects emotionally with the audience
 - Ends with the aspirational future
 
-Write 200-400 words. Compelling, authentic, and memorable. Return plain text — no JSON wrapper.${aiOutputLanguageDirective(language)}`;
+Write 200-400 words. Compelling, authentic, and memorable. Return plain text — no JSON wrapper.${aiOutputLanguageDirective(language, "brand")}`;
 }
 
 export function logoGuidelinesPrompt(
@@ -161,7 +161,7 @@ Cover:
 5. Don'ts — distortion, recoloring, rotation, effects to avoid
 6. File Formats — when to use SVG, PNG, PDF
 
-Write 200-350 words in markdown. Return plain text — no JSON wrapper.${aiOutputLanguageDirective(language)}`;
+Write 200-350 words in markdown. Return plain text — no JSON wrapper.${aiOutputLanguageDirective(language, "brand")}`;
 }
 
 export function brandAssetPrompt(

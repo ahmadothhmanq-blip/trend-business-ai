@@ -175,6 +175,10 @@ export function composeHomePage(params: {
   pageTopology?: ThemePageTopology | null;
   /** Inject persistent floating CTA (technology / bold themes). */
   floatingCta?: boolean;
+  /** When true, compose full section JSX even for localized LLM copy languages. */
+  forceDesignRebuild?: boolean;
+  visualSkinId?: string | null;
+  heroLayoutMode?: string | null;
 }): string {
   const sourceIds =
     params.homeComponentOrder?.length
@@ -184,7 +188,8 @@ export function composeHomePage(params: {
   const content = params.content;
   const ui = getComposeUiFallbacks(params.language);
   const contentLang = resolveContentLanguage(params.language);
-  const localized = usesLlmLocalizedWebsiteCopy(params.language);
+  const localized =
+    usesLlmLocalizedWebsiteCopy(params.language) && !params.forceDesignRebuild;
 
   const headerId: DesignRendererComponentId =
     ids.find((id) => isThemeNavComponent(id) || HEADER_IDS.has(id)) ??
@@ -347,6 +352,9 @@ ${jsxProp("eyebrow", ui.navContact)}${jsxProp("title", content.contactTitle)}${j
       props += jsxProp("eyebrow", heroEyebrow);
       props += jsxProp("primaryCta", primaryCta);
       if (withSecondary) props += jsxProp("secondaryCta", secondaryCta);
+      if (params.heroLayoutMode && isThemeHeroComponent(id)) {
+        props += jsxProp("layoutMode", params.heroLayoutMode);
+      }
       if (id === "HeroVideo") {
         props += "        posterUrl={HERO_IMAGE}\n";
       } else {
@@ -470,9 +478,10 @@ ${jsxProp("primaryCta", primaryCta)}${jsxProp("secondaryCta", secondaryCta)}    
   const themeClass = params.websiteThemeId
     ? ` ti-theme-${params.websiteThemeId}`
     : "";
+  const skinClass = params.visualSkinId ? ` tb-skin-page tb-skin-${params.visualSkinId}` : "";
   const topologyClass = ` ti-topology-${pageTopology.replace(/-/g, "_")}`;
   const rootClass =
-    `min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] antialiased${templateClass}${themeClass}${topologyClass}`;
+    `min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] antialiased${templateClass}${themeClass}${skinClass}${topologyClass}`;
 
   const headerProps =
     `${jsxProp("brandName", brand)}` +

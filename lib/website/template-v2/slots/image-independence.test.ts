@@ -14,6 +14,7 @@ const FLAGSHIPS = [
   "education-premium",
   "finance-premium",
   "hotel-resort-premium",
+  "ai-startup-signal",
 ];
 
 const ROOT = join(process.cwd(), "templates", "website");
@@ -21,6 +22,7 @@ const ROOT = join(process.cwd(), "templates", "website");
 const FORBIDDEN_PATTERNS = [
   { name: "raw img tag", pattern: /<img\b/ },
   { name: "resolveSiteImage", pattern: /\bresolveSiteImage\b/ },
+  { name: "resolveSlotImage import", pattern: /\bresolveSlotImage\b/ },
   { name: "template-images import", pattern: /template-images/ },
   { name: "hardcoded unsplash URL", pattern: /images\.unsplash\.com/i },
   { name: "HERO_IMAGE constant", pattern: /\bHERO_IMAGE\b/ },

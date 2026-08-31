@@ -1,7 +1,8 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
 import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
-import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { beginAiUsage } from "@/lib/api/rate-limit";
+import type { AiUsageLease } from "@/lib/billing/ai-usage-settlement";
 import {
   listProjects,
   createProject,
@@ -10,6 +11,7 @@ import {
 import type { BusinessProject } from "@/types/business-manager";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { getRequestAiLanguage } from "@/lib/i18n/api";
 
 const createSchema = z.object({
   name: z.string().trim().min(1),
@@ -22,6 +24,8 @@ const createSchema = z.object({
   endDate: z.string().nullable().optional(),
   brief: z.string().optional(),
   generate: z.boolean().default(false),
+  language: z.string().trim().optional(),
+  country: z.string().trim().optional(),
 });
 
 export async function GET(request: Request) {
@@ -56,10 +60,13 @@ export async function POST(request: Request) {
   }
 
   let metadata: Record<string, unknown> = {};
+  let creditLease: AiUsageLease | null = null;
   if (parsed.data.generate && parsed.data.brief) {
-    const rateLimited = await enforceAiUsage(auth.supabase, auth.user!.id, "workspace");
-    if (rateLimited) return rateLimited;
-    const plan = await generateBusinessPlan({ brief: parsed.data.brief });
+    const usage = await beginAiUsage(auth.supabase, auth.user!.id, "workspace");
+    if (!usage.ok) return usage.response;
+    creditLease = usage.lease;
+    const language = getRequestAiLanguage(request, parsed.data.language, parsed.data.country);
+    const plan = await generateBusinessPlan({ brief: parsed.data.brief, language });
     metadata = { generatedPlan: plan };
   }
 
@@ -76,5 +83,6 @@ export async function POST(request: Request) {
     metadata,
   });
   if (error) return databaseErrorResponse("business-manager.projects.create", error);
+  if (creditLease) await creditLease.settle(auth.supabase);
   return NextResponse.json({ project: data });
 }

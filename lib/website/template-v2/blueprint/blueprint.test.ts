@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import type { SectionVariantId } from "@/lib/website/template-v2/variants/types";
 import { describe, it } from "node:test";
 import {
   buildWebsiteBlueprint,
@@ -85,7 +86,7 @@ describe("Website Blueprint Engine", () => {
     });
 
     for (const section of blueprint.sectionVariants) {
-      const def = getVariantDefinition(section.sectionKind, section.variantId);
+      const def = getVariantDefinition(section.sectionKind, section.variantId as SectionVariantId);
       assert.ok(def, `Invalid variant ${section.variantId} for ${section.sectionKind}`);
       assert.equal(section.composition, def.composition);
     }

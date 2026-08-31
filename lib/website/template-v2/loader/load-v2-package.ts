@@ -90,10 +90,23 @@ export type LoadTemplateV2PackageResult =
 /**
  * Load a V2 presentation bundle from disk. Returns error for V1 packages.
  */
+const packageBundleCache = new Map<string, LoadTemplateV2PackageResult>();
+
+function packageCacheKey(
+  packageDirectory: string,
+  language?: string | null,
+): string {
+  return `${packageDirectory}::${language ?? ""}`;
+}
+
 export async function loadTemplateV2Package(
   packageDirectory: string,
   options: LoadTemplateV2PackageOptions = {},
 ): Promise<LoadTemplateV2PackageResult> {
+  const cacheKey = packageCacheKey(packageDirectory, options.language);
+  const cached = packageBundleCache.get(cacheKey);
+  if (cached) return cached;
+
   const manifest = await readTemplatePackageManifestRaw(packageDirectory);
   const architectureVersion = detectArchitectureVersionFromManifest(manifest);
 
@@ -175,7 +188,7 @@ export async function loadTemplateV2Package(
     isTbdpNativeMotionManifest(motionInput) &&
     isTbdpNativeResponsiveManifest(responsiveInput)
   ) {
-    return {
+    const result: LoadTemplateV2PackageResult = {
       ok: true,
       bundle: consumeTbdpNativePackage({
         bundle: {
@@ -190,9 +203,11 @@ export async function loadTemplateV2Package(
         language: options.language,
       }),
     };
+    packageBundleCache.set(cacheKey, result);
+    return result;
   }
 
-  return {
+  const result: LoadTemplateV2PackageResult = {
     ok: true,
     bundle: {
       ...baseBundlePartial,
@@ -201,6 +216,8 @@ export async function loadTemplateV2Package(
       responsive: templateV2ResponsiveRulesSchema.parse(responsiveInput),
     },
   };
+  packageBundleCache.set(cacheKey, result);
+  return result;
 }
 
 /**

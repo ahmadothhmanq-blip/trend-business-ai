@@ -1,0 +1,71 @@
+{
+  "packageId": "pulse-fintech",
+  "templateIntelligenceHint": "ti-technology-dark",
+  "layout": {
+    "defaultLayoutId": "default",
+    "regions": {
+      "header": {
+        "role": "header",
+        "sticky": true
+      },
+      "main": {
+        "role": "main"
+      },
+      "utility": {
+        "role": "utility"
+      },
+      "footer": {
+        "role": "footer"
+      },
+      "overlay": {
+        "role": "overlay"
+      }
+    }
+  },
+  "navigation": {
+    "componentId": "pulse-fintech-nav",
+    "variant": "enterprise-glass"
+  },
+  "hero": {
+    "componentId": "pulse-fintech-hero",
+    "region": "main"
+  },
+  "footer": {
+    "componentId": "pulse-fintech-footer",
+    "region": "footer"
+  },
+  "homeFlow": {
+    "regions": {
+      "main": [
+        "pulse-fintech-hero",
+        "pulse-fintech-features",
+        "pulse-fintech-integrations",
+        "pulse-fintech-about",
+        "pulse-fintech-stats",
+        "pulse-fintech-testimonials",
+        "pulse-fintech-portfolio",
+        "pulse-fintech-pricing",
+        "pulse-fintech-faq",
+        "pulse-fintech-contact"
+      ],
+      "utility": [
+        "pulse-fintech-utility-band"
+      ],
+      "overlay": [
+        "pulse-fintech-floating-cta"
+      ]
+    }
+  },
+  "sectionShell": {
+    "strategy": "package",
+    "componentId": "pulse-fintech-section-shell"
+  },
+  "aiGeneration": {
+    "contentProfile": "pulse-fintech-gtm",
+    "suggestedPages": [
+      "platform",
+      "pricing",
+      "customers"
+    ]
+  }
+}

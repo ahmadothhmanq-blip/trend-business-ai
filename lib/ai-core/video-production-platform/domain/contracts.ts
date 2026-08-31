@@ -69,6 +69,7 @@ export const SCENE_STATUSES = [
   "planned",
   "generating",
   "processing",
+  "quality_check",
   "ready",
   "failed",
   "cancelled",

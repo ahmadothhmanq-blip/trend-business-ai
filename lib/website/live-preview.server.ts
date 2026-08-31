@@ -34,8 +34,10 @@ export function livePreviewResponseHeaders() {
   return {
     "Content-Type": "text/html; charset=utf-8",
     "Cache-Control": "private, no-store",
+    // Inline script: V2 reveal boot (__V2_REVEAL_BOOT__). Inline style: design tokens.
+    // fonts.googleapis.com / fonts.gstatic.com: package @import font faces.
     "Content-Security-Policy":
-      "default-src 'none'; style-src 'unsafe-inline' https://cdn.tailwindcss.com; script-src https://cdn.tailwindcss.com; img-src data: https: blob:; base-uri 'none'; form-action 'none'; frame-ancestors 'self'",
+      "default-src 'none'; style-src 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com; script-src 'unsafe-inline' https://cdn.tailwindcss.com; font-src https://fonts.gstatic.com data:; img-src data: https: blob:; base-uri 'none'; form-action 'none'; frame-ancestors 'self'",
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "same-origin",
     "X-Frame-Options": "SAMEORIGIN",

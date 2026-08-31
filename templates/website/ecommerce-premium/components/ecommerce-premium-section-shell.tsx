@@ -23,20 +23,19 @@ export function EcommercePremiumSectionShell({
     <section
       id={id}
       data-v2-component="ecommerce-premium-section-shell"
-      className={`ec-section bg-[var(--color-background)] ${className}`.trim()}
+      className={`ec-section-shell ec-reveal ${className}`.trim()}
       aria-labelledby={title ? `${id ?? "section"}-title` : undefined}
     >
-      <div className="mx-auto max-w-[82rem] px-5 sm:px-8">
+      <div className="ec-section-shell-inner">
         {(eyebrow || title || subtitle) && (
-          <header className="mb-12 max-w-2xl">
-            {eyebrow && <p className="ec-eyebrow mb-4">{eyebrow}</p>}
-            {title && (
-              <h2 id={`${id ?? "section"}-title`} className="ec-headline-sm">
+          <header className="ec-section-head">
+            {eyebrow ? <p className="ec-eyebrow">{eyebrow}</p> : null}
+            {title ? (
+              <h2 id={`${id ?? "section"}-title`} className="ec-headline-sm ec-font-display">
                 {title}
               </h2>
-            )}
-            {title && <div className="ec-gold-rule mt-5" aria-hidden />}
-            {subtitle && <p className="ec-body mt-6">{subtitle}</p>}
+            ) : null}
+            {subtitle ? <p className="ec-body">{subtitle}</p> : null}
           </header>
         )}
         {children}

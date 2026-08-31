@@ -13,6 +13,12 @@ import { TemplateSelector } from "@/components/dashboard/social-media/template-s
 import { PostPreviewPanel } from "@/components/dashboard/social-media/post-preview";
 import type { SocialPost, SocialPostPlatform, SocialAccountPublic } from "@/types/social-media";
 import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
+import { useTranslation } from "@/lib/i18n/client";
+import { GlsGenerationLanguageSelect } from "@/components/dashboard/language/gls-generation-language-select";
+import {
+  getInitialGlsGenerationLanguage,
+  glsGenerationLanguagePayload,
+} from "@/lib/language-platform/generation/service";
 
 type Brand = { id: string; brand_name: string };
 
@@ -27,9 +33,13 @@ const POST_ACTIONS = ["rewrite", "improve_engagement", "shorten", "expand", "gen
 
 export function PostComposer({ post, brands, onSaved, onChange }: Props) {
   const wt = useWorkspaceT("socialMedia");
+  const { t } = useTranslation();
   const [platform, setPlatform] = useState<SocialPostPlatform>(post?.platform ?? "instagram");
   const [topic, setTopic] = useState("");
   const [tone, setTone] = useState("Professional");
+  const [language, setLanguage] = useState(() =>
+    getInitialGlsGenerationLanguage({ fallback: "english" }),
+  );
   const [brandId, setBrandId] = useState<string>("");
   const [generating, setGenerating] = useState(false);
   const [actionBusy, setActionBusy] = useState(false);
@@ -67,6 +77,7 @@ export function PostComposer({ post, brands, onSaved, onChange }: Props) {
           platform,
           topic: templateTopic || topic || post?.title || wt("composer.defaultTopic"),
           tone,
+          ...glsGenerationLanguagePayload(language),
           brandIdentityId: brandId || undefined,
           templateId,
           save: true,
@@ -246,10 +257,19 @@ export function PostComposer({ post, brands, onSaved, onChange }: Props) {
               onChange={(e) => setTone(e.target.value)}
               className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
             >
-              {SOCIAL_TONES.map((t) => (
-                <option key={t} value={t}>{wt(`tones.${t}`)}</option>
+              {SOCIAL_TONES.map((toneOption) => (
+                <option key={toneOption} value={toneOption}>{wt(`tones.${toneOption}`)}</option>
               ))}
             </select>
+          </div>
+          <div>
+            <label className="text-xs text-white/50">{t("common.language")}</label>
+            <GlsGenerationLanguageSelect
+              serviceId="social-media"
+              value={language}
+              onChange={setLanguage}
+              className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+            />
           </div>
         </div>
 

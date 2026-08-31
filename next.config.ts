@@ -3,6 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
+  devIndicators: false,
   async redirects() {
     return [
       // Consolidate legacy /solutions/* into canonical /products/* URLs

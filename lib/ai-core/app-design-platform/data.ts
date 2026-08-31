@@ -113,5 +113,13 @@ export function toPrismaSchemaSketch(model: StructuredAppModel): string {
       .join("\n");
     return `model ${dm.name} {\n  id String @id @default(cuid())\n${fields}\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}`;
   });
-  return blocks.join("\n\n");
+  return `generator client { provider = "prisma-client-js" }
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+${blocks.join("\n\n")}
+`;
 }

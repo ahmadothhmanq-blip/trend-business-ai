@@ -2,17 +2,29 @@
   "packageId": "hotel-resort-premium",
   "templateIntelligenceHint": "ti-hotel-sanctuary",
   "layout": {
-    "defaultLayoutId": "sidebar-left",
+    "defaultLayoutId": "default",
     "regions": {
-      "header": { "role": "header", "sticky": true },
-      "sidebar": { "role": "sidebar", "sticky": true, "collapseBelow": "lg" },
-      "main": { "role": "main" },
-      "footer": { "role": "footer" }
+      "header": {
+        "role": "header",
+        "sticky": true
+      },
+      "main": {
+        "role": "main"
+      },
+      "utility": {
+        "role": "utility"
+      },
+      "footer": {
+        "role": "footer"
+      },
+      "overlay": {
+        "role": "overlay"
+      }
     }
   },
   "navigation": {
     "componentId": "hotel-resort-premium-nav",
-    "variant": "luxury-minimal"
+    "variant": "enterprise-glass"
   },
   "hero": {
     "componentId": "hotel-resort-premium-hero",
@@ -24,19 +36,23 @@
   },
   "homeFlow": {
     "regions": {
-      "sidebar": ["hotel-resort-premium-sidebar-rail"],
       "main": [
         "hotel-resort-premium-hero",
-        "hotel-resort-premium-tasting-menu",
-        "hotel-resort-premium-chef-story",
+        "hotel-resort-premium-features",
+        "hotel-resort-premium-integrations",
+        "hotel-resort-premium-about",
         "hotel-resort-premium-stats",
-        "hotel-resort-premium-signature-dishes",
         "hotel-resort-premium-testimonials",
-        "hotel-resort-premium-atmosphere",
-        "hotel-resort-premium-gallery",
+        "hotel-resort-premium-portfolio",
+        "hotel-resort-premium-pricing",
         "hotel-resort-premium-faq",
-        "hotel-resort-premium-reservation-cta",
         "hotel-resort-premium-contact"
+      ],
+      "utility": [
+        "hotel-resort-premium-utility-band"
+      ],
+      "overlay": [
+        "hotel-resort-premium-floating-cta"
       ]
     }
   },
@@ -45,7 +61,11 @@
     "componentId": "hotel-resort-premium-section-shell"
   },
   "aiGeneration": {
-    "contentProfile": "hotel-resort-premium-luxury",
-    "suggestedPages": ["menu", "gallery", "reserve"]
+    "contentProfile": "hotel-resort-premium-gtm",
+    "suggestedPages": [
+      "platform",
+      "pricing",
+      "customers"
+    ]
   }
 }

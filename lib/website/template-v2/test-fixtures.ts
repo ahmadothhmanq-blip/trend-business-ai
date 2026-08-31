@@ -10,3 +10,9 @@ export const SAMPLE_V2_PACKAGE_DIR = path.join(
 );
 
 export const SAMPLE_V2_FIXTURES_ROOT = path.join(TEMPLATE_V2_ROOT, "__fixtures__");
+
+export const SAMPLE_V1_PACKAGE_DIR = path.join(
+  TEMPLATE_V2_ROOT,
+  "__fixtures__",
+  "sample-v1-package",
+);

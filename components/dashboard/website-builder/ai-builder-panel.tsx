@@ -2,10 +2,12 @@
 
 import { Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { AI_BUILDER_ACTIONS } from "@/lib/website/builder";
+import { listAiBuilderActionsForCapabilities } from "@/lib/website/builder";
+import type { WebsiteCapabilityService } from "@/lib/website/builder/capabilities/service";
 import { useBuilderLocale } from "@/lib/website/builder/use-builder-locale";
 
 type AiBuilderPanelProps = {
+  capabilityService: WebsiteCapabilityService;
   disabled?: boolean;
   loading?: boolean;
   streamMessage?: string | null;
@@ -23,12 +25,14 @@ const ACTION_I18N_IDS: Record<string, string> = {
 };
 
 export function AiBuilderPanel({
+  capabilityService,
   disabled,
   loading,
   streamMessage,
   onRun,
 }: AiBuilderPanelProps) {
   const { wb } = useBuilderLocale();
+  const actions = listAiBuilderActionsForCapabilities(capabilityService);
 
   return (
     <div className="flex h-full flex-col gap-3 overflow-y-auto p-3">
@@ -45,7 +49,7 @@ export function AiBuilderPanel({
         </p>
       ) : null}
       <ul className="space-y-2">
-        {AI_BUILDER_ACTIONS.map((action) => {
+        {actions.map((action) => {
           const i18nId = ACTION_I18N_IDS[action.id] ?? action.id;
           return (
             <li key={action.id}>

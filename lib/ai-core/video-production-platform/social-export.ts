@@ -97,14 +97,13 @@ export function buildSocialExportPackage(
 ): SocialPublishPackage {
   const preset = getSocialExportPreset(presetId) || SOCIAL_EXPORT_PRESETS[0]!;
   const job = model.jobs[model.jobs.length - 1];
-  const videoUrl =
-    job?.compositeAsset?.url ||
-    job?.clips.find((c) => c.asset)?.asset?.url ||
-    null;
+  const videoUrl = job?.compositeAsset?.url || null;
   const captionsVtt = buildCaptionsVtt(model);
 
   const warnings: string[] = [];
-  if (!videoUrl) warnings.push("No rendered video — run full render first");
+  if (!videoUrl) {
+    warnings.push("No playable composite — export requires a final assembled video");
+  }
   if (model.targetDurationSec > preset.maxDurationSec) {
     warnings.push(
       `Project ${model.targetDurationSec}s exceeds ${preset.label} max ${preset.maxDurationSec}s`,
@@ -124,7 +123,7 @@ export function buildSocialExportPackage(
     `Max duration ${preset.maxDurationSec}s (project ${model.targetDurationSec}s)`,
     preset.captions ? "Captions included (VTT)" : "Captions off",
     `Quality ${preset.quality}`,
-    videoUrl ? "Primary video asset linked" : "No rendered video yet",
+    videoUrl ? "Primary composite asset linked" : "No playable composite yet",
     job?.assemblyManifest
       ? `Assembly: ${job.assemblyManifest.method}`
       : "Assembly: n/a",
@@ -149,7 +148,7 @@ export function buildSocialExportPackage(
       model.title
     ).slice(0, 500),
     hashtags,
-    publishReady: Boolean(videoUrl) && warnings.length === 0,
+    publishReady: false,
     warnings,
     downloadManifest: [
       {
@@ -207,24 +206,43 @@ export async function persistSocialExportAssets(params: {
   });
   out.captionsAssetId = captions.asset.id;
 
-  const svgBytes = new TextEncoder().encode(params.package.endCardSvg);
-  const endCard = await uploadVideoStudioMedia({
-    supabase: params.supabase,
-    userId: params.userId,
-    generationId: params.generationId,
-    kind: "export",
-    bytes: svgBytes,
-    mimeType: "image/svg+xml",
-    filename: `${params.package.preset.id}-endcard.svg`,
-    provider: "social-export",
-    meta: { presetId: params.package.preset.id, kind: "end-card" },
-  });
-  out.endCardAssetId = endCard.asset.id;
   return out;
 }
 
+function packageFromVerified(
+  model: VideoProductionModel,
+  presetId: SocialExportPresetId,
+  videoUrl: string,
+  mimeType: "video/mp4" | "video/webm",
+  summary: string,
+): SocialPublishPackage {
+  const base = buildSocialExportPackage(model, presetId);
+  return {
+    ...base,
+    videoUrl,
+    publishReady: false,
+    warnings: base.warnings.filter(
+      (warning) => !warning.includes("No playable composite") && !warning.includes("No rendered"),
+    ),
+    downloadManifest: base.downloadManifest.map((item) =>
+      item.kind === "video"
+        ? {
+            ...item,
+            url: videoUrl,
+            filename: `${presetId}-export.${mimeType === "video/webm" ? "webm" : "mp4"}`,
+          }
+        : item,
+    ),
+    checklist: [
+      ...base.checklist.filter((line) => !line.startsWith("No playable") && !line.startsWith("Primary")),
+      summary,
+    ],
+  };
+}
+
 /**
- * Re-encode primary video to a social preset aspect/quality via FFmpeg when available.
+ * Re-encode a verified playable composite to a social preset via FFmpeg.
+ * Does not report success until write + probe verification complete.
  */
 export async function reencodeForSocialPreset(params: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -233,110 +251,46 @@ export async function reencodeForSocialPreset(params: {
   generationId: string;
   model: VideoProductionModel;
   presetId: SocialExportPresetId;
+  reencode?: boolean;
 }): Promise<{
   package: SocialPublishPackage;
   reencoded: boolean;
-  videoUrl: string | null;
+  reused: boolean;
+  charged: false;
+  videoUrl: string;
   message: string;
+  artifact: import("@/lib/ai-core/video-production-platform/export-production").VerifiedCompositeArtifact;
+  audioIncluded: boolean;
+  audioRequired: boolean;
 }> {
-  const { assembleComposite, resolveExportPreset } = await import(
-    "@/lib/ai-core/video-production-platform/assemble"
+  const { exportProductionForSocialPreset } = await import(
+    "@/lib/ai-core/video-production-platform/export-production"
   );
-  const { uploadVideoStudioMedia } = await import(
-    "@/lib/ai-core/video-production-platform/media-storage"
-  );
-
-  let pkg = buildSocialExportPackage(params.model, params.presetId);
-  const preset = pkg.preset;
-  const job = params.model.jobs[params.model.jobs.length - 1];
-  const sourceUrl =
-    job?.compositeAsset?.url ||
-    job?.clips.find((c) => c.asset)?.asset?.url ||
-    null;
-
-  if (!sourceUrl) {
-    return {
-      package: pkg,
-      reencoded: false,
-      videoUrl: null,
-      message: "No source video to re-encode.",
-    };
+  const preset = getSocialExportPreset(params.presetId);
+  if (!preset) {
+    const { ProductionExportError } = await import(
+      "@/lib/ai-core/video-production-platform/export-production"
+    );
+    throw new ProductionExportError("Unknown social export preset.", "export_failed");
   }
 
-  const assembled = await assembleComposite({
-    title: `${params.model.title}-${preset.id}`,
-    clips: [
-      {
-        url: sourceUrl,
-        durationSec: Math.min(
-          params.model.targetDurationSec || 30,
-          preset.maxDurationSec,
-        ),
-      },
-    ],
-    audioUrl: job?.audioAsset?.url,
-    subtitles: params.model.subtitles.map((s, i) => ({
-      startSec: s.startSec ?? i * 3,
-      endSec: s.endSec ?? (s.startSec ?? i * 3) + 3,
-      text: s.text,
-    })),
-    burnSubtitles: preset.captions && params.model.subtitles.length > 0,
-    exportPreset: resolveExportPreset(preset.aspectRatio, preset.quality),
-    outputFormat: "mp4",
-  });
-
-  if (!assembled.bytes) {
-    return {
-      package: pkg,
-      reencoded: false,
-      videoUrl: sourceUrl,
-      message: assembled.note,
-    };
-  }
-
-  const uploaded = await uploadVideoStudioMedia({
+  const exported = await exportProductionForSocialPreset({
     supabase: params.supabase,
     userId: params.userId,
     generationId: params.generationId,
-    kind: "export",
-    bytes: assembled.bytes,
-    mimeType: assembled.mimeType,
-    filename: `${preset.id}-export.mp4`,
-    durationSec: Math.min(
-      params.model.targetDurationSec || 30,
-      preset.maxDurationSec,
-    ),
-    provider: "social-reencode",
-    meta: {
-      presetId: preset.id,
-      aspectRatio: preset.aspectRatio,
-      quality: preset.quality,
-      assembly: assembled.manifest,
-    },
+    model: params.model,
+    preset,
+    reencode: params.reencode,
   });
 
-  pkg = {
-    ...pkg,
-    videoUrl: uploaded.asset.url,
-    publishReady: true,
-    warnings: pkg.warnings.filter(
-      (w) => !w.includes("Aspect") && !w.includes("No rendered"),
-    ),
-    downloadManifest: pkg.downloadManifest.map((d) =>
-      d.kind === "video"
-        ? { ...d, url: uploaded.asset.url }
-        : d,
-    ),
-    checklist: [
-      ...pkg.checklist.filter((c) => !c.startsWith("Aspect")),
-      `Re-encoded ${preset.aspectRatio} ${preset.quality}`,
-    ],
-  };
-
   return {
-    package: pkg,
-    reencoded: true,
-    videoUrl: uploaded.asset.url,
-    message: `Re-encoded for ${preset.label} (${preset.aspectRatio} ${preset.quality}).`,
+    ...exported,
+    package: packageFromVerified(
+      params.model,
+      params.presetId,
+      exported.videoUrl,
+      exported.artifact.mimeType,
+      `Verified ${exported.artifact.mimeType} ${exported.artifact.width}×${exported.artifact.height} ${exported.artifact.codec} ${exported.artifact.durationSec.toFixed(2)}s sha256=${exported.artifact.sha256.slice(0, 12)}`,
+    ),
   };
 }

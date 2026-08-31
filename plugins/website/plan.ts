@@ -32,21 +32,23 @@ import {
   websiteDynamicPlanSchema,
 } from "@/plugins/website/schemas";
 import type {
+  GeneratedWebsiteProject,
   WebsiteGenerationInput,
   WebsitePlanResult,
   WebsiteProjectAnalysis,
   WebsiteProjectBlueprint,
   WebsiteDynamicPlan,
 } from "@/plugins/website/types";
+import { projectCapabilityFlags } from "@/lib/website/builder/capabilities";
 import type { GenerationContext } from "@/lib/ai/types";
 import {
   isMinimalWebsiteGeneration,
   isUltraFastWebsiteGeneration,
+  isStructureFirstEnabled,
   resolveWebsiteGenerationProfile,
   shouldUseDeterministicBlueprint,
 } from "@/lib/website/generation-flags";
 import {
-  applyFeaturesToCapabilityFlags,
   applyFeaturesToStrategy,
   mergeFeatureFilePlans,
   resolveWebsiteFeatures,
@@ -61,20 +63,47 @@ import type { DesignSystem } from "@/plugins/website/layers/types";
 export function getCapabilityFlags(
   analysis: WebsiteProjectAnalysis,
   features?: string[],
+  planningContext?: {
+    strategy?: WebsiteStrategy;
+    components?: string[];
+    sections?: string[];
+    pages?: string[];
+    projectKind?: GeneratedWebsiteProject["projectKind"];
+    description?: string;
+  },
 ): ProjectCapabilityFlags {
-  const base: ProjectCapabilityFlags = {
-    requiresAuth: analysis.requiresAuth,
-    requiresDatabase: analysis.requiresDatabase,
-    requiresDashboard: analysis.requiresDashboard,
-    isEcommerce: analysis.isEcommerce,
-    isSaas: analysis.isSaas,
-    databaseProvider: analysis.databaseProvider,
+  const draftProject: GeneratedWebsiteProject = {
+    projectKind: planningContext?.projectKind ?? "website",
+    title: analysis.projectName,
+    description:
+      planningContext?.description ??
+      analysis.businessProfile?.summary ??
+      analysis.projectName,
+    pages: planningContext?.pages ?? analysis.pages ?? [],
+    sections: planningContext?.sections ?? [],
+    components: planningContext?.components ?? [],
+    colorPalette: [],
+    typography: [],
+    content: [],
+    seo: [],
+    roadmap: [],
+    files: [],
+    businessProfile: analysis.businessProfile,
+    strategy: planningContext?.strategy,
+    settings: {
+      requiresAuth: String(analysis.requiresAuth),
+      requiresDatabase: String(analysis.requiresDatabase),
+      requiresDashboard: String(analysis.requiresDashboard),
+      isEcommerce: String(analysis.isEcommerce),
+      isSaas: String(analysis.isSaas),
+      databaseProvider: analysis.databaseProvider,
+    },
   };
-  if (!features?.length) return base;
-  return applyFeaturesToCapabilityFlags(
-    base,
-    resolveWebsiteFeatures(features),
-  );
+
+  return projectCapabilityFlags(draftProject, {
+    seedFeatures: features,
+    force: true,
+  }).flags;
 }
 
 function normalizePlannedFiles(
@@ -117,7 +146,7 @@ function enrichBlueprintFromLayers(
   if (!next.pages?.length) {
     next.pages = strategy.pages.map((p) => p.name);
   }
-  if (designSystem.componentPalette?.length) {
+  if (!isStructureFirstEnabled() && designSystem.componentPalette?.length) {
     next.components = Array.from(
       new Set([
         ...(next.components ?? []),
@@ -153,9 +182,11 @@ function blueprintFromStrategy(
   const typeScale = Array.isArray(design.typography.scale)
     ? design.typography.scale
     : [];
-  const components = Array.isArray(design.componentPalette)
-    ? design.componentPalette
-    : [];
+  const components = isStructureFirstEnabled()
+    ? sectionPlan.map((section) => section.name)
+    : Array.isArray(design.componentPalette)
+      ? design.componentPalette
+      : [];
 
   return {
     title: analysis.businessProfile.projectName || analysis.projectName,
@@ -328,14 +359,24 @@ Section order must follow Strategy.sectionPlan (Design Renderer output).`,
 
   ctx.progress.emit("Planning files...");
 
-  const flags = getCapabilityFlags(analysis, input.features);
   const componentPaths = options?.designRenderComponentPaths;
   const componentIds = Array.from(
     new Set([
-      ...(designSystem.componentPalette ?? []),
+      ...(isStructureFirstEnabled()
+        ? []
+        : (designSystem.componentPalette ?? [])),
       ...resolvedFeatures.componentIds,
     ]),
   );
+
+  const flags = getCapabilityFlags(analysis, input.features, {
+    strategy,
+    components: componentIds,
+    sections: blueprint.sections,
+    pages: blueprint.pages,
+    projectKind: input.projectKind,
+    description: blueprint.description,
+  });
 
   let dynamicPlan: WebsiteDynamicPlan;
   if (isUltraFastWebsiteGeneration(input)) {

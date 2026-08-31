@@ -6,6 +6,8 @@ import {
   listMarketplaceComponents,
   type MarketplaceComponent,
 } from "@/lib/ai-core/component-marketplace";
+import type { WebsiteCapabilityId } from "@/lib/website/builder/capabilities/types";
+import type { WebsiteCapabilityService } from "@/lib/website/builder/capabilities/service";
 
 export type BuilderBlockCategory =
   | "all"
@@ -52,12 +54,15 @@ export function toBuilderBlockView(component: MarketplaceComponent): BuilderBloc
 export function listBuilderBlocks(params?: {
   category?: BuilderBlockCategory;
   query?: string;
+  capabilityService?: WebsiteCapabilityService;
 }): BuilderBlockView[] {
   const all = listMarketplaceComponents().map(toBuilderBlockView);
   const category = params?.category ?? "all";
   const query = params?.query?.trim().toLowerCase();
+  const service = params?.capabilityService;
 
   return all.filter((block) => {
+    if (service && !blockMatchesCapabilities(block, service)) return false;
     if (category !== "all" && block.category !== category) return false;
     if (!query) return true;
     return (
@@ -66,6 +71,25 @@ export function listBuilderBlocks(params?: {
       (block.description?.toLowerCase().includes(query) ?? false)
     );
   });
+}
+
+const BLOCK_CATEGORY_CAPABILITIES: Partial<
+  Record<BuilderBlockCategory, WebsiteCapabilityId[]>
+> = {
+  proof: ["testimonials", "reviews", "portfolio"],
+  media: ["gallery", "portfolio", "products", "team"],
+};
+
+function blockMatchesCapabilities(
+  block: BuilderBlockView,
+  service: WebsiteCapabilityService,
+): boolean {
+  if (block.category === "hero" || block.category === "cta" || block.category === "layout") {
+    return true;
+  }
+  const required = BLOCK_CATEGORY_CAPABILITIES[block.category];
+  if (!required?.length) return true;
+  return service.hasAnyCapability(required);
 }
 
 export function reorderBuilderSections<T>(

@@ -76,10 +76,10 @@ for (const rel of API_ROUTES) {
   else fail(`${rel}: missing requireUser`);
 }
 const actions = readFileSync(join(root, "app/api/content-studio/actions/route.ts"), "utf8");
-if (actions.includes("enforceAiUsage")) ok("actions: credits enforcement");
-else fail("actions: missing enforceAiUsage");
+if (actions.includes("beginAiUsage")) ok("actions: credits enforcement");
+else fail("actions: missing beginAiUsage");
 const stream = readFileSync(join(root, "app/api/content-studio/stream/route.ts"), "utf8");
-if (stream.includes("enforceAiUsage") && stream.includes("token")) ok("stream: credits + token events");
+if (stream.includes("beginAiUsage") && stream.includes("token")) ok("stream: credits + token events");
 else fail("stream: missing credits or token streaming");
 
 console.log("\n[4] Platform exports");

@@ -1,0 +1,21 @@
+{
+  "tbdpNative": true,
+  "sectorDnaId": "saas",
+  "experienceProfiles": ["technical", "corporate", "executive"],
+  "structure": {
+    "regions": {
+      "header": { "sticky": true, "position": "top" },
+      "utility": { "collapseBelow": "md", "collapseMode": "stack" },
+      "main": { "collapseBelow": "sm" },
+      "overlay": { "collapseBelow": "sm", "collapseMode": "fixed-bottom" }
+    },
+    "components": {
+      "lumina-wellness-hero": {
+        "layout": { "lg": "bento-command", "sm": "stacked" }
+      },
+      "lumina-wellness-features": {
+        "layout": { "lg": "bento-asymmetric", "sm": "stacked" }
+      }
+    }
+  }
+}

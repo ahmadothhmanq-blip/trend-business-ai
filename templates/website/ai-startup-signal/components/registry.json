@@ -1,0 +1,81 @@
+{
+  "components": [
+    {
+      "id": "ai-startup-signal-nav",
+      "role": "navigation",
+      "scaffold": "components/ai-startup-signal-nav.tsx",
+      "slots": ["logo", "links", "cta"]
+    },
+    {
+      "id": "ai-startup-signal-hero",
+      "role": "hero",
+      "scaffold": "components/ai-startup-signal-hero.tsx",
+      "slots": ["headline", "metrics", "cta"]
+    },
+    {
+      "id": "ai-startup-signal-features",
+      "role": "features",
+      "scaffold": "components/ai-startup-signal-features.tsx"
+    },
+    {
+      "id": "ai-startup-signal-about",
+      "role": "story",
+      "scaffold": "components/ai-startup-signal-about.tsx"
+    },
+    {
+      "id": "ai-startup-signal-stats",
+      "role": "custom",
+      "scaffold": "components/ai-startup-signal-stats.tsx"
+    },
+    {
+      "id": "ai-startup-signal-testimonials",
+      "role": "testimonials",
+      "scaffold": "components/ai-startup-signal-testimonials.tsx"
+    },
+    {
+      "id": "ai-startup-signal-pricing",
+      "role": "pricing",
+      "scaffold": "components/ai-startup-signal-pricing.tsx"
+    },
+    {
+      "id": "ai-startup-signal-faq",
+      "role": "faq",
+      "scaffold": "components/ai-startup-signal-faq.tsx"
+    },
+    {
+      "id": "ai-startup-signal-contact",
+      "role": "contact",
+      "scaffold": "components/ai-startup-signal-contact.tsx"
+    },
+    {
+      "id": "ai-startup-signal-footer",
+      "role": "footer",
+      "scaffold": "components/ai-startup-signal-footer.tsx"
+    },
+    {
+      "id": "ai-startup-signal-floating-cta",
+      "role": "cta",
+      "scaffold": "components/ai-startup-signal-floating-cta.tsx"
+    },
+    {
+      "id": "ai-startup-signal-utility-band",
+      "role": "cta",
+      "scaffold": "components/ai-startup-signal-utility-band.tsx"
+    },
+    {
+      "id": "ai-startup-signal-section-shell",
+      "role": "custom",
+      "scaffold": "components/ai-startup-signal-section-shell.tsx"
+    },
+    {
+      "id": "ai-startup-signal-portfolio",
+      "role": "custom",
+      "scaffold": "components/ai-startup-signal-portfolio.tsx"
+    },
+    {
+      "id": "ai-startup-signal-integrations",
+      "role": "custom",
+      "scaffold": "components/ai-startup-signal-integrations.tsx"
+    }
+  ]
+}

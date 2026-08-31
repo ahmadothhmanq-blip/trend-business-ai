@@ -1,7 +1,7 @@
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
 import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse } from "@/lib/api/errors";
-import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { beginAiUsage } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import { generateSocialPost, generatedPostToRow } from "@/lib/social-media/engine";
 import { fetchSocialBrandContext } from "@/lib/social-media/brand-integration";
@@ -17,7 +17,8 @@ const generateSchema = z.object({
   platform: z.enum(POST_PLATFORMS as [string, ...string[]]),
   topic: z.string().trim().min(3).max(4000),
   tone: z.enum(SOCIAL_TONES as unknown as [string, ...string[]]).default("Professional"),
-  language: z.string().trim().default("English"),
+  language: z.string().trim().optional(),
+  country: z.string().trim().optional(),
   audience: z.string().trim().optional(),
   brandIdentityId: z.string().uuid().optional(),
   templateId: z.string().optional(),
@@ -30,8 +31,9 @@ export async function POST(request: Request) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  const rateLimited = await enforceAiUsage(auth.supabase, auth.user!.id, "workspace");
-  if (rateLimited) return rateLimited;
+  const usage = await beginAiUsage(auth.supabase, auth.user!.id, "workspace");
+  if (!usage.ok) return usage.response;
+  const creditLease = usage.lease;
 
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
@@ -42,7 +44,7 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data;
-  const aiLanguage = resolveRequestLanguage(request, input.language);
+  const aiLanguage = resolveRequestLanguage(request, input.language, input.country);
   let templateStructure: string | undefined;
   if (input.templateId) {
     const tpl = getSocialTemplate(input.templateId);
@@ -72,6 +74,7 @@ export async function POST(request: Request) {
     });
 
     if (!input.save) {
+      await creditLease.settle(auth.supabase);
       return NextResponse.json({ generated, provider: generated.provider });
     }
 
@@ -95,6 +98,7 @@ export async function POST(request: Request) {
       return databaseErrorResponse("social-media.generate", error);
     }
 
+    await creditLease.settle(auth.supabase);
     return NextResponse.json({ post: data as SocialPost, generated, provider: generated.provider });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Generation failed";

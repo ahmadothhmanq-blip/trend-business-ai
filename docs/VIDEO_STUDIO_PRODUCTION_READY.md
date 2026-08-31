@@ -97,10 +97,10 @@ Production renders (`full`, `avatar`, `image-to-video`):
 
 | Step | Command / action |
 |------|------------------|
-| DB migrations | `npm run db:apply -- --only 044,045` |
+| DB migrations | `npm run db:apply -- --only 044,045,098` |
 | FFmpeg | `npm run verify:video-studio` section [3] |
-| Kling key | Set `KLING_API_KEY` |
+| Kling / Veo / Runway | Set at least one full-render key |
 | TTS | Set `ELEVENLABS_API_KEY` or `OPENAI_API_KEY` |
-| Strict mode | `VIDEO_PROVIDER_STRICT=1` |
-| Cron | Schedule `/api/video-studio/cron` |
+| Strict mode | `VIDEO_PROVIDER_STRICT=1` (required in production) |
+| Cron | Vercel cron every minute (`vercel.json`) **or** POST `/api/video-studio/cron` with Bearer `VIDEO_STUDIO_CRON_SECRET`. On Vercel set `CRON_SECRET` to the same value. |
 | Smoke test | Create project → Full MP4 Render → `assemblyManifest.method: ffmpeg` |

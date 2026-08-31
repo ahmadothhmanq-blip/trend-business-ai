@@ -22,6 +22,11 @@ import {
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n/client";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
+import { GlsGenerationLanguageSelect } from "@/components/dashboard/language/gls-generation-language-select";
+import {
+  getInitialGlsGenerationLanguage,
+  glsGenerationLanguagePayload,
+} from "@/lib/language-platform/generation/service";
 import { AGENT_TYPES, AGENT_TOOLS, AGENT_TEMPLATES, AGENT_CATEGORIES, getAgentTypeLabel, getToolLabel } from "@/lib/constants/ai-agents";
 import type { Agent, AgentExecution } from "@/types/agents";
 import type { AgentOutput } from "@/plugins/ai-agents/types";
@@ -34,7 +39,7 @@ type Props = {
 };
 
 export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Props) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const p = useProductT("aiAgents");
   const [tab, setTab] = useState<Tab>("agents");
   const [agents, setAgents] = useState<Agent[]>(initialAgents);
@@ -54,6 +59,9 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
   const [task, setTask] = useState("");
   const [context, setContext] = useState("");
   const [maxSteps, setMaxSteps] = useState("6");
+  const [language, setLanguage] = useState(() =>
+    getInitialGlsGenerationLanguage({ fallback: "ui-locale", uiLocale: locale }),
+  );
   const [generating, setGenerating] = useState(false);
   const [result, setResult] = useState<{ output: AgentOutput; execution: AgentExecution } | null>(null);
 
@@ -123,6 +131,7 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
         body: JSON.stringify({
           agentId: selectedAgent?.id,
           task, context, maxSteps: parseInt(maxSteps) || 6,
+          ...glsGenerationLanguagePayload(language),
         }),
       });
       const d = await res.json();
@@ -371,6 +380,10 @@ export function AiAgentsTool({ initialAgents = [], initialExecutions = [] }: Pro
                 <textarea value={context} onChange={(e) => setContext(e.target.value)}
                   placeholder={p("placeholders.context")}
                   className={cn(dashboardInputClass, "min-h-[60px] resize-y")} rows={2} />
+              </div>
+              <div className="max-w-xs">
+                <label className="mb-1 block text-xs font-medium text-white/60">{t("common.language")}</label>
+                <GlsGenerationLanguageSelect serviceId="ai-agents" value={language} onChange={setLanguage} />
               </div>
               <div className="max-w-xs">
                 <label className="mb-1 block text-xs font-medium text-white/60">{p("steps.maxStepsLabel")}</label>

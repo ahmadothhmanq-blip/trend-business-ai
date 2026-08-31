@@ -52,6 +52,9 @@ function detectComponents(files: GeneratedProjectFile[]): string[] {
 export function analyzeWebsite(input: ReviewStudioInput): WebsiteAnalysis {
   const signals = extractArtifactSignals(input.files);
   const combined = signals.combinedContent;
+  const activeCapabilities = new Set(input.activeCapabilityIds ?? []);
+  const scoped = (capabilityId: string) =>
+    !activeCapabilities.size || activeCapabilities.has(capabilityId);
   const detectedSections = detectSections(combined);
   const detectedComponents = detectComponents(input.files);
   const sectionCount = Math.max(
@@ -142,13 +145,21 @@ export function analyzeWebsite(input: ReviewStudioInput): WebsiteAnalysis {
     ),
   ];
 
+  const scopedDimensions = dimensions.filter((dimension) => {
+    if (dimension.dimension === "seo") return scoped("seo");
+    if (dimension.dimension === "businessLogic") {
+      return scoped("forms") || scoped("payments") || scoped("products") || !activeCapabilities.size;
+    }
+    return true;
+  });
+
   return {
     analyzedAt: new Date().toISOString(),
     pageCount: signals.pageCount,
     sectionCount,
     componentCount: detectedComponents.length,
     fileCount: input.files.length,
-    dimensions,
+    dimensions: scopedDimensions,
     detectedSections,
     detectedComponents,
   };

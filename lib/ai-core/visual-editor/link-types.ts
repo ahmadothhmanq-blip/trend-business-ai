@@ -36,7 +36,8 @@ export type LinkSourceKind =
   | "prop"
   | "array-const"
   | "array-prop"
-  | "logo";
+  | "logo"
+  | "anchor";
 
 export type LinkValidationStatus = "valid" | "warning" | "error";
 

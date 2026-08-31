@@ -3,20 +3,20 @@
   "layoutId": "default",
   "regions": {
     "header": ["hotel-resort-premium-nav"],
-    "sidebar": ["hotel-resort-premium-sidebar-rail"],
     "main": [
       "hotel-resort-premium-hero",
-      "hotel-resort-premium-tasting-menu",
-      "hotel-resort-premium-chef-story",
+      "hotel-resort-premium-features",
+      "hotel-resort-premium-integrations",
+      "hotel-resort-premium-about",
       "hotel-resort-premium-stats",
-      "hotel-resort-premium-signature-dishes",
       "hotel-resort-premium-testimonials",
-      "hotel-resort-premium-atmosphere",
-      "hotel-resort-premium-gallery",
+      "hotel-resort-premium-portfolio",
+      "hotel-resort-premium-pricing",
       "hotel-resort-premium-faq",
-      "hotel-resort-premium-reservation-cta",
       "hotel-resort-premium-contact"
     ],
+    "utility": ["hotel-resort-premium-utility-band"],
+    "overlay": ["hotel-resort-premium-floating-cta"],
     "footer": ["hotel-resort-premium-footer"]
   }
 }

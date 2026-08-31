@@ -16,15 +16,20 @@ import { runwayVideoProvider } from "@/lib/ai-core/video-production-platform/pro
 import { klingVideoProvider } from "@/lib/ai-core/video-production-platform/providers/kling";
 import { heygenVideoProvider } from "@/lib/ai-core/video-production-platform/providers/heygen";
 import { externalVideoProvider } from "@/lib/ai-core/video-production-platform/providers/external";
+import { veoVideoProvider } from "@/lib/ai-core/video-production-platform/providers/veo";
+import { omniFlashVideoProvider } from "@/lib/ai-core/video-production-platform/providers/google/omni-flash";
 
 export * from "@/lib/ai-core/video-production-platform/providers/types";
 export { previewVideoProvider } from "@/lib/ai-core/video-production-platform/providers/preview";
 export { runwayVideoProvider } from "@/lib/ai-core/video-production-platform/providers/runway";
 export { klingVideoProvider } from "@/lib/ai-core/video-production-platform/providers/kling";
 export { heygenVideoProvider } from "@/lib/ai-core/video-production-platform/providers/heygen";
+export { veoVideoProvider, veoConfigured, probeVeoHealth } from "@/lib/ai-core/video-production-platform/providers/veo";
 
 const REGISTRY: Record<VideoProviderId, VideoProvider> = {
   preview: previewVideoProvider,
+  veo: veoVideoProvider,
+  omni_flash: omniFlashVideoProvider,
   runway: runwayVideoProvider,
   kling: klingVideoProvider,
   heygen: heygenVideoProvider,

@@ -1,77 +1,78 @@
 "use client";
 
-const DEFAULT_TESTIMONIALS = [
+const DEFAULT_ITEMS = [
   {
-    quote:
-      "Prestige Estates understood our requirements before we articulated them. The Whitmore Penthouse was presented with complete discretion and impeccable timing.",
-    author: "Private collector",
-    context: "Upper East Side acquisition",
+    quote: "Discreet, precise, and relentlessly prepared — the dossier quality changed how we buy.",
+    name: "Sarah Chen",
+    role: "Principal",
+    company: "Northwind Family Office",
   },
   {
-    quote:
-      "Their architectural knowledge elevated every conversation. We weren't simply buying a home — we were acquiring a piece of design history.",
-    author: "Design patron",
-    context: "Tribeca loft purchase",
+    quote: "Every listing arrived as a complete brief. No theatre, just clarity.",
+    name: "Marcus Webb",
+    role: "Investment Lead",
+    company: "Helix Group",
+  },
+  {
+    quote: "White-glove conveyance with institutional rigor. Rare combination.",
+    name: "Elena Vasquez",
+    role: "Advisor",
+    company: "Axiom Holdings",
   },
 ];
+
+type Testimonial = { quote: string; name: string; role: string; company?: string };
 
 type RealEstatePremiumTestimonialsProps = {
   eyebrow?: string;
   title?: string;
   subtitle?: string;
-  items?: Array<{ quote: string; author: string; context?: string }>;
+  items?: Testimonial[];
 };
 
 export function RealEstatePremiumTestimonials({
-  eyebrow = "Client voices",
-  title = "Trusted by discerning collectors",
-  subtitle = "Our clients value discretion as much as expertise.",
-  items = DEFAULT_TESTIMONIALS,
+  eyebrow = "Client letters",
+  title = "References on file",
+  subtitle = "Statements from principals and advisors.",
+  items = DEFAULT_ITEMS,
 }: RealEstatePremiumTestimonialsProps) {
+  if (!items.length) return null;
+  const main = items[0];
+  if (!main) return null;
+
   return (
     <section
+      id="testimonials"
       data-v2-component="real-estate-premium-testimonials"
-      aria-labelledby="rep-testimonials-title"
-      className="rep-section-tight bg-[var(--color-stone)]/50"
+      className="rep-section-plain rep-reveal"
+      aria-label={title}
     >
-      <div className="px-5 sm:px-8 lg:px-12">
-        <header className="mb-14 text-center">
-          <p className="rep-eyebrow mb-5">{eyebrow}</p>
-          <h2 id="rep-testimonials-title" className="rep-headline-sm">
-            {title}
-          </h2>
-          <div className="rep-brass-rule mx-auto my-6" />
-          <p className="rep-body mx-auto max-w-lg">{subtitle}</p>
-        </header>
-
-        <div className="grid gap-8 lg:grid-cols-2 lg:gap-10">
-          {items.map((item, index) => (
-            <blockquote
-              key={`testimonial-${index}`}
-              className="rep-card relative bg-[var(--color-surface)] p-10 lg:p-12"
-            >
-              <span
-                className="rep-font-display absolute start-8 top-6 text-6xl leading-none text-[var(--color-brass)]/25"
-                aria-hidden
-              >
-                &ldquo;
-              </span>
-              <p className="rep-font-display relative text-2xl italic leading-relaxed text-[var(--color-foreground)]">
-                {item.quote}
-              </p>
-              <footer className="rep-font-body mt-10 border-t border-[var(--border-subtle)] pt-6">
-                <cite className="not-italic">
-                  <span className="block text-[0.6875rem] font-semibold uppercase tracking-[0.24em] text-[var(--color-foreground)]">
-                    {item.author}
-                  </span>
-                  {item.context ? (
-                    <span className="mt-1 block text-sm text-[var(--color-brass)]">{item.context}</span>
-                  ) : null}
-                </cite>
-              </footer>
-            </blockquote>
-          ))}
-        </div>
+      <div className="rep-section-plain-inner">
+        <p className="rep-eyebrow">{eyebrow}</p>
+        <h2 className="rep-amenities-title">{title}</h2>
+        <p className="sr-only">{subtitle}</p>
+        <figure className="rep-testimonial-sheet mt-6">
+          <blockquote>
+            <p>&ldquo;{main.quote}&rdquo;</p>
+          </blockquote>
+          <footer>
+            {main.name} · {main.role}
+            {main.company ? ` · ${main.company}` : ""}
+          </footer>
+        </figure>
+        {items.length > 1 ? (
+          <dl className="rep-spec-list mt-6">
+            {items.slice(1).map((item) => (
+              <div key={item.name}>
+                <dt>{item.name}</dt>
+                <dd>
+                  “{item.quote}” — {item.role}
+                  {item.company ? `, ${item.company}` : ""}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        ) : null}
       </div>
     </section>
   );

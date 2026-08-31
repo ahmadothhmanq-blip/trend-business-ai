@@ -3,6 +3,12 @@
  * Client-safe — used by dashboard i18n and Website Builder AI pipeline.
  */
 
+import { getLocaleDefinition, type SupportedLocale } from "@/lib/i18n/config";
+import {
+  normalizeGlsGenerationLanguage,
+  resolveGlsGenerationLanguageOption,
+} from "@/lib/language-platform/generation/options";
+
 export type SiteLocaleConfig = {
   language: string;
   localeCode: string;
@@ -92,6 +98,7 @@ export function resolveLocaleFromLanguage(
   const key = (language || "English").toLowerCase().trim();
   if (LANGUAGE_MAP[key]) return { ...LANGUAGE_MAP[key]! };
   if (key.includes("arab")) return { ...LANGUAGE_MAP.arabic! };
+  if (key.includes("bilingual")) return { ...LANGUAGE_MAP.bilingual! };
   if (key.includes("persian") || key.includes("farsi"))
     return { ...LANGUAGE_MAP.persian! };
   if (key.includes("urdu")) return { ...LANGUAGE_MAP.urdu! };
@@ -102,6 +109,27 @@ export function resolveLocaleFromLanguage(
     return { ...LANGUAGE_MAP.portuguese! };
   }
   if (key.includes("rtl")) return { ...LANGUAGE_MAP.arabic! };
+
+  const normalized = normalizeGlsGenerationLanguage(language);
+  const option = resolveGlsGenerationLanguageOption(normalized);
+  if (option.special && option.value === "Bilingual") {
+    return { ...LANGUAGE_MAP.bilingual! };
+  }
+  if (option.localeCode !== "bilingual") {
+    const localeDef = getLocaleDefinition(option.localeCode as SupportedLocale);
+    return {
+      language: option.value,
+      localeCode: option.localeCode,
+      dir: option.dir,
+      rtl: option.dir === "rtl",
+      htmlLang: localeDef.htmlLang,
+      fontHint:
+        option.dir === "rtl"
+          ? "Noto Naskh Arabic, Tajawal, system-ui"
+          : undefined,
+    };
+  }
+
   return { ...LANGUAGE_MAP.english! };
 }
 

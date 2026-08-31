@@ -47,12 +47,16 @@ function warn(label, detail = "") {
 const VS_FILES = [
   "supabase/migrations/044_video_studio_media.sql",
   "supabase/migrations/045_video_studio_media_update_rls.sql",
+  "supabase/migrations/090_video_domain_persistence.sql",
   "lib/ai-core/video-production-platform/production-health.ts",
   "lib/ai-core/video-production-platform/env-config.ts",
   "lib/ai-core/video-production-platform/generation-pipeline.ts",
+  "lib/ai-core/video-production-platform/persistence/repository.ts",
   "app/api/video-studio/health/route.ts",
   "app/api/video-studio/cron/route.ts",
   "app/api/video-studio/jobs/route.ts",
+  "supabase/migrations/098_video_studio_bucket_policy.sql",
+  "vercel.json",
 ];
 
 console.log("\n[1] Video Studio files");
@@ -62,7 +66,15 @@ for (const rel of VS_FILES) {
 }
 
 console.log("\n[2] Environment variables");
+const forceProduction =
+  process.argv.includes("--production") ||
+  (process.env.NODE_ENV === "production" && process.env.VERCEL_ENV !== "preview");
+if (forceProduction) {
+  console.log("  (production fail-closed mode)");
+}
 const envKeys = [
+  "GEMINI_API_KEY",
+  "VEO_API_KEY",
   "KLING_API_KEY",
   "RUNWAY_API_KEY",
   "HEYGEN_API_KEY",
@@ -73,25 +85,41 @@ const envKeys = [
   "VIDEO_STUDIO_CRON_SECRET",
   "SUPABASE_SERVICE_ROLE_KEY",
 ];
+const requiredProduction = new Set([
+  "FFMPEG_PATH",
+  "VIDEO_PROVIDER_STRICT",
+  "VIDEO_STUDIO_CRON_SECRET",
+  "SUPABASE_SERVICE_ROLE_KEY",
+]);
 for (const key of envKeys) {
   const set = Boolean(process.env[key]?.trim());
+  const strictOn = key === "VIDEO_PROVIDER_STRICT" && process.env.VIDEO_PROVIDER_STRICT === "1";
+  if (key === "VIDEO_PROVIDER_STRICT") {
+    if (strictOn) ok(key, "1");
+    else if (forceProduction) fail(key, "must be 1 in production");
+    else warn(key, "unset (must be 1 in production)");
+    continue;
+  }
   if (set) ok(key, "set");
-  else if (key === "VIDEO_PROVIDER_STRICT" || key === "VIDEO_STUDIO_CRON_SECRET") warn(key, "unset (recommended for production)");
-  else if (key === "SUPABASE_SERVICE_ROLE_KEY") warn(key, "unset (required for cron worker)");
+  else if (forceProduction && requiredProduction.has(key)) fail(key, "required in production");
+  else if (requiredProduction.has(key)) warn(key, "required in production");
   else warn(key, "unset");
 }
 
 const hasVideoProvider = Boolean(
-  process.env.KLING_API_KEY?.trim() ||
+  process.env.GEMINI_API_KEY?.trim() ||
+    process.env.VEO_API_KEY?.trim() ||
+    process.env.KLING_API_KEY?.trim() ||
     process.env.RUNWAY_API_KEY?.trim() ||
-    process.env.HEYGEN_API_KEY?.trim() ||
     (process.env.VIDEO_PROVIDER_API_KEY?.trim() && process.env.VIDEO_PROVIDER_BASE_URL?.trim()),
 );
-if (hasVideoProvider) ok("video provider", "at least one configured");
+if (hasVideoProvider) ok("video provider", "at least one full-render provider configured");
+else if (forceProduction) fail("video provider", "none configured — production full render blocked");
 else warn("video provider", "none configured — preview/stub mode");
 
 const hasTts = Boolean(process.env.ELEVENLABS_API_KEY?.trim() || process.env.OPENAI_API_KEY?.trim());
 if (hasTts) ok("TTS provider", "configured");
+else if (forceProduction) fail("TTS provider", "required in production");
 else warn("TTS provider", "unset — silent preview WAV");
 
 console.log("\n[3] FFmpeg");
@@ -131,7 +159,15 @@ if (dbUrl) {
   const client = new pg.Client({ connectionString: dbUrl });
   try {
     await client.connect();
-    for (const table of ["video_media", "video_render_jobs", "video_generations"]) {
+    for (const table of [
+      "video_media",
+      "video_render_jobs",
+      "video_generations",
+      "video_plans",
+      "video_scenes",
+      "video_provider_jobs",
+      "video_quality_reports",
+    ]) {
       const res = await client.query(
         `select to_regclass('public.${table}') as reg`,
       );
@@ -149,16 +185,30 @@ if (dbUrl) {
     if (policy.rowCount > 0) ok("RLS update policy on video_media");
     else fail("RLS update policy on video_media", "apply migration 045");
     const bucket = await client.query(
-      `select id from storage.buckets where id = 'video-studio'`,
+      `select id, public, file_size_limit, allowed_mime_types from storage.buckets where id = 'video-studio'`,
     );
-    if (bucket.rowCount > 0) ok("storage bucket video-studio");
-    else fail("storage bucket video-studio", "apply migration 044");
+    if (bucket.rowCount > 0) {
+      const row = bucket.rows[0];
+      if (row.public === false) ok("storage bucket video-studio private");
+      else fail("storage bucket video-studio", "must be private (public=false)");
+      if (Number(row.file_size_limit) > 0) ok("bucket file_size_limit", String(row.file_size_limit));
+      else warn("bucket file_size_limit", "unset — apply migration 098");
+      if (Array.isArray(row.allowed_mime_types) && row.allowed_mime_types.length > 0) {
+        ok("bucket allowed_mime_types", `${row.allowed_mime_types.length} types`);
+      } else {
+        warn("bucket allowed_mime_types", "unset — apply migration 098");
+      }
+    } else {
+      fail("storage bucket video-studio", "apply migration 044");
+    }
   } catch (error) {
     fail("database", error instanceof Error ? error.message : String(error));
   } finally {
     await client.end().catch(() => undefined);
   }
-} else {
+}
+
+if (!dbUrl) {
   warn("database", "SUPABASE_DB_URL unset — skipping direct table check");
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key =
@@ -170,11 +220,32 @@ if (dbUrl) {
       if (!error || error.code !== "PGRST205") ok(`table ${table}`, "reachable");
       else fail(`table ${table}`, "missing — apply 044/045");
     }
-    if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      const { data } = await supabase.storage.listBuckets();
-      const found = (data || []).some((b) => b.id === "video-studio");
-      if (found) ok("storage bucket video-studio");
-      else fail("storage bucket video-studio", "missing");
+  }
+}
+
+{
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (url && service) {
+    const supabase = createClient(url, service);
+    const probePath = `_health/verify-${Date.now()}.png`;
+    const png = Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+      "base64",
+    );
+    const uploaded = await supabase.storage.from("video-studio").upload(probePath, png, {
+      contentType: "image/png",
+      upsert: true,
+    });
+    if (uploaded.error) fail("storage upload", uploaded.error.message);
+    else {
+      ok("storage upload");
+      const signed = await supabase.storage.from("video-studio").createSignedUrl(probePath, 60);
+      const signedUrl = signed.data?.signedUrl || "";
+      if (/\/object\/public\//i.test(signedUrl)) fail("signed download", "returned unsigned public URL");
+      else if (signedUrl.startsWith("https://")) ok("signed download");
+      else fail("signed download", signed.error?.message || "no signed URL");
+      await supabase.storage.from("video-studio").remove([probePath]);
     }
   }
 }
@@ -184,9 +255,21 @@ for (const route of [
   "app/api/video-studio/route.ts",
   "app/api/video-studio/[id]/manage/route.ts",
   "app/api/video-studio/[id]/media/route.ts",
+  "app/api/video-studio/cron/route.ts",
+  "app/api/video-studio/health/route.ts",
 ]) {
   if (existsSync(join(root, route))) ok(route);
   else fail(route, "missing");
+}
+
+console.log("\n[6] Cron schedule");
+try {
+  const vercel = JSON.parse(readFileSync(join(root, "vercel.json"), "utf8"));
+  const cron = (vercel.crons || []).find((c) => c.path === "/api/video-studio/cron");
+  if (cron?.schedule) ok("vercel.json cron", cron.schedule);
+  else fail("vercel.json cron", "missing /api/video-studio/cron schedule");
+} catch (error) {
+  fail("vercel.json", error instanceof Error ? error.message : String(error));
 }
 
 console.log(`\n--- ${failed === 0 ? "PASS" : "FAIL"} (${failed} issue(s)) ---\n`);

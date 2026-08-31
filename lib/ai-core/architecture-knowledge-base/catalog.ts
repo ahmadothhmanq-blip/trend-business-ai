@@ -30,7 +30,7 @@ function industry(
         forbiddenPremiumTemplateIds: [],
         defaultLayoutFamily: "classic-stack",
         allowedLayoutFamilies: ["classic-stack"],
-        defaultStructureTemplateId: "corporate-business",
+        defaultStructureTemplateId: "_generation-default",
         defaultVisualThemeId: "modern",
         editorialLayoutAllowed: false,
       };
@@ -259,7 +259,6 @@ export const ARCHITECTURE_KNOWLEDGE_ENTRIES: ArchitectureKnowledgeEntry[] = [
     ],
     defaultLayoutFamily: "commerce-grid",
     allowedLayoutFamilies: ["commerce-grid", "showroom", "classic-stack"],
-    forbiddenStructureTemplateIds: ["ai-startup-signal"],
     defaultVisualThemeId: "luxury",
     premiumVisualThemesWhenLuxury: ["luxury"],
     editorialLayoutAllowed: false,
@@ -270,7 +269,7 @@ export const ARCHITECTURE_KNOWLEDGE_ENTRIES: ArchitectureKnowledgeEntry[] = [
     aliases: ["retail", "shop", "store"],
     defaultLayoutFamily: "commerce-grid",
     allowedLayoutFamilies: ["commerce-grid", "classic-stack"],
-    defaultStructureTemplateId: "ecommerce-premium",
+    defaultStructureTemplateId: "_generation-default",
     defaultVisualThemeId: "modern",
     editorialLayoutAllowed: false,
   }),
@@ -279,7 +278,7 @@ export const ARCHITECTURE_KNOWLEDGE_ENTRIES: ArchitectureKnowledgeEntry[] = [
     label: "Restaurant",
     defaultLayoutFamily: "hospitality",
     allowedLayoutFamilies: ["hospitality", "classic-stack"],
-    forbiddenStructureTemplateIds: ["ai-startup-signal"],
+    defaultStructureTemplateId: "_generation-default",
     defaultVisualThemeId: "luxury",
     editorialLayoutAllowed: false,
   }),
@@ -289,7 +288,7 @@ export const ARCHITECTURE_KNOWLEDGE_ENTRIES: ArchitectureKnowledgeEntry[] = [
     aliases: ["travel"],
     defaultLayoutFamily: "hospitality",
     allowedLayoutFamilies: ["hospitality", "classic-stack"],
-    forbiddenStructureTemplateIds: ["ai-startup-signal"],
+    defaultStructureTemplateId: "_generation-default",
     defaultVisualThemeId: "luxury",
     editorialLayoutAllowed: false,
   }),
@@ -298,7 +297,7 @@ export const ARCHITECTURE_KNOWLEDGE_ENTRIES: ArchitectureKnowledgeEntry[] = [
     label: "Hotel",
     extends: "tourism",
     overrides: {
-      defaultStructureTemplateId: "hotel-resort-premium",
+      defaultStructureTemplateId: "_generation-default",
     },
   }),
   industryExtend({
@@ -312,7 +311,6 @@ export const ARCHITECTURE_KNOWLEDGE_ENTRIES: ArchitectureKnowledgeEntry[] = [
     aliases: ["law-firm", "legal"],
     defaultLayoutFamily: "corporate-trust",
     allowedLayoutFamilies: ["corporate-trust", "classic-stack"],
-    forbiddenStructureTemplateIds: ["ai-startup-signal"],
     forbiddenPremiumTemplateIds: ["ecommerce", "fashion", "travel"],
     defaultVisualThemeId: "corporate",
     editorialLayoutAllowed: false,
@@ -323,7 +321,7 @@ export const ARCHITECTURE_KNOWLEDGE_ENTRIES: ArchitectureKnowledgeEntry[] = [
     extends: "law",
     overrides: {
       forbiddenPremiumTemplateIds: ["ecommerce", "fashion", "travel", "restaurant"],
-      defaultStructureTemplateId: "finance-premium",
+      defaultStructureTemplateId: "_generation-default",
     },
   }),
   industry({
@@ -337,9 +335,8 @@ export const ARCHITECTURE_KNOWLEDGE_ENTRIES: ArchitectureKnowledgeEntry[] = [
     aliases: ["medical", "healthcare", "health"],
     defaultLayoutFamily: "corporate-trust",
     allowedLayoutFamilies: ["corporate-trust", "classic-stack"],
-    forbiddenStructureTemplateIds: ["ai-startup-signal"],
     forbiddenPremiumTemplateIds: ["ecommerce", "fashion", "travel"],
-    defaultStructureTemplateId: "medical-premium",
+    defaultStructureTemplateId: "_generation-default",
     defaultVisualThemeId: "corporate",
     editorialLayoutAllowed: false,
   }),
@@ -353,9 +350,30 @@ export const ARCHITECTURE_KNOWLEDGE_ENTRIES: ArchitectureKnowledgeEntry[] = [
     label: "SaaS",
     defaultLayoutFamily: "product-saas",
     allowedLayoutFamilies: ["product-saas", "classic-stack"],
-    defaultStructureTemplateId: "ai-startup-signal",
+    defaultStructureTemplateId: "_generation-default",
     defaultVisualThemeId: "bold",
     editorialLayoutAllowed: false,
+  }),
+  industry({
+    id: "gaming",
+    label: "Gaming & Esports",
+    aliases: [
+      "esports",
+      "game-studio",
+      "video-games",
+      "entertainment",
+      "game-dev",
+    ],
+    extends: "saas",
+    overrides: {
+      defaultStructureTemplateId: "_generation-default",
+      defaultVisualThemeId: "bold",
+      forbiddenStructureTemplateIds: [
+        "restaurant-premium",
+        "restaurant-signature",
+        "hotel-resort-premium",
+      ],
+    },
   }),
   industry({
     id: "technology",
@@ -363,7 +381,7 @@ export const ARCHITECTURE_KNOWLEDGE_ENTRIES: ArchitectureKnowledgeEntry[] = [
     aliases: ["tech"],
     extends: "saas",
     overrides: {
-      defaultStructureTemplateId: "ai-startup-signal",
+      defaultStructureTemplateId: "_generation-default",
       defaultVisualThemeId: "technology",
     },
   }),
@@ -372,7 +390,7 @@ export const ARCHITECTURE_KNOWLEDGE_ENTRIES: ArchitectureKnowledgeEntry[] = [
     label: "Creative Agency",
     defaultLayoutFamily: "editorial-magazine",
     allowedLayoutFamilies: ["editorial-magazine", "classic-stack"],
-    defaultStructureTemplateId: "creative-agency-premium",
+    defaultStructureTemplateId: "_generation-default",
     defaultVisualThemeId: "creative",
     editorialLayoutAllowed: true,
   }),
@@ -412,7 +430,7 @@ export const ARCHITECTURE_KNOWLEDGE_ENTRIES: ArchitectureKnowledgeEntry[] = [
     aliases: ["realestate", "property"],
     defaultLayoutFamily: "showroom",
     allowedLayoutFamilies: ["showroom", "classic-stack"],
-    defaultStructureTemplateId: "real-estate-premium",
+    defaultStructureTemplateId: "_generation-default",
     defaultVisualThemeId: "modern",
     editorialLayoutAllowed: false,
   }),
@@ -421,7 +439,7 @@ export const ARCHITECTURE_KNOWLEDGE_ENTRIES: ArchitectureKnowledgeEntry[] = [
     label: "Education",
     defaultLayoutFamily: "classic-stack",
     allowedLayoutFamilies: ["classic-stack", "corporate-trust"],
-    defaultStructureTemplateId: "education-premium",
+    defaultStructureTemplateId: "_generation-default",
     defaultVisualThemeId: "corporate",
     editorialLayoutAllowed: false,
   }),
@@ -431,7 +449,7 @@ export const ARCHITECTURE_KNOWLEDGE_ENTRIES: ArchitectureKnowledgeEntry[] = [
     aliases: ["corporate", "company"],
     defaultLayoutFamily: "corporate-trust",
     allowedLayoutFamilies: ["corporate-trust", "classic-stack", "product-saas"],
-    defaultStructureTemplateId: "corporate-business",
+    defaultStructureTemplateId: "_generation-default",
     defaultVisualThemeId: "corporate",
     editorialLayoutAllowed: false,
   }),
@@ -476,7 +494,7 @@ export const ARCHITECTURE_KNOWLEDGE_ENTRIES: ArchitectureKnowledgeEntry[] = [
 ];
 
 export const DEFAULT_INDUSTRY_ID = "business";
-export const DEFAULT_STRUCTURE_TEMPLATE_ID = "corporate-business";
+export const DEFAULT_STRUCTURE_TEMPLATE_ID = "_generation-default";
 
 export function layoutFamilies(): LayoutFamilyKnowledgeEntry[] {
   return ARCHITECTURE_KNOWLEDGE_ENTRIES.filter(

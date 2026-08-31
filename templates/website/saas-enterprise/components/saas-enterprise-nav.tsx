@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 
 const DEFAULT_LINKS = [
-  { href: "/platform", label: "Platform" },
-  { href: "/customers", label: "Customers" },
-  { href: "#pricing", label: "Pricing" },
-  { href: "#contact", label: "Contact" },
+  { href: "#top", label: "Workspace" },
+  { href: "#features", label: "Modules" },
+  { href: "#pricing", label: "Plans" },
+  { href: "#faq", label: "Docs" },
+  { href: "#contact", label: "Support" },
 ];
 
 type SaasEnterpriseNavProps = {
@@ -16,19 +17,12 @@ type SaasEnterpriseNavProps = {
 };
 
 export function SaasEnterpriseNav({
-  brandName = "Northline",
-  ctaLabel = "Book a demo",
+  brandName = "Nexus",
+  ctaLabel = "Start trial",
   links = DEFAULT_LINKS,
 }: SaasEnterpriseNavProps) {
-  const [scrolled, setScrolled] = useState(false);
+  const navLinks = Array.isArray(links) && links.length ? links : DEFAULT_LINKS;
   const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -40,43 +34,28 @@ export function SaasEnterpriseNav({
   }, [open]);
 
   return (
-    <header
-      data-v2-component="saas-enterprise-nav"
-      className={[
-        "sticky top-0 z-50 border-b transition-all duration-300",
-        scrolled
-          ? "border-[var(--border-default)] bg-[var(--color-surface)]/90 shadow-[var(--shadow-card)] backdrop-blur-xl"
-          : "border-transparent bg-[var(--color-background)]/80 backdrop-blur-md",
-      ].join(" ")}
-    >
-      <div className="mx-auto flex h-16 max-w-[82rem] items-center justify-between gap-4 px-5 sm:px-8 lg:h-[4.25rem]">
-        <a
-          href="#top"
-          className="se-font-display flex items-center gap-2.5 text-base font-bold tracking-tight text-[var(--color-foreground)] se-focus-ring rounded-sm"
-        >
-          <span
-            className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-primary)] text-xs font-bold text-white"
-            aria-hidden
-          >
-            N
+    <header data-v2-component="saas-enterprise-nav" className="se-app-topbar">
+      <a href="#main-content" className="df-skip-link">
+        Skip to main content
+      </a>
+      <div className="se-app-topbar-inner">
+        <div className="se-app-topbar-left">
+          <a href="#top" className="se-app-mark se-font-display">
+            {brandName}
+          </a>
+          <span className="se-app-env" aria-hidden>
+            Production
           </span>
-          {brandName}
-        </a>
-
-        <nav aria-label="Primary" className="hidden items-center gap-8 lg:flex">
-          {links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="se-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] se-focus-ring rounded-sm"
-            >
-              {link.label}
+        </div>
+        <nav aria-label="App sections" className="se-app-topbar-nav hidden lg:flex">
+          {navLinks.map((l) => (
+            <a key={l.href} href={l.href}>
+              {l.label}
             </a>
           ))}
         </nav>
-
-        <div className="flex items-center gap-2">
-          <a href="#contact" className="se-btn-primary hidden sm:inline-flex">
+        <div className="se-app-topbar-right">
+          <a href="#contact" className="se-btn-primary se-focus-ring hidden sm:inline-flex">
             {ctaLabel}
           </a>
           <button
@@ -85,41 +64,22 @@ export function SaasEnterpriseNav({
             aria-controls="se-mobile-nav"
             aria-label={open ? "Close menu" : "Open menu"}
             onClick={() => setOpen((v) => !v)}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] lg:hidden se-focus-ring"
+            className="se-app-menu-btn lg:hidden se-focus-ring"
           >
-            <span className="sr-only">Menu</span>
-            <span aria-hidden className="flex flex-col gap-1">
-              <span className={`block h-0.5 w-5 bg-current transition ${open ? "translate-y-[5px] rotate-45" : ""}`} />
-              <span className={`block h-0.5 w-5 bg-current transition ${open ? "opacity-0" : ""}`} />
-              <span className={`block h-0.5 w-5 bg-current transition ${open ? "-translate-y-[5px] -rotate-45" : ""}`} />
-            </span>
+            Menu
           </button>
         </div>
       </div>
-
       {open ? (
-        <nav
-          id="se-mobile-nav"
-          aria-label="Mobile"
-          className="border-t border-[var(--border-default)] bg-[var(--color-surface)] px-5 py-4 lg:hidden"
-        >
-          <ul className="flex flex-col gap-3">
-            {links.map((link) => (
+        <nav id="se-mobile-nav" aria-label="Mobile" className="se-app-mobile lg:hidden">
+          <ul>
+            {navLinks.map((link) => (
               <li key={link.href}>
-                <a
-                  href={link.href}
-                  onClick={() => setOpen(false)}
-                  className="se-font-body block py-1 text-sm font-medium text-[var(--color-foreground)]"
-                >
+                <a href={link.href} onClick={() => setOpen(false)}>
                   {link.label}
                 </a>
               </li>
             ))}
-            <li className="pt-2">
-              <a href="#contact" onClick={() => setOpen(false)} className="se-btn-primary w-full">
-                {ctaLabel}
-              </a>
-            </li>
           </ul>
         </nav>
       ) : null}

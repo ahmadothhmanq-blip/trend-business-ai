@@ -160,7 +160,7 @@ test("scene to provider prompt includes camera and style", () => {
 test("scene router input maps references to image-to-video", () => {
   const route = buildSceneRouterInput(
     domainScene({
-      references: [{ role: "product", uri: "https://cdn.example.com/product.jpg" }],
+      references: [{ role: "product", uri: "https://cdn.example.com/product.jpg", kind: "image" }],
     }),
     { projectId: PROJECT, aspectRatio: "16:9" },
   );

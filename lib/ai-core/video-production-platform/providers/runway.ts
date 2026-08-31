@@ -1,17 +1,75 @@
 /**
- * Runway Gen-3 / image-to-video style adapter.
- * Uses RUNWAY_API_KEY when present; falls back to structured failure for queue retry.
+ * Runway Gen-3 / text + image-to-video adapter.
+ * Uses RUNWAY_API_KEY when present; fails honestly when unset or on HTTP errors.
  */
 
-import { softFallbackClip } from "@/lib/ai-core/video-production-platform/providers/types";
 import type {
   VideoProvider,
   VideoProviderClipRequest,
   VideoProviderClipResult,
 } from "@/lib/ai-core/video-production-platform/providers/types";
+import { classifyProviderHttpError } from "@/lib/ai-core/video-production-platform/providers/provider-errors";
 
 const RUNWAY_BASE =
   process.env.RUNWAY_API_BASE_URL || "https://api.dev.runwayml.com/v1";
+
+function runwayHeaders(key: string): Record<string, string> {
+  return {
+    Authorization: `Bearer ${key}`,
+    "Content-Type": "application/json",
+    "X-Runway-Version": process.env.RUNWAY_API_VERSION || "2024-11-06",
+  };
+}
+
+function runwayRatio(aspectRatio?: string): string {
+  return aspectRatio === "9:16" ? "768:1280" : "1280:768";
+}
+
+async function submitRunwayTask(
+  key: string,
+  endpoint: "text_to_video" | "image_to_video",
+  body: Record<string, unknown>,
+): Promise<VideoProviderClipResult> {
+  const res = await fetch(`${RUNWAY_BASE}/${endpoint}`, {
+    method: "POST",
+    headers: runwayHeaders(key),
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    const classified = classifyProviderHttpError({ httpStatus: res.status, body: text });
+    return {
+      provider: "runway",
+      status: "failed",
+      mimeType: "video/mp4",
+      error: `HTTP ${classified.httpStatus} ${classified.message}`,
+      errorCode: classified.errorCode,
+      httpStatus: classified.httpStatus ?? undefined,
+      message: "Runway job submission failed.",
+    };
+  }
+
+  const json = (await res.json()) as { id?: string; output?: string[] };
+  if (json.id && !json.output?.[0]) {
+    return {
+      provider: "runway",
+      status: "processing",
+      externalJobId: json.id,
+      mimeType: "video/mp4",
+      message: "Runway job accepted; poll for completion.",
+    };
+  }
+  const remoteUrl = json.output?.[0];
+  return {
+    provider: "runway",
+    status: remoteUrl ? "completed" : "processing",
+    externalJobId: json.id,
+    remoteUrl,
+    mimeType: "video/mp4",
+    message: remoteUrl ? "Runway clip ready." : "Runway processing.",
+  };
+}
 
 export const runwayVideoProvider: VideoProvider = {
   id: "runway",
@@ -27,53 +85,32 @@ export const runwayVideoProvider: VideoProvider = {
         status: "failed",
         mimeType: "video/mp4",
         error: "RUNWAY_API_KEY not configured",
+        errorCode: "unconfigured",
         message: "Runway not configured",
       };
     }
 
     try {
-      const body: Record<string, unknown> = {
+      const duration = Math.min(10, Math.max(2, Math.round(req.durationSec)));
+      const model = process.env.RUNWAY_MODEL || "gen3a_turbo";
+      const ratio = runwayRatio(req.aspectRatio);
+
+      if (req.imageUrl) {
+        return submitRunwayTask(key, "image_to_video", {
+          promptText: req.prompt,
+          model,
+          duration,
+          ratio,
+          promptImage: req.imageUrl,
+        });
+      }
+
+      return submitRunwayTask(key, "text_to_video", {
         promptText: req.prompt,
-        model: process.env.RUNWAY_MODEL || "gen3a_turbo",
-        duration: Math.min(10, Math.max(2, Math.round(req.durationSec))),
-        ratio: req.aspectRatio === "9:16" ? "768:1280" : "1280:768",
-      };
-      if (req.imageUrl) body.promptImage = req.imageUrl;
-
-      const res = await fetch(`${RUNWAY_BASE}/image_to_video`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${key}`,
-          "Content-Type": "application/json",
-          "X-Runway-Version": process.env.RUNWAY_API_VERSION || "2024-11-06",
-        },
-        body: JSON.stringify(body),
+        model,
+        duration,
+        ratio,
       });
-
-      if (!res.ok) {
-        const text = await res.text();
-        return softFallbackClip("runway", "runway-fallback", `HTTP ${res.status} ${text}`);
-      }
-
-      const json = (await res.json()) as { id?: string; output?: string[] };
-      if (json.id && !json.output?.[0]) {
-        return {
-          provider: "runway",
-          status: "processing",
-          externalJobId: json.id,
-          mimeType: "video/mp4",
-          message: "Runway job accepted; poll for completion.",
-        };
-      }
-      const remoteUrl = json.output?.[0];
-      return {
-        provider: "runway",
-        status: remoteUrl ? "completed" : "processing",
-        externalJobId: json.id,
-        remoteUrl,
-        mimeType: "video/mp4",
-        message: remoteUrl ? "Runway clip ready." : "Runway processing.",
-      };
     } catch (error) {
       const msg = error instanceof Error ? error.message : "Runway request failed";
       return {
@@ -93,15 +130,27 @@ export const runwayVideoProvider: VideoProvider = {
         status: "failed",
         mimeType: "video/mp4",
         error: "RUNWAY_API_KEY missing",
-        message: "Not configured",
+        errorCode: "unconfigured",
+        message: "Runway not configured",
       };
     }
     const res = await fetch(`${RUNWAY_BASE}/tasks/${externalJobId}`, {
-      headers: {
-        Authorization: `Bearer ${key}`,
-        "X-Runway-Version": process.env.RUNWAY_API_VERSION || "2024-11-06",
-      },
+      headers: runwayHeaders(key),
     });
+    if (!res.ok) {
+      const text = await res.text();
+      const classified = classifyProviderHttpError({ httpStatus: res.status, body: text });
+      return {
+        provider: "runway",
+        status: "failed",
+        externalJobId,
+        mimeType: "video/mp4",
+        error: `HTTP ${classified.httpStatus} ${classified.message}`,
+        errorCode: classified.errorCode,
+        httpStatus: classified.httpStatus ?? undefined,
+        message: "Runway poll failed.",
+      };
+    }
     const json = (await res.json()) as {
       status?: string;
       output?: string[];

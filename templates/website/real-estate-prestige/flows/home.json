@@ -1,16 +1,21 @@
 {
   "pageId": "home",
-  "layoutId": "sidebar-right",
+  "layoutId": "default",
   "regions": {
-    "sidebar": ["real-estate-prestige-dossier-rail"],
+    "header": ["real-estate-prestige-nav"],
     "main": [
       "real-estate-prestige-hero",
-      "real-estate-prestige-collection",
-      "real-estate-prestige-neighborhoods",
-      "real-estate-prestige-architecture",
-      "real-estate-prestige-advisors",
+      "real-estate-prestige-features",
+      "real-estate-prestige-integrations",
+      "real-estate-prestige-about",
+      "real-estate-prestige-stats",
       "real-estate-prestige-testimonials",
-      "real-estate-prestige-inquiry"
-    ]
+      "real-estate-prestige-pricing",
+      "real-estate-prestige-faq",
+      "real-estate-prestige-contact"
+    ],
+    "utility": ["real-estate-prestige-utility-band"],
+    "overlay": ["real-estate-prestige-floating-cta"],
+    "footer": ["real-estate-prestige-footer"]
   }
 }

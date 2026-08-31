@@ -17,7 +17,7 @@ function allContent(files: GeneratedProjectFile[]) {
   return files.map((f) => f.content).join("\n");
 }
 
-import { buildWebsiteLanguageDirective } from "@/lib/ai-core/website-builder/language-directive";
+import { buildWebsiteLanguageDirective } from "@/lib/ai-core/website-builder/language-directive.server";
 import { resolveContentLanguage, usesLlmLocalizedWebsiteCopy } from "@/lib/ai-core/content/content-language";
 
 export function runWebsiteQualityCheck(params: {

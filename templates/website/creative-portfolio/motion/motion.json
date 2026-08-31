@@ -1,6 +1,6 @@
 {
   "tbdpNative": true,
-  "sectorDnaId": "creative-studio",
-  "experienceProfiles": ["creative", "editorial", "playful"],
-  "presetBinding": "kinetic-spring-stagger"
+  "sectorDnaId": "saas",
+  "experienceProfiles": ["technical", "corporate", "executive"],
+  "presetBinding": "nexus-grid-reveal"
 }

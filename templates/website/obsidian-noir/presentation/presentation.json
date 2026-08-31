@@ -1,0 +1,71 @@
+{
+  "packageId": "obsidian-noir",
+  "templateIntelligenceHint": "ti-luxury-noir",
+  "layout": {
+    "defaultLayoutId": "default",
+    "regions": {
+      "header": {
+        "role": "header",
+        "sticky": true
+      },
+      "main": {
+        "role": "main"
+      },
+      "utility": {
+        "role": "utility"
+      },
+      "footer": {
+        "role": "footer"
+      },
+      "overlay": {
+        "role": "overlay"
+      }
+    }
+  },
+  "navigation": {
+    "componentId": "obsidian-noir-nav",
+    "variant": "enterprise-glass"
+  },
+  "hero": {
+    "componentId": "obsidian-noir-hero",
+    "region": "main"
+  },
+  "footer": {
+    "componentId": "obsidian-noir-footer",
+    "region": "footer"
+  },
+  "homeFlow": {
+    "regions": {
+      "main": [
+        "obsidian-noir-hero",
+        "obsidian-noir-features",
+        "obsidian-noir-integrations",
+        "obsidian-noir-about",
+        "obsidian-noir-stats",
+        "obsidian-noir-testimonials",
+        "obsidian-noir-portfolio",
+        "obsidian-noir-pricing",
+        "obsidian-noir-faq",
+        "obsidian-noir-contact"
+      ],
+      "utility": [
+        "obsidian-noir-utility-band"
+      ],
+      "overlay": [
+        "obsidian-noir-floating-cta"
+      ]
+    }
+  },
+  "sectionShell": {
+    "strategy": "package",
+    "componentId": "obsidian-noir-section-shell"
+  },
+  "aiGeneration": {
+    "contentProfile": "obsidian-noir-gtm",
+    "suggestedPages": [
+      "platform",
+      "pricing",
+      "customers"
+    ]
+  }
+}

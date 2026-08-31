@@ -23,20 +23,19 @@ export function EducationPremiumSectionShell({
     <section
       id={id}
       data-v2-component="education-premium-section-shell"
-      className={`ed-section ed-paper-grain bg-[var(--color-background)] ${className}`.trim()}
+      className={`ed-section-shell ed-paper ed-reveal ${className}`.trim()}
       aria-labelledby={title ? `${id ?? "section"}-title` : undefined}
     >
-      <div className="mx-auto max-w-[82rem] px-5 sm:px-8">
+      <div className="ed-section-shell-inner">
         {(eyebrow || title || subtitle) && (
-          <header className="mb-12 max-w-2xl">
-            {eyebrow && <p className="ed-eyebrow mb-3">{eyebrow}</p>}
-            {title && (
-              <h2 id={`${id ?? "section"}-title`} className="ed-headline-sm">
+          <header className="ed-section-head">
+            {eyebrow ? <p className="ed-eyebrow">{eyebrow}</p> : null}
+            {title ? (
+              <h2 id={`${id ?? "section"}-title`} className="ed-headline-sm ed-font-display">
                 {title}
               </h2>
-            )}
-            {subtitle && <p className="ed-body mt-4">{subtitle}</p>}
-            {(eyebrow || title) && <div className="ed-accent-line mt-4" aria-hidden />}
+            ) : null}
+            {subtitle ? <p className="ed-body">{subtitle}</p> : null}
           </header>
         )}
         {children}

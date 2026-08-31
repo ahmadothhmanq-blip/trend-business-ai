@@ -15,10 +15,9 @@ import {
 } from "@/lib/ai-core/performance/profiler-context";
 import { WebsitePipelineProfiler } from "@/lib/ai-core/performance/website-profiler";
 import type { PerformanceProfilingReport } from "@/lib/ai-core/performance/website-profiler";
-import {
-  resolveWebsiteTbgeRoute,
-  runTbgeWebsiteGeneration,
-} from "@/lib/tbge/integration";
+import { composeTbgeUnifiedHomeIfNeeded } from "@/lib/tbge/integration/compose-unified-home";
+import { resolveWebsiteTbgeRoute } from "@/lib/tbge/integration/router";
+import { runTbgeWebsiteGeneration } from "@/lib/tbge/integration/run-website-generation";
 import type {
   GeneratedProjectFile,
   GeneratedWebsiteProject,
@@ -31,6 +30,13 @@ import {
 } from "@/lib/website/tbdp-wiring";
 import { resolveBuilderTemplatePackageId } from "@/lib/website/builder/resolve-builder-template-package-id";
 import { finalizeV2StructureAfterGeneration } from "@/lib/website/template-v2/generation/v2-generation-bridge";
+import { applyFinalImageInjectionToProject } from "@/lib/ai-core/image-engine/inject";
+import { isStructureFirstEnabled } from "@/lib/website/generation-flags";
+import { applySitePlanIfEnabled } from "@/lib/website/site-plan/apply";
+import { applyResolvedIndustryToProject } from "@/lib/website/industry/apply-industry";
+import { resolveSiteImageStrategy } from "@/lib/website/site-plan/image-strategy";
+import { generateAssetsForWebsiteProject } from "@/lib/website/assets/generate-for-project";
+import { applyVisualSkinIfEnabledAsync } from "@/lib/website/visual-skin/apply";
 import {
   isMasterPlanIntegrationEnabled,
   mergeIntegrationSettings,
@@ -61,6 +67,26 @@ type GenerateWebsiteInput = WebsiteGenerationInput & {
   autoFallback?: boolean;
 };
 
+async function finalizeProjectEnhancements(
+  project: GeneratedWebsiteProject,
+  input: WebsiteGenerationInput,
+): Promise<GeneratedWebsiteProject> {
+  const withIndustry = applyResolvedIndustryToProject(project, {
+    prompt: input.prompt ?? project.prompt,
+    title: project.title,
+    description: project.description,
+    industryId: input.industryId,
+    businessIndustry: project.settings?.businessIndustry,
+  });
+  const withPlan = applySitePlanIfEnabled(withIndustry, { input });
+  return applyVisualSkinIfEnabledAsync(
+    withPlan,
+    input.visualSkinId,
+    input.language,
+    { generationFastPath: true },
+  );
+}
+
 function resolvePreferredProvider(input: GenerateWebsiteInput): AIProviderName | undefined {
   const settings = providerManager.getUserSettings();
   return (
@@ -88,7 +114,25 @@ async function applyV2StructureToGenerationResult(
   pluginInput: WebsiteGenerationInput,
   onProgress?: (event: string) => void,
 ): Promise<GeneratedWebsiteProject> {
-  return finalizeV2StructureAfterGeneration(project, pluginInput, onProgress);
+  const imageStrategy = resolveSiteImageStrategy(
+    pluginInput.imageStrategyMode ?? project.sitePlan?.imageStrategy,
+  );
+
+  if (isStructureFirstEnabled()) {
+    const finalized = await finalizeV2StructureAfterGeneration(
+      project,
+      pluginInput,
+      onProgress,
+    );
+    return applyFinalImageInjectionToProject(finalized, { imageStrategy });
+  }
+
+  const withV2 = await finalizeV2StructureAfterGeneration(
+    project,
+    pluginInput,
+    onProgress,
+  );
+  return applyFinalImageInjectionToProject(withV2, { imageStrategy });
 }
 
 /**
@@ -177,7 +221,18 @@ export async function generateWebsite(input: GenerateWebsiteInput): Promise<
       websiteStructureTemplateId: resolvedWebsiteStructureTemplateId,
     };
   }
-  if (tbdpWiring.enabled && tbdpWiring.suggestedComponents && !resolvedPluginInput.components?.length) {
+  const userChoseTemplate = Boolean(
+    pluginInput.templateIntelligenceId?.trim() ||
+      pluginInput.websiteStructureTemplateId?.trim() ||
+      pluginInput.templateId?.trim() ||
+      pluginInput.marketplaceTemplateId?.trim(),
+  );
+  if (
+    tbdpWiring.enabled &&
+    userChoseTemplate &&
+    tbdpWiring.suggestedComponents &&
+    !resolvedPluginInput.components?.length
+  ) {
     resolvedPluginInput = {
       ...resolvedPluginInput,
       components: tbdpWiring.suggestedComponents,
@@ -243,23 +298,59 @@ export async function generateWebsite(input: GenerateWebsiteInput): Promise<
       masterPlanContext,
       productionReports,
     });
+    const tbgeWithIndustry = applyResolvedIndustryToProject(tbgeResult, {
+      prompt: resolvedPluginInput.prompt,
+      industryId: resolvedPluginInput.industryId,
+    });
+    const tbgeWithAssets = await generateAssetsForWebsiteProject(
+      tbgeWithIndustry,
+      resolvedPluginInput,
+      { onProgress },
+    );
+    const tbgeWithComposedHome = composeTbgeUnifiedHomeIfNeeded(tbgeWithAssets, {
+      spec: tbgeResult.tbgeSpec,
+      industryId: resolvedPluginInput.industryId ?? tbgeResult.tbgeSpec?.business.industryId,
+      language: resolvedPluginInput.language,
+      prompt: resolvedPluginInput.prompt,
+    });
     const v2Project = await applyV2StructureToGenerationResult(
-      tbgeResult,
+      tbgeWithComposedHome,
       resolvedPluginInput,
       onProgress,
     );
-    const mergedProject = {
-      ...tbgeResult,
-      ...v2Project,
-      settings: mergeIntegrationSettings(
-        mergeTbdpSettings(
-          (v2Project.settings ?? {}) as Record<string, unknown>,
-          tbdpWiring.settingsPatch,
-        ),
-        masterPlanContext?.settingsPatch ?? {},
-      ) as GeneratedWebsiteProject["settings"],
+    const mergedProject = await finalizeProjectEnhancements(
+      {
+        ...tbgeWithComposedHome,
+        ...v2Project,
+        assetManifest:
+          v2Project.assetManifest ?? tbgeWithComposedHome.assetManifest,
+        settings: mergeIntegrationSettings(
+          mergeTbdpSettings(
+            (v2Project.settings ?? {}) as Record<string, unknown>,
+            tbdpWiring.settingsPatch,
+          ),
+          masterPlanContext?.settingsPatch ?? {},
+        ) as GeneratedWebsiteProject["settings"],
+      },
+      resolvedPluginInput,
+    );
+    const imageStrategy = resolveSiteImageStrategy(
+      resolvedPluginInput.imageStrategyMode ??
+        mergedProject.sitePlan?.imageStrategy,
+    );
+    const withImages = applyFinalImageInjectionToProject(mergedProject, {
+      imageStrategy,
+    });
+    return {
+      ...withImages,
+      settings: mergedProject.settings,
+      progressEvents: tbgeResult.progressEvents,
+      usage: tbgeResult.usage,
+      generationTimeMs: tbgeResult.generationTimeMs,
+      provider: tbgeResult.provider,
+      productionPipelineReports:
+        tbgeResult.productionPipelineReports ?? productionReports,
     };
-    return mergedProject;
   }
 
   let lastError: unknown = null;
@@ -322,8 +413,21 @@ export async function generateWebsite(input: GenerateWebsiteInput): Promise<
         onProgress,
       );
 
+      const withSitePlan = await finalizeProjectEnhancements(
+        v2Project,
+        resolvedPluginInput,
+      );
+
+      const imageStrategy = resolveSiteImageStrategy(
+        resolvedPluginInput.imageStrategyMode ??
+          withSitePlan.sitePlan?.imageStrategy,
+      );
+      const withImages = applyFinalImageInjectionToProject(withSitePlan, {
+        imageStrategy,
+      });
+
       return {
-        ...v2Project,
+        ...withImages,
         progressEvents: result.progressEvents as WebsiteGenerationProgressEvent[],
         usage: result.usage ?? emptyTokenUsage(),
         generationTimeMs: result.generationTimeMs,

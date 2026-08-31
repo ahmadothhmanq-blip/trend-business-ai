@@ -141,7 +141,7 @@ for (const rel of protectedRoutes) {
   else fail(`${rel}: missing requireUser`);
 }
 const act = readFileSync(join(root, "app/api/erp/actions/route.ts"), "utf8");
-if (act.includes("enforceAiUsage")) ok("actions: credits");
+if (act.includes("beginAiUsage")) ok("actions: credits");
 else fail("actions: missing credits");
 
 console.log("\n[7] Legacy BM ERP bridge");

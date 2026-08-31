@@ -232,9 +232,9 @@ export const INDUSTRY_THEME_ARCHITECTURES: ThemePageArchitecture[] = [
     templateIntelligenceId: "ti-luxury-brands-atelier",
     pageTopology: "fullscreen-editorial",
     sectionShellVariant: "editorial",
-    description: "Fashion runway · haute couture · lookbook cinematics",
-    animationLanguage: "runway cinematic · editorial parallax",
-    responsiveBehavior: "dark luxury · oversized type",
+    description: "Luxury brand storytelling · cinematic hero · gallery proof",
+    animationLanguage: "cinematic fade · editorial scroll",
+    responsiveBehavior: "full-bleed luxury · restrained CTAs",
     floatingCta: false,
   }),
   industryArch({

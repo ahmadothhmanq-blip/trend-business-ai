@@ -95,7 +95,7 @@ async function generateContent(
     ctx.progress.emit("Analyzing SEO...");
     try {
       seo = await ctx.provider.generateJson<ContentSeoResult>({
-        prompt: contentSeoPrompt(body, input.seoKeywords, input.contentType),
+        prompt: contentSeoPrompt(body, input.seoKeywords, input.contentType, input.language),
         schema: contentSeoSchema,
       });
       ctx.usage.add(ctx.provider.getLastUsage?.());
@@ -107,7 +107,7 @@ async function generateContent(
     ctx.progress.emit("Generating headline variants...");
     try {
       const h = await ctx.provider.generateJson<{ headlines: string[] }>({
-        prompt: contentHeadlinesPrompt(analysis.title, input.contentType, input.tone, input.audience),
+        prompt: contentHeadlinesPrompt(analysis.title, input.contentType, input.tone, input.audience, input.language),
         schema: contentHeadlinesSchema,
       });
       ctx.usage.add(ctx.provider.getLastUsage?.());
@@ -121,7 +121,7 @@ async function generateContent(
     ctx.progress.emit("Reviewing content quality...");
     try {
       const review = await ctx.provider.generateJson<{ suggestions: string[]; improvements: string[] }>({
-        prompt: contentImprovementsPrompt(body, input.contentType),
+        prompt: contentImprovementsPrompt(body, input.contentType, input.language),
         schema: contentImprovementsSchema,
       });
       ctx.usage.add(ctx.provider.getLastUsage?.());

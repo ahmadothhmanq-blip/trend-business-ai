@@ -1,6 +1,6 @@
 import { requireUser, parseJsonBody, parseUuidParam } from "@/lib/api/helpers";
 import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
-import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { beginAiUsage } from "@/lib/api/rate-limit";
 import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
 import {
   blueprintToModel,
@@ -11,11 +11,14 @@ import { generateBrandLogos } from "@/lib/ai-core/brand-studio/logos";
 import type { BrandIdentityGeneration } from "@/types/brand-identity";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { resolveRequestLanguage } from "@/lib/i18n/api";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
 const bodySchema = z.object({
   conceptCount: z.number().int().min(1).max(5).optional(),
+  language: z.string().trim().optional(),
+  country: z.string().trim().optional(),
 });
 
 export async function POST(request: Request, context: RouteContext) {
@@ -27,8 +30,9 @@ export async function POST(request: Request, context: RouteContext) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  const rateLimited = await enforceAiUsage(auth.supabase, auth.user!.id, "brand-identity");
-  if (rateLimited) return rateLimited;
+  const usage = await beginAiUsage(auth.supabase, auth.user!.id, "brand-identity");
+  if (!usage.ok) return usage.response;
+  const creditLease = usage.lease;
 
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
@@ -36,6 +40,7 @@ export async function POST(request: Request, context: RouteContext) {
   if (!parsed.success) {
     return apiValidationError("Invalid input");
   }
+  const aiLanguage = resolveRequestLanguage(request, parsed.data.language, parsed.data.country);
 
   const { data: gen, error: fetchError } = await auth.supabase
     .from("brand_identity_generations")
@@ -55,6 +60,7 @@ export async function POST(request: Request, context: RouteContext) {
     const logoResult = await generateBrandLogos({
       model,
       conceptCount: parsed.data.conceptCount ?? 3,
+      language: aiLanguage,
     });
 
     model = mergeModel(model, {
@@ -80,6 +86,7 @@ export async function POST(request: Request, context: RouteContext) {
 
     if (error) return databaseErrorResponse("brand-identity.logos", error);
 
+    await creditLease.settle(auth.supabase);
     return NextResponse.json({
       generation: data as BrandIdentityGeneration,
       logos: logoResult.concepts,

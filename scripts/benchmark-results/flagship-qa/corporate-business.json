@@ -1,31 +1,31 @@
 {
   "packageId": "corporate-business",
-  "completedAt": "2026-08-05T22:38:13.037Z",
+  "completedAt": "2026-08-08T17:46:06.339Z",
   "marketplaceScore": 97,
   "passed95": true,
   "visual": {
     "designTokens": 92,
-    "visualHierarchy": 85,
+    "visualHierarchy": 92,
     "responsiveLayout": 92,
     "heroQuality": 92,
-    "navigationUx": 92,
+    "navigationUx": 78,
     "ctaPlacement": 92,
-    "componentSpacing": 92,
+    "componentSpacing": 85,
     "typographyHierarchy": 92,
     "crossPageConsistency": 92,
-    "layout": 92,
-    "ux": 91,
-    "overall": 91
+    "layout": 90,
+    "ux": 88,
+    "overall": 90
   },
   "preview": {
-    "imageCount": 6,
+    "imageCount": 0,
     "hasHeroImage": true,
     "hasPlaceholder": true,
     "sectionCount": 12,
-    "premiumSignals": 5,
-    "duplicateImages": 1,
-    "uniquePhotoCount": 5,
-    "usesSlotImages": false
+    "premiumSignals": 6,
+    "duplicateImages": 0,
+    "uniquePhotoCount": 1,
+    "usesSlotImages": true
   },
   "slotIndependence": {
     "slotUsages": 6,
@@ -33,10 +33,10 @@
   },
   "imageValidation": {
     "passed": true,
-    "repairs": 36,
-    "duplicatesRemoved": 28,
+    "repairs": 0,
+    "duplicatesRemoved": 0,
     "industryId": "corporate",
-    "uniqueUrlCount": 16,
+    "uniqueUrlCount": 0,
     "issues": [
       "duplicate: Duplicate image URL rejected.",
       "duplicate: Duplicate image URL rejected.",
@@ -53,23 +53,23 @@
       "visualStyle": "executive editorial, trustworthy",
       "profileId": "corporate",
       "selectedCount": 44,
-      "rejectedCount": 27,
-      "replacedCount": 27,
+      "rejectedCount": 29,
+      "replacedCount": 29,
       "sourceCounts": {
         "user": 0,
         "ai": 0,
         "library": 44,
         "stock": 0
       },
-      "summary": "Industry image rules passed for Corporate Business (corporate). 44 images selected, 27 replaced."
+      "summary": "Image validation passed with 0 filled slot(s); blank slots preserved."
     }
   },
   "lighthouse": null,
   "previewPath": "C:\\Users\\PC\\Desktop\\trend-business-ai\\scripts\\benchmark-results\\flagship-previews\\corporate-business\\preview.html",
-  "bytes": 80275,
+  "bytes": 107741,
   "v2Markers": {
     "package": true,
     "hero": true,
-    "render": true
+    "render": false
   }
 }

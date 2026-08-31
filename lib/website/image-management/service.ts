@@ -20,18 +20,7 @@ import {
   type ImageValidationResult,
 } from "@/lib/website/image-management/validate-before-render";
 
-const PACKAGE_INDUSTRY: Record<string, string> = {
-  "saas-enterprise": "saas",
-  "corporate-business": "corporate",
-  "restaurant-premium": "restaurant",
-  "real-estate-premium": "real-estate",
-  "medical-premium": "medical",
-  "creative-agency-premium": "creative-agency",
-  "hotel-resort-premium": "hotel",
-  "finance-premium": "finance",
-  "education-premium": "education",
-  "ecommerce-premium": "ecommerce",
-};
+const PACKAGE_INDUSTRY: Record<string, string> = {};
 
 function resolveProjectIndustry(project: GeneratedWebsiteProject): string {
   const settings = (project.settings ?? {}) as Record<string, unknown>;
@@ -39,7 +28,9 @@ function resolveProjectIndustry(project: GeneratedWebsiteProject): string {
   if (packageId && PACKAGE_INDUSTRY[packageId]) {
     return PACKAGE_INDUSTRY[packageId]!;
   }
-  const industry = String(settings.industryId ?? project.strategy?.industry ?? "");
+  const industry = String(
+    settings.industryId ?? project.businessProfile?.industry ?? "",
+  );
   return industry || "corporate";
 }
 
@@ -59,8 +50,8 @@ export async function loadProjectForImageManagement(args: {
   if (!loaded) return { ok: false, error: "Website not found." };
   return {
     ok: true,
-    project: toWebsiteProject(loaded.generation),
-    generation: loaded.generation,
+    project: toWebsiteProject(loaded),
+    generation: loaded,
   };
 }
 
@@ -68,7 +59,10 @@ export async function listProjectSiteImages(args: {
   project: GeneratedWebsiteProject;
 }): Promise<{ images: ManagedSiteImage[]; industry: string }> {
   const industry = resolveProjectIndustry(args.project);
-  const images = buildSiteImageSlotInventory(args.project.files ?? []);
+  const images = buildSiteImageSlotInventory(
+    args.project.files ?? [],
+    args.project.assetManifest?.items,
+  );
   return { images, industry };
 }
 
@@ -89,8 +83,8 @@ export async function applyProjectImageOperation(args: {
   const loaded = await loadProjectForImageManagement(args);
   if (!loaded.ok) return loaded;
 
-  let { project, generation } = loaded;
-  let files = [...(project.files ?? [])];
+  const { project, generation } = loaded;
+  const files = [...(project.files ?? [])];
   const industry = resolveProjectIndustry(project);
 
   let request = args.request;

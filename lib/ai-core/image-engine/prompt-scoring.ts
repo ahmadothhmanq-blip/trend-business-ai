@@ -6,6 +6,16 @@ import {
 } from "@/lib/ai-core/image-engine/section-strategies";
 
 export const PROMPT_QUALITY_THRESHOLD = 65;
+export const PROMPT_QUALITY_THRESHOLD_PROFESSIONAL = 80;
+
+export type ImagePromptQualityProfile = "fast" | "professional" | "ultra";
+
+export function resolvePromptQualityThreshold(
+  profile?: ImagePromptQualityProfile | null,
+): number {
+  if (profile === "professional") return PROMPT_QUALITY_THRESHOLD_PROFESSIONAL;
+  return PROMPT_QUALITY_THRESHOLD;
+}
 
 export type ImagePromptScore = {
   score: number;
@@ -68,6 +78,7 @@ export function scoreImagePrompt(params: {
   ctx: ImageIntelligenceContext;
   sectionName?: string;
   shotBrief?: string;
+  threshold?: number;
 }): ImagePromptScore {
   const issues: string[] = [];
   const prompt = params.prompt.toLowerCase();
@@ -199,9 +210,11 @@ export function scoreImagePrompt(params: {
       aestheticQuality * 0.1,
   );
 
+  const threshold = params.threshold ?? PROMPT_QUALITY_THRESHOLD;
+
   return {
     score,
-    passed: score >= PROMPT_QUALITY_THRESHOLD,
+    passed: score >= threshold,
     dimensions,
     issues,
   };

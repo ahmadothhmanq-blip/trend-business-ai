@@ -40,6 +40,11 @@ import { useTranslation } from "@/lib/i18n/client";
 import { translateOption } from "@/lib/i18n/product-options";
 import { resolveLabel } from "@/lib/i18n/resolve-constant-label";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
+import { GlsGenerationLanguageSelect } from "@/components/dashboard/language/gls-generation-language-select";
+import {
+  getInitialGlsGenerationLanguage,
+  glsGenerationLanguagePayload,
+} from "@/lib/language-platform/generation/service";
 import {
   LOGO_STYLES,
   LOGO_COLOR_PALETTES,
@@ -266,12 +271,15 @@ function toHistoryItem(gen: LogoGeneration): ProjectHistoryItem {
 /* ------------------------------------------------------------------ */
 
 export function LogoDesignerTool({ initialGenerations }: Props) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const p = useProductT("logoDesigner");
   const [step, setStep] = useState<"style" | "config" | "history" | "generating" | "preview">("style");
   const [selectedStyle, setSelectedStyle] = useState("");
   const [brandName, setBrandName] = useState("");
   const [prompt, setPrompt] = useState("");
+  const [language, setLanguage] = useState(() =>
+    getInitialGlsGenerationLanguage({ fallback: "ui-locale", uiLocale: locale }),
+  );
   const [industry, setIndustry] = useState("");
   const [colorPalette, setColorPalette] = useState("Auto");
   const [iconStyle, setIconStyle] = useState("Abstract");
@@ -330,6 +338,7 @@ export function LogoDesignerTool({ initialGenerations }: Props) {
           prompt, brandName, logoStyle: selectedStyle, industry, colorPalette,
           iconStyle, typography, personality, options, mode, parentGenerationId,
           continueInstruction: mode === "continue" ? prompt : undefined,
+          ...glsGenerationLanguagePayload(language),
         }),
       });
       const d = await res.json();
@@ -460,6 +469,11 @@ export function LogoDesignerTool({ initialGenerations }: Props) {
                   rows={4}
                   className={cn(dashboardInputClass, "min-h-[100px] resize-none")}
                 />
+              </div>
+
+              <div className="max-w-md">
+                <label className="mb-1.5 block text-xs font-medium text-white/60">{t("common.language")}</label>
+                <GlsGenerationLanguageSelect serviceId="logo-designer" value={language} onChange={setLanguage} />
               </div>
 
               {/* Style selectors */}

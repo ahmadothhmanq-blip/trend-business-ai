@@ -66,7 +66,7 @@ export function CorporateBusinessTestimonials({
           <article className="cb-card-featured relative flex flex-col justify-between p-10 sm:p-12 lg:col-span-7 lg:row-span-2 lg:min-h-[24rem]">
             <div>
               <span className="cb-quote-mark" aria-hidden>
-                "
+                {"\u201C"}
               </span>
               <blockquote className="cb-font-display -mt-6 text-[clamp(1.375rem,2.5vw,1.75rem)] font-medium leading-[1.45] text-white/92">
                 {featured.quote}
@@ -86,7 +86,9 @@ export function CorporateBusinessTestimonials({
           {rest.map((item) => (
             <article key={item.name} className="cb-card flex flex-col justify-between p-8 lg:col-span-5">
               <blockquote className="cb-font-body text-[0.9375rem] leading-[1.75] text-[var(--color-foreground)]">
-                "{item.quote}"
+                {"\u201C"}
+                {item.quote}
+                {"\u201D"}
               </blockquote>
               <footer className="mt-8 border-t border-[var(--border-subtle)] pt-6">
                 <p className="cb-font-body text-sm font-medium text-[var(--color-foreground)]">{item.name}</p>

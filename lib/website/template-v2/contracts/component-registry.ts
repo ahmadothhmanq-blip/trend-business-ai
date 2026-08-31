@@ -19,6 +19,7 @@ export type TemplateV2ComponentRole =
   | "blog"
   | "timeline"
   | "portfolio"
+  | "section-shell"
   | "custom";
 
 export type TemplateV2ComponentDefinition = {

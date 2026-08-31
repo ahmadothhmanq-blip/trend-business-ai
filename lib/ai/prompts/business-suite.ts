@@ -1,4 +1,5 @@
 import type { BusinessPluginInput } from "@/plugins/business-suite/types";
+import { aiOutputLanguageDirective } from "@/lib/ai/prompts/language-directive.server";
 
 function getToolContext(tool: string): string {
   const ctx: Record<string, string> = {
@@ -46,7 +47,7 @@ Produce a JSON object with:
 - analysisScope: what the analysis should cover
 - urgencyLevel: urgency assessment (low/medium/high)
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(input.language, "business")}`;
 }
 
 export function businessPlanPrompt(input: BusinessPluginInput, analysis: { title: string; businessContext: string; mainChallenges: string[]; keyQuestions: string[]; analysisScope: string }): string {
@@ -73,7 +74,7 @@ Create a JSON object with:
 - riskCategories: array of risk categories to assess
 - opportunityAreas: array of opportunity areas to explore
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(input.language, "business")}`;
 }
 
 export function businessGeneratePrompt(
@@ -111,10 +112,10 @@ RULES:
 - Include tables for comparisons where relevant (markdown tables)
 - End each section with key takeaways
 
-Write 1000-4000 words depending on the document type. Return ONLY the document text — no JSON wrapper.`;
+Write 1000-4000 words depending on the document type. Return ONLY the document text — no JSON wrapper.${aiOutputLanguageDirective(input.language, "business")}`;
 }
 
-export function businessScorecardPrompt(body: string, businessType: string, industry: string): string {
+export function businessScorecardPrompt(body: string, businessType: string, industry: string, language?: string): string {
   return `You are a business analyst. Score this ${businessType} business in the ${industry} industry.
 
 Document excerpt:
@@ -129,10 +130,10 @@ Create a JSON object with:
 - growthPotential: growth potential score (0-100)
 - riskLevel: risk level score (0-100, where 100 = highest risk)
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(language, "business")}`;
 }
 
-export function businessRisksPrompt(body: string, businessType: string): string {
+export function businessRisksPrompt(body: string, businessType: string, language?: string): string {
   return `Identify business risks for this ${businessType} business.
 
 Document excerpt:
@@ -151,10 +152,10 @@ Create a JSON object with:
   - timeframe: expected timeframe
   - actionRequired: what action to take
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(language, "business")}`;
 }
 
-export function businessActionPlanPrompt(body: string, risks: string, opportunities: string): string {
+export function businessActionPlanPrompt(body: string, risks: string, opportunities: string, language?: string): string {
   return `Create a prioritized action plan based on this business analysis.
 
 Analysis excerpt:
@@ -173,5 +174,5 @@ Create a JSON object with:
 - recommendations: array of 3-5 strategic recommendations (strings)
 - improvements: array of 3-5 improvement suggestions (strings)
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(language, "business")}`;
 }

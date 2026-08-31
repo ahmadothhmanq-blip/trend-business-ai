@@ -1,98 +1,90 @@
 "use client";
 
-const DEFAULT_TESTIMONIALS = [
+const DEFAULT_ITEMS = [
   {
-    quote:
-      "From the first phone call, I felt heard. The care team coordinated everything — I never had to chase an appointment or repeat my history.",
-    author: "Patient, Cardiology",
-    rating: 5,
-    featured: true,
+    quote: "Professional, responsive, and focused on results — exactly what we needed.",
+    name: "Alex Morgan",
+    role: "Director",
+    company: "Northwind Co.",
   },
   {
-    quote:
-      "The facility feels nothing like a hospital. Private, calm, and every detail considered. My recovery was faster because I felt safe.",
-    author: "Patient, Orthopedics",
-    rating: 5,
+    quote: "Clear communication and strong execution from start to finish.",
+    name: "Samira Khan",
+    role: "Operations Lead",
+    company: "Helix Group",
+  },
+  {
+    quote: "They understood our goals quickly and delivered with consistency throughout.",
+    name: "Jordan Lee",
+    role: "Founder",
+    company: "Aperture Studio",
   },
 ];
+
+type Testimonial = { quote: string; name: string; role: string; company?: string };
+
+function testimonialInitials(name: string): string {
+  return name
+    .split(" ")
+    .map((part) => part[0] ?? "")
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
 
 type MedicalPremiumTestimonialsProps = {
   eyebrow?: string;
   title?: string;
   subtitle?: string;
-  items?: Array<{ quote: string; author: string; rating?: number; featured?: boolean }>;
+  items?: Testimonial[];
 };
 
 export function MedicalPremiumTestimonials({
-  eyebrow = "Patient stories",
-  title = "Trusted by families worldwide",
-  subtitle = "Verified patient experiences — shared with permission.",
-  items = DEFAULT_TESTIMONIALS,
+  eyebrow = "Testimonials",
+  title = "Trusted by clients",
+  subtitle = "Partnerships built on clarity, craft, and dependable delivery.",
+  items = DEFAULT_ITEMS,
 }: MedicalPremiumTestimonialsProps) {
-  const featured = items.find((i) => i.featured) ?? items[0];
-  const secondary = items.filter((i) => i !== featured);
+  if (!items.length) return null;
+
+  const featured = items[0];
+  const rest = items.slice(1);
 
   return (
-    <section
-      data-v2-component="medical-premium-testimonials"
-      aria-labelledby="mp-testimonials-title"
-      className="mp-section bg-[var(--color-surface)]/50 px-5 sm:px-8"
-    >
-      <header className="mx-auto mb-14 max-w-2xl text-center">
-        <p className="mp-eyebrow mb-4">{eyebrow}</p>
-        <div className="mp-sage-rule mx-auto mb-5" aria-hidden />
-        <h2 id="mp-testimonials-title" className="mp-headline-sm">
-          {title}
-        </h2>
-        <p className="mp-body text-muted-foreground mt-4 text-base leading-relaxed">{subtitle}</p>
-      </header>
-
-      <div className="mx-auto grid max-w-[76rem] gap-6 lg:grid-cols-[1.4fr_1fr]">
-        {featured ? (
-          <blockquote className="mp-card relative p-10 lg:p-12">
-            <span className="mp-quote-mark absolute start-8 top-6" aria-hidden>
+    <section id="testimonials" data-v2-component="medical-premium-testimonials" className="mp-reveal mp-section py-20 sm:py-28">
+      <div className="mp-container">
+        <header className="mp-section-header mp-section-header--rule mb-12">
+          {eyebrow ? <p className="mp-eyebrow">{eyebrow}</p> : null}
+          <h2 className="mp-headline-sm mt-4">{title}</h2>
+          {subtitle ? <p className="mp-body mt-4">{subtitle}</p> : null}
+        </header>
+        <div className="df-reveal-stagger grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <figure className="mp-panel flex flex-col justify-between p-8 sm:p-10">
+            <span className="mp-quote-mark" aria-hidden>
               &ldquo;
             </span>
-            {featured.rating ? (
-              <p
-                className="mp-font-body text-[var(--color-accent)]"
-                aria-label={`${featured.rating} out of 5 stars`}
-              >
-                {"★".repeat(featured.rating)}
-              </p>
-            ) : null}
-            <p className="mp-font-display relative z-10 mt-6 text-xl italic leading-relaxed text-[var(--color-foreground)] lg:text-2xl">
-              {featured.quote}
-            </p>
-            <footer className="mp-font-body mt-8 text-sm font-semibold text-muted-foreground">
-              — {featured.author}
-            </footer>
-          </blockquote>
-        ) : null}
-
-        <div className="flex flex-col gap-6">
-          {secondary.map((item, index) => (
-            <blockquote
-              key={`testimonial-${index}`}
-              className="mp-card flex-1 p-7 motion-safe:animate-[mp-scale-in_0.5s_ease_both]"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              {item.rating ? (
-                <p
-                  className="mp-font-body text-sm text-[var(--color-healing)]"
-                  aria-label={`${item.rating} out of 5 stars`}
-                >
-                  {"★".repeat(item.rating)}
+            <blockquote className="mp-quote mt-4">{featured.quote}</blockquote>
+            <figcaption className="mt-8 flex items-center gap-4">
+              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-healing)_16%,transparent)] text-sm font-semibold text-[var(--color-primary)]">
+                {testimonialInitials(featured.name)}
+              </span>
+              <div>
+                <p className="font-semibold text-[var(--color-foreground)]">{featured.name}</p>
+                <p className="mp-caption">
+                  {[featured.role, featured.company].filter(Boolean).join(" · ")}
                 </p>
-              ) : null}
-              <p className="mp-font-body mt-4 text-base leading-relaxed text-[var(--color-foreground)]">
-                &ldquo;{item.quote}&rdquo;
-              </p>
-              <footer className="mp-font-body mt-5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                — {item.author}
-              </footer>
-            </blockquote>
-          ))}
+              </div>
+            </figcaption>
+          </figure>
+          <ul className="mp-reveal-stagger space-y-4">
+            {rest.map((item) => (
+              <li key={item.name} className="mp-card p-6">
+                <blockquote className="mp-body-sm">&ldquo;{item.quote}&rdquo;</blockquote>
+                <p className="mt-4 text-sm font-semibold">{item.name}</p>
+                <p className="mp-caption">{[item.role, item.company].filter(Boolean).join(" · ")}</p>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>

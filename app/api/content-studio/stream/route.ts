@@ -1,6 +1,6 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
 import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
-import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { beginAiUsage } from "@/lib/api/rate-limit";
 import { serverErrorResponse } from "@/lib/api/errors";
 import { generateContent } from "@/lib/content-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
@@ -23,6 +23,7 @@ const streamSchema = z.discriminatedUnion("type", [
     tone: z.string().trim().default("Professional"),
     audience: z.string().trim().default("General"),
     language: z.string().trim().default("English"),
+    country: z.string().trim().optional(),
     brandVoice: z.string().trim().default(""),
     brandIdentityId: z.string().uuid().optional(),
     writingStyle: z.string().trim().default("Standard"),
@@ -51,8 +52,9 @@ export async function POST(request: Request) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  const rateLimited = await enforceAiUsage(auth.supabase, auth.user!.id, "content-studio");
-  if (rateLimited) return rateLimited;
+  const usage = await beginAiUsage(auth.supabase, auth.user!.id, "content-studio");
+  if (!usage.ok) return usage.response;
+  const creditLease = usage.lease;
 
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
@@ -66,6 +68,7 @@ export async function POST(request: Request) {
   const aiLanguage = resolveRequestLanguage(
     request,
     input.type === "generate" ? input.language : input.targetLanguage,
+    input.type === "generate" ? input.country : undefined,
   );
 
   const stream = new ReadableStream({
@@ -107,6 +110,7 @@ export async function POST(request: Request) {
           );
 
           send("complete", { result: result.text, action: result.action, provider: result.provider });
+          await creditLease.settle(auth.supabase);
           close();
           return;
         }
@@ -222,17 +226,20 @@ export async function POST(request: Request) {
           .single();
 
         if (error) {
+          await creditLease.release(auth.supabase);
           send("error", { error: "Failed to save generation." });
           close();
           return;
         }
 
+        await creditLease.settle(auth.supabase);
         send("complete", {
           generation: data,
           blueprint,
           progressEvents,
         });
       } catch (error) {
+        await creditLease.release(auth.supabase);
         send("error", {
           error: error instanceof Error ? error.message : "Stream failed",
         });

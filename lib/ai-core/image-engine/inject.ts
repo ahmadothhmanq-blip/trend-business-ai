@@ -1,15 +1,36 @@
 import type { GeneratedProjectFile } from "@/lib/ai/types";
 import type { CoreAssetManifest } from "@/lib/ai-core/layers/types";
 import type { ImageSystemSpec } from "@/lib/ai-core/image-intelligence/iie-types";
+import {
+  resolveSiteImageStrategy,
+  siteImageStrategyUsesGeneration,
+  type SiteImageStrategy,
+} from "@/lib/website/site-plan/image-strategy";
+import { resolveImageRoutingFromContext } from "@/lib/website/site-plan/resolve-image-routing";
 import { preferAiImages } from "@/lib/ai-core/image-engine/prefer";
 import {
   isPremiumStockUrl,
   normalizePremiumStockUrl,
   resolvePremiumStockUrl,
 } from "@/lib/ai-core/image-engine/stock";
+import { optimizePhotoUrlForRole } from "@/lib/ai-core/image-engine/optimize";
 import { buildSiteVideoModule } from "@/lib/ai-core/image-engine/video";
-import { enrichManifestWithProfileSlots } from "@/lib/ai-core/image-engine/profile-engine";
-import { hydrateSlotsFromManifest } from "@/lib/ai-core/image-engine/profile-engine";
+import {
+  enrichManifestWithProfileSlots,
+  hydrateSlotsFromManifest,
+} from "@/lib/ai-core/image-engine/profile-engine";
+import {
+  resolveStockIndustryForRole,
+  resolveRequiredPhotoRoleCounts,
+  capSubjectSparingGalleryUrls,
+  capSubjectSparingSectionUrls,
+  getIndustryVisualPolicy,
+  isHeroDominantIndustry,
+  isAutomotiveVehiclePhotoUrl,
+  isSubjectPackPhotoUrl,
+  isSubjectSparingIndustry,
+  stripSubjectPackPhotos,
+} from "@/lib/ai-core/image-engine/industry-slot-policy";
 import { slotUrls } from "@/lib/ai-core/image-engine/slots";
 
 const SITE_IMAGES_PATH = "lib/site-images.ts";
@@ -30,6 +51,33 @@ const REQUIRED_PHOTO_ROLES = [
   "testimonial",
 ] as const;
 
+function sanitizeHeroDominantManifestItems(
+  items: CoreAssetManifest["items"],
+  hero: string,
+  serviceFallback: string | null,
+): CoreAssetManifest["items"] {
+  return items.map((item) => {
+    const role = item.role;
+    if (role === "hero") return item;
+    if (role === "product" || role === "gallery" || role === "brand") {
+      return { ...item, url: hero };
+    }
+    if (item.url && isSubjectPackPhotoUrl(item.url, "automotive")) {
+      const replacement =
+        serviceFallback && !isSubjectPackPhotoUrl(serviceFallback, "automotive")
+          ? serviceFallback
+          : resolvePremiumStockUrl({
+              routingIndustryId: "business",
+              industry: "business",
+              role,
+              seed: item.id,
+            });
+      return { ...item, url: replacement };
+    }
+    return item;
+  });
+}
+
 /**
  * Emit a typed site image map and replace template layout placeholders with
  * ImageSpecification-driven photographic URLs only.
@@ -38,31 +86,69 @@ export function injectAiImagesIntoProject(params: {
   files: GeneratedProjectFile[];
   assetManifest: CoreAssetManifest;
   industry?: string | null;
+  routingIndustryId?: string | null;
   imageSystemSpec?: ImageSystemSpec | null;
 }): GeneratedProjectFile[] {
+  const routingIndustryId =
+    params.routingIndustryId ?? params.industry ?? null;
   const manifest = ensureRequiredPhotoAssets(
     preferAiImages(params.assetManifest),
     params.industry,
     {
       imageSystemSpec: params.imageSystemSpec,
+      routingIndustryId,
     },
   );
-  const enriched = enrichManifestWithProfileSlots(manifest, {
-    industry: params.industry,
-    routingIndustryId: params.industry,
-  }, { projectSeed: params.industry ?? "website" });
-  const slotResult = hydrateSlotsFromManifest(enriched, {
-    industry: params.industry,
-    routingIndustryId: params.industry,
-  }, { projectSeed: params.industry ?? "website" });
+  let enriched = enrichManifestWithProfileSlots(
+    manifest,
+    {
+      industry: params.industry,
+      routingIndustryId,
+    },
+    { projectSeed: params.industry ?? "website" },
+  );
+  const slotResult = hydrateSlotsFromManifest(
+    enriched,
+    {
+      industry: params.industry,
+      routingIndustryId,
+    },
+    { projectSeed: params.industry ?? "website" },
+  );
+  const hero = firstUrl(groupByRole(enriched), "hero");
+  const servicePreview = firstUrl(groupByRole(enriched), "service");
+  if (isHeroDominantIndustry(routingIndustryId) && hero) {
+    enriched = {
+      ...enriched,
+      items: sanitizeHeroDominantManifestItems(
+        enriched.items,
+        hero,
+        servicePreview,
+      ),
+    };
+  }
   const byRole = groupByRole(enriched);
-  const hero = firstUrl(byRole, "hero");
-  const product = firstUrl(byRole, "product");
+  const product = isHeroDominantIndustry(routingIndustryId) && hero
+    ? hero
+    : firstUrl(byRole, "product");
   const service = firstUrl(byRole, "service");
   const background = firstUrl(byRole, "background");
   const brand = firstUrl(byRole, "brand");
-  const sections = urlsForRole(byRole, "section");
-  const gallery = urlsForRole(byRole, "gallery");
+  const sections = isSubjectSparingIndustry(routingIndustryId)
+    ? capSubjectSparingSectionUrls(
+        routingIndustryId,
+        hero,
+        urlsForRole(byRole, "section"),
+        service,
+      )
+    : urlsForRole(byRole, "section");
+  const gallery = isSubjectSparingIndustry(routingIndustryId)
+    ? capSubjectSparingGalleryUrls(
+        routingIndustryId,
+        hero,
+        urlsForRole(byRole, "gallery"),
+      )
+    : urlsForRole(byRole, "gallery");
   const testimonials = urlsForRole(byRole, "testimonial");
 
   const hasPhotos = enriched.items.some(
@@ -87,6 +173,7 @@ export function injectAiImagesIntoProject(params: {
     features: slotUrls(slotResult.slots, "features"),
     team: slotUrls(slotResult.slots, "team"),
     items: enriched.items,
+    routingIndustryId,
   });
 
   const out: GeneratedProjectFile[] = [];
@@ -164,6 +251,88 @@ export function injectAiImagesIntoProject(params: {
   return out;
 }
 
+export type ImageInjectionProject = {
+  files: GeneratedProjectFile[];
+  assetManifest?: CoreAssetManifest | null;
+  businessProfile?: { industry?: string; routingIndustryId?: string } | null;
+  designSystem?: { industryPattern?: string } | null;
+  sitePlan?: {
+    imageStrategy?: SiteImageStrategy;
+    archetypeId?: string;
+  } | null;
+  prompt?: string | null;
+  title?: string | null;
+  description?: string | null;
+  settings?: {
+    businessIndustry?: string;
+    sitePlanArchetype?: string;
+  } | null;
+};
+
+/**
+ * Definitive image injection pass for completed generation output.
+ * Call once after all file generation, quality passes, and V2 template finalize.
+ */
+export function applyFinalImageInjectionToProject<T extends ImageInjectionProject>(
+  project: T,
+  options?: { imageStrategy?: SiteImageStrategy },
+): T {
+  if (!project.files?.length) {
+    return project;
+  }
+
+  const imageStrategy = resolveSiteImageStrategy(
+    options?.imageStrategy ?? project.sitePlan?.imageStrategy,
+  );
+  if (!siteImageStrategyUsesGeneration(imageStrategy)) {
+    return project;
+  }
+
+  const routing = resolveImageRoutingFromContext({
+    prompt: project.prompt,
+    title: project.title,
+    description: project.description,
+    industryId:
+      project.businessProfile?.routingIndustryId ??
+      project.settings?.businessIndustry,
+    businessIndustry:
+      project.settings?.businessIndustry ??
+      project.businessProfile?.routingIndustryId,
+    sitePlanArchetype:
+      project.settings?.sitePlanArchetype ?? project.sitePlan?.archetypeId,
+    archetypeId: project.sitePlan?.archetypeId as
+      | import("@/lib/website/site-plan/types").SiteArchetypeId
+      | undefined,
+  });
+
+  const industry =
+    project.businessProfile?.routingIndustryId ??
+    routing.routingIndustryId ??
+    project.businessProfile?.industry ??
+    project.designSystem?.industryPattern;
+
+  const manifest = project.assetManifest?.items?.length
+    ? project.assetManifest
+    : ensureRequiredPhotoAssets(
+        {
+          items: [],
+          engine: "premium-stock-fallback",
+          generatedAt: new Date().toISOString(),
+        },
+        industry,
+        { routingIndustryId: routing.routingIndustryId },
+      );
+
+  const files = injectAiImagesIntoProject({
+    files: project.files,
+    assetManifest: manifest,
+    industry,
+    routingIndustryId: routing.routingIndustryId,
+  });
+
+  return { ...project, files, assetManifest: manifest };
+}
+
 function isPhotographicUrl(url: string | null | undefined): boolean {
   if (!url) return false;
   if (
@@ -233,16 +402,15 @@ export function ensureRequiredPhotoAssets(
     };
   }
 
+  const routingId = options?.routingIndustryId ?? industry ?? "business";
+  const roleCounts = resolveRequiredPhotoRoleCounts(routingId);
+
   for (const role of REQUIRED_PHOTO_ROLES) {
     const haveCount = items.filter(
       (i) => i.role === role && isPhotographicUrl(i.url),
     ).length;
-    const need =
-      role === "section" || role === "gallery"
-        ? 3
-        : role === "testimonial"
-          ? 2
-          : 1;
+    const need = roleCounts[role] ?? 1;
+    if (need <= 0) continue;
     for (let i = haveCount; i < need; i += 1) {
       const id = need === 1 ? role : `${role}-${i + 1}`;
       if (items.some((item) => item.id === id && isPhotographicUrl(item.url))) {
@@ -327,9 +495,12 @@ function urlsForRole(
     .filter((u): u is string => Boolean(u));
 }
 
-function normalizePhotoUrl(url: string | null | undefined): string | null {
+function normalizePhotoUrl(
+  url: string | null | undefined,
+  role = "section",
+): string | null {
   if (!url?.trim()) return null;
-  return normalizePremiumStockUrl(url.trim());
+  return optimizePhotoUrlForRole(normalizePremiumStockUrl(url.trim()), role);
 }
 
 function buildSiteImagesModule(params: {
@@ -345,13 +516,14 @@ function buildSiteImagesModule(params: {
   features: string[];
   team: string[];
   items: CoreAssetManifest["items"];
+  routingIndustryId?: string | null;
 }): string {
   const meta = params.items.map((item) => ({
     id: item.id,
     role: item.role,
     name: item.name,
     alt: item.alt,
-    url: normalizePhotoUrl(item.url),
+    url: normalizePhotoUrl(item.url, item.role),
     status: item.status,
     purpose: item.metadata?.purpose ?? item.role,
     section: item.metadata?.section,
@@ -371,37 +543,114 @@ function buildSiteImagesModule(params: {
     ...params.gallery,
     ...params.testimonials,
   ]
-    .map((url) => normalizePhotoUrl(url))
+    .map((url, i) =>
+      normalizePhotoUrl(url, i === 0 ? "hero" : "section"),
+    )
     .filter((u): u is string => Boolean(u));
   const fallback = pool[0] ?? null;
-  const hero = normalizePhotoUrl(params.hero) || fallback;
-  const product = normalizePhotoUrl(params.product) || hero || fallback;
-  const service = normalizePhotoUrl(params.service) || product || fallback;
-  const background = normalizePhotoUrl(params.background) || hero || fallback;
-  const sections =
-    params.sections.length > 0
-      ? params.sections.map((url) => normalizePhotoUrl(url)!).filter(Boolean)
+  const policy = getIndustryVisualPolicy(params.routingIndustryId);
+  const subjectSparing = Boolean(policy);
+  const heroDominant = policy?.heroDominant ?? false;
+  const hero = normalizePhotoUrl(params.hero, "hero") || fallback;
+  const product = heroDominant
+    ? hero
+    : normalizePhotoUrl(params.product, "product") || hero || fallback;
+  const service = normalizePhotoUrl(params.service, "service") || product || fallback;
+  const rawBackground =
+    normalizePhotoUrl(params.background, "background") || service || fallback;
+  const background =
+    policy &&
+    heroDominant &&
+    isSubjectPackPhotoUrl(rawBackground, policy.subjectPackId)
+      ? service && !isSubjectPackPhotoUrl(service, policy.subjectPackId)
+        ? service
+        : rawBackground
+      : rawBackground;
+  const sections = subjectSparing
+    ? capSubjectSparingSectionUrls(
+        params.routingIndustryId,
+        hero,
+        params.sections
+          .map((url) => normalizePhotoUrl(url, "section")!)
+          .filter(Boolean),
+        service,
+      )
+    : params.sections.length > 0
+      ? params.sections
+          .map((url) => normalizePhotoUrl(url, "section")!)
+          .filter(Boolean)
       : ([service, product, hero].filter(Boolean) as string[]);
-  const gallery =
-    params.gallery.length > 0
-      ? params.gallery.map((url) => normalizePhotoUrl(url)!).filter(Boolean)
+  const gallery = subjectSparing
+    ? capSubjectSparingGalleryUrls(params.routingIndustryId, hero, params.gallery)
+    : params.gallery.length > 0
+      ? params.gallery
+          .map((url) => normalizePhotoUrl(url, "gallery")!)
+          .filter(Boolean)
       : ([product, hero, service].filter(Boolean) as string[]);
   const testimonials =
     params.testimonials.length > 0
-      ? params.testimonials.map((url) => normalizePhotoUrl(url)!).filter(Boolean)
-      : ([hero, product].filter(Boolean) as string[]);
-  const about =
-    params.about.length > 0
-      ? params.about.map((url) => normalizePhotoUrl(url)!).filter(Boolean)
+      ? params.testimonials
+          .map((url) => normalizePhotoUrl(url, "testimonial")!)
+          .filter(Boolean)
+      : heroDominant
+        ? []
+        : ([hero, product].filter(Boolean) as string[]);
+  const about = subjectSparing && policy
+    ? stripSubjectPackPhotos(
+        params.about.length > 0
+          ? params.about.map((url) => normalizePhotoUrl(url, "about")!).filter(Boolean)
+          : sections,
+        policy.subjectPackId,
+        hero,
+      ).slice(0, 2)
+    : params.about.length > 0
+      ? params.about.map((url) => normalizePhotoUrl(url, "about")!).filter(Boolean)
       : sections;
-  const features =
-    params.features.length > 0
-      ? params.features.map((url) => normalizePhotoUrl(url)!).filter(Boolean)
-      : ([service, product].filter(Boolean) as string[]);
+  const features = subjectSparing && policy
+    ? stripSubjectPackPhotos(
+        params.features.length > 0
+          ? params.features
+              .map((url) => normalizePhotoUrl(url, "features")!)
+              .filter(Boolean)
+          : ([service].filter(Boolean) as string[]),
+        policy.subjectPackId,
+        hero,
+      ).slice(0, 2)
+    : params.features.length > 0
+      ? params.features
+          .map((url) => normalizePhotoUrl(url, "features")!)
+          .filter(Boolean)
+      : heroDominant
+        ? ([service].filter(Boolean) as string[])
+        : ([service, product].filter(Boolean) as string[]);
   const team =
     params.team.length > 0
-      ? params.team.map((url) => normalizePhotoUrl(url)!).filter(Boolean)
+      ? params.team.map((url) => normalizePhotoUrl(url, "team")!).filter(Boolean)
       : testimonials;
+
+  const exportMeta = heroDominant
+    ? meta.map((item) => {
+        if (item.role === "hero") return item;
+        if (item.role === "product" || item.role === "gallery" || item.role === "brand") {
+          return { ...item, url: hero };
+        }
+        if (item.url && isAutomotiveVehiclePhotoUrl(item.url)) {
+          return {
+            ...item,
+            url:
+              service && !isAutomotiveVehiclePhotoUrl(service)
+                ? service
+                : resolvePremiumStockUrl({
+                    routingIndustryId: "business",
+                    industry: "business",
+                    role: item.role,
+                    seed: item.id,
+                  }),
+          };
+        }
+        return item;
+      })
+    : meta;
 
   return `/**
  * Website Builder Image Engine — generated site imagery.
@@ -413,7 +662,7 @@ export const PRODUCT_IMAGE = ${JSON.stringify(product)};
 export const SERVICE_IMAGE = ${JSON.stringify(service)};
 export const BACKGROUND_IMAGE = ${JSON.stringify(background)};
 export const ABOUT_IMAGE = ${JSON.stringify(about[0] ?? hero)};
-export const BRAND_IMAGE = ${JSON.stringify(normalizePhotoUrl(params.brand) || hero)};
+export const BRAND_IMAGE = ${JSON.stringify(normalizePhotoUrl(params.brand, "brand") || hero)};
 export const SECTION_IMAGES = ${JSON.stringify(about.length ? about : sections)} as const;
 export const FEATURE_IMAGES = ${JSON.stringify(features)} as const;
 export const TEAM_IMAGES = ${JSON.stringify(team)} as const;
@@ -448,7 +697,7 @@ export type SiteImageMeta = {
   isUserOverride?: boolean;
 };
 
-export const SITE_IMAGES: SiteImageMeta[] = ${JSON.stringify(meta, null, 2)};
+export const SITE_IMAGES: SiteImageMeta[] = ${JSON.stringify(exportMeta, null, 2)};
 
 export function siteImagePool(): string[] {
   return [
@@ -493,14 +742,31 @@ export function imageByRole(role: string): string | null {
   return hit?.url ?? null;
 }
 
+function sharpenUnsplashUrl(url: string, role: string): string {
+  if (!url?.trim()) return "";
+  const trimmed = url.trim();
+  if (!trimmed.includes("images.unsplash.com")) return trimmed;
+  const base = trimmed.split("?")[0]!;
+  const w =
+    role === "hero" || role === "background"
+      ? 2400
+      : role === "testimonial" || role === "team"
+        ? 960
+        : 1920;
+  const q = w >= 2400 ? 90 : 88;
+  return \`\${base}?auto=format&fit=crop&w=\${w}&q=\${q}\`;
+}
+
 export function resolveSlotImage(
   kind: ImageSlotKind,
   index = 0,
   preferred?: string | null,
 ): string {
-  if (preferred?.trim()) return preferred.trim();
+  if (preferred?.trim()) return sharpenUnsplashUrl(preferred.trim(), kind);
   const images = slotImages(kind);
-  if (images.length > 0) return images[index % images.length]!;
+  if (images.length > 0) {
+    return sharpenUnsplashUrl(images[index % images.length]!, kind);
+  }
   return resolveSiteImage(null, index);
 }
 
@@ -509,10 +775,12 @@ export function resolveSiteImage(
   preferred?: string | null,
   index = 0,
 ): string {
-  if (preferred?.trim()) return preferred.trim();
+  if (preferred?.trim()) {
+    return sharpenUnsplashUrl(preferred.trim(), index === 0 ? "hero" : "section");
+  }
   const pool = siteImagePool();
   if (!pool.length) return "";
-  return pool[index % pool.length]!;
+  return sharpenUnsplashUrl(pool[index % pool.length]!, "section");
 }
 `;
 }

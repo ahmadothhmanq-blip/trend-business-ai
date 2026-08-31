@@ -7,36 +7,25 @@
       "slots": ["logo", "links", "cta"]
     },
     {
-      "id": "real-estate-prestige-dossier-rail",
-      "role": "navigation",
-      "scaffold": "components/real-estate-prestige-dossier-rail.tsx",
-      "slots": ["property-intel", "links", "cta"]
-    },
-    {
       "id": "real-estate-prestige-hero",
       "role": "hero",
       "scaffold": "components/real-estate-prestige-hero.tsx",
-      "slots": ["headline", "subheadline", "cta", "property-stats"]
+      "slots": ["headline", "metrics", "cta"]
     },
     {
-      "id": "real-estate-prestige-collection",
-      "role": "portfolio",
-      "scaffold": "components/real-estate-prestige-collection.tsx"
+      "id": "real-estate-prestige-features",
+      "role": "features",
+      "scaffold": "components/real-estate-prestige-features.tsx"
     },
     {
-      "id": "real-estate-prestige-neighborhoods",
-      "role": "gallery",
-      "scaffold": "components/real-estate-prestige-neighborhoods.tsx"
-    },
-    {
-      "id": "real-estate-prestige-architecture",
+      "id": "real-estate-prestige-about",
       "role": "story",
-      "scaffold": "components/real-estate-prestige-architecture.tsx"
+      "scaffold": "components/real-estate-prestige-about.tsx"
     },
     {
-      "id": "real-estate-prestige-advisors",
+      "id": "real-estate-prestige-stats",
       "role": "custom",
-      "scaffold": "components/real-estate-prestige-advisors.tsx"
+      "scaffold": "components/real-estate-prestige-stats.tsx"
     },
     {
       "id": "real-estate-prestige-testimonials",
@@ -44,9 +33,19 @@
       "scaffold": "components/real-estate-prestige-testimonials.tsx"
     },
     {
-      "id": "real-estate-prestige-inquiry",
+      "id": "real-estate-prestige-pricing",
+      "role": "pricing",
+      "scaffold": "components/real-estate-prestige-pricing.tsx"
+    },
+    {
+      "id": "real-estate-prestige-faq",
+      "role": "faq",
+      "scaffold": "components/real-estate-prestige-faq.tsx"
+    },
+    {
+      "id": "real-estate-prestige-contact",
       "role": "contact",
-      "scaffold": "components/real-estate-prestige-inquiry.tsx"
+      "scaffold": "components/real-estate-prestige-contact.tsx"
     },
     {
       "id": "real-estate-prestige-footer",
@@ -54,9 +53,29 @@
       "scaffold": "components/real-estate-prestige-footer.tsx"
     },
     {
+      "id": "real-estate-prestige-floating-cta",
+      "role": "cta",
+      "scaffold": "components/real-estate-prestige-floating-cta.tsx"
+    },
+    {
+      "id": "real-estate-prestige-utility-band",
+      "role": "cta",
+      "scaffold": "components/real-estate-prestige-utility-band.tsx"
+    },
+    {
       "id": "real-estate-prestige-section-shell",
       "role": "custom",
       "scaffold": "components/real-estate-prestige-section-shell.tsx"
+    },
+    {
+      "id": "real-estate-prestige-portfolio",
+      "role": "custom",
+      "scaffold": "components/real-estate-prestige-portfolio.tsx"
+    },
+    {
+      "id": "real-estate-prestige-integrations",
+      "role": "custom",
+      "scaffold": "components/real-estate-prestige-integrations.tsx"
     }
   ]
 }

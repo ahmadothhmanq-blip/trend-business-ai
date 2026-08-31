@@ -30,7 +30,7 @@ Typography: Plus Jakarta Sans + IBM Plex Sans
 Layout: bento-grid hero, logo marquee, asymmetric features
 Design system: se-* classes, grid backgrounds, metric cards</pre>
     <iframe srcdoc="<!DOCTYPE html>
-<html lang=&quot;en&quot; data-v2-render=&quot;v2-files&quot; data-v2-package=&quot;saas-enterprise&quot; data-v2-layout=&quot;default&quot;>
+<html lang=&quot;en&quot; data-v2-render=&quot;v2-files-3&quot; data-v2-package=&quot;_generation-default&quot; data-v2-layout=&quot;default&quot;>
 <head>
   <meta charset=&quot;utf-8&quot; />
   <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot; />
@@ -38,29 +38,29 @@ Design system: se-* classes, grid backgrounds, metric cards</pre>
   <style>/* Template Architecture V2 — saas-enterprise · spec 2.0.0 */
 :root {
   --v2-package: &quot;saas-enterprise&quot;;
-  --color-primary: #1D4ED8;
-  --color-secondary: #1E293B;
-  --color-accent: #3B82F6;
-  --color-background: #F8FAFC;
-  --color-foreground: #0F172A;
-  --color-muted: rgba(15,23,42,0.58);
+  --color-primary: #080E18;
+  --color-secondary: #152238;
+  --color-accent: #C4A574;
+  --color-background: #F7F6F3;
+  --color-foreground: #080E18;
+  --color-muted: rgba(8,14,24,0.58);
   --color-surface: #FFFFFF;
-  --color-signal: #059669;
-  --color-grid: rgba(15,23,42,0.06);
-  --color-ink: #020617;
-  --font-display: &quot;Plus Jakarta Sans&quot;, ui-sans-serif, system-ui, sans-serif;
-  --font-body: &quot;IBM Plex Sans&quot;, ui-sans-serif, system-ui, sans-serif;
+  --color-signal: #C4A574;
+  --color-grid: rgba(79,70,229,0.06);
+  --color-ink: #030712;
+  --font-display: Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-body: Inter, ui-sans-serif, system-ui, sans-serif;
   --spacing-unit: 0.25rem;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-  --shadow-surface: 0 1px 3px rgba(15,23,42,0.06), 0 12px 40px rgba(15,23,42,0.08);
-  --shadow-glow: 0 0 80px rgba(59,130,246,0.18);
-  --shadow-card: 0 0 0 1px rgba(15,23,42,0.04), 0 4px 24px rgba(15,23,42,0.06);
-  --border-default: rgba(15,23,42,0.08);
-  --border-accent: rgba(59,130,246,0.24);
-  --border-subtle: rgba(15,23,42,0.04);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 28px;
+  --shadow-surface: 0 2px 8px rgba(11,17,32,0.04), 0 20px 48px rgba(79,70,229,0.08);
+  --shadow-glow: 0 0 96px rgba(79,70,229,0.2);
+  --shadow-card: 0 0 0 1px rgba(11,17,32,0.04), 0 6px 28px rgba(11,17,32,0.05);
+  --border-default: rgba(11,17,32,0.08);
+  --border-accent: rgba(79,70,229,0.28);
+  --border-subtle: rgba(11,17,32,0.04);
 }
 
 /* V2 language profile — RTL typography adaptation */
@@ -68,9 +68,1020 @@ Design system: se-* classes, grid backgrounds, metric cards</pre>
   --font-display: Cairo, ui-serif, Georgia, serif;
   --font-body: &quot;IBM Plex Sans Arabic&quot;, ui-sans-serif, system-ui, sans-serif;
   letter-spacing: 0.01em;
+  line-height: 1.75;
+}
+[dir=&quot;rtl&quot;] .df-headline, [dir=&quot;rtl&quot;] .df-headline-sm {
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+/* Design Foundation — token scale */
+:root {
+  --df-space-0: 0;
+  --df-space-1: calc(0.25rem * 1);
+  --df-space-2: calc(0.25rem * 2);
+  --df-space-3: calc(0.25rem * 3);
+  --df-space-4: calc(0.25rem * 4);
+  --df-space-5: calc(0.25rem * 6);
+  --df-space-6: calc(0.25rem * 8);
+  --df-space-7: calc(0.25rem * 12);
+  --df-space-8: calc(0.25rem * 16);
+  --df-space-9: calc(0.25rem * 20);
+  --df-space-10: calc(0.25rem * 24);
+  --df-space-11: calc(0.25rem * 32);
+  --df-space-12: calc(0.25rem * 40);
+  --df-space-13: calc(0.25rem * 48);
+  --df-space-14: calc(0.25rem * 64);
+  --df-text-xs: 0.75rem;
+  --df-text-sm: 0.8125rem;
+  --df-text-base: 0.9375rem;
+  --df-text-lg: 1.0625rem;
+  --df-text-xl: 1.75rem;
+  --df-text-2xl: clamp(1.375rem, 2.2vw, 1.875rem);
+  --df-text-3xl: clamp(1.625rem, 2.8vw, 2.25rem);
+  --df-text-display: clamp(2rem, 3.6vw, 2.75rem);
+  --df-leading-tight: 1.12;
+  --df-leading-display: 1.12;
+  --df-leading-stacked: 1.05;
+  --df-leading-snug: 1.32;
+  --df-leading-normal: 1.58;
+  --df-leading-relaxed: 1.72;
+  --df-stack-word-gap: 0.06em;
+  --df-tracking-tight: -0.028em;
+  --df-tracking-wide: 0.1em;
+  --df-tracking-wider: 0.2em;
+  --df-radius-sm: 6px;
+  --df-radius-md: 10px;
+  --df-radius-lg: 16px;
+  --df-radius-xl: 24px;
+  --df-radius-pill: 9999px;
+  --df-grid-columns: 12;
+  --df-grid-gutter: clamp(1.125rem, 2.8vw, 2rem);
+  --df-container-padding: clamp(1.25rem, 4.2vw, 2.75rem);
+  --df-section-y: clamp(4.25rem, 9vw, 7rem);
+  --df-section-y-tight: clamp(3.25rem, 6.5vw, 5rem);
+  --cb-section-y: clamp(4.5rem, 9.5vw, 7.25rem);
+  --se-section-y: clamp(3.75rem, 8.5vw, 6rem);
+  --as-section-y: clamp(4.5rem, 12vw, 7.5rem);
+  --ed-section-y: clamp(5.25rem, 11.5vw, 8rem);
+  --fn-section-y: clamp(5.25rem, 11.5vw, 8rem);
+  --mp-section-y: clamp(4.75rem, 11.5vw, 7.25rem);
+  --sv-section-y: clamp(4.75rem, 13.5vw, 8.5rem);
+  --ec-section-y: clamp(4.25rem, 8.5vw, 6.75rem);
+  --rp-section-y: clamp(5.25rem, 12.5vw, 8.5rem);
+  --hr-section-y: clamp(5.25rem, 12.5vw, 8.5rem);
+  --rep-section-y: clamp(5.75rem, 12.5vw, 8.75rem);
+  --df-stack-gap: clamp(1rem, 2.4vw, 1.625rem);
+  --df-shadow-ambient: 0 1px 2px color-mix(in srgb, var(--color-foreground) 4%, transparent);
+  --df-shadow-card: 0 10px 36px color-mix(in srgb, var(--color-foreground) 5%, transparent), 0 2px 8px color-mix(in srgb, var(--color-foreground) 3%, transparent);
+  --df-shadow-elevated: 0 28px 72px color-mix(in srgb, var(--color-foreground) 8%, transparent), 0 8px 24px color-mix(in srgb, var(--color-foreground) 4%, transparent);
+  --df-shadow-inset: inset 0 1px 0 color-mix(in srgb, #fff 22%, transparent);
+  --df-motion-fast: 180ms;
+  --df-motion-base: 380ms;
+  --df-motion-slow: 640ms;
+  --df-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --df-motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --df-focus-width: 2px;
+  --df-focus-offset: 3px;
+  --df-focus-color: color-mix(in srgb, var(--color-accent, var(--color-signal)) 72%, transparent);
+  --df-border-width: 1px;
+  --df-nav-height: 4.5rem;
+  --df-footer-gap: clamp(2.25rem, 5.5vw, 3.75rem);
 }
 
-@import url(&quot;https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:ital,wght@0,500;0,600;0,700;0,800;1,500&display=swap&quot;);
+/* Flagship semantic theme — visual identity layer */
+:root, .v2-template {
+  --df-theme-mode: dark;
+  --color-surface-elevated: color-mix(in srgb, var(--color-surface, var(--color-background)) 90%, #fff 10%);
+  --color-surface-inset: color-mix(in srgb, var(--color-background) 86%, #000 14%);
+  --df-border-subtle: color-mix(in srgb, var(--color-foreground) 8%, transparent);
+  --df-border-default: color-mix(in srgb, var(--color-foreground) 14%, transparent);
+  --df-border-accent: color-mix(in srgb, var(--color-accent, var(--color-signal)) 42%, transparent);
+  --df-foreground-muted: color-mix(in srgb, var(--color-foreground) 60%, transparent);
+  --df-accent-glow: color-mix(in srgb, var(--color-signal, var(--color-accent)) 24%, transparent);
+  --df-headline-tracking: -0.03em;
+}
+.v2-template { color-scheme: dark; }
+
+/* Design Foundation — motion */
+@keyframes df-reveal-up {
+  from { opacity: 0; transform: translateY(24px); filter: blur(4px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+@keyframes df-reveal-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes df-slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes df-scale-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes df-draw-line {
+  from { transform: scaleX(0); opacity: 0; }
+  to { transform: scaleX(1); opacity: 1; }
+}
+
+.v2-motion[data-entrance=&quot;slide-up&quot;],
+.v2-motion[data-entrance=&quot;fade-in&quot;] {
+  animation-duration: var(--df-motion-base);
+  animation-timing-function: var(--df-motion-ease);
+  animation-fill-mode: both;
+}
+.v2-motion[data-entrance=&quot;slide-up&quot;] { animation-name: df-reveal-up; }
+.v2-motion[data-entrance=&quot;fade-in&quot;] { animation-name: df-reveal-fade; }
+
+.df-animate-reveal {
+  animation: df-reveal-up var(--df-motion-slow) var(--df-motion-ease) both;
+}
+.df-animate-slide-up {
+  animation: df-slide-up var(--df-motion-base) var(--df-motion-ease) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v2-motion, [data-v2-motion], .df-animate-reveal, .df-animate-slide-up {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Design Foundation — primitives */
+.v2-template {
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-base);
+  line-height: var(--df-leading-normal);
+  color: var(--color-foreground);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography */
+.df-font-display { font-family: var(--font-display), ui-serif, Georgia, serif; }
+.df-font-body { font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif; }
+.df-eyebrow {
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-xs);
+  font-weight: 500;
+  letter-spacing: var(--df-tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-signal, var(--color-accent));
+}
+.df-headline {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+  font-size: var(--df-text-display);
+  font-weight: 500;
+  line-height: var(--df-leading-tight);
+  letter-spacing: var(--df-headline-tracking, var(--df-tracking-tight));
+  color: var(--color-foreground);
+  text-wrap: balance;
+}
+.df-headline-sm {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+  font-size: clamp(1.875rem, 3.5vw, 2.75rem);
+  font-weight: 500;
+  line-height: var(--df-leading-snug);
+  letter-spacing: var(--df-tracking-tight);
+  color: var(--color-foreground);
+  text-wrap: balance;
+}
+.df-body {
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-lg);
+  line-height: var(--df-leading-relaxed);
+  color: var(--df-foreground-muted, var(--color-muted, color-mix(in srgb, var(--color-foreground) 58%, transparent)));
+  max-width: 38rem;
+}
+.df-prose {
+  font-size: var(--df-text-base);
+  line-height: var(--df-leading-relaxed);
+  color: var(--color-muted, color-mix(in srgb, var(--color-foreground) 62%, transparent));
+  max-width: 36rem;
+}
+.df-caption {
+  font-size: var(--df-text-sm);
+  line-height: var(--df-leading-normal);
+  color: var(--color-muted, color-mix(in srgb, var(--color-foreground) 55%, transparent));
+}
+
+/* Layout — sections, grid, containers */
+.df-section { padding-block: var(--df-section-y); }
+.df-section-tight { padding-block: var(--df-section-y-tight); }
+.df-section-alt {
+  background: var(--color-surface-elevated, var(--color-surface, #fff));
+}
+.df-section-glow {
+  position: relative;
+  overflow: hidden;
+}
+.df-section-glow::before {
+  content: &quot;&quot;;
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 72% 58% at 14% 0%, var(--df-accent-glow, color-mix(in srgb, var(--color-accent, var(--color-signal)) 10%, transparent)), transparent 62%),
+    radial-gradient(ellipse 58% 48% at 92% 100%, color-mix(in srgb, var(--color-primary) 7%, transparent), transparent 58%);
+}
+.df-container {
+  margin-inline: auto;
+  width: 100%;
+  max-width: var(--container-max, 82rem);
+  padding-inline: var(--df-container-padding);
+}
+.df-container-narrow { max-width: min(var(--container-max, 82rem), 48rem); }
+.df-container-wide { max-width: min(calc(var(--container-max, 82rem) + 6rem), 96rem); }
+.df-grid-12 {
+  display: grid;
+  grid-template-columns: repeat(var(--df-grid-columns), minmax(0, 1fr));
+  gap: var(--df-grid-gutter);
+}
+.df-stack { display: flex; flex-direction: column; gap: var(--df-stack-gap); }
+.df-divider {
+  height: var(--df-border-width);
+  width: 100%;
+  background: var(--df-border-subtle, var(--border-subtle, color-mix(in srgb, var(--color-foreground) 8%, transparent)));
+}
+
+/* Cards */
+.df-card {
+  border: var(--df-border-width) solid var(--df-border-subtle, var(--border-subtle, color-mix(in srgb, var(--color-foreground) 8%, transparent)));
+  background: var(--color-surface-elevated, var(--color-surface, #fff));
+  border-radius: var(--radius-lg, var(--df-radius-lg, 16px));
+  box-shadow: var(--shadow-card, var(--df-shadow-card));
+  transition:
+    box-shadow var(--df-motion-base) var(--df-motion-ease),
+    transform var(--df-motion-base) var(--df-motion-ease),
+    border-color var(--df-motion-fast) ease;
+}
+.df-card:hover {
+  border-color: var(--df-border-accent, var(--border-accent, color-mix(in srgb, var(--color-accent) 28%, transparent)));
+  box-shadow: var(--shadow-surface, var(--df-shadow-elevated));
+  transform: translateY(-2px);
+}
+.df-card-featured {
+  border-color: color-mix(in srgb, var(--color-signal, var(--color-accent)) 28%, var(--border-subtle, transparent));
+  background: linear-gradient(
+    155deg,
+    var(--color-primary) 0%,
+    color-mix(in srgb, var(--color-primary) 88%, var(--color-secondary, var(--color-primary))) 100%
+  );
+  color: #fff;
+  box-shadow: var(--shadow-surface);
+}
+.df-card-glass {
+  background: color-mix(in srgb, var(--color-surface-elevated, var(--color-surface, #fff)) 78%, transparent);
+  backdrop-filter: blur(22px) saturate(1.15);
+  border: var(--df-border-width) solid color-mix(in srgb, #fff 55%, var(--df-border-subtle, transparent));
+  border-radius: var(--radius-lg, var(--df-radius-lg, 16px));
+  box-shadow: var(--shadow-card, var(--df-shadow-card));
+}
+.df-card-interactive { cursor: pointer; }
+.df-card-interactive:focus-visible { outline: var(--df-focus-width) solid var(--df-focus-color); outline-offset: var(--df-focus-offset); }
+
+/* Buttons */
+.df-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0 1.625rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  color: var(--color-background, #fff);
+  background: var(--color-primary);
+  border: var(--df-border-width) solid color-mix(in srgb, var(--color-primary) 78%, #000);
+  border-radius: var(--df-radius-pill, 9999px);
+  box-shadow: var(--shadow-card, var(--df-shadow-card));
+  transition:
+    transform var(--df-motion-fast) var(--df-motion-ease),
+    box-shadow var(--df-motion-base) var(--df-motion-ease),
+    filter var(--df-motion-fast) ease;
+}
+.df-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-surface, var(--df-shadow-elevated));
+  filter: brightness(1.05);
+}
+.df-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0 1.625rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  color: var(--color-foreground);
+  background: var(--color-surface-elevated, var(--color-surface, #fff));
+  border: var(--df-border-width) solid var(--df-border-default, var(--border-default, color-mix(in srgb, var(--color-foreground) 12%, transparent)));
+  border-radius: var(--df-radius-pill, 9999px);
+  transition:
+    border-color var(--df-motion-fast) ease,
+    background var(--df-motion-fast) ease,
+    transform var(--df-motion-fast) var(--df-motion-ease);
+}
+.df-btn-secondary:hover {
+  border-color: var(--df-border-accent, color-mix(in srgb, var(--color-foreground) 18%, var(--border-default, transparent)));
+  background: var(--color-surface-elevated, color-mix(in srgb, var(--color-surface, #fff) 96%, var(--color-background)));
+  transform: translateY(-1px);
+}
+.df-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  font-weight: 500;
+  color: var(--color-signal, var(--color-accent));
+  text-decoration: none;
+  transition: gap var(--df-motion-fast) ease, opacity var(--df-motion-fast) ease;
+}
+.df-btn-ghost:hover { gap: 0.625rem; opacity: 0.85; }
+.df-btn-link {
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  font-weight: 500;
+  color: var(--color-accent, var(--color-signal));
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  transition: opacity var(--df-motion-fast) ease;
+}
+.df-btn-link:hover { opacity: 0.8; }
+
+/* Forms */
+.df-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  font-weight: 500;
+  color: var(--color-foreground);
+}
+.df-input,
+.df-textarea,
+.df-select {
+  width: 100%;
+  border-radius: var(--radius-md, var(--df-radius-md, 10px));
+  border: var(--df-border-width) solid var(--df-border-default, var(--border-default, color-mix(in srgb, var(--color-foreground) 12%, transparent)));
+  background: var(--color-surface-elevated, var(--color-surface, var(--color-background)));
+  padding: 0.75rem 1rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  color: var(--color-foreground);
+  transition:
+    border-color var(--df-motion-fast) ease,
+    box-shadow var(--df-motion-fast) ease;
+}
+.df-textarea { min-height: 7rem; resize: vertical; }
+.df-input::placeholder,
+.df-textarea::placeholder {
+  color: color-mix(in srgb, var(--color-muted, var(--color-foreground)) 70%, transparent);
+}
+.df-input:focus-visible,
+.df-textarea:focus-visible,
+.df-select:focus-visible {
+  outline: none;
+  border-color: var(--color-signal, var(--color-accent));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-signal, var(--color-accent)) 14%, transparent);
+}
+.df-field { display: flex; flex-direction: column; gap: 0.375rem; }
+.df-form-group { display: flex; flex-direction: column; gap: var(--df-stack-gap); }
+
+/* Navigation */
+.df-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  min-height: var(--df-nav-height);
+}
+.df-nav-link {
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  font-weight: 500;
+  color: color-mix(in srgb, var(--color-foreground) 72%, transparent);
+  text-decoration: none;
+  transition: color var(--df-motion-fast) ease;
+}
+.df-nav-link:hover { color: var(--color-foreground); }
+.df-nav-link-active {
+  color: var(--color-foreground);
+  font-weight: 600;
+}
+
+/* Footer */
+.df-footer {
+  padding-block: var(--df-footer-gap);
+  border-top: var(--df-border-width) solid var(--df-border-subtle, var(--border-subtle, color-mix(in srgb, var(--color-foreground) 8%, transparent)));
+  background: var(--color-surface-inset, var(--color-surface, var(--color-background)));
+}
+.df-footer-grid {
+  display: grid;
+  gap: var(--df-stack-gap);
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+}
+.df-footer-col { display: flex; flex-direction: column; gap: 0.75rem; }
+.df-footer-link {
+  font-size: var(--df-text-sm);
+  color: var(--color-muted, color-mix(in srgb, var(--color-foreground) 58%, transparent));
+  text-decoration: none;
+  transition: color var(--df-motion-fast) ease;
+}
+.df-footer-link:hover { color: var(--color-foreground); }
+
+/* Effects & utilities */
+.df-focus-ring:focus-visible {
+  outline: var(--df-focus-width) solid var(--df-focus-color);
+  outline-offset: var(--df-focus-offset);
+}
+.df-accent-line {
+  height: var(--df-border-width);
+  width: 3.5rem;
+  background: linear-gradient(
+    to inline-end,
+    var(--color-signal, var(--color-accent)),
+    transparent
+  );
+}
+
+/* Typography-forward hero when image slots are empty — legacy fallback */
+.df-hero-editorial {
+  margin-inline: auto;
+  width: 100%;
+  max-width: min(44rem, 100%);
+  text-align: center;
+}
+.df-hero-editorial-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: min(88vh, 52rem);
+  padding-block: clamp(4.5rem, 12vh, 8rem);
+}
+.df-hero-editorial .df-accent-line,
+.df-hero-editorial [class*=&quot;-rule&quot;],
+.df-hero-editorial [class*=&quot;-copper-rule&quot;],
+.df-hero-editorial [class*=&quot;-brass-rule&quot;],
+.df-hero-editorial [class*=&quot;-azure-rule&quot;],
+.df-hero-editorial [class*=&quot;-gold-rule&quot;],
+.df-hero-editorial [class*=&quot;-sage-rule&quot;] {
+  margin-inline: auto;
+}
+.df-hero-editorial .df-body,
+.df-hero-editorial [class*=&quot;-body&quot;] {
+  margin-inline: auto;
+}
+
+/* Sector-specific empty-hero profiles */
+.df-hero-split-empty-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: min(94vh, 58rem);
+  padding-block: clamp(4rem, 10vh, 7rem);
+}
+.df-hero-split-empty-copy {
+  text-align: start;
+  max-width: none;
+}
+@media (min-width: 1024px) {
+  .df-hero-split-empty-copy { grid-column: span 5 / span 5; }
+  .df-hero-split-empty-visual { grid-column: span 7 / span 7; }
+}
+.df-hero-split-empty-visual {
+  position: relative;
+  min-height: clamp(18rem, 42vh, 28rem);
+}
+
+.df-hero-bleed-empty-section {
+  position: relative;
+  min-height: min(100svh, 56rem);
+  overflow: hidden;
+}
+.df-hero-bleed-empty-backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 90% 70% at 18% 85%, color-mix(in srgb, var(--color-primary) 22%, transparent), transparent 58%),
+    radial-gradient(ellipse 60% 50% at 82% 18%, color-mix(in srgb, var(--color-accent, var(--color-signal)) 14%, transparent), transparent 52%),
+    linear-gradient(168deg, var(--color-background) 0%, color-mix(in srgb, var(--color-surface) 88%, var(--color-background)) 48%, var(--color-background) 100%);
+}
+.df-hero-bleed-empty-content { text-align: start; }
+.df-hero-bleed-empty-copy { text-align: start; }
+.df-hero-bleed-empty-copy [class*=&quot;-rule&quot;],
+.df-hero-bleed-empty-copy [class*=&quot;-copper-rule&quot;],
+.df-hero-bleed-empty-copy [class*=&quot;-brass-rule&quot;],
+.df-hero-bleed-empty-copy [class*=&quot;-azure-rule&quot;] {
+  margin-inline: 0;
+}
+
+.df-hero-trust-empty-section {
+  min-height: min(88vh, 52rem);
+  padding-block: clamp(3.5rem, 8vh, 6rem);
+}
+.df-hero-trust-empty-copy { text-align: start; max-width: none; }
+
+.df-hero-type-empty-section {
+  min-height: min(94vh, 58rem);
+  border-bottom: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 12%, transparent));
+}
+.df-hero-type-empty { text-align: start; }
+
+/* Hero collision guards — fluid/smaller viewports */
+[data-v2-component$=&quot;-hero&quot;] {
+  isolation: isolate;
+}
+[data-v2-component$=&quot;-hero&quot;] h1,
+[data-v2-component$=&quot;-hero&quot;] [id$=&quot;-hero-title&quot;],
+[data-v2-component$=&quot;-hero&quot;] .df-hero-bleed-empty-copy,
+[data-v2-component$=&quot;-hero&quot;] [class*=&quot;-headline&quot;],
+[data-v2-component$=&quot;-hero&quot;] [class*=&quot;-display&quot;] {
+  position: relative;
+  z-index: 2;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+/* Typography collision guards — headlines, grids, stacked words */
+.v2-template h1,
+.v2-template h2,
+.v2-template h3,
+.v2-template [class*=&quot;-headline&quot;],
+.v2-template [class*=&quot;-display&quot;] {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  text-wrap: balance;
+  max-width: 100%;
+}
+.v2-template [class*=&quot;-display&quot;] > span,
+.v2-template .df-headline-stack > * {
+  display: block;
+  line-height: var(--df-leading-stacked, 1.05);
+  padding-block: var(--df-stack-word-gap, 0.06em);
+}
+.v2-template [class*=&quot;-quote-mark&quot;] {
+  display: block;
+  line-height: 1;
+  height: 0.62em;
+  margin-block-end: 0.2em;
+  overflow: visible;
+}
+.v2-template .grid > *,
+.v2-template [class*=&quot;grid-cols&quot;] > *,
+.v2-template .df-grid-12 > * {
+  min-width: 0;
+}
+.v2-template [class*=&quot;-metric&quot;],
+.v2-template [class*=&quot;-stat-value&quot;] {
+  line-height: var(--df-leading-tight, 1.12);
+}
+.df-hero-type-empty > *,
+.df-hero-split-empty > *,
+.df-hero-estate-empty > *,
+.df-hero-frame-empty > *,
+.df-hero-trust-empty > * {
+  min-width: 0;
+}
+@media (max-width: 1023px) {
+  .df-hero-type-empty {
+    min-height: auto;
+    padding-block: clamp(3rem, 9vh, 5.5rem);
+  }
+  .df-hero-split-empty-section {
+    min-height: auto;
+    padding-block: clamp(3.5rem, 10vh, 6rem);
+  }
+  .df-hero-bleed-empty-content {
+    min-height: min(88svh, 52rem);
+    padding-top: clamp(5rem, 14vh, 8rem);
+  }
+  .df-hero-type-empty [class*=&quot;-index-num&quot;] {
+    font-size: clamp(3rem, 12vw, 5rem) !important;
+    line-height: 1 !important;
+  }
+}
+
+.df-hero-estate-empty-section { min-height: min(95svh, 58rem); }
+.df-hero-estate-empty-copy { text-align: start; }
+.df-hero-estate-empty-visual {
+  position: relative;
+  min-height: clamp(20rem, 48vh, 32rem);
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--color-primary) 18%, var(--color-background)), var(--color-background)),
+    radial-gradient(ellipse 70% 60% at 70% 30%, color-mix(in srgb, var(--color-accent, var(--color-signal)) 12%, transparent), transparent 60%);
+}
+
+.df-hero-frame-empty-section { min-height: min(88svh, 54rem); }
+.df-hero-frame-empty-copy { text-align: start; }
+.df-hero-frame-empty-visual {
+  position: relative;
+  min-height: clamp(16rem, 38vh, 24rem);
+}
+.df-hero-scrim {
+  background: linear-gradient(
+    to inline-end,
+    color-mix(in srgb, var(--color-primary) 90%, transparent) 0%,
+    color-mix(in srgb, var(--color-primary) 70%, transparent) 45%,
+    transparent 100%
+  );
+}
+.df-scrim-inline {
+  background: linear-gradient(
+    to inline-end,
+    color-mix(in srgb, var(--color-background) 90%, transparent) 0%,
+    color-mix(in srgb, var(--color-background) 35%, transparent) 52%,
+    transparent 100%
+  );
+}
+
+/* Premium empty image slots — intentional editorial negative space */
+.df-slot-empty {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  min-height: var(--df-slot-min-h, 11rem);
+  background:
+    radial-gradient(
+      ellipse 90% 65% at 50% -10%,
+      color-mix(in srgb, var(--color-accent, var(--color-primary)) 7%, transparent),
+      transparent 68%
+    ),
+    linear-gradient(
+      168deg,
+      color-mix(in srgb, var(--color-surface, #fff) 94%, var(--color-primary)) 0%,
+      color-mix(in srgb, var(--color-background) 97%, var(--color-primary)) 100%
+    );
+  border: 1px solid color-mix(in srgb, var(--color-foreground) 7%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 40%, transparent);
+}
+.df-slot-empty::before {
+  content: &quot;&quot;;
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(
+      color-mix(in srgb, var(--color-foreground) 4%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-foreground) 4%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 3.5rem 3.5rem;
+  opacity: 0.45;
+  mask-image: radial-gradient(ellipse 75% 75% at 50% 45%, #000 20%, transparent 72%);
+}
+.df-slot-empty::after {
+  content: &quot;&quot;;
+  pointer-events: none;
+  position: absolute;
+  inset: auto 12% 14%;
+  height: 1px;
+  background: linear-gradient(
+    to inline-end,
+    transparent,
+    color-mix(in srgb, var(--color-accent, var(--color-primary)) 35%, transparent),
+    transparent
+  );
+  opacity: 0.65;
+}
+[data-slot-empty=&quot;hero&quot;].df-slot-empty {
+  min-height: var(--df-slot-min-h-hero, 18rem);
+}
+[data-slot-empty=&quot;gallery&quot;].df-slot-empty,
+[data-slot-empty=&quot;products&quot;].df-slot-empty {
+  min-height: var(--df-slot-min-h-media, 14rem);
+}
+.df-glow-orb {
+  pointer-events: none;
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(64px);
+  opacity: 0.35;
+}
+.df-quote-mark {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+  font-size: 3.5rem;
+  line-height: 1;
+  color: color-mix(in srgb, var(--color-signal, var(--color-accent)) 28%, transparent);
+}
+.df-star { color: var(--color-signal, var(--color-accent)); letter-spacing: 0.1em; }
+.df-metric {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 500;
+  letter-spacing: var(--df-tracking-tight);
+  color: var(--color-foreground);
+  line-height: var(--df-leading-tight, 1.12);
+}
+.df-grid-bg {
+  background-image:
+    linear-gradient(var(--color-grid, color-mix(in srgb, var(--color-foreground) 4%, transparent)) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid, color-mix(in srgb, var(--color-foreground) 4%, transparent)) 1px, transparent 1px);
+  background-size: 72px 72px;
+}
+
+/* Design Foundation — RTL & Arabic typography */
+[dir=&quot;rtl&quot;] .v2-template,
+[dir=&quot;rtl&quot;] .v2-template * {
+  letter-spacing: 0.01em;
+}
+
+[dir=&quot;rtl&quot;] .v2-template {
+  line-height: 1.75;
+}
+
+[dir=&quot;rtl&quot;] .df-eyebrow {
+  letter-spacing: 0.06em;
+}
+
+[dir=&quot;rtl&quot;] .df-headline,
+[dir=&quot;rtl&quot;] .df-headline-sm,
+[dir=&quot;rtl&quot;] [class*=&quot;-headline&quot;],
+[dir=&quot;rtl&quot;] [class*=&quot;-display&quot;] {
+  line-height: 1.28;
+  letter-spacing: 0;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+  text-transform: none;
+}
+
+[dir=&quot;rtl&quot;] [class*=&quot;-display&quot;] > span,
+[dir=&quot;rtl&quot;] .df-headline-stack > * {
+  line-height: 1.22;
+  padding-block: 0.08em;
+}
+
+[dir=&quot;rtl&quot;] .df-body,
+[dir=&quot;rtl&quot;] .df-prose {
+  line-height: 1.85;
+  max-width: 42rem;
+}
+
+[dir=&quot;rtl&quot;] .df-container,
+[dir=&quot;rtl&quot;] .df-stack,
+[dir=&quot;rtl&quot;] .df-card,
+[dir=&quot;rtl&quot;] section {
+  text-align: start;
+}
+
+[dir=&quot;rtl&quot;] .text-center {
+  text-align: center;
+}
+
+[dir=&quot;rtl&quot;] .df-accent-line,
+[dir=&quot;rtl&quot;] [class*=&quot;-rule&quot;],
+[dir=&quot;rtl&quot;] [class*=&quot;-accent-line&quot;],
+[dir=&quot;rtl&quot;] [class*=&quot;-gold-rule&quot;],
+[dir=&quot;rtl&quot;] [class*=&quot;-sage-rule&quot;],
+[dir=&quot;rtl&quot;] [class*=&quot;-volt-line&quot;],
+[dir=&quot;rtl&quot;] [class*=&quot;-brass-rule&quot;],
+[dir=&quot;rtl&quot;] [class*=&quot;-copper-rule&quot;],
+[dir=&quot;rtl&quot;] [class*=&quot;-azure-rule&quot;] {
+  transform-origin: inline-end;
+}
+
+[dir=&quot;rtl&quot;] [class*=&quot;marquee-track&quot;] {
+  animation-direction: reverse;
+}
+
+[dir=&quot;rtl&quot;] .df-hero-scrim {
+  background: linear-gradient(
+    to inline-start,
+    color-mix(in srgb, var(--color-primary) 90%, transparent) 0%,
+    color-mix(in srgb, var(--color-primary) 70%, transparent) 45%,
+    transparent 100%
+  );
+}
+
+[dir=&quot;rtl&quot;] .v2-sidebar-shell {
+  flex-direction: row-reverse;
+}
+
+/* Design Foundation — responsive */
+.v2-template .df-container {
+  max-width: var(--container-max, 80rem);
+}
+
+@media (max-width: 767px) {
+  .v2-template .df-nav {
+    flex-wrap: wrap;
+    min-height: auto;
+    padding-block: 0.75rem;
+  }
+  .v2-template .df-footer-grid {
+    grid-template-columns: 1fr;
+  }
+  .v2-template .df-grid-12 {
+    grid-template-columns: 1fr;
+  }
+  .v2-template .df-headline {
+    font-size: clamp(2rem, 8vw, 2.75rem);
+    line-height: var(--df-leading-display, 1.12);
+  }
+  .v2-template [class*=&quot;-display&quot;] {
+    font-size: clamp(2rem, 10vw, 3.5rem);
+    line-height: var(--df-leading-stacked, 1.05);
+  }
+  .v2-template [class*=&quot;-headline&quot;]:not([class*=&quot;-headline-sm&quot;]):not([class*=&quot;-headline-lg&quot;]) {
+    font-size: clamp(1.875rem, 8vw, 2.75rem);
+    line-height: var(--df-leading-display, 1.12);
+  }
+  .v2-template [class*=&quot;-headline-lg&quot;] {
+    font-size: clamp(2rem, 9vw, 3.25rem);
+    line-height: var(--df-leading-display, 1.12);
+  }
+  .v2-template .df-btn-primary,
+  .v2-template .df-btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (min-width: 768px) {
+  .v2-template .df-grid-12[data-cols=&quot;2&quot;] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .v2-template .df-grid-12[data-cols=&quot;3&quot;] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1024px) {
+  .v2-template .df-grid-12[data-cols=&quot;4&quot;] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .v2-template [data-v2-region=&quot;overlay&quot;] {
+    padding-inline: var(--df-container-padding);
+  }
+}
+
+@media (max-width: 1023px) {
+  .v2-template [data-v2-region=&quot;header&quot;] {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(12px);
+    background: color-mix(in srgb, var(--color-background) 88%, transparent);
+  }
+}
+
+/* Design Foundation — backward-compatible aliases */
+.df-section-glow,
+.se-section-glow,
+.cb-section-glow,
+.ec-section-glow,
+.mp-section-glow,
+.fn-section-glow,
+.ed-section-glow,
+.hr-section-glow,
+.rep-section-glow,
+.sv-section-glow,
+.cp-section-glow,
+.rs-section-glow,
+.rp-section-glow {
+position: relative; overflow: hidden;
+}
+.df-glow-orb,
+.se-glow-orb,
+.ec-glow-orb,
+.cb-glow-orb {
+pointer-events: none; position: absolute; border-radius: 9999px; filter: blur(64px); opacity: 0.35;
+}
+.df-section-alt,
+.se-section-alt,
+.ec-section-alt,
+.cb-section-alt,
+.mp-section-alt,
+.fn-section-alt,
+.ed-section-alt,
+.hr-section-alt,
+.rep-section-alt,
+.sv-section-alt,
+.cp-section-alt,
+.rs-section-alt,
+.rp-section-alt {
+background: var(--color-surface-elevated, var(--color-surface, #fff));
+}
+.df-card-featured,
+.se-card-featured,
+.cb-card-featured,
+.ec-card-featured {
+border-color: color-mix(in srgb, var(--color-signal, var(--color-accent)) 28%, var(--border-subtle, transparent));
+        background: linear-gradient(155deg, var(--color-primary) 0%, color-mix(in srgb, var(--color-primary) 88%, var(--color-secondary, var(--color-primary))) 100%);
+        color: #fff;
+        box-shadow: var(--shadow-surface);
+}
+.df-quote-mark,
+.se-quote-mark,
+.ec-quote-mark,
+.cb-quote-mark,
+.fn-quote-mark {
+font-family: var(--font-display), ui-serif, Georgia, serif;
+        font-size: 3.5rem;
+        line-height: 1;
+        color: color-mix(in srgb, var(--color-signal, var(--color-accent)) 28%, transparent);
+}
+.df-star,
+.se-star,
+.ec-star,
+.fn-star {
+color: var(--color-signal, var(--color-accent)); letter-spacing: 0.1em;
+}
+.df-input,
+.se-input,
+.ec-input,
+.cb-input,
+.fn-input,
+.mp-input,
+.ed-input,
+.hr-input,
+.rep-input,
+.sv-input,
+.cp-input,
+.rs-input,
+.rp-input {
+width: 100%;
+        border-radius: var(--radius-md, 8px);
+        border: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 12%, transparent));
+        background: var(--color-surface, var(--color-background));
+        padding: 0.75rem 1rem;
+        font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+        font-size: var(--df-text-sm, 0.875rem);
+        color: var(--color-foreground);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.df-textarea,
+.se-textarea,
+.ec-textarea,
+.cb-textarea,
+.fn-textarea,
+.mp-textarea {
+width: 100%;
+        min-height: 7rem;
+        resize: vertical;
+        border-radius: var(--radius-md, 8px);
+        border: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 12%, transparent));
+        background: var(--color-surface, var(--color-background));
+        padding: 0.75rem 1rem;
+        font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+        font-size: var(--df-text-sm, 0.875rem);
+        color: var(--color-foreground);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.df-container,
+.cb-container {
+margin-inline: auto;
+        width: 100%;
+        max-width: var(--container-max, 82rem);
+        padding-inline: var(--df-container-padding, clamp(1.25rem, 4vw, 2.5rem));
+}
+
+.df-section-glow::before,
+.se-section-glow::before,
+.cb-section-glow::before,
+.ec-section-glow::before,
+.mp-section-glow::before,
+.fn-section-glow::before,
+.ed-section-glow::before,
+.hr-section-glow::before,
+.rep-section-glow::before,
+.sv-section-glow::before,
+.cp-section-glow::before,
+.rs-section-glow::before,
+.rp-section-glow::before {
+  content: &quot;&quot;;
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 55% at 15% 0%, color-mix(in srgb, var(--color-accent, var(--color-signal)) 8%, transparent), transparent 60%),
+    radial-gradient(ellipse 55% 45% at 90% 100%, color-mix(in srgb, var(--color-primary) 6%, transparent), transparent 55%);
+}
+
+.df-input:focus-visible, .se-input:focus-visible, .ec-input:focus-visible, .cb-input:focus-visible, .fn-input:focus-visible,
+.df-textarea:focus-visible, .se-textarea:focus-visible, .ec-textarea:focus-visible, .cb-textarea:focus-visible, .fn-textarea:focus-visible {
+  outline: none;
+  border-color: var(--color-signal, var(--color-accent));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-signal, var(--color-accent)) 14%, transparent);
+}
+
+@keyframes df-slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes se-slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@import url(&quot;https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Syne:wght@500;600;700;800&display=swap&quot;);
 
 @keyframes se-grid-reveal {
   from { opacity: 0; transform: translateY(20px) scale(0.98); }
@@ -83,6 +1094,10 @@ Design system: se-* classes, grid backgrounds, metric cards</pre>
 @keyframes se-marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
+}
+[dir=&quot;rtl&quot;] [class*=&quot;se-marquee&quot;],
+[dir=&quot;rtl&quot;] [class*=&quot;cb-marquee&quot;] {
+  animation-direction: reverse;
 }
 @keyframes se-pulse-dot {
   0%, 100% { opacity: 0.4; transform: scale(0.85); }
@@ -98,11 +1113,11 @@ Design system: se-* classes, grid backgrounds, metric cards</pre>
   .se-animate, [data-se-motion] { animation: none !important; transition: none !important; }
 }
 
-.se-font-display { font-family: var(--font-display), &quot;Plus Jakarta Sans&quot;, system-ui, sans-serif; }
-.se-font-body { font-family: var(--font-body), &quot;IBM Plex Sans&quot;, system-ui, sans-serif; }
-.se-font-mono { font-family: &quot;IBM Plex Mono&quot;, ui-monospace, monospace; }
+.se-font-display { font-family: var(--font-display), &quot;Syne&quot;, system-ui, sans-serif; }
+.se-font-body { font-family: var(--font-body), &quot;DM Sans&quot;, system-ui, sans-serif; }
+.se-font-mono { font-family: &quot;JetBrains Mono&quot;, ui-monospace, monospace; }
 .se-eyebrow {
-  font-family: var(--font-body), &quot;IBM Plex Sans&quot;, system-ui, sans-serif;
+  font-family: var(--font-body), &quot;DM Sans&quot;, system-ui, sans-serif;
   font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.14em;
@@ -110,26 +1125,29 @@ Design system: se-* classes, grid backgrounds, metric cards</pre>
   color: var(--color-accent, #3B82F6);
 }
 .se-headline {
-  font-family: var(--font-display), &quot;Plus Jakarta Sans&quot;, system-ui, sans-serif;
-  font-size: clamp(2.25rem, 4.5vw, 3.75rem);
+  font-family: var(--font-display), &quot;Syne&quot;, system-ui, sans-serif;
+  font-size: var(--df-text-display, clamp(2rem, 3.6vw, 2.75rem));
   font-weight: 700;
-  line-height: 1.08;
-  letter-spacing: -0.03em;
+  line-height: 1.1;
+  letter-spacing: var(--df-headline-tracking, -0.028em);
   color: var(--color-foreground);
+  text-wrap: balance;
 }
 .se-headline-sm {
-  font-family: var(--font-display), &quot;Plus Jakarta Sans&quot;, system-ui, sans-serif;
-  font-size: clamp(1.5rem, 2.8vw, 2.25rem);
+  font-family: var(--font-display), &quot;Syne&quot;, system-ui, sans-serif;
+  font-size: var(--df-text-2xl, clamp(1.375rem, 2.2vw, 1.875rem));
   font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: -0.025em;
+  line-height: 1.18;
+  letter-spacing: var(--df-headline-tracking, -0.022em);
   color: var(--color-foreground);
+  text-wrap: balance;
 }
 .se-body {
-  font-family: var(--font-body), &quot;IBM Plex Sans&quot;, system-ui, sans-serif;
-  font-size: 1.0625rem;
-  line-height: 1.65;
+  font-family: var(--font-body), &quot;DM Sans&quot;, system-ui, sans-serif;
+  font-size: var(--df-text-base, 0.9375rem);
+  line-height: 1.62;
   color: var(--color-muted, rgba(15,23,42,0.58));
+  max-width: 36rem;
 }
 .se-grid-bg {
   background-image:
@@ -138,15 +1156,126 @@ Design system: se-* classes, grid backgrounds, metric cards</pre>
   background-size: 48px 48px;
 }
 .se-card {
-  border: 1px solid var(--border-subtle, rgba(15,23,42,0.04));
-  background: var(--color-surface);
-  border-radius: var(--radius-lg, 16px);
-  box-shadow: var(--shadow-card);
-  transition: box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease;
+  border: 1px solid var(--df-border-subtle, var(--border-subtle, rgba(15,23,42,0.04)));
+  background: var(--color-surface-elevated, var(--color-surface));
+  border-radius: var(--df-radius-lg, var(--radius-lg, 16px));
+  box-shadow: var(--df-shadow-card, var(--shadow-card));
+  transition: box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1), transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease;
 }
 .se-card:hover {
-  box-shadow: var(--shadow-surface);
-  border-color: var(--border-accent, rgba(59,130,246,0.24));
+  box-shadow: var(--df-shadow-elevated, var(--shadow-surface));
+  border-color: var(--df-border-accent, var(--border-accent, rgba(59,130,246,0.24)));
+  transform: translateY(-2px);
+}
+.se-card-featured {
+  border-color: var(--df-border-accent, var(--border-accent, rgba(59,130,246,0.28)));
+  background: linear-gradient(165deg, color-mix(in srgb, var(--color-accent) 5%, var(--color-surface-elevated, var(--color-surface))), var(--color-surface-elevated, var(--color-surface)));
+  box-shadow: var(--df-shadow-elevated, var(--shadow-surface)), 0 0 0 1px color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+.se-section-alt {
+  background: linear-gradient(180deg, var(--color-surface) 0%, var(--color-background) 100%);
+}
+.se-section-glow {
+  position: relative;
+  isolation: isolate;
+}
+.se-section-glow::before {
+  content: &quot;&quot;;
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 90% 55% at 50% -15%, var(--df-accent-glow, color-mix(in srgb, var(--color-accent) 9%, transparent)), transparent 68%);
+}
+.se-glow-orb {
+  pointer-events: none;
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(72px);
+  opacity: 0.42;
+  background: var(--df-accent-glow, color-mix(in srgb, var(--color-accent) 24%, transparent));
+}
+.se-browser-frame {
+  border: 1px solid var(--border-default, rgba(15,23,42,0.08));
+  border-radius: var(--radius-xl, 20px);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-surface), 0 0 0 1px color-mix(in srgb, var(--color-accent) 8%, transparent);
+  overflow: hidden;
+}
+.se-browser-chrome {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  border-bottom: 1px solid var(--border-subtle);
+  background: color-mix(in srgb, var(--color-foreground) 3%, var(--color-surface));
+  padding: 0.625rem 0.875rem;
+}
+.se-browser-dot {
+  height: 0.5rem;
+  width: 0.5rem;
+  border-radius: 50%;
+  background: var(--border-default);
+}
+.se-trust-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.25rem 1.75rem;
+}
+.se-trust-logo {
+  font-family: var(--font-display), &quot;Syne&quot;, system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: color-mix(in srgb, var(--color-foreground) 42%, transparent);
+  transition: color 0.25s ease;
+}
+.se-trust-logo:hover { color: var(--color-foreground); }
+.se-trust-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border-default);
+  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+  padding: 0.25rem 0.625rem;
+  font-family: var(--font-body), &quot;DM Sans&quot;, system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  backdrop-filter: blur(8px);
+}
+.se-star {
+  color: var(--color-signal, #059669);
+  letter-spacing: 0.12em;
+}
+.se-quote-mark {
+  font-family: var(--font-display), &quot;Syne&quot;, system-ui, sans-serif;
+  font-size: 3.5rem;
+  line-height: 1;
+  color: color-mix(in srgb, var(--color-accent) 35%, transparent);
+}
+.se-divider-gradient {
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(90deg, transparent, var(--border-default), transparent);
+}
+.se-input,
+.se-textarea {
+  width: 100%;
+  border-radius: var(--radius-md, 10px);
+  border: 1px solid var(--border-default);
+  background: var(--color-background);
+  padding: 0.625rem 0.875rem;
+  font-family: var(--font-body), &quot;DM Sans&quot;, system-ui, sans-serif;
+  font-size: 0.875rem;
+  color: var(--color-foreground);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.se-input:focus-visible,
+.se-textarea:focus-visible {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 18%, transparent);
 }
 .se-btn-primary {
   display: inline-flex;
@@ -154,7 +1283,7 @@ Design system: se-* classes, grid backgrounds, metric cards</pre>
   justify-content: center;
   min-height: 2.75rem;
   padding: 0.75rem 1.5rem;
-  font-family: var(--font-body), &quot;IBM Plex Sans&quot;, system-ui, sans-serif;
+  font-family: var(--font-body), &quot;DM Sans&quot;, system-ui, sans-serif;
   font-size: 0.875rem;
   font-weight: 600;
   text-decoration: none;
@@ -168,6 +1297,10 @@ Design system: se-* classes, grid backgrounds, metric cards</pre>
 .se-btn-primary:hover {
   background: var(--color-accent, #3B82F6);
   box-shadow: var(--shadow-glow);
+  transform: translateY(-1px);
+}
+.se-btn-primary:active {
+  transform: translateY(0) scale(0.98);
 }
 .se-btn-primary:focus-visible {
   outline: 2px solid var(--color-accent);
@@ -179,7 +1312,7 @@ Design system: se-* classes, grid backgrounds, metric cards</pre>
   justify-content: center;
   min-height: 2.75rem;
   padding: 0.75rem 1.5rem;
-  font-family: var(--font-body), &quot;IBM Plex Sans&quot;, system-ui, sans-serif;
+  font-family: var(--font-body), &quot;DM Sans&quot;, system-ui, sans-serif;
   font-size: 0.875rem;
   font-weight: 600;
   text-decoration: none;
@@ -189,18 +1322,199 @@ Design system: se-* classes, grid backgrounds, metric cards</pre>
   border-radius: var(--radius-md, 10px);
   transition: border-color 0.25s ease, background 0.25s ease;
 }
-.se-btn-secondary:hover { border-color: var(--color-accent); background: color-mix(in srgb, var(--color-accent) 4%, var(--color-surface)); }
+.se-btn-secondary:hover { border-color: var(--color-accent); background: color-mix(in srgb, var(--color-accent) 4%, var(--color-surface)); transform: translateY(-1px); }
+.se-btn-secondary:active { transform: translateY(0) scale(0.98); }
 .se-btn-secondary:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
-.se-section { padding-block: clamp(4rem, 10vw, 6.5rem); }
+.se-section { padding-block: var(--se-section-y, clamp(3.75rem, 8.5vw, 6rem)); }
 .se-metric {
-  font-family: var(--font-display), &quot;Plus Jakarta Sans&quot;, system-ui, sans-serif;
-  font-size: 1.75rem;
+  font-family: var(--font-display), &quot;Syne&quot;, system-ui, sans-serif;
+  font-size: var(--df-text-xl, 1.75rem);
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--df-headline-tracking, -0.02em);
   color: var(--color-primary);
 }
 .se-signal { color: var(--color-signal, #059669); }
 .se-focus-ring:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+/* TBDP Native Consumption — saas-enterprise
+   sector:saas · experience:technical, corporate, executive
+   identity:nexus-command · context:1037788af35209ca
+   integration:5.0.0 · consumption:1.0.0 */
+:root {
+  --tbdp-native: 1;
+  --tbdp-native-package: &quot;saas-enterprise&quot;;
+  --tbdp-sector-dna: &quot;saas&quot;;
+  --tbdp-template-identity: &quot;nexus-command&quot;;
+  --tbdp-experience-primary: &quot;technical&quot;;
+  --tbdp-context-hash: &quot;1037788af35209ca&quot;;
+  --tbdp-theme-mode: &quot;light&quot;;
+  --tbdp-direction: &quot;ltr&quot;;
+}
+
+/* TBDP Foundations — official design authority (scoped vars) */
+/* Trend Business AI Design Platform · 1.0.0 · foundations-1 */
+:root {
+  --tbdp-color-primary: #0047E6;
+  --tbdp-color-secondary: #334155;
+  --tbdp-color-accent: #4D85FF;
+  --tbdp-color-success: #10B981;
+  --tbdp-color-warning: #F59E0B;
+  --tbdp-color-danger: #EF4444;
+  --tbdp-color-info: #3B82F6;
+  --tbdp-color-surface-base: #FFFFFF;
+  --tbdp-color-surface-raised: #F8FAFC;
+  --tbdp-color-surface-overlay: #FFFFFF;
+  --tbdp-color-surface-sunken: #F1F5F9;
+  --tbdp-color-surface-inverse: #0F172A;
+  --tbdp-color-background-canvas: #F8FAFC;
+  --tbdp-color-background-subtle: #F1F5F9;
+  --tbdp-color-background-emphasis: #FFFFFF;
+  --tbdp-color-background-inverse: #020617;
+  --tbdp-color-text-primary: #0F172A;
+  --tbdp-color-text-secondary: #475569;
+  --tbdp-color-text-tertiary: #64748B;
+  --tbdp-color-text-disabled: #94A3B8;
+  --tbdp-color-text-inverse: #FFFFFF;
+  --tbdp-color-text-link: #0047E6;
+  --tbdp-color-text-linkHover: #0038B8;
+  --tbdp-color-border-default: #E2E8F0;
+  --tbdp-color-border-subtle: #F1F5F9;
+  --tbdp-color-border-strong: #CBD5E1;
+  --tbdp-color-border-focus: #1A5CFF;
+  --tbdp-color-border-inverse: rgba(255, 255, 255, 0.16);
+  --tbdp-color-overlay-scrim: rgba(2, 6, 23, 0.4);
+  --tbdp-color-overlay-scrimStrong: rgba(2, 6, 23, 0.64);
+  --tbdp-color-overlay-backdrop: rgba(2, 6, 23, 0.24);
+  --tbdp-color-overlay-highlight: rgba(26, 92, 255, 0.12);
+  --tbdp-opacity-transparent: 0;
+  --tbdp-opacity-subtle: 0.04;
+  --tbdp-opacity-muted: 0.08;
+  --tbdp-opacity-soft: 0.12;
+  --tbdp-opacity-medium: 0.24;
+  --tbdp-opacity-strong: 0.48;
+  --tbdp-opacity-opaque: 1;
+  --tbdp-spacing-micro: 0.125rem;
+  --tbdp-spacing-xs: 0.25rem;
+  --tbdp-spacing-sm: 0.5rem;
+  --tbdp-spacing-md: 1rem;
+  --tbdp-spacing-lg: 1.5rem;
+  --tbdp-spacing-xl: 2rem;
+  --tbdp-spacing-2xl: 3rem;
+  --tbdp-spacing-3xl: 4rem;
+  --tbdp-spacing-4xl: 6rem;
+  --tbdp-radius-sharp: 0;
+  --tbdp-radius-sm: 0.25rem;
+  --tbdp-radius-md: 0.5rem;
+  --tbdp-radius-lg: 0.75rem;
+  --tbdp-radius-pill: 9999px;
+  --tbdp-radius-circle: 50%;
+  --tbdp-shadow-0: none;
+  --tbdp-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-2: 0 2px 8px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-3: 0 8px 24px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);
+  --tbdp-shadow-4: 0 16px 48px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.08);
+  --tbdp-shadow-5: 0 24px 64px rgba(15, 23, 42, 0.18), 0 8px 24px rgba(15, 23, 42, 0.1);
+  --tbdp-container-sm: 640px;
+  --tbdp-container-md: 768px;
+  --tbdp-container-lg: 1024px;
+  --tbdp-container-xl: 1280px;
+  --tbdp-container-2xl: 1440px;
+  --tbdp-container-full: 100%;
+  --tbdp-font-display: &quot;Plus Jakarta Sans&quot;, &quot;Inter&quot;, ui-sans-serif, system-ui, sans-serif;
+  --tbdp-font-body: &quot;Inter&quot;, ui-sans-serif, system-ui, -apple-system, &quot;Segoe UI&quot;, sans-serif;
+  --tbdp-font-mono: &quot;IBM Plex Mono&quot;, ui-monospace, &quot;Cascadia Code&quot;, monospace;
+}
+
+/* TBDP Experience — motion, interaction, RTL, accessibility */
+/* TBDP Phase 3 — Motion System · tbdp-xp */
+
+@keyframes tbdp-xp-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes tbdp-xp-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes tbdp-xp-rise {
+  from { opacity: 0; transform: translateY(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tbdp-xp-rise-rtl {
+  from { opacity: 0; transform: translateX(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes tbdp-xp-slide-end {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-slide-start {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(calc(var(--tbdp-spacing-sm) * -1)); }
+  40%, 80% { transform: translateX(var(--tbdp-spacing-sm)); }
+}
+
+@keyframes tbdp-xp-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@keyframes tbdp-xp-lift {
+  to { transform: translateY(calc(var(--tbdp-spacing-sm) * -1)); box-shadow: var(--tbdp-shadow-2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp-motion] { animation: none !important; transition: none !important; }
+}
+
+[data-tbdp-xp-motion] { will-change: transform, opacity; }
+[data-tbdp-xp-motion=&quot;page-enter&quot;] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion=&quot;page-exit&quot;] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion=&quot;section-reveal&quot;] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion=&quot;hero-headline&quot;] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion=&quot;hero-media&quot;] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion=&quot;card-lift&quot;] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion=&quot;grid-stagger&quot;] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion=&quot;modal-enter&quot;] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion=&quot;modal-exit&quot;] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion=&quot;drawer-slide&quot;] { animation-name: tbdp-xp-slide-end; }
+[data-tbdp-xp-motion=&quot;toast-enter&quot;] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion=&quot;toast-exit&quot;] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion=&quot;tooltip-fade&quot;] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion=&quot;scroll-reveal-up&quot;] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion=&quot;stagger-children&quot;] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion=&quot;hover-lift&quot;] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion=&quot;focus-ring&quot;] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion=&quot;success-pulse&quot;] { animation-name: tbdp-xp-pulse; }
+[data-tbdp-xp-motion=&quot;error-shake&quot;] { animation-name: tbdp-xp-shake; }
+
+/* TBDP Experience — interaction utilities */
+[data-tbdp-xp] { --tbdp-xp-focus: var(--tbdp-color-border-focus); }
+[data-tbdp-xp-feedback=&quot;loading&quot;] { cursor: wait; }
+[data-tbdp-xp-feedback=&quot;error&quot;] { border-color: var(--tbdp-color-danger); }
+[data-tbdp-xp-feedback=&quot;success&quot;] { border-color: var(--tbdp-color-success); }
+[data-tbdp-xp-touch=&quot;true&quot;] { min-height: var(--tbdp-spacing-2xl); min-width: var(--tbdp-spacing-2xl); }
+[data-tbdp-xp-gpu] { transform: translateZ(0); backface-visibility: hidden; }
+[data-tbdp-xp-contain] { content-visibility: auto; contain-intrinsic-size: auto 500px; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp], [data-tbdp-xp-motion] { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
 /* V2 sidebar-left layout */
 .v2-layout-sidebar-left .v2-sidebar-shell { gap: 0; align-items: flex-start; }
 .v2-sidebar-rail {
@@ -215,18 +1529,65 @@ Design system: se-* classes, grid backgrounds, metric cards</pre>
   .v2-sidebar-rail { display: none !important; }
 }
 
+/* V2 sidebar-right layout */
+.v2-layout-sidebar-right .v2-sidebar-shell { gap: 0; align-items: flex-start; }
+.v2-layout-sidebar-right .v2-sidebar-rail {
+  border-inline-start: 1px solid var(--border-subtle, rgba(28,25,23,0.06));
+  border-inline-end: none;
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-inline-start: clamp(1.25rem, 3vw, 2rem);
+}
+[dir='rtl'] .v2-layout-sidebar-right .v2-sidebar-rail {
+  border-inline-start: none;
+  border-inline-end: 1px solid var(--border-subtle, rgba(28,25,23,0.06));
+}
+
+/* V2 full-bleed layout */
+.v2-layout-full-bleed .v2-overlay-canvas { width: 100%; }
+.v2-layout-full-bleed .v2-main-canvas { width: 100%; max-width: var(--container-max, 76rem); margin-inline: auto; }
+
+/* V2 editorial-reveal layout (creative portfolio) */
+.v2-layout-editorial-reveal .v2-main-canvas { width: 100%; }
+.v2-layout-editorial-reveal .v2-overlay-reveal { width: 100%; }
+
 :root {
-  --container-max: 82rem;
-  --font-body: &quot;IBM Plex Sans&quot;, ui-sans-serif, system-ui, sans-serif;
-  --font-display: &quot;Plus Jakarta Sans&quot;, ui-sans-serif, system-ui, sans-serif;
+  --container-max: 80rem;
+  --font-body: Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-display: Inter, ui-sans-serif, system-ui, sans-serif;
   --color-surface: #FFFFFF;
-  --color-foreground: #0F172A;
-  --color-background: #F8FAFC;
-  --color-accent: #3B82F6;
-  --color-secondary: #1E293B; --color-primary: #1D4ED8; }
+  --color-foreground: #080E18;
+  --color-background: #F7F6F3;
+  --color-accent: #C4A574;
+  --color-secondary: #152238; --color-primary: #080E18; }
+
+/* V2 Website Blueprint — design director output */
+:root {
+  --bp-blueprint-id: &quot;bp-saas-enterprise-general&quot;;
+  --bp-container-narrow: 40rem;
+  --bp-container-default: 80rem;
+  --bp-container-wide: 88rem;
+  --bp-grid-columns: 12;
+  --bp-grid-gutter: 1.5rem;
+  --bp-grid-rhythm: balanced;
+  --bp-motion-intensity: moderate;
+  --bp-cta-emphasis: bold;
+  --container-max: 80rem;
+}
 
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
+    .sr-only, .v2-sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    [class*=&quot;animate-&quot;] { animation-fill-mode: both; }
     body {
       margin: 0;
       min-height: 100vh;
@@ -240,12 +1601,202 @@ Design system: se-* classes, grid backgrounds, metric cards</pre>
     body:not(:has(.page:target)) .page#home { display: block; }
     img { max-width: 100%; height: auto; display: block; }
     a { color: inherit; }
+    .v2-preview-error {
+      margin: 2rem auto;
+      max-width: 36rem;
+      padding: 1.5rem 1.75rem;
+      border: 1px solid color-mix(in srgb, var(--color-foreground, #f8fafc) 12%, transparent);
+      border-radius: 0.75rem;
+      background: color-mix(in srgb, var(--color-surface, #1e293b) 88%, transparent);
+      text-align: center;
+    }
+    .v2-preview-error-title {
+      margin: 0 0 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--color-foreground, #f8fafc);
+    }
+    .v2-preview-error-detail {
+      margin: 0;
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      color: color-mix(in srgb, var(--color-foreground, #f8fafc) 72%, transparent);
+      word-break: break-word;
+    }
   </style>
   <script src=&quot;https://cdn.tailwindcss.com&quot;></script>
+<style id=&quot;tbdp-wiring-layer&quot;>
+/* TBDP Integration Layer — advisory token layer */
+
+/* Trend Business AI Design Platform · 1.0.0 · foundations-1 */
+:root {
+  --tbdp-color-primary: #0047E6;
+  --tbdp-color-secondary: #334155;
+  --tbdp-color-accent: #4D85FF;
+  --tbdp-color-success: #10B981;
+  --tbdp-color-warning: #F59E0B;
+  --tbdp-color-danger: #EF4444;
+  --tbdp-color-info: #3B82F6;
+  --tbdp-color-surface-base: #FFFFFF;
+  --tbdp-color-surface-raised: #F8FAFC;
+  --tbdp-color-surface-overlay: #FFFFFF;
+  --tbdp-color-surface-sunken: #F1F5F9;
+  --tbdp-color-surface-inverse: #0F172A;
+  --tbdp-color-background-canvas: #F8FAFC;
+  --tbdp-color-background-subtle: #F1F5F9;
+  --tbdp-color-background-emphasis: #FFFFFF;
+  --tbdp-color-background-inverse: #020617;
+  --tbdp-color-text-primary: #0F172A;
+  --tbdp-color-text-secondary: #475569;
+  --tbdp-color-text-tertiary: #64748B;
+  --tbdp-color-text-disabled: #94A3B8;
+  --tbdp-color-text-inverse: #FFFFFF;
+  --tbdp-color-text-link: #0047E6;
+  --tbdp-color-text-linkHover: #0038B8;
+  --tbdp-color-border-default: #E2E8F0;
+  --tbdp-color-border-subtle: #F1F5F9;
+  --tbdp-color-border-strong: #CBD5E1;
+  --tbdp-color-border-focus: #1A5CFF;
+  --tbdp-color-border-inverse: rgba(255, 255, 255, 0.16);
+  --tbdp-color-overlay-scrim: rgba(2, 6, 23, 0.4);
+  --tbdp-color-overlay-scrimStrong: rgba(2, 6, 23, 0.64);
+  --tbdp-color-overlay-backdrop: rgba(2, 6, 23, 0.24);
+  --tbdp-color-overlay-highlight: rgba(26, 92, 255, 0.12);
+  --tbdp-opacity-transparent: 0;
+  --tbdp-opacity-subtle: 0.04;
+  --tbdp-opacity-muted: 0.08;
+  --tbdp-opacity-soft: 0.12;
+  --tbdp-opacity-medium: 0.24;
+  --tbdp-opacity-strong: 0.48;
+  --tbdp-opacity-opaque: 1;
+  --tbdp-spacing-micro: 0.125rem;
+  --tbdp-spacing-xs: 0.25rem;
+  --tbdp-spacing-sm: 0.5rem;
+  --tbdp-spacing-md: 1rem;
+  --tbdp-spacing-lg: 1.5rem;
+  --tbdp-spacing-xl: 2rem;
+  --tbdp-spacing-2xl: 3rem;
+  --tbdp-spacing-3xl: 4rem;
+  --tbdp-spacing-4xl: 6rem;
+  --tbdp-radius-sharp: 0;
+  --tbdp-radius-sm: 0.25rem;
+  --tbdp-radius-md: 0.5rem;
+  --tbdp-radius-lg: 0.75rem;
+  --tbdp-radius-pill: 9999px;
+  --tbdp-radius-circle: 50%;
+  --tbdp-shadow-0: none;
+  --tbdp-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-2: 0 2px 8px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-3: 0 8px 24px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);
+  --tbdp-shadow-4: 0 16px 48px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.08);
+  --tbdp-shadow-5: 0 24px 64px rgba(15, 23, 42, 0.18), 0 8px 24px rgba(15, 23, 42, 0.1);
+  --tbdp-container-sm: 640px;
+  --tbdp-container-md: 768px;
+  --tbdp-container-lg: 1024px;
+  --tbdp-container-xl: 1280px;
+  --tbdp-container-2xl: 1440px;
+  --tbdp-container-full: 100%;
+  --tbdp-font-display: &quot;Plus Jakarta Sans&quot;, &quot;Inter&quot;, ui-sans-serif, system-ui, sans-serif;
+  --tbdp-font-body: &quot;Inter&quot;, ui-sans-serif, system-ui, -apple-system, &quot;Segoe UI&quot;, sans-serif;
+  --tbdp-font-mono: &quot;IBM Plex Mono&quot;, ui-monospace, &quot;Cascadia Code&quot;, monospace;
+}
+
+/* TBDP Phase 3 — Motion System · tbdp-xp */
+
+@keyframes tbdp-xp-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes tbdp-xp-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes tbdp-xp-rise {
+  from { opacity: 0; transform: translateY(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tbdp-xp-rise-rtl {
+  from { opacity: 0; transform: translateX(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes tbdp-xp-slide-end {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-slide-start {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(calc(var(--tbdp-spacing-sm) * -1)); }
+  40%, 80% { transform: translateX(var(--tbdp-spacing-sm)); }
+}
+
+@keyframes tbdp-xp-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@keyframes tbdp-xp-lift {
+  to { transform: translateY(calc(var(--tbdp-spacing-sm) * -1)); box-shadow: var(--tbdp-shadow-2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp-motion] { animation: none !important; transition: none !important; }
+}
+
+[data-tbdp-xp-motion] { will-change: transform, opacity; }
+[data-tbdp-xp-motion=&quot;page-enter&quot;] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion=&quot;page-exit&quot;] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion=&quot;section-reveal&quot;] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion=&quot;hero-headline&quot;] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion=&quot;hero-media&quot;] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion=&quot;card-lift&quot;] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion=&quot;grid-stagger&quot;] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion=&quot;modal-enter&quot;] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion=&quot;modal-exit&quot;] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion=&quot;drawer-slide&quot;] { animation-name: tbdp-xp-slide-end; }
+[data-tbdp-xp-motion=&quot;toast-enter&quot;] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion=&quot;toast-exit&quot;] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion=&quot;tooltip-fade&quot;] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion=&quot;scroll-reveal-up&quot;] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion=&quot;stagger-children&quot;] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion=&quot;hover-lift&quot;] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion=&quot;focus-ring&quot;] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion=&quot;success-pulse&quot;] { animation-name: tbdp-xp-pulse; }
+[data-tbdp-xp-motion=&quot;error-shake&quot;] { animation-name: tbdp-xp-shake; }
+
+/* TBDP Experience — interaction utilities */
+[data-tbdp-xp] { --tbdp-xp-focus: var(--tbdp-color-border-focus); }
+[data-tbdp-xp-feedback=&quot;loading&quot;] { cursor: wait; }
+[data-tbdp-xp-feedback=&quot;error&quot;] { border-color: var(--tbdp-color-danger); }
+[data-tbdp-xp-feedback=&quot;success&quot;] { border-color: var(--tbdp-color-success); }
+[data-tbdp-xp-touch=&quot;true&quot;] { min-height: var(--tbdp-spacing-2xl); min-width: var(--tbdp-spacing-2xl); }
+[data-tbdp-xp-gpu] { transform: translateZ(0); backface-visibility: hidden; }
+[data-tbdp-xp-contain] { content-visibility: auto; contain-intrinsic-size: auto 500px; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp], [data-tbdp-xp-motion] { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+</style>
 </head>
 <body>
   <div class=&quot;page&quot; id=&quot;home&quot;>
-    <div class=&quot;min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] antialiased v2-template v2-saas-enterprise&quot; data-v2-package=&quot;saas-enterprise&quot; data-v2-composer=&quot;region-grid&quot; data-v2-layout=&quot;default&quot;><header data-v2-region=&quot;header&quot;><header data-v2-component=&quot;saas-enterprise-nav&quot; class=&quot;sticky top-0 z-50 border-b transition-all duration-300 border-transparent bg-[var(--color-background)]/80 backdrop-blur-md&quot;><div class=&quot;mx-auto flex h-16 max-w-[82rem] items-center justify-between gap-4 px-5 sm:px-8 lg:h-[4.25rem]&quot;><a href=&quot;#top&quot; class=&quot;se-font-display flex items-center gap-2.5 text-base font-bold tracking-tight text-[var(--color-foreground)] se-focus-ring rounded-sm&quot;><span class=&quot;flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-primary)] text-xs font-bold text-white&quot; aria-hidden=&quot;true&quot;>N</span>Northline</a><nav aria-label=&quot;Primary&quot; class=&quot;hidden items-center gap-8 lg:flex&quot;><a href=&quot;#services&quot; class=&quot;se-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] se-focus-ring rounded-sm&quot;>Services</a><a href=&quot;#features&quot; class=&quot;se-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] se-focus-ring rounded-sm&quot;>Why us</a><a href=&quot;#pricing&quot; class=&quot;se-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] se-focus-ring rounded-sm&quot;>Packages</a><a href=&quot;#testimonials&quot; class=&quot;se-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] se-focus-ring rounded-sm&quot;>Clients</a><a href=&quot;#contact&quot; class=&quot;se-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] se-focus-ring rounded-sm&quot;>Contact</a></nav><div class=&quot;flex items-center gap-2&quot;><a href=&quot;#contact&quot; class=&quot;se-btn-primary hidden sm:inline-flex&quot;>Get started</a><button type=&quot;button&quot; aria-expanded=&quot;false&quot; aria-controls=&quot;se-mobile-nav&quot; aria-label=&quot;Open menu&quot; class=&quot;inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] lg:hidden se-focus-ring&quot;><span class=&quot;sr-only&quot;>Menu</span><span aria-hidden=&quot;true&quot; class=&quot;flex flex-col gap-1&quot;><span class=&quot;block h-0.5 w-5 bg-current transition &quot;></span><span class=&quot;block h-0.5 w-5 bg-current transition &quot;></span><span class=&quot;block h-0.5 w-5 bg-current transition &quot;></span></span></button></div></div></header></header><main data-v2-region=&quot;main&quot; class=&quot;v2-region-grid&quot;><section id=&quot;top&quot; data-v2-component=&quot;saas-enterprise-hero&quot; aria-labelledby=&quot;se-hero-title&quot; class=&quot;se-section relative overflow-hidden bg-[var(--color-background)]&quot;><div class=&quot;se-grid-bg pointer-events-none absolute inset-0 opacity-60&quot; aria-hidden=&quot;true&quot;></div><div class=&quot;pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_80%_0%,rgba(59,130,246,0.12),transparent_60%)]&quot; aria-hidden=&quot;true&quot;></div><div class=&quot;relative mx-auto max-w-[82rem] px-5 sm:px-8&quot;><div class=&quot;grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-14&quot;><div class=&quot;max-w-xl&quot;><p class=&quot;se-eyebrow mb-4 motion-safe:animate-[se-slide-up_0.6s_ease_both]&quot;>Professional presence</p><h1 id=&quot;se-hero-title&quot; class=&quot;se-headline motion-safe:animate-[se-slide-up_0.65s_ease_0.08s_both]&quot;>Northline</h1><p class=&quot;se-body mt-5 motion-safe:animate-[se-slide-up_0.65s_ease_0.16s_both]&quot;>Enterprise revenue operations platform</p><div class=&quot;mt-8 flex flex-wrap gap-3 motion-safe:animate-[se-slide-up_0.65s_ease_0.24s_both]&quot;><a href=&quot;#contact&quot; class=&quot;se-btn-primary&quot;>Get started</a><a href=&quot;#platform&quot; class=&quot;se-btn-secondary&quot;>Learn more</a></div><div class=&quot;mt-8 flex flex-wrap items-center gap-4 motion-safe:animate-[se-slide-up_0.65s_ease_0.32s_both]&quot;><span class=&quot;se-font-mono flex items-center gap-2 text-xs text-[var(--color-signal)]&quot;><span class=&quot;h-2 w-2 rounded-full bg-[var(--color-signal)] motion-safe:animate-[se-pulse-dot_2s_ease-in-out_infinite]&quot;></span>Live platform status</span><span class=&quot;se-font-body text-xs text-[var(--color-muted)]&quot;>SOC 2 Type II · GDPR · SSO</span></div></div><div class=&quot;grid gap-3 sm:grid-cols-2 motion-safe:animate-[se-grid-reveal_0.8s_ease_0.2s_both]&quot;><div class=&quot;se-card col-span-2 overflow-hidden p-1&quot;><div class=&quot;se-grid-bg relative aspect-[16/9] overflow-hidden rounded-[calc(var(--radius-lg)-4px)] bg-[var(--color-surface)]&quot;><div class=&quot;absolute inset-4 space-y-3&quot;><div class=&quot;h-3 w-32 rounded bg-[var(--color-grid)]&quot;></div><div class=&quot;grid grid-cols-3 gap-2&quot;><div class=&quot;h-16 rounded-[var(--radius-sm)] bg-[var(--color-grid)]&quot;></div><div class=&quot;h-16 rounded-[var(--radius-sm)] bg-[var(--color-grid)]&quot;></div><div class=&quot;h-16 rounded-[var(--radius-sm)] bg-[var(--color-grid)]&quot;></div></div><div class=&quot;h-24 rounded-[var(--radius-sm)] bg-[var(--color-grid)]&quot;></div></div></div></div><div class=&quot;se-card p-4 motion-safe:animate-[se-grid-reveal_0.6s_ease_both]&quot; style=&quot;animation-delay:0.3s&quot;><div class=&quot;flex items-baseline justify-between gap-2&quot;><p class=&quot;se-metric&quot;>38%</p><span class=&quot;se-font-mono text-[0.625rem] text-[var(--color-signal)]&quot;>+12%</span></div><p class=&quot;se-font-body mt-1 text-xs text-[var(--color-muted)]&quot;>Pipeline velocity</p></div><div class=&quot;se-card p-4 motion-safe:animate-[se-grid-reveal_0.6s_ease_both]&quot; style=&quot;animation-delay:0.38s&quot;><div class=&quot;flex items-baseline justify-between gap-2&quot;><p class=&quot;se-metric&quot;>$2.4M</p><span class=&quot;se-font-mono text-[0.625rem] text-[var(--color-signal)]&quot;>avg.</span></div><p class=&quot;se-font-body mt-1 text-xs text-[var(--color-muted)]&quot;>ARR unlocked</p></div><div class=&quot;se-card p-4 motion-safe:animate-[se-grid-reveal_0.6s_ease_both]&quot; style=&quot;animation-delay:0.45999999999999996s&quot;><div class=&quot;flex items-baseline justify-between gap-2&quot;><p class=&quot;se-metric&quot;>14d</p><span class=&quot;se-font-mono text-[0.625rem] text-[var(--color-signal)]&quot;>median</span></div><p class=&quot;se-font-body mt-1 text-xs text-[var(--color-muted)]&quot;>Time to value</p></div><div class=&quot;se-card p-4 motion-safe:animate-[se-grid-reveal_0.6s_ease_both]&quot; style=&quot;animation-delay:0.54s&quot;><div class=&quot;flex items-baseline justify-between gap-2&quot;><p class=&quot;se-metric&quot;>99.9%</p><span class=&quot;se-font-mono text-[0.625rem] text-[var(--color-signal)]&quot;>FY24</span></div><p class=&quot;se-font-body mt-1 text-xs text-[var(--color-muted)]&quot;>Uptime SLA</p></div></div></div></div></section><section id=&quot;customers&quot; data-v2-component=&quot;saas-enterprise-portfolio&quot; aria-labelledby=&quot;se-portfolio-title&quot; class=&quot;se-section bg-[var(--color-surface)]&quot;><div class=&quot;mx-auto max-w-[82rem] px-5 sm:px-8&quot;><header class=&quot;mb-12 max-w-2xl&quot;><p class=&quot;se-eyebrow mb-3&quot;>Customer outcomes</p><h2 id=&quot;se-portfolio-title&quot; class=&quot;se-headline-sm&quot;>Moments from the work</h2><p class=&quot;se-body mt-4&quot;>Enterprise GTM teams accelerate pipeline velocity and unlock expansion revenue with measurable ROI.</p></header><div class=&quot;grid gap-4 md:grid-cols-3&quot;><article class=&quot;se-card group relative overflow-hidden p-6&quot;><div class=&quot;absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] opacity-0 transition-opacity group-hover:opacity-100&quot; aria-hidden=&quot;true&quot;></div><p class=&quot;se-font-mono text-[0.625rem] font-medium uppercase tracking-wider text-[var(--color-muted)]&quot;>FinTech</p><h3 class=&quot;se-font-display mt-2 text-lg font-bold text-[var(--color-foreground)]&quot;>Vertex Systems</h3><div class=&quot;mt-6 flex items-baseline gap-2&quot;><span class=&quot;se-metric text-3xl&quot;>42%</span><span class=&quot;se-font-body text-sm text-[var(--color-muted)]&quot;>faster deal cycles</span></div><p class=&quot;se-font-body mt-4 text-sm leading-relaxed text-[var(--color-muted)]&quot;>Unified pipeline data across 6 regions and reduced forecast variance by 28%.</p><p class=&quot;se-font-mono mt-6 text-[0.625rem] text-[var(--color-accent)]&quot;>Case study 01</p></article><article class=&quot;se-card group relative overflow-hidden p-6&quot;><div class=&quot;absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] opacity-0 transition-opacity group-hover:opacity-100&quot; aria-hidden=&quot;true&quot;></div><p class=&quot;se-font-mono text-[0.625rem] font-medium uppercase tracking-wider text-[var(--color-muted)]&quot;>Healthcare SaaS</p><h3 class=&quot;se-font-display mt-2 text-lg font-bold text-[var(--color-foreground)]&quot;>Helix Health</h3><div class=&quot;mt-6 flex items-baseline gap-2&quot;><span class=&quot;se-metric text-3xl&quot;>$3.1M</span><span class=&quot;se-font-body text-sm text-[var(--color-muted)]&quot;>expansion ARR</span></div><p class=&quot;se-font-body mt-4 text-sm leading-relaxed text-[var(--color-muted)]&quot;>Identified expansion signals 3 weeks earlier with account health scoring.</p><p class=&quot;se-font-mono mt-6 text-[0.625rem] text-[var(--color-accent)]&quot;>Case study 02</p></article><article class=&quot;se-card group relative overflow-hidden p-6&quot;><div class=&quot;absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] opacity-0 transition-opacity group-hover:opacity-100&quot; aria-hidden=&quot;true&quot;></div><p class=&quot;se-font-mono text-[0.625rem] font-medium uppercase tracking-wider text-[var(--color-muted)]&quot;>Supply Chain</p><h3 class=&quot;se-font-display mt-2 text-lg font-bold text-[var(--color-foreground)]&quot;>Axiom Logistics</h3><div class=&quot;mt-6 flex items-baseline gap-2&quot;><span class=&quot;se-metric text-3xl&quot;>99.2%</span><span class=&quot;se-font-body text-sm text-[var(--color-muted)]&quot;>forecast accuracy</span></div><p class=&quot;se-font-body mt-4 text-sm leading-relaxed text-[var(--color-muted)]&quot;>Replaced manual spreadsheets with live revenue intelligence dashboards.</p><p class=&quot;se-font-mono mt-6 text-[0.625rem] text-[var(--color-accent)]&quot;>Case study 03</p></article></div></div></section><section id=&quot;platform&quot; data-v2-component=&quot;saas-enterprise-integrations&quot; aria-labelledby=&quot;se-integrations-title&quot; class=&quot;border-y border-[var(--border-default)] bg-[var(--color-background)] py-12 sm:py-14&quot;><div class=&quot;mx-auto max-w-[82rem] px-5 sm:px-8&quot;><header class=&quot;mb-10 text-center&quot;><p class=&quot;se-eyebrow mb-3&quot;>Integrations</p><h2 id=&quot;se-integrations-title&quot; class=&quot;se-headline-sm&quot;>A presence that earns trust</h2><p class=&quot;se-body mx-auto mt-3 max-w-lg text-sm&quot;>Native bi-directional sync with CRM, data warehouse, and collaboration tools.</p></header></div><div class=&quot;relative overflow-hidden&quot; aria-label=&quot;Integration partners&quot;><div class=&quot;flex motion-safe:animate-[se-marquee_40s_linear_infinite] hover:[animation-play-state:paused]&quot;><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Salesforce</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>HubSpot</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Slack</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Snowflake</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Workday</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Gong</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Outreach</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Segment</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Databricks</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Zendesk</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Salesforce</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>HubSpot</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Slack</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Snowflake</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Workday</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Gong</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Outreach</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Segment</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Databricks</span></div><div class=&quot;mx-3 flex h-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] px-8 shadow-[var(--shadow-card)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-muted)]&quot;>Zendesk</span></div></div></div><p class=&quot;se-font-body mx-auto mt-8 max-w-[82rem] px-5 text-center text-xs text-[var(--color-muted)] sm:px-8&quot;>120+ integrations · Custom API connectors available</p></section><section data-v2-component=&quot;saas-enterprise-features&quot; aria-labelledby=&quot;se-features-title&quot; class=&quot;se-section bg-[var(--color-background)]&quot;><div class=&quot;mx-auto max-w-[82rem] px-5 sm:px-8&quot;><header class=&quot;mb-12 max-w-2xl&quot;><p class=&quot;se-eyebrow mb-3&quot;>Why us</p><h2 id=&quot;se-features-title&quot; class=&quot;se-headline-sm&quot;>A presence that earns trust</h2><p class=&quot;se-body mt-4&quot;>Webflow-caliber spacing, type, and hierarchy for serious brands.</p></header><div class=&quot;grid gap-4 sm:grid-cols-2 lg:grid-cols-3&quot;><article class=&quot;se-card group p-6 &quot;><div class=&quot;mb-4 flex items-center justify-between&quot;><span class=&quot;se-font-mono flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] text-xs font-medium text-[var(--color-primary)]&quot;>01</span><span class=&quot;h-px flex-1 ms-4 bg-[var(--border-default)] transition group-hover:bg-[var(--color-accent)]&quot; aria-hidden=&quot;true&quot;></span></div><h3 class=&quot;se-font-display text-lg font-bold text-[var(--color-foreground)]&quot;>Clear offer</h3><p class=&quot;se-font-body mt-2 text-sm leading-relaxed text-[var(--color-muted)]&quot;></p></article><article class=&quot;se-card group p-6 &quot;><div class=&quot;mb-4 flex items-center justify-between&quot;><span class=&quot;se-font-mono flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] text-xs font-medium text-[var(--color-primary)]&quot;>02</span><span class=&quot;h-px flex-1 ms-4 bg-[var(--border-default)] transition group-hover:bg-[var(--color-accent)]&quot; aria-hidden=&quot;true&quot;></span></div><h3 class=&quot;se-font-display text-lg font-bold text-[var(--color-foreground)]&quot;>Premium presentation</h3><p class=&quot;se-font-body mt-2 text-sm leading-relaxed text-[var(--color-muted)]&quot;></p></article><article class=&quot;se-card group p-6 &quot;><div class=&quot;mb-4 flex items-center justify-between&quot;><span class=&quot;se-font-mono flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] text-xs font-medium text-[var(--color-primary)]&quot;>03</span><span class=&quot;h-px flex-1 ms-4 bg-[var(--border-default)] transition group-hover:bg-[var(--color-accent)]&quot; aria-hidden=&quot;true&quot;></span></div><h3 class=&quot;se-font-display text-lg font-bold text-[var(--color-foreground)]&quot;>Conversion paths</h3><p class=&quot;se-font-body mt-2 text-sm leading-relaxed text-[var(--color-muted)]&quot;></p></article><article class=&quot;se-card group p-6 &quot;><div class=&quot;mb-4 flex items-center justify-between&quot;><span class=&quot;se-font-mono flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] text-xs font-medium text-[var(--color-primary)]&quot;>04</span><span class=&quot;h-px flex-1 ms-4 bg-[var(--border-default)] transition group-hover:bg-[var(--color-accent)]&quot; aria-hidden=&quot;true&quot;></span></div><h3 class=&quot;se-font-display text-lg font-bold text-[var(--color-foreground)]&quot;>Trusted contact</h3><p class=&quot;se-font-body mt-2 text-sm leading-relaxed text-[var(--color-muted)]&quot;></p></article></div></div></section><section data-v2-component=&quot;saas-enterprise-faq&quot; aria-labelledby=&quot;se-faq-title&quot; class=&quot;se-section bg-[var(--color-surface)]&quot;><div class=&quot;mx-auto max-w-[82rem] px-5 sm:px-8&quot;><div class=&quot;grid gap-12 lg:grid-cols-[0.9fr_1.1fr]&quot;><header><p class=&quot;se-eyebrow mb-3&quot;>FAQ</p><h2 id=&quot;se-faq-title&quot; class=&quot;se-headline-sm&quot;>Common questions</h2><p class=&quot;se-body mt-4&quot;>Launch timing, edits, and languages.</p></header><div class=&quot;space-y-2&quot;><div class=&quot;overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-background)]&quot;><h3><button type=&quot;button&quot; id=&quot;se-faq-trigger-0&quot; aria-expanded=&quot;true&quot; aria-controls=&quot;se-faq-panel-0&quot; class=&quot;flex w-full items-center justify-between gap-4 px-5 py-4 text-start se-focus-ring&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-foreground)]&quot;></span><span class=&quot;se-font-mono flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-xs text-[var(--color-accent)]&quot; aria-hidden=&quot;true&quot;>−</span></button></h3><div id=&quot;se-faq-panel-0&quot; role=&quot;region&quot; aria-labelledby=&quot;se-faq-trigger-0&quot; class=&quot;border-t border-[var(--border-subtle)] px-5 py-4&quot;><p class=&quot;se-font-body text-sm leading-relaxed text-[var(--color-muted)]&quot;></p></div></div><div class=&quot;overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-background)]&quot;><h3><button type=&quot;button&quot; id=&quot;se-faq-trigger-1&quot; aria-expanded=&quot;false&quot; aria-controls=&quot;se-faq-panel-1&quot; class=&quot;flex w-full items-center justify-between gap-4 px-5 py-4 text-start se-focus-ring&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-foreground)]&quot;></span><span class=&quot;se-font-mono flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-xs text-[var(--color-accent)]&quot; aria-hidden=&quot;true&quot;>+</span></button></h3><div id=&quot;se-faq-panel-1&quot; role=&quot;region&quot; aria-labelledby=&quot;se-faq-trigger-1&quot; hidden=&quot;&quot; class=&quot;border-t border-[var(--border-subtle)] px-5 py-4&quot;><p class=&quot;se-font-body text-sm leading-relaxed text-[var(--color-muted)]&quot;></p></div></div><div class=&quot;overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-background)]&quot;><h3><button type=&quot;button&quot; id=&quot;se-faq-trigger-2&quot; aria-expanded=&quot;false&quot; aria-controls=&quot;se-faq-panel-2&quot; class=&quot;flex w-full items-center justify-between gap-4 px-5 py-4 text-start se-focus-ring&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-foreground)]&quot;></span><span class=&quot;se-font-mono flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-xs text-[var(--color-accent)]&quot; aria-hidden=&quot;true&quot;>+</span></button></h3><div id=&quot;se-faq-panel-2&quot; role=&quot;region&quot; aria-labelledby=&quot;se-faq-trigger-2&quot; hidden=&quot;&quot; class=&quot;border-t border-[var(--border-subtle)] px-5 py-4&quot;><p class=&quot;se-font-body text-sm leading-relaxed text-[var(--color-muted)]&quot;></p></div></div></div></div></div></section><section id=&quot;pricing&quot; data-v2-component=&quot;saas-enterprise-pricing&quot; aria-labelledby=&quot;se-pricing-title&quot; class=&quot;se-section bg-[var(--color-background)]&quot;><div class=&quot;mx-auto max-w-[82rem] px-5 sm:px-8&quot;><header class=&quot;mb-12 text-center&quot;><p class=&quot;se-eyebrow mb-3&quot;>Packages</p><h2 id=&quot;se-pricing-title&quot; class=&quot;se-headline-sm&quot;>Simple engagement options</h2><p class=&quot;se-body mx-auto mt-4 max-w-lg&quot;>Start lean or go deeper — both look premium.</p></header><div class=&quot;grid gap-4 lg:grid-cols-3&quot;><article class=&quot;se-card flex flex-col p-6 &quot;><h3 class=&quot;se-font-display text-lg font-bold text-[var(--color-foreground)]&quot;>Growth</h3><p class=&quot;se-font-body mt-2 text-sm text-[var(--color-muted)]&quot;>For scaling GTM teams building their revenue foundation.</p><p class=&quot;mt-6&quot;><span class=&quot;se-metric text-4xl&quot;>$499</span><span class=&quot;se-font-body text-sm text-[var(--color-muted)]&quot;>/seat/mo</span></p><ul class=&quot;mt-6 flex-1 space-y-3&quot;><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>Pipeline intelligence</li><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>CRM sync</li><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>Standard dashboards</li><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>Email support</li></ul><a href=&quot;#contact&quot; class=&quot;se-btn-secondary mt-8 w-full&quot;>Start trial</a></article><article class=&quot;se-card flex flex-col p-6 relative border-[var(--border-accent)] ring-2 ring-[var(--color-accent)]/20&quot;><span class=&quot;se-eyebrow absolute -top-3 start-6 rounded-full bg-[var(--color-primary)] px-3 py-1 text-[0.625rem] text-white&quot;>Most popular</span><h3 class=&quot;se-font-display text-lg font-bold text-[var(--color-foreground)]&quot;>Enterprise</h3><p class=&quot;se-font-body mt-2 text-sm text-[var(--color-muted)]&quot;>Full platform for revenue leaders with advanced forecasting.</p><p class=&quot;mt-6&quot;><span class=&quot;se-metric text-4xl&quot;>$899</span><span class=&quot;se-font-body text-sm text-[var(--color-muted)]&quot;>/seat/mo</span></p><ul class=&quot;mt-6 flex-1 space-y-3&quot;><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>Everything in Growth</li><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>AI forecast models</li><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>Custom dashboards</li><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>Dedicated CSM</li><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>SSO &amp; SCIM</li></ul><a href=&quot;#contact&quot; class=&quot;se-btn-primary mt-8 w-full&quot;>Book a demo</a></article><article class=&quot;se-card flex flex-col p-6 &quot;><h3 class=&quot;se-font-display text-lg font-bold text-[var(--color-foreground)]&quot;>Global</h3><p class=&quot;se-font-body mt-2 text-sm text-[var(--color-muted)]&quot;>Multi-region deployments with enterprise security and SLAs.</p><p class=&quot;mt-6&quot;><span class=&quot;se-metric text-4xl&quot;>Custom</span></p><ul class=&quot;mt-6 flex-1 space-y-3&quot;><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>Everything in Enterprise</li><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>Multi-region hosting</li><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>Custom integrations</li><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>24/7 priority support</li><li class=&quot;flex gap-2.5 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 shrink-0&quot; aria-hidden=&quot;true&quot;>✓</span>Executive business reviews</li></ul><a href=&quot;#contact&quot; class=&quot;se-btn-secondary mt-8 w-full&quot;>Contact sales</a></article></div></div></section></main><utility data-v2-region=&quot;utility&quot;><section id=&quot;contact&quot; data-v2-component=&quot;saas-enterprise-utility-band&quot; aria-labelledby=&quot;se-utility-title&quot; class=&quot;relative overflow-hidden bg-[var(--color-primary)] py-14 sm:py-16&quot;><div class=&quot;se-grid-bg pointer-events-none absolute inset-0 opacity-20&quot; aria-hidden=&quot;true&quot;></div><div class=&quot;pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_0%_50%,rgba(255,255,255,0.12),transparent)]&quot; aria-hidden=&quot;true&quot;></div><div class=&quot;relative mx-auto flex max-w-[82rem] flex-col items-start justify-between gap-8 px-5 sm:flex-row sm:items-center sm:px-8&quot;><div class=&quot;max-w-xl&quot;><p class=&quot;se-font-mono text-xs font-medium uppercase tracking-wider text-white/70&quot;>Get started</p><h2 id=&quot;se-utility-title&quot; class=&quot;se-font-display mt-2 text-[clamp(1.5rem,2.8vw,2.25rem)] font-bold text-white&quot;>Ready to look established online?</h2><p class=&quot;se-font-body mt-3 text-sm leading-relaxed text-white/75 sm:text-base&quot;>Share your goals — we will propose a clear path and timeline.</p></div><div class=&quot;flex flex-wrap gap-3&quot;><a href=&quot;#contact&quot; class=&quot;inline-flex min-h-[2.75rem] items-center justify-center rounded-[var(--radius-md)] bg-white px-5 py-3 text-sm font-semibold text-[var(--color-primary)] transition hover:bg-white/90 se-focus-ring&quot;>Get started</a><a href=&quot;#resources&quot; class=&quot;inline-flex min-h-[2.75rem] items-center justify-center rounded-[var(--radius-md)] border border-white/30 px-5 py-3 text-sm font-semibold text-white transition hover:border-white/60 se-focus-ring&quot;>Learn more</a></div></div></section></utility><footer data-v2-region=&quot;footer&quot;><footer data-v2-component=&quot;saas-enterprise-footer&quot; class=&quot;border-t border-[var(--border-default)] bg-[var(--color-ink,#020617)] text-white&quot; role=&quot;contentinfo&quot;><div class=&quot;mx-auto max-w-[82rem] px-5 py-14 sm:px-8 sm:py-16&quot;><div class=&quot;grid gap-10 md:grid-cols-[1.4fr_1fr]&quot;><div><p class=&quot;se-font-display text-xl font-bold&quot;>Northline</p><p class=&quot;se-font-body mt-3 max-w-sm text-sm leading-relaxed text-white/60&quot;>Clear messaging and conversion-focused pages that earn trust quickly.</p><div class=&quot;mt-6 flex flex-wrap gap-3&quot;><span class=&quot;se-font-mono rounded-[var(--radius-sm)] border border-white/10 px-2.5 py-1 text-[0.625rem] text-white/50&quot;>SOC 2</span><span class=&quot;se-font-mono rounded-[var(--radius-sm)] border border-white/10 px-2.5 py-1 text-[0.625rem] text-white/50&quot;>GDPR</span><span class=&quot;se-font-mono rounded-[var(--radius-sm)] border border-white/10 px-2.5 py-1 text-[0.625rem] text-white/50&quot;>ISO 27001</span></div></div><nav aria-label=&quot;Footer&quot;><p class=&quot;se-eyebrow text-white/40&quot;>Explore</p><ul class=&quot;mt-4 grid grid-cols-2 gap-x-6 gap-y-2.5&quot;><li><a href=&quot;#services&quot; class=&quot;se-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] se-focus-ring rounded-sm&quot;>Services</a></li><li><a href=&quot;#features&quot; class=&quot;se-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] se-focus-ring rounded-sm&quot;>Why us</a></li><li><a href=&quot;#pricing&quot; class=&quot;se-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] se-focus-ring rounded-sm&quot;>Packages</a></li><li><a href=&quot;#testimonials&quot; class=&quot;se-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] se-focus-ring rounded-sm&quot;>Clients</a></li><li><a href=&quot;#contact&quot; class=&quot;se-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] se-focus-ring rounded-sm&quot;>Contact</a></li></ul></nav></div><div class=&quot;mt-12 border-t border-white/10 pt-6&quot;><p class=&quot;se-font-body text-xs text-white/40&quot;>© 2026 Northline. All rights reserved.</p></div></div></footer></footer><div data-v2-region=&quot;overlay&quot; class=&quot;pointer-events-none fixed inset-x-0 bottom-0 z-50&quot;></div></div>
+    <link rel=&quot;preload&quot; as=&quot;image&quot; href=&quot;https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&amp;fit=crop&amp;w=1920&amp;q=88&quot; fetchPriority=&quot;high&quot;/><div class=&quot;flex min-h-screen flex-col bg-[var(--color-background)] text-[var(--color-foreground)] antialiased v2-template v2-saas-enterprise&quot; data-v2-package=&quot;saas-enterprise&quot; data-v2-composer=&quot;region-grid&quot; data-v2-layout=&quot;default&quot; data-v2-blueprint=&quot;bp-saas-enterprise-general&quot;><header data-v2-region=&quot;header&quot;><header data-v2-component=&quot;saas-enterprise-nav&quot; class=&quot;sticky top-0 z-50 border-b transition-all duration-300 border-transparent bg-[var(--color-background)]/80 backdrop-blur-md&quot;><div class=&quot;mx-auto flex h-16 max-w-[82rem] items-center justify-between gap-4 px-5 sm:px-8 lg:h-[4.25rem]&quot;><a href=&quot;#top&quot; class=&quot;se-font-display flex items-center gap-2.5 text-base font-bold tracking-tight text-[var(--color-foreground)] se-focus-ring rounded-sm&quot;><span class=&quot;flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-primary)] text-xs font-bold text-white&quot; aria-hidden=&quot;true&quot;>N</span>Northline</a><nav aria-label=&quot;Primary&quot; class=&quot;hidden items-center gap-8 lg:flex&quot;><a href=&quot;#services&quot; class=&quot;se-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] se-focus-ring rounded-sm&quot;>Services</a><a href=&quot;#features&quot; class=&quot;se-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] se-focus-ring rounded-sm&quot;>Why us</a><a href=&quot;#pricing&quot; class=&quot;se-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] se-focus-ring rounded-sm&quot;>Packages</a><a href=&quot;#testimonials&quot; class=&quot;se-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] se-focus-ring rounded-sm&quot;>Clients</a><a href=&quot;#contact&quot; class=&quot;se-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] se-focus-ring rounded-sm&quot;>Contact</a></nav><div class=&quot;flex items-center gap-2&quot;><a href=&quot;#contact&quot; class=&quot;se-btn-primary hidden sm:inline-flex&quot;>Get started</a><button type=&quot;button&quot; aria-expanded=&quot;false&quot; aria-controls=&quot;se-mobile-nav&quot; aria-label=&quot;Open menu&quot; class=&quot;inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] lg:hidden se-focus-ring&quot;><span class=&quot;sr-only&quot;>Menu</span><span aria-hidden=&quot;true&quot; class=&quot;flex flex-col gap-1&quot;><span class=&quot;block h-0.5 w-5 bg-current transition &quot;></span><span class=&quot;block h-0.5 w-5 bg-current transition &quot;></span><span class=&quot;block h-0.5 w-5 bg-current transition &quot;></span></span></button></div></div></header></header><main data-v2-region=&quot;main&quot; class=&quot;v2-region-grid flex flex-col&quot;><h1 class=&quot;v2-sr-only text-4xl&quot;>Northline</h1><div data-v2-section=&quot;hero&quot; data-v2-variant=&quot;split-trust&quot;><section id=&quot;top&quot; data-v2-component=&quot;saas-enterprise-hero&quot; aria-labelledby=&quot;se-hero-title&quot; class=&quot;se-section relative min-h-[min(82vh,48rem)] overflow-hidden bg-[var(--color-background)] pb-10 pt-12 sm:pt-16 lg:pb-14 lg:pt-18&quot;><div class=&quot;se-grid-bg pointer-events-none absolute inset-0 opacity-60&quot; aria-hidden=&quot;true&quot;></div><div class=&quot;se-glow-orb pointer-events-none absolute start-1/4 top-0 h-80 w-80 bg-[var(--color-primary)]&quot; aria-hidden=&quot;true&quot;></div><div class=&quot;se-glow-orb pointer-events-none absolute end-0 top-1/4 h-64 w-64 bg-[var(--color-signal)] opacity-30&quot; aria-hidden=&quot;true&quot;></div><div class=&quot;pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--border-accent)] to-transparent&quot; aria-hidden=&quot;true&quot;></div><div class=&quot;relative mx-auto max-w-[82rem] px-5 sm:px-8&quot;><div class=&quot;grid items-center gap-10 lg:grid-cols-12 lg:gap-10&quot;><div class=&quot;lg:col-span-6&quot;><div class=&quot;inline-flex items-center gap-2 rounded-full border border-[var(--border-accent)] bg-[var(--color-surface)] px-3 py-1.5 motion-safe:animate-[se-slide-up_0.6s_ease_both]&quot;><span class=&quot;h-1.5 w-1.5 rounded-full bg-[var(--color-signal)] motion-safe:animate-[se-pulse-dot_2s_ease-in-out_infinite]&quot; aria-hidden=&quot;true&quot;></span><span class=&quot;se-eyebrow !text-[0.625rem] !tracking-[0.12em]&quot;>Professional presence</span></div><h1 id=&quot;se-hero-title&quot; class=&quot;se-headline mt-5 max-w-[14ch] motion-safe:animate-[se-slide-up_0.65s_ease_0.08s_both]&quot;>Northline</h1><p class=&quot;se-body mt-5 max-w-lg motion-safe:animate-[se-slide-up_0.65s_ease_0.16s_both]&quot;>Enterprise revenue operations platform</p><div class=&quot;mt-8 flex flex-wrap gap-3 motion-safe:animate-[se-slide-up_0.65s_ease_0.24s_both]&quot;><a href=&quot;#contact&quot; class=&quot;se-btn-primary se-focus-ring&quot;>Get started</a><a href=&quot;/platform&quot; class=&quot;se-btn-secondary se-focus-ring&quot;>Learn more</a></div><div class=&quot;mt-10 border-t border-[var(--border-subtle)] pt-6 motion-safe:animate-[se-slide-up_0.65s_ease_0.32s_both]&quot;><p class=&quot;se-font-body mb-4 text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-[var(--color-muted)]&quot;>Trusted by GTM teams at</p><div class=&quot;flex flex-wrap gap-x-8 gap-y-3&quot; aria-label=&quot;Trusted by leading companies&quot;></div></div></div><div class=&quot;lg:col-span-6 motion-safe:animate-[se-grid-reveal_0.85s_ease_0.15s_both]&quot;><div class=&quot;se-browser-frame relative&quot;><div class=&quot;se-browser-chrome&quot; aria-hidden=&quot;true&quot;><span class=&quot;se-browser-dot bg-red-400/60&quot;></span><span class=&quot;se-browser-dot bg-amber-400/60&quot;></span><span class=&quot;se-browser-dot bg-emerald-400/60&quot;></span><span class=&quot;se-font-mono ms-2 flex-1 rounded-md bg-[var(--color-background)] px-2 py-0.5 text-center text-[0.5625rem] text-[var(--color-muted)]&quot;>app.northline.io/dashboard</span></div><img src=&quot;https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&amp;fit=crop&amp;w=1920&amp;q=88&quot; alt=&quot;Northline revenue command dashboard with pipeline analytics and forecast charts&quot; class=&quot;aspect-[16/10] w-full object-cover object-top&quot; loading=&quot;eager&quot; fetchPriority=&quot;high&quot;/></div><dl class=&quot;mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4&quot;></dl></div></div></div></section></div><div data-v2-section=&quot;features&quot; data-v2-variant=&quot;spotlight-list&quot;><section id=&quot;features&quot; data-v2-component=&quot;saas-enterprise-features&quot; aria-labelledby=&quot;se-features-title&quot; class=&quot;se-section se-section-alt bg-[var(--color-surface)]&quot;><div class=&quot;mx-auto max-w-[82rem] px-5 sm:px-8&quot;><header class=&quot;mb-10 max-w-2xl&quot;><p class=&quot;se-eyebrow mb-3&quot;>Why us</p><h2 id=&quot;se-features-title&quot; class=&quot;se-headline-sm&quot;>A presence that earns trust</h2><div class=&quot;mt-4 h-px w-12 bg-gradient-to-r from-[var(--color-accent)] to-transparent&quot; aria-hidden=&quot;true&quot;></div><p class=&quot;se-body text-muted-foreground mt-5&quot;>Webflow-caliber spacing, type, and hierarchy for serious brands.</p></header><div class=&quot;grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5&quot;><article class=&quot;se-card group relative overflow-hidden p-7 sm:p-8 transition-transform duration-500 motion-safe:hover:-translate-y-1 &quot; style=&quot;animation-delay:0s&quot;><div class=&quot;pointer-events-none absolute -end-8 -top-8 h-32 w-32 rounded-full bg-[color-mix(in_srgb,var(--color-accent)_8%,transparent)] blur-2xl transition group-hover:bg-[color-mix(in_srgb,var(--color-accent)_14%,transparent)]&quot; aria-hidden=&quot;true&quot;></div><div class=&quot;relative mb-5 flex items-center gap-4&quot;><span class=&quot;se-font-mono flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-gradient-to-br from-[color-mix(in_srgb,var(--color-primary)_12%,transparent)] to-[color-mix(in_srgb,var(--color-accent)_8%,transparent)] text-xs font-semibold text-[var(--color-primary)] ring-1 ring-[var(--border-subtle)]&quot;>01</span><span class=&quot;h-px flex-1 bg-gradient-to-r from-[var(--border-default)] to-transparent transition group-hover:from-[var(--color-accent)]&quot; aria-hidden=&quot;true&quot;></span></div><h3 class=&quot;se-font-display relative text-lg font-bold text-[var(--color-foreground)]&quot;>Clear offer</h3><p class=&quot;se-font-body relative mt-3 text-sm leading-relaxed text-[var(--color-muted)]&quot;>Explain what you do and who you help without jargon.</p></article><article class=&quot;se-card group relative overflow-hidden p-7 sm:p-8 transition-transform duration-500 motion-safe:hover:-translate-y-1 &quot; style=&quot;animation-delay:0.06s&quot;><div class=&quot;pointer-events-none absolute -end-8 -top-8 h-32 w-32 rounded-full bg-[color-mix(in_srgb,var(--color-accent)_8%,transparent)] blur-2xl transition group-hover:bg-[color-mix(in_srgb,var(--color-accent)_14%,transparent)]&quot; aria-hidden=&quot;true&quot;></div><div class=&quot;relative mb-5 flex items-center gap-4&quot;><span class=&quot;se-font-mono flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-gradient-to-br from-[color-mix(in_srgb,var(--color-primary)_12%,transparent)] to-[color-mix(in_srgb,var(--color-accent)_8%,transparent)] text-xs font-semibold text-[var(--color-primary)] ring-1 ring-[var(--border-subtle)]&quot;>02</span><span class=&quot;h-px flex-1 bg-gradient-to-r from-[var(--border-default)] to-transparent transition group-hover:from-[var(--color-accent)]&quot; aria-hidden=&quot;true&quot;></span></div><h3 class=&quot;se-font-display relative text-lg font-bold text-[var(--color-foreground)]&quot;>Premium presentation</h3><p class=&quot;se-font-body relative mt-3 text-sm leading-relaxed text-[var(--color-muted)]&quot;>Typography, spacing, and imagery that feel established.</p></article><article class=&quot;se-card group relative overflow-hidden p-7 sm:p-8 transition-transform duration-500 motion-safe:hover:-translate-y-1 &quot; style=&quot;animation-delay:0.12s&quot;><div class=&quot;pointer-events-none absolute -end-8 -top-8 h-32 w-32 rounded-full bg-[color-mix(in_srgb,var(--color-accent)_8%,transparent)] blur-2xl transition group-hover:bg-[color-mix(in_srgb,var(--color-accent)_14%,transparent)]&quot; aria-hidden=&quot;true&quot;></div><div class=&quot;relative mb-5 flex items-center gap-4&quot;><span class=&quot;se-font-mono flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-gradient-to-br from-[color-mix(in_srgb,var(--color-primary)_12%,transparent)] to-[color-mix(in_srgb,var(--color-accent)_8%,transparent)] text-xs font-semibold text-[var(--color-primary)] ring-1 ring-[var(--border-subtle)]&quot;>03</span><span class=&quot;h-px flex-1 bg-gradient-to-r from-[var(--border-default)] to-transparent transition group-hover:from-[var(--color-accent)]&quot; aria-hidden=&quot;true&quot;></span></div><h3 class=&quot;se-font-display relative text-lg font-bold text-[var(--color-foreground)]&quot;>Conversion paths</h3><p class=&quot;se-font-body relative mt-3 text-sm leading-relaxed text-[var(--color-muted)]&quot;>CTAs that guide visitors to the next decisive step.</p></article><article class=&quot;se-card group relative overflow-hidden p-7 sm:p-8 transition-transform duration-500 motion-safe:hover:-translate-y-1 &quot; style=&quot;animation-delay:0.18s&quot;><div class=&quot;pointer-events-none absolute -end-8 -top-8 h-32 w-32 rounded-full bg-[color-mix(in_srgb,var(--color-accent)_8%,transparent)] blur-2xl transition group-hover:bg-[color-mix(in_srgb,var(--color-accent)_14%,transparent)]&quot; aria-hidden=&quot;true&quot;></div><div class=&quot;relative mb-5 flex items-center gap-4&quot;><span class=&quot;se-font-mono flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-gradient-to-br from-[color-mix(in_srgb,var(--color-primary)_12%,transparent)] to-[color-mix(in_srgb,var(--color-accent)_8%,transparent)] text-xs font-semibold text-[var(--color-primary)] ring-1 ring-[var(--border-subtle)]&quot;>04</span><span class=&quot;h-px flex-1 bg-gradient-to-r from-[var(--border-default)] to-transparent transition group-hover:from-[var(--color-accent)]&quot; aria-hidden=&quot;true&quot;></span></div><h3 class=&quot;se-font-display relative text-lg font-bold text-[var(--color-foreground)]&quot;>Trusted contact</h3><p class=&quot;se-font-body relative mt-3 text-sm leading-relaxed text-[var(--color-muted)]&quot;>Forms and contact paths that get answered.</p></article></div></div></section></div><div data-v2-section=&quot;services&quot; data-v2-variant=&quot;minimal-list&quot;><section id=&quot;platform&quot; data-v2-component=&quot;saas-enterprise-integrations&quot; aria-labelledby=&quot;se-integrations-title&quot; class=&quot;se-section-glow relative overflow-hidden border-y border-[var(--border-default)] bg-[var(--color-background)] py-14 sm:py-16&quot;><div class=&quot;mx-auto max-w-[82rem] px-5 sm:px-8&quot;><header class=&quot;mb-9 text-center&quot;><p class=&quot;se-eyebrow mb-3&quot;>Why us</p><h2 id=&quot;se-integrations-title&quot; class=&quot;se-headline-sm&quot;>A presence that earns trust</h2><div class=&quot;mx-auto mt-4 h-px w-12 bg-gradient-to-r from-transparent via-[var(--color-accent)] to-transparent&quot; aria-hidden=&quot;true&quot;></div><p class=&quot;se-body text-muted-foreground mx-auto mt-5 max-w-lg text-sm&quot;>Webflow-caliber spacing, type, and hierarchy for serious brands.</p></header></div><div class=&quot;relative&quot; aria-label=&quot;Integration partners&quot;><div class=&quot;pointer-events-none absolute inset-y-0 start-0 z-10 w-24 bg-gradient-to-r from-[var(--color-background)] to-transparent&quot; aria-hidden=&quot;true&quot;></div><div class=&quot;pointer-events-none absolute inset-y-0 end-0 z-10 w-24 bg-gradient-to-l from-[var(--color-background)] to-transparent&quot; aria-hidden=&quot;true&quot;></div><div class=&quot;flex motion-safe:animate-[se-marquee_45s_linear_infinite] hover:[animation-play-state:paused]&quot;><div class=&quot;se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]&quot;><span class=&quot;se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]&quot;>Core services</span><span class=&quot;se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]&quot;>Platform</span></div><div class=&quot;se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]&quot;><span class=&quot;se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]&quot;>Proof &amp; process</span><span class=&quot;se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]&quot;>Data</span></div><div class=&quot;se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]&quot;><span class=&quot;se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]&quot;>Responsive follow-up</span><span class=&quot;se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]&quot;>Workflow</span></div><div class=&quot;se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]&quot;><span class=&quot;se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]&quot;>Clear offer</span><span class=&quot;se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]&quot;>Analytics</span></div><div class=&quot;se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]&quot;><span class=&quot;se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]&quot;>Premium presentation</span><span class=&quot;se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]&quot;>Security</span></div><div class=&quot;se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]&quot;><span class=&quot;se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]&quot;>Conversion paths</span><span class=&quot;se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]&quot;>API</span></div><div class=&quot;se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]&quot;><span class=&quot;se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]&quot;>Trusted contact</span><span class=&quot;se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]&quot;>Cloud</span></div><div class=&quot;se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]&quot;><span class=&quot;se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]&quot;>Services explained with outcomes, not jargon</span><span class=&quot;se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]&quot;>Ops</span></div><div class=&quot;se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]&quot;><span class=&quot;se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]&quot;>Core services</span><span class=&quot;se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]&quot;>Platform</span></div><div class=&quot;se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]&quot;><span class=&quot;se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]&quot;>Proof &amp; process</span><span class=&quot;se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]&quot;>Data</span></div><div class=&quot;se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]&quot;><span class=&quot;se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]&quot;>Responsive follow-up</span><span class=&quot;se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]&quot;>Workflow</span></div><div class=&quot;se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]&quot;><span class=&quot;se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]&quot;>Clear offer</span><span class=&quot;se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]&quot;>Analytics</span></div><div class=&quot;se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]&quot;><span class=&quot;se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]&quot;>Premium presentation</span><span class=&quot;se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]&quot;>Security</span></div><div class=&quot;se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]&quot;><span class=&quot;se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]&quot;>Conversion paths</span><span class=&quot;se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]&quot;>API</span></div><div class=&quot;se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]&quot;><span class=&quot;se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]&quot;>Trusted contact</span><span class=&quot;se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]&quot;>Cloud</span></div><div class=&quot;se-card mx-3 flex h-[4.5rem] min-w-[11rem] shrink-0 flex-col items-center justify-center px-6 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]&quot;><span class=&quot;se-font-display text-sm font-bold tracking-tight text-[var(--color-foreground)]&quot;>Services explained with outcomes, not jargon</span><span class=&quot;se-font-mono mt-1 text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]&quot;>Ops</span></div></div></div><p class=&quot;se-font-body mx-auto mt-10 max-w-[82rem] px-5 text-center text-xs text-[var(--color-muted)] sm:px-8&quot;>120+ integrations · OAuth 2.0 · Webhooks · Custom API connectors</p></section></div><section id=&quot;about&quot; data-v2-component=&quot;saas-enterprise-about&quot; aria-labelledby=&quot;about-title&quot; class=&quot;se-section bg-[var(--color-background)]&quot;><div class=&quot;df-container&quot;><div class=&quot;df-hero-split-empty grid items-start gap-10 lg:grid-cols-12 lg:items-center lg:gap-16 xl:gap-20&quot;><div class=&quot;df-hero-editorial&quot;><header class=&quot;mb-12 mx-auto text-center max-w-3xl mb-0&quot;><p class=&quot;se-eyebrow mb-3&quot;>Services</p><h2 id=&quot;about-title&quot; class=&quot;se-headline-sm&quot;>What we deliver for clients</h2><div class=&quot;df-accent-line mt-4 mx-auto&quot; aria-hidden=&quot;true&quot;></div><p class=&quot;se-body text-muted-foreground text-muted-foreground mt-5&quot;>Plain-language offerings with outcomes — ready for a premium business site.</p></header><p class=&quot;se-body text-muted-foreground mt-6&quot;>Plain-language offerings with outcomes — ready for a premium business site.</p><ul class=&quot;mt-8 grid gap-3 sm:grid-cols-2&quot; role=&quot;list&quot;><li class=&quot;se-font-body flex gap-3 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-foreground)]&quot;><span class=&quot;mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-accent)_12%,transparent)] text-[0.625rem] font-bold text-[var(--color-accent)]&quot; aria-hidden=&quot;true&quot;>✓</span>Services explained with outcomes, not jargon</li><li class=&quot;se-font-body flex gap-3 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-foreground)]&quot;><span class=&quot;mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-accent)_12%,transparent)] text-[0.625rem] font-bold text-[var(--color-accent)]&quot; aria-hidden=&quot;true&quot;>✓</span>Proof points that reduce hesitation for new clients</li><li class=&quot;se-font-body flex gap-3 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-foreground)]&quot;><span class=&quot;mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-accent)_12%,transparent)] text-[0.625rem] font-bold text-[var(--color-accent)]&quot; aria-hidden=&quot;true&quot;>✓</span>Contact paths designed for fast follow-up</li></ul><a href=&quot;#contact&quot; class=&quot;se-btn-primary mt-8 inline-flex se-focus-ring mx-auto&quot;>Get started</a></div></div></div></section><section id=&quot;stats&quot; data-v2-component=&quot;saas-enterprise-stats&quot; aria-labelledby=&quot;stats-title&quot; class=&quot;se-section df-section-glow relative overflow-hidden bg-[var(--color-background)]&quot;><div class=&quot;df-glow-orb -start-24 top-0 h-64 w-64 bg-[var(--color-accent)]&quot; aria-hidden=&quot;true&quot;></div><div class=&quot;df-glow-orb end-0 bottom-0 h-48 w-48 bg-[var(--color-primary)]&quot; aria-hidden=&quot;true&quot;></div><div class=&quot;df-container relative&quot;><header class=&quot;mb-12 mx-auto text-center max-w-3xl&quot;><p class=&quot;se-eyebrow mb-3&quot;>Why us</p><h2 id=&quot;stats-title&quot; class=&quot;se-headline-sm&quot;>A presence that earns trust</h2><div class=&quot;df-accent-line mt-4 mx-auto&quot; aria-hidden=&quot;true&quot;></div><p class=&quot;se-body text-muted-foreground text-muted-foreground mt-5&quot;>Webflow-caliber spacing, type, and hierarchy for serious brands.</p></header><dl class=&quot;grid gap-4 sm:grid-cols-2 lg:grid-cols-4&quot;><div class=&quot;se-card df-card p-6 text-center sm:p-7&quot;><dt class=&quot;se-font-body text-sm font-medium text-[var(--color-muted)]&quot;>Services explained with outcomes, not jargon</dt><dd class=&quot;se-metric mt-3 block&quot;>1</dd></div><div class=&quot;se-card df-card p-6 text-center sm:p-7&quot;><dt class=&quot;se-font-body text-sm font-medium text-[var(--color-muted)]&quot;>Proof points that reduce hesitation for new clients</dt><dd class=&quot;se-metric mt-3 block&quot;>2</dd></div><div class=&quot;se-card df-card p-6 text-center sm:p-7&quot;><dt class=&quot;se-font-body text-sm font-medium text-[var(--color-muted)]&quot;>Contact paths designed for fast follow-up</dt><dd class=&quot;se-metric mt-3 block&quot;>3</dd></div></dl></div></section><div data-v2-section=&quot;testimonials&quot; data-v2-variant=&quot;logo-wall&quot;><section id=&quot;testimonials&quot; data-v2-component=&quot;saas-enterprise-testimonials&quot; aria-labelledby=&quot;testimonials-title&quot; class=&quot;se-section df-section-alt bg-[var(--color-surface)]&quot;><div class=&quot;df-container&quot;><header class=&quot;mb-12 mx-auto text-center max-w-3xl&quot;><p class=&quot;se-eyebrow mb-3&quot;>Clients</p><h2 id=&quot;testimonials-title&quot; class=&quot;se-headline-sm&quot;>Businesses that raised their standard</h2><div class=&quot;df-accent-line mt-4 mx-auto&quot; aria-hidden=&quot;true&quot;></div><p class=&quot;se-body text-muted-foreground text-muted-foreground mt-5&quot;>Specific results from professional services teams.</p></header><div class=&quot;grid gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-6&quot;><figure class=&quot;se-card df-card relative flex flex-col p-7 sm:p-8 &quot;><span class=&quot;df-quote-mark absolute end-6 top-4 select-none&quot; aria-hidden=&quot;true&quot;>“</span><blockquote class=&quot;se-body text-muted-foreground relative z-[1] mt-4 flex-1 text-base leading-relaxed&quot;>We finally look as professional as the work we deliver — working with Northline.</blockquote><figcaption class=&quot;mt-8 flex items-center gap-3 border-t border-[var(--border-default,rgba(0,0,0,0.08))] pt-5&quot;><span class=&quot;se-font-body flex h-11 w-11 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-primary)_12%,transparent)] text-sm font-semibold text-[var(--color-primary)] ring-2 ring-[var(--color-surface)]&quot; aria-hidden=&quot;true&quot;>A</span><div><p class=&quot;se-font-body text-sm font-semibold text-[var(--color-foreground)]&quot;>Andrea Wells</p><p class=&quot;se-font-body text-xs text-[var(--color-muted)]&quot;>Owner, Wells Advisory</p></div></figcaption></figure><figure class=&quot;se-card df-card relative flex flex-col p-7 sm:p-8 df-card-featured md:-translate-y-1 lg:col-span-1&quot;><span class=&quot;df-quote-mark absolute end-6 top-4 select-none&quot; aria-hidden=&quot;true&quot;>“</span><blockquote class=&quot;se-body text-muted-foreground relative z-[1] mt-4 flex-1 text-base leading-relaxed&quot;>Inquiries went up after the redesign — messaging is clearer.</blockquote><figcaption class=&quot;mt-8 flex items-center gap-3 border-t border-[var(--border-default,rgba(0,0,0,0.08))] pt-5&quot;><span class=&quot;se-font-body flex h-11 w-11 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-primary)_12%,transparent)] text-sm font-semibold text-[var(--color-primary)] ring-2 ring-[var(--color-surface)]&quot; aria-hidden=&quot;true&quot;>K</span><div><p class=&quot;se-font-body text-sm font-semibold text-[var(--color-foreground)]&quot;>Kevin Zhao</p><p class=&quot;se-font-body text-xs text-[var(--color-muted)]&quot;>Managing Partner</p></div></figcaption></figure><figure class=&quot;se-card df-card relative flex flex-col p-7 sm:p-8 &quot;><span class=&quot;df-quote-mark absolute end-6 top-4 select-none&quot; aria-hidden=&quot;true&quot;>“</span><blockquote class=&quot;se-body text-muted-foreground relative z-[1] mt-4 flex-1 text-base leading-relaxed&quot;>Clients comment on the site before meetings now.</blockquote><figcaption class=&quot;mt-8 flex items-center gap-3 border-t border-[var(--border-default,rgba(0,0,0,0.08))] pt-5&quot;><span class=&quot;se-font-body flex h-11 w-11 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-primary)_12%,transparent)] text-sm font-semibold text-[var(--color-primary)] ring-2 ring-[var(--color-surface)]&quot; aria-hidden=&quot;true&quot;>R</span><div><p class=&quot;se-font-body text-sm font-semibold text-[var(--color-foreground)]&quot;>Ruth Okonkwo</p><p class=&quot;se-font-body text-xs text-[var(--color-muted)]&quot;>Consultant</p></div></figcaption></figure></div></div></section></div><section id=&quot;pricing&quot; data-v2-component=&quot;saas-enterprise-pricing&quot; aria-labelledby=&quot;se-pricing-title&quot; class=&quot;se-section se-section-glow relative bg-[var(--color-background)]&quot;><div class=&quot;mx-auto max-w-[82rem] px-5 sm:px-8&quot;><header class=&quot;mb-10 text-center&quot;><p class=&quot;se-eyebrow mb-3&quot;>Packages</p><h2 id=&quot;se-pricing-title&quot; class=&quot;se-headline-sm&quot;>Simple engagement options</h2><div class=&quot;mx-auto mt-4 h-px w-12 bg-gradient-to-r from-transparent via-[var(--color-accent)] to-transparent&quot; aria-hidden=&quot;true&quot;></div><p class=&quot;se-body text-muted-foreground mx-auto mt-5 max-w-lg&quot;>Start lean or go deeper — both look premium.</p></header><div class=&quot;grid items-stretch gap-5 lg:grid-cols-3 lg:gap-6&quot;><article class=&quot;se-card flex flex-col p-7 sm:p-8 transition-transform duration-500 motion-safe:hover:-translate-y-1&quot;><h3 class=&quot;se-font-display text-lg font-bold text-[var(--color-foreground)]&quot;>Essential</h3><p class=&quot;se-font-body mt-2 text-sm text-[var(--color-muted)]&quot;>Launch ready</p><p class=&quot;mt-8 border-b border-[var(--border-subtle)] pb-6&quot;><span class=&quot;se-metric text-3xl&quot;>$1,200</span></p><ul class=&quot;mt-6 flex-1 space-y-3.5&quot;><li class=&quot;flex gap-3 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold&quot; aria-hidden=&quot;true&quot;>✓</span>Core pages</li><li class=&quot;flex gap-3 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold&quot; aria-hidden=&quot;true&quot;>✓</span>Contact path</li><li class=&quot;flex gap-3 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold&quot; aria-hidden=&quot;true&quot;>✓</span>Mobile polish</li></ul><a href=&quot;#contact&quot; class=&quot;se-btn-secondary se-focus-ring mt-8 w-full&quot;>Get started</a></article><article class=&quot;se-card flex flex-col p-7 sm:p-8 transition-transform duration-500 se-card-featured relative lg:-translate-y-2 lg:shadow-[var(--shadow-surface)] ring-1 ring-[color-mix(in_srgb,var(--color-accent)_35%,transparent)] before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:bg-[radial-gradient(ellipse_at_top,color-mix(in_srgb,var(--color-accent)_12%,transparent),transparent_65%)]&quot;><span class=&quot;se-eyebrow absolute -top-3 start-1/2 -translate-x-1/2 rounded-full bg-[var(--color-primary)] px-4 py-1 text-[0.625rem] text-white shadow-[var(--shadow-card)]&quot;>Most popular</span><h3 class=&quot;se-font-display text-lg font-bold text-[var(--color-foreground)]&quot;>Growth</h3><p class=&quot;se-font-body mt-2 text-sm text-[var(--color-muted)]&quot;>Recommended</p><p class=&quot;mt-8 border-b border-[var(--border-subtle)] pb-6&quot;><span class=&quot;se-metric text-3xl&quot;>$2,800</span></p><ul class=&quot;mt-6 flex-1 space-y-3.5&quot;><li class=&quot;flex gap-3 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold&quot; aria-hidden=&quot;true&quot;>✓</span>Expanded sections</li><li class=&quot;flex gap-3 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold&quot; aria-hidden=&quot;true&quot;>✓</span>Proof blocks</li><li class=&quot;flex gap-3 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold&quot; aria-hidden=&quot;true&quot;>✓</span>CTA system</li></ul><a href=&quot;#contact&quot; class=&quot;se-btn-primary se-focus-ring mt-8 w-full&quot;>Get started</a></article><article class=&quot;se-card flex flex-col p-7 sm:p-8 transition-transform duration-500 motion-safe:hover:-translate-y-1&quot;><h3 class=&quot;se-font-display text-lg font-bold text-[var(--color-foreground)]&quot;>Custom</h3><p class=&quot;se-font-body mt-2 text-sm text-[var(--color-muted)]&quot;>Complex needs</p><p class=&quot;mt-8 border-b border-[var(--border-subtle)] pb-6&quot;><span class=&quot;se-metric text-3xl&quot;>Quote</span></p><ul class=&quot;mt-6 flex-1 space-y-3.5&quot;><li class=&quot;flex gap-3 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold&quot; aria-hidden=&quot;true&quot;>✓</span>Custom components</li><li class=&quot;flex gap-3 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold&quot; aria-hidden=&quot;true&quot;>✓</span>Integrations</li><li class=&quot;flex gap-3 se-font-body text-sm text-[var(--color-foreground)]&quot;><span class=&quot;se-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold&quot; aria-hidden=&quot;true&quot;>✓</span>Ongoing support</li></ul><a href=&quot;#contact&quot; class=&quot;se-btn-secondary se-focus-ring mt-8 w-full&quot;>Get started</a></article></div></div></section><section id=&quot;faq&quot; data-v2-component=&quot;saas-enterprise-faq&quot; aria-labelledby=&quot;se-faq-title&quot; class=&quot;se-section se-section-alt bg-[var(--color-surface)]&quot;><div class=&quot;mx-auto max-w-[82rem] px-5 sm:px-8&quot;><div class=&quot;grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start&quot;><header class=&quot;lg:sticky lg:top-28&quot;><p class=&quot;se-eyebrow mb-3&quot;>FAQ</p><h2 id=&quot;se-faq-title&quot; class=&quot;se-headline-sm&quot;>Common questions</h2><div class=&quot;mt-4 h-px w-12 bg-gradient-to-r from-[var(--color-accent)] to-transparent&quot; aria-hidden=&quot;true&quot;></div><p class=&quot;se-body text-muted-foreground mt-5&quot;>Launch timing, edits, and languages.</p></header><div class=&quot;space-y-3&quot;><div class=&quot;se-card overflow-hidden transition-shadow duration-300 shadow-[var(--shadow-surface)]&quot;><h3><button type=&quot;button&quot; id=&quot;se-faq-trigger-0&quot; aria-expanded=&quot;true&quot; aria-controls=&quot;se-faq-panel-0&quot; class=&quot;flex w-full items-center justify-between gap-4 px-5 py-4 text-start se-focus-ring transition-colors hover:text-[var(--color-primary)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-foreground)]&quot;>How soon can we launch?</span><span class=&quot;se-font-mono flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-xs text-[var(--color-accent)] transition-all duration-300 rotate-180 bg-[color-mix(in_srgb,var(--color-accent)_10%,transparent)]&quot; aria-hidden=&quot;true&quot;>−</span></button></h3><div id=&quot;se-faq-panel-0&quot; role=&quot;region&quot; aria-labelledby=&quot;se-faq-trigger-0&quot; class=&quot;border-t border-[var(--border-subtle)] px-5 py-4 motion-safe:animate-[se-slide-up_0.35s_ease_both]&quot;><p class=&quot;se-font-body text-sm leading-relaxed text-[var(--color-muted)]&quot;>Most first versions ship quickly once messaging and assets are aligned.</p></div></div><div class=&quot;se-card overflow-hidden transition-shadow duration-300 &quot;><h3><button type=&quot;button&quot; id=&quot;se-faq-trigger-1&quot; aria-expanded=&quot;false&quot; aria-controls=&quot;se-faq-panel-1&quot; class=&quot;flex w-full items-center justify-between gap-4 px-5 py-4 text-start se-focus-ring transition-colors hover:text-[var(--color-primary)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-foreground)]&quot;>Can we update content ourselves?</span><span class=&quot;se-font-mono flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-xs text-[var(--color-accent)] transition-all duration-300 &quot; aria-hidden=&quot;true&quot;>+</span></button></h3><div id=&quot;se-faq-panel-1&quot; role=&quot;region&quot; aria-labelledby=&quot;se-faq-trigger-1&quot; hidden=&quot;&quot; class=&quot;border-t border-[var(--border-subtle)] px-5 py-4 motion-safe:animate-[se-slide-up_0.35s_ease_both]&quot;><p class=&quot;se-font-body text-sm leading-relaxed text-[var(--color-muted)]&quot;>Yes — structured sections make ongoing edits straightforward.</p></div></div><div class=&quot;se-card overflow-hidden transition-shadow duration-300 &quot;><h3><button type=&quot;button&quot; id=&quot;se-faq-trigger-2&quot; aria-expanded=&quot;false&quot; aria-controls=&quot;se-faq-panel-2&quot; class=&quot;flex w-full items-center justify-between gap-4 px-5 py-4 text-start se-focus-ring transition-colors hover:text-[var(--color-primary)]&quot;><span class=&quot;se-font-display text-sm font-semibold text-[var(--color-foreground)]&quot;>Do you support bilingual sites?</span><span class=&quot;se-font-mono flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-xs text-[var(--color-accent)] transition-all duration-300 &quot; aria-hidden=&quot;true&quot;>+</span></button></h3><div id=&quot;se-faq-panel-2&quot; role=&quot;region&quot; aria-labelledby=&quot;se-faq-trigger-2&quot; hidden=&quot;&quot; class=&quot;border-t border-[var(--border-subtle)] px-5 py-4 motion-safe:animate-[se-slide-up_0.35s_ease_both]&quot;><p class=&quot;se-font-body text-sm leading-relaxed text-[var(--color-muted)]&quot;>Language options can be configured during generation and refinement.</p></div></div></div></div></div></section><div data-v2-section=&quot;contact&quot; data-v2-variant=&quot;dark-panel&quot;><section id=&quot;contact&quot; data-v2-component=&quot;saas-enterprise-contact&quot; aria-labelledby=&quot;contact-title&quot; class=&quot;se-section df-section-glow relative bg-[var(--color-background)]&quot;><div class=&quot;df-container&quot;><div class=&quot;grid gap-12 lg:grid-cols-2 lg:gap-16&quot;><div><p class=&quot;se-eyebrow mb-3&quot;>Next step</p><h2 id=&quot;contact-title&quot; class=&quot;se-headline-sm&quot;>Request a quote</h2><div class=&quot;df-accent-line mt-4&quot; aria-hidden=&quot;true&quot;></div><p class=&quot;se-body text-muted-foreground mt-5&quot;>Tell us about your business and we will respond promptly.</p></div><form id=&quot;_R_2i_&quot; class=&quot;se-card df-card p-6 sm:p-8&quot; noValidate=&quot;&quot;><div class=&quot;space-y-5&quot;><div><label for=&quot;_R_2i_-name&quot; class=&quot;se-font-body mb-2 block text-sm font-medium text-[var(--color-foreground)]&quot;>Name</label><input id=&quot;_R_2i_-name&quot; type=&quot;text&quot; required=&quot;&quot; autoComplete=&quot;name&quot; class=&quot;df-input se-focus-ring&quot; name=&quot;name&quot;/></div><div><label for=&quot;_R_2i_-email&quot; class=&quot;se-font-body mb-2 block text-sm font-medium text-[var(--color-foreground)]&quot;>Email</label><input id=&quot;_R_2i_-email&quot; type=&quot;email&quot; required=&quot;&quot; autoComplete=&quot;email&quot; class=&quot;df-input se-focus-ring&quot; name=&quot;email&quot;/></div><div><label for=&quot;_R_2i_-message&quot; class=&quot;se-font-body mb-2 block text-sm font-medium text-[var(--color-foreground)]&quot;>Message</label><textarea id=&quot;_R_2i_-message&quot; name=&quot;message&quot; rows=&quot;4&quot; required=&quot;&quot; class=&quot;df-textarea resize-y se-focus-ring&quot;></textarea></div><button type=&quot;submit&quot; class=&quot;se-btn-primary w-full sm:w-auto se-focus-ring&quot;>Get started</button></div></form></div></div></section></div></main><utility data-v2-region=&quot;utility&quot;><section id=&quot;cta-band&quot; data-v2-component=&quot;saas-enterprise-utility-band&quot; aria-labelledby=&quot;se-utility-title&quot; class=&quot;relative overflow-hidden bg-[var(--color-primary)] py-16 sm:py-20&quot;><div class=&quot;se-grid-bg pointer-events-none absolute inset-0 opacity-[0.18]&quot; aria-hidden=&quot;true&quot;></div><div class=&quot;pointer-events-none absolute -start-1/4 top-0 h-full w-1/2 bg-[radial-gradient(ellipse_70%_90%_at_0%_50%,rgba(255,255,255,0.14),transparent)]&quot; aria-hidden=&quot;true&quot;></div><div class=&quot;pointer-events-none absolute -end-1/4 bottom-0 h-2/3 w-1/2 bg-[radial-gradient(ellipse_60%_80%_at_100%_100%,rgba(59,130,246,0.25),transparent)]&quot; aria-hidden=&quot;true&quot;></div><div class=&quot;relative mx-auto flex max-w-[82rem] flex-col items-start justify-between gap-10 px-5 sm:flex-row sm:items-center sm:px-8&quot;><div class=&quot;max-w-xl&quot;><p class=&quot;se-font-mono text-xs font-medium uppercase tracking-[0.2em] text-white/70&quot;>Next step</p><h2 id=&quot;se-utility-title&quot; class=&quot;se-font-display mt-3 text-[clamp(1.75rem,3vw,2.5rem)] font-bold leading-tight text-white text-wrap-balance&quot;>Ready to look established online?</h2><p class=&quot;se-font-body mt-4 text-sm leading-relaxed text-white/78 sm:text-base&quot;>Share your goals — we will propose a clear path and timeline.</p><div class=&quot;se-trust-strip mt-6&quot;><span class=&quot;se-trust-badge border-white/15 bg-white/8 text-white/80&quot;><span class=&quot;se-signal text-[0.5rem]&quot; aria-hidden=&quot;true&quot;>✓</span>SOC 2</span><span class=&quot;se-trust-badge border-white/15 bg-white/8 text-white/80&quot;><span class=&quot;se-signal text-[0.5rem]&quot; aria-hidden=&quot;true&quot;>✓</span>99.9% uptime</span><span class=&quot;se-trust-badge border-white/15 bg-white/8 text-white/80&quot;><span class=&quot;se-signal text-[0.5rem]&quot; aria-hidden=&quot;true&quot;>✓</span>14-day onboarding</span></div></div><div class=&quot;flex w-full flex-col gap-3 sm:w-auto sm:flex-row&quot;><a href=&quot;#contact&quot; class=&quot;inline-flex min-h-[3rem] items-center justify-center rounded-[var(--radius-md)] bg-white px-6 py-3 text-sm font-semibold text-[var(--color-primary)] shadow-[0_8px_24px_rgba(0,0,0,0.18)] transition hover:-translate-y-0.5 hover:bg-white/95 hover:shadow-[0_12px_32px_rgba(0,0,0,0.22)] se-focus-ring&quot;>Get started</a><a href=&quot;/platform&quot; class=&quot;inline-flex min-h-[3rem] items-center justify-center rounded-[var(--radius-md)] border border-white/35 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:border-white/60 hover:bg-white/10 se-focus-ring&quot;>Learn more</a></div></div></section></utility><footer data-v2-region=&quot;footer&quot;><footer data-v2-component=&quot;saas-enterprise-footer&quot; class=&quot;border-t border-[var(--border-default)] bg-[var(--color-ink,#020617)] text-white&quot; role=&quot;contentinfo&quot;><div class=&quot;mx-auto max-w-[82rem] px-5 py-14 sm:px-8 sm:py-16&quot;><div class=&quot;grid gap-10 md:grid-cols-[1.4fr_1fr]&quot;><div><p class=&quot;se-font-display text-xl font-bold&quot;>Northline</p><p class=&quot;se-font-body mt-3 max-w-sm text-sm leading-relaxed text-white/60&quot;>Clear messaging and conversion-focused pages that earn trust quickly.</p><div class=&quot;mt-6 flex flex-wrap gap-3&quot;><span class=&quot;se-font-mono rounded-[var(--radius-sm)] border border-white/10 px-2.5 py-1 text-[0.625rem] text-white/50&quot;>SOC 2</span><span class=&quot;se-font-mono rounded-[var(--radius-sm)] border border-white/10 px-2.5 py-1 text-[0.625rem] text-white/50&quot;>GDPR</span><span class=&quot;se-font-mono rounded-[var(--radius-sm)] border border-white/10 px-2.5 py-1 text-[0.625rem] text-white/50&quot;>ISO 27001</span></div></div><nav aria-label=&quot;Footer&quot;><p class=&quot;se-eyebrow text-white/40&quot;>Explore</p><ul class=&quot;mt-4 grid grid-cols-2 gap-x-6 gap-y-2.5&quot;><li><a href=&quot;#services&quot; class=&quot;se-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] se-focus-ring rounded-sm&quot;>Services</a></li><li><a href=&quot;#features&quot; class=&quot;se-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] se-focus-ring rounded-sm&quot;>Why us</a></li><li><a href=&quot;#pricing&quot; class=&quot;se-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] se-focus-ring rounded-sm&quot;>Packages</a></li><li><a href=&quot;#testimonials&quot; class=&quot;se-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] se-focus-ring rounded-sm&quot;>Clients</a></li><li><a href=&quot;#contact&quot; class=&quot;se-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] se-focus-ring rounded-sm&quot;>Contact</a></li></ul></nav></div><div class=&quot;mt-12 border-t border-white/10 pt-6&quot;><p class=&quot;se-font-body text-xs text-white/40&quot;>© 2026 Northline. All rights reserved.</p></div></div></footer></footer><div data-v2-region=&quot;overlay&quot; class=&quot;pointer-events-none fixed inset-x-0 bottom-0 z-50&quot;><div data-v2-section=&quot;cta&quot; data-v2-variant=&quot;inline-newsletter&quot;></div></div></div>
   </div>
   <section class=&quot;page v2-secondary-page&quot; id=&quot;platform&quot;>
   <div class=&quot;mx-auto max-w-3xl px-6 py-16&quot;>
@@ -257,17 +1808,58 @@ Design system: se-* classes, grid backgrounds, metric cards</pre>
 <section class=&quot;page v2-secondary-page&quot; id=&quot;pricing&quot;>
   <div class=&quot;mx-auto max-w-3xl px-6 py-16&quot;>
     <p class=&quot;text-xs uppercase tracking-widest text-[var(--color-foreground)]/50&quot;>pricing</p>
-    <h1 class=&quot;mt-4 text-3xl font-semibold text-[var(--color-foreground)]&quot;>pricing</h1>
-    <p class=&quot;mt-4 text-[var(--color-foreground)]/70&quot;>pricing — Northline</p>
-    <a class=&quot;mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]&quot; href=&quot;#home&quot;>Back to home</a>
+    <pre class=&quot;mt-4 overflow-x-auto rounded border border-[var(--color-foreground)]/10 p-4 text-xs text-[var(--color-foreground)]/70&quot;>import type { Metadata } from &quot;next&quot;;
+import { SaasEnterpriseHero } from &quot;@/components/saas-enterprise-hero&quot;;
+import { SaasEnterprisePricing } from &quot;@/components/saas-enterprise-pricing&quot;;
+import { SaasEnterpriseFaq } from &quot;@/components/saas-enterprise-faq&quot;;
+import { SaasEnterpriseNav } from &quot;@/components/saas-enterprise-nav&quot;;
+import { SaasEnterpriseFooter } from &quot;@/components/saas-enterprise-footer&quot;;
+
+export const metadata: Metadata = {
+  title: &quot;Pricing&quot;,
+  description: &quot;Enterprise revenue operations platform&quot;,
+};
+
+export default function PricingPage() {
+  return (
+    &lt;div className=&quot;flex min-h-screen flex-col bg-[var(--color-background)] text-[var(--color-foreground)] antialiased v2-template v2-saas-enterprise&quot; data-v2-package=&quot;saas-enterprise&quot; data-v2-composer=&quot;region-grid&quot; data-v2-layout=&quot;default&quot;&gt;
+      &lt;header data-v2-region=&quot;header&quot;&gt;
+      &lt;SaasEnterpriseNav
+        brandName={&quot;Northline&quot;}
+        ctaLabel={&quot;Get started&quot;}
+        links={[{&quot;href&quot;:&quot;#services&quot;,&quot;label&quot;:&quot;Services&quot;},{&quot;href&quot;:&quot;#features&quot;,&quot;label&quot;:&quot;Why us&quot;},{&quot;href&quot;:&quot;#pricing&quot;,&quot;label&quot;:&quot;Packages&quot;},{&quot;href&quot;:&quot;#testimonials&quot;,&quot;label&quot;:&quot;Clients&quot;},{&quot;href&quot;:&quot;#contact&quot;,&quot;label&quot;:&quot;Contact&quot;}]}
+      /&gt;
+      &lt;/header&gt;
+      &lt;main dat</pre>
+    <a class=&quot;mt-6 inline-block text-sm text-[var(--color-accent,#B87333)]&quot; href=&quot;#home&quot;>Back to home</a>
   </div>
 </section>
 <section class=&quot;page v2-secondary-page&quot; id=&quot;customers&quot;>
   <div class=&quot;mx-auto max-w-3xl px-6 py-16&quot;>
     <p class=&quot;text-xs uppercase tracking-widest text-[var(--color-foreground)]/50&quot;>customers</p>
-    <h1 class=&quot;mt-4 text-3xl font-semibold text-[var(--color-foreground)]&quot;>customers</h1>
-    <p class=&quot;mt-4 text-[var(--color-foreground)]/70&quot;>customers — Northline</p>
-    <a class=&quot;mt-8 inline-block text-sm text-[var(--color-accent,#B87333)]&quot; href=&quot;#home&quot;>Back to home</a>
+    <pre class=&quot;mt-4 overflow-x-auto rounded border border-[var(--color-foreground)]/10 p-4 text-xs text-[var(--color-foreground)]/70&quot;>import type { Metadata } from &quot;next&quot;;
+import { SaasEnterpriseHero } from &quot;@/components/saas-enterprise-hero&quot;;
+import { SaasEnterprisePortfolio } from &quot;@/components/saas-enterprise-portfolio&quot;;
+import { SaasEnterpriseFeatures } from &quot;@/components/saas-enterprise-features&quot;;
+import { SaasEnterpriseNav } from &quot;@/components/saas-enterprise-nav&quot;;
+import { SaasEnterpriseFooter } from &quot;@/components/saas-enterprise-footer&quot;;
+
+export const metadata: Metadata = {
+  title: &quot;Customers&quot;,
+  description: &quot;Enterprise revenue operations platform&quot;,
+};
+
+export default function CustomersPage() {
+  return (
+    &lt;div className=&quot;flex min-h-screen flex-col bg-[var(--color-background)] text-[var(--color-foreground)] antialiased v2-template v2-saas-enterprise&quot; data-v2-package=&quot;saas-enterprise&quot; data-v2-composer=&quot;region-grid&quot; data-v2-layout=&quot;default&quot;&gt;
+      &lt;header data-v2-region=&quot;header&quot;&gt;
+      &lt;SaasEnterpriseNav
+        brandName={&quot;Northline&quot;}
+        ctaLabel={&quot;Get started&quot;}
+        links={[{&quot;href&quot;:&quot;#services&quot;,&quot;label&quot;:&quot;Services&quot;},{&quot;href&quot;:&quot;#features&quot;,&quot;label&quot;:&quot;Why us&quot;},{&quot;href&quot;:&quot;#pricing&quot;,&quot;label&quot;:&quot;Packages&quot;},{&quot;href&quot;:&quot;#testimonials&quot;,&quot;label&quot;:&quot;Clients&quot;},{&quot;href&quot;:&quot;#contact&quot;,&quot;label&quot;:&quot;Contact&quot;}]}
+      /&gt;
+      &lt;/heade</pre>
+    <a class=&quot;mt-6 inline-block text-sm text-[var(--color-accent,#B87333)]&quot; href=&quot;#home&quot;>Back to home</a>
   </div>
 </section>
 </body>

@@ -1,0 +1,7 @@
+{
+  "pageId": "platform",
+  "layoutId": "default",
+  "regions": {
+    "main": ["pulse-fintech-hero", "pulse-fintech-features", "pulse-fintech-integrations"]
+  }
+}

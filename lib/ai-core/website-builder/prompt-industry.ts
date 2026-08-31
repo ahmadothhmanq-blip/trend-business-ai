@@ -11,6 +11,7 @@ const INDUSTRY_LABELS: Record<IndustryId, string> = {
   restaurant: "Restaurant",
   ecommerce: "E-commerce",
   saas: "SaaS",
+  gaming: "Gaming & Esports",
   technology: "Technology",
   furniture: "Furniture",
   "real-estate": "Real Estate",
@@ -40,6 +41,32 @@ type Rule = {
 
 const RULES: Rule[] = [
   {
+    id: "gaming",
+    patterns: [
+      /\bgaming\b/i,
+      /\besports?\b/i,
+      /\be-sports\b/i,
+      /\bgame\s*studio\b/i,
+      /\bvideo\s*games?\b/i,
+      /\bgame\s*developer\b/i,
+      /\bgame\s*publisher\b/i,
+      /\bindie\s*game\b/i,
+      /\bpc\s*gaming\b/i,
+      /\bgaming\s*company\b/i,
+      /\btwitch\b/i,
+      /\bstreamer\b/i,
+      /\blan\s*(center|party)\b/i,
+      /ألعاب/,
+      /العاب/,
+      /جيمينج/,
+      /ألعاب\s*فيديو/,
+      /استوديو\s*ألعاب/,
+      /شركة\s*ألعاب/,
+      /رياضات\s*إلكترونية/,
+    ],
+    blockWhen: [/\brestaurant\b/i, /مطعم/, /\bdining\b/i],
+  },
+  {
     id: "furniture",
     patterns: [
       /\bfurniture\b/i,
@@ -67,6 +94,15 @@ const RULES: Rule[] = [
       /\bchef\b/i,
       /\bمطعم\b/,
       /\bمأكولات\b/,
+    ],
+    blockWhen: [
+      /\bgaming\b/i,
+      /\besports?\b/i,
+      /\bgame\s*studio\b/i,
+      /ألعاب/,
+      /العاب/,
+      /جيمينج/,
+      /شركة\s*ألعاب/,
     ],
   },
   {

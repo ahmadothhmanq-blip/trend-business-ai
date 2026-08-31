@@ -10,10 +10,12 @@ export function slugify(value: string): string {
 }
 
 const TAILWIND_CDN_MARKER = "cdn.tailwindcss.com";
+const V2_REVEAL_BOOT_MARKER = "__V2_REVEAL_BOOT__";
 
 function isAllowedPreviewScript(attrs: string, body: string): boolean {
   if (attrs.includes(TAILWIND_CDN_MARKER)) return true;
   if (/\btailwind\.config\b/.test(body)) return true;
+  if (body.includes(V2_REVEAL_BOOT_MARKER)) return true;
   return false;
 }
 

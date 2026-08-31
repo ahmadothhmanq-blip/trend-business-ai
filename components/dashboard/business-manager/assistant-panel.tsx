@@ -6,6 +6,12 @@ import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useWorkspaceT } from "@/lib/i18n/use-scoped-t";
+import { useTranslation } from "@/lib/i18n/client";
+import { GlsGenerationLanguageSelect } from "@/components/dashboard/language/gls-generation-language-select";
+import {
+  getInitialGlsGenerationLanguage,
+  glsGenerationLanguagePayload,
+} from "@/lib/language-platform/generation/service";
 import type { BusinessAssistantAction } from "@/types/business-manager";
 
 const ACTION_KEYS: BusinessAssistantAction[] = [
@@ -17,6 +23,7 @@ const ACTION_KEYS: BusinessAssistantAction[] = [
 
 export function AssistantPanel() {
   const wt = useWorkspaceT("businessManager");
+  const { t, locale } = useTranslation();
   const actions = useMemo(
     () =>
       ACTION_KEYS.map((key) => ({
@@ -29,6 +36,9 @@ export function AssistantPanel() {
   const [action, setAction] = useState<BusinessAssistantAction>("analyze");
   const [result, setResult] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(false);
+  const [language, setLanguage] = useState(() =>
+    getInitialGlsGenerationLanguage({ fallback: "ui-locale", uiLocale: locale }),
+  );
 
   const run = async () => {
     if (!text.trim()) return toast.error(wt("assistant.contextRequired"));
@@ -37,7 +47,7 @@ export function AssistantPanel() {
       const res = await fetch("/api/business-manager/actions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action, text }),
+        body: JSON.stringify({ action, text, ...glsGenerationLanguagePayload(language) }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? wt("toasts.failed"));
@@ -72,6 +82,10 @@ export function AssistantPanel() {
               {label}
             </button>
           ))}
+        </div>
+        <div className="mt-3 max-w-md">
+          <label className="mb-1.5 block text-xs font-medium text-white/60">{t("common.language")}</label>
+          <GlsGenerationLanguageSelect serviceId="business-manager" value={language} onChange={setLanguage} />
         </div>
         <Button className="mt-3 w-full" onClick={() => void run()} disabled={loading}>
           <Sparkles className="mr-2 size-4" />

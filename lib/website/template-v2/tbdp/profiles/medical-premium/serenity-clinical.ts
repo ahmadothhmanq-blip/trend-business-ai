@@ -8,17 +8,20 @@ import type { TemplateV2ResponsiveRules } from "@/lib/website/template-v2/contra
  * Display: Libre Baskerville · Body: Source Sans 3
  */
 export const SERENITY_CLINICAL_V2_TOKENS: TemplateV2DesignTokens = {
-  colors: {
-    primary: "#1A4D4A",
-    secondary: "#2A6560",
-    accent: "#C4A882",
-    background: "#FAFCFA",
-    foreground: "#162826",
-    muted: "rgba(22,40,38,0.58)",
-    surface: "#E8EDE6",
-    healing: "#6B9B8A",
-    pearl: "#FAFCFA",
-    sage: "#D8E2D4",
+  colors: {
+    primary: "#1B4D48",
+    secondary: "#2A635D",
+    accent: "#C4A882",
+    background: "#F7FAF8",
+    foreground: "#142E2B",
+    muted: "rgba(20,46,43,0.56)",
+    surface: "#FFFFFF",
+    signal: "#C4A882",
+    grid: "rgba(27,77,72,0.05)",
+    ink: "#1B4D48",
+    healing: "#9ca286",
+    pearl: "#F7FAF8",
+    sage: "#c4d4d1",
   },
   typography: {
     display: "Libre Baskerville",
@@ -51,15 +54,15 @@ export const SERENITY_CLINICAL_V2_TOKENS: TemplateV2DesignTokens = {
     md: "10px",
     lg: "18px",
   },
-  shadows: {
-    surface: "0 8px 32px rgba(26,77,74,0.09)",
-    glow: "0 0 48px rgba(107,155,138,0.14)",
-    card: "0 1px 2px rgba(22,40,38,0.04), 0 12px 32px rgba(26,77,74,0.07)",
+  shadows: {
+    surface: "0 20px 60px rgba(27,77,72,0.07), 0 2px 8px rgba(27,77,72,0.03)",
+    glow: "0 0 64px rgba(196,168,130,0.18)",
+    card: "0 0 0 1px rgba(27,77,72,0.05), 0 8px 32px rgba(27,77,72,0.06)",
   },
-  borders: {
-    default: "rgba(22,40,38,0.09)",
-    healing: "rgba(107,155,138,0.28)",
-    subtle: "rgba(22,40,38,0.05)",
+  borders: {
+    default: "rgba(27,77,72,0.09)",
+    accent: "rgba(196,168,130,0.32)",
+    subtle: "rgba(27,77,72,0.05)",
   },
 };
 

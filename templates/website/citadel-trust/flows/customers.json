@@ -1,0 +1,7 @@
+{
+  "pageId": "customers",
+  "layoutId": "default",
+  "regions": {
+    "main": ["citadel-trust-hero", "citadel-trust-portfolio", "citadel-trust-features"]
+  }
+}

@@ -19,27 +19,24 @@ export function RealEstatePrestigeSectionShell({
   children,
   className = "",
 }: RealEstatePrestigeSectionShellProps) {
+  const titleId = title ? `${id ?? "section"}-title` : undefined;
+
   return (
     <section
       id={id}
       data-v2-component="real-estate-prestige-section-shell"
-      className={`rep-section ${className}`.trim()}
-      aria-labelledby={title ? `${id ?? "section"}-title` : undefined}
+      className={`min-h-[40vh] bg-[var(--color-primary)] px-5 py-20 sm:px-8 sm:py-28 ${className}`.trim()}
+      aria-labelledby={titleId}
     >
-      <div className="px-5 sm:px-8 lg:px-10">
-        {(eyebrow || title || subtitle) && (
-          <header className="mb-12 max-w-2xl">
-            {eyebrow && <p className="rep-eyebrow mb-5">{eyebrow}</p>}
-            {title && (
-              <h2 id={`${id ?? "section"}-title`} className="rep-headline-sm">
-                {title}
-              </h2>
-            )}
-            {title && <div className="rep-brass-rule my-6" />}
-            {subtitle && <p className="rep-body">{subtitle}</p>}
-          </header>
-        )}
-        {children}
+      <div className="mx-auto max-w-[88rem]">
+        {eyebrow ? <p className="rep-eyebrow">{eyebrow}</p> : null}
+        {title ? (
+          <h2 id={titleId} className="rep-headline-sm text-balance">
+            {title}
+          </h2>
+        ) : null}
+        {subtitle ? <p className="rep-body max-w-xl">{subtitle}</p> : null}
+        {children ? <div className="mt-10">{children}</div> : null}
       </div>
     </section>
   );

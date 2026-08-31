@@ -22,12 +22,14 @@ const SECURITY_HEADERS: Record<string, string> = {
     "form-action 'self';",
 };
 
-/** Routes served inside dashboard iframes (D-017 static live preview). */
+/** Routes served inside dashboard iframes (D-017 static live preview + skin catalog). */
 function isEmbeddablePreviewPath(pathname: string): boolean {
   return (
     /^\/api\/website-builder\/[^/]+\/live-preview\/?$/.test(pathname) ||
     /^\/api\/webapp-builder\/[^/]+\/live-preview\/?$/.test(pathname) ||
-    pathname.startsWith("/api/website-builder/preview/")
+    pathname.startsWith("/api/website-builder/preview/") ||
+    /^\/api\/website-builder\/visual-skin\/[^/]+\/preview\/?$/.test(pathname) ||
+    pathname.startsWith("/api/dev/skin-preview")
   );
 }
 

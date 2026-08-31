@@ -1,9 +1,10 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
 import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
-import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { beginAiUsage } from "@/lib/api/rate-limit";
 import { executeAiCoreRun } from "@/lib/ai-core/runs/service";
 import { resolveAiCoreProduct } from "@/lib/ai-core/products";
 import { aiCoreRunCreateSchema } from "@/lib/ai-core/validations";
+import { getRequestAiLanguage } from "@/lib/i18n/api";
 import { NextResponse } from "next/server";
 
 /**
@@ -51,12 +52,13 @@ export async function POST(request: Request) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  const rateLimited = await enforceAiUsage(
+  const usage = await beginAiUsage(
     auth.supabase,
     auth.user!.id,
     "ai-core",
   );
-  if (rateLimited) return rateLimited;
+  if (!usage.ok) return usage.response;
+  const creditLease = usage.lease;
 
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
@@ -66,16 +68,18 @@ export async function POST(request: Request) {
     return apiValidationError(parsed.error.issues[0]?.message);
   }
 
+  const language = getRequestAiLanguage(request, parsed.data.language, parsed.data.country);
   const result = await executeAiCoreRun({
     supabase: auth.supabase,
     userId: auth.user!.id,
-    body: parsed.data,
+    body: { ...parsed.data, language },
   });
 
   if (!result.ok) {
     return apiErrorResponse(API_ERROR_CODES.SERVER_ERROR, result.status, result.error);
   }
 
+  await creditLease.settle(auth.supabase);
   return NextResponse.json({
     run: result.result.run,
     output: result.result.output,

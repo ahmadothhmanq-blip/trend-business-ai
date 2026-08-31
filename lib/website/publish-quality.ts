@@ -5,6 +5,7 @@
 import type { PublishGateResult } from "@/lib/website/publish-gates";
 import { evaluateUnifiedPublishGates } from "@/lib/ai-core/quality-platform";
 import type { WebsiteGeneration } from "@/types/database";
+import { isPublishGateEnabled } from "@/lib/website/generation-flags";
 
 export type PublishQualityPayload = {
   conversionReady: boolean | null;
@@ -77,7 +78,13 @@ export function shouldBlockPublish(
   gates: PublishGateResult,
   force: boolean,
 ): boolean {
-  return !force && !gates.publishReady;
+  if (force) return false;
+  const hasHardBlocker = gates.blockers.some((b) =>
+    /no generated website files/i.test(b),
+  );
+  if (hasHardBlocker) return true;
+  if (!isPublishGateEnabled()) return false;
+  return !gates.publishReady;
 }
 
 export function evaluateGenerationPublishGates(

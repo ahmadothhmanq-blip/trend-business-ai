@@ -15,6 +15,12 @@ export {
   NEXUS_COMMAND_RESPONSIVE_STRUCTURE,
 } from "@/lib/website/template-v2/tbdp/profiles/saas-enterprise/nexus-command";
 export {
+  AURA_SIGNAL_V2_TOKENS,
+  AURA_SIGNAL_MOTION,
+  AURA_SIGNAL_RESPONSIVE_BASE,
+  AURA_SIGNAL_RESPONSIVE_STRUCTURE,
+} from "@/lib/website/template-v2/tbdp/profiles/ai-startup-signal/aura-signal";
+export {
   MONOLITH_ESTATE_V2_TOKENS,
   MONOLITH_ESTATE_MOTION,
   MONOLITH_ESTATE_RESPONSIVE_BASE,

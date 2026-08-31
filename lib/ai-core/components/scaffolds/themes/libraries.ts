@@ -6,6 +6,7 @@
  */
 
 import { BOLD_SCAFFOLDS } from "@/lib/ai-core/components/scaffolds/themes/libraries/bold";
+import { GLOBAL_SCAFFOLDS } from "@/lib/ai-core/components/scaffolds/themes/libraries/global";
 import { CORPORATE_SCAFFOLDS } from "@/lib/ai-core/components/scaffolds/themes/libraries/corporate";
 import { CREATIVE_SCAFFOLDS } from "@/lib/ai-core/components/scaffolds/themes/libraries/creative";
 import { EDITORIAL_SCAFFOLDS } from "@/lib/ai-core/components/scaffolds/themes/libraries/editorial";
@@ -23,6 +24,7 @@ export const THEME_SCAFFOLD_BY_ID: Record<string, string> = {
   ...TECHNOLOGY_SCAFFOLDS,
   ...EDITORIAL_SCAFFOLDS,
   ...BOLD_SCAFFOLDS,
+  ...GLOBAL_SCAFFOLDS,
 };
 
 export function getThemeScaffoldById(id: string): string | null {

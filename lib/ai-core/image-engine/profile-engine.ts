@@ -6,12 +6,12 @@ import {
   flattenSlotUrls,
   IMAGE_SLOT_KINDS,
   roleToSlotKind,
-  SLOT_MIN_COUNTS,
   type ImageSlotAssignment,
   type ImageSlotKind,
   type SiteImageSlotMap,
 } from "@/lib/ai-core/image-engine/slots";
 import { runIndustryImageRulesEngine } from "@/lib/ai-core/image-engine/rules";
+import { resolveIndustrySlotCounts } from "@/lib/ai-core/image-engine/industry-slot-policy";
 
 export type ProfileEngineResult = {
   slots: SiteImageSlotMap;
@@ -59,10 +59,14 @@ export function buildSlotsFromProfile(
   const used = new Set<string>();
   const slots = emptySlotMap();
   const seedBase = opts?.projectSeed || ctx.industry || profile.id;
+  const slotCounts = resolveIndustrySlotCounts(ctx);
 
   for (const kind of IMAGE_SLOT_KINDS) {
     const pool = profile.slots[kind] ?? [];
-    const count = Math.max(SLOT_MIN_COUNTS[kind], pool.length > 0 ? Math.min(pool.length, SLOT_MIN_COUNTS[kind]) : 0);
+    const count = Math.min(
+      slotCounts[kind],
+      pool.length > 0 ? pool.length : slotCounts[kind],
+    );
     for (let i = 0; i < count; i += 1) {
       const url = pickUnique(
         pool.length ? pool : profile.slots.hero,
@@ -146,7 +150,20 @@ export function slotsToManifestItems(
     for (const slot of slots[kind]) {
       items.push({
         id: slot.id,
-        role: kind === "products" ? "product" : kind === "backgrounds" ? "background" : kind === "testimonials" ? "testimonial" : kind === "features" ? "service" : kind === "about" || kind === "team" ? "section" : kind,
+        role:
+          kind === "products"
+            ? "product"
+            : kind === "backgrounds"
+              ? "background"
+              : kind === "testimonials"
+                ? "testimonial"
+                : kind === "features"
+                  ? "service"
+                  : kind === "about" || kind === "team" || kind === "cta"
+                    ? "section"
+                    : kind === "gallery"
+                      ? "gallery"
+                      : "hero",
         name: `${kind} ${slot.id}`,
         prompt: `${profileId} ${kind} photography`,
         alt: slot.alt,

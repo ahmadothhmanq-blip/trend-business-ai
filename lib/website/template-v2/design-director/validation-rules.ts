@@ -354,7 +354,7 @@ export function runValidationRules(blueprint: WebsiteBlueprint): DesignIssue[] {
   // --- Footer ---
   if (
     blueprint.footerStyle.layout === "inline" &&
-    blueprint.premiumLevel === "enterprise"
+    blueprint.premiumLevel === "luxury"
   ) {
     issues.push(
       issue("footer", "info", "Inline footer may be insufficient for enterprise sites", {
@@ -365,7 +365,6 @@ export function runValidationRules(blueprint: WebsiteBlueprint): DesignIssue[] {
   }
 
   if (
-    blueprint.navigationStyle.density !== blueprint.footerStyle.layout &&
     blueprint.navigationStyle.density === "spacious" &&
     blueprint.footerStyle.layout === "inline"
   ) {

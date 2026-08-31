@@ -14,16 +14,15 @@ export const maxDuration = 300;
 
 const schema = z.object({
   limit: z.number().int().min(1).max(20).optional().default(5),
-  /** If true, only process jobs for the authenticated user */
-  mineOnly: z.boolean().optional().default(true),
   /** Resume queued/processing jobs and retry recent failures */
   fullQueue: z.boolean().optional().default(false),
   retryFailed: z.boolean().optional().default(true),
 });
 
 /**
- * POST — background worker: resume processing/queued render jobs.
- * Call from cron, dashboard "Process queue", or after async provider accepts jobs.
+ * POST — resume processing/queued render jobs for the authenticated tenant only.
+ * Cross-tenant drains are not allowed here. The secret-gated cron worker owns
+ * platform-wide polling (`POST /api/video-studio/cron`).
  */
 export async function POST(request: Request) {
   const auth = await requireUser();
@@ -37,11 +36,13 @@ export async function POST(request: Request) {
     return apiValidationError(parsed.error.issues[0]?.message);
   }
 
+  const userId = auth.user!.id;
+
   try {
     if (parsed.data.fullQueue) {
       const result = await processVideoStudioBackgroundQueue({
         supabase: auth.supabase,
-        userId: parsed.data.mineOnly ? auth.user!.id : undefined,
+        userId,
         limit: parsed.data.limit,
         pollRounds: 16,
         retryFailed: parsed.data.retryFailed,
@@ -54,7 +55,7 @@ export async function POST(request: Request) {
 
     const result = await processPendingRenderJobs({
       supabase: auth.supabase,
-      userId: parsed.data.mineOnly ? auth.user!.id : undefined,
+      userId,
       limit: parsed.data.limit,
       pollRounds: 12,
     });

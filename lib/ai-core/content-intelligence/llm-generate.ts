@@ -10,6 +10,7 @@ import {
 import {
   stripContentCliches,
 } from "@/lib/ai-core/content-intelligence/cliches";
+import { buildWebsiteLanguageDirective } from "@/lib/ai-core/website-builder/language-directive.server";
 
 function normalizePack(raw: Partial<AgencyContentPack>, fallback: AgencyContentPack): AgencyContentPack {
   return {
@@ -119,6 +120,7 @@ Tone: ${params.profile.tone}
 Visual style: ${params.profile.visualStyle.join(", ")}
 Design quality bar: ${params.designDNA.label}
 Language: ${params.language ?? "en"}
+${buildWebsiteLanguageDirective({ language: params.language ?? "English", prompt: params.prompt })}
 Country/market: ${params.country ?? "global"}
 Business goals: ${params.profile.designSystemHints.layoutApproach}
 Sections needed: ${params.profile.recommendedSections.join(", ")}

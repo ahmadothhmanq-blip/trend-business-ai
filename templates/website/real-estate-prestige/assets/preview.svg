@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" role="img" aria-label="Monolith Desktop preview">
+  <defs>
+    <linearGradient id="gold-1440" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C8A951"/>
+      <stop offset="100%" stop-color="#9A7B3A"/>
+    </linearGradient>
+  </defs>
+  <rect width="1440" height="900" fill="#0B0A09"/>
+  <rect width="1440" height="80" fill="#100F0D"/>
+  <rect x="72" y="32" width="120" height="16" rx="2" fill="url(#gold-1440)" opacity="0.9"/>
+  <rect x="1180" y="28" width="188" height="24" rx="2" fill="none" stroke="#C8A951" stroke-width="1.5"/>
+  <rect x="72" y="140" width="160" height="10" rx="2" fill="#C8A951" opacity="0.65"/>
+  <rect x="72" y="168" width="520" height="48" rx="4" fill="#F2EBE0" opacity="0.14"/>
+  <rect x="72" y="232" width="380" height="20" rx="4" fill="#F2EBE0" opacity="0.08"/>
+  <rect x="72" y="288" width="148" height="40" rx="2" fill="url(#gold-1440)"/>
+  <rect x="236" y="288" width="148" height="40" rx="2" fill="none" stroke="#C8A951" stroke-width="1.5"/>
+  <rect x="920" y="140" width="448" height="188" rx="8" fill="#13110F" stroke="rgba(200,169,81,0.28)" stroke-width="1"/>
+  <rect x="948" y="168" width="120" height="8" rx="2" fill="#C8A951" opacity="0.5"/>
+  <rect x="948" y="192" width="200" height="14" rx="2" fill="#F2EBE0" opacity="0.12"/>
+  <rect x="948" y="232" width="160" height="36" rx="4" fill="#181512"/>
+  <rect x="1124" y="232" width="160" height="36" rx="4" fill="#181512"/>
+  <rect x="72" y="420" width="1296" height="1" fill="rgba(200,169,81,0.2)"/>
+  <rect x="72" y="460" width="280" height="12" rx="2" fill="#F2EBE0" opacity="0.1"/>
+  <rect x="72" y="520" width="1296" height="1" fill="rgba(200,169,81,0.15)"/>
+  <rect x="72" y="560" width="48" height="48" rx="2" fill="none" stroke="#C8A951" stroke-width="1" opacity="0.5"/>
+  <rect x="148" y="572" width="320" height="14" rx="2" fill="#F2EBE0" opacity="0.12"/>
+  <rect x="148" y="596" width="480" height="8" rx="2" fill="#F2EBE0" opacity="0.06"/>
+  <rect x="72" y="640" width="1296" height="1" fill="rgba(200,169,81,0.15)"/>
+  <rect x="72" y="680" width="48" height="48" rx="2" fill="none" stroke="#C8A951" stroke-width="1" opacity="0.5"/>
+  <rect x="148" y="692" width="280" height="14" rx="2" fill="#F2EBE0" opacity="0.12"/>
+  <rect x="148" y="716" width="440" height="8" rx="2" fill="#F2EBE0" opacity="0.06"/>
+</svg>

@@ -9,8 +9,11 @@
  * header, nav, hero layout, sections composition, cards, typography, colors, etc.
  */
 
-import type { ProductionContentPack } from "@/lib/ai-core/content/production-content";
-import { buildProductionContentPack } from "@/lib/ai-core/content/production-content";
+import {
+  buildProductionContentPack,
+  hydrateProductionContentFromStrategy,
+  type ProductionContentPack,
+} from "@/lib/ai-core/content/production-content";
 import { getComposeUiFallbacks } from "@/lib/ai-core/content/content-language";
 import { getBrandPreset } from "@/lib/ai-core/brand-identity/presets";
 import type { TemplateIntelligenceDefinition } from "@/lib/ai-core/template-intelligence/types";
@@ -174,7 +177,7 @@ export function buildProductionContentFromProject(
   const contentBlocks =
     blocks.length > 2 ? blocks.slice(2) : blocks.slice(1);
 
-  const pack = buildProductionContentPack(
+  let pack = buildProductionContentPack(
     {
       industryId,
       heroHeadline,
@@ -200,36 +203,16 @@ export function buildProductionContentFromProject(
     language,
   );
 
-  if (strategy?.sectionPlan?.length) {
-    const services = strategy.sectionPlan
-      .filter((s) => /service|menu|care|package|offering/i.test(s.name))
-      .slice(0, 6)
-      .map((s, i) => ({
-        title: s.name,
-        body: s.contentNotes || s.goal || blocks[i + 2] || "",
-        cta: primaryCta,
-      }));
-    if (services.length) pack.services = services;
-
-    const features = strategy.sectionPlan
-      .filter((s) => /feature|benefit|why|highlight/i.test(s.name))
-      .slice(0, 6)
-      .map((s, i) => ({
-        title: s.name,
-        body: s.contentNotes || s.goal || blocks[i + 3] || "",
-      }));
-    if (features.length) pack.features = features;
-
-    const testimonials = strategy.sectionPlan
-      .filter((s) => /testimonial|review|proof|trust/i.test(s.name))
-      .slice(0, 4)
-      .map((s, i) => ({
-        quote: s.contentNotes || s.goal,
-        name: `Client ${i + 1}`,
-        role: profile?.industry?.replace(/-/g, " ") || "Customer",
-      }));
-    if (testimonials.length) pack.testimonials = testimonials;
-  }
+  pack = hydrateProductionContentFromStrategy(pack, {
+    strategy,
+    language,
+    industryId,
+    blocks,
+    primaryCta,
+    secondaryCta,
+    brandName: profile?.projectName || project.title,
+    profile,
+  });
 
   if (blocks.length) {
     pack.heroHeadline = heroHeadline;

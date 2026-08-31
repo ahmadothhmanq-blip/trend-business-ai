@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { z } from "zod";
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
-import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { beginAiUsage } from "@/lib/api/rate-limit";
 import { serverErrorResponse } from "@/lib/api/errors";
 import { generateVideo } from "@/lib/video-generator";
 import { getActiveProvider } from "@/lib/ai/provider-config";
@@ -13,11 +13,15 @@ import {
   updateBatchProgressPercent,
   runFullRenderPipeline,
   withProductionModel,
+  resolveBatchCreditLeaseAction,
   BATCH_PLAN_MAX,
   BATCH_GENERATE_MAX,
+  ProviderNotConfiguredError,
 } from "@/lib/ai-core/video-production-platform";
 import type { VideoProductionModel } from "@/lib/ai-core/video-production-platform/types";
 import type { VideoBlueprint, VideoGeneration } from "@/types/video";
+import { generationStatusAfterRenderJob } from "@/lib/ai-core/video-production-platform/generation-status";
+import { resolveRequestLanguage } from "@/lib/i18n/api";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -27,7 +31,8 @@ const batchSchema = z.object({
   prompt: z.string().trim().min(5),
   count: z.number().int().min(1).max(BATCH_PLAN_MAX).default(5),
   durationSec: z.number().int().min(5).max(600).default(30),
-  language: z.string().default("English"),
+  language: z.string().optional(),
+  country: z.string().optional(),
   style: z.string().default("Cinematic"),
   platform: z.string().default("TikTok"),
   videoType: z.string().optional(),
@@ -47,28 +52,38 @@ const batchSchema = z.object({
 
 /**
  * POST — plan (and optionally generate) a batch of videos.
- * Credits: 1 per generated item (via enforceAiUsage per call — we charge once per request + note).
+ * Credits: settle-after-success for this request lease (1 credit) when at least one
+ * item is successfully generated. planOnly does not charge. Failures release (no-op
+ * if never settled). Chunked retries are separate requests with their own leases.
  */
 export async function POST(request: Request) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  const rateLimited = await enforceAiUsage(
+  const usage = await beginAiUsage(
     auth.supabase,
     auth.user!.id,
     "video-studio",
   );
-  if (rateLimited) return rateLimited;
+  if (!usage.ok) return usage.response;
+  const creditLease = usage.lease;
 
   const body = await parseJsonBody<unknown>(request);
-  if (body instanceof NextResponse) return body;
+  if (body instanceof NextResponse) {
+    await creditLease.release(auth.supabase);
+    return body;
+  }
 
   const parsed = batchSchema.safeParse(body);
   if (!parsed.success) {
+    await creditLease.release(auth.supabase);
     return apiValidationError(parsed.error.issues[0]?.message);
   }
 
-  const req = parsed.data;
+  const req = {
+    ...parsed.data,
+    language: resolveRequestLanguage(request, parsed.data.language, parsed.data.country),
+  };
   const planned = planBatchVideos(req);
   let progress = createBatchProgress(
     planned.batchId,
@@ -77,6 +92,8 @@ export async function POST(request: Request) {
   );
 
   if (req.planOnly) {
+    // planOnly never settles (see resolveBatchCreditLeaseAction)
+    await creditLease.release(auth.supabase);
     return NextResponse.json({
       batchId: planned.batchId,
       items: planned.items,
@@ -153,7 +170,7 @@ export async function POST(request: Request) {
             options: pluginInput.options,
             prompt: pluginInput.prompt,
             blueprint,
-            status: "completed",
+            status: "storyboard_ready",
             mode: "generate",
             provider: result.provider ?? getActiveProvider(),
             token_usage: result.usage,
@@ -178,26 +195,48 @@ export async function POST(request: Request) {
         let generation = data as VideoGeneration;
 
         if (req.fullRender && productionModel) {
-          const rendered = await runFullRenderPipeline({
-            model: productionModel,
-            supabase: auth.supabase,
-            userId: auth.user!.id,
-            generationId: generation.id,
-            mode: "batch-item",
-          });
-          productionModel = rendered.model;
-          const nextBp = withProductionModel(
-            blueprint,
-            productionModel,
-            result.versionHistory,
-          ) as VideoBlueprint;
-          const { data: updated } = await auth.supabase
-            .from("video_generations")
-            .update({ blueprint: nextBp })
-            .eq("id", generation.id)
-            .select("*")
-            .single();
-          if (updated) generation = updated as VideoGeneration;
+          try {
+            const rendered = await runFullRenderPipeline({
+              model: productionModel,
+              supabase: auth.supabase,
+              userId: auth.user!.id,
+              generationId: generation.id,
+              mode: "batch-item",
+            });
+            productionModel = rendered.model;
+            const nextBp = withProductionModel(
+              blueprint,
+              productionModel,
+              result.versionHistory,
+            ) as VideoBlueprint;
+            const nextStatus = generationStatusAfterRenderJob({
+              mode: rendered.job.mode,
+              status: rendered.job.status,
+              provider: rendered.job.provider,
+              composite: rendered.job.compositeAsset,
+              clips: (rendered.job.clips || []).map((c) => ({
+                mimeType: c.asset?.mimeType,
+                url: c.asset?.url,
+                isStub: c.asset?.provider === "preview",
+                durationSec: c.asset?.durationSec,
+              })),
+            });
+            const { data: updated } = await auth.supabase
+              .from("video_generations")
+              .update({
+                blueprint: nextBp,
+                status: nextStatus,
+                updated_at: new Date().toISOString(),
+              })
+              .eq("id", generation.id)
+              .select("*")
+              .single();
+            if (updated) generation = updated as VideoGeneration;
+          } catch (renderError) {
+            if (!(renderError instanceof ProviderNotConfiguredError)) {
+              throw renderError;
+            }
+          }
         }
 
         generations.push(generation);
@@ -231,6 +270,15 @@ export async function POST(request: Request) {
       }
     }
 
+    if (resolveBatchCreditLeaseAction({
+      planOnly: false,
+      successfulGenerations: generations.length,
+    }) === "settle") {
+      await creditLease.settle(auth.supabase);
+    } else {
+      await creditLease.release(auth.supabase);
+    }
+
     return NextResponse.json({
       batchId: planned.batchId,
       planned: planned.items,
@@ -245,6 +293,7 @@ export async function POST(request: Request) {
           : null,
     });
   } catch (error) {
+    await creditLease.release(auth.supabase);
     return serverErrorResponse(
       "video-studio.batch",
       error,

@@ -2,6 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardHeader } from "@/components/dashboard/header";
 import { VideoManagementDashboard } from "@/components/dashboard/video-studio/video-management-dashboard";
+import { VideoEditorWorkspace } from "@/components/dashboard/video-studio/editor/editor-shell";
 import { dashboardPageMetadata } from "@/lib/i18n/dashboard-metadata";
 import { getServerTranslator } from "@/lib/i18n/server";
 
@@ -9,10 +10,11 @@ export async function generateMetadata() {
   return dashboardPageMetadata("videoStudioManage");
 }
 
-type PageProps = { params: Promise<{ id: string }> };
+type PageProps = { params: Promise<{ id: string }>; searchParams: Promise<{ view?: string }> };
 
-export default async function VideoStudioManagePage({ params }: PageProps) {
+export default async function VideoStudioManagePage({ params, searchParams }: PageProps) {
   const { id } = await params;
+  const query = await searchParams;
   const { t } = await getServerTranslator();
   const supabase = await createClient();
   const {
@@ -50,7 +52,11 @@ export default async function VideoStudioManagePage({ params }: PageProps) {
         avatarUrl={profile?.avatar_url as string | undefined}
       />
       <main className="flex-1 p-4 sm:p-6 lg:p-8 xl:p-10">
-        <VideoManagementDashboard generationId={id} />
+        {query.view === "manage" ? (
+          <VideoManagementDashboard generationId={id} />
+        ) : (
+          <VideoEditorWorkspace generationId={id} />
+        )}
       </main>
     </>
   );

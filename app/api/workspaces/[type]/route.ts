@@ -1,12 +1,13 @@
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
 import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
-import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { beginAiUsage } from "@/lib/api/rate-limit";
 import { WORKSPACE_LIST_COLUMNS } from "@/lib/api/list-selects";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import { generateWorkspaceProject } from "@/lib/workspace/service";
 import { getWorkspaceDefinition } from "@/lib/workspace/registry";
 import { isWorkspaceType } from "@/lib/workspace/types";
+import { getRequestAiLanguage } from "@/lib/i18n/api";
 import { ensureProjectForGeneration } from "@/lib/workspace/projects";
 import {
   appendPromptVersion,
@@ -97,8 +98,9 @@ export async function POST(request: Request, context: RouteContext) {
     return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Unknown workspace type.");
   }
 
-  const rateLimited = await enforceAiUsage(auth.supabase, auth.user!.id, "workspace");
-  if (rateLimited) return rateLimited;
+  const usage = await beginAiUsage(auth.supabase, auth.user!.id, "workspace");
+  if (!usage.ok) return usage.response;
+  const creditLease = usage.lease;
 
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
@@ -128,10 +130,13 @@ export async function POST(request: Request, context: RouteContext) {
     }
   }
 
+  const aiLanguage = getRequestAiLanguage(request, parsed.data.language, parsed.data.country);
+
   try {
     const { output, source, provider, usage, generationTimeMs } =
       await generateWorkspaceProject(type, {
         ...parsed.data,
+        language: aiLanguage,
         mode,
         previousOutput,
       });
@@ -172,7 +177,7 @@ export async function POST(request: Request, context: RouteContext) {
       title: savedOutput.title,
       brief: parsed.data.prompt,
       template: parsed.data.template ?? null,
-      language: parsed.data.language ?? "English",
+      language: aiLanguage,
       theme: parsed.data.theme ?? "Gold",
       features,
       output: savedOutput,
@@ -197,6 +202,7 @@ export async function POST(request: Request, context: RouteContext) {
       return databaseErrorResponse("workspace.insert", error);
     }
 
+    await creditLease.settle(auth.supabase);
     return NextResponse.json({
       generation: data as WorkspaceGeneration,
       output: savedOutput,
@@ -217,7 +223,7 @@ export async function POST(request: Request, context: RouteContext) {
         title: "Failed generation",
         brief: parsed.data.prompt,
         template: parsed.data.template ?? null,
-        language: parsed.data.language ?? "English",
+        language: aiLanguage,
         theme: parsed.data.theme ?? "Gold",
         features: parsed.data.features ?? [],
         output: {

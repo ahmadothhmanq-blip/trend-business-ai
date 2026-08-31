@@ -9,6 +9,7 @@ import { SITE_NAME } from "@/lib/seo/site";
 import { extractQuestions } from "@/lib/ai-search/utils";
 import type { ContentOptimizeResult } from "@/types/ai-search";
 import type { MarketingProductSlug } from "@/lib/constants/marketing-content";
+import { aiOutputLanguageDirective } from "@/lib/ai/prompts/language-directive.server";
 
 export const contentOptimizeBodySchema = z.object({
   title: z.string().max(200).optional(),
@@ -18,6 +19,8 @@ export const contentOptimizeBodySchema = z.object({
   keywords: z.array(z.string().max(80)).max(20).optional(),
   productSlug: z.string().max(80).optional(),
   useAi: z.boolean().optional(),
+  language: z.string().trim().optional(),
+  country: z.string().trim().optional(),
 });
 
 export type ContentOptimizeBody = z.infer<typeof contentOptimizeBodySchema>;
@@ -139,6 +142,7 @@ export function optimizeContent(input: ContentOptimizeBody): ContentOptimizeResu
 export async function enrichContentOptimizeWithAi(
   result: ContentOptimizeResult,
   input: ContentOptimizeBody,
+  language?: string,
 ): Promise<ContentOptimizeResult> {
   try {
     const { providerManager } = await import("@/lib/ai/provider-manager");
@@ -156,7 +160,7 @@ Path: ${input.path ?? "/"}
 Keywords: ${(input.keywords ?? []).join(", ")}
 Content excerpt: ${(input.content ?? "").slice(0, 1200)}
 
-Improve TITLE (max 60 chars), META (max 155 chars), SUMMARY (2 sentences), CTA (1 sentence), and two FAQ pairs.`,
+Improve TITLE (max 60 chars), META (max 155 chars), SUMMARY (2 sentences), CTA (1 sentence), and two FAQ pairs.${aiOutputLanguageDirective(language, "marketing")}`,
         temperature: 0.4,
       },
       providerName,

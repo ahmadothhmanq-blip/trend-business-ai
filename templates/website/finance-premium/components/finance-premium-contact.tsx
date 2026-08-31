@@ -1,140 +1,42 @@
 "use client";
 
-import { useId, useState } from "react";
+const OFFICES = [
+  { city: "New York", address: "450 Park Avenue, 28th Floor", phone: "+1 (212) 555-0140" },
+  { city: "London", address: "1 Canada Square, Canary Wharf", phone: "+44 20 7946 0958" },
+  { city: "Singapore", address: "8 Marina View, Asia Square", phone: "+65 6123 4567" },
+];
 
-export function FinancePremiumContact(
-  props: Partial<{
-    eyebrow: string;
-    title: string;
-    subtitle: string;
-    email: string;
-    phone: string;
-    address: string;
-    submitLabel: string;
-  }> = {},
-) {
-  const {
-    eyebrow = "Private consultation",
-    title = "Speak with a senior partner",
-    subtitle = "Share your priorities in confidence. We will assemble the right advisory team for a private consultation.",
-    email = "partners@meridiancapital.com",
-    phone = "+1 (212) 555-0140",
-    address = "200 Park Avenue, New York, NY",
-    submitLabel = "Request consultation",
-  } = props;
-
-  const formId = useId();
-  const [submitted, setSubmitted] = useState(false);
-
+export function FinancePremiumContact() {
   return (
-    <section
-      id="contact"
-      data-v2-component="finance-premium-contact"
-      aria-labelledby="contact-title"
-      className="fn-section fn-section-glow relative bg-[var(--color-background)]"
-    >
+    <section id="contact" data-v2-component="finance-premium-contact" aria-labelledby="fn-contact-title" className="df-reveal border-t border-[var(--border-default)] py-20 sm:py-28">
       <div className="mx-auto max-w-[82rem] px-5 sm:px-8">
-        <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
-          <div>
-            <p className="fn-eyebrow mb-3">{eyebrow}</p>
-            <h2 id="contact-title" className="fn-headline-sm">
-              {title}
-            </h2>
-            <div className="fn-accent-line mt-4" aria-hidden />
-            <p className="fn-body text-muted-foreground mt-5">{subtitle}</p>
-            <address className="fn-font-body mt-8 space-y-4 text-sm not-italic">
-              <p className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] p-4">
-                <span className="block font-semibold text-[var(--color-foreground)]">Email</span>
-                <a
-                  href={`mailto:${email}`}
-                  className="fn-focus-ring mt-1 inline-block text-[var(--color-muted)] hover:text-[var(--color-signal)]"
-                >
-                  {email}
-                </a>
-              </p>
-              <p className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] p-4">
-                <span className="block font-semibold text-[var(--color-foreground)]">Phone</span>
-                <a
-                  href={`tel:${phone.replace(/\s/g, "")}`}
-                  className="fn-focus-ring mt-1 inline-block text-[var(--color-muted)] hover:text-[var(--color-signal)]"
-                >
-                  {phone}
-                </a>
-              </p>
-              <p className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] p-4">
-                <span className="block font-semibold text-[var(--color-foreground)]">Office</span>
-                <span className="mt-1 block text-[var(--color-muted)]">{address}</span>
-              </p>
-            </address>
-          </div>
-
-          <form
-            id={formId}
-            className="fn-card p-6 sm:p-8"
-            onSubmit={(e) => {
-              e.preventDefault();
-              setSubmitted(true);
-            }}
-            noValidate
-          >
-            {submitted ? (
-              <p className="fn-body text-center" role="status">
-                Thank you — a senior partner will respond within one business day.
-              </p>
-            ) : (
-              <div className="space-y-5">
-                <div>
-                  <label
-                    htmlFor={`${formId}-name`}
-                    className="fn-font-body mb-2 block text-sm font-medium text-[var(--color-foreground)]"
-                  >
-                    Name
-                  </label>
-                  <input
-                    id={`${formId}-name`}
-                    name="name"
-                    type="text"
-                    required
-                    autoComplete="name"
-                    className="fn-input fn-focus-ring"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor={`${formId}-email`}
-                    className="fn-font-body mb-2 block text-sm font-medium text-[var(--color-foreground)]"
-                  >
-                    Email
-                  </label>
-                  <input
-                    id={`${formId}-email`}
-                    name="email"
-                    type="email"
-                    required
-                    autoComplete="email"
-                    className="fn-input fn-focus-ring"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor={`${formId}-message`}
-                    className="fn-font-body mb-2 block text-sm font-medium text-[var(--color-foreground)]"
-                  >
-                    Message
-                  </label>
-                  <textarea
-                    id={`${formId}-message`}
-                    name="message"
-                    rows={4}
-                    required
-                    className="fn-textarea resize-y fn-focus-ring"
-                  />
-                </div>
-                <button type="submit" className="fn-btn-primary fn-focus-ring w-full sm:w-auto">
-                  {submitLabel}
-                </button>
+        <header className="mb-12 max-w-2xl">
+          <p className="fn-eyebrow">Advisory inquiry</p>
+          <h2 id="fn-contact-title" className="fn-headline-sm mt-2">Speak with a partner</h2>
+          <p className="fn-body mt-4 text-[var(--color-muted)]">Confidential consultations — we respond within one business day.</p>
+        </header>
+        <div className="df-reveal-stagger grid gap-12 lg:grid-cols-[1fr_1.1fr]">
+          <div className="df-reveal-stagger grid gap-4 sm:grid-cols-1">
+            {OFFICES.map((office) => (
+              <div key={office.city} className="fn-card p-6">
+                <h3 className="fn-font-display text-lg font-semibold">{office.city}</h3>
+                <p className="mt-2 text-sm text-[var(--color-muted)]">{office.address}</p>
+                <p className="mt-3 text-sm font-medium">{office.phone}</p>
               </div>
-            )}
+            ))}
+          </div>
+          <form className="fn-card space-y-4 p-6 sm:p-8" onSubmit={(e) => e.preventDefault()}>
+            <div className="df-reveal-stagger grid gap-4 sm:grid-cols-2">
+              <input type="text" placeholder="Full name" aria-label="Full name" className="w-full min-w-0 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-background)] px-4 py-3 text-sm" />
+              <input type="email" placeholder="Work email" aria-label="Email" className="w-full min-w-0 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-background)] px-4 py-3 text-sm" />
+            </div>
+            <select aria-label="Inquiry type" className="w-full rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-background)] px-4 py-3 text-sm text-[var(--color-muted)]">
+              <option>Private wealth</option>
+              <option>Institutional mandate</option>
+              <option>Family office</option>
+            </select>
+            <textarea placeholder="Tell us about your goals and assets under advisement" aria-label="Message" rows={4} className="w-full rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-background)] px-4 py-3 text-sm" />
+            <button type="submit" className="fn-btn-primary fn-focus-ring">Request consultation</button>
           </form>
         </div>
       </div>

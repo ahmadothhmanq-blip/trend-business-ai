@@ -1,3 +1,4 @@
+import { getGlsGenerationLanguageValues } from "@/lib/language-platform/generation/options";
 import {
   AlignLeft,
   BookOpen,
@@ -140,11 +141,9 @@ export const CONTENT_AUDIENCES = [
   "Millennials", "Gen Z", "Parents", "Professionals", "Investors",
 ] as const;
 
-export const CONTENT_LANGUAGES = [
-  "English", "Spanish", "French", "German", "Italian", "Portuguese",
-  "Arabic", "Chinese", "Japanese", "Korean", "Hindi", "Russian",
-  "Dutch", "Swedish", "Turkish",
-] as const;
+export const CONTENT_LANGUAGES = getGlsGenerationLanguageValues(
+  "content-studio",
+) as readonly string[];
 
 export const WRITING_STYLES = [
   "Standard", "Academic", "Journalistic", "Technical", "Creative",

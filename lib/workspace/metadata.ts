@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react";
+import { getGlsGenerationLanguageValues } from "@/lib/language-platform/generation/options";
 
 export type WorkspaceMetadata = {
   title: string;
@@ -29,8 +30,12 @@ export type AIWorkspaceConfig = {
   metrics: { label: string; value: string }[];
 };
 
-export const WORKSPACE_LANGUAGES = ["English", "Arabic", "Bilingual"] as const;
+/** All GLS world languages — shared workspace generator (no Bilingual). */
+export const WORKSPACE_LANGUAGES = getGlsGenerationLanguageValues(
+  "content-studio",
+) as readonly string[];
+
 export const WORKSPACE_THEMES = ["Gold", "Blue", "Purple", "Green", "Custom"] as const;
 
-export type WorkspaceLanguage = (typeof WORKSPACE_LANGUAGES)[number];
+export type WorkspaceLanguage = string;
 export type WorkspaceTheme = (typeof WORKSPACE_THEMES)[number];

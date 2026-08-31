@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+<html lang="en" data-v2-render="v2-files-3" data-v2-package="creative-agency-premium" data-v2-layout="default">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Volt — Live Preview</title>
+  <style>/* Template Architecture V2 — creative-agency-premium · spec 2.0.0 */
+:root {
+  --v2-package: "creative-agency-premium";
+  --color-primary: #0A0A0B;
+  --color-secondary: #1A1A1D;
+  --color-accent: #D4FF00;
+  --color-background: #0A0A0B;
+  --color-foreground: #F4F4F0;
+  --color-muted: rgba(244,244,240,0.55);
+  --color-surface: #121214;
+  --color-volt: #D4FF00;
+  --color-ghost: #F4F4F0;
+  --color-zinc: #6B6B70;
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-body: Inter, ui-sans-serif, system-ui, sans-serif;
+  --spacing-unit: 0.25rem;
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --shadow-surface: 0 32px 96px rgba(0,0,0,0.55);
+  --shadow-glow: 0 0 140px rgba(212,255,0,0.12);
+  --shadow-volt: 0 0 80px rgba(212,255,0,0.28);
+  --border-default: rgba(244,244,240,0.1);
+  --border-volt: rgba(212,255,0,0.45);
+  --border-subtle: rgba(244,244,240,0.05);
+}
+
+/* V2 language profile — RTL typography adaptation */
+[dir="rtl"] {
+  --font-display: Alexandria, ui-serif, Georgia, serif;
+  --font-body: "Noto Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.01em;
+  line-height: 1.75;
+}
+[dir="rtl"] .df-headline, [dir="rtl"] .df-headline-sm {
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+/* Design Foundation — token scale */
+:root {
+  --df-space-0: 0;
+  --df-space-1: calc(0.25rem * 1);
+  --df-space-2: calc(0.25rem * 2);
+  --df-space-3: calc(0.25rem * 4);
+  --df-space-4: calc(0.25rem * 6);
+  --df-space-5: calc(0.25rem * 8);
+  --df-space-6: calc(0.25rem * 12);
+  --df-space-7: calc(0.25rem * 16);
+  --df-space-8: calc(0.25rem * 20);
+  --df-space-9: calc(0.25rem * 24);
+  --df-space-10: calc(0.25rem * 32);
+  --df-space-11: calc(0.25rem * 40);
+  --df-space-12: calc(0.25rem * 48);
+  --df-space-13: calc(0.25rem * 64);
+  --df-space-14: calc(0.25rem * 96);
+  --df-text-xs: 0.75rem;
+  --df-text-sm: 0.875rem;
+  --df-text-base: 1rem;
+  --df-text-lg: 1.125rem;
+  --df-text-xl: 1.75rem;
+  --df-text-2xl: clamp(1.3125rem, 2vw, 1.75rem);
+  --df-text-3xl: clamp(1.5rem, 2.4vw, 2rem);
+  --df-text-caption: 0.6875rem;
+  --df-text-label: 0.75rem;
+  --df-text-display: clamp(2rem, 4vw, 3rem);
+  --df-leading-tight: 1.1;
+  --df-leading-display: 1.1;
+  --df-leading-stacked: 1.05;
+  --df-leading-snug: 1.32;
+  --df-leading-normal: 1.65;
+  --df-leading-relaxed: 1.72;
+  --df-stack-word-gap: 0.06em;
+  --df-tracking-tight: -0.028em;
+  --df-tracking-wide: 0.1em;
+  --df-tracking-wider: 0.2em;
+  --df-radius-sm: 6px;
+  --df-radius-md: 10px;
+  --df-radius-lg: 16px;
+  --df-radius-xl: 24px;
+  --df-radius-pill: 9999px;
+  --df-grid-columns: 12;
+  --df-grid-gutter: clamp(1.125rem, 2.8vw, 2rem);
+  --df-container-padding: clamp(1.25rem, 4.2vw, 2.75rem);
+  --df-section-y: clamp(4.25rem, 9vw, 7rem);
+  --df-section-y-tight: clamp(3.25rem, 6.5vw, 5rem);
+  --cb-section-y: clamp(4.5rem, 9.5vw, 7.25rem);
+  --se-section-y: clamp(3.75rem, 8.5vw, 6rem);
+  --as-section-y: clamp(4.5rem, 12vw, 7.5rem);
+  --ed-section-y: clamp(5.25rem, 11.5vw, 8rem);
+  --fn-section-y: clamp(5.25rem, 11.5vw, 8rem);
+  --mp-section-y: clamp(4.75rem, 11.5vw, 7.25rem);
+  --sv-section-y: clamp(4.75rem, 13.5vw, 8.5rem);
+  --ec-section-y: clamp(4.25rem, 8.5vw, 6.75rem);
+  --rp-section-y: clamp(5.25rem, 12.5vw, 8.5rem);
+  --hr-section-y: clamp(5.25rem, 12.5vw, 8.5rem);
+  --rep-section-y: clamp(5.75rem, 12.5vw, 8.75rem);
+  --df-stack-gap: clamp(1rem, 2.4vw, 1.625rem);
+  --df-shadow-ambient: 0 1px 2px color-mix(in srgb, var(--color-foreground) 4%, transparent);
+  --df-shadow-card: 0 10px 36px color-mix(in srgb, var(--color-foreground) 5%, transparent), 0 2px 8px color-mix(in srgb, var(--color-foreground) 3%, transparent);
+  --df-shadow-elevated: 0 28px 72px color-mix(in srgb, var(--color-foreground) 8%, transparent), 0 8px 24px color-mix(in srgb, var(--color-foreground) 4%, transparent);
+  --df-shadow-inset: inset 0 1px 0 color-mix(in srgb, #fff 22%, transparent);
+  --df-motion-fast: 180ms;
+  --df-motion-base: 380ms;
+  --df-motion-slow: 640ms;
+  --df-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --df-motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --df-focus-width: 2px;
+  --df-focus-offset: 3px;
+  --df-focus-color: color-mix(in srgb, var(--color-accent, var(--color-signal)) 72%, transparent);
+  --df-border-width: 1px;
+  --df-nav-height: 4.5rem;
+  --df-footer-gap: clamp(2.25rem, 5.5vw, 3.75rem);
+}
+
+/* Flagship semantic theme — visual identity layer */
+:root, .v2-template {
+  --df-theme-mode: dark;
+  --color-surface-elevated: color-mix(in srgb, var(--color-surface, var(--color-background)) 90%, #fff 10%);
+  --color-surface-inset: color-mix(in srgb, var(--color-background) 86%, #000 14%);
+  --df-border-subtle: color-mix(in srgb, var(--color-foreground) 8%, transparent);
+  --df-border-default: color-mix(in srgb, var(--color-foreground) 14%, transparent);
+  --df-border-accent: color-mix(in srgb, var(--color-accent, var(--color-signal)) 42%, transparent);
+  --df-foreground-muted: color-mix(in srgb, var(--color-foreground) 60%, transparent);
+  --df-accent-glow: color-mix(in srgb, var(--color-signal, var(--color-accent)) 24%, transparent);
+  --df-headline-tracking: -0.03em;
+}
+.v2-template { color-scheme: dark; }
+
+/* Design Foundation — motion */
+@keyframes df-reveal-up {
+  from { opacity: 0; transform: translateY(24px); filter: blur(4px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+@keyframes df-reveal-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes df-slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes df-scale-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes df-draw-line {
+  from { transform: scaleX(0); opacity: 0; }
+  to { transform: scaleX(1); opacity: 1; }
+}
+
+.v2-motion[data-entrance="slide-up"],
+.v2-motion[data-entrance="fade-in"] {
+  animation-duration: var(--df-motion-base);
+  animation-timing-function: var(--df-motion-ease);
+  animation-fill-mode: both;
+}
+.v2-motion[data-entrance="slide-up"] { animation-name: df-reveal-up; }
+.v2-motion[data-entrance="fade-in"] { animation-name: df-reveal-fade; }
+
+.df-animate-reveal {
+  animation: df-reveal-up var(--df-motion-slow) var(--df-motion-ease) both;
+}
+.df-animate-slide-up {
+  animation: df-slide-up var(--df-motion-base) var(--df-motion-ease) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v2-motion, [data-v2-motion], .df-animate-reveal, .df-animate-slide-up {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Design Foundation — primitives */
+.v2-template {
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-base);
+  line-height: var(--df-leading-normal);
+  color: var(--color-foreground);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography */
+.df-font-display { font-family: var(--font-display), ui-serif, Georgia, serif; }
+.df-font-body { font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif; }
+.df-eyebrow {
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-xs);
+  font-weight: 500;
+  letter-spacing: var(--df-tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-signal, var(--color-accent));
+}
+.df-headline {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+  font-size: var(--df-text-display);
+  font-weight: 500;
+  line-height: var(--df-leading-tight);
+  letter-spacing: var(--df-headline-tracking, var(--df-tracking-tight));
+  color: var(--color-foreground);
+  text-wrap: balance;
+}
+.df-headline-sm {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+  font-size: clamp(1.875rem, 3.5vw, 2.75rem);
+  font-weight: 500;
+  line-height: var(--df-leading-snug);
+  letter-spacing: var(--df-tracking-tight);
+  color: var(--color-foreground);
+  text-wrap: balance;
+}
+.df-body {
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-lg);
+  line-height: var(--df-leading-relaxed);
+  color: var(--df-foreground-muted, var(--color-muted, color-mix(in srgb, var(--color-foreground) 58%, transparent)));
+  max-width: 38rem;
+}
+.df-prose {
+  font-size: var(--df-text-base);
+  line-height: var(--df-leading-relaxed);
+  color: var(--color-muted, color-mix(in srgb, var(--color-foreground) 62%, transparent));
+  max-width: 36rem;
+}
+.df-caption {
+  font-size: var(--df-text-sm);
+  line-height: var(--df-leading-normal);
+  color: var(--color-muted, color-mix(in srgb, var(--color-foreground) 55%, transparent));
+}
+
+/* Layout — sections, grid, containers */
+.df-section { padding-block: var(--df-section-y); }
+.df-section-tight { padding-block: var(--df-section-y-tight); }
+.df-section-alt {
+  background: var(--color-surface-elevated, var(--color-surface, #fff));
+}
+.df-section-glow {
+  position: relative;
+  overflow: hidden;
+}
+.df-section-glow::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 72% 58% at 14% 0%, var(--df-accent-glow, color-mix(in srgb, var(--color-accent, var(--color-signal)) 10%, transparent)), transparent 62%),
+    radial-gradient(ellipse 58% 48% at 92% 100%, color-mix(in srgb, var(--color-primary) 7%, transparent), transparent 58%);
+}
+.df-container {
+  margin-inline: auto;
+  width: 100%;
+  max-width: var(--container-max, 82rem);
+  padding-inline: var(--df-container-padding);
+}
+.df-container-narrow { max-width: min(var(--container-max, 82rem), 48rem); }
+.df-container-wide { max-width: min(calc(var(--container-max, 82rem) + 6rem), 96rem); }
+.df-grid-12 {
+  display: grid;
+  grid-template-columns: repeat(var(--df-grid-columns), minmax(0, 1fr));
+  gap: var(--df-grid-gutter);
+}
+.df-stack { display: flex; flex-direction: column; gap: var(--df-stack-gap); }
+.df-divider {
+  height: var(--df-border-width);
+  width: 100%;
+  background: var(--df-border-subtle, var(--border-subtle, color-mix(in srgb, var(--color-foreground) 8%, transparent)));
+}
+
+/* Cards */
+.df-card {
+  border: var(--df-border-width) solid var(--df-border-subtle, var(--border-subtle, color-mix(in srgb, var(--color-foreground) 8%, transparent)));
+  background: var(--color-surface-elevated, var(--color-surface, #fff));
+  border-radius: var(--radius-lg, var(--df-radius-lg, 16px));
+  box-shadow: var(--shadow-card, var(--df-shadow-card));
+  transition:
+    box-shadow var(--df-motion-base) var(--df-motion-ease),
+    transform var(--df-motion-base) var(--df-motion-ease),
+    border-color var(--df-motion-fast) ease;
+}
+.df-card:hover {
+  border-color: var(--df-border-accent, var(--border-accent, color-mix(in srgb, var(--color-accent) 28%, transparent)));
+  box-shadow: var(--shadow-surface, var(--df-shadow-elevated));
+  transform: translateY(-2px);
+}
+.df-card-featured {
+  border-color: color-mix(in srgb, var(--color-signal, var(--color-accent)) 28%, var(--border-subtle, transparent));
+  background: linear-gradient(
+    155deg,
+    var(--color-primary) 0%,
+    color-mix(in srgb, var(--color-primary) 88%, var(--color-secondary, var(--color-primary))) 100%
+  );
+  color: #fff;
+  box-shadow: var(--shadow-surface);
+}
+.df-card-glass {
+  background: color-mix(in srgb, var(--color-surface-elevated, var(--color-surface, #fff)) 78%, transparent);
+  backdrop-filter: blur(22px) saturate(1.15);
+  border: var(--df-border-width) solid color-mix(in srgb, #fff 55%, var(--df-border-subtle, transparent));
+  border-radius: var(--radius-lg, var(--df-radius-lg, 16px));
+  box-shadow: var(--shadow-card, var(--df-shadow-card));
+}
+.df-card-interactive { cursor: pointer; }
+.df-card-interactive:focus-visible { outline: var(--df-focus-width) solid var(--df-focus-color); outline-offset: var(--df-focus-offset); }
+
+/* Buttons */
+.df-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0 1.625rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  color: var(--color-background, #fff);
+  background: var(--color-primary);
+  border: var(--df-border-width) solid color-mix(in srgb, var(--color-primary) 78%, #000);
+  border-radius: var(--df-radius-pill, 9999px);
+  box-shadow: var(--shadow-card, var(--df-shadow-card));
+  transition:
+    transform var(--df-motion-fast) var(--df-motion-ease),
+    box-shadow var(--df-motion-base) var(--df-motion-ease),
+    filter var(--df-motion-fast) ease;
+}
+.df-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-surface, var(--df-shadow-elevated));
+  filter: brightness(1.05);
+}
+.df-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0 1.625rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  color: var(--color-foreground);
+  background: var(--color-surface-elevated, var(--color-surface, #fff));
+  border: var(--df-border-width) solid var(--df-border-default, var(--border-default, color-mix(in srgb, var(--color-foreground) 12%, transparent)));
+  border-radius: var(--df-radius-pill, 9999px);
+  transition:
+    border-color var(--df-motion-fast) ease,
+    background var(--df-motion-fast) ease,
+    transform var(--df-motion-fast) var(--df-motion-ease);
+}
+.df-btn-secondary:hover {
+  border-color: var(--df-border-accent, color-mix(in srgb, var(--color-foreground) 18%, var(--border-default, transparent)));
+  background: var(--color-surface-elevated, color-mix(in srgb, var(--color-surface, #fff) 96%, var(--color-background)));
+  transform: translateY(-1px);
+}
+.df-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  font-weight: 500;
+  color: var(--color-signal, var(--color-accent));
+  text-decoration: none;
+  transition: gap var(--df-motion-fast) ease, opacity var(--df-motion-fast) ease;
+}
+.df-btn-ghost:hover { gap: 0.625rem; opacity: 0.85; }
+.df-btn-link {
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  font-weight: 500;
+  color: var(--color-accent, var(--color-signal));
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  transition: opacity var(--df-motion-fast) ease;
+}
+.df-btn-link:hover { opacity: 0.8; }
+
+/* Forms */
+.df-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  font-weight: 500;
+  color: var(--color-foreground);
+}
+.df-input,
+.df-textarea,
+.df-select {
+  width: 100%;
+  border-radius: var(--radius-md, var(--df-radius-md, 10px));
+  border: var(--df-border-width) solid var(--df-border-default, var(--border-default, color-mix(in srgb, var(--color-foreground) 12%, transparent)));
+  background: var(--color-surface-elevated, var(--color-surface, var(--color-background)));
+  padding: 0.75rem 1rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  color: var(--color-foreground);
+  transition:
+    border-color var(--df-motion-fast) ease,
+    box-shadow var(--df-motion-fast) ease;
+}
+.df-textarea { min-height: 7rem; resize: vertical; }
+.df-input::placeholder,
+.df-textarea::placeholder {
+  color: color-mix(in srgb, var(--color-muted, var(--color-foreground)) 70%, transparent);
+}
+.df-input:focus-visible,
+.df-textarea:focus-visible,
+.df-select:focus-visible {
+  outline: none;
+  border-color: var(--color-signal, var(--color-accent));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-signal, var(--color-accent)) 14%, transparent);
+}
+.df-field { display: flex; flex-direction: column; gap: 0.375rem; }
+.df-form-group { display: flex; flex-direction: column; gap: var(--df-stack-gap); }
+
+/* Navigation */
+.df-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  min-height: var(--df-nav-height);
+}
+.df-nav-link {
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-sm);
+  font-weight: 500;
+  color: color-mix(in srgb, var(--color-foreground) 72%, transparent);
+  text-decoration: none;
+  transition: color var(--df-motion-fast) ease;
+}
+.df-nav-link:hover { color: var(--color-foreground); }
+.df-nav-link-active {
+  color: var(--color-foreground);
+  font-weight: 600;
+}
+
+/* Footer */
+.df-footer {
+  padding-block: var(--df-footer-gap);
+  border-top: var(--df-border-width) solid var(--df-border-subtle, var(--border-subtle, color-mix(in srgb, var(--color-foreground) 8%, transparent)));
+  background: var(--color-surface-inset, var(--color-surface, var(--color-background)));
+}
+.df-footer-grid {
+  display: grid;
+  gap: var(--df-stack-gap);
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+}
+.df-footer-col { display: flex; flex-direction: column; gap: 0.75rem; }
+.df-footer-link {
+  font-size: var(--df-text-sm);
+  color: var(--color-muted, color-mix(in srgb, var(--color-foreground) 58%, transparent));
+  text-decoration: none;
+  transition: color var(--df-motion-fast) ease;
+}
+.df-footer-link:hover { color: var(--color-foreground); }
+
+/* Effects & utilities */
+.df-focus-ring:focus-visible {
+  outline: var(--df-focus-width) solid var(--df-focus-color);
+  outline-offset: var(--df-focus-offset);
+}
+.df-accent-line {
+  height: var(--df-border-width);
+  width: 3.5rem;
+  background: linear-gradient(
+    to inline-end,
+    var(--color-signal, var(--color-accent)),
+    transparent
+  );
+}
+
+/* Typography-forward hero when image slots are empty — legacy fallback */
+.df-hero-editorial {
+  margin-inline: auto;
+  width: 100%;
+  max-width: min(44rem, 100%);
+  text-align: center;
+}
+.df-hero-editorial-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: min(88vh, 52rem);
+  padding-block: clamp(4.5rem, 12vh, 8rem);
+}
+.df-hero-editorial .df-accent-line,
+.df-hero-editorial [class*="-rule"],
+.df-hero-editorial [class*="-copper-rule"],
+.df-hero-editorial [class*="-brass-rule"],
+.df-hero-editorial [class*="-azure-rule"],
+.df-hero-editorial [class*="-gold-rule"],
+.df-hero-editorial [class*="-sage-rule"] {
+  margin-inline: auto;
+}
+.df-hero-editorial .df-body,
+.df-hero-editorial [class*="-body"] {
+  margin-inline: auto;
+}
+
+/* Sector-specific empty-hero profiles */
+.df-hero-split-empty-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: min(94vh, 58rem);
+  padding-block: clamp(4rem, 10vh, 7rem);
+}
+.df-hero-split-empty-copy {
+  text-align: start;
+  max-width: none;
+}
+@media (min-width: 1024px) {
+  .df-hero-split-empty-copy { grid-column: span 5 / span 5; }
+  .df-hero-split-empty-visual { grid-column: span 7 / span 7; }
+}
+.df-hero-split-empty-visual {
+  position: relative;
+  min-height: clamp(18rem, 42vh, 28rem);
+}
+
+.df-hero-bleed-empty-section {
+  position: relative;
+  min-height: min(100svh, 56rem);
+  overflow: hidden;
+}
+.df-hero-bleed-empty-backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 90% 70% at 18% 85%, color-mix(in srgb, var(--color-primary) 22%, transparent), transparent 58%),
+    radial-gradient(ellipse 60% 50% at 82% 18%, color-mix(in srgb, var(--color-accent, var(--color-signal)) 14%, transparent), transparent 52%),
+    linear-gradient(168deg, var(--color-background) 0%, color-mix(in srgb, var(--color-surface) 88%, var(--color-background)) 48%, var(--color-background) 100%);
+}
+.df-hero-bleed-empty-content { text-align: start; }
+.df-hero-bleed-empty-copy { text-align: start; }
+.df-hero-bleed-empty-copy [class*="-rule"],
+.df-hero-bleed-empty-copy [class*="-copper-rule"],
+.df-hero-bleed-empty-copy [class*="-brass-rule"],
+.df-hero-bleed-empty-copy [class*="-azure-rule"] {
+  margin-inline: 0;
+}
+
+.df-hero-trust-empty-section {
+  min-height: min(88vh, 52rem);
+  padding-block: clamp(3.5rem, 8vh, 6rem);
+}
+.df-hero-trust-empty-copy { text-align: start; max-width: none; }
+
+.df-hero-type-empty-section {
+  min-height: min(94vh, 58rem);
+  border-bottom: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 12%, transparent));
+}
+.df-hero-type-empty { text-align: start; }
+
+/* Hero collision guards — fluid/smaller viewports */
+[data-v2-component$="-hero"] {
+  isolation: isolate;
+}
+[data-v2-component$="-hero"] h1,
+[data-v2-component$="-hero"] [id$="-hero-title"],
+[data-v2-component$="-hero"] .df-hero-bleed-empty-copy,
+[data-v2-component$="-hero"] [class*="-headline"],
+[data-v2-component$="-hero"] [class*="-display"] {
+  position: relative;
+  z-index: 2;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+/* Typography collision guards — headlines, grids, stacked words */
+.v2-template h1,
+.v2-template h2,
+.v2-template h3,
+.v2-template [class*="-headline"],
+.v2-template [class*="-display"] {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  text-wrap: balance;
+  max-width: 100%;
+}
+.v2-template [class*="-display"] > span,
+.v2-template .df-headline-stack > * {
+  display: block;
+  line-height: var(--df-leading-stacked, 1.05);
+  padding-block: var(--df-stack-word-gap, 0.06em);
+}
+.v2-template [class*="-quote-mark"] {
+  display: block;
+  line-height: 1;
+  height: 0.62em;
+  margin-block-end: 0.2em;
+  overflow: visible;
+}
+.v2-template .grid > *,
+.v2-template [class*="grid-cols"] > *,
+.v2-template .df-grid-12 > * {
+  min-width: 0;
+}
+.v2-template [class*="-metric"],
+.v2-template [class*="-stat-value"] {
+  line-height: var(--df-leading-tight, 1.12);
+}
+.df-hero-type-empty > *,
+.df-hero-split-empty > *,
+.df-hero-estate-empty > *,
+.df-hero-frame-empty > *,
+.df-hero-trust-empty > * {
+  min-width: 0;
+}
+@media (max-width: 1023px) {
+  .df-hero-type-empty {
+    min-height: auto;
+    padding-block: clamp(3rem, 9vh, 5.5rem);
+  }
+  .df-hero-split-empty-section {
+    min-height: auto;
+    padding-block: clamp(3.5rem, 10vh, 6rem);
+  }
+  .df-hero-bleed-empty-content {
+    min-height: min(88svh, 52rem);
+    padding-top: clamp(5rem, 14vh, 8rem);
+  }
+  .df-hero-type-empty [class*="-index-num"] {
+    font-size: clamp(3rem, 12vw, 5rem) !important;
+    line-height: 1 !important;
+  }
+}
+
+.df-hero-estate-empty-section { min-height: min(95svh, 58rem); }
+.df-hero-estate-empty-copy { text-align: start; }
+.df-hero-estate-empty-visual {
+  position: relative;
+  min-height: clamp(20rem, 48vh, 32rem);
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--color-primary) 18%, var(--color-background)), var(--color-background)),
+    radial-gradient(ellipse 70% 60% at 70% 30%, color-mix(in srgb, var(--color-accent, var(--color-signal)) 12%, transparent), transparent 60%);
+}
+
+.df-hero-frame-empty-section { min-height: min(88svh, 54rem); }
+.df-hero-frame-empty-copy { text-align: start; }
+.df-hero-frame-empty-visual {
+  position: relative;
+  min-height: clamp(16rem, 38vh, 24rem);
+}
+.df-hero-scrim {
+  background: linear-gradient(
+    to inline-end,
+    color-mix(in srgb, var(--color-primary) 90%, transparent) 0%,
+    color-mix(in srgb, var(--color-primary) 70%, transparent) 45%,
+    transparent 100%
+  );
+}
+.df-scrim-inline {
+  background: linear-gradient(
+    to inline-end,
+    color-mix(in srgb, var(--color-background) 90%, transparent) 0%,
+    color-mix(in srgb, var(--color-background) 35%, transparent) 52%,
+    transparent 100%
+  );
+}
+
+/* Premium empty image slots — intentional editorial negative space */
+.df-slot-empty {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  min-height: var(--df-slot-min-h, 11rem);
+  background:
+    radial-gradient(
+      ellipse 90% 65% at 50% -10%,
+      color-mix(in srgb, var(--color-accent, var(--color-primary)) 7%, transparent),
+      transparent 68%
+    ),
+    linear-gradient(
+      168deg,
+      color-mix(in srgb, var(--color-surface, #fff) 94%, var(--color-primary)) 0%,
+      color-mix(in srgb, var(--color-background) 97%, var(--color-primary)) 100%
+    );
+  border: 1px solid color-mix(in srgb, var(--color-foreground) 7%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 40%, transparent);
+}
+.df-slot-empty::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(
+      color-mix(in srgb, var(--color-foreground) 4%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-foreground) 4%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 3.5rem 3.5rem;
+  opacity: 0.45;
+  mask-image: radial-gradient(ellipse 75% 75% at 50% 45%, #000 20%, transparent 72%);
+}
+.df-slot-empty::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: auto 12% 14%;
+  height: 1px;
+  background: linear-gradient(
+    to inline-end,
+    transparent,
+    color-mix(in srgb, var(--color-accent, var(--color-primary)) 35%, transparent),
+    transparent
+  );
+  opacity: 0.65;
+}
+[data-slot-empty="hero"].df-slot-empty {
+  min-height: var(--df-slot-min-h-hero, 18rem);
+}
+[data-slot-empty="gallery"].df-slot-empty,
+[data-slot-empty="products"].df-slot-empty {
+  min-height: var(--df-slot-min-h-media, 14rem);
+}
+.df-glow-orb {
+  pointer-events: none;
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(64px);
+  opacity: 0.35;
+}
+.df-quote-mark {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+  font-size: 3.5rem;
+  line-height: 1;
+  color: color-mix(in srgb, var(--color-signal, var(--color-accent)) 28%, transparent);
+}
+.df-star { color: var(--color-signal, var(--color-accent)); letter-spacing: 0.1em; }
+.df-metric {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 500;
+  letter-spacing: var(--df-tracking-tight);
+  color: var(--color-foreground);
+  line-height: var(--df-leading-tight, 1.12);
+}
+.df-grid-bg {
+  background-image:
+    linear-gradient(var(--color-grid, color-mix(in srgb, var(--color-foreground) 4%, transparent)) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid, color-mix(in srgb, var(--color-foreground) 4%, transparent)) 1px, transparent 1px);
+  background-size: 72px 72px;
+}
+
+/* Design Foundation — RTL & Arabic typography */
+[dir="rtl"] .v2-template,
+[dir="rtl"] .v2-template * {
+  letter-spacing: 0.01em;
+}
+
+[dir="rtl"] .v2-template {
+  line-height: 1.75;
+}
+
+[dir="rtl"] .df-eyebrow {
+  letter-spacing: 0.06em;
+}
+
+[dir="rtl"] .df-headline,
+[dir="rtl"] .df-headline-sm,
+[dir="rtl"] [class*="-headline"],
+[dir="rtl"] [class*="-display"] {
+  line-height: 1.28;
+  letter-spacing: 0;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+  text-transform: none;
+}
+
+[dir="rtl"] [class*="-display"] > span,
+[dir="rtl"] .df-headline-stack > * {
+  line-height: 1.22;
+  padding-block: 0.08em;
+}
+
+[dir="rtl"] .df-body,
+[dir="rtl"] .df-prose {
+  line-height: 1.85;
+  max-width: 42rem;
+}
+
+[dir="rtl"] .df-container,
+[dir="rtl"] .df-stack,
+[dir="rtl"] .df-card,
+[dir="rtl"] section {
+  text-align: start;
+}
+
+[dir="rtl"] .text-center {
+  text-align: center;
+}
+
+[dir="rtl"] .df-accent-line,
+[dir="rtl"] [class*="-rule"],
+[dir="rtl"] [class*="-accent-line"],
+[dir="rtl"] [class*="-gold-rule"],
+[dir="rtl"] [class*="-sage-rule"],
+[dir="rtl"] [class*="-volt-line"],
+[dir="rtl"] [class*="-brass-rule"],
+[dir="rtl"] [class*="-copper-rule"],
+[dir="rtl"] [class*="-azure-rule"] {
+  transform-origin: inline-end;
+}
+
+[dir="rtl"] [class*="marquee-track"] {
+  animation-direction: reverse;
+}
+
+[dir="rtl"] .df-hero-scrim {
+  background: linear-gradient(
+    to inline-start,
+    color-mix(in srgb, var(--color-primary) 90%, transparent) 0%,
+    color-mix(in srgb, var(--color-primary) 70%, transparent) 45%,
+    transparent 100%
+  );
+}
+
+[dir="rtl"] .v2-sidebar-shell {
+  flex-direction: row-reverse;
+}
+
+/* Design Foundation — responsive */
+.v2-template .df-container {
+  max-width: var(--container-max, 80rem);
+}
+
+@media (max-width: 767px) {
+  .v2-template .df-nav {
+    flex-wrap: wrap;
+    min-height: auto;
+    padding-block: 0.75rem;
+  }
+  .v2-template .df-footer-grid {
+    grid-template-columns: 1fr;
+  }
+  .v2-template .df-grid-12 {
+    grid-template-columns: 1fr;
+  }
+  .v2-template .df-headline {
+    font-size: clamp(2rem, 8vw, 2.75rem);
+    line-height: var(--df-leading-display, 1.12);
+  }
+  .v2-template [class*="-display"] {
+    font-size: clamp(2rem, 10vw, 3.5rem);
+    line-height: var(--df-leading-stacked, 1.05);
+  }
+  .v2-template [class*="-headline"]:not([class*="-headline-sm"]):not([class*="-headline-lg"]) {
+    font-size: clamp(1.875rem, 8vw, 2.75rem);
+    line-height: var(--df-leading-display, 1.12);
+  }
+  .v2-template [class*="-headline-lg"] {
+    font-size: clamp(2rem, 9vw, 3.25rem);
+    line-height: var(--df-leading-display, 1.12);
+  }
+  .v2-template .df-btn-primary,
+  .v2-template .df-btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (min-width: 768px) {
+  .v2-template .df-grid-12[data-cols="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .v2-template .df-grid-12[data-cols="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1024px) {
+  .v2-template .df-grid-12[data-cols="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .v2-template [data-v2-region="overlay"] {
+    padding-inline: var(--df-container-padding);
+  }
+}
+
+@media (max-width: 1023px) {
+  .v2-template [data-v2-region="header"] {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(12px);
+    background: color-mix(in srgb, var(--color-background) 88%, transparent);
+  }
+}
+
+/* Design Foundation — backward-compatible aliases */
+.df-section-glow,
+.se-section-glow,
+.cb-section-glow,
+.ec-section-glow,
+.mp-section-glow,
+.fn-section-glow,
+.ed-section-glow,
+.hr-section-glow,
+.rep-section-glow,
+.sv-section-glow,
+.cp-section-glow,
+.rs-section-glow,
+.rp-section-glow {
+position: relative; overflow: hidden;
+}
+.df-glow-orb,
+.se-glow-orb,
+.ec-glow-orb,
+.cb-glow-orb {
+pointer-events: none; position: absolute; border-radius: 9999px; filter: blur(64px); opacity: 0.35;
+}
+.df-section-alt,
+.se-section-alt,
+.ec-section-alt,
+.cb-section-alt,
+.mp-section-alt,
+.fn-section-alt,
+.ed-section-alt,
+.hr-section-alt,
+.rep-section-alt,
+.sv-section-alt,
+.cp-section-alt,
+.rs-section-alt,
+.rp-section-alt {
+background: var(--color-surface-elevated, var(--color-surface, #fff));
+}
+.df-card-featured,
+.se-card-featured,
+.cb-card-featured,
+.ec-card-featured {
+border-color: color-mix(in srgb, var(--color-signal, var(--color-accent)) 28%, var(--border-subtle, transparent));
+        background: linear-gradient(155deg, var(--color-primary) 0%, color-mix(in srgb, var(--color-primary) 88%, var(--color-secondary, var(--color-primary))) 100%);
+        color: #fff;
+        box-shadow: var(--shadow-surface);
+}
+.df-quote-mark,
+.se-quote-mark,
+.ec-quote-mark,
+.cb-quote-mark,
+.fn-quote-mark {
+font-family: var(--font-display), ui-serif, Georgia, serif;
+        font-size: 3.5rem;
+        line-height: 1;
+        color: color-mix(in srgb, var(--color-signal, var(--color-accent)) 28%, transparent);
+}
+.df-star,
+.se-star,
+.ec-star,
+.fn-star {
+color: var(--color-signal, var(--color-accent)); letter-spacing: 0.1em;
+}
+.df-input,
+.se-input,
+.ec-input,
+.cb-input,
+.fn-input,
+.mp-input,
+.ed-input,
+.hr-input,
+.rep-input,
+.sv-input,
+.cp-input,
+.rs-input,
+.rp-input {
+width: 100%;
+        border-radius: var(--radius-md, 8px);
+        border: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 12%, transparent));
+        background: var(--color-surface, var(--color-background));
+        padding: 0.75rem 1rem;
+        font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+        font-size: var(--df-text-sm, 0.875rem);
+        color: var(--color-foreground);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.df-textarea,
+.se-textarea,
+.ec-textarea,
+.cb-textarea,
+.fn-textarea,
+.mp-textarea {
+width: 100%;
+        min-height: 7rem;
+        resize: vertical;
+        border-radius: var(--radius-md, 8px);
+        border: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 12%, transparent));
+        background: var(--color-surface, var(--color-background));
+        padding: 0.75rem 1rem;
+        font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+        font-size: var(--df-text-sm, 0.875rem);
+        color: var(--color-foreground);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.df-container,
+.cb-container {
+margin-inline: auto;
+        width: 100%;
+        max-width: var(--container-max, 82rem);
+        padding-inline: var(--df-container-padding, clamp(1.25rem, 4vw, 2.5rem));
+}
+
+.df-section-glow::before,
+.se-section-glow::before,
+.cb-section-glow::before,
+.ec-section-glow::before,
+.mp-section-glow::before,
+.fn-section-glow::before,
+.ed-section-glow::before,
+.hr-section-glow::before,
+.rep-section-glow::before,
+.sv-section-glow::before,
+.cp-section-glow::before,
+.rs-section-glow::before,
+.rp-section-glow::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 55% at 15% 0%, color-mix(in srgb, var(--color-accent, var(--color-signal)) 8%, transparent), transparent 60%),
+    radial-gradient(ellipse 55% 45% at 90% 100%, color-mix(in srgb, var(--color-primary) 6%, transparent), transparent 55%);
+}
+
+.df-input:focus-visible, .se-input:focus-visible, .ec-input:focus-visible, .cb-input:focus-visible, .fn-input:focus-visible,
+.df-textarea:focus-visible, .se-textarea:focus-visible, .ec-textarea:focus-visible, .cb-textarea:focus-visible, .fn-textarea:focus-visible {
+  outline: none;
+  border-color: var(--color-signal, var(--color-accent));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-signal, var(--color-accent)) 14%, transparent);
+}
+
+@keyframes df-slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes se-slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Alexandria:wght@500;600;700&family=Inter:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Sans+Arabic:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap");
+
+@keyframes sv-volt-slam {
+  from { opacity: 0; transform: translateY(56px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes sv-slide-rise {
+  from { opacity: 0; transform: translateX(-32px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes sv-scroll-pulse {
+  0%, 100% { transform: scaleY(1); opacity: 0.5; }
+  50% { transform: scaleY(1.5); opacity: 1; }
+}
+@keyframes sv-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes sv-reveal-wipe {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+@keyframes sv-glow-pulse {
+  0%, 100% { box-shadow: 0 0 40px rgba(212,255,0,0.08); }
+  50% { box-shadow: 0 0 80px rgba(212,255,0,0.2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sv-animate-slam, .sv-animate-rise, .sv-marquee-track, .sv-overlay-active { animation: none !important; transition: none !important; }
+}
+
+.sv-font-display { font-family: var(--font-display), "Space Grotesk", ui-sans-serif, system-ui, sans-serif; }
+.sv-font-body { font-family: var(--font-body), "Inter", ui-sans-serif, system-ui, sans-serif; }
+.sv-font-mono { font-family: var(--font-mono, "Space Mono"), ui-monospace, monospace; }
+.sv-eyebrow {
+  font-family: var(--font-mono, "Space Mono"), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--color-volt, #D4FF00);
+}
+.sv-display {
+  font-family: var(--font-display), "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-display, clamp(2.75rem, 9.5vw, 7.5rem));
+  font-weight: 700;
+  line-height: var(--df-leading-stacked, 1.05);
+  letter-spacing: var(--df-headline-tracking, -0.045em);
+  text-transform: uppercase;
+  color: var(--color-ghost, #F4F4F0);
+  text-wrap: balance;
+}
+.sv-headline {
+  font-family: var(--font-display), "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-2xl, clamp(1.875rem, 4.5vw, 3.25rem));
+  font-weight: 700;
+  line-height: var(--df-leading-tight, 1.12);
+  letter-spacing: var(--df-headline-tracking, -0.035em);
+  text-transform: uppercase;
+  color: var(--color-foreground);
+  text-wrap: balance;
+}
+.sv-headline-sm {
+  font-family: var(--font-display), "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--df-text-xl, clamp(1.375rem, 3vw, 2rem));
+  font-weight: 600;
+  line-height: var(--df-leading-snug, 1.32);
+  letter-spacing: var(--df-headline-tracking, -0.025em);
+  text-transform: uppercase;
+  color: var(--color-foreground);
+}
+.sv-body {
+  font-family: var(--font-body), "Inter", ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--color-muted, rgba(244,244,240,0.55));
+}
+.sv-btn-volt {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.25rem;
+  padding: 0.875rem 2rem;
+  font-family: var(--font-mono, "Space Mono"), ui-monospace, monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-primary, #0A0A0B);
+  background: var(--color-volt, #D4FF00);
+  border: 2px solid var(--color-volt, #D4FF00);
+  transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+}
+.sv-btn-volt:hover {
+  background: transparent;
+  color: var(--color-volt, #D4FF00);
+  box-shadow: var(--shadow-volt);
+  transform: translateY(-2px);
+}
+.sv-btn-volt:focus-visible { outline: 3px solid var(--color-volt); outline-offset: 3px; }
+.sv-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.25rem;
+  padding: 0.875rem 2rem;
+  font-family: var(--font-mono, "Space Mono"), ui-monospace, monospace;
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-ghost);
+  background: transparent;
+  border: 1px solid var(--border-default);
+  transition: border-color 0.25s ease, color 0.25s ease;
+}
+.sv-btn-ghost:hover { border-color: var(--color-volt); color: var(--color-volt); }
+.sv-link-volt {
+  text-decoration: none;
+  color: var(--color-muted);
+  transition: color 0.2s ease;
+}
+.sv-link-volt:hover { color: var(--color-volt, #D4FF00); }
+.sv-link-volt:focus-visible { outline: 2px solid var(--color-volt); outline-offset: 2px; }
+.sv-section { padding-block: clamp(4.5rem, 13vw, 8rem); }
+.sv-section-glow {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.sv-section-glow::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 70% 55% at 85% -10%, var(--df-accent-glow, color-mix(in srgb, var(--color-volt) 18%, transparent)), transparent 65%);
+}
+.sv-focus-ring:focus-visible { outline: 2px solid var(--color-volt); outline-offset: 3px; }
+.sv-card-lift {
+  border: 1px solid var(--df-border-subtle, var(--border-default));
+  background: var(--color-surface-elevated, var(--color-surface));
+  box-shadow: var(--df-shadow-card, var(--shadow-card));
+  transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+}
+.sv-card-lift:hover {
+  transform: translateY(-6px);
+  border-color: var(--df-border-accent, var(--border-volt));
+  box-shadow: var(--df-shadow-elevated, var(--shadow-volt));
+}
+.sv-case-row:focus-visible { outline: 2px solid var(--color-volt); outline-offset: -2px; }
+.sv-animate-slam { animation: sv-volt-slam 0.85s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.sv-animate-rise { animation: sv-slide-rise 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both; }
+.sv-marquee-track { animation: sv-marquee 32s linear infinite; }
+.sv-overlay-active .sv-marquee-track { animation-play-state: running; }
+.sv-overlay-active { animation: sv-reveal-wipe 1s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.sv-volt-line { background: linear-gradient(90deg, var(--color-volt) 0%, transparent 100%); height: 2px; }
+.sv-index-num { font-variant-numeric: tabular-nums; }
+
+/* TBDP Native Consumption — creative-agency-premium
+   sector:creative-studio · experience:creative, agency, portfolio
+   identity:studio-volt · context:d74b79e2016499ad
+   integration:5.0.0 · consumption:1.0.0 */
+:root {
+  --tbdp-native: 1;
+  --tbdp-native-package: "creative-agency-premium";
+  --tbdp-sector-dna: "creative-studio";
+  --tbdp-template-identity: "studio-volt";
+  --tbdp-experience-primary: "creative";
+  --tbdp-context-hash: "d74b79e2016499ad";
+  --tbdp-theme-mode: "dark";
+  --tbdp-direction: "ltr";
+}
+
+/* TBDP Foundations — official design authority (scoped vars) */
+/* Trend Business AI Design Platform · 1.0.0 · foundations-1 */
+:root {
+  --tbdp-color-primary: #4D85FF;
+  --tbdp-color-secondary: #CBD5E1;
+  --tbdp-color-accent: #85ADFF;
+  --tbdp-color-success: #6EE7B7;
+  --tbdp-color-warning: #FCD34D;
+  --tbdp-color-danger: #FCA5A5;
+  --tbdp-color-info: #93C5FD;
+  --tbdp-color-surface-base: #0F172A;
+  --tbdp-color-surface-raised: #1E293B;
+  --tbdp-color-surface-overlay: #1E293B;
+  --tbdp-color-surface-sunken: #020617;
+  --tbdp-color-surface-inverse: #FFFFFF;
+  --tbdp-color-background-canvas: #020617;
+  --tbdp-color-background-subtle: #0F172A;
+  --tbdp-color-background-emphasis: #1E293B;
+  --tbdp-color-background-inverse: #FFFFFF;
+  --tbdp-color-text-primary: #F8FAFC;
+  --tbdp-color-text-secondary: #CBD5E1;
+  --tbdp-color-text-tertiary: #94A3B8;
+  --tbdp-color-text-disabled: #475569;
+  --tbdp-color-text-inverse: #0F172A;
+  --tbdp-color-text-link: #85ADFF;
+  --tbdp-color-text-linkHover: #B3CCFF;
+  --tbdp-color-border-default: #334155;
+  --tbdp-color-border-subtle: #1E293B;
+  --tbdp-color-border-strong: #475569;
+  --tbdp-color-border-focus: #4D85FF;
+  --tbdp-color-border-inverse: rgba(255, 255, 255, 0.12);
+  --tbdp-color-overlay-scrim: rgba(2, 6, 23, 0.72);
+  --tbdp-color-overlay-scrimStrong: rgba(2, 6, 23, 0.88);
+  --tbdp-color-overlay-backdrop: rgba(2, 6, 23, 0.48);
+  --tbdp-color-overlay-highlight: rgba(77, 133, 255, 0.16);
+  --tbdp-opacity-transparent: 0;
+  --tbdp-opacity-subtle: 0.04;
+  --tbdp-opacity-muted: 0.08;
+  --tbdp-opacity-soft: 0.12;
+  --tbdp-opacity-medium: 0.24;
+  --tbdp-opacity-strong: 0.48;
+  --tbdp-opacity-opaque: 1;
+  --tbdp-spacing-micro: 0.125rem;
+  --tbdp-spacing-xs: 0.25rem;
+  --tbdp-spacing-sm: 0.5rem;
+  --tbdp-spacing-md: 1rem;
+  --tbdp-spacing-lg: 1.5rem;
+  --tbdp-spacing-xl: 2rem;
+  --tbdp-spacing-2xl: 3rem;
+  --tbdp-spacing-3xl: 4rem;
+  --tbdp-spacing-4xl: 6rem;
+  --tbdp-radius-sharp: 0;
+  --tbdp-radius-sm: 0.25rem;
+  --tbdp-radius-md: 0.5rem;
+  --tbdp-radius-lg: 0.75rem;
+  --tbdp-radius-pill: 9999px;
+  --tbdp-radius-circle: 50%;
+  --tbdp-shadow-0: none;
+  --tbdp-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-2: 0 2px 8px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-3: 0 8px 24px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);
+  --tbdp-shadow-4: 0 16px 48px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.08);
+  --tbdp-shadow-5: 0 24px 64px rgba(15, 23, 42, 0.18), 0 8px 24px rgba(15, 23, 42, 0.1);
+  --tbdp-container-sm: 640px;
+  --tbdp-container-md: 768px;
+  --tbdp-container-lg: 1024px;
+  --tbdp-container-xl: 1280px;
+  --tbdp-container-2xl: 1440px;
+  --tbdp-container-full: 100%;
+  --tbdp-font-display: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --tbdp-font-body: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --tbdp-font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", monospace;
+}
+
+[data-tbdp-mode="dark"] { /* inherits :root dark build */ }
+
+/* TBDP Experience — motion, interaction, RTL, accessibility */
+/* TBDP Phase 3 — Motion System · tbdp-xp */
+
+@keyframes tbdp-xp-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes tbdp-xp-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes tbdp-xp-rise {
+  from { opacity: 0; transform: translateY(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tbdp-xp-rise-rtl {
+  from { opacity: 0; transform: translateX(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes tbdp-xp-slide-end {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-slide-start {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(calc(var(--tbdp-spacing-sm) * -1)); }
+  40%, 80% { transform: translateX(var(--tbdp-spacing-sm)); }
+}
+
+@keyframes tbdp-xp-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@keyframes tbdp-xp-lift {
+  to { transform: translateY(calc(var(--tbdp-spacing-sm) * -1)); box-shadow: var(--tbdp-shadow-2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp-motion] { animation: none !important; transition: none !important; }
+}
+
+[data-tbdp-xp-motion] { will-change: transform, opacity; }
+[data-tbdp-xp-motion="page-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="page-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="section-reveal"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-headline"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-media"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="card-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="grid-stagger"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="modal-enter"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="modal-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="drawer-slide"] { animation-name: tbdp-xp-slide-end; }
+[data-tbdp-xp-motion="toast-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="toast-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="tooltip-fade"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="scroll-reveal-up"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="stagger-children"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hover-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="focus-ring"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="success-pulse"] { animation-name: tbdp-xp-pulse; }
+[data-tbdp-xp-motion="error-shake"] { animation-name: tbdp-xp-shake; }
+
+/* TBDP Experience — interaction utilities */
+[data-tbdp-xp] { --tbdp-xp-focus: var(--tbdp-color-border-focus); }
+[data-tbdp-xp-feedback="loading"] { cursor: wait; }
+[data-tbdp-xp-feedback="error"] { border-color: var(--tbdp-color-danger); }
+[data-tbdp-xp-feedback="success"] { border-color: var(--tbdp-color-success); }
+[data-tbdp-xp-touch="true"] { min-height: var(--tbdp-spacing-2xl); min-width: var(--tbdp-spacing-2xl); }
+[data-tbdp-xp-gpu] { transform: translateZ(0); backface-visibility: hidden; }
+[data-tbdp-xp-contain] { content-visibility: auto; contain-intrinsic-size: auto 500px; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp], [data-tbdp-xp-motion] { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+/* V2 sidebar-left layout */
+.v2-layout-sidebar-left .v2-sidebar-shell { gap: 0; align-items: flex-start; }
+.v2-sidebar-rail {
+  border-inline-end: 1px solid var(--border-subtle, rgba(244,237,228,0.06));
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-inline-end: clamp(1.25rem, 3vw, 2rem);
+}
+[dir='rtl'] .v2-sidebar-rail { border-inline-end: none; border-inline-start: 1px solid var(--border-subtle, rgba(244,237,228,0.06)); }
+.v2-main-canvas > [data-v2-component] + [data-v2-component] { margin-top: 0; }
+.v2-layout-sidebar-left .v2-main-canvas { padding-inline-start: 0; }
+@media (max-width: 1023px) {
+  .v2-sidebar-rail { display: none !important; }
+}
+
+/* V2 sidebar-right layout */
+.v2-layout-sidebar-right .v2-sidebar-shell { gap: 0; align-items: flex-start; }
+.v2-layout-sidebar-right .v2-sidebar-rail {
+  border-inline-start: 1px solid var(--border-subtle, rgba(28,25,23,0.06));
+  border-inline-end: none;
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-inline-start: clamp(1.25rem, 3vw, 2rem);
+}
+[dir='rtl'] .v2-layout-sidebar-right .v2-sidebar-rail {
+  border-inline-start: none;
+  border-inline-end: 1px solid var(--border-subtle, rgba(28,25,23,0.06));
+}
+
+/* V2 full-bleed layout */
+.v2-layout-full-bleed .v2-overlay-canvas { width: 100%; }
+.v2-layout-full-bleed .v2-main-canvas { width: 100%; max-width: var(--container-max, 76rem); margin-inline: auto; }
+
+/* V2 editorial-reveal layout (creative portfolio) */
+.v2-layout-editorial-reveal .v2-main-canvas { width: 100%; }
+.v2-layout-editorial-reveal .v2-overlay-reveal { width: 100%; }
+
+:root {
+  --container-max: 80rem;
+  --font-body: Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --color-surface: #121214;
+  --color-foreground: #F4F4F0;
+  --color-background: #0A0A0B;
+  --color-accent: #D4FF00;
+  --color-secondary: #1A1A1D; --color-primary: #0A0A0B; }
+
+/* V2 Website Blueprint — design director output */
+:root {
+  --bp-blueprint-id: "bp-creative-agency-premium-general";
+  --bp-container-narrow: 40rem;
+  --bp-container-default: 80rem;
+  --bp-container-wide: 88rem;
+  --bp-grid-columns: 12;
+  --bp-grid-gutter: 1.5rem;
+  --bp-grid-rhythm: balanced;
+  --bp-motion-intensity: moderate;
+  --bp-cta-emphasis: bold;
+  --container-max: 80rem;
+}
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    .sr-only, .v2-sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    [class*="animate-"] { animation-fill-mode: both; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--color-background, #0f172a);
+      color: var(--color-foreground, #f8fafc);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .page { display: none; padding-bottom: 2rem; }
+    .page:target { display: block; }
+    body:not(:has(.page:target)) .page#home { display: block; }
+    img { max-width: 100%; height: auto; display: block; }
+    a { color: inherit; }
+    .v2-preview-error {
+      margin: 2rem auto;
+      max-width: 36rem;
+      padding: 1.5rem 1.75rem;
+      border: 1px solid color-mix(in srgb, var(--color-foreground, #f8fafc) 12%, transparent);
+      border-radius: 0.75rem;
+      background: color-mix(in srgb, var(--color-surface, #1e293b) 88%, transparent);
+      text-align: center;
+    }
+    .v2-preview-error-title {
+      margin: 0 0 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--color-foreground, #f8fafc);
+    }
+    .v2-preview-error-detail {
+      margin: 0;
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      color: color-mix(in srgb, var(--color-foreground, #f8fafc) 72%, transparent);
+      word-break: break-word;
+    }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+<style id="tbdp-wiring-layer">
+/* TBDP Integration Layer — advisory token layer */
+
+/* Trend Business AI Design Platform · 1.0.0 · foundations-1 */
+:root {
+  --tbdp-color-primary: #0047E6;
+  --tbdp-color-secondary: #334155;
+  --tbdp-color-accent: #4D85FF;
+  --tbdp-color-success: #10B981;
+  --tbdp-color-warning: #F59E0B;
+  --tbdp-color-danger: #EF4444;
+  --tbdp-color-info: #3B82F6;
+  --tbdp-color-surface-base: #FFFFFF;
+  --tbdp-color-surface-raised: #F8FAFC;
+  --tbdp-color-surface-overlay: #FFFFFF;
+  --tbdp-color-surface-sunken: #F1F5F9;
+  --tbdp-color-surface-inverse: #0F172A;
+  --tbdp-color-background-canvas: #F8FAFC;
+  --tbdp-color-background-subtle: #F1F5F9;
+  --tbdp-color-background-emphasis: #FFFFFF;
+  --tbdp-color-background-inverse: #020617;
+  --tbdp-color-text-primary: #0F172A;
+  --tbdp-color-text-secondary: #475569;
+  --tbdp-color-text-tertiary: #64748B;
+  --tbdp-color-text-disabled: #94A3B8;
+  --tbdp-color-text-inverse: #FFFFFF;
+  --tbdp-color-text-link: #0047E6;
+  --tbdp-color-text-linkHover: #0038B8;
+  --tbdp-color-border-default: #E2E8F0;
+  --tbdp-color-border-subtle: #F1F5F9;
+  --tbdp-color-border-strong: #CBD5E1;
+  --tbdp-color-border-focus: #1A5CFF;
+  --tbdp-color-border-inverse: rgba(255, 255, 255, 0.16);
+  --tbdp-color-overlay-scrim: rgba(2, 6, 23, 0.4);
+  --tbdp-color-overlay-scrimStrong: rgba(2, 6, 23, 0.64);
+  --tbdp-color-overlay-backdrop: rgba(2, 6, 23, 0.24);
+  --tbdp-color-overlay-highlight: rgba(26, 92, 255, 0.12);
+  --tbdp-opacity-transparent: 0;
+  --tbdp-opacity-subtle: 0.04;
+  --tbdp-opacity-muted: 0.08;
+  --tbdp-opacity-soft: 0.12;
+  --tbdp-opacity-medium: 0.24;
+  --tbdp-opacity-strong: 0.48;
+  --tbdp-opacity-opaque: 1;
+  --tbdp-spacing-micro: 0.125rem;
+  --tbdp-spacing-xs: 0.25rem;
+  --tbdp-spacing-sm: 0.5rem;
+  --tbdp-spacing-md: 1rem;
+  --tbdp-spacing-lg: 1.5rem;
+  --tbdp-spacing-xl: 2rem;
+  --tbdp-spacing-2xl: 3rem;
+  --tbdp-spacing-3xl: 4rem;
+  --tbdp-spacing-4xl: 6rem;
+  --tbdp-radius-sharp: 0;
+  --tbdp-radius-sm: 0.25rem;
+  --tbdp-radius-md: 0.5rem;
+  --tbdp-radius-lg: 0.75rem;
+  --tbdp-radius-pill: 9999px;
+  --tbdp-radius-circle: 50%;
+  --tbdp-shadow-0: none;
+  --tbdp-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-2: 0 2px 8px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --tbdp-shadow-3: 0 8px 24px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);
+  --tbdp-shadow-4: 0 16px 48px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.08);
+  --tbdp-shadow-5: 0 24px 64px rgba(15, 23, 42, 0.18), 0 8px 24px rgba(15, 23, 42, 0.1);
+  --tbdp-container-sm: 640px;
+  --tbdp-container-md: 768px;
+  --tbdp-container-lg: 1024px;
+  --tbdp-container-xl: 1280px;
+  --tbdp-container-2xl: 1440px;
+  --tbdp-container-full: 100%;
+  --tbdp-font-display: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --tbdp-font-body: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --tbdp-font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", monospace;
+}
+
+/* TBDP Phase 3 — Motion System · tbdp-xp */
+
+@keyframes tbdp-xp-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes tbdp-xp-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes tbdp-xp-rise {
+  from { opacity: 0; transform: translateY(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tbdp-xp-rise-rtl {
+  from { opacity: 0; transform: translateX(var(--tbdp-spacing-lg)); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes tbdp-xp-slide-end {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-slide-start {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tbdp-xp-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(calc(var(--tbdp-spacing-sm) * -1)); }
+  40%, 80% { transform: translateX(var(--tbdp-spacing-sm)); }
+}
+
+@keyframes tbdp-xp-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@keyframes tbdp-xp-lift {
+  to { transform: translateY(calc(var(--tbdp-spacing-sm) * -1)); box-shadow: var(--tbdp-shadow-2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp-motion] { animation: none !important; transition: none !important; }
+}
+
+[data-tbdp-xp-motion] { will-change: transform, opacity; }
+[data-tbdp-xp-motion="page-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="page-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="section-reveal"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-headline"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hero-media"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="card-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="grid-stagger"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="modal-enter"] { animation-name: tbdp-xp-scale-in; }
+[data-tbdp-xp-motion="modal-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="drawer-slide"] { animation-name: tbdp-xp-slide-end; }
+[data-tbdp-xp-motion="toast-enter"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="toast-exit"] { animation-name: tbdp-xp-fade-out; }
+[data-tbdp-xp-motion="tooltip-fade"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="scroll-reveal-up"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="stagger-children"] { animation-name: tbdp-xp-rise; }
+[data-tbdp-xp-motion="hover-lift"] { animation-name: tbdp-xp-lift; }
+[data-tbdp-xp-motion="focus-ring"] { animation-name: tbdp-xp-fade-in; }
+[data-tbdp-xp-motion="success-pulse"] { animation-name: tbdp-xp-pulse; }
+[data-tbdp-xp-motion="error-shake"] { animation-name: tbdp-xp-shake; }
+
+/* TBDP Experience — interaction utilities */
+[data-tbdp-xp] { --tbdp-xp-focus: var(--tbdp-color-border-focus); }
+[data-tbdp-xp-feedback="loading"] { cursor: wait; }
+[data-tbdp-xp-feedback="error"] { border-color: var(--tbdp-color-danger); }
+[data-tbdp-xp-feedback="success"] { border-color: var(--tbdp-color-success); }
+[data-tbdp-xp-touch="true"] { min-height: var(--tbdp-spacing-2xl); min-width: var(--tbdp-spacing-2xl); }
+[data-tbdp-xp-gpu] { transform: translateZ(0); backface-visibility: hidden; }
+[data-tbdp-xp-contain] { content-visibility: auto; contain-intrinsic-size: auto 500px; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tbdp-xp], [data-tbdp-xp-motion] { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+  <div class="page" id="home">
+    <div class="flex min-h-screen flex-col bg-[var(--color-background)] text-[var(--color-foreground)] antialiased v2-template v2-creative-agency-premium" data-v2-package="creative-agency-premium" data-v2-composer="region-grid" data-v2-layout="default" data-v2-blueprint="bp-creative-agency-premium-general"><header data-v2-region="header"><header data-v2-component="creative-agency-premium-nav" class="sticky top-0 z-50 border-b transition-all duration-300 border-transparent bg-[var(--color-background)]/80 backdrop-blur-md"><div class="mx-auto flex h-16 max-w-[82rem] items-center justify-between gap-4 px-5 sm:px-8 lg:h-[4.25rem]"><a href="#top" class="sv-font-display flex items-center gap-2.5 text-base font-bold tracking-tight text-[var(--color-foreground)] sv-focus-ring rounded-sm"><span class="flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-primary)] text-xs font-bold text-white" aria-hidden="true">N</span>Volt</a><nav aria-label="Primary" class="hidden items-center gap-8 lg:flex"><a href="#features" class="sv-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] sv-focus-ring rounded-sm">Features</a><a href="#services" class="sv-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] sv-focus-ring rounded-sm">Services</a><a href="#pricing" class="sv-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] sv-focus-ring rounded-sm">Pricing</a><a href="#contact" class="sv-font-body text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)] sv-focus-ring rounded-sm">Contact</a></nav><div class="flex items-center gap-2"><a href="#contact" class="sv-btn-primary hidden sm:inline-flex">Get started</a><button type="button" aria-expanded="false" aria-controls="sv-mobile-nav" aria-label="Open menu" class="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-surface)] lg:hidden sv-focus-ring"><span class="sr-only">Menu</span><span aria-hidden="true" class="flex flex-col gap-1"><span class="block h-0.5 w-5 bg-current transition "></span><span class="block h-0.5 w-5 bg-current transition "></span><span class="block h-0.5 w-5 bg-current transition "></span></span></button></div></div></header></header><main data-v2-region="main" class="v2-region-grid flex flex-col"><h1 class="v2-sr-only text-4xl">Volt</h1><div data-v2-section="hero" data-v2-variant="split-trust"><section id="top" data-v2-component="creative-agency-premium-hero" aria-labelledby="sv-hero-title" class="sv-section relative overflow-hidden bg-[var(--color-background)] pb-14 pt-16 sm:pt-20"><div class="sv-section-glow pointer-events-none absolute inset-0" aria-hidden="true"></div><div class="relative mx-auto max-w-[88rem] px-5 sm:px-8"><div class="grid gap-12 lg:grid-cols-12 lg:items-end"><div class="lg:col-span-8"><p class="sv-eyebrow sv-animate-slam">Global creative studio</p><h1 id="sv-hero-title" class="sv-display mt-6 max-w-[12ch] sv-animate-slam">Design systems for brands that compete globally</h1><p class="sv-body mt-8 max-w-2xl text-[var(--color-muted)] sv-animate-rise">We build distinctive digital experiences — strategy, identity, and product craft for teams who refuse to look like everyone else.</p><div class="mt-10 flex flex-wrap gap-4 sv-animate-rise"><a href="#contact" class="sv-btn-volt sv-focus-ring">Get started</a><a href="#portfolio" class="sv-btn-ghost sv-focus-ring">Learn more</a></div></div><div class="lg:col-span-4"><div class="sv-card-lift border border-[var(--border-default)] bg-[var(--color-surface)] p-6 sm:p-8"><dl class="space-y-5"><div class="flex items-baseline justify-between gap-4 border-b border-[var(--border-subtle)] pb-4 last:border-0 last:pb-0"><dt class="sv-font-body text-sm text-[var(--color-muted)]">Global launches</dt><dd class="sv-font-display text-2xl font-bold">240+</dd></div><div class="flex items-baseline justify-between gap-4 border-b border-[var(--border-subtle)] pb-4 last:border-0 last:pb-0"><dt class="sv-font-body text-sm text-[var(--color-muted)]">Markets served</dt><dd class="sv-font-display text-2xl font-bold">38</dd></div><div class="flex items-baseline justify-between gap-4 border-b border-[var(--border-subtle)] pb-4 last:border-0 last:pb-0"><dt class="sv-font-body text-sm text-[var(--color-muted)]">Repeat clients</dt><dd class="sv-font-display text-2xl font-bold">92%</dd></div><div class="flex items-baseline justify-between gap-4 border-b border-[var(--border-subtle)] pb-4 last:border-0 last:pb-0"><dt class="sv-font-body text-sm text-[var(--color-muted)]">Design awards</dt><dd class="sv-font-display text-2xl font-bold">18</dd></div></dl></div></div></div></div></section></div><div data-v2-section="features" data-v2-variant="spotlight-list"><section id="features" data-v2-component="creative-agency-premium-features" aria-labelledby="sv-features-title" class="sv-section sv-section-alt bg-[var(--color-surface)]"><div class="mx-auto max-w-[82rem] px-5 sm:px-8"><header class="mb-10 max-w-2xl"><p class="sv-eyebrow mb-3">Platform capabilities</p><h2 id="sv-features-title" class="sv-headline-sm">Built for revenue operations at scale</h2><div class="mt-4 h-px w-12 bg-gradient-to-r from-[var(--color-accent)] to-transparent" aria-hidden="true"></div><p class="sv-body text-muted-foreground mt-5">Purposv-built modules from pipeline to post-sale expansion — one command center for your GTM.</p></header><div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5"><article class="sv-card group relative overflow-hidden p-7 sm:p-8 transition-transform duration-500 motion-safe:hover:-translate-y-1 lg:col-span-2" style="animation-delay:0s"><div class="pointer-events-none absolute -end-8 -top-8 h-32 w-32 rounded-full bg-[color-mix(in_srgb,var(--color-accent)_8%,transparent)] blur-2xl transition group-hover:bg-[color-mix(in_srgb,var(--color-accent)_14%,transparent)]" aria-hidden="true"></div><div class="relative mb-5 flex items-center gap-4"><span class="sv-font-mono flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-gradient-to-br from-[color-mix(in_srgb,var(--color-primary)_12%,transparent)] to-[color-mix(in_srgb,var(--color-accent)_8%,transparent)] text-xs font-semibold text-[var(--color-primary)] ring-1 ring-[var(--border-subtle)]">01</span><span class="h-px flex-1 bg-gradient-to-r from-[var(--border-default)] to-transparent transition group-hover:from-[var(--color-accent)]" aria-hidden="true"></span></div><h3 class="sv-font-display relative text-lg font-bold text-[var(--color-foreground)]">Pipeline intelligence</h3><p class="sv-font-body relative mt-3 text-sm leading-relaxed text-[var(--color-muted)]">Real-time deal health scoring with AI-powered risk signals across every stage.</p></article><article class="sv-card group relative overflow-hidden p-7 sm:p-8 transition-transform duration-500 motion-safe:hover:-translate-y-1 " style="animation-delay:0.06s"><div class="pointer-events-none absolute -end-8 -top-8 h-32 w-32 rounded-full bg-[color-mix(in_srgb,var(--color-accent)_8%,transparent)] blur-2xl transition group-hover:bg-[color-mix(in_srgb,var(--color-accent)_14%,transparent)]" aria-hidden="true"></div><div class="relative mb-5 flex items-center gap-4"><span class="sv-font-mono flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-gradient-to-br from-[color-mix(in_srgb,var(--color-primary)_12%,transparent)] to-[color-mix(in_srgb,var(--color-accent)_8%,transparent)] text-xs font-semibold text-[var(--color-primary)] ring-1 ring-[var(--border-subtle)]">02</span><span class="h-px flex-1 bg-gradient-to-r from-[var(--border-default)] to-transparent transition group-hover:from-[var(--color-accent)]" aria-hidden="true"></span></div><h3 class="sv-font-display relative text-lg font-bold text-[var(--color-foreground)]">Forecast accuracy</h3><p class="sv-font-body relative mt-3 text-sm leading-relaxed text-[var(--color-muted)]">Unified revenue models aligning sales, finance, and leadership on one source of truth.</p></article><article class="sv-card group relative overflow-hidden p-7 sm:p-8 transition-transform duration-500 motion-safe:hover:-translate-y-1 " style="animation-delay:0.12s"><div class="pointer-events-none absolute -end-8 -top-8 h-32 w-32 rounded-full bg-[color-mix(in_srgb,var(--color-accent)_8%,transparent)] blur-2xl transition group-hover:bg-[color-mix(in_srgb,var(--color-accent)_14%,transparent)]" aria-hidden="true"></div><div class="relative mb-5 flex items-center gap-4"><span class="sv-font-mono flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-gradient-to-br from-[color-mix(in_srgb,var(--color-primary)_12%,transparent)] to-[color-mix(in_srgb,var(--color-accent)_8%,transparent)] text-xs font-semibold text-[var(--color-primary)] ring-1 ring-[var(--border-subtle)]">03</span><span class="h-px flex-1 bg-gradient-to-r from-[var(--border-default)] to-transparent transition group-hover:from-[var(--color-accent)]" aria-hidden="true"></span></div><h3 class="sv-font-display relative text-lg font-bold text-[var(--color-foreground)]">Account expansion</h3><p class="sv-font-body relative mt-3 text-sm leading-relaxed text-[var(--color-muted)]">Surface upsell opportunities before competitors reach your accounts.</p></article><article class="sv-card group relative overflow-hidden p-7 sm:p-8 transition-transform duration-500 motion-safe:hover:-translate-y-1 lg:col-span-2" style="animation-delay:0.18s"><div class="pointer-events-none absolute -end-8 -top-8 h-32 w-32 rounded-full bg-[color-mix(in_srgb,var(--color-accent)_8%,transparent)] blur-2xl transition group-hover:bg-[color-mix(in_srgb,var(--color-accent)_14%,transparent)]" aria-hidden="true"></div><div class="relative mb-5 flex items-center gap-4"><span class="sv-font-mono flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-gradient-to-br from-[color-mix(in_srgb,var(--color-primary)_12%,transparent)] to-[color-mix(in_srgb,var(--color-accent)_8%,transparent)] text-xs font-semibold text-[var(--color-primary)] ring-1 ring-[var(--border-subtle)]">04</span><span class="h-px flex-1 bg-gradient-to-r from-[var(--border-default)] to-transparent transition group-hover:from-[var(--color-accent)]" aria-hidden="true"></span></div><h3 class="sv-font-display relative text-lg font-bold text-[var(--color-foreground)]">Executive dashboards</h3><p class="sv-font-body relative mt-3 text-sm leading-relaxed text-[var(--color-muted)]">Board-ready reporting with drill-down from ARR to rep-level activity in seconds.</p></article></div></div></section></div><section id="platform" data-v2-component="creative-agency-premium-integrations" aria-labelledby="sv-integrations-title" class="sv-section-glow relative overflow-hidden border-y border-[var(--border-default)] bg-[var(--color-background)] py-14 sm:py-16"><div class="mx-auto max-w-[82rem] px-5 sm:px-8"><header class="mb-9 text-center"><p class="sv-eyebrow mb-3">Integrations</p><h2 id="sv-integrations-title" class="sv-headline-sm">Your entire GTM stack, connected</h2><div class="mx-auto mt-4 h-px w-12 bg-gradient-to-r from-transparent via-[var(--color-accent)] to-transparent" aria-hidden="true"></div><p class="sv-body text-muted-foreground mx-auto mt-5 max-w-lg text-sm">Native bi-directional sync with CRM, data warehouse, and collaboration tools — no middleware required.</p></header></div><div class="relative" aria-label="Integration categories"><div class="pointer-events-none absolute inset-y-0 start-0 z-10 w-24 bg-gradient-to-r from-[var(--color-background)] to-transparent" aria-hidden="true"></div><div class="pointer-events-none absolute inset-y-0 end-0 z-10 w-24 bg-gradient-to-l from-[var(--color-background)] to-transparent" aria-hidden="true"></div><div class="flex motion-safe:animate-[sv-marquee_45s_linear_infinite] hover:[animation-play-state:paused]"><div class="sv-card sv-integration-tile mx-3 flex h-[4.75rem] min-w-[12rem] shrink-0 items-center gap-3 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="sv-integration-mark" aria-hidden="true">CRM</span><span class="min-w-0"><span class="sv-font-display block truncate text-sm font-bold tracking-tight text-[var(--color-foreground)]">Revenue CRM</span><span class="sv-font-mono mt-0.5 block text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Bi-directional</span></span></div><div class="sv-card sv-integration-tile mx-3 flex h-[4.75rem] min-w-[12rem] shrink-0 items-center gap-3 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="sv-integration-mark" aria-hidden="true">MAP</span><span class="min-w-0"><span class="sv-font-display block truncate text-sm font-bold tracking-tight text-[var(--color-foreground)]">Marketing automation</span><span class="sv-font-mono mt-0.5 block text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Native</span></span></div><div class="sv-card sv-integration-tile mx-3 flex h-[4.75rem] min-w-[12rem] shrink-0 items-center gap-3 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="sv-integration-mark" aria-hidden="true">COM</span><span class="min-w-0"><span class="sv-font-display block truncate text-sm font-bold tracking-tight text-[var(--color-foreground)]">Collaboration hub</span><span class="sv-font-mono mt-0.5 block text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Realtime</span></span></div><div class="sv-card sv-integration-tile mx-3 flex h-[4.75rem] min-w-[12rem] shrink-0 items-center gap-3 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="sv-integration-mark" aria-hidden="true">DWH</span><span class="min-w-0"><span class="sv-font-display block truncate text-sm font-bold tracking-tight text-[var(--color-foreground)]">Data warehouse</span><span class="sv-font-mono mt-0.5 block text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">ETL</span></span></div><div class="sv-card sv-integration-tile mx-3 flex h-[4.75rem] min-w-[12rem] shrink-0 items-center gap-3 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="sv-integration-mark" aria-hidden="true">HCM</span><span class="min-w-0"><span class="sv-font-display block truncate text-sm font-bold tracking-tight text-[var(--color-foreground)]">Workforce data</span><span class="sv-font-mono mt-0.5 block text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Sync</span></span></div><div class="sv-card sv-integration-tile mx-3 flex h-[4.75rem] min-w-[12rem] shrink-0 items-center gap-3 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="sv-integration-mark" aria-hidden="true">REV</span><span class="min-w-0"><span class="sv-font-display block truncate text-sm font-bold tracking-tight text-[var(--color-foreground)]">Conversation intel</span><span class="sv-font-mono mt-0.5 block text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Insights</span></span></div><div class="sv-card sv-integration-tile mx-3 flex h-[4.75rem] min-w-[12rem] shrink-0 items-center gap-3 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="sv-integration-mark" aria-hidden="true">SEQ</span><span class="min-w-0"><span class="sv-font-display block truncate text-sm font-bold tracking-tight text-[var(--color-foreground)]">Sales engagement</span><span class="sv-font-mono mt-0.5 block text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Workflow</span></span></div><div class="sv-card sv-integration-tile mx-3 flex h-[4.75rem] min-w-[12rem] shrink-0 items-center gap-3 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="sv-integration-mark" aria-hidden="true">CDP</span><span class="min-w-0"><span class="sv-font-display block truncate text-sm font-bold tracking-tight text-[var(--color-foreground)]">Customer data</span><span class="sv-font-mono mt-0.5 block text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Identity</span></span></div><div class="sv-card sv-integration-tile mx-3 flex h-[4.75rem] min-w-[12rem] shrink-0 items-center gap-3 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="sv-integration-mark" aria-hidden="true">LAK</span><span class="min-w-0"><span class="sv-font-display block truncate text-sm font-bold tracking-tight text-[var(--color-foreground)]">Analytics lake</span><span class="sv-font-mono mt-0.5 block text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Batch</span></span></div><div class="sv-card sv-integration-tile mx-3 flex h-[4.75rem] min-w-[12rem] shrink-0 items-center gap-3 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="sv-integration-mark" aria-hidden="true">SUP</span><span class="min-w-0"><span class="sv-font-display block truncate text-sm font-bold tracking-tight text-[var(--color-foreground)]">Support platform</span><span class="sv-font-mono mt-0.5 block text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Tickets</span></span></div><div class="sv-card sv-integration-tile mx-3 flex h-[4.75rem] min-w-[12rem] shrink-0 items-center gap-3 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="sv-integration-mark" aria-hidden="true">CRM</span><span class="min-w-0"><span class="sv-font-display block truncate text-sm font-bold tracking-tight text-[var(--color-foreground)]">Revenue CRM</span><span class="sv-font-mono mt-0.5 block text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Bi-directional</span></span></div><div class="sv-card sv-integration-tile mx-3 flex h-[4.75rem] min-w-[12rem] shrink-0 items-center gap-3 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="sv-integration-mark" aria-hidden="true">MAP</span><span class="min-w-0"><span class="sv-font-display block truncate text-sm font-bold tracking-tight text-[var(--color-foreground)]">Marketing automation</span><span class="sv-font-mono mt-0.5 block text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Native</span></span></div><div class="sv-card sv-integration-tile mx-3 flex h-[4.75rem] min-w-[12rem] shrink-0 items-center gap-3 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="sv-integration-mark" aria-hidden="true">COM</span><span class="min-w-0"><span class="sv-font-display block truncate text-sm font-bold tracking-tight text-[var(--color-foreground)]">Collaboration hub</span><span class="sv-font-mono mt-0.5 block text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Realtime</span></span></div><div class="sv-card sv-integration-tile mx-3 flex h-[4.75rem] min-w-[12rem] shrink-0 items-center gap-3 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="sv-integration-mark" aria-hidden="true">DWH</span><span class="min-w-0"><span class="sv-font-display block truncate text-sm font-bold tracking-tight text-[var(--color-foreground)]">Data warehouse</span><span class="sv-font-mono mt-0.5 block text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">ETL</span></span></div><div class="sv-card sv-integration-tile mx-3 flex h-[4.75rem] min-w-[12rem] shrink-0 items-center gap-3 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="sv-integration-mark" aria-hidden="true">HCM</span><span class="min-w-0"><span class="sv-font-display block truncate text-sm font-bold tracking-tight text-[var(--color-foreground)]">Workforce data</span><span class="sv-font-mono mt-0.5 block text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Sync</span></span></div><div class="sv-card sv-integration-tile mx-3 flex h-[4.75rem] min-w-[12rem] shrink-0 items-center gap-3 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="sv-integration-mark" aria-hidden="true">REV</span><span class="min-w-0"><span class="sv-font-display block truncate text-sm font-bold tracking-tight text-[var(--color-foreground)]">Conversation intel</span><span class="sv-font-mono mt-0.5 block text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Insights</span></span></div><div class="sv-card sv-integration-tile mx-3 flex h-[4.75rem] min-w-[12rem] shrink-0 items-center gap-3 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="sv-integration-mark" aria-hidden="true">SEQ</span><span class="min-w-0"><span class="sv-font-display block truncate text-sm font-bold tracking-tight text-[var(--color-foreground)]">Sales engagement</span><span class="sv-font-mono mt-0.5 block text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Workflow</span></span></div><div class="sv-card sv-integration-tile mx-3 flex h-[4.75rem] min-w-[12rem] shrink-0 items-center gap-3 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="sv-integration-mark" aria-hidden="true">CDP</span><span class="min-w-0"><span class="sv-font-display block truncate text-sm font-bold tracking-tight text-[var(--color-foreground)]">Customer data</span><span class="sv-font-mono mt-0.5 block text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Identity</span></span></div><div class="sv-card sv-integration-tile mx-3 flex h-[4.75rem] min-w-[12rem] shrink-0 items-center gap-3 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="sv-integration-mark" aria-hidden="true">LAK</span><span class="min-w-0"><span class="sv-font-display block truncate text-sm font-bold tracking-tight text-[var(--color-foreground)]">Analytics lake</span><span class="sv-font-mono mt-0.5 block text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Batch</span></span></div><div class="sv-card sv-integration-tile mx-3 flex h-[4.75rem] min-w-[12rem] shrink-0 items-center gap-3 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-surface)]"><span class="sv-integration-mark" aria-hidden="true">SUP</span><span class="min-w-0"><span class="sv-font-display block truncate text-sm font-bold tracking-tight text-[var(--color-foreground)]">Support platform</span><span class="sv-font-mono mt-0.5 block text-[0.625rem] uppercase tracking-wider text-[var(--color-muted)]">Tickets</span></span></div></div></div><p class="sv-font-body mx-auto mt-10 max-w-[82rem] px-5 text-center text-xs text-[var(--color-muted)] sm:px-8">120+ integrations · OAuth 2.0 · Webhooks · Custom API connectors</p></section><div data-v2-section="services" data-v2-variant="minimal-list"><section id="about" data-v2-component="creative-agency-premium-about" aria-labelledby="about-title" class="as-section bg-[var(--color-background)]"><div class="df-container"><div class="df-hero-split-empty grid items-start gap-10 lg:grid-cols-12 lg:items-center lg:gap-16 xl:gap-20"><div class="df-hero-editorial"><header class="mb-12 mx-auto text-center max-w-3xl mb-0"><p class="as-eyebrow mb-3">Our story</p><h2 id="about-title" class="as-headline-sm">Built by operators, for operators</h2><div class="df-accent-line mt-4 mx-auto" aria-hidden="true"></div></header><p class="as-body text-muted-foreground mt-6">our studio began inside a revenue operations team that was tired of stitching together spreadsheets, CRM exports, and BI tools. We built the command center we wished existed — and now power GTM teams at scale.</p><ul class="mt-8 grid gap-3 sm:grid-cols-2" role="list"><li class="as-font-body flex gap-3 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-foreground)]"><span class="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-accent)_12%,transparent)] text-[0.625rem] font-bold text-[var(--color-accent)]" aria-hidden="true">✓</span>Founded by former Salesforce and Snowflake leaders</li><li class="as-font-body flex gap-3 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-foreground)]"><span class="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-accent)_12%,transparent)] text-[0.625rem] font-bold text-[var(--color-accent)]" aria-hidden="true">✓</span>Backed by tier-one enterprise investors</li><li class="as-font-body flex gap-3 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-foreground)]"><span class="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-accent)_12%,transparent)] text-[0.625rem] font-bold text-[var(--color-accent)]" aria-hidden="true">✓</span>Deployed across 40+ countries</li></ul><a href="#contact" class="as-btn-primary mt-8 inline-flex as-focus-ring mx-auto">Get started</a></div></div></div></section></div><section id="stats" data-v2-component="creative-agency-premium-stats" aria-labelledby="stats-title" class="as-section df-section-glow relative overflow-hidden bg-[var(--color-background)]"><div class="df-glow-orb -start-24 top-0 h-64 w-64 bg-[var(--color-accent)]" aria-hidden="true"></div><div class="df-glow-orb end-0 bottom-0 h-48 w-48 bg-[var(--color-primary)]" aria-hidden="true"></div><div class="df-container relative"><header class="mb-12 mx-auto text-center max-w-3xl"><p class="as-eyebrow mb-3">Platform impact</p><h2 id="stats-title" class="as-headline-sm">Numbers that move the needle</h2><div class="df-accent-line mt-4 mx-auto" aria-hidden="true"></div><p class="as-body text-muted-foreground text-muted-foreground mt-5">Measured across our enterprise customer base in the last twelve months.</p></header><dl class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><div class="as-card df-card p-6 text-center sm:p-7"><dt class="as-font-body text-sm font-medium text-[var(--color-muted)]">Enterprise customers</dt><dd class="as-metric mt-3 block">500+</dd><dd class="as-font-body mt-2 text-xs text-[var(--color-muted)]">Across 28 countries</dd></div><div class="as-card df-card p-6 text-center sm:p-7"><dt class="as-font-body text-sm font-medium text-[var(--color-muted)]">G2 satisfaction</dt><dd class="as-metric mt-3 block">4.9/5</dd><dd class="as-font-body mt-2 text-xs text-[var(--color-muted)]">Verified reviews</dd></div><div class="as-card df-card p-6 text-center sm:p-7"><dt class="as-font-body text-sm font-medium text-[var(--color-muted)]">Forecast accuracy</dt><dd class="as-metric mt-3 block">2.1×</dd><dd class="as-font-body mt-2 text-xs text-[var(--color-muted)]">vs. prior stack</dd></div><div class="as-card df-card p-6 text-center sm:p-7"><dt class="as-font-body text-sm font-medium text-[var(--color-muted)]">Avg. retention</dt><dd class="as-metric mt-3 block">18mo</dd><dd class="as-font-body mt-2 text-xs text-[var(--color-muted)]">Enterprise cohort</dd></div></dl></div></section><div data-v2-section="testimonials" data-v2-variant="logo-wall"></div><section id="pricing" data-v2-component="creative-agency-premium-pricing" aria-labelledby="sv-pricing-title" class="sv-section sv-section-glow relative bg-[var(--color-background)]"><div class="mx-auto max-w-[82rem] px-5 sm:px-8"><header class="mb-10 text-center"><p class="sv-eyebrow mb-3">Pricing</p><h2 id="sv-pricing-title" class="sv-headline-sm">Plans that scale with your GTM</h2><div class="mx-auto mt-4 h-px w-12 bg-gradient-to-r from-transparent via-[var(--color-accent)] to-transparent" aria-hidden="true"></div><p class="sv-body text-muted-foreground mx-auto mt-5 max-w-lg">Transparent per-seat pricing. Annual commitments receive up to 20% discount.</p></header><div class="grid items-stretch gap-5 lg:grid-cols-3 lg:gap-6"><article class="sv-card flex flex-col p-7 sm:p-8 transition-transform duration-500 motion-safe:hover:-translate-y-1"><h3 class="sv-font-display text-lg font-bold text-[var(--color-foreground)]">Growth</h3><p class="sv-font-body mt-2 text-sm text-[var(--color-muted)]">For scaling GTM teams building their revenue foundation.</p><p class="mt-8 border-b border-[var(--border-subtle)] pb-6"><span class="sv-metric">$499</span><span class="sv-font-body text-sm text-[var(--color-muted)]">/seat/mo</span></p><ul class="mt-6 flex-1 space-y-3.5"><li class="flex gap-3 sv-font-body text-sm text-[var(--color-foreground)]"><span class="sv-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>Pipeline intelligence</li><li class="flex gap-3 sv-font-body text-sm text-[var(--color-foreground)]"><span class="sv-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>CRM sync</li><li class="flex gap-3 sv-font-body text-sm text-[var(--color-foreground)]"><span class="sv-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>Standard dashboards</li><li class="flex gap-3 sv-font-body text-sm text-[var(--color-foreground)]"><span class="sv-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>Email support</li></ul><a href="#contact" class="sv-btn-secondary sv-focus-ring mt-8 w-full">Start trial</a></article><article class="sv-card flex flex-col p-7 sm:p-8 transition-transform duration-500 sv-card-featured relative lg:-translate-y-2 lg:shadow-[var(--shadow-surface)] ring-1 ring-[color-mix(in_srgb,var(--color-accent)_35%,transparent)] before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:bg-[radial-gradient(ellipse_at_top,color-mix(in_srgb,var(--color-accent)_12%,transparent),transparent_65%)]"><span class="sv-eyebrow absolute -top-3 start-1/2 -translate-x-1/2 rounded-full bg-[var(--color-primary)] px-4 py-1 text-[0.625rem] text-white shadow-[var(--shadow-card)]">Most popular</span><h3 class="sv-font-display text-lg font-bold text-[var(--color-foreground)]">Enterprise</h3><p class="sv-font-body mt-2 text-sm text-[var(--color-muted)]">Full platform for revenue leaders with advanced forecasting.</p><p class="mt-8 border-b border-[var(--border-subtle)] pb-6"><span class="sv-metric">$899</span><span class="sv-font-body text-sm text-[var(--color-muted)]">/seat/mo</span></p><ul class="mt-6 flex-1 space-y-3.5"><li class="flex gap-3 sv-font-body text-sm text-[var(--color-foreground)]"><span class="sv-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>Everything in Growth</li><li class="flex gap-3 sv-font-body text-sm text-[var(--color-foreground)]"><span class="sv-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>AI forecast models</li><li class="flex gap-3 sv-font-body text-sm text-[var(--color-foreground)]"><span class="sv-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>Custom dashboards</li><li class="flex gap-3 sv-font-body text-sm text-[var(--color-foreground)]"><span class="sv-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>Dedicated CSM</li><li class="flex gap-3 sv-font-body text-sm text-[var(--color-foreground)]"><span class="sv-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>SSO &amp; SCIM</li></ul><a href="#contact" class="sv-btn-primary sv-focus-ring mt-8 w-full">Book a demo</a></article><article class="sv-card flex flex-col p-7 sm:p-8 transition-transform duration-500 motion-safe:hover:-translate-y-1"><h3 class="sv-font-display text-lg font-bold text-[var(--color-foreground)]">Global</h3><p class="sv-font-body mt-2 text-sm text-[var(--color-muted)]">Multi-region deployments with enterprise security and SLAs.</p><p class="mt-8 border-b border-[var(--border-subtle)] pb-6"><span class="sv-metric">Custom</span></p><ul class="mt-6 flex-1 space-y-3.5"><li class="flex gap-3 sv-font-body text-sm text-[var(--color-foreground)]"><span class="sv-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>Everything in Enterprise</li><li class="flex gap-3 sv-font-body text-sm text-[var(--color-foreground)]"><span class="sv-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>Multi-region hosting</li><li class="flex gap-3 sv-font-body text-sm text-[var(--color-foreground)]"><span class="sv-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>Custom integrations</li><li class="flex gap-3 sv-font-body text-sm text-[var(--color-foreground)]"><span class="sv-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>24/7 priority support</li><li class="flex gap-3 sv-font-body text-sm text-[var(--color-foreground)]"><span class="sv-signal mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-signal)_12%,transparent)] text-xs font-bold" aria-hidden="true">✓</span>Executive business reviews</li></ul><a href="#contact" class="sv-btn-secondary sv-focus-ring mt-8 w-full">Contact sales</a></article></div></div></section><section id="faq" data-v2-component="creative-agency-premium-faq" aria-labelledby="sv-faq-title" class="sv-section sv-section-alt bg-[var(--color-surface)]"><div class="mx-auto max-w-[82rem] px-5 sm:px-8"><div class="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start"><header class="lg:sticky lg:top-28"><p class="sv-eyebrow mb-3">FAQ</p><h2 id="sv-faq-title" class="sv-headline-sm">Answers for revenue leaders</h2><div class="mt-4 h-px w-12 bg-gradient-to-r from-[var(--color-accent)] to-transparent" aria-hidden="true"></div><p class="sv-body text-muted-foreground mt-5">Everything you need to know before your first demo.</p></header><div class="space-y-3"><div class="sv-card overflow-hidden transition-shadow duration-300 shadow-[var(--shadow-surface)]"><h3><button type="button" id="sv-faq-trigger-0" aria-expanded="true" aria-controls="sv-faq-panel-0" class="flex w-full items-center justify-between gap-4 px-5 py-4 text-start sv-focus-ring transition-colors hover:text-[var(--color-primary)]"><span class="sv-font-display text-sm font-semibold text-[var(--color-foreground)]">How long does implementation take?</span><span class="sv-font-mono flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-xs text-[var(--color-accent)] transition-all duration-300 rotate-180 bg-[color-mix(in_srgb,var(--color-accent)_10%,transparent)]" aria-hidden="true">−</span></button></h3><div id="sv-faq-panel-0" role="region" aria-labelledby="sv-faq-trigger-0" class="border-t border-[var(--border-subtle)] px-5 py-4 motion-safe:animate-[sv-slide-up_0.35s_ease_both]"><p class="sv-font-body text-sm leading-relaxed text-[var(--color-muted)]">Most enterprise teams go live in 14 days with guided onboarding. Complex multi-region rollouts typically complete within 30 days.</p></div></div><div class="sv-card overflow-hidden transition-shadow duration-300 "><h3><button type="button" id="sv-faq-trigger-1" aria-expanded="false" aria-controls="sv-faq-panel-1" class="flex w-full items-center justify-between gap-4 px-5 py-4 text-start sv-focus-ring transition-colors hover:text-[var(--color-primary)]"><span class="sv-font-display text-sm font-semibold text-[var(--color-foreground)]">Does our studio integrate with our CRM?</span><span class="sv-font-mono flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-xs text-[var(--color-accent)] transition-all duration-300 " aria-hidden="true">+</span></button></h3><div id="sv-faq-panel-1" role="region" aria-labelledby="sv-faq-trigger-1" hidden="" class="border-t border-[var(--border-subtle)] px-5 py-4 motion-safe:animate-[sv-slide-up_0.35s_ease_both]"><p class="sv-font-body text-sm leading-relaxed text-[var(--color-muted)]">Yes. Native bi-directional sync with Salesforce, HubSpot, and Microsoft Dynamics, plus custom API connectors for proprietary systems.</p></div></div><div class="sv-card overflow-hidden transition-shadow duration-300 "><h3><button type="button" id="sv-faq-trigger-2" aria-expanded="false" aria-controls="sv-faq-panel-2" class="flex w-full items-center justify-between gap-4 px-5 py-4 text-start sv-focus-ring transition-colors hover:text-[var(--color-primary)]"><span class="sv-font-display text-sm font-semibold text-[var(--color-foreground)]">What security certifications do you hold?</span><span class="sv-font-mono flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-xs text-[var(--color-accent)] transition-all duration-300 " aria-hidden="true">+</span></button></h3><div id="sv-faq-panel-2" role="region" aria-labelledby="sv-faq-trigger-2" hidden="" class="border-t border-[var(--border-subtle)] px-5 py-4 motion-safe:animate-[sv-slide-up_0.35s_ease_both]"><p class="sv-font-body text-sm leading-relaxed text-[var(--color-muted)]">our studio is SOC 2 Type II certified, GDPR compliant, and supports HIPAA BAA agreements for healthcare customers.</p></div></div><div class="sv-card overflow-hidden transition-shadow duration-300 "><h3><button type="button" id="sv-faq-trigger-3" aria-expanded="false" aria-controls="sv-faq-panel-3" class="flex w-full items-center justify-between gap-4 px-5 py-4 text-start sv-focus-ring transition-colors hover:text-[var(--color-primary)]"><span class="sv-font-display text-sm font-semibold text-[var(--color-foreground)]">Can we customize dashboards for executives?</span><span class="sv-font-mono flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[var(--border-default)] text-xs text-[var(--color-accent)] transition-all duration-300 " aria-hidden="true">+</span></button></h3><div id="sv-faq-panel-3" role="region" aria-labelledby="sv-faq-trigger-3" hidden="" class="border-t border-[var(--border-subtle)] px-5 py-4 motion-safe:animate-[sv-slide-up_0.35s_ease_both]"><p class="sv-font-body text-sm leading-relaxed text-[var(--color-muted)]">Role-based dashboards let CROs, VPs, and reps each see the metrics that matter most, with drill-down to deal-level detail.</p></div></div></div></div></div></section><div data-v2-section="contact" data-v2-variant="dark-panel"><section id="contact" data-v2-component="creative-agency-premium-contact" aria-labelledby="contact-title" class="as-section df-section-glow relative bg-[var(--color-background)]"><div class="df-container"><div class="grid gap-12 lg:grid-cols-2 lg:gap-16"><div><p class="as-eyebrow mb-3">Contact sales</p><h2 id="contact-title" class="as-headline-sm">Book a personalized demo</h2><div class="df-accent-line mt-4" aria-hidden="true"></div><p class="as-body text-muted-foreground mt-5">See how our studio fits your revenue stack. Enterprise teams get a dedicated solutions architect.</p><address class="as-font-body mt-8 space-y-4 text-sm not-italic"><p class="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] p-4"><span class="block font-semibold text-[var(--color-foreground)]">Email</span><a href="mailto:sales@northline.io" class="as-focus-ring mt-1 inline-block text-[var(--color-muted)] hover:text-[var(--color-accent)]">sales@northline.io</a></p><p class="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] p-4"><span class="block font-semibold text-[var(--color-foreground)]">Phone</span><a href="tel:+1(888)555-0142" class="as-focus-ring mt-1 inline-block text-[var(--color-muted)] hover:text-[var(--color-accent)]">+1 (888) 555-0142</a></p><p class="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--color-surface)] p-4"><span class="block font-semibold text-[var(--color-foreground)]">Office</span><span class="mt-1 block text-[var(--color-muted)]">535 Mission Street, San Francisco, CA</span></p></address></div><form id="_R_2i_" class="as-card df-card p-6 sm:p-8" noValidate=""><div class="space-y-5"><div><label for="_R_2i_-name" class="as-font-body mb-2 block text-sm font-medium text-[var(--color-foreground)]">Name</label><input id="_R_2i_-name" type="text" required="" autoComplete="name" class="df-input as-focus-ring" name="name"/></div><div><label for="_R_2i_-email" class="as-font-body mb-2 block text-sm font-medium text-[var(--color-foreground)]">Email</label><input id="_R_2i_-email" type="email" required="" autoComplete="email" class="df-input as-focus-ring" name="email"/></div><div><label for="_R_2i_-message" class="as-font-body mb-2 block text-sm font-medium text-[var(--color-foreground)]">Message</label><textarea id="_R_2i_-message" name="message" rows="4" required="" class="df-textarea resize-y as-focus-ring"></textarea></div><button type="submit" class="as-btn-primary w-full sm:w-auto as-focus-ring">Get started</button></div></form></div></div></section></div></main><utility data-v2-region="utility"><section id="cta-band" data-v2-component="creative-agency-premium-utility-band" aria-labelledby="sv-utility-title" class="relative overflow-hidden bg-[var(--color-primary)] py-16 sm:py-20"><div class="sv-grid-bg pointer-events-none absolute inset-0 opacity-[0.18]" aria-hidden="true"></div><div class="pointer-events-none absolute -start-1/4 top-0 h-full w-1/2 bg-[radial-gradient(ellipse_70%_90%_at_0%_50%,rgba(255,255,255,0.14),transparent)]" aria-hidden="true"></div><div class="pointer-events-none absolute -end-1/4 bottom-0 h-2/3 w-1/2 bg-[radial-gradient(ellipse_60%_80%_at_100%_100%,rgba(59,130,246,0.25),transparent)]" aria-hidden="true"></div><div class="relative mx-auto flex max-w-[82rem] flex-col items-start justify-between gap-10 px-5 sm:flex-row sm:items-center sm:px-8"><div class="max-w-xl"><p class="sv-font-mono text-xs font-medium uppercase tracking-[0.2em] text-white/70">Get started</p><h2 id="sv-utility-title" class="sv-headline-sm mt-3 text-white">See our studio in action</h2><p class="sv-font-body mt-4 text-sm leading-relaxed text-white/78 sm:text-base">Join 500+ revenue teams who&#x27;ve transformed their GTM operations.</p><div class="sv-trust-strip mt-6"><span class="sv-trust-badge border-white/15 bg-white/8 text-white/80"><span class="sv-signal text-[0.5rem]" aria-hidden="true">✓</span>SOC 2</span><span class="sv-trust-badge border-white/15 bg-white/8 text-white/80"><span class="sv-signal text-[0.5rem]" aria-hidden="true">✓</span>99.9% uptime</span><span class="sv-trust-badge border-white/15 bg-white/8 text-white/80"><span class="sv-signal text-[0.5rem]" aria-hidden="true">✓</span>14-day onboarding</span></div></div><div class="flex w-full flex-col gap-3 sm:w-auto sm:flex-row"><a href="#contact" class="inline-flex min-h-[3rem] items-center justify-center rounded-[var(--radius-md)] bg-white px-6 py-3 text-sm font-semibold text-[var(--color-primary)] shadow-[0_8px_24px_rgba(0,0,0,0.18)] transition hover:-translate-y-0.5 hover:bg-white/95 hover:shadow-[0_12px_32px_rgba(0,0,0,0.22)] sv-focus-ring">Get started</a><a href="/platform" class="inline-flex min-h-[3rem] items-center justify-center rounded-[var(--radius-md)] border border-white/35 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:border-white/60 hover:bg-white/10 sv-focus-ring">Learn more</a></div></div></section></utility><footer data-v2-region="footer"><footer data-v2-component="creative-agency-premium-footer" class="border-t border-[var(--border-default)] bg-[var(--color-ink,#020617)] text-white" role="contentinfo"><div class="mx-auto max-w-[82rem] px-5 py-14 sm:px-8 sm:py-16"><div class="grid gap-10 md:grid-cols-[1.4fr_1fr]"><div><p class="sv-font-display text-xl font-bold">Volt</p><p class="sv-font-body mt-3 max-w-sm text-sm leading-relaxed text-white/60">Template inspection</p><div class="mt-6 flex flex-wrap gap-3"><span class="sv-font-mono rounded-[var(--radius-sm)] border border-white/10 px-2.5 py-1 text-[0.625rem] text-white/50">SOC 2</span><span class="sv-font-mono rounded-[var(--radius-sm)] border border-white/10 px-2.5 py-1 text-[0.625rem] text-white/50">GDPR</span><span class="sv-font-mono rounded-[var(--radius-sm)] border border-white/10 px-2.5 py-1 text-[0.625rem] text-white/50">ISO 27001</span></div></div><nav aria-label="Footer"><p class="sv-eyebrow text-white/40">Explore</p><ul class="mt-4 grid grid-cols-2 gap-x-6 gap-y-2.5"><li><a href="#features" class="sv-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] sv-focus-ring rounded-sm">Features</a></li><li><a href="#services" class="sv-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] sv-focus-ring rounded-sm">Services</a></li><li><a href="#pricing" class="sv-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] sv-focus-ring rounded-sm">Pricing</a></li><li><a href="#contact" class="sv-font-body text-sm text-white/65 transition hover:text-[var(--color-accent)] sv-focus-ring rounded-sm">Contact</a></li></ul></nav></div><div class="mt-12 border-t border-white/10 pt-6"><p class="sv-font-body text-xs text-white/40">© 2026 Volt. All rights reserved.</p></div></div></footer></footer><div data-v2-region="overlay" class="pointer-events-none fixed inset-x-0 bottom-0 z-50"><div data-v2-section="cta" data-v2-variant="inline-newsletter"></div></div></div>
+  </div>
+  
+</body>
+</html>

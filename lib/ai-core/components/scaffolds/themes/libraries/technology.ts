@@ -478,7 +478,7 @@ type ThemeTechTrustProps = {
   eyebrow?: string;
   title?: string;
   subtitle?: string;
-  items?: Array<{ label: string; value: string }>;
+  items?: Array<{ label?: string; value?: string; name?: string; quote?: string }>;
 };
 
 export function ThemeTechTrust({
@@ -492,7 +492,7 @@ export function ThemeTechTrust({
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {items.map((item) => (
           <div
-            key={item.label}
+            key={item.label || [item.name, item.quote, item.value].filter(Boolean).join("|")}
             className="rounded-2xl border border-white/10 bg-white/5 px-6 py-5 backdrop-blur-xl transition hover:border-[var(--color-accent)]/30 hover:shadow-[0_0_32px_-10px_var(--color-accent)]"
           >
             <p className="font-mono text-3xl font-bold tracking-tight text-[var(--color-accent)] shadow-[0_0_24px_-8px_var(--color-accent)]">

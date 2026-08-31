@@ -1,19 +1,20 @@
 {
   "tbdpNative": true,
-  "sectorDnaId": "restaurant",
-  "experienceProfiles": ["hospitality"],
+  "sectorDnaId": "saas",
+  "experienceProfiles": ["technical", "corporate", "executive"],
   "structure": {
     "regions": {
       "header": { "sticky": true, "position": "top" },
-      "sidebar": { "sticky": true, "collapseBelow": "lg", "collapseMode": "drawer" },
-      "main": { "collapseBelow": "sm" }
+      "utility": { "collapseBelow": "md", "collapseMode": "stack" },
+      "main": { "collapseBelow": "sm" },
+      "overlay": { "collapseBelow": "sm", "collapseMode": "fixed-bottom" }
     },
     "components": {
       "restaurant-signature-hero": {
-        "layout": { "lg": "cinematic-fullbleed", "sm": "stacked-portrait" }
+        "layout": { "lg": "bento-command", "sm": "stacked" }
       },
-      "restaurant-signature-gallery": {
-        "layout": { "lg": "editorial-mosaic", "sm": "scroll-snap-strip" }
+      "restaurant-signature-features": {
+        "layout": { "lg": "bento-asymmetric", "sm": "stacked" }
       }
     }
   }

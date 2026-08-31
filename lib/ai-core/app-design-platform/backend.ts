@@ -73,6 +73,21 @@ export function provisionAppBackend(
   model: StructuredAppModel,
   files: GeneratedProjectFile[] = [],
 ): BackendProvisionResult {
+  const hasPrisma = files.some(
+    (file) => file.path.replaceAll("\\", "/") === "prisma/schema.prisma",
+  );
+  if (hasPrisma) {
+    return {
+      files,
+      apiRoutes: files
+        .map((file) => file.path.replaceAll("\\", "/"))
+        .filter((path) => /^app\/api\/.+\/route\.(ts|js)$/.test(path)),
+      notes: [
+        "Skipped backend provision; generated Prisma application is already self-contained.",
+      ],
+    };
+  }
+
   let next = [...files];
   const apiRoutes: string[] = [];
   const notes: string[] = [];

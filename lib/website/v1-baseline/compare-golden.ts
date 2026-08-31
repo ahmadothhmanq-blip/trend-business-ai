@@ -88,7 +88,7 @@ export function compareQaReportToGolden(
 ): GoldenCompareResult {
   const failures: GoldenCompareFailure[] = [];
   const packageId = report.packageId as FrozenFlagshipPackageId;
-  const expected = golden.templates[packageId];
+  const expected = (golden.templates as Record<string, GoldenTemplateSnapshot>)[packageId];
 
   if (!expected) {
     failures.push({
@@ -191,7 +191,7 @@ export function comparePreviewHtmlToGolden(
   html: string,
   golden: GoldenBaseline = loadGoldenBaseline(),
 ): GoldenCompareResult {
-  const expected = golden.templates[packageId as FrozenFlagshipPackageId];
+  const expected = (golden.templates as Record<string, GoldenTemplateSnapshot>)[packageId];
   if (!expected) {
     return {
       passed: false,

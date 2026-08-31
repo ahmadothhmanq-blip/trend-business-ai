@@ -1,6 +1,6 @@
 import { requireUser, parseJsonBody } from "@/lib/api/helpers";
 import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
-import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { beginAiUsage } from "@/lib/api/rate-limit";
 import { getActiveProvider } from "@/lib/ai/provider-config";
 import { resolveIteratedPrompt } from "@/lib/ai/iteration";
 import { generateImage, modelToBlueprint } from "@/lib/image-generator";
@@ -35,6 +35,8 @@ const requestSchema = z.object({
   quality: z.enum(["standard", "hd"]).optional(),
   preferredProvider: z.enum(["openai", "replicate", "stability"]).optional(),
   seed: z.number().int().optional(),
+  language: z.string().trim().optional(),
+  country: z.string().trim().optional(),
   brandIdentity: z.object({
     brandName: z.string().optional(),
     primary: z.string().optional(),
@@ -55,8 +57,9 @@ export async function POST(request: Request) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  const rateLimited = await enforceAiUsage(auth.supabase, auth.user!.id, "image-generator");
-  if (rateLimited) return rateLimited;
+  const usage = await beginAiUsage(auth.supabase, auth.user!.id, "image-generator");
+  if (!usage.ok) return usage.response;
+  const creditLease = usage.lease;
 
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
@@ -67,7 +70,7 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data;
-  const aiLanguage = resolveRequestLanguage(request);
+  const aiLanguage = resolveRequestLanguage(request, input.language, input.country);
   const template = input.templateId ? getDesignTemplate(input.templateId) : undefined;
   const brand = input.brandIdentity ? brandTokensToContext(input.brandIdentity) : undefined;
   const encoder = new TextEncoder();
@@ -194,8 +197,10 @@ export async function POST(request: Request) {
           model: result.model,
           message: "Image generation complete.",
         });
+        await creditLease.settle(auth.supabase);
         controller.close();
       } catch (error) {
+        await creditLease.release(auth.supabase);
         send("error", {
           error: error instanceof Error ? error.message : "Generation failed",
         });

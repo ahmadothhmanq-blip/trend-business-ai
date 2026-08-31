@@ -22,12 +22,13 @@
   "visualIdentity": {
     "colors": {
       "primary": "#020617",
-      "secondary": "#0F172A",
-      "accent": "#22D3EE",
+      "secondary": "#111827",
+      "accent": "#E8364E",
       "background": "#030712",
-      "foreground": "#F0F9FF",
-      "muted": "rgba(240,249,255,0.62)",
-      "surface": "#0F172A"
+      "foreground": "#F1F5F9",
+      "muted": "rgba(241,245,249,0.58)",
+      "surface": "#0B1220",
+      "signal": "#2EC8E0"
     },
     "typography": {
       "display": "Syne, ui-sans-serif, system-ui, sans-serif",
@@ -45,10 +46,13 @@
       "lg": "28px"
     },
     "shadows": {
-      "surface": "0 0 40px rgba(34,211,238,0.15)"
+      "surface": "0 0 40px rgba(46,200,224,0.12)",
+      "glow": "0 0 72px rgba(232,54,78,0.22)"
     },
     "borders": {
-      "default": "rgba(0,0,0,0.08)"
+      "default": "rgba(241,245,249,0.12)",
+      "accent": "rgba(232,54,78,0.42)",
+      "subtle": "rgba(241,245,249,0.06)"
     },
     "animation": "glow-stagger"
   },

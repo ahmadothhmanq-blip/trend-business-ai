@@ -1,9 +1,9 @@
 import {
-  COMPLEXITY_GUIDE,
   FILE_GENERATION_RULES,
   PRODUCTION_ARCHITECTURE_GUIDE,
-  aiOutputLanguageDirective,
 } from "@/lib/ai/prompts/shared";
+import { aiOutputLanguageDirective } from "@/lib/ai/prompts/language-directive";
+import { buildWebsiteLanguageDirective } from "@/lib/ai-core/website-builder/language-directive";
 import { WEBAPP_TYPES } from "@/lib/constants/webapp-builder";
 
 type WebAppPromptInput = {
@@ -120,6 +120,13 @@ function getAppTypeContext(appType: string): string {
   return moduleMap[appType] ?? moduleMap.custom ?? "";
 }
 
+function appLanguageBlock(input: WebAppPromptInput): string {
+  return `${buildWebsiteLanguageDirective({
+    language: input.language,
+    prompt: input.prompt,
+  })}${aiOutputLanguageDirective(input.language, "app")}`;
+}
+
 export function webappAnalyzePrompt(input: WebAppPromptInput): string {
   const appTypeContext = getAppTypeContext(input.appType);
   const def = WEBAPP_TYPES.find((t) => t.id === input.appType);
@@ -144,16 +151,78 @@ Detect capability flags:
 - isSaas: true only for SaaS apps with subscription billing
 - databaseProvider: "prisma" (use Prisma for all web apps)
 
-Determine complexity:
-- simple: 1-3 CRUD entities, basic dashboard (20-40 files)
-- moderate: 4-8 entities, multiple views, reports (40-80 files)
-- complex: 8+ entities, workflows, role-based access (80-150 files)
+Determine complexity (file counts must stay within the 18-file hard limit):
+- simple: 1-3 CRUD entities, basic dashboard
+- moderate: focused MVP with auth + one dashboard + 1-2 entity pages
+- complex: still an 18-file MVP — do not plan a large incomplete tree
 
 List all required database tables, API endpoints, pages, features and technologies.
 
-Return only structured JSON.${aiOutputLanguageDirective(input.language)}`;
+Return only structured JSON.${appLanguageBlock(input)}`;
 }
 
+/**
+ * Single Stage-2 planning prompt — one DeepSeek JSON response replaces
+ * sequential Blueprint → Plan LLM calls. Context is compact structured JSON
+ * (Universal Planner + seed analysis), not rebuilt prose from prior LLM turns.
+ */
+export function webappUnifiedPlanningPrompt(args: {
+  input: WebAppPromptInput;
+  seedAnalysis: unknown;
+  designSeed: unknown;
+  universalPlannerContext: unknown;
+}): string {
+  const appTypeContext = getAppTypeContext(args.input.appType);
+  const contextJson = JSON.stringify(
+    {
+      input: {
+        prompt: args.input.prompt,
+        appType: args.input.appType,
+        language: args.input.language,
+        designStyle: args.input.designStyle,
+        colorStyle: args.input.colorStyle,
+        features: args.input.features,
+      },
+      seedAnalysis: args.seedAnalysis,
+      designSeed: args.designSeed,
+      universalPlanner: args.universalPlannerContext,
+    },
+    null,
+    2,
+  );
+
+  return `Create a COMPLETE production planning document for a Next.js 16 App Router web application in ONE JSON response.
+
+Structured planning context (use as source of truth; refine, do not ignore):
+${contextJson}
+
+${appTypeContext}
+
+${PRODUCTION_ARCHITECTURE_GUIDE}
+
+Return a single JSON object with ALL of these top-level keys:
+- analysis: requirements analysis (appName, complexity, pages, features, technologies, databaseTables, apiEndpoints, capability flags)
+- strategy: positioning, pages, sections, ctas, seoFocus
+- universalBlueprint: intentSummary, goals, constraints, orderedServices, selectedServiceId ("app-builder")
+- databaseSchema: provider ("prisma"), tables[{name, fields, relations}]
+- apiPlan: routes[{path, methods, purpose}]
+- uiPlan: layouts, pages, components, navigation, theme
+- filePlan: dynamic file tree (complexity, estimatedFileCount, layouts, pages, components, apiRoutes, hooks, utilities, types, configs, files[{path, purpose, language, category}])
+- servicePlan: services, integrations, authProvider ("cookie-session")
+- dependencies: npm, devNpm (package names only; versions optional)
+- executionMetadata: complexity, estimatedFileCount, generationMode ("mvp"), notes
+- blueprint: title, description, pages, sections, dataModels, apiRoutes, components, navigation, theme, roadmap
+
+Hard limits:
+- Target 16–18 files; never exceed 18.
+- Always plan: configs, app/layout.tsx, app/page.tsx, components/ui.tsx, prisma/schema.prisma, lib/db.ts, login, middleware, dashboard page, one authenticated CRUD API.
+- Prisma + SQLite only. No competing catch-all routes. Explicit paths only.
+- This is a full-stack app with real CRUD — no placeholder content.
+
+Return only JSON.${appLanguageBlock(args.input)}`;
+}
+
+/** @deprecated Prefer webappUnifiedPlanningPrompt — kept for reference/tests. */
 export function webappBlueprintPrompt(
   input: WebAppPromptInput,
   analysis: unknown,
@@ -183,9 +252,10 @@ This is a full-stack web application, not a static website.
 Every page must have real functionality — forms that submit, tables that display data, charts that visualize metrics.
 No placeholder content. Use realistic business data aligned with the app type.
 
-Return only JSON.${aiOutputLanguageDirective(input.language)}`;
+Return only JSON.${appLanguageBlock(input)}`;
 }
 
+/** @deprecated Prefer webappUnifiedPlanningPrompt — kept for reference/tests. */
 export function webappPlanPrompt(
   input: WebAppPromptInput,
   analysis: unknown,
@@ -197,10 +267,12 @@ Original prompt: ${input.prompt}
 Analysis: ${JSON.stringify(analysis)}
 Blueprint: ${JSON.stringify(blueprint)}
 
-${COMPLEXITY_GUIDE}
 ${PRODUCTION_ARCHITECTURE_GUIDE}
 
-You must NOT use a fixed template file list.
+Target 16–18 files for a shippable MVP. Do not exceed 18 files.
+Always include: Next.js configs, app/layout.tsx, app/page.tsx, components/ui.tsx, Prisma schema, lib/db.ts, login, middleware, one dashboard page, and one authenticated CRUD API route.
+Prefer a complete local SQLite app over a large incomplete tree.
+
 Decide automatically based on the blueprint and analysis:
 - required pages, layouts, components, API routes, hooks, utilities, types, configs
 
@@ -209,19 +281,18 @@ Every file must include: path, purpose, language, category (layout | lib | types
 
 Web Application specific rules:
 - All apps need a dashboard layout with sidebar and top nav.
-- Include CRUD API routes for every data model identified in the analysis.
-- Include form components for creating/editing each entity.
-- Include data table components for listing each entity.
-- Include Prisma schema with all identified database tables.
-- Include middleware for route protection.
-- Include hooks for data fetching (useQuery patterns or server components).
-- Include Zod validation schemas for all API inputs.
+- Plan only pages that will actually be generated. Sidebar links must match planned page paths.
+- Never plan two App Router pages that resolve to the same URL.
+- Never plan two dynamic segments at the same URL depth (app/(auth)/[mode] and app/(dashboard)/[resource] both own /[param]). Use explicit routes such as /login, /contacts, and /deals.
+- Include Prisma schema with SQLite, lib/db.ts, login, middleware, and at least one authenticated app/api/{resource}/route.ts CRUD handler.
+- Include Zod validation schemas for forms and mutations.
 - Include types for all database entities.
-- Match complexity to estimated file count.
+- Match complexity to estimated file count and stay within the 18-file hard limit.
 - Reuse shared UI primitives — do not plan duplicate button/card/input implementations.
+- If pages/forms use Label or Textarea, include matching UI primitives in the shared UI module plan (components/ui.tsx or equivalent).
 - Do not plan unused files.
 - Do not include file contents.
-- Return only JSON.${aiOutputLanguageDirective(input.language)}`;
+- Return only JSON.${appLanguageBlock(input)}`;
 }
 
 export function webappFilePrompt(args: {
@@ -238,12 +309,19 @@ export function webappFilePrompt(args: {
   projectTree: unknown;
   existingFiles: unknown;
   validationReason?: string;
+  /** Prefer compact structured unified planning JSON when Stage 2 produced it. */
+  unifiedPlanning?: unknown;
 }): string {
   const validationNote = args.validationReason
     ? `\nPrevious attempt failed validation:\n${args.validationReason}\nFix all issues and regenerate this file correctly.`
     : "";
 
   const appTypeContext = getAppTypeContext(args.input.appType);
+  const planningContext = args.unifiedPlanning
+    ? `Unified planning document: ${JSON.stringify(args.unifiedPlanning)}`
+    : `Analysis: ${JSON.stringify(args.analysis)}
+Blueprint: ${JSON.stringify(args.blueprint)}
+Dynamic project plan: ${JSON.stringify(args.dynamicPlan)}`;
 
   return `Generate exactly one production-ready file for this Next.js 16 App Router web application.
 
@@ -254,9 +332,7 @@ Current file category: ${args.filePlan.category}
 
 Original prompt: ${args.input.prompt}
 App type: ${args.input.appType}
-Analysis: ${JSON.stringify(args.analysis)}
-Blueprint: ${JSON.stringify(args.blueprint)}
-Dynamic project plan: ${JSON.stringify(args.dynamicPlan)}
+${planningContext}
 Project tree: ${JSON.stringify(args.projectTree)}
 Existing generated files: ${JSON.stringify(args.existingFiles)}
 ${validationNote}
@@ -267,12 +343,40 @@ ${PRODUCTION_ARCHITECTURE_GUIDE}
 ${FILE_GENERATION_RULES}
 
 Web Application specific rules:
+- This app must be completely self-contained: it must install, typecheck, and build with no files from the parent platform.
+- Do not generate proxy.ts that imports the host. If auth middleware is needed, generate middleware.ts that only uses this app's lib/auth (or Next.js APIs).
+- next.config.ts must pin turbopack.root and outputFileTracingRoot to this app directory by default so nested builds never compile the host. (Verify tooling may expand turbopack.root via .webapp-turbopack-root when linking a shared dependency cache.)
 - Dashboard pages use server components with data fetching.
+- Pages that read cookies, headers, or Prisma must export const dynamic = 'force-dynamic'.
 - Forms use controlled React components with proper validation and error states.
 - Tables use pagination, sorting, and search.
 - API routes use Zod validation, proper error handling, and typed responses.
-- Prisma schema includes all relationships, indexes, and timestamps.
+- Prisma schema must use SQLite (provider = "sqlite") so the app runs after npm install without a hosted database. Do not use PostgreSQL enums; use String fields with defaults. Include relationships, indexes, and timestamps.
+- Every prisma.*.create data object must include every required schema field (or give that field @default).
+- Badge variants must match the BadgeVariant union. Never use variant="danger"; use variant="destructive".
+- Pass Uint8Array values into crypto.subtle as BufferSource via bytes.buffer.slice(...) or a toBufferSource helper.
+- Client components must never import modules that use next/headers, next/server, or inline "use server". Put Zod schemas in a separate file.
+- Link href values must point at routes that exist in the project tree.
+- Do not emit both components/ui.tsx and components/ui/*.tsx. Pick one UI module style and import from it consistently.
+- Link must be imported from "next/link" (never from "next/navigation").
+- cookies() from "next/headers" must always be awaited in Next.js 15+.
+- headers() from "next/headers" must always be awaited in Next.js 15+.
+- async function return types must be Promise<T> (never bare T on an async function).
+- If pages pass Button asChild, components/ui.tsx must export ButtonProps.asChild only on Button.
+- Never add asChild to Slot, Card, Input, Label, Textarea, or other wrapper components.
+- Button asChild must clone a ReactElement<{ className?: string }>, never untyped children.props.
+- badgeVariants must include every BadgeVariant union member (including destructive).
+- Any symbol imported from "@/components/ui" (e.g. Label, Textarea) must be exported by that module.
+- Avoid React type typos (HTMLAttributes, not HMLAttributes).
+- Custom search handlers must not redefine InputHTMLAttributes.onSubmit; use onSearchSubmit instead.
+- Use DB-backed cookie-session auth in lib/auth.ts via getSession(). Session must be { sessionId: string; userId: string; email: string }. Never use session.user — use session.email / session.userId / session.sessionId. Login must verify passwordHash; include signup. Do not scaffold NextAuth CredentialsProvider in lib/auth.ts.
+- Toolchain files may already exist in Existing generated files (package.json, tsconfig, next.config, postcss, eslint, globals.css, lib/utils.ts, components/ui.tsx, lib/auth.ts). Reuse their exports and APIs — do not reinvent conflicting primitives.
+- If NextAuth is ever required, CredentialsProvider must be a default import: import CredentialsProvider from "next-auth/providers/credentials", and authorize(credentials) must be explicitly typed (never implicit any).
+- Do not emit competing catch-all pages at the same URL depth. Prefer app/contacts/page.tsx over app/[resource]/page.tsx.
+- Do not emit both app/api/{resource}/route.ts and app/api/{resource}/[[...id]]/route.ts — optional catch-alls conflict with the collection route. Use either the collection route plus app/api/{resource}/[id]/route.ts, or a single optional catch-all handler.
+- The client directive must be exactly "use client"; (including quotes). Never emit use client"; or other malformed directives.
+- Never mix ?? with || or && in the same expression without explicit parentheses.
 - Use realistic business copy — no lorem ipsum or "Your Company Here".
-- Navigation sidebar must list all app sections.
-- All pages must be responsive and use Tailwind CSS.${aiOutputLanguageDirective(args.input.language)}`;
+- Navigation sidebar must list only sections that have generated pages.
+- All pages must be responsive and use Tailwind CSS.${appLanguageBlock(args.input)}`;
 }

@@ -1,20 +1,29 @@
 /**
- * App deployment platform — preview/production URLs, env, status.
+ * App deployment — honest preview/production hosting (no fake /apps URLs).
+ *
+ * Preview → authenticated live-preview HTML sandbox.
+ * Production → public /w/app/[slug] when trust gate passes.
  */
 
 import { slugId } from "@/lib/ai-core/app-design-platform/ids";
 import type { GeneratedProjectFile } from "@/lib/ai/types";
+import { findWebAppReadinessIssues } from "@/lib/ai/webapp-readiness";
 
 export type AppDeploymentEnvironment = "preview" | "production";
+
+export type AppDeploymentKind = "live-preview" | "public-host";
 
 export type AppDeploymentRecord = {
   id: string;
   generationId: string;
   environment: AppDeploymentEnvironment;
   status: "queued" | "building" | "live" | "failed";
+  kind: AppDeploymentKind;
   url: string;
+  publicPath?: string;
   env: Record<string, string>;
   message: string;
+  readinessIssues: string[];
   createdAt: string;
   updatedAt: string;
 };
@@ -37,13 +46,64 @@ export function extractDeploymentState(blueprint: {
   return emptyDeploymentState();
 }
 
+export function isWebAppDeployEnabled(): boolean {
+  const raw = process.env.WEBAPP_DEPLOY_ENABLED;
+  if (raw === undefined || raw === "") return true;
+  return raw === "true" || raw === "1";
+}
+
+export function isWebAppPublicPublishEnabled(): boolean {
+  const raw = process.env.WEBAPP_PUBLISH_ENABLED;
+  if (raw === undefined || raw === "") return true;
+  return raw !== "false" && raw !== "0";
+}
+
+export function buildLivePreviewPath(generationId: string): string {
+  return `/api/webapp-builder/${generationId}/live-preview`;
+}
+
+export function buildPublicAppPath(slug: string): string {
+  return `/w/app/${slug}`;
+}
+
+export function absoluteUrl(baseUrl: string, pathname: string): string {
+  const base = baseUrl.replace(/\/$/, "");
+  const path = pathname.startsWith("/") ? pathname : `/${pathname}`;
+  return `${base}${path}`;
+}
+
+/** @deprecated Prefer buildLivePreviewPath / buildPublicAppPath + absoluteUrl. */
 export function buildDeploymentUrl(params: {
   baseUrl: string;
   generationId: string;
   environment: AppDeploymentEnvironment;
 }): string {
-  const base = params.baseUrl.replace(/\/$/, "");
-  return `${base}/apps/${params.generationId}/${params.environment}`;
+  const path =
+    params.environment === "production"
+      ? buildPublicAppPath(slugifyAppName("app", params.generationId))
+      : buildLivePreviewPath(params.generationId);
+  return absoluteUrl(params.baseUrl, path);
+}
+
+export function slugifyAppName(name: string, generationId: string): string {
+  const base =
+    name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 40) || "app";
+  const suffix = generationId.replace(/-/g, "").slice(0, 8);
+  return `${base}-${suffix}`;
+}
+
+export function evaluateDeploymentReadiness(
+  files: GeneratedProjectFile[],
+  flags?: { requiresAuth?: boolean; requiresDatabase?: boolean },
+): string[] {
+  return findWebAppReadinessIssues(files, {
+    requiresAuth: flags?.requiresAuth ?? true,
+    requiresDatabase: flags?.requiresDatabase ?? true,
+  });
 }
 
 export function createDeployment(params: {
@@ -52,29 +112,110 @@ export function createDeployment(params: {
   baseUrl: string;
   env?: Record<string, string>;
   files?: GeneratedProjectFile[];
+  appName?: string;
+  previewHtml?: string;
+  readinessIssues?: string[];
 }): AppDeploymentRecord {
   const now = new Date().toISOString();
   const id = slugId("deploy", params.environment, Date.now() % 100000);
-  const url = buildDeploymentUrl({
-    baseUrl: params.baseUrl,
-    generationId: params.generationId,
-    environment: params.environment,
-  });
-
+  const issues = params.readinessIssues ?? [];
   const fileCount = params.files?.length ?? 0;
-  const status = fileCount > 0 ? "live" : "building";
 
+  if (fileCount === 0) {
+    return {
+      id,
+      generationId: params.generationId,
+      environment: params.environment,
+      status: "failed",
+      kind: "live-preview",
+      url: absoluteUrl(params.baseUrl, buildLivePreviewPath(params.generationId)),
+      env: params.env ?? {},
+      message: "Deployment failed: no project files to host.",
+      readinessIssues: ["No project files."],
+      createdAt: now,
+      updatedAt: now,
+    };
+  }
+
+  if (issues.length > 0) {
+    return {
+      id,
+      generationId: params.generationId,
+      environment: params.environment,
+      status: "failed",
+      kind: "live-preview",
+      url: absoluteUrl(params.baseUrl, buildLivePreviewPath(params.generationId)),
+      env: params.env ?? {},
+      message: `Trust gate failed (${issues.length} issue${issues.length === 1 ? "" : "s"}). Fix readiness before deploy.`,
+      readinessIssues: issues,
+      createdAt: now,
+      updatedAt: now,
+    };
+  }
+
+  if (params.environment === "preview") {
+    const publicPath = buildLivePreviewPath(params.generationId);
+    return {
+      id,
+      generationId: params.generationId,
+      environment: "preview",
+      status: "live",
+      kind: "live-preview",
+      url: absoluteUrl(params.baseUrl, publicPath),
+      publicPath,
+      env: params.env ?? {},
+      message: `Preview live (${fileCount} files). Authenticated sandbox at live-preview — not an external Node host.`,
+      readinessIssues: [],
+      createdAt: now,
+      updatedAt: now,
+    };
+  }
+
+  if (!isWebAppPublicPublishEnabled()) {
+    return {
+      id,
+      generationId: params.generationId,
+      environment: "production",
+      status: "failed",
+      kind: "public-host",
+      url: absoluteUrl(params.baseUrl, buildLivePreviewPath(params.generationId)),
+      env: params.env ?? {},
+      message: "Public app hosting is disabled (WEBAPP_PUBLISH_ENABLED=false).",
+      readinessIssues: ["Public publish disabled."],
+      createdAt: now,
+      updatedAt: now,
+    };
+  }
+
+  if (!params.previewHtml?.trim()) {
+    return {
+      id,
+      generationId: params.generationId,
+      environment: "production",
+      status: "failed",
+      kind: "public-host",
+      url: absoluteUrl(params.baseUrl, buildLivePreviewPath(params.generationId)),
+      env: params.env ?? {},
+      message: "Production publish requires preview HTML.",
+      readinessIssues: ["Missing preview HTML."],
+      createdAt: now,
+      updatedAt: now,
+    };
+  }
+
+  const slug = slugifyAppName(params.appName || "app", params.generationId);
+  const publicPath = buildPublicAppPath(slug);
   return {
     id,
     generationId: params.generationId,
-    environment: params.environment,
-    status,
-    url,
+    environment: "production",
+    status: "live",
+    kind: "public-host",
+    url: absoluteUrl(params.baseUrl, publicPath),
+    publicPath,
     env: params.env ?? {},
-    message:
-      status === "live"
-        ? `Deployed ${fileCount} files to ${params.environment}.`
-        : `Deployment queued for ${params.environment}.`,
+    message: `Published public host at ${publicPath} (${fileCount} files). Download ZIP for a full Next.js Node deploy.`,
+    readinessIssues: [],
     createdAt: now,
     updatedAt: now,
   };

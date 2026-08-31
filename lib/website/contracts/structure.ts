@@ -16,6 +16,8 @@ export type WebsiteStructureTemplate = {
   sections: string[];
   /** Template Intelligence id retained for legacy generation compatibility. */
   templateIntelligenceId: string;
+  /** V2 on-disk package vs V1 Template Intelligence style preset. */
+  architectureVersion?: "v1" | "v2";
   marketplaceTemplateId: string;
   premiumTemplateId: string;
 };

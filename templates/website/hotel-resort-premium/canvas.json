@@ -4,68 +4,65 @@
     "columns": 12,
     "gutter": "1.5rem",
     "margin": "1.25rem",
-    "maxWidth": "90rem"
+    "maxWidth": "76rem"
   },
   "spacing": {
     "unit": "rem",
-    "scale": [
-      "0.5",
-      "1",
-      "1.5",
-      "2",
-      "3",
-      "4",
-      "5",
-      "6",
-      "8",
-      "10",
-      "12"
-    ]
+    "scale": ["0.5", "1", "1.5", "2", "3", "4", "5", "6", "8", "10", "12"]
   },
   "visualIdentity": {
     "colors": {
-      "primary": "#0C2340",
-      "secondary": "#1A4A6E",
-      "accent": "#4A9FD4",
-      "background": "#0C2340",
-      "foreground": "#F2E8DC",
-      "muted": "rgba(242,232,220,0.58)",
-      "surface": "#0F2A4A",
-      "sand": "#F2E8DC",
-      "azure": "#4A9FD4",
-      "pearl": "#FDFBF7"
+      "primary": "#2A2340",
+      "secondary": "#4E3D6B",
+      "accent": "#FF5C8A",
+      "background": "#E6E0F5",
+      "foreground": "#1A1228",
+      "muted": "rgba(26,18,40,0.58)",
+      "surface": "#D8CFE8",
+      "surface-elevated": "#F9F7FD",
+      "signal": "#FF5C8A",
+      "grid": "rgba(78,61,107,0.07)",
+      "ink": "#1A1228",
+      "sand": "#D8CFE8",
+      "azure": "#FF5C8A",
+      "azure-light": "#FF8FB0",
+      "azure-deep": "#E03D72",
+      "pearl": "#F9F7FD"
     },
     "typography": {
-      "display": "Cormorant Garamond, Georgia, ui-serif, serif",
-      "body": "Jost, ui-sans-serif, system-ui, sans-serif",
+      "display": "Playfair Display, ui-serif, Georgia, serif",
+      "body": "Outfit, ui-sans-serif, system-ui, sans-serif",
+      "mono": "ui-monospace, monospace",
       "scale": {
-        "sm": "0.8125rem",
-        "base": "1.0625rem",
-        "lg": "1.375rem",
-        "xl": "3.5rem",
-        "display": "clamp(2.875rem, 6.5vw, 5rem)"
+        "sm": "0.875rem",
+        "base": "1rem",
+        "lg": "1.125rem",
+        "xl": "1.75rem",
+        "display": "clamp(2.5rem, 4.8vw, 3.75rem)"
       }
     },
     "radius": {
-      "sm": "2px",
-      "md": "4px",
-      "lg": "8px"
+      "sm": "6px",
+      "md": "12px",
+      "lg": "20px",
+      "xl": "28px"
     },
     "shadows": {
-      "surface": "0 32px 80px rgba(0,0,0,0.45)",
-      "glow": "0 0 100px rgba(74,159,212,0.18)"
+      "surface": "0 2px 10px rgba(42,35,64,0.06), 0 14px 36px rgba(255,92,138,0.08)",
+      "glow": "0 20px 56px rgba(78,61,107,0.14), 0 8px 24px rgba(255,92,138,0.12)",
+      "card": "0 22px 52px rgba(42,35,64,0.1), 0 10px 24px rgba(255,92,138,0.08), 0 0 0 1px rgba(78,61,107,0.08)"
     },
     "borders": {
-      "default": "rgba(242,232,220,0.1)",
-      "azure": "rgba(74,159,212,0.32)",
-      "subtle": "rgba(242,232,220,0.06)"
+      "default": "rgba(26,18,40,0.11)",
+      "accent": "rgba(255,92,138,0.32)",
+      "subtle": "rgba(78,61,107,0.1)"
     },
-    "animation": "azure-haven-reveal"
+    "animation": "mirage-haven-rise"
   },
   "designSystem": {
     "tier": "premium",
-    "industry": "Hotel & Resort",
-    "layoutKind": "sidebar-left",
+    "industry": "luxury",
+    "layoutKind": "split-editorial",
     "templateIntelligenceId": "ti-hotel-sanctuary"
   }
 }

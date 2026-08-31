@@ -1,4 +1,9 @@
 import type { GeneratedProjectFile } from "@/lib/ai/types";
+import {
+  isHostPlatformFilePath,
+  isHostPlatformImport,
+  relativeImportEscapesProject,
+} from "@/lib/ai/webapp-isolation";
 
 export type ProjectCapabilityFlags = {
   requiresAuth: boolean;
@@ -46,6 +51,24 @@ const EXTERNAL_PACKAGES = new Set([
   "recharts",
   "lucide-react",
   "date-fns",
+]);
+
+const NODE_BUILTIN_MODULES = new Set([
+  "node:crypto",
+  "node:fs",
+  "node:path",
+  "node:url",
+  "node:stream",
+  "node:buffer",
+  "node:util",
+  "node:os",
+  "node:events",
+  "node:assert",
+  "node:zlib",
+  "node:http",
+  "node:https",
+  "node:timers",
+  "node:process",
 ]);
 
 function dirname(filePath: string) {
@@ -686,6 +709,10 @@ export function validateGeneratedFileContent(
     }
   }
 
+  if (plannedPath === "next-env.d.ts") {
+    return { valid: true };
+  }
+
   if (plannedPath.endsWith(".tsx") || plannedPath.endsWith(".ts")) {
     if (!/(export|import)\s/.test(file.content)) {
       return {
@@ -712,7 +739,27 @@ function validateImportsForFile(
     return issues;
   }
 
+  if (isHostPlatformFilePath(file.path)) {
+    issues.push(
+      `${file.path}: generated apps must not copy host-platform files.`,
+    );
+  }
+
   for (const importPath of extractImportPaths(file.content)) {
+    if (isHostPlatformImport(importPath)) {
+      issues.push(
+        `${file.path}: host-platform import "${importPath}" is not allowed. Generate the dependency inside this app or use an npm package.`,
+      );
+      continue;
+    }
+
+    if (relativeImportEscapesProject(file.path, importPath)) {
+      issues.push(
+        `${file.path}: relative import "${importPath}" escapes the generated app and is not allowed.`,
+      );
+      continue;
+    }
+
     if (importPath.startsWith("@/")) {
       const resolved = importPath.slice(2);
       const candidates = candidatePathsForImport(resolved);
@@ -767,6 +814,9 @@ function findDuplicateBasenames(files: GeneratedProjectFile[]) {
 
     const basename = file.path.split("/").pop();
     if (!basename) continue;
+    if (/^(index|page|layout|route|loading|error|not-found|template|default|types|schema|config|constants|utils|helpers)\.(ts|tsx|js|jsx)$/.test(basename)) {
+      continue;
+    }
 
     const prior = seen.get(basename);
     if (prior && prior !== file.path) {
@@ -814,7 +864,8 @@ function validatePackageImports(files: GeneratedProjectFile[]) {
         !importPath.startsWith(".") &&
         !importPath.startsWith("@/") &&
         !importPath.startsWith("next/") &&
-        importPath !== "next"
+        importPath !== "next" &&
+        !NODE_BUILTIN_MODULES.has(importPath)
       ) {
         const root = importPath.startsWith("@")
           ? importPath.split("/").slice(0, 2).join("/")

@@ -1,0 +1,7 @@
+{
+  "pageId": "pricing",
+  "layoutId": "default",
+  "regions": {
+    "main": ["prism-aurora-hero", "prism-aurora-pricing", "prism-aurora-faq"]
+  }
+}

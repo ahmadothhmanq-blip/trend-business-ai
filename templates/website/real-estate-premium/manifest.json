@@ -2,16 +2,16 @@
   "specVersion": "2.0.0",
   "id": "real-estate-premium",
   "version": "2.0.0",
-  "name": "Real Estate Premium",
-  "description": "Prestige Estates — editorial luxury real estate with charcoal-stone palette, bronze accents, and private advisory dossier rail.",
+  "name": "Estates",
+  "description": "عقارات فاخرة فاتحة — كريم، serif راقٍ، معارض properties. للوكالات العقارية العالمية.",
   "metadata": {
     "category": "real-estate",
     "industry": "Real Estate",
     "tags": [
       "real-estate",
-      "luxury",
-      "property",
-      "brokerage"
+      "premium",
+      "global",
+      "flagship"
     ],
     "author": {
       "name": "Trend Business AI",
@@ -19,18 +19,20 @@
     },
     "license": "MIT",
     "keywords": [
-      "real estate",
-      "property",
-      "listings",
-      "brokerage"
+      "saas",
+      "enterprise",
+      "platform",
+      "revenue"
     ],
     "templateIntelligenceId": "ti-real-estate-listings",
     "premium": true,
     "tier": "agency"
   },
   "media": {
-    "thumbnail": "assets/thumbnail.png",
-    "preview": "assets/preview.png"
+    "thumbnail": "assets/thumbnail.svg",
+    "preview": "assets/preview.svg",
+    "previewTablet": "assets/preview-tablet.svg",
+    "previewMobile": "assets/preview-mobile.svg"
   },
   "compatibility": {
     "engineVersion": ">=1.0.0",
@@ -44,7 +46,7 @@
   },
   "update": {
     "channel": "stable",
-    "releasedAt": "2026-08-03T16:09:45.080Z"
+    "releasedAt": "2026-08-03T16:09:45.050Z"
   },
   "responsive": {
     "breakpoints": [
@@ -82,9 +84,9 @@
     {
       "id": "default",
       "file": "layouts/default.json",
-      "kind": "sidebar-right",
+      "kind": "single-column",
       "label": "Default",
-      "description": "Premium sidebar-right layout for Real Estate."
+      "description": "Premium single-column layout for SaaS."
     }
   ],
   "regions": [
@@ -93,28 +95,28 @@
       "file": "regions/header.json",
       "role": "header",
       "label": "Header Region",
-      "description": "Premium header region for Real Estate Prestige."
+      "description": "Premium header region for SaaS Enterprise."
     },
     {
       "id": "main",
       "file": "regions/main.json",
       "role": "main",
       "label": "Main Region",
-      "description": "Premium main region for Real Estate Prestige."
+      "description": "Premium main region for SaaS Enterprise."
     },
     {
-      "id": "sidebar",
-      "file": "regions/sidebar.json",
-      "role": "sidebar",
-      "label": "Sidebar Region",
-      "description": "Premium sidebar region for Real Estate Prestige."
+      "id": "utility",
+      "file": "regions/utility.json",
+      "role": "utility",
+      "label": "Utility Region",
+      "description": "Premium utility region for SaaS Enterprise."
     },
     {
       "id": "footer",
       "file": "regions/footer.json",
       "role": "footer",
       "label": "Footer Region",
-      "description": "Premium footer region for Real Estate Prestige."
+      "description": "Premium footer region for SaaS Enterprise."
     }
   ],
   "pages": [
@@ -124,31 +126,31 @@
       "path": "/",
       "layoutId": "default",
       "file": "pages/home.json",
-      "description": "Home — premium Real Estate page blueprint."
+      "description": "Home — premium SaaS page blueprint."
     },
     {
-      "id": "listings",
-      "title": "Listings",
-      "path": "/listings",
+      "id": "platform",
+      "title": "Platform",
+      "path": "/platform",
       "layoutId": "default",
-      "file": "pages/listings.json",
-      "description": "Listings — premium Real Estate page blueprint."
+      "file": "pages/platform.json",
+      "description": "Platform — premium SaaS page blueprint."
     },
     {
-      "id": "neighborhoods",
-      "title": "Neighborhoods",
-      "path": "/neighborhoods",
+      "id": "pricing",
+      "title": "Pricing",
+      "path": "/pricing",
       "layoutId": "default",
-      "file": "pages/neighborhoods.json",
-      "description": "Neighborhoods — premium Real Estate page blueprint."
+      "file": "pages/pricing.json",
+      "description": "Pricing — premium SaaS page blueprint."
     },
     {
-      "id": "contact",
-      "title": "Contact",
-      "path": "/contact",
+      "id": "customers",
+      "title": "Customers",
+      "path": "/customers",
       "layoutId": "default",
-      "file": "pages/contact.json",
-      "description": "Contact — premium Real Estate page blueprint."
+      "file": "pages/customers.json",
+      "description": "Customers — premium SaaS page blueprint."
     }
   ],
   "entry": "package.entry.json",
@@ -157,18 +159,26 @@
     "composer": "region-grid",
     "sdkVersion": "1.0.0"
   },
-  "presentation": { "file": "presentation/presentation.json" },
-  "tokens": { "file": "tokens/tokens.json" },
-  "motion": { "file": "motion/motion.json" },
-  "responsiveConfig": { "file": "responsive/responsive.json" },
+  "presentation": {
+    "file": "presentation/presentation.json"
+  },
+  "tokens": {
+    "file": "tokens/tokens.json"
+  },
+  "motion": {
+    "file": "motion/motion.json"
+  },
+  "responsiveConfig": {
+    "file": "responsive/responsive.json"
+  },
   "componentLibrary": {
     "file": "components/registry.json",
     "root": "components"
   },
   "pageFlows": {
     "home": "flows/home.json",
-    "listings": "flows/listings.json",
-    "neighborhoods": "flows/neighborhoods.json",
-    "contact": "flows/contact.json"
+    "platform": "flows/platform.json",
+    "pricing": "flows/pricing.json",
+    "customers": "flows/customers.json"
   }
 }

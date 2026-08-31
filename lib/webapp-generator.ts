@@ -7,6 +7,11 @@ import {
   createWebappBuilderAdapter,
   webappInputToBrief,
 } from "@/lib/ai-core/adapters/webapp-builder";
+import {
+  getActiveAppBuilderTiming,
+  runWithAppBuilderTiming,
+} from "@/lib/webapp/stage-timing-context";
+import type { AppBuilderStageTiming } from "@/lib/webapp/stage-timing";
 import type {
   WebAppOutput,
   WebAppPluginInput,
@@ -32,6 +37,44 @@ export type WebAppGenerationResult = WebAppOutput & {
   provider: string;
 };
 
+async function runLayerPipeline(
+  pluginInput: WebAppPluginInput,
+  resolved: string,
+  timing: AppBuilderStageTiming,
+  onProgress?: (event: string) => void,
+): Promise<WebAppGenerationResult> {
+  const adapter = createWebappBuilderAdapter();
+  try {
+    const result = await layerRunner.run(
+      adapter,
+      { brief: webappInputToBrief(pluginInput) },
+      {
+        provider: resolved as import("@/lib/ai/types").AIProviderName,
+        onProgress: (event) => {
+          timing.observeProgress(event);
+          onProgress?.(event);
+        },
+      },
+    );
+
+    const project = result.finalOutput ?? result.generation;
+
+    return {
+      ...project,
+      progressEvents: result.progressEvents as WebAppProgressEvent[],
+      usage: result.usage ?? emptyTokenUsage(),
+      generationTimeMs: result.generationTimeMs,
+      provider: result.provider,
+    };
+  } catch (error) {
+    timing.finish({
+      failed: true,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    throw error;
+  }
+}
+
 /**
  * Web App Builder entrypoint — Phase 2 runs through AI Core LayerRunner
  * (Idea → Strategy → Design → Assets → Generation → Quality → Finalize).
@@ -48,20 +91,23 @@ export async function generateWebApp(
     );
   }
 
-  const adapter = createWebappBuilderAdapter();
-  const result = await layerRunner.run(
-    adapter,
-    { brief: webappInputToBrief(pluginInput) },
-    { provider: resolved, onProgress },
-  );
+  const active = getActiveAppBuilderTiming();
+  if (active) {
+    // Reuse API-route timing context so Stage 2 logs share one runId.
+    return runLayerPipeline(pluginInput, resolved, active, onProgress);
+  }
 
-  const project = result.finalOutput ?? result.generation;
-
-  return {
-    ...project,
-    progressEvents: result.progressEvents as WebAppProgressEvent[],
-    usage: result.usage ?? emptyTokenUsage(),
-    generationTimeMs: result.generationTimeMs,
-    provider: result.provider,
-  };
+  return runWithAppBuilderTiming(async (timing) => {
+    const result = await runLayerPipeline(
+      pluginInput,
+      resolved,
+      timing,
+      onProgress,
+    );
+    timing.finish({
+      generationTimeMs: result.generationTimeMs,
+      provider: result.provider,
+    });
+    return result;
+  });
 }

@@ -1,0 +1,18 @@
+{
+  "pageId": "home",
+  "layoutId": "default",
+  "regions": {
+    "header": ["lumina-wellness-nav"],
+    "main": [
+      "lumina-wellness-hero",
+      "lumina-wellness-features",
+      "lumina-wellness-about",
+      "lumina-wellness-testimonials",
+      "lumina-wellness-pricing",
+      "lumina-wellness-contact"
+    ],
+    "utility": [],
+    "overlay": [],
+    "footer": ["lumina-wellness-footer"]
+  }
+}

@@ -2,17 +2,29 @@
   "packageId": "restaurant-premium",
   "templateIntelligenceHint": "ti-restaurant-dining",
   "layout": {
-    "defaultLayoutId": "sidebar-left",
+    "defaultLayoutId": "default",
     "regions": {
-      "header": { "role": "header", "sticky": true },
-      "sidebar": { "role": "sidebar", "sticky": true, "collapseBelow": "lg" },
-      "main": { "role": "main" },
-      "footer": { "role": "footer" }
+      "header": {
+        "role": "header",
+        "sticky": true
+      },
+      "main": {
+        "role": "main"
+      },
+      "utility": {
+        "role": "utility"
+      },
+      "footer": {
+        "role": "footer"
+      },
+      "overlay": {
+        "role": "overlay"
+      }
     }
   },
   "navigation": {
     "componentId": "restaurant-premium-nav",
-    "variant": "luxury-minimal"
+    "variant": "enterprise-glass"
   },
   "hero": {
     "componentId": "restaurant-premium-hero",
@@ -24,19 +36,23 @@
   },
   "homeFlow": {
     "regions": {
-      "sidebar": ["restaurant-premium-sidebar-rail"],
       "main": [
         "restaurant-premium-hero",
-        "restaurant-premium-tasting-menu",
-        "restaurant-premium-chef-story",
         "restaurant-premium-stats",
-        "restaurant-premium-signature-dishes",
+        "restaurant-premium-features",
+        "restaurant-premium-integrations",
+        "restaurant-premium-about",
         "restaurant-premium-testimonials",
-        "restaurant-premium-atmosphere",
-        "restaurant-premium-gallery",
+        "restaurant-premium-portfolio",
+        "restaurant-premium-pricing",
         "restaurant-premium-faq",
-        "restaurant-premium-reservation-cta",
         "restaurant-premium-contact"
+      ],
+      "utility": [
+        "restaurant-premium-utility-band"
+      ],
+      "overlay": [
+        "restaurant-premium-floating-cta"
       ]
     }
   },
@@ -45,7 +61,11 @@
     "componentId": "restaurant-premium-section-shell"
   },
   "aiGeneration": {
-    "contentProfile": "restaurant-premium-luxury",
-    "suggestedPages": ["menu", "gallery", "reserve"]
+    "contentProfile": "restaurant-premium-gtm",
+    "suggestedPages": [
+      "platform",
+      "pricing",
+      "customers"
+    ]
   }
 }

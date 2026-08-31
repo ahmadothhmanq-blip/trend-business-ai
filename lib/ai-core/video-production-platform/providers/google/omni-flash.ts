@@ -47,6 +47,19 @@ type OmniInteractionResponse = {
   object?: string;
 };
 
+function readNestedString(
+  value: unknown,
+  field: "mime_type" | "data" | "uri",
+): string | undefined {
+  if (!value || typeof value !== "object") return undefined;
+  const raw = (value as Record<string, unknown>)[field];
+  return typeof raw === "string" ? raw : undefined;
+}
+
+function normalizeVideoMimeType(value?: string): "video/mp4" | "video/webm" {
+  return value === "video/webm" ? "video/webm" : "video/mp4";
+}
+
 function extractInteractionVideo(resp: OmniInteractionResponse): {
   mimeType?: string;
   base64?: string;
@@ -60,28 +73,16 @@ function extractInteractionVideo(resp: OmniInteractionResponse): {
       const anyC = c as Record<string, unknown>;
       // Typical: { type:"video", mime_type:"video/mp4", data:"<base64>" }
       const mimeType =
-        (typeof anyC["mime_type"] === "string" ? (anyC["mime_type"] as string) : undefined) ||
-        (typeof anyC["video"] === "object" &&
-        anyC["video"] &&
-        typeof (anyC["video"] as any)["mime_type"] === "string"
-          ? ((anyC["video"] as any)["mime_type"] as string)
-          : undefined);
+        readNestedString(anyC, "mime_type") ||
+        readNestedString(anyC["video"], "mime_type");
 
       const base64 =
-        (typeof anyC["data"] === "string" ? (anyC["data"] as string) : undefined) ||
-        (typeof anyC["video"] === "object" &&
-        anyC["video"] &&
-        typeof (anyC["video"] as any)["data"] === "string"
-          ? ((anyC["video"] as any)["data"] as string)
-          : undefined);
+        readNestedString(anyC, "data") ||
+        readNestedString(anyC["video"], "data");
 
       const uri =
-        (typeof anyC["uri"] === "string" ? (anyC["uri"] as string) : undefined) ||
-        (typeof anyC["video"] === "object" &&
-        anyC["video"] &&
-        typeof (anyC["video"] as any)["uri"] === "string"
-          ? ((anyC["video"] as any)["uri"] as string)
-          : undefined);
+        readNestedString(anyC, "uri") ||
+        readNestedString(anyC["video"], "uri");
 
       if (mimeType || base64 || uri) return { mimeType, base64, uri };
     }
@@ -174,7 +175,7 @@ export const omniFlashVideoProvider: VideoProvider = {
           provider: "omni_flash",
           status: "completed",
           externalJobId: interactionId,
-          mimeType: video.mimeType ? (video.mimeType as any) : "video/mp4",
+          mimeType: normalizeVideoMimeType(video.mimeType),
           bytes,
           message: "Omni Flash completed (inline).",
         };
@@ -185,7 +186,7 @@ export const omniFlashVideoProvider: VideoProvider = {
           provider: "omni_flash",
           status: "processing",
           externalJobId: interactionId,
-          mimeType: video.mimeType ? (video.mimeType as any) : "video/mp4",
+          mimeType: normalizeVideoMimeType(video.mimeType),
           remoteUrl: video.uri,
           message: "Omni Flash accepted; poll for completion.",
         };
@@ -246,7 +247,7 @@ export const omniFlashVideoProvider: VideoProvider = {
         provider: "omni_flash",
         status: "completed",
         externalJobId,
-        mimeType: video.mimeType ? (video.mimeType as any) : "video/mp4",
+        mimeType: normalizeVideoMimeType(video.mimeType),
         bytes,
         message: "Omni Flash completed.",
       };
@@ -260,7 +261,7 @@ export const omniFlashVideoProvider: VideoProvider = {
           status: "completed",
           externalJobId,
           remoteUrl: video.uri,
-          mimeType: video.mimeType ? (video.mimeType as any) : "video/mp4",
+          mimeType: normalizeVideoMimeType(video.mimeType),
           bytes,
           message: "Omni Flash completed (downloaded).",
         };
@@ -270,7 +271,7 @@ export const omniFlashVideoProvider: VideoProvider = {
         status: "processing",
         externalJobId,
         remoteUrl: video.uri,
-        mimeType: video.mimeType ? (video.mimeType as any) : "video/mp4",
+        mimeType: normalizeVideoMimeType(video.mimeType),
         message: "Omni Flash video uri available; download pending.",
       };
     }

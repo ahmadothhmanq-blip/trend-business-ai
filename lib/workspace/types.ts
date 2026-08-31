@@ -33,6 +33,7 @@ export type WorkspaceGenerationInput = {
   prompt: string;
   template?: string;
   language?: string;
+  country?: string;
   theme?: string;
   features?: string[];
   productId?: string;

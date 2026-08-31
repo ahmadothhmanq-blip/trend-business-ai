@@ -1,0 +1,24 @@
+{
+  "title": "مكتب الراشد للمحاماة والاستشارات القانونية",
+  "preRoutingIndustryId": "business",
+  "routingIndustryId": "law",
+  "settingsBusinessIndustry": "law",
+  "totalUniqueUrls": 35,
+  "lawPhotoCount": 10,
+  "carPhotoCount": 0,
+  "lawUrls": [
+    "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1600&q=88",
+    "https://images.unsplash.com/photo-1589829545856-d10d557cf57f?auto=format&fit=crop&w=1600&q=88",
+    "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1600&q=88",
+    "https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1600&q=88",
+    "https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1920&q=88",
+    "https://images.unsplash.com/photo-1589829545856-d10d557cf57f?auto=format&fit=crop&w=1920&q=88",
+    "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1920&q=88",
+    "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1920&q=88",
+    "https://images.unsplash.com/photo-1589829545856-d10d557cf57f?auto=format&fit=crop&w=2400&q=90",
+    "https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=2400&q=90"
+  ],
+  "carUrls": [],
+  "badPhrasesFound": [],
+  "pass": true
+}

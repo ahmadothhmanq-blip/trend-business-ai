@@ -10,42 +10,42 @@
       "id": "creative-portfolio-hero",
       "role": "hero",
       "scaffold": "components/creative-portfolio-hero.tsx",
-      "slots": ["headline", "subheadline", "scroll-cue"]
+      "slots": ["headline", "metrics", "cta"]
     },
     {
-      "id": "creative-portfolio-selected-work",
-      "role": "portfolio",
-      "scaffold": "components/creative-portfolio-selected-work.tsx"
-    },
-    {
-      "id": "creative-portfolio-case-grid",
-      "role": "gallery",
-      "scaffold": "components/creative-portfolio-case-grid.tsx"
-    },
-    {
-      "id": "creative-portfolio-manifesto",
-      "role": "story",
-      "scaffold": "components/creative-portfolio-manifesto.tsx"
-    },
-    {
-      "id": "creative-portfolio-capabilities",
+      "id": "creative-portfolio-features",
       "role": "features",
-      "scaffold": "components/creative-portfolio-capabilities.tsx"
+      "scaffold": "components/creative-portfolio-features.tsx"
     },
     {
-      "id": "creative-portfolio-process",
-      "role": "process",
-      "scaffold": "components/creative-portfolio-process.tsx"
+      "id": "creative-portfolio-about",
+      "role": "story",
+      "scaffold": "components/creative-portfolio-about.tsx"
     },
     {
-      "id": "creative-portfolio-collaborate-cta",
-      "role": "cta",
-      "scaffold": "components/creative-portfolio-collaborate-cta.tsx"
-    },
-    {
-      "id": "creative-portfolio-overlay-showcase",
+      "id": "creative-portfolio-stats",
       "role": "custom",
-      "scaffold": "components/creative-portfolio-overlay-showcase.tsx"
+      "scaffold": "components/creative-portfolio-stats.tsx"
+    },
+    {
+      "id": "creative-portfolio-testimonials",
+      "role": "testimonials",
+      "scaffold": "components/creative-portfolio-testimonials.tsx"
+    },
+    {
+      "id": "creative-portfolio-pricing",
+      "role": "pricing",
+      "scaffold": "components/creative-portfolio-pricing.tsx"
+    },
+    {
+      "id": "creative-portfolio-faq",
+      "role": "faq",
+      "scaffold": "components/creative-portfolio-faq.tsx"
+    },
+    {
+      "id": "creative-portfolio-contact",
+      "role": "contact",
+      "scaffold": "components/creative-portfolio-contact.tsx"
     },
     {
       "id": "creative-portfolio-footer",
@@ -53,9 +53,29 @@
       "scaffold": "components/creative-portfolio-footer.tsx"
     },
     {
+      "id": "creative-portfolio-floating-cta",
+      "role": "cta",
+      "scaffold": "components/creative-portfolio-floating-cta.tsx"
+    },
+    {
+      "id": "creative-portfolio-utility-band",
+      "role": "cta",
+      "scaffold": "components/creative-portfolio-utility-band.tsx"
+    },
+    {
       "id": "creative-portfolio-section-shell",
       "role": "custom",
       "scaffold": "components/creative-portfolio-section-shell.tsx"
+    },
+    {
+      "id": "creative-portfolio-portfolio",
+      "role": "custom",
+      "scaffold": "components/creative-portfolio-portfolio.tsx"
+    },
+    {
+      "id": "creative-portfolio-integrations",
+      "role": "custom",
+      "scaffold": "components/creative-portfolio-integrations.tsx"
     }
   ]
 }

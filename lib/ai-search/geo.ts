@@ -10,6 +10,7 @@ import {
   wordCount,
 } from "@/lib/ai-search/utils";
 import type { AiSearchIssue, GeoAnalyzeResult } from "@/types/ai-search";
+import { aiOutputLanguageDirective } from "@/lib/ai/prompts/language-directive.server";
 
 export const geoAnalyzeBodySchema = z.object({
   title: z.string().max(200).optional(),
@@ -19,6 +20,8 @@ export const geoAnalyzeBodySchema = z.object({
   brandName: z.string().max(120).optional(),
   entities: z.array(z.string().max(80)).max(40).optional(),
   useAi: z.boolean().optional(),
+  language: z.string().trim().optional(),
+  country: z.string().trim().optional(),
 });
 
 export type GeoAnalyzeBody = z.infer<typeof geoAnalyzeBodySchema>;
@@ -187,6 +190,7 @@ export function analyzeGeo(input: GeoAnalyzeBody): GeoAnalyzeResult {
 export async function enrichGeoWithAi(
   result: GeoAnalyzeResult,
   input: GeoAnalyzeBody,
+  language?: string,
 ): Promise<GeoAnalyzeResult> {
   try {
     const { providerManager } = await import("@/lib/ai/provider-manager");
@@ -207,7 +211,7 @@ Issues: ${result.issues
           .join("; ")}
 Excerpt: ${(input.content ?? "").slice(0, 900)}
 
-Recommend GEO improvements for generative AI search.`,
+Recommend GEO improvements for generative AI search.${aiOutputLanguageDirective(language, "marketing")}`,
         temperature: 0.35,
       },
       providerName,

@@ -10,7 +10,7 @@
 | Business Idea | `analyze` | `plugins/website/layers/business-idea.ts` |
 | Strategy | `plan` | `plugins/website/layers/strategy.ts` |
 | Design | `plan` | `plugins/website/layers/design-engine.ts` |
-| Assets | `generate` (before code) | `plugins/website/layers/assets.ts` |
+| Assets | AI Core `runAssets` layer | `lib/ai-core/image-engine/engine.ts` (`runAiImageEngine`) |
 | Code | `generate` | `plugins/website/generate.ts` + scaffold |
 | Quality Check | `generate` + `validate` | `plugins/website/layers/quality.ts` |
 

@@ -1,6 +1,6 @@
 {
   "tbdpNative": true,
-  "sectorDnaId": "finance",
-  "experienceProfiles": ["corporate", "executive", "minimal"],
-  "presetBinding": "ledger-reveal"
+  "sectorDnaId": "saas",
+  "experienceProfiles": ["technical", "corporate", "executive"],
+  "presetBinding": "nexus-grid-reveal"
 }

@@ -17,8 +17,13 @@ import { Button } from "@/components/ui/button";
 import { DashboardPanel } from "@/components/dashboard/ui/dashboard-card";
 import { cn } from "@/lib/utils";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
+import { useTranslation } from "@/lib/i18n/client";
 import type { WbTemplateMarketplaceListing } from "@/lib/website/template-marketplace/types";
-import { canSelectMarketplaceListing } from "@/lib/website/template-marketplace";
+import { resolveTemplateListingDisplayName } from "@/lib/website/template-marketplace/display-name";
+import {
+  canSelectMarketplaceListing,
+  canInstallMarketplaceListing,
+} from "@/lib/website/template-marketplace";
 import { resolveMarketplaceListingThumbnail } from "@/lib/website/template-marketplace/client";
 import { CATEGORY_GRADIENTS } from "@/components/dashboard/template-marketplace/marketplace-visuals";
 
@@ -61,7 +66,10 @@ export function WbTemplateMarketplaceCard({
   onPreview,
 }: WbTemplateMarketplaceCardProps) {
   const pt = useProductT("templateMarketplace");
+  const { locale } = useTranslation();
+  const displayName = resolveTemplateListingDisplayName(listing, locale);
   const selectable = canSelectMarketplaceListing(listing);
+  const installable = canInstallMarketplaceListing(listing);
   const installed = listing.availability === "installed";
   const thumbnail = resolveMarketplaceListingThumbnail(listing);
   const authorName =
@@ -86,7 +94,7 @@ export function WbTemplateMarketplaceCard({
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
               <p className="truncate text-[13px] font-semibold text-foreground dark:text-white">
-                {listing.name}
+                {displayName}
               </p>
               {listing.featured ? (
                 <Star className="size-3 shrink-0 fill-premium-gold text-premium-gold" />
@@ -138,7 +146,7 @@ export function WbTemplateMarketplaceCard({
               type="button"
               size="sm"
               variant="secondary"
-              disabled={disabled || installing || !onInstall}
+              disabled={disabled || installing || !onInstall || !installable}
               className={cn(
                 "flex-1 min-w-0 gap-1.5 border border-dashed border-border bg-muted/70 font-semibold text-foreground opacity-100 disabled:cursor-not-allowed dark:border-white/15 dark:bg-white/[0.06] dark:text-white",
                 "h-8 text-xs",
@@ -184,7 +192,7 @@ export function WbTemplateMarketplaceCard({
         {thumbnail ? (
           <Image
             src={thumbnail}
-            alt={listing.name}
+            alt={displayName}
             fill
             unoptimized
             className="object-cover"
@@ -215,7 +223,7 @@ export function WbTemplateMarketplaceCard({
       </div>
 
       <div className="flex flex-1 flex-col p-4">
-        <h4 className="text-[15px] font-bold text-white">{listing.name}</h4>
+        <h4 className="text-[15px] font-bold text-white">{displayName}</h4>
         <p className="mt-1 line-clamp-2 text-[12px] leading-relaxed text-white/60">
           {listing.description}
         </p>
@@ -371,16 +379,24 @@ function AvailabilityBadge({
         "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
         installed
           ? "bg-emerald-500/20 text-emerald-800 dark:text-emerald-200"
-          : "bg-sky-500/15 text-sky-800 dark:text-sky-200",
+          : availability === "unavailable"
+            ? "bg-amber-500/15 text-amber-900 dark:text-amber-200"
+            : "bg-sky-500/15 text-sky-800 dark:text-sky-200",
         compact && "px-1.5 py-0 text-[9px]",
       )}
     >
       {installed ? (
         <HardDrive className={cn("size-3", compact && "size-2.5")} />
+      ) : availability === "unavailable" ? (
+        <LayoutTemplate className={cn("size-3 opacity-50", compact && "size-2.5")} />
       ) : (
         <Cloud className={cn("size-3", compact && "size-2.5")} />
       )}
-      {installed ? pt("installed") : pt("notInstalled")}
+      {installed
+        ? pt("installed")
+        : availability === "unavailable"
+          ? pt("unavailable")
+          : pt("notInstalled")}
     </span>
   );
 }

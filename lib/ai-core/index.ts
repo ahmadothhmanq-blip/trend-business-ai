@@ -125,6 +125,25 @@ export {
 } from "@/lib/ai-core/master-planner";
 
 export {
+  runUniversalPlanner,
+  universalBlueprintSchema,
+  universalServiceIdSchema,
+  validateUniversalBlueprint,
+  safeParseUniversalBlueprint,
+  type UniversalBlueprintSchema,
+  type UniversalServiceId,
+  type PlannerIntent,
+  type ServiceCapabilityNeeds,
+  type RequirementAnalysisResult,
+  type ClarificationQuestion,
+  type ClarificationResolution,
+  type UniversalBlueprint,
+  type UniversalServiceBlueprint,
+  type UniversalPlannerRunInput,
+  type UniversalPlannerRunResult,
+} from "@/lib/ai-core/universal-planner";
+
+export {
   selectPremiumTemplate,
   applyPremiumTemplateToBrief,
   configurePremiumTemplate,

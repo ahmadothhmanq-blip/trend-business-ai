@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="768" height="1024" viewBox="0 0 768 1024" role="img" aria-label="Monolith Tablet preview">
+  <defs>
+    <linearGradient id="gold-768" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C8A951"/>
+      <stop offset="100%" stop-color="#9A7B3A"/>
+    </linearGradient>
+  </defs>
+  <rect width="768" height="1024" fill="#0B0A09"/>
+  <rect width="768" height="72" fill="#100F0D"/>
+  <rect x="40" y="28" width="88" height="16" rx="2" fill="url(#gold-768)" opacity="0.9"/>
+  <rect x="40" y="120" width="120" height="8" rx="2" fill="#C8A951" opacity="0.65"/>
+  <rect x="40" y="144" width="420" height="36" rx="4" fill="#F2EBE0" opacity="0.14"/>
+  <rect x="40" y="196" width="300" height="16" rx="4" fill="#F2EBE0" opacity="0.08"/>
+  <rect x="40" y="240" width="120" height="36" rx="2" fill="url(#gold-768)"/>
+  <rect x="176" y="240" width="120" height="36" rx="2" fill="none" stroke="#C8A951" stroke-width="1.5"/>
+  <rect x="40" y="320" width="688" height="140" rx="8" fill="#13110F" stroke="rgba(200,169,81,0.28)" stroke-width="1"/>
+  <rect x="40" y="500" width="688" height="1" fill="rgba(200,169,81,0.2)"/>
+  <rect x="40" y="540" width="40" height="40" rx="2" fill="none" stroke="#C8A951" stroke-width="1" opacity="0.5"/>
+  <rect x="96" y="552" width="240" height="12" rx="2" fill="#F2EBE0" opacity="0.12"/>
+  <rect x="40" y="620" width="688" height="1" fill="rgba(200,169,81,0.15)"/>
+  <rect x="40" y="660" width="40" height="40" rx="2" fill="none" stroke="#C8A951" stroke-width="1" opacity="0.5"/>
+  <rect x="96" y="672" width="220" height="12" rx="2" fill="#F2EBE0" opacity="0.12"/>
+  <rect x="40" y="760" width="220" height="180" rx="8" fill="#13110F" stroke="rgba(200,169,81,0.2)" stroke-width="1"/>
+  <rect x="280" y="760" width="220" height="180" rx="8" fill="#13110F" stroke="rgba(200,169,81,0.2)" stroke-width="1"/>
+  <rect x="520" y="760" width="208" height="180" rx="8" fill="#13110F" stroke="rgba(200,169,81,0.35)" stroke-width="1.5"/>
+</svg>

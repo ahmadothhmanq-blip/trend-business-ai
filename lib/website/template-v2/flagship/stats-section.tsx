@@ -15,33 +15,29 @@ export type FlagshipStatsProps = {
   stats?: FlagshipStat[];
 };
 
-const DEFAULT_STATS: FlagshipStat[] = [
-  { value: "98%", label: "Client satisfaction", detail: "12-month rolling" },
-  { value: "40+", label: "Markets served", detail: "Global footprint" },
-  { value: "15yr", label: "Industry leadership", detail: "Since founding" },
-  { value: "2.4×", label: "Average ROI", detail: "First-year impact" },
-];
-
 export function FlagshipStatsSection({
   ui,
   componentId,
-  id = "stats",
-  eyebrow = "By the numbers",
-  title = "Proof that compounds",
+  id,
+  eyebrow,
+  title,
   subtitle,
-  stats = DEFAULT_STATS,
+  stats,
 }: FlagshipStatsProps) {
+  if (!stats?.length) return null;
+  const sectionId = id ?? "stats";
+
   return (
     <section
-      id={id}
+      id={sectionId}
       data-v2-component={componentId}
-      aria-labelledby={`${id}-title`}
+      aria-labelledby={`${sectionId}-title`}
       className={`${ui.section} df-section-glow relative overflow-hidden bg-[var(--color-background)]`}
     >
       <div className="df-glow-orb -start-24 top-0 h-64 w-64 bg-[var(--color-accent)]" aria-hidden />
       <div className="df-glow-orb end-0 bottom-0 h-48 w-48 bg-[var(--color-primary)]" aria-hidden />
       <div className={`${ui.container} relative`}>
-        <FlagshipSectionHeader ui={ui} id={id} eyebrow={eyebrow} title={title} subtitle={subtitle} align="center" />
+        <FlagshipSectionHeader ui={ui} id={sectionId} eyebrow={eyebrow} title={title} subtitle={subtitle} align="center" />
         <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat) => (
             <div key={stat.label} className={`${ui.card} p-6 text-center sm:p-7`}>

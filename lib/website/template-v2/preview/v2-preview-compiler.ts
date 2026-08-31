@@ -1,14 +1,16 @@
 import { readFileSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { createSiteImageDepsFromFiles, type SiteImageDeps } from "@/lib/website/theme-preview/preview-stubs";
 import {
-  resolveSlotImage as canonicalResolveSlotImage,
-  slotImages as canonicalSlotImages,
-} from "@/lib/site-images";
+  buildSiteImagesRequireModule,
+  createSiteImageDepsFromFiles,
+  type SiteImageDeps,
+} from "@/lib/website/theme-preview/preview-stubs";
 import type { ComponentType, ReactNode } from "react";
 import { createRequire } from "node:module";
 import ts from "typescript";
+import { optimizeImageUrl } from "@/lib/ai-core/image-engine/optimize";
+import { getProfessionalScaffoldByPath } from "@/lib/ai-core/components/scaffolds";
 
 const nodeRequire = createRequire(import.meta.url);
 const workspaceRoot = join(
@@ -92,6 +94,12 @@ function findProjectFile(
     const fromDisk = readWorkspaceFile(candidate);
     if (fromDisk?.content?.trim()) return fromDisk;
   }
+  for (const candidate of candidates) {
+    const scaffold = getProfessionalScaffoldByPath(candidate);
+    if (scaffold?.trim()) {
+      return { path: candidate, content: scaffold };
+    }
+  }
   return null;
 }
 
@@ -113,11 +121,16 @@ function resolveExportModule(
   file: ProjectFileRef,
   exportName: string,
   files: ProjectFileRef[],
+  seen = new Set<string>(),
 ): ProjectFileRef {
+  const visitKey = `${normalizePath(file.path)}::${exportName}`;
+  if (seen.has(visitKey)) return file;
+  seen.add(visitKey);
+
   if (isComponentExport(file.content, exportName)) return file;
   const reexported = resolveReexportSource(file.content, exportName, files);
   if (reexported) {
-    return resolveExportModule(reexported, exportName, files);
+    return resolveExportModule(reexported, exportName, files, seen);
   }
   return file;
 }
@@ -198,8 +211,8 @@ function siteImageDepsRecord(base: BaseDeps): Record<string, unknown> {
     SECTION_IMAGES: base.SECTION_IMAGES,
     TESTIMONIAL_IMAGES: base.TESTIMONIAL_IMAGES,
     resolveSiteImage: base.resolveSiteImage,
-    resolveSlotImage: base.resolveSlotImage ?? canonicalResolveSlotImage,
-    slotImages: base.slotImages ?? canonicalSlotImages,
+    resolveSlotImage: base.resolveSlotImage,
+    slotImages: base.slotImages,
   };
 }
 
@@ -217,46 +230,110 @@ function siteImageCacheKey(deps: Record<string, unknown>): string {
   ].join("::");
 }
 
-function createPreviewRequire(React: ReactModule): (id: string) => unknown {
+function createPreviewRequire(
+  React: ReactModule,
+  siteImagesModule: Record<string, unknown>,
+): (id: string) => unknown {
   return (id: string) => {
     if (id === "react" || id === "react/jsx-runtime") return React;
+    if (id === "@/lib/site-images") return siteImagesModule;
+    if (id === "@/lib/ai-core/image-engine/optimize") {
+      return { optimizeImageUrl };
+    }
     throw new Error(`V2 preview: unsupported require("${id}")`);
   };
 }
 
+function stripExportKeywordsForPreview(transpiled: string): string {
+  return transpiled
+    .replace(/\bexport\s+default\s+async\s+function\s+/g, "async function ")
+    .replace(/\bexport\s+default\s+function\s+/g, "function ")
+    .replace(/\bexport\s+default\s+class\s+/g, "class ")
+    .replace(/\bexport\s+async\s+function\s+/g, "async function ")
+    .replace(/\bexport\s+function\s+/g, "function ")
+    .replace(/\bexport\s+class\s+/g, "class ")
+    .replace(/\bexport\s+const\s+/g, "const ")
+    .replace(/\bexport\s+let\s+/g, "let ")
+    .replace(/\bexport\s+var\s+/g, "var ")
+    .replace(/\bexport\s+default\s+/g, "__v2_default = ")
+    // Pure re-export lines are resolved via resolveExportModule before compile.
+    .replace(/^\s*export\s+type\s+[^;]+;?\s*$/gm, "")
+    .replace(/^\s*export\s+\{[^}]*\}\s+from\s+["'][^"']+["'];?\s*$/gm, "")
+    .replace(/^\s*export\s+\{[^}]*\}\s*;?\s*$/gm, "");
+}
+
+/**
+ * Evaluate a component/module in Preview.
+ *
+ * Next.js keeps local helpers (e.g. resolveLinks) in module scope. The old
+ * CommonJS + `exports.X = X` path could leave imported/local bindings missing
+ * inside `new Function`. ESNext emit + explicit return keeps helpers and the
+ * exported symbol in one lexical scope — same runtime behavior as the app.
+ */
 function compileModuleExport(
   source: string,
   exportName: string,
   deps: Record<string, unknown>,
+  previewRequire: (id: string) => unknown,
 ): unknown {
   const depKeys = Object.keys(deps).sort();
   const cacheKey = `export::${exportName}::${source.length}::${source.slice(0, 80)}::${depKeys.join(",")}::${siteImageCacheKey(deps)}`;
   const cached = compiledValueCache.get(cacheKey);
   if (cached !== undefined) return cached;
 
+  for (const { names, from } of parseNamedImports(source)) {
+    if (from === "react" || from.startsWith("next") || from === "@/lib/site-images") {
+      continue;
+    }
+    for (const name of names) {
+      if (!(name in deps)) {
+        throw new Error(
+          `V2 preview: missing binding "${name}" from "${from}" while compiling "${exportName}"`,
+        );
+      }
+    }
+  }
+
   const cleaned = preprocessScaffoldSource(source);
   const transpiled = ts.transpileModule(cleaned, {
     compilerOptions: {
       jsx: ts.JsxEmit.React,
       target: ts.ScriptTarget.ES2020,
-      module: ts.ModuleKind.CommonJS,
+      module: ts.ModuleKind.ESNext,
     },
   }).outputText;
 
-  const exports: Record<string, unknown> = {};
+  const body = stripExportKeywordsForPreview(transpiled);
   const { React } = getPreviewReactRuntime();
-  const previewRequire = createPreviewRequire(React);
-  const argNames = ["exports", "require", "React", ...depKeys];
-  const runner = new Function(...argNames, transpiled) as (
-    exports: Record<string, unknown>,
+  const argNames = ["require", "React", ...depKeys];
+  const runner = new Function(
+    ...argNames,
+    `"use strict";
+let __v2_default;
+${body}
+const __v2_export = typeof ${exportName} !== "undefined" ? ${exportName} : __v2_default;
+return { "${exportName}": __v2_export, default: __v2_default ?? __v2_export };`,
+  ) as (
     requireFn: (id: string) => unknown,
     react: typeof React,
     ...rest: unknown[]
-  ) => void;
+  ) => Record<string, unknown>;
 
-  runner(exports, previewRequire, React, ...depKeys.map((key) => deps[key]));
+  let result: Record<string, unknown>;
+  try {
+    result = runner(
+      previewRequire,
+      React,
+      ...depKeys.map((key) => deps[key]),
+    );
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(
+      `V2 preview: runtime error compiling "${exportName}": ${message}`,
+    );
+  }
 
-  const value = exports[exportName] ?? exports.default;
+  const value = result[exportName] ?? result.default;
   if (value === undefined) {
     throw new Error(`V2 preview: export "${exportName}" was not compiled`);
   }
@@ -269,8 +346,9 @@ function compileSource(
   source: string,
   exportName: string,
   deps: Record<string, unknown>,
+  previewRequire: (id: string) => unknown,
 ): ComponentType<Record<string, unknown>> {
-  const value = compileModuleExport(source, exportName, deps);
+  const value = compileModuleExport(source, exportName, deps, previewRequire);
   if (typeof value !== "function") {
     throw new Error(`V2 preview: export "${exportName}" is not a component`);
   }
@@ -287,12 +365,13 @@ function compileSource(
 function compileMotion(
   files: ProjectFileRef[],
   base: BaseDeps,
+  previewRequire: (id: string) => unknown,
 ): ComponentType<Record<string, unknown>> {
   const motionFile = findProjectFile(files, "@/components/ui/motion");
   if (!motionFile) {
     return base.Motion;
   }
-  return compileSource(motionFile.content, "Motion", {});
+  return compileSource(motionFile.content, "Motion", {}, previewRequire);
 }
 
 function compileModuleValue(
@@ -301,53 +380,77 @@ function compileModuleValue(
   files: ProjectFileRef[],
   base: BaseDeps,
   extraDeps: Record<string, ComponentType<Record<string, unknown>>>,
+  previewRequire: (id: string) => unknown,
+  compiling = new Set<string>(),
 ): unknown {
   const fileKey = normalizePath(file.path);
-  const cached = compiledValueCache.get(`value::${fileKey}::${exportName}`);
+  const compileKey = `value::${fileKey}::${exportName}`;
+  const cached = compiledValueCache.get(compileKey);
   if (cached !== undefined) return cached;
+  if (compiling.has(compileKey)) {
+    throw new Error(`V2 preview: circular value export "${exportName}" in ${fileKey}`);
+  }
+  compiling.add(compileKey);
 
   const moduleDeps: Record<string, unknown> = {
     ...siteImageDepsRecord(base),
     ...extraDeps,
   };
 
-  for (const { names, from } of parseNamedImports(file.content)) {
-    if (from === "react" || from.startsWith("next")) continue;
-    if (from === "@/lib/site-images") continue;
+  try {
+    for (const { names, from } of parseNamedImports(file.content)) {
+      if (from === "react" || from.startsWith("next")) continue;
+      if (from === "@/lib/site-images") continue;
 
-    const depFile = findProjectFile(files, from);
-    if (!depFile) continue;
-
-    for (const name of names) {
-      if (moduleDeps[name]) continue;
-      if (from === "@/components/ui/motion" && name === "Motion") {
-        moduleDeps.Motion = base.Motion;
-        continue;
+      const depFile = findProjectFile(files, from);
+      if (!depFile) {
+        throw new Error(
+          `V2 preview: cannot resolve "${from}" (needed for ${names.join(", ")}) in ${fileKey}`,
+        );
       }
-      const resolved = resolveExportModule(depFile, name, files);
-      if (isComponentExport(resolved.content, name)) {
-        moduleDeps[name] = compileProjectModule(
-          resolved,
-          name,
-          files,
-          base,
-          extraDeps,
-        );
-      } else {
-        moduleDeps[name] = compileModuleValue(
-          resolved,
-          name,
-          files,
-          base,
-          extraDeps,
-        );
+
+      for (const name of names) {
+        if (moduleDeps[name]) continue;
+        if (from === "@/components/ui/motion" && name === "Motion") {
+          moduleDeps.Motion = base.Motion;
+          continue;
+        }
+        const resolved = resolveExportModule(depFile, name, files);
+        if (isComponentExport(resolved.content, name)) {
+          moduleDeps[name] = compileProjectModule(
+            resolved,
+            name,
+            files,
+            base,
+            extraDeps,
+            previewRequire,
+            compiling,
+          );
+        } else {
+          moduleDeps[name] = compileModuleValue(
+            resolved,
+            name,
+            files,
+            base,
+            extraDeps,
+            previewRequire,
+            compiling,
+          );
+        }
       }
     }
-  }
 
-  const value = compileModuleExport(file.content, exportName, moduleDeps);
-  compiledValueCache.set(`value::${fileKey}::${exportName}`, value);
-  return value;
+    const value = compileModuleExport(
+      file.content,
+      exportName,
+      moduleDeps,
+      previewRequire,
+    );
+    compiledValueCache.set(compileKey, value);
+    return value;
+  } finally {
+    compiling.delete(compileKey);
+  }
 }
 
 function compileProjectModule(
@@ -356,53 +459,77 @@ function compileProjectModule(
   files: ProjectFileRef[],
   base: BaseDeps,
   extraDeps: Record<string, ComponentType<Record<string, unknown>>>,
+  previewRequire: (id: string) => unknown,
+  compiling = new Set<string>(),
 ): ComponentType<Record<string, unknown>> {
   const fileKey = normalizePath(file.path);
-  const cached = compiledCache.get(`file::${fileKey}::${exportName}`);
+  const compileKey = `file::${fileKey}::${exportName}`;
+  const cached = compiledCache.get(compileKey);
   if (cached) return cached;
+  if (compiling.has(compileKey)) {
+    throw new Error(`V2 preview: circular component export "${exportName}" in ${fileKey}`);
+  }
+  compiling.add(compileKey);
 
   const moduleDeps: Record<string, unknown> = {
     ...siteImageDepsRecord(base),
     ...extraDeps,
   };
 
-  for (const { names, from } of parseNamedImports(file.content)) {
-    if (from === "react" || from.startsWith("next")) continue;
-    if (from === "@/lib/site-images") continue;
+  try {
+    for (const { names, from } of parseNamedImports(file.content)) {
+      if (from === "react" || from.startsWith("next")) continue;
+      if (from === "@/lib/site-images") continue;
 
-    const depFile = findProjectFile(files, from);
-    if (!depFile) continue;
-
-    for (const name of names) {
-      if (moduleDeps[name]) continue;
-      if (from === "@/components/ui/motion" && name === "Motion") {
-        moduleDeps.Motion = base.Motion;
-        continue;
+      const depFile = findProjectFile(files, from);
+      if (!depFile) {
+        throw new Error(
+          `V2 preview: cannot resolve "${from}" (needed for ${names.join(", ")}) in ${fileKey}`,
+        );
       }
-      const resolved = resolveExportModule(depFile, name, files);
-      if (isComponentExport(resolved.content, name)) {
-        moduleDeps[name] = compileProjectModule(
-          resolved,
-          name,
-          files,
-          base,
-          extraDeps,
-        );
-      } else {
-        moduleDeps[name] = compileModuleValue(
-          resolved,
-          name,
-          files,
-          base,
-          extraDeps,
-        );
+
+      for (const name of names) {
+        if (moduleDeps[name]) continue;
+        if (from === "@/components/ui/motion" && name === "Motion") {
+          moduleDeps.Motion = base.Motion;
+          continue;
+        }
+        const resolved = resolveExportModule(depFile, name, files);
+        if (isComponentExport(resolved.content, name)) {
+          moduleDeps[name] = compileProjectModule(
+            resolved,
+            name,
+            files,
+            base,
+            extraDeps,
+            previewRequire,
+            compiling,
+          );
+        } else {
+          moduleDeps[name] = compileModuleValue(
+            resolved,
+            name,
+            files,
+            base,
+            extraDeps,
+            previewRequire,
+            compiling,
+          );
+        }
       }
     }
-  }
 
-  const component = compileSource(file.content, exportName, moduleDeps);
-  compiledCache.set(`file::${fileKey}::${exportName}`, component);
-  return component;
+    const component = compileSource(
+      file.content,
+      exportName,
+      moduleDeps,
+      previewRequire,
+    );
+    compiledCache.set(compileKey, component);
+    return component;
+  } finally {
+    compiling.delete(compileKey);
+  }
 }
 
 export function renderV2PageMarkup(
@@ -414,44 +541,75 @@ export function renderV2PageMarkup(
     throw new Error("V2 preview requires app/page.tsx in project.files");
   }
 
-  const images = createSiteImageDepsFromFiles(files, heroImageUrl);
-  const { React, renderToStaticMarkup } = getPreviewReactRuntime();
-  const motionStub: ComponentType<Record<string, unknown>> = ({ children, className }) =>
-    React.createElement("div", { className: className as string }, children as ReactNode);
+  try {
+    const images = createSiteImageDepsFromFiles(files, heroImageUrl);
+    const siteImagesModule = buildSiteImagesRequireModule(images);
+    const { React, renderToStaticMarkup } = getPreviewReactRuntime();
+    const previewRequire = createPreviewRequire(React, siteImagesModule);
+    const motionStub: ComponentType<Record<string, unknown>> = ({ children, className }) =>
+      React.createElement("div", { className: className as string }, children as ReactNode);
 
-  const base: BaseDeps = {
-    Motion: motionStub,
-    ...images,
-  };
-  base.Motion = compileMotion(files, base);
+    const base: BaseDeps = {
+      Motion: motionStub,
+      ...images,
+    };
+    base.Motion = compileMotion(files, base, previewRequire);
 
-  const pageDeps: Record<string, ComponentType<Record<string, unknown>>> = {};
-  const pageValueDeps: Record<string, unknown> = {};
-  for (const { names, from } of parseNamedImports(pageFile.content)) {
-    if (from === "react" || from.startsWith("next") || from === "@/lib/site-images") {
-      continue;
-    }
-    const depFile = findProjectFile(files, from);
-    if (!depFile) continue;
-    for (const name of names) {
-      const resolved = resolveExportModule(depFile, name, files);
-      if (isComponentExport(resolved.content, name)) {
-        pageDeps[name] = compileProjectModule(resolved, name, files, base, pageDeps);
-      } else {
-        pageValueDeps[name] = compileModuleValue(resolved, name, files, base, pageDeps);
+    const pageDeps: Record<string, ComponentType<Record<string, unknown>>> = {};
+    const pageValueDeps: Record<string, unknown> = {};
+    for (const { names, from } of parseNamedImports(pageFile.content)) {
+      if (from === "react" || from.startsWith("next") || from === "@/lib/site-images") {
+        continue;
+      }
+      const depFile = findProjectFile(files, from);
+      if (!depFile) {
+        throw new Error(
+          `V2 preview: cannot resolve "${from}" (needed for ${names.join(", ")}) in app/page.tsx`,
+        );
+      }
+      for (const name of names) {
+        const resolved = resolveExportModule(depFile, name, files);
+        if (isComponentExport(resolved.content, name)) {
+          pageDeps[name] = compileProjectModule(
+            resolved,
+            name,
+            files,
+            base,
+            pageDeps,
+            previewRequire,
+          );
+        } else {
+          pageValueDeps[name] = compileModuleValue(
+            resolved,
+            name,
+            files,
+            base,
+            pageDeps,
+            previewRequire,
+          );
+        }
       }
     }
+
+    const pageExport = resolveDefaultExportName(pageFile.content);
+    const pageDepsRecord: Record<string, unknown> = {
+      ...siteImageDepsRecord(base),
+      ...pageDeps,
+      ...pageValueDeps,
+    };
+
+    const Page = compileSource(
+      pageFile.content,
+      pageExport,
+      pageDepsRecord,
+      previewRequire,
+    );
+    return renderToStaticMarkup(React.createElement(Page, {}));
+  } finally {
+    // Release transpiled component closures after each preview — caches are per-request only.
+    compiledCache.clear();
+    compiledValueCache.clear();
   }
-
-  const pageExport = resolveDefaultExportName(pageFile.content);
-  const pageDepsRecord: Record<string, unknown> = {
-    ...siteImageDepsRecord(base),
-    ...pageDeps,
-    ...pageValueDeps,
-  };
-
-  const Page = compileSource(pageFile.content, pageExport, pageDepsRecord);
-  return renderToStaticMarkup(React.createElement(Page, {}));
 }
 
 export function extractV2PackageIdFromPage(pageSource: string): string | null {

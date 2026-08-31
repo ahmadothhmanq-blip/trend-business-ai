@@ -1,0 +1,503 @@
+/* Estates — real-estate-premium — PROPERTY DOSSIER DNA (.rep-*) */
+
+.rep-nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: color-mix(in srgb, var(--color-background) 92%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 12%, transparent));
+}
+
+.rep-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  max-width: 88rem;
+  margin-inline: auto;
+  padding: 0.85rem 1.25rem;
+}
+
+.rep-nav-brand {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 0.8125rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-foreground);
+}
+
+.rep-nav-links {
+  display: none;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .rep-nav-links {
+    display: flex;
+  }
+}
+
+.rep-nav-links a {
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: color-mix(in srgb, var(--color-foreground) 70%, transparent);
+}
+
+.rep-nav-links a:hover {
+  color: var(--color-accent);
+}
+
+/* Hero = search utility + featured dossier opener (not marketing theatre) */
+.rep-dossier-opener {
+  display: grid;
+  gap: 0;
+  border-bottom: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 12%, transparent));
+  background: var(--color-background);
+}
+
+@media (min-width: 1024px) {
+  .rep-dossier-opener {
+    grid-template-columns: minmax(16rem, 0.95fr) minmax(0, 1.35fr);
+    min-height: min(88svh, 52rem);
+  }
+}
+
+.rep-dossier-search {
+  padding: 2rem 1.25rem 2.5rem;
+  border-bottom: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 10%, transparent));
+  background: var(--color-surface);
+}
+
+@media (min-width: 1024px) {
+  .rep-dossier-search {
+    border-bottom: 0;
+    border-inline-end: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 10%, transparent));
+    padding: 2.5rem 1.75rem;
+  }
+}
+
+.rep-dossier-search-label {
+  font-size: 0.625rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin: 0 0 1rem;
+}
+
+.rep-dossier-search form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.rep-dossier-search input,
+.rep-dossier-search select {
+  width: 100%;
+  border: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 14%, transparent));
+  background: var(--color-background);
+  color: var(--color-foreground);
+  padding: 0.75rem 0.9rem;
+  font-size: 0.875rem;
+}
+
+.rep-dossier-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.rep-dossier-filters button {
+  border: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 14%, transparent));
+  background: transparent;
+  color: var(--color-foreground);
+  padding: 0.45rem 0.75rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.rep-dossier-filters button:hover,
+.rep-dossier-filters button[aria-pressed="true"] {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.rep-dossier-featured {
+  padding: 2rem 1.25rem 2.5rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .rep-dossier-featured {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    padding: 2.5rem 2rem;
+    align-items: start;
+  }
+}
+
+.rep-dossier-featured-visual {
+  position: relative;
+  min-height: 16rem;
+  background: color-mix(in srgb, var(--color-surface) 70%, var(--color-primary));
+  border: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 10%, transparent));
+  overflow: hidden;
+}
+
+.rep-dossier-featured-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  min-height: 16rem;
+}
+
+.rep-dossier-featured-visual-empty {
+  min-height: 16rem;
+  display: flex;
+  align-items: flex-end;
+  padding: 1rem;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  color: color-mix(in srgb, var(--color-foreground) 14%, transparent);
+}
+
+.rep-dossier-sheet {
+  border: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 12%, transparent));
+  background: var(--color-background);
+  padding: 1.25rem 1.35rem 1.5rem;
+}
+
+.rep-dossier-sheet-ref {
+  font-family: var(--font-mono, ui-monospace), monospace;
+  font-size: 0.625rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin: 0 0 0.75rem;
+}
+
+.rep-dossier-sheet h1,
+.rep-dossier-sheet h2 {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.rep-dossier-sheet-deck {
+  margin: 0.85rem 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--color-muted);
+}
+
+.rep-spec-list {
+  margin: 1.25rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 10%, transparent));
+}
+
+.rep-spec-list > div {
+  display: grid;
+  grid-template-columns: minmax(6rem, 0.4fr) minmax(0, 1fr);
+  gap: 0.75rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 8%, transparent));
+}
+
+.rep-spec-list dt {
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin: 0;
+}
+
+.rep-spec-list dd {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-foreground);
+}
+
+/* Amenities / features as specs */
+.rep-amenities {
+  padding: clamp(3.5rem, 8vw, 5.5rem) 1.25rem;
+  background: var(--color-background);
+  border-bottom: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 10%, transparent));
+}
+
+.rep-amenities-inner {
+  max-width: 56rem;
+  margin-inline: auto;
+}
+
+.rep-amenities-title {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 500;
+  margin: 0 0 1.5rem;
+}
+
+/* Listings split: index | dossier */
+.rep-listings {
+  display: grid;
+  gap: 0;
+  border-bottom: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 10%, transparent));
+  background: var(--color-background);
+  min-height: 28rem;
+}
+
+@media (min-width: 1024px) {
+  .rep-listings {
+    grid-template-columns: minmax(15rem, 0.85fr) minmax(0, 1.45fr);
+  }
+}
+
+.rep-listings-index {
+  border-bottom: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 10%, transparent));
+  background: var(--color-surface);
+}
+
+@media (min-width: 1024px) {
+  .rep-listings-index {
+    border-bottom: 0;
+    border-inline-end: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 10%, transparent));
+    position: sticky;
+    top: 3.5rem;
+    align-self: start;
+    max-height: calc(100svh - 3.5rem);
+    overflow-y: auto;
+  }
+}
+
+.rep-listings-index-head {
+  padding: 1.25rem 1.25rem 0.75rem;
+  font-size: 0.625rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.rep-listing-row {
+  display: block;
+  width: 100%;
+  text-align: start;
+  border: 0;
+  border-top: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 8%, transparent));
+  background: transparent;
+  color: inherit;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+}
+
+.rep-listing-row:hover,
+.rep-listing-row[aria-current="true"] {
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+}
+
+.rep-listing-row-title {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.rep-listing-row-meta {
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--color-muted);
+}
+
+.rep-listings-detail {
+  padding: 1.5rem 1.25rem 2.5rem;
+}
+
+@media (min-width: 768px) {
+  .rep-listings-detail {
+    padding: 2rem 2rem 3rem;
+  }
+}
+
+.rep-listings-detail-visual {
+  position: relative;
+  min-height: 14rem;
+  margin-bottom: 1.25rem;
+  overflow: hidden;
+  border: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 10%, transparent));
+  background: color-mix(in srgb, var(--color-surface) 70%, var(--color-primary));
+}
+
+.rep-listings-detail-visual img {
+  width: 100%;
+  height: 100%;
+  min-height: 14rem;
+  object-fit: cover;
+  display: block;
+}
+
+.rep-section-plain {
+  padding: clamp(3.5rem, 8vw, 5.5rem) 1.25rem;
+  background: var(--color-background);
+  border-bottom: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 8%, transparent));
+}
+
+.rep-section-plain-inner {
+  max-width: 56rem;
+  margin-inline: auto;
+}
+
+.rep-stats-sheet {
+  margin: 1.5rem 0 0;
+  padding: 0;
+}
+
+.rep-stats-sheet > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 8%, transparent));
+}
+
+.rep-stats-sheet dt {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.rep-stats-sheet dd {
+  margin: 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.25rem;
+}
+
+.rep-testimonial-sheet {
+  border: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 12%, transparent));
+  padding: 1.75rem;
+  background: var(--color-surface);
+}
+
+.rep-testimonial-sheet p {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.15rem, 2.4vw, 1.65rem);
+  line-height: 1.35;
+  margin: 0;
+}
+
+.rep-testimonial-sheet footer {
+  margin-top: 1.25rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.rep-agency-programs {
+  margin: 1.5rem 0 0;
+  padding: 0;
+}
+
+.rep-agency-programs > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) auto;
+  gap: 1rem;
+  align-items: baseline;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 8%, transparent));
+}
+
+.rep-agency-programs dt {
+  margin: 0;
+}
+
+.rep-agency-programs dt strong {
+  display: block;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+.rep-agency-programs dt span {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+}
+
+.rep-agency-programs dd {
+  margin: 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.15rem;
+  white-space: nowrap;
+}
+
+.rep-contact-sheet {
+  max-width: 36rem;
+  margin-inline: auto;
+}
+
+.rep-contact-sheet form {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.rep-contact-sheet input,
+.rep-contact-sheet textarea {
+  width: 100%;
+  border: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 14%, transparent));
+  background: var(--color-background);
+  color: var(--color-foreground);
+  padding: 0.75rem 0.9rem;
+  font-size: 0.875rem;
+}
+
+.rep-footer {
+  padding: 2.5rem 1.25rem 3rem;
+  background: var(--color-surface);
+  border-top: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 10%, transparent));
+}
+
+.rep-footer-grid {
+  max-width: 88rem;
+  margin-inline: auto;
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .rep-footer-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.rep-footer-grid p:first-child {
+  font-family: var(--font-display), Georgia, serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.8125rem;
+  margin: 0;
+}
+
+.rep-footer-meta {
+  max-width: 88rem;
+  margin: 2rem auto 0;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border-default, color-mix(in srgb, var(--color-foreground) 8%, transparent));
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+

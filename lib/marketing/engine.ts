@@ -40,6 +40,7 @@ export async function generateCampaign(input: {
   budget?: number;
   channels?: string[];
   tone?: string;
+  language?: string;
 }): Promise<GeneratedMarketingCampaign & { provider: string }> {
   const prompt = buildCampaignGenerationPrompt(input);
   const data = await generateJson<Record<string, unknown>>(prompt);
@@ -70,6 +71,7 @@ export async function generatePersona(input: {
   brief: string;
   industry?: string;
   product?: string;
+  language?: string;
 }): Promise<GeneratedPersona & { provider: string }> {
   const prompt = buildPersonaGenerationPrompt(input);
   const data = await generateJson<Record<string, unknown>>(prompt);
@@ -88,7 +90,7 @@ export async function generatePersona(input: {
 
 export async function runMarketingAssistant(
   action: MarketingAssistantAction,
-  input: { text: string; campaignContext?: string; instruction?: string },
+  input: { text: string; campaignContext?: string; instruction?: string; language?: string },
 ): Promise<Record<string, unknown> & { provider: string }> {
   const prompt = buildAssistantPrompt(action, input);
   return generateJson<Record<string, unknown>>(prompt);

@@ -6,6 +6,7 @@ export type BusinessPluginInput = {
   companyStage: string;
   targetMarket: string;
   options: string[];
+  language?: string;
 };
 
 export type BusinessAnalysis = {

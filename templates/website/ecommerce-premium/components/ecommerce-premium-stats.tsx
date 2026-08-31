@@ -1,9 +1,14 @@
 "use client";
 
-import { FlagshipStatsSection } from "@/lib/website/template-v2/flagship/stats-section";
-import { ECOMMERCE_FLAGSHIP_UI } from "@/lib/website/template-v2/flagship/themes";
+/** Stats live as the hero ticker; this section stays a slim secondary strip when included. */
+const DEFAULT_STATS = [
+  { value: "12", label: "Cities stocked", detail: "flagship" },
+  { value: "48h", label: "White-glove window", detail: "metro" },
+  { value: "1/yr", label: "Archive drop", detail: "numbered" },
+  { value: "100%", label: "Traceable makers", detail: "atelier" },
+];
 
-type Props = {
+type EcommercePremiumStatsProps = {
   eyebrow?: string;
   title?: string;
   subtitle?: string;
@@ -11,25 +16,33 @@ type Props = {
 };
 
 export function EcommercePremiumStats({
-  eyebrow = "By the numbers",
-  title = "Trusted by collectors worldwide",
-  subtitle = "A community built on craft, transparency, and objects that endure beyond seasons.",
-  stats = [
-    { value: "48+", label: "Artisan partners", detail: "Independent studios" },
-    { value: "4.9", label: "Customer rating", detail: "12k+ reviews" },
-    { value: "72h", label: "Avg. delivery", detail: "Express available" },
-    { value: "98%", label: "Would recommend", detail: "Repeat collectors" },
-  ],
-}: Props) {
+  eyebrow = "Signals",
+  title = "Collection pulse",
+  subtitle,
+  stats = DEFAULT_STATS,
+}: EcommercePremiumStatsProps) {
   return (
-    <FlagshipStatsSection
-      ui={ECOMMERCE_FLAGSHIP_UI}
-      componentId="ecommerce-premium-stats"
+    <section
       id="stats"
-      eyebrow={eyebrow}
-      title={title}
-      subtitle={subtitle}
-      stats={stats}
-    />
+      data-v2-component="ecommerce-premium-stats"
+      aria-label={title}
+      className="ec-slim-ticker ec-reveal"
+    >
+      <p className="sr-only">
+        {eyebrow}. {title}
+        {subtitle ? ` ${subtitle}` : ""}
+      </p>
+      <dl className="ec-slim-ticker-row">
+        {stats.map((s) => (
+          <div key={s.label} className="ec-slim-ticker-item">
+            <dd>{s.value}</dd>
+            <dt>
+              {s.label}
+              {s.detail ? <span> · {s.detail}</span> : null}
+            </dt>
+          </div>
+        ))}
+      </dl>
+    </section>
   );
 }

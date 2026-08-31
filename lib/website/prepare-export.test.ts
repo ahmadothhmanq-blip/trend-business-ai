@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { prepareWebsiteProjectForExport } from "./prepare-export.ts";
+import { prepareWebsiteProjectForExport } from "./prepare-export";
 
 /** Minimal AI Signal scaffold similar to QA Test Corp before export prep. */
 function minimalGeneratedProject() {

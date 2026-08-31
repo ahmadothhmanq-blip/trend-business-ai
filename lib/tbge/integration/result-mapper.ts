@@ -7,6 +7,8 @@ import type { TbgeArtifactFile } from "@/lib/tbge/kernel/types";
 import type { GenerationSpec } from "@/lib/tbge/spec/types";
 import type { GeneratedWebsiteProject } from "@/lib/website/types";
 import { mergeIntegrationSettings } from "@/lib/ai-core/generation-engine/integration";
+import { normalizeExplicitRoutingIndustryId } from "@/lib/website/site-plan/normalize-routing-industry";
+import { resolveWebsiteIndustryId } from "@/lib/website/industry/industry-resolver";
 
 export function mapTbgeFilesToWebsiteFiles(
   files: TbgeArtifactFile[],
@@ -43,6 +45,19 @@ export function mapTbgeSpecToWebsiteProject(input: {
     spec.design.tokens.background,
     spec.design.tokens.foreground,
   ];
+  const businessIndustry =
+    normalizeExplicitRoutingIndustryId(spec.business.industryId) ??
+    normalizeExplicitRoutingIndustryId(spec.business.industry) ??
+    resolveWebsiteIndustryId({
+      prompt,
+      title: spec.business.name,
+      description: spec.business.offer,
+      industryId: spec.business.industryId,
+      businessIndustry: spec.business.industry,
+    }) ??
+    spec.business.industryId?.trim() ??
+    spec.business.industry?.trim() ??
+    undefined;
 
   return {
     projectKind: spec.productId === "website-builder" ? "website" : "web_application",
@@ -76,6 +91,7 @@ export function mapTbgeSpecToWebsiteProject(input: {
         isEcommerce: String(spec.capabilities.ecommerce),
         isSaas: String(spec.capabilities.saas),
         databaseProvider: spec.capabilities.database.provider,
+        ...(businessIndustry ? { businessIndustry } : {}),
       },
       settingsPatch ?? {},
     ) as GeneratedWebsiteProject["settings"],

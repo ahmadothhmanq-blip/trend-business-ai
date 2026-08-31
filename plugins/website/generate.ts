@@ -16,23 +16,25 @@ import {
 import { sanitizeProjectPath } from "@/lib/ai/zipper";
 import { logger } from "@/lib/logger";
 import {
-  assetManifestForPrompt,
-  generateWebsiteAssets,
-} from "@/plugins/website/layers/assets";
-import {
   injectProfessionalComponents,
 } from "@/lib/ai-core/components";
 import {
   resolveWebsiteGenerationProfile,
+  isStructureFirstEnabled,
 } from "@/lib/website/generation-flags";
-import { injectAiImagesIntoProject } from "@/lib/ai-core/image-engine";
 import { getThemePageArchitecture } from "@/lib/website/builder/theme-architecture";
+import {
+  projectCapabilityFlags,
+  refreshCapabilities,
+} from "@/lib/website/builder/capabilities";
 import {
   applyV2StructureDuringGeneration,
   resolveGenerationTemplatePackageId,
   resolveTemplateIntelligenceForStructurePackage,
   shouldUseV2StructureDuringGeneration,
 } from "@/lib/website/template-v2/generation/v2-generation-bridge";
+import { composeStructureFirstHomeFiles } from "@/lib/website/template-v2/integration/compose-structure-first-home";
+import { resolveStructureFirstHomeComponents } from "@/lib/website/template-v2/integration/strategy-home-components";
 import {
   buildGenerationRepairInstruction,
   validateWebsiteGeneration,
@@ -54,10 +56,9 @@ import {
 import { performance } from "node:perf_hooks";
 import {
   buildWebsiteLanguageDirective,
-} from "@/lib/ai-core/website-builder/language-directive";
+} from "@/lib/ai-core/website-builder/language-directive.server";
 import { websiteGenerateJson } from "@/lib/ai-core/website-builder/llm-calls";
 import { productionContentForPreview } from "@/lib/ai-core/content/production-content";
-import { buildWebsiteGenerationKey } from "@/lib/ai-core/website-builder/prompt-industry";
 import { designSystemCssVariables } from "@/plugins/website/layers/design-engine";
 import {
   runUnifiedQualityPipeline,
@@ -82,6 +83,24 @@ import { runWebsiteFileLoop } from "@/plugins/website/file-generation-loop";
 
 const FILE_GENERATION_RETRIES = 3;
 const PROJECT_VALIDATION_ROUNDS = 2;
+
+function assetManifestForPrompt(manifest: AssetManifest): string {
+  return manifest.items
+    .map((item) => {
+      const meta = item.metadata;
+      const metaBits = [
+        meta?.purpose ? `purpose=${meta.purpose}` : null,
+        meta?.section ? `section=${meta.section}` : null,
+        meta?.style ? `style=${meta.style}` : null,
+        meta?.provider ? `provider=${meta.provider}` : null,
+      ]
+        .filter(Boolean)
+        .join(", ");
+      return `- id=${item.id} role=${item.role} name=${item.name}: alt="${item.alt}" url=${item.url || "missing"} (${item.status})${metaBits ? ` [${metaBits}]` : ""}
+  Use this exact URL in next/image or <img>. Prefer import from @/lib/site-images (HERO_IMAGE, SECTION_IMAGES, GALLERY_IMAGES, etc.).`;
+    })
+    .join("\n");
+}
 
 async function profilePlugin<T>(
   category: ProfilerCategory,
@@ -413,15 +432,80 @@ export async function applyQualityImprovePass(
 }
 
 export type GenerateWebsiteOptions = {
-  /** Precomputed assets from AI Core assets layer */
-  assetManifest?: AssetManifest;
-  /** Skip asset generation (requires assetManifest) */
-  skipAssetGeneration?: boolean;
+  /** Precomputed assets from AI Core image engine (runAiImageEngine). */
+  assetManifest: AssetManifest;
   /** Skip quality check/improve (Core quality layer will run) */
   skipQuality?: boolean;
   /** fast | professional — controls repair strictness and file scope */
   generationProfile?: import("@/lib/website/generation-flags").WebsiteGenerationProfile;
 };
+
+function structureFirstComponentPaths(plan: WebsitePlanResult): string[] {
+  return plan.filePlans
+    .map((f) => f.path)
+    .filter(
+      (p) =>
+        p.startsWith("components/sections/") ||
+        p.startsWith("components/layout/") ||
+        p.startsWith("components/ui/"),
+    );
+}
+
+function injectStructureFirstV2HomePage(params: {
+  files: GeneratedProjectFile[];
+  plan: WebsitePlanResult;
+  analysis: WebsiteProjectAnalysis;
+  generationInput: WebsiteGenerationInput;
+  productionContent: NonNullable<
+    Awaited<
+      ReturnType<
+        typeof import("@/lib/ai-core/content-intelligence/resolve").resolveProductionContentWithIntelligence
+      >
+    >["pack"]
+  >;
+  brandName: string;
+  sectionShellVariant:
+    | import("@/lib/ai-core/components/scaffolds").SectionShellVariant
+    | null;
+}): GeneratedProjectFile[] {
+  const industryId =
+    params.analysis.businessProfile?.industry ??
+    (typeof params.generationInput.industryId === "string"
+      ? params.generationInput.industryId
+      : undefined);
+  const { service: capabilityService } = projectCapabilityFlags(
+    {
+      projectKind: params.generationInput.projectKind,
+      title: params.plan.blueprint.title || params.analysis.projectName,
+      description: params.plan.blueprint.description,
+      pages: params.plan.blueprint.pages,
+      sections: params.plan.blueprint.sections,
+      colorPalette: params.plan.blueprint.colorPalette,
+      typography: params.plan.blueprint.typography,
+      components: params.plan.blueprint.components,
+      content: params.plan.blueprint.content,
+      seo: params.plan.blueprint.seo,
+      roadmap: params.plan.blueprint.roadmap,
+      files: params.files,
+      strategy: params.plan.strategy,
+      businessProfile: params.analysis.businessProfile,
+      settings: {},
+    },
+    { files: params.files },
+  );
+  return composeStructureFirstHomeFiles({
+    files: params.files,
+    strategy: params.plan.strategy,
+    industryId,
+    brandName: params.brandName,
+    productionContent: params.productionContent,
+    language: params.generationInput.language,
+    sectionShellVariant: params.sectionShellVariant,
+    componentPaths: structureFirstComponentPaths(params.plan),
+    capabilityService,
+    compositionMode: params.plan.designSystem.industryPattern,
+  });
+}
 
 export async function generateWebsite(
   input: WebsiteGenerationInput,
@@ -452,25 +536,12 @@ export async function generateWebsite(
       }
     : input;
 
-  const assetManifest =
-    options?.skipAssetGeneration && options.assetManifest
-      ? options.assetManifest
-      : await profilePlugin("image-generation", "generateWebsiteAssets", () =>
-          generateWebsiteAssets({
-            input: generationInput,
-            businessProfile: analysis.businessProfile,
-            strategy: plan.strategy,
-            designSystem: plan.designSystem,
-            ctx,
-            userId: input.userId,
-            generationKey: buildWebsiteGenerationKey({
-              userId: input.userId,
-              parentGenerationId: input.parentGenerationId,
-              mode: input.mode,
-              prompt: input.prompt,
-            }),
-          }),
-        );
+  const assetManifest = options?.assetManifest;
+  if (!assetManifest) {
+    throw new Error(
+      "generateWebsite requires options.assetManifest from runAiImageEngine (AI Core image engine).",
+    );
+  }
   const assetSummary = assetManifestForPrompt(assetManifest);
 
   ctx.progress.emit("Generating files...");
@@ -553,16 +624,7 @@ export async function generateWebsite(
       ),
   });
 
-  // AI Image Engine: inject lib/site-images.ts and wire photographic URLs into components.
-  const industryHint =
-    analysis.businessProfile?.industry || plan.designSystem.industryPattern;
-  const coreManifest =
-    assetManifest as import("@/lib/ai-core/layers/types").CoreAssetManifest;
-  const filesWithImages = injectAiImagesIntoProject({
-    files,
-    assetManifest: coreManifest,
-    industry: industryHint,
-  });
+  // Image injection runs once in lib/website/orchestrator after V2 finalize.
 
   // Industry copy → hero/CTA props on composed home page.
   const { resolveProductionContentWithIntelligence } = await import(
@@ -629,10 +691,44 @@ export async function generateWebsite(
     });
     productionContent = contentResolution.pack;
     contentIntelligenceTrace = contentResolution.trace;
-    filesWithComponents = filesWithImages;
+    filesWithComponents = files;
+    if (isStructureFirstEnabled() && productionContent) {
+      filesWithComponents = injectStructureFirstV2HomePage({
+        files,
+        plan,
+        analysis,
+        generationInput,
+        productionContent,
+        brandName,
+        sectionShellVariant,
+      });
+      filesWithComponents = polishGeneratedProject({
+        files: filesWithComponents,
+        componentIds: resolveStructureFirstHomeComponents({
+          strategy: plan.strategy,
+          industryId:
+            analysis.businessProfile?.industry ??
+            (typeof generationInput.industryId === "string"
+              ? generationInput.industryId
+              : undefined),
+          compositionMode: plan.designSystem.industryPattern,
+        }).map(String),
+        brandName,
+        pageTitle:
+          plan.blueprint.title ||
+          productionContent.heroHeadline ||
+          analysis.projectName,
+        pageDescription:
+          plan.blueprint.description || productionContent.heroSubheadline,
+        content: productionContent,
+        language: generationInput.language,
+        eliteColors: generationInput.agencyContract?.brandKit.colorPalette,
+        spacingDensity: plan.designSystem.uiStyle?.density,
+      });
+    }
   } else if (localizedCopy) {
     filesWithComponents = injectProfessionalComponents({
-      files: filesWithImages,
+      files,
       composePage: false,
       language: generationInput.language,
     });
@@ -651,7 +747,7 @@ export async function generateWebsite(
     contentIntelligenceTrace = contentResolution.trace;
 
     filesWithComponents = injectProfessionalComponents({
-      files: filesWithImages,
+      files,
       componentPaths: plan.filePlans
         .map((f) => f.path)
         .filter(
@@ -715,13 +811,6 @@ export async function generateWebsite(
         minimalGeneration ? "fatal-only" : "full",
       ),
   );
-
-  // Re-inject after validation repairs so LLM rewrites cannot drop site imagery.
-  validatedFiles = injectAiImagesIntoProject({
-    files: validatedFiles,
-    assetManifest: coreManifest,
-    industry: industryHint,
-  });
 
   validatedFiles = repairAccessibility(validatedFiles);
 
@@ -805,11 +894,6 @@ export async function generateWebsite(
           assetManifestForPrompt(assetManifest),
           repairInstruction,
         );
-        validatedFiles = injectAiImagesIntoProject({
-          files: validatedFiles,
-          assetManifest: coreManifest,
-          industry: industryHint,
-        });
         if (!useV2Structure && !localizedCopy && productionContent) {
           validatedFiles = injectProfessionalComponents({
             files: validatedFiles,
@@ -844,6 +928,20 @@ export async function generateWebsite(
             pageTopology: themeArch?.pageTopology ?? null,
             floatingCta: themeArch?.floatingCta ?? false,
           });
+        } else if (
+          useV2Structure &&
+          isStructureFirstEnabled() &&
+          productionContent
+        ) {
+          validatedFiles = injectStructureFirstV2HomePage({
+            files: validatedFiles,
+            plan,
+            analysis,
+            generationInput,
+            productionContent,
+            brandName,
+            sectionShellVariant,
+          });
         } else if (!useV2Structure && localizedCopy) {
           validatedFiles = injectProfessionalComponents({
             files: validatedFiles,
@@ -859,13 +957,6 @@ export async function generateWebsite(
     }
   }
 
-  // Final image pass — quality improve must never leave empty placeholders.
-  validatedFiles = injectAiImagesIntoProject({
-    files: validatedFiles,
-    assetManifest: coreManifest,
-    industry: industryHint,
-  });
-
   const localizedContent =
     localizedCopy
       ? plan.blueprint.content
@@ -874,7 +965,7 @@ export async function generateWebsite(
         : plan.blueprint.content;
 
   let v2AppliedProject: GeneratedWebsiteProject | null = null;
-  if (useV2Structure && structurePackageId) {
+  if (useV2Structure && structurePackageId && !isStructureFirstEnabled()) {
     ctx.progress.emit(
       `[v2] Applying structure template ${structurePackageId}…`,
     );
@@ -913,11 +1004,15 @@ export async function generateWebsite(
         `[v2] Production blueprint applied${blueprintId ? `: ${blueprintId}` : ""}`,
       );
     }
+  } else if (useV2Structure && structurePackageId && isStructureFirstEnabled()) {
+    ctx.progress.emit(
+      "[structure-first] deferring template skin until after images",
+    );
   }
 
   const v2Settings = (v2AppliedProject?.settings ?? {}) as Record<string, unknown>;
 
-  return {
+  const generatedProject: GeneratedWebsiteProject = {
     projectKind: generationInput.projectKind,
     title: v2AppliedProject?.title ?? (plan.blueprint.title || analysis.projectName),
     description: v2AppliedProject?.description ?? plan.blueprint.description,
@@ -953,7 +1048,7 @@ export async function generateWebsite(
       isEcommerce: String(plan.flags.isEcommerce),
       isSaas: String(plan.flags.isSaas),
       databaseProvider: plan.flags.databaseProvider,
-      generationProfile: String(generationProfile),
+      generationProfile,
       ...(generationInput.templateIntelligenceId
         ? { templateIntelligenceId: generationInput.templateIntelligenceId }
         : {}),
@@ -961,6 +1056,26 @@ export async function generateWebsite(
         ? { contentIntelligenceTrace }
         : {}),
       ...v2Settings,
+    },
+  };
+
+  const { project: capabilityProject } = refreshCapabilities(generatedProject, {
+    files: validatedFiles,
+    seedFeatures: generationInput.features,
+    force: true,
+  });
+  const manifestFlags = projectCapabilityFlags(capabilityProject).flags;
+
+  return {
+    ...capabilityProject,
+    settings: {
+      ...(capabilityProject.settings ?? {}),
+      requiresAuth: String(manifestFlags.requiresAuth),
+      requiresDatabase: String(manifestFlags.requiresDatabase),
+      requiresDashboard: String(manifestFlags.requiresDashboard),
+      isEcommerce: String(manifestFlags.isEcommerce),
+      isSaas: String(manifestFlags.isSaas),
+      databaseProvider: manifestFlags.databaseProvider,
     },
   };
 }
@@ -1004,17 +1119,8 @@ export async function runWebsiteQualityLayer(params: {
       ),
   });
 
-  const validatedFiles = injectAiImagesIntoProject({
-    files: pipelineResult.files,
-    assetManifest:
-      assetManifest as import("@/lib/ai-core/layers/types").CoreAssetManifest,
-    industry:
-      analysis.businessProfile?.industry || plan.designSystem.industryPattern,
-  });
-
   return {
     ...pipelineResult,
-    files: validatedFiles,
     semanticContentQualityReport: pipelineResult.semanticContentQualityReport,
     visualDesignQualityReport: pipelineResult.visualDesignQualityReport,
   };

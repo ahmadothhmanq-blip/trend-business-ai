@@ -7,7 +7,7 @@ import {
 } from "@/lib/website/template-v2/validation/validate-v2-package";
 import { readTemplatePackageManifestRaw } from "@/lib/website/template-v2/loader/load-v2-package";
 import { resolveWbTemplatesRoot } from "@/lib/website/template-engine/constants.server";
-import { SAMPLE_V2_PACKAGE_DIR } from "@/lib/website/template-v2/test-fixtures";
+import { SAMPLE_V1_PACKAGE_DIR, SAMPLE_V2_PACKAGE_DIR } from "@/lib/website/template-v2/test-fixtures";
 
 describe("validateTemplateV2Package", () => {
   it("passes validation for the sample V2 fixture", async () => {
@@ -19,11 +19,9 @@ describe("validateTemplateV2Package", () => {
   });
 
   it("skips validation for V1 packages", async () => {
-    const templatesRoot = resolveWbTemplatesRoot();
-    const packageDir = path.join(templatesRoot, "modern-business");
-    const manifest = await readTemplatePackageManifestRaw(packageDir);
+    const manifest = await readTemplatePackageManifestRaw(SAMPLE_V1_PACKAGE_DIR);
 
-    const result = await validateTemplateV2Package(packageDir, manifest);
+    const result = await validateTemplateV2Package(SAMPLE_V1_PACKAGE_DIR, manifest);
 
     assert.equal(result.valid, true);
     assert.equal(result.architectureVersion, "v1");

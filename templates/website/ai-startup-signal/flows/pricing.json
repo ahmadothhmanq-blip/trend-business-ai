@@ -1,0 +1,7 @@
+{
+  "pageId": "pricing",
+  "layoutId": "default",
+  "regions": {
+    "main": ["ai-startup-signal-hero", "ai-startup-signal-pricing", "ai-startup-signal-faq"]
+  }
+}

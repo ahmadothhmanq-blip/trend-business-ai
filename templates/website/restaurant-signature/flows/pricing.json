@@ -1,0 +1,7 @@
+{
+  "pageId": "pricing",
+  "layoutId": "default",
+  "regions": {
+    "main": ["restaurant-signature-hero", "restaurant-signature-pricing", "restaurant-signature-faq"]
+  }
+}

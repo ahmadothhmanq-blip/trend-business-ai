@@ -28,13 +28,24 @@ import {
   resolvePreviewSections,
   type TemplatePreviewTheme,
 } from "@/lib/website/template-preview-renderer";
-import { buildV2PreviewDocument } from "@/lib/website/template-v2/preview/v2-preview-document";
 import {
   isV2PreviewInput,
+  readHomePageSource,
   resolveV2PackageId,
+  shouldUseProjectFilesPreview,
+  shouldUseV2PreviewDocument,
   v2PreviewCacheSignature,
   V2_PREVIEW_RENDER_VERSION,
 } from "@/lib/website/template-v2/preview/v2-preview-input";
+import {
+  hasComposedProfessionalHomeInFiles,
+  previewHtmlShowsRawComponentNames,
+  repairStructureFirstPreviewFiles,
+} from "@/lib/website/template-v2/preview/repair-structure-first-preview";
+import {
+  buildProjectFilesPreviewDocument,
+  buildV2PreviewDocument,
+} from "@/lib/website/template-v2/preview/v2-preview-document";
 import type { GeneratedProjectFile } from "@/plugins/website/types";
 import { validateAndRepairProjectImages } from "@/lib/website/image-management/validate-before-render";
 
@@ -449,15 +460,13 @@ function buildRtlPreviewStyles(locale: SiteLocaleConfig, bodyFont: string): stri
   return `
     html[dir="rtl"] { direction: rtl; }
     html[dir="rtl"] body {
-      text-align: right;
+      text-align: start;
       font-family: ${fontStack};
+      line-height: 1.75;
+      letter-spacing: 0.01em;
     }
     html[dir="rtl"] .ti-site-header {
       flex-direction: row-reverse;
-    }
-    html[dir="rtl"] nav {
-      flex-direction: row-reverse;
-      justify-content: flex-start;
     }
     html[dir="rtl"] .ti-hero-inner,
     html[dir="rtl"] .ti-hero-editorial,
@@ -535,29 +544,57 @@ function buildSecondaryPagesHtml(
  * Build a self-contained multi-page website preview (CSS :target navigation).
  * V2 templates render from project.files; V1 uses Theme* architecture or TI fallback.
  */
+function shouldAvoidTemplateIntelligenceFallback(
+  input: StaticPreviewInput,
+): boolean {
+  if (shouldUseProjectFilesPreview(input)) return true;
+  return hasComposedProfessionalHomeInFiles(readHomePageSource(input));
+}
+
 export function buildStaticPreviewHtml(input: StaticPreviewInput): string {
   const wiredInput = previewInputFromTbdpSettings(input);
+  const previewInput: StaticPreviewInput = {
+    ...wiredInput,
+    files: repairStructureFirstPreviewFiles(wiredInput),
+  };
   const previewWire = wirePreviewContext({
-    language: wiredInput.language,
-    industryId: wiredInput.industryId,
-    templatePackageId: wiredInput.templatePackageId,
-    settings: wiredInput.settings,
+    language: previewInput.language,
+    industryId: previewInput.industryId,
+    templatePackageId: previewInput.templatePackageId,
+    settings: previewInput.settings,
   });
 
-  if (isV2PreviewInput(wiredInput) && wiredInput.files?.length) {
-    const validated = validateAndRepairProjectImages(wiredInput.files, {
-      industry: wiredInput.industryId,
-      templatePackageId: wiredInput.templatePackageId,
+  if (shouldUseV2PreviewDocument(previewInput) && previewInput.files?.length) {
+    const validated = validateAndRepairProjectImages(previewInput.files, {
+      industry: previewInput.industryId,
+      templatePackageId: previewInput.templatePackageId,
     });
-    wiredInput.files = validated.files;
+    previewInput.files = validated.files;
   }
 
-  if (isV2PreviewInput(wiredInput)) {
-    const v2 = buildV2PreviewDocument(wiredInput);
-    if (v2) return sanitizePreviewHtml(appendTbdpPreviewCss(v2, previewWire.tbdpCssLayer));
+  if (shouldUseV2PreviewDocument(previewInput)) {
+    const v2 = buildV2PreviewDocument(previewInput);
+    if (v2) {
+      const html = sanitizePreviewHtml(appendTbdpPreviewCss(v2, previewWire.tbdpCssLayer));
+      if (!previewHtmlShowsRawComponentNames(html)) {
+        return html;
+      }
+    }
   }
 
-  const locale = resolveLocaleFromLanguage(wiredInput.language);
+  if (shouldUseProjectFilesPreview(previewInput)) {
+    const fromFiles = buildProjectFilesPreviewDocument(previewInput);
+    if (fromFiles) {
+      const html = sanitizePreviewHtml(
+        appendTbdpPreviewCss(fromFiles, previewWire.tbdpCssLayer),
+      );
+      if (!previewHtmlShowsRawComponentNames(html)) {
+        return html;
+      }
+    }
+  }
+
+  const locale = resolveLocaleFromLanguage(previewInput.language);
   const ui = getComposeUiFallbacks(wiredInput.language);
   const defaultPageNames = getDefaultPreviewPageNames(wiredInput.language);
   const pageNames = (wiredInput.pages ?? [])
@@ -580,7 +617,7 @@ export function buildStaticPreviewHtml(input: StaticPreviewInput): string {
     locale,
   );
 
-  if (resolveThemePreviewContext(wiredInput)) {
+  if (!shouldUseProjectFilesPreview(wiredInput) && resolveThemePreviewContext(wiredInput)) {
     const themed = buildThemePreviewDocument(wiredInput, {
       defaultSlug,
       secondaryPagesHtml: secondaryPages,
@@ -590,13 +627,35 @@ export function buildStaticPreviewHtml(input: StaticPreviewInput): string {
     }
   }
 
+  if (shouldUseProjectFilesPreview(wiredInput)) {
+    const fromFiles = buildProjectFilesPreviewDocument(wiredInput);
+    if (fromFiles) {
+      return sanitizePreviewHtml(
+        appendTbdpPreviewCss(fromFiles, previewWire.tbdpCssLayer),
+      );
+    }
+  }
+
+  if (shouldAvoidTemplateIntelligenceFallback(wiredInput)) {
+    const fromFiles = buildProjectFilesPreviewDocument(wiredInput);
+    if (fromFiles) {
+      return sanitizePreviewHtml(
+        appendTbdpPreviewCss(fromFiles, previewWire.tbdpCssLayer),
+      );
+    }
+  }
+
   const theme = resolvePreviewTheme(wiredInput);
   const title = wiredInput.title?.trim() || (locale.rtl ? "معاينة الموقع" : "Website Preview");
+  const rawDescription = input.description?.trim() || "";
   const description =
-    input.description?.trim() ||
-    (locale.rtl
-      ? "معاينة منتج الموقع المُنشأ بالذكاء الاصطناعي."
-      : "AI-generated website product preview.");
+    rawDescription &&
+    !/^create a website for\b/i.test(rawDescription) &&
+    !/generating website/i.test(rawDescription)
+      ? rawDescription
+      : locale.rtl
+        ? `معاينة موقع ${title}`
+        : `${title} — website preview`;
   const content = (input.content ?? []).map((c) => c.trim()).filter(Boolean);
 
   const navItems = pages
@@ -688,17 +747,64 @@ function previewNeedsTailwindRegeneration(content: string): boolean {
   );
 }
 
+/** Cached preview HTML that failed V2 compile or rendered no components. */
+function previewHtmlIsBroken(content: string): boolean {
+  if (
+    content.includes("data-v2-preview-error=") ||
+    content.includes('class="v2-preview-error"')
+  ) {
+    return true;
+  }
+  if (previewHtmlShowsRawComponentNames(content)) {
+    return true;
+  }
+  // Reveal nodes stuck at opacity:0 when cached HTML lacks force-visible CSS
+  // (in-app live-preview CSP historically blocked the inline reveal boot script).
+  if (
+    content.includes("-reveal") &&
+    !content.includes("never leave reveal") &&
+    /opacity:\s*0/.test(content)
+  ) {
+    return true;
+  }
+  // Home page blank without a non-:has() default visibility rule.
+  if (
+    content.includes(".page { display: none") &&
+    !content.includes(".page#") &&
+    content.includes("body:not(:has(.page:target))")
+  ) {
+    return true;
+  }
+  if (
+    content.includes(`data-ti-render="${LEGACY_PREVIEW_RENDER_VERSION}"`) &&
+    (content.includes("Generating website") ||
+      content.includes("جاري إنشاء الموقع") ||
+      content.includes("AI-generated website product preview") ||
+      content.includes("Hero Split"))
+  ) {
+    return true;
+  }
+  return false;
+}
+
 export function extractStaticPreviewHtml(
   files: GeneratedProjectFile[] | undefined,
   fallback: StaticPreviewInput,
 ): string {
-  const preview = files?.find(
+  const repairedFallback: StaticPreviewInput = {
+    ...fallback,
+    files: repairStructureFirstPreviewFiles({
+      ...fallback,
+      files: files ?? fallback.files,
+    }),
+  };
+  const preview = repairedFallback.files?.find(
     (file) => file.path.replaceAll("\\", "/") === PREVIEW_PATH,
   );
 
-  if (isV2PreviewInput(fallback)) {
-    const v2Signature = v2PreviewCacheSignature(fallback);
-    const packageId = resolveV2PackageId(fallback);
+  if (shouldUseV2PreviewDocument(repairedFallback)) {
+    const v2Signature = v2PreviewCacheSignature(repairedFallback);
+    const packageId = resolveV2PackageId(repairedFallback);
     if (preview?.content?.includes("<html")) {
       const hasV2Render = preview.content.includes(
         `data-v2-render="${V2_PREVIEW_RENDER_VERSION}"`,
@@ -707,21 +813,32 @@ export function extractStaticPreviewHtml(
         const matchesPackage = preview.content.includes(
           `data-v2-package="${packageId}"`,
         );
-        if (matchesPackage) {
+        if (matchesPackage && !previewHtmlIsBroken(preview.content)) {
           return sanitizePreviewHtml(preview.content);
         }
       }
     }
     if (v2Signature) {
-      return buildStaticPreviewHtml(fallback);
+      return buildStaticPreviewHtml(repairedFallback);
     }
   }
 
-  const themeSignature = themePreviewCacheSignature(fallback);
+  if (shouldUseProjectFilesPreview(repairedFallback)) {
+    if (
+      preview?.content?.includes("<html") &&
+      preview.content.includes('data-project-files-render="') &&
+      !previewHtmlIsBroken(preview.content)
+    ) {
+      return sanitizePreviewHtml(preview.content);
+    }
+    return buildStaticPreviewHtml(repairedFallback);
+  }
+
+  const themeSignature = themePreviewCacheSignature(repairedFallback);
 
   if (preview?.content?.includes("<html")) {
     if (previewNeedsTailwindRegeneration(preview.content)) {
-      return buildStaticPreviewHtml(fallback);
+      return buildStaticPreviewHtml(repairedFallback);
     }
 
     const hasV4 = preview.content.includes(`data-ti-render="${PREVIEW_RENDER_VERSION}"`);
@@ -733,7 +850,7 @@ export function extractStaticPreviewHtml(
       const matchesSignature = preview.content.includes(
         `data-ti-template="${fallback.templateIntelligenceId?.trim() || themeSignature.split("|")[0]}"`,
       );
-      if (matchesTheme && matchesSignature) {
+      if (matchesTheme && matchesSignature && !previewHtmlIsBroken(preview.content)) {
         return sanitizePreviewHtml(preview.content);
       }
     }
@@ -747,15 +864,15 @@ export function extractStaticPreviewHtml(
         const matchesTemplate = preview.content.includes(
           `data-ti-template="${tiId}"`,
         );
-        if (matchesTemplate) {
+        if (matchesTemplate && !previewHtmlIsBroken(preview.content)) {
           return sanitizePreviewHtml(preview.content);
         }
-      } else if (!preview.content.includes("data-ti-template=")) {
+      } else if (!preview.content.includes("data-ti-template=") && !previewHtmlIsBroken(preview.content)) {
         return sanitizePreviewHtml(preview.content);
       }
     }
   }
-  return buildStaticPreviewHtml(fallback);
+  return buildStaticPreviewHtml(repairedFallback);
 }
 
 export { PREVIEW_PATH, sanitizePreviewHtml, slugify } from "@/lib/website/preview-shared";

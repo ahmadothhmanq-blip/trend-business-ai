@@ -2,7 +2,7 @@ import { generateBusinessIdeas } from "@/lib/ai/business-ideas";
 import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { requireUser, parseJsonBody, paginationParams } from "@/lib/api/helpers";
 import { databaseErrorResponse, serverErrorResponse } from "@/lib/api/errors";
-import { enforceAiUsage } from "@/lib/api/rate-limit";
+import { beginAiUsage } from "@/lib/api/rate-limit";
 import { buildMultiColumnIlikeOrFilter } from "@/lib/api/search-filters";
 import {
   ideaInputSchema,
@@ -58,8 +58,9 @@ export async function POST(request: Request) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
-  const rateLimited = await enforceAiUsage(auth.supabase, auth.user!.id, "ideas");
-  if (rateLimited) return rateLimited;
+  const usage = await beginAiUsage(auth.supabase, auth.user!.id, "ideas");
+  if (!usage.ok) return usage.response;
+  const creditLease = usage.lease;
 
   const body = await parseJsonBody<unknown>(request);
   if (body instanceof NextResponse) return body;
@@ -69,7 +70,7 @@ export async function POST(request: Request) {
     return apiValidationError(parsed.error.issues[0]?.message);
   }
 
-  const aiLanguage = resolveRequestLanguage(request);
+  const aiLanguage = resolveRequestLanguage(request, parsed.data.language, parsed.data.country);
 
   let generated;
   let source: string;
@@ -78,6 +79,7 @@ export async function POST(request: Request) {
     generated = result.ideas;
     source = result.source;
   } catch (error) {
+    await creditLease.release(auth.supabase);
     return serverErrorResponse(
       "ideas.generate",
       error,
@@ -101,9 +103,11 @@ export async function POST(request: Request) {
     .select("*");
 
   if (error) {
+    await creditLease.release(auth.supabase);
     return databaseErrorResponse("ideas.insert", error);
   }
 
+  await creditLease.settle(auth.supabase);
   return NextResponse.json({
     ideas: data as BusinessIdea[],
     message:

@@ -1,7 +1,13 @@
 import type { VideoProductionModel } from "@/lib/ai-core/video-production-platform/types";
 import type { VideoVersionHistory } from "@/lib/ai-core/video-production-platform/versions";
 
-export type VideoGenerationStatus = "pending" | "generating" | "completed" | "failed";
+export type VideoGenerationStatus =
+  | "pending"
+  | "generating"
+  | "storyboard_ready"
+  | "video_rendered"
+  | "completed"
+  | "failed";
 export type VideoGenerationMode = "generate" | "regenerate" | "continue" | "retry";
 
 export type VideoScene = {
@@ -65,4 +71,8 @@ export type VideoGeneration = {
   is_favorite: boolean;
   created_at: string;
   updated_at: string;
+  domain_state?: string | null;
+  workflow?: string | null;
+  language?: string | null;
+  active_plan_id?: string | null;
 };

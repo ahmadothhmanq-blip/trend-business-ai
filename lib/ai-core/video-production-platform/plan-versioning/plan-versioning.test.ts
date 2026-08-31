@@ -7,6 +7,8 @@ import type { Scene } from "@/lib/ai-core/video-production-platform/domain/contr
 import { directorInputFromGenerateRequest } from "@/lib/ai-core/video-production-platform/director/from-generate";
 import { runDirector } from "@/lib/ai-core/video-production-platform/director/service";
 import type { DirectorLlmDraft } from "@/lib/ai-core/video-production-platform/director/normalize";
+import type { DirectorLlmClient } from "@/lib/ai-core/video-production-platform/director/llm";
+import type { MemoryQueryBuilder } from "@/lib/ai-core/video-production-platform/test/memory-query-builder";
 import {
   loadDomainScenes,
   loadPlanForProject,
@@ -75,7 +77,7 @@ function createMemorySupabase() {
             error = { code: "23505", message: "duplicate plan scene order" };
             break;
           }
-          const row = {
+          const row: Record<string, unknown> = {
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
             status: raw.status ?? "inactive",
@@ -120,7 +122,7 @@ function createMemorySupabase() {
       return { data, error: null };
     }
 
-    const api: Record<string, unknown> = {
+    const api: MemoryQueryBuilder = {
       insert(row: unknown) {
         state.action = "insert";
         state.payload = row;
@@ -149,7 +151,7 @@ function createMemorySupabase() {
       },
       maybeSingle: () => execute("maybe"),
       single: () => execute("single"),
-      then(resolve: (value: unknown) => unknown, reject: (reason: unknown) => unknown) {
+      then(resolve, reject?) {
         return execute("many").then(resolve, reject);
       },
     };
@@ -181,10 +183,10 @@ function draftFor(prompt: string): DirectorLlmDraft {
   };
 }
 
-function llmFor(prompt: string) {
+function llmFor(prompt: string): DirectorLlmClient {
   return {
-    async generateJson() {
-      return draftFor(prompt);
+    async generateJson<T>() {
+      return draftFor(prompt) as T;
     },
   };
 }

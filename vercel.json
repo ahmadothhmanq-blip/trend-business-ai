@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/video-studio/cron",
+      "schedule": "* * * * *"
+    }
+  ]
+}

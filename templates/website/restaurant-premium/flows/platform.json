@@ -1,0 +1,7 @@
+{
+  "pageId": "platform",
+  "layoutId": "default",
+  "regions": {
+    "main": ["restaurant-premium-hero", "restaurant-premium-features", "restaurant-premium-integrations"]
+  }
+}

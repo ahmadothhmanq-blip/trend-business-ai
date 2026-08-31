@@ -1,0 +1,7 @@
+{
+  "pageId": "pricing",
+  "layoutId": "default",
+  "regions": {
+    "main": ["real-estate-prestige-hero", "real-estate-prestige-pricing", "real-estate-prestige-faq"]
+  }
+}

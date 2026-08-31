@@ -1,4 +1,5 @@
 import type { ContentPluginInput } from "@/plugins/content-studio/types";
+import { aiOutputLanguageDirective } from "@/lib/ai/prompts/language-directive.server";
 
 function getContentTypeContext(type: string): string {
   const ctx: Record<string, string> = {
@@ -56,7 +57,7 @@ Produce a JSON object with:
 - toneAnalysis: how the tone should manifest
 - competitiveAngle: unique angle or differentiator
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(input.language, "content")}`;
 }
 
 export function contentPlanPrompt(input: ContentPluginInput, analysis: { title: string; keyPoints: string[]; suggestedStructure: string; toneAnalysis: string }): string {
@@ -84,7 +85,7 @@ Create a JSON object with:
 - secondaryKeywords: array of secondary keywords
 - headlineVariants: array of 3-5 alternative headlines
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(input.language, "content")}`;
 }
 
 export function contentGeneratePrompt(
@@ -115,7 +116,7 @@ ${sectionGuide}
 Context: ${getContentTypeContext(input.contentType)}
 
 IMPORTANT RULES:
-- Write in ${input.language}
+- Write natively in ${input.language} — do not draft in English and translate
 - Use ${input.tone} tone consistently
 - Follow ${input.writingStyle} writing style
 - ${input.options.includes("seo") ? "Optimize for SEO naturally — don't keyword-stuff" : "Focus on quality over SEO"}
@@ -124,10 +125,10 @@ IMPORTANT RULES:
 - ${input.options.includes("cta") ? "Include compelling call-to-action" : ""}
 - ${input.options.includes("readability") ? "Optimize for readability — short paragraphs, simple language" : ""}
 
-Write the complete content. Use markdown formatting. Return ONLY the content text — no JSON wrapper.`;
+Write the complete content. Use markdown formatting. Return ONLY the content text — no JSON wrapper.${aiOutputLanguageDirective(input.language, "content")}`;
 }
 
-export function contentSeoPrompt(content: string, keywords: string, contentType: string): string {
+export function contentSeoPrompt(content: string, keywords: string, contentType: string, language?: string): string {
   return `You are an SEO expert. Analyze this ${contentType} content for SEO performance.
 
 Content:
@@ -147,10 +148,10 @@ Produce a JSON object with:
 - readabilityScore: readability score 0-100
 - wordCount: approximate word count
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(language, "content")}`;
 }
 
-export function contentHeadlinesPrompt(title: string, contentType: string, tone: string, audience: string): string {
+export function contentHeadlinesPrompt(title: string, contentType: string, tone: string, audience: string, language?: string): string {
   return `Generate 10 headline variations for this ${contentType}.
 
 Current title: ${title}
@@ -162,10 +163,10 @@ Create a JSON object with:
 
 Mix styles: question, how-to, number-list, power-word, curiosity-gap, benefit-driven.
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(language, "content")}`;
 }
 
-export function contentImprovementsPrompt(content: string, contentType: string): string {
+export function contentImprovementsPrompt(content: string, contentType: string, language?: string): string {
   return `You are a senior editor. Review this ${contentType} content and suggest improvements.
 
 Content (excerpt):
@@ -175,5 +176,5 @@ Create a JSON object with:
 - suggestions: array of 3-5 improvement suggestions (actionable, specific)
 - improvements: array of 3-5 specific edits to improve quality
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON.${aiOutputLanguageDirective(language, "content")}`;
 }

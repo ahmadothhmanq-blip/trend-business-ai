@@ -2,6 +2,7 @@ import type { WebsiteBlueprint } from "@/lib/website/template-v2/blueprint/types
 import type { TemplateV2ComponentDefinition } from "@/lib/website/template-v2/contracts/component-registry";
 import type { TemplateV2PackageBundle } from "@/lib/website/template-v2/contracts/package";
 import type { SectionKind } from "@/lib/website/template-v2/variants/types";
+import { isStructureFirstEnabled } from "@/lib/website/generation-flags";
 
 /** Section kind → component registry roles (first match wins). */
 const SECTION_ROLE_PRIORITY: Record<SectionKind, string[]> = {
@@ -88,6 +89,91 @@ export type BlueprintRegionPlan = {
   sectionVariants: Map<string, { sectionKind: SectionKind; variantId: string }>;
 };
 
+/** Preserve template homeFlow order while including blueprint-driven sections. */
+export function mergeHomeFlowMainSections(
+  blueprintMain: string[],
+  homeFlowMain: string[],
+): string[] {
+  if (!homeFlowMain.length) return blueprintMain;
+  if (!blueprintMain.length) return homeFlowMain;
+
+  const merged: string[] = [];
+  const seen = new Set<string>();
+
+  for (const componentId of homeFlowMain) {
+    if (seen.has(componentId)) continue;
+    merged.push(componentId);
+    seen.add(componentId);
+  }
+
+  for (const componentId of blueprintMain) {
+    if (seen.has(componentId)) continue;
+    merged.push(componentId);
+    seen.add(componentId);
+  }
+
+  return merged;
+}
+
+function appendUniqueComponents(
+  target: string[],
+  source: string[],
+  exclude?: string,
+): void {
+  const seen = new Set(target);
+  for (const componentId of source) {
+    if (componentId === exclude || seen.has(componentId)) continue;
+    target.push(componentId);
+    seen.add(componentId);
+  }
+}
+
+/** Use presentation.json homeFlow as the project home page (matches skin preview). */
+export function hasPresentationHomeFlow(
+  presentation: TemplateV2PackageBundle["presentation"],
+): boolean {
+  return (presentation.homeFlow?.regions?.main?.length ?? 0) > 0;
+}
+
+function resolveBlueprintLayoutId(
+  presentation: TemplateV2PackageBundle["presentation"],
+  blueprint: WebsiteBlueprint,
+): string {
+  if (
+    blueprint.heroComposition.layout === "full-bleed" ||
+    blueprint.navigationStyle.layout === "transparent-overlay"
+  ) {
+    return "full-bleed";
+  }
+  if (blueprint.visualStyle === "editorial") {
+    return "editorial-reveal";
+  }
+  return presentation.layout.defaultLayoutId;
+}
+
+function buildPresentationHomeFlowPlan(
+  presentation: TemplateV2PackageBundle["presentation"],
+  sectionVariants: BlueprintRegionPlan["sectionVariants"],
+  layoutId?: string,
+): BlueprintRegionPlan {
+  const homeRegions = presentation.homeFlow?.regions ?? {
+    main: [],
+    utility: [],
+    overlay: [],
+  };
+  return {
+    main: homeRegions.main ?? [],
+    utility: homeRegions.utility ?? [],
+    overlay: homeRegions.overlay ?? [],
+    layoutId: layoutId ?? presentation.layout.defaultLayoutId,
+    sectionVariants,
+  };
+}
+
+export type ResolveBlueprintRegionPlanOptions = {
+  structureFirst?: boolean;
+};
+
 /**
  * Build region component order from optimized Website Blueprint.
  * Falls back to presentation profile for unmapped sections.
@@ -95,9 +181,16 @@ export type BlueprintRegionPlan = {
 export function resolveBlueprintRegionPlan(
   blueprint: WebsiteBlueprint,
   bundle: TemplateV2PackageBundle,
+  options?: ResolveBlueprintRegionPlanOptions,
 ): BlueprintRegionPlan {
+  const structureFirst = options?.structureFirst ?? isStructureFirstEnabled();
   const presentation = bundle.presentation;
-  const fallbackMain = presentation.homeFlow.regions.main ?? [];
+  const homeRegions = presentation.homeFlow?.regions ?? {
+    main: [],
+    utility: [],
+    overlay: [],
+  };
+  const fallbackMain = homeRegions.main ?? [];
   const sectionVariants = new Map<
     string,
     { sectionKind: SectionKind; variantId: string }
@@ -126,11 +219,19 @@ export function resolveBlueprintRegionPlan(
     }
   }
 
+  if (hasPresentationHomeFlow(presentation)) {
+    return buildPresentationHomeFlowPlan(
+      presentation,
+      sectionVariants,
+      resolveBlueprintLayoutId(presentation, blueprint),
+    );
+  }
+
   if (main.length === 0) {
     return {
       main: fallbackMain,
-      utility: presentation.homeFlow.regions.utility ?? [],
-      overlay: presentation.homeFlow.regions.overlay ?? [],
+      utility: homeRegions.utility ?? [],
+      overlay: homeRegions.overlay ?? [],
       sectionVariants,
     };
   }
@@ -138,8 +239,16 @@ export function resolveBlueprintRegionPlan(
   const density = blueprint.sectionDensity;
   const isDense = Object.values(density).filter((d) => d === "dense").length >= 2;
   const extras = PACKAGE_DENSITY_EXTRAS[bundle.packageId] ?? [];
+  const sectionOrderSet = new Set(blueprint.sectionOrder);
   for (const extraId of extras) {
     if (!isDense && extraId.includes("faq")) continue;
+    if (structureFirst) {
+      const mapsToIncludedSection = blueprint.sectionOrder.some((section) => {
+        const componentId = resolveSectionComponentId(section, bundle);
+        return componentId === extraId;
+      });
+      if (!mapsToIncludedSection && !sectionOrderSet.has("features")) continue;
+    }
     if (!seen.has(extraId) && fallbackMain.includes(extraId)) {
       main.push(extraId);
       seen.add(extraId);
@@ -151,6 +260,9 @@ export function resolveBlueprintRegionPlan(
     resolveSectionComponentId("cta", bundle);
   const utility: string[] = [];
   const overlay: string[] = [];
+
+  const homeUtility = homeRegions.utility ?? [];
+  const homeOverlay = homeRegions.overlay ?? [];
 
   if (ctaComponent) {
     if (blueprint.ctaStrategy.placement === "pre-footer") {
@@ -167,22 +279,20 @@ export function resolveBlueprintRegionPlan(
         variantId: ctaVariant.variantId,
       });
     }
+    appendUniqueComponents(utility, homeUtility, ctaComponent);
+    appendUniqueComponents(overlay, homeOverlay, ctaComponent);
   } else {
-    utility.push(...(presentation.homeFlow.regions.utility ?? []));
-    overlay.push(...(presentation.homeFlow.regions.overlay ?? []));
+    utility.push(...homeUtility);
+    overlay.push(...homeOverlay);
   }
 
-  let layoutId = presentation.layout.defaultLayoutId;
-  if (
-    blueprint.heroComposition.layout === "full-bleed" ||
-    blueprint.navigationStyle.layout === "transparent-overlay"
-  ) {
-    layoutId = "full-bleed";
-  } else if (blueprint.visualStyle === "editorial") {
-    layoutId = "editorial-reveal";
-  }
+  const mergedMain = structureFirst
+    ? main
+    : mergeHomeFlowMainSections(main, fallbackMain);
 
-  return { main, utility, overlay, layoutId, sectionVariants };
+  const layoutId = resolveBlueprintLayoutId(presentation, blueprint);
+
+  return { main: mergedMain, utility, overlay, layoutId, sectionVariants };
 }
 
 export function getVariantForComponent(

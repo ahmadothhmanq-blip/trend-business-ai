@@ -8,6 +8,7 @@ import {
   deleteVideoStudioMedia,
   uploadVideoStudioMedia,
 } from "@/lib/ai-core/video-production-platform";
+import { VideoStudioUploadError } from "@/lib/ai-core/video-production-platform/upload-validation";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -36,6 +37,9 @@ export async function GET(request: Request, { params }: Params) {
         mediaId,
       });
       if (!preview.record) {
+        return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Media not found.");
+      }
+      if (preview.record.generationId && preview.record.generationId !== parsedId.id) {
         return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Media not found.");
       }
       return NextResponse.json({
@@ -105,11 +109,17 @@ export async function POST(request: Request, { params }: Params) {
   }
 
   try {
-    const bytes = new Uint8Array(Buffer.from(parsed.data.base64, "base64"));
-    if (bytes.byteLength > 8_000_000) {
-      return apiValidationError("File too large (max 8MB via this endpoint).");
+    const { data: generation, error: genError } = await auth.supabase
+      .from("video_generations")
+      .select("id")
+      .eq("id", parsedId.id)
+      .eq("user_id", auth.user!.id)
+      .maybeSingle();
+    if (genError || !generation) {
+      return apiNotFoundError(API_ERROR_CODES.NOT_FOUND, "Video project not found.");
     }
 
+    const bytes = Buffer.from(parsed.data.base64, "base64");
     const uploaded = await uploadVideoStudioMedia({
       supabase: auth.supabase,
       userId: auth.user!.id,
@@ -128,6 +138,9 @@ export async function POST(request: Request, { params }: Params) {
       record: uploaded.record,
     });
   } catch (error) {
+    if (error instanceof VideoStudioUploadError) {
+      return apiValidationError(error.message);
+    }
     return serverErrorResponse(
       "video-studio.media.upload",
       error,

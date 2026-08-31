@@ -1,29 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="768" height="1024" viewBox="0 0 768 1024" role="img" aria-label="Restaurant Premium Tablet preview">
+<svg xmlns="http://www.w3.org/2000/svg" width="768" height="1024" viewBox="0 0 768 1024" role="img" aria-label="Haven Tablet preview">
   <defs>
-    <linearGradient id="g-restaurant-premium-768" x1="0" y1="0" x2="1" y2="0.6">
-      <stop offset="0%" stop-color="#1B3D2F"/>
-      <stop offset="100%" stop-color="#D4A574"/>
+    <linearGradient id="plum-t" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2A2340"/>
+      <stop offset="100%" stop-color="#4E3D6B"/>
+    </linearGradient>
+    <linearGradient id="img-t" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#E8E0F8"/>
+      <stop offset="100%" stop-color="#D8CFE8"/>
     </linearGradient>
   </defs>
-  <rect width="768" height="1024" fill="#0A1210"/>
-  <rect width="768" height="82" fill="#1B3D2F"/>
-  <circle cx="52" cy="41" r="10" fill="#D4A574"/>
-  <rect x="70" y="35" width="115" height="12" rx="4" fill="#fff" opacity="0.85"/>
-  <rect x="592" y="31" width="138" height="20" rx="10" fill="url(#g-restaurant-premium-768)"/>
-  <rect x="38" y="90" width="56" height="803" rx="6" fill="#121F1A" opacity="0.95"/>
-       <rect x="48" y="110" width="36" height="4" rx="2" fill="#D4A574" opacity="0.5"/>
-       <rect x="48" y="126" width="32" height="3" rx="1.5" fill="rgba(244,237,228,0.08)"/>
-       <rect x="48" y="138" width="40" height="3" rx="1.5" fill="rgba(244,237,228,0.08)"/>
-  <rect x="106" y="98" width="218" height="10" rx="4" fill="#D4A574" opacity="0.6"/>
-  <rect x="106" y="118" width="468" height="63" rx="8" fill="#F4EDE4" opacity="0.16"/>
-  <rect x="106" y="198" width="343" height="40" rx="6" fill="#F4EDE4" opacity="0.09"/>
-  <rect x="106" y="289" width="175" height="32" rx="16" fill="url(#g-restaurant-premium-768)"/>
-  <rect x="106" y="430" width="306" height="123" rx="10" fill="#121F1A" stroke="rgba(244,237,228,0.08)" stroke-width="1"/>
-      <rect x="120" y="446" width="153" height="8" rx="4" fill="#F4EDE4" opacity="0.15"/>
-      <rect x="120" y="464" width="214" height="6" rx="3" fill="#F4EDE4" opacity="0.08"/>
-  <rect x="424" y="430" width="306" height="123" rx="10" fill="#121F1A" stroke="rgba(244,237,228,0.08)" stroke-width="1"/>
-      <rect x="438" y="446" width="153" height="8" rx="4" fill="#F4EDE4" opacity="0.15"/>
-      <rect x="438" y="464" width="214" height="6" rx="3" fill="#F4EDE4" opacity="0.08"/>
-  <rect x="38" y="922" width="692" height="1" fill="rgba(244,237,228,0.08)"/>
-  <text x="38" y="53" fill="#fff" font-family="system-ui,sans-serif" font-size="17" font-weight="600">Restaurant Premium · Tablet</text>
+  <rect width="768" height="1024" fill="#E6E0F5"/>
+  <rect x="40" y="28" width="688" height="52" rx="26" fill="#F9F7FD" stroke="rgba(78,61,107,0.12)" stroke-width="1"/>
+  <rect x="64" y="46" width="80" height="12" rx="3" fill="#1A1228" opacity="0.85"/>
+  <rect x="600" y="38" width="96" height="32" rx="16" fill="url(#plum-t)"/>
+  <rect x="48" y="120" width="80" height="8" rx="4" fill="#4E3D6B"/>
+  <rect x="48" y="144" width="300" height="36" rx="5" fill="#1A1228" opacity="0.1"/>
+  <rect x="48" y="196" width="32" height="4" rx="2" fill="#FF5C8A"/>
+  <rect x="48" y="236" width="120" height="36" rx="18" fill="url(#plum-t)"/>
+  <rect x="400" y="112" width="320" height="280" rx="18" fill="url(#img-t)" stroke="rgba(78,61,107,0.1)" stroke-width="1"/>
+  <rect x="48" y="440" width="672" height="160" rx="14" fill="#D8CFE8"/>
+  <rect x="72" y="468" width="148" height="104" rx="10" fill="#F9F7FD"/>
+  <rect x="236" y="468" width="148" height="104" rx="10" fill="#F9F7FD"/>
+  <rect x="400" y="468" width="148" height="104" rx="10" fill="#F9F7FD"/>
+  <rect x="564" y="468" width="132" height="104" rx="10" fill="#F9F7FD"/>
+  <rect x="48" y="640" width="672" height="48" rx="22" fill="url(#plum-t)"/>
 </svg>

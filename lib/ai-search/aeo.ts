@@ -8,6 +8,7 @@ import {
   wordCount,
 } from "@/lib/ai-search/utils";
 import type { AeoAnalyzeResult, AiSearchIssue } from "@/types/ai-search";
+import { aiOutputLanguageDirective } from "@/lib/ai/prompts/language-directive.server";
 
 export const aeoAnalyzeBodySchema = z.object({
   title: z.string().max(200).optional(),
@@ -26,6 +27,8 @@ export const aeoAnalyzeBodySchema = z.object({
     .optional(),
   internalLinkCount: z.number().int().min(0).max(500).optional(),
   useAi: z.boolean().optional(),
+  language: z.string().trim().optional(),
+  country: z.string().trim().optional(),
 });
 
 export type AeoAnalyzeBody = z.infer<typeof aeoAnalyzeBodySchema>;
@@ -183,6 +186,7 @@ export function analyzeAeo(input: AeoAnalyzeBody): AeoAnalyzeResult {
 export async function enrichAeoWithAi(
   result: AeoAnalyzeResult,
   input: AeoAnalyzeBody,
+  language?: string,
 ): Promise<AeoAnalyzeResult> {
   try {
     const { providerManager } = await import("@/lib/ai/provider-manager");
@@ -204,7 +208,7 @@ Issues: ${result.issues
           .join("; ")}
 Excerpt: ${(input.content ?? "").slice(0, 900)}
 
-Recommend AEO improvements for AI answer engines.`,
+Recommend AEO improvements for AI answer engines.${aiOutputLanguageDirective(language, "marketing")}`,
         temperature: 0.35,
       },
       providerName,

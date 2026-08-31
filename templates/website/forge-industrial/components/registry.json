@@ -1,0 +1,81 @@
+{
+  "components": [
+    {
+      "id": "forge-industrial-nav",
+      "role": "navigation",
+      "scaffold": "components/forge-industrial-nav.tsx",
+      "slots": ["logo", "links", "cta"]
+    },
+    {
+      "id": "forge-industrial-hero",
+      "role": "hero",
+      "scaffold": "components/forge-industrial-hero.tsx",
+      "slots": ["headline", "metrics", "cta"]
+    },
+    {
+      "id": "forge-industrial-features",
+      "role": "features",
+      "scaffold": "components/forge-industrial-features.tsx"
+    },
+    {
+      "id": "forge-industrial-about",
+      "role": "story",
+      "scaffold": "components/forge-industrial-about.tsx"
+    },
+    {
+      "id": "forge-industrial-stats",
+      "role": "custom",
+      "scaffold": "components/forge-industrial-stats.tsx"
+    },
+    {
+      "id": "forge-industrial-testimonials",
+      "role": "testimonials",
+      "scaffold": "components/forge-industrial-testimonials.tsx"
+    },
+    {
+      "id": "forge-industrial-pricing",
+      "role": "pricing",
+      "scaffold": "components/forge-industrial-pricing.tsx"
+    },
+    {
+      "id": "forge-industrial-faq",
+      "role": "faq",
+      "scaffold": "components/forge-industrial-faq.tsx"
+    },
+    {
+      "id": "forge-industrial-contact",
+      "role": "contact",
+      "scaffold": "components/forge-industrial-contact.tsx"
+    },
+    {
+      "id": "forge-industrial-footer",
+      "role": "footer",
+      "scaffold": "components/forge-industrial-footer.tsx"
+    },
+    {
+      "id": "forge-industrial-floating-cta",
+      "role": "cta",
+      "scaffold": "components/forge-industrial-floating-cta.tsx"
+    },
+    {
+      "id": "forge-industrial-utility-band",
+      "role": "cta",
+      "scaffold": "components/forge-industrial-utility-band.tsx"
+    },
+    {
+      "id": "forge-industrial-section-shell",
+      "role": "custom",
+      "scaffold": "components/forge-industrial-section-shell.tsx"
+    },
+    {
+      "id": "forge-industrial-portfolio",
+      "role": "custom",
+      "scaffold": "components/forge-industrial-portfolio.tsx"
+    },
+    {
+      "id": "forge-industrial-integrations",
+      "role": "custom",
+      "scaffold": "components/forge-industrial-integrations.tsx"
+    }
+  ]
+}

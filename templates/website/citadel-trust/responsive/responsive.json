@@ -1,0 +1,21 @@
+{
+  "tbdpNative": true,
+  "sectorDnaId": "law-firm",
+  "experienceProfiles": ["corporate", "executive", "trust"],
+  "structure": {
+    "regions": {
+      "header": { "sticky": true, "position": "top" },
+      "utility": { "collapseBelow": "md", "collapseMode": "stack" },
+      "main": { "collapseBelow": "sm" },
+      "overlay": { "collapseBelow": "sm", "collapseMode": "fixed-bottom" }
+    },
+    "components": {
+      "citadel-trust-hero": {
+        "layout": { "lg": "split-trust", "sm": "stacked" }
+      },
+      "citadel-trust-features": {
+        "layout": { "lg": "grid-3", "sm": "stacked" }
+      }
+    }
+  }
+}

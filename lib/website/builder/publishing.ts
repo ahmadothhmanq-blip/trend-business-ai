@@ -2,11 +2,19 @@
  * Website Builder — publishing & performance services (Phase 7).
  */
 
+import type { WebsiteCapabilityId } from "@/lib/website/builder/capabilities/types";
+import {
+  filterItemsByCapabilities,
+  type WebsiteCapabilityService,
+} from "@/lib/website/builder/capabilities/service";
+
 export type PublishingChecklistItem = {
   id: string;
   label: string;
   description: string;
   required: boolean;
+  alwaysVisible?: boolean;
+  requiresAnyCapability?: WebsiteCapabilityId[];
 };
 
 export const PUBLISHING_CHECKLIST: PublishingChecklistItem[] = [
@@ -15,44 +23,64 @@ export const PUBLISHING_CHECKLIST: PublishingChecklistItem[] = [
     label: "Quality gates",
     description: "Pre-publish quality control passed",
     required: true,
+    alwaysVisible: true,
   },
   {
     id: "seo",
     label: "SEO metadata",
     description: "Titles, descriptions, and sitemap ready",
     required: true,
+    requiresAnyCapability: ["seo"],
   },
   {
     id: "ssl",
     label: "SSL",
     description: "HTTPS enabled on publish URL",
     required: true,
+    alwaysVisible: true,
   },
   {
     id: "cdn",
     label: "CDN delivery",
     description: "Static assets served via platform CDN path",
     required: false,
+    alwaysVisible: true,
   },
   {
     id: "backup",
     label: "Backup snapshot",
     description: "Server-side blueprint snapshot stored",
     required: false,
+    alwaysVisible: true,
   },
   {
     id: "performance",
     label: "Performance",
     description: "Core Web Vitals heuristics within targets",
     required: false,
+    alwaysVisible: true,
   },
   {
     id: "accessibility",
     label: "Accessibility",
     description: "Basic a11y checks on key pages",
     required: false,
+    alwaysVisible: true,
+  },
+  {
+    id: "payments",
+    label: "Payment flows",
+    description: "Checkout and billing routes validated",
+    required: false,
+    requiresAnyCapability: ["payments", "products"],
   },
 ];
+
+export function resolvePublishingChecklist(
+  service: WebsiteCapabilityService,
+): PublishingChecklistItem[] {
+  return filterItemsByCapabilities(PUBLISHING_CHECKLIST, service);
+}
 
 export type BuilderAccessibilityIssue = {
   id: string;

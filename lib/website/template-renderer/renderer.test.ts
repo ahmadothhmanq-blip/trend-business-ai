@@ -237,25 +237,35 @@ describe("renderWbTemplateRuntimeModel", () => {
 });
 
 describe("renderWbTemplateFromResolvedPackage", () => {
-  it("renders the modern-business template package from disk", async () => {
+  it("renders the corporate-business template package from disk", async () => {
     const pkg = await loadValidatedWbTemplatePackage(
-      join(root, "templates/website/modern-business"),
+      join(root, "templates/website/corporate-business"),
     );
     const result = assertSuccess(renderWbTemplateFromResolvedPackage(pkg));
 
-    assert.equal(result.value.model.template.id, "modern-business");
+    assert.equal(result.value.model.template.id, "corporate-business");
     assert.equal(result.value.model.template.version, "2.0.0");
-    assert.deepEqual(result.value.model.pages.home.regionIds, ["header", "main", "footer"]);
+    assert.deepEqual(result.value.model.pages.home.regionIds, [
+      "header",
+      "main",
+      "utility",
+      "footer",
+    ]);
     assert.equal(validateRuntimeModel(result.value.model).valid, true);
   });
 
   it("adapts engine page blueprints with regions[] into runtime regionIds[]", async () => {
     const pkg = await loadValidatedWbTemplatePackage(
-      join(root, "templates/website/modern-business"),
+      join(root, "templates/website/corporate-business"),
     );
     const adapted = adaptResolvedTemplatePackage(pkg);
 
-    assert.deepEqual(adapted.pages.home.regionIds, ["header", "main", "footer"]);
+    assert.deepEqual(adapted.pages.home.regionIds, [
+      "header",
+      "main",
+      "utility",
+      "footer",
+    ]);
     assert.equal("regions" in (pkg.pages.home as object), true);
     assert.equal("regionIds" in adapted.pages.home, true);
   });

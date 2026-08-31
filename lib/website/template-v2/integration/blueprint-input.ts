@@ -12,107 +12,41 @@ import type {
   WebsiteGoal,
 } from "@/lib/website/template-v2/variants/decision/types";
 import type { GeneratedWebsiteProject } from "@/plugins/website/types";
+import { isTechRoutingIndustry } from "@/lib/website/template-v2/composer/package-sector";
+import { isStructureFirstEnabled } from "@/lib/website/generation-flags";
+import { resolveSectionOrderFromProject } from "@/lib/website/template-v2/integration/strategy-section-order";
 
 /** Package-specific defaults for blueprint generation. */
 export const PACKAGE_BLUEPRINT_DEFAULTS: Record<
   string,
   Partial<BlueprintInput>
 > = {
-  "corporate-business": {
-    industry: "corporate",
-    websiteGoal: "trust",
-    targetAudience: "b2b",
-    brandPersonality: "professional",
-    premiumLevel: "premium",
-    visualStyle: "corporate",
-    businessModel: "service",
-  },
   "saas-enterprise": {
     industry: "saas",
     websiteGoal: "saas",
-    targetAudience: "b2b",
     brandPersonality: "technical",
     premiumLevel: "premium",
     visualStyle: "modern",
-    businessModel: "product",
-  },
-  "restaurant-premium": {
-    industry: "restaurant",
-    websiteGoal: "booking",
-    targetAudience: "consumer",
-    brandPersonality: "warm",
-    premiumLevel: "luxury",
-    visualStyle: "editorial",
-    businessModel: "service",
-  },
-  "ecommerce-premium": {
-    industry: "ecommerce",
-    websiteGoal: "ecommerce",
-    targetAudience: "b2c",
-    brandPersonality: "bold",
-    premiumLevel: "premium",
-    visualStyle: "modern",
-    businessModel: "product",
-  },
-  "medical-premium": {
-    industry: "medical",
-    websiteGoal: "trust",
-    targetAudience: "b2c",
-    brandPersonality: "warm",
-    premiumLevel: "premium",
-    visualStyle: "corporate",
-    businessModel: "service",
-  },
-  "real-estate-premium": {
-    industry: "real-estate",
-    websiteGoal: "lead-generation",
-    targetAudience: "luxury",
-    brandPersonality: "luxury",
-    premiumLevel: "luxury",
-    visualStyle: "luxury",
-    businessModel: "service",
-  },
-  "creative-agency-premium": {
-    industry: "creative-agency",
-    websiteGoal: "portfolio",
-    targetAudience: "b2c",
-    brandPersonality: "bold",
-    premiumLevel: "premium",
-    visualStyle: "bold",
-    businessModel: "service",
-  },
-  "education-premium": {
-    industry: "education",
-    websiteGoal: "brand-awareness",
-    targetAudience: "b2c",
-    brandPersonality: "warm",
-    premiumLevel: "premium",
-    visualStyle: "editorial",
-    businessModel: "service",
-  },
-  "finance-premium": {
-    industry: "finance",
-    websiteGoal: "trust",
     targetAudience: "enterprise",
-    brandPersonality: "professional",
-    premiumLevel: "premium",
-    visualStyle: "corporate",
-    businessModel: "service",
   },
-  "hotel-resort-premium": {
-    industry: "hotel-resort",
-    websiteGoal: "booking",
-    targetAudience: "luxury",
-    brandPersonality: "luxury",
+  "corporate-business": {
+    industry: "corporate",
+    websiteGoal: "trust",
+    brandPersonality: "professional",
     premiumLevel: "luxury",
     visualStyle: "luxury",
-    businessModel: "service",
+    targetAudience: "enterprise",
   },
 };
 
 const GOAL_KEYWORDS: Array<{ pattern: RegExp; goal: WebsiteGoal }> = [
+  {
+    pattern:
+      /\b(gaming|esports|e-sports|game studio|video game|saas|software|platform|tech|technology|ai startup|fintech|developer tools)\b/i,
+    goal: "saas",
+  },
   { pattern: /saas|software|platform/i, goal: "saas" },
-  { pattern: /book|reserv|hotel|restaurant/i, goal: "booking" },
+  { pattern: /book|reserv|hotel|restaurant|dining|menu/i, goal: "booking" },
   { pattern: /shop|ecommerce|retail|store/i, goal: "ecommerce" },
   { pattern: /portfolio|creative|agency|studio/i, goal: "portfolio" },
   { pattern: /lead|inquir|contact/i, goal: "lead-generation" },
@@ -141,8 +75,7 @@ function inferImageAvailability(
 ): ImageAvailability {
   const manifest = project.assetManifest;
   if (!manifest) return "moderate";
-  const imageCount =
-    (manifest.images?.length ?? 0) + (manifest.slots?.length ?? 0);
+  const imageCount = manifest.items?.length ?? 0;
   if (imageCount === 0) return "none";
   if (imageCount <= 2) return "limited";
   if (imageCount <= 6) return "moderate";
@@ -182,10 +115,18 @@ export function resolveBlueprintInputFromGeneration(
   const profile = project.businessProfile;
   const strategy = project.strategy as { goals?: string[] } | undefined;
 
-  const industry =
+  let industry =
     normalizeIndustry(profile?.industry) ||
     pkgDefaults.industry ||
     templatePackageId.replace(/-premium$/, "");
+
+  if (
+    templatePackageId === "_generation-default" &&
+    (isTechRoutingIndustry(industry) ||
+      isTechRoutingIndustry(profile?.industry))
+  ) {
+    industry = "ai-startup";
+  }
 
   const websiteGoal =
     pkgDefaults.websiteGoal ??
@@ -235,6 +176,10 @@ export function resolveBlueprintInputFromGeneration(
   const contentDensity: ContentDensity =
     websiteGoal === "saas" || websiteGoal === "ecommerce" ? "dense" : "medium";
 
+  const sectionOrder = isStructureFirstEnabled()
+    ? resolveSectionOrderFromProject(project)
+    : undefined;
+
   return {
     industry,
     businessSubtype: profile?.offer?.slice(0, 48) || industry,
@@ -255,8 +200,9 @@ export function resolveBlueprintInputFromGeneration(
     accessibilityLevel: inferAccessibility(params.language),
     seed:
       params.seed ??
-      project.settings?.id?.toString() ??
+      project.title?.toLowerCase().replace(/\s+/g, "-") ??
       `${templatePackageId}-${industry}`,
     blueprintId: `bp-${templatePackageId}-${industry}`,
+    ...(sectionOrder?.length ? { sectionOrder } : {}),
   };
 }

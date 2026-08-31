@@ -16,6 +16,7 @@ Run these files in order against your Supabase project (SQL Editor or CLI).
 | 44 | `044_video_studio_media.sql` | Video Studio media tables + `video-studio` bucket |
 | 45 | `045_video_studio_media_update_rls.sql` | Video Studio `video_media` UPDATE RLS |
 | 46 | `046_webapp_deployments.sql` | App Builder deployments (preview + production) |
+| 97 | `097_webapp_publications.sql` | App Builder public HTML hosts at `/w/app/[slug]` |
 
 | 47 | `047_website_leads_cms.sql` | Website leads + CMS entries + versions |
 

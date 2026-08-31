@@ -2,6 +2,7 @@ import {
   FILE_GENERATION_RULES,
   PRODUCTION_ARCHITECTURE_GUIDE,
 } from "@/lib/ai/prompts/shared";
+import { buildWebsiteLanguageDirective } from "@/lib/ai-core/website-builder/language-directive.server";
 import { LANDING_PAGE_TYPES } from "@/lib/constants/landing-page-builder";
 
 type LPPromptInput = {
@@ -140,6 +141,14 @@ function getPageTypeContext(pageType: string): string {
   return contextMap[pageType] ?? contextMap.custom ?? "";
 }
 
+function landingLanguageBlock(input: LPPromptInput): string {
+  return `${buildWebsiteLanguageDirective({
+    language: input.language,
+    prompt: input.prompt,
+  })}
+- English CTA examples in the type context (for example "Start Free Trial") are STRUCTURAL hints only. Never copy them into user-facing output.`;
+}
+
 export function lpAnalyzePrompt(input: LPPromptInput): string {
   const def = LANDING_PAGE_TYPES.find((t) => t.id === input.pageType);
   const typeContext = getPageTypeContext(input.pageType);
@@ -155,6 +164,7 @@ Color style: ${input.colorStyle}
 Requested sections: ${input.sections.join(", ") || "Default for type"}
 
 ${typeContext}
+${landingLanguageBlock(input)}
 
 This is a SINGLE landing page (not a multi-page website or web app).
 Detect capability flags:
@@ -180,6 +190,7 @@ Original prompt: ${input.prompt}
 Analysis: ${JSON.stringify(analysis)}
 
 ${typeContext}
+${landingLanguageBlock(input)}
 
 ${PRODUCTION_ARCHITECTURE_GUIDE}
 
@@ -209,6 +220,7 @@ export function lpPlanPrompt(
 Original prompt: ${input.prompt}
 Analysis: ${JSON.stringify(analysis)}
 Blueprint: ${JSON.stringify(blueprint)}
+${landingLanguageBlock(input)}
 
 This is a SINGLE landing page project. File count should be ~15-30 files:
 - package.json, tsconfig.json, next.config.ts, tailwind.config.ts, postcss.config.js
@@ -260,6 +272,7 @@ Existing generated files: ${JSON.stringify(args.existingFiles)}
 ${validationNote}
 
 ${typeContext}
+${landingLanguageBlock(args.input)}
 
 ${PRODUCTION_ARCHITECTURE_GUIDE}
 ${FILE_GENERATION_RULES}

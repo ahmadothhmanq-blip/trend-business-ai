@@ -23,6 +23,21 @@ export const BATCH_PLAN_MAX = 100;
 /** Max videos generated synchronously in one HTTP request (chunk for larger batches) */
 export const BATCH_GENERATE_MAX = 50;
 
+/**
+ * Settle-after-success policy for the batch route lease.
+ * - planOnly: never charge
+ * - ≥1 successful generation: settle
+ * - zero successes / cancelled mid-flight handled by caller via release
+ */
+export function resolveBatchCreditLeaseAction(input: {
+  planOnly: boolean;
+  successfulGenerations: number;
+}): "settle" | "release" {
+  if (input.planOnly) return "release";
+  if (input.successfulGenerations > 0) return "settle";
+  return "release";
+}
+
 const ANGLES = [
   "Hook-first",
   "Story-driven",
@@ -213,5 +228,6 @@ export function batchItemToPluginInput(
       item.presenterPersona || "business-expert",
     ],
     sceneCount: Math.min(8, item.sceneCount),
+    language: req.language,
   };
 }

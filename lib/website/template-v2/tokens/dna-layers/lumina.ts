@@ -1,0 +1,291 @@
+/** Auto-generated from scripts/_skin-css/lumina.css — do not hand-edit */
+export function buildLuminaDnaCss(): string {
+  return `/* Lumina Wellness — ATMOSPHERE BREATH DNA (.lu-*) */
+
+@import url("https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;0,600;1,400&family=Manrope:wght@400;500;600&display=swap");
+
+@keyframes lu-breathe {
+  0%, 100% { transform: scale(1); opacity: 0.55; }
+  50% { transform: scale(1.06); opacity: 0.8; }
+}
+@keyframes lu-orb-drift {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(2%, -3%, 0); }
+}
+@keyframes lu-reveal-soft {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lu-reveal, .lu-reveal-stagger > *, .lu-orb, .lu-btn-primary, .lu-btn-secondary, .lu-atmosphere::before {
+    animation: none !important;
+    transition: none !important;
+  }
+  .lu-reveal, .lu-reveal-stagger > * {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+.lu-font-display { font-family: "Cormorant", var(--font-display), Georgia, serif; }
+.lu-font-body { font-family: "Manrope", var(--font-body), system-ui, sans-serif; }
+
+.lu-eyebrow {
+  font-family: "Manrope", var(--font-body), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-accent, #7C9A92) 90%, var(--color-foreground));
+}
+
+.lu-headline {
+  font-family: "Cormorant", var(--font-display), Georgia, serif;
+  font-size: clamp(2.75rem, 7vw, 5rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.02;
+  color: var(--color-foreground);
+  text-wrap: balance;
+}
+
+.lu-headline-sm {
+  font-family: "Cormorant", var(--font-display), Georgia, serif;
+  font-size: clamp(1.85rem, 4vw, 3rem);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.12;
+  color: var(--color-foreground);
+}
+
+.lu-body {
+  font-family: "Manrope", var(--font-body), system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  color: var(--color-muted);
+  font-weight: 400;
+}
+
+.lu-metric {
+  font-family: "Cormorant", var(--font-display), Georgia, serif;
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 500;
+  color: var(--color-accent, #7C9A92);
+  line-height: 1;
+}
+
+.lu-btn-primary,
+.lu-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.875rem;
+  padding: 0.8rem 1.6rem;
+  font-family: "Manrope", var(--font-body), system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 9999px;
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.25s ease;
+}
+
+.lu-btn-primary {
+  color: #fff;
+  background: color-mix(in srgb, var(--color-primary, #4A6A62) 92%, #000);
+  border: 1px solid transparent;
+}
+.lu-btn-primary:hover {
+  transform: translateY(-1px);
+  background: var(--color-accent, #7C9A92);
+}
+
+.lu-btn-secondary {
+  color: var(--color-foreground);
+  background: color-mix(in srgb, var(--color-surface) 55%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 35%, transparent);
+  backdrop-filter: blur(8px);
+}
+.lu-btn-secondary:hover {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+}
+
+.lu-focus-ring:focus-visible {
+  outline: 2px solid var(--color-accent, #7C9A92);
+  outline-offset: 3px;
+}
+
+.lu-section {
+  padding-block: clamp(5rem, 14vw, 9rem);
+  position: relative;
+}
+
+.lu-atmosphere {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 20%, color-mix(in srgb, var(--color-accent, #7C9A92) 22%, transparent), transparent 70%),
+    radial-gradient(ellipse 50% 40% at 80% 80%, color-mix(in srgb, var(--color-primary, #4A6A62) 14%, transparent), transparent 65%),
+    linear-gradient(180deg, var(--color-background), color-mix(in srgb, var(--color-surface) 70%, var(--color-background)));
+}
+.lu-atmosphere::before {
+  content: "";
+  position: absolute;
+  inset: -10%;
+  background:
+    radial-gradient(circle at 30% 40%, color-mix(in srgb, var(--color-accent) 18%, transparent), transparent 42%),
+    radial-gradient(circle at 70% 60%, color-mix(in srgb, var(--color-primary) 12%, transparent), transparent 45%);
+  animation: lu-orb-drift 18s ease-in-out infinite;
+  z-index: -1;
+}
+
+.lu-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  pointer-events: none;
+  animation: lu-breathe 10s ease-in-out infinite;
+  background: color-mix(in srgb, var(--color-accent, #7C9A92) 28%, transparent);
+}
+.lu-orb-a { width: 18rem; height: 18rem; top: 12%; inset-inline-start: 8%; }
+.lu-orb-b { width: 14rem; height: 14rem; bottom: 18%; inset-inline-end: 12%; animation-delay: -4s; }
+
+.lu-quiet-nav {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  z-index: 40;
+  background: transparent;
+}
+.lu-quiet-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  max-width: 48rem;
+  margin-inline: auto;
+  min-height: 4.5rem;
+  padding-inline: 1.25rem;
+}
+.lu-quiet-nav-brand {
+  font-family: "Cormorant", Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  color: var(--color-foreground);
+}
+.lu-quiet-nav-links {
+  display: none;
+  gap: 1.75rem;
+}
+@media (min-width: 1024px) {
+  .lu-quiet-nav-links { display: flex; }
+}
+.lu-quiet-nav-links a {
+  font-family: "Manrope", system-ui, sans-serif;
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-muted);
+}
+.lu-quiet-nav-links a:hover { color: var(--color-foreground); }
+.lu-quiet-nav-cta {
+  font-family: "Manrope", system-ui, sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-accent);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-accent) 40%, transparent);
+  padding-bottom: 0.15rem;
+}
+
+/* Ritual sequence — sparse vertical steps, not cards */
+.lu-ritual {
+  max-width: 36rem;
+  margin-inline: auto;
+}
+.lu-ritual-step {
+  position: relative;
+  padding-block: clamp(2.5rem, 6vw, 4rem);
+  text-align: center;
+}
+.lu-ritual-step + .lu-ritual-step::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 2.5rem;
+  background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--color-accent) 55%, transparent), transparent);
+}
+.lu-ritual-index {
+  display: inline-grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-bottom: 1.25rem;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  font-family: "Cormorant", Georgia, serif;
+  font-size: 1rem;
+  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-surface) 60%, transparent);
+}
+.lu-ritual-title {
+  font-family: "Cormorant", Georgia, serif;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 500;
+  color: var(--color-foreground);
+}
+
+.lu-soft-quote {
+  max-width: 34rem;
+  margin-inline: auto;
+  text-align: center;
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+}
+.lu-soft-quote blockquote {
+  font-family: "Cormorant", Georgia, serif;
+  font-size: clamp(1.35rem, 3vw, 1.85rem);
+  font-style: italic;
+  line-height: 1.45;
+  color: var(--color-foreground);
+}
+
+.lu-membership {
+  max-width: 28rem;
+  margin-inline: auto;
+  text-align: center;
+  padding-block: clamp(2rem, 5vw, 3rem);
+  border-top: 1px solid color-mix(in srgb, var(--color-accent) 22%, transparent);
+}
+.lu-membership:first-of-type { border-top: 0; }
+
+.lu-reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.9s cubic-bezier(0.22,1,0.36,1), transform 0.9s cubic-bezier(0.22,1,0.36,1); }
+.lu-reveal.df-is-visible,
+.lu-reveal.lu-is-visible,
+.lu-reveal.is-visible { opacity: 1; transform: none; }
+.lu-reveal-stagger > * { opacity: 0; transform: translateY(14px); transition: opacity 0.8s cubic-bezier(0.22,1,0.36,1), transform 0.8s cubic-bezier(0.22,1,0.36,1); }
+.lu-reveal-stagger.df-is-visible > *,
+.lu-reveal-stagger.lu-is-visible > *,
+.lu-reveal-stagger.is-visible > *,
+.lu-reveal.df-is-visible .lu-reveal-stagger > * { opacity: 1; transform: none; }
+.lu-reveal-stagger > *:nth-child(1) { transition-delay: 0.06s; }
+.lu-reveal-stagger > *:nth-child(2) { transition-delay: 0.14s; }
+.lu-reveal-stagger > *:nth-child(3) { transition-delay: 0.22s; }
+.lu-reveal-stagger > *:nth-child(4) { transition-delay: 0.3s; }
+.lu-reveal-stagger > *:nth-child(5) { transition-delay: 0.38s; }
+.lu-reveal-stagger > *:nth-child(6) { transition-delay: 0.46s; }
+`;
+}

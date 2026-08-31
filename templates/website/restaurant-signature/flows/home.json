@@ -1,17 +1,19 @@
 {
   "pageId": "home",
-  "layoutId": "sidebar-left",
+  "layoutId": "default",
   "regions": {
-    "sidebar": ["restaurant-signature-sidebar-rail"],
+    "header": ["restaurant-signature-nav"],
     "main": [
       "restaurant-signature-hero",
-      "restaurant-signature-reservation",
-      "restaurant-signature-chef-story",
-      "restaurant-signature-tasting-menu",
-      "restaurant-signature-signature-dishes",
-      "restaurant-signature-atmosphere",
-      "restaurant-signature-gallery",
-      "restaurant-signature-reservation-cta"
-    ]
+      "restaurant-signature-features",
+      "restaurant-signature-portfolio",
+      "restaurant-signature-about",
+      "restaurant-signature-testimonials",
+      "restaurant-signature-faq",
+      "restaurant-signature-contact"
+    ],
+    "utility": [],
+    "overlay": [],
+    "footer": ["restaurant-signature-footer"]
   }
 }

@@ -3,6 +3,7 @@ import {
   FILE_GENERATION_RULES,
   PRODUCTION_ARCHITECTURE_GUIDE,
 } from "@/lib/ai/prompts/shared";
+import { aiOutputLanguageDirective } from "@/lib/ai/prompts/language-directive";
 import {
   buildWebsiteLanguageDirective,
   requiresArabicWebsiteCopy,
@@ -205,20 +206,20 @@ ${PRODUCTION_ARCHITECTURE_GUIDE}
 ${FILE_GENERATION_RULES}`;
 }
 
-export function brandAnalyzePrompt(brief: string) {
+export function brandAnalyzePrompt(brief: string, language?: string) {
   return `Analyze this brand design brief and return structured JSON with: brandName, industry, audience, personality, competitors, visualStyle, deliverables.
 
-Brief: ${brief}`;
+Brief: ${brief}${aiOutputLanguageDirective(language, "brand")}`;
 }
 
-export function contentAnalyzePrompt(brief: string) {
+export function contentAnalyzePrompt(brief: string, language?: string) {
   return `Analyze this content brief and return structured JSON with: topic, audience, channel, tone, format, goals, keywords.
 
-Brief: ${brief}`;
+Brief: ${brief}${aiOutputLanguageDirective(language, "content")}`;
 }
 
-export function marketingAnalyzePrompt(brief: string) {
+export function marketingAnalyzePrompt(brief: string, language?: string) {
   return `Analyze this marketing campaign brief and return structured JSON with: offer, audience, platform, budget, conversionGoal, objections, brandTone.
 
-Brief: ${brief}`;
+Brief: ${brief}${aiOutputLanguageDirective(language, "marketing")}`;
 }

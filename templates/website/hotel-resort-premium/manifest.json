@@ -2,16 +2,16 @@
   "specVersion": "2.0.0",
   "id": "hotel-resort-premium",
   "version": "2.0.0",
-  "name": "Hotel & Resort Premium",
-  "description": "Azure Haven — coastal luxury resort with cinematic hospitality, suite storytelling, and reservation-first conversion paths.",
+  "name": "Haven",
+  "description": "مظهر مرن فاخر — ضباب بنفسجي ولمسة وردية. مناسب للضيافة، الخدمات، العيادات، والعلامات الراقية.",
   "metadata": {
     "category": "hotel",
-    "industry": "Hotel & Resort",
+    "industry": "Hotel Resort",
     "tags": [
-      "hotel",
-      "resort",
-      "hospitality",
-      "luxury"
+      "hotel-resort",
+      "premium",
+      "global",
+      "flagship"
     ],
     "author": {
       "name": "Trend Business AI",
@@ -19,9 +19,10 @@
     },
     "license": "MIT",
     "keywords": [
-      "hotel",
-      "resort",
-      "spa",
+      "premium",
+      "editorial",
+      "hospitality",
+      "services",
       "luxury"
     ],
     "templateIntelligenceId": "ti-hotel-sanctuary",
@@ -46,7 +47,7 @@
   },
   "update": {
     "channel": "stable",
-    "releasedAt": "2026-08-03T16:09:45.065Z"
+    "releasedAt": "2026-08-03T16:09:45.050Z"
   },
   "responsive": {
     "breakpoints": [
@@ -71,7 +72,7 @@
         "minWidth": 1536
       }
     ],
-    "containerMaxWidth": "90rem",
+    "containerMaxWidth": "82rem",
     "fluidTypography": true
   },
   "canvas": {
@@ -84,9 +85,9 @@
     {
       "id": "default",
       "file": "layouts/default.json",
-      "kind": "sidebar-left",
+      "kind": "single-column",
       "label": "Default",
-      "description": "Premium sidebar-left layout for Restaurant."
+      "description": "Premium single-column layout for editorial brands."
     }
   ],
   "regions": [
@@ -95,28 +96,28 @@
       "file": "regions/header.json",
       "role": "header",
       "label": "Header Region",
-      "description": "Premium header region for Restaurant Premium."
-    },
-    {
-      "id": "sidebar",
-      "file": "regions/sidebar.json",
-      "role": "sidebar",
-      "label": "Sidebar Region",
-      "description": "Premium sidebar region for Restaurant Premium."
+      "description": "Header region with sticky navigation."
     },
     {
       "id": "main",
       "file": "regions/main.json",
       "role": "main",
       "label": "Main Region",
-      "description": "Premium main region for Restaurant Premium."
+      "description": "Main content region for page sections."
+    },
+    {
+      "id": "utility",
+      "file": "regions/utility.json",
+      "role": "utility",
+      "label": "Utility Region",
+      "description": "Utility band for mid-page calls to action."
     },
     {
       "id": "footer",
       "file": "regions/footer.json",
       "role": "footer",
       "label": "Footer Region",
-      "description": "Premium footer region for Restaurant Premium."
+      "description": "Footer region with brand and links."
     }
   ],
   "pages": [
@@ -126,31 +127,31 @@
       "path": "/",
       "layoutId": "default",
       "file": "pages/home.json",
-      "description": "Home — premium Restaurant page blueprint."
+      "description": "Home — flagship landing page."
     },
     {
-      "id": "menu",
-      "title": "Menu",
-      "path": "/menu",
+      "id": "platform",
+      "title": "Platform",
+      "path": "/platform",
       "layoutId": "default",
-      "file": "pages/menu.json",
-      "description": "Menu — premium Restaurant page blueprint."
+      "file": "pages/platform.json",
+      "description": "Capabilities — services and offerings page."
     },
     {
-      "id": "gallery",
-      "title": "Gallery",
-      "path": "/gallery",
+      "id": "pricing",
+      "title": "Pricing",
+      "path": "/pricing",
       "layoutId": "default",
-      "file": "pages/gallery.json",
-      "description": "Gallery — premium Restaurant page blueprint."
+      "file": "pages/pricing.json",
+      "description": "Pricing — packages and plans page."
     },
     {
-      "id": "reserve",
-      "title": "Reserve",
-      "path": "/reserve",
+      "id": "customers",
+      "title": "Customers",
+      "path": "/customers",
       "layoutId": "default",
-      "file": "pages/reserve.json",
-      "description": "Reserve — premium Restaurant page blueprint."
+      "file": "pages/customers.json",
+      "description": "Work — portfolio and case studies page."
     }
   ],
   "entry": "package.entry.json",
@@ -177,8 +178,8 @@
   },
   "pageFlows": {
     "home": "flows/home.json",
-    "menu": "flows/menu.json",
-    "gallery": "flows/gallery.json",
-    "reserve": "flows/reserve.json"
+    "platform": "flows/platform.json",
+    "pricing": "flows/pricing.json",
+    "customers": "flows/customers.json"
   }
 }

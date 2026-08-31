@@ -8,7 +8,37 @@ export type OptimizeImageOptions = {
   format?: "auto" | "webp" | "avif" | "jpg";
 };
 
-const DEFAULT_WIDTHS = [400, 800, 1200, 1600, 2400] as const;
+const DEFAULT_WIDTHS = [640, 960, 1280, 1920, 2400] as const;
+
+/** Target Unsplash width by photographic role. */
+export function stockWidthForRole(role: string): number {
+  const key = role.toLowerCase();
+  if (key === "hero" || key === "background") return 2400;
+  if (key === "testimonial" || key === "brand") return 960;
+  if (
+    key === "gallery" ||
+    key === "product" ||
+    key === "section" ||
+    key === "service"
+  ) {
+    return 1920;
+  }
+  return 1600;
+}
+
+export function stockQualityForRole(role: string): number {
+  const key = role.toLowerCase();
+  if (key === "hero" || key === "background") return 90;
+  return 88;
+}
+
+/** Normalize a photographic URL for web display at role-appropriate sharpness. */
+export function optimizePhotoUrlForRole(url: string, role: string): string {
+  return optimizeImageUrl(url, {
+    width: stockWidthForRole(role),
+    quality: stockQualityForRole(role),
+  });
+}
 
 /**
  * Build an optimized image URL with width/quality params.
@@ -23,8 +53,8 @@ export function optimizeImageUrl(
 
   if (trimmed.includes("images.unsplash.com")) {
     const base = trimmed.split("?")[0]!;
-    const width = opts.width ?? 1600;
-    const quality = opts.quality ?? 82;
+    const width = opts.width ?? 1920;
+    const quality = opts.quality ?? 88;
     const format = opts.format ?? "auto";
     const params = new URLSearchParams({
       auto: "format",

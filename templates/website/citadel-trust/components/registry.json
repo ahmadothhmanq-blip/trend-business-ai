@@ -1,0 +1,81 @@
+{
+  "components": [
+    {
+      "id": "citadel-trust-nav",
+      "role": "navigation",
+      "scaffold": "components/citadel-trust-nav.tsx",
+      "slots": ["logo", "links", "cta"]
+    },
+    {
+      "id": "citadel-trust-hero",
+      "role": "hero",
+      "scaffold": "components/citadel-trust-hero.tsx",
+      "slots": ["headline", "metrics", "cta"]
+    },
+    {
+      "id": "citadel-trust-features",
+      "role": "features",
+      "scaffold": "components/citadel-trust-features.tsx"
+    },
+    {
+      "id": "citadel-trust-about",
+      "role": "story",
+      "scaffold": "components/citadel-trust-about.tsx"
+    },
+    {
+      "id": "citadel-trust-stats",
+      "role": "custom",
+      "scaffold": "components/citadel-trust-stats.tsx"
+    },
+    {
+      "id": "citadel-trust-testimonials",
+      "role": "testimonials",
+      "scaffold": "components/citadel-trust-testimonials.tsx"
+    },
+    {
+      "id": "citadel-trust-pricing",
+      "role": "pricing",
+      "scaffold": "components/citadel-trust-pricing.tsx"
+    },
+    {
+      "id": "citadel-trust-faq",
+      "role": "faq",
+      "scaffold": "components/citadel-trust-faq.tsx"
+    },
+    {
+      "id": "citadel-trust-contact",
+      "role": "contact",
+      "scaffold": "components/citadel-trust-contact.tsx"
+    },
+    {
+      "id": "citadel-trust-footer",
+      "role": "footer",
+      "scaffold": "components/citadel-trust-footer.tsx"
+    },
+    {
+      "id": "citadel-trust-floating-cta",
+      "role": "cta",
+      "scaffold": "components/citadel-trust-floating-cta.tsx"
+    },
+    {
+      "id": "citadel-trust-utility-band",
+      "role": "cta",
+      "scaffold": "components/citadel-trust-utility-band.tsx"
+    },
+    {
+      "id": "citadel-trust-section-shell",
+      "role": "custom",
+      "scaffold": "components/citadel-trust-section-shell.tsx"
+    },
+    {
+      "id": "citadel-trust-portfolio",
+      "role": "custom",
+      "scaffold": "components/citadel-trust-portfolio.tsx"
+    },
+    {
+      "id": "citadel-trust-integrations",
+      "role": "custom",
+      "scaffold": "components/citadel-trust-integrations.tsx"
+    }
+  ]
+}

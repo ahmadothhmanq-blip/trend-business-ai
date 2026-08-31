@@ -79,6 +79,7 @@ export { preferAiImages } from "@/lib/ai-core/image-engine/prefer";
 
 export {
   injectAiImagesIntoProject,
+  applyFinalImageInjectionToProject,
   ensureRequiredPhotoAssets,
   hasPublishableHeroImage,
 } from "@/lib/ai-core/image-engine/inject";

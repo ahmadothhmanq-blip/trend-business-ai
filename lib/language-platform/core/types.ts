@@ -51,7 +51,11 @@ export type GlsServiceId =
   | "content-studio"
   | "brand-designer"
   | "logo-designer"
+  | "image-generator"
+  | "ai-agents"
   | "marketing-ai"
+  | "business-manager"
+  | "social-media"
   | "crm"
   | "erp";
 

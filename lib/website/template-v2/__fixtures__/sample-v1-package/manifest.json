@@ -1,0 +1,7 @@
+{
+  "specVersion": "2.0.0",
+  "id": "sample-v1-package",
+  "version": "1.0.0",
+  "name": "Sample V1 Package",
+  "description": "Fixture package for V1 architecture detection tests (no architecture.version v2)."
+}
