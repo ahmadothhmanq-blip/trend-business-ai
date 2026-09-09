@@ -30,12 +30,14 @@ const TEMPLATE_CASES: Array<{
   id: AppTemplateId;
   label: string;
   appName: string;
+  verticalMarker: RegExp;
 }> = [
-  { id: "crm", label: "CRM", appName: "CRM Preview" },
-  { id: "booking", label: "Booking", appName: "Booking Preview" },
-  { id: "education", label: "LMS", appName: "LMS Preview" },
-  { id: "ecommerce", label: "Marketplace", appName: "Marketplace Preview" },
-  { id: "healthcare", label: "Healthcare", appName: "Healthcare Preview" },
+  { id: "crm", label: "CRM", appName: "CRM Preview", verticalMarker: /data-vertical-view=\\"pipeline\\"|data-vertical-view="pipeline"/ },
+  { id: "booking", label: "Booking", appName: "Booking Preview", verticalMarker: /data-vertical-view=\\"agenda\\"|preview\.agenda/ },
+  { id: "education", label: "LMS", appName: "LMS Preview", verticalMarker: /data-preview-runtime="interactive"/ },
+  { id: "ecommerce", label: "Marketplace", appName: "Marketplace Preview", verticalMarker: /data-vertical-view=\\"catalog\\"|preview\.catalogBoard/ },
+  { id: "healthcare", label: "Healthcare", appName: "Healthcare Preview", verticalMarker: /data-vertical-view=\\"agenda\\"|preview\.clinicBoard/ },
+  { id: "finance", label: "Finance", appName: "Finance Preview", verticalMarker: /data-vertical-view=\\"ledger\\"|preview\.ledgerBoard/ },
 ];
 
 function buildModel(templateId: AppTemplateId, appName: string) {
@@ -70,8 +72,11 @@ describe("interactive App Builder live preview", () => {
       assert.match(html, /data-action=\\"search\\"|data-action="search"/);
       assert.match(html, /data-action=\\"page-next\\"|data-action="page-next"/);
       assert.match(html, /data-action=\\"switch-role\\"|data-action="switch-role"/);
+      assert.match(html, /interactive-v8/);
+      assert.match(html, tpl.verticalMarker);
 
       const manifest = buildAppPreviewManifest(model);
+      assert.equal(manifest.templateId, tpl.id);
       assert.ok(manifest.loginPath, `${tpl.label} missing login`);
       assert.ok(manifest.dashboardPath, `${tpl.label} missing dashboard`);
       assert.ok(manifest.screens.length >= 3, `${tpl.label} too few screens`);

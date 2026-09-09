@@ -330,6 +330,243 @@ export function getInteractivePreviewRuntimeScript(): string {
     return Boolean(field && field.enumValues && field.enumValues.length >= 3);
   }
 
+  function entityKey(entity) {
+    return String(entity && entity.name ? entity.name : "")
+      .trim()
+      .toLowerCase();
+  }
+
+  function formatWhen(value) {
+    if (value == null || value === "") return "—";
+    const raw = String(value);
+    const d = new Date(raw);
+    if (!Number.isNaN(d.getTime())) {
+      try {
+        return d.toLocaleString(M.htmlLang || undefined, {
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      } catch {
+        return raw.slice(0, 16).replace("T", " ");
+      }
+    }
+    return raw;
+  }
+
+  function formatMoney(value) {
+    if (value == null || value === "") return "—";
+    const n = Number(value);
+    if (Number.isFinite(n)) {
+      try {
+        return new Intl.NumberFormat(M.htmlLang || undefined, {
+          style: "currency",
+          currency: "USD",
+          maximumFractionDigits: 0,
+        }).format(n);
+      } catch {
+        return String(n);
+      }
+    }
+    return String(value);
+  }
+
+  function agendaBoard(titleKey, rows, timeKey, titleFn, metaFn, statusKey) {
+    const items = rows
+      .slice()
+      .sort(function (a, b) {
+        return String(a[timeKey] || "").localeCompare(String(b[timeKey] || ""));
+      })
+      .map(function (row) {
+        return (
+          '<article class="agenda-item" data-vertical-board="agenda">' +
+          '<div class="when">' +
+          escapeHtml(formatWhen(row[timeKey])) +
+          "</div>" +
+          "<div><strong>" +
+          escapeHtml(titleFn(row)) +
+          '</strong><div class="meta">' +
+          escapeHtml(metaFn(row)) +
+          "</div></div>" +
+          (statusKey
+            ? '<span class="badge">' +
+              escapeHtml(row[statusKey] == null ? "" : String(row[statusKey])) +
+              "</span>"
+            : "") +
+          "</article>"
+        );
+      })
+      .join("");
+    return (
+      '<div class="card" data-vertical-view="agenda"><h3>' +
+      escapeHtml(t(titleKey)) +
+      '</h3><div class="agenda">' +
+      (items ||
+        '<p class="muted">' + escapeHtml(t("crud.empty")) + "</p>") +
+      "</div></div>"
+    );
+  }
+
+  function catalogBoard(rows) {
+    const cards = rows
+      .map(function (row) {
+        const title =
+          row.title != null
+            ? row.title
+            : row.name != null
+              ? row.name
+              : row.id;
+        const price =
+          row.price != null
+            ? formatMoney(row.price)
+            : row.amount != null
+              ? formatMoney(row.amount)
+              : "";
+        const stock =
+          row.stock != null
+            ? "Stock " + String(row.stock)
+            : row.category != null
+              ? String(row.category)
+              : "";
+        return (
+          '<article class="product-card" data-vertical-board="catalog">' +
+          "<strong>" +
+          escapeHtml(title) +
+          '</strong><div class="price">' +
+          escapeHtml(price) +
+          '</div><div class="meta">' +
+          escapeHtml(stock) +
+          "</div><p class=\\"muted\\">" +
+          escapeHtml(row.description == null ? "" : String(row.description)) +
+          "</p></article>"
+        );
+      })
+      .join("");
+    return (
+      '<div class="card" data-vertical-view="catalog"><h3>' +
+      escapeHtml(t("preview.catalogBoard")) +
+      '</h3><div class="product-grid">' +
+      (cards ||
+        '<p class="muted">' + escapeHtml(t("crud.empty")) + "</p>") +
+      "</div></div>"
+    );
+  }
+
+  function ledgerBoard(rows) {
+    const cards = rows
+      .map(function (row) {
+        return (
+          '<article class="ledger-card" data-vertical-board="ledger">' +
+          '<div class="code">' +
+          escapeHtml(row.code == null ? row.id : String(row.code)) +
+          "</div><strong>" +
+          escapeHtml(row.name == null ? row.id : String(row.name)) +
+          '</strong><div class="balance">' +
+          escapeHtml(
+            formatMoney(row.balance != null ? row.balance : row.amount)
+          ) +
+          '</div><div class="type">' +
+          escapeHtml(row.type == null ? "" : String(row.type)) +
+          "</div></article>"
+        );
+      })
+      .join("");
+    return (
+      '<div class="card" data-vertical-view="ledger"><h3>' +
+      escapeHtml(t("preview.ledgerBoard")) +
+      '</h3><div class="ledger-grid">' +
+      (cards ||
+        '<p class="muted">' + escapeHtml(t("crud.empty")) + "</p>") +
+      "</div></div>"
+    );
+  }
+
+  function transactionBoard(rows) {
+    const items = rows
+      .slice()
+      .sort(function (a, b) {
+        return String(b.date || "").localeCompare(String(a.date || ""));
+      })
+      .map(function (row) {
+        const amount = Number(row.amount);
+        const cls = Number.isFinite(amount) && amount < 0 ? "neg" : "pos";
+        return (
+          '<div class="tx-row" data-vertical-board="transactions">' +
+          "<div><strong>" +
+          escapeHtml(
+            row.memo == null ? row.reference || row.id : String(row.memo)
+          ) +
+          '</strong><div class="muted">' +
+          escapeHtml(row.date == null ? "" : String(row.date)) +
+          " · " +
+          escapeHtml(row.reference == null ? "" : String(row.reference)) +
+          '</div></div><div class="amt ' +
+          cls +
+          '">' +
+          escapeHtml(formatMoney(row.amount)) +
+          "</div></div>"
+        );
+      })
+      .join("");
+    return (
+      '<div class="card" data-vertical-view="transactions"><h3>' +
+      escapeHtml(t("preview.ledgerBoard")) +
+      '</h3><div class="tx-list">' +
+      (items ||
+        '<p class="muted">' + escapeHtml(t("crud.empty")) + "</p>") +
+      "</div></div>"
+    );
+  }
+
+  function verticalSpecialtyBoard(entity, rowsAll) {
+    const key = entityKey(entity);
+    if (key === "booking") {
+      return agendaBoard(
+        "preview.agenda",
+        rowsAll,
+        "startsAt",
+        function (row) {
+          return String(row.notes || row.serviceId || row.id);
+        },
+        function (row) {
+          return (
+            String(row.customerId || "") +
+            (row.serviceId ? " · " + row.serviceId : "")
+          );
+        },
+        "status"
+      );
+    }
+    if (key === "appointment") {
+      return agendaBoard(
+        "preview.clinicBoard",
+        rowsAll,
+        "startsAt",
+        function (row) {
+          return String(row.reason || row.providerName || row.id);
+        },
+        function (row) {
+          return (
+            String(row.providerName || "") +
+            (row.patientId ? " · " + row.patientId : "")
+          );
+        },
+        "status"
+      );
+    }
+    if (key === "product") {
+      return catalogBoard(rowsAll);
+    }
+    if (key === "ledgeraccount" || key === "account") {
+      return ledgerBoard(rowsAll);
+    }
+    if (key === "transaction") {
+      return transactionBoard(rowsAll);
+    }
+    return "";
+  }
+
   function honestyBanner() {
     return (
       '<div class="trust-banner" role="note">' +
@@ -818,15 +1055,22 @@ export function getInteractivePreviewRuntimeScript(): string {
       escapeHtml(t("preview.next")) +
       "</button></div>";
 
-    let board = "";
-    if (isPipelineEntity(entity) && statusKey && filterOptions.length) {
+    let board = verticalSpecialtyBoard(entity, rowsAll);
+    const pipelineTitle =
+      entityKey(entity) === "order"
+        ? "preview.fulfillment"
+        : "preview.pipeline";
+    if (!board && isPipelineEntity(entity) && statusKey && filterOptions.length) {
       const columns = filterOptions
         .map((stage) => {
           const cards = rowsAll
             .filter((row) => String(row[statusKey]) === String(stage))
             .map((row) => {
               const valueField = entity.fields.find(
-                (f) => f.name === "value" || f.name === "amount" || f.type === "money"
+                (f) =>
+                  f.name === "value" ||
+                  f.name === "amount" ||
+                  f.type === "money"
               );
               const meta = valueField
                 ? '<div class="meta">' +
@@ -879,8 +1123,8 @@ export function getInteractivePreviewRuntimeScript(): string {
         })
         .join("");
       board =
-        '<div class="card"><h3>' +
-        escapeHtml(t("preview.pipeline")) +
+        '<div class="card" data-vertical-view="pipeline"><h3>' +
+        escapeHtml(t(pipelineTitle)) +
         '</h3><div class="kanban">' +
         columns +
         "</div></div>";

@@ -144,6 +144,79 @@ th { font-size:11px; text-transform:uppercase; letter-spacing:.04em; opacity:.75
 .kanban-card .meta { font-size:11px; opacity:.8; margin-bottom:8px; }
 .kanban-card .actions { gap:4px; }
 .kanban-card .actions button { min-height:28px; padding:4px 8px; font-size:11px; background: transparent; color: var(--fg); border:1px solid color-mix(in srgb, var(--primary) 30%, transparent); }
+.agenda { display:flex; flex-direction:column; gap:8px; margin-top:8px; }
+.agenda-item {
+  display:grid;
+  grid-template-columns: minmax(88px, 120px) 1fr auto;
+  gap:10px;
+  align-items:start;
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid color-mix(in srgb, var(--primary) 16%, transparent);
+  background: var(--surface);
+}
+.agenda-item .when { font-size:12px; font-weight:600; }
+.agenda-item .meta { font-size:11px; opacity:.8; margin-top:4px; }
+.agenda-item .badge {
+  font-size:11px;
+  padding:3px 8px;
+  border-radius:999px;
+  border:1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  text-transform: capitalize;
+  white-space:nowrap;
+}
+.product-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap:10px;
+  margin-top:8px;
+}
+.product-card {
+  padding:12px;
+  border-radius:12px;
+  border:1px solid color-mix(in srgb, var(--primary) 16%, transparent);
+  background: var(--surface);
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  min-height:140px;
+}
+.product-card strong { font-size:13px; }
+.product-card .price { font-size:14px; font-weight:700; color: var(--accent); }
+.product-card .meta { font-size:11px; opacity:.8; }
+.ledger-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap:10px;
+  margin-top:8px;
+}
+.ledger-card {
+  padding:12px;
+  border-radius:12px;
+  border:1px solid color-mix(in srgb, var(--primary) 16%, transparent);
+  background: var(--surface);
+}
+.ledger-card .code { font-size:11px; opacity:.7; margin-bottom:4px; }
+.ledger-card .balance { font-size:18px; font-weight:700; margin-top:8px; }
+.ledger-card .type { font-size:11px; text-transform:capitalize; opacity:.8; }
+.tx-list { display:flex; flex-direction:column; gap:8px; margin-top:8px; }
+.tx-row {
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid color-mix(in srgb, var(--primary) 14%, transparent);
+  background: var(--surface);
+  font-size:12px;
+}
+.tx-row .amt.pos { color:#15803d; font-weight:700; }
+.tx-row .amt.neg { color:#b91c1c; font-weight:700; }
+@media (max-width: 640px) {
+  .agenda-item { grid-template-columns: 1fr; }
+}
 footer { margin-top:auto; padding:10px 16px; font-size:11px; opacity:.5; border-top:1px solid color-mix(in srgb, var(--primary) 10%, transparent); }
 .table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
 :where(input, select, textarea, button, a):focus-visible {

@@ -20,7 +20,7 @@ import {
 } from "@/lib/ai/webapp-i18n/resolve-locale";
 import type { WebAppI18nKey } from "@/lib/ai/webapp-i18n/keys";
 
-export const APP_PREVIEW_RUNTIME_VERSION = "interactive-v7";
+export const APP_PREVIEW_RUNTIME_VERSION = "interactive-v8";
 
 export type PreviewField = {
   name: string;
@@ -61,6 +61,8 @@ export type PreviewNavItem = {
 export type PreviewManifest = {
   runtime: typeof APP_PREVIEW_RUNTIME_VERSION;
   appName: string;
+  /** Template vertical when known (crm, booking, ecommerce, healthcare, finance, …). */
+  templateId?: string;
   language: string;
   htmlLang: string;
   dir: "ltr" | "rtl";
@@ -464,6 +466,16 @@ function buildI18nBundle(locale: ResolvedWebAppLocale): Record<string, string> {
       : "In-platform interactive preview — the full production app is exported as a ZIP for self-hosting.";
   out["preview.pipeline"] =
     locale.language === "Arabic" ? "لوحة الصفقات" : "Pipeline board";
+  out["preview.agenda"] =
+    locale.language === "Arabic" ? "جدول المواعيد" : "Agenda";
+  out["preview.catalogBoard"] =
+    locale.language === "Arabic" ? "كتالوج المنتجات" : "Product catalog";
+  out["preview.clinicBoard"] =
+    locale.language === "Arabic" ? "لوحة العيادة" : "Clinic board";
+  out["preview.ledgerBoard"] =
+    locale.language === "Arabic" ? "ملخص دفتر الحسابات" : "Ledger summary";
+  out["preview.fulfillment"] =
+    locale.language === "Arabic" ? "متابعة الطلبات" : "Order fulfillment";
   out["preview.resetDemo"] =
     locale.language === "Arabic" ? "إعادة ضبط بيانات العرض" : "Reset demo data";
   out["preview.signupOk"] =
@@ -635,6 +647,7 @@ export function buildAppPreviewManifest(
   return {
     runtime: APP_PREVIEW_RUNTIME_VERSION,
     appName: model.settings.appName || model.brand.businessName || "App",
+    templateId: model.templateId || undefined,
     language: locale.language,
     htmlLang: locale.htmlLang,
     dir: locale.dir,
