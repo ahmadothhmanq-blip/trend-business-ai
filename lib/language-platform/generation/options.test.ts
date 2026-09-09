@@ -21,11 +21,16 @@ describe("GLS generation language options", () => {
   it("includes Bilingual for website-builder only", () => {
     const website = getGlsGenerationLanguageValues("website-builder");
     const video = getGlsGenerationLanguageValues("video-studio");
+    const appBuilder = getGlsGenerationLanguageValues("app-builder");
 
     assert.ok(website.includes("Bilingual"));
     assert.ok(website.includes("English"));
     assert.ok(!video.includes("Bilingual"));
     assert.equal(website.length, getGlsWorldGenerationLanguageOptions().length + 1);
+    assert.ok(appBuilder.includes("Arabic"));
+    assert.ok(appBuilder.includes("English"));
+    assert.ok(appBuilder.includes("Japanese"));
+    assert.equal(appBuilder.length, getGlsWorldGenerationLanguageOptions().length);
   });
 
   it("orders website-builder with English, Arabic, Bilingual first", () => {

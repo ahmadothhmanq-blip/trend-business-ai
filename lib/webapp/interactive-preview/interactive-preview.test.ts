@@ -72,7 +72,7 @@ describe("interactive App Builder live preview", () => {
       assert.match(html, /data-action=\\"search\\"|data-action="search"/);
       assert.match(html, /data-action=\\"page-next\\"|data-action="page-next"/);
       assert.match(html, /data-action=\\"switch-role\\"|data-action="switch-role"/);
-      assert.match(html, /interactive-v8/);
+      assert.match(html, /interactive-v9/);
       assert.match(html, tpl.verticalMarker);
 
       const manifest = buildAppPreviewManifest(model);
@@ -107,6 +107,21 @@ describe("interactive App Builder live preview", () => {
       }
     });
   }
+
+  it("localizes preview chrome for Spanish (not English leftovers)", () => {
+    const model = buildStructuredAppModel({
+      templateId: "booking",
+      appName: "Cita Studio",
+      prompt: "Cita Studio production app",
+      language: "Spanish",
+      features: [],
+    });
+    const manifest = buildAppPreviewManifest(model);
+    assert.equal(manifest.i18n["preview.role"], "Rol");
+    assert.match(manifest.i18n["preview.session"], /[Ss]esi/);
+    assert.doesNotMatch(manifest.i18n["preview.demoHint"], /^Interactive preview/);
+    assert.match(manifest.i18n["auth.signIn"], /Iniciar/);
+  });
 
   it("trusted sanitizer keeps inline runtime and strips external scripts", () => {
     const model = buildModel("crm", "Sanitize CRM");

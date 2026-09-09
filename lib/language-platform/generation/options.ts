@@ -1,3 +1,4 @@
+import { getWebAppUiTranslationPackLanguages } from "@/lib/ai/webapp-i18n/packs";
 import type { SupportedLocale } from "@/lib/i18n/config";
 import type { GlsServiceId } from "@/lib/language-platform/core/types";
 import {
@@ -98,12 +99,19 @@ export function getGlsSpecialGenerationLanguageOptions(): readonly GlsGeneration
 
 /**
  * Generation language picker options for a service.
- * Website / landing builders include Bilingual; all others use world languages only.
+ * Website / landing builders include Bilingual; App Builder only lists languages
+ * with a complete generated-app UI translation pack; all others use world languages.
  */
 export function getGlsGenerationLanguageOptions(
   serviceId: GlsServiceId,
 ): readonly GlsGenerationLanguageOption[] {
   const world = getGlsWorldGenerationLanguageOptions();
+
+  if (serviceId === "app-builder") {
+    const supported = new Set(getWebAppUiTranslationPackLanguages());
+    return world.filter((opt) => supported.has(opt.value));
+  }
+
   if (!BILINGUAL_SERVICE_IDS.has(serviceId)) {
     return world;
   }

@@ -11,6 +11,7 @@ import {
   EN_WEBAPP_ENTITIES,
   EN_WEBAPP_MESSAGES,
 } from "@/lib/ai/webapp-i18n/dictionaries/en";
+import worldPacksJson from "@/lib/ai/webapp-i18n/dictionaries/world-packs.json";
 import {
   WEBAPP_ENTITY_KEYS,
   WEBAPP_I18N_KEYS,
@@ -23,11 +24,31 @@ export type WebAppUiTranslationPack = {
   entities: WebAppEntityDictionary;
 };
 
+type WorldPackJson = {
+  messages: Record<string, string>;
+  entities: Record<string, string>;
+};
+
+function asUiPack(pack: WorldPackJson): WebAppUiTranslationPack {
+  return {
+    messages: pack.messages as WebAppI18nDictionary,
+    entities: pack.entities as WebAppEntityDictionary,
+  };
+}
+
+const WORLD_UI_TRANSLATION_PACKS: Record<string, WebAppUiTranslationPack> =
+  Object.fromEntries(
+    Object.entries(worldPacksJson as Record<string, WorldPackJson>).map(
+      ([language, pack]) => [language, asUiPack(pack)],
+    ),
+  );
+
 /** Registered generation-language → UI pack map (canonical GLS values). */
 export const WEBAPP_UI_TRANSLATION_PACKS: Record<string, WebAppUiTranslationPack> =
   {
     English: { messages: EN_WEBAPP_MESSAGES, entities: EN_WEBAPP_ENTITIES },
     Arabic: { messages: AR_WEBAPP_MESSAGES, entities: AR_WEBAPP_ENTITIES },
+    ...WORLD_UI_TRANSLATION_PACKS,
   };
 
 /** True when every required UI message key exists and is non-empty. */

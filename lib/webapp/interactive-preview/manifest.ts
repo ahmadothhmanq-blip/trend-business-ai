@@ -19,8 +19,9 @@ import {
   type ResolvedWebAppLocale,
 } from "@/lib/ai/webapp-i18n/resolve-locale";
 import type { WebAppI18nKey } from "@/lib/ai/webapp-i18n/keys";
+import { getPreviewChromeBundle } from "@/lib/webapp/interactive-preview/preview-chrome";
 
-export const APP_PREVIEW_RUNTIME_VERSION = "interactive-v8";
+export const APP_PREVIEW_RUNTIME_VERSION = "interactive-v9";
 
 export type PreviewField = {
   name: string;
@@ -430,67 +431,7 @@ function buildI18nBundle(locale: ResolvedWebAppLocale): Record<string, string> {
   for (const key of I18N_KEYS) {
     out[key] = translateWebAppMessage(locale, key);
   }
-  // Preview-only chrome strings (English keys, localized values when AR pack exists)
-  out["preview.search"] =
-    locale.language === "Arabic" ? "بحث" : "Search";
-  out["preview.filter"] =
-    locale.language === "Arabic" ? "تصفية" : "Filter";
-  out["preview.all"] = locale.language === "Arabic" ? "الكل" : "All";
-  out["preview.edit"] = locale.language === "Arabic" ? "تعديل" : "Edit";
-  out["preview.save"] = locale.language === "Arabic" ? "حفظ" : "Save";
-  out["preview.cancel"] = locale.language === "Arabic" ? "إلغاء" : "Cancel";
-  out["preview.prev"] = locale.language === "Arabic" ? "السابق" : "Previous";
-  out["preview.next"] = locale.language === "Arabic" ? "التالي" : "Next";
-  out["preview.page"] = locale.language === "Arabic" ? "صفحة" : "Page";
-  out["preview.logout"] = locale.language === "Arabic" ? "تسجيل الخروج" : "Sign out";
-  out["preview.role"] = locale.language === "Arabic" ? "الدور" : "Role";
-  out["preview.session"] =
-    locale.language === "Arabic" ? "جلسة معاينة" : "Preview session";
-  out["preview.required"] =
-    locale.language === "Arabic" ? "هذا الحقل مطلوب." : "This field is required.";
-  out["preview.saved"] =
-    locale.language === "Arabic" ? "تم الحفظ بنجاح." : "Saved successfully.";
-  out["preview.deleted"] =
-    locale.language === "Arabic" ? "تم الحذف." : "Deleted.";
-  out["preview.loginOk"] =
-    locale.language === "Arabic"
-      ? "تم تسجيل الدخول."
-      : "Signed in.";
-  out["preview.demoHint"] =
-    locale.language === "Arabic"
-      ? "معاينة تفاعلية — أي بريد وكلمة مرور (8+)، أو أنشئ حساباً. يُحفظ في هذه الجلسة فقط."
-      : "Interactive preview — any email and password (8+), or create an account. Stored in this session only.";
-  out["preview.zipHonesty"] =
-    locale.language === "Arabic"
-      ? "هذه معاينة داخل المنصة — التطبيق الإنتاجي الكامل يُصدَّر كـ ZIP وتستضيفه بنفسك."
-      : "In-platform interactive preview — the full production app is exported as a ZIP for self-hosting.";
-  out["preview.pipeline"] =
-    locale.language === "Arabic" ? "لوحة الصفقات" : "Pipeline board";
-  out["preview.agenda"] =
-    locale.language === "Arabic" ? "جدول المواعيد" : "Agenda";
-  out["preview.catalogBoard"] =
-    locale.language === "Arabic" ? "كتالوج المنتجات" : "Product catalog";
-  out["preview.clinicBoard"] =
-    locale.language === "Arabic" ? "لوحة العيادة" : "Clinic board";
-  out["preview.ledgerBoard"] =
-    locale.language === "Arabic" ? "ملخص دفتر الحسابات" : "Ledger summary";
-  out["preview.fulfillment"] =
-    locale.language === "Arabic" ? "متابعة الطلبات" : "Order fulfillment";
-  out["preview.resetDemo"] =
-    locale.language === "Arabic" ? "إعادة ضبط بيانات العرض" : "Reset demo data";
-  out["preview.signupOk"] =
-    locale.language === "Arabic"
-      ? "تم إنشاء الحساب."
-      : "Account created.";
-  out["preview.noAccess"] =
-    locale.language === "Arabic"
-      ? "لا تملك صلاحية لهذه الصفحة."
-      : "You do not have access to this page.";
-  out["preview.open"] = locale.language === "Arabic" ? "فتح" : "Open";
-  out["preview.emptyTitle"] =
-    locale.language === "Arabic" ? "لا توجد بيانات بعد" : "Nothing here yet";
-  out["preview.addFirst"] =
-    locale.language === "Arabic" ? "أضف أول سجل" : "Add first record";
+  Object.assign(out, getPreviewChromeBundle(locale.language));
   return out;
 }
 

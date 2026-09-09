@@ -19,6 +19,7 @@ import {
 } from "@/lib/webapp/sanitize-app-preview-html";
 import { EN_WEBAPP_MESSAGES } from "@/lib/ai/webapp-i18n/dictionaries/en";
 import {
+  canUseWebAppUiPackForRequest,
   detectWebAppUiDictionaryLanguage,
   findCrossLanguageMessageKeys,
   findMissingWebAppEntityTranslations,
@@ -463,12 +464,10 @@ export function findWebAppI18nReadinessIssues(
     const languageMatch = configFile.content.match(
       /language:\s*["']([^"']+)["']/,
     );
-    const language = languageMatch?.[1]
-      ? normalizeGlsGenerationLanguage(languageMatch[1])
-      : null;
-    if (language && !hasCompleteWebAppUiTranslationPack(language)) {
+    const rawLanguage = languageMatch?.[1]?.trim() || null;
+    if (rawLanguage && !canUseWebAppUiPackForRequest(rawLanguage)) {
       issues.push(
-        `lib/i18n/config.ts: generation language ${JSON.stringify(language)} has no complete UI translation pack.`,
+        `lib/i18n/config.ts: generation language ${JSON.stringify(rawLanguage)} has no complete UI translation pack.`,
       );
     }
   }

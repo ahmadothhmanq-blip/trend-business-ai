@@ -49,7 +49,9 @@ describe("webapp generated-app i18n", () => {
   });
 
   it("ships a complete entity catalog in every UI pack", () => {
-    for (const language of ["English", "Arabic"] as const) {
+    const languages = getWebAppUiTranslationPackLanguages();
+    assert.ok(languages.length >= 31);
+    for (const language of languages) {
       const pack = WEBAPP_UI_TRANSLATION_PACKS[language]!;
       assert.equal(isCompleteWebAppEntityDictionary(pack.entities), true);
       assert.deepEqual(findMissingWebAppEntityTranslations(pack.entities), []);
@@ -65,7 +67,7 @@ describe("webapp generated-app i18n", () => {
   });
 
   it("falls back completely to English for unsupported languages (no mixed chrome)", () => {
-    const locale = resolveWebAppLocale("Spanish");
+    const locale = resolveWebAppLocale("Klingon");
     assert.equal(locale.fellBackToDefault, true);
     assert.equal(locale.language, "English");
     assert.equal(locale.htmlLang, "en");
@@ -78,30 +80,37 @@ describe("webapp generated-app i18n", () => {
     assert.equal(locale.messages["auth.signIn"], locale.defaultMessages["auth.signIn"]);
   });
 
-  it("applies RTL only for fully supported RTL languages; unsupported RTL falls back to English LTR", () => {
+  it("resolves Spanish with native UI pack (parity with site languages)", () => {
+    const locale = resolveWebAppLocale("Spanish");
+    assert.equal(locale.fellBackToDefault, false);
+    assert.equal(locale.language, "Spanish");
+    assert.equal(locale.htmlLang, "es");
+    assert.equal(locale.dir, "ltr");
+    assert.equal(translateWebAppMessage(locale, "auth.signIn"), "Iniciar sesión");
+  });
+
+  it("applies RTL for fully supported RTL languages including Persian and Urdu", () => {
     assert.equal(isWebAppSupportedRtlLanguage("Arabic"), true);
     assert.equal(isWebAppSupportedRtlLanguage("English"), false);
-    assert.equal(isWebAppSupportedRtlLanguage("Persian"), false);
-    assert.equal(isWebAppSupportedRtlLanguage("Urdu"), false);
+    assert.equal(isWebAppSupportedRtlLanguage("Persian"), true);
+    assert.equal(isWebAppSupportedRtlLanguage("Urdu"), true);
 
     assert.equal(resolveWebAppTextDirection("Arabic"), "rtl");
     assert.equal(resolveWebAppTextDirection("English"), "ltr");
-    assert.equal(resolveWebAppTextDirection("Persian"), "ltr");
-    assert.equal(resolveWebAppTextDirection("Urdu"), "ltr");
+    assert.equal(resolveWebAppTextDirection("Persian"), "rtl");
+    assert.equal(resolveWebAppTextDirection("Urdu"), "rtl");
 
-    // GLS still marks Persian as RTL world language — generated apps must not.
     assert.equal(resolveGlsGenerationLanguageOption("Persian").dir, "rtl");
 
-    for (const unsupportedRtl of ["Persian", "Urdu"] as const) {
-      const locale = resolveWebAppLocale(unsupportedRtl);
-      assert.equal(locale.fellBackToDefault, true, unsupportedRtl);
-      assert.equal(locale.language, "English", unsupportedRtl);
-      assert.equal(locale.dir, "ltr", unsupportedRtl);
-      assert.equal(locale.htmlLang, "en", unsupportedRtl);
-      assert.equal(
+    for (const rtlLang of ["Persian", "Urdu"] as const) {
+      const locale = resolveWebAppLocale(rtlLang);
+      assert.equal(locale.fellBackToDefault, false, rtlLang);
+      assert.equal(locale.language, rtlLang, rtlLang);
+      assert.equal(locale.dir, "rtl", rtlLang);
+      assert.notEqual(
         translateWebAppMessage(locale, "auth.signIn"),
         "Sign in",
-        unsupportedRtl,
+        rtlLang,
       );
     }
 
@@ -112,10 +121,9 @@ describe("webapp generated-app i18n", () => {
 
     const persianFiles = buildWebAppI18nFiles("Persian");
     const faConfig = persianFiles.find((file) => file.path === "lib/i18n/config.ts")!.content;
-    assert.match(faConfig, /language: "English"/);
-    assert.match(faConfig, /dir: "ltr"/);
-    assert.match(faConfig, /htmlLang: "en"/);
-    assert.doesNotMatch(faConfig, /dir: "rtl"|htmlLang: "fa"|Persian/);
+    assert.match(faConfig, /language: "Persian"/);
+    assert.match(faConfig, /dir: "rtl"/);
+    assert.match(faConfig, /htmlLang: "fa"/);
   });
 
   it("fails readiness on RTL/LTR mismatches", () => {
@@ -180,7 +188,8 @@ describe("webapp generated-app i18n", () => {
 
   it("exposes only complete UI translation packs as selectable App Builder languages", () => {
     const packs = getWebAppUiTranslationPackLanguages();
-    assert.deepEqual([...packs].sort(), ["Arabic", "English"]);
+    const world = getGlsWorldGenerationLanguageOptions();
+    assert.equal(packs.length, world.length);
     for (const language of packs) {
       assert.equal(hasCompleteWebAppUiTranslationPack(language), true);
       assert.equal(
@@ -194,21 +203,20 @@ describe("webapp generated-app i18n", () => {
         true,
       );
     }
-    assert.equal(hasCompleteWebAppUiTranslationPack("Spanish"), false);
-    assert.equal(hasCompleteWebAppUiTranslationPack("French"), false);
+    assert.equal(hasCompleteWebAppUiTranslationPack("Spanish"), true);
+    assert.equal(hasCompleteWebAppUiTranslationPack("French"), true);
+    assert.equal(hasCompleteWebAppUiTranslationPack("Japanese"), true);
 
     const appBuilder = getGlsGenerationLanguageValues("app-builder");
-    assert.deepEqual([...appBuilder].sort(), ["Arabic", "English"]);
-    assert.ok(!appBuilder.includes("Spanish"));
-    assert.ok(!appBuilder.includes("Japanese"));
+    assert.deepEqual([...appBuilder].sort(), [...packs].sort());
+    assert.ok(appBuilder.includes("Spanish"));
+    assert.ok(appBuilder.includes("Japanese"));
     assert.ok(
       getGlsGenerationLanguageOptions("app-builder").every((opt) =>
         hasCompleteWebAppUiTranslationPack(opt.value),
       ),
     );
 
-    const world = getGlsWorldGenerationLanguageOptions();
-    assert.ok(world.length > appBuilder.length);
     assert.ok(getGlsGenerationLanguageValues("video-studio").includes("Japanese"));
   });
 
@@ -216,10 +224,10 @@ describe("webapp generated-app i18n", () => {
     const integrity = findWebAppSelectableLanguagePackIssues([
       "English",
       "Arabic",
-      "Spanish",
+      "NotARealLanguage",
     ]);
     assert.ok(
-      integrity.some((issue) => issue.includes("Spanish")),
+      integrity.some((issue) => issue.includes("NotARealLanguage")),
       integrity.join("\n"),
     );
 
@@ -237,7 +245,7 @@ describe("webapp generated-app i18n", () => {
             ...file,
             content: file.content.replace(
               /language:\s*["']English["']/,
-              'language: "Spanish"',
+              'language: "NotARealLanguage"',
             ),
           }
         : file,
@@ -245,7 +253,7 @@ describe("webapp generated-app i18n", () => {
     const issues = findWebAppI18nReadinessIssues(withUnsupported);
     assert.ok(
       issues.some((issue) =>
-        issue.includes("Spanish") && issue.includes("complete UI translation pack"),
+        issue.includes("NotARealLanguage") && issue.includes("complete UI translation pack"),
       ),
       issues.join("\n"),
     );
@@ -297,14 +305,19 @@ describe("webapp generated-app i18n", () => {
     assert.match(arConfig, /htmlLang: "ar"/);
     assert.match(arConfig, /dir: "rtl"/);
 
-    const spanishFallback = buildWebAppI18nFiles("Spanish");
-    const esConfig = spanishFallback.find((file) => file.path === "lib/i18n/config.ts")!.content;
-    assert.match(esConfig, /language: "English"/);
-    assert.match(esConfig, /htmlLang: "en"/);
+    const spanish = buildWebAppI18nFiles("Spanish");
+    const esConfig = spanish.find((file) => file.path === "lib/i18n/config.ts")!.content;
+    assert.match(esConfig, /language: "Spanish"/);
+    assert.match(esConfig, /htmlLang: "es"/);
     assert.match(esConfig, /dir: "ltr"/);
-    const esMessages = spanishFallback.find((file) => file.path === "lib/i18n/messages.ts")!.content;
-    assert.match(esMessages, /"auth\.signIn": "Sign in"/);
-    assert.doesNotMatch(esConfig, /Spanish|htmlLang: "es"/);
+    const esMessages = spanish.find((file) => file.path === "lib/i18n/messages.ts")!.content;
+    assert.match(esMessages, /"auth\.signIn": "Iniciar sesión"/);
+
+    const unsupported = buildWebAppI18nFiles("Klingon");
+    const fallbackConfig = unsupported.find((file) => file.path === "lib/i18n/config.ts")!.content;
+    assert.match(fallbackConfig, /language: "English"/);
+    assert.match(fallbackConfig, /htmlLang: "en"/);
+    assert.match(fallbackConfig, /dir: "ltr"/);
   });
 
   it("emits i18n modules with default fallback translator", () => {

@@ -64,8 +64,7 @@ export function canUseWebAppUiPackForRequest(language?: string | null): boolean 
  * Unsupported languages return null — callers must fall back completely.
  *
  * RTL is applied only when the language both (1) has a complete UI pack and
- * (2) is registered as RTL in GLS. Unsupported RTL GLS languages (Persian,
- * Urdu, …) never receive dir=rtl here.
+ * (2) is registered as RTL in GLS.
  */
 export function getWebAppLocaleMeta(language?: string | null): WebAppLocaleMeta | null {
   const normalized = normalizeGlsGenerationLanguage(language);

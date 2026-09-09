@@ -18,12 +18,17 @@ describe("GLS generation language service", () => {
     const website = getGlsAvailableGenerationLanguages("website-builder");
     const image = getGlsAvailableGenerationLanguages("image-generator");
     const agents = getGlsAvailableGenerationLanguages("ai-agents");
+    const appBuilder = getGlsAvailableGenerationLanguages("app-builder");
 
     assert.ok(website.includes("Bilingual"));
     assert.ok(!image.includes("Bilingual"));
     assert.ok(!agents.includes("Bilingual"));
     assert.ok(image.includes("Arabic"));
     assert.ok(image.includes("Japanese"));
+    assert.ok(appBuilder.includes("Arabic"));
+    assert.ok(appBuilder.includes("English"));
+    assert.ok(appBuilder.includes("Japanese"));
+    assert.equal(appBuilder.length, image.length);
   });
 
   it("maps workspace types onto GLS service ids", () => {

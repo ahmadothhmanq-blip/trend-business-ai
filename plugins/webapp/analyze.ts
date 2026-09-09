@@ -38,11 +38,40 @@ function titleCaseAppName(prompt: string, appType: string, language?: string): s
     return localizedAppTypeFallback(def?.label ?? appType, language);
   }
 
-  const fromPrompt = cleaned
+  const fillerPrefix =
+    /^(?:build|create|make|generate|aplicaci[oó]n|application|app|sistema|system|una?|an?|the)\b[\s-]*/i;
+  const withoutFiller = cleaned.replace(fillerPrefix, "").trim() || cleaned;
+  const stop = new Set([
+    "de",
+    "del",
+    "la",
+    "el",
+    "los",
+    "las",
+    "para",
+    "por",
+    "for",
+    "of",
+    "to",
+    "a",
+    "an",
+    "the",
+    "un",
+    "una",
+    "y",
+    "and",
+    "con",
+    "with",
+  ]);
+  const contentWords = withoutFiller
     .split(/\s+/)
-    .slice(0, 4)
+    .filter((w) => !stop.has(w.toLowerCase()))
+    .slice(0, 5);
+  const fromPrompt = contentWords
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-    .join(" ");
+    .join(" ")
+    .slice(0, 48)
+    .trim();
   if (fromPrompt.length >= 3) return fromPrompt;
   return localizedAppTypeFallback(def?.label ?? appType, language);
 }
