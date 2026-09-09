@@ -109,7 +109,18 @@ export function dropConflictingUiModules(files: GeneratedProjectFile[]): Generat
 }
 
 export function dropConflictingAppPages(files: GeneratedProjectFile[]): GeneratedProjectFile[] {
-  const pages = files
+  // Collapse exact path duplicates first — otherwise dropping "extras" by path
+  // removes the kept winner too when duplicates share the same path string.
+  const deduped: GeneratedProjectFile[] = [];
+  const seenPaths = new Set<string>();
+  for (const file of files) {
+    const path = normalizePath(file.path);
+    if (seenPaths.has(path)) continue;
+    seenPaths.add(path);
+    deduped.push({ ...file, path });
+  }
+
+  const pages = deduped
     .map((file) => ({ file, route: appRouteFromPagePath(file.path) }))
     .filter((entry): entry is { file: GeneratedProjectFile; route: string } =>
       Boolean(entry.route),
@@ -132,7 +143,7 @@ export function dropConflictingAppPages(files: GeneratedProjectFile[]): Generate
     if (rootPage) {
       for (const entry of group) {
         if (normalizePath(entry.file.path) !== "app/page.tsx") {
-          drop.add(entry.file.path);
+          drop.add(normalizePath(entry.file.path));
         }
       }
       continue;
@@ -143,11 +154,11 @@ export function dropConflictingAppPages(files: GeneratedProjectFile[]): Generate
       return a.file.path.localeCompare(b.file.path);
     });
     for (const extra of ranked.slice(1)) {
-      drop.add(extra.file.path);
+      drop.add(normalizePath(extra.file.path));
     }
   }
 
-  let next = files.filter((file) => !drop.has(file.path));
+  let next = deduped.filter((file) => !drop.has(normalizePath(file.path)));
 
   next = next.filter((file) => {
     const match = normalizePath(file.path).match(/^app\/(\([^/]+\))\/layout\.(tsx|ts|jsx|js)$/);

@@ -141,6 +141,7 @@ export async function planWebApp(
     colorStyle: input.colorStyle,
     features: input.features.length ? input.features : analysis.features,
     industryHint: analysis.appType,
+    templateId: input.templateId,
   });
   timing?.setWaitingFor("idle", "runAppDesignEngine complete");
 

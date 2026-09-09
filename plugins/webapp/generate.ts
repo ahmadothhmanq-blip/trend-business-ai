@@ -142,6 +142,7 @@ async function validateAndRepairProject(
     tablesForValidation: entityTables,
     scaffoldOptions: {
       projectName: plan.blueprint.title || analysis.appName,
+      language: input.language,
       requiresAuth: Boolean(analysis.requiresAuth),
       requiresDatabase: Boolean(analysis.requiresDatabase),
       requiresDashboard: Boolean(analysis.requiresDashboard),
@@ -194,11 +195,13 @@ export async function generateWebApp(
 
   const scaffold = buildWebAppScaffold({
     projectName: plan.blueprint.title || analysis.appName,
+    language: input.language,
     requiresAuth: Boolean(analysis.requiresAuth),
     requiresDatabase: Boolean(analysis.requiresDatabase),
     requiresDashboard: Boolean(analysis.requiresDashboard),
     tables: entityTables,
     dataModels: plan.appModel?.dataModels,
+    templateId: plan.appModel?.templateId,
   });
   const scaffoldByPath = new Map(scaffold.map((file) => [file.path, file]));
 
@@ -300,6 +303,7 @@ export async function generateWebApp(
       designStyle: input.designStyle,
       colorStyle: input.colorStyle,
       features: input.features,
+      templateId: input.templateId,
     }).model;
 
   const versionHistory = saveAppVersion(

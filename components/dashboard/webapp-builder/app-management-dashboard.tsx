@@ -13,6 +13,8 @@ import {
   Trash2,
   Save,
   RefreshCw,
+  Store,
+  Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,8 +35,9 @@ import type { AppIntelligenceReport, AppQualityReport } from "@/lib/ai-core/app-
 import type { AppPreviewPayload, VisualEditorState } from "@/lib/ai-core/app-design-platform/types";
 import { PREVIEW_DEVICE_FRAMES } from "@/lib/ai-core/app-design-platform/preview";
 import { brandTokensToCssVars } from "@/lib/ai-core/app-design-platform/brand";
-import { AppCopilotCommandPanel } from "@/components/dashboard/webapp-builder/app-copilot-command-panel";
+import { AppStudioChat } from "@/components/dashboard/webapp-builder/app-studio-chat";
 import type { AppCopilotUndoSnapshot } from "@/components/dashboard/webapp-builder/hooks/use-app-copilot-command";
+import { StorePublishPanel } from "@/components/dashboard/webapp-builder/store-publish-panel";
 import type { GeneratedProjectFile } from "@/lib/ai/types";
 import type { WebAppGeneration } from "@/types/webapp";
 import { readBlueprintRevisionFromGeneration } from "@/lib/webapp/platform/revision";
@@ -58,6 +61,18 @@ type ManagePayload = {
   template: { id: string; label: string; description: string; userFlows: string[] } | null;
   componentPalette?: Array<{ id: string; label: string; category: string; description: string }>;
   livePreviewUrl?: string;
+  publication?: {
+    publicPath: string | null;
+    productionUrl: string | null;
+    previewHostUrl?: string | null;
+    status: string;
+    kind: string;
+  } | null;
+  runtimeHost?: {
+    url: string;
+    status: string;
+    message?: string;
+  } | null;
 };
 
 type Tab =
@@ -71,7 +86,8 @@ type Tab =
   | "intelligence"
   | "versions"
   | "data"
-  | "deploy";
+  | "deploy"
+  | "stores";
 
 export function AppManagementDashboard({ generationId }: { generationId: string }) {
   const p = useProductT("webappBuilder");
@@ -87,6 +103,9 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [propTitle, setPropTitle] = useState("");
   const [deployStatus, setDeployStatus] = useState<string | null>(null);
+  const [productionUrl, setProductionUrl] = useState<string | null>(null);
+  const [previewHostUrl, setPreviewHostUrl] = useState<string | null>(null);
+  const [runtimeHostStatus, setRuntimeHostStatus] = useState<string | null>(null);
   const [revision, setRevision] = useState(0);
   const [files, setFiles] = useState<GeneratedProjectFile[]>([]);
 
@@ -104,6 +123,25 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
       setPrimary(json.model.brand.tokens.primary);
       setRevision(readBlueprintRevisionFromGeneration(json.generation));
       setFiles(json.generation?.blueprint?.files ?? []);
+      if (json.runtimeHost?.url) {
+        setProductionUrl(String(json.runtimeHost.url));
+        setRuntimeHostStatus(String(json.runtimeHost.status ?? ""));
+      } else if (
+        json.publication?.kind === "self-hosted" &&
+        json.publication?.productionUrl
+      ) {
+        setProductionUrl(String(json.publication.productionUrl));
+        setRuntimeHostStatus(String(json.publication.status ?? ""));
+      } else {
+        setProductionUrl(null);
+        setRuntimeHostStatus(null);
+      }
+      const preview =
+        json.publication?.previewHostUrl ||
+        (json.publication?.kind === "interactive-preview-host"
+          ? json.publication?.productionUrl
+          : null);
+      setPreviewHostUrl(preview ? String(preview) : null);
     } catch {
       toast.error(p("errors.loadManagementFailed"));
     } finally {
@@ -115,7 +153,10 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
     void load();
   }, [load]);
 
-  const postAction = async (body: Record<string, unknown>) => {
+  const postAction = async (
+    body: Record<string, unknown>,
+    options?: { silent?: boolean },
+  ): Promise<string | undefined> => {
     setBusy(true);
     try {
       const res = await fetch(`/api/webapp-builder/${generationId}/manage`, {
@@ -126,9 +167,11 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
       const json = await res.json();
       if (!res.ok) {
         toast.error(json.error ?? p("errors.actionFailed"));
-        return;
+        return undefined;
       }
-      toast.success(json.message ?? p("management.updated"));
+      if (!options?.silent) {
+        toast.success(json.message ?? p("management.updated"));
+      }
       if (json.model) {
         setData((prev) =>
           prev
@@ -149,8 +192,39 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
       if (json.preview && body.action === "preview") {
         setData((prev) => (prev ? { ...prev, preview: json.preview } : prev));
       }
+      return typeof json.message === "string" ? json.message : undefined;
     } catch {
       toast.error(p("errors.requestFailed"));
+      return undefined;
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const downloadProjectZip = async () => {
+    setBusy(true);
+    try {
+      const res = await fetch(`/api/webapp-builder/${generationId}/export`);
+      if (!res.ok) {
+        const json = (await res.json().catch(() => ({}))) as { error?: string };
+        toast.error(json.error ?? p("management.downloadZipFailed"));
+        return;
+      }
+      const blob = await res.blob();
+      const disposition = res.headers.get("Content-Disposition") ?? "";
+      const match = disposition.match(/filename="([^"]+)"/);
+      const filename =
+        match?.[1] ??
+        `${(data?.model.settings.appName ?? appName).replace(/\s+/g, "-").toLowerCase()}.zip`;
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = filename;
+      anchor.click();
+      URL.revokeObjectURL(url);
+      toast.success(p("management.downloadZipStarted"));
+    } catch {
+      toast.error(p("management.downloadZipFailed"));
     } finally {
       setBusy(false);
     }
@@ -178,6 +252,7 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
     { id: "preview", label: p("management.tabs.livePreview") },
     { id: "editor", label: p("management.tabs.visualEditor") },
     { id: "deploy", label: p("management.tabs.deploy") },
+    { id: "stores", label: p("management.tabs.stores") },
     { id: "assistant", label: p("management.tabs.assistant") },
     { id: "intelligence", label: p("management.tabs.intelligence") },
     { id: "versions", label: p("management.tabs.versions") },
@@ -294,6 +369,13 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
               <div className="text-xs text-white/40">
                 {p("management.intelligenceGrade", { grade: intelligence.grade, score: intelligence.score })}
               </div>
+              <Button
+                variant="outline"
+                className="mt-3 w-full rounded-xl border-white/10"
+                onClick={() => setTab("stores")}
+              >
+                {p("management.mobileStores.openWizard")}
+              </Button>
             </DashboardCardContent>
           </DashboardCard>
         </div>
@@ -576,7 +658,7 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
                   width: Math.min(frame.width, device === "desktop" ? 960 : frame.width),
                   height: Math.min(frame.height, 620),
                 }}
-                sandbox="allow-same-origin"
+                sandbox="allow-scripts allow-same-origin allow-forms"
               />
             </div>
           </DashboardCardContent>
@@ -784,6 +866,7 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
                       return;
                     }
                     setDeployStatus(`${json.deployment?.url} · ${json.deployment?.status}`);
+                    if (json.deployment?.url) setPreviewHostUrl(String(json.deployment.url));
                     toast.success(json.message ?? p("management.productionDeployStarted"));
                   } catch {
                     toast.error(p("management.deployFailed"));
@@ -802,12 +885,31 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
               >
                 {p("management.provisionBackend")}
               </Button>
+              <Button
+                variant="outline"
+                className="gap-2 rounded-xl border-premium-gold/25 text-premium-gold-light hover:border-premium-gold/40"
+                disabled={busy}
+                onClick={() => void downloadProjectZip()}
+              >
+                <Download className="size-4" aria-hidden />
+                {p("management.downloadZip")}
+              </Button>
             </div>
             <p className="text-xs text-white/40">
               Preview uses the authenticated live sandbox. Production publishes a public HTML host at{" "}
               <code className="text-white/60">/w/app/…</code>
               {" "}(not a remote Node/Vercel build). Full Next.js runtime: download the project ZIP.
             </p>
+            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 space-y-2">
+              <p className="text-sm font-semibold text-white">{p("management.zipPlaybookTitle")}</p>
+              <p className="text-xs text-white/55">{p("management.zipPlaybookIntro")}</p>
+              <ol className="list-decimal space-y-1 ps-4 text-xs text-white/65">
+                <li>{p("management.zipPlaybookStep1")}</li>
+                <li>{p("management.zipPlaybookStep2")}</li>
+                <li>{p("management.zipPlaybookStep3")}</li>
+              </ol>
+              <p className="text-xs text-premium-gold-light/80">{p("management.zipPlaybookTrust")}</p>
+            </div>
             <p className="text-xs text-white/40">
               {p("management.livePreviewPath")} <code className="text-white/60">/api/webapp-builder/{generationId}/live-preview</code>
             </p>
@@ -815,12 +917,129 @@ export function AppManagementDashboard({ generationId }: { generationId: string 
         </DashboardCard>
       )}
 
+      {tab === "deploy" && (
+        <DashboardCard>
+          <DashboardCardHeader>
+            <div className="flex items-center gap-3">
+              <div className="flex size-10 items-center justify-center rounded-xl bg-premium-gold/15 text-premium-gold-light">
+                <Store className="size-5" aria-hidden />
+              </div>
+              <div>
+                <DashboardCardTitle>{p("management.mobileStores.title")}</DashboardCardTitle>
+                <DashboardCardDescription>{p("management.mobileStores.description")}</DashboardCardDescription>
+              </div>
+            </div>
+          </DashboardCardHeader>
+          <DashboardCardContent className="flex flex-wrap gap-2">
+            <Button
+              className="btn-gold rounded-xl font-bold text-luxury-black"
+              onClick={() => setTab("stores")}
+            >
+              {p("management.mobileStores.openWizard")}
+            </Button>
+            <Button
+              variant="outline"
+              className="gap-2 rounded-xl border-white/10"
+              disabled={busy}
+              onClick={() => void downloadProjectZip()}
+            >
+              <Download className="size-4" aria-hidden />
+              {p("management.downloadZip")}
+            </Button>
+          </DashboardCardContent>
+        </DashboardCard>
+      )}
+
+      {tab === "stores" && (
+        <StorePublishPanel
+          appName={model.settings.appName || appName}
+          busy={busy}
+          productionUrl={productionUrl}
+          previewHostUrl={previewHostUrl}
+          runtimeHostStatus={runtimeHostStatus}
+          onDeployProduction={async () => {
+            setBusy(true);
+            try {
+              const res = await fetch(`/api/webapp-builder/${generationId}/deploy`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ environment: "production", provisionBackend: true }),
+              });
+              const json = await res.json();
+              if (!res.ok) {
+                toast.error(json.error ?? p("management.deployFailed"));
+                return;
+              }
+              setDeployStatus(`${json.deployment?.url} · ${json.deployment?.status}`);
+              if (json.deployment?.url) setPreviewHostUrl(String(json.deployment.url));
+              toast.success(json.message ?? p("management.productionDeployStarted"));
+            } catch {
+              toast.error(p("management.deployFailed"));
+            } finally {
+              setBusy(false);
+            }
+          }}
+          onDownloadZip={() => downloadProjectZip()}
+          onSyncPackaging={() => postAction({ action: "sync_files" }, { silent: true })}
+          onRegisterRuntimeHost={async (url) => {
+            setBusy(true);
+            try {
+              const res = await fetch(`/api/webapp-builder/${generationId}/manage`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  action: "register_runtime_host",
+                  url,
+                  verify: true,
+                }),
+              });
+              const json = await res.json();
+              if (!res.ok) {
+                toast.error(json.error ?? p("management.mobileStores.registerHostFailed"));
+                return;
+              }
+              if (json.runtimeHost?.url) {
+                setProductionUrl(String(json.runtimeHost.url));
+                setRuntimeHostStatus(String(json.runtimeHost.status ?? ""));
+              }
+              toast.success(json.message ?? p("management.mobileStores.registerHostSuccess"));
+            } catch {
+              toast.error(p("management.mobileStores.registerHostFailed"));
+            } finally {
+              setBusy(false);
+            }
+          }}
+          onClearRuntimeHost={async () => {
+            setBusy(true);
+            try {
+              const res = await fetch(`/api/webapp-builder/${generationId}/manage`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: "clear_runtime_host" }),
+              });
+              const json = await res.json();
+              if (!res.ok) {
+                toast.error(json.error ?? p("management.mobileStores.clearHostFailed"));
+                return;
+              }
+              setProductionUrl(null);
+              setRuntimeHostStatus(null);
+              toast.success(json.message ?? p("management.mobileStores.clearHostSuccess"));
+            } catch {
+              toast.error(p("management.mobileStores.clearHostFailed"));
+            } finally {
+              setBusy(false);
+            }
+          }}
+        />
+      )}
+
       {tab === "assistant" && data && (
-        <AppCopilotCommandPanel
+        <AppStudioChat
+          mode="edit"
           generationId={generationId}
           expectedRevision={revision}
-          disabled={busy}
-          getUndoSnapshot={() => {
+          onBeforeMutation={() => {
             if (!data) return null;
             return {
               model: data.model,

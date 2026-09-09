@@ -42,6 +42,7 @@ export function webappInputToBrief(input: WebAppPluginInput): CoreBrief {
       [INPUT_META_KEY]: input,
       colorStyle: input.colorStyle,
       appType: input.appType,
+      templateId: input.templateId,
     },
   };
 }

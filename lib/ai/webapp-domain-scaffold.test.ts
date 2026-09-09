@@ -21,7 +21,18 @@ describe("webapp domain scaffold", () => {
   it("builds authenticated CRUD API routes for an entity", () => {
     const route = buildCanonicalCrudApiRoute("Product");
     assert.match(route, /db\.product\.findMany/);
-    assert.match(route, /Unauthorized/);
+    assert.match(route, /t\("crud\.unauthorized"\)/);
+    assert.match(route, /isStaffRole/);
+    assert.match(route, /ownerId:\s*session\.userId/);
+    assert.match(route, /t\("crud\.forbidden"\)/);
     assert.match(route, /export async function DELETE/);
+    assert.match(route, /\.strict\(\)/);
+    assert.match(route, /createSchema\.safeParse/);
+  });
+
+  it("includes User.role and entity ownerId in prisma schema", () => {
+    const schema = buildCanonicalPrismaSchema(["Product"]);
+    assert.match(schema, /model User \{[\s\S]*\brole\s+String/);
+    assert.match(schema, /model Product \{[\s\S]*\bownerId\s+String/);
   });
 });

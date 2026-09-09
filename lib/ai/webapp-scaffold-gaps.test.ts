@@ -84,6 +84,11 @@ describe("deterministic scaffold gap fill (no LLM)", () => {
       richTables,
     );
     assert.equal(validation.valid, true, validation.issues.join("\n"));
+    assert.equal(
+      validation.issues.some((issue) => issue.includes("@capacitor/cli")),
+      false,
+      validation.issues.join("\n"),
+    );
   });
 
   it("resyncs drifted LLM CRUD APIs and thin prisma schema without LLM", () => {
@@ -171,6 +176,51 @@ export async function GET() {
       richTables,
     );
     assert.equal(validation.valid, true, validation.issues.join("\n"));
+    assert.equal(
+      validation.issues.some((issue) => issue.includes("@capacitor/cli")),
+      false,
+      validation.issues.join("\n"),
+    );
+  });
+
+  it("preserves localized entity dashboard pages instead of English resync", () => {
+    const tables = ["Booking", "Service"];
+    const scaffold = buildWebAppScaffold({
+      projectName: "Clinic",
+      requiresAuth: true,
+      requiresDatabase: true,
+      requiresDashboard: true,
+      tables,
+    });
+    const localizedBookings = {
+      path: "app/dashboard/bookings/page.tsx",
+      language: "tsx" as const,
+      content: `"use client";
+import { useEffect, useState } from "react";
+export default function BookingsPage() {
+  const [rows, setRows] = useState([]);
+  useEffect(() => {
+    void fetch("/api/bookings").then((r) => r.json()).then(setRows);
+  }, []);
+  return <main><h1>الحجوزات</h1><p>{rows.length} موعد</p></main>;
+}
+`,
+    };
+    const withLocalized = [
+      ...scaffold.filter((file) => file.path !== localizedBookings.path),
+      localizedBookings,
+    ];
+    const gap = applyDeterministicScaffoldGaps(withLocalized, {
+      projectName: "Clinic",
+      requiresAuth: true,
+      requiresDatabase: true,
+      requiresDashboard: true,
+      tables,
+    });
+    const kept = gap.files.find((file) => file.path === localizedBookings.path);
+    assert.ok(kept);
+    assert.match(kept!.content, /الحجوزات/);
+    assert.equal(gap.replacedPaths.includes(localizedBookings.path), false);
   });
 
   it("keeps AI file count at zero for unified rich entity plans", () => {

@@ -23,6 +23,7 @@ describe("phase0 trust auth + schema", () => {
 
     for (const required of [
       "lib/password.ts",
+      "lib/session-cookie.ts",
       "lib/auth.ts",
       "lib/db.ts",
       "prisma/schema.prisma",
@@ -36,6 +37,8 @@ describe("phase0 trust auth + schema", () => {
     const auth = scaffold.find((file) => file.path === "lib/auth.ts")!.content;
     assert.match(auth, /userId:\s*string/);
     assert.match(auth, /email:\s*string/);
+    assert.match(auth, /role:\s*string/);
+    assert.match(auth, /isStaffRole/);
     assert.match(auth, /db\.session/);
 
     const login = scaffold.find(
@@ -43,17 +46,22 @@ describe("phase0 trust auth + schema", () => {
     )!.content;
     assert.match(login, /verifyPassword/);
     assert.match(login, /db\.user\.findUnique/);
+    assert.match(login, /signSessionCookie/);
 
     const signup = scaffold.find(
       (file) => file.path === "app/api/auth/signup/route.ts",
     )!.content;
     assert.match(signup, /hashPassword/);
+    assert.match(signup, /role/);
+    assert.match(signup, /signSessionCookie/);
 
     const schema = scaffold.find(
       (file) => file.path === "prisma/schema.prisma",
     )!.content;
     assert.match(schema, /passwordHash/);
+    assert.match(schema, /\brole\b/);
     assert.match(schema, /model Session/);
+    assert.match(schema, /\bownerId\b/);
   });
 
   it("maps AppDataModel fields into prisma schema", () => {
@@ -137,7 +145,55 @@ export async function POST() {
 
   it("auth builders stay aligned", () => {
     assert.match(buildCanonicalAuthModule(), /db\.session/);
+    assert.match(buildCanonicalAuthModule(), /role:\s*string/);
+    assert.match(buildCanonicalAuthModule(), /isStaffRole/);
     assert.match(buildCanonicalAuthLoginRoute(), /verifyPassword/);
+    assert.match(buildCanonicalAuthLoginRoute(), /signSessionCookie/);
     assert.match(buildCanonicalAuthSignupRoute(), /hashPassword/);
+    assert.match(buildCanonicalAuthSignupRoute(), /role/);
+  });
+
+  it("readiness rejects missing RBAC contracts", () => {
+    const scaffold = buildWebAppScaffold({
+      projectName: "Ops",
+      requiresAuth: true,
+      requiresDatabase: true,
+      tables: ["Item"],
+    });
+    const withoutRole = scaffold.map((file) => {
+      if (file.path === "prisma/schema.prisma") {
+        return {
+          ...file,
+          content: file.content.replace(/\n\s*role\s+String[^\n]*/g, ""),
+        };
+      }
+      if (file.path.startsWith("app/api/") && file.path.endsWith("/route.ts") && !file.path.includes("/auth/")) {
+        return {
+          ...file,
+          content: `import { NextResponse } from "next/server";
+import { getSession } from "@/lib/auth";
+import { db } from "@/lib/db";
+export async function GET() {
+  if (!(await getSession())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  return NextResponse.json({ data: await db.item.findMany() });
+}
+`,
+        };
+      }
+      return file;
+    });
+
+    const issues = findWebAppReadinessIssues(withoutRole, {
+      requiresAuth: true,
+      requiresDatabase: true,
+    });
+    assert.ok(
+      issues.some((issue) => issue.includes("User must include role")),
+      issues.join("\n"),
+    );
+    assert.ok(
+      issues.some((issue) => issue.includes("ownerId ownership") || issue.includes("isStaffRole")),
+      issues.join("\n"),
+    );
   });
 });

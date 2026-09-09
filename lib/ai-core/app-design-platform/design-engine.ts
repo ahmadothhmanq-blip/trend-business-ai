@@ -18,6 +18,8 @@ export type AppDesignInput = {
   colorStyle?: string;
   features?: string[];
   industryHint?: string;
+  /** When set, skips auto-matching and uses this professional template. */
+  templateId?: string;
 };
 
 const INDUSTRY_HINTS: Array<{ industry: string; keys: string[] }> = [
@@ -53,11 +55,13 @@ export function runAppDesignEngine(input: AppDesignInput): {
   model: StructuredAppModel;
 } {
   const industry = detectIndustry(input.prompt, input.industryHint);
-  const template = matchTemplateFromSignals({
-    appType: input.appType,
-    prompt: input.prompt,
-    industry,
-  });
+  const template =
+    (input.templateId ? getAppTemplate(input.templateId) : undefined) ??
+    matchTemplateFromSignals({
+      appType: input.appType,
+      prompt: input.prompt,
+      industry,
+    });
 
   const featureSet = new Set([
     ...template.defaultFeatures,
@@ -76,8 +80,10 @@ export function runAppDesignEngine(input: AppDesignInput): {
     roles: template.roles.map((r) => r.name),
     workflows: template.workflows.map((w) => w.name),
     dataEntities: template.dataModels.map((m) => m.name),
-    confidence: template.id === "saas-dashboard" && !input.appType ? 0.72 : 0.9,
-    reason: `Selected ${template.label} architecture (${template.architecture}) for ${industry}.`,
+    confidence: input.templateId ? 0.96 : template.id === "saas-dashboard" && !input.appType ? 0.72 : 0.9,
+    reason: input.templateId
+      ? `Selected ${template.label} template (${template.architecture}).`
+      : `Selected ${template.label} architecture (${template.architecture}) for ${industry}.`,
   };
 
   const model = buildStructuredAppModel({
@@ -87,22 +93,33 @@ export function runAppDesignEngine(input: AppDesignInput): {
     designStyle: input.designStyle,
     colorStyle: input.colorStyle,
     features: [...featureSet],
-    appName: deriveAppName(input.prompt, template.label),
+    appName: deriveAppName(input.prompt, template.label, input.language),
   });
 
   return { blueprint, model };
 }
 
-export function deriveAppName(prompt: string, fallback: string): string {
-  const quoted = prompt.match(/["']([^"']{2,60})["']/);
+export function deriveAppName(
+  prompt: string,
+  fallback: string,
+  language?: string,
+): string {
+  const quoted = prompt.match(/["'«»„"]([^"'«»„"]{2,60})["'«»„"]/);
   if (quoted?.[1]) return quoted[1].trim();
   const named = prompt.match(
-    /(?:called|named|brand|app(?:lication)?)\s+([A-Z][\w\s&-]{1,40})/,
+    /(?:called|named|brand|app(?:lication)?|يسمى|اسمه)\s+([^\s,.!]{2,40})/i,
   );
   if (named?.[1]) return named[1].trim();
-  const first = prompt.split(/[.!\n]/)[0]?.trim();
+  const first = prompt.split(/[.!\n؟]/)[0]?.trim().replace(/\s+/g, " ");
   if (first && first.length <= 48) return first;
-  return `${fallback} App`;
+  if (first && first.length > 48) {
+    return first.slice(0, 47).trim();
+  }
+  const isArabic =
+    /\p{Script=Arabic}/u.test(prompt) ||
+    /\p{Script=Arabic}/u.test(language ?? "") ||
+    /^(ar|arabic)\b/i.test((language ?? "").trim());
+  return isArabic ? `تطبيق ${fallback}` : `${fallback} App`;
 }
 
 export function resolveTemplateId(id: string): AppTemplateId {

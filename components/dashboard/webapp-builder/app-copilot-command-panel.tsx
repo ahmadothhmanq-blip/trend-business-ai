@@ -10,10 +10,10 @@ import {
   useAppCopilotCommand,
   type AppCopilotUndoSnapshot,
 } from "@/components/dashboard/webapp-builder/hooks/use-app-copilot-command";
-import { APP_COPILOT_MVP_EXAMPLES } from "@/lib/ai-core/app-copilot/types";
 import type { StructuredAppModel } from "@/lib/ai-core/app-design-platform/types";
 import type { GeneratedProjectFile } from "@/lib/ai/types";
 import type { WebAppGeneration } from "@/types/webapp";
+import { useProductT } from "@/lib/i18n/use-scoped-t";
 
 type AppCopilotCommandPanelProps = {
   generationId: string | null;
@@ -29,6 +29,14 @@ type AppCopilotCommandPanelProps = {
   }) => void;
 };
 
+const COPILOT_EXAMPLE_KEYS = [
+  "changeColor",
+  "addProduct",
+  "addDashboard",
+  "addBooking",
+  "redesign",
+] as const;
+
 export function AppCopilotCommandPanel({
   generationId,
   disabled,
@@ -36,6 +44,7 @@ export function AppCopilotCommandPanel({
   getUndoSnapshot,
   onApplied,
 }: AppCopilotCommandPanelProps) {
+  const p = useProductT("webappBuilder");
   const [open, setOpen] = useState(true);
   const [chatView, setChatView] = useState(false);
   const [command, setCommand] = useState("");
@@ -58,6 +67,8 @@ export function AppCopilotCommandPanel({
   });
 
   const costHint = command.trim() ? previewCostHint(command) : null;
+  const costLabel =
+    costHint?.costTier === "ai-standard" ? p("copilot.costAi") : p("copilot.costFree");
 
   const handleSubmit = async () => {
     if (!command.trim() || loading || disabled) return;
@@ -78,10 +89,8 @@ export function AppCopilotCommandPanel({
             <Sparkles className="size-5" />
           </span>
           <div>
-            <h3 className="text-base font-semibold text-white">App Copilot</h3>
-            <p className="text-xs text-white/50">
-              Natural-language commands for your application
-            </p>
+            <h3 className="text-base font-semibold text-white">{p("copilot.title")}</h3>
+            <p className="text-xs text-white/50">{p("copilot.subtitle")}</p>
           </div>
         </div>
         {open ? (
@@ -95,7 +104,7 @@ export function AppCopilotCommandPanel({
         <div className="mt-5 space-y-4 border-t border-white/[0.06] pt-5">
           <div className="flex items-center justify-between gap-2">
             <p className="text-[10px] font-medium uppercase tracking-wide text-white/35">
-              {chatView ? "Conversation" : "Quick commands"}
+              {chatView ? p("copilot.conversation") : p("copilot.quickCommands")}
             </p>
             <button
               type="button"
@@ -108,16 +117,14 @@ export function AppCopilotCommandPanel({
               )}
             >
               <MessageSquare className="size-3" />
-              {chatView ? "Command view" : "Chat view"}
+              {chatView ? p("copilot.commandView") : p("copilot.chatView")}
             </button>
           </div>
 
           {chatView ? (
             <div className="max-h-56 space-y-2 overflow-y-auto rounded-2xl border border-white/8 bg-black/20 p-3">
               {thread.length === 0 ? (
-                <p className="text-xs text-white/45">
-                  Start a conversation — your session history appears here.
-                </p>
+                <p className="text-xs text-white/45">{p("copilot.emptyThread")}</p>
               ) : (
                 thread.map((turn) => (
                   <div
@@ -130,7 +137,7 @@ export function AppCopilotCommandPanel({
                     )}
                   >
                     <p className="mb-0.5 text-[10px] font-medium uppercase tracking-wide text-white/35">
-                      {turn.role === "user" ? "You" : "Copilot"}
+                      {turn.role === "user" ? p("copilot.you") : p("copilot.assistant")}
                     </p>
                     <p>{turn.content}</p>
                   </div>
@@ -139,27 +146,31 @@ export function AppCopilotCommandPanel({
             </div>
           ) : (
             <div className="flex flex-wrap gap-2">
-              {APP_COPILOT_MVP_EXAMPLES.map((chip) => (
-                <button
-                  key={chip}
-                  type="button"
-                  disabled={disabled || loading || !generationId}
-                  onClick={() => setCommand(chip)}
-                  className={cn(
-                    "rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-white/70 transition hover:border-premium-gold/30 hover:text-white",
-                    (disabled || loading || !generationId) && "opacity-50",
-                  )}
-                >
-                  {chip}
-                </button>
-              ))}
+              {COPILOT_EXAMPLE_KEYS.map((key) => {
+                const label = p(`copilot.examples.${key}.label`);
+                const exampleCommand = p(`copilot.examples.${key}.command`);
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    disabled={disabled || loading || !generationId}
+                    onClick={() => setCommand(exampleCommand)}
+                    className={cn(
+                      "rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-white/70 transition hover:border-premium-gold/30 hover:text-white",
+                      (disabled || loading || !generationId) && "opacity-50",
+                    )}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
             </div>
           )}
 
           <Textarea
             value={command}
             onChange={(e) => setCommand(e.target.value)}
-            placeholder="Describe a change to your app…"
+            placeholder={p("copilot.placeholder")}
             disabled={disabled || loading || !generationId}
             rows={3}
             className="resize-none rounded-2xl border-white/10 bg-black/30 text-sm text-white placeholder:text-white/35"
@@ -180,9 +191,11 @@ export function AppCopilotCommandPanel({
                   : "border-white/10 bg-white/[0.03] text-white/60",
               )}
             >
-              <span>{costHint.label}</span>
+              <span>{costLabel}</span>
               {costHint.costTier === "ai-standard" ? (
-                <span className="font-medium">{costHint.creditCost} credit</span>
+                <span className="font-medium">
+                  {p("copilot.creditSingular", { count: costHint.creditCost })}
+                </span>
               ) : null}
             </div>
           ) : null}
@@ -207,12 +220,12 @@ export function AppCopilotCommandPanel({
               {loading ? (
                 <>
                   <Loader2 className="size-4 animate-spin" />
-                  {streamMessage || "Running command…"}
+                  {streamMessage || p("copilot.runningCommand")}
                 </>
               ) : (
                 <>
                   <Sparkles className="size-4" />
-                  Run command
+                  {p("copilot.runCommand")}
                 </>
               )}
             </Button>
@@ -222,7 +235,7 @@ export function AppCopilotCommandPanel({
               disabled={disabled || loading || !canUndo}
               onClick={() => void undo()}
               className="h-11 rounded-2xl border-white/15 bg-white/[0.03] px-4 text-white/70"
-              title="Undo last Copilot change"
+              title={p("copilot.undoTitle")}
             >
               <Undo2 className="size-4" />
             </Button>

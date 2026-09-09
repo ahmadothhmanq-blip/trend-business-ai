@@ -6,8 +6,9 @@ import {
   buildCanonicalLoginPage,
   buildCanonicalPasswordCryptoModule,
   buildCanonicalSignupPage,
+  buildCanonicalSessionCookieModule,
 } from "@/lib/ai/webapp-auth-scaffold";
-import { buildCanonicalProviders } from "@/lib/ai/webapp-domain-scaffold";
+import { buildCanonicalProviders, buildCanonicalCrudApiRoute, crudRouteHasInputValidation, crudRouteHasMassAssignmentRisk, extractPrismaModelFieldNames } from "@/lib/ai/webapp-domain-scaffold";
 import {
   canonicalAuthModuleContent,
   ensureCanonicalAuthModule,
@@ -20,6 +21,8 @@ import {
   normalizePath,
 } from "@/lib/ai/webapp-harden-shared";
 import { buildCanonicalMiddleware } from "@/lib/ai/webapp-runtime-scaffold";
+import { buildWebAppI18nFiles, resolveWebAppLocale } from "@/lib/ai/webapp-i18n";
+import { sanitizeAppPreviewHtml } from "@/lib/webapp/sanitize-app-preview-html";
 
 export function isLikelyRelationFk(fieldName: string): boolean {
   if (fieldName === "id") return true;
@@ -53,7 +56,7 @@ export function hardenPrismaSchema(content: string): string {
 
   next = convertPrismaEnumsToStrings(next);
 
-  return next.replace(
+  next = next.replace(
     /^([ \t]+)([A-Za-z_][A-Za-z0-9_]*)[ \t]+(String|Int|Float|Boolean|DateTime)(?!\?)([ \t]+.*)?$/gm,
     (full, indent: string, name: string, type: string, rest = "") => {
       if (isLikelyRelationFk(name)) return full;
@@ -71,6 +74,38 @@ export function hardenPrismaSchema(content: string): string {
       return `${indent}${name} ${type} ${defaults[type]}${suffix}`;
     },
   );
+
+  if (/model\s+User\s*\{/.test(next)) {
+    const userBlock = next.match(/model\s+User\s*\{[^}]*\}/)?.[0] ?? "";
+    if (userBlock && !/\brole\b/.test(userBlock)) {
+      next = next.replace(/model\s+User\s*\{([^}]*)\}/, (_full, body: string) => {
+        if (/\bpasswordHash\b/.test(body)) {
+          return `model User {${body.replace(
+            /(\bpasswordHash\s+[^\n]+)/,
+            `$1\n  role         String    @default("user")`,
+          )}}`;
+        }
+        if (/\bid\s+/.test(body)) {
+          return `model User {${body.replace(
+            /(\bid\s+[^\n]+)/,
+            `$1\n  role         String    @default("user")`,
+          )}}`;
+        }
+        return `model User {\n  role         String    @default("user")\n${body}}`;
+      });
+    }
+  }
+
+  next = next.replace(/model\s+(\w+)\s*\{([^}]*)\}/g, (full, name: string, body: string) => {
+    if (name === "User" || name === "Session") return full;
+    if (/\bownerId\b/.test(body)) return full;
+    if (/\bid\s+/.test(body)) {
+      return `model ${name} {${body.replace(/(\bid\s+[^\n]+)/, `$1\n  ownerId   String`)}}`;
+    }
+    return `model ${name} {\n  ownerId   String\n${body}}`;
+  });
+
+  return next;
 }
 
 export function isServerOnlyModule(content: string): boolean {
@@ -274,6 +309,23 @@ export function upsertMissing(
   return files;
 }
 
+/** Insert or replace a generated file (used to keep i18n packs single-language). */
+export function upsertFile(
+  files: GeneratedProjectFile[],
+  path: string,
+  language: string,
+  content: string,
+): GeneratedProjectFile[] {
+  const normalized = normalizePath(path);
+  const index = files.findIndex((file) => normalizePath(file.path) === normalized);
+  if (index >= 0) {
+    files[index] = { ...files[index]!, path: normalized, language, content };
+    return files;
+  }
+  files.push({ path: normalized, language, content });
+  return files;
+}
+
 export function firstPrismaModel(schema: string): string | null {
   const names = [...schema.matchAll(/model\s+([A-Za-z_][A-Za-z0-9_]*)\s*\{/g)].map(
     (match) => match[1],
@@ -297,6 +349,56 @@ export function hasApiRoute(files: GeneratedProjectFile[]): boolean {
   return files.some((file) =>
     /^app\/api\/(?!auth\/).+\/route\.(ts|js)$/.test(normalizePath(file.path)),
   );
+}
+
+function modelNameFromCrudRoute(path: string, content: string): string | null {
+  const delegateMatch = content.match(/\bdb\.([A-Za-z][A-Za-z0-9]*)\b/);
+  if (delegateMatch) {
+    const delegate = delegateMatch[1];
+    return delegate.charAt(0).toUpperCase() + delegate.slice(1);
+  }
+  const slug = path.split("/")[2];
+  if (!slug) return null;
+  return slug
+    .split("-")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join("");
+}
+
+/** Replace entity CRUD routes that still mass-assign request bodies. */
+export function rewriteUnsafeCrudApiRoutes(
+  files: GeneratedProjectFile[],
+): GeneratedProjectFile[] {
+  const schema = files.find(
+    (file) => normalizePath(file.path) === "prisma/schema.prisma",
+  )?.content;
+
+  return files.map((file) => {
+    const path = normalizePath(file.path);
+    if (
+      !/^app\/api\/[^/]+\/route\.(ts|js)$/.test(path) ||
+      path.startsWith("app/api/auth/")
+    ) {
+      return file;
+    }
+    if (
+      crudRouteHasInputValidation(file.content) &&
+      !crudRouteHasMassAssignmentRisk(file.content)
+    ) {
+      return file;
+    }
+    const model = modelNameFromCrudRoute(path, file.content);
+    if (!model) return file;
+    const fieldNames = schema
+      ? extractPrismaModelFieldNames(schema, model)
+      : undefined;
+    return {
+      ...file,
+      language: "typescript",
+      content: buildCanonicalCrudApiRoute(model, { fieldNames }),
+    };
+  });
 }
 
 export function importsPrismaAlias(files: GeneratedProjectFile[]): boolean {
@@ -377,7 +479,7 @@ dev.db-journal
           paths: { "@/*": ["./*"] },
         },
         include: ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-        exclude: ["node_modules"],
+        exclude: ["node_modules", "mobile-store"],
       },
       null,
       2,
@@ -460,6 +562,12 @@ Host on Node.js (\`npm run build && npm start\`) or Vercel. For Vercel, switch \
     );
     next = upsertMissing(
       next,
+      "lib/session-cookie.ts",
+      "typescript",
+      buildCanonicalSessionCookieModule(),
+    );
+    next = upsertMissing(
+      next,
       "lib/auth.ts",
       "typescript",
       canonicalAuthModuleContent(),
@@ -504,15 +612,41 @@ if (process.env.NODE_ENV !== "production") {
       buildCanonicalSignupPage(),
     );
 
-    // Replace legacy any-password login routes if still present.
+    // Replace legacy cookie-only / unsigned session login routes if still present.
     next = next.map((file) => {
       if (normalizePath(file.path) !== "app/api/auth/login/route.ts") return file;
-      if (/verifyPassword/.test(file.content) && /db\.user/.test(file.content)) {
+      if (
+        /verifyPassword/.test(file.content) &&
+        /db\.user/.test(file.content) &&
+        /signSessionCookie/.test(file.content)
+      ) {
         return file;
       }
       return { ...file, content: buildCanonicalAuthLoginRoute() };
     });
+    next = next.map((file) => {
+      if (normalizePath(file.path) !== "app/api/auth/signup/route.ts") return file;
+      if (
+        /hashPassword/.test(file.content) &&
+        /signSessionCookie/.test(file.content) &&
+        /\brole\b/.test(file.content)
+      ) {
+        return file;
+      }
+      return { ...file, content: buildCanonicalAuthSignupRoute() };
+    });
+    next = next.map((file) => {
+      if (normalizePath(file.path) !== "app/api/auth/logout/route.ts") return file;
+      if (/verifySessionCookie/.test(file.content)) return file;
+      return { ...file, content: buildCanonicalAuthLogoutRoute() };
+    });
   } else if (hasPrisma) {
+    next = upsertMissing(
+      next,
+      "lib/session-cookie.ts",
+      "typescript",
+      buildCanonicalSessionCookieModule(),
+    );
     next = upsertMissing(
       next,
       "lib/auth.ts",
@@ -554,81 +688,53 @@ if (process.env.NODE_ENV !== "production") {
       )?.content;
       const model = schema ? firstPrismaModel(schema) : null;
       if (model) {
-        const delegate = prismaClientDelegate(model);
         const slug = resourceSlug(model);
+        const fieldNames = schema
+          ? extractPrismaModelFieldNames(schema, model)
+          : undefined;
         next = upsertMissing(
           next,
           `app/api/${slug}/route.ts`,
           "typescript",
-          `import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
-
-export const dynamic = "force-dynamic";
-
-async function requireSession() {
-  const jar = await cookies();
-  return jar.get("session")?.value ?? jar.get("app_session")?.value ?? null;
-}
-
-export async function GET() {
-  if (!(await requireSession())) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  const data = await db.${delegate}.findMany({ take: 100 });
-  return NextResponse.json({ data });
-}
-
-export async function POST(request: Request) {
-  if (!(await requireSession())) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  const body = await request.json();
-  const data = await db.${delegate}.create({ data: body as never });
-  return NextResponse.json({ data }, { status: 201 });
-}
-
-export async function PATCH(request: Request) {
-  if (!(await requireSession())) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  const body = (await request.json()) as { id?: string } & Record<string, unknown>;
-  const { id, ...data } = body;
-  if (!id) {
-    return NextResponse.json({ error: "id is required" }, { status: 400 });
-  }
-  const updated = await db.${delegate}.update({
-    where: { id } as never,
-    data: data as never,
-  });
-  return NextResponse.json({ data: updated });
-}
-
-export async function DELETE(request: Request) {
-  if (!(await requireSession())) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  const { searchParams } = new URL(request.url);
-  const id = searchParams.get("id");
-  if (!id) {
-    return NextResponse.json({ error: "id is required" }, { status: 400 });
-  }
-  await db.${delegate}.delete({ where: { id } as never });
-  return NextResponse.json({ ok: true });
-}
-`,
+          buildCanonicalCrudApiRoute(model, { fieldNames }),
         );
       }
+    } else {
+      next = rewriteUnsafeCrudApiRoutes(next);
     }
   }
 
-  if (!paths.has("middleware.ts") && !paths.has("proxy.ts")) {
+  const middlewareFile = next.find(
+    (file) => normalizePath(file.path) === "middleware.ts",
+  );
+  const middlewareNeedsVerifiedSession =
+    !middlewareFile ||
+    !/verifySessionCookie/.test(middlewareFile.content) ||
+    !/async\s+function\s+middleware/.test(middlewareFile.content) ||
+    !(/Forbidden/.test(middlewareFile.content) || /403/.test(middlewareFile.content)) ||
+    /cookies\.get\(\s*["']session_role["']\s*\)/.test(middlewareFile.content);
+
+  if (!paths.has("proxy.ts") && middlewareNeedsVerifiedSession) {
     next = upsertMissing(
       next,
-      "middleware.ts",
+      "lib/session-cookie.ts",
       "typescript",
-      buildCanonicalMiddleware(),
+      buildCanonicalSessionCookieModule(),
     );
+    if (middlewareFile) {
+      next = next.map((file) =>
+        normalizePath(file.path) === "middleware.ts"
+          ? { ...file, content: buildCanonicalMiddleware() }
+          : file,
+      );
+    } else {
+      next = upsertMissing(
+        next,
+        "middleware.ts",
+        "typescript",
+        buildCanonicalMiddleware(),
+      );
+    }
   }
 
   next = next.map((file) => {
@@ -642,17 +748,28 @@ export async function DELETE(request: Request) {
     };
   });
 
+  next = next.map((file) => {
+    const path = normalizePath(file.path);
+    if (path !== "preview/index.html" && path !== "public/preview.html") {
+      return file;
+    }
+    if (!file.content.includes("<html")) return file;
+    return { ...file, content: sanitizeAppPreviewHtml(file.content) };
+  });
+
   const homeRedirect = hasDashboard ? "/dashboard" : hasLogin ? "/login" : null;
   if (hasDashboardIntent && !hasDashboardOverview) {
     next = upsertMissing(
       next,
       "app/dashboard/page.tsx",
       "typescript",
-      `export default function DashboardPage() {
+      `import { t } from "@/lib/i18n";
+
+export default function DashboardPage() {
   return (
     <main className="p-8">
-      <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
-      <p className="mt-2 text-muted-foreground">Overview of your workspace.</p>
+      <h1 className="text-2xl font-semibold tracking-tight">{t("nav.dashboard")}</h1>
+      <p className="mt-2 text-muted-foreground">{t("dashboard.overviewSubtitle")}</p>
     </main>
   );
 }
@@ -670,11 +787,13 @@ export default function HomePage() {
   redirect("${homeRedirect}");
 }
 `
-      : `export default function HomePage() {
+      : `import { t } from "@/lib/i18n";
+
+export default function HomePage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-8">
-      <h1 className="text-3xl font-semibold tracking-tight">Welcome</h1>
-      <p className="mt-2 text-muted-foreground">Your application is ready.</p>
+      <h1 className="text-3xl font-semibold tracking-tight">{t("home.getStarted")}</h1>
+      <p className="mt-2 text-muted-foreground">{t("dashboard.emptyHint")}</p>
     </main>
   );
 }
@@ -682,6 +801,23 @@ export default function HomePage() {
   );
 
   next = ensureCanonicalAuthModule(next);
+
+  const existingConfig = next.find(
+    (file) => normalizePath(file.path) === "lib/i18n/config.ts",
+  )?.content;
+  const detectedLanguage =
+    existingConfig?.match(/language:\s*"([^"]+)"/)?.[1] ?? "English";
+  // Resolve to a supported pack (complete English fallback) and overwrite i18n
+  // so lang/dir/messages never diverge across harden passes.
+  const resolvedLanguage = resolveWebAppLocale(detectedLanguage).language;
+  for (const i18nFile of buildWebAppI18nFiles(resolvedLanguage)) {
+    next = upsertFile(
+      next,
+      i18nFile.path,
+      i18nFile.language || "typescript",
+      i18nFile.content,
+    );
+  }
 
   return next;
 }

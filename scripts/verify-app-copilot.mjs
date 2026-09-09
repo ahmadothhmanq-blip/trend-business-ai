@@ -82,9 +82,20 @@ const manageSrc = readFileSync(
   join(root, "components/dashboard/webapp-builder/app-management-dashboard.tsx"),
   "utf8",
 );
-if (!manageSrc.includes("AppCopilotCommandPanel")) {
-  fail("management assistant delegation", "missing copilot panel");
-} else ok("management dashboard uses App Copilot");
+if (
+  !manageSrc.includes("AppCopilotCommandPanel") &&
+  !manageSrc.includes("AppStudioChat")
+) {
+  fail("management assistant delegation", "missing copilot/studio chat panel");
+} else ok("management dashboard uses App Studio Chat / Copilot");
+
+const studioChatSrc = readFileSync(
+  join(root, "components/dashboard/webapp-builder/app-studio-chat.tsx"),
+  "utf8",
+);
+if (!studioChatSrc.includes("useAppCopilotCommand")) {
+  fail("studio chat edit path", "missing useAppCopilotCommand");
+} else ok("studio chat reuses App Copilot command hook");
 
 const appStream = readFileSync(
   join(root, "lib/ai-core/app-copilot/stream.ts"),

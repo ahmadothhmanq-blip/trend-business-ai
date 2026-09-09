@@ -161,7 +161,7 @@ export function buildDeterministicBlueprint(
       const n = name.toLowerCase();
       return !["user", "users", "account", "session"].includes(n);
     })
-    .slice(0, 4)
+    .slice(0, 8)
     .map((name) => {
       const base = name
         .replace(/([a-z0-9])([A-Z])/g, "$1-$2")

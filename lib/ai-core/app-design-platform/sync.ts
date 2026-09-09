@@ -1,11 +1,14 @@
 /**
  * Bidirectional sync: StructuredAppModel → generated project files.
+ * Screen titles resolve through t()/te() — never bake template English labels.
  */
 
 import type { StructuredAppModel } from "@/lib/ai-core/app-design-platform/types";
 import type { GeneratedProjectFile } from "@/lib/ai/types";
 import { brandTokensToCssVars } from "@/lib/ai-core/app-design-platform/brand";
 import { toPrismaSchemaSketch } from "@/lib/ai-core/app-design-platform/data";
+import { resolveAppScreenDisplayRef } from "@/lib/ai/webapp-i18n/localize-template";
+import { mergeMobileStoreIntoProjectFiles } from "@/lib/ai/webapp-mobile-store";
 
 export type AppSyncResult = {
   files: GeneratedProjectFile[];
@@ -28,18 +31,36 @@ function upsertFile(
   return [...files, entry];
 }
 
-function screenPageContent(screen: StructuredAppModel["screens"][0], model: StructuredAppModel): string {
+function screenPageContent(
+  screen: StructuredAppModel["screens"][0],
+  model: StructuredAppModel,
+): string {
   const comps = model.components
     .filter((c) => c.screenId === screen.id)
     .map((c) => `      <${pascalCase(c.type)} {...${JSON.stringify(c.props)}} />`)
     .join("\n");
 
-  return `export default function Page() {
+  const display = resolveAppScreenDisplayRef(screen);
+  const titleExpr =
+    display.kind === "entity"
+      ? `te(${JSON.stringify(display.key)})`
+      : `t(${JSON.stringify(display.key)})`;
+
+  const isDashboard =
+    /^(dashboard|overview|home)$/i.test(screen.name.trim()) ||
+    /^\/?(dashboard|home)?$/i.test(screen.path);
+  const subtitle = isDashboard
+    ? `      <p className="text-muted-foreground">{t("dashboard.overviewSubtitle")}</p>`
+    : "";
+
+  return `import { t, te } from "@/lib/i18n";
+
+export default function Page() {
   return (
     <main className="p-6 space-y-4">
-      <h1 className="text-2xl font-semibold">${escapeTs(screen.name)}</h1>
-      <p className="text-muted-foreground">${escapeTs(screen.purpose)}</p>
-${comps || "      <p>Screen content</p>"}
+      <h1 className="text-2xl font-semibold">{${titleExpr}}</h1>
+${subtitle}
+${comps || "      <p>{t(\"dashboard.emptyHint\")}</p>"}
     </main>
   );
 }
@@ -52,10 +73,6 @@ function pascalCase(value: string): string {
     .filter(Boolean)
     .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
     .join("") || "Component";
-}
-
-function escapeTs(value: string): string {
-  return value.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$/g, "\\$");
 }
 
 /** Sync model changes into blueprint source files. */
@@ -73,14 +90,20 @@ export function syncAppModelToFiles(
   updatedPaths.push("app/globals.css");
 
   for (const screen of model.screens) {
-    const routePath = screen.path === "/" ? "app/page.tsx" : `app${screen.path}/page.tsx`;
+    const routePath =
+      screen.path === "/" ? "app/page.tsx" : `app${screen.path}/page.tsx`;
     const exists = next.some(
       (f) => f.path.replaceAll("\\", "/") === routePath,
     );
     // Keep previously generated pages when deploying, to avoid overwriting
     // App Builder's compiled page implementations with preview stubs.
     if (!exists) {
-      next = upsertFile(next, routePath, screenPageContent(screen, model), "typescript");
+      next = upsertFile(
+        next,
+        routePath,
+        screenPageContent(screen, model),
+        "typescript",
+      );
       updatedPaths.push(routePath);
     }
   }
@@ -102,7 +125,15 @@ export function syncAppModelToFiles(
   next = upsertFile(next, "preview/index.html", previewHtml, "html");
   updatedPaths.push("preview/index.html");
 
-  notes.push(`Synced ${model.screens.length} screens, ${model.components.length} components, ${model.dataModels.length} data models.`);
+  notes.push(
+    `Synced ${model.screens.length} screens, ${model.components.length} components, ${model.dataModels.length} data models.`,
+  );
+
+  next = mergeMobileStoreIntoProjectFiles(next, {
+    title: model.settings.appName,
+    primaryColor: model.brand.tokens.primary,
+  });
+  notes.push("Mobile store packaging (PWA, Capacitor, Google Play TWA) included.");
 
   return { files: next, updatedPaths, notes };
 }

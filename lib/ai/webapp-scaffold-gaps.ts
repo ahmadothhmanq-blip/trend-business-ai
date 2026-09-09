@@ -10,6 +10,8 @@ import {
   businessEntityTables,
   prismaClientDelegate,
   toPrismaModelName,
+  crudRouteHasInputValidation,
+  crudRouteHasMassAssignmentRisk,
 } from "@/lib/ai/webapp-domain-scaffold";
 import type { GeneratedProjectFile } from "@/lib/ai/types";
 import {
@@ -105,11 +107,20 @@ function shouldReplaceScaffoldOwnedFile(
     if (!table) return false;
     return (
       existing.content !== scaffoldFile.content ||
-      !apiUsesExpectedDelegate(existing.content, table)
+      !apiUsesExpectedDelegate(existing.content, table) ||
+      !crudRouteHasInputValidation(existing.content) ||
+      crudRouteHasMassAssignmentRisk(existing.content)
     );
   }
 
   if (isEntityDashboardPagePath(path, tables)) {
+    // Do not wipe LLM-localized UI (e.g. Arabic) just because it differs from the
+    // English canonical scaffold. Only replace clearly broken / empty pages.
+    const usable =
+      existing.content.length > 200 &&
+      /["']use client["']/.test(existing.content) &&
+      (/fetch\s*\(/.test(existing.content) || /useEffect/.test(existing.content));
+    if (usable) return false;
     return existing.content !== scaffoldFile.content;
   }
 

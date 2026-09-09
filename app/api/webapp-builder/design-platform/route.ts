@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
+import {
+  API_ERROR_CODES,
+  apiNotFoundError,
+  apiValidationError,
+} from "@/lib/i18n/api-errors";
 import { z } from "zod";
 import {
   listAppTemplates,
@@ -7,6 +11,7 @@ import {
   runAppDesignEngine,
   matchTemplateFromSignals,
 } from "@/lib/ai-core/app-design-platform";
+import { authorizeDesignPlatformRequest } from "@/lib/webapp/design-platform-api-access";
 
 export const dynamic = "force-dynamic";
 
@@ -21,9 +26,12 @@ const designSchema = z.object({
 
 /**
  * GET — list professional app templates + component library.
- * POST — run App Design Engine (blueprint only, no code generation).
+ * Auth required; mutation rate limit applied.
  */
 export async function GET(request: Request) {
+  const access = await authorizeDesignPlatformRequest();
+  if (!access.ok) return access.response;
+
   const { searchParams } = new URL(request.url);
   const templateId = searchParams.get("templateId");
 
@@ -55,7 +63,14 @@ export async function GET(request: Request) {
   });
 }
 
+/**
+ * POST — run App Design Engine (blueprint only, no code generation).
+ * Auth required; mutation rate limit applied.
+ */
 export async function POST(request: Request) {
+  const access = await authorizeDesignPlatformRequest();
+  if (!access.ok) return access.response;
+
   let json: unknown;
   try {
     json = await request.json();

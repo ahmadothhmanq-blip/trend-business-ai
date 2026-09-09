@@ -1,0 +1,207 @@
+/**
+ * Message keys for generated App Builder applications.
+ * Templates must reference these keys via t() — never hardcode UI copy.
+ */
+
+export const WEBAPP_ENTITY_KEYS = [
+  "Item",
+  "User",
+  "Customer",
+  "MenuItem",
+  "Order",
+  "OrderItem",
+  "Table",
+  "Product",
+  "Review",
+  "Service",
+  "Booking",
+  "Availability",
+  "Contact",
+  "Deal",
+  "Company",
+  "Activity",
+  "Invoice",
+  "Employee",
+  "StockItem",
+  "Warehouse",
+  "Supplier",
+  "PurchaseOrder",
+  "Member",
+  "Subscription",
+  "ApiKey",
+  "Course",
+  "Lesson",
+  "Enrollment",
+  "Property",
+  "Inquiry",
+  "Vehicle",
+  "Lead",
+  "ServiceBooking",
+  "Patient",
+  "Appointment",
+  "Record",
+  "LedgerAccount",
+  "Account",
+  "Transaction",
+  "Budget",
+  "Payment",
+  "Settings",
+  "Expense",
+  "Leave",
+  "Report",
+  "AuditLog",
+  "Alert",
+  "Metric",
+  "Quiz",
+  "Staff",
+  "CartItem",
+] as const;
+
+export type WebAppEntityKey = (typeof WEBAPP_ENTITY_KEYS)[number];
+
+export const WEBAPP_I18N_KEYS = [
+  // Meta
+  "meta.description",
+  "meta.appFallbackName",
+
+  // Common
+  "common.continue",
+  "common.create",
+  "common.delete",
+  "common.refresh",
+  "common.loading",
+  "common.saving",
+  "common.actions",
+  "common.name",
+  "common.notes",
+  "common.email",
+  "common.password",
+  "common.records",
+  "common.emptyValue",
+
+  // Auth
+  "auth.signIn",
+  "auth.signInSubtitle",
+  "auth.signingIn",
+  "auth.noAccount",
+  "auth.createOne",
+  "auth.createAccount",
+  "auth.createAccountSubtitle",
+  "auth.creating",
+  "auth.alreadyRegistered",
+  "auth.invalidCredentials",
+  "auth.invalidSignup",
+  "auth.accountExists",
+  "auth.unableSignIn",
+  "auth.unableCreateAccount",
+  "auth.unableReachServer",
+  "auth.unableReachServerRetry",
+
+  // Roles (display labels)
+  "role.admin",
+  "role.manager",
+  "role.employee",
+  "role.user",
+
+  // Staff admin
+  "admin.staff.nav",
+  "admin.staff.title",
+  "admin.staff.subtitle",
+  "admin.staff.usersTitle",
+  "admin.staff.emailColumn",
+  "admin.staff.roleColumn",
+  "admin.staff.saveRole",
+  "admin.staff.roleUpdated",
+  "admin.staff.lastAdminGuard",
+  "admin.staff.unableUpdate",
+
+  // Nav / dashboard
+  "nav.overview",
+  "nav.dashboard",
+  "dashboard.overviewSubtitle",
+  "dashboard.emptyHint",
+  "home.getStarted",
+  "home.openDashboard",
+
+  // CRUD
+  "crud.recordsTitle",
+  "crud.recordsSubtitle",
+  "crud.newRecord",
+  "crud.unableLoad",
+  "crud.unableCreate",
+  "crud.unableDelete",
+  "crud.empty",
+  "crud.unauthorized",
+  "crud.forbidden",
+  "crud.notFound",
+  "crud.invalidBody",
+  "crud.idRequired",
+
+  // Middleware
+  "middleware.unauthorized",
+  "middleware.forbidden",
+
+  // Entity display labels (resolved via t("entity.Name") / te("Name"))
+  "entity.Item",
+  "entity.User",
+  "entity.Customer",
+  "entity.MenuItem",
+  "entity.Order",
+  "entity.OrderItem",
+  "entity.Table",
+  "entity.Product",
+  "entity.Review",
+  "entity.Service",
+  "entity.Booking",
+  "entity.Availability",
+  "entity.Contact",
+  "entity.Deal",
+  "entity.Company",
+  "entity.Activity",
+  "entity.Invoice",
+  "entity.Employee",
+  "entity.StockItem",
+  "entity.Warehouse",
+  "entity.Supplier",
+  "entity.PurchaseOrder",
+  "entity.Member",
+  "entity.Subscription",
+  "entity.ApiKey",
+  "entity.Course",
+  "entity.Lesson",
+  "entity.Enrollment",
+  "entity.Property",
+  "entity.Inquiry",
+  "entity.Vehicle",
+  "entity.Lead",
+  "entity.ServiceBooking",
+  "entity.Patient",
+  "entity.Appointment",
+  "entity.Record",
+  "entity.LedgerAccount",
+  "entity.Account",
+  "entity.Transaction",
+  "entity.Budget",
+  "entity.Payment",
+  "entity.Settings",
+  "entity.Expense",
+  "entity.Leave",
+  "entity.Report",
+  "entity.AuditLog",
+  "entity.Alert",
+  "entity.Metric",
+  "entity.Quiz",
+  "entity.Staff",
+  "entity.CartItem",
+] as const;
+
+export type WebAppI18nKey = (typeof WEBAPP_I18N_KEYS)[number];
+
+export type WebAppI18nDictionary = Record<WebAppI18nKey, string>;
+
+/** Entity display names keyed by Prisma/model table name — must cover WEBAPP_ENTITY_KEYS. */
+export type WebAppEntityDictionary = Record<WebAppEntityKey, string>;
+
+export function webAppEntityMessageKey(entity: string): `entity.${string}` {
+  return `entity.${entity}`;
+}

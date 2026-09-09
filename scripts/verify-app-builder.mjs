@@ -27,6 +27,7 @@ const APP_BUILDER_FILES = [
   "lib/ai-core/app-design-platform/workflows.ts",
   "lib/ai-core/app-design-platform/production-health.ts",
   "app/api/webapp-builder/[id]/live-preview/route.ts",
+  "app/api/webapp-builder/[id]/export/route.ts",
   "app/api/webapp-builder/[id]/deploy/route.ts",
   "app/api/webapp-builder/health/route.ts",
   "supabase/migrations/046_webapp_deployments.sql",
@@ -97,6 +98,23 @@ if (nextConfig.includes("/api/webapp-builder/:id/live-preview")) {
   ok("next.config webapp live-preview headers");
 } else {
   fail("next.config missing webapp live-preview headers");
+}
+
+console.log("\n[5b] Mobile store packaging");
+const mobileStorePath = join(root, "lib/ai/webapp-mobile-store.ts");
+if (existsSync(mobileStorePath)) {
+  const mobileSrc = readFileSync(mobileStorePath, "utf8");
+  if (
+    mobileSrc.includes("buildWebAppMobileStoreFiles") &&
+    mobileSrc.includes("capacitor.config.ts") &&
+    mobileSrc.includes("GOOGLE_PLAY.md")
+  ) {
+    ok("mobile store packaging module");
+  } else {
+    fail("mobile store packaging module", "incomplete");
+  }
+} else {
+  fail("lib/ai/webapp-mobile-store.ts", "missing");
 }
 
 console.log("\n[6] Honest deploy markers");

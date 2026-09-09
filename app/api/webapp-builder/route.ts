@@ -12,7 +12,9 @@ import { runWithAppBuilderTiming } from "@/lib/webapp/stage-timing-context";
 import { getActiveProvider } from "@/lib/ai/provider-config";
 import { resolveIteratedPrompt } from "@/lib/ai/iteration";
 import { getWebAppTypeLabel } from "@/lib/constants/webapp-builder";
+import { hasCompleteWebAppUiTranslationPack } from "@/lib/ai/webapp-i18n";
 import { resolveRequestLanguage } from "@/lib/i18n/api";
+import { normalizeGlsGenerationLanguage } from "@/lib/language-platform/generation/options";
 import type { WebAppGeneration, WebAppBlueprint } from "@/types/webapp";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -29,6 +31,7 @@ const webappRequestSchema = z.object({
   parentGenerationId: z.string().uuid().optional(),
   continueInstruction: z.string().trim().max(4000).optional(),
   projectId: z.string().uuid().optional(),
+  templateId: z.string().trim().optional(),
 });
 
 function logWebAppBuilderError(stage: string, error: unknown) {
@@ -111,7 +114,19 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data;
+  const requestedLanguage = normalizeGlsGenerationLanguage(input.language);
+  if (!hasCompleteWebAppUiTranslationPack(requestedLanguage)) {
+    return apiValidationError(
+      "Select a language with a complete UI translation pack.",
+    );
+  }
+
   const aiLanguage = resolveRequestLanguage(request, input.language, input.country);
+  if (!hasCompleteWebAppUiTranslationPack(aiLanguage)) {
+    return apiValidationError(
+      "Select a language with a complete UI translation pack.",
+    );
+  }
   const appLabel = getWebAppTypeLabel(input.appType);
 
   let stage = "generateWebApp";
@@ -142,6 +157,7 @@ export async function POST(request: Request) {
           designStyle: input.designStyle,
           colorStyle: input.colorStyle,
           features: input.features,
+          templateId: input.templateId,
         },
         onProgress: (message) => apiTiming.observeProgress(message),
       });
@@ -155,6 +171,7 @@ export async function POST(request: Request) {
         designStyle: input.designStyle,
         colorStyle: input.colorStyle,
         features: input.features,
+        templateId: input.templateId,
         ...(plannerIntegration.inputPatch ?? {}),
       });
 

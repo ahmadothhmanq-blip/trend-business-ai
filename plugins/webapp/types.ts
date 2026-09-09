@@ -26,6 +26,8 @@ export type WebAppPluginInput = {
   universalPlannerTraceRef?: string;
   universalPlannerBlueprint?: UniversalBlueprint;
   universalPlannerAppPlan?: UniversalServiceBlueprint;
+  /** Explicit App Design Platform template (from template gallery). */
+  templateId?: string;
 };
 
 export type WebAppProgressEvent =

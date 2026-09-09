@@ -27,7 +27,7 @@
     "export": "تصدير",
     "import": "استيراد",
     "duplicate": "مكرر",
-    "rename": "Rename (إعادة تسمية)",
+    "rename": "إعادة تسمية",
     "refresh": "تحديث",
     "filter": "تصفية",
     "sort": "الفرز",
@@ -149,8 +149,8 @@
       "business": "بنية الأعمال"
     },
     "trustBadges": {
-      "fast": "[ترجمة المصطلح: Fast]",
-      "secure": "[ترجمة المصطلح: Secure]",
+      "fast": "سريع",
+      "secure": "آمن",
       "aiPowered": "قائم على تكنولوجيا الذكاء الصناعي.",
       "global": "عالمي"
     },
@@ -1127,7 +1127,7 @@
       "signInForBalance": "تسجيل الدخول لتحميل الرصيد",
       "activity": "نشاط",
       "recentGenerations": "الأجيال الحديثة",
-      "saved": "[ترجمة المصطلح: Saved]",
+      "saved": "تم الحفظ",
       "pinnedFavorites": "مفضلات مثبتة",
       "quickActionsTitle": "خيارات سريعة",
       "recentActivityTitle": "النشاط الأخير",
@@ -1401,6 +1401,15 @@
       "generating": "جارٍ التوليد...",
       "pipelineHint": "AI يوجه الفكرة ← الإستراتيجية ← التصميم ← الأصول ← التوليد ← الجودة ← جاهز",
       "creationPipeline": "خط أنابيب الإنشاء",
+      "analyzingTags": "جارٍ تحليل الوصف",
+      "analyzingInBackground": "نحلل فكرتك في الخلفية — يمكنك التوليد في أي وقت",
+      "tagsHint": "استمر بالكتابة — الذكاء الاصطناعي سيقدّر النوع والقطاع والتعقيد والوسوم.",
+      "noTagsYet": "لا توجد وسوم بعد — جرّب وصفاً أوضح للمنتج.",
+      "insightAppType": "نوع التطبيق",
+      "insightIndustry": "القطاع",
+      "insightComplexity": "التعقيد",
+      "insightBuildTime": "وقت البناء التقريبي",
+      "insightTags": "الوسوم",
       "progressAria": "تقدم التوليد",
       "publishStatus": {
         "ready": "جاهز للنشر",
@@ -1468,6 +1477,30 @@
       "backToHome": "العودة إلى الصفحة الرئيسية",
       "genericTitle": "حدث خطأ ما",
       "genericDescription": "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى أو العودة إلى صفحة آمنة."
+    },
+    "expandSidebar": "توسيع الشريط الجانبي",
+    "openSidebar": "فتح الشريط الجانبي",
+    "closeSidebar": "إغلاق الشريط الجانبي",
+    "userMenu": "قائمة المستخدم",
+    "search": {
+      "resultsFor": "نتائج البحث عن \"{query}\"",
+      "emptyHeading": "ابحث في مساحة عمل الذكاء الاصطناعي",
+      "hint": "استخدم حقل البحث في الأعلى للعثور على الأفكار المُنشأة وتحليلات السوق والتقارير ومشاريع المواقع/التطبيقات.",
+      "noResults": "لم يتم العثور على نتائج",
+      "noResultsHint": "جرّب اسم مشروع أو موضوع تقرير أو صناعة أو منطقة أو وصف أصل محفوظ.",
+      "industryInRegion": "{industry} في {region}",
+      "marketAnalysisFallback": "تحليل السوق",
+      "types": {
+        "idea": "فكرة",
+        "marketAnalysis": "تحليل السوق",
+        "report": "تقرير",
+        "project": "مشروع"
+      }
+    },
+    "files": {
+      "emptyTitle": "لا توجد ملفات بعد",
+      "emptyDescription": "ستظهر المشاريع والملفات المُصدَّرة هنا بعد إنشاء الأصول.",
+      "generateAsset": "إنشاء أصل"
     }
   },
   "settings": {
@@ -1588,6 +1621,34 @@
     "videoStudio": {
       "title": "استوديو الفيديو",
       "description": "إنتاج الفيديو بالذكاء الاصطناعي والقصص المصورة"
+    },
+    "videoStudioProductAds": {
+      "title": "إعلانات المنتجات بالذكاء الاصطناعي",
+      "description": "أنشئ إعلانات فيديو للمنتجات في استوديو الفيديو"
+    },
+    "videoStudioPodcastVideos": {
+      "title": "فيديوهات البودكاست",
+      "description": "أنشئ مقاطع بودكاست بقيادة المضيف في استوديو الفيديو"
+    },
+    "videoStudioNewsVideos": {
+      "title": "فيديوهات الأخبار",
+      "description": "أنشئ موجزات أخبار بقيادة المذيع في استوديو الفيديو"
+    },
+    "videoStudioTemplates": {
+      "title": "مكتبة القوالب",
+      "description": "تصفّح وطبّق قوالب فيديو جاهزة للإنتاج"
+    },
+    "videoStudioBrandKit": {
+      "title": "هوية العلامة",
+      "description": "أدر الشعارات والألوان والخطوط وصوت العلامة لاستوديو الفيديو"
+    },
+    "videoStudioStockAssets": {
+      "title": "أصول المكتبة",
+      "description": "تصفّح صور ومقاطع فيديو خالية من حقوق الملكية لإنتاجات استوديو الفيديو"
+    },
+    "videoStudioPresenterTemplates": {
+      "title": "قوالب المقدّمين بالذكاء الاصطناعي",
+      "description": "إعدادات جاهزة للمقدّمين بالذكاء الاصطناعي للإعلانات والبودكاست والأخبار"
     },
     "contentStudio": {
       "title": "استوديو المحتوى",
@@ -1780,7 +1841,7 @@
     "minimal": "طفيف",
     "corporate": "المستحدات التجارية وأخبار الشركات",
     "startup": "البدء",
-    "modern": "[ترجمة المصطلح: Modern]",
+    "modern": "عصري",
     "glass": "الزجاج",
     "dark": "غامق",
     "light": "الخفيفة",
@@ -1883,7 +1944,7 @@
       "tone": "الوتيرة",
       "style": "النمط",
       "template": "نموذج",
-      "loading": "مولد كهربائي ، مولد طاقة",
+      "loading": "جارٍ التحميل…",
       "history": "تاريخ",
       "favorites": "المفضلات",
       "settings": "الإعدادات",
@@ -2166,10 +2227,10 @@
         "applied": "تم تطبيق القالب المرئي — تم الحفاظ على المحتوى والصور.",
         "usingTemplate": "استخدام القالب: {name}",
         "intelligenceApplied": "ذكاء القالب: {name}",
-        "structureApplied": "Structure template: {name}",
-        "structureRedesigned": "Redesigned with {name} — your content and images preserved",
-        "themeRedesigned": "Theme applied: {name} — content preserved, design rebuilt",
-        "themeApplied": "Theme selected: {name}",
+        "structureApplied": "قالب الهيكل: {name}",
+        "structureRedesigned": "أُعيد التصميم باستخدام {name} — تم الحفاظ على المحتوى والصور",
+        "themeRedesigned": "تم تطبيق السمة: {name} — المحتوى محفوظ والتصميم مُعاد بناؤه",
+        "themeApplied": "تم اختيار السمة: {name}",
         "clearSelection": "مسح اختيار القالب"
       },
       "favorites": {
@@ -2190,7 +2251,7 @@
         "createOrSelectFirst": "أنشئ موقعًا أو اختره أولاً.",
         "editThenImprove": "حرّر التعليمات، ثم انقر تحسين بالذكاء الاصطناعي.",
         "seoFixApplied": "تم تطبيق إصلاح تحسين محركات البحث.",
-        "reviewImprovementApplied": "Website improvements applied.",
+        "reviewImprovementApplied": "تم تطبيق تحسينات الموقع.",
         "websiteCreated": "تم إنشاء الموقع وحفظه. راجع المعاينة، ثم حسّنه بالذكاء الاصطناعي.",
         "projectDuplicated": "تم نسخ المشروع",
         "projectDeleted": "تم حذف المشروع",
@@ -2286,65 +2347,65 @@
         "experiments": "التجارب",
         "intelligence": "الذكاء",
         "seoAgent": "وكيل تحسين محركات البحث",
-        "reviewStudio": "Website Review",
+        "reviewStudio": "مراجعة الموقع",
         "publish": "النشر",
         "openEditorHint": "أنشئ موقعًا أولاً لفتح المحرر المرئي.",
         "createPreviewHint": "أنشئ موقعًا لفتح المعاينة المباشرة داخل المنصة."
       },
       "reviewStudio": {
-        "badge": "AI Review Studio",
-        "title": "{name} — Quality Review",
-        "running": "Running website quality review…",
-        "failedLoad": "Failed to load website review",
-        "applyFailed": "Failed to apply improvements",
-        "rollbackFailed": "Failed to rollback version",
-        "selectWebsite": "Generate or select a website to open the Review Studio.",
-        "strengths": "Strengths",
-        "weaknesses": "Weaknesses",
-        "estimatedGain": "Estimated Quality Gain",
-        "noStrengths": "No major strengths detected yet.",
-        "apply": "Apply",
-        "selected": "Selected",
-        "applySelected": "Apply selected improvements",
-        "selectedCount": "{count} selected",
-        "quality": "quality",
-        "conversion": "conversion",
-        "risk": "Risk",
-        "targetedRegenHint": "Requires AI executor — use deterministic improvements in Phase 1",
-        "version": "Version",
-        "rollback": "Rollback",
-        "noVersions": "No version history yet. Apply improvements to create versions.",
-        "noComparison": "Apply improvements to see before/after comparison.",
-        "points": "points",
-        "appliedChanges": "Applied changes",
+        "badge": "استوديو المراجعة بالذكاء الاصطناعي",
+        "title": "{name} — مراجعة الجودة",
+        "running": "جارٍ تشغيل مراجعة جودة الموقع…",
+        "failedLoad": "تعذّر تحميل مراجعة الموقع",
+        "applyFailed": "تعذّر تطبيق التحسينات",
+        "rollbackFailed": "تعذّر التراجع عن الإصدار",
+        "selectWebsite": "أنشئ موقعًا أو اختره لفتح استوديو المراجعة.",
+        "strengths": "نقاط القوة",
+        "weaknesses": "نقاط الضعف",
+        "estimatedGain": "التحسن المتوقع في الجودة",
+        "noStrengths": "لم تُكتشف نقاط قوة رئيسية بعد.",
+        "apply": "تطبيق",
+        "selected": "محدّد",
+        "applySelected": "تطبيق التحسينات المحددة",
+        "selectedCount": "{count} محدّد",
+        "quality": "الجودة",
+        "conversion": "التحويل",
+        "risk": "المخاطر",
+        "targetedRegenHint": "يتطلب منفّذ الذكاء الاصطناعي — استخدم التحسينات الحتمية في المرحلة 1",
+        "version": "الإصدار",
+        "rollback": "تراجع",
+        "noVersions": "لا يوجد سجل إصدارات بعد. طبّق التحسينات لإنشاء إصدارات.",
+        "noComparison": "طبّق التحسينات لعرض مقارنة قبل/بعد.",
+        "points": "نقاط",
+        "appliedChanges": "التغييرات المطبّقة",
         "tabs": {
-          "dashboard": "Dashboard",
-          "improvements": "Improvements",
-          "versions": "Versions",
-          "compare": "Compare",
-          "reports": "Reports"
+          "dashboard": "لوحة التحكم",
+          "improvements": "التحسينات",
+          "versions": "الإصدارات",
+          "compare": "مقارنة",
+          "reports": "التقارير"
         },
         "scores": {
-          "overall": "Overall",
-          "design": "Design",
+          "overall": "الإجمالي",
+          "design": "التصميم",
           "ux": "UX",
-          "business": "Business",
+          "business": "الأعمال",
           "seo": "SEO",
-          "performance": "Performance",
-          "accessibility": "Accessibility",
-          "content": "Content",
-          "localization": "Localization"
+          "performance": "الأداء",
+          "accessibility": "إمكانية الوصول",
+          "content": "المحتوى",
+          "localization": "التوطين"
         },
         "reports": {
-          "executive": "Executive Report",
-          "technical": "Technical Report",
-          "developer": "Developer Report",
-          "benchmark": "Benchmark Report",
-          "priorityActions": "Priority actions",
-          "technicalInsights": "Technical insights",
-          "designInsights": "Design insights",
-          "businessInsights": "Business insights",
-          "noFiles": "No specific files"
+          "executive": "تقرير تنفيذي",
+          "technical": "تقرير تقني",
+          "developer": "تقرير المطوّر",
+          "benchmark": "تقرير المقارنة المرجعية",
+          "priorityActions": "إجراءات ذات أولوية",
+          "technicalInsights": "رؤى تقنية",
+          "designInsights": "رؤى التصميم",
+          "businessInsights": "رؤى الأعمال",
+          "noFiles": "لا توجد ملفات محددة"
         }
       },
       "workspace": {
@@ -2374,7 +2435,7 @@
           "structure": "الهيكل",
           "design": "التصميم",
           "blocks": "الكتل",
-          "media": "Media",
+          "media": "الوسائط",
           "ai": "الذكاء الاصطناعي",
           "professional": "احترافي",
           "business": "الأعمال",
@@ -2946,14 +3007,14 @@
         "failedToAnalyze": "فشل التحليل",
         "templateIntelligenceTitle": "ذكاء القالب",
         "templateIntelligenceSubtitle": "يختار الذكاء الاصطناعي أفضل مظهر — أو اختر واحدًا في أي وقت",
-        "themesTitle": "Themes",
-        "themesSubtitle": "Complete design redesign — layout, hero, navigation, sections, and UI. Your business content stays the same.",
-        "structureTemplatesTitle": "Templates",
-        "structureTemplatesSubtitle": "Complete website redesign — layout, hero, navigation, sections. Your business content stays the same.",
-        "applyTheme": "Apply theme",
-        "useTheme": "Use theme",
-        "failedApplyTheme": "Failed to apply theme",
-        "appliedThemeRedesigned": "Redesigned with {name} — same business, new design",
+        "themesTitle": "السمات",
+        "themesSubtitle": "إعادة تصميم كاملة — التخطيط، البطل، التنقل، الأقسام، وواجهة المستخدم. يبقى محتوى عملك كما هو.",
+        "structureTemplatesTitle": "القوالب",
+        "structureTemplatesSubtitle": "إعادة تصميم كاملة للموقع — التخطيط، البطل، التنقل، الأقسام. يبقى محتوى عملك كما هو.",
+        "applyTheme": "تطبيق السمة",
+        "useTheme": "استخدام السمة",
+        "failedApplyTheme": "تعذّر تطبيق السمة",
+        "appliedThemeRedesigned": "أُعيد التصميم باستخدام {name} — نفس العمل، تصميم جديد",
         "autoSelect": "اختيار تلقائي",
         "all": "الكل",
         "loadingVisualTemplates": "جارٍ تحميل القوالب المرئية…",
@@ -3011,11 +3072,11 @@
         "improveStrategyHint": "حسّن التموضع وخريطة الموقع ودعوات الإجراء لتحويلات أعلى.",
         "improveDesignHint": "حدّث نظام الألوان والخطوط وقواعد التخطيط لمظهر أكثر تميزًا.",
         "improveAssetsHint": "أعد إنشاء صور البطل والأقسام لتناسب العلامة والجمهور.",
-        "improvingStrategy": "Analyzing strategy…",
-        "improvingDesign": "Improving design…",
-        "improvingAssets": "Generating better assets…",
-        "layerImproveComplete": "Optimization completed successfully.",
-        "generateBeforeLayerImprove": "Generate the website first, then use Improve strategy, design, or assets."
+        "improvingStrategy": "جارٍ تحليل الاستراتيجية…",
+        "improvingDesign": "جارٍ تحسين التصميم…",
+        "improvingAssets": "جارٍ إنشاء أصول أفضل…",
+        "layerImproveComplete": "اكتمل التحسين بنجاح.",
+        "generateBeforeLayerImprove": "أنشئ الموقع أولاً، ثم استخدم تحسين الاستراتيجية أو التصميم أو الأصول."
       },
       "previewExport": {
         "openLivePreview": "فتح المعاينة المباشرة",
@@ -3058,6 +3119,83 @@
         "defaultFramework": "نكست.جي إس آب روتر",
         "defaultStyling": "تيلويند سي إس إس",
         "defaultDeploy": "Vercel أو استضافة Node"
+      },
+      "proWorkspace": {
+        "visual": "مرئي",
+        "source": "المصدر",
+        "saveFile": "حفظ الملف",
+        "selectFile": "اختر ملفاً",
+        "discardUnsaved": "لديك تغييرات غير محفوظة. هل تريد تجاهلها والانتقال إلى ملف آخر؟",
+        "fileSaved": "تم حفظ الملف",
+        "saveFailed": "فشل الحفظ",
+        "failedToSaveFile": "تعذر حفظ الملف"
+      },
+      "imageStrategy": {
+        "label": "استراتيجية الصور",
+        "withImages": "مع صور بالذكاء الاصطناعي",
+        "withoutImages": "بدون صور (التركيز على الخطوط)",
+        "userAddsLater": "سأضيف الصور لاحقاً"
+      },
+      "visualSkin": {
+        "title": "المظهر المرئي",
+        "description": "تحديث رموز التصميم فقط — دون إعادة إنشاء كاملة.",
+        "applying": "جارٍ التطبيق…",
+        "applySkin": "تطبيق المظهر",
+        "updated": "تم تحديث المظهر المرئي",
+        "updateFailed": "فشل تحديث المظهر",
+        "failedToApply": "تعذر تطبيق المظهر",
+        "preview": {
+          "live": "مباشر",
+          "start": "ابدأ",
+          "builtForScale": "مصمم للتوسع",
+          "glassSurfaces": "أسطح زجاجية، إيقاع بنتو، وعمق سينمائي.",
+          "studio": "الاستوديو",
+          "work": "الأعمال",
+          "pricing": "الأسعار",
+          "faq": "الأسئلة",
+          "launch": "إطلاق",
+          "productStory": "قصة المنتج",
+          "editorialClarity": "وضوح تحريري",
+          "floatingNav": "تنقل عائم، تدرجات شبكية، وإيقاع تحويل.",
+          "primary": "أساسي",
+          "tour": "جولة",
+          "brand": "العلامة",
+          "cta": "دعوة لاتخاذ إجراء",
+          "welcome": "مرحباً",
+          "buildRemarkable": "ابنِ شيئاً استثنائياً",
+          "clearStory": "قصة واضحة، عرض قوي، وتصميم مدروس."
+        }
+      },
+      "siteImages": {
+        "dragDrop": "اسحب الصور وأفلتها هنا، أو ارفع عدة ملفات",
+        "multiUpload": "رفع متعدد",
+        "validation": "التحقق من الصور: {issues}",
+        "issuesDetected": "تم اكتشاف مشاكل",
+        "loading": "جارٍ تحميل الصور…",
+        "custom": "مخصص",
+        "editTitle": "تعديل {slot}",
+        "editImage": "تعديل الصورة",
+        "replace": "استبدال",
+        "aiGenerate": "توليد بالذكاء الاصطناعي",
+        "restoreDefault": "استعادة الافتراضي",
+        "cropAspect": "نسبة القص",
+        "cropFree": "حر",
+        "reposition": "إعادة التموضع",
+        "positionPlaceholder": "وسط أعلى",
+        "aiPrompt": "موجه الذكاء الاصطناعي",
+        "altText": "النص البديل",
+        "operationFailed": "فشلت العملية",
+        "slots": {
+          "hero": "البطل",
+          "gallery": "المعرض",
+          "about": "من نحن",
+          "features": "الميزات",
+          "team": "الفريق",
+          "products": "المنتجات",
+          "testimonials": "الشهادات",
+          "backgrounds": "الخلفيات",
+          "cta": "دعوة لاتخاذ إجراء"
+        }
       }
     },
     "contentStudio": {
@@ -3075,8 +3213,8 @@
       },
       "actions": {
         "generate": "التأسيس",
-        "regenerate": "يجدد",
-        "save": "[ترجمة المصطلح: Save]",
+        "regenerate": "إعادة التوليد",
+        "save": "حفظ",
         "export": "تصدير",
         "download": "تحميل",
         "preview": "معاينة",
@@ -3099,7 +3237,7 @@
         "noHistoryDescription": "ستظهر أجيالكم السابقة هنا.",
         "noTemplates": "لم يتم تحديد قوالب",
         "noTemplatesDescription": "تصفح السوق لبدء مشروعك.",
-        "noResults": "لا يوجد نتائج تطابق البحث !!!",
+        "noResults": "لا توجد نتائج تطابق بحثك",
         "noFavorites": "لا توجد تفضيلات",
         "noFavoritesDescription": "نجمة المشاريع للعثور عليها بسرعة."
       },
@@ -3119,11 +3257,11 @@
       },
       "status": {
         "idle": "جاهز",
-        "generating": "مولد كهربائي ، مولد طاقة",
+        "generating": "جارٍ التوليد…",
         "building": "بناء...",
         "success": "إكمال",
         "error": "فشل",
-        "saved": "[ترجمة المصطلح: Saved]"
+        "saved": "تم الحفظ"
       },
       "toasts": {
         "saved": "تم الحفظ بنجاح",
@@ -3368,8 +3506,8 @@
       },
       "actions": {
         "generate": "التأسيس",
-        "regenerate": "يجدد",
-        "save": "[ترجمة المصطلح: Save]",
+        "regenerate": "إعادة التوليد",
+        "save": "حفظ",
         "export": "تصدير",
         "download": "تحميل",
         "preview": "معاينة",
@@ -3392,7 +3530,7 @@
         "noHistoryDescription": "ستظهر أجيالكم السابقة هنا.",
         "noTemplates": "لم يتم تحديد قوالب",
         "noTemplatesDescription": "تصفح السوق لبدء مشروعك.",
-        "noResults": "لا يوجد نتائج تطابق البحث !!!",
+        "noResults": "لا توجد نتائج تطابق بحثك",
         "noFavorites": "لا توجد تفضيلات",
         "noFavoritesDescription": "نجمة المشاريع للعثور عليها بسرعة."
       },
@@ -3413,11 +3551,11 @@
       },
       "status": {
         "idle": "جاهز",
-        "generating": "مولد كهربائي ، مولد طاقة",
+        "generating": "جارٍ التوليد…",
         "building": "بناء...",
         "success": "إكمال",
         "error": "فشل",
-        "saved": "[ترجمة المصطلح: Saved]"
+        "saved": "تم الحفظ"
       },
       "toasts": {
         "saved": "تم الحفظ بنجاح",
@@ -3535,21 +3673,21 @@
           "defaultTagline": "مجموعة العلامة التجارية",
           "applyToCanvas": "تطبيق مجموعة العلامة التجارية على اللوحة"
         },
-        "save": "Save",
+        "save": "حفظ",
         "png": "PNG",
         "pdf": "PDF",
-        "project": "Project",
-        "text": "Text",
-        "shape": "Shape",
-        "image": "Image",
-        "icon": "Icon",
-        "logo": "Logo",
-        "brandKit": "Brand Kit",
-        "enhance": "Enhance",
-        "removeBg": "Remove BG",
-        "upscale": "Upscale",
-        "brandKitDefault": "Brand kit",
-        "loadBrandKitsFailed": "Failed to load brand kits"
+        "project": "المشروع",
+        "text": "نص",
+        "shape": "شكل",
+        "image": "صورة",
+        "icon": "أيقونة",
+        "logo": "شعار",
+        "brandKit": "مجموعة العلامة التجارية",
+        "enhance": "تحسين",
+        "removeBg": "إزالة الخلفية",
+        "upscale": "تكبير الدقة",
+        "brandKitDefault": "مجموعة العلامة التجارية",
+        "loadBrandKitsFailed": "فشل تحميل مجموعات العلامات التجارية"
       },
       "history": {
         "count": "{count} صورة",
@@ -3572,20 +3710,20 @@
         "assets": "الأصول"
       },
       "actions": {
-        "generate": "التأسيس",
-        "regenerate": "يجدد",
-        "save": "[ترجمة المصطلح: Save]",
+        "generate": "إنشاء",
+        "regenerate": "إعادة التوليد",
+        "save": "حفظ",
         "export": "تصدير",
         "download": "تحميل",
         "preview": "معاينة",
         "publish": "نشر",
-        "duplicate": "مكرر",
+        "duplicate": "نسخ",
         "delete": "حذف",
-        "favorite": "اضافة الى المفضلة",
-        "unfavorite": "حذف من المفضلة",
+        "favorite": "إضافة إلى المفضلة",
+        "unfavorite": "إزالة من المفضلة",
         "improveWithAi": "التحسين باستخدام الذكاء الاصطناعي",
-        "applyTemplate": "قالب التطبيق",
-        "clearTemplate": "نموذج واضح",
+        "applyTemplate": "تطبيق القالب",
+        "clearTemplate": "مسح القالب",
         "browseTemplates": "تصفح القوالب",
         "viewHistory": "عرض التاريخ",
         "copyToClipboard": "نسخ إلى الحافظة"
@@ -3597,7 +3735,7 @@
         "noHistoryDescription": "ستظهر أجيالكم السابقة هنا.",
         "noTemplates": "لم يتم تحديد قوالب",
         "noTemplatesDescription": "تصفح السوق لبدء مشروعك.",
-        "noResults": "لا يوجد نتائج تطابق البحث !!!",
+        "noResults": "لا توجد نتائج تطابق بحثك",
         "noFavorites": "لا توجد تفضيلات",
         "noFavoritesDescription": "نجمة المشاريع للعثور عليها بسرعة."
       },
@@ -3618,11 +3756,11 @@
       },
       "status": {
         "idle": "جاهز",
-        "generating": "مولد كهربائي ، مولد طاقة",
-        "building": "بناء...",
-        "success": "إكمال",
+        "generating": "جارٍ التوليد…",
+        "building": "جارٍ البناء…",
+        "success": "اكتمل",
         "error": "فشل",
-        "saved": "[ترجمة المصطلح: Saved]"
+        "saved": "تم الحفظ"
       },
       "toasts": {
         "saved": "تم الحفظ بنجاح",
@@ -3668,10 +3806,10 @@
         "productionOptions": "خيارات الإنتاج",
         "numberOfScenes": "عدد المشاهد",
         "generateVideoProject": "توليد مشروع فيديو",
-        "outputLanguage": "Output language",
-        "sourceImages": "Source images *",
-        "sourceImagesHint": "Upload one or more stills. Director will animate them into a storyboard, then Production Studio can render the motion video.",
-        "addImages": "Add images"
+        "outputLanguage": "لغة المخرجات",
+        "sourceImages": "صور المصدر *",
+        "sourceImagesHint": "ارفع صورة واحدة أو أكثر. يحوّلها المخرج إلى لوحة قصة ثم يمكن لاستوديو الإنتاج عرض الفيديو.",
+        "addImages": "إضافة صور"
       },
       "placeholders": {
         "videoBrief": "صف الفيديو الخاص بك — المفهوم، القصة، المشاهد الرئيسية، الرسائل، الاتجاه البصري...",
@@ -3680,7 +3818,9 @@
         "searchTemplates": "بحث عن قوالب...",
         "batchBrief": "إنشاء 20 فيديو تحفيزي لتيك توك...",
         "batchExample": "مثال: إنشاء 20 فيديو تحفيزي عن الانضباط والروتين الصباحي",
-        "imageToVideoBrief": "Describe the motion: camera path, product turn, atmosphere. Keep the subject in the uploaded stills."
+        "imageToVideoBrief": "صف الحركة: مسار الكاميرا، دوران المنتج، الأجواء. حافظ على الموضوع في الصور المرفوعة.",
+        "brandName": "اسم العلامة",
+        "primaryColor": "اللون الأساسي"
       },
       "preview": {
         "noProject": "لا يوجد مشروع فيديو للمعاينة",
@@ -3722,14 +3862,15 @@
         "batchFailed": "فشلت الدفعة",
         "batchRequestFailed": "فشل طلب الدفعة",
         "enterIdeaVideo": "أدخل فكرتك لتوليد مفهوم فيديو.",
-        "imageToVideoRequiresImage": "Add at least one source image for Image to Video.",
-        "invalidSourceImage": "Use PNG, JPEG, or WebP images under 8 MB.",
-        "tooManySourceImages": "You can attach up to 8 source images."
+        "imageToVideoRequiresImage": "أضف صورة مصدر واحدة على الأقل لوضع تحويل الصورة إلى فيديو.",
+        "invalidSourceImage": "استخدم صور PNG أو JPEG أو WebP بحجم أقل من 8 ميجابايت.",
+        "tooManySourceImages": "يمكنك إرفاق حتى 8 صور مصدر.",
+        "loadFailed": "فشل تحميل إدارة الفيديو"
       },
       "providerStatus": {
         "title": "حالة مزود الإنتاج",
         "checking": "جارٍ التحقق من تكوين المزود...",
-        "healthUnavailable": "تعذر تحميل حالة Video Studio الصحية.",
+        "healthUnavailable": "تعذر تحميل حالة استوديو الفيديو.",
         "productionReady": "جاهز للإنتاج",
         "setupRequired": "الإعداد مطلوب",
         "fullRender": "عرض كامل",
@@ -3745,126 +3886,702 @@
         "ttsReady": "تم تكوين مزود تحويل النص إلى كلام.",
         "ttsMissing": "قم بتعيين ELEVENLABS_API_KEY أو OPENAI_API_KEY للصوت.",
         "strictOn": "تم تعطيل التراجعات البديلة عند أخطاء المزود.",
-        "strictOff": "لم يتم تعيين VIDEO_PROVIDER_STRICT — يُسمح بالبدائل عند الأخطاء.",
+        "strictOff": "الوضع الصارم غير مفعّل — يُسمح بالبدائل عند الأخطاء.",
         "fullRenderBlocked": "العرض الكامل يتطلب KLING_API_KEY. وضع المعاينة لا يزال يعمل."
       },
       "editor": {
-        "loading": "Loading editor…",
+        "loading": "جارٍ تحميل المحرر…",
         "errors": {
-          "loadFailed": "Failed to load editor.",
-          "noActivePlan": "This project has no active plan to edit.",
-          "saveFailed": "Save failed.",
-          "undoFailed": "Undo failed.",
-          "redoFailed": "Redo failed.",
-          "regenerationFailed": "Regeneration failed.",
-          "requestFailed": "Request failed ({status})"
+          "loadFailed": "فشل تحميل المحرر.",
+          "noActivePlan": "لا توجد خطة نشطة لهذا المشروع للتحرير.",
+          "saveFailed": "فشل الحفظ.",
+          "undoFailed": "فشل التراجع.",
+          "redoFailed": "فشل الإعادة.",
+          "regenerationFailed": "فشل إعادة التوليد.",
+          "requestFailed": "فشل الطلب ({status})"
         },
         "tabs": {
-          "inspector": "Inspector",
-          "audio": "Audio",
-          "text": "Text"
+          "inspector": "المفتش",
+          "effects": "المؤثرات",
+          "audio": "الصوت",
+          "text": "النص",
+          "comments": "التعليقات",
+          "templates": "القوالب"
+        },
+        "templatesPanel": {
+          "browseLibrary": "تصفح المكتبة",
+          "saveAsTemplate": "حفظ كقالب",
+          "loading": "جارٍ تحميل القوالب المحفوظة…",
+          "empty": "لا توجد قوالب محفوظة بعد.",
+          "use": "استخدام",
+          "toasts": {
+            "saved": "تم حفظ القالب.",
+            "saveFailed": "تعذّر حفظ القالب.",
+            "deleteFailed": "تعذّر حذف القالب."
+          }
         },
         "saveStatus": {
-          "saving": "Saving",
-          "unsaved": "Unsaved changes",
-          "error": "Save failed",
-          "saved": "Saved"
+          "saving": "جارٍ الحفظ",
+          "unsaved": "تغييرات غير محفوظة",
+          "error": "فشل الحفظ",
+          "saved": "تم الحفظ"
         },
         "actions": {
-          "trimStart": "Trim start",
-          "trimEnd": "Trim end",
-          "split": "Split",
-          "regenerateScene": "Regenerate Scene",
-          "production": "Production"
+          "trimStart": "قص البداية",
+          "trimEnd": "قص النهاية",
+          "split": "تقسيم",
+          "regenerateScene": "إعادة توليد المشهد",
+          "production": "الإنتاج"
         },
         "inspector": {
-          "selectScene": "Select a scene to inspect.",
-          "durationSec": "Duration (sec)",
-          "cameraMove": "Camera move",
-          "visualStyle": "Visual style",
-          "transition": "Transition",
-          "dialogue": "Dialogue",
-          "voiceRequired": "Voice required",
-          "providerPreference": "Provider preference",
-          "fallbackProvider": "Fallback provider",
-          "none": "None",
-          "characters": "Characters",
-          "products": "Products",
-          "referencesUri": "References (uri)"
+          "selectScene": "اختر مشهدًا للمعاينة.",
+          "durationSec": "المدة (ث)",
+          "cameraMove": "حركة الكاميرا",
+          "visualStyle": "النمط البصري",
+          "transition": "الانتقال",
+          "dialogue": "الحوار",
+          "voiceRequired": "الصوت مطلوب",
+          "providerPreference": "مزود مفضّل",
+          "fallbackProvider": "مزود احتياطي",
+          "none": "لا شيء",
+          "characters": "الشخصيات",
+          "products": "المنتجات",
+          "referencesUri": "مراجع (رابط)"
+        },
+        "effects": {
+          "selectScene": "اختر مشهدًا لتطبيق المؤثرات.",
+          "transition": "انتقال جاهز",
+          "colorGrade": "تصحيح الألوان",
+          "speed": "سرعة التشغيل",
+          "visualStyle": "تجاوز النمط البصري",
+          "transitions": {
+            "cut": "قطع",
+            "fade": "تلاشي",
+            "crossfade": "تلاشي متقاطع",
+            "wipe": "مسح",
+            "zoom": "تكبير",
+            "slide": "انزلاق"
+          },
+          "colorGrades": {
+            "neutral": "محايد",
+            "cinematic": "سينمائي",
+            "warm": "دافئ",
+            "cool": "بارد",
+            "high-contrast": "تباين عالٍ",
+            "muted": "باهت"
+          },
+          "speeds": {
+            "1": "1×",
+            "0_75": "0.75×",
+            "1_25": "1.25×",
+            "1_5": "1.5×"
+          }
+        },
+        "comments": {
+          "title": "التعليقات",
+          "placeholder": "اترك ملاحظاتك على هذا المشهد أو المشروع…",
+          "loading": "جارٍ تحميل التعليقات…",
+          "empty": "لا توجد تعليقات بعد.",
+          "actions": {
+            "post": "نشر تعليق"
+          },
+          "toasts": {
+            "created": "تم نشر التعليق."
+          },
+          "errors": {
+            "loadFailed": "تعذّر تحميل التعليقات.",
+            "createFailed": "تعذّر نشر التعليق.",
+            "deleteFailed": "تعذّر حذف التعليق."
+          }
+        },
+        "presence": {
+          "active": "{count} متعاون(ون) متصل(ون)"
         },
         "captions": {
-          "selectScene": "Select a scene to edit captions.",
-          "captionsEnabled": "Captions enabled",
-          "alignLeft": "Left",
-          "alignCenter": "Center",
-          "alignRight": "Right",
-          "overlayOn": "On",
-          "defaultCaption": "Caption",
-          "addTextOverlay": "Add text overlay"
+          "selectScene": "اختر مشهدًا لتحرير الترجمة.",
+          "captionsEnabled": "الترجمة مفعّلة",
+          "alignLeft": "يسار",
+          "alignCenter": "وسط",
+          "alignRight": "يمين",
+          "overlayOn": "تشغيل",
+          "defaultCaption": "ترجمة",
+          "addTextOverlay": "إضافة طبقة نص"
         },
         "audio": {
-          "tts": "TTS",
-          "ttsReady": "TTS ready",
-          "ttsUnavailable": "TTS unavailable",
-          "voice": "Voice",
-          "narration": "Narration",
-          "noVoiceTrack": "No voice track on the audio plan yet.",
-          "music": "Music",
-          "score": "Score",
-          "noMusic": "No music ingested.",
-          "sfx": "SFX",
-          "cue": "Cue",
-          "noSfx": "No SFX ingested.",
-          "muteVoice": "Mute voice",
-          "muteMusic": "Mute music",
-          "voiceLevel": "Voice level",
-          "musicLevel": "Music level",
-          "muteSfx": "Mute SFX",
-          "sfxLevel": "SFX level",
-          "footerNote": "Audio is displayed from the existing Audio Engine. This panel does not generate TTS.",
-          "trackVoice": "{speaker} · {status} · {startSec}s",
+          "tts": "تحويل النص إلى كلام",
+          "ttsReady": "الصوت جاهز",
+          "ttsUnavailable": "الصوت غير متاح",
+          "voice": "الصوت",
+          "narration": "السرد",
+          "noVoiceTrack": "لا يوجد مسار صوتي في خطة الصوت بعد.",
+          "music": "الموسيقى",
+          "score": "المقطوعة",
+          "noMusic": "لم تُضف موسيقى.",
+          "sfx": "مؤثرات",
+          "cue": "إشارة",
+          "noSfx": "لم تُضف مؤثرات صوتية.",
+          "muteVoice": "كتم الصوت",
+          "muteMusic": "كتم الموسيقى",
+          "voiceLevel": "مستوى الصوت",
+          "musicLevel": "مستوى الموسيقى",
+          "muteSfx": "كتم المؤثرات",
+          "sfxLevel": "مستوى المؤثرات",
+          "footerNote": "يُعرض الصوت من محرك الصوت الحالي. هذه اللوحة لا تولّد تحويل النص إلى كلام.",
+          "trackVoice": "{speaker} · {status} · {startSec}ث",
           "trackMusic": "{mood} · {status}",
-          "trackSfx": "{cue} @ {timestampSec}s"
+          "trackSfx": "{cue} @ {timestampSec}ث"
         },
         "preview": {
-          "title": "Scene preview",
-          "storyboardFallback": "Storyboard",
-          "emptyPrompt": "Select a scene to preview its storyboard. SVG is not treated as video.",
-          "timeDisplay": "{current}s / {total}s"
+          "title": "معاينة المشهد",
+          "storyboardFallback": "لوحة القصة",
+          "emptyPrompt": "اختر مشهدًا لمعاينة لوحة القصة. لا يُعامل SVG كفيديو.",
+          "timeDisplay": "{current}ث / {total}ث"
         },
         "scenes": {
-          "sceneLabel": "Scene {index}",
-          "playableClip": "Playable clip",
-          "storyboardOnly": "Storyboard only"
+          "sceneLabel": "المشهد {index}",
+          "playableClip": "مقطع قابل للتشغيل",
+          "storyboardOnly": "لوحة قصة فقط"
         },
         "timeline": {
-          "label": "Timeline · {duration}s",
-          "zoom": "Zoom",
-          "blockLabel": "S{index}"
+          "label": "الجدول الزمني · {duration}ث",
+          "zoom": "تكبير",
+          "blockLabel": "م{index}"
         },
         "regeneration": {
-          "label": "Regeneration: {status}",
-          "attempt": " · attempt {attempt}",
-          "previous": " · previous {id}",
-          "active": " · active {id}",
+          "label": "إعادة التوليد: {status}",
+          "attempt": " · محاولة {attempt}",
+          "previous": " · السابق {id}",
+          "active": " · النشط {id}",
           "errorSuffix": " · {error}"
+        }
+      },
+      "productAds": {
+        "create": "إنشاء إعلان منتج",
+        "title": "إعلانات المنتجات بالذكاء الاصطناعي",
+        "description": "اضبط منتجك ومنصتك ونمط المقدّم. يخطّط المخرج لوحة القصة تلقائيًا — دون مطالبات.",
+        "stepTwoTitle": "اختر المقدّم والبيئة",
+        "stepTwoDescription": "اختر ممثلًا بالذكاء الاصطناعي وبيئة المشهد لإعلان منتجك.",
+        "stepThreeTitle": "اختر النمط التجاري",
+        "stepThreeDescription": "اختر قالبًا جاهزًا للإنتاج. لا حاجة لمطالبات — نضبط الإيقاع والصوت والموسيقى والبنية.",
+        "backToStudio": "العودة إلى استوديو الفيديو",
+        "stepIndicator": "الخطوة {current} من {total}",
+        "footerNote": "يخطّط المخرج الافتتاحية والمشاهد والحوار ودعوة الإجراء. لم يبدأ عرض الفيديو بعد.",
+        "fields": {
+          "productImages": "صور المنتج",
+          "productImagesHint": "ارفع صورة واحدة أو أكثر للمنتج. تُستخدم في الإنتاج لتحريك المشهد.",
+          "addImages": "إضافة صور",
+          "productName": "اسم المنتج",
+          "brand": "العلامة (اختياري)",
+          "category": "فئة المنتج",
+          "language": "اللغة",
+          "languageHint": "لغة المخرجات والسياق الإقليمي.",
+          "duration": "مدة الفيديو",
+          "platform": "المنصة",
+          "presenter": "المقدّم"
+        },
+        "placeholders": {
+          "productName": "مثال: سماعات أورورا اللاسلكية",
+          "brand": "مثال: أورورا للصوت"
+        },
+        "categories": {
+          "clothing": "ملابس وأزياء",
+          "electronics": "إلكترونيات",
+          "cars": "سيارات",
+          "beauty": "جمال وتجميل",
+          "food": "طعام ومشروبات",
+          "other": "أخرى"
+        },
+        "durations": {
+          "15s": "15 ثانية",
+          "30s": "30 ثانية",
+          "60s": "60 ثانية"
+        },
+        "platforms": {
+          "tiktok": "تيك توك",
+          "instagram_reels": "ريلز إنستغرام",
+          "facebook": "فيسبوك",
+          "youtube_shorts": "يوتيوب شورتس",
+          "website": "موقع إلكتروني"
+        },
+        "presenters": {
+          "ai-presenter": {
+            "title": "مقدّم بالذكاء الاصطناعي",
+            "description": "مقدّم بشري يعرّف بالمنتج ويُبرز مزاياه.",
+            "unavailable": "يتطلب HEYGEN_API_KEY. اختر وضع المنتج فقط أو فعّل HeyGen."
+          },
+          "product-only": {
+            "title": "المنتج فقط",
+            "description": "لقطات سينمائية للمنتج دون مقدّم."
+          }
+        },
+        "actions": {
+          "continue": "متابعة",
+          "back": "رجوع",
+          "saveDraft": "حفظ الإعدادات",
+          "createStoryboard": "إنشاء لوحة قصة",
+          "generateVideo": "توليد الفيديو",
+          "retryProduction": "إعادة الإنتاج"
+        },
+        "actors": {
+          "choosePresenter": "اختر المقدّم",
+          "choosePresenterHint": "اختر ممثلًا يناسب فئة منتجك ونبرة المنصة.",
+          "chooseEnvironment": "اختر البيئة",
+          "chooseEnvironmentHint": "حدد مكان تصوير الإعلان. الخيارات مفلترة حسب مجموعات المقدّم.",
+          "chooseEnvironmentLocked": "اختر مقدّمًا أولًا لعرض البيئات المتوافقة.",
+          "selectActorFirst": "اختر مقدّمًا لفتح البيئات.",
+          "productOnlyHint": "إعلانات المنتج فقط تتخطى المقدّم. اختر بيئة للقطات المنتج.",
+          "selected": "المحدّد: {name}",
+          "genders": {
+            "male": "ذكر",
+            "female": "أنثى"
+          }
+        },
+        "commercials": {
+          "chooseStyle": "اختر النمط التجاري",
+          "chooseStyleHint": "القوالب تجمع إيقاع الصناعة والخطافات والصوت والموسيقى وأنماط دعوة الإجراء — اختر واحدًا للمتابعة.",
+          "allIndustries": "جميع الصناعات",
+          "selected": "القالب المحدّد: {name}"
+        },
+        "talent": {
+          "title": "سوق المواهب بالذكاء الاصطناعي",
+          "subtitle": "تصفّح المقدّمين والمبدعين والمضيفين الموثّقين. تُحفظ المفضلة والاختيارات الأخيرة على هذا الجهاز.",
+          "searchPlaceholder": "ابحث عن المواهب بالاسم أو النمط أو الوسم…",
+          "allCollections": "جميع المجموعات",
+          "featured": "مواهب مميزة",
+          "recentlyUsed": "المستخدمة مؤخرًا",
+          "results": "جميع المواهب",
+          "resultCount": "{count} ملف موهبة",
+          "noResults": "لا توجد مواهب تطابق الفلاتر. جرّب تعديل البحث أو الفئات.",
+          "loadMore": "تحميل المزيد",
+          "selected": "الموهبة المحدّدة: {name}",
+          "viewGrid": "عرض شبكي",
+          "viewList": "عرض قائمة",
+          "badges": {
+            "premium": "مميز",
+            "verified": "موثّق",
+            "featured": "بارز"
+          },
+          "filters": {
+            "allGenders": "جميع الأجناس",
+            "premium": "مميز",
+            "featured": "بارز",
+            "verified": "موثّق",
+            "favorites": "المفضلة",
+            "genders": {
+              "male": "ذكر",
+              "female": "أنثى"
+            }
+          },
+          "actions": {
+            "favorite": "إضافة إلى المفضلة",
+            "unfavorite": "إزالة من المفضلة"
+          }
+        },
+        "toasts": {
+          "draftSaved": "تم حفظ إعدادات إعلان المنتج.",
+          "storyboardReady": "خطّط المخرج لوحة القصة. افتح استوديو الفيديو للمراجعة.",
+          "productionComplete": "فيديو إعلان المنتج جاهز في المحرر."
+        },
+        "production": {
+          "readyTitle": "لوحة القصة جاهزة",
+          "readyDescription": "راجع المشاهد أدناه، ثم ولّد فيديو إعلان المنتج الكامل مع الصوت والترجمة والمخرجات المركّبة.",
+          "generatingTitle": "جارٍ توليد {title}",
+          "generatingSubtitle": "توجيه المشاهد إلى المزودين وتجميع إعلان المنتج.",
+          "failedTitle": "توقف الإنتاج",
+          "events": {
+            "starting": "جارٍ بدء إنتاج إعلان المنتج…"
+          }
+        },
+        "errors": {
+          "incomplete": "أضف صورة منتج واحدة على الأقل واسم المنتج للمتابعة.",
+          "incompleteActor": "اختر بيئة ومقدّمًا (عند استخدام مقدّم بالذكاء الاصطناعي).",
+          "incompleteTemplate": "اختر قالب نمط تجاري لحفظ الإعدادات.",
+          "planningFailed": "تعذّر على المخرج تخطيط إعلان المنتج. حاول مجددًا أو عدّل الإعدادات.",
+          "productionFailed": "فشل إنتاج إعلان المنتج. أعد المحاولة أو استأنف المهمة.",
+          "productionIncomplete": "اكتمل الإنتاج دون مخرج مركّب قابل للتشغيل. أعد المقاطع الفاشلة أو شغّل الإنتاج مجددًا."
+        }
+      },
+      "podcastVideos": {
+        "create": "إنشاء فيديو بودكاست",
+        "title": "فيديوهات البودكاست",
+        "description": "خطّط مقاطع بودكاست بقيادة المضيف مع المخرج — افتتاحية، فقرات، وختام الاشتراك.",
+        "backToStudio": "العودة إلى استوديو الفيديو",
+        "stepIndicator": "الخطوة {current} من {total}",
+        "stepOneTitle": "تفاصيل الحلقة",
+        "stepOneDescription": "حدّد البرنامج وموضوع الحلقة والصيغة والمدة.",
+        "stepTwoTitle": "المضيف والاستوديو",
+        "stepTwoDescription": "اختر التعليق الصوتي فقط أو مضيفًا بالذكاء الاصطناعي مع بيئة الاستوديو.",
+        "placeholders": {
+          "showTitle": "مثال: مستقبل العمل اليومي",
+          "episodeTitle": "مثال: أدوات الذكاء الاصطناعي للفرق الصغيرة",
+          "topic": "ما الذي يجب أن يغطيه هذا المقطع؟"
+        },
+        "formats": {
+          "solo": "مضيف منفرد",
+          "interview": "نمط مقابلة",
+          "highlights": "ملخص أبرز اللحظات"
+        },
+        "durations": {
+          "60s": "60 ثانية",
+          "90s": "90 ثانية",
+          "120s": "دقيقتان",
+          "300s": "5 دقائق"
+        },
+        "presenters": {
+          "ai-host": {
+            "title": "مضيف بالذكاء الاصطناعي",
+            "description": "مقدّم أمام الكاميرا مع مزامنة الشفاه.",
+            "unavailable": "يتطلب HEYGEN_API_KEY. اختر التعليق الصوتي فقط أو فعّل HeyGen."
+          },
+          "voiceover-only": {
+            "title": "تعليق صوتي فقط",
+            "description": "سرد مع لقطات مرافقة — لا حاجة لمزود صورة رمزية."
+          }
+        },
+        "actions": {
+          "continue": "متابعة",
+          "back": "رجوع",
+          "createStoryboard": "إنشاء لوحة قصة",
+          "generateVideo": "توليد الفيديو",
+          "retryProduction": "إعادة الإنتاج",
+          "refreshStatus": "تحديث الحالة"
+        },
+        "toasts": {
+          "storyboardReady": "لوحة قصة البودكاست جاهزة. افتح المحرر للمراجعة.",
+          "productionComplete": "اكتمل إنتاج فيديو البودكاست."
+        },
+        "production": {
+          "title": "جارٍ توليد فيديو البودكاست",
+          "subtitle": "عرض المشاهد وتجميع مقطع البودكاست.",
+          "panelTitle": "توليد فيديو البودكاست",
+          "panelDescription": "راجع لوحة القصة، ثم ابدأ الإنتاج الكامل.",
+          "starting": "جارٍ بدء إنتاج فيديو البودكاست…"
+        },
+        "errors": {
+          "incomplete": "أكمل جميع الحقول المطلوبة قبل المتابعة.",
+          "planningFailed": "تعذّر على المخرج تخطيط فيديو البودكاست.",
+          "productionFailed": "فشل إنتاج فيديو البودكاست.",
+          "renderBlocked": "العرض الكامل غير متاح. فعّل مزود فيديو أولًا."
+        }
+      },
+      "newsVideos": {
+        "create": "إنشاء فيديو أخبار",
+        "title": "فيديوهات الأخبار",
+        "description": "خطّط نشرات أخبار بقيادة المذيع مع العنوان والسياق والتفاصيل والختام.",
+        "backToStudio": "العودة إلى استوديو الفيديو",
+        "stepIndicator": "الخطوة {current} من {total}",
+        "stepOneTitle": "تفاصيل الخبر",
+        "stepOneDescription": "أدخل العنوان والملخص والفئة والصيغة.",
+        "stepTwoTitle": "المذيع والمكتب",
+        "stepTwoDescription": "اختر التعليق الصوتي أو مذيع أخبار بالذكاء الاصطناعي مع بيئة بث.",
+        "placeholders": {
+          "headline": "مثال: ارتفاع الأسواق بعد إعلان السياسة",
+          "summary": "لخّص الحقائق الأساسية التي يجب أن يغطيها المخرج (20 حرفًا على الأقل)."
+        },
+        "categories": {
+          "politics": "سياسة",
+          "business": "أعمال",
+          "technology": "تكنولوجيا",
+          "sports": "رياضة",
+          "world": "عالم",
+          "local": "محلي",
+          "other": "أخرى"
+        },
+        "formats": {
+          "breaking": "خبر عاجل",
+          "daily-brief": "موجز يومي",
+          "explainer": "شرح"
+        },
+        "durations": {
+          "30s": "30 ثانية",
+          "60s": "60 ثانية",
+          "90s": "90 ثانية"
+        },
+        "presenters": {
+          "anchor": {
+            "title": "مذيع أخبار",
+            "description": "تقديم أمام الكاميرا مع نية للشرائط السفلية.",
+            "unavailable": "يتطلب HEYGEN_API_KEY. اختر التعليق الصوتي أو فعّل HeyGen."
+          },
+          "voiceover": {
+            "title": "تعليق صوتي",
+            "description": "سرد مع لقطات مرافقة — لا حاجة لمزود صورة رمزية."
+          }
+        },
+        "actions": {
+          "continue": "متابعة",
+          "back": "رجوع",
+          "createStoryboard": "إنشاء لوحة قصة",
+          "generateVideo": "توليد الفيديو",
+          "retryProduction": "إعادة الإنتاج",
+          "refreshStatus": "تحديث الحالة"
+        },
+        "toasts": {
+          "storyboardReady": "لوحة قصة الأخبار جاهزة. افتح المحرر للمراجعة.",
+          "productionComplete": "اكتمل إنتاج فيديو الأخبار."
+        },
+        "production": {
+          "title": "جارٍ توليد فيديو الأخبار",
+          "subtitle": "عرض المشاهد وتجميع موجز الأخبار.",
+          "panelTitle": "توليد فيديو الأخبار",
+          "panelDescription": "راجع لوحة القصة، ثم ابدأ الإنتاج الكامل.",
+          "starting": "جارٍ بدء إنتاج فيديو الأخبار…"
+        },
+        "errors": {
+          "incomplete": "أكمل جميع الحقول المطلوبة قبل المتابعة.",
+          "planningFailed": "تعذّر على المخرج تخطيط فيديو الأخبار.",
+          "productionFailed": "فشل إنتاج فيديو الأخبار.",
+          "renderBlocked": "العرض الكامل غير متاح. فعّل مزود فيديو أولًا."
+        }
+      },
+      "templatesLibrary": {
+        "open": "مكتبة القوالب",
+        "title": "مكتبة القوالب",
+        "description": "تصفّح قوالب جاهزة للإنتاج لإعلانات المنتجات والبودكاست والأخبار ومشاريع الفيديو العامة.",
+        "backToStudio": "العودة إلى استوديو الفيديو",
+        "loading": "جارٍ تحميل القوالب…",
+        "empty": "لا توجد قوالب تطابق الفلاتر. جرّب تعديل البحث أو الفلاتر.",
+        "premium": "مميز",
+        "stats": {
+          "total": "{count} قالب متاح"
+        },
+        "recent": {
+          "title": "المستخدمة مؤخرًا",
+          "description": "تابع من حيث توقفت مع القوالب التي استخدمتها مؤخرًا."
+        },
+        "filters": {
+          "title": "ابحث عن قالب",
+          "description": "ابحث وفلتر عبر القوالب التجارية وقوالب المنصة.",
+          "searchPlaceholder": "ابحث في القوالب…",
+          "allWorkflows": "جميع سير العمل",
+          "allCategories": "جميع الفئات",
+          "allIndustries": "جميع الصناعات",
+          "favorites": "المفضلة ({count})"
+        },
+        "workflows": {
+          "product-ads": "إعلانات المنتجات",
+          "podcast": "بودكاست",
+          "news": "أخبار",
+          "generic": "فيديو عام"
+        },
+        "categories": {
+          "all": "الكل",
+          "product-marketing": "تسويق المنتجات",
+          "podcast": "بودكاست",
+          "news": "أخبار",
+          "social": "اجتماعي",
+          "explainer": "شرح",
+          "corporate": "مؤسسي"
+        },
+        "actions": {
+          "preview": "معاينة",
+          "useTemplate": "استخدام القالب",
+          "favorite": "إضافة إلى المفضلة",
+          "unfavorite": "إزالة من المفضلة",
+          "loadMore": "تحميل المزيد ({shown} من {total})"
+        },
+        "toasts": {
+          "applied": "تم تطبيق القالب — أكمل المعالج لتوليد الفيديو."
+        },
+        "errors": {
+          "loadFailed": "تعذّر تحميل القوالب."
+        }
+      },
+      "brandKit": {
+        "open": "هوية العلامة",
+        "backToStudio": "العودة إلى استوديو الفيديو",
+        "title": "هوية العلامة",
+        "description": "أدر الشعارات والألوان والخطوط والمقدّمات والختامات والعلامات المائية ودعوات الإجراء وصوت العلامة لكل سير عمل فيديو.",
+        "loading": "جارٍ تحميل هويات العلامة…",
+        "brands": {
+          "title": "علاماتك",
+          "description": "{count} هوية علامة في مساحة العمل",
+          "empty": "لا توجد هويات علامة بعد. أنشئ واحدة لضمان اتساق الهوية عبر الفيديوهات."
+        },
+        "editor": {
+          "title": "تحرير {name}",
+          "emptyTitle": "محرر العلامة",
+          "description": "اضبط الهوية البصرية وإرشادات الصوت المستخدمة أثناء التخطيط والعرض بالذكاء الاصطناعي.",
+          "selectBrand": "اختر هوية علامة من القائمة أو أنشئ واحدة جديدة."
+        },
+        "sections": {
+          "logos": "الشعارات",
+          "colors": "الألوان",
+          "fonts": "الخطوط",
+          "media": "المقدّمة والختام والعلامة المائية",
+          "voice": "الصوت ودعوات الإجراء"
+        },
+        "fields": {
+          "name": "اسم العلامة",
+          "defaultBrand": "تعيين كهوية علامة افتراضية",
+          "tagline": "الشعار النصي",
+          "ctaPresets": "قوالب دعوة الإجراء (مفصولة بفواصل)",
+          "introUrl": "رابط فيديو المقدّمة",
+          "outroUrl": "رابط فيديو الختام",
+          "watermarkUrl": "رابط صورة العلامة المائية",
+          "logo": {
+            "primary": "رابط الشعار الأساسي",
+            "secondary": "رابط الشعار الثانوي",
+            "icon": "رابط الأيقونة / الاختصار"
+          },
+          "colors": {
+            "primary": "أساسي",
+            "secondary": "ثانوي",
+            "accent": "تمييز",
+            "background": "خلفية"
+          },
+          "fonts": {
+            "heading": "خط العناوين",
+            "body": "خط النص"
+          },
+          "watermarkPositions": {
+            "bottom-right": "أسفل يمين",
+            "bottom-left": "أسفل يسار",
+            "top-right": "أعلى يمين",
+            "top-left": "أعلى يسار"
+          }
+        },
+        "actions": {
+          "newBrand": "علامة جديدة",
+          "save": "حفظ التغييرات",
+          "delete": "حذف العلامة"
+        },
+        "picker": {
+          "title": "تطبيق هوية العلامة",
+          "description": "فرض الشعارات والألوان والخطوط والصوت قبل التوليد.",
+          "loading": "جارٍ تحميل هويات العلامة…",
+          "none": "بدون هوية علامة",
+          "default": "افتراضي",
+          "apply": "تطبيق",
+          "active": "نشط: {name}"
+        },
+        "toasts": {
+          "created": "تم إنشاء هوية العلامة.",
+          "saved": "تم حفظ هوية العلامة.",
+          "deleted": "تم حذف هوية العلامة.",
+          "applied": "تم تطبيق هوية العلامة — سيستخدم التوليد إرشادات علامتك."
+        },
+        "errors": {
+          "loadFailed": "تعذّر تحميل هويات العلامة.",
+          "createFailed": "تعذّر إنشاء هوية العلامة.",
+          "saveFailed": "تعذّر حفظ هوية العلامة.",
+          "deleteFailed": "تعذّر حذف هوية العلامة."
+        }
+      },
+      "stockAssets": {
+        "open": "أصول المكتبة",
+        "backToStudio": "العودة إلى استوديو الفيديو",
+        "title": "أصول المكتبة",
+        "description": "تصفّح صور ومقاطع فيديو خالية من حقوق الملكية لإثراء المشاهد في كل سير عمل استوديو الفيديو.",
+        "loading": "جارٍ تحميل الأصول…",
+        "empty": "لا توجد أصول تطابق الفلاتر.",
+        "featured": "مميز",
+        "stats": {
+          "total": "{count} أصل متاح"
+        },
+        "types": {
+          "image": "صورة",
+          "video": "فيديو"
+        },
+        "categories": {
+          "corporate": "مؤسسي",
+          "technology": "تكنولوجيا",
+          "product": "منتج",
+          "lifestyle": "أسلوب حياة",
+          "abstract": "تجريدي",
+          "nature": "طبيعة",
+          "urban": "حضري",
+          "finance": "مالية",
+          "healthcare": "رعاية صحية"
+        },
+        "filters": {
+          "title": "ابحث عن أصول",
+          "description": "ابحث في الصور والمقاطع المنسّقة حسب النوع والفئة ونسبة العرض.",
+          "searchPlaceholder": "ابحث في الأصول…",
+          "allTypes": "جميع الأنواع",
+          "allCategories": "جميع الفئات",
+          "allAspectRatios": "جميع نسب العرض",
+          "favorites": "المفضلة ({count})"
+        },
+        "actions": {
+          "copyUrl": "نسخ رابط الأصل"
+        },
+        "picker": {
+          "title": "لقطات مرافقة",
+          "description": "اختر حتى {count} أصول لإدراجها في تخطيط المشاهد.",
+          "searchPlaceholder": "ابحث في المكتبة…",
+          "selectedCount": "{count} محدّد",
+          "browseAll": "تصفح المكتبة الكاملة",
+          "maxReached": "يمكنك اختيار حتى {count} أصول."
+        },
+        "toasts": {
+          "copied": "تم نسخ رابط الأصل — {title}",
+          "selected": "تم اختيار الأصل — {title}"
+        },
+        "errors": {
+          "loadFailed": "تعذّر تحميل الأصول."
+        }
+      },
+      "presenterTemplates": {
+        "open": "قوالب المقدّمين",
+        "backToStudio": "العودة إلى استوديو الفيديو",
+        "title": "قوالب المقدّمين بالذكاء الاصطناعي",
+        "description": "إعدادات جاهزة للمقدّمين والممثلين والبيئات لكل سير عمل في استوديو الفيديو.",
+        "loading": "جارٍ تحميل قوالب المقدّمين…",
+        "empty": "لا توجد قوالب مقدّمين تطابق الفلاتر.",
+        "featured": "مميز",
+        "stats": {
+          "total": "{count} قالب متاح"
+        },
+        "workflows": {
+          "product-ads": "إعلانات المنتجات",
+          "podcast": "بودكاست",
+          "news": "أخبار",
+          "generic": "فيديو عام"
+        },
+        "styles": {
+          "corporate": "مؤسسي",
+          "tech": "تكنولوجيا",
+          "beauty": "جمال",
+          "luxury": "فاخر",
+          "retail": "تجزئة",
+          "lifestyle": "أسلوب حياة",
+          "news": "أخبار",
+          "podcast": "بودكاست"
+        },
+        "filters": {
+          "title": "ابحث عن قالب مقدّم",
+          "description": "فلتر حسب سير العمل ونمط العرض.",
+          "searchPlaceholder": "ابحث في قوالب المقدّمين…",
+          "allWorkflows": "جميع سير العمل",
+          "allStyles": "جميع الأنماط",
+          "favorites": "المفضلة ({count})"
+        },
+        "actions": {
+          "useTemplate": "استخدام القالب"
+        },
+        "toasts": {
+          "applied": "تم تطبيق قالب المقدّم — أكمل المعالج للتوليد."
+        },
+        "errors": {
+          "loadFailed": "تعذّر تحميل قوالب المقدّمين."
         }
       },
       "management": {
         "loading": "جارٍ تحميل استوديو إنتاج الفيديو...",
-        "backToStudio": "العودة إلى Video Studio",
+        "backToStudio": "العودة إلى استوديو الفيديو",
         "tabs": {
           "overview": "نظرة عامة",
           "timeline": "الجدول الزمني",
           "preview": "معاينة / عرض",
-          "presenter": "مقدم",
+          "presenter": "مقدّم",
           "brand": "العلامة التجارية",
           "audio": "الصوت والصوتيات",
           "export": "تصدير اجتماعي",
           "media": "وسائط",
           "quality": "الجودة",
           "versions": "الإصدارات",
-          "publish": "Publish"
+          "publish": "نشر"
         },
         "productionModel": "نموذج الإنتاج",
         "productionDescription": "مشروع فيديو منظم — قابل للتعديل دون إعادة إنشاء من الصفر",
@@ -3893,7 +4610,7 @@
         "noVideoApiKey": "لا يوجد مفتاح API للفيديو",
         "ttsPreview": "معاينة TTS",
         "strict": "صارم",
-        "stubAllowed": "مسموح بالكعب",
+        "stubAllowed": "البدائل مسموحة",
         "checkingTooling": "جارٍ التحقق من أدوات التجميع…",
         "trimToSeconds": "قص إلى ثوانٍ",
         "professionalTimeline": "مخطط زمني احترافي",
@@ -3963,33 +4680,36 @@
         "cueLinesPlaceholder": "أسطر الإشارات…",
         "applyBrand": "تطبيق العلامة التجارية",
         "restore": "استعادة",
-        "publishTitle": "Publish to web",
-        "publishDescription": "Share a public HTML5 page with a copyable link and embed snippet.",
-        "publishedStatus": "Published",
-        "notPublished": "Not published",
-        "publishRequiresRender": "Run a full MP4 render before publishing.",
-        "publishing": "Publishing…",
-        "published": "Video published.",
-        "publishFailed": "Publish failed.",
-        "unpublishing": "Unpublishing…",
-        "unpublishAction": "Unpublish",
-        "unpublished": "Video unpublished.",
-        "unpublishFailed": "Unpublish failed.",
-        "previewPublic": "Preview public page",
-        "publicLink": "Public link",
-        "copyPublicLink": "Copy link",
-        "linkCopied": "Public link copied",
-        "embedCode": "Embed code",
-        "embedPlaceholder": "Publish to generate an embed snippet.",
-        "copyEmbed": "Copy embed",
-        "embedCopied": "Embed code copied",
-        "hydrating": "Loading publication…"
+        "publishTitle": "نشر على الويب",
+        "publishDescription": "شارك صفحة HTML5 عامة مع رابط قابل للنسخ ومقتطف تضمين.",
+        "publishedStatus": "منشور",
+        "notPublished": "غير منشور",
+        "publishRequiresRender": "شغّل عرض MP4 كامل قبل النشر.",
+        "publishing": "جارٍ النشر…",
+        "published": "تم نشر الفيديو.",
+        "publishFailed": "فشل النشر.",
+        "unpublishing": "جارٍ إلغاء النشر…",
+        "unpublishAction": "إلغاء النشر",
+        "unpublished": "تم إلغاء نشر الفيديو.",
+        "unpublishFailed": "فشل إلغاء النشر.",
+        "previewPublic": "معاينة الصفحة العامة",
+        "publicLink": "الرابط العام",
+        "copyPublicLink": "نسخ الرابط",
+        "linkCopied": "تم نسخ الرابط العام",
+        "embedCode": "كود التضمين",
+        "embedPlaceholder": "انشر لتوليد مقتطف التضمين.",
+        "copyEmbed": "نسخ التضمين",
+        "embedCopied": "تم نسخ كود التضمين",
+        "hydrating": "جارٍ تحميل بيانات النشر…"
       },
       "history": {
         "count": "{count} فيديو",
         "countPlural": "{count} فيديو",
         "emptyNoun": "مشاريع فيديو",
         "emptyItem": "مشروع فيديو"
+      },
+      "aria": {
+        "removeImage": "إزالة الصورة"
       }
     },
     "webappBuilder": {
@@ -4006,20 +4726,20 @@
         "assets": "الأصول"
       },
       "actions": {
-        "generate": "التأسيس",
-        "regenerate": "يجدد",
-        "save": "[ترجمة المصطلح: Save]",
+        "generate": "إنشاء",
+        "regenerate": "إعادة التوليد",
+        "save": "حفظ",
         "export": "تصدير",
         "download": "تحميل",
         "preview": "معاينة",
         "publish": "نشر",
-        "duplicate": "مكرر",
+        "duplicate": "نسخ",
         "delete": "حذف",
-        "favorite": "اضافة الى المفضلة",
-        "unfavorite": "حذف من المفضلة",
+        "favorite": "إضافة إلى المفضلة",
+        "unfavorite": "إزالة من المفضلة",
         "improveWithAi": "التحسين باستخدام الذكاء الاصطناعي",
-        "applyTemplate": "قالب التطبيق",
-        "clearTemplate": "نموذج واضح",
+        "applyTemplate": "تطبيق القالب",
+        "clearTemplate": "مسح القالب",
         "browseTemplates": "تصفح القوالب",
         "viewHistory": "عرض التاريخ",
         "copyToClipboard": "نسخ إلى الحافظة"
@@ -4031,7 +4751,7 @@
         "noHistoryDescription": "ستظهر أجيالكم السابقة هنا.",
         "noTemplates": "لم يتم تحديد قوالب",
         "noTemplatesDescription": "تصفح السوق لبدء مشروعك.",
-        "noResults": "لا يوجد نتائج تطابق البحث !!!",
+        "noResults": "لا توجد نتائج تطابق بحثك",
         "noFavorites": "لا توجد تفضيلات",
         "noFavoritesDescription": "نجمة المشاريع للعثور عليها بسرعة."
       },
@@ -4051,11 +4771,11 @@
       },
       "status": {
         "idle": "جاهز",
-        "generating": "مولد كهربائي ، مولد طاقة",
-        "building": "بناء...",
-        "success": "إكمال",
+        "generating": "جارٍ التوليد…",
+        "building": "جارٍ البناء…",
+        "success": "اكتمل",
         "error": "فشل",
-        "saved": "[ترجمة المصطلح: Saved]"
+        "saved": "تم الحفظ"
       },
       "toasts": {
         "saved": "تم الحفظ بنجاح",
@@ -4080,8 +4800,86 @@
         "customApp": "تطبيق {type}",
         "configureDescription": "صف تطبيقك وقم بتكوين خيارات التوليد",
         "orChooseAppType": "أو اختر نوع التطبيق",
+        "orBrowseTemplates": "أو اختر نوعًا سريعًا",
         "describeYourApp": "صف تطبيقك",
         "generateWebApp": "توليد تطبيق ويب"
+      },
+      "templates": {
+        "title": "قوالب التطبيقات",
+        "subtitle": "ابدأ من هيكل جاهز للإنتاج — شاشات، نماذج بيانات، أدوار، وسير عمل مضمّنة.",
+        "searchPlaceholder": "البحث في القوالب…",
+        "allIndustries": "كل القطاعات",
+        "screens": "{count} شاشات",
+        "models": "{count} نماذج بيانات",
+        "roles": "{count} أدوار",
+        "useTemplate": "استخدام القالب",
+        "selected": "القالب المحدد: {name}",
+        "clearSelection": "مسح القالب",
+        "loading": "جارٍ تحميل القوالب…",
+        "empty": "لا توجد قوالب تطابق بحثك.",
+        "failedLoad": "تعذّر تحميل القوالب.",
+        "flagshipBadge": "قطاع أعمال",
+        "architectures": {
+          "pos-retail": "نقطة بيع وطلبات",
+          "marketplace": "واجهة متجر",
+          "booking-calendar": "جدولة",
+          "crm-pipeline": "خط مبيعات",
+          "erp-modules": "عمليات معيارية",
+          "dashboard-sidebar": "تطبيق لوحة تحكم",
+          "multi-tenant-saas": "SaaS متعدد المستأجرين",
+          "learning-portal": "بوابة تعلّم",
+          "content-catalog": "فهرس وقوائم"
+        },
+        "catalog": {
+          "restaurant": {
+            "label": "نقطة بيع وإدارة الطلبات",
+            "description": "قوائم، طلبات مباشرة، طاولات، وسير عمل المطبخ"
+          },
+          "ecommerce": {
+            "label": "متجر إلكتروني ودفع",
+            "description": "فهرس منتجات، سلة، دفع، وتنفيذ الطلبات"
+          },
+          "booking": {
+            "label": "مواعيد وجدولة",
+            "description": "تقويم، توفر، خدمات، وتدفق الحجز"
+          },
+          "crm": {
+            "label": "جهات اتصال وخط مبيعات",
+            "description": "جهات اتصال، صفقات، شركات، ومتابعة الأنشطة"
+          },
+          "erp": {
+            "label": "مجموعة عمليات الأعمال",
+            "description": "مالية، موارد بشرية، مخزون، وتقارير متكاملة"
+          },
+          "inventory": {
+            "label": "تحكم بالمخزون والمستودعات",
+            "description": "فهرس SKU، مستودعات، موردون، وتنبيهات إعادة الطلب"
+          },
+          "saas-dashboard": {
+            "label": "لوحة إدارة SaaS",
+            "description": "إدارة الفريق، فوترة، مفاتيح API، وإعدادات مساحة العمل"
+          },
+          "education": {
+            "label": "دورات ومتابعة التقدّم",
+            "description": "دورات، دروس، اختبارات، وتقدّم المتعلمين"
+          },
+          "real-estate": {
+            "label": "قوائم واستفسارات",
+            "description": "قوائم عرض، صندوق استفسارات، وكلاء، وخرائط"
+          },
+          "automotive": {
+            "label": "فهرس مركبات وعملاء محتملين",
+            "description": "مخزون مركبات، عملاء محتملون، وحجوزات صيانة"
+          },
+          "healthcare": {
+            "label": "مرضى ومواعيد",
+            "description": "دليل مرضى، جدولة، سجلات، وأدوار الموظفين"
+          },
+          "finance": {
+            "label": "حسابات ومعاملات",
+            "description": "دليل حسابات، دفتر أستاذ، ميزانيات، وتقارير مالية"
+          }
+        }
       },
       "placeholders": {
         "appBrief": "صف تطبيقك — الغرض، المستخدمون، الشاشات الرئيسية، نموذج البيانات، التكاملات...",
@@ -4108,7 +4906,7 @@
         "scenes": "مشاهد",
         "chars": "أحرف",
         "liveAppPreview": "معاينة التطبيق المباشر",
-        "liveAppPreviewDescription": "بيئة تشغيل اختبارية من نموذج التطبيق الذي تم إنشاؤه",
+        "liveAppPreviewDescription": "معاينة تفاعلية من نموذج التطبيق (مصادقة/CRUD تجريبية). ليست استضافة Next.js إنتاجية — استخدم تصدير ZIP للاستضافة الذاتية.",
         "livePreviewIframeTitle": "معاينة حية للتطبيق المُنشأ",
         "openLivePreview": "فتح المعاينة الحية"
       },
@@ -4145,6 +4943,7 @@
           "versions": "الإصدارات",
           "data": "نموذج البيانات",
           "deploy": "نشر",
+          "stores": "متاجر التطبيقات",
           "content": "المحتوى",
           "livePreview": "معاينة حية",
           "visualEditor": "المحرر البصري"
@@ -4186,7 +4985,7 @@
         "saveName": "اسم الحفظ",
         "applyBrandColors": "تطبيق ألوان العلامة التجارية",
         "liveAppPreview": "معاينة التطبيق المباشر",
-        "liveAppPreviewDescription": "بيئة تشغيل تجريبية من الملفات المُنشأة + نموذج التطبيق المنظم",
+        "liveAppPreviewDescription": "معاينة تفاعلية من نموذج التطبيق (مصادقة/CRUD تجريبية). ليست تطبيق Next.js من الـ ZIP.",
         "livePreviewTitle": "معاينة حية للتطبيق",
         "componentLibrary": "مكتبة المكونات",
         "addToSelectedScreen": "إضافة إلى الشاشة المحددة",
@@ -4194,9 +4993,15 @@
         "visualEditorDescription": "اسحب لإعادة الترتيب · تعديل الخصائص · المزامنة مع الكود",
         "applyProperties": "تطبيق الخصائص",
         "deployment": "النشر",
-        "deploymentDescription": "نشر معاينة أو إنتاج بنقرة واحدة",
-        "deployPreview": "نشر المعاينة",
-        "deployProduction": "نشر الإنتاج",
+        "deploymentDescription": "معاينة أو استضافة HTML تفاعلية عامة — تطبيق Next.js الكامل مع قاعدة البيانات يتطلب تنزيل ZIP على Node",
+        "zipPlaybookTitle": "النشر الإنتاجي (ZIP)",
+        "zipPlaybookIntro": "استضافة المنصة معاينة HTML تفاعلية فقط. لتطبيق Next.js حقيقي مع قاعدة بيانات:",
+        "zipPlaybookStep1": "حمّل مشروع ZIP من هذه الصفحة.",
+        "zipPlaybookStep2": "على استضافتك (Vercel أو Railway أو VPS): npm install → npx prisma db push → npm run db:seed (اختياري) → npm run build → npm start.",
+        "zipPlaybookStep3": "اربط عنوان HTTPS عامًا، ثم سجّله في متاجر الموبايل إن احتجت Play/App Store.",
+        "zipPlaybookTrust": "لا ندّعي استضافة Next.js مدارة داخل المنصة.",
+        "deployPreview": "نشر معاينة الاختبار",
+        "deployProduction": "نشر مضيف المعاينة (/w/app)",
         "provisionBackend": "توفير الواجهة الخلفية",
         "livePreviewPath": "معاينة حية:",
         "aiAssistant": "مساعد تطبيق الذكاء الاصطناعي",
@@ -4214,16 +5019,164 @@
         "customScreenPurpose": "شاشة مخصصة",
         "deployFailed": "فشل النشر",
         "deployed": "تم النشر",
-        "productionDeployStarted": "بدأ نشر الإنتاج",
+        "downloadZip": "تحميل ZIP",
+        "downloadZipStarted": "بدأ تحميل ZIP",
+        "downloadZipFailed": "تعذّر تحميل ZIP",
+        "productionDeployStarted": "نُشرت استضافة معاينة تفاعلية — نزّل ZIP لتطبيق Next.js الكامل",
         "assistantPlaceholder": "جرب: \"إضافة نظام دفع\" · \"إنشاء لوحة طلبات\" · \"ربط قاعدة بيانات\" · \"إنشاء لوحة إدارة\"",
         "manualCheckpoint": "نقطة تفتيش يدوية",
         "componentTitlePlaceholder": "عنوان المكون",
         "primaryColorPlaceholder": "تجاوز اللون الأساسي",
         "permissionSummary": "{screenCount} شاشات · {dataAccess} بيانات · {actions}",
+        "mobileStores": {
+          "title": "متاجر التطبيقات",
+          "description": "تجهيز للنشر على Google Play وApple App Store وSamsung Galaxy Store وتثبيت PWA.",
+          "publishTitle": "انشر على Google Play أو App Store",
+          "publishDescription": "مسار موجّه لنشر {appName} كتطبيق جوال. Trend يجهّز ملفات التغليف — وأنت تبني وترفع بحساب المطوّر لديك.",
+          "stepDeploy": "انشر رابط HTTPS عام (استضافة معاينة تفاعلية حالياً؛ استخدم ZIP على Node لمصادقة/CRUD كاملة قبل مراجعة المتجر).",
+          "stepDownload": "حمّل ZIP المشروع — يتضمن mobile-store/ مع إعدادات Capacitor وTWA.",
+          "stepIcons": "استبدل أيقونات public/icons/ بصور PNG 512×512 للمتاجر.",
+          "stepBuild": "اتبع mobile-store/GOOGLE_PLAY.md أو APPLE_APP_STORE.md لبناء .aab أو أرشيف iOS.",
+          "stepSubmit": "ارفع إلى Play Console أو App Store Connect مع سياسة خصوصية ولقطات شاشة.",
+          "googlePlay": "Google Play (Android)",
+          "googlePlayHint": "TWA أو غلاف Capacitor → حزمة .aab موقّعة.",
+          "appStore": "Apple App Store (iOS)",
+          "appStoreHint": "مشروع Capacitor iOS → أرشفة في Xcode → App Store Connect.",
+          "syncPackaging": "تحديث ملفات packaging المتاجر",
+          "folderNote": "ملفات المتاجر في",
+          "checklistTitle": "قائمة نشر المتجر",
+          "checklistProgress": "{done} من {total} خطوات مكتملة",
+          "googleCommandsTitle": "أوامر بناء Android",
+          "appleCommandsTitle": "أوامر بناء iOS",
+          "commandsHint": "نفّذها بعد تحميل الـ ZIP من جذر المشروع.",
+          "copyCommands": "نسخ الأوامر",
+          "commandsCopied": "تم نسخ أوامر البناء",
+          "copyFailed": "تعذر نسخ الأوامر",
+          "guideFiles": "الدليل الكامل في",
+          "openPlayConsole": "فتح Play Console",
+          "openAppStoreConnect": "فتح App Store Connect",
+          "productionUrlLabel": "رابط الإنتاج:",
+          "productionUrlMissing": "لا يوجد رابط HTTPS جاهز للمتجر بعد. نزّل ZIP، استضف تطبيق Next.js الكامل على Node، ثم ضع الرابط في إعدادات mobile-store.",
+          "productionUrlSuitable": "مضيف HTTPS جاهز للمتجر:",
+          "productionUrlNotSuitable": "رابط المنصة /w/app/… معاينة HTML تفاعلية — وليست تطبيق Next.js كامل مع تسجيل دخول/CRUD. مراجعة المتجر ستفشل إن استخدمته كمضيف.",
+          "productionUrlNotSuitableToast": "علّم خطوة النشر كمكتملة فقط بعد استضافة ZIP على رابط HTTPS خاص بك (Node/Vercel).",
+          "storeHostRequirement": "مطلوب للمتاجر: نزّل ZIP ← انشر Next.js مع /api/auth وCRUD ← استخدم ذلك الرابط في TWA/Capacitor.",
+          "previewHostDeployedHint": "نُشرت استضافة المعاينة. للمتاجر ما زال يلزم تنزيل ZIP واستضافة التطبيق الكامل بنفسك.",
+          "downloadRequiredToast": "نزّل ملف ZIP للمشروع قبل نسخ أوامر البناء.",
+          "submitBlockedToast": "أكمل تنزيل ZIP والبناء المحلي قبل تعليم الإرسال كمكتمل.",
+          "setHostInConfig": "عيّن رابط التطبيق الحقيقي HTTPS في",
+          "registerHostTitle": "سجّل مضيف Next.js للإنتاج",
+          "registerHostHint": "نزّل ZIP ← انشر على Vercel/Node ← الصق رابط HTTPS هنا. المنصة لا تشغّل تطبيقات Next.js للعملاء نيابةً عنك.",
+          "registerHost": "تسجيل والتحقق",
+          "clearHost": "مسح",
+          "registerHostSuccess": "تم تسجيل مضيف الإنتاج",
+          "registerHostFailed": "تعذر تسجيل مضيف الإنتاج",
+          "clearHostSuccess": "تم مسح مضيف الإنتاج",
+          "clearHostFailed": "تعذر مسح مضيف الإنتاج",
+          "packagingRefreshed": "تم تحديث ملفات تغليف المتجر",
+          "packagingHealthTitle": "صحة التغليف",
+          "openWizard": "انشر على متاجر التطبيقات"
+        },
         "devices": {
           "mobile": "معاينة الجوال",
           "tablet": "معاينة الجهاز اللوحي",
           "desktop": "معاينة سطح المكتب"
+        }
+      },
+      "copilot": {
+        "title": "مساعد التطبيق",
+        "subtitle": "أوامر بلغة طبيعية لتعديل تطبيقك",
+        "quickCommands": "أوامر سريعة",
+        "conversation": "المحادثة",
+        "commandView": "عرض الأوامر",
+        "chatView": "عرض المحادثة",
+        "emptyThread": "ابدأ محادثة — سيظهر سجل الجلسة هنا.",
+        "you": "أنت",
+        "assistant": "المساعد",
+        "placeholder": "صف التغيير الذي تريده في تطبيقك…",
+        "runningCommand": "جارٍ تنفيذ الأمر…",
+        "runCommand": "تنفيذ الأمر",
+        "undoTitle": "تراجع عن آخر تغيير من المساعد",
+        "costFree": "مجاني — بدون رصيد",
+        "costAi": "ذكاء اصطناعي — رصيد واحد",
+        "creditSingular": "{count} رصيد",
+        "errors": {
+          "streamFailed": "فشل بث مساعد التطبيق.",
+          "streamNoResult": "انتهى بث مساعد التطبيق دون نتيجة.",
+          "commandFailed": "فشل أمر مساعد التطبيق.",
+          "undoFailed": "فشل التراجع عن آخر تغيير من المساعد.",
+          "notFound": "التطبيق غير موجود أو لم يعد متاحًا.",
+          "conflict": "تم تعديل التطبيق في مكان آخر. حدّث الصفحة ثم أعد المحاولة."
+        },
+        "examples": {
+          "changeColor": {
+            "label": "تغيير اللون الأساسي إلى الأزرق",
+            "command": "غيّر اللون الأساسي إلى الأزرق"
+          },
+          "addProduct": {
+            "label": "إضافة منتج جديد باسم Widget",
+            "command": "أضف منتجًا جديدًا باسم Widget"
+          },
+          "addDashboard": {
+            "label": "إضافة شاشة لوحة تحكم",
+            "command": "أضف شاشة لوحة تحكم"
+          },
+          "addBooking": {
+            "label": "إضافة ميزة الحجز",
+            "command": "أضف ميزة الحجز"
+          },
+          "redesign": {
+            "label": "إعادة تصميم التطبيق",
+            "command": "أعد تصميم التطبيق"
+          }
+        }
+      },
+      "studioChat": {
+        "buildTitle": "شات استوديو التطبيق",
+        "buildSubtitle": "صف تطبيق عملك، أجب عن أسئلة قصيرة، وافق على الخطة، ثم ابدأ البناء. بعد التوليد عدّل من نفس الشات.",
+        "editTitle": "عدّل من الشات",
+        "editSubtitle": "اطلب التغييرات بلغة طبيعية — نفس المحادثة بعد بناء التطبيق.",
+        "empty": "ستظهر محادثتك هنا.",
+        "you": "أنت",
+        "assistant": "الاستوديو",
+        "buildPlaceholder": "مثال: أحتاج نظام مبيعات لفريقي لتتبع الصفقات…",
+        "editPlaceholder": "مثال: أضف حقل حالة الدفع للطلبات…",
+        "send": "إرسال",
+        "sendEdit": "تطبيق التعديل",
+        "quickGenerateOptional": "توليد سريع (اختياري)",
+        "errors": {
+          "failed": "فشل طلب شات الاستوديو. حاول مرة أخرى."
+        }
+      },
+      "onboarding": {
+        "title": "ابنِ خلال 60 ثانية",
+        "subtitle": "اختر القطاع، أجب في الشات، جرّب المعاينة، ثم حمّل ZIP الإنتاجي.",
+        "stepPick": "اختر القطاع",
+        "stepChat": "أجب عن سؤالين قصيرين",
+        "stepPreview": "جرّب المعاينة التفاعلية",
+        "stepZip": "حمّل ZIP واستضف بنفسك",
+        "pickVertical": "ابدأ بقطاع",
+        "verticals": {
+          "crm": {
+            "label": "نظام مبيعات",
+            "hint": "عملاء، صفقات، أنشطة"
+          },
+          "booking": {
+            "label": "حجوزات",
+            "hint": "مواعيد، خدمات، زبائن"
+          },
+          "ecommerce": {
+            "label": "متجر إلكتروني",
+            "hint": "منتجات، سلة، طلبات"
+          },
+          "healthcare": {
+            "label": "عيادة",
+            "hint": "مرضى، زيارات، سجلات"
+          },
+          "finance": {
+            "label": "محاسبة",
+            "hint": "حسابات، دفتر، ميزانيات"
+          }
         }
       },
       "history": {
@@ -4248,8 +5201,8 @@
       },
       "actions": {
         "generate": "التأسيس",
-        "regenerate": "يجدد",
-        "save": "[ترجمة المصطلح: Save]",
+        "regenerate": "إعادة التوليد",
+        "save": "حفظ",
         "export": "تصدير",
         "download": "تحميل",
         "preview": "معاينة",
@@ -4272,7 +5225,7 @@
         "noHistoryDescription": "ستظهر أجيالكم السابقة هنا.",
         "noTemplates": "لم يتم تحديد قوالب",
         "noTemplatesDescription": "تصفح السوق لبدء مشروعك.",
-        "noResults": "لا يوجد نتائج تطابق البحث !!!",
+        "noResults": "لا توجد نتائج تطابق بحثك",
         "noFavorites": "لا توجد تفضيلات",
         "noFavoritesDescription": "نجمة المشاريع للعثور عليها بسرعة."
       },
@@ -4292,11 +5245,11 @@
       },
       "status": {
         "idle": "جاهز",
-        "generating": "مولد كهربائي ، مولد طاقة",
+        "generating": "جارٍ التوليد…",
         "building": "بناء...",
         "success": "إكمال",
         "error": "فشل",
-        "saved": "[ترجمة المصطلح: Saved]"
+        "saved": "تم الحفظ"
       },
       "toasts": {
         "saved": "تم الحفظ بنجاح",
@@ -4389,8 +5342,8 @@
       },
       "actions": {
         "generate": "التأسيس",
-        "regenerate": "يجدد",
-        "save": "[ترجمة المصطلح: Save]",
+        "regenerate": "إعادة التوليد",
+        "save": "حفظ",
         "export": "تصدير",
         "download": "تحميل",
         "preview": "معاينة",
@@ -4413,7 +5366,7 @@
         "noHistoryDescription": "ستظهر أجيالكم السابقة هنا.",
         "noTemplates": "لم يتم تحديد قوالب",
         "noTemplatesDescription": "تصفح السوق لبدء مشروعك.",
-        "noResults": "لا يوجد نتائج تطابق البحث !!!",
+        "noResults": "لا توجد نتائج تطابق بحثك",
         "noFavorites": "لا توجد تفضيلات",
         "noFavoritesDescription": "نجمة المشاريع للعثور عليها بسرعة."
       },
@@ -4433,11 +5386,11 @@
       },
       "status": {
         "idle": "جاهز",
-        "generating": "مولد كهربائي ، مولد طاقة",
+        "generating": "جارٍ التوليد…",
         "building": "بناء...",
         "success": "إكمال",
         "error": "فشل",
-        "saved": "[ترجمة المصطلح: Saved]"
+        "saved": "تم الحفظ"
       },
       "toasts": {
         "saved": "تم الحفظ بنجاح",
@@ -4614,8 +5567,8 @@
       },
       "actions": {
         "generate": "التأسيس",
-        "regenerate": "يجدد",
-        "save": "[ترجمة المصطلح: Save]",
+        "regenerate": "إعادة التوليد",
+        "save": "حفظ",
         "export": "تصدير",
         "download": "تحميل",
         "preview": "معاينة",
@@ -4638,7 +5591,7 @@
         "noHistoryDescription": "ستظهر أجيالكم السابقة هنا.",
         "noTemplates": "لم يتم تحديد قوالب",
         "noTemplatesDescription": "تصفح السوق لبدء مشروعك.",
-        "noResults": "لا يوجد نتائج تطابق البحث !!!",
+        "noResults": "لا توجد نتائج تطابق بحثك",
         "noFavorites": "لا توجد تفضيلات",
         "noFavoritesDescription": "نجمة المشاريع للعثور عليها بسرعة."
       },
@@ -4658,11 +5611,11 @@
       },
       "status": {
         "idle": "جاهز",
-        "generating": "مولد كهربائي ، مولد طاقة",
+        "generating": "جارٍ التوليد…",
         "building": "بناء...",
         "success": "إكمال",
         "error": "فشل",
-        "saved": "[ترجمة المصطلح: Saved]"
+        "saved": "تم الحفظ"
       },
       "toasts": {
         "saved": "تم الحفظ بنجاح",
@@ -4761,8 +5714,8 @@
       },
       "actions": {
         "generate": "التأسيس",
-        "regenerate": "يجدد",
-        "save": "[ترجمة المصطلح: Save]",
+        "regenerate": "إعادة التوليد",
+        "save": "حفظ",
         "export": "تصدير",
         "download": "تحميل",
         "preview": "معاينة",
@@ -4785,7 +5738,7 @@
         "noHistoryDescription": "ستظهر أجيالكم السابقة هنا.",
         "noTemplates": "لم يتم تحديد قوالب",
         "noTemplatesDescription": "تصفح السوق لبدء مشروعك.",
-        "noResults": "لا يوجد نتائج تطابق البحث !!!",
+        "noResults": "لا توجد نتائج تطابق بحثك",
         "noFavorites": "لا توجد تفضيلات",
         "noFavoritesDescription": "نجمة المشاريع للعثور عليها بسرعة."
       },
@@ -4805,11 +5758,11 @@
       },
       "status": {
         "idle": "جاهز",
-        "generating": "مولد كهربائي ، مولد طاقة",
+        "generating": "جارٍ التوليد…",
         "building": "بناء...",
         "success": "إكمال",
         "error": "فشل",
-        "saved": "[ترجمة المصطلح: Saved]"
+        "saved": "تم الحفظ"
       },
       "toasts": {
         "saved": "تم الحفظ بنجاح",
@@ -5029,7 +5982,18 @@
         "savePrompt": "حفظ المطالبة",
         "noPrompts": "لم يتم حفظ أي مطالبات بعد",
         "noPromptsHint": "احفظ مطالبات قابلة لإعادة الاستخدام لوكلائك",
-        "usedTimes": "مستخدم {count} مرة"
+        "usedTimes": "مستخدم {count} مرة",
+        "categories": {
+          "general": "عام",
+          "business": "أعمال",
+          "marketing": "تسويق",
+          "content": "محتوى",
+          "design": "تصميم",
+          "development": "تطوير",
+          "seo": "تحسين محركات البحث",
+          "research": "بحث",
+          "automation": "أتمتة"
+        }
       },
       "editor": {
         "titleEdit": "تحرير الوكيل",
@@ -5081,8 +6045,8 @@
       },
       "actions": {
         "generate": "التأسيس",
-        "regenerate": "يجدد",
-        "save": "[ترجمة المصطلح: Save]",
+        "regenerate": "إعادة التوليد",
+        "save": "حفظ",
         "export": "تصدير",
         "download": "تحميل",
         "preview": "معاينة",
@@ -5105,7 +6069,7 @@
         "noHistoryDescription": "ستظهر أجيالكم السابقة هنا.",
         "noTemplates": "لم يتم تحديد قوالب",
         "noTemplatesDescription": "تصفح السوق لبدء مشروعك.",
-        "noResults": "لا يوجد نتائج تطابق البحث !!!",
+        "noResults": "لا توجد نتائج تطابق بحثك",
         "noFavorites": "لا توجد تفضيلات",
         "noFavoritesDescription": "نجمة المشاريع للعثور عليها بسرعة."
       },
@@ -5125,11 +6089,11 @@
       },
       "status": {
         "idle": "جاهز",
-        "generating": "مولد كهربائي ، مولد طاقة",
+        "generating": "جارٍ التوليد…",
         "building": "بناء...",
         "success": "إكمال",
         "error": "فشل",
-        "saved": "[ترجمة المصطلح: Saved]"
+        "saved": "تم الحفظ"
       },
       "toasts": {
         "saved": "تم الحفظ بنجاح",
@@ -5156,6 +6120,11 @@
         "designStyle": "نمط التصميم",
         "colorStyle": "نمط الألوان",
         "sections": "الأقسام",
+        "generationSpeed": "سرعة الإنشاء",
+        "speedFast": "سريع (موصى به)",
+        "speedStandard": "صفحة كاملة",
+        "speedFastHint": "أقسام أقل ومكوّنات مجمّعة — أسرع طريق للمعاينة.",
+        "speedStandardHint": "كل الأقسام المحددة كمكوّنات منفصلة — مخرجات أغنى.",
         "generateLandingPage": "إنشاء الصفحة المقصودة"
       },
       "placeholders": {
@@ -5165,7 +6134,9 @@
       },
       "generating": {
         "title": "جارٍ إنشاء صفحتك المقصودة...",
-        "subtitle": "عادةً ما يستغرق 30-90 ثانية",
+        "subtitle": "توليد متوازٍ — عادةً 2–4 دقائق",
+        "subtitleFast": "الوضع السريع — عادةً 1–3 دقائق",
+        "subtitleStandard": "صفحة كاملة — عادةً 3–6 دقائق",
         "ideaEvent": "[فكرة] فهم فكرة عملك...",
         "strategyEvent": "[استراتيجية] بناء استراتيجية التحويل..."
       },
@@ -5296,8 +6267,8 @@
       },
       "actions": {
         "generate": "التأسيس",
-        "regenerate": "يجدد",
-        "save": "[ترجمة المصطلح: Save]",
+        "regenerate": "إعادة التوليد",
+        "save": "حفظ",
         "export": "تصدير",
         "download": "تحميل",
         "preview": "معاينة",
@@ -5320,7 +6291,7 @@
         "noHistoryDescription": "ستظهر أجيالكم السابقة هنا.",
         "noTemplates": "لم يتم تحديد قوالب",
         "noTemplatesDescription": "تصفح السوق لبدء مشروعك.",
-        "noResults": "لا يوجد نتائج تطابق البحث !!!",
+        "noResults": "لا توجد نتائج تطابق بحثك",
         "noFavorites": "لا توجد تفضيلات",
         "noFavoritesDescription": "نجمة المشاريع للعثور عليها بسرعة."
       },
@@ -5340,11 +6311,11 @@
       },
       "status": {
         "idle": "جاهز",
-        "generating": "مولد كهربائي ، مولد طاقة",
+        "generating": "جارٍ التوليد…",
         "building": "بناء...",
         "success": "إكمال",
         "error": "فشل",
-        "saved": "[ترجمة المصطلح: Saved]"
+        "saved": "تم الحفظ"
       },
       "toasts": {
         "saved": "تم الحفظ بنجاح",
@@ -5461,277 +6432,294 @@
         "resultsHint": "{count} مكونات · اسحب إلى اللوحة أو انقر للإدراج"
       },
       "buttonEditor": {
-        "title": "Button properties",
-        "preview": "Live preview",
-        "text": "Text",
-        "labelPlaceholder": "Button label",
+        "title": "خصائص الزر",
+        "preview": "معاينة مباشرة",
+        "text": "النص",
+        "labelPlaceholder": "تسمية الزر",
         "link": {
-          "type": "Link type",
-          "internal": "Internal page",
-          "external": "External URL",
-          "email": "Email",
-          "phone": "Phone",
-          "anchor": "Anchor (#section)",
-          "placeholder": "Enter link value"
+          "type": "نوع الرابط",
+          "internal": "صفحة داخلية",
+          "external": "رابط URL خارجي",
+          "email": "البريد الإلكتروني",
+          "phone": "الهاتف",
+          "anchor": "مرساة (#section)",
+          "placeholder": "أدخل قيمة الرابط"
         },
-        "target": "Open in",
-        "targetSame": "Same tab",
-        "targetNew": "New tab",
-        "style": "Style",
+        "target": "الفتح في",
+        "targetSame": "نفس التبويب",
+        "targetNew": "تبويب جديد",
+        "style": "النمط",
         "styles": {
-          "primary": "Primary",
-          "secondary": "Secondary",
-          "outline": "Outline",
-          "ghost": "Ghost",
-          "text": "Text"
+          "primary": "أساسي",
+          "secondary": "ثانوي",
+          "outline": "إطار",
+          "ghost": "شفاف",
+          "text": "نص"
         },
-        "size": "Size",
+        "size": "الحجم",
         "sizes": {
-          "sm": "Small",
-          "md": "Medium",
-          "lg": "Large"
+          "sm": "صغير",
+          "md": "متوسط",
+          "lg": "كبير"
         },
-        "width": "Width",
-        "widthAuto": "Auto",
-        "widthFull": "Full width",
-        "radius": "Border radius",
-        "radiusSquare": "Square",
-        "radiusRounded": "Rounded",
-        "radiusPill": "Pill",
-        "radiusCustom": "Custom",
-        "radiusCustomPx": "Custom radius (px)",
-        "colors": "Colors",
-        "colorBackground": "Background",
-        "colorText": "Text",
-        "colorBorder": "Border",
-        "colorHoverBackground": "Hover background",
-        "colorHoverText": "Hover text",
-        "typography": "Typography",
-        "fontSize": "Font size",
-        "letterSpacing": "Letter spacing",
-        "spacing": "Spacing",
-        "padding": "Padding",
-        "margin": "Margin",
-        "icon": "Icon",
-        "iconNone": "None",
-        "iconLeft": "Left icon",
-        "iconRight": "Right icon",
-        "iconRemove": "Remove icon",
-        "accessibility": "Accessibility",
-        "disabledState": "Disabled",
+        "width": "العرض",
+        "widthAuto": "تلقائي",
+        "widthFull": "عرض كامل",
+        "radius": "نصف قطر الحافة",
+        "radiusSquare": "مربّع",
+        "radiusRounded": "مستدير",
+        "radiusPill": "حبة دوائية",
+        "radiusCustom": "مخصص",
+        "radiusCustomPx": "نصف قطر مخصص (px)",
+        "colors": "الألوان",
+        "colorBackground": "الخلفية",
+        "colorText": "النص",
+        "colorBorder": "الحدود",
+        "colorHoverBackground": "خلفية التحويم",
+        "colorHoverText": "نص التحويم",
+        "typography": "الخطوط",
+        "fontSize": "حجم الخط",
+        "letterSpacing": "تباعد الحروف",
+        "spacing": "التباعد",
+        "padding": "الحشو الداخلي",
+        "margin": "الهامش",
+        "icon": "الأيقونة",
+        "iconNone": "بدون",
+        "iconLeft": "أيقونة يسار",
+        "iconRight": "أيقونة يمين",
+        "iconRemove": "إزالة الأيقونة",
+        "accessibility": "إمكانية الوصول",
+        "disabledState": "معطّل",
         "states": {
-          "normal": "Normal",
-          "hover": "Hover",
-          "disabled": "Disabled"
+          "normal": "عادي",
+          "hover": "تحويم",
+          "disabled": "معطّل"
         },
-        "history": "Edit button"
+        "history": "تحرير الزر"
       },
       "linkEditor": {
-        "title": "Link properties",
-        "preview": "Live preview",
-        "label": "Label",
-        "labelPlaceholder": "Link label",
-        "linkType": "Link type",
-        "hrefPlaceholder": "Enter link value",
-        "target": "Open in",
-        "targetSame": "Same tab",
-        "targetNew": "New tab",
-        "rel": "Link rel attributes",
-        "history": "Edit link",
-        "validationBlocked": "Fix invalid links before saving",
+        "title": "خصائص الرابط",
+        "preview": "معاينة مباشرة",
+        "label": "التسمية",
+        "labelPlaceholder": "تسمية الرابط",
+        "linkType": "نوع الرابط",
+        "hrefPlaceholder": "أدخل قيمة الرابط",
+        "target": "الفتح في",
+        "targetSame": "نفس التبويب",
+        "targetNew": "تبويب جديد",
+        "rel": "سمات rel للرابط",
+        "history": "تحرير الرابط",
+        "validationBlocked": "أصلِح الروابط غير الصالحة قبل الحفظ",
         "types": {
-          "internal": "Internal page",
-          "external": "External URL",
-          "email": "Email",
-          "phone": "Phone",
+          "internal": "صفحة داخلية",
+          "external": "رابط URL خارجي",
+          "email": "البريد الإلكتروني",
+          "phone": "الهاتف",
           "whatsapp": "WhatsApp",
           "telegram": "Telegram",
-          "anchor": "Anchor (#section)",
-          "download": "File download"
+          "anchor": "مرساة (#section)",
+          "download": "تنزيل ملف"
         }
       },
       "iconEditor": {
-        "title": "Icon properties",
-        "preview": "Live preview",
-        "library": "Icon library",
-        "position": "Position",
-        "positionNone": "None",
-        "positionLeft": "Left",
-        "positionRight": "Right",
-        "positionTop": "Top",
-        "positionBottom": "Bottom",
-        "variant": "Style",
-        "variantOutline": "Outline",
-        "variantFilled": "Filled",
-        "variantDuotone": "Duotone",
-        "size": "Size",
-        "sizeCustom": "Custom",
-        "customSizePx": "Custom size (px)",
-        "colors": "Colors",
-        "colorNormal": "Normal",
-        "colorHover": "Hover",
-        "colorDisabled": "Disabled",
-        "background": "Background",
-        "backgroundNone": "None",
-        "backgroundCircle": "Circle",
-        "backgroundRounded": "Rounded square",
-        "backgroundSquare": "Square",
-        "backgroundColor": "Background color",
-        "border": "Border",
-        "borderWidth": "Width",
-        "borderColor": "Color",
-        "borderRadius": "Radius",
-        "spacing": "Spacing",
-        "margin": "Margin",
-        "padding": "Padding",
-        "rotation": "Rotation",
-        "rotationCustom": "Custom",
-        "customRotationDeg": "Custom degrees",
-        "accessibility": "Accessibility",
-        "decorative": "Decorative icon (hide from screen readers)",
-        "history": "Edit icon",
+        "title": "خصائص الأيقونة",
+        "preview": "معاينة مباشرة",
+        "library": "مكتبة الأيقونات",
+        "position": "الموضع",
+        "positionNone": "بدون",
+        "positionLeft": "يسار",
+        "positionRight": "يمين",
+        "positionTop": "أعلى",
+        "positionBottom": "أسفل",
+        "variant": "النمط",
+        "variantOutline": "إطار",
+        "variantFilled": "مملوء",
+        "variantDuotone": "ثنائي اللون",
+        "size": "الحجم",
+        "sizeCustom": "مخصص",
+        "customSizePx": "حجم مخصص (px)",
+        "colors": "الألوان",
+        "colorNormal": "عادي",
+        "colorHover": "تحويم",
+        "colorDisabled": "معطّل",
+        "background": "الخلفية",
+        "backgroundNone": "بدون",
+        "backgroundCircle": "دائرة",
+        "backgroundRounded": "مربع مستدير",
+        "backgroundSquare": "مربّع",
+        "backgroundColor": "لون الخلفية",
+        "border": "الحدود",
+        "borderWidth": "العرض",
+        "borderColor": "اللون",
+        "borderRadius": "نصف القطر",
+        "spacing": "التباعد",
+        "margin": "الهامش",
+        "padding": "الحشو الداخلي",
+        "rotation": "الدوران",
+        "rotationCustom": "مخصص",
+        "customRotationDeg": "درجات مخصصة",
+        "accessibility": "إمكانية الوصول",
+        "decorative": "أيقونة زخرفية (إخفاؤها عن قارئات الشاشة)",
+        "history": "تحرير الأيقونة",
         "states": {
-          "normal": "Normal",
-          "hover": "Hover",
-          "disabled": "Disabled"
+          "normal": "عادي",
+          "hover": "تحويم",
+          "disabled": "معطّل"
         }
       },
       "sectionEditor": {
-        "title": "Section",
-        "preview": "Live preview",
-        "position": "Position",
-        "hiddenOnViewport": "Hidden on this viewport",
-        "operations": "Section actions",
-        "insertBefore": "Insert before",
-        "insertAfter": "Insert after",
-        "insertAtEnd": "Insert at end",
-        "fromTemplates": "From templates",
-        "duplicate": "Duplicate",
-        "delete": "Delete",
-        "deleteTitle": "Delete section?",
-        "deleteBody": "This removes the section from the page. You can undo with Ctrl+Z before saving.",
-        "deleted": "Section removed — undo to restore",
-        "cancel": "Cancel",
-        "move": "Move",
-        "moveUp": "Move up",
-        "moveDown": "Move down",
-        "visibility": "Visibility",
-        "visibilityShow": "Show",
-        "visibilityHide": "Hide",
-        "visibilityDesktop": "Desktop only",
-        "visibilityTablet": "Tablet only",
-        "visibilityMobile": "Mobile only",
-        "layout": "Layout",
-        "widthFull": "Full width",
-        "widthBoxed": "Boxed",
-        "widthContainer": "Container",
-        "alignLeft": "Left",
-        "alignCenter": "Center",
-        "alignRight": "Right",
-        "alignStretch": "Stretch",
-        "columns": "Columns",
-        "gap": "Gap",
-        "settings": "Section settings",
+        "title": "القسم",
+        "preview": "معاينة مباشرة",
+        "position": "الموضع",
+        "hiddenOnViewport": "مخفي في هذه النافذة المعروضة",
+        "operations": "إجراءات القسم",
+        "insertBefore": "إدراج قبل",
+        "insertAfter": "إدراج بعد",
+        "insertAtEnd": "إدراج في النهاية",
+        "fromTemplates": "من القوالب",
+        "duplicate": "تكرار",
+        "delete": "حذف",
+        "deleteTitle": "حذف القسم؟",
+        "deleteBody": "يزيل هذا القسم من الصفحة. يمكنك التراجع بـ Ctrl+Z قبل الحفظ.",
+        "deleted": "تمت إزالة القسم — تراجع للاستعادة",
+        "cancel": "إلغاء",
+        "move": "نقل",
+        "moveUp": "نقل لأعلى",
+        "moveDown": "نقل لأسفل",
+        "visibility": "الظهور",
+        "visibilityShow": "إظهار",
+        "visibilityHide": "إخفاء",
+        "visibilityDesktop": "سطح المكتب فقط",
+        "visibilityTablet": "الجهاز اللوحي فقط",
+        "visibilityMobile": "الجوال فقط",
+        "layout": "التخطيط",
+        "widthFull": "عرض كامل",
+        "widthBoxed": "محدد بإطار",
+        "widthContainer": "حاوية",
+        "alignLeft": "يسار",
+        "alignCenter": "وسط",
+        "alignRight": "يمين",
+        "alignStretch": "تمديد",
+        "columns": "الأعمدة",
+        "gap": "الفجوة",
+        "settings": "إعدادات القسم",
         "htmlId": "HTML ID",
-        "anchor": "Anchor",
-        "cssClasses": "CSS classes",
-        "customAttributes": "Custom attributes",
-        "styling": "Styling",
-        "padding": "Padding",
-        "margin": "Margin",
-        "borderWidth": "Border width",
-        "borderColor": "Border color",
-        "radius": "Radius",
-        "shadow": "Shadow",
-        "opacity": "Opacity",
+        "anchor": "المرساة",
+        "cssClasses": "فئات CSS",
+        "customAttributes": "سمات مخصصة",
+        "styling": "التنسيق",
+        "padding": "الحشو الداخلي",
+        "margin": "الهامش",
+        "borderWidth": "عرض الحدود",
+        "borderColor": "لون الحدود",
+        "radius": "نصف القطر",
+        "shadow": "الظل",
+        "opacity": "الشفافية",
         "zIndex": "Z-index",
-        "overflowVisible": "Visible",
-        "overflowHidden": "Hidden",
-        "overflowAuto": "Auto",
-        "overflowScroll": "Scroll",
-        "animation": "Animation",
-        "animNone": "None",
-        "animFade": "Fade",
-        "animSlide": "Slide",
-        "animZoom": "Zoom",
-        "duration": "Duration (ms)",
-        "delay": "Delay (ms)",
-        "background": "Background",
-        "ai": "AI actions",
-        "aiImprove": "Improve",
-        "aiRegenerate": "Regenerate",
-        "aiRewrite": "Rewrite",
-        "aiMoreItems": "More items",
-        "aiQueued": "Queue AI section edit",
-        "aiQueuedHint": "AI action queued — save to apply",
-        "history": "Edit section",
-        "historyMove": "Move section"
+        "overflowVisible": "مرئي",
+        "overflowHidden": "مخفي",
+        "overflowAuto": "تلقائي",
+        "overflowScroll": "تمرير",
+        "animation": "الحركة",
+        "animNone": "بدون",
+        "animFade": "تلاشي",
+        "animSlide": "انزلاق",
+        "animZoom": "تكبير",
+        "duration": "المدة (ms)",
+        "delay": "التأخير (ms)",
+        "background": "الخلفية",
+        "ai": "إجراءات الذكاء الاصطناعي",
+        "aiImprove": "تحسين",
+        "aiRegenerate": "إعادة الإنشاء",
+        "aiRewrite": "إعادة الصياغة",
+        "aiMoreItems": "المزيد من العناصر",
+        "aiQueued": "إضافة تعديل قسم بالذكاء الاصطناعي إلى القائمة",
+        "aiQueuedHint": "أُضيف إجراء الذكاء الاصطناعي إلى القائمة — احفظ للتطبيق",
+        "history": "تحرير القسم",
+        "historyMove": "نقل القسم"
       },
       "backgroundEditor": {
-        "title": "Background image",
-        "preview": "Live preview",
-        "source": "Background source",
-        "upload": "Upload",
-        "mediaLibrary": "Media library",
-        "aiGenerate": "AI image",
-        "aiHint": "Pick an AI-generated image from the media library",
-        "remove": "Remove",
-        "urlPlaceholder": "Image URL",
-        "displayMode": "Display mode",
-        "position": "Position",
-        "positionX": "Custom X",
-        "positionY": "Custom Y",
-        "overlay": "Overlay",
-        "overlayEnabled": "Enable overlay",
-        "overlaySolid": "Solid",
-        "overlayGradient": "Gradient",
-        "overlayNone": "None",
-        "overlayColor": "Overlay color",
-        "overlayOpacity": "Opacity %",
-        "overlayGradientValue": "Gradient CSS",
-        "overlayBlur": "Overlay blur (px)",
-        "effects": "Effects",
-        "brightness": "Brightness",
-        "contrast": "Contrast",
-        "saturation": "Saturation",
-        "grayscale": "Grayscale",
-        "blur": "Blur",
-        "parallax": "Parallax",
-        "parallaxOn": "Enable parallax",
-        "borderRadius": "Border radius",
-        "sectionHeight": "Section height",
-        "customHeightPx": "Custom height (px)",
-        "mobile": "Mobile settings",
-        "hideOnMobile": "Hide background on mobile",
-        "mobileUrlPlaceholder": "Mobile image URL (optional)",
-        "accessibility": "Accessibility",
-        "decorative": "Decorative background",
-        "altPlaceholder": "Alt text",
-        "history": "Edit background",
+        "title": "صورة الخلفية",
+        "preview": "معاينة مباشرة",
+        "source": "مصدر الخلفية",
+        "upload": "رفع",
+        "mediaLibrary": "مكتبة الوسائط",
+        "aiGenerate": "صورة بالذكاء الاصطناعي",
+        "aiHint": "اختر صورة مُنشأة بالذكاء الاصطناعي من مكتبة الوسائط",
+        "remove": "إزالة",
+        "urlPlaceholder": "رابط URL للصورة",
+        "displayMode": "وضع العرض",
+        "position": "الموضع",
+        "positionX": "X مخصص",
+        "positionY": "Y مخصص",
+        "overlay": "الطبقة العلوية",
+        "overlayEnabled": "تفعيل الطبقة العلوية",
+        "overlaySolid": "صلب",
+        "overlayGradient": "تدرّج",
+        "overlayNone": "بدون",
+        "overlayColor": "لون الطبقة العلوية",
+        "overlayOpacity": "الشفافية %",
+        "overlayGradientValue": "تدرّج CSS",
+        "overlayBlur": "ضبابية الطبقة (px)",
+        "effects": "التأثيرات",
+        "brightness": "السطوع",
+        "contrast": "التباين",
+        "saturation": "التشبّع",
+        "grayscale": "تدرج رمادي",
+        "blur": "ضبابية",
+        "parallax": "المنظور المتوازي",
+        "parallaxOn": "تفعيل المنظور المتوازي",
+        "borderRadius": "نصف قطر الحافة",
+        "sectionHeight": "ارتفاع القسم",
+        "customHeightPx": "ارتفاع مخصص (px)",
+        "mobile": "إعدادات الجوال",
+        "hideOnMobile": "إخفاء الخلفية على الجوال",
+        "mobileUrlPlaceholder": "رابط URL لصورة الجوال (اختياري)",
+        "accessibility": "إمكانية الوصول",
+        "decorative": "خلفية زخرفية",
+        "altPlaceholder": "النص البديل",
+        "history": "تحرير الخلفية",
         "modes": {
-          "cover": "Cover",
-          "contain": "Contain",
-          "fill": "Fill",
-          "fitWidth": "Fit width",
-          "fitHeight": "Fit height",
-          "repeat": "Repeat",
-          "noRepeat": "No repeat"
+          "cover": "تغطية",
+          "contain": "احتواء",
+          "fill": "ملء",
+          "fitWidth": "ملاءمة العرض",
+          "fitHeight": "ملاءمة الارتفاع",
+          "repeat": "تكرار",
+          "noRepeat": "بدون تكرار"
         },
         "positions": {
-          "center": "Center",
-          "top": "Top",
-          "bottom": "Bottom",
-          "left": "Left",
-          "right": "Right",
-          "custom": "Custom"
+          "center": "وسط",
+          "top": "أعلى",
+          "bottom": "أسفل",
+          "left": "يسار",
+          "right": "يمين",
+          "custom": "مخصص"
         },
         "heights": {
-          "auto": "Auto",
-          "sm": "Small",
-          "md": "Medium",
-          "lg": "Large",
-          "fullscreen": "Full screen",
-          "custom": "Custom"
+          "auto": "تلقائي",
+          "sm": "صغير",
+          "md": "متوسط",
+          "lg": "كبير",
+          "fullscreen": "شاشة كاملة",
+          "custom": "مخصص"
+        }
+      },
+      "iconPicker": {
+        "searchPlaceholder": "البحث عن أيقونات…",
+        "empty": "لم يتم العثور على أيقونات",
+        "addFavorite": "إضافة إلى المفضلة",
+        "removeFavorite": "إزالة من المفضلة",
+        "categories": {
+          "all": "الكل",
+          "favorites": "المفضلة",
+          "recent": "الأخيرة",
+          "arrows": "أسهم",
+          "communication": "تواصل",
+          "business": "أعمال",
+          "social": "اجتماعي",
+          "interface": "واجهة",
+          "media": "وسائط"
         }
       }
     },
@@ -5827,31 +6815,31 @@
       "openWebsiteBuilder": "فتح منشئ المواقع",
       "searchPlaceholder": "ابحث عن مطاعم، SaaS، مالية...",
       "allCategories": "جميع الفئات",
-      "allAvailability": "All templates",
-      "installedOnly": "Installed only",
-      "remoteOnlyFilter": "Remote only",
-      "tagsFilter": "Tags",
-      "featured": "Featured",
-      "featuredSection": "Featured templates",
-      "installed": "Installed",
-      "remote": "Remote",
-      "remoteOnly": "Remote only",
-      "remoteOnlyHint": "Install this template in Website Builder to use it. Remote downloads are not available yet.",
+      "allAvailability": "كل القوالب",
+      "installedOnly": "المثبّتة فقط",
+      "remoteOnlyFilter": "عن بُعد فقط",
+      "tagsFilter": "الوسوم",
+      "featured": "مميز",
+      "featuredSection": "قوالب مميزة",
+      "installed": "مثبّت",
+      "remote": "عن بُعد",
+      "remoteOnly": "عن بُعد فقط",
+      "remoteOnlyHint": "ثبّت هذا القالب في منشئ المواقع لاستخدامه. التنزيلات عن بُعد غير متاحة بعد.",
       "popular": "شائع",
       "library": "المكتبة",
       "loading": "جارٍ تحميل السوق...",
       "noResults": "لا توجد قوالب تطابق هذه الفلاتر.",
-      "createFirst": "Create First Template",
-      "createUnavailable": "Template creation is not available yet.",
+      "createFirst": "إنشاء أول قالب",
+      "createUnavailable": "إنشاء القوالب غير متاح بعد.",
       "previewTitle": "معاينة القالب",
       "previewDescription": "معاينة هيكلية حية قبل الإنشاء.",
       "previewUnavailable": "المعاينة غير متاحة",
       "previewIframe": "معاينة القالب",
-      "details": "Details",
-      "metadataSection": "Author & tags",
-      "categoryLabel": "Category · {category}",
-      "authorLabel": "Author · {author}",
-      "regionsPages": "{regions} regions · {pages} pages",
+      "details": "التفاصيل",
+      "metadataSection": "المؤلف والوسوم",
+      "categoryLabel": "الفئة · {category}",
+      "authorLabel": "المؤلف · {author}",
+      "regionsPages": "{regions} مناطق · {pages} صفحات",
       "intelligence": "الذكاء",
       "industry": "الصناعة",
       "style": "النمط",
@@ -5861,24 +6849,24 @@
       "pipelineHint": "يربط التصميم · العلامة التجارية · الأصول · المحرر · الجودة",
       "useThisTemplate": "استخدم هذا القالب",
       "preview": "معاينة",
-      "close": "Close",
+      "close": "إغلاق",
       "use": "استخدام",
-      "install": "Install",
-      "installToUse": "Install this template to enable Use",
-      "installSuccess": "{name} installed — ready to use",
-      "installAlreadyDone": "{name} is already installed",
-      "installComingSoon": "Installation coming soon",
-      "notInstalled": "Not installed",
+      "install": "تثبيت",
+      "installToUse": "ثبّت هذا القالب لتفعيل الاستخدام",
+      "installSuccess": "تم تثبيت {name} — جاهز للاستخدام",
+      "installAlreadyDone": "{name} مثبّت بالفعل",
+      "installComingSoon": "التثبيت قريبًا",
+      "notInstalled": "غير مثبّت",
       "layoutLabel": "تخطيط · {type}",
       "audienceLabel": "جمهور · {audience}",
       "featuresLabel": "ميزات · {features}",
       "badgeScore": "{score}% : {reason}",
       "sort": {
-        "featured": "Featured first",
-        "name-asc": "Name (A–Z)",
-        "name-desc": "Name (Z–A)",
-        "released-desc": "Newest",
-        "category-asc": "Category"
+        "featured": "المميز أولًا",
+        "name-asc": "الاسم (أ–ي)",
+        "name-desc": "الاسم (ي–أ)",
+        "released-desc": "الأحدث",
+        "category-asc": "الفئة"
       },
       "viewports": {
         "desktop": "سطح المكتب",
@@ -5889,7 +6877,7 @@
         "loadFailed": "فشل تحميل السوق",
         "previewFailed": "فشلت المعاينة",
         "recommendFailed": "فشلت التوصية",
-        "installFailed": "Template installation failed"
+        "installFailed": "فشل تثبيت القالب"
       },
       "allStyles": "جميع الأنماط",
       "aiRecommendations": "توصيات القوالب بالذكاء الاصطناعي",
@@ -6072,9 +7060,9 @@
         "import": "استيراد",
         "export": "تصدير",
         "refresh": "تحديث",
-        "filter": "[ترجمة المصطلح: Filter]",
+        "filter": "تصفية",
         "search": "بحث",
-        "save": "[ترجمة المصطلح: Save]",
+        "save": "حفظ",
         "cancel": "إلغاء",
         "delete": "حذف",
         "edit": "تحرير",
@@ -6240,9 +7228,9 @@
         "import": "استيراد",
         "export": "تصدير",
         "refresh": "تحديث",
-        "filter": "[ترجمة المصطلح: Filter]",
+        "filter": "تصفية",
         "search": "بحث",
-        "save": "[ترجمة المصطلح: Save]",
+        "save": "حفظ",
         "cancel": "إلغاء",
         "delete": "حذف",
         "edit": "تحرير",
@@ -6431,9 +7419,9 @@
         "import": "استيراد",
         "export": "تصدير",
         "refresh": "تحديث",
-        "filter": "[ترجمة المصطلح: Filter]",
+        "filter": "تصفية",
         "search": "بحث",
-        "save": "[ترجمة المصطلح: Save]",
+        "save": "حفظ",
         "cancel": "إلغاء",
         "delete": "حذف",
         "edit": "تحرير",
@@ -6583,9 +7571,9 @@
         "import": "استيراد",
         "export": "تصدير",
         "refresh": "تحديث",
-        "filter": "[ترجمة المصطلح: Filter]",
+        "filter": "تصفية",
         "search": "بحث",
-        "save": "[ترجمة المصطلح: Save]",
+        "save": "حفظ",
         "cancel": "إلغاء",
         "delete": "حذف",
         "edit": "تحرير",
@@ -7591,7 +8579,7 @@
         "investors": "المستثمرون"
       },
       "languages": {
-        "english": "‫المرجع: CCF/107/d488‬",
+        "english": "الإنجليزية",
         "spanish": "الإسبانية",
         "french": "الفرنسية",
         "german": "الألمانية",

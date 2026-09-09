@@ -1,5 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
 import { isWebAppPublicPublishEnabled } from "@/lib/ai-core/app-design-platform/deploy";
+import {
+  appPreviewSecurityHeaders,
+  sanitizeAppPreviewHtml,
+  sanitizeTrustedInteractivePreviewHtml,
+} from "@/lib/webapp/sanitize-app-preview-html";
+import { injectPublicAppDemoBanner } from "@/lib/webapp/public-demo-banner";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -7,19 +13,18 @@ export const runtime = "nodejs";
 
 type RouteContext = { params: Promise<{ slug: string }> };
 
-function publicAppHeaders() {
-  return {
-    "Content-Type": "text/html; charset=utf-8",
-    "Cache-Control": "public, max-age=60, s-maxage=300",
-    "Content-Security-Policy":
-      "default-src 'none'; style-src 'unsafe-inline'; img-src data: https: blob:; base-uri 'none'; form-action 'none'; frame-ancestors 'self'",
-    "X-Content-Type-Options": "nosniff",
-    "Referrer-Policy": "strict-origin-when-cross-origin",
-  };
+function publicAppHeaders(interactive: boolean) {
+  return appPreviewSecurityHeaders({
+    cacheControl: "public, max-age=60, s-maxage=300",
+    referrerPolicy: "strict-origin-when-cross-origin",
+    frameOptions: "SAMEORIGIN",
+    interactive,
+  });
 }
 
 /**
- * Public hosted App Builder URL — static HTML sandbox (not a Node Next.js host).
+ * Public hosted App Builder URL — interactive in-memory preview sandbox
+ * (not a Node Next.js host / database).
  */
 export async function GET(_request: Request, context: RouteContext) {
   const { slug: rawSlug } = await context.params;
@@ -51,8 +56,18 @@ export async function GET(_request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Published app not found." }, { status: 404 });
   }
 
-  return new NextResponse(data.preview_html, {
+  const interactive =
+    data.preview_html.includes('data-preview-trusted="1"') &&
+    data.preview_html.includes("__PREVIEW_RUNTIME__");
+  const html = interactive
+    ? sanitizeTrustedInteractivePreviewHtml(data.preview_html)
+    : sanitizeAppPreviewHtml(data.preview_html);
+  const withDemo = injectPublicAppDemoBanner(html, {
+    title: typeof data.title === "string" ? data.title : null,
+  });
+
+  return new NextResponse(withDemo, {
     status: 200,
-    headers: publicAppHeaders(),
+    headers: publicAppHeaders(interactive),
   });
 }

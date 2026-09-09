@@ -98,6 +98,34 @@ export const WEBAPP_TYPES: WebAppTypeDefinition[] = [
     defaultFeatures: ["auth", "products", "orders", "customers", "analytics", "settings"],
   },
   {
+    id: "real-estate",
+    label: "Real Estate",
+    description: "Property listings, inquiries, and agent workflows",
+    icon: Building2,
+    defaultFeatures: ["auth", "listings", "search", "maps", "inquiries", "profiles"],
+  },
+  {
+    id: "healthcare",
+    label: "Healthcare",
+    description: "Patients, appointments, clinical records, and staff roles",
+    icon: ClipboardList,
+    defaultFeatures: ["auth", "patients", "appointments", "records", "roles", "notifications"],
+  },
+  {
+    id: "finance",
+    label: "Finance",
+    description: "Accounts, transactions, budgets, and financial reports",
+    icon: CreditCard,
+    defaultFeatures: ["auth", "accounts", "transactions", "budgets", "reports", "roles"],
+  },
+  {
+    id: "automotive",
+    label: "Automotive",
+    description: "Vehicle inventory, sales leads, and service bookings",
+    icon: Wrench,
+    defaultFeatures: ["auth", "inventory", "leads", "bookings", "search", "filters"],
+  },
+  {
     id: "custom",
     label: "Custom Web App",
     description: "Build any custom web application with your own requirements",
@@ -152,6 +180,26 @@ export function getWebAppType(id: string): WebAppTypeDefinition | undefined {
 
 export function getWebAppTypeLabel(id: string): string {
   return WEBAPP_TYPES.find((t) => t.id === id)?.label ?? id;
+}
+
+/** Maps App Design Platform template ids to builder app-type presets. */
+export const APP_TEMPLATE_TO_WEBAPP_TYPE: Record<string, string> = {
+  restaurant: "pos",
+  ecommerce: "ecommerce-admin",
+  booking: "booking",
+  crm: "crm",
+  erp: "erp",
+  inventory: "inventory",
+  "saas-dashboard": "saas",
+  education: "lms",
+  "real-estate": "real-estate",
+  automotive: "automotive",
+  healthcare: "healthcare",
+  finance: "finance",
+};
+
+export function getWebappTypeForTemplate(templateId: string): string {
+  return APP_TEMPLATE_TO_WEBAPP_TYPE[templateId] ?? "custom";
 }
 
 export type WebAppLanguage = string;

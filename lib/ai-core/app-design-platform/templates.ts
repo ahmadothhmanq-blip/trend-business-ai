@@ -89,8 +89,8 @@ function role(
 export const APP_TEMPLATES: AppTemplateDefinition[] = [
   {
     id: "restaurant",
-    label: "Restaurant App",
-    description: "Menus, orders, tables, and kitchen workflow for restaurants",
+    label: "POS & Order Management",
+    description: "Menus, live orders, tables, and kitchen workflow",
     industry: "Food & Hospitality",
     architecture: "pos-retail",
     defaultFeatures: ["auth", "dashboard", "products", "orders", "payments", "notifications"],
@@ -101,7 +101,7 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
       screen("Orders", "/orders", "Live order board", ["orders-list", "filters", "status-badge"], ["Order"], ["admin", "manager", "employee"], 3),
       screen("Tables", "/tables", "Floor and table status", ["map", "status-badge"], ["Table"], ["admin", "manager", "employee"], 4),
       screen("Kitchen", "/kitchen", "Kitchen display system", ["orders-list", "notifications"], ["Order"], ["employee"], 5),
-      screen("Settings", "/settings", "Restaurant branding and preferences", ["form", "brand-panel"], ["Settings"], ["admin"], 6),
+      screen("Settings", "/settings", "Restaurant branding and preferences", ["form", "brand-panel"], [], ["admin"], 6),
     ],
     navigation: [
       { label: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
@@ -130,9 +130,11 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
         { name: "menuItemId", type: "relation", relationTo: "MenuItem", required: true },
         { name: "quantity", type: "number", required: true },
         { name: "price", type: "money" },
+        { name: "notes", type: "string" },
       ]),
       model("Table", "Table", [
         { name: "number", type: "number", required: true, unique: true },
+        { name: "name", type: "string" },
         { name: "seats", type: "number" },
         { name: "status", type: "enum", enumValues: ["free", "occupied", "reserved"] },
       ]),
@@ -146,6 +148,7 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
     workflows: [
       { name: "Order lifecycle", trigger: "new-order", steps: ["create", "send-kitchen", "prepare", "serve", "pay"], roles: ["employee", "manager"] },
       { name: "Menu update", trigger: "menu-edit", steps: ["edit-item", "publish"], roles: ["manager", "admin"] },
+      { name: "Table turn", trigger: "table-clear", steps: ["clear", "ready", "seat"], roles: ["employee"] },
     ],
     componentTypes: ["auth", "dashboard", "products", "orders", "payments", "forms", "tables", "charts", "notifications", "filters"],
     designSystem: baseTokens("#C45C26", "#1F2937", "#F59E0B", "#FFF7ED", "#1C1917", "#FFFFFF"),
@@ -153,8 +156,8 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
   },
   {
     id: "ecommerce",
-    label: "Ecommerce App",
-    description: "Products, cart, checkout, and order management",
+    label: "Online Store & Checkout",
+    description: "Product catalog, cart, checkout, and order fulfillment",
     industry: "Retail & Commerce",
     architecture: "marketplace",
     defaultFeatures: ["auth", "dashboard", "products", "orders", "payments", "search", "reviews"],
@@ -184,15 +187,26 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
         { name: "imageUrl", type: "image" },
         { name: "category", type: "string" },
       ]),
+      model("CartItem", "Cart Item", [
+        { name: "productId", type: "relation", relationTo: "Product", required: true },
+        { name: "quantity", type: "number", required: true },
+        { name: "unitPrice", type: "money" },
+        { name: "notes", type: "string" },
+        { name: "addedAt", type: "date" },
+      ]),
       model("Order", "Order", [
-        { name: "customerId", type: "relation", relationTo: "User" },
+        { name: "customerEmail", type: "string", required: true },
         { name: "status", type: "enum", enumValues: ["pending", "paid", "shipped", "delivered", "cancelled"] },
         { name: "total", type: "money" },
+        { name: "shippingAddress", type: "string" },
+        { name: "placedAt", type: "date" },
       ]),
       model("Review", "Review", [
         { name: "productId", type: "relation", relationTo: "Product" },
         { name: "rating", type: "number", required: true },
         { name: "comment", type: "string" },
+        { name: "authorName", type: "string" },
+        { name: "published", type: "boolean", defaultValue: true },
       ]),
     ],
     roles: [
@@ -203,6 +217,7 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
     workflows: [
       { name: "Checkout", trigger: "checkout", steps: ["validate-cart", "payment", "create-order", "notify"], roles: ["customer"] },
       { name: "Fulfillment", trigger: "order-paid", steps: ["pick", "pack", "ship", "deliver"], roles: ["manager"] },
+      { name: "Review moderation", trigger: "new-review", steps: ["submit", "moderate", "publish"], roles: ["manager"] },
     ],
     componentTypes: ["auth", "products", "orders", "payments", "forms", "tables", "charts", "search", "filters", "reviews", "dashboards"],
     designSystem: baseTokens("#2563EB", "#0F172A", "#F97316", "#F8FAFC", "#0F172A", "#FFFFFF"),
@@ -210,8 +225,8 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
   },
   {
     id: "booking",
-    label: "Booking App",
-    description: "Appointments, availability, and calendar scheduling",
+    label: "Appointments & Scheduling",
+    description: "Calendar, availability, services, and booking flow",
     industry: "Services",
     architecture: "booking-calendar",
     defaultFeatures: ["auth", "calendar", "bookings", "notifications", "payments", "profiles"],
@@ -236,17 +251,29 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
         { name: "name", type: "string", required: true },
         { name: "durationMin", type: "number", required: true },
         { name: "price", type: "money" },
+        { name: "description", type: "string" },
+        { name: "active", type: "boolean", defaultValue: true },
+      ]),
+      model("Customer", "Customer", [
+        { name: "name", type: "string", required: true },
+        { name: "email", type: "string", required: true },
+        { name: "phone", type: "string" },
+        { name: "notes", type: "string" },
+        { name: "preferredLanguage", type: "string" },
       ]),
       model("Booking", "Booking", [
         { name: "serviceId", type: "relation", relationTo: "Service" },
         { name: "customerId", type: "relation", relationTo: "Customer" },
         { name: "startsAt", type: "date", required: true },
         { name: "status", type: "enum", enumValues: ["pending", "confirmed", "completed", "cancelled"] },
+        { name: "notes", type: "string" },
       ]),
       model("Availability", "Availability", [
-        { name: "weekday", type: "number" },
-        { name: "startTime", type: "string" },
-        { name: "endTime", type: "string" },
+        { name: "weekday", type: "number", required: true },
+        { name: "startTime", type: "string", required: true },
+        { name: "endTime", type: "string", required: true },
+        { name: "capacity", type: "number" },
+        { name: "staffName", type: "string" },
       ]),
     ],
     roles: [
@@ -257,6 +284,7 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
     ],
     workflows: [
       { name: "Book appointment", trigger: "book", steps: ["select-service", "pick-slot", "confirm", "pay", "notify"], roles: ["customer"] },
+      { name: "Reschedule", trigger: "reschedule", steps: ["request", "confirm-slot", "notify"], roles: ["customer", "employee"] },
     ],
     componentTypes: ["auth", "booking", "forms", "tables", "calendars", "payments", "notifications", "user-profiles", "dashboards"],
     designSystem: baseTokens("#0D9488", "#134E4A", "#F59E0B", "#F0FDFA", "#042F2E", "#FFFFFF"),
@@ -264,8 +292,8 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
   },
   {
     id: "crm",
-    label: "CRM App",
-    description: "Contacts, deals, and sales pipelines",
+    label: "Contacts & Sales Pipeline",
+    description: "Contacts, deals, companies, and activity tracking",
     industry: "Sales",
     architecture: "crm-pipeline",
     defaultFeatures: ["auth", "dashboard", "contacts", "deals", "pipeline", "search", "roles"],
@@ -276,7 +304,7 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
       screen("Deals", "/deals", "Deal board", ["pipeline", "kanban", "filters"], ["Deal"], ["admin", "manager", "employee"], 3),
       screen("Companies", "/companies", "Accounts", ["table", "form"], ["Company"], ["admin", "manager"], 4),
       screen("Activities", "/activities", "Tasks and calls", ["table", "form", "notifications"], ["Activity"], ["admin", "manager", "employee"], 5),
-      screen("Settings", "/settings", "CRM settings", ["form", "roles-panel"], ["Settings"], ["admin"], 6),
+      screen("Settings", "/settings", "CRM settings", ["form", "roles-panel"], [], ["admin"], 6),
     ],
     navigation: [
       { label: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
@@ -292,21 +320,28 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
         { name: "email", type: "string" },
         { name: "phone", type: "string" },
         { name: "companyId", type: "relation", relationTo: "Company" },
+        { name: "ownerEmail", type: "string" },
       ]),
       model("Deal", "Deal", [
         { name: "title", type: "string", required: true },
         { name: "value", type: "money" },
         { name: "stage", type: "enum", enumValues: ["lead", "qualified", "proposal", "won", "lost"] },
         { name: "contactId", type: "relation", relationTo: "Contact" },
+        { name: "priority", type: "enum", enumValues: ["low", "medium", "high"] },
       ]),
       model("Company", "Company", [
         { name: "name", type: "string", required: true },
         { name: "industry", type: "string" },
+        { name: "website", type: "string" },
+        { name: "size", type: "string" },
+        { name: "city", type: "string" },
       ]),
       model("Activity", "Activity", [
         { name: "type", type: "enum", enumValues: ["call", "email", "meeting", "task"] },
+        { name: "subject", type: "string", required: true },
         { name: "dueAt", type: "date" },
         { name: "done", type: "boolean", defaultValue: false },
+        { name: "dealId", type: "relation", relationTo: "Deal" },
       ]),
     ],
     roles: [
@@ -316,6 +351,7 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
     ],
     workflows: [
       { name: "Deal progression", trigger: "stage-change", steps: ["update-stage", "log-activity", "notify-manager"], roles: ["employee", "manager"] },
+      { name: "New contact intake", trigger: "contact-create", steps: ["create-contact", "assign-owner", "schedule-follow-up"], roles: ["employee", "manager"] },
     ],
     componentTypes: ["auth", "dashboards", "tables", "forms", "search", "filters", "charts", "notifications", "user-profiles"],
     designSystem: baseTokens("#4F46E5", "#1E1B4B", "#22D3EE", "#EEF2FF", "#0F172A", "#FFFFFF"),
@@ -323,8 +359,8 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
   },
   {
     id: "erp",
-    label: "ERP App",
-    description: "Modular finance, HR, and operations planning",
+    label: "Business Operations Suite",
+    description: "Finance, HR, inventory modules, and cross-module reporting",
     industry: "Enterprise",
     architecture: "erp-modules",
     defaultFeatures: ["auth", "dashboard", "modules", "reports", "roles", "audit-log"],
@@ -335,7 +371,7 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
       screen("HR", "/hr", "Employees and leave", ["table", "form"], ["Employee", "Leave"], ["admin", "manager"], 3),
       screen("Inventory", "/inventory", "Stock modules", ["table", "filters"], ["StockItem"], ["admin", "manager", "employee"], 4),
       screen("Reports", "/reports", "Operational reports", ["chart", "table", "export"], ["Report"], ["admin", "manager"], 5),
-      screen("Admin", "/admin", "Roles and audit", ["roles-panel", "audit-log", "form"], ["User", "AuditLog"], ["admin"], 6),
+      screen("Admin", "/admin", "Roles and audit", ["roles-panel", "audit-log", "form"], ["Staff", "AuditLog"], ["admin"], 6),
     ],
     navigation: [
       { label: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
@@ -348,18 +384,51 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
     dataModels: [
       model("Invoice", "Invoice", [
         { name: "number", type: "string", required: true, unique: true },
+        { name: "customerName", type: "string", required: true },
         { name: "amount", type: "money", required: true },
         { name: "status", type: "enum", enumValues: ["draft", "sent", "paid", "overdue"] },
       ]),
+      model("Expense", "Expense", [
+        { name: "name", type: "string", required: true },
+        { name: "amount", type: "money", required: true },
+        { name: "category", type: "string" },
+        { name: "spentAt", type: "date" },
+      ]),
       model("Employee", "Employee", [
         { name: "name", type: "string", required: true },
+        { name: "email", type: "string", required: true },
         { name: "department", type: "string" },
-        { name: "role", type: "string" },
+        { name: "title", type: "string" },
+      ]),
+      model("Leave", "Leave", [
+        { name: "employeeId", type: "relation", relationTo: "Employee", required: true },
+        { name: "startsAt", type: "date", required: true },
+        { name: "endsAt", type: "date", required: true },
+        { name: "status", type: "enum", enumValues: ["pending", "approved", "rejected"] },
       ]),
       model("StockItem", "Stock Item", [
         { name: "sku", type: "string", required: true, unique: true },
+        { name: "name", type: "string", required: true },
         { name: "quantity", type: "number" },
         { name: "reorderLevel", type: "number" },
+      ]),
+      model("Report", "Report", [
+        { name: "name", type: "string", required: true },
+        { name: "period", type: "string", required: true },
+        { name: "status", type: "enum", enumValues: ["draft", "ready", "archived"] },
+        { name: "summary", type: "string" },
+      ]),
+      model("Staff", "Staff", [
+        { name: "name", type: "string", required: true },
+        { name: "email", type: "string", required: true },
+        { name: "role", type: "enum", enumValues: ["admin", "manager", "employee"] },
+        { name: "active", type: "boolean", defaultValue: true },
+      ]),
+      model("AuditLog", "Audit Log", [
+        { name: "action", type: "string", required: true },
+        { name: "actorEmail", type: "string", required: true },
+        { name: "entity", type: "string" },
+        { name: "createdAt", type: "date" },
       ]),
     ],
     roles: [
@@ -369,6 +438,7 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
     ],
     workflows: [
       { name: "Invoice approval", trigger: "invoice-submit", steps: ["create", "review", "approve", "send"], roles: ["manager", "admin"] },
+      { name: "Leave request", trigger: "leave-submit", steps: ["request", "manager-review", "approve", "notify-hr"], roles: ["employee", "manager"] },
     ],
     componentTypes: ["auth", "dashboards", "tables", "forms", "charts", "notifications", "roles", "search", "filters"],
     designSystem: baseTokens("#0F766E", "#134E4A", "#FBBF24", "#F0FDFA", "#042F2E", "#FFFFFF"),
@@ -376,8 +446,8 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
   },
   {
     id: "inventory",
-    label: "Inventory App",
-    description: "Stock, warehouses, suppliers, and reorder alerts",
+    label: "Stock & Warehouse Control",
+    description: "SKU catalog, warehouses, suppliers, and reorder alerts",
     industry: "Logistics",
     architecture: "dashboard-sidebar",
     defaultFeatures: ["auth", "products", "stock", "suppliers", "orders", "alerts"],
@@ -407,16 +477,27 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
       ]),
       model("Warehouse", "Warehouse", [
         { name: "name", type: "string", required: true },
+        { name: "code", type: "string", required: true },
         { name: "address", type: "string" },
+        { name: "capacity", type: "number" },
       ]),
       model("Supplier", "Supplier", [
         { name: "name", type: "string", required: true },
         { name: "email", type: "string" },
+        { name: "phone", type: "string" },
+        { name: "leadTimeDays", type: "number" },
       ]),
       model("PurchaseOrder", "Purchase Order", [
         { name: "supplierId", type: "relation", relationTo: "Supplier" },
         { name: "status", type: "enum", enumValues: ["draft", "ordered", "received", "cancelled"] },
         { name: "total", type: "money" },
+        { name: "orderedAt", type: "date" },
+      ]),
+      model("Alert", "Alert", [
+        { name: "name", type: "string", required: true },
+        { name: "sku", type: "string", required: true },
+        { name: "severity", type: "enum", enumValues: ["low", "medium", "high"] },
+        { name: "resolved", type: "boolean", defaultValue: false },
       ]),
     ],
     roles: [
@@ -426,6 +507,7 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
     ],
     workflows: [
       { name: "Reorder", trigger: "low-stock", steps: ["alert", "create-po", "receive", "restock"], roles: ["manager"] },
+      { name: "Stock adjustment", trigger: "stock-count", steps: ["count", "adjust", "audit"], roles: ["employee", "manager"] },
     ],
     componentTypes: ["auth", "products", "tables", "forms", "charts", "notifications", "search", "filters", "maps", "dashboards"],
     designSystem: baseTokens("#EA580C", "#7C2D12", "#2563EB", "#FFF7ED", "#1C1917", "#FFFFFF"),
@@ -433,8 +515,8 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
   },
   {
     id: "saas-dashboard",
-    label: "SaaS Dashboard",
-    description: "Multi-tenant SaaS with billing, teams, and settings",
+    label: "SaaS Admin Console",
+    description: "Team management, billing, API keys, and workspace settings",
     industry: "Software",
     architecture: "multi-tenant-saas",
     defaultFeatures: ["auth", "dashboard", "billing", "teams", "settings", "api", "roles"],
@@ -443,7 +525,7 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
       screen("Dashboard", "/dashboard", "Product analytics", ["kpi-cards", "chart"], ["Metric"], ["admin", "manager", "employee"], 1),
       screen("Team", "/team", "Members and invites", ["table", "form", "user-profiles"], ["Member"], ["admin", "manager"], 2),
       screen("Billing", "/billing", "Plans and invoices", ["pricing-table", "payments", "table"], ["Subscription", "Invoice"], ["admin"], 3),
-      screen("Settings", "/settings", "Workspace settings", ["form", "brand-panel"], ["Settings"], ["admin"], 4),
+      screen("Settings", "/settings", "Workspace settings", ["form", "brand-panel"], [], ["admin"], 4),
       screen("API Keys", "/api-keys", "Developer keys", ["table", "form"], ["ApiKey"], ["admin"], 5),
     ],
     navigation: [
@@ -455,17 +537,34 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
     ],
     dataModels: [
       model("Member", "Member", [
+        { name: "name", type: "string", required: true },
         { name: "email", type: "string", required: true },
         { name: "role", type: "enum", enumValues: ["admin", "manager", "member"] },
+        { name: "status", type: "enum", enumValues: ["invited", "active", "disabled"] },
       ]),
       model("Subscription", "Subscription", [
         { name: "plan", type: "string", required: true },
         { name: "status", type: "enum", enumValues: ["trialing", "active", "past_due", "cancelled"] },
+        { name: "seats", type: "number" },
+        { name: "renewsAt", type: "date" },
+      ]),
+      model("Invoice", "Invoice", [
+        { name: "number", type: "string", required: true },
+        { name: "amount", type: "money", required: true },
+        { name: "status", type: "enum", enumValues: ["open", "paid", "void"] },
+        { name: "issuedAt", type: "date" },
       ]),
       model("ApiKey", "API Key", [
         { name: "name", type: "string", required: true },
         { name: "prefix", type: "string" },
+        { name: "scopes", type: "string" },
         { name: "revoked", type: "boolean", defaultValue: false },
+      ]),
+      model("Metric", "Metric", [
+        { name: "name", type: "string", required: true },
+        { name: "value", type: "number", required: true },
+        { name: "unit", type: "string" },
+        { name: "period", type: "string" },
       ]),
     ],
     roles: [
@@ -475,6 +574,7 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
     ],
     workflows: [
       { name: "Invite member", trigger: "invite", steps: ["send-invite", "accept", "assign-role"], roles: ["admin", "manager"] },
+      { name: "Plan change", trigger: "upgrade", steps: ["select-plan", "invoice", "activate"], roles: ["admin"] },
     ],
     componentTypes: ["auth", "dashboards", "tables", "forms", "charts", "payments", "user-profiles", "notifications"],
     designSystem: baseTokens("#7C3AED", "#2E1065", "#06B6D4", "#FAF5FF", "#0F172A", "#FFFFFF"),
@@ -482,8 +582,8 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
   },
   {
     id: "education",
-    label: "Education App",
-    description: "Courses, lessons, quizzes, and student progress",
+    label: "Courses & Progress Tracking",
+    description: "Courses, lessons, quizzes, and learner progress",
     industry: "Education",
     architecture: "learning-portal",
     defaultFeatures: ["auth", "courses", "lessons", "quizzes", "progress", "certificates"],
@@ -506,6 +606,7 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
         { name: "title", type: "string", required: true },
         { name: "description", type: "string" },
         { name: "price", type: "money" },
+        { name: "level", type: "enum", enumValues: ["beginner", "intermediate", "advanced"] },
       ]),
       model("Lesson", "Lesson", [
         { name: "courseId", type: "relation", relationTo: "Course" },
@@ -513,8 +614,15 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
         { name: "content", type: "string" },
         { name: "order", type: "number" },
       ]),
+      model("Quiz", "Quiz", [
+        { name: "lessonId", type: "relation", relationTo: "Lesson" },
+        { name: "title", type: "string", required: true },
+        { name: "passingScore", type: "number" },
+        { name: "questionCount", type: "number" },
+      ]),
       model("Enrollment", "Enrollment", [
         { name: "courseId", type: "relation", relationTo: "Course" },
+        { name: "learnerEmail", type: "string", required: true },
         { name: "progress", type: "number" },
         { name: "completed", type: "boolean", defaultValue: false },
       ]),
@@ -526,6 +634,7 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
     ],
     workflows: [
       { name: "Complete course", trigger: "lesson-complete", steps: ["update-progress", "quiz", "certificate"], roles: ["student"] },
+      { name: "Publish course", trigger: "course-draft", steps: ["edit", "review", "publish"], roles: ["manager", "admin"] },
     ],
     componentTypes: ["auth", "products", "forms", "tables", "charts", "progress", "search", "filters", "dashboards"],
     designSystem: baseTokens("#1D4ED8", "#1E3A8A", "#F59E0B", "#EFF6FF", "#0F172A", "#FFFFFF"),
@@ -533,8 +642,8 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
   },
   {
     id: "real-estate",
-    label: "Real Estate App",
-    description: "Listings, inquiries, agents, and property maps",
+    label: "Listings & Inquiries",
+    description: "Catalog listings, lead inbox, agents, and property maps",
     industry: "Real Estate",
     architecture: "content-catalog",
     defaultFeatures: ["auth", "listings", "search", "maps", "inquiries", "profiles"],
@@ -543,7 +652,7 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
       screen("Listings", "/listings", "Property catalog", ["product-grid", "search", "filters", "map"], ["Property"], ["guest", "customer", "agent", "admin"], 1, "topnav"),
       screen("Property", "/listings/[id]", "Property detail", ["product-detail", "map", "form"], ["Property", "Inquiry"], ["guest", "customer", "agent"], 2, "topnav"),
       screen("Inquiries", "/inquiries", "Lead inbox", ["table", "filters", "chat"], ["Inquiry"], ["agent", "admin", "manager"], 3),
-      screen("Agents", "/agents", "Agent directory", ["user-profiles", "table"], ["Agent"], ["admin", "manager"], 4),
+      screen("Agents", "/agents", "Agent directory", ["user-profiles", "table"], ["Staff"], ["admin", "manager"], 4),
       screen("Dashboard", "/dashboard", "Listings KPIs", ["kpi-cards", "chart"], ["Property", "Inquiry"], ["admin", "manager", "agent"], 5),
     ],
     navigation: [
@@ -563,8 +672,16 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
       ]),
       model("Inquiry", "Inquiry", [
         { name: "propertyId", type: "relation", relationTo: "Property" },
+        { name: "name", type: "string", required: true },
+        { name: "email", type: "string", required: true },
         { name: "message", type: "string" },
         { name: "status", type: "enum", enumValues: ["new", "contacted", "closed"] },
+      ]),
+      model("Staff", "Staff", [
+        { name: "name", type: "string", required: true },
+        { name: "email", type: "string", required: true },
+        { name: "phone", type: "string" },
+        { name: "active", type: "boolean", defaultValue: true },
       ]),
     ],
     roles: [
@@ -575,6 +692,7 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
     ],
     workflows: [
       { name: "Inquiry handling", trigger: "new-inquiry", steps: ["notify-agent", "contact", "schedule-viewing", "close"], roles: ["agent"] },
+      { name: "Listing publish", trigger: "listing-draft", steps: ["create", "photos", "publish", "promote"], roles: ["employee", "manager"] },
     ],
     componentTypes: ["auth", "products", "maps", "search", "filters", "forms", "tables", "chat", "user-profiles", "dashboards"],
     designSystem: baseTokens("#0E7490", "#164E63", "#D97706", "#ECFEFF", "#083344", "#FFFFFF"),
@@ -582,8 +700,8 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
   },
   {
     id: "automotive",
-    label: "Automotive App",
-    description: "Vehicle inventory, leads, and service bookings",
+    label: "Vehicle Catalog & Leads",
+    description: "Vehicle inventory, sales leads, and service bookings",
     industry: "Automotive",
     architecture: "content-catalog",
     defaultFeatures: ["auth", "inventory", "leads", "bookings", "search", "filters"],
@@ -613,10 +731,13 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
       model("Lead", "Lead", [
         { name: "vehicleId", type: "relation", relationTo: "Vehicle" },
         { name: "name", type: "string", required: true },
+        { name: "email", type: "string" },
+        { name: "phone", type: "string" },
         { name: "status", type: "enum", enumValues: ["new", "contacted", "test-drive", "won", "lost"] },
       ]),
       model("ServiceBooking", "Service Booking", [
-        { name: "vehicleInfo", type: "string" },
+        { name: "vehicleInfo", type: "string", required: true },
+        { name: "customerName", type: "string", required: true },
         { name: "startsAt", type: "date", required: true },
         { name: "status", type: "enum", enumValues: ["scheduled", "in-progress", "done"] },
       ]),
@@ -629,6 +750,7 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
     ],
     workflows: [
       { name: "Vehicle lead", trigger: "inquire", steps: ["create-lead", "contact", "test-drive", "close"], roles: ["employee"] },
+      { name: "Service intake", trigger: "service-book", steps: ["schedule", "diagnose", "repair", "close"], roles: ["employee"] },
     ],
     componentTypes: ["auth", "products", "search", "filters", "forms", "tables", "booking", "chat", "dashboards", "charts"],
     designSystem: baseTokens("#DC2626", "#7F1D1D", "#FBBF24", "#FEF2F2", "#1C1917", "#FFFFFF"),
@@ -636,8 +758,8 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
   },
   {
     id: "healthcare",
-    label: "Healthcare App",
-    description: "Patients, appointments, records, and clinic staff",
+    label: "Patients & Appointments",
+    description: "Patient directory, scheduling, records, and staff roles",
     industry: "Healthcare",
     architecture: "booking-calendar",
     defaultFeatures: ["auth", "patients", "appointments", "records", "roles", "notifications"],
@@ -659,18 +781,31 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
     dataModels: [
       model("Patient", "Patient", [
         { name: "name", type: "string", required: true },
+        { name: "email", type: "string" },
         { name: "dob", type: "date" },
         { name: "phone", type: "string" },
+        { name: "bloodType", type: "string" },
       ]),
       model("Appointment", "Appointment", [
         { name: "patientId", type: "relation", relationTo: "Patient" },
         { name: "startsAt", type: "date", required: true },
+        { name: "reason", type: "string" },
         { name: "status", type: "enum", enumValues: ["scheduled", "checked-in", "completed", "cancelled"] },
+        { name: "providerName", type: "string" },
       ]),
       model("Record", "Record", [
         { name: "patientId", type: "relation", relationTo: "Patient" },
+        { name: "title", type: "string", required: true },
         { name: "notes", type: "string" },
         { name: "createdAt", type: "date" },
+        { name: "confidential", type: "boolean", defaultValue: true },
+      ]),
+      model("Staff", "Staff", [
+        { name: "name", type: "string", required: true },
+        { name: "email", type: "string", required: true },
+        { name: "role", type: "enum", enumValues: ["admin", "manager", "employee"] },
+        { name: "specialty", type: "string" },
+        { name: "active", type: "boolean", defaultValue: true },
       ]),
     ],
     roles: [
@@ -681,6 +816,7 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
     ],
     workflows: [
       { name: "Visit", trigger: "appointment", steps: ["book", "check-in", "consult", "record", "follow-up"], roles: ["employee", "customer"] },
+      { name: "Staff onboarding", trigger: "hire", steps: ["create-staff", "assign-role", "activate"], roles: ["admin"] },
     ],
     componentTypes: ["auth", "booking", "tables", "forms", "calendars", "user-profiles", "notifications", "dashboards", "search"],
     designSystem: baseTokens("#059669", "#064E3B", "#0284C7", "#ECFDF5", "#022C22", "#FFFFFF"),
@@ -688,51 +824,64 @@ export const APP_TEMPLATES: AppTemplateDefinition[] = [
   },
   {
     id: "finance",
-    label: "Finance App",
-    description: "Accounts, transactions, budgets, and reporting",
+    label: "Accounts & Transactions",
+    description: "Chart of accounts, ledger, budgets, and financial reports",
     industry: "Finance",
     architecture: "dashboard-sidebar",
     defaultFeatures: ["auth", "accounts", "transactions", "budgets", "reports", "roles"],
     screens: [
       screen("Login", "/login", "Auth", ["auth-form"], [], ["guest"], 0, "auth"),
-      screen("Dashboard", "/dashboard", "Financial overview", ["kpi-cards", "chart"], ["Account", "Transaction"], ["admin", "manager"], 1),
-      screen("Accounts", "/accounts", "Chart of accounts", ["table", "form"], ["Account"], ["admin", "manager"], 2),
+      screen("Dashboard", "/dashboard", "Financial overview", ["kpi-cards", "chart"], ["LedgerAccount", "Transaction"], ["admin", "manager"], 1),
+      screen("Accounts", "/ledger-accounts", "Chart of accounts", ["table", "form"], ["LedgerAccount"], ["admin", "manager"], 2),
       screen("Transactions", "/transactions", "Ledger", ["table", "filters", "form", "search"], ["Transaction"], ["admin", "manager", "employee"], 3),
       screen("Budgets", "/budgets", "Budget planning", ["table", "chart", "form"], ["Budget"], ["admin", "manager"], 4),
       screen("Reports", "/reports", "Financial reports", ["chart", "table", "export"], ["Report"], ["admin", "manager"], 5),
     ],
     navigation: [
       { label: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
-      { label: "Accounts", href: "/accounts", icon: "Wallet" },
+      { label: "Accounts", href: "/ledger-accounts", icon: "Wallet" },
       { label: "Transactions", href: "/transactions", icon: "ArrowLeftRight" },
       { label: "Budgets", href: "/budgets", icon: "PiggyBank" },
       { label: "Reports", href: "/reports", icon: "BarChart3" },
     ],
     dataModels: [
-      model("Account", "Account", [
+      model("LedgerAccount", "Ledger Account", [
         { name: "name", type: "string", required: true },
+        { name: "code", type: "string", required: true },
         { name: "type", type: "enum", enumValues: ["asset", "liability", "equity", "income", "expense"] },
         { name: "balance", type: "money" },
+        { name: "currency", type: "string" },
       ]),
       model("Transaction", "Transaction", [
-        { name: "accountId", type: "relation", relationTo: "Account" },
+        { name: "accountId", type: "relation", relationTo: "LedgerAccount" },
         { name: "amount", type: "money", required: true },
         { name: "date", type: "date", required: true },
         { name: "memo", type: "string" },
+        { name: "reference", type: "string" },
       ]),
       model("Budget", "Budget", [
         { name: "name", type: "string", required: true },
+        { name: "category", type: "string" },
         { name: "limit", type: "money" },
         { name: "spent", type: "money" },
+        { name: "period", type: "string" },
+      ]),
+      model("Report", "Report", [
+        { name: "name", type: "string", required: true },
+        { name: "period", type: "string", required: true },
+        { name: "status", type: "enum", enumValues: ["draft", "ready", "archived"] },
+        { name: "summary", type: "string" },
+        { name: "generatedAt", type: "date" },
       ]),
     ],
     roles: [
       role("Admin", "Finance admin", ["*"], ["*"], "all"),
       role("Manager", "Controller", ["*"], ["approve", "report"], "all"),
-      role("Employee", "Bookkeeper", ["/transactions", "/accounts"], ["create-transaction"], "own"),
+      role("Employee", "Bookkeeper", ["/transactions", "/ledger-accounts"], ["create-transaction"], "own"),
     ],
     workflows: [
       { name: "Expense entry", trigger: "expense", steps: ["create-transaction", "categorize", "approve", "report"], roles: ["employee", "manager"] },
+      { name: "Month close", trigger: "period-end", steps: ["reconcile", "budget-check", "publish-report"], roles: ["manager", "admin"] },
     ],
     componentTypes: ["auth", "dashboards", "tables", "forms", "charts", "search", "filters", "notifications"],
     designSystem: baseTokens("#1E40AF", "#1E3A8A", "#10B981", "#EFF6FF", "#0F172A", "#FFFFFF"),
@@ -786,6 +935,10 @@ export function matchTemplateFromSignals(params: {
     hr: "erp",
     inventory: "inventory",
     "ecommerce-admin": "ecommerce",
+    "real-estate": "real-estate",
+    healthcare: "healthcare",
+    finance: "finance",
+    automotive: "automotive",
   };
   const mapped = params.appType ? typeMap[params.appType] : undefined;
   if (mapped) return getAppTemplate(mapped) ?? APP_TEMPLATES[0]!;

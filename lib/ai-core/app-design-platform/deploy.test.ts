@@ -69,6 +69,8 @@ describe("app builder full trust deploy", () => {
     assert.equal(record.status, "live");
     assert.equal(record.kind, "public-host");
     assert.match(record.url, /\/w\/app\/inventory-ops-33333333/);
+    assert.match(record.message, /interactive preview/i);
+    assert.match(record.message, /not a full Next\.js/i);
   });
 
   it("deploy flags default on", () => {

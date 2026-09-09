@@ -87,6 +87,7 @@ export function hardenTsConfig(content: string): string {
         rootDir?: string;
       };
       include?: unknown;
+      exclude?: string[];
     };
     parsed.compilerOptions = parsed.compilerOptions ?? {};
     parsed.compilerOptions.baseUrl = ".";
@@ -97,6 +98,10 @@ export function hardenTsConfig(content: string): string {
     ) {
       delete parsed.compilerOptions.rootDir;
     }
+    const exclude = new Set(parsed.exclude ?? ["node_modules"]);
+    exclude.add("node_modules");
+    exclude.add("mobile-store");
+    parsed.exclude = [...exclude];
     return `${JSON.stringify(parsed, null, 2)}\n`;
   } catch {
     let next = content.replace(

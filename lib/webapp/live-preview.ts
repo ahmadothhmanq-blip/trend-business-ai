@@ -4,9 +4,10 @@
 
 import {
   buildAppPreviewHtml,
-  extractAppPreviewFromFiles,
+  finalizeLivePreviewHtml,
 } from "@/lib/webapp/build-app-preview";
 import { extractAppModelFromBlueprint } from "@/lib/ai-core/app-design-platform/management";
+import { appPreviewSecurityHeaders } from "@/lib/webapp/sanitize-app-preview-html";
 import type { WebAppGeneration } from "@/types/webapp";
 
 export function resolveAppLivePreviewHtml(
@@ -24,26 +25,19 @@ export function resolveAppLivePreviewHtml(
     appName: generation.app_name,
   });
 
-  const input = {
+  const html = buildAppPreviewHtml({
     model,
     activeScreenPath: options?.screenPath ?? null,
-  };
+  });
 
-  if (blueprint?.files?.length) {
-    return extractAppPreviewFromFiles(blueprint.files, input);
-  }
-
-  return buildAppPreviewHtml(input);
+  return finalizeLivePreviewHtml(html);
 }
 
 export function appLivePreviewResponseHeaders() {
-  return {
-    "Content-Type": "text/html; charset=utf-8",
-    "Cache-Control": "private, no-store",
-    "Content-Security-Policy":
-      "default-src 'none'; style-src 'unsafe-inline'; img-src data: https: blob:; base-uri 'none'; form-action 'none'; frame-ancestors 'self'",
-    "X-Content-Type-Options": "nosniff",
-    "Referrer-Policy": "same-origin",
-    "X-Frame-Options": "SAMEORIGIN",
-  };
+  return appPreviewSecurityHeaders({
+    cacheControl: "private, no-store",
+    referrerPolicy: "same-origin",
+    frameOptions: "SAMEORIGIN",
+    interactive: true,
+  });
 }

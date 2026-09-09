@@ -2,7 +2,11 @@ import type { GeneratedProjectFile } from "@/lib/ai/types";
 import { findAuthContractIssues, findCanonicalSessionContractIssues } from "@/lib/ai/webapp-harden-auth";
 import { findUseClientDirectiveIssues } from "@/lib/ai/webapp-harden-next";
 import { findApiRouteConflictIssues } from "@/lib/ai/webapp-harden-routes";
-import { normalizePath } from "@/lib/ai/webapp-harden-shared";
+import {
+  findMatchingBrace,
+  findMatchingParen,
+  normalizePath,
+} from "@/lib/ai/webapp-harden-shared";
 import {
   extractBadgeVariantBlockBody,
   extractQuotedUnionMembers,
@@ -11,6 +15,58 @@ import {
   projectUsesButtonAsChild,
 } from "@/lib/ai/webapp-harden-ui";
 import ts from "typescript";
+
+export { findMatchingBrace, findMatchingParen };
+
+/**
+ * Only mark sync exported functions async when their body needs await.
+ * Avoids turning helpers like isStaffRole into Promise-returning APIs.
+ */
+export function markExportedFunctionsAsyncWhenBodyMatches(
+  content: string,
+  bodyPattern: RegExp,
+): string {
+  const signatureRe = /export\s+(default\s+)?function\s+(\w+\s*)?\(/g;
+  const replacements: Array<{ start: number; end: number; text: string }> = [];
+
+  for (const match of content.matchAll(signatureRe)) {
+    const openParen = match.index! + match[0].length - 1;
+    const closeParen = findMatchingParen(content, openParen);
+    if (closeParen === -1) continue;
+
+    const afterParams = content.slice(closeParen + 1);
+    const braceOffset = afterParams.search(/\{/);
+    if (braceOffset === -1) continue;
+    // Skip if a semicolon/statement ends the signature before a brace (overload/declare).
+    const between = afterParams.slice(0, braceOffset);
+    if (/;/.test(between)) continue;
+
+    const bodyOpen = closeParen + 1 + braceOffset;
+    const bodyClose = findMatchingBrace(content, bodyOpen);
+    if (bodyClose === -1) continue;
+
+    const body = content.slice(bodyOpen, bodyClose + 1);
+    if (!bodyPattern.test(body)) continue;
+
+    const header = match[0];
+    const asyncHeader = header.replace(
+      /^export\s+(default\s+)?function/,
+      (_full, defaultPart: string | undefined) =>
+        defaultPart ? "export default async function" : "export async function",
+    );
+    replacements.push({
+      start: match.index!,
+      end: match.index! + header.length,
+      text: asyncHeader,
+    });
+  }
+
+  let next = content;
+  for (const entry of replacements.sort((a, b) => b.start - a.start)) {
+    next = `${next.slice(0, entry.start)}${entry.text}${next.slice(entry.end)}`;
+  }
+  return next;
+}
 
 export function hardenAsyncCookies(content: string): string {
   if (!/from\s+['"]next\/headers['"]/.test(content)) return content;
@@ -23,9 +79,10 @@ export function hardenAsyncCookies(content: string): string {
   );
   if (!/\bawait\s+cookies\s*\(\s*\)/.test(next)) return content;
 
-  next = next.replace(/export\s+function\s+/g, "export async function ");
-  next = next.replace(/export\s+default\s+function\s+/g, "export default async function ");
-  return next;
+  return markExportedFunctionsAsyncWhenBodyMatches(
+    next,
+    /\bawait\s+cookies\s*\(\s*\)/,
+  );
 }
 
 export function hardenAsyncHeaders(content: string): string {
@@ -39,23 +96,10 @@ export function hardenAsyncHeaders(content: string): string {
   );
   if (!/\bawait\s+headers\s*\(\s*\)/.test(next)) return content;
 
-  next = next.replace(/export\s+function\s+/g, "export async function ");
-  next = next.replace(/export\s+default\s+function\s+/g, "export default async function ");
-  return next;
-}
-
-export function findMatchingParen(content: string, openIndex: number): number {
-  if (content[openIndex] !== "(") return -1;
-  let depth = 0;
-  for (let i = openIndex; i < content.length; i += 1) {
-    const ch = content[i];
-    if (ch === "(") depth += 1;
-    else if (ch === ")") {
-      depth -= 1;
-      if (depth === 0) return i;
-    }
-  }
-  return -1;
+  return markExportedFunctionsAsyncWhenBodyMatches(
+    next,
+    /\bawait\s+headers\s*\(\s*\)/,
+  );
 }
 
 export function hardenAsyncFunctionReturnTypes(content: string): string {

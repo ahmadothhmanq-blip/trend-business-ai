@@ -144,6 +144,7 @@ export async function POST(request: Request, { params }: Params) {
     const readinessIssues = evaluateDeploymentReadiness(files, {
       requiresAuth: blueprint.settings?.requiresAuth !== "false",
       requiresDatabase: blueprint.settings?.requiresDatabase !== "false",
+      model,
     });
 
     const previewHtml = resolveAppLivePreviewHtml({
@@ -188,7 +189,7 @@ export async function POST(request: Request, { params }: Params) {
           ...record,
           url: publication.planned_public_url || record.url,
           publicPath: publication.public_path,
-          message: `Published at ${publication.public_path}. Full Next.js runtime: download ZIP and host on Node.`,
+          message: `Published interactive preview at ${publication.public_path}. Not a full Next.js + database app — download ZIP to host login/CRUD on Node.`,
         };
       } catch (publishError) {
         record = {

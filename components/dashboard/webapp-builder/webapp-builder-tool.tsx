@@ -26,7 +26,12 @@ import {
   type ProjectHistoryItem,
 } from "@/components/dashboard/builder-shared";
 import { GlsGenerationLanguageSelect } from "@/components/dashboard/language/gls-generation-language-select";
-import { getInitialGlsGenerationLanguage, glsGenerationLanguagePayload } from "@/lib/language-platform/generation/service";
+import {
+  getGlsAvailableGenerationLanguages,
+  getInitialGlsGenerationLanguage,
+  glsGenerationLanguagePayload,
+} from "@/lib/language-platform/generation/service";
+import { normalizeGlsGenerationLanguage } from "@/lib/language-platform/generation/options";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n/client";
 import { useProductT } from "@/lib/i18n/use-scoped-t";
@@ -36,10 +41,18 @@ import {
   WEBAPP_COLOR_STYLES,
   WEBAPP_FEATURE_OPTIONS,
   getWebAppType,
+  getWebappTypeForTemplate,
 } from "@/lib/constants/webapp-builder";
+import { AppTemplatesPanel, resolveTemplateDescription, resolveTemplateLabel, type AppTemplateSummary } from "@/components/dashboard/webapp-builder/app-templates-panel";
+import { AppStudioChat } from "@/components/dashboard/webapp-builder/app-studio-chat";
+import {
+  AppBuilderOnboarding,
+  type OnboardingVerticalId,
+} from "@/components/dashboard/webapp-builder/app-builder-onboarding";
 import { getOnePromptProduct } from "@/lib/constants/one-prompt-products";
 import { useIdeaQueryParam } from "@/lib/hooks/use-idea-query-param";
 import type { WebAppGeneration } from "@/types/webapp";
+import type { StudioChatPlan } from "@/lib/webapp/studio-chat/engine";
 
 type WebAppBuilderToolProps = { initialGenerations?: WebAppGeneration[] };
 
@@ -64,8 +77,15 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
   const onePrompt = getOnePromptProduct("app-builder");
   const [step, setStep] = useState<"type" | "config" | "history" | "generating" | "preview">("type");
   const [selectedType, setSelectedType] = useState("");
+  const [selectedTemplateId, setSelectedTemplateId] = useState("");
+  const [selectedTemplateLabel, setSelectedTemplateLabel] = useState("");
+  const [onboardingVertical, setOnboardingVertical] = useState<OnboardingVerticalId | "">("");
   const [prompt, setPrompt] = useState("");
-  const [language, setLanguage] = useState(() => getInitialGlsGenerationLanguage());
+  const [language, setLanguage] = useState(() => {
+    const initial = normalizeGlsGenerationLanguage(getInitialGlsGenerationLanguage());
+    const supported = getGlsAvailableGenerationLanguages("app-builder");
+    return supported.includes(initial) ? initial : "English";
+  });
   const [designStyle, setDesignStyle] = useState("Modern");
   const [colorStyle, setColorStyle] = useState("Dark Minimal");
   const [features, setFeatures] = useState<string[]>([]);
@@ -105,18 +125,68 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
 
   const handleSelectType = (id: string) => {
     setSelectedType(id);
+    setSelectedTemplateId("");
+    setSelectedTemplateLabel("");
     const def = getWebAppType(id);
     if (def) setFeatures([...def.defaultFeatures]);
+  };
+
+  const handleSelectTemplate = (template: AppTemplateSummary) => {
+    setSelectedTemplateId(template.id);
+    setSelectedTemplateLabel(resolveTemplateLabel(p, template));
+    const appType = getWebappTypeForTemplate(template.id);
+    setSelectedType(appType);
+    setFeatures([...template.defaultFeatures]);
+    if (
+      template.id === "crm" ||
+      template.id === "booking" ||
+      template.id === "ecommerce" ||
+      template.id === "healthcare" ||
+      template.id === "finance"
+    ) {
+      setOnboardingVertical(template.id);
+    }
+    if (!prompt.trim()) {
+      setPrompt(resolveTemplateDescription(p, template));
+    }
+    setStep("config");
+  };
+
+  const handleOnboardingVertical = (vertical: OnboardingVerticalId, templateId: string) => {
+    setOnboardingVertical(vertical);
+    setSelectedTemplateId(templateId);
+    setSelectedTemplateLabel(p(`onboarding.verticals.${vertical}.label`));
+    setSelectedType(getWebappTypeForTemplate(templateId));
+    setStep("config");
+  };
+
+  const clearTemplateSelection = () => {
+    setSelectedTemplateId("");
+    setSelectedTemplateLabel("");
+    setOnboardingVertical("");
   };
 
   const handleGenerate = async (
     mode: "generate" | "regenerate" | "continue" | "retry" = "generate",
     parentGenerationId?: string,
     overridePrompt?: string,
+    overrides?: {
+      appType?: string;
+      templateId?: string;
+      features?: string[];
+      language?: string;
+    },
   ) => {
     const idea = (overridePrompt ?? prompt).trim();
-    let appType = selectedType;
-    let appFeatures = features;
+    let appType = overrides?.appType || selectedType;
+    let appFeatures = overrides?.features?.length ? overrides.features : features;
+    const templateId = overrides?.templateId ?? selectedTemplateId;
+    let genLanguage = language;
+    if (overrides?.language) {
+      const normalized = normalizeGlsGenerationLanguage(overrides.language);
+      const supported = getGlsAvailableGenerationLanguages("app-builder");
+      if (supported.includes(normalized)) genLanguage = normalized;
+    }
     if (!appType) {
       const def = WEBAPP_TYPES[0];
       appType = def.id;
@@ -133,6 +203,12 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
       return;
     }
     if (overridePrompt) setPrompt(overridePrompt);
+    if (overrides?.templateId !== undefined) {
+      setSelectedTemplateId(overrides.templateId || "");
+    }
+    if (overrides?.appType) setSelectedType(overrides.appType);
+    if (overrides?.features?.length) setFeatures(overrides.features);
+    if (genLanguage !== language) setLanguage(genLanguage);
     setStep("generating");
     setProgressEvents([
       "[idea] Understanding your product idea...",
@@ -145,7 +221,8 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
         body: JSON.stringify({
           prompt: idea,
           appType,
-          ...glsGenerationLanguagePayload(language),
+          templateId: templateId || undefined,
+          ...glsGenerationLanguagePayload(genLanguage),
           designStyle,
           colorStyle,
           features: appFeatures,
@@ -166,9 +243,30 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
     void handleGenerate("generate", undefined, idea);
   };
 
+  const handleStudioBuildApproved = (plan: StudioChatPlan, compiledPrompt: string) => {
+    setSelectedTemplateLabel(plan.title);
+    void handleGenerate("generate", undefined, compiledPrompt, {
+      appType: plan.appType || selectedType || WEBAPP_TYPES[0]?.id || "custom",
+      templateId: plan.templateId || "",
+      features: plan.features.length ? plan.features : features,
+      language: plan.language,
+    });
+  };
+
   const loadGenerationConfig = (gen: WebAppGeneration) => {
     setSelectedType(gen.app_type);
-    setLanguage(gen.language || "English");
+    const templateId = gen.blueprint?.appModel?.templateId ?? "";
+    setSelectedTemplateId(templateId);
+    setSelectedTemplateLabel(
+      templateId
+        ? resolveTemplateLabel(p, { id: templateId, label: templateId })
+        : "",
+    );
+    {
+      const next = normalizeGlsGenerationLanguage(gen.language || "English");
+      const supported = getGlsAvailableGenerationLanguages("app-builder");
+      setLanguage(supported.includes(next) ? next : "English");
+    }
     setDesignStyle(gen.design_style);
     setColorStyle(gen.color_style);
     setFeatures(gen.features ?? []);
@@ -218,6 +316,17 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
             </a>
           </Button>
         </div>
+        <AppStudioChat
+          mode="edit"
+          language={language}
+          generationId={previewGen.id}
+          onApplied={({ generation }) => {
+            setPreviewGen(generation);
+            setGenerations((prev) =>
+              prev.map((g) => (g.id === generation.id ? generation : g)),
+            );
+          }}
+        />
         <DashboardCard>
           <DashboardCardHeader>
             <DashboardCardTitle>{p("preview.liveAppPreview")}</DashboardCardTitle>
@@ -230,7 +339,7 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
               title={p("preview.livePreviewIframeTitle")}
               src={`/api/webapp-builder/${previewGen.id}/live-preview`}
               className="h-[560px] w-full max-w-4xl rounded-2xl border border-white/15 bg-black"
-              sandbox="allow-same-origin"
+              sandbox="allow-scripts allow-same-origin allow-forms"
             />
           </DashboardCardContent>
         </DashboardCard>
@@ -260,44 +369,125 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
       </div>
 
       {(step === "type" || step === "config") && (
-        <OnePromptExperience
-          product={onePrompt}
-          value={prompt}
-          onChange={setPrompt}
-          onSubmit={handleOnePrompt}
-          showPipelinePreview={step === "type"}
-          compact={step === "config"}
+        <AppBuilderOnboarding
+          selectedVertical={onboardingVertical}
+          onPickVertical={handleOnboardingVertical}
         />
       )}
 
+      {(step === "type" || step === "config") && (
+        <AppStudioChat
+          mode="build"
+          language={language}
+          seedVertical={onboardingVertical || null}
+          onBuildApproved={handleStudioBuildApproved}
+        />
+      )}
+
+      {(step === "type" || step === "config") && (
+        <details className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+          <summary className="cursor-pointer text-sm font-medium text-white/70">
+            {p("studioChat.quickGenerateOptional")}
+          </summary>
+          <div className="mt-4">
+            <OnePromptExperience
+              product={onePrompt}
+              value={prompt}
+              onChange={setPrompt}
+              onSubmit={handleOnePrompt}
+              showPipelinePreview={step === "type"}
+              compact={step === "config"}
+              aiDescriptionTags
+              language={language}
+              onTagsChange={(tags) => {
+                if (tags.length > 0) setFeatures(tags);
+              }}
+              onInsightChange={(insight) => {
+                if (!insight.appType || selectedTemplateId) return;
+                const label = insight.appType.trim();
+                const match = WEBAPP_TYPES.find(
+                  (def) =>
+                    def.label.toLowerCase() === label.toLowerCase() ||
+                    def.id === label.toLowerCase().replace(/\s+/g, "-"),
+                );
+                if (match) {
+                  setSelectedType(match.id);
+                  return;
+                }
+                const arabicToId: Record<string, string> = {
+                  "إدارة علاقات العملاء": "crm",
+                  "تخطيط موارد المؤسسة": "erp",
+                  "لوحة تحكم": "dashboard",
+                  "برمجيات سحابية": "saas",
+                  "نظام حجوزات": "booking",
+                  "نقطة بيع": "pos",
+                  "نظام تعليم": "lms",
+                  "موارد بشرية": "hr",
+                  "مخزون": "inventory",
+                  "إدارة متجر إلكتروني": "ecommerce-admin",
+                  "تطبيق ويب مخصص": "custom",
+                };
+                const mapped = arabicToId[label];
+                if (mapped) setSelectedType(mapped);
+              }}
+            />
+          </div>
+        </details>
+      )}
+
       {step === "type" && (
-        <DashboardCard>
-          <DashboardCardHeader>
-            <DashboardCardTitle>{p("steps.orChooseAppType")}</DashboardCardTitle>
-            <DashboardCardDescription>
-              {t("products.common.optionalOnePrompt")}
-            </DashboardCardDescription>
-          </DashboardCardHeader>
-          <DashboardCardContent>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {WEBAPP_TYPES.map((def) => <TypeSelectorCard key={def.id} def={def} selected={selectedType === def.id} onSelect={() => handleSelectType(def.id)} />)}
-            </div>
-            {selectedType && (
-              <div className="mt-6 flex justify-end">
-                <Button onClick={() => setStep("config")} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">{p("steps.configureApp")} <ArrowRight className="size-4" /></Button>
+        <>
+          <DashboardCard>
+            <DashboardCardContent className="pt-6">
+              <AppTemplatesPanel
+                selectedId={selectedTemplateId}
+                onSelect={handleSelectTemplate}
+                onClear={clearTemplateSelection}
+              />
+            </DashboardCardContent>
+          </DashboardCard>
+
+          <DashboardCard>
+            <DashboardCardHeader>
+              <DashboardCardTitle>{p("steps.orBrowseTemplates")}</DashboardCardTitle>
+              <DashboardCardDescription>
+                {t("products.common.optionalOnePrompt")}
+              </DashboardCardDescription>
+            </DashboardCardHeader>
+            <DashboardCardContent>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {WEBAPP_TYPES.map((def) => <TypeSelectorCard key={def.id} def={def} selected={selectedType === def.id && !selectedTemplateId} onSelect={() => handleSelectType(def.id)} />)}
               </div>
-            )}
-          </DashboardCardContent>
-        </DashboardCard>
+              {selectedType && !selectedTemplateId && (
+                <div className="mt-6 flex justify-end">
+                  <Button onClick={() => setStep("config")} className="btn-gold gap-2 rounded-xl font-bold text-luxury-black">{p("steps.configureApp")} <ArrowRight className="size-4" /></Button>
+                </div>
+              )}
+            </DashboardCardContent>
+          </DashboardCard>
+        </>
       )}
 
       {step === "config" && (
         <DashboardCard>
           <DashboardCardHeader>
             <div className="flex items-center gap-3">
-              {(() => { const def = getWebAppType(selectedType); const Icon = def?.icon ?? Sparkles; return (<>
+              {(() => {
+                const def = getWebAppType(selectedType);
+                const Icon = def?.icon ?? Sparkles;
+                const title = selectedTemplateLabel
+                  ? selectedTemplateLabel
+                  : p("steps.customApp", { type: def?.label ?? t("products.common.custom") });
+                return (<>
                 <div className="flex size-10 items-center justify-center rounded-xl bg-premium-gold/15 text-premium-gold-light"><Icon className="size-5" /></div>
-                <div><DashboardCardTitle>{p("steps.customApp", { type: def?.label ?? t("products.common.custom") })}</DashboardCardTitle><DashboardCardDescription>{p("steps.configureDescription")}</DashboardCardDescription></div>
+                <div>
+                  <DashboardCardTitle>{title}</DashboardCardTitle>
+                  <DashboardCardDescription>
+                    {selectedTemplateId
+                      ? p("templates.selected", { name: selectedTemplateLabel })
+                      : p("steps.configureDescription")}
+                  </DashboardCardDescription>
+                </div>
               </>); })()}
             </div>
           </DashboardCardHeader>
@@ -330,6 +520,7 @@ export function WebAppBuilderTool({ initialGenerations }: WebAppBuilderToolProps
                   className="rounded-xl border-white/10 text-white/60 hover:border-white/20"
                   onClick={() => {
                     setParentId(null);
+                    clearTemplateSelection();
                     setStep("type");
                   }}
                 >

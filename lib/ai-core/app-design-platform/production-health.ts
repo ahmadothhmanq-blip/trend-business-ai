@@ -20,7 +20,7 @@ export type AppBuilderHealthReport = {
   templates: { count: number };
   components: { count: number };
   aiProvider: { configured: boolean; name: string };
-  livePreview: { endpoint: string };
+  livePreview: { endpoint: string; sanitizer: string; csp: string };
   deployment: { endpoint: string };
 };
 
@@ -82,7 +82,11 @@ export async function buildAppBuilderHealthReport(
     templates: { count: listAppTemplates().length },
     components: { count: APP_COMPONENT_LIBRARY.length },
     aiProvider: { configured: aiConfigured, name: providerName },
-    livePreview: { endpoint: "/api/webapp-builder/[id]/live-preview" },
+    livePreview: {
+      endpoint: "/api/webapp-builder/[id]/live-preview",
+      sanitizer: "sanitizeAppPreviewHtml",
+      csp: "default-src 'none' (no script-src)",
+    },
     deployment: { endpoint: "/api/webapp-builder/[id]/deploy" },
   };
 }

@@ -1,7 +1,9 @@
 /**
  * Production auth scaffolds for App Builder — password hashing + DB sessions.
- * Uses node:crypto scrypt (no extra npm dependency).
+ * Uses node:crypto scrypt (no extra npm dependency) + signed session cookies.
  */
+
+export { buildCanonicalSessionCookieModule } from "@/lib/ai/webapp-session-cookie";
 
 export function buildCanonicalPasswordCryptoModule(): string {
   return `import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
@@ -26,20 +28,36 @@ export function verifyPassword(password: string, stored: string): boolean {
 export function buildCanonicalAuthModule(): string {
   return `import { cookies } from "next/headers";
 import { db } from "@/lib/db";
+import { verifySessionCookie } from "@/lib/session-cookie";
+
+export const STAFF_ROLES = ["admin", "manager", "employee"] as const;
 
 export type Session = {
   sessionId: string;
   userId: string;
   email: string;
+  role: string;
 };
+
+export function isStaffRole(role: string): boolean {
+  return (STAFF_ROLES as readonly string[]).includes(role);
+}
+
+export function requireRole(
+  session: Session | null,
+  allowed: readonly string[],
+): boolean {
+  return Boolean(session && allowed.includes(session.role));
+}
 
 export async function getSession(): Promise<Session | null> {
   const jar = await cookies();
-  const token = jar.get("session")?.value ?? jar.get("app_session")?.value;
-  if (!token) return null;
+  const cookieValue = jar.get("session")?.value ?? jar.get("app_session")?.value;
+  const claims = await verifySessionCookie(cookieValue);
+  if (!claims) return null;
 
   const row = await db.session.findUnique({
-    where: { token },
+    where: { token: claims.sid },
     include: { user: true },
   });
   if (!row) return null;
@@ -47,11 +65,13 @@ export async function getSession(): Promise<Session | null> {
     await db.session.delete({ where: { id: row.id } }).catch(() => null);
     return null;
   }
+  if (row.userId !== claims.userId) return null;
 
   return {
     sessionId: row.token,
     userId: row.userId,
     email: row.user.email,
+    role: row.user.role,
   };
 }
 
@@ -68,6 +88,8 @@ import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { verifyPassword } from "@/lib/password";
+import { signSessionCookie } from "@/lib/session-cookie";
+import { t } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -82,7 +104,7 @@ export async function POST(request: Request) {
 
   if (!parsed.success) {
     return NextResponse.json(
-      { error: "Invalid email or password." },
+      { error: t("auth.invalidCredentials") },
       { status: 400 },
     );
   }
@@ -92,7 +114,7 @@ export async function POST(request: Request) {
   });
   if (!user || !verifyPassword(parsed.data.password, user.passwordHash)) {
     return NextResponse.json(
-      { error: "Invalid email or password." },
+      { error: t("auth.invalidCredentials") },
       { status: 401 },
     );
   }
@@ -107,10 +129,17 @@ export async function POST(request: Request) {
     },
   });
 
+  const cookieValue = await signSessionCookie({
+    token,
+    userId: user.id,
+    role: user.role,
+    expiresAt,
+  });
+
   const jar = await cookies();
   jar.set({
     name: "session",
-    value: token,
+    value: cookieValue,
     httpOnly: true,
     sameSite: "lax",
     path: "/",
@@ -130,6 +159,8 @@ import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
+import { signSessionCookie } from "@/lib/session-cookie";
+import { t } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -144,7 +175,7 @@ export async function POST(request: Request) {
 
   if (!parsed.success) {
     return NextResponse.json(
-      { error: "Invalid email or password (min 8 characters)." },
+      { error: t("auth.invalidSignup") },
       { status: 400 },
     );
   }
@@ -153,15 +184,19 @@ export async function POST(request: Request) {
   const existing = await db.user.findUnique({ where: { email } });
   if (existing) {
     return NextResponse.json(
-      { error: "An account with this email already exists." },
+      { error: t("auth.accountExists") },
       { status: 409 },
     );
   }
+
+  const userCount = await db.user.count();
+  const role = userCount === 0 ? "admin" : "user";
 
   const user = await db.user.create({
     data: {
       email,
       passwordHash: hashPassword(parsed.data.password),
+      role,
     },
   });
 
@@ -175,10 +210,17 @@ export async function POST(request: Request) {
     },
   });
 
+  const cookieValue = await signSessionCookie({
+    token,
+    userId: user.id,
+    role: user.role,
+    expiresAt,
+  });
+
   const jar = await cookies();
   jar.set({
     name: "session",
-    value: token,
+    value: cookieValue,
     httpOnly: true,
     sameSite: "lax",
     path: "/",
@@ -195,17 +237,20 @@ export function buildCanonicalAuthLogoutRoute(): string {
   return `import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { db } from "@/lib/db";
+import { verifySessionCookie } from "@/lib/session-cookie";
 
 export const dynamic = "force-dynamic";
 
 export async function POST() {
   const jar = await cookies();
-  const token = jar.get("session")?.value ?? jar.get("app_session")?.value;
-  if (token) {
-    await db.session.deleteMany({ where: { token } }).catch(() => null);
+  const cookieValue = jar.get("session")?.value ?? jar.get("app_session")?.value;
+  const claims = await verifySessionCookie(cookieValue);
+  if (claims?.sid) {
+    await db.session.deleteMany({ where: { token: claims.sid } }).catch(() => null);
   }
   jar.delete("session");
   jar.delete("app_session");
+  jar.delete("session_role");
   return NextResponse.json({ ok: true }, { status: 200 });
 }
 `;
@@ -218,6 +263,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button, Card, Input, Label } from "@/components/ui";
+import { t } from "@/lib/i18n";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -244,13 +290,13 @@ export default function LoginPage() {
 
       if (!res.ok) {
         const body = await res.json().catch(() => null);
-        setError(body?.error || "Unable to sign in. Please try again.");
+        setError(body?.error || t("auth.unableSignIn"));
         return;
       }
 
       router.push("/dashboard");
     } catch {
-      setError("Unable to reach the server. Please try again.");
+      setError(t("auth.unableReachServerRetry"));
     } finally {
       setPending(false);
     }
@@ -260,13 +306,13 @@ export default function LoginPage() {
     <main className="flex min-h-[60vh] items-center justify-center p-6">
       <Card className="w-full max-w-md space-y-4 p-6">
         <header>
-          <h1 className="text-2xl font-semibold">Sign in</h1>
-          <p className="text-muted-foreground">Access your dashboard and saved records.</p>
+          <h1 className="text-2xl font-semibold">{t("auth.signIn")}</h1>
+          <p className="text-muted-foreground">{t("auth.signInSubtitle")}</p>
         </header>
 
         <form onSubmit={onSubmit} className="space-y-3">
           <div className="space-y-1">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t("common.email")}</Label>
             <Input
               id="email"
               value={email}
@@ -278,7 +324,7 @@ export default function LoginPage() {
           </div>
 
           <div className="space-y-1">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t("common.password")}</Label>
             <Input
               id="password"
               value={password}
@@ -297,14 +343,14 @@ export default function LoginPage() {
           ) : null}
 
           <Button type="submit" className="w-full" disabled={submitDisabled}>
-            {pending ? "Signing in..." : "Continue"}
+            {pending ? t("auth.signingIn") : t("auth.signIn")}
           </Button>
         </form>
 
         <p className="text-sm text-muted-foreground">
-          No account?{" "}
+          {t("auth.noAccount")}{" "}
           <Link href="/signup" className="font-medium text-foreground underline">
-            Create one
+            {t("auth.createOne")}
           </Link>
         </p>
       </Card>
@@ -321,6 +367,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button, Card, Input, Label } from "@/components/ui";
+import { t } from "@/lib/i18n";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -347,13 +394,13 @@ export default function SignupPage() {
 
       if (!res.ok) {
         const body = await res.json().catch(() => null);
-        setError(body?.error || "Unable to create account.");
+        setError(body?.error || t("auth.unableCreateAccount"));
         return;
       }
 
       router.push("/dashboard");
     } catch {
-      setError("Unable to reach the server. Please try again.");
+      setError(t("auth.unableReachServerRetry"));
     } finally {
       setPending(false);
     }
@@ -363,13 +410,13 @@ export default function SignupPage() {
     <main className="flex min-h-[60vh] items-center justify-center p-6">
       <Card className="w-full max-w-md space-y-4 p-6">
         <header>
-          <h1 className="text-2xl font-semibold">Create account</h1>
-          <p className="text-muted-foreground">Register with email and a secure password.</p>
+          <h1 className="text-2xl font-semibold">{t("auth.createAccount")}</h1>
+          <p className="text-muted-foreground">{t("auth.createAccountSubtitle")}</p>
         </header>
 
         <form onSubmit={onSubmit} className="space-y-3">
           <div className="space-y-1">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t("common.email")}</Label>
             <Input
               id="email"
               value={email}
@@ -381,7 +428,7 @@ export default function SignupPage() {
           </div>
 
           <div className="space-y-1">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t("common.password")}</Label>
             <Input
               id="password"
               value={password}
@@ -400,14 +447,14 @@ export default function SignupPage() {
           ) : null}
 
           <Button type="submit" className="w-full" disabled={submitDisabled}>
-            {pending ? "Creating..." : "Create account"}
+            {pending ? t("auth.creating") : t("auth.createAccount")}
           </Button>
         </form>
 
         <p className="text-sm text-muted-foreground">
-          Already registered?{" "}
+          {t("auth.alreadyRegistered")}{" "}
           <Link href="/login" className="font-medium text-foreground underline">
-            Sign in
+            {t("auth.signIn")}
           </Link>
         </p>
       </Card>
@@ -422,6 +469,7 @@ export function buildCanonicalUseAuthHook(): string {
 
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
+import { t } from "@/lib/i18n";
 
 export function useAuth() {
   const router = useRouter();
@@ -439,13 +487,13 @@ export function useAuth() {
       });
       if (!res.ok) {
         const body = (await res.json().catch(() => null)) as { error?: string } | null;
-        setError(body?.error || "Unable to sign in.");
+        setError(body?.error || t("auth.unableSignIn"));
         return false;
       }
       router.push("/dashboard");
       return true;
     } catch {
-      setError("Unable to reach the server.");
+      setError(t("auth.unableReachServer"));
       return false;
     } finally {
       setPending(false);
@@ -463,13 +511,13 @@ export function useAuth() {
       });
       if (!res.ok) {
         const body = (await res.json().catch(() => null)) as { error?: string } | null;
-        setError(body?.error || "Unable to create account.");
+        setError(body?.error || t("auth.unableCreateAccount"));
         return false;
       }
       router.push("/dashboard");
       return true;
     } catch {
-      setError("Unable to reach the server.");
+      setError(t("auth.unableReachServer"));
       return false;
     } finally {
       setPending(false);
@@ -483,7 +531,7 @@ export function useAuth() {
       await fetch("/api/auth/logout", { method: "POST" });
       router.push("/login");
     } catch {
-      setError("Unable to reach the server.");
+      setError(t("auth.unableReachServer"));
     } finally {
       setPending(false);
     }

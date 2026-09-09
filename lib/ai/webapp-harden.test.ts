@@ -133,12 +133,16 @@ const badgeVariants: Record<BadgeVariant, string> = {
 
     const auth = hardened.find((entry) => entry.path === "lib/auth.ts")!.content;
     assert.match(auth, /sessionId:\s*string/);
+    assert.match(auth, /role:\s*string/);
+    assert.match(auth, /export function isStaffRole\(role: string\): boolean/);
+    assert.doesNotMatch(auth, /export async function isStaffRole/);
     assert.doesNotMatch(auth, /user:\s*\{/);
 
     const crypto = hardened.find((entry) => entry.path === "lib/crypto.ts")!.content;
     assert.match(crypto, /function toBufferSource/);
     assert.match(crypto, /toBufferSource\(new TextEncoder\(\)\.encode\(password\)\)/);
     assert.match(crypto, /salt: toBufferSource\(salt\)/);
+    assert.doesNotMatch(crypto, /toBufferSource\(new TextEncoder\(\)\)\.encode/);
 
     const ui = hardened.find((entry) => entry.path === "components/ui.tsx")!.content;
     assert.match(ui, /destructive/);
@@ -335,7 +339,9 @@ export const leaked = paths;
     assert.deepEqual(tsconfig.compilerOptions.paths, { "@/*": ["./*"] });
 
     const middleware = hardened.find((entry) => entry.path === "middleware.ts")!.content;
-    assert.match(middleware, /@\/lib\/auth/);
+    assert.match(middleware, /verifySessionCookie/);
+    assert.match(middleware, /t\("middleware\.forbidden"\)/);
+    assert.doesNotMatch(middleware, /@\/lib\/supabase/);
   });
 
   it("always emits an isolated next.config.ts even when the model omitted one", () => {
@@ -616,9 +622,22 @@ model Product { id String @id name String }
     assert.ok(pkg.devDependencies["@tailwindcss/postcss"]);
 
     const api = hardened.find((entry) => entry.path === "app/api/products/route.ts")!.content;
-    assert.match(api, /Unauthorized/);
+    assert.match(api, /t\("crud\.unauthorized"\)/);
     assert.match(api, /db\.product/);
+    assert.match(api, /isStaffRole/);
+    assert.match(api, /ownerId:\s*session\.userId/);
+    assert.match(api, /t\("crud\.forbidden"\)/);
+    assert.match(api, /\.strict\(\)/);
+    assert.match(api, /safeParse/);
     assert.equal(api.includes("db.user"), false);
+    assert.doesNotMatch(api, /data:\s*body\b/);
+
+    const schema = hardened.find((entry) => entry.path === "prisma/schema.prisma")!.content;
+    assert.match(schema, /model User \{[\s\S]*\brole\b/);
+    assert.match(schema, /model Product \{[\s\S]*\bownerId\b/);
+
+    const middleware = hardened.find((entry) => entry.path === "middleware.ts")!.content;
+    assert.match(middleware, /verifySessionCookie/);
 
     const css = hardened.find((entry) => entry.path === "app/globals.css")!.content;
     assert.match(css, /@import "tailwindcss"/);
@@ -712,11 +731,11 @@ const badgeVariants = cva("base", {
     assert.match(page, /: null\}/);
   });
 
-  it("rewrites session.user to canonical session.sessionId and danger badges to destructive", () => {
+  it("rewrites session.user to canonical session fields and danger badges to destructive", () => {
     const hardened = hardenGeneratedWebApp([
       file(
         "lib/auth.ts",
-        `export type Session = { user: { email: string } };
+        `export type Session = { user: { email: string; role: string } };
 export async function getSession() { return null; }
 `,
       ),
@@ -725,7 +744,7 @@ export async function getSession() { return null; }
         `import { getSession } from "@/lib/auth";
 export default async function Layout() {
   const session = await getSession();
-  return <div>{session.user.email}{session?.user?.id}</div>;
+  return <div>{session.user.email}{session?.user?.id}{session.user.role}</div>;
 }
 `,
       ),
@@ -751,11 +770,17 @@ export function Badge(props: { variant?: BadgeVariant }) { return null; }
 
     const auth = hardened.find((entry) => entry.path === "lib/auth.ts")!.content;
     assert.match(auth, /sessionId:\s*string/);
+    assert.match(auth, /userId:\s*string/);
+    assert.match(auth, /role:\s*string/);
+    assert.match(auth, /isStaffRole/);
     assert.doesNotMatch(auth, /user:\s*\{/);
 
     const layout = hardened.find((entry) => entry.path === "app/dashboard/layout.tsx")!.content;
-    assert.doesNotMatch(layout, /session(?:\?)?\.user/);
-    assert.match(layout, /session\.sessionId/);
+    assert.doesNotMatch(layout, /\bsession(?:\?)?\.user\b/);
+    assert.match(layout, /session\.email/);
+    assert.match(layout, /session\?\.userId/);
+    assert.match(layout, /session\.role/);
+    assert.doesNotMatch(layout, /session\.sessionId/);
 
     const page = hardened.find(
       (entry) => entry.path === "app/dashboard/stock-items/page.tsx",

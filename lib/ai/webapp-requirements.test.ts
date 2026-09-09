@@ -3,12 +3,24 @@ import { describe, it } from "node:test";
 import type { GeneratedProjectFile } from "@/lib/ai/types";
 import type { PlannedFileLike } from "@/lib/ai/validator";
 import {
+  entitySlug,
   mergeWebAppProductionRequirements,
   missingWebAppRequirementPaths,
   validateWebAppProject,
 } from "@/lib/ai/webapp-requirements";
 
 describe("webapp production requirements", () => {
+  it("pluralizes entity slugs correctly", () => {
+    assert.equal(entitySlug("Contact"), "contacts");
+    assert.equal(entitySlug("Company"), "companies");
+    assert.equal(entitySlug("Activity"), "activities");
+    assert.equal(entitySlug("Property"), "properties");
+    assert.equal(entitySlug("Inquiry"), "inquiries");
+    assert.equal(entitySlug("Staff"), "staff");
+    assert.equal(entitySlug("ServiceBooking"), "service-bookings");
+    assert.equal(entitySlug("Quiz"), "quizzes");
+  });
+
   it("requires prisma, auth, and CRUD files instead of host eslintrc", () => {
     const merged = mergeWebAppProductionRequirements(
       [] as PlannedFileLike[],

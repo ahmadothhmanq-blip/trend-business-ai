@@ -6,12 +6,15 @@
  */
 
 import { slugId } from "@/lib/ai-core/app-design-platform/ids";
+import type { StructuredAppModel } from "@/lib/ai-core/app-design-platform/types";
 import type { GeneratedProjectFile } from "@/lib/ai/types";
 import { findWebAppReadinessIssues } from "@/lib/ai/webapp-readiness";
+import { findInteractiveAppPreviewReadinessIssues } from "@/lib/webapp/interactive-preview/readiness";
+import type { RuntimeHostRecord } from "@/lib/webapp/runtime-host";
 
 export type AppDeploymentEnvironment = "preview" | "production";
 
-export type AppDeploymentKind = "live-preview" | "public-host";
+export type AppDeploymentKind = "live-preview" | "public-host" | "self-hosted";
 
 export type AppDeploymentRecord = {
   id: string;
@@ -31,6 +34,8 @@ export type AppDeploymentRecord = {
 export type AppDeploymentState = {
   preview?: AppDeploymentRecord;
   production?: AppDeploymentRecord;
+  /** User-registered full Next.js HTTPS host (ZIP self-host). */
+  runtimeHost?: RuntimeHostRecord | null;
   history: AppDeploymentRecord[];
 };
 
@@ -42,7 +47,14 @@ export function extractDeploymentState(blueprint: {
   deployment?: AppDeploymentState;
   settings?: Record<string, string>;
 }): AppDeploymentState {
-  if (blueprint.deployment?.history) return blueprint.deployment;
+  if (blueprint.deployment) {
+    return {
+      ...emptyDeploymentState(),
+      ...blueprint.deployment,
+      history: blueprint.deployment.history ?? [],
+      runtimeHost: blueprint.deployment.runtimeHost ?? null,
+    };
+  }
   return emptyDeploymentState();
 }
 
@@ -98,12 +110,20 @@ export function slugifyAppName(name: string, generationId: string): string {
 
 export function evaluateDeploymentReadiness(
   files: GeneratedProjectFile[],
-  flags?: { requiresAuth?: boolean; requiresDatabase?: boolean },
+  flags?: {
+    requiresAuth?: boolean;
+    requiresDatabase?: boolean;
+    model?: StructuredAppModel | null;
+  },
 ): string[] {
-  return findWebAppReadinessIssues(files, {
+  const issues = findWebAppReadinessIssues(files, {
     requiresAuth: flags?.requiresAuth ?? true,
     requiresDatabase: flags?.requiresDatabase ?? true,
   });
+  if (flags?.model) {
+    issues.push(...findInteractiveAppPreviewReadinessIssues(flags.model));
+  }
+  return [...new Set(issues)];
 }
 
 export function createDeployment(params: {
@@ -214,7 +234,7 @@ export function createDeployment(params: {
     url: absoluteUrl(params.baseUrl, publicPath),
     publicPath,
     env: params.env ?? {},
-    message: `Published public host at ${publicPath} (${fileCount} files). Download ZIP for a full Next.js Node deploy.`,
+    message: `Published interactive preview host at ${publicPath}. This is not a full Next.js runtime with database login/CRUD — download the ZIP and host on Node for the production app.`,
     readinessIssues: [],
     createdAt: now,
     updatedAt: now,
@@ -231,6 +251,22 @@ export function upsertDeploymentState(
     [record.environment]: record,
     history,
   };
+}
+
+export function setRuntimeHostOnDeploymentState(
+  state: AppDeploymentState,
+  runtimeHost: RuntimeHostRecord | null,
+): AppDeploymentState {
+  return {
+    ...state,
+    runtimeHost,
+  };
+}
+
+export function resolveStoreProductionUrl(state: AppDeploymentState | null | undefined): string | null {
+  const runtime = state?.runtimeHost?.url?.trim();
+  if (runtime) return runtime;
+  return null;
 }
 
 export function updateDeploymentEnv(

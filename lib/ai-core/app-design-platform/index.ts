@@ -13,6 +13,13 @@ export {
 } from "@/lib/ai-core/app-design-platform/templates";
 
 export {
+  TEMPLATE_QUALITY_MIN,
+  auditAppTemplate,
+  auditAllAppTemplates,
+  type TemplateQualityIssue,
+} from "@/lib/ai-core/app-design-platform/template-quality";
+
+export {
   APP_COMPONENT_LIBRARY,
   getAppComponent,
   listComponentsForTemplate,
@@ -81,6 +88,7 @@ export {
 export {
   createDeployment,
   extractDeploymentState,
+  setRuntimeHostOnDeploymentState,
   upsertDeploymentState,
   updateDeploymentEnv,
   buildDeploymentUrl,

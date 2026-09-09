@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { API_ERROR_CODES, apiErrorResponse, apiNotFoundError, apiValidationError } from "@/lib/i18n/api-errors";
 import { requireUser, parseUuidParam, parseJsonBody } from "@/lib/api/helpers";
 import { serverErrorResponse } from "@/lib/api/errors";
+import { hasCompleteWebAppUiTranslationPack } from "@/lib/ai/webapp-i18n";
+import { normalizeGlsGenerationLanguage } from "@/lib/language-platform/generation/options";
 import type { WebAppGeneration, WebAppBlueprint } from "@/types/webapp";
 import {
   extractAppModelFromBlueprint,
@@ -43,6 +45,16 @@ import {
   executeWorkflow,
 } from "@/lib/ai-core/app-design-platform";
 import type { AppAssistantAgentResult } from "@/lib/ai-core/app-design-platform/assistant-agent";
+import {
+  extractDeploymentState,
+  setRuntimeHostOnDeploymentState,
+} from "@/lib/ai-core/app-design-platform/deploy";
+import { getWebAppPublicationByGeneration } from "@/lib/webapp/publish";
+import {
+  probeRuntimeHostUrl,
+  registerRuntimeHost,
+} from "@/lib/webapp/runtime-host";
+import { inspectMobileStorePackaging } from "@/lib/webapp/store-packaging-health";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -128,6 +140,13 @@ export async function GET(_request: Request, { params }: Params) {
     const preview = buildAppPreviewPayload(model, "desktop");
     const editor = createVisualEditorState(model, "desktop");
     const template = listAppTemplates().find((t) => t.id === model.templateId);
+    const publication = await getWebAppPublicationByGeneration({
+      supabase: auth.supabase,
+      userId: auth.user!.id,
+      generationId: parsedId.id,
+    });
+    const deployment = extractDeploymentState(generation.blueprint || {});
+    const runtimeHostUrl = deployment.runtimeHost?.url ?? null;
 
     return NextResponse.json({
       generation,
@@ -141,6 +160,25 @@ export async function GET(_request: Request, { params }: Params) {
       workflows: describeBackendWorkflows(model),
       prismaSketch: toPrismaSchemaSketch(model),
       components: listComponentsForTemplate(model.templateId),
+      deployment,
+      runtimeHost: deployment.runtimeHost ?? null,
+      publication: publication
+        ? {
+            publicPath: publication.public_path,
+            productionUrl: runtimeHostUrl || publication.planned_public_url,
+            previewHostUrl: publication.planned_public_url,
+            status: publication.status,
+            kind: runtimeHostUrl ? "self-hosted" : "interactive-preview-host",
+          }
+        : runtimeHostUrl
+          ? {
+              publicPath: null,
+              productionUrl: runtimeHostUrl,
+              previewHostUrl: null,
+              status: deployment.runtimeHost?.status ?? "registered",
+              kind: "self-hosted",
+            }
+          : null,
       template: template
         ? {
             id: template.id,
@@ -288,6 +326,14 @@ const manageSchema = z.discriminatedUnion("action", [
     action: z.literal("run_workflow"),
     workflowId: z.string().min(1),
   }),
+  z.object({
+    action: z.literal("register_runtime_host"),
+    url: z.string().trim().url().max(500),
+    verify: z.boolean().optional().default(true),
+  }),
+  z.object({
+    action: z.literal("clear_runtime_host"),
+  }),
 ]);
 
 /**
@@ -340,7 +386,15 @@ export async function POST(request: Request, { params }: Params) {
     let blueprintFiles = generation.blueprint?.files ?? [];
 
     switch (action.action) {
-      case "update_settings":
+      case "update_settings": {
+        if (action.language != null && action.language.trim()) {
+          const language = normalizeGlsGenerationLanguage(action.language);
+          if (!hasCompleteWebAppUiTranslationPack(language)) {
+            return apiValidationError(
+              "Select a language with a complete UI translation pack.",
+            );
+          }
+        }
         model = updateAppSettings(model, {
           appName: action.appName,
           tagline: action.tagline,
@@ -351,6 +405,7 @@ export async function POST(request: Request, { params }: Params) {
         syncFiles = true;
         message = "Settings updated.";
         break;
+      }
       case "upsert_catalog":
         model = upsertCatalogItem(model, action.item);
         syncFiles = true;
@@ -493,9 +548,10 @@ export async function POST(request: Request, { params }: Params) {
       case "sync_files": {
         const sync = syncAppModelToFiles(model, blueprintFiles);
         blueprintFiles = sync.files;
+        const packagingNotes = inspectMobileStorePackaging(blueprintFiles);
         persist = true;
         syncFiles = false;
-        message = sync.notes.join(" ");
+        message = [...sync.notes, ...packagingNotes].join(" ");
         break;
       }
       case "provision_backend": {
@@ -519,6 +575,81 @@ export async function POST(request: Request, { params }: Params) {
           execution,
           model,
           intelligence: runAppIntelligence(model),
+        });
+      }
+      case "register_runtime_host": {
+        const probe = action.verify
+          ? await probeRuntimeHostUrl(action.url)
+          : {
+              ok: true,
+              message: "URL registered without live probe.",
+            };
+        let runtimeHost;
+        try {
+          runtimeHost = registerRuntimeHost({
+            url: action.url,
+            probe,
+          });
+        } catch (error) {
+          return apiValidationError(
+            error instanceof Error ? error.message : "Invalid production URL.",
+          );
+        }
+        const deploymentState = setRuntimeHostOnDeploymentState(
+          extractDeploymentState(generation.blueprint || {}),
+          runtimeHost,
+        );
+        const blueprint = {
+          ...(generation.blueprint || {}),
+          files: blueprintFiles,
+          pages: syncPagesFromModel(model),
+          deployment: deploymentState,
+        } as WebAppBlueprint;
+        const withModel = withAppModel(blueprint, model, history) as WebAppBlueprint;
+        withModel.deployment = deploymentState;
+        const registered = await persistBlueprint(
+          auth.supabase,
+          auth.user!.id,
+          parsedId.id,
+          withModel,
+          { app_name: model.settings.appName },
+        );
+        return NextResponse.json({
+          message: probe.ok
+            ? "Production Next.js host registered and reachable."
+            : "Production host saved, but reachability check failed — verify the URL.",
+          generation: registered,
+          model,
+          runtimeHost,
+          deployment: deploymentState,
+        });
+      }
+      case "clear_runtime_host": {
+        const deploymentState = setRuntimeHostOnDeploymentState(
+          extractDeploymentState(generation.blueprint || {}),
+          null,
+        );
+        const blueprint = {
+          ...(generation.blueprint || {}),
+          files: blueprintFiles,
+          pages: syncPagesFromModel(model),
+          deployment: deploymentState,
+        } as WebAppBlueprint;
+        const withModel = withAppModel(blueprint, model, history) as WebAppBlueprint;
+        withModel.deployment = deploymentState;
+        const cleared = await persistBlueprint(
+          auth.supabase,
+          auth.user!.id,
+          parsedId.id,
+          withModel,
+          { app_name: model.settings.appName },
+        );
+        return NextResponse.json({
+          message: "Production host registration cleared.",
+          generation: cleared,
+          model,
+          runtimeHost: null,
+          deployment: deploymentState,
         });
       }
     }

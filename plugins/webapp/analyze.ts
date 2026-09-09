@@ -21,17 +21,51 @@ function normalizeComplexity(
   return "moderate";
 }
 
-function titleCaseAppName(prompt: string, appType: string): string {
+function titleCaseAppName(prompt: string, appType: string, language?: string): string {
   const def = WEBAPP_TYPES.find((t) => t.id === appType);
-  const fromPrompt = prompt
-    .replace(/[^a-zA-Z0-9\s]/g, " ")
+  const cleaned = prompt
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
     .trim()
+    .replace(/\s+/g, " ");
+  if (!cleaned) {
+    return localizedAppTypeFallback(def?.label ?? appType, language);
+  }
+
+  // Arabic / non-Latin: keep a short native title from the prompt.
+  if (!/[A-Za-z]/.test(cleaned)) {
+    const native = cleaned.split(/\s+/).slice(0, 6).join(" ");
+    if (native.length >= 3) return native.slice(0, 48);
+    return localizedAppTypeFallback(def?.label ?? appType, language);
+  }
+
+  const fromPrompt = cleaned
     .split(/\s+/)
     .slice(0, 4)
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
     .join(" ");
   if (fromPrompt.length >= 3) return fromPrompt;
-  return `${def?.label ?? appType} App`;
+  return localizedAppTypeFallback(def?.label ?? appType, language);
+}
+
+function localizedAppTypeFallback(label: string, language?: string): string {
+  const isArabic =
+    /\p{Script=Arabic}/u.test(language ?? "") ||
+    /^(ar|arabic)\b/i.test((language ?? "").trim());
+  if (!isArabic) return `${label} App`;
+  const arabicLabels: Record<string, string> = {
+    CRM: "تطبيق إدارة العملاء",
+    ERP: "تطبيق تخطيط الموارد",
+    Dashboard: "تطبيق لوحة التحكم",
+    SaaS: "تطبيق سحابي",
+    "Booking System": "تطبيق نظام الحجوزات",
+    POS: "تطبيق نقطة البيع",
+    LMS: "تطبيق التعليم",
+    HR: "تطبيق الموارد البشرية",
+    Inventory: "تطبيق المخزون",
+    "E-commerce Admin": "تطبيق إدارة المتجر",
+    "Custom Web App": "تطبيق ويب مخصص",
+  };
+  return arabicLabels[label] ?? `تطبيق ${label}`;
 }
 
 function deriveTablesFromPlanner(input: WebAppPluginInput): string[] {
@@ -85,7 +119,7 @@ export async function analyzeWebApp(
   ];
 
   return {
-    appName: titleCaseAppName(input.prompt, input.appType),
+    appName: titleCaseAppName(input.prompt, input.appType, input.language),
     appType: def?.label ?? input.appType,
     complexity: "moderate",
     pages,

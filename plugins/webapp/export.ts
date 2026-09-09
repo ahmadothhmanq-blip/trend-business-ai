@@ -1,4 +1,5 @@
 import { exportProjectAsZip } from "@/lib/ai/exporter";
+import { mergeMobileStoreIntoProjectFiles } from "@/lib/ai/webapp-mobile-store";
 import type { WebAppOutput } from "@/plugins/webapp/types";
 import type { ExportResult, GenerationContext } from "@/lib/ai/types";
 
@@ -7,5 +8,9 @@ export async function exportWebApp(
   ctx: GenerationContext,
 ): Promise<ExportResult> {
   ctx.progress.emit("Building ZIP...");
-  return exportProjectAsZip(output.files, `${output.title || "webapp"}.zip`);
+  const files = mergeMobileStoreIntoProjectFiles(output.files, {
+    title: output.title || "webapp",
+    primaryColor: output.appModel?.brand?.tokens?.primary,
+  });
+  return exportProjectAsZip(files, `${output.title || "webapp"}.zip`);
 }

@@ -208,6 +208,29 @@ export function getWebAppRequirementGroups(
   return groups;
 }
 
+const IRREGULAR_PLURALS: Record<string, string> = {
+  company: "companies",
+  activity: "activities",
+  category: "categories",
+  property: "properties",
+  inquiry: "inquiries",
+  staff: "staff",
+  person: "people",
+  child: "children",
+  leaf: "leaves",
+  quiz: "quizzes",
+};
+
+function pluralizeToken(token: string): string {
+  if (!token) return token;
+  const irregular = IRREGULAR_PLURALS[token];
+  if (irregular) return irregular;
+  if (/(?:s|x|z|ch|sh)$/.test(token)) return `${token}es`;
+  if (/[^aeiou]y$/.test(token)) return `${token.slice(0, -1)}ies`;
+  if (token.endsWith("s")) return token;
+  return `${token}s`;
+}
+
 export function entitySlug(name: string): string {
   const base = name
     .trim()
@@ -216,7 +239,10 @@ export function entitySlug(name: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9-]/g, "");
   if (!base) return "records";
-  return base.endsWith("s") ? base : `${base}s`;
+  const parts = base.split("-").filter(Boolean);
+  if (parts.length === 0) return "records";
+  parts[parts.length - 1] = pluralizeToken(parts[parts.length - 1]!);
+  return parts.join("-");
 }
 
 export function mergeWebAppProductionRequirements<T extends PlannedFileLike>(

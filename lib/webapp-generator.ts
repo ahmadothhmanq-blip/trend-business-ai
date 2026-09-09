@@ -2,7 +2,7 @@ import { getDefaultTextProvider } from "@/lib/ai/provider-config";
 import { providerManager } from "@/lib/ai/provider-manager";
 import { emptyTokenUsage } from "@/lib/ai/usage";
 import type { TokenUsage } from "@/lib/ai/types";
-import { layerRunner } from "@/lib/ai-core";
+import { layerRunner } from "@/lib/ai-core/layers/runner";
 import {
   createWebappBuilderAdapter,
   webappInputToBrief,

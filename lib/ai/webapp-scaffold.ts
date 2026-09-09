@@ -8,6 +8,7 @@ import {
   buildCanonicalLoginPage,
   buildCanonicalPasswordCryptoModule,
   buildCanonicalSignupPage,
+  buildCanonicalSessionCookieModule,
   buildCanonicalUseAuthHook,
 } from "@/lib/ai/webapp-auth-scaffold";
 import {
@@ -18,6 +19,7 @@ import {
   buildCanonicalProviders,
   buildCanonicalTailwindConfig,
   businessEntityTables,
+  toPrismaModelName,
 } from "@/lib/ai/webapp-domain-scaffold";
 import { ISOLATED_NEXT_CONFIG } from "@/lib/ai/webapp-isolation";
 import { entitySlug } from "@/lib/ai/webapp-requirements";
@@ -29,9 +31,18 @@ import {
   buildCanonicalRootLayout,
 } from "@/lib/ai/webapp-runtime-scaffold";
 import { buildFullCanonicalUiBarrel } from "@/lib/ai/webapp-ui-primitives";
+import { buildWebAppMobileStoreFiles } from "@/lib/ai/webapp-mobile-store";
+import { buildWebAppI18nFiles } from "@/lib/ai/webapp-i18n";
+import {
+  buildCanonicalStaffDashboardPage,
+  buildCanonicalStaffUsersApiRoute,
+} from "@/lib/ai/webapp-staff-scaffold";
+import { applyVerticalScaffolds } from "@/lib/ai/webapp-verticals";
 
 export type WebAppScaffoldOptions = {
   projectName?: string;
+  /** Generation language (GLS). Drives dictionary + RTL for generated UI. */
+  language?: string;
   /** When true, include password-hash + DB session auth. Implies database. */
   requiresAuth?: boolean;
   /** When true, include Prisma client singleton. */
@@ -42,6 +53,8 @@ export type WebAppScaffoldOptions = {
   tables?: string[];
   /** Rich App Design Platform models — drive Prisma field fidelity. */
   dataModels?: AppDataModel[];
+  /** Template id from App Design Platform (enables vertical overlays). */
+  templateId?: string | null;
 };
 
 export { buildCanonicalAuthModule };
@@ -149,7 +162,7 @@ export function buildWebAppScaffold(
             paths: { "@/*": ["./*"] },
           },
           include: ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-          exclude: ["node_modules"],
+          exclude: ["node_modules", "mobile-store"],
         },
         null,
         2,
@@ -247,6 +260,14 @@ npm run lint
 npm run build
 npm start
 \`\`\`
+
+## Mobile stores (Google Play, App Store, and more)
+
+Every export includes a \`mobile-store/\` folder with Capacitor + TWA (Trusted Web Activity) packaging.
+
+1. Deploy this app to a public HTTPS URL.
+2. Open \`mobile-store/README.md\` and follow the Google Play or Apple App Store checklist.
+3. Replace placeholder icons in \`public/icons/\` with 512×512 PNG before store submission.
 `,
     },
     {
@@ -313,6 +334,11 @@ export function cn(...inputs: ClassValue[]) {
         content: buildCanonicalPasswordCryptoModule(),
       },
       {
+        path: "lib/session-cookie.ts",
+        language: "typescript",
+        content: buildCanonicalSessionCookieModule(),
+      },
+      {
         path: "lib/auth.ts",
         language: "typescript",
         content: buildCanonicalAuthModule(),
@@ -352,10 +378,23 @@ export function cn(...inputs: ClassValue[]) {
         language: "tsx",
         content: buildCanonicalSignupPage(),
       },
+      {
+        path: "app/api/admin/users/route.ts",
+        language: "typescript",
+        content: buildCanonicalStaffUsersApiRoute(),
+      },
+      {
+        path: "app/dashboard/admin/staff/page.tsx",
+        language: "tsx",
+        content: buildCanonicalStaffDashboardPage(),
+      },
     );
   }
 
-  const entityTables = businessEntityTables(options.tables ?? []);
+  const entityTables = businessEntityTables([
+    ...(options.tables ?? []),
+    ...(options.dataModels ?? []).map((model) => model.name),
+  ]);
 
   if (needsDatabase) {
     files.push(
@@ -376,16 +415,21 @@ export function cn(...inputs: ClassValue[]) {
 
     for (const table of entityTables) {
       const slug = entitySlug(table);
+      const dataModel = (options.dataModels ?? []).find(
+        (model) =>
+          toPrismaModelName(model.name).toLowerCase() ===
+          toPrismaModelName(table).toLowerCase(),
+      );
       files.push(
         {
           path: `app/api/${slug}/route.ts`,
           language: "typescript",
-          content: buildCanonicalCrudApiRoute(table),
+          content: buildCanonicalCrudApiRoute(table, { dataModel }),
         },
         {
           path: `app/dashboard/${slug}/page.tsx`,
           language: "tsx",
-          content: buildCanonicalEntityDashboardPage(table),
+          content: buildCanonicalEntityDashboardPage(table, { dataModel }),
         },
       );
     }
@@ -408,7 +452,7 @@ export function cn(...inputs: ClassValue[]) {
 
   if (options.requiresDashboard !== false) {
     const entityLinks = entityTables.map((table) => ({
-      label: table,
+      entity: toPrismaModelName(table),
       href: `/dashboard/${entitySlug(table)}`,
     }));
 
@@ -418,6 +462,7 @@ export function cn(...inputs: ClassValue[]) {
       content: buildCanonicalDashboardLayout({
         title,
         entityLinks,
+        includeStaffNav: needsAuth,
       }),
     });
 
@@ -431,7 +476,19 @@ export function cn(...inputs: ClassValue[]) {
     });
   }
 
-  return files;
+  files.push(
+    ...buildWebAppMobileStoreFiles({
+      title,
+      pkgName,
+    }),
+  );
+
+  files.push(...buildWebAppI18nFiles(options.language));
+
+  return applyVerticalScaffolds(files, {
+    templateId: options.templateId,
+    dataModels: options.dataModels,
+  });
 }
 
 /**

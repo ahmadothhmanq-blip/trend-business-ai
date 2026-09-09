@@ -37,6 +37,34 @@ export function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+export function findMatchingParen(content: string, openIndex: number): number {
+  if (content[openIndex] !== "(") return -1;
+  let depth = 0;
+  for (let i = openIndex; i < content.length; i += 1) {
+    const ch = content[i];
+    if (ch === "(") depth += 1;
+    else if (ch === ")") {
+      depth -= 1;
+      if (depth === 0) return i;
+    }
+  }
+  return -1;
+}
+
+export function findMatchingBrace(content: string, openIndex: number): number {
+  if (content[openIndex] !== "{") return -1;
+  let depth = 0;
+  for (let i = openIndex; i < content.length; i += 1) {
+    const ch = content[i];
+    if (ch === "{") depth += 1;
+    else if (ch === "}") {
+      depth -= 1;
+      if (depth === 0) return i;
+    }
+  }
+  return -1;
+}
+
 export function extractStatement(content: string, start: number): string | null {
   let parens = 0;
   let braces = 0;

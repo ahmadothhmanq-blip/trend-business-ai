@@ -1401,6 +1401,15 @@
       "generating": "Generating…",
       "pipelineHint": "AI guides Idea → Strategy → Design → Assets → Generation → Quality → Ready",
       "creationPipeline": "Creation pipeline",
+      "analyzingTags": "Analyzing description",
+      "analyzingInBackground": "Analyzing your idea in the background — you can generate anytime",
+      "tagsHint": "Keep typing — AI will estimate type, industry, complexity, and tags.",
+      "noTagsYet": "No tags found yet — try a clearer product description.",
+      "insightAppType": "App type",
+      "insightIndustry": "Industry",
+      "insightComplexity": "Complexity",
+      "insightBuildTime": "Est. build time",
+      "insightTags": "Tags",
       "progressAria": "Generation progress",
       "publishStatus": {
         "ready": "Ready to publish",
@@ -1468,6 +1477,30 @@
       "backToHome": "Back to home",
       "genericTitle": "Something went wrong",
       "genericDescription": "An unexpected error occurred. Please try again or return to a safe page."
+    },
+    "expandSidebar": "Expand sidebar",
+    "openSidebar": "Open sidebar",
+    "closeSidebar": "Close sidebar",
+    "userMenu": "User menu",
+    "search": {
+      "resultsFor": "Results for \"{query}\"",
+      "emptyHeading": "Search your AI workspace",
+      "hint": "Use the top search field to find generated ideas, market analyses, reports and website/app projects.",
+      "noResults": "No results found",
+      "noResultsHint": "Try a project name, report topic, industry, region or saved asset description.",
+      "industryInRegion": "{industry} in {region}",
+      "marketAnalysisFallback": "Market analysis",
+      "types": {
+        "idea": "Idea",
+        "marketAnalysis": "Market Analysis",
+        "report": "Report",
+        "project": "Project"
+      }
+    },
+    "files": {
+      "emptyTitle": "No files yet",
+      "emptyDescription": "Generated projects and exports will appear here once you create assets.",
+      "generateAsset": "Generate an asset"
     }
   },
   "settings": {
@@ -1588,6 +1621,34 @@
     "videoStudio": {
       "title": "AI Video Production Platform",
       "description": "AI video production and storyboards"
+    },
+    "videoStudioProductAds": {
+      "title": "AI Product Ads",
+      "description": "Create product-focused video ads in Video Studio"
+    },
+    "videoStudioPodcastVideos": {
+      "title": "Podcast Videos",
+      "description": "Create host-led podcast video clips in Video Studio"
+    },
+    "videoStudioNewsVideos": {
+      "title": "News Videos",
+      "description": "Create anchor-led news briefs in Video Studio"
+    },
+    "videoStudioTemplates": {
+      "title": "Templates Library",
+      "description": "Browse and apply production-ready video templates"
+    },
+    "videoStudioBrandKit": {
+      "title": "Brand Kit",
+      "description": "Manage logos, colors, fonts, and brand voice for Video Studio"
+    },
+    "videoStudioStockAssets": {
+      "title": "Stock Assets",
+      "description": "Browse royalty-free images and video clips for Video Studio productions"
+    },
+    "videoStudioPresenterTemplates": {
+      "title": "AI Presenter Templates",
+      "description": "Pre-configured AI presenter setups for product ads, podcasts, and news"
     },
     "contentStudio": {
       "title": "AI Content Studio",
@@ -2434,13 +2495,34 @@
         "ai": {
           "title": "AI website actions",
           "subtitle": "Unified with Website Copilot — streaming, memory, selection context, and review.",
-          "fullModernize": { "label": "Modernize design", "description": "Refresh the overall visual style" },
-          "pageAbout": { "label": "Add About page", "description": "Generate a new About page" },
-          "sectionTestimonials": { "label": "Add testimonials", "description": "Insert a social proof section" },
-          "sectionHero": { "label": "Regenerate hero", "description": "Rewrite the hero for higher conversion" },
-          "contentHome": { "label": "Rewrite homepage copy", "description": "Improve homepage messaging" },
-          "imagesFresh": { "label": "Refresh images", "description": "Replace images with new photography" },
-          "seoImprove": { "label": "Improve SEO", "description": "Apply SEO recommendations" }
+          "fullModernize": {
+            "label": "Modernize design",
+            "description": "Refresh the overall visual style"
+          },
+          "pageAbout": {
+            "label": "Add About page",
+            "description": "Generate a new About page"
+          },
+          "sectionTestimonials": {
+            "label": "Add testimonials",
+            "description": "Insert a social proof section"
+          },
+          "sectionHero": {
+            "label": "Regenerate hero",
+            "description": "Rewrite the hero for higher conversion"
+          },
+          "contentHome": {
+            "label": "Rewrite homepage copy",
+            "description": "Improve homepage messaging"
+          },
+          "imagesFresh": {
+            "label": "Refresh images",
+            "description": "Replace images with new photography"
+          },
+          "seoImprove": {
+            "label": "Improve SEO",
+            "description": "Apply SEO recommendations"
+          }
         },
         "copilot": {
           "title": "Website Copilot",
@@ -2502,12 +2584,30 @@
           "resendFailed": "Resend failed.",
           "loadFailed": "Failed to load team.",
           "capabilities": {
-            "teams": { "label": "Team access", "description": "Invite collaborators to a website generation" },
-            "roles": { "label": "Roles & permissions", "description": "Owner, editor, and viewer access levels" },
-            "marketplace": { "label": "Template marketplace", "description": "Browse and apply premium templates" },
-            "plugins": { "label": "Plugin architecture", "description": "Website plugin pipeline (generate, plan, validate)" },
-            "api": { "label": "Public API", "description": "Design platform, marketplace, and builder APIs" },
-            "white-label": { "label": "White label", "description": "Custom branding via organization settings (foundation)" }
+            "teams": {
+              "label": "Team access",
+              "description": "Invite collaborators to a website generation"
+            },
+            "roles": {
+              "label": "Roles & permissions",
+              "description": "Owner, editor, and viewer access levels"
+            },
+            "marketplace": {
+              "label": "Template marketplace",
+              "description": "Browse and apply premium templates"
+            },
+            "plugins": {
+              "label": "Plugin architecture",
+              "description": "Website plugin pipeline (generate, plan, validate)"
+            },
+            "api": {
+              "label": "Public API",
+              "description": "Design platform, marketplace, and builder APIs"
+            },
+            "white-label": {
+              "label": "White label",
+              "description": "Custom branding via organization settings (foundation)"
+            }
           }
         },
         "media": {
@@ -2520,37 +2620,118 @@
           "loadFailed": "Failed to load media."
         },
         "themes": {
-          "luxuryGold": { "label": "Luxury Gold", "description": "Premium dark with gold accents" },
-          "modernMinimal": { "label": "Modern Minimal", "description": "Clean light SaaS aesthetic" },
-          "boldStartup": { "label": "Bold Startup", "description": "High-contrast conversion-focused" }
+          "luxuryGold": {
+            "label": "Luxury Gold",
+            "description": "Premium dark with gold accents"
+          },
+          "modernMinimal": {
+            "label": "Modern Minimal",
+            "description": "Clean light SaaS aesthetic"
+          },
+          "boldStartup": {
+            "label": "Bold Startup",
+            "description": "High-contrast conversion-focused"
+          }
         },
         "publishingItems": {
-          "quality": { "label": "Quality gates", "description": "Pre-publish quality control passed" },
-          "seo": { "label": "SEO metadata", "description": "Titles, descriptions, and sitemap ready" },
-          "ssl": { "label": "SSL", "description": "HTTPS enabled on publish URL" },
-          "cdn": { "label": "CDN delivery", "description": "Static assets served via platform CDN path" },
-          "backup": { "label": "Backup snapshot", "description": "Server-side blueprint snapshot stored" },
-          "performance": { "label": "Performance", "description": "Core Web Vitals heuristics within targets" },
-          "accessibility": { "label": "Accessibility", "description": "Basic a11y checks on generated markup" }
+          "quality": {
+            "label": "Quality gates",
+            "description": "Pre-publish quality control passed"
+          },
+          "seo": {
+            "label": "SEO metadata",
+            "description": "Titles, descriptions, and sitemap ready"
+          },
+          "ssl": {
+            "label": "SSL",
+            "description": "HTTPS enabled on publish URL"
+          },
+          "cdn": {
+            "label": "CDN delivery",
+            "description": "Static assets served via platform CDN path"
+          },
+          "backup": {
+            "label": "Backup snapshot",
+            "description": "Server-side blueprint snapshot stored"
+          },
+          "performance": {
+            "label": "Performance",
+            "description": "Core Web Vitals heuristics within targets"
+          },
+          "accessibility": {
+            "label": "Accessibility",
+            "description": "Basic a11y checks on generated markup"
+          }
         },
         "features": {
-          "templates": { "label": "Templates", "description": "Apply industry templates and layouts" },
-          "blog": { "label": "Blog & CMS", "description": "Manage posts, categories, and content" },
-          "forms": { "label": "Forms & leads", "description": "Capture leads and contact submissions" },
-          "booking": { "label": "Booking", "description": "Add appointment booking flows" },
-          "portfolio": { "label": "Portfolio", "description": "Showcase projects and case studies" },
-          "pricing": { "label": "Pricing tables", "description": "Display plans and packages" },
-          "testimonials": { "label": "Testimonials", "description": "Social proof and reviews" },
-          "faq": { "label": "FAQ", "description": "Answer common customer questions" },
-          "navigation": { "label": "Navigation", "description": "Edit header and footer links" },
-          "contact": { "label": "Contact", "description": "Contact forms and business details" },
-          "analytics": { "label": "Analytics", "description": "Traffic, engagement, and conversion metrics" },
-          "experiments": { "label": "A/B experiments", "description": "Test headlines, CTAs, and layouts" },
-          "leads": { "label": "Lead collection", "description": "Form submissions and CRM export" },
-          "ecommerce": { "label": "E-commerce catalog", "description": "Products, services, and catalog management" },
-          "membership": { "label": "Membership foundation", "description": "Gated content and member areas (foundation)" },
-          "marketing": { "label": "Marketing tools", "description": "Conversion tracking and campaign hooks" },
-          "crm": { "label": "CRM integration", "description": "Webhook and lead routing integrations" }
+          "templates": {
+            "label": "Templates",
+            "description": "Apply industry templates and layouts"
+          },
+          "blog": {
+            "label": "Blog & CMS",
+            "description": "Manage posts, categories, and content"
+          },
+          "forms": {
+            "label": "Forms & leads",
+            "description": "Capture leads and contact submissions"
+          },
+          "booking": {
+            "label": "Booking",
+            "description": "Add appointment booking flows"
+          },
+          "portfolio": {
+            "label": "Portfolio",
+            "description": "Showcase projects and case studies"
+          },
+          "pricing": {
+            "label": "Pricing tables",
+            "description": "Display plans and packages"
+          },
+          "testimonials": {
+            "label": "Testimonials",
+            "description": "Social proof and reviews"
+          },
+          "faq": {
+            "label": "FAQ",
+            "description": "Answer common customer questions"
+          },
+          "navigation": {
+            "label": "Navigation",
+            "description": "Edit header and footer links"
+          },
+          "contact": {
+            "label": "Contact",
+            "description": "Contact forms and business details"
+          },
+          "analytics": {
+            "label": "Analytics",
+            "description": "Traffic, engagement, and conversion metrics"
+          },
+          "experiments": {
+            "label": "A/B experiments",
+            "description": "Test headlines, CTAs, and layouts"
+          },
+          "leads": {
+            "label": "Lead collection",
+            "description": "Form submissions and CRM export"
+          },
+          "ecommerce": {
+            "label": "E-commerce catalog",
+            "description": "Products, services, and catalog management"
+          },
+          "membership": {
+            "label": "Membership foundation",
+            "description": "Gated content and member areas (foundation)"
+          },
+          "marketing": {
+            "label": "Marketing tools",
+            "description": "Conversion tracking and campaign hooks"
+          },
+          "crm": {
+            "label": "CRM integration",
+            "description": "Webhook and lead routing integrations"
+          }
         }
       },
       "management": {
@@ -2937,6 +3118,83 @@
         "defaultFramework": "Next.js App Router",
         "defaultStyling": "Tailwind CSS",
         "defaultDeploy": "Vercel or Node hosting"
+      },
+      "proWorkspace": {
+        "visual": "Visual",
+        "source": "Source",
+        "saveFile": "Save file",
+        "selectFile": "Select a file",
+        "discardUnsaved": "You have unsaved changes. Discard and switch files?",
+        "fileSaved": "File saved",
+        "saveFailed": "Save failed",
+        "failedToSaveFile": "Failed to save file"
+      },
+      "imageStrategy": {
+        "label": "Image strategy",
+        "withImages": "With AI images",
+        "withoutImages": "No images (typography-first)",
+        "userAddsLater": "I'll add images later"
+      },
+      "visualSkin": {
+        "title": "Visual skin",
+        "description": "Update design tokens only — no full re-generation.",
+        "applying": "Applying…",
+        "applySkin": "Apply skin",
+        "updated": "Visual skin updated",
+        "updateFailed": "Skin update failed",
+        "failedToApply": "Failed to apply skin",
+        "preview": {
+          "live": "live",
+          "start": "Start",
+          "builtForScale": "Built for scale",
+          "glassSurfaces": "Glass surfaces, bento rhythm, cinematic depth.",
+          "studio": "Studio",
+          "work": "Work",
+          "pricing": "Pricing",
+          "faq": "FAQ",
+          "launch": "Launch",
+          "productStory": "Product story",
+          "editorialClarity": "Editorial clarity",
+          "floatingNav": "Floating nav, mesh gradients, conversion rhythm.",
+          "primary": "Primary",
+          "tour": "Tour",
+          "brand": "Brand",
+          "cta": "CTA",
+          "welcome": "Welcome",
+          "buildRemarkable": "Build something remarkable",
+          "clearStory": "Clear story, strong offer, thoughtful design."
+        }
+      },
+      "siteImages": {
+        "dragDrop": "Drag & drop images here, or upload multiple files",
+        "multiUpload": "Multi upload",
+        "validation": "Image validation: {issues}",
+        "issuesDetected": "Issues detected",
+        "loading": "Loading images…",
+        "custom": "Custom",
+        "editTitle": "Edit {slot}",
+        "editImage": "Edit image",
+        "replace": "Replace",
+        "aiGenerate": "AI Generate",
+        "restoreDefault": "Restore default",
+        "cropAspect": "Crop aspect",
+        "cropFree": "Free",
+        "reposition": "Reposition",
+        "positionPlaceholder": "center top",
+        "aiPrompt": "AI prompt",
+        "altText": "Alt text",
+        "operationFailed": "Operation failed",
+        "slots": {
+          "hero": "Hero",
+          "gallery": "Gallery",
+          "about": "About",
+          "features": "Features",
+          "team": "Team",
+          "products": "Products",
+          "testimonials": "Testimonials",
+          "backgrounds": "Backgrounds",
+          "cta": "CTA"
+        }
       }
     },
     "contentStudio": {
@@ -3392,7 +3650,22 @@
           "title": "Brand Studio Kits",
           "defaultTagline": "Brand kit",
           "applyToCanvas": "Apply brand kit to canvas"
-        }
+        },
+        "save": "Save",
+        "png": "PNG",
+        "pdf": "PDF",
+        "project": "Project",
+        "text": "Text",
+        "shape": "Shape",
+        "image": "Image",
+        "icon": "Icon",
+        "logo": "Logo",
+        "brandKit": "Brand Kit",
+        "enhance": "Enhance",
+        "removeBg": "Remove BG",
+        "upscale": "Upscale",
+        "brandKitDefault": "Brand kit",
+        "loadBrandKitsFailed": "Failed to load brand kits"
       },
       "history": {
         "count": "{count} image",
@@ -3523,7 +3796,9 @@
         "searchTemplates": "Search templates…",
         "batchBrief": "Create 20 motivational videos for TikTok...",
         "batchExample": "Example: Create 20 motivational videos about discipline and morning routines",
-        "imageToVideoBrief": "Describe the motion: camera path, product turn, atmosphere. Keep the subject in the uploaded stills."
+        "imageToVideoBrief": "Describe the motion: camera path, product turn, atmosphere. Keep the subject in the uploaded stills.",
+        "brandName": "Brand name",
+        "primaryColor": "Primary color"
       },
       "preview": {
         "noProject": "No video project to preview",
@@ -3567,7 +3842,8 @@
         "enterIdeaVideo": "Enter your idea to generate a video concept.",
         "imageToVideoRequiresImage": "Add at least one source image for Image to Video.",
         "invalidSourceImage": "Use PNG, JPEG, or WebP images under 8 MB.",
-        "tooManySourceImages": "You can attach up to 8 source images."
+        "tooManySourceImages": "You can attach up to 8 source images.",
+        "loadFailed": "Failed to load video management"
       },
       "providerStatus": {
         "title": "Production provider status",
@@ -3604,8 +3880,23 @@
         },
         "tabs": {
           "inspector": "Inspector",
+          "effects": "Effects",
           "audio": "Audio",
-          "text": "Text"
+          "text": "Text",
+          "comments": "Comments",
+          "templates": "Templates"
+        },
+        "templatesPanel": {
+          "browseLibrary": "Browse library",
+          "saveAsTemplate": "Save as template",
+          "loading": "Loading saved templates…",
+          "empty": "No saved templates yet.",
+          "use": "Use",
+          "toasts": {
+            "saved": "Template saved.",
+            "saveFailed": "Could not save template.",
+            "deleteFailed": "Could not delete template."
+          }
         },
         "saveStatus": {
           "saving": "Saving",
@@ -3634,6 +3925,55 @@
           "characters": "Characters",
           "products": "Products",
           "referencesUri": "References (uri)"
+        },
+        "effects": {
+          "selectScene": "Select a scene to apply timeline effects.",
+          "transition": "Transition preset",
+          "colorGrade": "Color grade",
+          "speed": "Playback speed",
+          "visualStyle": "Visual style override",
+          "transitions": {
+            "cut": "Cut",
+            "fade": "Fade",
+            "crossfade": "Crossfade",
+            "wipe": "Wipe",
+            "zoom": "Zoom",
+            "slide": "Slide"
+          },
+          "colorGrades": {
+            "neutral": "Neutral",
+            "cinematic": "Cinematic",
+            "warm": "Warm",
+            "cool": "Cool",
+            "high-contrast": "High Contrast",
+            "muted": "Muted"
+          },
+          "speeds": {
+            "1": "1×",
+            "0_75": "0.75×",
+            "1_25": "1.25×",
+            "1_5": "1.5×"
+          }
+        },
+        "comments": {
+          "title": "Comments",
+          "placeholder": "Leave feedback for this scene or project…",
+          "loading": "Loading comments…",
+          "empty": "No comments yet.",
+          "actions": {
+            "post": "Post comment"
+          },
+          "toasts": {
+            "created": "Comment posted."
+          },
+          "errors": {
+            "loadFailed": "Could not load comments.",
+            "createFailed": "Could not post comment.",
+            "deleteFailed": "Could not delete comment."
+          }
+        },
+        "presence": {
+          "active": "{count} collaborator(s) online"
         },
         "captions": {
           "selectScene": "Select a scene to edit captions.",
@@ -3691,6 +4031,518 @@
           "previous": " · previous {id}",
           "active": " · active {id}",
           "errorSuffix": " · {error}"
+        }
+      },
+      "productAds": {
+        "create": "Create Product Ad",
+        "title": "AI Product Ads",
+        "description": "Configure your product, platform, and presenter mode. The Director plans your storyboard automatically — no prompts required.",
+        "stepTwoTitle": "Choose presenter & environment",
+        "stepTwoDescription": "Select an AI actor and the scene environment for your product ad.",
+        "stepThreeTitle": "Choose commercial style",
+        "stepThreeDescription": "Pick a production-ready template. No prompts required — we configure pacing, voice, music, and structure for you.",
+        "backToStudio": "Back to Video Studio",
+        "stepIndicator": "Step {current} of {total}",
+        "footerNote": "Director plans hook, scenes, dialogue, and CTA. Video rendering is not started yet.",
+        "fields": {
+          "productImages": "Product images",
+          "productImagesHint": "Upload one or more product stills. These reuse the Image-to-Video uploader and will animate in production.",
+          "addImages": "Add images",
+          "productName": "Product name",
+          "brand": "Brand (optional)",
+          "category": "Product category",
+          "language": "Language",
+          "languageHint": "Output language and regional context (GLS / GCRI).",
+          "duration": "Video duration",
+          "platform": "Platform",
+          "presenter": "Presenter"
+        },
+        "placeholders": {
+          "productName": "e.g. Aurora Wireless Earbuds",
+          "brand": "e.g. Aurora Audio"
+        },
+        "categories": {
+          "clothing": "Clothing & apparel",
+          "electronics": "Electronics",
+          "cars": "Automotive",
+          "beauty": "Beauty & cosmetics",
+          "food": "Food & beverage",
+          "other": "Other"
+        },
+        "durations": {
+          "15s": "15 seconds",
+          "30s": "30 seconds",
+          "60s": "60 seconds"
+        },
+        "platforms": {
+          "tiktok": "TikTok",
+          "instagram_reels": "Instagram Reels",
+          "facebook": "Facebook",
+          "youtube_shorts": "YouTube Shorts",
+          "website": "Website"
+        },
+        "presenters": {
+          "ai-presenter": {
+            "title": "AI Presenter",
+            "description": "Human presenter introduces and demonstrates the product.",
+            "unavailable": "Requires HEYGEN_API_KEY. Choose Product Only or configure HeyGen in your environment."
+          },
+          "product-only": {
+            "title": "Product Only",
+            "description": "Cinematic product shots without a spokesperson."
+          }
+        },
+        "actions": {
+          "continue": "Continue",
+          "back": "Back",
+          "saveDraft": "Save configuration",
+          "createStoryboard": "Create storyboard",
+          "generateVideo": "Generate Video",
+          "retryProduction": "Retry production"
+        },
+        "actors": {
+          "choosePresenter": "Choose presenter",
+          "choosePresenterHint": "Pick an AI actor that matches your product category and platform tone.",
+          "chooseEnvironment": "Choose environment",
+          "chooseEnvironmentHint": "Select where the ad is filmed. Options are filtered by the presenter's supported sets.",
+          "chooseEnvironmentLocked": "Select a presenter first to see compatible environments.",
+          "selectActorFirst": "Select a presenter to unlock environments.",
+          "productOnlyHint": "Product-only ads skip the presenter. Choose an environment for your product shots.",
+          "selected": "Selected: {name}",
+          "genders": {
+            "male": "Male",
+            "female": "Female"
+          }
+        },
+        "commercials": {
+          "chooseStyle": "Choose commercial style",
+          "chooseStyleHint": "Templates bundle industry pacing, hooks, voice, music, and CTA patterns — select one to continue.",
+          "allIndustries": "All industries",
+          "selected": "Selected template: {name}"
+        },
+        "talent": {
+          "title": "AI Talent Marketplace",
+          "subtitle": "Browse verified presenters, creators, and hosts. Favorites and recent picks are saved on this device.",
+          "searchPlaceholder": "Search talent by name, style, or tag…",
+          "allCollections": "All collections",
+          "featured": "Featured talent",
+          "recentlyUsed": "Recently used",
+          "results": "All talent",
+          "resultCount": "{count} talent profiles",
+          "noResults": "No talent matches your filters. Try adjusting search or categories.",
+          "loadMore": "Load more",
+          "selected": "Selected talent: {name}",
+          "viewGrid": "Grid view",
+          "viewList": "List view",
+          "badges": {
+            "premium": "Premium",
+            "verified": "Verified",
+            "featured": "Featured"
+          },
+          "filters": {
+            "allGenders": "All genders",
+            "premium": "Premium",
+            "featured": "Featured",
+            "verified": "Verified",
+            "favorites": "Favorites",
+            "genders": {
+              "male": "Male",
+              "female": "Female"
+            }
+          },
+          "actions": {
+            "favorite": "Add to favorites",
+            "unfavorite": "Remove from favorites"
+          }
+        },
+        "toasts": {
+          "draftSaved": "Product ad configuration saved.",
+          "storyboardReady": "Storyboard planned by Director. Open Video Studio to review.",
+          "productionComplete": "Product ad video is ready in the editor."
+        },
+        "production": {
+          "readyTitle": "Storyboard ready",
+          "readyDescription": "Review scenes below, then generate the full product ad video with voice, captions, and composite output.",
+          "generatingTitle": "Generating {title}",
+          "generatingSubtitle": "Routing scenes to providers and assembling your product ad.",
+          "failedTitle": "Production interrupted",
+          "events": {
+            "starting": "Starting product ad production…"
+          }
+        },
+        "errors": {
+          "incomplete": "Add at least one product image and a product name to continue.",
+          "incompleteActor": "Select an environment and a presenter (when using AI presenter).",
+          "incompleteTemplate": "Select a commercial style template to save your configuration.",
+          "planningFailed": "Director could not plan your product ad. Try again or adjust your configuration.",
+          "productionFailed": "Product ad production failed. Retry or resume the render job.",
+          "productionIncomplete": "Production finished without a playable composite. Retry failed clips or run production again."
+        }
+      },
+      "podcastVideos": {
+        "create": "Create Podcast Video",
+        "title": "Podcast Videos",
+        "description": "Plan host-led podcast clips with Director — cold open, segments, and subscribe closer.",
+        "backToStudio": "Back to Video Studio",
+        "stepIndicator": "Step {current} of {total}",
+        "stepOneTitle": "Episode details",
+        "stepOneDescription": "Set your show, episode topic, format, and duration.",
+        "stepTwoTitle": "Host & studio",
+        "stepTwoDescription": "Choose voiceover-only or an AI host with studio environment.",
+        "placeholders": {
+          "showTitle": "e.g. Future of Work Daily",
+          "episodeTitle": "e.g. AI tools for small teams",
+          "topic": "What should this clip cover?"
+        },
+        "formats": {
+          "solo": "Solo host",
+          "interview": "Interview style",
+          "highlights": "Highlights reel"
+        },
+        "durations": {
+          "60s": "60 seconds",
+          "90s": "90 seconds",
+          "120s": "2 minutes",
+          "300s": "5 minutes"
+        },
+        "presenters": {
+          "ai-host": {
+            "title": "AI Host",
+            "description": "On-camera presenter with lip-sync delivery.",
+            "unavailable": "Requires HEYGEN_API_KEY. Choose voiceover-only or configure HeyGen."
+          },
+          "voiceover-only": {
+            "title": "Voiceover only",
+            "description": "Narration with b-roll visuals — no avatar provider required."
+          }
+        },
+        "actions": {
+          "continue": "Continue",
+          "back": "Back",
+          "createStoryboard": "Create storyboard",
+          "generateVideo": "Generate Video",
+          "retryProduction": "Retry production",
+          "refreshStatus": "Refresh status"
+        },
+        "toasts": {
+          "storyboardReady": "Podcast storyboard is ready. Open the editor to review.",
+          "productionComplete": "Podcast video production finished."
+        },
+        "production": {
+          "title": "Generating podcast video",
+          "subtitle": "Rendering scenes and assembling your podcast clip.",
+          "panelTitle": "Generate podcast video",
+          "panelDescription": "Review the storyboard, then start full production.",
+          "starting": "Starting podcast video production…"
+        },
+        "errors": {
+          "incomplete": "Complete all required fields before continuing.",
+          "planningFailed": "Director could not plan your podcast video.",
+          "productionFailed": "Podcast video production failed.",
+          "renderBlocked": "Full render is not available. Configure a video provider first."
+        }
+      },
+      "newsVideos": {
+        "create": "Create News Video",
+        "title": "News Videos",
+        "description": "Plan anchor-led news briefs with headline, context, details, and sign-off.",
+        "backToStudio": "Back to Video Studio",
+        "stepIndicator": "Step {current} of {total}",
+        "stepOneTitle": "Story details",
+        "stepOneDescription": "Enter the headline, summary, category, and format.",
+        "stepTwoTitle": "Anchor & desk",
+        "stepTwoDescription": "Choose voiceover or an AI news anchor with broadcast environment.",
+        "placeholders": {
+          "headline": "e.g. Markets rally after policy announcement",
+          "summary": "Summarize the key facts Director should cover (at least 20 characters)."
+        },
+        "categories": {
+          "politics": "Politics",
+          "business": "Business",
+          "technology": "Technology",
+          "sports": "Sports",
+          "world": "World",
+          "local": "Local",
+          "other": "Other"
+        },
+        "formats": {
+          "breaking": "Breaking news",
+          "daily-brief": "Daily brief",
+          "explainer": "Explainer"
+        },
+        "durations": {
+          "30s": "30 seconds",
+          "60s": "60 seconds",
+          "90s": "90 seconds"
+        },
+        "presenters": {
+          "anchor": {
+            "title": "News anchor",
+            "description": "On-camera anchor delivery with lower-thirds intent.",
+            "unavailable": "Requires HEYGEN_API_KEY. Choose voiceover or configure HeyGen."
+          },
+          "voiceover": {
+            "title": "Voiceover",
+            "description": "Narration with b-roll — no avatar provider required."
+          }
+        },
+        "actions": {
+          "continue": "Continue",
+          "back": "Back",
+          "createStoryboard": "Create storyboard",
+          "generateVideo": "Generate Video",
+          "retryProduction": "Retry production",
+          "refreshStatus": "Refresh status"
+        },
+        "toasts": {
+          "storyboardReady": "News storyboard is ready. Open the editor to review.",
+          "productionComplete": "News video production finished."
+        },
+        "production": {
+          "title": "Generating news video",
+          "subtitle": "Rendering scenes and assembling your news brief.",
+          "panelTitle": "Generate news video",
+          "panelDescription": "Review the storyboard, then start full production.",
+          "starting": "Starting news video production…"
+        },
+        "errors": {
+          "incomplete": "Complete all required fields before continuing.",
+          "planningFailed": "Director could not plan your news video.",
+          "productionFailed": "News video production failed.",
+          "renderBlocked": "Full render is not available. Configure a video provider first."
+        }
+      },
+      "templatesLibrary": {
+        "open": "Templates Library",
+        "title": "Templates Library",
+        "description": "Browse production-ready templates for product ads, podcasts, news, and general video projects.",
+        "backToStudio": "Back to Video Studio",
+        "loading": "Loading templates…",
+        "empty": "No templates match your filters. Try adjusting search or filters.",
+        "premium": "Premium",
+        "stats": {
+          "total": "{count} templates available"
+        },
+        "recent": {
+          "title": "Recently used",
+          "description": "Pick up where you left off with templates you used recently."
+        },
+        "filters": {
+          "title": "Find a template",
+          "description": "Search and filter across commercial and platform templates.",
+          "searchPlaceholder": "Search templates…",
+          "allWorkflows": "All workflows",
+          "allCategories": "All categories",
+          "allIndustries": "All industries",
+          "favorites": "Favorites ({count})"
+        },
+        "workflows": {
+          "product-ads": "Product Ads",
+          "podcast": "Podcast",
+          "news": "News",
+          "generic": "General Video"
+        },
+        "categories": {
+          "all": "All",
+          "product-marketing": "Product Marketing",
+          "podcast": "Podcast",
+          "news": "News",
+          "social": "Social",
+          "explainer": "Explainer",
+          "corporate": "Corporate"
+        },
+        "actions": {
+          "preview": "Preview",
+          "useTemplate": "Use Template",
+          "favorite": "Add to favorites",
+          "unfavorite": "Remove from favorites",
+          "loadMore": "Load more ({shown} of {total})"
+        },
+        "toasts": {
+          "applied": "Template applied — complete the wizard to generate your video."
+        },
+        "errors": {
+          "loadFailed": "Could not load templates."
+        }
+      },
+      "brandKit": {
+        "open": "Brand Kit",
+        "backToStudio": "Back to Video Studio",
+        "title": "Brand Kit",
+        "description": "Manage logos, colors, fonts, intros, outros, watermarks, CTAs, and brand voice for every video workflow.",
+        "loading": "Loading brand kits…",
+        "brands": {
+          "title": "Your brands",
+          "description": "{count} brand kits in this workspace",
+          "empty": "No brand kits yet. Create one to enforce consistent branding across videos."
+        },
+        "editor": {
+          "title": "Edit {name}",
+          "emptyTitle": "Brand editor",
+          "description": "Configure visual identity and voice guidelines used during AI planning and rendering.",
+          "selectBrand": "Select a brand kit from the list or create a new one."
+        },
+        "sections": {
+          "logos": "Logos",
+          "colors": "Colors",
+          "fonts": "Fonts",
+          "media": "Intro, outro & watermark",
+          "voice": "Voice & CTAs"
+        },
+        "fields": {
+          "name": "Brand name",
+          "defaultBrand": "Set as default brand kit",
+          "tagline": "Tagline",
+          "ctaPresets": "CTA presets (comma-separated)",
+          "introUrl": "Intro video URL",
+          "outroUrl": "Outro video URL",
+          "watermarkUrl": "Watermark image URL",
+          "logo": {
+            "primary": "Primary logo URL",
+            "secondary": "Secondary logo URL",
+            "icon": "Icon / monogram URL"
+          },
+          "colors": {
+            "primary": "Primary",
+            "secondary": "Secondary",
+            "accent": "Accent",
+            "background": "Background"
+          },
+          "fonts": {
+            "heading": "Heading font",
+            "body": "Body font"
+          },
+          "watermarkPositions": {
+            "bottom-right": "Bottom right",
+            "bottom-left": "Bottom left",
+            "top-right": "Top right",
+            "top-left": "Top left"
+          }
+        },
+        "actions": {
+          "newBrand": "New brand",
+          "save": "Save changes",
+          "delete": "Delete brand"
+        },
+        "picker": {
+          "title": "Apply Brand Kit",
+          "description": "Enforce logos, colors, fonts, and voice before generation.",
+          "loading": "Loading brand kits…",
+          "none": "No brand kit",
+          "default": "default",
+          "apply": "Apply",
+          "active": "Active: {name}"
+        },
+        "toasts": {
+          "created": "Brand kit created.",
+          "saved": "Brand kit saved.",
+          "deleted": "Brand kit deleted.",
+          "applied": "Brand kit applied — generation will use your brand guidelines."
+        },
+        "errors": {
+          "loadFailed": "Could not load brand kits.",
+          "createFailed": "Could not create brand kit.",
+          "saveFailed": "Could not save brand kit.",
+          "deleteFailed": "Could not delete brand kit."
+        }
+      },
+      "stockAssets": {
+        "open": "Stock Assets",
+        "backToStudio": "Back to Video Studio",
+        "title": "Stock Assets",
+        "description": "Browse royalty-free images and video clips to enrich scenes across every Video Studio workflow.",
+        "loading": "Loading stock assets…",
+        "empty": "No stock assets match your filters.",
+        "featured": "Featured",
+        "stats": {
+          "total": "{count} assets available"
+        },
+        "types": {
+          "image": "Image",
+          "video": "Video"
+        },
+        "categories": {
+          "corporate": "Corporate",
+          "technology": "Technology",
+          "product": "Product",
+          "lifestyle": "Lifestyle",
+          "abstract": "Abstract",
+          "nature": "Nature",
+          "urban": "Urban",
+          "finance": "Finance",
+          "healthcare": "Healthcare"
+        },
+        "filters": {
+          "title": "Find stock assets",
+          "description": "Search curated royalty-free images and clips by type, category, and aspect ratio.",
+          "searchPlaceholder": "Search stock assets…",
+          "allTypes": "All types",
+          "allCategories": "All categories",
+          "allAspectRatios": "All aspect ratios",
+          "favorites": "Favorites ({count})"
+        },
+        "actions": {
+          "copyUrl": "Copy asset URL"
+        },
+        "picker": {
+          "title": "Stock B-Roll",
+          "description": "Select up to {count} stock assets to inject into scene planning.",
+          "searchPlaceholder": "Search stock…",
+          "selectedCount": "{count} selected",
+          "browseAll": "Browse full library",
+          "maxReached": "You can select up to {count} stock assets."
+        },
+        "toasts": {
+          "copied": "Asset URL copied — {title}",
+          "selected": "Stock asset selected — {title}"
+        },
+        "errors": {
+          "loadFailed": "Could not load stock assets."
+        }
+      },
+      "presenterTemplates": {
+        "open": "Presenter Templates",
+        "backToStudio": "Back to Video Studio",
+        "title": "AI Presenter Templates",
+        "description": "Pre-configured presenter, actor, and environment setups for every Video Studio workflow.",
+        "loading": "Loading presenter templates…",
+        "empty": "No presenter templates match your filters.",
+        "featured": "Featured",
+        "stats": {
+          "total": "{count} templates available"
+        },
+        "workflows": {
+          "product-ads": "Product Ads",
+          "podcast": "Podcast",
+          "news": "News",
+          "generic": "General Video"
+        },
+        "styles": {
+          "corporate": "Corporate",
+          "tech": "Technology",
+          "beauty": "Beauty",
+          "luxury": "Luxury",
+          "retail": "Retail",
+          "lifestyle": "Lifestyle",
+          "news": "News",
+          "podcast": "Podcast"
+        },
+        "filters": {
+          "title": "Find a presenter template",
+          "description": "Filter by workflow and presentation style.",
+          "searchPlaceholder": "Search presenter templates…",
+          "allWorkflows": "All workflows",
+          "allStyles": "All styles",
+          "favorites": "Favorites ({count})"
+        },
+        "actions": {
+          "useTemplate": "Use Template"
+        },
+        "toasts": {
+          "applied": "Presenter template applied — complete the wizard to generate."
+        },
+        "errors": {
+          "loadFailed": "Could not load presenter templates."
         }
       },
       "management": {
@@ -3833,6 +4685,9 @@
         "countPlural": "{count} videos",
         "emptyNoun": "video projects",
         "emptyItem": "video project"
+      },
+      "aria": {
+        "removeImage": "Remove image"
       }
     },
     "webappBuilder": {
@@ -3923,8 +4778,86 @@
         "customApp": "{type} App",
         "configureDescription": "Describe your app and configure generation options",
         "orChooseAppType": "Or choose an app type",
+        "orBrowseTemplates": "Or pick a quick app type",
         "describeYourApp": "Describe your app",
         "generateWebApp": "Generate Web App"
+      },
+      "templates": {
+        "title": "App templates",
+        "subtitle": "Start from a production-ready architecture — screens, data models, roles, and workflows included.",
+        "searchPlaceholder": "Search templates…",
+        "allIndustries": "All industries",
+        "screens": "{count} screens",
+        "models": "{count} data models",
+        "roles": "{count} roles",
+        "useTemplate": "Use template",
+        "selected": "Selected template: {name}",
+        "clearSelection": "Clear template",
+        "loading": "Loading templates…",
+        "empty": "No templates match your search.",
+        "failedLoad": "Could not load templates.",
+        "flagshipBadge": "Business vertical",
+        "architectures": {
+          "pos-retail": "POS & orders",
+          "marketplace": "Storefront",
+          "booking-calendar": "Scheduling",
+          "crm-pipeline": "Sales pipeline",
+          "erp-modules": "Modular operations",
+          "dashboard-sidebar": "Dashboard app",
+          "multi-tenant-saas": "Multi-tenant SaaS",
+          "learning-portal": "Learning portal",
+          "content-catalog": "Catalog & listings"
+        },
+        "catalog": {
+          "restaurant": {
+            "label": "POS & Order Management",
+            "description": "Menus, live orders, tables, and kitchen workflow"
+          },
+          "ecommerce": {
+            "label": "Online Store & Checkout",
+            "description": "Product catalog, cart, checkout, and order fulfillment"
+          },
+          "booking": {
+            "label": "Appointments & Scheduling",
+            "description": "Calendar, availability, services, and booking flow"
+          },
+          "crm": {
+            "label": "Contacts & Sales Pipeline",
+            "description": "Contacts, deals, companies, and activity tracking"
+          },
+          "erp": {
+            "label": "Business Operations Suite",
+            "description": "Finance, HR, inventory modules, and cross-module reporting"
+          },
+          "inventory": {
+            "label": "Stock & Warehouse Control",
+            "description": "SKU catalog, warehouses, suppliers, and reorder alerts"
+          },
+          "saas-dashboard": {
+            "label": "SaaS Admin Console",
+            "description": "Team management, billing, API keys, and workspace settings"
+          },
+          "education": {
+            "label": "Courses & Progress Tracking",
+            "description": "Courses, lessons, quizzes, and learner progress"
+          },
+          "real-estate": {
+            "label": "Listings & Inquiries",
+            "description": "Catalog listings, lead inbox, agents, and maps"
+          },
+          "automotive": {
+            "label": "Vehicle Catalog & Leads",
+            "description": "Vehicle inventory, sales leads, and service bookings"
+          },
+          "healthcare": {
+            "label": "Patients & Appointments",
+            "description": "Patient directory, scheduling, records, and staff roles"
+          },
+          "finance": {
+            "label": "Accounts & Transactions",
+            "description": "Chart of accounts, ledger, budgets, and financial reports"
+          }
+        }
       },
       "placeholders": {
         "appBrief": "Describe your app — purpose, users, key screens, data model, integrations...",
@@ -3951,7 +4884,7 @@
         "scenes": "scenes",
         "chars": "chars",
         "liveAppPreview": "Live app preview",
-        "liveAppPreviewDescription": "Sandbox runtime from your generated app model",
+        "liveAppPreviewDescription": "Interactive sandbox from your app model (mock auth/CRUD). Not a full Next.js production host — use ZIP export to self-host.",
         "livePreviewIframeTitle": "Generated app live preview",
         "openLivePreview": "Open Live Preview"
       },
@@ -3988,6 +4921,7 @@
           "versions": "Versions",
           "data": "Data Model",
           "deploy": "Deploy",
+          "stores": "App Stores",
           "content": "Content",
           "livePreview": "Live Preview",
           "visualEditor": "Visual Editor"
@@ -4029,7 +4963,7 @@
         "saveName": "Save name",
         "applyBrandColors": "Apply brand colors",
         "liveAppPreview": "Live app preview",
-        "liveAppPreviewDescription": "Sandbox runtime from generated files + structured app model",
+        "liveAppPreviewDescription": "Interactive sandbox from your app model (mock auth/CRUD). Not the hosted Next.js ZIP.",
         "livePreviewTitle": "App live preview",
         "componentLibrary": "Component library",
         "addToSelectedScreen": "Add to selected screen",
@@ -4037,9 +4971,15 @@
         "visualEditorDescription": "Drag to reorder · edit props · syncs to code",
         "applyProperties": "Apply properties",
         "deployment": "Deployment",
-        "deploymentDescription": "One-click preview or production deploy",
-        "deployPreview": "Deploy preview",
-        "deployProduction": "Deploy production",
+        "deploymentDescription": "Preview sandbox or public interactive HTML host — full Next.js + database requires ZIP on Node",
+        "zipPlaybookTitle": "Production deploy (ZIP)",
+        "zipPlaybookIntro": "Platform hosting is an interactive HTML preview only. For a real Next.js + database app:",
+        "zipPlaybookStep1": "Download the project ZIP from this page.",
+        "zipPlaybookStep2": "On your Node host (Vercel, Railway, VPS): npm install → npx prisma db push → npm run db:seed (optional) → npm run build → npm start.",
+        "zipPlaybookStep3": "Point a public HTTPS URL at the app, then register it under Mobile stores if you need Play/App Store packaging.",
+        "zipPlaybookTrust": "We never claim managed Next.js hosting inside the platform.",
+        "deployPreview": "Deploy preview sandbox",
+        "deployProduction": "Publish preview host (/w/app)",
         "provisionBackend": "Provision backend",
         "livePreviewPath": "Live preview:",
         "aiAssistant": "AI App Assistant",
@@ -4057,16 +4997,164 @@
         "customScreenPurpose": "Custom screen",
         "deployFailed": "Deploy failed",
         "deployed": "Deployed",
-        "productionDeployStarted": "Production deploy started",
+        "downloadZip": "Download ZIP",
+        "downloadZipStarted": "ZIP download started",
+        "downloadZipFailed": "Could not download ZIP",
+        "productionDeployStarted": "Interactive preview host published — download ZIP for full Next.js production",
         "assistantPlaceholder": "Try: \"Add payment system\" · \"Create orders dashboard\" · \"Connect database\" · \"Create admin panel\"",
         "manualCheckpoint": "Manual checkpoint",
         "componentTitlePlaceholder": "Component title",
         "primaryColorPlaceholder": "Primary color override",
         "permissionSummary": "{screenCount} screens · {dataAccess} data · {actions}",
+        "mobileStores": {
+          "title": "Mobile stores",
+          "description": "Package for Google Play, Apple App Store, Samsung Galaxy Store, and installable PWA.",
+          "publishTitle": "Publish to Google Play or App Store",
+          "publishDescription": "Guided path to ship {appName} as a mobile app. Trend prepares packaging — you build and upload with your developer account.",
+          "stepDeploy": "Publish a public HTTPS URL (interactive preview host today; use ZIP on Node for full auth/CRUD before store review).",
+          "stepDownload": "Download the project ZIP — includes mobile-store/ with Capacitor + TWA configs.",
+          "stepIcons": "Replace public/icons/ placeholders with 512×512 PNG store icons.",
+          "stepBuild": "Follow mobile-store/GOOGLE_PLAY.md or APPLE_APP_STORE.md to build .aab / iOS archive.",
+          "stepSubmit": "Upload to Play Console or App Store Connect with privacy policy and screenshots.",
+          "googlePlay": "Google Play (Android)",
+          "googlePlayHint": "Trusted Web Activity (TWA) or Capacitor shell → signed .aab bundle.",
+          "appStore": "Apple App Store (iOS)",
+          "appStoreHint": "Capacitor iOS project → archive in Xcode → App Store Connect.",
+          "syncPackaging": "Refresh store packaging files",
+          "folderNote": "Store files live in",
+          "checklistTitle": "Publishing checklist",
+          "checklistProgress": "{done} of {total} steps marked done",
+          "googleCommandsTitle": "Android build commands",
+          "appleCommandsTitle": "iOS build commands",
+          "commandsHint": "Run these after downloading the ZIP, from the project root.",
+          "copyCommands": "Copy commands",
+          "commandsCopied": "Build commands copied",
+          "copyFailed": "Could not copy commands",
+          "guideFiles": "Full checklist in",
+          "openPlayConsole": "Open Play Console",
+          "openAppStoreConnect": "Open App Store Connect",
+          "productionUrlLabel": "Production URL:",
+          "productionUrlMissing": "No store-ready HTTPS URL yet. Download the ZIP, host the full Next.js app on Node, then paste that URL into mobile-store configs.",
+          "productionUrlSuitable": "Store-ready HTTPS host:",
+          "productionUrlNotSuitable": "The platform /w/app/… link is an interactive HTML preview — not a full Next.js app with login/CRUD. Store review will fail if you use it as the app host.",
+          "productionUrlNotSuitableToast": "Mark deploy done only after you host the ZIP on your own HTTPS Node/Vercel URL.",
+          "storeHostRequirement": "Required for stores: download ZIP → deploy Next.js with working /api/auth and CRUD → use that HTTPS URL in TWA/Capacitor.",
+          "previewHostDeployedHint": "Preview host published. For stores, still download ZIP and host the full app yourself.",
+          "downloadRequiredToast": "Download the project ZIP before copying build commands.",
+          "submitBlockedToast": "Complete ZIP download and local build before marking submit done.",
+          "setHostInConfig": "Set your real HTTPS app URL in",
+          "registerHostTitle": "Register your Next.js production host",
+          "registerHostHint": "Download ZIP → deploy on Vercel/Node → paste the HTTPS URL here. Platform does not run customer Next.js apps for you.",
+          "registerHost": "Register & verify",
+          "clearHost": "Clear",
+          "registerHostSuccess": "Production host registered",
+          "registerHostFailed": "Could not register production host",
+          "clearHostSuccess": "Production host cleared",
+          "clearHostFailed": "Could not clear production host",
+          "packagingRefreshed": "Store packaging files refreshed",
+          "packagingHealthTitle": "Packaging health",
+          "openWizard": "Publish to app stores"
+        },
         "devices": {
           "mobile": "Mobile preview",
           "tablet": "Tablet preview",
           "desktop": "Desktop preview"
+        }
+      },
+      "copilot": {
+        "title": "App Copilot",
+        "subtitle": "Natural-language commands for your application",
+        "quickCommands": "Quick commands",
+        "conversation": "Conversation",
+        "commandView": "Command view",
+        "chatView": "Chat view",
+        "emptyThread": "Start a conversation — your session history appears here.",
+        "you": "You",
+        "assistant": "Copilot",
+        "placeholder": "Describe a change to your app…",
+        "runningCommand": "Running command…",
+        "runCommand": "Run command",
+        "undoTitle": "Undo last Copilot change",
+        "costFree": "Free — no credits",
+        "costAi": "AI — 1 credit",
+        "creditSingular": "{count} credit",
+        "errors": {
+          "streamFailed": "App Copilot stream failed.",
+          "streamNoResult": "App Copilot stream ended without a result.",
+          "commandFailed": "App Copilot command failed.",
+          "undoFailed": "App Copilot undo failed.",
+          "notFound": "App not found or no longer available.",
+          "conflict": "The app changed elsewhere. Refresh and try again."
+        },
+        "examples": {
+          "changeColor": {
+            "label": "Change primary color to blue",
+            "command": "Change primary color to blue"
+          },
+          "addProduct": {
+            "label": "Add a new product called Widget",
+            "command": "Add a new product called Widget"
+          },
+          "addDashboard": {
+            "label": "Add a dashboard screen",
+            "command": "Add a dashboard screen"
+          },
+          "addBooking": {
+            "label": "Add booking feature",
+            "command": "Add booking feature"
+          },
+          "redesign": {
+            "label": "Redesign the application",
+            "command": "Redesign the application"
+          }
+        }
+      },
+      "studioChat": {
+        "buildTitle": "App Studio Chat",
+        "buildSubtitle": "Describe your business app, answer a few questions, approve the plan, then build. Keep editing here after generation.",
+        "editTitle": "Edit in chat",
+        "editSubtitle": "Ask for changes in plain language — same chat after your app is built.",
+        "empty": "Your conversation will appear here.",
+        "you": "You",
+        "assistant": "Studio",
+        "buildPlaceholder": "Example: I need a sales CRM for my team to track deals…",
+        "editPlaceholder": "Example: Add a payment status field to orders…",
+        "send": "Send",
+        "sendEdit": "Apply change",
+        "quickGenerateOptional": "Quick generate (optional)",
+        "errors": {
+          "failed": "Studio chat request failed. Please try again."
+        }
+      },
+      "onboarding": {
+        "title": "Build in 60 seconds",
+        "subtitle": "Pick a business vertical, chat the details, preview, then download the production ZIP.",
+        "stepPick": "Choose your vertical",
+        "stepChat": "Answer 2 short questions",
+        "stepPreview": "Try the interactive preview",
+        "stepZip": "Download ZIP & self-host",
+        "pickVertical": "Start with a vertical",
+        "verticals": {
+          "crm": {
+            "label": "Sales CRM",
+            "hint": "Contacts, deals pipeline, activities"
+          },
+          "booking": {
+            "label": "Bookings",
+            "hint": "Appointments, services, customers"
+          },
+          "ecommerce": {
+            "label": "Online store",
+            "hint": "Catalog, cart, order fulfillment"
+          },
+          "healthcare": {
+            "label": "Clinic",
+            "hint": "Patients, visits, records"
+          },
+          "finance": {
+            "label": "Accounting",
+            "hint": "Accounts, ledger, budgets"
+          }
         }
       },
       "history": {
@@ -4872,7 +5960,18 @@
         "savePrompt": "Save Prompt",
         "noPrompts": "No prompts saved yet",
         "noPromptsHint": "Save reusable prompts for your agents",
-        "usedTimes": "Used {count} times"
+        "usedTimes": "Used {count} times",
+        "categories": {
+          "general": "General",
+          "business": "Business",
+          "marketing": "Marketing",
+          "content": "Content",
+          "design": "Design",
+          "development": "Development",
+          "seo": "SEO",
+          "research": "Research",
+          "automation": "Automation"
+        }
       },
       "editor": {
         "titleEdit": "Edit Agent",
@@ -4999,6 +6098,11 @@
         "designStyle": "Design Style",
         "colorStyle": "Color Style",
         "sections": "Sections",
+        "generationSpeed": "Generation speed",
+        "speedFast": "Fast (recommended)",
+        "speedStandard": "Full page",
+        "speedFastHint": "Fewer sections, bundled components — fastest path to preview.",
+        "speedStandardHint": "All selected sections as separate components — richer output.",
         "generateLandingPage": "Generate Landing Page"
       },
       "placeholders": {
@@ -5008,7 +6112,9 @@
       },
       "generating": {
         "title": "Generating your landing page...",
-        "subtitle": "This usually takes 30-90 seconds",
+        "subtitle": "Parallel generation — usually 2–4 minutes",
+        "subtitleFast": "Fast mode — usually 1–3 minutes",
+        "subtitleStandard": "Full page — usually 3–6 minutes",
         "ideaEvent": "[idea] Understanding your business idea...",
         "strategyEvent": "[strategy] Building conversion strategy..."
       },
@@ -5329,7 +6435,11 @@
           "text": "Text"
         },
         "size": "Size",
-        "sizes": { "sm": "Small", "md": "Medium", "lg": "Large" },
+        "sizes": {
+          "sm": "Small",
+          "md": "Medium",
+          "lg": "Large"
+        },
         "width": "Width",
         "widthAuto": "Auto",
         "widthFull": "Full width",
@@ -5571,6 +6681,23 @@
           "lg": "Large",
           "fullscreen": "Full screen",
           "custom": "Custom"
+        }
+      },
+      "iconPicker": {
+        "searchPlaceholder": "Search icons…",
+        "empty": "No icons found",
+        "addFavorite": "Add favorite",
+        "removeFavorite": "Remove favorite",
+        "categories": {
+          "all": "All",
+          "favorites": "Favorites",
+          "recent": "Recent",
+          "arrows": "Arrows",
+          "communication": "Communication",
+          "business": "Business",
+          "social": "Social",
+          "interface": "Interface",
+          "media": "Media"
         }
       }
     },
